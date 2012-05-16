@@ -1,46 +1,8 @@
 package lila.chess
 
-object Eco {
+object EcoDb {
 
-  type Move = String
-
-  case class Opening(code: String, name: String)
-
-  case class Branch(
-      moves: Map[Move, Branch] = Map.empty,
-      opening: Option[Opening] = None) {
-
-    def get(move: Move) = moves get move
-
-    def apply(move: Move) = get(move) getOrElse Branch()
-
-    def add(moves: List[Move], opening: Opening): Branch = moves match {
-      case Nil            ⇒ this
-      case move :: Nil    ⇒ this.updated(move, apply(move) set opening)
-      case move :: others ⇒ this.updated(move, apply(move).add(others, opening))
-    }
-
-    def updated(k: Move, v: Branch) = copy(moves = moves.updated(k, v))
-
-    def set(o: Opening) = copy(opening = Some(o))
-
-    def render(margin: String = ""): String = 
-      margin + toString + "\n" + (moves map {
-        case (m, b) => margin + m + b.render(margin + "  ")
-      } mkString "\n")
-
-    override def toString = opening.fold(o ⇒ o.code + ": " + o.name, "-")
-  }
-
-  def openingOf(pgn: String): Option[Opening] = {
-    def next(branch: Branch, moves: List[Move]): Branch = moves match {
-      case Nil     ⇒ branch
-      case m :: ms ⇒ (branch get m).fold(b ⇒ next(b, ms), branch)
-    }
-    next(tree, pgn.split(' ').toList).opening
-  }
-
-  val tree: Branch = List(
+  def db = List(
     ("A01", "Nimzovich-Larsen Attack", "b3"),
     ("A02", "Bird's Opening", "f4"),
     ("A03", "Bird's Opening", "f4 d5"),
@@ -540,10 +502,5 @@ object Eco {
     ("E97", "King's Indian", "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nc6"),
     ("E98", "King's Indian, Orthodox, Taimanov, 9.Ne1", "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nc6 d5 Ne7 Ne1"),
     ("E99", "King's Indian, Orthodox, Taimanov", "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nc6 d5 Ne7 Ne1 Nd7 10 f3 f5")
-  ).foldLeft(Branch()) {
-      case (tree, (code, name, moves)) ⇒ tree.add(
-        moves.split(' ').toList,
-        Opening(code, name)
-      )
-    }
+  )
 }

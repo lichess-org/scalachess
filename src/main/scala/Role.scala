@@ -5,6 +5,7 @@ import Pos._
 sealed trait Role {
   val forsyth: Char
   lazy val pgn: Char = forsyth.toUpper
+  lazy val name = toString.toLowerCase
   val attacker: Boolean = true
   val projection: Boolean = false
   def dirs: List[Direction]

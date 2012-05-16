@@ -1,4 +1,4 @@
-package lila.chess
+package chess
 package format
 
 case class ParsedPgn(tags: List[Tag], sans: List[San])

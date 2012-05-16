@@ -1,4 +1,4 @@
-package lila.chess
+package chess
 
 sealed abstract class Mode(val id: Int)
 

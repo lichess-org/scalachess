@@ -1,4 +1,4 @@
-package lila.chess
+package chess
 
 case class Piece(color: Color, role: Role) {
 

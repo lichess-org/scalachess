@@ -1,4 +1,4 @@
-package lila.chess
+package chess
 
 case class Situation(board: Board, color: Color) {
 

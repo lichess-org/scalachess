@@ -1,11 +1,9 @@
-package lila
-
-import ornicar.scalalib._
+import ornicar.scalalib
 
 package object chess
-    extends OrnicarValidation
-    with OrnicarCommon
-    with OrnicarNonEmptyLists 
+    extends scalalib.OrnicarValidation
+    with scalalib.OrnicarCommon
+    with scalalib.OrnicarNonEmptyLists 
     with scalaz.NonEmptyLists
     with scalaz.Strings
     with scalaz.Lists

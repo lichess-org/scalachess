@@ -1,4 +1,4 @@
-package lila.chess
+package chess
 
 class Replay private[chess] (val game: Game, val moves: List[Move]) {
 

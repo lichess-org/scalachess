@@ -1,4 +1,4 @@
-package lila.chess
+package chess
 
 import Pos.posAt
 import format.Visual

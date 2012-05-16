@@ -3,19 +3,17 @@ Chess API written in scala with minimal dependencies
 INSTALL
 -------
 
-1. Clone scalachess
+Clone scalachess
 
     git clone git://github.com/ornicar/scalachess
 
-2. Get latest sbt (0.11.3) 
+Get latest sbt (0.11.3) on http://www.scala-sbt.org/download.html
 
-http://www.scala-sbt.org/download.html
-
-3. In scalachess, run
+Start sbt in scalachess directory
 
     sbt
 
-You're in. In the sbt shell, to compile, run
+In the sbt shell, to compile scalachess, run
 
     compile
 

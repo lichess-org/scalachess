@@ -14,6 +14,9 @@ class ForsythTest extends ChessTest {
         "new game" in {
           f >> Game() must_== "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
         }
+        "new game board only" in {
+          f exportBoard Board() must_== "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+        }
         "one move" in {
           Game().playMoveList(moves take 1) must beSuccess.like {
             case g ⇒ f >> g must_== "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"

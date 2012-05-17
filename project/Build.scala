@@ -16,7 +16,7 @@ object ApplicationBuild extends Build with Resolvers with Dependencies {
 
   private val buildSettings = Project.defaultSettings ++ Seq(
     organization := "com.github.ornicar",
-    version := "0.1",
+    version := "1.1",
     scalaVersion := "2.9.1",
     resolvers := Seq(iliaz),
     libraryDependencies := Seq(scalaz, scalalib, hasher),
@@ -24,7 +24,11 @@ object ApplicationBuild extends Build with Resolvers with Dependencies {
     shellPrompt := {
       (state: State) ⇒ "%s> ".format(Project.extract(state).currentProject.id)
     },
-    scalacOptions := Seq("-deprecation", "-unchecked")
+    scalacOptions := Seq("-deprecation", "-unchecked"),
+    publishTo := Some(Resolver.sftp(
+      "iliaz",
+      "scala.iliaz.com"
+    ) as ("scala_iliaz_com", Path.userHome / ".ssh" / "id_rsa"))
   )
 
   lazy val main = Project("scalachess", file("."), settings = buildSettings)

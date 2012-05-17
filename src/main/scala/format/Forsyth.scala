@@ -62,7 +62,7 @@ object Forsyth {
     (pos.y - (pos.x + n - 1) / 8)
   )
 
-  private def exportBoard(board: Board) = {
+  def exportBoard(board: Board): String = {
     {
       for (y ← 8 to 1 by -1) yield {
         (1 to 8).map(board(_, y)).foldLeft(("", 0)) {

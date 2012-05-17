@@ -46,7 +46,7 @@ object EcoDb {
     ("A27", "English, Three Knights System", "c4 e5 Nc3 Nc6 Nf3"),
     ("A28", "English, Four Knights System", "c4 e5 Nc3 Nc6 Nf3 Nf6"),
     ("A29", "English, Four Knights, Kingside Fianchetto", "c4 e5 Nc3 Nc6 Nf3 Nf6 g3"),
-    ("A30", "English, Symmetrical Variation", "c4 c5"), //also, QP pawn game
+    ("A30", "English, Symmetrical Variation", "c4 c5"), //also, QB pawn game
     ("A31", "English, Symmetrical, Benoni Formation", "c4 c5 Nf3 Nf6 d4"),
     ("A32", "English, Symmetrical Variation", "c4 c5 Nf3 Nf6 d4 cxd4 Nxd4 e6"),
     ("A33", "English, Symmetrical Variation", "c4 c5 Nf3 Nf6 d4 cxd4 Nxd4 e6 Nc3 Nc6"),

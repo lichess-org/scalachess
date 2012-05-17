@@ -3,15 +3,29 @@ package chess
 object EcoDb {
 
   def db = List(
-    ("A01", "Nimzovich-Larsen Attack", "b3"),
-    ("A02", "Bird's Opening", "f4"),
-    ("A03", "Bird's Opening", "f4 d5"),
-    ("A04", "Reti Opening", "Nf3"),
-    ("A05", "Reti Opening", "Nf3 Nf6"),
-    ("A06", "Reti Opening", "Nf3 d5"),
-    ("A07", "King's Indian Attack", "Nf3 d5 g3"),
-    ("A08", "King's Indian Attack", "Nf3 d5 g3 c5 Bg2"),
-    ("A09", "Reti Opening", "Nf3 d5 c4"),
+    ("A00", "Benko Opening", "g3"), //1962 Pal Benko, in tournaments against Fischer and Tal
+    ("A00", "Computer Opening", "Nc3"), //1950 to present, frequent chess engine (no book) opening move
+    ("A00", "Sokolsky Opening", "b4"), //1924 and later, "Orangutan Opening" or "Sokolsky Opening"
+    ("A00", "Van 't Kruijs Opening", "e3"), //1878 Maarten van 't Kruijs
+    ("A00", "Mieses Opening", "d3"), //1910 Jacques Mieses
+    ("A00", "Saragossa Opening", "c3"), //1922 tournament requiring this opening in Zaragoza, Spain
+    ("A00", "Anderssen Opening", "a3"), //1858 reverse-Sicilian method against Morphy
+    ("A00", "Clemenz Opening", "h3"), //1873 Hermann Clemenz
+    ("A00", "Ware Opening", "a4"), //1880 Preston Ware, known to play other irregular openings
+    ("A00", "Kadas Opening", "h4"), //1977 Gabor Kadas
+    ("A00", "Durkin Opening", "Na3"), //1955 Robert T. "Na3" Durkin, his favorite signature
+    ("A00", "Amar Opening", "Nh3"), //1930s Charles Amar amateur in Paris
+    ("A00", "Spike Opening", "g4"), //1942 Henri Grob chose this opening name instead of "Grob's Attack"
+    ("A00", "Barnes Opening", "f3"), //1858 Thomas Wilson Barnes, scored 8 wins against Paul Morphy
+    ("A01", "Larsen's Opening", "b3"), //1968-1970 Larsen and Fischer win, also 1.Nf3, 2.b3 Nimzowitsch
+    ("A02", "Bird's Opening", "f4"), //1885 Hereford Times named after Bird, also "Dutch Attack"
+    ("A03", "Bird's Opening", "f4 d5"), //also, a reversed Dutch Defense (1.d4 f5)
+    ("A04", "Zukertort Opening", "Nf3"), //1880s Johannes Zukertort favored transpositions
+    ("A05", "Zukertort Opening", "Nf3 Nf6"),
+    ("A06", "Zukertort Opening", "Nf3 d5"), //also, a reversed Indian Defense (1.d4 Nf6)
+    ("A07", "Barcza System", "Nf3 d5 g3"), //1950s and 1959 Gedeon Barcza v. Fischer
+    ("A08", "Barcza System", "Nf3 d5 g3 c5 Bg2"),
+    ("A09", "Réti System", "Nf3 d5 c4"), //1923 Richard Réti
     ("A10", "English", "c4"),
     ("A11", "English, Caro-Kann Defensive System", "c4 c6"),
     ("A12", "English with b3", "c4 c6 Nf3 d5 b3"),

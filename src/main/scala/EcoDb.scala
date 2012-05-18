@@ -25,7 +25,7 @@ object EcoDb {
     ("A06", "Zukertort Opening", "Nf3 d5"), //also, a reversed Indian Defense (1.d4 Nf6)
     ("A07", "Barcza System", "Nf3 d5 g3"), //1950s and 1959 Gedeon Barcza v. Fischer
     ("A08", "Barcza System", "Nf3 d5 g3 c5 Bg2"),
-    ("A09", "Réti System", "Nf3 d5 c4"), //1923 Richard Réti
+    ("A09", "RÃ©ti System", "Nf3 d5 c4"), //1923 Richard RÃ©ti
     ("A10", "English Opening", "c4"), //1843 Howard Staunton
     ("A11", "English, Anglo-Slav Defense", "c4 c6"),
     ("A12", "English, Anglo-Slav Defense", "c4 c6 Nf3 d5 b3"),

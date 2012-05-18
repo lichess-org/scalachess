@@ -19,16 +19,16 @@ sealed abstract class Variant(val id: Int) {
 object Variant {
 
   private def symmetricRank(rank: IndexedSeq[Role]): Map[Pos, Piece] =
-      (for (y ← Seq(1, 2, 7, 8); x ← 1 to 8) yield {
-        posAt(x, y) map { pos ⇒
-          (pos, y match {
-            case 1 ⇒ White - rank(x - 1)
-            case 2 ⇒ White.pawn
-            case 7 ⇒ Black.pawn
-            case 8 ⇒ Black - rank(x - 1)
-          })
-        }
-      }).flatten.toMap
+    (for (y ← Seq(1, 2, 7, 8); x ← 1 to 8) yield {
+      posAt(x, y) map { pos ⇒
+        (pos, y match {
+          case 1 ⇒ White - rank(x - 1)
+          case 2 ⇒ White.pawn
+          case 7 ⇒ Black.pawn
+          case 8 ⇒ Black - rank(x - 1)
+        })
+      }
+    }).flatten.toMap
 
   case object Standard extends Variant(1) {
 
@@ -48,7 +48,7 @@ object Variant {
       } map (_ - 1)
       def update(rank: Rank, role: Role)(x: Int): Rank =
         rank.updated(x, role.some)
-      def place(rank: Rank, role: Role, x: Int): Option[Rank] = 
+      def place(rank: Rank, role: Role, x: Int): Option[Rank] =
         empty(rank, x) map update(rank, role)
       val bishops: Rank =
         IndexedSeq.fill(8)(none[Role])
@@ -58,11 +58,11 @@ object Variant {
       val rank = for {
         a1 ← bishops.some
         a2 ← place(a1, Queen, ?(6))
-        a3 ← place(a2, Knight, ?(5)) 
-        a4 ← place(a3, Knight, ?(4)) 
-        a5 ← place(a4, Rook, 0) 
-        a6 ← place(a5, King, 0) 
-        a7 ← place(a6, Rook, 0) 
+        a3 ← place(a2, Knight, ?(5))
+        a4 ← place(a3, Knight, ?(4))
+        a5 ← place(a4, Rook, 0)
+        a6 ← place(a5, King, 0)
+        a7 ← place(a6, Rook, 0)
       } yield a7
 
       rank.err("WTF").flatten

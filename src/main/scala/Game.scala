@@ -36,7 +36,6 @@ case class Game(
 
   lazy val situation = Situation(board, player)
 
-  // TODO remove dead pieces?
   lazy val allPieces: Iterable[(Pos, Piece, Boolean)] = (board.pieces map {
     case (pos, piece) ⇒ (pos, piece, false)
   }) ++ (deads map {

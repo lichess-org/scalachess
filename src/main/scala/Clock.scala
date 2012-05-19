@@ -39,6 +39,13 @@ sealed trait Clock {
 
   def switch: Clock
 
+  def reset = PausedClock(
+    limit = limit,
+    increment = increment,
+    color = Color.White,
+    whiteTime = 0f,
+    blackTime = 0f)
+
   protected def now = System.currentTimeMillis / 1000d
 }
 

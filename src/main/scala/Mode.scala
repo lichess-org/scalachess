@@ -21,6 +21,8 @@ object Mode {
 
   def apply(id: Int): Option[Mode] = byId get id
 
+  def apply(rated: Boolean) = rated.fold(Rated, Casual)
+
   val default = Casual
 
   def orDefault(id: Int): Mode = apply(id) | default

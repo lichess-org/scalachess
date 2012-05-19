@@ -4,8 +4,8 @@ sealed abstract class Mode(val id: Int) {
 
   lazy val name = toString.toLowerCase
 
-  def casual = this == Variant.Casual
-  def rated = this == Variant.Rated
+  def casual = this == Mode.Casual
+  def rated = this == Mode.Rated
 
   def fold[A](c: ⇒ A, r: ⇒ A): A = if (this.casual) c else r
 }

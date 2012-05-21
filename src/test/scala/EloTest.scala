@@ -68,4 +68,30 @@ class EloTest extends ChessTest {
       (nu1, nu2) must_== (1322, 1149)
     }
   }
+  "calculate diff" should {
+    "same level" in {
+      val (u1, u2) = (user(1200, 100), user(1200, 100))
+      "win" in {
+        diff(u1, u2, Some(White)) must_== 16
+      }
+      "loss" in {
+        diff(u1, u2, Some(Black)) must_== -16
+      }
+      "draw" in {
+        diff(u1, u2, None) must_== 0
+      }
+    }
+    "against higher rated player" in {
+      val (u1, u2) = (user(1200, 100), user(1500, 100))
+      "win" in {
+        diff(u1, u2, Some(White)) must_== 27
+      }
+      "loss" in {
+        diff(u1, u2, Some(Black)) must_== -5
+      }
+      "draw" in {
+        diff(u1, u2, None) must_== 11
+      }
+    }
+  }
 }

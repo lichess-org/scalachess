@@ -11,7 +11,7 @@ sealed trait Clock {
   val blackTime: Float
   val timerOption: Option[Double]
 
-  def time(c: Color) = if (c == White) whiteTime else blackTime
+  def time(c: Color) = c.fold(whiteTime, blackTime)
 
   def outoftime(c: Color) = remainingTime(c) == 0
 

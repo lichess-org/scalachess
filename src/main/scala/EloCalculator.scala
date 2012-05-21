@@ -28,6 +28,12 @@ final class EloCalculator {
       calculateUserElo(user2, user1.elo, winCode))
   }
 
+  def diff(user1: User, user2: User, winner: Option[Color]): Int =
+    (user1 == user2).fold(
+      0,
+      calculate(user1, user2, winner)._1 - user1.elo
+    )
+
   private def calculateUserElo(user: User, opponentElo: Int, win: Int) = {
     val score = (1 + win) / 2f
     val expected = 1 / (1 + math.pow(10, (opponentElo - user.elo) / 400f))

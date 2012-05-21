@@ -1,4 +1,5 @@
-Chess API written in scala with minimal dependencies
+Chess API written in scala.
+It is functional, immutable, and free of side effects.
 
 INSTALL
 -------

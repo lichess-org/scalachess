@@ -125,4 +125,11 @@ case class PausedClock(
 object Clock {
 
   val httpDelay = 0.4f
+  val minInitLimit = 2
+
+  def create(
+    limit: Int, 
+    increment: Int) = PausedClock(
+      limit = max(minInitLimit, limit),
+      increment = increment)
 }

@@ -4,7 +4,7 @@ import Pos._
 
 class ClockTest extends ChessTest {
 
-  "play with a clock" in {
+  "play with a clock" should {
     val clock = PausedClock(5 * 60 * 1000, 0)
     val game = Game() withClock clock
     "new game" in {
@@ -18,6 +18,17 @@ class ClockTest extends ChessTest {
           case c ⇒ c.color must_== Black
         }
       }
+    }
+  }
+  "create a clock" should {
+    "with time" in {
+      Clock.create(60, 10).limit must_== 60
+    }
+    "with increment" in {
+      Clock.create(60, 10).increment must_== 10
+    }
+    "with few time" in {
+      Clock.create(0, 10).limit must_== 2
     }
   }
 }

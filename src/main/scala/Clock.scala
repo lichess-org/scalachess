@@ -39,12 +39,9 @@ sealed trait Clock {
 
   def switch: Clock
 
-  def reset = PausedClock(
+  def reset = Clock(
     limit = limit,
-    increment = increment,
-    color = Color.White,
-    whiteTime = 0f,
-    blackTime = 0f)
+    increment = increment)
 
   protected def now = System.currentTimeMillis / 1000d
 }
@@ -52,10 +49,10 @@ sealed trait Clock {
 case class RunningClock(
     limit: Int,
     increment: Int,
-    color: Color = White,
-    whiteTime: Float = 0f,
-    blackTime: Float = 0f,
-    timer: Double = 0d) extends Clock {
+    color: Color,
+    whiteTime: Float,
+    blackTime: Float,
+    timer: Double) extends Clock {
 
   val timerOption = Some(timer)
 
@@ -94,9 +91,9 @@ case class RunningClock(
 case class PausedClock(
     limit: Int,
     increment: Int,
-    color: Color = White,
-    whiteTime: Float = 0f,
-    blackTime: Float = 0f) extends Clock {
+    color: Color,
+    whiteTime: Float,
+    blackTime: Float) extends Clock {
 
   val timerOption = None
 
@@ -127,9 +124,12 @@ object Clock {
   val httpDelay = 0.4f
   val minInitLimit = 2
 
-  def create(
-    limit: Int, 
-    increment: Int) = PausedClock(
-      limit = max(minInitLimit, limit),
-      increment = increment)
+  def apply(
+    limit: Int,
+    increment: Int): PausedClock = PausedClock(
+    limit = max(minInitLimit, limit),
+    increment = increment,
+    color = White,
+    whiteTime = 0f,
+    blackTime = 0f)
 }

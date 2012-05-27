@@ -473,7 +473,7 @@ object EcoDb {
     ("E54", "Nimzo-Indian, 4.e3, Gligoric System", "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Nf3 d5 Bd3 c5 O-O dxc4 Bxc4"),
     ("E55", "Nimzo-Indian, 4.e3, Gligoric System, Bronstein Variation", "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Nf3 d5 Bd3 c5 O-O dxc4 Bxc4 Nbd7"),
     ("E56", "Nimzo-Indian, 4.e3, Main line with 7...Nc6", "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Nf3 d5 Bd3 c5 O-O Nc6"),
-    ("E57", "Nimzo-Indian, 4.e3, Main line with 8...dc and 9...cd", "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Nf3 d5 Bd3 c5 O-O Nc6 a3 dxc4 9"),
+    ("E57", "Nimzo-Indian, 4.e3, Main line with 8...dc and 9...cd", "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Nf3 d5 Bd3 c5 O-O Nc6 a3 dxc4"),
     ("E58", "Nimzo-Indian, 4.e3, Main line with 8...Bxc3", "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Nf3 d5 Bd3 c5 O-O Nc6 a3 Bxc3 bxc3"),
     ("E59", "Nimzo-Indian, 4.e3, Main line", "d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Nf3 d5 Bd3 c5 O-O Nc6 a3 Bxc3 bxc3 dxc4 10 Bxc4"),
     ("E60", "King's Indian Defense", "d4 Nf6 c4 g6"),

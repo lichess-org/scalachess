@@ -116,26 +116,26 @@ object EcoDb {
     ("A97", "Dutch, Ilyin-Genevsky Variation", "d4 f5 c4 Nf6 g3 e6 Bg2 Be7 Nf3 O-O O-O d6 Nc3 Qe8"),
     ("A98", "Dutch, Ilyin-Genevsky Variation with Qc2", "d4 f5 c4 Nf6 g3 e6 Bg2 Be7 Nf3 O-O O-O d6 Nc3 Qe8 Qc2"),
     ("A99", "Dutch, Ilyin-Genevsky Variation with b3", "d4 f5 c4 Nf6 g3 e6 Bg2 Be7 Nf3 O-O O-O d6 Nc3 Qe8 b3"),
-    ("B00", "Uncommon King's Pawn Opening", "e4"),
-    ("B01", "Scandinavian", "e4 d5"),
+    ("B00", "King's Pawn Opening", "e4"),
+    ("B01", "Scandinavian Defense", "e4 d5"), //or "Center Counter Defense", 1475 oldest recorded chess game
     ("B02", "Alekhine's Defense", "e4 Nf6"),
     ("B03", "Alekhine's Defense", "e4 Nf6 e5 Nd5 d4"),
-    ("B04", "Alekhine's Defense, Modern", "e4 Nf6 e5 Nd5 d4 d6 Nf3"),
-    ("B05", "Alekhine's Defense, Modern", "e4 Nf6 e5 Nd5 d4 d6 Nf3 Bg4"),
-    ("B06", "Robatsch", "e4 g6"),
-    ("B07", "Pirc", "e4 d6 d4 Nf6"),
-    ("B08", "Pirc, Classical", "e4 d6 d4 Nf6 Nc3 g6 Nf3"),
+    ("B04", "Alekhine's Defense, Modern Variation", "e4 Nf6 e5 Nd5 d4 d6 Nf3"),
+    ("B05", "Alekhine's Defense, Modern, 4...Bg4", "e4 Nf6 e5 Nd5 d4 d6 Nf3 Bg4"),
+    ("B06", "Robatsch Defense", "e4 g6"), //Karl Robatsch in the 1960s, 70s, and 80s
+    ("B07", "Pirc Defense", "e4 d6 d4 Nf6"), //Vasja Pirc but also used in world championships
+    ("B08", "Pirc, Classical System", "e4 d6 d4 Nf6 Nc3 g6 Nf3"), //or "Two Knights" system
     ("B09", "Pirc, Austrian Attack", "e4 d6 d4 Nf6 Nc3 g6 f4"),
-    ("B10", "Caro-Kann", "e4 c6"),
+    ("B10", "Caro-Kann Defense", "e4 c6"), //1886 analysis journal by Horatio Caro and Marcus Kann
     ("B11", "Caro-Kann, Two Knights, 3...Bg4", "e4 c6 Nc3 d5 Nf3 Bg4"),
     ("B12", "Caro-Kann Defense", "e4 c6 d4"),
-    ("B13", "Caro-Kann, Exchange", "e4 c6 d4 d5 exd5 cxd5"),
-    ("B14", "Caro-Kann, Panov-Botvinnik Attack", "e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3 e6"),
-    ("B15", "Caro-Kann", "e4 c6 d4 d5 Nc3"),
+    ("B13", "Caro-Kann, Exchange Variation", "e4 c6 d4 d5 exd5"),
+    ("B14", "Caro-Kann, Panov-Botvinnik Attack, 5...e6", "e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3 e6"),
+    ("B15", "Caro-Kann Defense", "e4 c6 d4 d5 Nc3"),
     ("B16", "Caro-Kann, Bronstein-Larsen Variation", "e4 c6 d4 d5 Nc3 dxe4 Nxe4 Nf6 Nxf6+ gxf6"),
-    ("B17", "Caro-Kann, Steinitz Variation", "e4 c6 d4 d5 Nc3 dxe4 Nxe4 Nd7"),
-    ("B18", "Caro-Kann, Classical", "e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5"),
-    ("B19", "Caro-Kann, Classical", "e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng3 Bg6 h4 h6 Nf3 Nd7"),
+    ("B17", "Caro-Kann, Steinitz Variation", "e4 c6 d4 d5 Nc3 dxe4 Nxe4 Nd7"), //also known as Smyslov systems
+    ("B18", "Caro-Kann, Classical Variation", "e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5"), //also, "Capablanca Variation"
+    ("B19", "Caro-Kann, Classical, 7...Nd7", "e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng3 Bg6 h4 h6 Nf3 Nd7"),
     ("B20", "Sicilian", "e4 c5"),
     ("B21", "Sicilian, 2.f4 and 2.d4", "e4 c5 f4"),
     ("B22", "Sicilian, Alapin", "e4 c5 c3"),

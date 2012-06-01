@@ -33,11 +33,18 @@ object OpeningExplorer {
   }
 
   def openingOf(pgn: String): Option[Opening] = {
-    def next(branch: Branch, moves: List[Move]): Branch = moves match {
-      case Nil     ⇒ branch
-      case m :: ms ⇒ (branch get m).fold(b ⇒ next(b, ms), branch)
-    }
-    next(tree, pgn.split(' ').toList).opening
+
+    def next(
+      branch: Branch,
+      moves: List[Move],
+      last: Option[Opening]): Option[Opening] =
+      moves match {
+        case Nil ⇒ branch.opening orElse last
+        case m :: ms ⇒ (branch get m).fold(
+          b ⇒ next(b, ms, b.opening orElse last),
+          last)
+      }
+    next(tree, pgn.split(' ').toList, none)
   }
 
   val tree: Branch = EcoDb.db.foldLeft(Branch()) {

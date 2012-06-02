@@ -43,7 +43,7 @@ object PgnParser {
 
     override val whiteSpace = "".r
 
-    def apply(pgn: String): Valid[List[San]] = 
+    def apply(pgn: String): Valid[List[San]] =
       parseAll(moves, (pgn.lines mkString " ")) match {
         case f: Failure       ⇒ "Cannot parse moves: %s\n%s".format(f.toString, pgn).failNel
         case Success(sans, _) ⇒ scalaz.Scalaz.success(sans)
@@ -53,14 +53,18 @@ object PgnParser {
 
     val result: Parser[String] = space ~> ("*" | "1/2-1/2" | "0-1" | "1-0")
 
-    def move: Parser[San] = 
-      (number?) ~> (qCastle | kCastle | std) <~ (comment?) 
+    def move: Parser[San] =
+      (number?) ~> (castle | std) <~ (comment?)
 
     val comment: Parser[String] = space ~> "{" ~> """[^\}]+""".r <~ "}"
 
-    val qCastle: Parser[San] = "O-O-O" ^^^ Castle(QueenSide)
+    def castle = (qCastle | kCastle) ~ suffixes ^^ {
+      case side ~ suf ⇒ Castle(side) withSuffixes suf
+    }
 
-    val kCastle: Parser[San] = "O-O" ^^^ Castle(KingSide)
+    val qCastle: Parser[Side] = "O-O-O" ^^^ QueenSide
+
+    val kCastle: Parser[Side] = "O-O" ^^^ KingSide
 
     def std: Parser[Std] = (complete | simple | disambiguated) ~ suffixes ^^ {
       case std ~ suf ⇒ std withSuffixes suf

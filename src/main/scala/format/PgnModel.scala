@@ -52,7 +52,14 @@ case class Suffixes(
   checkmate: Boolean,
   promotion: Option[PromotableRole])
 
-case class Castle(side: Side) extends San {
+case class Castle(
+    side: Side,
+    check: Boolean = false,
+    checkmate: Boolean = false) extends San {
+
+  def withSuffixes(s: Suffixes) = copy(
+    check = s.check,
+    checkmate = s.checkmate)
 
   def apply(game: Game): Valid[Move] = for {
     kingPos ← game.board kingPosOf game.player toValid "No king found"

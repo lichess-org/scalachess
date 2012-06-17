@@ -54,7 +54,7 @@ object PgnParser {
     val result: Parser[String] = space ~> ("*" | "1/2-1/2" | "0-1" | "1-0")
 
     def move: Parser[San] =
-      (number?) ~> (castle | std) <~ (comment?)
+      (number?) ~> (castle | standard) <~ (comment?)
 
     val comment: Parser[String] = space ~> "{" ~> """[^\}]+""".r <~ "}"
 
@@ -66,7 +66,7 @@ object PgnParser {
 
     val kCastle: Parser[Side] = "O-O" ^^^ KingSide
 
-    def std: Parser[Std] = (complete | simple | disambiguated) ~ suffixes ^^ {
+    def standard: Parser[Std] = (complete | simple | disambiguated) ~ suffixes ^^ {
       case std ~ suf ⇒ std withSuffixes suf
     }
 

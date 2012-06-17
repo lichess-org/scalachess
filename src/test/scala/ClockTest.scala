@@ -31,4 +31,44 @@ class ClockTest extends ChessTest {
       Clock(0, 10).limit must_== 2
     }
   }
+  "lag compensation" should {
+    def clockStep(wait: Float, lag: Float): Double = {
+      val clock = Clock(60, 0) step 0
+      Thread sleep (wait * 1000).toInt
+      (clock step lag remainingTime Black).toDouble
+    }
+    def clockStart(lag: Float): Double = {
+      val clock = Clock(60, 0) step lag
+      (clock step lag remainingTime White).toDouble
+    }
+    val delta = 0.01
+    val maxLag = Clock.maxLagToCompensate
+    "premove, no lag" in {
+      clockStep(0, 0) must beCloseTo(60, delta)
+    }
+    "premove, small lag" in {
+      clockStep(0, 0.2f) must beCloseTo(60, delta)
+    }
+    "premove, big lag" in {
+      clockStep(0, maxLag * 5) must beCloseTo(60, delta)
+    }
+    "1s move, no lag" in {
+      clockStep(1f, 0) must beCloseTo(59, delta)
+    }
+    "1s move, small lag" in {
+      clockStep(1f, 0.2f) must beCloseTo(59.2, delta)
+    }
+    "1s move, big lag" in {
+      clockStep(1f, maxLag * 5) must beCloseTo(59 + maxLag, delta)
+    }
+    "start, no lag" in {
+      clockStart(0) must beCloseTo(60, delta)
+    }
+    "start, small lag" in {
+      clockStart(0.2f) must beCloseTo(60, delta)
+    }
+    "start, big lag" in {
+      clockStart(maxLag * 5) must beCloseTo(60, delta)
+    }
+  }
 }

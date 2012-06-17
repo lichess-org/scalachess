@@ -1,7 +1,5 @@
 package chess
 
-import scala.math.max
-
 // All durations are expressed in seconds
 sealed trait Clock {
   val limit: Int
@@ -15,7 +13,7 @@ sealed trait Clock {
 
   def outoftime(c: Color) = remainingTime(c) == 0
 
-  def remainingTime(c: Color) = max(0, limit - elapsedTime(c))
+  def remainingTime(c: Color) = math.max(0, limit - elapsedTime(c))
 
   def remainingTimes = Color.all map { c ⇒ c -> remainingTime(c) } toMap
 
@@ -25,7 +23,8 @@ sealed trait Clock {
 
   def estimateTotalTime = limit + 30 * increment
 
-  def step: RunningClock
+  // if lag is provided, it is added to the clock as a compensation
+  def step(lag: Float = 0): RunningClock
 
   def stop: PausedClock
 
@@ -60,11 +59,14 @@ case class RunningClock(
     if (c == color) now - timer else 0
   }.toFloat
 
-  def step = {
+  def step(lag: Float = 0) = {
     val t = now
     addTime(
       color,
-      max(0, (t - timer).toFloat - Clock.httpDelay) - increment
+      math.max(
+        0, 
+        (t - timer).toFloat - math.min(lag, Clock.maxLagToCompensate)
+      ) - increment
     ).copy(
         color = !color,
         timer = t
@@ -97,7 +99,7 @@ case class PausedClock(
 
   val timerOption = None
 
-  def step = run.step
+  def step(lag: Float = 0) = run step lag
 
   def stop = this
 
@@ -121,13 +123,13 @@ case class PausedClock(
 
 object Clock {
 
-  val httpDelay = 0.4f
   val minInitLimit = 2
+  val maxLagToCompensate = 0.5f
 
   def apply(
     limit: Int,
     increment: Int): PausedClock = PausedClock(
-    limit = max(minInitLimit, limit),
+    limit = math.max(minInitLimit, limit),
     increment = increment,
     color = White,
     whiteTime = 0f,

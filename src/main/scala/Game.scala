@@ -13,16 +13,17 @@ case class Game(
   def apply(
     orig: Pos,
     dest: Pos,
-    promotion: Option[PromotableRole] = None): Valid[(Game, Move)] = for {
-    move ← situation.move(orig, dest, promotion)
-  } yield (apply(move), move)
+    promotion: Option[PromotableRole] = None,
+    lag: Int = 0): Valid[(Game, Move)] = for {
+    move ← situation.move(orig, dest, promotion) map (_ withLag lag)
+  } yield apply(move) -> move
 
   def apply(move: Move): Game = {
     val newGame = copy(
       board = move.finalizeAfter,
       player = !player,
       turns = turns + 1,
-      clock = clock map (_.step),
+      clock = clock map (_ step move.lag),
       deads = (for {
         cpos ← move.capture
         cpiece ← board(cpos)

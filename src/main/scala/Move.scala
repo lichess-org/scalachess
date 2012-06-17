@@ -9,7 +9,8 @@ case class Move(
     capture: Option[Pos],
     promotion: Option[PromotableRole],
     castle: Option[((Pos, Pos), (Pos, Pos))],
-    enpassant: Boolean) {
+    enpassant: Boolean,
+    lag: Int = 0) {
 
   def withHistory(h: History) = copy(after = after withHistory h)
 
@@ -61,6 +62,8 @@ case class Move(
     else None,
     Some(this)
   )
+
+  def withLag(l: Int) = copy(lag = l)
 
   override def toString = "%s %s".format(piece, notation)
 }

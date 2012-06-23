@@ -41,7 +41,7 @@ class ClockTest extends ChessTest {
       val clock = Clock(60, 0) step lag
       (clock step lag remainingTime White).toDouble
     }
-    val delta = 0.01
+    val delta = 0.05
     val maxLag = Clock.maxLagToCompensate
     "premove, no lag" in {
       clockStep(0, 0) must beCloseTo(60, delta)

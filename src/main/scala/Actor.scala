@@ -20,13 +20,16 @@ case class Actor(piece: Piece, pos: Pos, board: Board) {
       val fwd = Some(next) filterNot board.occupations
       def capture(horizontal: Direction): Option[Move] = {
         for {
-          p ← horizontal(next); if enemies(p);
+          p ← horizontal(next) 
+          if enemies(p)
           b ← board.taking(pos, p)
         } yield move(p, b, Some(p))
       } flatMap maybePromote
       def enpassant(horizontal: Direction): Option[Move] = for {
-        victimPos ← horizontal(pos); if pos.y == color.passablePawnY
-        victim ← board(victimPos); if victim == !color - Pawn
+        victimPos ← horizontal(pos)
+        if pos.y == color.passablePawnY
+        victim ← board(victimPos)
+        if victim == !color - Pawn
         targetPos ← horizontal(next)
         victimFrom ← pawnDir(victimPos) flatMap pawnDir
         if history.lastMove == Some(victimFrom, victimPos)

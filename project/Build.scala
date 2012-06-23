@@ -7,8 +7,8 @@ trait Resolvers {
 
 trait Dependencies {
   val scalaz = "org.scalaz" %% "scalaz-core" % "6.0.4"
-  val specs2 = "org.specs2" %% "specs2" % "1.9"
-  val scalalib = "com.github.ornicar" %% "scalalib" % "1.34"
+  val specs2 = "org.specs2" %% "specs2" % "1.11"
+  val scalalib = "com.github.ornicar" %% "scalalib" % "1.36"
   val hasher = "com.roundeights" % "hasher" % "0.3" from "http://cloud.github.com/downloads/Nycto/Hasher/hasher_2.9.1-0.3.jar"
 }
 
@@ -16,7 +16,7 @@ object ApplicationBuild extends Build with Resolvers with Dependencies {
 
   private val buildSettings = Project.defaultSettings ++ Seq(
     organization := "com.github.ornicar",
-    version := "1.13",
+    version := "1.15",
     scalaVersion := "2.9.1",
     resolvers := Seq(iliaz),
     libraryDependencies := Seq(scalaz, scalalib, hasher),

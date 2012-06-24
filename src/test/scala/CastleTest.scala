@@ -37,7 +37,7 @@ RQK   R """ withHistory History.castle(White, true, true)
       "standard" in {
         val game = Game(goodHist, White)
         "viable moves" in {
-          game.board destsFrom E1 must bePoss(F1, G1)
+          game.board destsFrom E1 must bePoss(F1, G1, H1)
         }
         "correct new board" in {
           game.playMove(E1, G1) must beGame("""
@@ -73,6 +73,31 @@ PPPPPPPP
   KR   B""")
         }
       }
+      "chess960 close queenside as black" in {
+        val game = Game("""
+ b rkr q
+p pppppp
+ p n
+
+ 
+ 
+ 
+ K""", Black)
+        "viable moves" in {
+          game.board destsFrom E8 must bePoss(C8, D8, F8, G8)
+        }
+        "correct new board" in {
+          game.playMove(E8, D8) must beGame("""
+ bkr r q
+p pppppp
+ p n
+
+ 
+ 
+ 
+ K""")
+        }
+      }
     }
   }
 
@@ -98,7 +123,7 @@ R   KB R"""
     "possible" in {
       val game = Game(goodHist, White)
       "viable moves" in {
-        game.board destsFrom E1 must bePoss(D1, C1)
+        game.board destsFrom E1 must bePoss(A1, C1, D1)
       }
       "correct new board" in {
         game.playMove(E1, C1) must beGame("""
@@ -172,7 +197,7 @@ PPPPPPPP
     "if kingside rook moves" in {
       val g2 = game.playMove(H1, G1) map (_ as White)
       "can only castle queenside" in {
-        g2 flatOption (_.board destsFrom E1) must bePoss(C1, D1, F1)
+        g2 flatOption (_.board destsFrom E1) must bePoss(A1, C1, D1, F1)
       }
       "if queenside rook moves" in {
         val g3 = g2 flatMap (_.playMove(A1, B1))
@@ -184,7 +209,7 @@ PPPPPPPP
     "if queenside rook moves" in {
       val g2 = game.playMove(A1, B1) map (_ as White)
       "can only castle kingside" in {
-        g2 flatOption (_.board destsFrom E1) must bePoss(D1, F1, G1)
+        g2 flatOption (_.board destsFrom E1) must bePoss(D1, F1, G1, H1)
       }
       "if kingside rook moves" in {
         val g3 = g2 flatMap (_.playMove(H1, G1))
@@ -237,11 +262,11 @@ PPPPPPPP
   "threat on rook does not prevent castling" in {
     "king side" in {
       val board: Board = """R  QK  R"""
-      board place Black.rook at H3 flatOption (_ destsFrom E1) must bePoss(D2, E2, F1, F2, G1)
+      board place Black.rook at H3 flatOption (_ destsFrom E1) must bePoss(D2, E2, F1, F2, G1, H1)
     }
     "queen side" in {
       val board: Board = """R   KB R"""
-      board place Black.rook at A3 flatOption (_ destsFrom E1) must bePoss(C1, D1, D2, E2, F2)
+      board place Black.rook at A3 flatOption (_ destsFrom E1) must bePoss(A1, C1, D1, D2, E2, F2)
     }
   }
 }

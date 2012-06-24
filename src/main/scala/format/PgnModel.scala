@@ -64,6 +64,6 @@ case class Castle(
   def apply(game: Game): Valid[Move] = for {
     kingPos ← game.board kingPosOf game.player toValid "No king found"
     actor ← game.board actorAt kingPos toValid "No actor found"
-    move ← actor castleOn side toValid "Cannot castle"
+    move ← (actor castleOn side).headOption toValid "Cannot castle"
   } yield move
 }

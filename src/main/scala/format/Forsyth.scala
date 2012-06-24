@@ -37,7 +37,7 @@ object Forsyth {
     for {
       color ← colorOption
       pieces ← board(boardChars, A8)
-    } yield Situation(Board(pieces), color)
+    } yield Situation(Board(pieces, variant = chess.Variant.default), color)
   }
 
   def >>(game: Game): String = List(

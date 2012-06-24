@@ -5,6 +5,6 @@ import Variant._
 object Setup {
 
   def apply(variant: Variant): Game = Game(
-    board = Board(pieces = variant.pieces)
+    board = Board(pieces = variant.pieces, variant = variant)
   )
 }

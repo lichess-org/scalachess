@@ -2,7 +2,10 @@ package chess
 
 import Pos.posAt
 
-case class Actor(piece: Piece, pos: Pos, board: Board) {
+case class Actor(
+  piece: Piece, 
+  pos: Pos, 
+  board: Board) {
 
   lazy val moves: List[Move] = kingSafety(piece.role match {
 
@@ -100,33 +103,28 @@ case class Actor(piece: Piece, pos: Pos, board: Board) {
   lazy val check: Boolean = board check color
 
   private def castle: List[Move] =
-    castleOn(KingSide) ::: castleOn(QueenSide)
+    List(castleOn(KingSide), castleOn(QueenSide)).flatten
 
-  def castleOn(side: Side): List[Move] = {
-    for {
-      kingPos ← board kingPosOf color
-      if history canCastle color on side
-      tripToRook = side.tripToRook(kingPos, board)
-      rookPos ← tripToRook.lastOption
-      if board(rookPos) == Some(color.rook)
-      newKingPos ← posAt(side.castledKingX, kingPos.y)
-      securedPoss = kingPos <-> newKingPos
-      if ((board threatsOf !color) & securedPoss.toSet).isEmpty
-      newRookPos ← posAt(side.castledRookX, rookPos.y)
-      b1 ← board take rookPos
-      b2 ← newKingPos match {
-        case p if p == kingPos ⇒ Some(b1)
-        case p                 ⇒ b1.move(kingPos, p)
-      }
-      b3 ← b2.place(color.rook, newRookPos)
-      b4 = b3 updateHistory (_ withoutCastles color)
-      castle = Some(((kingPos, newKingPos), (rookPos, newRookPos)))
-      targets = newKingPos match {
-        case p if (p == kingPos) || (p nextTo kingPos) || (p == rookPos) ⇒ List(rookPos)
-        case p ⇒ List(rookPos, p)
-      }
-    } yield targets map { move(_, b4, castle = castle) }
-  } | Nil
+  def castleOn(side: Side): Option[Move] = for {
+    kingPos ← board kingPosOf color
+    if history canCastle color on side
+    tripToRook = side.tripToRook(kingPos, board)
+    rookPos ← tripToRook.lastOption
+    if board(rookPos) == Some(color.rook)
+    newKingPos ← posAt(side.castledKingX, kingPos.y)
+    securedPoss = kingPos <-> newKingPos
+    if ((board threatsOf !color) & securedPoss.toSet).isEmpty
+    newRookPos ← posAt(side.castledRookX, rookPos.y)
+    b1 ← board take rookPos
+    b2 ← newKingPos match {
+      case p if p == kingPos ⇒ Some(b1)
+      case p                 ⇒ b1.move(kingPos, p)
+    }
+    b3 ← b2.place(color.rook, newRookPos)
+    target = (board.variant == Variant.Chess960).fold(rookPos, newKingPos)
+    b4 = b3 updateHistory (_ withoutCastles color)
+    castle = Some(((kingPos, newKingPos), (rookPos, newRookPos)))
+  } yield move(target, b4, castle = castle)
 
   private def shortRange(dirs: Directions): List[Move] =
     (pos mapply dirs).flatten filterNot friends map { to ⇒

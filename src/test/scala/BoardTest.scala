@@ -4,7 +4,7 @@ import Pos._
 
 class BoardTest extends ChessTest {
 
-  val board = Board()
+  val board = makeBoard
 
   "a board" should {
 
@@ -43,13 +43,13 @@ class BoardTest extends ChessTest {
     }
 
     "allow a pawn to be promoted to a queen" in {
-      Board.empty.place(Black.pawn, A8) flatMap (_ promote A8) must beSome.like {
+      makeEmptyBoard.place(Black.pawn, A8) flatMap (_ promote A8) must beSome.like {
         case b ⇒ b(A8) must beSome(Black.queen)
       }
     }
 
     "allow chaining actions" in {
-      Board.empty.seq(
+      makeEmptyBoard.seq(
         _ place White - Pawn at A2,
         _ place White - Pawn at A3,
         _ move A2 to A4
@@ -59,7 +59,7 @@ class BoardTest extends ChessTest {
     }
 
     "fail on bad actions chain" in {
-      Board.empty.seq(
+      makeEmptyBoard.seq(
         _ place White - Pawn at A2,
         _ place White - Pawn at A3,
         _ move B2 to B4
@@ -67,7 +67,7 @@ class BoardTest extends ChessTest {
     }
 
     "provide occupation map" in {
-      Board(
+      makeBoard(
         A2 -> (White - Pawn),
         A3 -> (White - Pawn),
         D1 -> (White - King),
@@ -105,13 +105,13 @@ R  BK  R"""
       "automatic draw" in {
         "by lack of pieces" in {
           "empty" in {
-            Board.empty.autoDraw must_== true
+            makeEmptyBoard.autoDraw must_== true
           }
           "new" in {
-            Board().autoDraw must_== false
+            makeBoard.autoDraw must_== false
           }
           "opened" in {
-            Game().playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5) map { g ⇒
+            makeGame.playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5) map { g ⇒
               g.board.autoDraw
             } must beSuccess(false)
           }
@@ -148,16 +148,16 @@ R  BK  R"""
         }
         "by fifty moves" in {
           "new" in {
-            Board().autoDraw must_== false
+            makeBoard.autoDraw must_== false
           }
           "opened" in {
-            Game().playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5) map { g ⇒
+            makeGame.playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5) map { g ⇒
               g.board.autoDraw
             } must beSuccess(false)
           }
           "tons of pointless moves" in {
             val moves = List.fill(30)(List(B1 -> C3, B8 -> C6, C3 -> B1, C6 -> B8))
-            Game().playMoves(moves.flatten: _*) must beSuccess.like {
+            makeGame.playMoves(moves.flatten: _*) must beSuccess.like {
               case g ⇒ g.board.autoDraw must_== true
             }
           }

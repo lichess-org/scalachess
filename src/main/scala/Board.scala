@@ -4,7 +4,10 @@ import Pos.posAt
 import format.Visual
 import com.roundeights.hasher.Hasher
 
-case class Board(pieces: Map[Pos, Piece], history: History) {
+case class Board(
+  pieces: Map[Pos, Piece], 
+  history: History,
+  variant: Variant) {
 
   import implicitFailures._
 
@@ -101,6 +104,8 @@ case class Board(pieces: Map[Pos, Piece], history: History) {
 
   def withHistory(h: History): Board = copy(history = h)
 
+  def withVariant(v: Variant): Board = copy(variant = v)
+
   def updateHistory(f: History ⇒ History) = copy(history = f(history))
 
   def count(p: Piece): Int = pieces.values count (_ == p)
@@ -132,12 +137,12 @@ object Board {
 
   import Pos._
 
-  def apply(pieces: Traversable[(Pos, Piece)]): Board =
-    Board(pieces toMap, History())
+  def apply(pieces: Traversable[(Pos, Piece)], variant: Variant): Board =
+    Board(pieces toMap, History(), variant)
 
-  def apply(pieces: (Pos, Piece)*): Board = Board(pieces toMap, History())
+  def init(variant: Variant): Board = 
+    Board(pieces = variant.pieces, variant = variant)
 
-  def apply(): Board = Board(pieces = Variant.Standard.pieces)
-
-  def empty = new Board(Map.empty, History())
+  def empty(variant: Variant): Board = 
+    Board(Map.empty, History(), variant)
 }

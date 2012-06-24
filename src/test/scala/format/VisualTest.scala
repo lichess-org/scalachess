@@ -9,10 +9,10 @@ class VisualTest extends ChessTest {
 
   "The visual board formatter" should {
     "export new board" in {
-      f.addNewLines(f >> (Board())) must_== newBoardFormat
+      f.addNewLines(f >> (makeBoard)) must_== newBoardFormat
     }
     "import new board" in {
-      f << newBoardFormat must_== Board()
+      f << newBoardFormat must_== makeBoard
     }
     "import and export is non destructive" in {
       forall(examples) { example ⇒

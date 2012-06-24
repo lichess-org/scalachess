@@ -23,7 +23,7 @@ object Visual {
       case n          ⇒ (List.fill(8 - n)("")) ::: lines
     }
     Board(
-      (for {
+      pieces = (for {
         line ← (filtered.zipWithIndex)
         (l, y) = line
         char ← (l zipWithIndex)
@@ -31,7 +31,8 @@ object Visual {
         role ← Role forsyth c.toLower
       } yield {
         posAt(x + 1, 8 - y) map { pos ⇒ pos -> (Color(c isUpper) - role) }
-      }) flatten
+      }) flatten,
+      variant = chess.Variant.default
     )
   }
 

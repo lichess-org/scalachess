@@ -3,11 +3,11 @@ package format
 
 object PgnReader {
 
-  def apply(pgn: String, tags: List[Tag] = Nil): Valid[Replay] = 
+  def apply(pgn: String, tags: List[Tag] = Nil): Valid[Replay] =
     withSans(pgn, identity, tags)
 
   def withSans(
-    pgn: String, 
+    pgn: String,
     op: List[San] ⇒ List[San],
     tags: List[Tag] = Nil): Valid[Replay] = for {
     parsed ← PgnParser(pgn)
@@ -23,14 +23,15 @@ object PgnReader {
   } yield replay
 
   def makeGame(tags: List[Tag]): Valid[Game] =
-    tags collect {
-      case Fen(fen) ⇒ fen
-    } match {
-      case Nil ⇒ Game().success
-      case fen :: Nil ⇒ (Forsyth << fen).fold(
-        s ⇒ Game(board = s.board, player = s.color).success,
-        "Invalid fen %s".format(fen).failNel
-      )
-      case many ⇒ "Multiple fen tags".failNel
+    tags.foldLeft(success(Game(chess.Variant.default)): Valid[Game]) {
+      case (vg, Fen(fen)) ⇒ for {
+        g1 ← vg
+        parsed ← (Forsyth << fen) toValid "Invalid fen " + fen
+      } yield g1.copy(board = parsed.board, player = parsed.color)
+      case (vg, Variant(name)) ⇒ for {
+        g1 ← vg
+        variant ← chess.Variant(name) toValid "Invalid variant " + name
+      } yield g1 updateBoard (_ withVariant variant)
+      case (vg, _) ⇒ vg
     }
 }

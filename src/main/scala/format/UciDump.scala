@@ -8,7 +8,9 @@ object UciDump {
     pgn.trim.some filter ("" !=) fold (
       nonEmptyPgn ⇒ PgnReader(
         nonEmptyPgn,
-        initialFen.fold(Fen(_) :: Nil, Nil)
+        initialFen.fold(
+          fen => Fen(fen) :: Variant(chess.Variant.Chess960.name) :: Nil, 
+          Nil)
       ) map (_.chronoMoves map move mkString " "),
       success(""))
 

@@ -7,7 +7,7 @@ class GameTest extends ChessTest {
 
   "capture a piece" should {
     "add it to the dead pieces" in {
-      val game = Game().playMoves(
+      val game = makeGame.playMoves(
         E2 -> E4,
         D7 -> D5,
         E4 -> D5)

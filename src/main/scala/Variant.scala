@@ -70,14 +70,15 @@ object Variant {
   }
 
   val all = List(Standard, Chess960)
-
   val byId = all map { v ⇒ (v.id, v) } toMap
+  val byName = all map { v ⇒ (v.name, v) } toMap
 
   val default = Standard
 
   def apply(id: Int): Option[Variant] = byId get id
-
   def orDefault(id: Int): Variant = apply(id) | default
+
+  def apply(name: String): Option[Variant] = byName get name
 
   def exists(id: Int): Boolean = byId contains id
 }

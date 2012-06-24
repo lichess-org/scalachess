@@ -7,20 +7,20 @@ class PawnTest extends ChessTest {
   "a white pawn" should {
 
     "move towards rank by 1 square" in {
-      Board(
+      makeBoard(
         A4 -> White.pawn
       ) destsFrom A4 must bePoss(A5)
     }
 
     "not move to positions that are occupied by the same color" in {
-      Board(
+      makeBoard(
         A4 -> White.pawn,
         A5 -> White.pawn
       ) destsFrom A4 must bePoss()
     }
 
     "capture in diagonal" in {
-      Board(
+      makeBoard(
         D4 -> White.pawn,
         C5 -> Black.pawn,
         E5 -> Black.bishop
@@ -28,7 +28,7 @@ class PawnTest extends ChessTest {
     }
 
     "require a capture to move in diagonal" in {
-      Board(
+      makeBoard(
         A4 -> White.pawn,
         C5 -> White.pawn
       ) destsFrom A4 must bePoss(A5)
@@ -36,19 +36,19 @@ class PawnTest extends ChessTest {
 
     "move towards rank by 2 squares" in {
       "if the path is free" in {
-        Board(
+        makeBoard(
           A2 -> White.pawn
         ) destsFrom A2 must bePoss(A3, A4)
       }
       "if the path is occupied by a friend" in {
         "close" in {
-          Board(
+          makeBoard(
             A2 -> White.pawn,
             A3 -> White.rook
           ) destsFrom A2 must bePoss()
         }
         "far" in {
-          Board(
+          makeBoard(
             A2 -> White.pawn,
             A4 -> White.rook
           ) destsFrom A2 must bePoss(A3)
@@ -56,13 +56,13 @@ class PawnTest extends ChessTest {
       }
       "if the path is occupied by a enemy" in {
         "close" in {
-          Board(
+          makeBoard(
             A2 -> White.pawn,
             A3 -> Black.rook
           ) destsFrom A2 must bePoss()
         }
         "far" in {
-          Board(
+          makeBoard(
             A2 -> White.pawn,
             A4 -> Black.rook
           ) destsFrom A2 must bePoss(A3)
@@ -71,7 +71,7 @@ class PawnTest extends ChessTest {
     }
     "capture en passant" in {
       "with proper position" in {
-        val board = Board(
+        val board = makeBoard(
           D5 -> White.pawn,
           C5 -> Black.pawn,
           E5 -> Black.pawn
@@ -96,7 +96,7 @@ class PawnTest extends ChessTest {
         }
       }
       "enemy not-a-pawn" in {
-        Board(
+        makeBoard(
           D5 -> White.pawn,
           E5 -> Black.rook
         ) withHistory History(
@@ -104,7 +104,7 @@ class PawnTest extends ChessTest {
         ) destsFrom D5 must bePoss(D6)
       }
       "friend pawn (?!)" in {
-        Board(
+        makeBoard(
           D5 -> White.pawn,
           E5 -> White.pawn
         ) withHistory History(
@@ -117,20 +117,20 @@ class PawnTest extends ChessTest {
   "a black pawn" should {
 
     "move towards rank by 1 square" in {
-      Board(
+      makeBoard(
         A4 -> Black.pawn
       ) destsFrom A4 must bePoss(A3)
     }
 
     "not move to positions that are occupied by the same color" in {
-      Board(
+      makeBoard(
         A4 -> Black.pawn,
         A3 -> Black.pawn
       ) destsFrom A4 must bePoss()
     }
 
     "capture in diagonal" in {
-      Board(
+      makeBoard(
         D4 -> Black.pawn,
         C3 -> White.pawn,
         E3 -> White.bishop
@@ -138,7 +138,7 @@ class PawnTest extends ChessTest {
     }
 
     "require a capture to move in diagonal" in {
-      Board(
+      makeBoard(
         A4 -> Black.pawn,
         C3 -> Black.pawn
       ) destsFrom A4 must bePoss(A3)
@@ -146,19 +146,19 @@ class PawnTest extends ChessTest {
 
     "move towards rank by 2 squares" in {
       "if the path is free" in {
-        Board(
+        makeBoard(
           A7 -> Black.pawn
         ) destsFrom A7 must bePoss(A6, A5)
       }
       "if the path is occupied by a friend" in {
         "close" in {
-          Board(
+          makeBoard(
             A7 -> Black.pawn,
             A6 -> Black.rook
           ) destsFrom A7 must bePoss()
         }
         "far" in {
-          Board(
+          makeBoard(
             A7 -> Black.pawn,
             A5 -> Black.rook
           ) destsFrom A7 must bePoss(A6)
@@ -166,13 +166,13 @@ class PawnTest extends ChessTest {
       }
       "if the path is occupied by a enemy" in {
         "close" in {
-          Board(
+          makeBoard(
             A7 -> Black.pawn,
             A6 -> White.rook
           ) destsFrom A7 must bePoss()
         }
         "far" in {
-          Board(
+          makeBoard(
             A7 -> Black.pawn,
             A5 -> White.rook
           ) destsFrom A7 must bePoss(A6)
@@ -181,7 +181,7 @@ class PawnTest extends ChessTest {
     }
     "capture en passant" in {
       "with proper position" in {
-        val board = Board(
+        val board = makeBoard(
           D4 -> Black.pawn,
           C4 -> White.pawn,
           E4 -> White.pawn
@@ -196,7 +196,7 @@ class PawnTest extends ChessTest {
         }
       }
       "enemy not-a-pawn" in {
-        Board(
+        makeBoard(
           D4 -> Black.pawn,
           E4 -> White.rook
         ) withHistory History(

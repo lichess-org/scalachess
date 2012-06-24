@@ -5,7 +5,7 @@ import Variant._
 
 class VariantTest extends ChessTest {
 
-  val board = Board()
+  val board = makeBoard
 
   "standard" should {
 

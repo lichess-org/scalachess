@@ -34,5 +34,5 @@ case class Situation(board: Board, color: Color) {
 
 object Situation {
 
-  def apply(): Situation = Situation(Board(), White)
+  def apply(variant: Variant): Situation = Situation(Board init variant, White)
 }

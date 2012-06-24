@@ -12,6 +12,11 @@ trait ChessTest
 
   implicit def stringToBoard(str: String): Board = Visual << str
 
+  implicit def stringToBoardBuilder(str: String) = new {
+
+    def chess960: Board = makeBoard(str, Variant.Chess960)
+  }
+
   implicit def stringToSituationBuilder(str: String) = new {
 
     def as(color: Color): Situation = Situation(Visual << str, color)
@@ -37,9 +42,21 @@ trait ChessTest
     def withClock(c: Clock) = game.copy(clock = Some(c))
   }
 
+  def makeBoard(pieces: (Pos, Piece)*): Board = 
+    Board(pieces toMap, History(), Variant.Standard)
+
+  def makeBoard(str: String, variant: Variant) = 
+    Visual << str withVariant variant
+
+  def makeBoard: Board = Board init Variant.Standard
+
+  def makeEmptyBoard: Board = Board empty Variant.Standard
+
   def bePoss(poss: Pos*): Matcher[Option[Iterable[Pos]]] = beSome.like {
     case p ⇒ sortPoss(p.toList) must_== sortPoss(poss.toList)
   }
+
+  def makeGame: Game = Game(makeBoard)
 
   def bePoss(board: Board, visual: String): Matcher[Option[Iterable[Pos]]] = beSome.like {
     case p ⇒ Visual.addNewLines(Visual.>>|(board, Map(p -> 'x'))) must_== visual
@@ -60,7 +77,7 @@ trait ChessTest
   def sortPoss(poss: Seq[Pos]): Seq[Pos] = poss sortBy (_.toString)
 
   def pieceMoves(piece: Piece, pos: Pos): Option[List[Pos]] =
-    (Board.empty place piece at pos).toOption flatMap { b ⇒
+    (makeEmptyBoard place piece at pos).toOption flatMap { b ⇒
       b actorAt pos map (_.destinations)
     }
 }

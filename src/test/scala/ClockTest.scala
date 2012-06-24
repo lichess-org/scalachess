@@ -6,7 +6,7 @@ class ClockTest extends ChessTest {
 
   "play with a clock" should {
     val clock = Clock(5 * 60 * 1000, 0)
-    val game = Game() withClock clock
+    val game = makeGame withClock clock
     "new game" in {
       game.clock must beSome.like {
         case c ⇒ c.color must_== White

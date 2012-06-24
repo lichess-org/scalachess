@@ -7,6 +7,8 @@ sealed abstract class Tag(name: String, value: String)
 
 case class Fen(value: String) extends Tag("fen", value)
 
+case class Variant(value: String) extends Tag("variant", value)
+
 case class Unknown(name: String, value: String) extends Tag(name, value)
 
 // Standard Algebraic Notation
@@ -64,6 +66,6 @@ case class Castle(
   def apply(game: Game): Valid[Move] = for {
     kingPos ← game.board kingPosOf game.player toValid "No king found"
     actor ← game.board actorAt kingPos toValid "No actor found"
-    move ← (actor castleOn side).headOption toValid "Cannot castle"
+    move ← actor.castleOn(side).headOption toValid "Cannot castle / variant is " + game.board.variant
   } yield move
 }

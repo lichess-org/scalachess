@@ -3,7 +3,7 @@ package chess
 import format.PgnDump
 
 case class Game(
-    board: Board = Board(),
+    board: Board,
     player: Color = White,
     pgnMoves: String = "",
     clock: Option[Clock] = None,
@@ -66,4 +66,11 @@ case class Game(
   def withPlayer(c: Color) = copy(player = c)
 
   def withTurns(t: Int) = copy(turns = t)
+}
+
+object Game {
+
+  def apply(variant: Variant): Game = new Game(
+    board = Board init variant
+  )
 }

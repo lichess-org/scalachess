@@ -24,16 +24,12 @@ case class Situation(board: Board, color: Color) {
 
   def end: Boolean = checkMate || staleMate || autoDraw
 
-  def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Valid[Move] = {
-
-    for {
-      actor ← board.actors get from
-      if actor is color
-      m1 ← actor.moves find (_.dest == to)
-      m2 ← m1 withPromotion promotion
-    } yield m2
-
-  } toSuccess "Invalid move %s %s".format(from, to).wrapNel
+  def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Valid[Move] = for {
+    actor ← board.actors get from toValid "No piece on " + from
+    myActor ← actor.validIf(actor is color, "Not my piece")
+    m1 ← myActor.moves find (_.dest == to) toValid "Piece cannot move to " + to
+    m2 ← m1 withPromotion promotion toValid "Piece cannot promote to " + promotion
+  } yield m2
 }
 
 object Situation {

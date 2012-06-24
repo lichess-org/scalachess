@@ -9,11 +9,11 @@ object UciDump {
       nonEmptyPgn ⇒ PgnReader(
         nonEmptyPgn,
         initialFen.fold(
-          fen => Fen(fen) :: Variant(chess.Variant.Chess960.name) :: Nil, 
+          fen ⇒ Fen(fen) :: Variant(chess.Variant.Chess960.name) :: Nil,
           Nil)
       ) map (_.chronoMoves map move mkString " "),
       success(""))
 
   private def move(m: Move): String =
-    m.orig.key + m.dest.key + m.promotion.fold(_.pgn, "")
+    m.orig.key + m.dest.key + m.promotion.fold(_.forsyth.toString, "")
 }

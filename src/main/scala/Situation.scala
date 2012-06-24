@@ -26,9 +26,9 @@ case class Situation(board: Board, color: Color) {
 
   def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Valid[Move] = for {
     actor ← board.actors get from toValid "No piece on " + from
-    myActor ← actor.validIf(actor is color, "Not my piece")
-    m1 ← myActor.moves find (_.dest == to) toValid "Piece cannot move to " + to
-    m2 ← m1 withPromotion promotion toValid "Piece cannot promote to " + promotion
+    myActor ← actor.validIf(actor is color, "Not my piece on " + from)
+    m1 ← myActor.moves find (_.dest == to) toValid "Piece on " + from + " cannot move to " + to
+    m2 ← m1 withPromotion promotion toValid "Piece on " + from + " cannot promote to " + promotion
   } yield m2
 }
 

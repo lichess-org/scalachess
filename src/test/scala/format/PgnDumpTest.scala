@@ -23,4 +23,51 @@ class PgnDumpTest extends ChessTest {
       }
     }
   }
+  "dump a promotion move" should {
+    "without check" in {
+      val game = Game("""
+   
+P    k
+
+
+
+
+PP   PPP
+KNBQ BNR
+""")
+      game.playMoves(A7 -> A8) map (_.pgnMoves) must beSuccess.like {
+        case ms ⇒ ms must_== "a8=Q"
+      }
+    }
+    "with check" in {
+      val game = Game("""
+    k
+P     
+
+
+
+
+PP   PPP
+KNBQ BNR
+""")
+      game.playMoves(A7 -> A8) map (_.pgnMoves) must beSuccess.like {
+        case ms ⇒ ms must_== "a8=Q+"
+      }
+    }
+    "with checkmate" in {
+      val game = Game("""
+    k
+P  ppp  
+
+
+
+
+PP   PPP
+KNBQ BNR
+""")
+      game.playMoves(A7 -> A8) map (_.pgnMoves) must beSuccess.like {
+        case ms ⇒ ms must_== "a8=Q#"
+      }
+    }
+  }
 }

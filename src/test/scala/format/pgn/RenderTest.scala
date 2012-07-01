@@ -68,13 +68,10 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         )
       )
     )
-    pgn.toString must_== """
-[White "Kramnik,V"]
+    pgn.toString must_== """[White "Kramnik,V"]
 [Black "Anand,V"]
 [ECO "D14"]
 
-1. d4 d5 2. c4 c6 3. Nc3 Nf6 4. cxd5 { The Exchange Slav, the sure way to
-play with zero losing chances so an ideal choice for game one } 4... cxd5
-5. Bf4 Nc6"""
+1. d4 d5 2. c4 $1 c6 $2 3. Nc3 $3 Nf6 $4 4. cxd5 $5 { The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one } 4... cxd5 $6 5. Bf4 Nc6"""
   }
 }

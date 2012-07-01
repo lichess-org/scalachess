@@ -21,12 +21,13 @@ case class Turn(
 
   override def toString = "%d.%s".format(
     number,
-    white.fold(
-      w ⇒ black.fold(
-        b ⇒ "%s %s".format(w, b),
-        w),
-      ~(black map (_.toString))
-    )
+    (white, black) match {
+      case (Some(w), Some(b)) if w.isLong ⇒ " %s %d... %s".format(w, number, b)
+      case (Some(w), Some(b))             ⇒ " %s %s".format(w, b)
+      case (Some(w), None)                ⇒ " %s".format(w)
+      case (None, Some(b))                ⇒ ".. %s".format(b)
+      case (None, None)                   ⇒ ""
+    }
   )
 }
 
@@ -35,6 +36,8 @@ case class Move(
     nag: Option[Int] = None,
     comment: Option[String] = None,
     variation: Option[Movetext] = None) {
+
+  def isLong = comment.isDefined || variation.isDefined
 
   override def toString = "%s%s%s".format(
     san,

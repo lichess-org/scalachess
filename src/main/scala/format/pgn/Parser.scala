@@ -27,8 +27,7 @@ object Parser {
     def tags: Parser[List[Tag]] = rep(tag)
 
     def tag: Parser[Tag] = tagName ~ tagValue ^^ {
-      case "FEN" ~ value ⇒ Fen(value)
-      case name ~ value  ⇒ Unknown(name, value)
+      case name ~ value  ⇒ Tag(name, value)
     }
 
     val tagName: Parser[String] = "[" ~> """[a-zA-Z]+""".r

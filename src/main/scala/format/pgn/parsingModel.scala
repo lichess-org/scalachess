@@ -6,7 +6,7 @@ case class ParsedPgn(tags: List[Tag], sans: List[San])
 // Standard Algebraic Notation
 sealed trait San {
 
-  def apply(game: Game): Valid[Move]
+  def apply(game: Game): Valid[chess.Move]
 }
 
 case class Std(
@@ -24,7 +24,7 @@ case class Std(
     checkmate = s.checkmate,
     promotion = s.promotion)
 
-  def apply(game: Game): Valid[Move] = {
+  def apply(game: Game): Valid[chess.Move] = {
     def compare[A](a: Option[A], b: ⇒ A) = a map (_ == b) getOrElse true
     game.situation.moves map {
       case (orig, moves) ⇒ moves find { move ⇒
@@ -55,7 +55,7 @@ case class Castle(
     check = s.check,
     checkmate = s.checkmate)
 
-  def apply(game: Game): Valid[Move] = for {
+  def apply(game: Game): Valid[chess.Move] = for {
     kingPos ← game.board kingPosOf game.player toValid "No king found"
     actor ← game.board actorAt kingPos toValid "No actor found"
     move ← actor.castleOn(side).headOption toValid "Cannot castle / variant is " + game.board.variant

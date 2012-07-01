@@ -1,10 +1,38 @@
 package chess
 package format.pgn
 
-sealed abstract class Tag(name: String, value: String)
+case class Tag(name: TagName, value: String) {
 
-case class Fen(value: String) extends Tag("fen", value)
+  override def toString = """[%s "%s"]""".format(name, value)
+}
 
-case class Variant(value: String) extends Tag("variant", value)
+sealed trait TagName {
+  lazy val name = toString
+  lazy val lowercase = name.toLowerCase
+}
 
-case class Unknown(name: String, value: String) extends Tag(name, value)
+object Tag {
+
+  case object FEN extends TagName
+  case object Variant extends TagName
+  case object White extends TagName
+  case object Black extends TagName
+  case object ECO extends TagName
+  case class Unknown(n: String) extends TagName {
+    override def toString = n
+  }
+
+  val knownTagNames = List(FEN, Variant, White, Black, ECO)
+
+  def apply(name: String, value: String): Tag = new Tag(
+    name = tagName(name),
+    value = value)
+
+  def apply(name: Tag.type => TagName, value: String): Tag = new Tag(
+    name = name(this),
+    value = value)
+
+  def tagName(name: String) = {
+    knownTagNames find (_.lowercase == name.toLowerCase)
+  } | Unknown(name)
+}

@@ -1,7 +1,7 @@
 package chess
 package format
 
-import pgn.{ Reader, Fen, Variant }
+import pgn.{ Reader, Tag }
 
 object UciDump {
 
@@ -11,7 +11,7 @@ object UciDump {
       nonEmptyPgn ⇒ Reader(
         nonEmptyPgn,
         initialFen.fold(
-          fen ⇒ Fen(fen) :: Variant(chess.Variant.Chess960.name) :: Nil,
+          fen ⇒ Tag(_.FEN, fen) :: Tag(_.Variant, chess.Variant.Chess960.name) :: Nil,
           Nil)
       ) map (_.chronoMoves map move mkString " "),
       success(""))

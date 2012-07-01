@@ -3,15 +3,11 @@ package format.pgn
 
 case class Pgn(
     tags: List[Tag],
-    movetext: Movetext) {
-
-  override def toString = "%s\n\n%s".format(tags mkString "\n", movetext)
-}
-
-case class Movetext(
     turns: List[Turn]) {
 
-  override def toString = turns mkString " "
+  override def toString = "%s\n\n%s".format(
+    tags mkString "\n", 
+    turns mkString " ")
 }
 
 case class Turn(
@@ -35,9 +31,9 @@ case class Move(
     san: String,
     nag: Option[Int] = None,
     comment: Option[String] = None,
-    variation: Option[Movetext] = None) {
+    variation: List[Turn] = Nil) {
 
-  def isLong = comment.isDefined || variation.isDefined
+  def isLong = comment.isDefined || variation.nonEmpty
 
   override def toString = "%s%s%s".format(
     san,

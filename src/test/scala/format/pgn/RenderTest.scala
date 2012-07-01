@@ -38,7 +38,6 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         Tag(_.Black, "Anand,V"),
         Tag(_.ECO, "D14")
       ),
-      movetext = Movetext(
         turns = List(
           Turn(
             number = 1,
@@ -66,7 +65,6 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
             black = Move("Nc6").some
           )
         )
-      )
     )
     pgn.toString must_== """[White "Kramnik,V"]
 [Black "Anand,V"]

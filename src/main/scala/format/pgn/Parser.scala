@@ -7,11 +7,11 @@ object Parser {
 
   type TagType = (List[Tag], String)
 
-  def apply(pgn: String): Valid[Pgn] = for {
+  def apply(pgn: String): Valid[ParsedPgn] = for {
     parsed ← TagParser(pgn)
     (tags, moveString) = parsed
     sans ← MoveParser(moveString)
-  } yield Pgn(tags, sans)
+  } yield ParsedPgn(tags, sans)
 
   object TagParser extends RegexParsers {
 

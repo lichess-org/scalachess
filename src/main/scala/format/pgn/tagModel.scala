@@ -1,42 +1,42 @@
 package chess
 package format.pgn
 
-case class Tag(name: TagName, value: String) {
+case class Tag(name: TagType, value: String) {
 
   override def toString = """[%s "%s"]""".format(name, value)
 }
 
-sealed trait TagName {
+sealed trait TagType {
   lazy val name = toString
   lazy val lowercase = name.toLowerCase
 }
 
 object Tag {
 
-  case object Event extends TagName
-  case object Site extends Site
-  case object Date extends Date
-  case object White extends TagName
-  case object Black extends TagName
-  case object Result extends Date
-  case object FEN extends TagName
-  case object Variant extends TagName
-  case object ECO extends TagName
-  case class Unknown(n: String) extends TagName {
+  case object Event extends TagType
+  case object Site extends TagType
+  case object Date extends TagType
+  case object White extends TagType
+  case object Black extends TagType
+  case object Result extends TagType
+  case object FEN extends TagType
+  case object Variant extends TagType
+  case object ECO extends TagType
+  case class Unknown(n: String) extends TagType {
     override def toString = n
   }
 
-  val knownTagNames = List(Event, Site, Date, White, Black, Result, FEN, Variant, ECO)
+  val tagTypes = List(Event, Site, Date, White, Black, Result, FEN, Variant, ECO)
+  val tagTypesByName = tagTypes map { t ⇒ t.name -> t } toMap
 
   def apply(name: String, value: Any): Tag = new Tag(
-    name = tagName(name),
+    name = tagType(name),
     value = value.toString)
 
-  def apply(name: Tag.type ⇒ TagName, value: Any): Tag = new Tag(
+  def apply(name: Tag.type ⇒ TagType, value: Any): Tag = new Tag(
     name = name(this),
     value = value.toString)
 
-  def tagName(name: String) = {
-    knownTagNames find (_.lowercase == name.toLowerCase)
-  } | Unknown(name)
+  def tagType(name: String) = 
+    (tagTypesByName get name.toLowerCase) | Unknown(name)
 }

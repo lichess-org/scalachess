@@ -5,10 +5,12 @@ case class Pgn(
     tags: List[Tag],
     turns: List[Turn]) {
 
-  def updateTurn(index: Int, f: Turn ⇒ Turn) = turns lift index fold (
-    turn ⇒ copy(turns = turns.updated(index, f(turn))),
-    this
-  )
+  def updateTurn(fullMove: Int, f: Turn ⇒ Turn) = fullMove - 1 |> { index ⇒
+    turns lift index fold (
+      turn ⇒ copy(turns = turns.updated(index, f(turn))),
+      this
+    )
+  }
 
   override def toString = "%s\n\n%s %s".format(
     tags mkString "\n",

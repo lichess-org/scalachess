@@ -13,24 +13,28 @@ sealed trait TagName {
 
 object Tag {
 
-  case object FEN extends TagName
-  case object Variant extends TagName
+  case object Event extends TagName
+  case object Site extends Site
+  case object Date extends Date
   case object White extends TagName
   case object Black extends TagName
+  case object Result extends Date
+  case object FEN extends TagName
+  case object Variant extends TagName
   case object ECO extends TagName
   case class Unknown(n: String) extends TagName {
     override def toString = n
   }
 
-  val knownTagNames = List(FEN, Variant, White, Black, ECO)
+  val knownTagNames = List(Event, Site, Date, White, Black, Result, FEN, Variant, ECO)
 
-  def apply(name: String, value: String): Tag = new Tag(
+  def apply(name: String, value: Any): Tag = new Tag(
     name = tagName(name),
-    value = value)
+    value = value.toString)
 
-  def apply(name: Tag.type => TagName, value: String): Tag = new Tag(
+  def apply(name: Tag.type ⇒ TagName, value: Any): Tag = new Tag(
     name = name(this),
-    value = value)
+    value = value.toString)
 
   def tagName(name: String) = {
     knownTagNames find (_.lowercase == name.toLowerCase)

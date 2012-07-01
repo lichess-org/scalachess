@@ -5,15 +5,26 @@ case class Pgn(
     tags: List[Tag],
     turns: List[Turn]) {
 
-  override def toString = "%s\n\n%s".format(
-    tags mkString "\n", 
-    turns mkString " ")
+  def updateTurn(index: Int, f: Turn ⇒ Turn) = turns lift index fold (
+    turn ⇒ copy(turns = turns.updated(index, f(turn))),
+    this
+  )
+
+  override def toString = "%s\n\n%s %s".format(
+    tags mkString "\n",
+    turns mkString " ",
+    tags find (_.name == Tag.Result) map (_.value) filter ("*" !=) getOrElse "")
 }
 
 case class Turn(
     number: Int,
     white: Option[Move],
     black: Option[Move]) {
+
+  def update(color: Color, f: Move ⇒ Move) = color.fold(
+    copy(white = white map f),
+    copy(black = black map f)
+  )
 
   override def toString = "%d.%s".format(
     number,

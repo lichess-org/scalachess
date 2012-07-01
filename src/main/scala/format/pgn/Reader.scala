@@ -1,7 +1,9 @@
 package chess
-package format
+package format.pgn
 
-object PgnReader {
+import format.Forsyth
+
+object Reader {
 
   def apply(pgn: String, tags: List[Tag] = Nil): Valid[Replay] =
     withSans(pgn, identity, tags)
@@ -10,7 +12,7 @@ object PgnReader {
     pgn: String,
     op: List[San] ⇒ List[San],
     tags: List[Tag] = Nil): Valid[Replay] = for {
-    parsed ← PgnParser(pgn)
+    parsed ← Parser(pgn)
     game ← makeGame(parsed.tags ::: tags)
     replay ← op(parsed.sans).foldLeft(Replay(game).success: Valid[Replay]) {
       case (replayValid, san) ⇒ for {

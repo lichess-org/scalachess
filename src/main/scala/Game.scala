@@ -1,6 +1,6 @@
 package chess
 
-import format.PgnDump
+import format.pgn
 
 case class Game(
     board: Board,
@@ -29,7 +29,7 @@ case class Game(
         cpiece ← board(cpos)
       } yield (cpos, cpiece) :: deads) | deads
     )
-    val pgnMove = PgnDump.move(situation, move, newGame.situation)
+    val pgnMove = pgn.Dumper.move(situation, move, newGame.situation)
     newGame.copy(pgnMoves = pgnMoves.isEmpty.fold(
       pgnMove,
       pgnMoves + " " + pgnMove))

@@ -1,7 +1,7 @@
 package chess
-package format
+package format.pgn
 
-object PgnFixtures {
+object Fixtures {
 
   val simple = "e3 Nc6 d4 Nf6"
 

@@ -1,17 +1,17 @@
 package chess
-package format
+package format.pgn
 
 import scala.util.parsing.combinator._
 
-object PgnParser {
+object Parser {
 
   type TagType = (List[Tag], String)
 
-  def apply(pgn: String): Valid[ParsedPgn] = for {
+  def apply(pgn: String): Valid[Pgn] = for {
     parsed ← TagParser(pgn)
     (tags, moveString) = parsed
     sans ← MoveParser(moveString)
-  } yield ParsedPgn(tags, sans)
+  } yield Pgn(tags, sans)
 
   object TagParser extends RegexParsers {
 

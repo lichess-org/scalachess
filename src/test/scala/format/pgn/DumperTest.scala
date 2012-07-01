@@ -1,9 +1,9 @@
 package chess
-package format
+package format.pgn
 
 import Pos._
 
-class PgnDumpTest extends ChessTest {
+class DumperTest extends ChessTest {
 
   val gioachineGreco = makeGame.playMoves(D2 -> D4, D7 -> D5, C2 -> C4, D5 -> C4, E2 -> E3, B7 -> B5, A2 -> A4, C7 -> C6, A4 -> B5, C6 -> B5, D1 -> F3)
 

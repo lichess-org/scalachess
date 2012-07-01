@@ -1,7 +1,7 @@
 package chess
-package format
+package format.pgn
 
-case class ParsedPgn(tags: List[Tag], sans: List[San])
+case class Pgn(tags: List[Tag], sans: List[San])
 
 sealed abstract class Tag(name: String, value: String)
 

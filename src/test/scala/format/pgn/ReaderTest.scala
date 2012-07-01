@@ -1,45 +1,45 @@
 package chess
-package format
+package format.pgn
 
 import Pos._
 
-class PgnReaderTest extends ChessTest {
+class ReaderTest extends ChessTest {
 
-  import PgnFixtures._
+  import Fixtures._
 
   "only raw moves" should {
     "many games" in {
       forall(raws) { (c: String) ⇒
-        PgnReader(c) must beSuccess.like {
+        Reader(c) must beSuccess.like {
           case replay ⇒ replay.moves must have size (c.split(' ').size)
         }
       }
     }
     "example from prod 1" in {
-      PgnReader(fromProd1) must beSuccess
+      Reader(fromProd1) must beSuccess
     }
     "example from prod 2" in {
-      PgnReader(fromProd2) must beSuccess
+      Reader(fromProd2) must beSuccess
     }
     "rook promotion" in {
-      PgnReader(promoteRook) must beSuccess
+      Reader(promoteRook) must beSuccess
     }
     "castle check O-O-O+" in {
-      PgnReader(castleCheck1) must beSuccess
+      Reader(castleCheck1) must beSuccess
     }
     "castle checkmate O-O#" in {
-      PgnReader(castleCheck2) must beSuccess
+      Reader(castleCheck2) must beSuccess
     }
   }
   "tags and moves" should {
     "chess960" in {
-      PgnReader(complete960) must beSuccess
+      Reader(complete960) must beSuccess
     }
     "example from wikipedia" in {
-      PgnReader(fromWikipedia) must beSuccess
+      Reader(fromWikipedia) must beSuccess
     }
     "example from chessgames.com" in {
-      PgnReader(fromChessgames) must beSuccess
+      Reader(fromChessgames) must beSuccess
     }
   }
 }

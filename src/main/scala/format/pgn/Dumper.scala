@@ -1,7 +1,7 @@
 package chess
-package format
+package format.pgn
 
-object PgnDump {
+object Dumper {
 
   def move(situation: Situation, data: Move, next: Situation): String = {
     import data._

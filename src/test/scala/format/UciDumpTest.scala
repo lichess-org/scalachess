@@ -5,7 +5,7 @@ import Pos._
 
 class UciDumpTest extends ChessTest {
 
-  import PgnFixtures._
+  import pgn.Fixtures._
 
   "only raw moves" should {
     "empty" in {

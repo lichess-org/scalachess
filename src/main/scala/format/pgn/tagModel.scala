@@ -27,7 +27,7 @@ object Tag {
   }
 
   val tagTypes = List(Event, Site, Date, White, Black, Result, FEN, Variant, ECO)
-  val tagTypesByName = tagTypes map { t ⇒ t.name -> t } toMap
+  val tagTypesByLowercase = tagTypes map { t ⇒ t.lowercase -> t } toMap
 
   def apply(name: String, value: Any): Tag = new Tag(
     name = tagType(name),
@@ -38,5 +38,5 @@ object Tag {
     value = value.toString)
 
   def tagType(name: String) = 
-    (tagTypesByName get name.toLowerCase) | Unknown(name)
+    (tagTypesByLowercase get name.toLowerCase) | Unknown(name)
 }

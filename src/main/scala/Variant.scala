@@ -30,14 +30,14 @@ object Variant {
       }
     }).flatten.toMap
 
-  case object Standard extends Variant(1) {
+  case object Standard extends Variant(id = 1) {
 
     val pieces = symmetricRank(
       IndexedSeq(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
     )
   }
 
-  case object Chess960 extends Variant(2) with States {
+  case object Chess960 extends Variant(id = 2) with States {
 
     def pieces = symmetricRank {
       val size = 8
@@ -78,7 +78,7 @@ object Variant {
   def apply(id: Int): Option[Variant] = byId get id
   def orDefault(id: Int): Variant = apply(id) | default
 
-  def apply(name: String): Option[Variant] = byName get name
+  def apply(name: String): Option[Variant] = byName get name.toLowerCase
 
   def exists(id: Int): Boolean = byId contains id
 }

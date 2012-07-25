@@ -50,11 +50,14 @@ case class Move(
 
   def isLong = comment.isDefined || variation.nonEmpty
 
-  def timeLeftString: Option[String] = timeLeft.fold("PLACEHOLDER",None)
+  def timeLeftString: Option[String] = timeLeft.fold(
+    Some(List(List(0, 3600), List(0, 60), List(0, 1)).scanLeft(
+      List(_, 0),(List(x,y) => List(x%y, x/y))).transpose.head.mkString(":")), None)
 
   override def toString = "%s%s%s".format(
     san,
     nag.fold(" $" + _, ""),
-    comment.fold(" { " + _ + " }", "")
+    !(comment.isEmpty && timeLeft.isempty).fold(
+      List(" {", timeLeftString, comment, "}").flatten.mkString(" "), "")
   )
 }

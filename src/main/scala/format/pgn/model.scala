@@ -45,9 +45,12 @@ case class Move(
     san: String,
     nag: Option[Int] = None,
     comment: Option[String] = None,
-    variation: List[Turn] = Nil) {
+    variation: List[Turn] = Nil,
+    timeLeft: Option[Int] = None) {
 
   def isLong = comment.isDefined || variation.nonEmpty
+
+  def timeLeftString: Option[String] = timeLeft.fold("PLACEHOLDER",None)
 
   override def toString = "%s%s%s".format(
     san,

@@ -51,9 +51,15 @@ case class Move(
   def isLong = comment.isDefined || variation.nonEmpty
 
   def timeLeftString: Option[String] = timeLeft.fold(
-    tlValue => Some(List(List(0, 3600),List(0, 60),List(0, 1)).scanLeft(
-      List(tlValue, 0))({case (List(x,a),List(b,y)) => List(x%y, x/y)}).
-        tail.transpose.tail.flatten.map("%02d".format(_)).mkString(":")), None)
+    tlValue => Some(
+      "[%clk " +
+      List(List(0, 3600),List(0, 60),List(0, 1)).scanLeft(
+        List(tlValue, 0))({case (List(x,a),List(b,y)) => List(x%y, x/y)}).
+          tail.transpose.tail.flatten.map("%02d".format(_)).mkString(":") +
+      "]"
+    ),
+    None
+  )
 
   override def toString = "%s%s%s".format(
     san,

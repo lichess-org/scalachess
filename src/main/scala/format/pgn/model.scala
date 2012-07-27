@@ -71,9 +71,7 @@ case class Move(
     nag.fold(" $" + _, ""),
     (comment.isDefined || timeLeft.isDefined).fold(
       List(
-        " {",
-        timeLeftString.getOrElse(""),
-        comment.getOrElse(""), "}"
+        Some(" {"), timeLeftString, comment, Some("}")
       ).flatten.mkString(" "),
       ""
     )

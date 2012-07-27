@@ -61,9 +61,7 @@ case class Move(
       appendSeconds.
       toFormatter
 
-    timeLeft.fold(
-      time => Some("[%clk " + pf.print(Period.seconds(time)) + "]"), None
-    )
+    timeLeft.map(time => "[%clk " + pf.print(Period.seconds(time)) + "]")
   }
 
   override def toString = "%s%s%s".format(

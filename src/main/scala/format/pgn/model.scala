@@ -1,6 +1,9 @@
 package chess
 package format.pgn
 
+import org.joda.time.Period
+import org.joda.time.format.{PeriodFormatter, PeriodFormatterBuilder}
+
 case class Pgn(
     tags: List[Tag],
     turns: List[Turn]) {
@@ -50,16 +53,18 @@ case class Move(
 
   def isLong = comment.isDefined || variation.nonEmpty
 
-  def timeLeftString: Option[String] = timeLeft.fold(
-    tlValue => Some(
-      "[%clk " +
-      List(List(0, 3600),List(0, 60),List(0, 1)).scanLeft(
-        List(tlValue, 0))({case (List(x,a),List(b,y)) => List(x%y, x/y)}).
-          tail.transpose.tail.flatten.map("%02d".format(_)).mkString(":") +
-      "]"
-    ),
-    None
-  )
+  def timeLeftString: Option[String] = {
+    val pf = new PeriodFormatterBuilder().
+      printZeroAlways.minimumPrintedDigits(2).
+      appendHours.appendSeparator(":").
+      appendMinutes.appendSeparator(":").
+      appendSeconds.
+      toFormatter
+
+    timeLeft.fold(
+      time => Some("[%clk " + pf.print(Period.seconds(time)) + "]"), None
+    )
+  }
 
   override def toString = "%s%s%s".format(
     san,

@@ -49,28 +49,30 @@ case class Move(
     nag: Option[Int] = None,
     comment: Option[String] = None,
     variation: List[Turn] = Nil,
+    // time left for the user who made the move, after he made it
     timeLeft: Option[Int] = None) {
 
   def isLong = comment.isDefined || variation.nonEmpty
 
-  def timeLeftString: Option[String] = {
-    timeLeft.map(time => "[%clk " + 
-      Move.pf.print(Duration.standardSeconds(time).toPeriod) + "]")
-  }
+  def timeLeftString: Option[String] =
+    timeLeft.map(time ⇒ "[%clk " + Move.formatTime(time) + "]")
 
   override def toString = "%s%s%s".format(
     san,
     nag.fold(" $" + _, ""),
     (comment.isDefined || timeLeft.isDefined).fold(
-      List(
-        Some(" {"), timeLeftString, comment, Some("}")
-      ).flatten.mkString(" "),
+      List(timeLeftString, comment).flatten.mkString(" { ", " ", " }"),
       ""
     )
   )
 }
 object Move {
-  val pf = new PeriodFormatterBuilder().
+
+  def formatTime(time: Int) = periodFormatter.print(
+    Duration.standardSeconds(time).toPeriod
+  )
+
+  private val periodFormatter = new PeriodFormatterBuilder().
     printZeroAlways.
     minimumPrintedDigits(1).appendHours.appendSeparator(":").
     minimumPrintedDigits(2).appendMinutes.appendSeparator(":").

@@ -1,8 +1,8 @@
 package chess
 package format.pgn
 
-import org.joda.time.Period
-import org.joda.time.format.{PeriodFormatter, PeriodFormatterBuilder}
+import org.joda.time.Duration
+import org.joda.time.format.PeriodFormatterBuilder
 
 case class Pgn(
     tags: List[Tag],
@@ -54,7 +54,8 @@ case class Move(
   def isLong = comment.isDefined || variation.nonEmpty
 
   def timeLeftString: Option[String] = {
-    timeLeft.map(time => "[%clk " + Move.pf.print(Period.seconds(time)) + "]")
+    timeLeft.map(time => "[%clk " + 
+      Move.pf.print(Duration.standardSeconds(time).toPeriod) + "]")
   }
 
   override def toString = "%s%s%s".format(

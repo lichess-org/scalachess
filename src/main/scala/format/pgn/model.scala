@@ -54,14 +54,7 @@ case class Move(
   def isLong = comment.isDefined || variation.nonEmpty
 
   def timeLeftString: Option[String] = {
-    val pf = new PeriodFormatterBuilder().
-      printZeroAlways.minimumPrintedDigits(2).
-      appendHours.appendSeparator(":").
-      appendMinutes.appendSeparator(":").
-      appendSeconds.
-      toFormatter
-
-    timeLeft.map(time => "[%clk " + pf.print(Period.seconds(time)) + "]")
+    timeLeft.map(time => "[%clk " + Move.pf.print(Period.seconds(time)) + "]")
   }
 
   override def toString = "%s%s%s".format(
@@ -75,3 +68,12 @@ case class Move(
     )
   )
 }
+object Move {
+  val pf = new PeriodFormatterBuilder().
+    printZeroAlways.
+    minimumPrintedDigits(1).appendHours.appendSeparator(":").
+    minimumPrintedDigits(2).appendMinutes.appendSeparator(":").
+    appendSeconds.
+    toFormatter
+}
+

@@ -1,5 +1,8 @@
 package chess
 
+import org.joda.time.Duration
+import org.joda.time.format.PeriodFormatterBuilder
+
 // All durations are expressed in seconds
 sealed trait Clock {
   val limit: Int
@@ -134,4 +137,15 @@ object Clock {
     color = White,
     whiteTime = 0f,
     blackTime = 0f)
+
+  def timeString(time: Int) = periodFormatter.print(
+    Duration.standardSeconds(time).toPeriod
+  )
+
+  private val periodFormatter = new PeriodFormatterBuilder().
+    printZeroAlways.
+    minimumPrintedDigits(1).appendHours.appendSeparator(":").
+    minimumPrintedDigits(2).appendMinutes.appendSeparator(":").
+    appendSeconds.
+    toFormatter
 }

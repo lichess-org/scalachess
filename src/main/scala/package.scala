@@ -1,9 +1,9 @@
 import ornicar.scalalib
 
 package object chess
-    extends scalalib.OrnicarValidation
-    with scalalib.OrnicarCommon
-    with scalalib.OrnicarNonEmptyLists 
+    extends scalalib.Validation
+    with scalalib.Common
+    with scalalib.NonEmptyLists 
     with scalaz.NonEmptyLists
     with scalaz.Strings
     with scalaz.Lists

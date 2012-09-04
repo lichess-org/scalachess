@@ -3,6 +3,8 @@ package chess
 sealed abstract class Status(val id: Int) extends Ordered[Status] {
 
   def compare(other: Status) = id compare other.id
+
+  def name = toString
 }
 
 object Status {
@@ -19,6 +21,10 @@ object Status {
   case object Cheat extends Status(36)
 
   val all = List(Created, Started, Aborted, Mate, Resign, Stalemate, Timeout, Draw, Outoftime, Cheat)
+
+  val finishedNotCheated = all filter { s ⇒
+    s.id >= Mate.id && s.id < Cheat.id
+  }
 
   val byId = all map { v ⇒ (v.id, v) } toMap
 

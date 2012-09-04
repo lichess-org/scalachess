@@ -1,6 +1,6 @@
 package chess
 
-import ornicar.scalalib.test.OrnicarValidationMatchers
+import ornicar.scalalib.test.ValidationMatchers
 import org.specs2.mutable.Specification
 import org.specs2.matcher.Matcher
 
@@ -8,7 +8,7 @@ import format.Visual
 
 trait ChessTest
     extends Specification
-    with OrnicarValidationMatchers {
+    with ValidationMatchers {
 
   implicit def stringToBoard(str: String): Board = Visual << str
 

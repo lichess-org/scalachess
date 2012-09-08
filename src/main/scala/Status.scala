@@ -1,10 +1,10 @@
 package chess
 
-sealed abstract class Status(val id: Int, rename: Option[String] = None) extends Ordered[Status] {
+sealed abstract class Status(val id: Int) extends Ordered[Status] {
 
   def compare(other: Status) = id compare other.id
 
-  def name = rename | toString
+  def name = toString
 
   def is(s: Status): Boolean = this == s
 
@@ -21,7 +21,7 @@ object Status {
   case object Stalemate extends Status(32)
   case object Timeout extends Status(33) // when player leaves the game
   case object Draw extends Status(34)
-  case object Outoftime extends Status(35, "Clock Flag".some) // clock flag
+  case object Outoftime extends Status(35) // clock flag
   case object Cheat extends Status(36)
 
   val all = List(Created, Started, Aborted, Mate, Resign, Stalemate, Timeout, Draw, Outoftime, Cheat)

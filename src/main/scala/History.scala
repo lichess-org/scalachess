@@ -75,10 +75,10 @@ object History {
 
   val hashSize = 5
 
-  val MoveString = """^([a-h][1-8]) ([a-h][1-8])$""".r
+  val MoveString = """^([a-h][1-8])([a-h][1-8])$""".r
 
   def apply(
-    lastMove: Option[String], // a2 a4
+    lastMove: Option[String], // a2a4
     positionHashes: String, // KQkq
     castles: String) = new History(
     lastMove = lastMove flatMap {

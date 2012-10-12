@@ -10,7 +10,9 @@ case class History(
     blackCastleKingSide: Boolean = true,
     blackCastleQueenSide: Boolean = true) {
 
-  def isLastMove(p1: Pos, p2: Pos): Boolean = lastMove == (p1, p2)
+  def lastMoveString: Option[String] = lastMove map {
+    case (p1, p2) ⇒ p1.toString + p2.toString
+  }
 
   def threefoldRepetition: Boolean = positionHashes.size > 6 && {
     positionHashes.headOption map { hash ⇒

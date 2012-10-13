@@ -45,6 +45,8 @@ case class Game(
 
   def pgnMovesList = pgnMoves.split(' ').toList
 
+  def withPgnMoves(pgn: String) = copy(pgnMoves = pgn)
+
   /**
    * Halfmove clock: This is the number of halfmoves
    * since the last pawn advance or capture.

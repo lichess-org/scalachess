@@ -28,12 +28,10 @@ object ApplicationBuild extends Build with Resolvers with Dependencies {
       (state: State) ⇒ "%s> ".format(Project.extract(state).currentProject.id)
     },
     scalacOptions := Seq(
-      "-deprecation", 
-      "-unchecked", 
+      "-deprecation",
+      "-unchecked",
       "-feature",
-      "-language:implicitConversions",
-      "-language:reflectiveCalls",
-      "-language:postfixOps"),
+      "-language:implicitConversions,reflectiveCalls,postfixOps,higherKinds,existentials"),
     publishTo := Some(Resolver.sftp(
       "iliaz",
       "scala.iliaz.com"

@@ -31,7 +31,7 @@ object ApplicationBuild extends Build with Resolvers with Dependencies {
       "-deprecation",
       "-unchecked",
       "-feature",
-      "-language:implicitConversions,reflectiveCalls,postfixOps,higherKinds,existentials"),
+      "-language:_"),
     publishTo := Some(Resolver.sftp(
       "iliaz",
       "scala.iliaz.com"

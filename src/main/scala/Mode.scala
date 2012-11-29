@@ -23,7 +23,7 @@ object Mode {
 
   def apply(rated: Boolean) = rated.fold(Rated, Casual)
 
-  val default = Casual
+  val default: Mode = Casual
 
   def orDefault(id: Int): Mode = apply(id) | default
 }

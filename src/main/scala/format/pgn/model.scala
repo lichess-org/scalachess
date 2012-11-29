@@ -6,10 +6,9 @@ case class Pgn(
     turns: List[Turn]) {
 
   def updateTurn(fullMove: Int, f: Turn ⇒ Turn) = fullMove - 1 |> { index ⇒
-    turns lift index fold (
-      turn ⇒ copy(turns = turns.updated(index, f(turn))),
-      this
-    )
+    (turns lift index).fold(this) { turn =>
+      copy(turns = turns.updated(index, f(turn)))
+    }
   }
 
   override def toString = "%s\n\n%s %s".format(
@@ -58,7 +57,7 @@ case class Move(
 
   override def toString = "%s%s%s".format(
     san,
-    nag.fold(" $" + _, ""),
+    nag.fold("")(" $" + _),
     (comment.isDefined || timeLeft.isDefined).fold(
       List(clockString, comment).flatten.mkString(" { ", " ", " }"),
       ""

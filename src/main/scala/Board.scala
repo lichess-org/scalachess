@@ -47,7 +47,7 @@ case class Board(
   lazy val checkBlack = checkOf(Black)
 
   private def checkOf(c: Color): Boolean = 
-    kingPosOf(c).fold(king ⇒ actorsOf(!c) exists (_ threatens king), false)
+    kingPosOf(c).fold(false) { king ⇒ actorsOf(!c) exists (_ threatens king) }
 
   def destsFrom(from: Pos): Option[List[Pos]] = actorAt(from) map (_.destinations)
 

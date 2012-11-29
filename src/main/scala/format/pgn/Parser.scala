@@ -16,8 +16,8 @@ object Parser {
   object TagParser extends RegexParsers {
 
     def apply(pgn: String): Valid[TagType] = parseAll(all, pgn) match {
-      case f: Failure       ⇒ "Cannot parse tags: %s\n%s".format(f.toString, pgn).failNel
       case Success(sans, _) ⇒ scalaz.Scalaz.success(sans)
+      case err              ⇒ "Cannot parse tags: %s\n%s".format(err.toString, pgn).failNel
     }
 
     def all: Parser[TagType] = tags ~ """(.|\n)+""".r ^^ {
@@ -27,7 +27,7 @@ object Parser {
     def tags: Parser[List[Tag]] = rep(tag)
 
     def tag: Parser[Tag] = tagName ~ tagValue ^^ {
-      case name ~ value  ⇒ Tag(name, value)
+      case name ~ value ⇒ Tag(name, value)
     }
 
     val tagName: Parser[String] = "[" ~> """[a-zA-Z]+""".r
@@ -44,8 +44,8 @@ object Parser {
 
     def apply(pgn: String): Valid[List[San]] =
       parseAll(moves, (pgn.lines mkString " ")) match {
-        case f: Failure       ⇒ "Cannot parse moves: %s\n%s".format(f.toString, pgn).failNel
         case Success(sans, _) ⇒ scalaz.Scalaz.success(sans)
+        case err              ⇒ "Cannot parse moves: %s\n%s".format(err.toString, pgn).failNel
       }
 
     def moves: Parser[List[San]] = repsep(move, space) <~ (result?)

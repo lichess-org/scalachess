@@ -27,7 +27,13 @@ object ApplicationBuild extends Build with Resolvers with Dependencies {
     shellPrompt := {
       (state: State) ⇒ "%s> ".format(Project.extract(state).currentProject.id)
     },
-    scalacOptions := Seq("-deprecation", "-unchecked"),
+    scalacOptions := Seq(
+      "-deprecation", 
+      "-unchecked", 
+      "-feature",
+      "-language:implicitConversions",
+      "-language:reflectiveCalls",
+      "-language:postfixOps"),
     publishTo := Some(Resolver.sftp(
       "iliaz",
       "scala.iliaz.com"

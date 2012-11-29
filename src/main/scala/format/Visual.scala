@@ -44,7 +44,7 @@ object Visual {
     }
     for (y ← 8 to 1 by -1) yield {
       for (x ← 1 to 8) yield {
-        posAt(x, y) flatMap markedPoss.get getOrElse board(x, y).fold(_ forsyth, ' ')
+        posAt(x, y) flatMap markedPoss.get getOrElse board(x, y).fold(' ')(_ forsyth)
       }
     } mkString
   } map { """\s*$""".r.replaceFirstIn(_, "") } mkString "\n"

@@ -10,7 +10,7 @@ object Dumper {
       case _ if enpassant ⇒ orig.file + 'x' + dest.key
       case (promotion, Pawn) ⇒
         captures.fold(orig.file + "x", "") + 
-        promotion.fold(p ⇒ dest.key + "=" + p.pgn, dest.key)
+        promotion.fold(dest.key)(p ⇒ dest.key + "=" + p.pgn)
       case (_, role) ⇒ role.pgn + {
         val candidates = situation.actors filter { a ⇒
           a.piece.role == piece.role &&

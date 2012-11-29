@@ -7,7 +7,7 @@ case class UciMove(orig: Pos, dest: Pos, promotion: Option[PromotableRole]) {
 
   def piotr = orig.piotr.toString + dest.piotr.toString + promotionString
 
-  def promotionString = promotion.fold(_.forsyth.toString, "")
+  def promotionString = promotion.fold("")(_.forsyth.toString)
 }
 
 object UciMove {

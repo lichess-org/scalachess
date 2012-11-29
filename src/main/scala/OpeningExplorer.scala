@@ -29,7 +29,7 @@ object OpeningExplorer {
         case (m, b) ⇒ margin + m + b.render(margin + "  ")
       } mkString "\n")
 
-    override def toString = opening.fold(o ⇒ o.code + ": " + o.name, "-")
+    override def toString = opening.fold("-") { o ⇒ o.code + ": " + o.name }
   }
 
   def openingOf(pgn: String): Option[Opening] = {
@@ -39,10 +39,8 @@ object OpeningExplorer {
       moves: List[Move],
       last: Option[Opening]): Option[Opening] =
       moves match {
-        case Nil ⇒ branch.opening orElse last
-        case m :: ms ⇒ (branch get m).fold(
-          b ⇒ next(b, ms, b.opening orElse last),
-          last)
+        case Nil     ⇒ branch.opening orElse last
+        case m :: ms ⇒ (branch get m).fold(last) { b ⇒ next(b, ms, b.opening orElse last) }
       }
     next(tree, pgn.split(' ').toList, none)
   }

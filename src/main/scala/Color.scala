@@ -66,6 +66,9 @@ object Color {
     else if (c == 'b') Some(Black)
     else None
 
+  val white: Color = White
+  val black: Color = Black
+
   val all = List(White, Black)
 
   val names = all map (_.name)

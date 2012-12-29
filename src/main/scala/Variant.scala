@@ -1,7 +1,6 @@
 package chess
 
 import scala.util.Random
-import scalaz.{ States }
 
 import Pos.posAt
 
@@ -37,7 +36,7 @@ object Variant {
     )
   }
 
-  case object Chess960 extends Variant(id = 2) with States {
+  case object Chess960 extends Variant(id = 2) {
 
     def pieces = symmetricRank {
       val size = 8

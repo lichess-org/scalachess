@@ -18,7 +18,7 @@ object ApplicationBuild extends Build with Resolvers with Dependencies {
 
   private val buildSettings = Project.defaultSettings ++ Seq(
     organization := "com.github.ornicar",
-    version := "2.14",
+    version := "2.15",
     scalaVersion := "2.9.1",
     resolvers := Seq(iliaz),
     libraryDependencies := Seq(scalaz, scalalib, hasher, jodaTime, jodaConvert),

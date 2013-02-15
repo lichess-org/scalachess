@@ -123,7 +123,7 @@ R   KB R"""
     "possible" in {
       val game = Game(goodHist, White)
       "viable moves" in {
-        game.board destsFrom E1 must bePoss(C1, D1)
+        game.board destsFrom E1 must bePoss(A1, C1, D1)
       }
       "correct new board" in {
         game.playMove(E1, C1) must beGame("""
@@ -263,12 +263,12 @@ PPPPPPPP
     "king side" in {
       val board: Board = """R  QK  R"""
       board place Black.rook at H3 flatOption (_ destsFrom E1) must bePoss(
-        D2, E2, F1, F2, G1)
+        D2, E2, F1, F2, G1, H1)
     }
     "queen side" in {
       val board: Board = """R   KB R"""
       board place Black.rook at A3 flatOption (_ destsFrom E1) must bePoss(
-        C1, D1, D2, E2, F2)
+        A1, C1, D1, D2, E2, F2)
     }
   }
 }

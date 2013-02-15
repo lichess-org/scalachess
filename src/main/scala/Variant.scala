@@ -56,9 +56,14 @@ object Variant {
     }
   }
 
-  case class FromPosition(pieces: Map[Pos, Piece]) extends Variant(id = 3) 
+  case object FromPosition extends Variant(id = 3) {
 
-  val all = List(Standard, Chess960)
+    def pieces = Map.empty
+
+    override def toString = "From position"
+  }
+
+  val all = List(Standard, Chess960, FromPosition)
   val byId = all map { v ⇒ (v.id, v) } toMap
   val byName = all map { v ⇒ (v.name, v) } toMap
 

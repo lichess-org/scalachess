@@ -17,18 +17,6 @@ sealed abstract class Variant(val id: Int) {
 
 object Variant {
 
-  private def symmetricRank(rank: IndexedSeq[Role]): Map[Pos, Piece] =
-    (for (y ← Seq(1, 2, 7, 8); x ← 1 to 8) yield {
-      posAt(x, y) map { pos ⇒
-        (pos, y match {
-          case 1 ⇒ White - rank(x - 1)
-          case 2 ⇒ White.pawn
-          case 7 ⇒ Black.pawn
-          case 8 ⇒ Black - rank(x - 1)
-        })
-      }
-    }).flatten.toMap
-
   case object Standard extends Variant(id = 1) {
 
     val pieces = symmetricRank(
@@ -68,6 +56,8 @@ object Variant {
     }
   }
 
+  case class FromPosition(pieces: Map[Pos, Piece]) extends Variant(id = 3) 
+
   val all = List(Standard, Chess960)
   val byId = all map { v ⇒ (v.id, v) } toMap
   val byName = all map { v ⇒ (v.name, v) } toMap
@@ -80,4 +70,16 @@ object Variant {
   def apply(name: String): Option[Variant] = byName get name.toLowerCase
 
   def exists(id: Int): Boolean = byId contains id
+
+  private def symmetricRank(rank: IndexedSeq[Role]): Map[Pos, Piece] =
+    (for (y ← Seq(1, 2, 7, 8); x ← 1 to 8) yield {
+      posAt(x, y) map { pos ⇒
+        (pos, y match {
+          case 1 ⇒ White - rank(x - 1)
+          case 2 ⇒ White.pawn
+          case 7 ⇒ Black.pawn
+          case 8 ⇒ Black - rank(x - 1)
+        })
+      }
+    }).flatten.toMap
 }

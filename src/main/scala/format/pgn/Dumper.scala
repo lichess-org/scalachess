@@ -13,13 +13,10 @@ object Dumper {
         promotion.fold(p ⇒ dest.key + "=" + p.pgn, dest.key)
       case (_, role) ⇒ role.pgn + {
         val candidates = situation.actors filter { a ⇒
-          a.piece.role == piece.role &&
-            a.pos != orig &&
-            (a.destinations contains dest)
+          a.piece.role == piece.role && a.pos != orig && (a.destinations contains dest)
         }
         if (candidates.isEmpty) ""
-        else if (candidates exists (_.pos ?| orig))
-          orig.file + orig.rank else orig.file
+        else if (candidates exists (_.pos ?| orig)) orig.file + orig.rank else orig.file
       } + captures.fold("x", "") + dest.key
       case _ ⇒ "?"
     }) + (if (next.check) if (next.checkMate) "#" else "+" else "")

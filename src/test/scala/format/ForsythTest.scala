@@ -104,17 +104,17 @@ class ForsythTest extends ChessTest {
     "with turns" in {
       "starting" in {
         f <<< "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" must beSome.like {
-          case SituationPlus(_, _, turns) ⇒ turns must_== 0
+          case s ⇒ s.turns must_== 0
         }
       }
       "white to play" in {
         f <<< "r2q1rk1/ppp2pp1/1bnpbn1p/4p3/4P3/1BNPBN1P/PPPQ1PP1/R3K2R w KQ - 7 10" must beSome.like {
-          case SituationPlus(_, _, turns) ⇒ turns must_== 18
+          case s ⇒ s.turns must_== 18
         }
       }
       "black to play" in {
         f <<< "r1q2rk1/ppp2ppp/3p1n2/8/2PNp3/P1PnP3/2QP1PPP/R1B2K1R b - - 3 12" must beSome.like {
-          case SituationPlus(_, _, turns) ⇒ turns must_== 23
+          case s ⇒ s.turns must_== 23
         }
       }
     }

@@ -24,6 +24,8 @@ case class Situation(board: Board, color: Color) {
 
   def end: Boolean = checkMate || staleMate || autoDraw
 
+  def playable: Boolean = !end
+
   def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Valid[Move] = for {
     actor ← board.actors get from toValid "No piece on " + from
     myActor ← actor.validIf(actor is color, "Not my piece on " + from)

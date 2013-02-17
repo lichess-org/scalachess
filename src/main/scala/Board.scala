@@ -138,7 +138,7 @@ object Board {
   import Pos._
 
   def apply(pieces: Traversable[(Pos, Piece)], variant: Variant): Board =
-    Board(pieces toMap, History(), variant)
+    Board(pieces.toMap, History(), variant)
 
   def init(variant: Variant): Board = 
     Board(pieces = variant.pieces, variant = variant)

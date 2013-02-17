@@ -45,8 +45,8 @@ object Forsyth {
   def <<<(source: String): Option[SituationPlus] = for {
     situation ← <<(source)
     history ← source split " " lift 2 map { History(none, "", _) }
-    fullMoveNumber ← source split " " lift 5 flatMap parseIntOption
-  } yield SituationPlus(situation, history, fullMoveNumber)
+    fullMoveNumber = source split " " lift 5 flatMap parseIntOption
+  } yield SituationPlus(situation, history, fullMoveNumber | 1)
 
   def >>(game: Game): String = List(
     exportBoard(game.board),

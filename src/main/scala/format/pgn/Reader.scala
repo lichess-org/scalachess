@@ -28,8 +28,11 @@ object Reader {
     tags.foldLeft(success(Game(chess.Variant.default)): Valid[Game]) {
       case (vg, Tag(Tag.FEN, fen)) ⇒ for {
         g1 ← vg
-        parsed ← (Forsyth << fen) toValid "Invalid fen " + fen
-      } yield g1.copy(board = parsed.board, player = parsed.color)
+        parsed ← (Forsyth <<< fen) toValid "Invalid fen " + fen
+      } yield g1.copy(
+        board = parsed.situation.board, 
+        player = parsed.situation.color,
+        turns = parsed.turns)
       case (vg, Tag(Tag.Variant, name)) ⇒ for {
         g1 ← vg
         variant ← chess.Variant(name) toValid "Invalid variant " + name

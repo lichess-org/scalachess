@@ -37,7 +37,7 @@ object Forsyth {
     } yield Situation(Board(pieces, variant = chess.Variant.default), color)
   }
 
-  case class SituationPlus(situation: Situation, history: History, fullMoveNumber: Int) {
+  case class SituationPlus(situation: Situation, fullMoveNumber: Int) {
 
     def turns = fullMoveNumber * 2 - (if (situation.color.white) 2 else 1)
   }
@@ -45,8 +45,13 @@ object Forsyth {
   def <<<(source: String): Option[SituationPlus] = for {
     situation ← <<(source)
     history ← source split " " lift 2 map { History(none, "", _) }
+    situation2 = situation withHistory history
     fullMoveNumber = source split " " lift 5 flatMap parseIntOption
-  } yield SituationPlus(situation, history, fullMoveNumber | 1)
+  } yield SituationPlus(situation2, fullMoveNumber | 1)
+
+  def >>(parsed: SituationPlus): String = parsed match {
+    case SituationPlus(Situation(board, color), _) ⇒ >>(Game(board, color, turns = parsed.turns))
+  }
 
   def >>(game: Game): String = List(
     exportBoard(game.board),

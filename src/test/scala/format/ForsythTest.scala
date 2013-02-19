@@ -98,6 +98,15 @@ class ForsythTest extends ChessTest {
           "rnbqkb1r/pp1ppppp/7n/2p5/4P3/P4N2/1PPP1PPP/RNBQKB1R b KQkq - 0 3"
         )
       }
+      "invalid" in {
+        f << "hahaha" must beNone
+      }
+      // "weird" in {
+      //   f << "raalll3qb1r/p1Q1nk1p/2n3p1/8/8/5N2/PPPP1PPP/RNB1K2R b KQ - 0 10" must beNone
+      // }
+      // "too long" in {
+      //   f << "r3qb1r/p1Q1nk1p/2n3p1/8/8/5N2/PPPP1PPP/RNB1K2R/RNB1K2R b KQ - 0 10" must beNone
+      // }
     }
   }
   "export to situation plus" should {
@@ -121,17 +130,17 @@ class ForsythTest extends ChessTest {
     "with history" in {
       "starting" in {
         f <<< "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" must beSome.like {
-          case SituationPlus(_, History(_, _, true, true, true, true), _) ⇒ ok
+          case SituationPlus(Situation(Board(_, History(_, _, true, true, true, true), _), _), _) ⇒ ok
         }
       }
       "white to play" in {
         f <<< "r2q1rk1/ppp2pp1/1bnpbn1p/4p3/4P3/1BNPBN1P/PPPQ1PP1/R3K2R w KQ - 7 10" must beSome.like {
-          case SituationPlus(_, History(_, _, true, true, false, false), _) ⇒ ok
+          case SituationPlus(Situation(Board(_, History(_, _, true, true, false, false), _), _), _) ⇒ ok
         }
       }
       "black to play" in {
         f <<< "r1q2rk1/ppp2ppp/3p1n2/8/2PNp3/P1PnP3/2QP1PPP/R1B2K1R b - - 3 12" must beSome.like {
-          case SituationPlus(_, History(_, _, false, false, false, false), _) ⇒ ok
+          case SituationPlus(Situation(Board(_, History(_, _, false, false, false, false), _), _), _) ⇒ ok
         }
       }
     }

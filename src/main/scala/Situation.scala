@@ -32,6 +32,10 @@ case class Situation(board: Board, color: Color) {
     m1 ← myActor.moves find (_.dest == to) toValid "Piece on " + from + " cannot move to " + to
     m2 ← m1 withPromotion promotion toValid "Piece on " + from + " cannot promote to " + promotion
   } yield m2
+
+  def withHistory(history: History) = copy(
+    board = board withHistory history
+  )
 }
 
 object Situation {

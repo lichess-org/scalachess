@@ -130,12 +130,10 @@ case class Board(
 
   def visual = Visual >> this
 
-  def valid = Color.all map rolesOf forall { roles ⇒ 
-    Seq(
-      (roles count (_ == King)) == 1,
-      (roles count (_ == Pawn)) <= 8,
-      roles.size <= 16
-    ) forall identity
+  def valid(strict: Boolean) = Color.all map rolesOf forall { roles ⇒
+    ((roles count (_ == King)) == 1) :: {
+      if (strict) List((roles count (_ == Pawn)) <= 8, roles.size <= 16) else Nil
+    } forall identity
   }
 
   override def toString = visual

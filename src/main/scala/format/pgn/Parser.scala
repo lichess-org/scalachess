@@ -8,10 +8,13 @@ object Parser {
   type TagType = (List[Tag], String)
 
   def apply(pgn: String): Valid[ParsedPgn] = for {
-    parsed ← TagParser(pgn)
+    parsed ← TagParser(sanitize(pgn))
     (tags, moveString) = parsed
     sans ← MoveParser(moveString)
   } yield ParsedPgn(tags, sans)
+
+  private val SanitizeRegex = """(\$\d+)|(\{[^\}]+\})""".r
+  private def sanitize(pgn: String): String = SanitizeRegex.replaceAllIn(pgn, "").pp
 
   object TagParser extends RegexParsers {
 

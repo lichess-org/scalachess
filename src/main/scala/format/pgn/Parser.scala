@@ -14,7 +14,7 @@ object Parser {
   } yield ParsedPgn(tags, sans)
 
   private val SanitizeRegex = """(\$\d+)|(\{[^\}]+\})""".r
-  private def sanitize(pgn: String): String = SanitizeRegex.replaceAllIn(pgn, "").pp
+  private def sanitize(pgn: String): String = SanitizeRegex.replaceAllIn(pgn, "")
 
   object TagParser extends RegexParsers {
 

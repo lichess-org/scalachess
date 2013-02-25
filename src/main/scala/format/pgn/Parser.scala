@@ -5,32 +5,36 @@ import scala.util.parsing.combinator._
 
 object Parser {
 
-  type TagType = (List[Tag], String)
-
   def apply(pgn: String): Valid[ParsedPgn] = for {
-    parsed ← TagParser(sanitize(pgn))
-    (tags, moveString) = parsed
-    sans ← MoveParser(moveString)
+    splitted ← splitSanAndMoves(sanitize(pgn))
+    (tagStr, moveStr) = splitted
+    tags ← TagParser(tagStr)
+    sans ← MoveParser(moveStr)
   } yield ParsedPgn(tags, sans)
 
   private val SanitizeRegex = """(\$\d+)|(\{[^\}]+\})""".r
   private def sanitize(pgn: String): String = SanitizeRegex.replaceAllIn(pgn, "")
 
+  private def splitSanAndMoves(pgn: String): Valid[(String, String)] =
+    pgn.lines.toList span { line ⇒
+      ~((line lift 0).map('[' ==))
+    } match {
+      case (tagLines, moveLines) ⇒ success(tagLines.mkString("\n") -> moveLines.mkString)
+    }
+
   object TagParser extends RegexParsers {
 
-    def apply(pgn: String): Valid[TagType] = parseAll(all, pgn) match {
+    def apply(pgn: String): Valid[List[Tag]] = parseAll(all, pgn) match {
       case f: Failure       ⇒ "Cannot parse tags: %s\n%s".format(f.toString, pgn).failNel
       case Success(sans, _) ⇒ scalaz.Scalaz.success(sans)
     }
 
-    def all: Parser[TagType] = tags ~ """(.|\n)+""".r ^^ {
-      case ts ~ ms ⇒ (ts, ms)
-    }
+    def all: Parser[List[Tag]] = tags <~ """(.|\n)*""".r 
 
     def tags: Parser[List[Tag]] = rep(tag)
 
     def tag: Parser[Tag] = tagName ~ tagValue ^^ {
-      case name ~ value  ⇒ Tag(name, value)
+      case name ~ value ⇒ Tag(name, value)
     }
 
     val tagName: Parser[String] = "[" ~> """[a-zA-Z]+""".r

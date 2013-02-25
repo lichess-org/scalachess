@@ -13,13 +13,14 @@ object Parser {
   } yield ParsedPgn(tags, sans)
 
   private val SanitizeRegex = """(\$\d+)|(\{[^\}]+\})""".r
-  private def sanitize(pgn: String): String = SanitizeRegex.replaceAllIn(pgn, "")
+  private def sanitize(pgn: String): String = 
+    SanitizeRegex.replaceAllIn(pgn.lines.map(_.trim).filterNot(_.isEmpty) mkString "\n", "")
 
   private def splitSanAndMoves(pgn: String): Valid[(String, String)] =
     pgn.lines.toList span { line ⇒
       ~((line lift 0).map('[' ==))
     } match {
-      case (tagLines, moveLines) ⇒ success(tagLines.mkString("\n") -> moveLines.mkString)
+      case (tagLines, moveLines) ⇒ success(tagLines.mkString("\n") -> moveLines.mkString(" ").trim)
     }
 
   object TagParser extends RegexParsers {

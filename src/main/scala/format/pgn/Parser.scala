@@ -77,7 +77,9 @@ object Parser {
       case std ~ suf ⇒ std withSuffixes suf
     }
 
-    val number: Parser[String] = """\d+\.+""".r <~ space
+    val number: Parser[String] = """\d+\.+""".r <~ maybeSpace
+
+    val maybeSpace = space?
 
     def simple: Parser[Std] = role ~ x ~ dest ^^ {
       case ro ~ ca ~ de ⇒ Std(dest = de, role = ro, capture = ca)

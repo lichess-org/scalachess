@@ -9,7 +9,7 @@ trait Resolvers {
 
 trait Dependencies {
   val scalaz = "org.scalaz" %% "scalaz-core" % "6.0.4"
-  val specs2 = "org.specs2" %% "specs2" % "1.12"
+  val specs2 = "org.specs2" %% "specs2" % "1.14"
   val scalalib = "com.github.ornicar" %% "scalalib" % "3.1"
   val hasher = "hasher" %% "hasher" % "0.3.1" 
   val jodaTime = "joda-time" % "joda-time" % "2.1"

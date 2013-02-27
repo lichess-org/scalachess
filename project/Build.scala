@@ -10,7 +10,7 @@ trait Resolvers {
 trait Dependencies {
   val scalaz = "org.scalaz" %% "scalaz-core" % "6.0.4"
   val specs2 = "org.specs2" %% "specs2" % "1.14"
-  val scalalib = "com.github.ornicar" %% "scalalib" % "3.1"
+  val scalalib = "com.github.ornicar" %% "scalalib" % "3.2"
   val hasher = "hasher" %% "hasher" % "0.3.1" 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
@@ -21,7 +21,7 @@ object ApplicationBuild extends Build with Resolvers with Dependencies {
   private val buildSettings = Project.defaultSettings ++ Seq(
     scalaVersion := "2.10.0",
     organization := "com.github.ornicar",
-    version := "3.1",
+    version := "3.2",
     resolvers := Seq(iliaz, sonatype, awesomepom),
     libraryDependencies := Seq(scalaz, scalalib, hasher, jodaTime, jodaConvert),
     libraryDependencies in test := Seq(specs2),

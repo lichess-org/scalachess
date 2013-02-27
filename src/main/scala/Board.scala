@@ -5,9 +5,9 @@ import format.Visual
 import com.roundeights.hasher.Hasher
 
 case class Board(
-  pieces: Map[Pos, Piece], 
-  history: History,
-  variant: Variant) {
+    pieces: Map[Pos, Piece],
+    history: History,
+    variant: Variant) {
 
   import implicitFailures._
 
@@ -38,7 +38,7 @@ case class Board(
 
   def kingPosOf(c: Color): Option[Pos] = kingPos get c
 
-  def threatsOf(c: Color): Set[Pos] = 
+  def threatsOf(c: Color): Set[Pos] =
     actorsOf(c).toSet flatMap { actor: Actor ⇒ actor.threats }
 
   def check(c: Color): Boolean = c.white.fold(checkWhite, checkBlack)
@@ -46,7 +46,7 @@ case class Board(
   lazy val checkWhite = checkOf(White)
   lazy val checkBlack = checkOf(Black)
 
-  private def checkOf(c: Color): Boolean = 
+  private def checkOf(c: Color): Boolean =
     kingPosOf(c).fold(false) { king ⇒ actorsOf(!c) exists (_ threatens king) }
 
   def destsFrom(from: Pos): Option[List[Pos]] = actorAt(from) map (_.destinations)
@@ -113,7 +113,7 @@ case class Board(
 
   def autoDraw: Boolean =
     history.positionHashes.size > 100 ||
-    (Color.all forall { !hasEnoughMaterialToMate(_) })
+      (Color.all forall { !hasEnoughMaterialToMate(_) })
 
   def hasEnoughMaterialToMate(color: Color) =
     rolesOf(color) filterNot (_ == King) match {
@@ -130,6 +130,12 @@ case class Board(
 
   def visual = Visual >> this
 
+  def valid(strict: Boolean) = Color.all map rolesOf forall { roles ⇒
+    ((roles count (_ == King)) == 1) :: {
+      if (strict) List((roles count (_ == Pawn)) <= 8, roles.size <= 16) else Nil
+    } forall identity
+  }
+
   override def toString = visual
 }
 
@@ -138,11 +144,11 @@ object Board {
   import Pos._
 
   def apply(pieces: Traversable[(Pos, Piece)], variant: Variant): Board =
-    Board(pieces toMap, History(), variant)
+    Board(pieces.toMap, History(), variant)
 
-  def init(variant: Variant): Board = 
+  def init(variant: Variant): Board =
     Board(pieces = variant.pieces, variant = variant)
 
-  def empty(variant: Variant): Board = 
+  def empty(variant: Variant): Board =
     Board(Map.empty, History(), variant)
 }

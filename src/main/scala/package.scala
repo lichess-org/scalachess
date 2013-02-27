@@ -18,4 +18,11 @@ package object chess
   object implicitFailures {
     implicit def stringToFailures(str: String): Failures = str wrapNel
   }
+
+  def parseIntOption(str: String): Option[Int] = try {
+    Some(java.lang.Integer.parseInt(str))
+  }
+  catch {
+    case e: NumberFormatException ⇒ None
+  }
 }

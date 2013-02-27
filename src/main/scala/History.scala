@@ -81,7 +81,7 @@ object History {
 
   def apply(
     lastMove: Option[String], // a2a4
-    positionHashes: String, // KQkq
+    positionHashes: String, 
     castles: String) = new History(
     lastMove = lastMove flatMap {
       case MoveString(a, b) ⇒ for (o ← posAt(a); d ← posAt(b)) yield (o, d)

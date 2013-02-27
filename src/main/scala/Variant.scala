@@ -1,7 +1,6 @@
 package chess
 
 import scala.util.Random
-import scalaz.{ States }
 
 import Pos.posAt
 
@@ -18,18 +17,6 @@ sealed abstract class Variant(val id: Int) {
 
 object Variant {
 
-  private def symmetricRank(rank: IndexedSeq[Role]): Map[Pos, Piece] =
-    (for (y ← Seq(1, 2, 7, 8); x ← 1 to 8) yield {
-      posAt(x, y) map { pos ⇒
-        (pos, y match {
-          case 1 ⇒ White - rank(x - 1)
-          case 2 ⇒ White.pawn
-          case 7 ⇒ Black.pawn
-          case 8 ⇒ Black - rank(x - 1)
-        })
-      }
-    }).flatten.toMap
-
   case object Standard extends Variant(id = 1) {
 
     val pieces = symmetricRank(
@@ -37,7 +24,7 @@ object Variant {
     )
   }
 
-  case object Chess960 extends Variant(id = 2) with States {
+  case object Chess960 extends Variant(id = 2) {
 
     def pieces = symmetricRank {
       val size = 8
@@ -69,7 +56,14 @@ object Variant {
     }
   }
 
-  val all = List(Standard, Chess960)
+  case object FromPosition extends Variant(id = 3) {
+
+    def pieces = Map.empty
+
+    override def toString = "From position"
+  }
+
+  val all = List(Standard, Chess960, FromPosition)
   val byId = all map { v ⇒ (v.id, v) } toMap
   val byName = all map { v ⇒ (v.name, v) } toMap
 
@@ -81,4 +75,16 @@ object Variant {
   def apply(name: String): Option[Variant] = byName get name.toLowerCase
 
   def exists(id: Int): Boolean = byId contains id
+
+  private def symmetricRank(rank: IndexedSeq[Role]): Map[Pos, Piece] =
+    (for (y ← Seq(1, 2, 7, 8); x ← 1 to 8) yield {
+      posAt(x, y) map { pos ⇒
+        (pos, y match {
+          case 1 ⇒ White - rank(x - 1)
+          case 2 ⇒ White.pawn
+          case 7 ⇒ Black.pawn
+          case 8 ⇒ Black - rank(x - 1)
+        })
+      }
+    }).flatten.toMap
 }

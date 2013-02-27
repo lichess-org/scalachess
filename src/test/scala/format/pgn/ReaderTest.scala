@@ -35,6 +35,9 @@ class ReaderTest extends ChessTest {
     "chess960" in {
       Reader(complete960) must beSuccess
     }
+    "with empty lines" in {
+      Reader("\n" + complete960 + "\n") must beSuccess
+    }
     "example from wikipedia" in {
       Reader(fromWikipedia) must beSuccess
     }

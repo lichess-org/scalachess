@@ -16,10 +16,7 @@ object Forsyth {
       m ⇒ m group 1
     ).toList
 
-    val colorOption = for {
-      letter ← """^[\w\d/]+\s(\w).*$""".r.replaceAllIn(source, m ⇒ m group 1).headOption
-      color ← Color(letter)
-    } yield color
+    val colorOption = source split " " lift 1 flatMap (_ lift 0) flatMap Color.apply
 
     def board(chars: List[Char], pos: Pos): Option[List[(Pos, Piece)]] = chars match {
       case Nil ⇒ Some(Nil)
@@ -38,6 +35,22 @@ object Forsyth {
       color ← colorOption
       pieces ← board(boardChars, A8)
     } yield Situation(Board(pieces, variant = chess.Variant.default), color)
+  }
+
+  case class SituationPlus(situation: Situation, fullMoveNumber: Int) {
+
+    def turns = fullMoveNumber * 2 - (if (situation.color.white) 2 else 1)
+  }
+
+  def <<<(source: String): Option[SituationPlus] = for {
+    situation ← <<(source)
+    history ← source split " " lift 2 map { History(none, "", _) }
+    situation2 = situation withHistory history
+    fullMoveNumber = source split " " lift 5 flatMap parseIntOption
+  } yield SituationPlus(situation2, fullMoveNumber | 1)
+
+  def >>(parsed: SituationPlus): String = parsed match {
+    case SituationPlus(Situation(board, color), _) ⇒ >>(Game(board, color, turns = parsed.turns))
   }
 
   def >>(game: Game): String = List(

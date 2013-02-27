@@ -24,12 +24,24 @@ case class Situation(board: Board, color: Color) {
 
   def end: Boolean = checkMate || staleMate || autoDraw
 
+  def playable(strict: Boolean): Boolean = (board valid strict) && !end
+
+  def status: Option[Status] =
+    if (checkMate) Status.Mate.some
+    else if (staleMate) Status.Stalemate.some
+    else if (autoDraw) Status.Draw.some
+    else none
+
   def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Valid[Move] = for {
     actor ← board.actors get from toValid "No piece on " + from
     myActor ← actor.validIf(actor is color, "Not my piece on " + from)
     m1 ← myActor.moves find (_.dest == to) toValid "Piece on " + from + " cannot move to " + to
     m2 ← m1 withPromotion promotion toValid "Piece on " + from + " cannot promote to " + promotion
   } yield m2
+
+  def withHistory(history: History) = copy(
+    board = board withHistory history
+  )
 }
 
 object Situation {

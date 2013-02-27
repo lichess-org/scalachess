@@ -9,9 +9,7 @@ class UciDumpTest extends ChessTest {
 
   "only raw moves" should {
     "empty" in {
-      UciDump("", None) must beSuccess.like {
-        case moves ⇒ moves must_== ""
-      }
+      UciDump("", None) must beFailure
     }
     "simple" in {
       UciDump(simple, None) must beSuccess.like {

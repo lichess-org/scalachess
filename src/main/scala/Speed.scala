@@ -19,7 +19,7 @@ object Speed {
 
   def apply(id: Int): Option[Speed] = byId get id
 
-  def apply(clock: Option[Clock]) = byTime(clock.fold(_.estimateTotalTime, Int.MaxValue))
+  def apply(clock: Option[Clock]) = byTime(clock.fold(Int.MaxValue)(_.estimateTotalTime))
 
   def byTime(seconds: Int): Speed = all.find(_.range contains seconds) | Unlimited
 

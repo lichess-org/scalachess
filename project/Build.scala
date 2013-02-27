@@ -4,13 +4,14 @@ import Keys._
 trait Resolvers {
   val iliaz = "iliaz.com" at "http://scala.iliaz.com/"
   val sonatype = "sonatype" at "http://oss.sonatype.org/content/repositories/releases"
+  val awesomepom = "awesomepom" at "https://raw.github.com/jibs/maven-repo-scala/master"
 }
 
 trait Dependencies {
   val scalaz = "org.scalaz" %% "scalaz-core" % "6.0.4"
   val specs2 = "org.specs2" %% "specs2" % "1.12"
   val scalalib = "com.github.ornicar" %% "scalalib" % "3.1"
-  val hasher = "com.roundeights" % "hasher" % "0.3" from "http://cloud.github.com/downloads/Nycto/Hasher/hasher_2.9.1-0.3.jar"
+  val hasher = "hasher" %% "hasher" % "0.3.1" 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
 }
@@ -20,8 +21,8 @@ object ApplicationBuild extends Build with Resolvers with Dependencies {
   private val buildSettings = Project.defaultSettings ++ Seq(
     scalaVersion := "2.10.0",
     organization := "com.github.ornicar",
-    version := "3",
-    resolvers := Seq(iliaz, sonatype),
+    version := "3.1",
+    resolvers := Seq(iliaz, sonatype, awesomepom),
     libraryDependencies := Seq(scalaz, scalalib, hasher, jodaTime, jodaConvert),
     libraryDependencies in test := Seq(specs2),
     shellPrompt := {

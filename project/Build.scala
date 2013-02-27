@@ -18,10 +18,9 @@ trait Dependencies {
 object ApplicationBuild extends Build with Resolvers with Dependencies {
 
   private val buildSettings = Project.defaultSettings ++ Seq(
-    scalaVersion := "2.10.0-RC3",
+    scalaVersion := "2.10.0",
     organization := "com.github.ornicar",
     version := "3",
-    scalaVersion := "2.10.0",
     resolvers := Seq(iliaz, sonatype),
     libraryDependencies := Seq(scalaz, scalalib, hasher, jodaTime, jodaConvert),
     libraryDependencies in test := Seq(specs2),

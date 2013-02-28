@@ -20,7 +20,7 @@ object ApplicationBuild extends Build with Resolvers with Dependencies {
 
   private val buildSettings = Project.defaultSettings ++ Seq(
     scalaVersion := "2.10.0",
-    organization := "com.github.ornicar",
+    organization := "org.lichess",
     version := "3.3",
     resolvers := Seq(iliaz, sonatype, awesomepom),
     libraryDependencies := Seq(scalaz, scalalib, hasher, jodaTime, jodaConvert),

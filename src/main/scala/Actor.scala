@@ -48,10 +48,7 @@ case class Actor(
         else Some(m)
 
       List(
-        for {
-          p ← fwd
-          m ← forward(p)
-        } yield m,
+        fwd flatMap forward,
         for {
           p ← fwd; if pos.y == color.unmovedPawnY
           p2 ← pawnDir(p); if !(board occupations p2)
@@ -88,11 +85,11 @@ case class Actor(
       if (m.piece is King) (_ ⇒ true)
       else if (check) (_.attacker)
       else (_.projection)
-    m.after kingPosOf color filter { afterKingPos ⇒
+    m.after kingPosOf color exists { afterKingPos ⇒
       m.after actorsOf !color exists {
         oActor ⇒ condition(oActor) && (oActor threatens afterKingPos)
       }
-    } isDefined
+    } 
   }
 
   def attacker = piece.role.attacker

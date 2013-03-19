@@ -19,15 +19,12 @@ trait Dependencies {
 object ApplicationBuild extends Build with Resolvers with Dependencies {
 
   private val buildSettings = Project.defaultSettings ++ Seq(
-    scalaVersion := "2.10.0",
+    scalaVersion := "2.10.1",
     organization := "org.lichess",
-    version := "3.3",
+    version := "3.4",
     resolvers := Seq(iliaz, sonatype, awesomepom),
     libraryDependencies := Seq(scalaz, scalalib, hasher, jodaTime, jodaConvert),
     libraryDependencies in test := Seq(specs2),
-    shellPrompt := {
-      (state: State) ⇒ "%s> ".format(Project.extract(state).currentProject.id)
-    },
     scalacOptions := Seq(
       "-deprecation",
       "-unchecked",

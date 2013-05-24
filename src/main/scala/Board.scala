@@ -1,8 +1,8 @@
 package chess
 
-import Pos.posAt
-import format.Visual
 import com.roundeights.hasher.Hasher
+import format.Visual
+import Pos.posAt
 
 case class Board(
     pieces: Map[Pos, Piece],

@@ -1,7 +1,7 @@
 package chess
 
-import Pos._
 import format.Visual.addNewLines
+import Pos._
 import scalaz.Success
 
 class ReverseEngineeringTest extends ChessTest {

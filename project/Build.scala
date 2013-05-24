@@ -1,5 +1,5 @@
-import sbt._
 import Keys._
+import sbt._
 
 trait Resolvers {
   val iliaz = "iliaz.com" at "http://scala.iliaz.com/"

@@ -1,7 +1,7 @@
 package chess
 
-import Pos._
 import com.roundeights.hasher.Implicits._
+import Pos._
 
 class HistoryTest extends ChessTest {
 

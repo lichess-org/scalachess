@@ -1,10 +1,9 @@
 package chess
 
-import ornicar.scalalib.test.ValidationMatchers
-import org.specs2.mutable.Specification
-import org.specs2.matcher.Matcher
-
 import format.Visual
+import org.specs2.matcher.Matcher
+import org.specs2.mutable.Specification
+import ornicar.scalalib.test.ValidationMatchers
 
 trait ChessTest
     extends Specification

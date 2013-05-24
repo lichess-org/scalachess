@@ -1,4 +1,4 @@
-package chess
+
 import Pos._
 
 class PromotionTest extends ChessTest {

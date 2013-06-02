@@ -15,7 +15,7 @@ final class EloCalculator(inflation: Boolean = false) {
 
   type User = {
     def elo: Int
-    def nbRatedGames: Int
+    def countRated: Int
   }
 
   def calculate(user1: User, user2: User, win: Option[Color]): (Int, Int) = {
@@ -51,8 +51,8 @@ final class EloCalculator(inflation: Boolean = false) {
     val score = (1 + win) / 2f
     val expected = 1 / (1 + math.pow(10, (opponentElo - user.elo) / 400f))
     val kFactor = math.round(
-      if (user.nbRatedGames > 20) 16
-      else 50 - user.nbRatedGames * (34 / 20f)
+      if (user.countRated > 20) 16
+      else 50 - user.countRated * (34 / 20f)
     )
     val diff = 2 * kFactor * (score - expected)
 

@@ -16,6 +16,7 @@ object UciDump {
       ) map { _.chronoMoves map move mkString " " }
     }
 
-  private def move(m: Move): String =
+  private def move(m: Move): String = m.castle.fold(
     m.orig.key + m.dest.key + m.promotion.fold("")(_.forsyth.toString)
+  ) { case ((kf, kt), _) ⇒ kf.key + kt.key }
 }

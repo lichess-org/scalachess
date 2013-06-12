@@ -11,5 +11,5 @@ object Nag {
   case object Mistake extends Nag(2, "?")
   case object Inaccuracy extends Nag(6, "?!")
 
-  val all = List(Blunder, Mistake, Inaccuracy)
+  val all = List(Inaccuracy, Mistake, Blunder)
 }

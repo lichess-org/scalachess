@@ -18,33 +18,33 @@ final class EloCalculator(inflation: Boolean = false) {
     def countRated: Int
   }
 
-  def calculate(user1: User, user2: User, win: Option[Color]): (Int, Int) = {
+  def calculate(white: User, black: User, win: Option[Color]): (Int, Int) = {
     val winCode = win match {
       case None        ⇒ DRAW
       case Some(White) ⇒ P1WIN
       case Some(Black) ⇒ P2WIN
     }
-    val (user1Elo, user2Elo) = (
-      calculateUserElo(user1, user2.elo, -winCode), 
-      calculateUserElo(user2, user1.elo, winCode)
+    val (whiteElo, blackElo) = (
+      calculateUserElo(white, black.elo, -winCode), 
+      calculateUserElo(black, white.elo, winCode)
     )
 
     inflation.fold(
-      inflate(user1, user1Elo, user2, user2Elo), 
-      (user1Elo, user2Elo)
+      inflate(white, whiteElo, black, blackElo), 
+      (whiteElo, blackElo)
     )
   }
 
-  def diff(user1: User, user2: User, winner: Option[Color]): Int =
-    (user1 == user2).fold(
+  def diff(white: User, black: User, winner: Option[Color]): Int =
+    (white == black).fold(
       0,
-      calculate(user1, user2, winner)._1 - user1.elo
+      calculate(white, black, winner)._1 - white.elo
     )
 
-  private def inflate(user1: User, user1Elo: Int, user2: User, user2Elo: Int): (Int, Int) = {
-    if (user1Elo > user1.elo) (user1Elo + 1, user2Elo)
-    else if (user2Elo > user2.elo) (user1Elo, user2Elo + 1)
-    else (user1Elo, user2Elo)
+  private def inflate(white: User, whiteElo: Int, black: User, blackElo: Int): (Int, Int) = {
+    if (whiteElo > white.elo) (whiteElo + 1, blackElo)
+    else if (blackElo > black.elo) (whiteElo, blackElo + 1)
+    else (whiteElo, blackElo)
   }
 
   private def calculateUserElo(user: User, opponentElo: Int, win: Int) = {

@@ -10,9 +10,9 @@ sealed abstract class Speed(
 
 object Speed {
 
-  case object Bullet extends Speed(1, 0 to 180, "Less than 3 minutes") 
-  case object Blitz extends Speed(2, 181 to 480, "3 to 8 minutes") 
-  case object Slow extends Speed(3, 481 to 1200, "8 to 20 minutes") 
+  case object Bullet extends Speed(1, 0 to 179, "Less than 3 minutes") 
+  case object Blitz extends Speed(2, 180 to 479, "3 to 8 minutes") 
+  case object Slow extends Speed(3, 480 to 1199, "8 to 20 minutes") 
   case object Unlimited extends Speed(4, 1200 to Int.MaxValue, "No clock") 
 
   val all = List(Bullet, Blitz, Slow, Unlimited)

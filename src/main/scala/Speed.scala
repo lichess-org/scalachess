@@ -4,6 +4,8 @@ sealed abstract class Speed(
   val id: Int, 
   val range: Range,
   val name: String) {
+
+    def shortName = toString.toLowerCase
 }
 
 object Speed {

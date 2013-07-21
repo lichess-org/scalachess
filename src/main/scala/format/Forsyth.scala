@@ -31,10 +31,11 @@ object Forsyth {
       }
     }
 
-    for {
-      color ← colorOption
-      pieces ← board(boardChars, A8)
-    } yield Situation(Board(pieces, variant = chess.Variant.default), color)
+    board(boardChars, A8) map { pieces ⇒
+      Situation(
+        Board(pieces, variant = chess.Variant.default), 
+        colorOption | Color.white)
+    }
   }
 
   case class SituationPlus(situation: Situation, fullMoveNumber: Int) {
@@ -42,12 +43,12 @@ object Forsyth {
     def turns = fullMoveNumber * 2 - (if (situation.color.white) 2 else 1)
   }
 
-  def <<<(source: String): Option[SituationPlus] = for {
-    situation ← <<(source)
-    history ← source split " " lift 2 map { History(none, "", _) }
-    situation2 = situation withHistory history
-    fullMoveNumber = source split " " lift 5 flatMap parseIntOption
-  } yield SituationPlus(situation2, fullMoveNumber | 1)
+  def <<<(source: String): Option[SituationPlus] = <<(source) map { situation ⇒
+    val history = source split " " lift 2 map { History(none, "", _) }
+    val situation2 = situation withHistory (history | History(none, "", ""))
+    val fullMoveNumber = source split " " lift 5 flatMap parseIntOption
+    SituationPlus(situation2, fullMoveNumber | 1)
+  }
 
   def >>(parsed: SituationPlus): String = parsed match {
     case SituationPlus(Situation(board, color), _) ⇒ >>(Game(board, color, turns = parsed.turns))

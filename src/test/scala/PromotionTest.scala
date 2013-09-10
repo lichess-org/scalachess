@@ -1,3 +1,4 @@
+package chess
 
 import Pos._
 

@@ -7,7 +7,7 @@ class EloTest extends ChessTest {
 
   def user(e: Int, n: Int) = new {
     val elo = e
-    val nbRatedGames = n
+    val countRated = n
   }
 
   "calculate standard" should {

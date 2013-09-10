@@ -77,4 +77,21 @@ val promoteRook = """d4 Nf6 f3 d5 e3 e5 Ne2 Bd6 g3 a5 Bg2 Bf5 e4 Bb4+ Nbc3 Bxc3+
 
 val castleCheck1 = """e3 d5 Be2 Nc6 Nf3 e5 d4 e4 Ne5 Nxe5 dxe5 Qg5 Kd2 d4 g3 dxe3+ fxe3 Bh3 Bh5 O-O-O+"""
 val castleCheck2 = """d4 Nf6 c4 e6 Nc3 Bb4 Bd2 O-O#"""
+
+val withNag = """
+[Event "Casual Game"]
+[Site "?"]
+[Date "1851.??.??"]
+[Round "?"]
+[White "Anderssen, Adolph"]
+[Black "Lionel, Kieseritsky"]
+[Result "1-0"]
+[ECO "C33"]
+[WhiteElo "unknown"]
+[BlackElo "unknown"]
+[Annotator "Hayes, David"]
+[PlyCount "45"]
+
+1. e4 {C33: King's Gambit Accepted: 3 Nc3 and 3 Bc4} 1... e5 2. f4 {White offers a pawn to gain better development and control of the center.} 2... exf4 3. Bc4 Qh4+ 4. Kf1 b5?! {Bryan's Counter Gambit. A dubious gambit in modern times, but typical of the attacking style of that time. Here black lures the Bishop from it attacking diagonal against the sensitive f7-pawn, and provides a diagonal for development of his own Bishop to b7 where it will bear down on white's King side. All this value for the price of a pawn.} 5. Bxb5 Nf6 6. Nf3 Qh6 7. d3 Nh5 {The immediate, cheap, and shallow threat of ... Ng3+ is easily defended.} 8. Nh4 {The position is sharp and getting sharper.} 8... Qg5 {Again, playing for cheap threats. In this case, black attacks two pieces at once.} 9. Nf5 c6 {9... g6 10. h4 Qf6 is another complicated position for another day.} 10. g4 {A brilliant move made with a steady hand. Note that white cares little for defensive moves, and is always alert for attack. Now black plays to win the g4-pawn.} 10... Nf6 {Black should have played 10... cxb5 11. gxh5 with a better game.} 11. Rg1 {Now Anderssen sacrifices his Bishop, the first of many sacrifices in this game. White cares little for defensive moves, and plays always for the initiative.} 11... cxb5 12. h4 Qg6 13. h5 {White gets more space.} 13... Qg5 14. Qf3 {White now has the ghastly threat of Bxf4 winning black's Queen next.} 14... Ng8 {Black is forces to clear a path of retreat for his Queen by also retreating one of his only developed pieces.} 15. Bxf4 Qf6 {Black should quickly develop his pieces.} 16. Nc3 Bc5 17. Nd5 {Inviting black to indulge his greed. Also good is 17. d4 Bf8 (17... Bxd4? 18. Nd5 when the Knights savage the board.) 18. Be5.} 17... Qxb2 18. Bd6 Qxa1+ {And why not capture with check!} 19. Ke2 {Now who can resist the tender morsel on g1, but resist he must.} 19... Bxg1 {Black is just too greedy. He has too few pieces developed, and what is developed is sent to the far corners of the board. Now it is white's turn to play. Black may have won after 19... Qb2 (to guard against Nxg7+) 20. Rc1 g6 21. Bxc5 gxf5 (not 21... Qxc1 22. Nd6+ Kd8 23. Nxf7+ Ke8 24. Nc7#).} 20. e5 {Slipping the noose around the neck of the black King.} 20... Na6 {Perhaps 20... Ba6 would have put up more resistance by giving black's King more room to run.} 21. Nxg7+ Kd8 22. Qf6+! {A final pretty sacrifice that ends the game.} 22... Nxf6 {A deflection.} 23. Be7# 1-0
+"""
 }

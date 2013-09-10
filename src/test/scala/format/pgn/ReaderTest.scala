@@ -44,5 +44,8 @@ class ReaderTest extends ChessTest {
     "example from chessgames.com" in {
       Reader(fromChessgames) must beSuccess
     }
+    "immortal with NAG" in {
+      Reader(withNag) must beSuccess
+    }
   }
 }

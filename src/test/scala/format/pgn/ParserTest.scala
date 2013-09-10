@@ -10,4 +10,8 @@ class ParserTest extends ChessTest {
   "promotion check" in {
     Parser("b8=Q+") must beSuccess
   }
+
+  "nags" in {
+    Parser(withNag) must beSuccess
+  }
 }

@@ -62,9 +62,11 @@ object Parser {
     val result: Parser[String] = space ~> ("*" | "1/2-1/2" | "0-1" | "1-0")
 
     def move: Parser[San] =
-      (number?) ~> (castle | standard) <~ (comment?)
+      (number?) ~> (castle | standard) <~ (nag?) <~ (comment?)
 
-    val comment: Parser[String] = space ~> "{" ~> """[^\}]+""".r <~ "}"
+    def nag: Parser[String] = """[^\s]*""".r
+
+    def comment: Parser[String] = space ~> "{" ~> """[^\}]+""".r <~ "}"
 
     def castle = (qCastle | kCastle) ~ suffixes ^^ {
       case side ~ suf ⇒ Castle(side) withSuffixes suf

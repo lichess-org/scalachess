@@ -27,7 +27,7 @@ object Parser {
 
     def apply(pgn: String): Valid[List[Tag]] = parseAll(all, pgn) match {
       case f: Failure       ⇒ "Cannot parse tags: %s\n%s".format(f.toString, pgn).failNel
-      case Success(sans, _) ⇒ scalaz.Scalaz.success(sans)
+      case Success(sans, _) ⇒ scalaz.Validation.success(sans)
       case err              ⇒ "Cannot parse tags: %s\n%s".format(err.toString, pgn).failNel
     }
 
@@ -53,7 +53,7 @@ object Parser {
 
     def apply(pgn: String): Valid[List[San]] =
       parseAll(moves, (pgn.lines mkString " ")) match {
-        case Success(sans, _) ⇒ scalaz.Scalaz.success(sans)
+        case Success(sans, _) ⇒ scalaz.Validation.success(sans)
         case err              ⇒ "Cannot parse moves: %s\n%s".format(err.toString, pgn).failNel
       }
 

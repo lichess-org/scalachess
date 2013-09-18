@@ -1,5 +1,4 @@
-import Keys._
-import sbt._
+import sbt._, Keys._
 
 trait Resolvers {
   val iliaz = "iliaz.com" at "http://scala.iliaz.com/"
@@ -8,9 +7,9 @@ trait Resolvers {
 }
 
 trait Dependencies {
-  val scalaz = "org.scalaz" %% "scalaz-core" % "6.0.4"
+  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.3"
   val specs2 = "org.specs2" %% "specs2" % "1.14"
-  val scalalib = "com.github.ornicar" %% "scalalib" % "3.3"
+  val scalalib = "com.github.ornicar" %% "scalalib" % "4.3"
   val hasher = "hasher" %% "hasher" % "0.3.1" 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
@@ -19,9 +18,9 @@ trait Dependencies {
 object ApplicationBuild extends Build with Resolvers with Dependencies {
 
   private val buildSettings = Project.defaultSettings ++ Seq(
-    scalaVersion := "2.10.1",
+    scalaVersion := "2.10.2",
     organization := "org.lichess",
-    version := "3.4",
+    version := "3.5",
     resolvers := Seq(iliaz, sonatype, awesomepom),
     libraryDependencies := Seq(scalaz, scalalib, hasher, jodaTime, jodaConvert),
     libraryDependencies in test := Seq(specs2),

@@ -1,13 +1,23 @@
 import ornicar.scalalib
 
 package object chess
+
     extends scalalib.Validation
     with scalalib.Common
-    with scalalib.NonEmptyLists 
-    with scalaz.NonEmptyLists
-    with scalaz.Strings
-    with scalaz.Lists
-    with scalaz.Booleans {
+    with scalalib.OrnicarNonEmptyList
+
+    with scalaz.syntax.std.ToBooleanOps
+
+    with scalaz.std.OptionFunctions
+    with scalaz.syntax.std.ToOptionOps
+    with scalaz.syntax.std.ToOptionIdOps
+
+    with scalaz.std.ListInstances
+    with scalaz.syntax.std.ToListOps
+
+    with scalaz.syntax.ToValidationOps
+    with scalaz.syntax.ToFunctorOps
+    with scalaz.syntax.ToIdOps {
 
   val White = Color.White
   val Black = Color.Black
@@ -16,7 +26,7 @@ package object chess
   type Directions = List[Direction]
 
   object implicitFailures {
-    implicit def stringToFailures(str: String): Failures = str wrapNel
+    implicit def stringToFailures(str: String): Failures = str.wrapNel
   }
 
   def parseIntOption(str: String): Option[Int] = try {

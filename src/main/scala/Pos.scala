@@ -33,6 +33,7 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
   lazy val file = Pos xToString x
   lazy val rank = y.toString
   lazy val key = file + rank
+  lazy val color = Color((x%2 == 0) ^ (y%2 == 0))
 
   override val toString = key
 }

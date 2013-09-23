@@ -4,6 +4,7 @@ import format.Visual
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.Specification
 import ornicar.scalalib.test.ValidationMatchers
+import scalaz.{ Validation ⇒ V }
 
 trait ChessTest
     extends Specification
@@ -28,7 +29,7 @@ trait ChessTest
     def playMoves(moves: (Pos, Pos)*): Valid[Game] = playMoveList(moves)
 
     def playMoveList(moves: Iterable[(Pos, Pos)]): Valid[Game] =
-      moves.foldLeft(success(game): Valid[Game]) { (vg, move) ⇒
+      moves.foldLeft(V.success(game): Valid[Game]) { (vg, move) ⇒
         vg flatMap { g ⇒ g(move._1, move._2) map (_._1) }
       }
 
@@ -41,10 +42,10 @@ trait ChessTest
     def withClock(c: Clock) = game.copy(clock = Some(c))
   }
 
-  def makeBoard(pieces: (Pos, Piece)*): Board = 
+  def makeBoard(pieces: (Pos, Piece)*): Board =
     Board(pieces toMap, History(), Variant.Standard)
 
-  def makeBoard(str: String, variant: Variant) = 
+  def makeBoard(str: String, variant: Variant) =
     Visual << str withVariant variant
 
   def makeBoard: Board = Board init Variant.Standard

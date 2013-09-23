@@ -113,16 +113,7 @@ case class Board(
 
   def autoDraw: Boolean =
     history.positionHashes.size > 100 ||
-      (Color.all forall { !hasEnoughMaterialToMate(_) })
-
-  def hasEnoughMaterialToMate(color: Color) =
-    rolesOf(color) filterNot (_ == King) match {
-      case roles if roles.size > 1 ⇒ true
-      case List(Knight)            ⇒ false
-      case List(Bishop)            ⇒ false
-      case Nil                     ⇒ false
-      case _                       ⇒ true
-    }
+      InsufficientMatingMaterial(this).apply
 
   def positionHash = Hasher(actors.values map (_.hash) mkString).md5.toString
 

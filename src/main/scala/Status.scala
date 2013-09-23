@@ -30,6 +30,8 @@ object Status {
     s.id >= Mate.id && s.id < Cheat.id
   }
 
+  val finishedWithWinner = List(Mate, Resign, Timeout, Outoftime, Cheat)
+
   val byId = all map { v ⇒ (v.id, v) } toMap
 
   def apply(id: Int): Option[Status] = byId get id

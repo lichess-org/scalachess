@@ -112,8 +112,7 @@ case class Board(
   def count(c: Color): Int = pieces.values count (_.color == c)
 
   def autoDraw: Boolean =
-    history.positionHashes.size > 100 ||
-      InsufficientMatingMaterial(this).apply
+    history.positionHashes.size > 100 || InsufficientMatingMaterial(this)
 
   def positionHash = Hasher(actors.values map (_.hash) mkString).md5.toString
 

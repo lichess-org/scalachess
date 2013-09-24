@@ -11,8 +11,8 @@ object UciDump {
       Reader(
         nonEmptyPgn,
         List(
-          (initialFen map { fen ⇒ Tag(_.FEN, fen) }),
-          (variant map { v ⇒ Tag(_.Variant, v.name) })
+          initialFen map { fen ⇒ Tag(_.FEN, fen) },
+          variant map { v ⇒ Tag(_.Variant, v.name) }
         ).flatten
       ) map {
           _.chronoMoves map { m ⇒

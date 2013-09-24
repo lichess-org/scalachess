@@ -30,12 +30,16 @@ object Reader {
         g1 ← vg
         parsed ← (Forsyth <<< fen) toValid "Invalid fen " + fen
       } yield g1.copy(
-        board = parsed.situation.board, 
+        board = parsed.situation.board,
         player = parsed.situation.color,
         turns = parsed.turns)
       case (vg, Tag(Tag.Variant, name)) ⇒ for {
         g1 ← vg
-        variant ← chess.Variant(name) toValid "Invalid variant " + name
+        renamed = name.toLowerCase match {
+          case "normal" ⇒ Variant.default.name
+          case _        ⇒ name
+        }
+        variant ← chess.Variant(renamed) toValid "Invalid variant " + name
       } yield g1 updateBoard (_ withVariant variant)
       case (vg, _) ⇒ vg
     }

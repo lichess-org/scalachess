@@ -30,9 +30,6 @@ class ReaderTest extends ChessTest {
     "castle checkmate O-O#" in {
       Reader(castleCheck2) must beSuccess
     }
-    "example from TCEC" in {
-      Reader(fromTcec) must beSuccess
-    }
   }
   "tags and moves" should {
     "chess960" in {
@@ -49,6 +46,12 @@ class ReaderTest extends ChessTest {
     }
     "immortal with NAG" in {
       Reader(withNag) must beSuccess
+    }
+    "example from TCEC" in {
+      Reader(fromTcec) must beSuccess
+    }
+    "invalid variant" in {
+      Reader(invalidVariant) must haveFailureMatching("Invalid variant")
     }
   }
 }

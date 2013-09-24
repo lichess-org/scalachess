@@ -116,4 +116,26 @@ e5 9. fxe5 dxe5 10. Be2 Re8 11. O-O Qe7 12. Rb1 b6 13. Rb5 a6 14. Rb2 h6
 g6 59. Ra5 Ncd7 60. Kd2 Nf8 61. Ra6+ Ne6 62. h4 Ng4 63. Bxe6 fxe6 64. Kd3 Ne5+
 65. Ke4 Ng4 66. Kd4 Ne5 67. Ra8 Nd7 68. Rc8 Ke7 69. e4 Nf6 70. Rc7+ Kd6 71. Rg7
 Ng4 1-0"""
+
+val invalidVariant = """[Event "nTCEC - Stage 2 - Season 2"]
+[Site "http://www.tcec-chess.net"]
+[Date "2013.09.24"]
+[Round "5.2"]
+[White "Stockfish 160913"]
+[Black "Spike 1.4"]
+[Result "1-0"]
+[Variant "starwars"]
+
+1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 4. Qc2 Nc6 5. e3 O-O 6. f4 Bxc3+ 7. bxc3 d6 8. Nf3
+e5 9. fxe5 dxe5 10. Be2 Re8 11. O-O Qe7 12. Rb1 b6 13. Rb5 a6 14. Rb2 h6
+15. Nh4 Qd6 16. Qd1 Rb8 17. Qd3 b5 18. cxb5 axb5 19. Nf5 Bxf5 20. Qxf5 b4
+21. cxb4 Nxb4 22. a3 Nc6 23. dxe5 Nxe5 24. Rd1 Qc5 25. Qc2 Qa7 26. Rxb8 Qxb8
+27. h3 c6 28. a4 Qa7 29. Rd4 Nd5 30. Bd2 Rd8 31. a5 c5 32. Re4 Nc6 33. a6 Qb6
+34. Be1 Kf8 35. Qa2 Qc7 36. Qa4 Kg8 37. a7 Ra8 38. Bg3 Qc8 39. Bb8 Rxb8
+40. axb8=R Qxb8 41. Qb5 Nf6 42. Ra4 Qxb5 43. Bxb5 Ne5 44. Ra8+ Kh7 45. Rc8 Kg6
+46. Rxc5 Kf5 47. Ba4 Ke6 48. Bb3+ Kd6 49. Ra5 Nfd7 50. Rd5+ Ke6 51. Kf2 Kf6
+52. Rd6+ Ke7 53. Rd4 Nc5 54. Bd5 h5 55. g3 Ne6 56. Ra4 Nc5 57. Ra7+ Kf6 58. Ke2
+g6 59. Ra5 Ncd7 60. Kd2 Nf8 61. Ra6+ Ne6 62. h4 Ng4 63. Bxe6 fxe6 64. Kd3 Ne5+
+65. Ke4 Ng4 66. Kd4 Ne5 67. Ra8 Nd7 68. Rc8 Ke7 69. e4 Nf6 70. Rc7+ Kd6 71. Rg7
+Ng4 1-0"""
 }

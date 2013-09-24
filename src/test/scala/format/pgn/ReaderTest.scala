@@ -30,6 +30,9 @@ class ReaderTest extends ChessTest {
     "castle checkmate O-O#" in {
       Reader(castleCheck2) must beSuccess
     }
+    "example from TCEC" in {
+      Reader(fromTcec) must beSuccess
+    }
   }
   "tags and moves" should {
     "chess960" in {

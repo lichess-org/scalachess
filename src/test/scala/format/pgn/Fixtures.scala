@@ -94,4 +94,26 @@ val withNag = """
 
 1. e4 {C33: King's Gambit Accepted: 3 Nc3 and 3 Bc4} 1... e5 2. f4 {White offers a pawn to gain better development and control of the center.} 2... exf4 3. Bc4 Qh4+ 4. Kf1 b5?! {Bryan's Counter Gambit. A dubious gambit in modern times, but typical of the attacking style of that time. Here black lures the Bishop from it attacking diagonal against the sensitive f7-pawn, and provides a diagonal for development of his own Bishop to b7 where it will bear down on white's King side. All this value for the price of a pawn.} 5. Bxb5 Nf6 6. Nf3 Qh6 7. d3 Nh5 {The immediate, cheap, and shallow threat of ... Ng3+ is easily defended.} 8. Nh4 {The position is sharp and getting sharper.} 8... Qg5 {Again, playing for cheap threats. In this case, black attacks two pieces at once.} 9. Nf5 c6 {9... g6 10. h4 Qf6 is another complicated position for another day.} 10. g4 {A brilliant move made with a steady hand. Note that white cares little for defensive moves, and is always alert for attack. Now black plays to win the g4-pawn.} 10... Nf6 {Black should have played 10... cxb5 11. gxh5 with a better game.} 11. Rg1 {Now Anderssen sacrifices his Bishop, the first of many sacrifices in this game. White cares little for defensive moves, and plays always for the initiative.} 11... cxb5 12. h4 Qg6 13. h5 {White gets more space.} 13... Qg5 14. Qf3 {White now has the ghastly threat of Bxf4 winning black's Queen next.} 14... Ng8 {Black is forces to clear a path of retreat for his Queen by also retreating one of his only developed pieces.} 15. Bxf4 Qf6 {Black should quickly develop his pieces.} 16. Nc3 Bc5 17. Nd5 {Inviting black to indulge his greed. Also good is 17. d4 Bf8 (17... Bxd4? 18. Nd5 when the Knights savage the board.) 18. Be5.} 17... Qxb2 18. Bd6 Qxa1+ {And why not capture with check!} 19. Ke2 {Now who can resist the tender morsel on g1, but resist he must.} 19... Bxg1 {Black is just too greedy. He has too few pieces developed, and what is developed is sent to the far corners of the board. Now it is white's turn to play. Black may have won after 19... Qb2 (to guard against Nxg7+) 20. Rc1 g6 21. Bxc5 gxf5 (not 21... Qxc1 22. Nd6+ Kd8 23. Nxf7+ Ke8 24. Nc7#).} 20. e5 {Slipping the noose around the neck of the black King.} 20... Na6 {Perhaps 20... Ba6 would have put up more resistance by giving black's King more room to run.} 21. Nxg7+ Kd8 22. Qf6+! {A final pretty sacrifice that ends the game.} 22... Nxf6 {A deflection.} 23. Be7# 1-0
 """
+
+val fromTcec = """[Event "nTCEC - Stage 2 - Season 2"]
+[Site "http://www.tcec-chess.net"]
+[Date "2013.09.24"]
+[Round "5.2"]
+[White "Stockfish 160913"]
+[Black "Spike 1.4"]
+[Result "1-0"]
+[Variant "normal"]
+
+1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 4. Qc2 Nc6 5. e3 O-O 6. f4 Bxc3+ 7. bxc3 d6 8. Nf3
+e5 9. fxe5 dxe5 10. Be2 Re8 11. O-O Qe7 12. Rb1 b6 13. Rb5 a6 14. Rb2 h6
+15. Nh4 Qd6 16. Qd1 Rb8 17. Qd3 b5 18. cxb5 axb5 19. Nf5 Bxf5 20. Qxf5 b4
+21. cxb4 Nxb4 22. a3 Nc6 23. dxe5 Nxe5 24. Rd1 Qc5 25. Qc2 Qa7 26. Rxb8 Qxb8
+27. h3 c6 28. a4 Qa7 29. Rd4 Nd5 30. Bd2 Rd8 31. a5 c5 32. Re4 Nc6 33. a6 Qb6
+34. Be1 Kf8 35. Qa2 Qc7 36. Qa4 Kg8 37. a7 Ra8 38. Bg3 Qc8 39. Bb8 Rxb8
+40. axb8=R Qxb8 41. Qb5 Nf6 42. Ra4 Qxb5 43. Bxb5 Ne5 44. Ra8+ Kh7 45. Rc8 Kg6
+46. Rxc5 Kf5 47. Ba4 Ke6 48. Bb3+ Kd6 49. Ra5 Nfd7 50. Rd5+ Ke6 51. Kf2 Kf6
+52. Rd6+ Ke7 53. Rd4 Nc5 54. Bd5 h5 55. g3 Ne6 56. Ra4 Nc5 57. Ra7+ Kf6 58. Ke2
+g6 59. Ra5 Ncd7 60. Kd2 Nf8 61. Ra6+ Ne6 62. h4 Ng4 63. Bxe6 fxe6 64. Kd3 Ne5+
+65. Ke4 Ng4 66. Kd4 Ne5 67. Ra8 Nd7 68. Rc8 Ke7 69. e4 Nf6 70. Rc7+ Kd6 71. Rg7
+Ng4 1-0"""
 }

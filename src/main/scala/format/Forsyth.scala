@@ -18,23 +18,27 @@ object Forsyth {
 
     val colorOption = source split " " lift 1 flatMap (_ lift 0) flatMap Color.apply
 
-    def board(chars: List[Char], pos: Pos): Option[List[(Pos, Piece)]] = chars match {
+    def makePieces(chars: List[Char], pos: Pos): Option[List[(Pos, Piece)]] = chars match {
       case Nil ⇒ Some(Nil)
       case c :: rest ⇒ c match {
         case n if (n.toInt < 58) ⇒
-          tore(pos, n.toInt - 48) flatMap { board(rest, _) }
+          tore(pos, n.toInt - 48) flatMap { makePieces(rest, _) }
         case n ⇒ for {
           role ← Role forsyth n.toLower
         } yield (pos, Piece(Color(n.isUpper), role)) :: {
-          tore(pos, 1) flatMap { board(rest, _) } getOrElse Nil
+          tore(pos, 1) flatMap { makePieces(rest, _) } getOrElse Nil
         }
       }
     }
 
-    board(boardChars, A8) map { pieces ⇒
-      Situation(
-        Board(pieces, variant = chess.Variant.default), 
-        colorOption | Color.white)
+    makePieces(boardChars, A8) flatMap { pieces ⇒
+      val board = Board(pieces, variant = chess.Variant.default)
+      val c = colorOption | Color.white
+      if (board check !c) {
+        if (board check c) none // both sides cannot be in check
+        else Situation(board, !c).some // user in check will move first
+      }
+      else Situation(board, c).some
     }
   }
 

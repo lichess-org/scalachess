@@ -8,7 +8,19 @@ case class Situation(board: Board, color: Color) {
     case actor if actor.moves.nonEmpty ⇒ actor.pos -> actor.moves
   } toMap
 
-  lazy val destinations: Map[Pos, List[Pos]] = moves mapValues { ms ⇒ ms map (_.dest) }
+  // import scala.concurrent.{ Future, Await }
+  // import scala.concurrent.duration._
+  // import scala.concurrent.ExecutionContext.Implicits.global
+  // lazy val moves: Map[Pos, List[Move]] = Await.result(
+  //   Future.traverse(actors) { a ⇒ Future(a.pos -> a.moves) },
+  //   1.second
+  // ).filter(_._2.nonEmpty).toMap
+
+  // lazy val moves: Map[Pos, List[Move]] = (actors.par collect {
+  //   case actor if actor.moves.nonEmpty ⇒ actor.pos -> actor.moves
+  // }).toIndexedSeq.toMap
+
+  lazy val destinations: Map[Pos, List[Pos]] = moves mapValues { _ map (_.dest) }
 
   lazy val kingPos: Option[Pos] = board kingPosOf color
 

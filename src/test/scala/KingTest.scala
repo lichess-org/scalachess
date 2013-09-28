@@ -78,7 +78,7 @@ PP   PPP
         board actorAt C4 map (_ threatens A5) must beSome(false)
       }
       "a reachable friend" in {
-        board actorAt C4 map (_ threatens C3) must beSome(false)
+        board actorAt C4 map (_ threatens C3) must beSome(true)
       }
     }
     "not move near from the other king" in {

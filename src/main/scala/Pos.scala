@@ -23,6 +23,8 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
 
   def ?<(other: Pos): Boolean = x < other.x
   def ?>(other: Pos): Boolean = x > other.x
+  def ?+(other: Pos): Boolean = y < other.y
+  def ?^(other: Pos): Boolean = y > other.y
   def ?|(other: Pos): Boolean = x == other.x
   def ?-(other: Pos): Boolean = y == other.y
 
@@ -32,6 +34,7 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
   def touches(other: Pos): Boolean = xDist(other) <= 1 && yDist(other) <= 1
 
   def onSameDiagonal(other: Pos): Boolean = xDist(other) == yDist(other)
+  def onSameLine(other: Pos): Boolean = ?-(other) || ?|(other)
 
   def xDist(other: Pos) = abs(x - other.x)
   def yDist(other: Pos) = abs(y - other.y)

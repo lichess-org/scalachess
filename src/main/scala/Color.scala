@@ -4,7 +4,7 @@ sealed trait Color {
 
   def -(role: Role) = Piece(this, role)
 
-  def fold[A](w: ⇒ A, b: ⇒ A): A = if (this.white) w else b
+  def fold[A](w: ⇒ A, b: ⇒ A): A = if (white) w else b
 
   val unary_! : Color
 
@@ -22,8 +22,8 @@ sealed trait Color {
   def queen = this - Queen
   def king = this - King
 
-  def white = this == Color.White
-  def black = this == Color.Black
+  val white = this == Color.White
+  val black = this == Color.Black
 
   override def toString = name
 }

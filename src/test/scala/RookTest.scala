@@ -60,13 +60,13 @@ PPPPPPPP
         board actorAt C4 map (_ threatens A6) must beSome(false)
       }
       "a reachable friend" in {
-        board actorAt C4 map (_ threatens H4) must beSome(false)
+        board actorAt C4 map (_ threatens H4) must beSome(true)
       }
       "nothing left" in {
-        board actorAt C4 map (_ threatens B4) must beSome(false)
+        board actorAt C4 map (_ threatens B4) must beSome(true)
       }
       "nothing up" in {
-        board actorAt C4 map (_ threatens C5) must beSome(false)
+        board actorAt C4 map (_ threatens C5) must beSome(true)
       }
     }
   }

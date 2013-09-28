@@ -22,19 +22,34 @@ trait ChessTest
     def as(color: Color): Situation = Situation(Visual << str, color)
   }
 
+  implicit def richActor(actor: Actor) = new {
+
+    def threatens(to: Pos): Boolean = actor.piece.role match {
+      case x: Projection ⇒ x.dir(actor.pos, to) exists { Actor.longRangeThreatens(actor.board, actor.pos, _, to) }
+      case _             ⇒ actor.piece.eyes(actor.pos, to)
+    }
+  }
+
   implicit def richGame(game: Game) = new {
 
     def as(color: Color): Game = game.copy(player = color)
 
     def playMoves(moves: (Pos, Pos)*): Valid[Game] = playMoveList(moves)
 
-    def playMoveList(moves: Iterable[(Pos, Pos)]): Valid[Game] =
-      moves.foldLeft(V.success(game): Valid[Game]) { (vg, move) ⇒
+    def playMoveList(moves: Iterable[(Pos, Pos)]): Valid[Game] = {
+      val vg = moves.foldLeft(V.success(game): Valid[Game]) { (vg, move) ⇒
+        // vg foreach { x ⇒
+          // println(s"------------------------ ${x.turns} = $move")
+        // }
+        // because possible moves are asked for player highlight
+        // before the move is played (on initial situation)
+        vg foreach { _.situation.destinations }
         val ng = vg flatMap { g ⇒ g(move._1, move._2) map (_._1) }
-        // because possible moves are asked for next player highlight
-        ng foreach { _.situation.destinations }
         ng
       }
+      // vg foreach { x ⇒ println("========= PGN: " + x.pgnMoves) }
+      vg
+    }
 
     def playMove(
       orig: Pos,

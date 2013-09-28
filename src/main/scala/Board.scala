@@ -38,16 +38,14 @@ case class Board(
 
   def kingPosOf(c: Color): Option[Pos] = kingPos get c
 
-  def threatsOf(c: Color): Set[Pos] =
-    actorsOf(c).toSet flatMap { actor: Actor ⇒ actor.threats }
-
   def check(c: Color): Boolean = c.white.fold(checkWhite, checkBlack)
 
   lazy val checkWhite = checkOf(White)
   lazy val checkBlack = checkOf(Black)
 
-  private def checkOf(c: Color): Boolean =
-    kingPosOf(c).fold(false) { king ⇒ actorsOf(!c) exists (_ threatens king) }
+  private def checkOf(c: Color): Boolean = kingPosOf(c) exists { kingPos ⇒
+    Actor.threatens(this, !c, kingPos, _.role != King)
+  }
 
   def destsFrom(from: Pos): Option[List[Pos]] = actorAt(from) map (_.destinations)
 

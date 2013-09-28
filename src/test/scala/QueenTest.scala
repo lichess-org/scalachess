@@ -82,9 +82,12 @@ PPPPPPPP
         board actorAt C4 map (_ threatens H4) must beSome(false)
       }
       "a reachable friend" in {
-        board actorAt C4 map (_ threatens C2) must beSome(false)
+        board actorAt C4 map (_ threatens C2) must beSome(true)
       }
-      "nothing" in {
+      "nothing reachable" in {
+        board actorAt C4 map (_ threatens B5) must beSome(true)
+      }
+      "nothing unreachable" in {
         board actorAt C4 map (_ threatens B6) must beSome(false)
       }
     }

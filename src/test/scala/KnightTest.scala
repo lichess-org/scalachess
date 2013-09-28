@@ -79,7 +79,7 @@ PPP  PPP
         board actorAt C4 map (_ threatens A8) must beSome(false)
       }
       "a reachable friend" in {
-        board actorAt C4 map (_ threatens E3) must beSome(false)
+        board actorAt C4 map (_ threatens E3) must beSome(true)
       }
       "nothing left" in {
         board actorAt C4 map (_ threatens B4) must beSome(false)

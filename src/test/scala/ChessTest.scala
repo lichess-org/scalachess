@@ -30,7 +30,10 @@ trait ChessTest
 
     def playMoveList(moves: Iterable[(Pos, Pos)]): Valid[Game] =
       moves.foldLeft(V.success(game): Valid[Game]) { (vg, move) ⇒
-        vg flatMap { g ⇒ g(move._1, move._2) map (_._1) }
+        val ng = vg flatMap { g ⇒ g(move._1, move._2) map (_._1) }
+        // because possible moves are asked for next player highlight
+        ng foreach { _.situation.destinations }
+        ng
       }
 
     def playMove(

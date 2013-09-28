@@ -24,11 +24,17 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
   def ?<(other: Pos): Boolean = x < other.x
   def ?>(other: Pos): Boolean = x > other.x
   def ?|(other: Pos): Boolean = x == other.x
+  def ?-(other: Pos): Boolean = y == other.y
 
   def <->(other: Pos): Iterable[Pos] =
     min(x, other.x) to max(x, other.x) map { posAt(_, y) } flatten
 
-  def nextTo(other: Pos): Boolean = abs(x - other.x) == 1
+  def touches(other: Pos): Boolean = xDist(other) <= 1 && yDist(other) <= 1
+
+  def onSameDiagonal(other: Pos): Boolean = xDist(other) == yDist(other)
+
+  def xDist(other: Pos) = abs(x - other.x)
+  def yDist(other: Pos) = abs(y - other.y)
 
   lazy val file = Pos xToString x
   lazy val rank = y.toString

@@ -6,23 +6,21 @@ import pgn.{ Reader, Tag }
 object UciDump {
 
   // a2a4, b8c6
-  def apply(pgn: String, initialFen: Option[String], variant: Option[Variant]): Valid[String] =
-    pgn.trim.some.filter(_.nonEmpty).fold[Valid[String]](success("")) { nonEmptyPgn ⇒
+  def apply(pgn: String, initialFen: Option[String], variant: Variant): Valid[Seq[String]] =
+    pgn.trim.some.filter(_.nonEmpty).fold[Valid[Seq[String]]](success(Nil)) { nonEmptyPgn ⇒
       Reader(
         nonEmptyPgn,
         List(
           initialFen map { fen ⇒ Tag(_.FEN, fen) },
-          variant map { v ⇒ Tag(_.Variant, v.name) }
+          variant.some.filterNot(_.standard) map { v ⇒ Tag(_.Variant, v.name) }
         ).flatten
-      ) map {
-          _.chronoMoves map move(variant) mkString " "
-        }
+      ) map { _.chronoMoves map move(variant) }
     }
 
-  def move(variant: Option[Variant])(m: Move): String = m.castle.fold(
+  def move(variant: Variant)(m: Move): String = m.castle.fold(
     m.orig.key + m.dest.key + m.promotion.fold("")(_.forsyth.toString)
   ) {
-      case ((kf, kt), (rf, rt)) if kf == kt || variant == Some(Variant.Chess960) ⇒ kf.key + rf.key
+      case ((kf, kt), (rf, rt)) if kf == kt || variant == Variant.Chess960 ⇒ kf.key + rf.key
       case ((kf, kt), _) ⇒ kf.key + kt.key
     }
 }

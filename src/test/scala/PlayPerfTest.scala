@@ -2,7 +2,7 @@ package chess
 
 import Pos._
 
-class PerfTest extends ChessTest {
+class PlayPerfTest extends ChessTest {
 
   val nb = 20
   val iterations = 10

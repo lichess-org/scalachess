@@ -15,14 +15,14 @@ object UciDump {
           variant map { v ⇒ Tag(_.Variant, v.name) }
         ).flatten
       ) map {
-          _.chronoMoves map { m ⇒
-            m.castle.fold(
-              m.orig.key + m.dest.key + m.promotion.fold("")(_.forsyth.toString)
-            ) {
-                case ((kf, kt), (rf, rt)) if kf == kt || variant == Some(Variant.Chess960) ⇒ kf.key + rf.key
-                case ((kf, kt), _) ⇒ kf.key + kt.key
-              }
-          } mkString " "
+          _.chronoMoves map move(variant) mkString " "
         }
+    }
+
+  def move(variant: Option[Variant])(m: Move): String = m.castle.fold(
+    m.orig.key + m.dest.key + m.promotion.fold("")(_.forsyth.toString)
+  ) {
+      case ((kf, kt), (rf, rt)) if kf == kt || variant == Some(Variant.Chess960) ⇒ kf.key + rf.key
+      case ((kf, kt), _) ⇒ kf.key + kt.key
     }
 }

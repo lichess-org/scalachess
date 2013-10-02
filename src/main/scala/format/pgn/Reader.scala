@@ -14,7 +14,7 @@ object Reader {
     tags: List[Tag] = Nil): Valid[Replay] = for {
     parsed ← Parser(pgn)
     game ← makeGame(parsed.tags ::: tags)
-    replay ← op(parsed.sans).foldLeft(Replay(game).success: Valid[Replay]) {
+    replay ← op(parsed.sans).foldLeft[Valid[Replay]](Replay(game).success) {
       case (replayValid, san) ⇒ for {
         replay ← replayValid
         move ← san(replay.game)

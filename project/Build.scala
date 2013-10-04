@@ -18,7 +18,7 @@ trait Dependencies {
 object ApplicationBuild extends Build with Resolvers with Dependencies {
 
   private val buildSettings = Project.defaultSettings ++ Seq(
-    scalaVersion := "2.10.2",
+    scalaVersion := "2.10.3",
     organization := "org.lichess",
     version := "3.6",
     resolvers := Seq(iliaz, sonatype, awesomepom),

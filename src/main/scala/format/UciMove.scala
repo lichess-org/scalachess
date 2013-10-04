@@ -10,7 +10,9 @@ case class UciMove(orig: Pos, dest: Pos, promotion: Option[PromotableRole]) {
   def promotionString = promotion.fold("")(_.forsyth.toString)
 }
 
-object UciMove {
+object UciMove 
+  extends scalaz.std.OptionInstances
+  with scalaz.syntax.ToTraverseOps {
 
   def apply(move: String): Option[UciMove] = for {
     orig ← Pos.posAt(move take 2)
@@ -23,4 +25,16 @@ object UciMove {
     dest ← move lift 1 flatMap Pos.piotr
     promotion = move lift 2 flatMap Role.promotable
   } yield UciMove(orig, dest, promotion)
+
+  def readList(moves: String): Option[List[UciMove]] = 
+    moves.split(' ').toList.map(apply).sequence
+
+  def writeList(moves: List[UciMove]): String = 
+    moves.map(_.uci) mkString " "
+
+  def readListPiotr(moves: String): Option[List[UciMove]] = 
+    moves.split(' ').toList.map(piotr).sequence
+
+  def writeListPiotr(moves: List[UciMove]): String = 
+    moves.map(_.piotr) mkString " "
 }

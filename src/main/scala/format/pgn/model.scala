@@ -1,5 +1,3 @@
-package chess
-package format.pgn
 
 case class Pgn(
     tags: List[Tag],
@@ -35,7 +33,7 @@ case class Turn(
       case (Some(w), Some(b))             ⇒ " %s %s".format(w, b)
       case (Some(w), None)                ⇒ " %s".format(w)
       case (None, Some(b))                ⇒ ".. %s".format(b)
-      case (None, None)                   ⇒ ""
+      case _                              ⇒ ""
     }
   )
 }
@@ -44,7 +42,7 @@ case class Move(
     san: String,
     nag: Option[Int] = None,
     comment: Option[String] = None,
-    variation: List[Turn] = Nil,
+    variation: List[String] = Nil, // pgn moves
     // time left for the user who made the move, after he made it
     timeLeft: Option[Int] = None) {
 

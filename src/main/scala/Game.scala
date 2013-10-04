@@ -29,7 +29,7 @@ case class Game(
         cpiece ← board(cpos)
       } yield (cpos, cpiece) :: deads) | deads
     )
-    val pgnMove = pgn.Dumper.move(situation, move, newGame.situation)
+    val pgnMove = pgn.Dumper(situation, move, newGame.situation)
     newGame.copy(pgnMoves = pgnMoves.isEmpty.fold(
       pgnMove,
       pgnMoves + " " + pgnMove))

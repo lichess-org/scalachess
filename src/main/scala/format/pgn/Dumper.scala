@@ -3,7 +3,7 @@ package format.pgn
 
 object Dumper {
 
-  def move(situation: Situation, data: chess.Move, next: Situation): String = {
+  def apply(situation: Situation, data: chess.Move, next: Situation): String = {
     import data._
     ((promotion, piece.role) match {
       case _ if castles   ⇒ if (orig ?> dest) "O-O-O" else "O-O"
@@ -20,4 +20,9 @@ object Dumper {
       } + captures.fold("x", "") + dest.key
     }) + (if (next.check) if (next.checkMate) "#" else "+" else "")
   }
+
+  def apply(data: chess.Move): String = apply(
+    data.before situationOf data.color,
+    data,
+    data.after situationOf !data.color)
 }

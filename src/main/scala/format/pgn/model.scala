@@ -6,7 +6,7 @@ case class Pgn(
     turns: List[Turn]) {
 
   def updateTurn(fullMove: Int, f: Turn ⇒ Turn) = fullMove - 1 |> { index ⇒
-    (turns lift index).fold(this) { turn =>
+    (turns lift index).fold(this) { turn ⇒
       copy(turns = turns.updated(index, f(turn)))
     }
   }
@@ -50,17 +50,18 @@ case class Move(
 
   def isLong = comment.isDefined || variation.nonEmpty
 
-  def timeString(time:Int) = Clock.timeString(time)
+  def timeString(time: Int) = Clock.timeString(time)
 
   private def clockString: Option[String] =
     timeLeft.map(time ⇒ "[%clk " + timeString(time) + "]")
 
-  override def toString = "%s%s%s".format(
+  override def toString = "%s%s%s%s".format(
     san,
     nag.fold("")(" $" + _),
     (comment.isDefined || timeLeft.isDefined).fold(
       List(clockString, comment).flatten.mkString(" { ", " ", " }"),
       ""
-    )
+    ),
+    variation.isEmpty.fold("", variation.mkString(" ( ", " ", " )"))
   )
 }

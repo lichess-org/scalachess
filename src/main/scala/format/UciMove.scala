@@ -17,7 +17,7 @@ object UciMove
   def apply(move: String): Option[UciMove] = for {
     orig ← Pos.posAt(move take 2)
     dest ← Pos.posAt(move drop 2 take 2)
-    promotion = move lift 5 flatMap Role.promotable
+    promotion = move lift 4 flatMap Role.promotable
   } yield UciMove(orig, dest, promotion)
 
   def piotr(move: String): Option[UciMove] = for {

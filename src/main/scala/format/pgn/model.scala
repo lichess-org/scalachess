@@ -6,7 +6,7 @@ case class Pgn(
     turns: List[Turn]) {
 
   def updateTurn(fullMove: Int, f: Turn ⇒ Turn) = fullMove - 1 |> { index ⇒
-    (turns lift index).fold(this) { turn =>
+    (turns lift index).fold(this) { turn ⇒
       copy(turns = turns.updated(index, f(turn)))
     }
   }
@@ -35,7 +35,7 @@ case class Turn(
       case (Some(w), Some(b))             ⇒ " %s %s".format(w, b)
       case (Some(w), None)                ⇒ " %s".format(w)
       case (None, Some(b))                ⇒ ".. %s".format(b)
-      case (None, None)                   ⇒ ""
+      case _                              ⇒ ""
     }
   )
 }
@@ -44,23 +44,24 @@ case class Move(
     san: String,
     nag: Option[Int] = None,
     comment: Option[String] = None,
-    variation: List[Turn] = Nil,
+    variation: List[String] = Nil, // pgn moves
     // time left for the user who made the move, after he made it
     timeLeft: Option[Int] = None) {
 
   def isLong = comment.isDefined || variation.nonEmpty
 
-  def timeString(time:Int) = Clock.timeString(time)
+  def timeString(time: Int) = Clock.timeString(time)
 
   private def clockString: Option[String] =
     timeLeft.map(time ⇒ "[%clk " + timeString(time) + "]")
 
-  override def toString = "%s%s%s".format(
+  override def toString = "%s%s%s%s".format(
     san,
     nag.fold("")(" $" + _),
     (comment.isDefined || timeLeft.isDefined).fold(
       List(clockString, comment).flatten.mkString(" { ", " ", " }"),
       ""
-    )
+    ),
+    variation.isEmpty.fold("", variation.mkString(" ( ", " ", " )"))
   )
 }

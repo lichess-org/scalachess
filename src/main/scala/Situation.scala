@@ -37,7 +37,7 @@ case class Situation(board: Board, color: Color) {
   def end: Boolean = checkMate || staleMate || autoDraw
 
   def playable(strict: Boolean): Boolean = 
-    (board valid strict) && !end && (!copy(color = !color).end)
+    (board valid strict) && !end && !copy(color = !color).check
 
   def status: Option[Status] =
     if (checkMate) Status.Mate.some

@@ -1,3 +1,5 @@
+package chess
+package format.pgn
 
 case class Pgn(
     tags: List[Tag],

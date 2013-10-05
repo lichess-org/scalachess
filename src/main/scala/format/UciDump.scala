@@ -8,7 +8,10 @@ object UciDump {
     replay.chronoMoves map move(replay.game.board.variant)
 
   def apply(pgn: String, initialFen: Option[String], variant: Variant): Valid[List[String]] =
-    Replay(pgn, initialFen, variant) map apply
+    pgn.trim.isEmpty.fold(
+      success(Nil),
+      Replay(pgn, initialFen, variant) map apply
+    )
 
   def move(variant: Variant)(m: Move): String = m.castle.fold(
     m.orig.key + m.dest.key + m.promotion.fold("")(_.forsyth.toString)

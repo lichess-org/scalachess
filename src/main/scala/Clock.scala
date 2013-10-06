@@ -70,7 +70,11 @@ case class RunningClock(
       color,
       math.max(
         0, 
-        (t - timer).toFloat - math.min(lag, Clock.maxLagToCompensate)
+        (t - timer).toFloat - math.max(
+          0,
+          math.min(
+            lag - Clock.naturalLag, 
+            Clock.maxLagToCompensate))
       ) - increment
     ).copy(
         color = !color,
@@ -131,7 +135,10 @@ case class PausedClock(
 object Clock {
 
   val minInitLimit = 2
-  val maxLagToCompensate = 0.5f
+  // no more than this time will be offered to the lagging player
+  val maxLagToCompensate = 0.7f
+  // substracted from lag compensation
+  val naturalLag = 0.1f
 
   def apply(
     limit: Int,

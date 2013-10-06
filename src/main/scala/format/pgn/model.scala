@@ -28,6 +28,8 @@ case class Turn(
     copy(black = black map f)
   )
 
+  def isEmpty = white.isEmpty && black.isEmpty
+
   override def toString = "%d.%s".format(
     number,
     (white, black) match {

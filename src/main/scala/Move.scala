@@ -1,5 +1,7 @@
 package chess
 
+import scala.concurrent.duration._
+
 case class Move(
     piece: Piece,
     orig: Pos,
@@ -10,7 +12,7 @@ case class Move(
     promotion: Option[PromotableRole],
     castle: Option[((Pos, Pos), (Pos, Pos))],
     enpassant: Boolean,
-    lag: Int = 0) {
+    lag: FiniteDuration = 0.millis) {
 
   def withHistory(h: History) = copy(after = after withHistory h)
 
@@ -62,7 +64,7 @@ case class Move(
     else None
   }
 
-  def withLag(l: Int) = copy(lag = l)
+  def withLag(l: FiniteDuration) = copy(lag = l)
 
   override def toString = "%s %s".format(piece, notation)
 }

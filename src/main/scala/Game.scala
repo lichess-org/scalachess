@@ -1,5 +1,7 @@
 package chess
 
+import scala.concurrent.duration._
+
 import format.pgn
 
 case class Game(
@@ -14,7 +16,7 @@ case class Game(
     orig: Pos,
     dest: Pos,
     promotion: Option[PromotableRole] = None,
-    lag: Int = 0): Valid[(Game, Move)] = for {
+    lag: FiniteDuration = 0.millis): Valid[(Game, Move)] = for {
     move ← situation.move(orig, dest, promotion) map (_ withLag lag)
   } yield apply(move) -> move
 

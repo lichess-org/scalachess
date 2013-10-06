@@ -1,7 +1,6 @@
 package chess
 
-import org.joda.time.Duration
-import org.joda.time.format.PeriodFormatterBuilder
+import scala.concurrent.duration._
 
 // All durations are expressed in seconds
 sealed trait Clock {
@@ -27,7 +26,7 @@ sealed trait Clock {
   def estimateTotalTime = limit + 30 * increment
 
   // if lag is provided, it is added to the clock as a compensation
-  def step(lag: Float = 0): RunningClock
+  def step(lag: FiniteDuration = 0.millis): RunningClock
 
   def run: RunningClock
 
@@ -64,18 +63,17 @@ case class RunningClock(
     if (c == color) now - timer else 0
   }.toFloat
 
-  def step(lag: Float = 0) = {
+  def step(lag: FiniteDuration = 0.millis) = {
     val t = now
+    val lagSeconds = lag.toMillis.toFloat / 1000
+    val lagCompensation = math.max(
+      0,
+      math.min(
+        lagSeconds.pp - Clock.naturalLag,
+        Clock.maxLagToCompensate)).pp
     addTime(
       color,
-      math.max(
-        0, 
-        (t - timer).toFloat - math.max(
-          0,
-          math.min(
-            lag - Clock.naturalLag, 
-            Clock.maxLagToCompensate))
-      ) - increment
+      math.max(0, (t - timer).toFloat - lagCompensation) - increment
     ).copy(
         color = !color,
         timer = t
@@ -110,7 +108,7 @@ case class PausedClock(
 
   val timerOption = None
 
-  def step(lag: Float = 0) = run step lag
+  def step(lag: FiniteDuration = 0.millis) = run step lag
 
   def stop = this
 
@@ -150,10 +148,10 @@ object Clock {
     blackTime = 0f)
 
   def timeString(time: Int) = periodFormatter.print(
-    Duration.standardSeconds(time).toPeriod
+    org.joda.time.Duration.standardSeconds(time).toPeriod
   )
 
-  private val periodFormatter = new PeriodFormatterBuilder().
+  private val periodFormatter = new org.joda.time.format.PeriodFormatterBuilder().
     printZeroAlways.
     minimumPrintedDigits(1).appendHours.appendSeparator(":").
     minimumPrintedDigits(2).appendMinutes.appendSeparator(":").

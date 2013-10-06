@@ -1,5 +1,7 @@
 package chess
 
+import scala.concurrent.duration.{ FiniteDuration, MILLISECONDS }
+
 import Pos._
 
 class ClockTest extends ChessTest {
@@ -32,14 +34,15 @@ class ClockTest extends ChessTest {
     }
   }
   "lag compensation" should {
+    def durOf(lag: Float) = FiniteDuration((lag * 1000).toLong, MILLISECONDS)
     def clockStep(wait: Float, lag: Float): Double = {
-      val clock = Clock(60, 0) step 0
+      val clock = Clock(60, 0).step()
       Thread sleep ((wait + lag) * 1000).toInt
-      (clock step lag remainingTime Black).toDouble
+      (clock step durOf(lag) remainingTime Black).toDouble
     }
     def clockStart(lag: Float): Double = {
-      val clock = Clock(60, 0) step lag
-      (clock step lag remainingTime White).toDouble
+      val clock = Clock(60, 0).step()
+      (clock step durOf(lag) remainingTime White).toDouble
     }
     val delta = 0.05
     val maxLag = Clock.maxLagToCompensate

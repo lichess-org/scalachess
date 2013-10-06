@@ -66,11 +66,10 @@ case class RunningClock(
   def step(lag: FiniteDuration = 0.millis) = {
     val t = now
     val lagSeconds = lag.toMillis.toFloat / 1000
-    val lagCompensation = math.max(
-      0,
+    val lagCompensation = math.max( 0,
       math.min(
-        lagSeconds.pp - Clock.naturalLag,
-        Clock.maxLagToCompensate)).pp
+        lagSeconds - Clock.naturalLag,
+        Clock.maxLagToCompensate))
     addTime(
       color,
       math.max(0, (t - timer).toFloat - lagCompensation) - increment

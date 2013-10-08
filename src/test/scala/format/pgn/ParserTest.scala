@@ -14,4 +14,12 @@ class ParserTest extends ChessTest {
   "nags" in {
     Parser(withNag) must beSuccess
   }
+
+  "lines" in {
+    Parser(lines) must beSuccess
+  }
+
+  "comments and lines" in {
+    Parser(commented) must beSuccess
+  }
 }

@@ -138,4 +138,69 @@ e5 9. fxe5 dxe5 10. Be2 Re8 11. O-O Qe7 12. Rb1 b6 13. Rb5 a6 14. Rb2 h6
 g6 59. Ra5 Ncd7 60. Kd2 Nf8 61. Ra6+ Ne6 62. h4 Ng4 63. Bxe6 fxe6 64. Kd3 Ne5+
 65. Ke4 Ng4 66. Kd4 Ne5 67. Ra8 Nd7 68. Rc8 Ke7 69. e4 Nf6 70. Rc7+ Kd6 71. Rg7
 Ng4 1-0"""
+
+val commented = """
+[Event "ICC"]
+[Site "Internet Chess Club"]
+[Date "2013.09.29"]
+[Round "?"]
+[White "Pedro"]
+[Black "burza"]
+[Result "1-0"]
+[ECO "B12"]
+[WhiteElo "1536"]
+[BlackElo "1467"]
+[Annotator "Pedro"]
+[PlyCount "103"]
+[EventDate "2013.??.??"]
+[SourceDate "2009.04.28"]
+[TimeControl "1800"]
+
+1. e4 d6 2. d4 c6 {I'm out of book right now.} 3. f4 {Black's queenside pawns
+seemed a bit weird and not secure to long-castle; therefore I was expecting
+short castle for black. Given the fact that black does not have serious piece
+development at the moment I decided to go 3.f4 right away. Besides controling
+more central squares, it also aims to support e5 advance which might kick out
+a knight on natural square f6, making the king more vulnerable. Also it
+provides Qe1-Qe3 maneuver which can be good for attack.} Qc7 4. Nf3 h6 $6 {
+Losing development time with a profilactic move. The g5 square is not a
+serious threat at the moment, specially at this early opening stage with only
+one piece developed. Also, h6 might a target for attacking sacrifice.} 5. Bd3 (
+{I've considered also} 5. Bc4 {but I was discouraged by} e6) 5... Bg4 6. O-O
+Nd7 {Now I was getting worried the long-castle was comming anyway.
+Nevertheless, I have better centre control and prospects of attacking kingside
+anyway, specially if I manage to get a open f-file.} 7. Nc3 a6 $6 {I do not
+understand why such caution on b5.} 8. Be3 e5 $2 {Breaking the centre too soon,
+he must finish his development first, his king is still in the centre} 9. fxe5
+dxe5 10. d5 $1 ({Perhaps black was expecting} 10. dxe5 $2 Nxe5 {freeing his
+position}) 10... c5 (10... cxd5 $6 11. Nxd5 {occupying central weak square}) (
+10... Ngf6 11. dxc6 {eternalizing central weak square or damaging the pawn
+structure.}) 11. a4 {Preventing b5, which could cramp my queenside with
+further b4 move.} Be7 {Now short-castle seems reasonable} 12. Qe1 g5 $2 {No
+development, weakening f5.} 13. Qg3 f6 $4 {Too much worry overprotecting
+what's already protected. It's impressive the pressure simple piece play makes,
+making him blunder a piece.} 14. Qxg4 Qd6 15. Qh5+ {Stopping his castle.} Kd8
+16. Qf7 {Threatning Qg8 taking the rook.} Bf8 17. a5 {Openning route to
+ocupying b6 weak square by Na4-Nb6. This square seemed more important than f5 
+(Ne2-Ng3-Nf5) because its nearer the black's king.} h5 18. Na4 (18. Nxg5 $5 {
+Should have been fun, but I didn't want to risk it because I didn't want to
+get low on the clock. I think if it was a 45 45 game for example I would
+calculate it further.} fxg5 19. Bxg5+ Ne7 (19... Kc8 $2 20. Qe8+ Kc7 21. Qxa8)
+(19... Be7 20. Qg7) 20. Be2 $18) 18... Rb8 (18... Nh6 19. Qxh5) 19. Nb6 $1 {
+removing the defender of Bf8} Nxb6 20. axb6 h4 {Black is just cramped, with no
+moves.} (20... Qe7 {Impressive how white's queen paralize all black's kingside
+pieces, an exchange of queens was called to diffuse that.} 21. Qxe7+ Bxe7) 21.
+Nxg5 fxg5 22. Qxf8+ Kd7 {only move} (22... Qxf8 $4 23. Rxf8+ Kd7 24. Rxb8 $18)
+23. Qxd6+ (23. Rf7+ {does not work due to} Ne7) 23... Kxd6 24. Rf7 Nh6 25. Rf6+
+Ke7 26. Bxg5 Ng4 27. Rf4+ Kd6 28. Rxg4 Rhg8 29. Rf1 Rbf8 30. Rxf8 Rxf8 31. Bxh4
+Rf7 32. Rg6+ Kd7 33. Bf2 Rxf2 34. Kxf2 a5 35. Bb5+ Ke7 36. Re6+ Kf7 37. Rxe5
+Kf6 38. Rf5+ {Imprecise} ({better was} 38. Re6+ Kf7 39. Bc4 Kg7 40. d6) 38...
+Ke7 39. h4 c4 40. Bxc4 Kd6 41. h5 Kc5 42. b3 a4 43. bxa4 Kxc4 44. h6 Kb4 45. h7
+Kxa4 46. h8=Q Kb5 47. d6+ Kxb6 48. d7 Kc6 49. d8=Q b5 50. Qd5+ Kb6 51. Qxb5+
+Kc7 52. Qhb8# 1-0
+"""
+
+val lines = """
+1. e4 d6 2. d4 c6  3. f4  Qc7 4. Nf3 h6 $6  5. Bd3 (  5. Bc4  e6) 5... Bg4 6. O-O Nd7  7. Nc3 a6 $6  8. Be3 e5 $2  9. fxe5 dxe5 10. d5 $1 ( 10. dxe5 $2 Nxe5 ) 10... c5 (10... cxd5 $6 11. Nxd5 ) ( 10... Ngf6 11. dxc6 ) 
+"""
 }

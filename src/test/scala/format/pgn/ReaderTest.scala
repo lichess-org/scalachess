@@ -50,6 +50,9 @@ class ReaderTest extends ChessTest {
     "example from TCEC" in {
       Reader(fromTcec) must beSuccess
     }
+    "lines and comments" in {
+      Reader(commented) must beSuccess
+    }
     "invalid variant" in {
       Reader(invalidVariant) must haveFailureMatching("Invalid variant")
     }

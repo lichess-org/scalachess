@@ -13,8 +13,12 @@ object Parser {
   } yield ParsedPgn(tags, sans)
 
   private val SanitizeRegex = """(\$\d+)|(\{[^\}]+\})""".r
-  private def sanitize(pgn: String): String = 
-    SanitizeRegex.replaceAllIn(pgn.lines.map(_.trim).filterNot(_.isEmpty) mkString "\n", "")
+  private val DoubleSpaceRegex = """\s{2,}""".r
+  private def sanitize(pgn: String): String = DoubleSpaceRegex.replaceAllIn(
+    SanitizeRegex.replaceAllIn(
+      pgn.lines.map(_.trim).filterNot(_.isEmpty) mkString "\n", 
+      ""),
+    " ")
 
   private def splitSanAndMoves(pgn: String): Valid[(String, String)] =
     pgn.lines.toList span { line ⇒
@@ -62,11 +66,12 @@ object Parser {
     val result: Parser[String] = space ~> ("*" | "1/2-1/2" | "0-1" | "1-0")
 
     def move: Parser[San] =
-      (number?) ~> (castle | standard) <~ (nag?) <~ (comment?)
+      (number?) ~> (castle | standard) <~ (nag?) <~ rep(line)
 
-    def nag: Parser[String] = """[^\s]*""".r
+    def nag: Parser[String] = """[^\(\)\{\}]*""".r
 
-    def comment: Parser[String] = space ~> "{" ~> """[^\}]+""".r <~ "}"
+    def line: Parser[List[San]] = 
+      (space?) ~> "(" ~> (space?) ~> moves <~ (space?) <~ ")"
 
     def castle = (qCastle | kCastle) ~ suffixes ^^ {
       case side ~ suf ⇒ Castle(side) withSuffixes suf

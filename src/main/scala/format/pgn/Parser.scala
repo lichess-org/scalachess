@@ -33,7 +33,7 @@ object Parser
       }
 
     def moves: Parser[List[String]] = as("moves") {
-      rep(move) <~ (result?)
+      rep(move) <~ (result?) <~ (commentary*)
     }
 
     val moveRegex = """(0\-0|0\-0\-0|[QKRBNOoa-h][QKRBNa-h1-8xOo\-=\+\#]{1,6})""".r

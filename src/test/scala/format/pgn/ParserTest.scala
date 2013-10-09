@@ -76,4 +76,16 @@ class ParserTest extends ChessTest {
       case a ⇒ a.sans.size must_== 42
     }
   }
+
+  "TCEC" in {
+    parser(fromTcec) must beSuccess.like {
+      case a ⇒ a.sans.size must_== 142
+    }
+  }
+
+  "TCEC with engine output" in {
+    parser(fromTcecWithEngineOutput) must beSuccess.like {
+      case a ⇒ a.sans.size must_== 165
+    }
+  }
 }

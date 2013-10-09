@@ -41,6 +41,9 @@ class ReaderTest extends ChessTest {
     "example from wikipedia" in {
       Reader(fromWikipedia) must beSuccess
     }
+    "with inline comments" in {
+      Reader(inlineComments) must beSuccess
+    }
     "example from chessgames.com" in {
       Reader(fromChessgames) must beSuccess
     }
@@ -50,8 +53,11 @@ class ReaderTest extends ChessTest {
     "example from TCEC" in {
       Reader(fromTcec) must beSuccess
     }
-    "lines and comments" in {
-      Reader(commented) must beSuccess
+    "comments and variations" in {
+      Reader(commentsAndVariations) must beSuccess
+    }
+    "comments and variations by smartchess" in {
+      Reader(bySmartChess) must beSuccess
     }
     "invalid variant" in {
       Reader(invalidVariant) must haveFailureMatching("Invalid variant")

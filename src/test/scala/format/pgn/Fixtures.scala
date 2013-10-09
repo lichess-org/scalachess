@@ -45,6 +45,23 @@ hxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5
 35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6
 Nf2 42. g4 Bd3 43. Re6 1/2-1/2"""
 
+  val inlineComments = """[Event "F/S Return Match"]
+[Site "Belgrade, Serbia Yugoslavia|JUG"]
+[Date "1992.11.04"]
+[Round "29"]
+[White "Fischer, Robert J."]
+[Black "Spassky, Boris V."]
+[Result "1/2-1/2"]
+ 
+1. e4 e5 2. Nf3 Nc6 3. Bb5 {This opening is called the Ruy Lopez.} 3... a6 ; this is an inline comment
+4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8  10. d4 Nbd7
+11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5 ; Openning route to ocupying b6 weak square by Na4-Nb6. This square seemed more important than f5 (Ne2-Ng3-Nf5) because its nearer the black's king.
+Nxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6
+23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5
+hxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5
+35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6
+Nf2 42. g4 Bd3 43. Re6 1/2-1/2"""
+
 val fromChessgames = """[Event "The Match - Braingames World Chess Cham"]
 [Site "London"]
 [Date "2000.01.04"]
@@ -69,6 +86,8 @@ Ne5 37. Rg7 Rf8 38. h3 c4 39. Re7 Nd3 40. f7 Nxf2 41. Re8+ Kd7
 42. Rxf8 Ke7 43. Rc8 Kxf7 44. Rxc7+ Ke6 45. Be3 Nd1 46. Bxb6
 c3 47. h4 Ra6 48. Bd4 Ra4 49. Bxc3 Nxc3 50. Rxc3 Rxh4 51. Rf3
 Rh5 52. Kf2 Rg5 53. Rf8 Ke5 1/2-1/2"""
+
+val disambiguated = "Be5 g6 Ne7g6+"
 
 val fromProd1 = """d4 Nf6 c4 e6 Nc3 Bb4 Bd2 O-O Nf3 c6 e4 Qa5 Be2 Kh8 O-O h5 Ne5 h4 h3 Be7 Nd5 Qd8 Nxe7 d6 Ne7g6+"""
 val fromProd2 = """e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 e5 Nf5 d5 g4 Bxf5 exf5 d4 Ne2 Nxg4 Bh3 Qd5 Ng3 Bb4+ Bd2 Bxd2+ Qxd2 Qf3 Qe2 Qxe2+ Kxe2 Nh6 Bg2 Kf8 Rhe1 Ke7 Kd3 Nb4+ Kd2 Rhc8 c3 dxc3+ bxc3 Rd8+ Kc1 Nd3+ Kc2 Nxe1+ Rxe1 Kf6 Be4 Rdb8 Rd1 Kg5 Rd7 a6 Bxb7 Ra7 Bc6 Rxd7 Bxd7 Rd8 Bc6 Nxf5 Nxf5 Kxf5 f3 Rb8 Be4+ Kf4 c4 Rh8 c5 a5 c6 f5 Bd5 Rc8 Kc3 g6 Kc4 h5 Kb5 Rb8+ Ka6 a4 c7 Rc8 Kb7 Rh8 c8=Q Rxc8 Kxc8 g5 Kd7 g4 fxg4 hxg4 Ke6 e4 Bc4 Kg5 Ke5 e3 Bd3 f4 Ke4 g3 Kf3 gxh2 Kg2 f3+ Kxh2 e2 Bxe2 fxe2 Kh3 e1=Q Kg2 Qe6"""
@@ -139,7 +158,7 @@ g6 59. Ra5 Ncd7 60. Kd2 Nf8 61. Ra6+ Ne6 62. h4 Ng4 63. Bxe6 fxe6 64. Kd3 Ne5+
 65. Ke4 Ng4 66. Kd4 Ne5 67. Ra8 Nd7 68. Rc8 Ke7 69. e4 Nf6 70. Rc7+ Kd6 71. Rg7
 Ng4 1-0"""
 
-val commented = """
+val commentsAndVariations = """
 [Event "ICC"]
 [Site "Internet Chess Club"]
 [Date "2013.09.29"]
@@ -166,7 +185,7 @@ provides Qe1-Qe3 maneuver which can be good for attack.} Qc7 4. Nf3 h6 $6 {
 Losing development time with a profilactic move. The g5 square is not a
 serious threat at the moment, specially at this early opening stage with only
 one piece developed. Also, h6 might a target for attacking sacrifice.} 5. Bd3 (
-{I've considered also} 5. Bc4 {but I was discouraged by} e6) 5... Bg4 6. O-O
+{I've considered also} 5. Bc4 {but I was discouraged by} e6) 5... Bg4 6. O-O ; Openning route to ocupying b6 weak square by Na4-Nb6. This square seemed more important than f5 (Ne2-Ng3-Nf5) because its nearer the black's king.
 Nd7 {Now I was getting worried the long-castle was comming anyway.
 Nevertheless, I have better centre control and prospects of attacking kingside
 anyway, specially if I manage to get a open f-file.} 7. Nc3 a6 $6 {I do not
@@ -200,7 +219,129 @@ Kxa4 46. h8=Q Kb5 47. d6+ Kxb6 48. d7 Kc6 49. d8=Q b5 50. Qd5+ Kb6 51. Qxb5+
 Kc7 52. Qhb8# 1-0
 """
 
-val lines = """
+val bySmartChess = """
+[Event "?"]
+[Site "Munich"]
+[Date "1979.??.??"]
+[Round "?"]
+[White "Andersson, U"]
+[Black "Robatsch"]
+[Result "1-0"]
+[Annotator  "Krush, I]
+
+{
+http://www.smartchess.com/SmartChessOnline/default.htm
+English Double Fianchetto (A30)
+When two grandmasters play out moves from a symmetrical opening and begin methodically exchanging pieces, it is almost as if you can hear the collective groan from the audience as they realize a quick draw may soon result.
+However, openings such as the one we are about to examine are deceptive in their simplicity. In the hands of a strong technical player such as GM Ulf Andersson of Sweden, the Double Fianchetto Exchange Variation can be slow death for a player of the Black pieces who lets his guard slip for even a moment.
+}
+1.c4 c5 2.Nf3 Nf6 3.g3 b6 4.Bg2 Bb7 5.0-0 g6 6.b3 Bg7 7.Bb2 0-0 8.Nc3
+{
+If White strikes first with the advance of his d-pawn, then Black is able to equalize with 8.d4 cxd4 9.Qxd4 Nc6 10.Qd2 d5 11.cxd5 Qxd5, for example 12.Nd4 Ne4! 13.Nxc6 Qxc6 14.Bxg7 Kxg7 15.Qe3 Qc5 16.Qxc5 Nxc5 17.Bxb7 Nxb7 18.Nc3 Rac8 19.Rac1 Rfd8, is completely equal, Barcza-Steiner, Budapest 1948. If we compare this situation to the one that occurs in the line after 8.Nc3 d5, we note that here Black has completed his development and is able to challenge White on the c- and d-files with his rooks.
+}
+8...d5
+{
+Black breaks the symmetry of moves and provokes the following flurry of exchanges. In my opinion this move is a little dubious and Black can instead equalize in the variation with 8...Na6!
+}
+9.Nxd5
+{
+The only correct way to proceed. If 9.cxd5?! Nxd5 10.Na4 Bxb2 11.Nxb2 Nc6, Black has at least equalized as the White knight on b2 is misplaced.
+}
+9...Nxd5 10.Bxg7 Kxg7 11.cxd5 Qxd5
+{
+The exchanging sequence is forcing, as 11...Bxd5 12.d4, is good for White. Note that White wins immediately after 12...cxd4? 13.Qxd4+ Kg8 14.Rfd1, pinning and winning Black's bishop.
+}
+12.d4 cxd4
+{
+Black's last opportunity to avoid the endgame that occurs in the game is 12...Na6, when it is probably easier for Black to demonstrate equality.
+}
+13.Qxd4+
+{
+Less effective is 13.Nh4 Qd7 14.Bxb7 Qxb7 15.Qxd4+ Kg8 16.Rfd1 Nc6 17.Qd7 (17.Qe4 Rfd8 18.Nf3 0.5-0.5 Sanguinetti-Panno, Buenos Aires 1977) 17...Qxd7 18.Rxd7 Rfd8 0.5-0.5 Tal-Salov, Brussels 1988. In both cases Black equalized.
+}
+13...Qxd4 14.Nxd4 Bxg2 15.Kxg2
+{
+An important position in the Double Fianchetto Exchange Variation which in practice has been a deceptively tricky defensive chore for Black.
+White has a small nagging initiative for the endgame in that:
+a) his knight is ACTIVE and CENTRALIZED, while Black's knight is still at home (indeed, it is not clear where Black should develop his knight);
+b) White's rooks are already CONNECTED;
+c) White has the maneuver Nd4-b5 in reserve to create pressure against Black's queenside pawns and interfere with Black's development.
+}
+15...a6
+{
+Black prevents the possibility of Nc3-b5 and prepares to develop his rook with Ra8-a7 to facilitate doubling of the rooks on the c- or d-file (if allowed). Alternatives include:
+15...Nd7, and now:
+A) 16.Rfd1 Nf6 17.Nb5! Rfc8 18.Rac1 Rxc1 (if 18...a6? 19.Nc7 Rab8 20.Nxa6 Rxc1 21.Rxc1 Ra8 22.Nb4, and White has won a pawn) 19.Rxc1 a6 20.Nd4 Rd8 21.e3 Nd5 22.Rc6 Rd6 23.Rxd6! exd6 24.Kf1, and White enjoys an advantage in the knight endgame thanks to his better pawn structure, Andersson-Marovic, Banja Luka 1976.
+B) 16.Rac1 Rfc8 17.Rfd1, and now:
+B1) 17...Nc5 18.b4! Ne4 (18...Na4 19.Nb5! Rxc1 20.Rxc1 a5 21.a3! with a clear advantage for White Smyslov-Benko, Monte Carlo 1968, while worse is 18...Nd7? 19.Ne6+ fxe6 20.Rxc8 Rxc8 21.Rxd7, with a winning endgame for White) 19.Nb5! Rxc1 20.Rxc1 a5 21.Rc4, with an edge for White, Lisitsyn-Levenfish, USSR Ch. 1948.
+B2) 17...Kf6 18.Nb5 Rxc1 19.Rxc1 Nc5 20.b4, with an edge for White, Ribli-Sapi, Budapest 1976. These examples show how White's Nd4-b5 idea can make life awkward for Black.
+An interesting try is 15...Na6!? 16.Rfd1 Rfc8 17.Rac1, and now:
+A) 17...Kf6 18.Nb5 Rxc1 (18...Nc5? - losing a pawn - 19.b4 Ne6 20.Rxc8 Rxc8 21.Nxa7, with a big advantage for White, Smyslov-Castro Rojas, Biel 1976) 19.Rxc1 Nc5 20.b4 Ne6 21.Rc6, reaches a position that occurred in the game Portisch-Pachman, Sarajevo 1963, when White stood better.
+B) 17...Nb4 18.Rxc8 (Possible is 18.a3, when White may have a slight pull) 18...Rxc8 19.Rd2 a6 0.5-0.5 Benko-Weinstein, Lone Pine 1975.
+Also possible is 15...Rc8, when 16.Rac1 Nd7 17.Rfd1 transposes to variations examined after 15...Nd7.
+}
+16.Rac1
+{
+16.Rfc1 Ra7 17.Rc2 (17.e3 Rd7 18.Rc2 e5?! 19.Nf3 f6 20.g4! with advantage to White, Szabo-Bisguier, Gothenburg 1955) 17...Rd8 18.e3 Kf8 (18...e5 19.Nf3 f6 20.Rac1, is good for White) 19.Rac1 Ke8 20.g4! (this idea is thematic - gaining space on the kingside while Black is busy preventing White from penetrating on the queenside) 20...h6 21.h4 Rad7 22.f4 a5 23.Kf3 Rd6 24.h5! with a clear plus for White, Andersson-Hort, Niksic 1978.
+}
+16...Ra7 17.Rc2 Rd8 18.e3
+{
+White anchors his centralized knight.
+}
+18...e5?!
+{
+A mistake, as White will be able to capitalize on the resultant weakening of the Black pawn structure.
+Better is 18...Kf8 19.Rfc1, transposing to the Andersson-Hort game in the previous note, although as we saw, White also enjoys more pleasant prospects in that instance.
+}
+19.Nf3 f6
+{
+Passively defending the e-pawn with 19...Re7 can be met with 20.Rfc1 Kf8 21.Rc8, and White stands better.
+}
+20.g4!
+{
+White gains space on the kingside and has a perceptible advantage.
+}
+20...Rd6 21.Rfc1 Nd7 22.Rc6 Rxc6 23.Rxc6
+{
+An exchange of rooks has exposed Black's tender spots along his third rank (b6, d6).
+}
+23...Kf7 24.Nd2
+{
+Andersson redirects his knight to the more lucrative outpost on e4.
+}
+24...Ke7
+{
+Keeping the knight out of e4 with 24...f5? allows White to post the knight efficiently elsewhere with 25.gxf5 gxf5 26.Nc4, and Black is losing a pawn, as 26...b5 allows 27.Nd6+ etc.
+}
+25.Ne4 Rb7 26.b4!
+{
+Effectively binding Black's position.
+}
+26...Rb8 27.Nc3
+{
+Andersson now directs his knight to the more powerful post on d5.
+}
+27...f5
+{
+If 27...Rb7 28.Nd5+ Kf7 then 29.e4! leaves Black without any useful move, for example 29...a5 (29...Rb8 30.Rc7, and White wins a pawn after 30...Ke6 31.Ra7 a5 32.bxa5 bxa5 33.Ra6+ Kf7 34.Rxa5, etc., while 29...Kg7 is met by 30.Re6! g5 31.Re7+ Kg6 32.Ne3, and the Black king is practically in a mating net) 30.b5, maintains the bind - Black is running out of moves.
+}
+28.Nd5+ Kf7 29.Kg3 h5?
+{
+White's king penetrates easily after this move by Black. But even after 29...fxg4 30.Kxg4, there is a grim defensive task for Black.
+}
+30.gxf5 gxf5 31.Rd6 Rb7 32.Kh4
+{
+Andersson introduces his king as the last attacking unit in his endgame attack. Black's kingside pawns have become easy targets.
+}
+32...Kg7 33.Kxh5  
+{
+The continuation might be 33...a5 34.b5 Kf7 (34...Kh7? loses to 35.Rxd7+ Rxd7 36.Nf6+) 35.Kg5, and White wins another pawn.
+What we learn from a study of a game such as this is that no matter how quiet or simplified a position may appear on the surface, active and accurate defense is paramount as any mistake can lead to a technically lost endgame (with almost certain fatal consequences).
+}
+1-0
+"""
+
+val variations = """
 1. e4 d6 2. d4 c6  3. f4  Qc7 4. Nf3 h6 $6  5. Bd3 (  5. Bc4  e6) 5... Bg4 6. O-O Nd7  7. Nc3 a6 $6  8. Be3 e5 $2  9. fxe5 dxe5 10. d5 $1 ( 10. dxe5 $2 Nxe5 ) 10... c5 (10... cxd5 $6 11. Nxd5 ) ( 10... Ngf6 11. dxc6 ) 
 """
 }

@@ -4,7 +4,7 @@ import format.pgn.{ Reader, Tag }
 
 case class Replay(game: Game, moves: List[Move]) {
 
-  def chronoMoves = moves.reverse
+  lazy val chronoMoves = moves.reverse
 }
 
 object Replay {

@@ -25,7 +25,6 @@ object Parser
   object MovesParser extends RegexParsers with Logging {
 
     override val whiteSpace = """(\s|\t|\r?\n)+""".r
-    def eol = """(\r?\n)+""".r
 
     def apply(pgn: String): Valid[List[String]] =
       parseAll(moves, pgn) match {

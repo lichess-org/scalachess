@@ -135,7 +135,7 @@ object Clock {
   // no more than this time will be offered to the lagging player
   val maxLagToCompensate = 0.7f
   // substracted from lag compensation
-  val naturalLag = 0.1f
+  val naturalLag = 0.05f
 
   def apply(
     limit: Int,

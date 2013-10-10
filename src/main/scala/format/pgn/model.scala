@@ -1,5 +1,6 @@
 package chess
-package format.pgn
+package format
+package pgn
 
 case class Pgn(
     tags: List[Tag],
@@ -59,11 +60,11 @@ case class Move(
 
   override def toString = "%s%s%s%s".format(
     san,
-    nag.fold("")(" $" + _),
+    nag.fold("") { code ⇒ Nag(code).fold(" $" + code)(_.symbol) },
     (comment.isDefined || timeLeft.isDefined).fold(
       List(clockString, comment).flatten.mkString(" { ", " ", " }"),
       ""
     ),
-    variation.isEmpty.fold("", variation.mkString(" ( ", " ", " )"))
+    variation.isEmpty.fold("", variation.mkString(" (", " ", ")"))
   )
 }

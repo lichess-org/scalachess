@@ -1,7 +1,7 @@
 package chess
 package format
 
-case class UciMove(orig: Pos, dest: Pos, promotion: Option[PromotableRole]) {
+case class UciMove(orig: Pos, dest: Pos, promotion: Option[PromotableRole] = None) {
 
   def uci = orig.key + dest.key + promotionString
 

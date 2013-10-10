@@ -14,6 +14,9 @@ case class Move(
     enpassant: Boolean,
     lag: FiniteDuration = 0.millis) {
 
+  def situationBefore = before situationOf piece.color
+  def situationAfter = after situationOf !piece.color
+
   def withHistory(h: History) = copy(after = after withHistory h)
 
   def finalizeAfter: Board = after updateHistory { h1 ⇒

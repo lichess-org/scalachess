@@ -12,7 +12,9 @@ object Nag {
   case object Blunder extends Nag(4, "??")
   case object Inaccuracy extends Nag(6, "?!")
 
-  val all = List(Good, Mistake, Brilliant, Blunder, Inaccuracy)
+  val badOnes = List(Inaccuracy, Mistake, Blunder)
+  val goodOnes = List(Good, Brilliant)
+  val all = badOnes ::: goodOnes
   val byCode = all map { n ⇒ n.code -> n } toMap
 
   def apply(code: Int): Option[Nag] = byCode get code

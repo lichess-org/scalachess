@@ -5,7 +5,7 @@ object UciDump {
 
   // a2a4, b8c6
   def apply(replay: Replay): List[String] =
-    replay.chronoMoves map move(replay.game.board.variant)
+    replay.chronoMoves map move(replay.setup.board.variant)
 
   def apply(pgn: String, initialFen: Option[String], variant: Variant): Valid[List[String]] =
     pgn.trim.isEmpty.fold(

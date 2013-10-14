@@ -17,10 +17,8 @@ object Reader {
     replay ← op(parsed.sans).foldLeft[Valid[Replay]](Replay(game).success) {
       case (replayValid, san) ⇒ for {
         replay ← replayValid
-        move ← san(replay.game)
-      } yield new Replay(
-        game = replay game move,
-        moves = move :: replay.moves)
+        move ← san(replay.state)
+      } yield replay addMove move
     }
   } yield replay
 

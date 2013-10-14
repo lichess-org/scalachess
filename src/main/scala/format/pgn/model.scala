@@ -2,6 +2,8 @@ package chess
 package format
 package pgn
 
+import scala._
+
 case class Pgn(
     tags: List[Tag],
     turns: List[Turn]) {
@@ -29,7 +31,14 @@ case class Turn(
     copy(black = black map f)
   )
 
+  def updateLast(f: Move ⇒ Move) = {
+    black.map(m ⇒ copy(black = f(m).some)) orElse
+      white.map(m ⇒ copy(white = f(m).some))
+  } | this
+
   def isEmpty = white.isEmpty && black.isEmpty
+
+  def plyOf(color: Color) = number * 2 - color.fold(1, 0)
 
   override def toString = "%d.%s".format(
     number,
@@ -43,11 +52,25 @@ case class Turn(
   )
 }
 
+object Turn {
+
+  def fromMoves(moves: List[Move], ply: Int): List[Turn] = {
+    moves.foldLeft((List[Turn](), ply)) {
+      case ((turns, p), move) if p % 2 == 1 ⇒
+        (Turn((p + 1) / 2, move.some, none) :: turns) -> (p + 1)
+      case ((Nil, p), move) ⇒
+        (Turn((p + 1) / 2, none, move.some) :: Nil) -> (p + 1)
+      case ((t :: tt, p), move) ⇒
+        (t.copy(black = move.some) :: tt) -> (p + 1)
+    }
+  }._1.reverse
+}
+
 case class Move(
     san: String,
     nag: Option[Int] = None,
     comment: Option[String] = None,
-    variation: List[String] = Nil, // pgn moves
+    variation: List[Turn] = Nil,
     // time left for the user who made the move, after he made it
     timeLeft: Option[Int] = None) {
 

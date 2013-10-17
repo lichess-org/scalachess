@@ -9,6 +9,8 @@ import Pos.{ posAt, A8 }
  */
 object Forsyth {
 
+  val initial = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
   def <<(source: String): Option[Situation] = {
 
     val boardChars = """\s*([\w\d/]+)\s.*""".r.replaceAllIn(
@@ -53,6 +55,8 @@ object Forsyth {
     val fullMoveNumber = source split " " lift 5 flatMap parseIntOption
     SituationPlus(situation2, fullMoveNumber | 1)
   }
+
+  def >>(situation: Situation): String = >>(SituationPlus(situation, 0))
 
   def >>(parsed: SituationPlus): String = parsed match {
     case SituationPlus(Situation(board, color), _) ⇒ >>(Game(board, color, turns = parsed.turns))

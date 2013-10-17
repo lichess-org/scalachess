@@ -43,6 +43,8 @@ case class Situation(board: Board, color: Color) {
   def withHistory(history: History) = copy(
     board = board withHistory history
   )
+
+  def canCastle = board.history.canCastle _
 }
 
 object Situation {

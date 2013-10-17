@@ -15,7 +15,7 @@ case class Move(
     lag: FiniteDuration = 0.millis) {
 
   def situationBefore = before situationOf piece.color
-  def situationAfter = after situationOf !piece.color
+  def situationAfter = finalizeAfter situationOf !piece.color
 
   def withHistory(h: History) = copy(after = after withHistory h)
 

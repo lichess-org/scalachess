@@ -3,9 +3,11 @@ package format
 
 case class UciMove(orig: Pos, dest: Pos, promotion: Option[PromotableRole] = None) {
 
-  def uci = orig.key + dest.key + promotionString
+  def keys = orig.key + dest.key
+  def uci = keys + promotionString
 
-  def piotr = orig.piotrStr + dest.piotrStr + promotionString
+  def keysPiotr = orig.piotrStr + dest.piotrStr
+  def piotr = keysPiotr + promotionString
 
   def promotionString = promotion.fold("")(_.forsyth.toString)
 }

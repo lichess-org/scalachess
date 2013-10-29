@@ -33,9 +33,9 @@ case class Std(
     } collect {
       case Some(m) if compare(file, m.orig.x) && compare(rank, m.orig.y) ⇒ m
     } match {
-      case Nil        ⇒ "No move found: %s\n%s".format(this, game.board).failNel
+      case Nil        ⇒ s"${game.id} No move found: $this\n${game.board}".failNel
       case one :: Nil ⇒ one withPromotion promotion toValid "Wrong promotion"
-      case many       ⇒ "Many moves found: %s\n%s".format(many, game.board).failNel
+      case many       ⇒ s"${game.id} Many moves found: $many\n${game.board}".failNel
     }
   }
 

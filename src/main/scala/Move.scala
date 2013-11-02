@@ -57,7 +57,7 @@ case class Move(
 
   def color = piece.color
 
-  def notation = orig + " " + dest
+  def spaceNotation = orig + " " + dest
 
   def withPromotion(op: Option[PromotableRole]): Option[Move] = op.fold(some(this)) { p ⇒
     if ((after count color.queen) > (before count color.queen)) for {
@@ -69,5 +69,7 @@ case class Move(
 
   def withLag(l: FiniteDuration) = copy(lag = l)
 
-  override def toString = "%s %s".format(piece, notation)
+  def keyString = s"$orig$dest"
+
+  override def toString = s"$piece $keyString"
 }

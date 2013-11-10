@@ -31,14 +31,9 @@ object Reader {
         board = parsed.situation.board,
         player = parsed.situation.color,
         turns = parsed.turns)
-      case (vg, Tag(Tag.Variant, name)) ⇒ for {
-        g1 ← vg
-        renamed = name.toLowerCase match {
-          case "normal" ⇒ Variant.default.name
-          case _        ⇒ name
-        }
-        variant ← chess.Variant(renamed) toValid "Invalid variant " + name
-      } yield g1 updateBoard (_ withVariant variant)
+      case (vg, Tag(Tag.Variant, name)) ⇒ vg map { g1 =>
+        val variant = chess.Variant(name.toLowerCase) | chess.Variant.default
+        g1 updateBoard (_ withVariant variant)
       case (vg, _) ⇒ vg
     }
 }

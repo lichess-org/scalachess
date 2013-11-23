@@ -42,7 +42,7 @@ disambiguation    a-h|a-h+1-8|  2 + 3 + 6 bits
   check           |+|#          2 bits
   capture         |x            1 bit
 
-  disamb_type     min|full      1 bit
-  disambiguation  a-h|a-h+1-8   6 bits
+  disamb_type     file|rank|both 2 bits
+  disambiguation  a-h|1-8|a-h+1-8   6 bits
 
 = 3 bytes

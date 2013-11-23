@@ -15,15 +15,15 @@ class BinaryTest extends ChessTest {
   }
 
   private def showByte(b: Byte): String = "%08d" format {
-    val int = b.toInt 
+    val int = b.toInt
     if (int < 0) 256 + int else int
   }.toBinaryString.toInt
 
-  private def showMove(m: String): String = 
+  private def showMove(m: String): String =
     writeMove(m) map showByte mkString ","
 
   "binary encoding" should {
-    "write" in {
+    "write single move" in {
       "simple pawn" in {
         showMove("a1") must_== "00000000"
         showMove("a2") must_== "00000001"
@@ -77,22 +77,38 @@ class BinaryTest extends ChessTest {
         showMove("O-O+") must_== "01000000,11001000"
         showMove("O-O-O#") must_== "01000000,11110000"
       }
-      "disambiguated" in {
-        showMove("Kfa1") must_== "11000000,00100000,01010000"
+      "disambiguated by file" in {
+        showMove("Kfa1") must_== "11000000,00100000,00000101"
+      }
+      "disambiguated by rank" in {
+        showMove("K8a1") must_== "11000000,00100000,01000111"
       }
       "disambiguated fully" in {
-        showMove("Kf4a1") must_== "11000000,00100000,11010110"
+        showMove("Kf4a1") must_== "11000000,00100000,10101011"
       }
       "disambiguated fully with capture" in {
-        showMove("Kf4xa1") must_== "11000000,00100100,11010110"
+        showMove("Kf4xa1") must_== "11000000,00100100,10101011"
       }
       "disambiguated fully with check" in {
-        showMove("Kf4a1+") must_== "11000000,00101000,11010110"
-        showMove("Kf4a1#") must_== "11000000,00110000,11010110"
+        showMove("Kf4a1+") must_== "11000000,00101000,10101011"
+        showMove("Kf4a1#") must_== "11000000,00110000,10101011"
       }
       "disambiguated fully with capture and check" in {
-        showMove("Kf4xa1+") must_== "11000000,00101100,11010110"
-        showMove("Kf4xa1#") must_== "11000000,00110100,11010110"
+        showMove("Kf4xa1+") must_== "11000000,00101100,10101011"
+        showMove("Kf4xa1#") must_== "11000000,00110100,10101011"
+      }
+      "disambiguated by rank with capture and check" in {
+        showMove("K8xa1+") must_== "11000000,00101100,01000111"
+      }
+    }
+    "write many moves" in {
+      "all games" in {
+        forall(pgn200) { pgn ⇒
+          val bin = writeMoves(pgn)
+          val pct = ((pgn.size * 100) / bin.size) 
+          println(s"${pgn.size} -> ${bin.size} = $pct")
+          bin.size must be_<=(pgn.size)
+        }
       }
     }
     // "be isomorphic" in {

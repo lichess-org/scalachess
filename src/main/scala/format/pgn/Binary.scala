@@ -50,14 +50,17 @@ object Binary {
       def fullPiece(piece: String, orig: String, pos: String, capture: String, check: String) = List(
         (FullPiece << 6) + posInt(pos),
         (pieceInt(piece) << 5) + (checkInt(check) << 3) + (boolInt(capture) << 2),
-        (disambTypeInt(orig) << 7) + (disambiguationInt(orig) << 1)
+        (disambTypeInt(orig) << 6) + disambiguationInt(orig)
       )
     }
 
-    def disambTypeInt(orig: String): Int = if (orig.size > 1) 1 else 0
+    def disambTypeInt(orig: String): Int = 
+      if (orig.size > 1) 2 
+      else if (orig.head.toInt < 97) 1 else 0
 
     def disambiguationInt(orig: String): Int = 
-      if (orig.size > 1) posInt(orig) else (fileInt(orig) << 3)
+      if (orig.size > 1) posInt(orig) 
+      else if (orig.head.toInt < 97) rankInt(orig.head) else fileInt(orig.head) 
 
     def checkInt(s: String) = s match {
       case ""  ⇒ 0
@@ -68,10 +71,11 @@ object Binary {
     def boolInt(s: String): Int = if (s.nonEmpty) 1 else 0
     def boolInt(b: Boolean): Int = if (b) 1 else 0
 
-    def posInt(pos: String): Int = posInt(fileInt(pos), pos(1).toInt - 49)
+    def posInt(pos: String): Int = posInt(fileInt(pos.head), rankInt(pos(1)))
     def posInt(x: Int, y: Int): Int = (x << 3) + y
 
-    def fileInt(pos: String): Int = pos.head.toInt - 97
+    def fileInt(c: Char): Int = c.toInt - 97
+    def rankInt(c: Char): Int = c.toInt - 49
 
     def shiftOptionInt(fileOption: Option[String], pos: String): Int =
       fileOption.fold(0) { file ⇒
@@ -89,8 +93,8 @@ object Binary {
     val posR = "([a-h][1-9])"
     val captureR = "(x?)"
     val checkR = "([\\+#]?)"
-    val promotionR = "(?:\\=([QRNB]))?"
-    val origR = "([a-h][1-8]|[a-h]|)".r
+    val promotionR = "(?:\\=?([QRNB]))?"
+    val origR = "([a-h]?[1-8]?)".r
     val SimplePieceR = s"^$pieceR$captureR$posR$checkR$$".r
     val FullPawnR = s"^${fileR}$posR$promotionR$checkR$$".r
     val CastlingR = s"^(O-O|O-O-O)$checkR$$".r

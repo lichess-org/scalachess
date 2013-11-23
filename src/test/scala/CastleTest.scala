@@ -37,7 +37,7 @@ RQK   R """.chess960 withHistory History.castle(White, true, true)
       "standard" in {
         val game = Game(goodHist, White)
         "viable moves" in {
-          game.board destsFrom E1 must bePoss(F1, G1)
+          game.board destsFrom E1 must bePoss(F1, G1, H1)
         }
         "correct new board" in {
           game.playMove(E1, G1) must beGame("""
@@ -197,7 +197,7 @@ PPPPPPPP
     "if kingside rook moves" in {
       val g2 = game.playMove(H1, G1) map (_ as White)
       "can only castle queenside" in {
-        g2 flatOption (_.board destsFrom E1) must bePoss(C1, D1, F1)
+        g2 flatOption (_.board destsFrom E1) must bePoss(C1, D1, F1, A1)
       }
       "if queenside rook moves" in {
         val g3 = g2 flatMap (_.playMove(A1, B1))
@@ -209,7 +209,7 @@ PPPPPPPP
     "if queenside rook moves" in {
       val g2 = game.playMove(A1, B1) map (_ as White)
       "can only castle kingside" in {
-        g2 flatOption (_.board destsFrom E1) must bePoss(D1, F1, G1)
+        g2 flatOption (_.board destsFrom E1) must bePoss(D1, F1, G1, H1)
       }
       "if kingside rook moves" in {
         val g3 = g2 flatMap (_.playMove(H1, G1))

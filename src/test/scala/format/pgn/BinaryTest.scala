@@ -6,22 +6,103 @@ import scala._
 class BinaryTest extends ChessTest {
 
   import BinaryTestData._
+  import Binary._
 
   private def compareStrAndBin(pgn: String) = {
-    val bin = Binary.Write.moves(pgn)
-    Binary.read(bin) must_== pgn
+    val bin = writeMoves(pgn)
+    read(bin) must_== pgn
     bin.size must be_<=(pgn.size)
   }
 
+  private def showByte(b: Byte): String = "%08d" format {
+    val int = b.toInt 
+    if (int < 0) 256 + int else int
+  }.toBinaryString.toInt
+
+  private def showMove(m: String): String = 
+    writeMove(m) map showByte mkString ","
+
   "binary encoding" should {
-    "be isomorphic" in {
-      "for one" in {
-        compareStrAndBin(pgn200(0))
+    "write" in {
+      "simple pawn" in {
+        showMove("a1") must_== "00000000"
+        showMove("a2") must_== "00000001"
+        showMove("a3") must_== "00000010"
+        showMove("h4") must_== "00111011"
       }
-      // "for all" in {
-      //   forall(pgn200)(compareStrAndBin)
-      // }
+      "simple piece" in {
+        showMove("Ka1") must_== "01000000,00100000"
+        showMove("Qa2") must_== "01000001,01000000"
+        showMove("Rh4") must_== "01111011,01100000"
+      }
+      "simple piece with capture" in {
+        showMove("Kxa1") must_== "01000000,00100100"
+        showMove("Qxa2") must_== "01000001,01000100"
+        showMove("Rxh4") must_== "01111011,01100100"
+      }
+      "simple piece with check" in {
+        showMove("Ka1+") must_== "01000000,00101000"
+        showMove("Qa2#") must_== "01000001,01010000"
+        showMove("Rxh4+") must_== "01111011,01101100"
+      }
+      "pawn capture" in {
+        showMove("bxa1") must_== "10000000,10000000"
+        showMove("gxh4") must_== "10111011,01000000"
+      }
+      "pawn capture with check" in {
+        showMove("bxa1+") must_== "10000000,10010000"
+        showMove("gxh4#") must_== "10111011,01100000"
+      }
+      "pawn promotion" in {
+        showMove("a1=Q") must_== "10000000,00000010"
+        showMove("h8=B") must_== "10111111,00001000"
+      }
+      "pawn promotion with check" in {
+        showMove("a1=Q+") must_== "10000000,00010010"
+        showMove("h8=B#") must_== "10111111,00101000"
+      }
+      "pawn promotion with capture" in {
+        showMove("bxa1=Q") must_== "10000000,10000010"
+        showMove("gxh8=B") must_== "10111111,01001000"
+      }
+      "pawn promotion with capture and check" in {
+        showMove("bxa1=Q+") must_== "10000000,10010010"
+        showMove("gxh8=B#") must_== "10111111,01101000"
+      }
+      "castling" in {
+        showMove("O-O") must_== "01000000,11000000"
+        showMove("O-O-O") must_== "01000000,11100000"
+      }
+      "castling with check" in {
+        showMove("O-O+") must_== "01000000,11001000"
+        showMove("O-O-O#") must_== "01000000,11110000"
+      }
+      "disambiguated" in {
+        showMove("Kfa1") must_== "11000000,00100000,01010000"
+      }
+      "disambiguated fully" in {
+        showMove("Kf4a1") must_== "11000000,00100000,11010110"
+      }
+      "disambiguated fully with capture" in {
+        showMove("Kf4xa1") must_== "11000000,00100100,11010110"
+      }
+      "disambiguated fully with check" in {
+        showMove("Kf4a1+") must_== "11000000,00101000,11010110"
+        showMove("Kf4a1#") must_== "11000000,00110000,11010110"
+      }
+      "disambiguated fully with capture and check" in {
+        showMove("Kf4xa1+") must_== "11000000,00101100,11010110"
+        showMove("Kf4xa1#") must_== "11000000,00110100,11010110"
+      }
     }
+    // "be isomorphic" in {
+    //   "for one" in {
+    //     compareStrAndBin(pgn200(0))
+    //   }
+    //   // "for all" in {
+    //   //   forall(pgn200)(compareStrAndBin)
+    //   // }
+    // }
   }
 
 }

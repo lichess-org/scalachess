@@ -60,7 +60,9 @@ class ReaderTest extends ChessTest {
       Reader(bySmartChess) must beSuccess
     }
     "invalid variant" in {
-      Reader(invalidVariant) must haveFailureMatching("Invalid variant")
+      Reader(invalidVariant) must beSuccess.like {
+        case replay ⇒ replay.setup.board.variant must_== Variant.Standard
+      }
     }
   }
 }

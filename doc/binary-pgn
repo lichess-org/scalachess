@@ -31,7 +31,7 @@ disambiguation    a-h|a-h+1-8|  2 + 3 + 6 bits
 
   shiftOption     |<|>          2 bits # only set if captures
   check           |+|#          2 bits
-  promotion       |Q|B|N|R      3 bits
+  promotion       |Q|R|N|B      3 bits
 
 = 2 bytes
 

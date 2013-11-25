@@ -6,7 +6,7 @@ import scala.util.Try
 object Binary {
 
   def writeMove(m: String) = Try(Writer move m)
-  def writeMoves(ms: String) = Try(Writer moves ms)
+  def writeMoves(ms: List[String]) = Try(Writer moves ms)
 
   def readMoves(bs: List[Byte]) = Try(Reader moves bs)
 
@@ -115,7 +115,7 @@ object Binary {
         fullPiece(piece, orig, pos, capture, check)
     }) map (_.toByte)
 
-    def moves(str: String): List[Byte] = str.split(' ').toList flatMap move
+    def moves(str: List[String]): List[Byte] = str flatMap move
 
     def simplePawn(pos: String) = List(
       (MoveType.SimplePawn << 6) + posInt(pos)

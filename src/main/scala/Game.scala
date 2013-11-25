@@ -7,7 +7,7 @@ import format.pgn
 case class Game(
     board: Board,
     player: Color = White,
-    pgnMoves: String = "",
+    pgnMoves: List[String] = Nil,
     clock: Option[Clock] = None,
     deads: List[(Pos, Piece)] = Nil,
     turns: Int = 0) {
@@ -33,8 +33,8 @@ case class Game(
     )
     val pgnMove = pgn.Dumper(situation, move, newGame.situation)
     newGame.copy(pgnMoves = pgnMoves.isEmpty.fold(
-      pgnMove,
-      pgnMoves + " " + pgnMove))
+      List(pgnMove),
+      pgnMoves :+ pgnMove))
   }
 
   lazy val situation = Situation(board, player)
@@ -45,9 +45,7 @@ case class Game(
     case (pos, piece) ⇒ (pos, piece, true)
   })
 
-  def pgnMovesList = pgnMoves.split(' ').toList
-
-  def withPgnMoves(pgn: String) = copy(pgnMoves = pgn)
+  def withPgnMoves(x: List[String]) = copy(pgnMoves = x)
 
   /**
    * Halfmove clock: This is the number of halfmoves

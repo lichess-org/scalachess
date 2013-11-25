@@ -7,10 +7,10 @@ object UciDump {
   def apply(replay: Replay): List[String] =
     replay.chronoMoves map move(replay.setup.board.variant)
 
-  def apply(pgn: String, initialFen: Option[String], variant: Variant): Valid[List[String]] =
-    pgn.trim.isEmpty.fold(
+  def apply(moves: List[String], initialFen: Option[String], variant: Variant): Valid[List[String]] =
+    moves.isEmpty.fold(
       success(Nil),
-      Replay(pgn, initialFen, variant) map apply
+      Replay(moves mkString " ", initialFen, variant) map apply
     )
 
   def move(variant: Variant)(m: Move): String = m.castle.fold(

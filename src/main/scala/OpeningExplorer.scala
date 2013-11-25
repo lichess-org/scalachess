@@ -32,7 +32,7 @@ object OpeningExplorer {
     override def toString = opening.fold("-") { o ⇒ o.code + ": " + o.name }
   }
 
-  def openingOf(pgn: String): Option[Opening] = {
+  def openingOf(moves: List[String]): Option[Opening] = {
 
     def next(
       branch: Branch,
@@ -42,7 +42,7 @@ object OpeningExplorer {
         case Nil     ⇒ branch.opening orElse last
         case m :: ms ⇒ (branch get m).fold(last) { b ⇒ next(b, ms, b.opening orElse last) }
       }
-    next(tree, pgn.split(' ').toList, none)
+    next(tree, moves, none)
   }
 
   val tree: Branch = EcoDb.db.foldLeft(Branch()) {

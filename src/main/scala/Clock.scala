@@ -25,6 +25,10 @@ sealed trait Clock {
 
   def estimateTotalTime = limit + 30 * increment
 
+  def emergTime: Int = math.round(
+    math.min(60, math.max(3, estimateTotalTime / 10))
+  )
+
   // if lag is provided, it is added to the clock as a compensation
   def step(lag: FiniteDuration = 0.millis): RunningClock
 

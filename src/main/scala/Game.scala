@@ -9,7 +9,7 @@ case class Game(
     player: Color = White,
     pgnMoves: List[String] = Nil,
     clock: Option[Clock] = None,
-    deads: List[(Pos, Piece)] = Nil,
+    deads: DeadPieces = Nil,
     turns: Int = 0) {
 
   def apply(
@@ -26,10 +26,7 @@ case class Game(
       player = !player,
       turns = turns + 1,
       clock = clock map (_ step move.lag),
-      deads = (for {
-        cpos ← move.capture
-        cpiece ← board(cpos)
-      } yield (cpos, cpiece) :: deads) | deads
+      deads = (move.capture flatMap board.apply).fold(deads)(_ :: deads)
     )
     val pgnMove = pgn.Dumper(situation, move, newGame.situation)
     newGame.copy(pgnMoves = pgnMoves.isEmpty.fold(
@@ -38,12 +35,6 @@ case class Game(
   }
 
   lazy val situation = Situation(board, player)
-
-  lazy val allPieces: Iterable[(Pos, Piece, Boolean)] = (board.pieces map {
-    case (pos, piece) ⇒ (pos, piece, false)
-  }) ++ (deads map {
-    case (pos, piece) ⇒ (pos, piece, true)
-  })
 
   def withPgnMoves(x: List[String]) = copy(pgnMoves = x)
 

@@ -26,6 +26,10 @@ package object chess
   type Direction = Pos ⇒ Option[Pos]
   type Directions = List[Direction]
 
+  type AlivePieces = Map[Pos, Piece]
+  type DeadPieces = List[Piece]
+  type AllPieces = (AlivePieces, DeadPieces)
+
   object implicitFailures {
     implicit def stringToFailures(str: String): Failures = str.wrapNel
   }

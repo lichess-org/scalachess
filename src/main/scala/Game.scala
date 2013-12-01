@@ -38,6 +38,8 @@ case class Game(
 
   def allPieces: AllPieces = (board.pieces, deads)
 
+  def isStandardInit = deads.isEmpty && board.pieces == Variant.Standard.pieces
+
   def withPgnMoves(x: List[String]) = copy(pgnMoves = x)
 
   /**

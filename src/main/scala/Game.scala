@@ -36,6 +36,8 @@ case class Game(
 
   lazy val situation = Situation(board, player)
 
+  def allPieces: AllPieces = (board.pieces, deads)
+
   def withPgnMoves(x: List[String]) = copy(pgnMoves = x)
 
   /**

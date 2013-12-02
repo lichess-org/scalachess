@@ -2,9 +2,9 @@ package chess
 
 class OpeningExplorerTest extends ChessTest {
 
-  def name(g: String) = OpeningExplorer openingOf g map (_.name)
+  def name(g: String) = OpeningExplorer openingOf g.split(' ').toList map (_.name)
 
-  def code(g: String) = OpeningExplorer openingOf g map (_.code)
+  def code(g: String) = OpeningExplorer openingOf g.split(' ').toList map (_.code)
 
   val g1 = "d4 Nf6 e4 Nxe4 f3 Nd6 g3" 
   g1 in {

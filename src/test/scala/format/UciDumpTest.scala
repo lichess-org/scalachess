@@ -9,7 +9,7 @@ class UciDumpTest extends ChessTest {
 
   "only raw moves" should {
     "empty" in {
-      UciDump("", None, Variant.Standard) must beSuccess.like {
+      UciDump(Nil, None, Variant.Standard) must beSuccess.like {
         case x ⇒ x must beEmpty
       }
     }

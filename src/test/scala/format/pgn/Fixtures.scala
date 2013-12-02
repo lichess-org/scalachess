@@ -3,7 +3,7 @@ package format.pgn
 
 object Fixtures {
 
-  val simple = "e3 Nc6 d4 Nf6"
+  val simple = "e3 Nc6 d4 Nf6".split(' ').toList
 
   val raws = List(
     "e3 Nc6 d4 Nf6 c3 e5 dxe5 Nxe5 Bb5 a6 Ba4 b5 Bb3 d5 e4 dxe4 f4 Qxd1+ Kxd1 Nd3 Be3 Ng4 Bd4 Ngf2+ Bxf2 Nxf2+ Ke1 Nxh1 Bd5 Ra7 Bc6+ Kd8 Bxe4 Bd6 g3 Re8 Nd2 f5 Ne2 fxe4 Kf1 e3 Kg2 exd2 Rxh1 Bb7+ Kf2 Bc5+ Kf1 d1=Q#",
@@ -135,6 +135,20 @@ e5 9. fxe5 dxe5 10. Be2 Re8 11. O-O Qe7 12. Rb1 b6 13. Rb5 a6 14. Rb2 h6
 g6 59. Ra5 Ncd7 60. Kd2 Nf8 61. Ra6+ Ne6 62. h4 Ng4 63. Bxe6 fxe6 64. Kd3 Ne5+
 65. Ke4 Ng4 66. Kd4 Ne5 67. Ra8 Nd7 68. Rc8 Ke7 69. e4 Nf6 70. Rc7+ Kd6 71. Rg7
 Ng4 1-0"""
+
+val fromLichessBadPromotion = """
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+[FEN "8/8/1KP5/3r4/8/8/8/k7 w - - 0 1"]
+[SetUp "1"]
+
+1. c7 Rd6+ 2. Kb5 Rd5+ 3. Kb4 Rd4+ 4. Kb3 Rd3+ 5. Kc2 Rd4 6. c8=R Ra4 7. Kb3 *
+"""
 
 val fromTcecWithEngineOutput = """
 [Event "nTCEC - Stage 2 - Season 2"]

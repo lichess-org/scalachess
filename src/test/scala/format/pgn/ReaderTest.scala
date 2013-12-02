@@ -64,5 +64,12 @@ class ReaderTest extends ChessTest {
         case replay ⇒ replay.setup.board.variant must_== Variant.Standard
       }
     }
+    "promoting to a rook" in {
+      Reader(fromLichessBadPromotion) must beSuccess.like {
+        case replay ⇒ replay.chronoMoves lift 10 must beSome.like {
+          case move ⇒ move.promotion must_== Some(Rook)
+        }
+      }
+    }
   }
 }

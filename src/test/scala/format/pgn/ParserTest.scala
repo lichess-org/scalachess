@@ -9,8 +9,21 @@ class ParserTest extends ChessTest {
 
   val parser = Parser
 
-  "promotion check" in {
-    parser("b8=Q ") must beSuccess
+  "promotion check" should {
+    "as a queen" in {
+      parser("b8=Q ") must beSuccess.like {
+        case a ⇒ a.sans.headOption must beSome.like {
+          case san: Std ⇒ san.promotion must_== Some(Queen)
+        }
+      }
+    }
+    "as a rook" in {
+      parser("b8=R ") must beSuccess.like {
+        case a ⇒ a.sans.headOption must beSome.like {
+          case san: Std ⇒ san.promotion must_== Some(Rook)
+        }
+      }
+    }
   }
 
   "nags" in {
@@ -43,7 +56,7 @@ class ParserTest extends ChessTest {
 
   "variations" in {
     parser(variations) must beSuccess.like {
-      case a => a.sans.size must_== 20
+      case a ⇒ a.sans.size must_== 20
     }
   }
 

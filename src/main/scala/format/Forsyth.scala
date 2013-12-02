@@ -65,7 +65,7 @@ object Forsyth {
   def >>(game: Game): String = List(
     exportBoard(game.board),
     game.player.letter,
-    game.board.history.castleNotation,
+    game.board.history.castles.toString,
     ((for {
       lastMove ← game.board.history.lastMove
       (orig, dest) = lastMove

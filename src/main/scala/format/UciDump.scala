@@ -13,6 +13,12 @@ object UciDump {
       Replay(moves mkString " ", initialFen, variant) map apply
     )
 
+  def apply(moves: String, initialFen: Option[String], variant: Variant): Valid[List[String]] =
+    moves.isEmpty.fold(
+      success(Nil),
+      Replay(moves, initialFen, variant) map apply
+    )
+
   def move(variant: Variant)(m: Move): String = m.castle.fold(
     m.orig.key + m.dest.key + m.promotion.fold("")(_.forsyth.toString)
   ) {

@@ -115,7 +115,7 @@ object Binary {
         fullPiece(piece, orig, pos, capture, check)
     }) map (_.toByte)
 
-    def moves(str: List[String]): List[Byte] = str flatMap move
+    def moves(strs: List[String]): List[Byte] = strs flatMap move
 
     def simplePawn(pos: String) = List(
       (MoveType.SimplePawn << 6) + posInt(pos)

@@ -52,6 +52,7 @@ class BinaryTest extends ChessTest {
       "pawn promotion" in {
         writeMove("a1=Q") must_== "10000000,00000010"
         writeMove("h8=B") must_== "10111111,00001000"
+        writeMove("h8=R") must_== "10111111,00000100"
       }
       "pawn promotion with check" in {
         writeMove("a1=Q+") must_== "10000000,00010010"
@@ -101,7 +102,7 @@ class BinaryTest extends ChessTest {
       "all games" in {
         forall(pgn200) { pgn ⇒
           val bin = (Binary writeMoves pgn.split(' ').toList).get
-          val pct = ((pgn.size * 100) / bin.size) 
+          val pct = ((pgn.size * 100) / bin.size)
           bin.size must be_<=(pgn.size)
         }
       }
@@ -139,6 +140,7 @@ class BinaryTest extends ChessTest {
       "pawn promotion" in {
         readMove("10000000,00000010") must_== "a1=Q"
         readMove("10111111,00001000") must_== "h8=B"
+        readMove("10111111,00000100") must_== "h8=R"
       }
       "pawn promotion with check" in {
         readMove("10000000,00010010") must_== "a1=Q+"
@@ -230,8 +232,8 @@ object BinaryTestUtils {
 
 object BinaryTestData {
 
-  // mongo lichess --eval "db.pgn.find().sort({_id:-1}).limit(200).skip(10000).forEach(function(o) { print(o.p); })"
   val pgn200: List[String] = """
+c7 Rd6+ Kb5 Rd5+ Kb4 Rd4+ Kb3 Rd3+ Kc2 Rd4 c8=R Ra4 Kb3
 d4 Nc6 d5 Ne5 f4 Nc4 b3 Nb6 c4 Nh6 Nc3 e6 dxe6 dxe6 Be3 Nf5 Bxb6 Qxd1+ Kxd1 cxb6 Kd2 Bc5 g3 Bd7 Nf3 Ne3 Ne4 Nxf1+ Rhxf1 Bb4+ Kc2 O-O-O Rfd1 Kb8 Nc3 h5 Rd4 f6 Rad1 Kc7 Ne4 f5 Nd6 Bc6 Nf7 Rxd4 Rxd4 Rf8 Nf7g5 Rf6 h4 Be8 e3 Bc6 Ne5 Be7 Kc3 a6 b4 Bd6 a3 Be7 c5 b5 Nxc6 Kxc6 e4 b6 e5 Rg6 cxb6 Bxg5 Rd6+ Kb7 hxg5 Kb8 Rd7 a5 bxa5 b4+ Kxb4 Ka8 b7+ Kb8 a6 Ka7 Kb5 h4 Rd3 h3 Rd2 h2 Rxh2 Rxg5 fxg5 g6 Rh6 f4 gxf4 Kb8 Rxg6 Ka7 Rg8
 e4 e5 f4 d5 exd5 exf4 Nf3 Nc6 dxc6 bxc6 Bc4 Nf6 d4 Bd6 O-O Qe7 Re1 Rb8 Rxe7+ Kxe7 Qe2+ Ne4 Qxe4+ Be6 Bxe6 fxe6 Ng5 Rhf8 Qxe6+ Kd8 Nf7+ Rxf7 Qxf7 Be7 Bxf4 Rxb2 Nc3 Rxc2 Re1 Rxa2 Qxe7+ Kc8 Qxc7#
 e4 e5 Nf3 f6 Nc3 Bc5 Bc4 Ne7 d3 c6 Be3 Bb6 d4 d5 exd5 cxd5 Bb3 e4 Nd2 Be6 Ncxe4 Nbc6 Nc5 Bf7 c3 Nf5 Qf3 Nce7 Nxb7 Qc7 Nc5 Nh4 Qh3 g5 O-O-O Bh5 f3 Nef5 Bf2 Bg6 g3 Nxf3 Nxf3 h5 g4 Nd6 gxh5 Rxh5 Rde1+ Kf8 Ne6+

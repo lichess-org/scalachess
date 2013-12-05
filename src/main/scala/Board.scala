@@ -1,6 +1,5 @@
 package chess
 
-import com.roundeights.hasher.Hasher
 import format.Visual
 import Pos.posAt
 
@@ -112,7 +111,10 @@ case class Board(
   def autoDraw: Boolean =
     history.positionHashes.size >= 100 || InsufficientMatingMaterial(this)
 
-  def positionHash = Hasher(actors.values map (_.hash) mkString).md5.toString
+  def positionHash: PositionHash = {
+    import com.roundeights.hasher.Implicits._
+    actors.values.map(_.hash).mkString.md5.bytes take Board.positionHashSize
+  }
 
   def situationOf(color: Color) = Situation(this, color)
 
@@ -128,6 +130,8 @@ case class Board(
 }
 
 object Board {
+
+  val positionHashSize = 2
 
   import Pos._
 

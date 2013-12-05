@@ -23,7 +23,7 @@ case class Move(
     // last move and position hashes
     val h2 = h1.copy(
       positionHashes =
-        if ((piece is Pawn) || captures || promotes || castles) Nil
+        if ((piece is Pawn) || captures || promotes || castles) Array()
         else h1 positionHashesWith after.positionHash,
       lastMove = Some(orig, dest)
     )

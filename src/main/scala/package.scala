@@ -30,6 +30,8 @@ package object chess
   type DeadPieces = List[Piece]
   type AllPieces = (AlivePieces, DeadPieces)
 
+  type PositionHash = Array[Byte]
+
   object implicitFailures {
     implicit def stringToFailures(str: String): Failures = str.wrapNel
   }

@@ -50,8 +50,8 @@ object Forsyth {
   }
 
   def <<<(source: String): Option[SituationPlus] = <<(source) map { situation ⇒
-    val history = source split " " lift 2 map { History(none, "", _) }
-    val situation2 = situation withHistory (history | History(none, "", ""))
+    val history = source split " " lift 2 map { History.make(none, _) }
+    val situation2 = situation withHistory (history | History.make(none, ""))
     val fullMoveNumber = source split " " lift 5 flatMap parseIntOption
     SituationPlus(situation2, fullMoveNumber | 1)
   }

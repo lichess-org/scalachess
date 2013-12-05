@@ -4,16 +4,17 @@ import Pos.posAt
 
 case class History(
     lastMove: Option[(Pos, Pos)] = None,
-    positionHashes: List[String] = Nil,
+    positionHashes: PositionHash = Array(),
     castles: Castles = Castles.all) {
 
   def lastMoveString: Option[String] = lastMove map {
     case (p1, p2) ⇒ p1.toString + p2.toString
   }
 
-  def threefoldRepetition: Boolean = positionHashes.size > 6 && {
-    positionHashes.headOption map { hash ⇒
-      positionHashes.count(_ == hash) >= 3
+  def threefoldRepetition: Boolean = positionHashes.size > 12 && {
+    val positions = (positionHashes grouped 2).toList
+    positions.headOption map { hash ⇒
+      positions.count(_ == hash) >= 3
     } getOrElse false
   }
 
@@ -28,11 +29,11 @@ case class History(
 
   def withoutCastle(color: Color, side: Side) = copy(castles = castles.without(color, side))
 
-  def withNewPositionHash(hash: String): History =
+  def withNewPositionHash(hash: PositionHash): History =
     copy(positionHashes = positionHashesWith(hash))
 
-  def positionHashesWith(hash: String): List[String] =
-    (hash take History.hashSize) :: positionHashes
+  def positionHashesWith(hash: PositionHash): PositionHash =
+    hash ++ positionHashes
 
   def withLastMove(orig: Pos, dest: Pos) = copy(
     lastMove = Some((orig, dest))
@@ -41,27 +42,24 @@ case class History(
 
 object History {
 
-  val hashSize = 5
-
   val MoveString = """^([a-h][1-8])([a-h][1-8])$""".r
 
-  def apply(
+  def make(
     lastMove: Option[(Pos, Pos)],
-    positionHashes: String,
+    positionHashes: PositionHash,
     castles: Castles): History = new History(
     lastMove = lastMove,
     castles = castles,
-    positionHashes = positionHashes grouped hashSize toList)
+    positionHashes = positionHashes)
 
-  def apply(
+  def make(
     lastMove: Option[String], // a2a4
-    positionHashes: String,
-    castles: String): History = apply(
+    castles: String): History = make(
     lastMove = lastMove flatMap {
       case MoveString(a, b) ⇒ for (o ← posAt(a); d ← posAt(b)) yield (o, d)
       case _                ⇒ None
     },
-    positionHashes = positionHashes,
+    positionHashes = Array(),
     castles = Castles(castles))
 
   def castle(color: Color, kingSide: Boolean, queenSide: Boolean) =

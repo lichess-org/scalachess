@@ -12,7 +12,7 @@ class GameTest extends ChessTest {
         D7 -> D5,
         E4 -> D5)
       game must beSuccess.like {
-        case g ⇒ g.deads must containTheSameElementsAs(List(D5 -> Black.pawn))
+        case g ⇒ g.deads must containTheSameElementsAs(List(Black.pawn))
       }
     }
   }
@@ -24,9 +24,7 @@ R""").playMoves(
         A1 -> A2,
         B2 -> A2)
       game must beSuccess.like {
-        case g ⇒ g.deads must containTheSameElementsAs(List(
-          A2 -> Black.bishop,
-          A2 -> White.rook))
+        case g ⇒ g.deads must containTheSameElementsAs(List(Black.bishop, White.rook))
       }
     }
   }

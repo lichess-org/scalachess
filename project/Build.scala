@@ -10,7 +10,7 @@ trait Dependencies {
   val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.4"
   val specs2 = "org.specs2" %% "specs2" % "2.3.4" % "test"
   val scalalib = "com.github.ornicar" %% "scalalib" % "4.19"
-  val hasher = "hasher" %% "hasher" % "0.3.1" 
+  val hasher = "com.roundeights" %% "hasher" % "1.0.0" 
   val jodaTime = "joda-time" % "joda-time" % "2.1"
   val jodaConvert = "org.joda" % "joda-convert" % "1.2"
 }

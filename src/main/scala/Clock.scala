@@ -70,7 +70,7 @@ case class RunningClock(
   def step(lag: FiniteDuration = 0.millis) = {
     val t = now
     val lagSeconds = lag.toMillis.toFloat / 1000
-    val lagCompensation = math.max( 0,
+    val lagCompensation = math.max(0,
       math.min(
         lagSeconds - Clock.naturalLag,
         Clock.maxLagToCompensate))
@@ -135,7 +135,7 @@ case class PausedClock(
 
 object Clock {
 
-  val minInitLimit = 2
+  val minInitLimit = 2f
   // no more than this time will be offered to the lagging player
   val maxLagToCompensate = 0.7f
   // substracted from lag compensation
@@ -143,12 +143,16 @@ object Clock {
 
   def apply(
     limit: Int,
-    increment: Int): PausedClock = PausedClock(
-    limit = math.max(minInitLimit, limit),
-    increment = increment,
-    color = White,
-    whiteTime = 0f,
-    blackTime = 0f)
+    increment: Int): PausedClock = {
+    val clock = PausedClock(
+      limit = limit / 60 * 60, // round to minutes
+      increment = increment,
+      color = White,
+      whiteTime = 0f,
+      blackTime = 0f)
+    if (clock.limit == 0) clock.giveTime(White, minInitLimit).giveTime(Black, minInitLimit)
+    else clock
+  }
 
   def timeString(time: Int) = periodFormatter.print(
     org.joda.time.Duration.standardSeconds(time).toPeriod

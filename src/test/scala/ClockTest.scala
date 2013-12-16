@@ -30,7 +30,7 @@ class ClockTest extends ChessTest {
       Clock(60, 10).increment must_== 10
     }
     "with few time" in {
-      Clock(0, 10).limit must_== 2
+      Clock(0, 10).limit must_== 0
     }
   }
   "lag compensation" should {

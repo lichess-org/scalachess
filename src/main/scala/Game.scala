@@ -42,13 +42,7 @@ case class Game(
 
   def withPgnMoves(x: List[String]) = copy(pgnMoves = x)
 
-  /**
-   * Halfmove clock: This is the number of halfmoves
-   * since the last pawn advance or capture.
-   * This is used to determine if a draw
-   * can be claimed under the fifty-move rule.
-   */
-  def halfMoveClock: Int = board.history.positionHashes.size
+  def halfMoveClock: Int = board.history.halfMoveClock
 
   /**
    * Fullmove number: The number of the full move.

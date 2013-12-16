@@ -11,11 +11,23 @@ case class History(
     case (p1, p2) ⇒ p1.toString + p2.toString
   }
 
-  def threefoldRepetition: Boolean = positionHashes.size > 12 && {
+  /**
+   * Halfmove clock: This is the number of halfmoves
+   * since the last pawn advance or capture.
+   * This is used to determine if a draw
+   * can be claimed under the fifty-move rule.
+   */
+  def halfMoveClock = positionHashes.size / 2
+
+  def threefoldRepetition: Boolean = halfMoveClock > 6 && {
     val positions = (positionHashes grouped 2).toList
-    positions.headOption map { hash ⇒
-      positions.count(_ == hash) >= 3
-    } getOrElse false
+    positions.headOption match {
+      case Some(Array(x, y)) ⇒ (positions count {
+        case Array(x2, y2) ⇒ x == x2 && y == y2
+        case _             ⇒ false
+      }) >= 3
+      case _ ⇒ false
+    }
   }
 
   def canCastle(color: Color) = new {

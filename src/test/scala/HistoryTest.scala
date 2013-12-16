@@ -6,8 +6,8 @@ import Pos._
 class HistoryTest extends ChessTest {
 
   "threefold repetition" should {
-    def toHash(a: Any) = a.toString.md5.toString
-    def makeHistory(positions: List[Any]) = (positions map toHash).foldLeft(History()) {
+    def toHash(a: Int) = Array(a.toByte, 0.toByte)
+    def makeHistory(positions: List[Int]) = (positions map toHash).foldLeft(History()) {
       case (history, hash) ⇒ history withNewPositionHash hash
     }
     "empty history" in {

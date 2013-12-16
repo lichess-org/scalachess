@@ -11,29 +11,29 @@ class VisualTest extends ChessTest {
     "export new board" in {
       f.addNewLines(f >> (makeBoard)) must_== newBoardFormat
     }
-    "import new board" in {
-      f << newBoardFormat must_== makeBoard
-    }
+    // "import new board" in {
+    //   f << newBoardFormat must_== makeBoard
+    // }
     "import and export is non destructive" in {
       forall(examples) { example ⇒
         f.addNewLines(f >> (f << example)) must_== example
       }
     }
-    "import partial board representation" in {
-      f << """
-    P n
-PPPP   P
-RNBQK  R""" must_== (f << """
+    // "import partial board representation" in {
+    //   f << """
+    // P n
+// PPPP   P
+// RNBQK  R""" must_== (f << """
 
 
 
 
 
-    P n
-PPPP   P
-RNBQK  R
-""")
-    }
+    // P n
+// PPPP   P
+// RNBQK  R
+// """)
+    // }
     "export with special marks" in {
       val board = Visual << """
 k B

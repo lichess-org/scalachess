@@ -9,6 +9,7 @@ sealed abstract class Variant(val id: Int) {
   lazy val name = toString.toLowerCase
 
   def standard = this == Variant.Standard
+  def chess960 = this == Variant.Chess960
 
   def exotic = !standard
 

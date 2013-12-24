@@ -108,8 +108,7 @@ case class Board(
   def count(p: Piece): Int = pieces.values count (_ == p)
   def count(c: Color): Int = pieces.values count (_.color == c)
 
-  def autoDraw: Boolean =
-    history.halfMoveClock >= 50 || InsufficientMatingMaterial(this)
+  def autoDraw: Boolean = history.fiftyMoves|| InsufficientMatingMaterial(this)
 
   def positionHash: PositionHash = {
     import com.roundeights.hasher.Implicits._

@@ -17,10 +17,10 @@ case class History(
    * This is used to determine if a draw
    * can be claimed under the fifty-move rule.
    */
-  def halfMoveClock = positionHashes.size / 2
+  def halfMoveClock = positionHashes.size / Board.positionHashSize
 
   def threefoldRepetition: Boolean = halfMoveClock > 6 && {
-    val positions = (positionHashes grouped 2).toList
+    val positions = (positionHashes grouped Board.positionHashSize).toList
     positions.headOption match {
       case Some(Array(x, y)) ⇒ (positions count {
         case Array(x2, y2) ⇒ x == x2 && y == y2
@@ -29,6 +29,8 @@ case class History(
       case _ ⇒ false
     }
   }
+
+  def fiftyMoves: Boolean = halfMoveClock >= 100
 
   def canCastle(color: Color) = new {
     def on(side: Side): Boolean = castles can color on side
@@ -40,9 +42,6 @@ case class History(
   def withoutAnyCastles = copy(castles = Castles.none)
 
   def withoutCastle(color: Color, side: Side) = copy(castles = castles.without(color, side))
-
-  def withNewPositionHash(hash: PositionHash): History =
-    copy(positionHashes = positionHashesWith(hash))
 
   def positionHashesWith(hash: PositionHash): PositionHash =
     hash ++ positionHashes

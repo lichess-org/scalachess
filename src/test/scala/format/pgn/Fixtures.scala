@@ -14,6 +14,8 @@ object Fixtures {
     "e3 Nc6 Nf3 Nf6 Nc3 e6 a3 Bd6 d4 Ng4 h3 Nf6 Bb5 a6 Bxc6 dxc6 e4 Nd7 O-O h5 h4 c5 Bg5 f6 Be3 cxd4 Bxd4 c5 Be3 Qe7 g3 Ne5 Nxe5 Bxe5 Qe2 Bxc3 bxc3 Kf7 Rad1 b5 c4 Rb8 Rd2 Bb7 Rfd1 Bc6 Kg2 Bxe4+ Kf1 Bc6 Bf4 e5 Be3 Qe6 Bxc5 Qh3+ Ke1 Qh1+ Qf1 Qe4+ Re2 Qxc4 Bd6 Rbd8 Bb4 Bf3 Rxd8 Rxd8 Re3 Rd1#",
     "e4 e5 Nf3 Nc6 Nc3 Bb4 Nd5 Nf6 Nxb4 Nxb4 c3 Nc6 Nxe5 Nxe5 d4 Ng6 Bg5 h6 Bxf6 Qxf6 e5 Qe6 Bd3 d6 Qe2 Nf4 Qe4 dxe5 Bb5+ c6 d5 Nxd5 Bc4 O-O O-O b5 Bb3 Bb7 Bc2 Nf4 Qh7#")
 
+  val noTagButResult = "1.g4 e5 2.d4 e4 3.c4 Qh4 4.h3 Bb4+ 5.Nc3 Bxc3+ 6.bxc3 Qe7 7.Bf4 d6 8.e3 g5 9.Bg3 Be6 10.Rb1 Bc8 11.Be2 Nf6 12.h4 gxh4 13.Bxh4 Qe6 14.g5 Nfd7 15.Nh3 Rg8 16.Nf4 Qe7 17.Nd5 Qd8 18.g6 f6 19.gxh7 1-0"
+
   val complete960 = """[Event "Casual game"]
 [Site "http://en.lichess.org/analyse/---qxr00"]
 [Date "2010.10.30"]

@@ -12,9 +12,11 @@ object Parser
     splitted ← splitTagAndMoves(pgn)
     (tagStr, moveStr) = splitted
     tags ← TagParser(tagStr)
-    sanStrs ← MovesParser(moveStr)
+    parsedMoves ← MovesParser(moveStr)
+    (sanStrs, resultOption) = parsedMoves
+    tags2 = resultOption.filterNot(_ ⇒ tags.exists(_.name == Tag.Result)).fold(tags)(t ⇒ tags :+ t)
     sans ← sanStrs.map(MoveParser.apply).sequence
-  } yield ParsedPgn(tags, sans)
+  } yield ParsedPgn(tags2, sans)
 
   trait Logging { self: Parsers ⇒
     protected val loggingEnabled = false
@@ -26,14 +28,16 @@ object Parser
 
     override val whiteSpace = """(\s|\t|\r?\n)+""".r
 
-    def apply(pgn: String): Valid[List[String]] =
+    def apply(pgn: String): Valid[(List[String], Option[Tag])] =
       parseAll(moves, pgn) match {
-        case Success(moves, _) ⇒ scalaz.Validation.success(moves)
-        case err               ⇒ "Cannot parse moves: %s\n%s".format(err.toString, pgn).failNel
+        case Success((moves, result), _) ⇒ scalaz.Validation.success(moves, result map { r ⇒ Tag(_.Result, r) })
+        case err                         ⇒ "Cannot parse moves: %s\n%s".format(err.toString, pgn).failNel
       }
 
-    def moves: Parser[List[String]] = as("moves") {
-      rep(move) <~ (result?) <~ (commentary*)
+    def moves: Parser[(List[String], Option[String])] = as("moves") {
+      rep(move) ~ (result?) ~ (commentary*) ^^ {
+        case sans ~ res ~ _ ⇒ sans -> res
+      }
     }
 
     val moveRegex = """(0\-0|0\-0\-0|[QKRBNOoa-h][QKRBNa-h1-8xOo\-=\+\#]{1,6})""".r
@@ -54,17 +58,17 @@ object Parser
     def nag: Parser[String] = """\$\d+""".r
 
     def variation: Parser[List[String]] = as("variation") {
-      "(" ~> moves <~ ")"
+      "(" ~> moves <~ ")" ^^ { case (sans, _) ⇒ sans }
     }
 
     def commentary: Parser[String] = blockCommentary | inlineCommentary
 
     def blockCommentary: Parser[String] = as("block comment") {
       "{" ~> """[^\}]+""".r <~ "}"
-  }
+    }
 
     def inlineCommentary: Parser[String] = as("inline comment") {
-      ";" ~> """.+""".r 
+      ";" ~> """.+""".r
     }
 
     val result: Parser[String] = "*" | "1/2-1/2" | "0-1" | "1-0"

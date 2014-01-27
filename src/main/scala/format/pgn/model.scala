@@ -14,6 +14,10 @@ case class Pgn(
     }
   }
 
+  def moves = turns.flatMap { t ⇒
+    List(t.white, t.black).flatten
+  }
+
   override def toString = "%s\n\n%s %s".format(
     tags mkString "\n",
     turns mkString " ",

@@ -46,7 +46,7 @@ object Parser
       ((number | commentary)*) ~> moveRegex <~ (moveExtras*)
     }
 
-    def number: Parser[String] = """[1-9]\d*\s*\.*""".r
+    def number: Parser[String] = """[1-9]\d*[\s\.]*""".r
 
     def moveExtras: Parser[Unit] = as("moveExtras") {
       (annotation | nag | variation | commentary) ^^^ ()

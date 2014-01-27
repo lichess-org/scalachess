@@ -72,6 +72,12 @@ class ParserTest extends ChessTest {
     }
   }
 
+  "game from crafty" in {
+    parser(fromCrafty) must beSuccess.like {
+      case a ⇒ a.sans.size must_== 68
+    }
+  }
+
   "inline comments" in {
     parser(inlineComments) must beSuccess.like {
       case a ⇒ a.sans.size must_== 85

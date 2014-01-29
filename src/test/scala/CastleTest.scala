@@ -59,6 +59,15 @@ B     KR""".chess960
 B    RK """)
         }
       }
+      "chess960 close kingside with 2 rooks around" in {
+        val board: Board = """
+PPPPPPPP
+RKRBB   """.chess960
+        val game = Game(board, White)
+        "viable moves" in {
+          board destsFrom B1 must bePoss()
+        }
+      }
       "chess960 close queenside" in {
         val board: Board = """
 PPPPPPPP
@@ -79,9 +88,9 @@ PPPPPPPP
 p pppppp
  p n
 
- 
- 
- 
+
+
+
  K""".chess960, Black)
         "viable moves" in {
           game.board destsFrom E8 must bePoss(D8, F8)
@@ -92,9 +101,9 @@ p pppppp
 p pppppp
  p n
 
- 
- 
- 
+
+
+
  K""")
         }
       }

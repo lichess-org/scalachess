@@ -98,8 +98,13 @@ case class Actor(
     rookPos ← tripToRook.lastOption
     if board(rookPos) == Some(color.rook)
     newKingPos ← posAt(side.castledKingX, kingPos.y)
-    securedPoss = kingPos <-> newKingPos
-    if !securedPoss.exists(p ⇒ threatens(board, !color, p))
+    travelPoss = kingPos <-> newKingPos
+    if !travelPoss.map(board.apply).exists {
+      case Some(piece) if piece == color.rook || piece == color.king ⇒ false
+      case Some(piece) ⇒ true
+      case _ ⇒ false
+    }
+    if !travelPoss.exists(p ⇒ threatens(board, !color, p))
     newRookPos ← posAt(side.castledRookX, rookPos.y)
     b1 ← board take rookPos
     b2 ← newKingPos match {

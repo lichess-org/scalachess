@@ -21,11 +21,16 @@ case class Game(
   } yield apply(move) -> move
 
   def apply(move: Move): Game = {
+    val newTurns = turns + 1
     val newGame = copy(
       board = move.finalizeAfter,
       player = !player,
-      turns = turns + 1,
-      clock = clock map (_ step move.lag),
+      turns = newTurns,
+      clock = clock map {
+        case c: RunningClock                 ⇒ c step move.lag
+        case c: PausedClock if newTurns == 2 ⇒ c.start.switch
+        case c                               ⇒ c
+      },
       deads = (move.capture flatMap board.apply).fold(deads)(_ :: deads)
     )
     val pgnMove = pgn.Dumper(situation, move, newGame.situation)

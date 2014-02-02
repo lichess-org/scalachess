@@ -29,11 +29,6 @@ sealed trait Clock {
     math.min(60, math.max(3, estimateTotalTime / 10))
   )
 
-  // if lag is provided, it is added to the clock as a compensation
-  def step(lag: FiniteDuration = 0.millis): RunningClock
-
-  def run: RunningClock
-
   def stop: PausedClock
 
   def addTime(c: Color, t: Float): Clock
@@ -83,8 +78,6 @@ case class RunningClock(
       )
   }
 
-  def run = this
-
   def stop = PausedClock(
     limit = limit,
     increment = increment,
@@ -111,8 +104,6 @@ case class PausedClock(
 
   val timerOption = None
 
-  def step(lag: FiniteDuration = 0.millis) = run step lag
-
   def stop = this
 
   def addTime(c: Color, t: Float): PausedClock = c match {
@@ -124,7 +115,7 @@ case class PausedClock(
 
   def switch: PausedClock = copy(color = !color)
 
-  def run = RunningClock(
+  def start = RunningClock(
     color = color,
     whiteTime = whiteTime,
     blackTime = blackTime,

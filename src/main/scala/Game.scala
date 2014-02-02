@@ -16,9 +16,10 @@ case class Game(
     orig: Pos,
     dest: Pos,
     promotion: Option[PromotableRole] = None,
-    lag: FiniteDuration = 0.millis): Valid[(Game, Move)] = for {
-    move ← situation.move(orig, dest, promotion) map (_ withLag lag)
-  } yield apply(move) -> move
+    lag: FiniteDuration = 0.millis): Valid[(Game, Move)] =
+    situation.move(orig, dest, promotion) map (_ withLag lag) map { move ⇒
+      apply(move) -> move
+    }
 
   def apply(move: Move): Game = {
     val newTurns = turns + 1

@@ -7,7 +7,7 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
   import Pos.posAt
 
   lazy val up: Option[Pos] = posAt(x, y + 1)
-  lazy val down: Option[Pos] = posAt(x, y -1)
+  lazy val down: Option[Pos] = posAt(x, y - 1)
   lazy val right: Option[Pos] = posAt(x + 1, y)
   lazy val left: Option[Pos] = posAt(x - 1, y)
   lazy val upLeft: Option[Pos] = up flatMap (_ left)
@@ -42,7 +42,7 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
   lazy val file = Pos xToString x
   lazy val rank = y.toString
   lazy val key = file + rank
-  lazy val color = Color((x%2 == 0) ^ (y%2 == 0))
+  lazy val color = Color((x % 2 == 0) ^ (y % 2 == 0))
   lazy val piotrStr = piotr.toString
 
   override val toString = key
@@ -57,6 +57,16 @@ object Pos {
   def xToString(x: Int) = (96 + x).toChar.toString
 
   def piotr(c: Char): Option[Pos] = allPiotrs get c
+
+  def keyToPiotr(key: String) = posAt(key) map (_.piotr)
+  def doubleKeyToPiotr(key: String) = for {
+    a ← keyToPiotr(key take 2)
+    b ← keyToPiotr(key drop 2)
+  } yield s"$a$b"
+  def doublePiotrToKey(piotrs: String) = for {
+    a ← piotr(piotrs.head)
+    b ← piotr(piotrs(1))
+  } yield s"${a.key}${b.key}"
 
   val A1 = Pos(1, 1, 'a')
   val B1 = Pos(2, 1, 'b')

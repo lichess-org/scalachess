@@ -39,11 +39,11 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
   def xDist(other: Pos) = abs(x - other.x)
   def yDist(other: Pos) = abs(y - other.y)
 
-  lazy val file = Pos xToString x
-  lazy val rank = y.toString
-  lazy val key = file + rank
-  lazy val color = Color((x % 2 == 0) ^ (y % 2 == 0))
-  lazy val piotrStr = piotr.toString
+  val file = Pos xToString x
+  val rank = y.toString
+  val key = file + rank
+  val color = Color((x % 2 == 0) ^ (y % 2 == 0))
+  val piotrStr = piotr.toString
 
   override val toString = key
 }

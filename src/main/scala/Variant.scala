@@ -32,7 +32,7 @@ object Variant {
       type Rank = IndexedSeq[Option[Role]]
       def ?(max: Int) = Random nextInt max
       def empty(rank: Rank, skip: Int): Option[Int] = {
-        1 to size find (x ⇒ (rank take x count (_.isEmpty)) == skip + 1)
+        1 to size find (x => (rank take x count (_.isEmpty)) == skip + 1)
       } map (_ - 1)
       def update(rank: Rank, role: Role)(x: Int): Rank =
         rank.updated(x, role.some)
@@ -65,8 +65,8 @@ object Variant {
   }
 
   val all = List(Standard, Chess960, FromPosition)
-  val byId = all map { v ⇒ (v.id, v) } toMap
-  val byName = all map { v ⇒ (v.name, v) } toMap
+  val byId = all map { v => (v.id, v) } toMap
+  val byName = all map { v => (v.name, v) } toMap
 
   val default = Standard
 
@@ -79,12 +79,12 @@ object Variant {
 
   private def symmetricRank(rank: IndexedSeq[Role]): Map[Pos, Piece] =
     (for (y ← Seq(1, 2, 7, 8); x ← 1 to 8) yield {
-      posAt(x, y) map { pos ⇒
+      posAt(x, y) map { pos =>
         (pos, y match {
-          case 1 ⇒ White - rank(x - 1)
-          case 2 ⇒ White.pawn
-          case 7 ⇒ Black.pawn
-          case 8 ⇒ Black - rank(x - 1)
+          case 1 => White - rank(x - 1)
+          case 2 => White.pawn
+          case 7 => Black.pawn
+          case 8 => Black - rank(x - 1)
         })
       }
     }).flatten.toMap

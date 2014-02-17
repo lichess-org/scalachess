@@ -23,7 +23,7 @@ package object chess
   val White = Color.White
   val Black = Color.Black
 
-  type Direction = Pos ⇒ Option[Pos]
+  type Direction = Pos => Option[Pos]
   type Directions = List[Direction]
 
   type AlivePieces = Map[Pos, Piece]
@@ -40,6 +40,6 @@ package object chess
     Some(java.lang.Integer.parseInt(str))
   }
   catch {
-    case e: NumberFormatException ⇒ None
+    case e: NumberFormatException => None
   }
 }

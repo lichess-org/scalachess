@@ -11,17 +11,17 @@ case class Actor(
 
   lazy val moves: List[Move] = kingSafety(piece.role match {
 
-    case Bishop ⇒ longRange(Bishop.dirs)
+    case Bishop => longRange(Bishop.dirs)
 
-    case Queen  ⇒ longRange(Queen.dirs)
+    case Queen  => longRange(Queen.dirs)
 
-    case Knight ⇒ shortRange(Knight.dirs)
+    case Knight => shortRange(Knight.dirs)
 
-    case King   ⇒ shortRange(King.dirs) ++ castle
+    case King   => shortRange(King.dirs) ++ castle
 
-    case Rook   ⇒ longRange(Rook.dirs)
+    case Rook   => longRange(Rook.dirs)
 
-    case Pawn ⇒ pawnDir(pos) map { next ⇒
+    case Pawn => pawnDir(pos) map { next =>
       val fwd = Some(next) filterNot board.occupations
       def capture(horizontal: Direction): Option[Move] = {
         for {
@@ -44,7 +44,7 @@ case class Actor(
         board.move(pos, p) map { move(p, _) } flatMap maybePromote
       def maybePromote(m: Move): Option[Move] =
         if (m.dest.y == m.color.promotablePawnY)
-          (m.after promote m.dest) map { b2 ⇒
+          (m.after promote m.dest) map { b2 =>
             m.copy(after = b2, promotion = Some(Queen))
           }
         else Some(m)
@@ -74,11 +74,11 @@ case class Actor(
 
   // critical function. optimize for performance
   private def kingSafety(ms: List[Move]): List[Move] = {
-    val filter: Piece ⇒ Boolean =
-      if (piece is King) (_ ⇒ true) else if (check) (_.role.attacker) else (_.role.projection)
+    val filter: Piece => Boolean =
+      if (piece is King) (_ => true) else if (check) (_.role.attacker) else (_.role.projection)
     val stableKingPos = if (piece.role == King) None else board kingPosOf color
-    ms filterNot { m ⇒
-      stableKingPos orElse (m.after kingPosOf color) exists { kingPos ⇒
+    ms filterNot { m =>
+      stableKingPos orElse (m.after kingPosOf color) exists { kingPos =>
         threatens(m.after, !color, kingPos, filter)
       }
     }
@@ -100,16 +100,16 @@ case class Actor(
     newKingPos ← posAt(side.castledKingX, kingPos.y)
     travelPoss = kingPos <-> newKingPos
     if !travelPoss.map(board.apply).exists {
-      case Some(piece) if piece == color.rook || piece == color.king ⇒ false
-      case Some(piece) ⇒ true
-      case _ ⇒ false
+      case Some(piece) if piece == color.rook || piece == color.king => false
+      case Some(piece) => true
+      case _ => false
     }
-    if !travelPoss.exists(p ⇒ threatens(board, !color, p))
+    if !travelPoss.exists(p => threatens(board, !color, p))
     newRookPos ← posAt(side.castledRookX, rookPos.y)
     b1 ← board take rookPos
     b2 ← newKingPos match {
-      case p if p == kingPos ⇒ Some(b1)
-      case p                 ⇒ b1.move(kingPos, p)
+      case p if p == kingPos => Some(b1)
+      case p                 => b1.move(kingPos, p)
     }
     b3 ← b2.place(color.rook, newRookPos)
     b4 = b3 updateHistory (_ withoutCastles color)
@@ -120,7 +120,7 @@ case class Actor(
   ) map { move(_, b4, castle = castle) }) getOrElse Nil
 
   private def shortRange(dirs: Directions): List[Move] =
-    (pos mapply dirs).flatten filterNot friends map { to ⇒
+    (pos mapply dirs).flatten filterNot friends map { to =>
       if (enemies(to)) board.taking(pos, to) map { move(to, _, Some(to)) }
       else board.move(pos, to) map { move(to, _) }
     } flatten
@@ -128,29 +128,29 @@ case class Actor(
   private def longRange(dirs: Directions): List[Move] = {
 
     def forward(p: Pos, dir: Direction): List[Move] = dir(p) match {
-      case None                        ⇒ Nil
-      case Some(next) if friends(next) ⇒ Nil
-      case Some(next) if enemies(next) ⇒ board.taking(pos, next) map { b ⇒
+      case None                        => Nil
+      case Some(next) if friends(next) => Nil
+      case Some(next) if enemies(next) => board.taking(pos, next) map { b =>
         move(next, b, Some(next))
       } toList
-      case Some(next) ⇒ board.move(pos, next) map { b ⇒
+      case Some(next) => board.move(pos, next) map { b =>
         move(next, b) :: forward(next, dir)
       } getOrElse Nil
     }
 
-    dirs flatMap { dir ⇒ forward(pos, dir) }
+    dirs flatMap { dir => forward(pos, dir) }
   }
 
   private def longRangePoss(dirs: Directions): List[Pos] = {
 
     def forward(p: Pos, dir: Direction): List[Pos] = dir(p) match {
-      case None                        ⇒ Nil
-      case Some(next) if friends(next) ⇒ Nil
-      case Some(next) if enemies(next) ⇒ List(next)
-      case Some(next)                  ⇒ next :: forward(next, dir)
+      case None                        => Nil
+      case Some(next) if friends(next) => Nil
+      case Some(next) if enemies(next) => List(next)
+      case Some(next)                  => next :: forward(next, dir)
     }
 
-    dirs flatMap { dir ⇒ forward(pos, dir) }
+    dirs flatMap { dir => forward(pos, dir) }
   }
 
   private val pawnDir = pawnDirOf(color)
@@ -180,18 +180,18 @@ case class Actor(
 object Actor {
 
   // critical function. optimize for performance
-  def threatens(board: Board, color: Color, to: Pos, filter: Piece ⇒ Boolean = _ ⇒ true): Boolean =
+  def threatens(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean =
     board.pieces exists {
-      case (pos, piece) if piece.color == color && filter(piece) ⇒ piece.role match {
-        case x: Projection ⇒ x.dir(pos, to) exists {
+      case (pos, piece) if piece.color == color && filter(piece) => piece.role match {
+        case x: Projection => x.dir(pos, to) exists {
           longRangeThreatens(board, pos, _, to)
         }
-        case _ ⇒ piece.eyes(pos, to)
+        case _ => piece.eyes(pos, to)
       }
-      case _ ⇒ false
+      case _ => false
     }
 
-  def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean = dir(p) exists { next ⇒
+  def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean = dir(p) exists { next =>
     next == to || (!board.pieces.contains(next) && longRangeThreatens(board, next, dir, to))
   }
 

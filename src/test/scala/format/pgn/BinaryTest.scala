@@ -100,7 +100,7 @@ class BinaryTest extends ChessTest {
     }
     "write many moves" in {
       "all games" in {
-        forall(pgn200) { pgn ⇒
+        forall(pgn200) { pgn =>
           val bin = (Binary writeMoves pgn.split(' ').toList).get
           val pct = ((pgn.size * 100) / bin.size)
           bin.size must be_<=(pgn.size)
@@ -219,9 +219,9 @@ object BinaryTestUtils {
     var mult = 1
     while (i >= 0) {
       s.charAt(i) match {
-        case '1' ⇒ sum += mult
-        case '0' ⇒
-        case x   ⇒ sys error s"invalid binary literal: $x in $s"
+        case '1' => sum += mult
+        case '0' =>
+        case x   => sys error s"invalid binary literal: $x in $s"
       }
       mult *= 2
       i -= 1

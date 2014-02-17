@@ -8,28 +8,28 @@ case class Castles(
 
   def can(color: Color) = new {
     def on(side: Side): Boolean = (color, side) match {
-      case (White, KingSide)  ⇒ whiteKingSide
-      case (White, QueenSide) ⇒ whiteQueenSide
-      case (Black, KingSide)  ⇒ blackKingSide
-      case (Black, QueenSide) ⇒ blackQueenSide
+      case (White, KingSide)  => whiteKingSide
+      case (White, QueenSide) => whiteQueenSide
+      case (Black, KingSide)  => blackKingSide
+      case (Black, QueenSide) => blackQueenSide
     }
     def any = on(KingSide) || on(QueenSide)
   }
 
   def without(color: Color) = color match {
-    case White ⇒ copy(
+    case White => copy(
       whiteKingSide = false,
       whiteQueenSide = false)
-    case Black ⇒ copy(
+    case Black => copy(
       blackKingSide = false,
       blackQueenSide = false)
   }
 
   def without(color: Color, side: Side) = (color, side) match {
-    case (White, KingSide)  ⇒ copy(whiteKingSide = false)
-    case (White, QueenSide) ⇒ copy(whiteQueenSide = false)
-    case (Black, KingSide)  ⇒ copy(blackKingSide = false)
-    case (Black, QueenSide) ⇒ copy(blackQueenSide = false)
+    case (White, KingSide)  => copy(whiteKingSide = false)
+    case (White, QueenSide) => copy(whiteQueenSide = false)
+    case (Black, KingSide)  => copy(blackKingSide = false)
+    case (Black, QueenSide) => copy(blackQueenSide = false)
   }
 
   override lazy val toString: String = {
@@ -38,8 +38,8 @@ case class Castles(
       (if (blackKingSide) "k" else "") +
       (if (blackQueenSide) "q" else "")
   } match {
-    case "" ⇒ "-"
-    case n  ⇒ n
+    case "" => "-"
+    case n  => n
   }
 
   def toList = List(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)

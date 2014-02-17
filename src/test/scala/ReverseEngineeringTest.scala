@@ -8,7 +8,7 @@ class ReverseEngineeringTest extends ChessTest {
 
   def findMove(g1: Game, g2: Game) = (new ReverseEngineering(g1, g2.board)).move
   def play(game: Game, moves: (Pos, Pos)*): Game =
-    game.playMoveList(moves).fold(e ⇒ sys.error(e.toString), identity)
+    game.playMoveList(moves).fold(e => sys.error(e.toString), identity)
   val playedGame = play(makeGame,
     E2 -> E4, E7 -> E5, F1 -> C4, G8 -> F6, D2 -> D3, C7 -> C6, C1 -> G5, H7 -> H6, G1 -> H3, A7 -> A5)
   /*
@@ -63,15 +63,15 @@ RN QK  R
   p  k
 K      """, Black)
         "to queen" in {
-          val newGame = game.playMove(C2, C1, Queen.some).fold(e ⇒ sys.error(e.toString), identity)
+          val newGame = game.playMove(C2, C1, Queen.some).fold(e => sys.error(e.toString), identity)
           findMove(game, newGame) must_== Success(C2 -> C1)
         }
         "to knight" in {
-          val newGame = game.playMove(C2, C1, Knight.some).fold(e ⇒ sys.error(e.toString), identity)
+          val newGame = game.playMove(C2, C1, Knight.some).fold(e => sys.error(e.toString), identity)
           findMove(game, newGame) must_== Success(C2 -> C1)
         }
         "not" in {
-          val newGame = game.playMove(F2, E2).fold(e ⇒ sys.error(e.toString), identity)
+          val newGame = game.playMove(F2, E2).fold(e => sys.error(e.toString), identity)
           findMove(game, newGame) must_== Success(F2 -> E2)
         }
       }

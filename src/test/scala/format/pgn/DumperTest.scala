@@ -13,12 +13,12 @@ class DumperTest extends ChessTest {
     "move list" in {
       "Gioachine Greco" in {
         gioachineGreco map (_.pgnMoves) must beSuccess.like {
-          case ms ⇒ ms must_== "d4 d5 c4 dxc4 e3 b5 a4 c6 axb5 cxb5 Qf3".split(' ').toList
+          case ms => ms must_== "d4 d5 c4 dxc4 e3 b5 a4 c6 axb5 cxb5 Qf3".split(' ').toList
         }
       }
       "Peruvian Immortal" in {
         peruvianImmortal map (_.pgnMoves) must beSuccess.like {
-          case ms ⇒ ms must_== "e4 d5 exd5 Qxd5 Nc3 Qa5 d4 c6 Nf3 Bg4 Bf4 e6 h3 Bxf3 Qxf3 Bb4 Be2 Nd7 a3 O-O-O axb4 Qxa1+ Kd2 Qxh1 Qxc6+ bxc6 Ba6#".split(' ').toList
+          case ms => ms must_== "e4 d5 exd5 Qxd5 Nc3 Qa5 d4 c6 Nf3 Bg4 Bf4 e6 h3 Bxf3 Qxf3 Bb4 Be2 Nd7 a3 O-O-O axb4 Qxa1+ Kd2 Qxh1 Qxc6+ bxc6 Ba6#".split(' ').toList
         }
       }
     }
@@ -36,7 +36,7 @@ PP   PPP
 KNBQ BNR
 """)
       game.playMoves(A7 -> A8) map (_.pgnMoves) must beSuccess.like {
-        case ms ⇒ ms must_== List("a8=Q")
+        case ms => ms must_== List("a8=Q")
       }
     }
     "with check" in {
@@ -51,7 +51,7 @@ PP   PPP
 KNBQ BNR
 """)
       game.playMoves(A7 -> A8) map (_.pgnMoves) must beSuccess.like {
-        case ms ⇒ ms must_== List("a8=Q+")
+        case ms => ms must_== List("a8=Q+")
       }
     }
     "with checkmate" in {
@@ -66,7 +66,7 @@ PP   PPP
 KNBQ BNR
 """)
       game.playMoves(A7 -> A8) map (_.pgnMoves) must beSuccess.like {
-        case ms ⇒ ms must_== List("a8=Q#")
+        case ms => ms must_== List("a8=Q#")
       }
     }
     "castle kingside" in {
@@ -74,7 +74,7 @@ KNBQ BNR
 PP   PPP
 R   K  R
 """).playMoves(E1 -> G1) map (_.pgnMoves) must beSuccess.like {
-        case ms ⇒ ms must_== List("O-O")
+        case ms => ms must_== List("O-O")
       }
     }
     "castle queenside" in {
@@ -82,7 +82,7 @@ R   K  R
 PP   PPP
 R   K  R
 """).playMoves(E1 -> C1) map (_.pgnMoves) must beSuccess.like {
-        case ms ⇒ ms must_== List("O-O-O")
+        case ms => ms must_== List("O-O-O")
       }
     }
   }
@@ -92,7 +92,7 @@ R   K  R
 PPPPPPPP
 NRK RQBB
 """, Variant.Chess960)).playMoves(C1 -> B1) map (_.pgnMoves) must beSuccess.like {
-        case ms ⇒ ms must_== List("O-O-O")
+        case ms => ms must_== List("O-O-O")
       }
     }
     "castle kingside as white" in {
@@ -100,7 +100,7 @@ NRK RQBB
 PP PPPPP
 NRK R  B
 """, Variant.Chess960)).playMoves(C1 -> E1) map (_.pgnMoves) must beSuccess.like {
-        case ms ⇒ ms must_== List("O-O")
+        case ms => ms must_== List("O-O")
       }
     }
     "castle queenside as black" in {
@@ -114,7 +114,7 @@ pppppppp
 PPPPPPPP
 NRK RQBB
 """, Variant.Chess960)).withPlayer(Black).playMoves(C8 -> B8) map (_.pgnMoves) must beSuccess.like {
-        case ms ⇒ ms must_== List("O-O-O")
+        case ms => ms must_== List("O-O-O")
       }
     }
     "castle kingside as black" in {
@@ -128,7 +128,7 @@ pppppppp
 PPPPPPPP
 NRK RQBB
 """, Variant.Chess960)).withPlayer(Black).playMoves(C8 -> E8) map (_.pgnMoves) must beSuccess.like {
-        case ms ⇒ ms must_== List("O-O")
+        case ms => ms must_== List("O-O")
       }
     }
     "opening with castles" in {
@@ -150,7 +150,7 @@ NRKNRQBB
   C8 -> B8,
   C1 -> B1
 ) map (_.pgnMoves) must beSuccess.like {
-        case ms ⇒ ms must_== "f4 Nc6 Nc3 g6 Nb5 O-O-O O-O-O".split(' ').toList
+        case ms => ms must_== "f4 Nc6 Nc3 g6 Nb5 O-O-O O-O-O".split(' ').toList
       }
     }
   }

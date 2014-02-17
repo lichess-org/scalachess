@@ -18,9 +18,9 @@ object Visual {
   def <<(source: String): Board = {
     val lines = source.lines.toList
     val filtered = lines.size match {
-      case 8          ⇒ lines
-      case n if n > 8 ⇒ lines drop 1 take 8
-      case n          ⇒ (List.fill(8 - n)("")) ::: lines
+      case 8          => lines
+      case n if n > 8 => lines drop 1 take 8
+      case n          => (List.fill(8 - n)("")) ::: lines
     }
     Board(
       pieces = (for {
@@ -30,7 +30,7 @@ object Visual {
         (c, x) = char
         role ← Role forsyth c.toLower
       } yield {
-        posAt(x + 1, 8 - y) map { pos ⇒ pos -> (Color(c isUpper) - role) }
+        posAt(x + 1, 8 - y) map { pos => pos -> (Color(c isUpper) - role) }
       }) flatten,
       variant = chess.Variant.default
     )
@@ -40,7 +40,7 @@ object Visual {
 
   def >>|(board: Board, marks: Map[Iterable[Pos], Char]): String = {
     val markedPoss: Map[Pos, Char] = marks.foldLeft(Map[Pos, Char]()) {
-      case (marks, (poss, char)) ⇒ marks ++ (poss.toList map { pos ⇒ (pos, char) })
+      case (marks, (poss, char)) => marks ++ (poss.toList map { pos => (pos, char) })
     }
     for (y ← 8 to 1 by -1) yield {
       for (x ← 1 to 8) yield {

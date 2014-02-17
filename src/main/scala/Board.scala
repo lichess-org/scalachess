@@ -15,14 +15,14 @@ case class Board(
   def apply(x: Int, y: Int): Option[Piece] = posAt(x, y) flatMap pieces.get
 
   lazy val actors: Map[Pos, Actor] = pieces map {
-    case (pos, piece) ⇒ (pos, Actor(piece, pos, this))
+    case (pos, piece) => (pos, Actor(piece, pos, this))
   }
 
   lazy val colorActors: Map[Color, List[Actor]] =
     actors.values groupBy (_.color) mapValues (_.toList)
 
   def rolesOf(c: Color): List[Role] = pieces.values.toList collect {
-    case piece if piece.color == c ⇒ piece.role
+    case piece if piece.color == c => piece.role
   }
 
   def actorsOf(c: Color): List[Actor] = colorActors get c getOrElse Nil
@@ -32,7 +32,7 @@ case class Board(
   def piecesOf(c: Color): Map[Pos, Piece] = pieces filter (_._2 is c)
 
   lazy val kingPos: Map[Color, Pos] = pieces collect {
-    case (pos, Piece(color, King)) ⇒ color -> pos
+    case (pos, Piece(color, King)) => color -> pos
   } toMap
 
   def kingPosOf(c: Color): Option[Pos] = kingPos get c
@@ -42,13 +42,13 @@ case class Board(
   lazy val checkWhite = checkOf(White)
   lazy val checkBlack = checkOf(Black)
 
-  private def checkOf(c: Color): Boolean = kingPosOf(c) exists { kingPos ⇒
+  private def checkOf(c: Color): Boolean = kingPosOf(c) exists { kingPos =>
     Actor.threatens(this, !c, kingPos, _.role != King)
   }
 
   def destsFrom(from: Pos): Option[List[Pos]] = actorAt(from) map (_.destinations)
 
-  def seq(actions: Board ⇒ Valid[Board]*): Valid[Board] =
+  def seq(actions: Board => Valid[Board]*): Valid[Board] =
     actions.foldLeft(success(this): Valid[Board])(_ flatMap _)
 
   def place(piece: Piece) = new {
@@ -61,13 +61,13 @@ case class Board(
     if (pieces contains at) None
     else Some(copy(pieces = pieces + ((at, piece))))
 
-  def take(at: Pos): Option[Board] = pieces get at map { piece ⇒
+  def take(at: Pos): Option[Board] = pieces get at map { piece =>
     copy(pieces = pieces - at)
   }
 
   def move(orig: Pos, dest: Pos): Option[Board] =
     if (pieces contains dest) None
-    else pieces get orig map { piece ⇒
+    else pieces get orig map { piece =>
       copy(pieces = pieces - orig + ((dest, piece)))
     }
 
@@ -80,14 +80,14 @@ case class Board(
   def move(orig: Pos) = new {
     def to(dest: Pos): Valid[Board] = {
       if (pieces contains dest) failure("Cannot move to occupied " + dest)
-      else pieces get orig map { piece ⇒
+      else pieces get orig map { piece =>
         copy(pieces = (pieces - orig) + ((dest, piece)))
       } toSuccess ("No piece at " + orig + " to move")
     }
   }
 
-  lazy val occupation: Map[Color, Set[Pos]] = Color.all map { color ⇒
-    (color, pieces collect { case (pos, piece) if piece is color ⇒ pos } toSet)
+  lazy val occupation: Map[Color, Set[Pos]] = Color.all map { color =>
+    (color, pieces collect { case (pos, piece) if piece is color => pos } toSet)
   } toMap
 
   lazy val occupations = pieces.keySet
@@ -103,7 +103,7 @@ case class Board(
 
   def withVariant(v: Variant): Board = copy(variant = v)
 
-  def updateHistory(f: History ⇒ History) = copy(history = f(history))
+  def updateHistory(f: History => History) = copy(history = f(history))
 
   def count(p: Piece): Int = pieces.values count (_ == p)
   def count(c: Color): Int = pieces.values count (_.color == c)
@@ -119,7 +119,7 @@ case class Board(
 
   def visual = Visual >> this
 
-  def valid(strict: Boolean) = Color.all map rolesOf forall { roles ⇒
+  def valid(strict: Boolean) = Color.all map rolesOf forall { roles =>
     ((roles count (_ == King)) == 1) :: {
       if (strict) List((roles count (_ == Pawn)) <= 8, roles.size <= 16) else Nil
     } forall identity

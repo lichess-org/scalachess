@@ -20,27 +20,27 @@ class ForsythTest extends ChessTest {
         }
         "one move" in {
           makeGame.playMoveList(moves take 1) must beSuccess.like {
-            case g ⇒ f >> g must_== "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"
+            case g => f >> g must_== "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"
           }
         }
         "2 moves" in {
           makeGame.playMoveList(moves take 2) must beSuccess.like {
-            case g ⇒ f >> g must_== "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2"
+            case g => f >> g must_== "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2"
           }
         }
         "3 moves" in {
           makeGame.playMoveList(moves take 3) must beSuccess.like {
-            case g ⇒ f >> g must_== "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"
+            case g => f >> g must_== "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"
           }
         }
         "4 moves" in {
           makeGame.playMoveList(moves take 4) must beSuccess.like {
-            case g ⇒ f >> g must_== "rnbqkb1r/pp1ppppp/7n/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"
+            case g => f >> g must_== "rnbqkb1r/pp1ppppp/7n/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"
           }
         }
         "5 moves" in {
           makeGame.playMoveList(moves take 5) must beSuccess.like {
-            case g ⇒ f >> g must_== "rnbqkb1r/pp1ppppp/7n/2p5/4P3/P4N2/1PPP1PPP/RNBQKB1R b KQkq - 0 3"
+            case g => f >> g must_== "rnbqkb1r/pp1ppppp/7n/2p5/4P3/P4N2/1PPP1PPP/RNBQKB1R b KQkq - 0 3"
           }
         }
       }
@@ -58,8 +58,8 @@ class ForsythTest extends ChessTest {
       val moves = List(E2 -> E4, C7 -> C5, G1 -> F3, G8 -> H6, A2 -> A3)
       def compare(ms: List[(Pos, Pos)], fen: String) =
         makeGame.playMoveList(ms) must beSuccess.like {
-          case g ⇒ (f << fen) must beSome.like {
-            case situation ⇒ situation.board.visual must_== g.situation.board.visual
+          case g => (f << fen) must beSome.like {
+            case situation => situation.board.visual must_== g.situation.board.visual
           }
         }
       "new game" in {
@@ -113,34 +113,34 @@ class ForsythTest extends ChessTest {
     "with turns" in {
       "starting" in {
         f <<< "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" must beSome.like {
-          case s ⇒ s.turns must_== 0
+          case s => s.turns must_== 0
         }
       }
       "white to play" in {
         f <<< "r2q1rk1/ppp2pp1/1bnpbn1p/4p3/4P3/1BNPBN1P/PPPQ1PP1/R3K2R w KQ - 7 10" must beSome.like {
-          case s ⇒ s.turns must_== 18
+          case s => s.turns must_== 18
         }
       }
       "black to play" in {
         f <<< "r1q2rk1/ppp2ppp/3p1n2/8/2PNp3/P1PnP3/2QP1PPP/R1B2K1R b - - 3 12" must beSome.like {
-          case s ⇒ s.turns must_== 23
+          case s => s.turns must_== 23
         }
       }
     }
     "with history" in {
       "starting" in {
         f <<< "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" must beSome.like {
-          case SituationPlus(Situation(Board(_, History(_, _, Castles(true, true, true, true)), _), _), _) ⇒ ok
+          case SituationPlus(Situation(Board(_, History(_, _, Castles(true, true, true, true)), _), _), _) => ok
         }
       }
       "white to play" in {
         f <<< "r2q1rk1/ppp2pp1/1bnpbn1p/4p3/4P3/1BNPBN1P/PPPQ1PP1/R3K2R w KQ - 7 10" must beSome.like {
-          case SituationPlus(Situation(Board(_, History(_, _, Castles(true, true, false, false)), _), _), _) ⇒ ok
+          case SituationPlus(Situation(Board(_, History(_, _, Castles(true, true, false, false)), _), _), _) => ok
         }
       }
       "black to play" in {
         f <<< "r1q2rk1/ppp2ppp/3p1n2/8/2PNp3/P1PnP3/2QP1PPP/R1B2K1R b - - 3 12" must beSome.like {
-          case SituationPlus(Situation(Board(_, History(_, _, Castles(false, false, false, false)), _), _), _) ⇒ ok
+          case SituationPlus(Situation(Board(_, History(_, _, Castles(false, false, false, false)), _), _), _) => ok
         }
       }
     }

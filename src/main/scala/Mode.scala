@@ -7,7 +7,7 @@ sealed abstract class Mode(val id: Int) {
   def casual = this == Mode.Casual
   def rated = this == Mode.Rated
 
-  def fold[A](c: ⇒ A, r: ⇒ A): A = if (this.casual) c else r
+  def fold[A](c: => A, r: => A): A = if (this.casual) c else r
 }
 
 object Mode {
@@ -17,7 +17,7 @@ object Mode {
 
   val all = List(Casual, Rated)
 
-  val byId = all map { v ⇒ (v.id, v) } toMap
+  val byId = all map { v => (v.id, v) } toMap
 
   def apply(id: Int): Option[Mode] = byId get id
 

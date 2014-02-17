@@ -14,13 +14,13 @@ object Parser
     tags ← TagParser(tagStr)
     parsedMoves ← MovesParser(moveStr)
     (sanStrs, resultOption) = parsedMoves
-    tags2 = resultOption.filterNot(_ ⇒ tags.exists(_.name == Tag.Result)).fold(tags)(t ⇒ tags :+ t)
+    tags2 = resultOption.filterNot(_ => tags.exists(_.name == Tag.Result)).fold(tags)(t => tags :+ t)
     sans ← sanStrs.map(MoveParser.apply).sequence
   } yield ParsedPgn(tags2, sans)
 
-  trait Logging { self: Parsers ⇒
+  trait Logging { self: Parsers =>
     protected val loggingEnabled = false
-    protected def as[T](msg: String)(p: ⇒ Parser[T]): Parser[T] =
+    protected def as[T](msg: String)(p: => Parser[T]): Parser[T] =
       if (loggingEnabled) log(p)(msg) else p
   }
 
@@ -30,13 +30,13 @@ object Parser
 
     def apply(pgn: String): Valid[(List[String], Option[Tag])] =
       parseAll(moves, pgn) match {
-        case Success((moves, result), _) ⇒ scalaz.Validation.success(moves, result map { r ⇒ Tag(_.Result, r) })
-        case err                         ⇒ "Cannot parse moves: %s\n%s".format(err.toString, pgn).failNel
+        case Success((moves, result), _) => scalaz.Validation.success(moves, result map { r => Tag(_.Result, r) })
+        case err                         => "Cannot parse moves: %s\n%s".format(err.toString, pgn).failNel
       }
 
     def moves: Parser[(List[String], Option[String])] = as("moves") {
       rep(move) ~ (result?) ~ (commentary*) ^^ {
-        case sans ~ res ~ _ ⇒ sans -> res
+        case sans ~ res ~ _ => sans -> res
       }
     }
 
@@ -58,7 +58,7 @@ object Parser
     def nag: Parser[String] = """\$\d+""".r
 
     def variation: Parser[List[String]] = as("variation") {
-      "(" ~> moves <~ ")" ^^ { case (sans, _) ⇒ sans }
+      "(" ~> moves <~ ")" ^^ { case (sans, _) => sans }
     }
 
     def commentary: Parser[String] = blockCommentary | inlineCommentary
@@ -80,14 +80,14 @@ object Parser
 
     def apply(str: String): Valid[San] =
       parseAll(move, str) match {
-        case Success(san, _) ⇒ scalaz.Validation.success(san)
-        case err             ⇒ "Cannot parse move: %s\n%s".format(err.toString, str).failNel
+        case Success(san, _) => scalaz.Validation.success(san)
+        case err             => "Cannot parse move: %s\n%s".format(err.toString, str).failNel
       }
 
     def move: Parser[San] = castle | standard
 
     def castle = (qCastle | kCastle) ~ suffixes ^^ {
-      case side ~ suf ⇒ Castle(side) withSuffixes suf
+      case side ~ suf => Castle(side) withSuffixes suf
     }
 
     val qCastle: Parser[Side] = ("O-O-O" | "o-o-o" | "0-0-0") ^^^ QueenSide
@@ -96,34 +96,34 @@ object Parser
 
     def standard: Parser[Std] = as("standard") {
       (pawn | disambiguated | ambiguous) ~ suffixes ^^ {
-        case std ~ suf ⇒ std withSuffixes suf
+        case std ~ suf => std withSuffixes suf
       }
     }
 
     // e5
     def pawn: Parser[Std] = as("pawn") {
       dest ^^ {
-        case de ⇒ Std(dest = de, role = Pawn)
+        case de => Std(dest = de, role = Pawn)
       }
     }
 
     // Bg5
     def ambiguous: Parser[Std] = as("ambiguous") {
       role ~ x ~ dest ^^ {
-        case ro ~ ca ~ de ⇒ Std(dest = de, role = ro, capture = ca)
+        case ro ~ ca ~ de => Std(dest = de, role = ro, capture = ca)
       }
     }
 
     // Bac3 Baxc3 B2c3 B2xc3 Ba2xc3
     def disambiguated: Parser[Std] = as("disambiguated") {
       role ~ opt(file) ~ opt(rank) ~ x ~ dest ^^ {
-        case ro ~ fi ~ ra ~ ca ~ de ⇒ Std(
+        case ro ~ fi ~ ra ~ ca ~ de => Std(
           dest = de, role = ro, capture = ca, file = fi, rank = ra)
       }
     }
 
     def suffixes: Parser[Suffixes] = opt(promotion) ~ check ~ checkmate ^^ {
-      case p ~ c ~ cm ⇒ Suffixes(c, cm, p)
+      case p ~ c ~ cm => Suffixes(c, cm, p)
     }
 
     val x = exists("x")
@@ -150,16 +150,16 @@ object Parser
 
     def mapParser[A, B](map: Map[A, B], name: String): Parser[B] =
       map.foldLeft(failure(name + " not found"): Parser[B]) {
-        case (acc, (a, b)) ⇒ a.toString ^^^ b | acc
+        case (acc, (a, b)) => a.toString ^^^ b | acc
       }
   }
 
   private object TagParser extends RegexParsers with Logging {
 
     def apply(pgn: String): Valid[List[Tag]] = parseAll(all, pgn) match {
-      case f: Failure       ⇒ "Cannot parse tags: %s\n%s".format(f.toString, pgn).failNel
-      case Success(sans, _) ⇒ scalaz.Validation.success(sans)
-      case err              ⇒ "Cannot parse tags: %s\n%s".format(err.toString, pgn).failNel
+      case f: Failure       => "Cannot parse tags: %s\n%s".format(f.toString, pgn).failNel
+      case Success(sans, _) => scalaz.Validation.success(sans)
+      case err              => "Cannot parse tags: %s\n%s".format(err.toString, pgn).failNel
     }
 
     def all: Parser[List[Tag]] = as("all") {
@@ -170,7 +170,7 @@ object Parser
 
     def tag: Parser[Tag] = as("tag") {
       tagName ~ tagValue ^^ {
-        case name ~ value ⇒ Tag(name, value)
+        case name ~ value => Tag(name, value)
       }
     }
 
@@ -180,9 +180,9 @@ object Parser
   }
 
   private def splitTagAndMoves(pgn: String): Valid[(String, String)] =
-    pgn.lines.toList.map(_.trim).filter(_.nonEmpty) span { line ⇒
+    pgn.lines.toList.map(_.trim).filter(_.nonEmpty) span { line =>
       ~((line lift 0).map('[' ==))
     } match {
-      case (tagLines, moveLines) ⇒ success(tagLines.mkString("\n") -> moveLines.mkString("\n"))
+      case (tagLines, moveLines) => success(tagLines.mkString("\n") -> moveLines.mkString("\n"))
     }
 }

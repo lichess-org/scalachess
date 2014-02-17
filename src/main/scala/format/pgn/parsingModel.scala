@@ -25,17 +25,17 @@ case class Std(
     promotion = s.promotion)
 
   def apply(game: Game): Valid[chess.Move] = {
-    def compare[A](a: Option[A], b: ⇒ A) = a map (_ == b) getOrElse true
+    def compare[A](a: Option[A], b: => A) = a map (_ == b) getOrElse true
     game.situation.moves map {
-      case (orig, moves) ⇒ moves find { move ⇒
+      case (orig, moves) => moves find { move =>
         move.dest == dest && move.piece.role == role
       }
     } collect {
-      case Some(m) if compare(file, m.orig.x) && compare(rank, m.orig.y) ⇒ m
+      case Some(m) if compare(file, m.orig.x) && compare(rank, m.orig.y) => m
     } match {
-      case Nil        ⇒ s"No move found: $this\n${game.board}".failNel
-      case one :: Nil ⇒ one withPromotion promotion toValid "Wrong promotion"
-      case many       ⇒ s"Many moves found: $many\n${game.board}".failNel
+      case Nil        => s"No move found: $this\n${game.board}".failNel
+      case one :: Nil => one withPromotion promotion toValid "Wrong promotion"
+      case many       => s"Many moves found: $many\n${game.board}".failNel
     }
   }
 

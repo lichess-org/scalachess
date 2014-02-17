@@ -9,9 +9,9 @@ class ReaderTest extends ChessTest {
 
   "only raw moves" should {
     "many games" in {
-      forall(raws) { (c: String) ⇒
+      forall(raws) { (c: String) =>
         Reader(c) must beSuccess.like {
-          case replay ⇒ replay.moves must have size (c.split(' ').size)
+          case replay => replay.moves must have size (c.split(' ').size)
         }
       }
     }
@@ -61,13 +61,13 @@ class ReaderTest extends ChessTest {
     }
     "invalid variant" in {
       Reader(invalidVariant) must beSuccess.like {
-        case replay ⇒ replay.setup.board.variant must_== Variant.Standard
+        case replay => replay.setup.board.variant must_== Variant.Standard
       }
     }
     "promoting to a rook" in {
       Reader(fromLichessBadPromotion) must beSuccess.like {
-        case replay ⇒ replay.chronoMoves lift 10 must beSome.like {
-          case move ⇒ move.promotion must_== Some(Rook)
+        case replay => replay.chronoMoves lift 10 must beSome.like {
+          case move => move.promotion must_== Some(Rook)
         }
       }
     }

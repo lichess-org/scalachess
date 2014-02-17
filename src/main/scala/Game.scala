@@ -17,7 +17,7 @@ case class Game(
     dest: Pos,
     promotion: Option[PromotableRole] = None,
     lag: FiniteDuration = 0.millis): Valid[(Game, Move)] =
-    situation.move(orig, dest, promotion) map (_ withLag lag) map { move ⇒
+    situation.move(orig, dest, promotion) map (_ withLag lag) map { move =>
       apply(move) -> move
     }
 
@@ -28,9 +28,9 @@ case class Game(
       player = !player,
       turns = newTurns,
       clock = clock map {
-        case c: RunningClock                 ⇒ c step move.lag
-        case c: PausedClock if newTurns == 2 ⇒ c.start.switch
-        case c                               ⇒ c
+        case c: RunningClock                 => c step move.lag
+        case c: PausedClock if newTurns == 2 => c.start.switch
+        case c                               => c
       },
       deads = (move.capture flatMap board.apply).fold(deads)(_ :: deads)
     )
@@ -58,7 +58,7 @@ case class Game(
 
   def withBoard(b: Board) = copy(board = b)
 
-  def updateBoard(f: Board ⇒ Board) = withBoard(f(board))
+  def updateBoard(f: Board => Board) = withBoard(f(board))
 
   def withPlayer(c: Color) = copy(player = c)
 

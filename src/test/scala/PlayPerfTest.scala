@@ -13,7 +13,7 @@ class PlayPerfTest extends ChessTest {
   // val moves = Seq(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5, D8 -> D5, D2 -> D4, G8 -> F6, G1 -> F3, C8 -> G4, F1 -> E2, E7 -> E6, H2 -> H3, G4 -> H5, E1 -> G1, B8 -> C6, C1 -> E3, C5 -> D4, C3 -> D4, F8 -> B4) 
   // val moves = format.pgn.Reader(
   //   format.pgn.Fixtures.fromChessgames
-  // ).toOption.get.chronoMoves map { m ⇒ m.orig -> m.dest }
+  // ).toOption.get.chronoMoves map { m => m.orig -> m.dest }
   val game = makeGame
 
   def runOne = game.playMoves(moves: _*)

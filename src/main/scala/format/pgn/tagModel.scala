@@ -32,13 +32,13 @@ object Tag {
   }
 
   val tagTypes = List(Event, Site, Date, White, Black, TimeControl, WhiteClock, BlackClock, WhiteElo, BlackElo, Result, FEN, Variant, ECO)
-  val tagTypesByLowercase = tagTypes map { t ⇒ t.lowercase -> t } toMap
+  val tagTypesByLowercase = tagTypes map { t => t.lowercase -> t } toMap
 
   def apply(name: String, value: Any): Tag = new Tag(
     name = tagType(name),
     value = value.toString)
 
-  def apply(name: Tag.type ⇒ TagType, value: Any): Tag = new Tag(
+  def apply(name: Tag.type => TagType, value: Any): Tag = new Tag(
     name = name(this),
     value = value.toString)
 

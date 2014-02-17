@@ -12,7 +12,7 @@ class GameTest extends ChessTest {
         D7 -> D5,
         E4 -> D5)
       game must beSuccess.like {
-        case g ⇒ g.deads must containTheSameElementsAs(List(Black.pawn))
+        case g => g.deads must containTheSameElementsAs(List(Black.pawn))
       }
     }
   }
@@ -24,7 +24,7 @@ R""").playMoves(
         A1 -> A2,
         B2 -> A2)
       game must beSuccess.like {
-        case g ⇒ g.deads must containTheSameElementsAs(List(Black.bishop, White.rook))
+        case g => g.deads must containTheSameElementsAs(List(Black.bishop, White.rook))
       }
     }
   }
@@ -37,12 +37,12 @@ R   K""", Black)
     }
     "can still castle queenside" in {
       game.playMoves(B2 -> A3) must beSuccess.like {
-        case g ⇒ g.board.history canCastle White on QueenSide must_== true
+        case g => g.board.history canCastle White on QueenSide must_== true
       }
     }
     "can not castle queenside anymore" in {
       game.playMoves(B2 -> A1) must beSuccess.like {
-        case g ⇒ g.board.history canCastle White on QueenSide must_== false
+        case g => g.board.history canCastle White on QueenSide must_== false
       }
     }
   }

@@ -20,11 +20,11 @@ object Binary {
 
   private object Encoding {
     val pieceInts: Map[String, Int] = Map("K" -> 1, "Q" -> 2, "R" -> 3, "N" -> 4, "B" -> 5, "O-O" -> 6, "O-O-O" -> 7)
-    val pieceStrs: Map[Int, String] = (pieceInts map { case (k, v) ⇒ v -> k }).toMap
+    val pieceStrs: Map[Int, String] = (pieceInts map { case (k, v) => v -> k }).toMap
     val promotionInts: Map[String, Int] = Map("" -> 0, "Q" -> 1, "R" -> 2, "N" -> 3, "B" -> 4)
-    val promotionStrs: Map[Int, String] = (promotionInts map { case (k, v) ⇒ v -> k }).toMap
+    val promotionStrs: Map[Int, String] = (promotionInts map { case (k, v) => v -> k }).toMap
     val checkInts: Map[String, Int] = Map("" -> 0, "+" -> 1, "#" -> 2)
-    val checkStrs: Map[Int, String] = (checkInts map { case (k, v) ⇒ v -> k }).toMap
+    val checkStrs: Map[Int, String] = (checkInts map { case (k, v) => v -> k }).toMap
   }
 
   private object Reader {
@@ -34,26 +34,26 @@ object Binary {
     def moves(bs: List[Byte]): List[String] = intMoves(bs map toInt)
 
     def intMoves(bs: List[Int]): List[String] = bs match {
-      case Nil ⇒ Nil
-      case b1 :: rest if moveType(b1) == MoveType.SimplePawn ⇒
+      case Nil => Nil
+      case b1 :: rest if moveType(b1) == MoveType.SimplePawn =>
         simplePawn(b1) :: intMoves(rest)
-      case b1 :: b2 :: rest if moveType(b1) == MoveType.SimplePiece ⇒
+      case b1 :: b2 :: rest if moveType(b1) == MoveType.SimplePiece =>
         simplePiece(b1, b2) :: intMoves(rest)
-      case b1 :: b2 :: rest if moveType(b1) == MoveType.FullPawn ⇒
+      case b1 :: b2 :: rest if moveType(b1) == MoveType.FullPawn =>
         fullPawn(b1, b2) :: intMoves(rest)
-      case b1 :: b2 :: b3 :: rest if moveType(b1) == MoveType.FullPiece ⇒
+      case b1 :: b2 :: b3 :: rest if moveType(b1) == MoveType.FullPiece =>
         fullPiece(b1, b2, b3) :: intMoves(rest)
-      case x ⇒ !!(x map showByte mkString ",")
+      case x => !!(x map showByte mkString ",")
     }
 
     def simplePawn(i: Int): String = posString(right(i, 6))
 
     def simplePiece(b1: Int, b2: Int): String = pieceStrs(b2 >> 5) match {
-      case castle@("O-O" | "O-O-O") ⇒ {
+      case castle@("O-O" | "O-O-O") => {
         val check = checkStrs(cut(b2, 5, 3))
         s"$castle$check"
       }
-      case piece ⇒ {
+      case piece => {
         val pos = posString(right(b1, 6))
         val capture = if (bitAt(b2, 3)) "x" else ""
         val check = checkStrs(cut(b2, 5, 3))
@@ -64,9 +64,9 @@ object Binary {
     def fullPawn(b1: Int, b2: Int): String = {
       val pos = posString(right(b1, 6))
       val fileCapture = (b2 >> 6) match {
-        case 0 ⇒ ""
-        case 1 ⇒ (pos(0) - 1).toChar + "x"
-        case 2 ⇒ (pos(0) + 1).toChar + "x"
+        case 0 => ""
+        case 1 => (pos(0) - 1).toChar + "x"
+        case 2 => (pos(0) + 1).toChar + "x"
       }
       val check = checkStrs(cut(b2, 6, 4))
       val prom = promotionStrs(cut(b2, 4, 1))
@@ -80,9 +80,9 @@ object Binary {
       val capture = if (bitAt(b2, 3)) "x" else ""
       val check = checkStrs(cut(b2, 5, 3))
       val disamb = (b3 >> 6) match {
-        case 0 ⇒ fileChar(right(b3, 3)).toString
-        case 1 ⇒ rankChar(right(b3, 3)).toString
-        case _ ⇒ posString(right(b3, 6))
+        case 0 => fileChar(right(b3, 3)).toString
+        case 1 => rankChar(right(b3, 3)).toString
+        case _ => posString(right(b3, 6))
       }
       s"$piece$disamb$capture$pos$check"
     }
@@ -105,13 +105,13 @@ object Binary {
     import Encoding._
 
     def move(str: String): List[Byte] = (str match {
-      case pos if pos.size == 2  ⇒ simplePawn(pos)
-      case CastlingR(str, check) ⇒ castling(str, check)
-      case SimplePieceR(piece, capture, pos, check) ⇒
+      case pos if pos.size == 2  => simplePawn(pos)
+      case CastlingR(str, check) => castling(str, check)
+      case SimplePieceR(piece, capture, pos, check) =>
         simplePiece(piece, pos, capture, check)
-      case FullPawnR(file, pos, promotion, check) ⇒
+      case FullPawnR(file, pos, promotion, check) =>
         fullPawn(Option(file), pos, check, Option(promotion))
-      case FullPieceR(piece, orig, capture, pos, check) ⇒
+      case FullPieceR(piece, orig, capture, pos, check) =>
         fullPiece(piece, orig, pos, capture, check)
     }) map (_.toByte)
 
@@ -160,7 +160,7 @@ object Binary {
     def rankInt(c: Char): Int = c.toInt - 49
 
     def shiftOptionInt(fileOption: Option[String], pos: String): Int =
-      fileOption.fold(0) { file ⇒
+      fileOption.fold(0) { file =>
         if (file.head < pos.head) 1 else 2
       }
 

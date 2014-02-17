@@ -69,14 +69,14 @@ object Role {
 
   val all: List[Role] = List(King, Queen, Rook, Bishop, Knight, Pawn)
   val allPromotable: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
-  val allByForsyth: Map[Char, Role] = all map { r ⇒ (r.forsyth, r) } toMap
-  val allByPgn: Map[Char, Role] = all map { r ⇒ (r.pgn, r) } toMap
+  val allByForsyth: Map[Char, Role] = all map { r => (r.forsyth, r) } toMap
+  val allByPgn: Map[Char, Role] = all map { r => (r.pgn, r) } toMap
   val allPromotableByName: Map[String, PromotableRole] =
-    allPromotable map { r ⇒ (r.toString, r) } toMap
+    allPromotable map { r => (r.toString, r) } toMap
   val allPromotableByForsyth: Map[Char, PromotableRole] =
-    allPromotable map { r ⇒ (r.forsyth, r) } toMap
+    allPromotable map { r => (r.forsyth, r) } toMap
   val allPromotableByPgn: Map[Char, PromotableRole] =
-    allPromotable map { r ⇒ (r.pgn, r) } toMap
+    allPromotable map { r => (r.pgn, r) } toMap
 
   def forsyth(c: Char): Option[Role] = allByForsyth get c
 

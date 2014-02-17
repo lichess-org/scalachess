@@ -16,8 +16,8 @@ object Speed {
   case object Unlimited extends Speed(4, 1200 to Int.MaxValue, "No clock") 
 
   val all = List(Bullet, Blitz, Slow, Unlimited)
-  val byId = all map { v ⇒ (v.id, v) } toMap
-  val byName = all map { v ⇒ (v.name, v) } toMap
+  val byId = all map { v => (v.id, v) } toMap
+  val byName = all map { v => (v.name, v) } toMap
 
   def apply(id: Int): Option[Speed] = byId get id
 

@@ -13,7 +13,7 @@ class AutodrawTest extends ChessTest {
         makeBoard.autoDraw must_== false
       }
       "opened" in {
-        makeGame.playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5) map { g ⇒
+        makeGame.playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5) map { g =>
           g.board.autoDraw
         } must beSuccess(false)
       }
@@ -63,14 +63,14 @@ K   bB""".autoDraw must_== false
         makeBoard.autoDraw must_== false
       }
       "opened" in {
-        makeGame.playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5) map { g ⇒
+        makeGame.playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5) map { g =>
           g.board.autoDraw
         } must beSuccess(false)
       }
       "tons of pointless moves" in {
         val moves = List.fill(30)(List(B1 -> C3, B8 -> C6, C3 -> B1, C6 -> B8))
         makeGame.playMoves(moves.flatten: _*) must beSuccess.like {
-          case g ⇒ g.board.autoDraw must_== true
+          case g => g.board.autoDraw must_== true
         }
       }
     }

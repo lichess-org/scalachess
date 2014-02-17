@@ -5,7 +5,7 @@ case class Situation(board: Board, color: Color) {
   lazy val actors = board actorsOf color
 
   lazy val moves: Map[Pos, List[Move]] = actors collect {
-    case actor if actor.moves.nonEmpty ⇒ actor.pos -> actor.moves
+    case actor if actor.moves.nonEmpty => actor.pos -> actor.moves
   } toMap
 
   lazy val destinations: Map[Pos, List[Pos]] = moves mapValues { _ map (_.dest) }

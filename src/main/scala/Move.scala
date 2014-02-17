@@ -19,7 +19,7 @@ case class Move(
 
   def withHistory(h: History) = copy(after = after withHistory h)
 
-  def finalizeAfter: Board = after updateHistory { h1 ⇒
+  def finalizeAfter: Board = after updateHistory { h1 =>
     // last move and position hashes
     val h2 = h1.copy(
       positionHashes =
@@ -59,7 +59,7 @@ case class Move(
 
   def spaceNotation = orig + " " + dest
 
-  def withPromotion(op: Option[PromotableRole]): Option[Move] = op.fold(some(this)) { p ⇒
+  def withPromotion(op: Option[PromotableRole]): Option[Move] = op.fold(some(this)) { p =>
     if ((after count color.queen) > (before count color.queen)) for {
       b2 ← after take dest
       b3 ← b2.place(color - p, dest)

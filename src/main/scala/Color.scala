@@ -4,7 +4,7 @@ sealed trait Color {
 
   def -(role: Role) = Piece(this, role)
 
-  def fold[A](w: ⇒ A, b: ⇒ A): A = if (white) w else b
+  def fold[A](w: => A, b: => A): A = if (white) w else b
 
   val unary_! : Color
 

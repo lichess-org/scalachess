@@ -15,7 +15,7 @@ object Nag {
   val badOnes = List(Inaccuracy, Mistake, Blunder)
   val goodOnes = List(Good, Brilliant)
   val all = badOnes ::: goodOnes
-  val byCode = all map { n ⇒ n.code -> n } toMap
+  val byCode = all map { n => n.code -> n } toMap
 
   def apply(code: Int): Option[Nag] = byCode get code
 }

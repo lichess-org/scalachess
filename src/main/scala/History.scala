@@ -8,7 +8,7 @@ case class History(
     castles: Castles = Castles.all) {
 
   def lastMoveString: Option[String] = lastMove map {
-    case (p1, p2) ⇒ p1.toString + p2.toString
+    case (p1, p2) => p1.toString + p2.toString
   }
 
   /**
@@ -22,11 +22,11 @@ case class History(
   def threefoldRepetition: Boolean = halfMoveClock > 6 && {
     val positions = (positionHashes grouped Board.positionHashSize).toList
     positions.headOption match {
-      case Some(Array(x, y)) ⇒ (positions count {
-        case Array(x2, y2) ⇒ x == x2 && y == y2
-        case _             ⇒ false
+      case Some(Array(x, y)) => (positions count {
+        case Array(x2, y2) => x == x2 && y == y2
+        case _             => false
       }) >= 3
-      case _ ⇒ false
+      case _ => false
     }
   }
 
@@ -67,8 +67,8 @@ object History {
     lastMove: Option[String], // a2a4
     castles: String): History = make(
     lastMove = lastMove flatMap {
-      case MoveString(a, b) ⇒ for (o ← posAt(a); d ← posAt(b)) yield (o, d)
-      case _                ⇒ None
+      case MoveString(a, b) => for (o ← posAt(a); d ← posAt(b)) yield (o, d)
+      case _                => None
     },
     positionHashes = Array(),
     castles = Castles(castles))
@@ -76,10 +76,10 @@ object History {
   def castle(color: Color, kingSide: Boolean, queenSide: Boolean) =
     History().copy(
       castles = color match {
-        case White ⇒ Castles.init.copy(
+        case White => Castles.init.copy(
           whiteKingSide = kingSide,
           whiteQueenSide = queenSide)
-        case Black ⇒ Castles.init.copy(
+        case Black => Castles.init.copy(
           blackKingSide = kingSide,
           blackQueenSide = queenSide)
       })

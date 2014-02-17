@@ -17,7 +17,7 @@ sealed trait Clock {
 
   def remainingTime(c: Color) = math.max(0, limit - elapsedTime(c))
 
-  def remainingTimes = Color.all map { c ⇒ c -> remainingTime(c) } toMap
+  def remainingTimes = Color.all map { c => c -> remainingTime(c) } toMap
 
   def elapsedTime(c: Color) = time(c)
 
@@ -86,8 +86,8 @@ case class RunningClock(
     blackTime = blackTime + (if (color == Black) (now - timer).toFloat else 0))
 
   def addTime(c: Color, t: Float): RunningClock = c match {
-    case White ⇒ copy(whiteTime = whiteTime + t)
-    case Black ⇒ copy(blackTime = blackTime + t)
+    case White => copy(whiteTime = whiteTime + t)
+    case Black => copy(blackTime = blackTime + t)
   }
 
   def giveTime(c: Color, t: Float): RunningClock = addTime(c, -t)
@@ -107,8 +107,8 @@ case class PausedClock(
   def stop = this
 
   def addTime(c: Color, t: Float): PausedClock = c match {
-    case White ⇒ copy(whiteTime = whiteTime + t)
-    case Black ⇒ copy(blackTime = blackTime + t)
+    case White => copy(whiteTime = whiteTime + t)
+    case Black => copy(blackTime = blackTime + t)
   }
 
   def giveTime(c: Color, t: Float): PausedClock = addTime(c, -t)

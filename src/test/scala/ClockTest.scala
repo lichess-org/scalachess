@@ -11,13 +11,13 @@ class ClockTest extends ChessTest {
     val game = makeGame withClock clock
     "new game" in {
       game.clock must beSome.like {
-        case c ⇒ c.color must_== White
+        case c => c.color must_== White
       }
     }
     "one move played" in {
       game.playMoves(E2 -> E4) must beSuccess.like {
-        case g ⇒ g.clock must beSome.like {
-          case c ⇒ c.color must_== Black
+        case g => g.clock must beSome.like {
+          case c => c.color must_== Black
         }
       }
     }

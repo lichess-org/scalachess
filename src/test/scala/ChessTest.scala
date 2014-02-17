@@ -4,7 +4,7 @@ import format.Visual
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.Specification
 import ornicar.scalalib.test.ValidationMatchers
-import scalaz.{ Validation ⇒ V }
+import scalaz.{ Validation => V }
 
 trait ChessTest
     extends Specification
@@ -25,8 +25,8 @@ trait ChessTest
   implicit def richActor(actor: Actor) = new {
 
     def threatens(to: Pos): Boolean = actor.piece.role match {
-      case x: Projection ⇒ x.dir(actor.pos, to) exists { Actor.longRangeThreatens(actor.board, actor.pos, _, to) }
-      case _             ⇒ actor.piece.eyes(actor.pos, to)
+      case x: Projection => x.dir(actor.pos, to) exists { Actor.longRangeThreatens(actor.board, actor.pos, _, to) }
+      case _             => actor.piece.eyes(actor.pos, to)
     }
   }
 
@@ -37,17 +37,17 @@ trait ChessTest
     def playMoves(moves: (Pos, Pos)*): Valid[Game] = playMoveList(moves)
 
     def playMoveList(moves: Iterable[(Pos, Pos)]): Valid[Game] = {
-      val vg = moves.foldLeft(V.success(game): Valid[Game]) { (vg, move) ⇒
-        // vg foreach { x ⇒
+      val vg = moves.foldLeft(V.success(game): Valid[Game]) { (vg, move) =>
+        // vg foreach { x =>
           // println(s"------------------------ ${x.turns} = $move")
         // }
         // because possible moves are asked for player highlight
         // before the move is played (on initial situation)
         vg foreach { _.situation.destinations }
-        val ng = vg flatMap { g ⇒ g(move._1, move._2) map (_._1) }
+        val ng = vg flatMap { g => g(move._1, move._2) map (_._1) }
         ng
       }
-      // vg foreach { x ⇒ println("========= PGN: " + x.pgnMoves) }
+      // vg foreach { x => println("========= PGN: " + x.pgnMoves) }
       vg
     }
 
@@ -71,31 +71,31 @@ trait ChessTest
   def makeEmptyBoard: Board = Board empty Variant.Standard
 
   def bePoss(poss: Pos*): Matcher[Option[Iterable[Pos]]] = beSome.like {
-    case p ⇒ sortPoss(p.toList) must_== sortPoss(poss.toList)
+    case p => sortPoss(p.toList) must_== sortPoss(poss.toList)
   }
 
   def makeGame: Game = Game(makeBoard)
 
   def bePoss(board: Board, visual: String): Matcher[Option[Iterable[Pos]]] = beSome.like {
-    case p ⇒ Visual.addNewLines(Visual.>>|(board, Map(p -> 'x'))) must_== visual
+    case p => Visual.addNewLines(Visual.>>|(board, Map(p -> 'x'))) must_== visual
   }
 
   def beBoard(visual: String): Matcher[Valid[Board]] = beSuccess.like {
-    case b ⇒ b.visual must_== (Visual << visual).visual
+    case b => b.visual must_== (Visual << visual).visual
   }
 
   def beSituation(visual: String): Matcher[Valid[Situation]] = beSuccess.like {
-    case s ⇒ s.board.visual must_== (Visual << visual).visual
+    case s => s.board.visual must_== (Visual << visual).visual
   }
 
   def beGame(visual: String): Matcher[Valid[Game]] = beSuccess.like {
-    case g ⇒ g.board.visual must_== (Visual << visual).visual
+    case g => g.board.visual must_== (Visual << visual).visual
   }
 
   def sortPoss(poss: Seq[Pos]): Seq[Pos] = poss sortBy (_.toString)
 
   def pieceMoves(piece: Piece, pos: Pos): Option[List[Pos]] =
-    (makeEmptyBoard place piece at pos).toOption flatMap { b ⇒
+    (makeEmptyBoard place piece at pos).toOption flatMap { b =>
       b actorAt pos map (_.destinations)
     }
 }

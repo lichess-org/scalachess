@@ -8,7 +8,7 @@ sealed abstract class Status(val id: Int) extends Ordered[Status] {
 
   def is(s: Status): Boolean = this == s
 
-  def is(f: Status.type ⇒ Status): Boolean = is(f(Status))
+  def is(f: Status.type => Status): Boolean = is(f(Status))
 }
 
 object Status {
@@ -26,13 +26,13 @@ object Status {
 
   val all = List(Created, Started, Aborted, Mate, Resign, Stalemate, Timeout, Draw, Outoftime, Cheat)
 
-  val finishedNotCheated = all filter { s ⇒
+  val finishedNotCheated = all filter { s =>
     s.id >= Mate.id && s.id < Cheat.id
   }
 
   val finishedWithWinner = List(Mate, Resign, Timeout, Outoftime, Cheat)
 
-  val byId = all map { v ⇒ (v.id, v) } toMap
+  val byId = all map { v => (v.id, v) } toMap
 
   def apply(id: Int): Option[Status] = byId get id
 }

@@ -15,7 +15,7 @@ class VisualTest extends ChessTest {
     //   f << newBoardFormat must_== makeBoard
     // }
     "import and export is non destructive" in {
-      forall(examples) { example ⇒
+      forall(examples) { example =>
         f.addNewLines(f >> (f << example)) must_== example
       }
     }

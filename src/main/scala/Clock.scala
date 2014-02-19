@@ -39,6 +39,8 @@ sealed trait Clock {
 
   def isRunning = timerOption.isDefined
 
+  def isInit = elapsedTime(White) == 0 && elapsedTime(Black) == 0
+
   def switch: Clock
 
   def reset = Clock(

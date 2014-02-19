@@ -10,7 +10,8 @@ case class Game(
     pgnMoves: List[String] = Nil,
     clock: Option[Clock] = None,
     deads: DeadPieces = Nil,
-    turns: Int = 0) {
+    turns: Int = 0,
+    startedAtTurn: Int = 0) {
 
   def apply(
     orig: Pos,
@@ -28,9 +29,9 @@ case class Game(
       player = !player,
       turns = newTurns,
       clock = clock map {
-        case c: RunningClock                 => c step move.lag
-        case c: PausedClock if newTurns == 2 => c.start.switch
-        case c                               => c
+        case c: RunningClock => c step move.lag
+        case c: PausedClock if (newTurns - startedAtTurn) == 2 => c.start.switch
+        case c => c
       },
       deads = (move.capture flatMap board.apply).fold(deads)(_ :: deads)
     )

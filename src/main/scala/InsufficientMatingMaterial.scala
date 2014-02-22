@@ -19,10 +19,9 @@ object InsufficientMatingMaterial {
     kingsOnly || bishopsOnSameColor || singleKnight
   }
 
-  def apply(board: Board, color: Color) = 
+  def apply(board: Board, color: Color) =
     board rolesOf color filter (King !=) match {
-      case roles if roles.size > 1 => true
       case Nil | List(Knight) | List(Bishop) => false
-      case _                       => true
+      case _                                 => true
     }
 }

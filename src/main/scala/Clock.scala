@@ -25,9 +25,7 @@ sealed trait Clock {
 
   def estimateTotalTime = limit + 30 * increment
 
-  def emergTime: Int = math.round(
-    math.min(60, math.max(3, estimateTotalTime / 10))
-  )
+  def emergTime: Int = math.round(math.min(60, math.max(3, estimateTotalTime / 10)))
 
   def stop: PausedClock
 
@@ -66,6 +64,7 @@ case class RunningClock(
 
   def step(lag: FiniteDuration = 0.millis) = {
     val t = now
+    val spentTime = (t - timer).toFloat
     val lagSeconds = lag.toMillis.toFloat / 1000
     val lagCompensation = math.max(0,
       math.min(
@@ -73,7 +72,7 @@ case class RunningClock(
         Clock.maxLagToCompensate))
     addTime(
       color,
-      math.max(0, (t - timer).toFloat - lagCompensation) - increment
+      (math.max(0, spentTime - lagCompensation) - increment)
     ).copy(
         color = !color,
         timer = t
@@ -130,9 +129,9 @@ object Clock {
 
   val minInitLimit = 2f
   // no more than this time will be offered to the lagging player
-  val maxLagToCompensate = 0.7f
+  val maxLagToCompensate = 10 * 1f
   // substracted from lag compensation
-  val naturalLag = 0.05f
+  val naturalLag = 0f
 
   def apply(
     limit: Int,

@@ -25,7 +25,7 @@ sealed trait Clock {
 
   def estimateTotalTime = limit + 30 * increment
 
-  def emergTime: Int = math.round(math.min(60, math.max(3, estimateTotalTime / 10)))
+  def emergTime: Int = math.round(math.min(30, math.max(2, estimateTotalTime / 12)))
 
   def stop: PausedClock
 

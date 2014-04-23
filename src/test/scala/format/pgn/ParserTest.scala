@@ -113,4 +113,10 @@ class ParserTest extends ChessTest {
       case a => a.sans.size must_== 165
     }
   }
+
+  "Android device" in {
+    parser(android) must beSuccess.like {
+      case a => a.sans.size must_== 165
+    }
+  }
 }

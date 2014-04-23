@@ -660,6 +660,23 @@ What we learn from a study of a game such as this is that no matter how quiet or
 1-0
 """
 
+val android = """[Event "AI Factory's Chess"]
+[Site "Android Device"]
+[Date "2014.04.23"]
+[Round "1"]
+[White "You"]
+[Black "Cpu (3)"]
+[PlyCount "69"]
+[Result "1-0"]
+
+1. e2e4 e7e5 2. Qd1f3 Ng8f6 3. Bf1c4 Nb8c6 4. Nb1c3 h7h6 5. Qf3d3 d7d6
+6. Ng1f3 a7a6 7. Nf3xe5 Rh8g8 8. Ne5xf7 Bc8d7 9. Nf7xd8 Rg8h8 10. Nd8e6 Bd7xe6
+11. Bc4xe6 Bf8e7 12. Nc3d5 Ke8d8 13. Nd5xe7 Kd8xe7 14. Qd3c4 b7b5 15. Qc4xc6 Ke7xe6
+16. d2d3 Ra8c8 17. Bc1f4 Ke6e7 18. e4e5 Nf6e8 19. Qc6xa6 Rh8f8 20. Bf4g3 Rc8b8
+21. Qa6a7 Rb8d8 22. Bg3h4+ g7g5 23. Bh4g3 Rf8f7 24. Qa7a6 b5b4 25. h2h4 b4b3
+26. a2xb3 Rf7g7 27. Qa6b5 Rd8d7 28. Ra1a8 Rg7f7 29. Qb5b4 Rf7f8 30. Ke1d1 Rf8f5
+31. Rh1e1 Rd7d8 32. e5xd6+ Ke7d7 33. Qb4a4+ Rf5b5 34. Qa4xb5+ c7c6 35. Qb5f5# 1-0"""
+
 val variations = """
 1. e4 d6 2. d4 c6  3. f4  Qc7 4. Nf3 h6 $6  5. Bd3 (  5. Bc4  e6) 5... Bg4 6. O-O Nd7  7. Nc3 a6 $6  8. Be3 e5 $2  9. fxe5 dxe5 10. d5 $1 ( 10. dxe5 $2 Nxe5 ) 10... c5 (10... cxd5 $6 11. Nxd5 ) ( 10... Ngf6 11. dxc6 ) 
 """

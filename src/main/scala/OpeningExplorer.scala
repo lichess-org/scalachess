@@ -4,7 +4,10 @@ object OpeningExplorer {
 
   type Move = String
 
-  case class Opening(code: String, name: String)
+  case class Opening(code: String, name: String) {
+
+    def fullName = s"$code $name"
+  }
 
   case class Branch(
       moves: Map[Move, Branch] = Map.empty,

@@ -48,7 +48,7 @@ object OpeningExplorer {
     next(tree, moves, none)
   }
 
-  val tree: Branch = EcoDb.db.foldLeft(Branch()) {
+  val tree: Branch = Openings.db.foldLeft(Branch()) {
     case (tree, (code, name, moves)) => tree.add(
       moves.split(' ').toList,
       Opening(code, name)

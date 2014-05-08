@@ -27,12 +27,12 @@ object OpeningExplorer {
 
     def set(o: Opening) = copy(opening = Some(o))
 
-    def render(margin: String = ""): String =
-      margin + toString + "\n" + (moves map {
-        case (m, b) => margin + m + b.render(margin + "  ")
-      } mkString "\n")
+    // def render(margin: String = ""): String =
+    //   margin + toString + "\n" + (moves map {
+    //     case (m, b) => margin + m + b.render(margin + "  ")
+    //   } mkString "\n")
 
-    override def toString = opening.fold("-") { o => o.code + ": " + o.name }
+    // override def toString = opening.fold("-") { o => s"${o.code} ${o.name}" }
   }
 
   def openingOf(moves: List[String]): Option[Opening] = {

@@ -4,9 +4,11 @@ object OpeningExplorer {
 
   type Move = String
 
-  case class Opening(code: String, name: String) {
+  case class Opening(code: String, name: String, size: Int) {
 
     def fullName = s"$code $name"
+
+    override def toString = s"$code $name ($size)"
   }
 
   case class Branch(
@@ -27,16 +29,15 @@ object OpeningExplorer {
 
     def set(o: Opening) = copy(opening = Some(o))
 
-    // def render(margin: String = ""): String =
-    //   margin + toString + "\n" + (moves map {
-    //     case (m, b) => margin + m + b.render(margin + "  ")
-    //   } mkString "\n")
+    def render(margin: String = ""): String =
+      margin + toString + "\n" + (moves map {
+        case (m, b) => margin + m + b.render(margin + " ")
+      } mkString "\n")
 
-    // override def toString = opening.fold("-") { o => s"${o.code} ${o.name}" }
+    override def toString = opening.fold("")(_.toString)
   }
 
   def openingOf(moves: List[String]): Option[Opening] = {
-
     def next(
       branch: Branch,
       moves: List[Move],
@@ -49,9 +50,8 @@ object OpeningExplorer {
   }
 
   val tree: Branch = Openings.db.foldLeft(Branch()) {
-    case (tree, (code, name, moves)) => tree.add(
-      moves.split(' ').toList,
-      Opening(code, name)
-    )
+    case (tree, (code, name, moves)) =>
+      val moveList = moves.split(' ').toList
+      tree.add(moveList, Opening(code, name, moveList.size))
   }
 }

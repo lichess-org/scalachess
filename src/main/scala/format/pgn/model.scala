@@ -8,10 +8,16 @@ case class Pgn(
     tags: List[Tag],
     turns: List[Turn]) {
 
-  def updateTurn(fullMove: Int, f: Turn => Turn) = fullMove - 1 |> { index =>
+  def updateTurn(fullMove: Int, f: Turn => Turn) = {
+    val index = fullMove - 1
     (turns lift index).fold(this) { turn =>
       copy(turns = turns.updated(index, f(turn)))
     }
+  }
+  def updatePly(ply: Int, f: Move => Move) = {
+    val fullMove = (ply + 1) / 2
+    val color = Color(ply % 2 == 1)
+    updateTurn(fullMove, _.update(color, f))
   }
 
   def moves = turns.flatMap { t =>
@@ -44,16 +50,16 @@ case class Turn(
 
   def plyOf(color: Color) = number * 2 - color.fold(1, 0)
 
-  override def toString = "%d.%s".format(
-    number,
-    (white, black) match {
-      case (Some(w), Some(b)) if w.isLong => " %s %d... %s".format(w, number, b)
-      case (Some(w), Some(b))             => " %s %s".format(w, b)
-      case (Some(w), None)                => " %s".format(w)
-      case (None, Some(b))                => ".. %s".format(b)
+  override def toString = {
+    val text = (white, black) match {
+      case (Some(w), Some(b)) if w.isLong => s" $w $number... $b"
+      case (Some(w), Some(b))             => s" $w $b"
+      case (Some(w), None)                => s" $w"
+      case (None, Some(b))                => s".. $b"
       case _                              => ""
     }
-  )
+    s"$number.$text"
+  }
 }
 
 object Turn {
@@ -74,6 +80,7 @@ case class Move(
     san: String,
     nag: Option[Int] = None,
     comment: Option[String] = None,
+    opening: Option[String] = None,
     variation: List[Turn] = Nil,
     // time left for the user who made the move, after he made it
     timeLeft: Option[Int] = None) {
@@ -85,13 +92,13 @@ case class Move(
   private def clockString: Option[String] =
     timeLeft.map(time => "[%clk " + timeString(time) + "]")
 
-  override def toString = "%s%s%s%s".format(
-    san,
-    nag.fold("") { code => Nag(code).fold(" $" + code)(_.symbol) },
-    (comment.isDefined || timeLeft.isDefined).fold(
-      List(clockString, comment).flatten.mkString(" { ", " ", " }"),
-      ""
-    ),
-    variation.isEmpty.fold("", variation.mkString(" (", " ", ")"))
-  )
+  override def toString = {
+    val nagSymbol = nag.fold("") { code => Nag(code).fold(" $" + code)(_.symbol) }
+    val commentOrTime =
+      if (comment.isDefined || timeLeft.isDefined || opening.isDefined)
+        List(clockString, opening, comment).flatten.mkString(" { ", " ", " }")
+      else ""
+    val variationString = if (variation.isEmpty) "" else variation.mkString(" (", " ", ")")
+    s"$san$nagSymbol$commentOrTime$variationString"
+  }
 }

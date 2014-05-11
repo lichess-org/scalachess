@@ -27,6 +27,7 @@ object Tag {
   case object FEN extends TagType
   case object Variant extends TagType
   case object ECO extends TagType
+  case object Opening extends TagType
   case class Unknown(n: String) extends TagType {
     override def toString = n
   }
@@ -42,6 +43,6 @@ object Tag {
     name = name(this),
     value = value.toString)
 
-  def tagType(name: String) = 
+  def tagType(name: String) =
     (tagTypesByLowercase get name.toLowerCase) | Unknown(name)
 }

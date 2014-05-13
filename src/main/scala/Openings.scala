@@ -1935,6 +1935,14 @@ object Openings {
     ("C25", "Vienna Game, Hamppe-Muzio Gambit", "e4 e5 Nc3 Nc6 f4 exf4 Nf3 g5 Bc4 g4 O-O"),
     ("C25", "Vienna Game, Pierce Gambit", "e4 e5 Nc3 Nc6 f4 exf4 Nf3 g5 d4 g4 Bc4"),
     ("C25", "Vienna Game, Steinitz Gambit", "e4 e5 Nc3 Nc6 f4 exf4 d4"),
-    ("A00", "Ware Opening, Ware Gambit", "a4 e5 a5 d5 e3 f5 a6")
+    ("A00", "Ware Opening, Ware Gambit", "a4 e5 a5 d5 e3 f5 a6"),
+    ("Z00", "Transvestite Attack, Courteous, Straight Variation", "e3 ** Ke2 ** Qe1 ** Kd1"),
+    ("Z00", "Transvestite Attack, Courteous, Gay Variation", "d3 ** Kd2 ** Qe1 ** Kd1"),
+    ("Z01", "Transvestite Attack, Discourteous, Straight Variation", "d3 ** Qd2 ** Kd1 ** Qe1"),
+    ("Z01", "Transvestite Attack, Discourteous, Gay Variation", "e3 ** Qe2 ** Kd1 ** Qe1"),
+    ("Z02", "Transvestite Defense, Courteous, Straight Variation", "e6 ** Ke7 ** Qe8 ** Kd8"),
+    ("Z02", "Transvestite Defense, Courteous, Gay Variation", "d6 ** Kd7 ** Qe8 ** Kd8"),
+    ("Z03", "Transvestite Defense, Discourteous, Straight Variation", "d6 ** Qd7 ** Kd8 ** Qe8"),
+    ("Z03", "Transvestite Defense, Discourteous, Gay Variation", "e6 ** Qe7 ** Kd8 ** Qe8")
   )
 }

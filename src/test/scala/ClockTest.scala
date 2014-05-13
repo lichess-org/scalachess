@@ -8,7 +8,7 @@ class ClockTest extends ChessTest {
 
   "play with a clock" should {
     val clock = Clock(5 * 60 * 1000, 0)
-    val game = makeGame withClock clock
+    val game = makeGame withClock clock.start
     "new game" in {
       game.clock must beSome.like {
         case c => c.color must_== White
@@ -36,12 +36,12 @@ class ClockTest extends ChessTest {
   "lag compensation" should {
     def durOf(lag: Float) = FiniteDuration((lag * 1000).toLong, MILLISECONDS)
     def clockStep(wait: Float, lag: Float): Double = {
-      val clock = Clock(60, 0).step()
+      val clock = Clock(60, 0).start.step()
       Thread sleep ((wait + lag) * 1000).toInt
       (clock step durOf(lag) remainingTime Black).toDouble
     }
     def clockStart(lag: Float): Double = {
-      val clock = Clock(60, 0).step()
+      val clock = Clock(60, 0).start.step()
       (clock step durOf(lag) remainingTime White).toDouble
     }
     val delta = 0.07
@@ -50,19 +50,19 @@ class ClockTest extends ChessTest {
       clockStep(0, 0) must beCloseTo(60, delta)
     }
     "premove, small lag" in {
-      clockStep(0, 0.2f) must beCloseTo(59.9, delta)
+      clockStep(0, 0.2f) must beCloseTo(60, delta)
     }
     "premove, big lag" in {
-      clockStep(0, 2f) must beCloseTo(58.7, delta)
+      clockStep(0, 2f) must beCloseTo(60, delta)
     }
     "1s move, no lag" in {
       clockStep(1f, 0) must beCloseTo(59, delta)
     }
     "1s move, small lag" in {
-      clockStep(1f, 0.2f) must beCloseTo(58.9, delta)
+      clockStep(1f, 0.2f) must beCloseTo(59, delta)
     }
     "1s move, big lag" in {
-      clockStep(1f, 2f) must beCloseTo(57.7, delta)
+      clockStep(1f, 2f) must beCloseTo(59, delta)
     }
     "start, no lag" in {
       clockStart(0) must beCloseTo(60, delta)

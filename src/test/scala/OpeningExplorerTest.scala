@@ -38,4 +38,12 @@ class OpeningExplorerTest extends ChessTest {
   g8 in {
     code(g8) must_== Some("B03")
   }
+  val transvestite1 = "d3 d5 Kd2 e6 Qe1 Qh4 Kd1 Nf6"
+  transvestite1 in {
+    name(transvestite1) must_== Some("Transvestite Attack, Courteous, Gay Variation")
+  }
+  val transvestite2 = "d6 ?? Qd7 ?? Kd8 ?? Qe8 ?? ?? ??"
+  transvestite2 in {
+    name(transvestite2) must_== Some("Transvestite Defense, Discourteous, Straight Variation")
+  }
 }

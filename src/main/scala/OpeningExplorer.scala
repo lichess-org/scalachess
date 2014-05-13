@@ -43,8 +43,10 @@ object OpeningExplorer {
       moves: List[Move],
       last: Option[Opening]): Option[Opening] =
       moves match {
-        case Nil     => branch.opening orElse last
-        case m :: ms => (branch get m).fold(last) { b => next(b, ms, b.opening orElse last) }
+        case Nil => branch.opening orElse last
+        case m :: ms => (branch get m).orElse(branch get "**").fold(last) { b =>
+          next(b, ms, b.opening orElse last)
+        }
       }
     next(tree, moves, none)
   }

@@ -3052,8 +3052,8 @@ object Openings {
     ("B21", "Sicilian Defense, Smith-Morra Gambit, Siberian Trap", "e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 e6 Bc4 Qc7 0-0 Nf6 Qe2 Ng4 h3 Nd4"),
     ("000", "Vienna Game, Würzburger Trap", "e4 e5 Nc3 Nf6 f4 d5 fxe5 Nxe4 d3 Qh4+ g3 Nxg3 Nf3 Qh5 Nxd5 Bg4 Nf4 Bxf3 Nxh5 Bxd1 hxg3 Bxc2 b3"),
     ("000", "Scholar's Mate", "e4 e5 Qh5 Nc6 Bc4 Nf6 Qxf7#"),
-    ("Z20", "Bong Cloud Attack", "** ** Ke2"),
-    ("Z20", "Bong Cloud Defense", "** ** ** Ke7"),
+    ("Z20", "Bongcloud Attack", "** ** Ke2"),
+    ("Z20", "Bongcloud Defense", "** ** ** Ke7"),
     ("Z20", "Zukertort Opening, Psyche Variation", "Nf3 ** Ng1 ** Nf3")
   )
 }

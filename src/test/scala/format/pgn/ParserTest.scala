@@ -114,9 +114,15 @@ class ParserTest extends ChessTest {
     }
   }
 
-  "Android device" in {
-    parser(android) must beSuccess.like {
-      case a => a.sans.size must_== 165
+  "chesskids iphone" in {
+    parser(chesskids) must beSuccess.like {
+      case a => a.sans.size must_== 135
     }
   }
+
+  // "Android device" in {
+  //   parser(android) must beSuccess.like {
+  //     case a => a.sans.size must_== 165
+  //   }
+  // }
 }

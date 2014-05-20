@@ -677,6 +677,18 @@ val android = """[Event "AI Factory's Chess"]
 26. a2xb3 Rf7g7 27. Qa6b5 Rd8d7 28. Ra1a8 Rg7f7 29. Qb5b4 Rf7f8 30. Ke1d1 Rf8f5
 31. Rh1e1 Rd7d8 32. e5xd6+ Ke7d7 33. Qb4a4+ Rf5b5 34. Qa4xb5+ c7c6 35. Qb5f5# 1-0"""
 
+val chesskids = """[Site "ChessKid iPhone"]
+[Date "04/29/2014 02:27PM"]
+[White "NicePlatypus"]
+[Black "Computer"]
+
+1. e4 e5 2. Nc3 Nc6 3. Nf3 Bc5 4. Bb5 d6 5. Bxc6+ bxc6 6. d4 exd4 7. Nxd4 Ne7 8. Be3 Bb4 9. a3 Bxc3+ 10. bxc3 c5 11. Nf3 f5 12. exf5 Bxf5
+13. 0-0 0-0 14. Bg5 c6 15. Rb1 Be4 16. Rb7 Re8 17. Re1 d5 18. Ne5 Qd6 19. f4 Qe6 20. Bxe7 Rxe7 21. Rxe7 Qxe7 22. Nxc6 Qe6 23. Ne5 Rf8 24. g3
+Rb8 25. c4 Rf8 26. cxd5 Qxd5 27. Qxd5+ Bxd5 28. Nd3 c4 29. Nb4 Bf7 30. c3 Re8 31. Rxe8+ Bxe8 32. Kf2 Kf7 33. Ke3 Bb5 34. Ke4 Bd7 35. Ke5 a5
+36. Nd5 Bc6 37. Nb6 Bb5 38. h4 Ba6 39. g4 h5 40. gxh5 a4 41. Kf5 Bb5 42. Kg5 Ke7 43. h6 gxh6+ 44. Kxh6 Kd6 45. f5 Kc5 46. f6 Be8 47. Nxa4+
+Kd5 48. Nb6+ Ke6 49. Kg7 Bh5 50. a4 Be8 51. a5 Bh5 52. a6 Ke5 53. f7 Bxf7 54. Kxf7 Ke4 55. a7 Kd3 56. a8Q Kxc3 57. Qa5+ Kd3 58. Qd5+ Ke2 59.
+h5 c3 60. Qc4+ Kd2 61. Na4 c2 62. Qc3+ Ke2 63. Qxc2+ Ke1 64. Kf6 Kf1 65. Kf5 Ke1 66. Kf4 Kf1 67. Kf3 Ke1 68. Qe2# 1-0"""
+
 val variations = """
 1. e4 d6 2. d4 c6  3. f4  Qc7 4. Nf3 h6 $6  5. Bd3 (  5. Bc4  e6) 5... Bg4 6. O-O Nd7  7. Nc3 a6 $6  8. Be3 e5 $2  9. fxe5 dxe5 10. d5 $1 ( 10. dxe5 $2 Nxe5 ) 10... c5 (10... cxd5 $6 11. Nxd5 ) ( 10... Ngf6 11. dxc6 ) 
 """

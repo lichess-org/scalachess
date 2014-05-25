@@ -19,6 +19,9 @@ case class Pgn(
     val color = Color(ply % 2 == 1)
     updateTurn(fullMove, _.update(color, f))
   }
+  def updateLastPly(f: Move => Move) = updatePly(nbPlies, f)
+
+  def nbPlies = turns.foldLeft(0)(_ + _.count)
 
   def moves = turns.flatMap { t =>
     List(t.white, t.black).flatten
@@ -49,6 +52,8 @@ case class Turn(
   def isEmpty = white.isEmpty && black.isEmpty
 
   def plyOf(color: Color) = number * 2 - color.fold(1, 0)
+
+  def count = List(white, black) count (_.isDefined)
 
   override def toString = {
     val text = (white, black) match {
@@ -81,6 +86,7 @@ case class Move(
     nag: Option[Int] = None,
     comment: Option[String] = None,
     opening: Option[String] = None,
+    result: Option[String] = None,
     variation: List[Turn] = Nil,
     // time left for the user who made the move, after he made it
     timeLeft: Option[Int] = None) {
@@ -95,8 +101,8 @@ case class Move(
   override def toString = {
     val nagSymbol = nag.fold("") { code => Nag(code).fold(" $" + code)(_.symbol) }
     val commentOrTime =
-      if (comment.isDefined || timeLeft.isDefined || opening.isDefined)
-        List(clockString, opening, comment).flatten.mkString(" { ", " ", " }")
+      if (comment.isDefined || timeLeft.isDefined || opening.isDefined || result.isDefined)
+        List(clockString, opening, result, comment).flatten.mkString(" { ", " ", " }")
       else ""
     val variationString = if (variation.isEmpty) "" else variation.mkString(" (", " ", ")")
     s"$san$nagSymbol$commentOrTime$variationString"

@@ -35,6 +35,13 @@ sealed trait Clock {
 
   def show = limitInMinutes.toString + " + " + increment.toString
 
+  def showTime(time: Float) = {
+    val hours = math.floor(time / 3600).toInt
+    val minutes = math.floor((time - hours * 3600) / 60).toInt
+    val seconds = time.toInt % 60
+    s"${if (hours > 0) hours else ""}:$minutes:$seconds"
+  }
+
   def isRunning = timerOption.isDefined
 
   def isInit = elapsedTime(White) == 0 && elapsedTime(Black) == 0

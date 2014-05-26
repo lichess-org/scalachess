@@ -33,7 +33,8 @@ sealed trait Clock {
 
   def giveTime(c: Color, t: Float): Clock
 
-  def show = limitInMinutes.toString + " + " + increment.toString
+  def show = s"$limitInMinutes + $increment"
+  def showCondensed = s"$limitInMinutes+$increment"
 
   def showTime(time: Float) = {
     val hours = math.floor(time / 3600).toInt

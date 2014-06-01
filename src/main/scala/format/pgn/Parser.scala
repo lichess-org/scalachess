@@ -49,7 +49,7 @@ object Parser
     def number: Parser[String] = """[1-9]\d*[\s\.]*""".r
 
     def moveExtras: Parser[Unit] = as("moveExtras") {
-      (annotation | nag | variation | commentary) ^^^ ()
+      (annotation | nag | variation | commentary).^^^(())
     }
 
     def annotation: Parser[String] =

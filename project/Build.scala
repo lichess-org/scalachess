@@ -7,22 +7,21 @@ trait Resolvers {
 }
 
 trait Dependencies {
-  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.4"
-  val specs2 = "org.specs2" %% "specs2" % "2.3.4" % "test"
-  val scalalib = "com.github.ornicar" %% "scalalib" % "4.19"
+  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
+  val specs2 = "org.specs2" %% "specs2" % "2.3.12" % "test"
+  val scalalib = "com.github.ornicar" %% "scalalib" % "5.0"
   val hasher = "com.roundeights" %% "hasher" % "1.0.0"
-  val jodaTime = "joda-time" % "joda-time" % "2.1"
-  val jodaConvert = "org.joda" % "joda-convert" % "1.2"
+  val jodaTime = "joda-time" % "joda-time" % "2.3"
 }
 
 object ApplicationBuild extends Build with Resolvers with Dependencies {
 
   private val buildSettings = Project.defaultSettings ++ Seq(
-    scalaVersion := "2.10.3",
+    scalaVersion := "2.11.1",
     organization := "org.lichess",
-    version := "3.6",
+    version := "4.0",
     resolvers := Seq(iliaz, sonatype, awesomepom),
-    libraryDependencies := Seq(scalaz, scalalib, hasher, jodaTime, jodaConvert, specs2),
+    libraryDependencies := Seq(scalaz, scalalib, hasher, jodaTime, specs2),
     incOptions := incOptions.value.withNameHashing(true),
     scalacOptions := Seq(
       "-deprecation",

@@ -95,7 +95,7 @@ object Parser
     val kCastle: Parser[Side] = ("O-O" | "o-o" | "0-0") ^^^ KingSide
 
     def standard: Parser[Std] = as("standard") {
-      (pawn | disambiguated | ambiguous) ~ suffixes ^^ {
+      (disambiguatedPawn | pawn | disambiguated | ambiguous) ~ suffixes ^^ {
         case std ~ suf => std withSuffixes suf
       }
     }
@@ -119,6 +119,14 @@ object Parser
       role ~ opt(file) ~ opt(rank) ~ x ~ dest ^^ {
         case ro ~ fi ~ ra ~ ca ~ de => Std(
           dest = de, role = ro, capture = ca, file = fi, rank = ra)
+      }
+    }
+
+    // d7d5
+    def disambiguatedPawn: Parser[Std] = as("disambiguated") {
+      opt(file) ~ opt(rank) ~ x ~ dest ^^ {
+        case fi ~ ra ~ ca ~ de => Std(
+          dest = de, role = Pawn, capture = ca, file = fi, rank = ra)
       }
     }
 

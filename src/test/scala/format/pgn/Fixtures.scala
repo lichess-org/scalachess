@@ -775,4 +775,19 @@ val handwritten = """
 69. Kf2		Kh2
 70. Rh7++
 1-0"""
+
+val chessByPost = """
+[Site "Chess By Post"]
+[Date "2014.2.23"]
+[White "paularsen"]
+[Black "colonel68"]
+[FinishedDate "2014.4.5"]
+[Result "1/2-1/2"]
+
+1. e2e4 c7c6 2. d2d4 d7d5 3. Nb1c3 d5xe4 4. Nc3xe4 Ng8f6 5. Ne4xf6+ g7xf6 6. c2c3 Bc8f5 7. Ng1f3 e7e6 8. g2g3 Bf8d6 9. Bf1g2 Nb8d7 10. O-O
+Qd8c7 11. Rf1e1 O-O-O 12. b2b4 Bf5g6 13. a2a3 f6f5 14. c3c4 Qc7b8 15. Ra1b1 f5f4 16. Rb1b3 f4xg3 17. f2xg3 c6c5 18. b4xc5 Nd7xc5 19. Rb3c3
+Nc5d3 20. Rc3xd3 Bg6xd3 21. Qd1xd3 Qb8c7 22. c4c5 Bd6e7 23. Nf3e5 Be7xc5 24. Bc1e3 Qc7xe5 25. d4xe5 Rd8xd3 26. Be3xc5 b7b6 27. Bg2f1 Rd3d5
+28. Bf1a6+ Kc8c7 29. Bc5d6+ Rd5xd6 30. e5xd6+ Kc7xd6 31. g3g4 h7h5 32. g4g5 h5h4 33. Kg1g2 Rh8g8 34. g5g6 Rg8xg6+ 35. Kg2h3 f7f5 36. Kh3xh4
+e6e5 37. Kh4h5 Rg6g7 38. Ba6c8 Rg7h7+ 39. Kh5g5 Rh7xh2 40. Bc8xf5 Rh2d2 41. Kg5f6 Rd2d5 42. Bf5e4 Rd5d4 43. Kf6f5 Rd4d2 44. Re1e3 Rd2d4 45.
+Re3d3 Rd4xd3 46. Be4xd3 Kd6d5 47. Bd3b5 Kd5c5 48. a3a4 Kc5b4 49. Kf5xe5 a7a6 50. Bb5xa6 Kb4xa4  1/2-1/2"""
 }

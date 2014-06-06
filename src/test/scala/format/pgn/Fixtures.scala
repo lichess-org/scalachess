@@ -692,4 +692,87 @@ h5 c3 60. Qc4+ Kd2 61. Na4 c2 62. Qc3+ Ke2 63. Qxc2+ Ke1 64. Kf6 Kf1 65. Kf5 Ke1
 val variations = """
 1. e4 d6 2. d4 c6  3. f4  Qc7 4. Nf3 h6 $6  5. Bd3 (  5. Bc4  e6) 5... Bg4 6. O-O Nd7  7. Nc3 a6 $6  8. Be3 e5 $2  9. fxe5 dxe5 10. d5 $1 ( 10. dxe5 $2 Nxe5 ) 10... c5 (10... cxd5 $6 11. Nxd5 ) ( 10... Ngf6 11. dxc6 ) 
 """
+
+val handwritten = """
+[Event "XEQUE-MATEmatica 2014"]
+[Site "Lisbon, Portugal POR"]
+[Date "2014.05.19"]
+[Round "2"]
+[White "Oliveira, Paulo"]
+[Black "Moreira, Simao"]
+[Result "1-0"]
+[Time "19:30:00"]
+[Mode "OTB"]
+
+1.  e4		e5
+2.  Nf3		Nc6
+3.  Bc4		Bc5
+4.  c3		Nf6
+5.  Ng5		O-O
+6.  Qf3		d6
+7.  h3		h6
+8.  Bxf7+	Rxf7
+9.  Nxf7	Kxf7
+10. d3		Qh8
+11. g4		Be6
+12. Rg1		d5
+13. Nd2		Be7
+14. h4		Ke8
+15. g5		hxg5
+16. hxg5	Nh5
+17. exd5	Bd7
+18. dxc6	Bxc6
+19. Ne4		Rd8
+20. g6		Bxe4
+21. Qxe4	Nf6
+22. Rh1		Qf8
+23. Qf5		Qg8
+24. b3		Rd7
+25. Bg5		Kd8
+26. c4		Kc8
+27. O-O-O	Qf8
+28. Qxe5	Ng4
+29. Bxe7	Rxe7
+30. Qd4		Nxf2
+31. Rdf1	Re2
+32. Qxa7	Qf4+
+33. Kb1		Qd2
+34. Rh8+	Kd7
+35. Qd4+	Ke7
+36. Qd8+	Ke6
+37. Re8+	Kf5
+38. Rxe2	Qxe2
+39. Qf8+	Kxg6
+40. Rxf2	Qxd3+
+41. Kb2		Qd4+
+42. Ka3		Qa7+
+43. Kb4		Qb6+
+44. Kc3		Qe3+
+45. Kc2		Qe4+
+46. Kd2		Qd4+
+47. Kc1		Qc3+
+48. Rc2		Qe3+
+49. Rd2		Qg1+
+50. Kc2		Qg4
+51. Qe8+	Kg5
+52. Rd5+	Kh6
+53. Qe3+	Kh7
+54. Qd3+	Kh6
+55. Rd4		Qg2+
+56. Qd2+	Qg5
+57. Qxg5+	Kxg5
+58. Rd7		Kh6
+59. Rxc7	g5
+60. Rxb7	g4
+61. Rd7		Kg5
+62. Kd3		g3
+63. Rg7+	Kh4
+64. Ke2		Kh3
+65. Kf3		Kh2
+66. Rxg3	Kh1
+67. Rg8		Kh2
+68. Rg7		Kh1
+69. Kf2		Kh2
+70. Rh7++
+1-0"""
 }

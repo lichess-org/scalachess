@@ -120,6 +120,12 @@ class ParserTest extends ChessTest {
     }
   }
 
+  "handwritten" in {
+    parser(handwritten) must beSuccess.like {
+      case a => a.sans.size must_== 139
+    }
+  }
+
   // "Android device" in {
   //   parser(android) must beSuccess.like {
   //     case a => a.sans.size must_== 165

@@ -122,15 +122,15 @@ object Parser
       }
     }
 
-    def suffixes: Parser[Suffixes] = opt(promotion) ~ check ~ checkmate ^^ {
-      case p ~ c ~ cm => Suffixes(c, cm, p)
+    def suffixes: Parser[Suffixes] = opt(promotion) ~ checkmate ~ check ^^ {
+      case p ~ cm ~ c => Suffixes(c, cm, p)
     }
 
     val x = exists("x")
 
     val check = exists("+")
 
-    val checkmate = exists("#")
+    val checkmate = ("#" | "++") ^^^ true | success(false)
 
     val role = mapParser(Role.allByPgn, "role") | success(Pawn)
 

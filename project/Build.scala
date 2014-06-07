@@ -4,6 +4,7 @@ trait Resolvers {
   val iliaz = "iliaz.com" at "http://scala.iliaz.com/"
   val sonatype = "sonatype" at "http://oss.sonatype.org/content/repositories/releases"
   val awesomepom = "awesomepom" at "https://raw.github.com/jibs/maven-repo-scala/master"
+  val roundeights = "RoundEights" at "http://maven.spikemark.net/roundeights"
 }
 
 trait Dependencies {
@@ -20,7 +21,7 @@ object ApplicationBuild extends Build with Resolvers with Dependencies {
     scalaVersion := "2.11.1",
     organization := "org.lichess",
     version := "4.0",
-    resolvers := Seq(iliaz, sonatype, awesomepom),
+    resolvers := Seq(iliaz, sonatype, awesomepom, roundeights),
     libraryDependencies := Seq(scalaz, scalalib, hasher, jodaTime, specs2),
     incOptions := incOptions.value.withNameHashing(true),
     scalacOptions := Seq(

@@ -8,7 +8,7 @@ Clone scalachess
 
     git clone git://github.com/ornicar/scalachess
 
-Get latest sbt (0.11.3) on http://www.scala-sbt.org/download.html
+Get latest sbt on http://www.scala-sbt.org/download.html
 
 Start sbt in scalachess directory
 

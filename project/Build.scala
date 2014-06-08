@@ -11,7 +11,6 @@ trait Dependencies {
   val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
   val specs2 = "org.specs2" %% "specs2" % "2.3.12" % "test"
   val scalalib = "com.github.ornicar" %% "scalalib" % "5.0"
-  val hasher = "com.roundeights" %% "hasher" % "1.0.0"
   val jodaTime = "joda-time" % "joda-time" % "2.3"
 }
 
@@ -21,8 +20,8 @@ object ApplicationBuild extends Build with Resolvers with Dependencies {
     scalaVersion := "2.11.1",
     organization := "org.lichess",
     version := "4.0",
-    resolvers := Seq(iliaz, sonatype, awesomepom, roundeights),
-    libraryDependencies := Seq(scalaz, scalalib, hasher, jodaTime, specs2),
+    resolvers := Seq(iliaz, sonatype, awesomepom),
+    libraryDependencies := Seq(scalaz, scalalib, jodaTime, specs2),
     incOptions := incOptions.value.withNameHashing(true),
     scalacOptions := Seq(
       "-deprecation",

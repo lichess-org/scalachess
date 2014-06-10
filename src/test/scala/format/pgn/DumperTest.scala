@@ -23,6 +23,7 @@ class DumperTest extends ChessTest {
       }
     }
   }
+
   "dump a promotion move" should {
     "without check" in {
       val game = Game("""
@@ -86,6 +87,85 @@ R   K  R
       }
     }
   }
+
+  "ambiguous moves" should {
+    "ambiguous file only" in {
+      val game = Game("""
+k
+
+
+
+
+
+P   K  P
+R      R
+""")
+      game.playMoves(H1 -> B1) map (_.pgnMoves) must beSuccess.like {
+        case ms => ms must_== List("Rhb1")
+      }
+    }
+    "ambiguous rank only" in {
+      val game = Game("""
+k
+
+
+ N
+
+
+    K  P
+ N
+""")
+      game.playMoves(B5 -> C3) map (_.pgnMoves) must beSuccess.like {
+        case ms => ms must_== List("N5c3")
+      }
+    }
+    "ambiguous file and rank" in {
+      val game = Game("""
+
+
+  QQ
+  Q
+
+
+    K
+k
+""")
+      game.playMoves(C6 -> D5) map (_.pgnMoves) must beSuccess.like {
+        case ms => ms must_== List("Qc6d5")
+      }
+    }
+    "unambiguous file" in {
+      val game = Game("""
+k
+
+
+
+
+
+P      P
+R   K  R
+""")
+      game.playMoves(H1 -> F1) map (_.pgnMoves) must beSuccess.like {
+        case ms => ms must_== List("Rf1")
+      }
+    }
+    "unambiguous rank" in {
+      val game = Game("""
+k
+
+   KRq
+
+    R
+
+
+
+""")
+      game.playMoves(E4 -> E5) map (_.pgnMoves) must beSuccess.like {
+        case ms => ms must_== List("Re5")
+      }
+    }
+  }
+
   "chess960" should {
     "castle queenside as white" in {
       Game(makeBoard("""

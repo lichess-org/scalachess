@@ -16,7 +16,7 @@ class OpeningExplorerTest extends ChessTest {
   }
   val g3 = "e4 e5"
   g3 in {
-    name(g3) must_== Some("Sicilian Defense, General")
+    name(g3) must_== Some("King Pawn Game, General")
   }
   val g4 = "e4 e5 b3 Nc6"
   g4 in {

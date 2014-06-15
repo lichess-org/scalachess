@@ -40,7 +40,7 @@ object Parser
       }
     }
 
-    val moveRegex = """(0\-0|0\-0\-0|[QKRBNOoa-h][QKRBNa-h1-8xOo\-=\+\#]{1,6})""".r
+    val moveRegex = """(0\-0\-0|0\-0|[QKRBNOoa-h][QKRBNa-h1-8xOo\-=\+\#]{1,6})""".r
 
     def move: Parser[String] = as("move") {
       ((number | commentary)*) ~> moveRegex <~ (moveExtras*)

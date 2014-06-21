@@ -23,14 +23,15 @@ object Status {
   case object Draw extends Status(34)
   case object Outoftime extends Status(35) // clock flag
   case object Cheat extends Status(36)
+  case object NoStart extends Status(37) // the player did not make the first move in time
 
-  val all = List(Created, Started, Aborted, Mate, Resign, Stalemate, Timeout, Draw, Outoftime, Cheat)
+  val all = List(Created, Started, Aborted, Mate, Resign, Stalemate, Timeout, Draw, Outoftime, Cheat, NoStart)
 
   val finishedNotCheated = all filter { s =>
     s.id >= Mate.id && s.id < Cheat.id
   }
 
-  val finishedWithWinner = List(Mate, Resign, Timeout, Outoftime, Cheat)
+  val finishedWithWinner = List(Mate, Resign, Timeout, Outoftime, Cheat, NoStart)
 
   val byId = all map { v => (v.id, v) } toMap
 

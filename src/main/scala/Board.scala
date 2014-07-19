@@ -110,14 +110,6 @@ case class Board(
 
   def autoDraw: Boolean = history.fiftyMoves|| InsufficientMatingMaterial(this)
 
-  def positionHash: PositionHash = {
-    import java.security.MessageDigest
-    val hashInput  = actors.values.map(_.hash).mkString
-    val mdInstance = MessageDigest.getInstance("MD5")
-    val hashBytes  = mdInstance.digest(hashInput.getBytes("UTF-8"))
-    hashBytes take Board.positionHashSize
-  }
-
   def situationOf(color: Color) = Situation(this, color)
 
   def visual = Visual >> this
@@ -132,8 +124,6 @@ case class Board(
 }
 
 object Board {
-
-  val positionHashSize = 2
 
   import Pos._
 

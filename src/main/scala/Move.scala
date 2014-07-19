@@ -24,7 +24,7 @@ case class Move(
     val h2 = h1.copy(
       positionHashes =
         if ((piece is Pawn) || captures || promotes || castles) Array()
-        else h1 positionHashesWith after.positionHash,
+        else h1 positionHashesWith Hash(after.actors.values, piece.color),
       lastMove = Some(orig, dest)
     )
     // my broken castles

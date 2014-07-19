@@ -70,8 +70,6 @@ case class Actor(
   def is(c: Color) = c == piece.color
   def is(p: Piece) = p == piece
 
-  def hash: String = piece.forsyth + pos.key
-
   // critical function. optimize for performance
   private def kingSafety(ms: List[Move]): List[Move] = {
     val filter: Piece => Boolean =

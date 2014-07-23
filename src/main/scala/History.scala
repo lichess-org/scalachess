@@ -22,9 +22,9 @@ case class History(
   def threefoldRepetition: Boolean = halfMoveClock > 6 && {
     val positions = (positionHashes grouped Hash.size).toList
     positions.headOption match {
-      case Some(Array(x, y)) => (positions count {
-        case Array(x2, y2) => x == x2 && y == y2
-        case _             => false
+      case Some(Array(x, y, z)) => (positions count {
+        case Array(x2, y2, z2) => x == x2 && y == y2 && z == z2
+        case _                 => false
       }) >= 3
       case _ => false
     }

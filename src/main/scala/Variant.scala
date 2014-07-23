@@ -68,14 +68,14 @@ object Variant {
 
   case object Center extends Variant(id = 4) {
 
-    val pieces = Standard.pieces
+    def pieces = Standard.pieces
 
     private val center = Set(Pos.D4, Pos.D5, Pos.E4, Pos.E5)
 
     override def specialEnd(board: Board) = board.kingPos.values exists center.contains
   }
 
-  val all = List(Standard, Chess960, FromPosition)
+  val all = List(Standard, Chess960, FromPosition, Center)
   val byId = all map { v => (v.id, v) } toMap
   val byName = all map { v => (v.name, v) } toMap
 

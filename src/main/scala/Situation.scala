@@ -22,7 +22,9 @@ case class Situation(board: Board, color: Color) {
 
   def threefoldRepetition: Boolean = board.history.threefoldRepetition
 
-  def end: Boolean = checkMate || staleMate || autoDraw || board.variant.specialEnd(board)
+  def variantEnd = board.variant specialEnd board
+
+  def end: Boolean = checkMate || staleMate || autoDraw || variantEnd
 
   def playable(strict: Boolean): Boolean =
     (board valid strict) && !end && !copy(color = !color).check
@@ -31,6 +33,7 @@ case class Situation(board: Board, color: Color) {
     if (checkMate) Status.Mate.some
     else if (staleMate) Status.Stalemate.some
     else if (autoDraw) Status.Draw.some
+    else if (variantEnd) Status.VariantEnd.some
     else none
 
   def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Valid[Move] = for {

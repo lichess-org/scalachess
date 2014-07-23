@@ -5,7 +5,7 @@ import Pos._
 class HistoryTest extends ChessTest {
 
   "threefold repetition" should {
-    def toHash(a: Int) = Array(a.toByte, 0.toByte)
+    def toHash(a: Int) = Array(a.toByte, 0.toByte, 0.toByte)
     def makeHistory(positions: List[Int]) = (positions map toHash).foldLeft(History()) {
       case (history, hash) => history.copy(positionHashes = history.positionHashesWith(hash))
     }

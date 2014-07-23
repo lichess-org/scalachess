@@ -22,9 +22,9 @@ case class Situation(board: Board, color: Color) {
 
   def threefoldRepetition: Boolean = board.history.threefoldRepetition
 
-  def end: Boolean = checkMate || staleMate || autoDraw
+  def end: Boolean = checkMate || staleMate || autoDraw || board.variant.specialEnd(board)
 
-  def playable(strict: Boolean): Boolean = 
+  def playable(strict: Boolean): Boolean =
     (board valid strict) && !end && !copy(color = !color).check
 
   def status: Option[Status] =

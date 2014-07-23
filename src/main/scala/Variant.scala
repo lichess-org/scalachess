@@ -14,6 +14,8 @@ sealed abstract class Variant(val id: Int) {
   def exotic = !standard
 
   def pieces: Map[Pos, Piece]
+
+  def specialEnd(board: Board) = false
 }
 
 object Variant {
@@ -62,6 +64,15 @@ object Variant {
     def pieces = Map.empty
 
     override def toString = "From position"
+  }
+
+  case object Center extends Variant(id = 4) {
+
+    val pieces = Standard.pieces
+
+    private val center = Set(Pos.D4, Pos.D5, Pos.E4, Pos.E5)
+
+    override def specialEnd(board: Board) = board.kingPos.values exists center.contains
   }
 
   val all = List(Standard, Chess960, FromPosition)

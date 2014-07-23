@@ -20,4 +20,30 @@ class VariantTest extends ChessTest {
       Chess960.pieces must havePair(A2 -> (White - Pawn))
     }
   }
+
+  "center" should {
+    "detect win" in {
+      "not" in {
+        Game("""
+PPk
+K
+""".centerChess, White).situation.end must beFalse
+      }
+      "regular checkMate" in {
+        Game("""
+PP
+K  r
+""".centerChess, White).situation.end must beTrue
+        "centered white king" in {
+          val sit = Game("""
+   k
+
+PP
+   K
+""".centerChess, White).situation
+          sit.end must beTrue
+        }
+      }
+    }
+  }
 }

@@ -108,7 +108,9 @@ case class Board(
   def count(p: Piece): Int = pieces.values count (_ == p)
   def count(c: Color): Int = pieces.values count (_.color == c)
 
-  def autoDraw: Boolean = history.fiftyMoves|| InsufficientMatingMaterial(this)
+  def autoDraw: Boolean = history.fiftyMoves || {
+    variant.drawsOnInsufficientMaterial && InsufficientMatingMaterial(this)
+  }
 
   def situationOf(color: Color) = Situation(this, color)
 

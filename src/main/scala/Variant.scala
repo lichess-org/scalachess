@@ -16,6 +16,8 @@ sealed abstract class Variant(val id: Int) {
   def pieces: Map[Pos, Piece]
 
   def specialEnd(board: Board) = false
+
+  def drawsOnInsufficientMaterial = true
 }
 
 object Variant {
@@ -73,6 +75,8 @@ object Variant {
     private val center = Set(Pos.D4, Pos.D5, Pos.E4, Pos.E5)
 
     override def specialEnd(board: Board) = board.kingPos.values exists center.contains
+
+    override def drawsOnInsufficientMaterial = false
   }
 
   val all = List(Standard, Chess960, FromPosition, Center)

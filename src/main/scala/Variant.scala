@@ -4,9 +4,7 @@ import scala.util.Random
 
 import Pos.posAt
 
-sealed abstract class Variant(val id: Int) {
-
-  lazy val name = toString.toLowerCase
+sealed abstract class Variant(val id: Int, val name: String) {
 
   def standard = this == Variant.Standard
   def chess960 = this == Variant.Chess960
@@ -23,14 +21,14 @@ sealed abstract class Variant(val id: Int) {
 
 object Variant {
 
-  case object Standard extends Variant(id = 1) {
+  case object Standard extends Variant(id = 1, name = "Standard") {
 
     val pieces = symmetricRank(
       IndexedSeq(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
     )
   }
 
-  case object Chess960 extends Variant(id = 2) {
+  case object Chess960 extends Variant(id = 2, name = "Chess 960") {
 
     def pieces = symmetricRank {
       val size = 8
@@ -62,14 +60,14 @@ object Variant {
     }
   }
 
-  case object FromPosition extends Variant(id = 3) {
+  case object FromPosition extends Variant(id = 3, name = "From Position") {
 
     def pieces = Map.empty
 
     override def toString = "From position"
   }
 
-  case object KingOfTheHill extends Variant(id = 4) {
+  case object KingOfTheHill extends Variant(id = 4, name = "King Of The Hill") {
 
     def pieces = Standard.pieces
 
@@ -82,14 +80,14 @@ object Variant {
 
   val all = List(Standard, Chess960, FromPosition, KingOfTheHill)
   val byId = all map { v => (v.id, v) } toMap
-  val byName = all map { v => (v.name, v) } toMap
 
   val default = Standard
 
   def apply(id: Int): Option[Variant] = byId get id
   def orDefault(id: Int): Variant = apply(id) | default
 
-  def apply(name: String): Option[Variant] = byName get name.toLowerCase
+  def byName(name: String): Option[Variant] =
+    all find (_.name.toLowerCase == name.toLowerCase)
 
   def exists(id: Int): Boolean = byId contains id
 

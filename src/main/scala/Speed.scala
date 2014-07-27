@@ -1,19 +1,17 @@
 package chess
 
 sealed abstract class Speed(
-    val id: Int,
-    val range: Range,
-    val name: String) {
-
-  def shortName = toString.toLowerCase
-}
+  val id: Int,
+  val range: Range,
+  val shortName: String,
+  val name: String)
 
 object Speed {
 
-  case object Bullet extends Speed(1, 0 to 179, "Less than 3 minutes")
-  case object Blitz extends Speed(2, 180 to 479, "3 to 8 minutes")
-  case object Slow extends Speed(3, 480 to 1199, "8 to 20 minutes")
-  case object Unlimited extends Speed(4, 1200 to Int.MaxValue, "No clock")
+  case object Bullet extends Speed(1, 0 to 179, "Bullet", "Less than 3 minutes")
+  case object Blitz extends Speed(2, 180 to 479, "Blitz", "3 to 8 minutes")
+  case object Slow extends Speed(3, 480 to 1199, "Classical", "8 to 20 minutes")
+  case object Unlimited extends Speed(4, 1200 to Int.MaxValue, "Unlimited", "No clock")
 
   val all = List(Bullet, Blitz, Slow, Unlimited)
   val byId = all map { v => (v.id, v) } toMap

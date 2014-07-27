@@ -10,6 +10,7 @@ sealed abstract class Variant(val id: Int) {
 
   def standard = this == Variant.Standard
   def chess960 = this == Variant.Chess960
+  def kingOfTheHill = this == Variant.KingOfTheHill
 
   def exotic = !standard
 
@@ -68,7 +69,7 @@ object Variant {
     override def toString = "From position"
   }
 
-  case object Center extends Variant(id = 4) {
+  case object KingOfTheHill extends Variant(id = 4) {
 
     def pieces = Standard.pieces
 
@@ -79,7 +80,7 @@ object Variant {
     override def drawsOnInsufficientMaterial = false
   }
 
-  val all = List(Standard, Chess960, FromPosition, Center)
+  val all = List(Standard, Chess960, FromPosition, KingOfTheHill)
   val byId = all map { v => (v.id, v) } toMap
   val byName = all map { v => (v.name, v) } toMap
 

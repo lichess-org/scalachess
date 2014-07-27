@@ -16,7 +16,7 @@ trait ChessTest
 
     def chess960: Board = makeBoard(str, Variant.Chess960)
 
-    def centerChess: Board = makeBoard(str, Variant.Center)
+    def centerChess: Board = makeBoard(str, Variant.KingOfTheHill)
   }
 
   implicit def stringToSituationBuilder(str: String) = new {

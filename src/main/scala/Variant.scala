@@ -67,7 +67,7 @@ object Variant {
     override def toString = "From position"
   }
 
-  case object KingOfTheHill extends Variant(id = 4, name = "King Of The Hill") {
+  case object KingOfTheHill extends Variant(id = 4, name = "King of the Hill") {
 
     def pieces = Standard.pieces
 

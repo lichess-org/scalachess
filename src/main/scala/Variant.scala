@@ -9,28 +9,30 @@ sealed abstract class Variant(val id: Int, val name: String) {
   def standard = this == Variant.Standard
   def chess960 = this == Variant.Chess960
   def kingOfTheHill = this == Variant.KingOfTheHill
+  def threeCheck = this == Variant.ThreeCheck
 
   def exotic = !standard
 
-  def pieces: Map[Pos, Piece]
+  def pieces: Map[Pos, Piece] = Variant.symmetricRank(
+    IndexedSeq(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
+  )
 
-  def specialEnd(board: Board) = false
+  def specialEnd(situation: Situation) = false
 
   def drawsOnInsufficientMaterial = true
+
+  def finalizeMove(board: Board): Board = board
+
+  override def toString = name
 }
 
 object Variant {
 
-  case object Standard extends Variant(id = 1, name = "Standard") {
+  case object Standard extends Variant(id = 1, name = "Standard")
 
-    val pieces = symmetricRank(
-      IndexedSeq(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
-    )
-  }
+  case object Chess960 extends Variant(id = 2, name = "Chess960") {
 
-  case object Chess960 extends Variant(id = 2, name = "Chess 960") {
-
-    def pieces = symmetricRank {
+    override def pieces = symmetricRank {
       val size = 8
       type Rank = IndexedSeq[Option[Role]]
       def ?(max: Int) = Random nextInt max
@@ -60,25 +62,31 @@ object Variant {
     }
   }
 
-  case object FromPosition extends Variant(id = 3, name = "From Position") {
-
-    def pieces = Map.empty
-
-    override def toString = "From position"
-  }
+  case object FromPosition extends Variant(id = 3, name = "From Position")
 
   case object KingOfTheHill extends Variant(id = 4, name = "King of the Hill") {
 
-    def pieces = Standard.pieces
-
     private val center = Set(Pos.D4, Pos.D5, Pos.E4, Pos.E5)
 
-    override def specialEnd(board: Board) = board.kingPos.values exists center.contains
+    override def specialEnd(situation: Situation) =
+      situation.board.kingPosOf(!situation.color) exists center.contains
 
     override def drawsOnInsufficientMaterial = false
   }
 
-  val all = List(Standard, Chess960, FromPosition, KingOfTheHill)
+  case object ThreeCheck extends Variant(id = 5, name = "Three-check") {
+
+    override def finalizeMove(board: Board) = board updateHistory {
+      _.withCheck(Color.White, board.checkWhite).withCheck(Color.Black, board.checkBlack)
+    }
+
+    override def specialEnd(situation: Situation) = situation.check && {
+      val checks = situation.board.history.checkCount
+      situation.color.fold(checks.white, checks.black) >= 3
+    }
+  }
+
+  val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck)
   val byId = all map { v => (v.id, v) } toMap
 
   val default = Standard

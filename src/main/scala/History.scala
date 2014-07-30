@@ -2,10 +2,20 @@ package chess
 
 import Pos.posAt
 
+case class CheckCount(white: Int = 0, black: Int = 0) {
+
+  def add(color: Color) = copy(
+    white = white + color.fold(1, 0),
+    black = black + color.fold(0, 1))
+
+  def nonEmpty = white > 0 || black > 0
+}
+
 case class History(
     lastMove: Option[(Pos, Pos)] = None,
     positionHashes: PositionHash = Array(),
-    castles: Castles = Castles.all) {
+    castles: Castles = Castles.all,
+    checkCount: CheckCount = CheckCount(0, 0)) {
 
   def lastMoveString: Option[String] = lastMove map {
     case (p1, p2) => p1.toString + p2.toString
@@ -49,6 +59,9 @@ case class History(
   def withLastMove(orig: Pos, dest: Pos) = copy(
     lastMove = Some((orig, dest))
   )
+
+  def withCheck(color: Color, v: Boolean) =
+    if (v) copy(checkCount = checkCount add color) else this
 }
 
 object History {

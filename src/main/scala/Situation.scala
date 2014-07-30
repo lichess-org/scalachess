@@ -22,7 +22,7 @@ case class Situation(board: Board, color: Color) {
 
   def threefoldRepetition: Boolean = board.history.threefoldRepetition
 
-  def variantEnd = board.variant specialEnd board
+  def variantEnd = board.variant specialEnd this
 
   def end: Boolean = checkMate || staleMate || autoDraw || variantEnd
 

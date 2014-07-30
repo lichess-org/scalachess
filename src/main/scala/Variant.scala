@@ -4,7 +4,7 @@ import scala.util.Random
 
 import Pos.posAt
 
-sealed abstract class Variant(val id: Int, val name: String) {
+sealed abstract class Variant(val id: Int, val key: String, val name: String) {
 
   def standard = this == Variant.Standard
   def chess960 = this == Variant.Chess960
@@ -28,9 +28,9 @@ sealed abstract class Variant(val id: Int, val name: String) {
 
 object Variant {
 
-  case object Standard extends Variant(id = 1, name = "Standard")
+  case object Standard extends Variant(id = 1, key = "standard", name = "Standard")
 
-  case object Chess960 extends Variant(id = 2, name = "Chess960") {
+  case object Chess960 extends Variant(id = 2, key = "chess960", name = "Chess960") {
 
     override def pieces = symmetricRank {
       val size = 8
@@ -62,9 +62,9 @@ object Variant {
     }
   }
 
-  case object FromPosition extends Variant(id = 3, name = "From Position")
+  case object FromPosition extends Variant(id = 3, key = "fromPosition", name = "From Position")
 
-  case object KingOfTheHill extends Variant(id = 4, name = "King of the Hill") {
+  case object KingOfTheHill extends Variant(id = 4, key = "kingOfTheHill", name = "King of the Hill") {
 
     private val center = Set(Pos.D4, Pos.D5, Pos.E4, Pos.E5)
 
@@ -74,7 +74,7 @@ object Variant {
     override def drawsOnInsufficientMaterial = false
   }
 
-  case object ThreeCheck extends Variant(id = 5, name = "Three-check") {
+  case object ThreeCheck extends Variant(id = 5, key = "threeCheck", name = "Three-check") {
 
     override def finalizeMove(board: Board) = board updateHistory {
       _.withCheck(Color.White, board.checkWhite).withCheck(Color.Black, board.checkBlack)

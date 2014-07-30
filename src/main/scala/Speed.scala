@@ -1,10 +1,13 @@
 package chess
 
 sealed abstract class Speed(
-  val id: Int,
-  val range: Range,
-  val shortName: String,
-  val name: String)
+    val id: Int,
+    val range: Range,
+    val shortName: String,
+    val name: String) {
+
+  lazy val key = toString.toLowerCase
+}
 
 object Speed {
 

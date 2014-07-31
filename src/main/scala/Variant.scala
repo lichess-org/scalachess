@@ -4,7 +4,12 @@ import scala.util.Random
 
 import Pos.posAt
 
-sealed abstract class Variant(val id: Int, val key: String, val name: String, val shortName: String) {
+sealed abstract class Variant(
+    val id: Int,
+    val key: String,
+    val name: String,
+    val shortName: String,
+    val title: String) {
 
   def standard = this == Variant.Standard
   def chess960 = this == Variant.Chess960
@@ -32,13 +37,15 @@ object Variant {
     id = 1,
     key = "standard",
     name = "Standard",
-    shortName = "STD")
+    shortName = "STD",
+    title = "Standard rules of chess (FIDE)")
 
   case object Chess960 extends Variant(
     id = 2,
     key = "chess960",
     name = "Chess960",
-    shortName = "960") {
+    shortName = "960",
+    title = "Starting position of the home rank pieces is randomized") {
 
     override def pieces = symmetricRank {
       val size = 8
@@ -74,13 +81,15 @@ object Variant {
     id = 3,
     key = "fromPosition",
     name = "From Position",
-    shortName = "FEN")
+    shortName = "FEN",
+    title = "Custom starting position")
 
   case object KingOfTheHill extends Variant(
     id = 4,
     key = "kingOfTheHill",
     name = "King of the Hill",
-    shortName = "KotH") {
+    shortName = "KotH",
+    title = "Bring your king to the center to win the game") {
 
     private val center = Set(Pos.D4, Pos.D5, Pos.E4, Pos.E5)
 
@@ -94,7 +103,8 @@ object Variant {
     id = 5,
     key = "threeCheck",
     name = "Three-check",
-    shortName = "3+") {
+    shortName = "3+",
+    title = "Check your opponent 3 times to win the game") {
 
     override def finalizeMove(board: Board) = board updateHistory {
       _.withCheck(Color.White, board.checkWhite).withCheck(Color.Black, board.checkBlack)

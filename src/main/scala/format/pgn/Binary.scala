@@ -32,20 +32,22 @@ object Binary {
 
     import Encoding._
 
-    def moves(bs: List[Byte]): List[String] = intMoves(bs map toInt, 0, none)
-    def moves(bs: List[Byte], nb: Int): List[String] = intMoves(bs map toInt, 0, nb.some)
+    private val maxPlies = 600
 
-    def intMoves(bs: List[Int], count: Int, max: Option[Int]): List[String] = bs match {
-      case _ if max.fold(false)(_ <= count) => Nil
+    def moves(bs: List[Byte]): List[String] = moves(bs, maxPlies)
+    def moves(bs: List[Byte], nb: Int): List[String] = intMoves(bs map toInt, nb)
+
+    def intMoves(bs: List[Int], pliesToGo: Int): List[String] = bs match {
+      case _ if pliesToGo <= 0 => Nil
       case Nil                              => Nil
       case b1 :: rest if moveType(b1) == MoveType.SimplePawn =>
-        simplePawn(b1) :: intMoves(rest, count + 1, max)
+        simplePawn(b1) :: intMoves(rest, pliesToGo - 1)
       case b1 :: b2 :: rest if moveType(b1) == MoveType.SimplePiece =>
-        simplePiece(b1, b2) :: intMoves(rest, count + 1, max)
+        simplePiece(b1, b2) :: intMoves(rest, pliesToGo - 1)
       case b1 :: b2 :: rest if moveType(b1) == MoveType.FullPawn =>
-        fullPawn(b1, b2) :: intMoves(rest, count + 1, max)
+        fullPawn(b1, b2) :: intMoves(rest, pliesToGo - 1)
       case b1 :: b2 :: b3 :: rest if moveType(b1) == MoveType.FullPiece =>
-        fullPiece(b1, b2, b3) :: intMoves(rest, count + 1, max)
+        fullPiece(b1, b2, b3) :: intMoves(rest, pliesToGo - 1)
       case x => !!(x map showByte mkString ",")
     }
 

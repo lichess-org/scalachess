@@ -6,10 +6,8 @@ object Hash {
 
   private[chess] val size = 3
 
-  private val hasher = MessageDigest getInstance "MD5"
-
   private def apply(str: String): PositionHash =
-    hasher.digest(str getBytes "UTF-8") take size
+    MessageDigest getInstance "MD5" digest (str getBytes "UTF-8") take size
 
   def apply(actors: Iterable[Actor], color: Color): PositionHash = apply {
     actors.map { a =>

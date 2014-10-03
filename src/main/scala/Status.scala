@@ -6,6 +6,8 @@ sealed abstract class Status(val id: Int) extends Ordered[Status] {
 
   def name = toString
 
+  lazy val lowerName = name.head.toLower + name.tail
+
   def is(s: Status): Boolean = this == s
 
   def is(f: Status.type => Status): Boolean = is(f(Status))

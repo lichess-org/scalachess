@@ -2,11 +2,9 @@ package chess
 
 sealed abstract class Status(val id: Int) extends Ordered[Status] {
 
+  val name = toString.head.toLower + toString.tail
+
   def compare(other: Status) = id compare other.id
-
-  def name = toString
-
-  lazy val lowerName = name.head.toLower + name.tail
 
   def is(s: Status): Boolean = this == s
 

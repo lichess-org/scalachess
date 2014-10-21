@@ -561,7 +561,7 @@ object Openings {
     ("A48", "Indian Game, Colle System, King's Indian Variation", "d4 Nf6 Nf3 g6 e3 Bg7 Bd3 d6"),
     ("A46", "Indian Game, Czech-Indian", "d4 Nf6 Nf3 c6"),
     ("E10", "Indian Game, Dzindzi-Indian Defense", "d4 Nf6 c4 e6 Nf3 a6"),
-    ("E00", "Indian Game, East Indian Defense", "d4 Nf6 c4 e6"),
+    ("E00", "Indian Game, East Indian Defense", "d4 Nf6 c4 g6"),
     ("A45", "Indian Game, General", "d4 Nf6"),
     ("E61", "Indian Game, Kingside Fianchetto", "d4 Nf6 c4 g6"),
     ("A46", "Indian Game, Knights Variation, General", "d4 Nf6 Nf3"),

@@ -1778,7 +1778,7 @@ object Openings {
     ("A00", "Van Geet Opening, Grünfeld Defense", "Nc3 d5 e4 dxe4 Nxe4 e5"),
     ("A00", "Van Geet Opening, Napoleon Attack", "Nc3 e5 Nf3 Nc6 d4"),
     ("A00", "Van Geet Opening, Sicilian Two Knights", "Nc3 c5 Nf3 Nc6 d4 cxd4 Nxd4"),
-    ("A00", "Van't Kruijs Opening, General", "e3"),
+    ("A00", "Van 't Kruijs Opening, General", "e3"),
     ("C25", "Vienna Game, Anderssen Defense", "e4 e5 Nc3 Bc5"),
     ("C26", "Vienna Game, Falkbeer Variation", "e4 e5 Nc3 Nf6"),
     ("C27", "Vienna Game, General", "e4 e5 Nc3"),

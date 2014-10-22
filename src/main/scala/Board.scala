@@ -4,7 +4,7 @@ import format.Visual
 import Pos.posAt
 
 case class Board(
-    pieces: AlivePieces,
+    pieces: PieceMap,
     history: History,
     variant: Variant) {
 

@@ -27,12 +27,7 @@ object ApplicationBuild extends Build with Resolvers with Dependencies {
       "-deprecation",
       "-unchecked",
       "-feature",
-      "-language:_"),
-    publishTo := Some(Resolver.sftp(
-      "iliaz",
-      "scala.iliaz.com"
-    ) as ("scala_iliaz_com", Path.userHome / ".ssh" / "id_rsa"))
-  )
+      "-language:_"))
 
   lazy val main = Project("scalachess", file("."), settings = buildSettings)
 }

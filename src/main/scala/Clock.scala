@@ -33,13 +33,12 @@ sealed trait Clock {
 
   def giveTime(c: Color, t: Float): Clock
 
-  def show = s"$limitInMinutes + $increment"
-  def showCondensed = s"$limitInMinutes+$increment"
+  def show = s"$limitInMinutes+$increment"
 
-  def showTime(time: Float) = {
-    val hours = math.floor(time / 3600).toInt
-    val minutes = math.floor((time - hours * 3600) / 60).toInt
-    val seconds = time.toInt % 60
+  def showTime(t: Float) = {
+    val hours = math.floor(t / 3600).toInt
+    val minutes = math.floor((t - hours * 3600) / 60).toInt
+    val seconds = t.toInt % 60
     s"${if (hours > 0) hours else ""}:$minutes:$seconds"
   }
 
@@ -154,8 +153,8 @@ object Clock {
     else clock
   }
 
-  def timeString(time: Int) = periodFormatter.print(
-    org.joda.time.Duration.standardSeconds(time).toPeriod
+  def timeString(t: Int) = periodFormatter.print(
+    org.joda.time.Duration.standardSeconds(t).toPeriod
   )
 
   private val periodFormatter = new org.joda.time.format.PeriodFormatterBuilder().

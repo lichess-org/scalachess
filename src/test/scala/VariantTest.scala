@@ -20,4 +20,63 @@ class VariantTest extends ChessTest {
       Chess960.pieces must havePair(A2 -> (White - Pawn))
     }
   }
+
+  "kingOfTheHill" should {
+    "detect win" in {
+      "not" in {
+        Game("""
+PPk
+K
+""".kingOfTheHill, White).situation.end must beFalse
+      }
+      "regular checkMate" in {
+        Game("""
+PP
+K  r
+""".kingOfTheHill, White).situation.end must beTrue
+      }
+      "centered white king" in {
+        val sit = Game("""
+   k
+
+PP
+   K
+""".kingOfTheHill, White).situation
+        sit.end must beTrue
+      }
+    }
+  }
+
+  "threeCheck" should {
+    "detect win" in {
+      "not" in {
+        Game("""
+PPk
+K
+""".threeCheck, White).situation.end must beFalse
+      }
+      "regular checkMate" in {
+        Game("""
+PP
+K  r
+""".threeCheck, White).situation.end must beTrue
+      }
+      "1 check" in {
+        val game = Game(Board init Variant.ThreeCheck).playMoves(
+          E2 -> E4, E7 -> E6, D2 -> D4, F8 -> B4).toOption.get
+        game.situation.end must beFalse
+      }
+      "2 checks" in {
+        val game = Game(Board init Variant.ThreeCheck).playMoves(
+          E2 -> E4, E7 -> E6, D2 -> D4, F8 -> B4, C2 -> C3, B4 -> C3).toOption.get
+        game.situation.end must beFalse
+      }
+      "3 checks" in {
+        val game = Game(Board init Variant.ThreeCheck).playMoves(
+          E2 -> E4, E7 -> E6, D2 -> D4, F8 -> B4, C2 -> C3,
+          B4 -> C3, B1 -> C3, D8 -> H4, A2 -> A3, H4 -> F2).toOption.get
+        game.situation.end must beTrue
+      }
+    }
+  }
 }

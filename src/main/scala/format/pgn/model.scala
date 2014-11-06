@@ -30,7 +30,7 @@ case class Pgn(
   override def toString = "%s\n\n%s %s".format(
     tags mkString "\n",
     turns mkString " ",
-    tags find (_.name == Tag.Result) map (_.value) filter ("*" !=) getOrElse ""
+    tags find (_.name == Tag.Result) map (_.value) getOrElse ""
   ).trim
 }
 

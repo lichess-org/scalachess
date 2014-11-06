@@ -24,7 +24,7 @@ object Forsyth {
       case Nil => Some(Nil)
       case c :: rest => c match {
         case n if (n.toInt < 58) =>
-          tore(pos, n.toInt - 48) flatMap { makePieces(rest, _) }
+          makePieces(rest, tore(pos, n.toInt - 48) getOrElse pos)
         case n => for {
           role ← Role forsyth n.toLower
         } yield (pos, Piece(Color(n.isUpper), role)) :: {

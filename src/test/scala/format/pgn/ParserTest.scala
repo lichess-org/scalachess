@@ -45,6 +45,15 @@ class ParserTest extends ChessTest {
     }
   }
 
+  (shortCastles ++ longCastles) foreach { sans =>
+    val size = sans.split(' ').size
+    "sans only size: " + size in {
+      parser(sans) must beSuccess.like {
+        case a => a.sans.size must_== size
+      }
+    }
+  }
+
   "disambiguated" in {
     parser(disambiguated) must beSuccess.like {
       case a => a.sans.pp.size must_== 3

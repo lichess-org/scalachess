@@ -9,7 +9,6 @@ case class Game(
     player: Color = White,
     pgnMoves: List[String] = Nil,
     clock: Option[Clock] = None,
-    deads: DeadPieces = Nil,
     turns: Int = 0,
     startedAtTurn: Int = 0) {
 
@@ -32,8 +31,7 @@ case class Game(
         case c: RunningClock => c step move.lag
         case c: PausedClock if (newTurns - startedAtTurn) == 2 => c.start.switch
         case c => c
-      },
-      deads = (move.capture flatMap board.apply).fold(deads)(_ :: deads)
+      }
     )
     val pgnMove = pgn.Dumper(situation, move, newGame.situation)
     newGame.copy(pgnMoves = pgnMoves.isEmpty.fold(
@@ -43,9 +41,7 @@ case class Game(
 
   lazy val situation = Situation(board, player)
 
-  def allPieces: AllPieces = (board.pieces, deads)
-
-  def isStandardInit = deads.isEmpty && board.pieces == Variant.Standard.pieces
+  def isStandardInit = board.pieces == Variant.Standard.pieces
 
   def withPgnMoves(x: List[String]) = copy(pgnMoves = x)
 

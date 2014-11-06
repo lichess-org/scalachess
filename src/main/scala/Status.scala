@@ -2,9 +2,9 @@ package chess
 
 sealed abstract class Status(val id: Int) extends Ordered[Status] {
 
-  def compare(other: Status) = id compare other.id
+  val name = toString.head.toLower + toString.tail
 
-  def name = toString
+  def compare(other: Status) = id compare other.id
 
   def is(s: Status): Boolean = this == s
 
@@ -23,14 +23,16 @@ object Status {
   case object Draw extends Status(34)
   case object Outoftime extends Status(35) // clock flag
   case object Cheat extends Status(36)
+  case object NoStart extends Status(37) // the player did not make the first move in time
+  case object VariantEnd extends Status(60) // the variant has a special ending
 
-  val all = List(Created, Started, Aborted, Mate, Resign, Stalemate, Timeout, Draw, Outoftime, Cheat)
+  val all = List(Created, Started, Aborted, Mate, Resign, Stalemate, Timeout, Draw, Outoftime, Cheat, NoStart, VariantEnd)
 
   val finishedNotCheated = all filter { s =>
-    s.id >= Mate.id && s.id < Cheat.id
+    s.id >= Mate.id && s.id != Cheat.id
   }
 
-  val finishedWithWinner = List(Mate, Resign, Timeout, Outoftime, Cheat)
+  val finishedWithWinner = List(Mate, Resign, Timeout, Outoftime, Cheat, NoStart, VariantEnd)
 
   val byId = all map { v => (v.id, v) } toMap
 

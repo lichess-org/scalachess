@@ -4,30 +4,50 @@ import scala.util.Random
 
 import Pos.posAt
 
-sealed abstract class Variant(val id: Int) {
-
-  lazy val name = toString.toLowerCase
+sealed abstract class Variant(
+    val id: Int,
+    val key: String,
+    val name: String,
+    val shortName: String,
+    val title: String) {
 
   def standard = this == Variant.Standard
   def chess960 = this == Variant.Chess960
+  def kingOfTheHill = this == Variant.KingOfTheHill
+  def threeCheck = this == Variant.ThreeCheck
 
   def exotic = !standard
 
-  def pieces: Map[Pos, Piece]
+  def pieces: Map[Pos, Piece] = Variant.symmetricRank(
+    IndexedSeq(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
+  )
+
+  def specialEnd(situation: Situation) = false
+
+  def drawsOnInsufficientMaterial = true
+
+  def finalizeMove(board: Board): Board = board
+
+  override def toString = name
 }
 
 object Variant {
 
-  case object Standard extends Variant(id = 1) {
+  case object Standard extends Variant(
+    id = 1,
+    key = "standard",
+    name = "Standard",
+    shortName = "STD",
+    title = "Standard rules of chess (FIDE)")
 
-    val pieces = symmetricRank(
-      IndexedSeq(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
-    )
-  }
+  case object Chess960 extends Variant(
+    id = 2,
+    key = "chess960",
+    name = "Chess960",
+    shortName = "960",
+    title = "Starting position of the home rank pieces is randomized") {
 
-  case object Chess960 extends Variant(id = 2) {
-
-    def pieces = symmetricRank {
+    override def pieces = symmetricRank {
       val size = 8
       type Rank = IndexedSeq[Option[Role]]
       def ?(max: Int) = Random nextInt max
@@ -57,23 +77,55 @@ object Variant {
     }
   }
 
-  case object FromPosition extends Variant(id = 3) {
+  case object FromPosition extends Variant(
+    id = 3,
+    key = "fromPosition",
+    name = "From Position",
+    shortName = "FEN",
+    title = "Custom starting position")
 
-    def pieces = Map.empty
+  case object KingOfTheHill extends Variant(
+    id = 4,
+    key = "kingOfTheHill",
+    name = "King of the Hill",
+    shortName = "KotH",
+    title = "Bring your king to the center to win the game") {
 
-    override def toString = "From position"
+    private val center = Set(Pos.D4, Pos.D5, Pos.E4, Pos.E5)
+
+    override def specialEnd(situation: Situation) =
+      situation.board.kingPosOf(!situation.color) exists center.contains
+
+    override def drawsOnInsufficientMaterial = false
   }
 
-  val all = List(Standard, Chess960, FromPosition)
+  case object ThreeCheck extends Variant(
+    id = 5,
+    key = "threeCheck",
+    name = "Three-check",
+    shortName = "3+",
+    title = "Check your opponent 3 times to win the game") {
+
+    override def finalizeMove(board: Board) = board updateHistory {
+      _.withCheck(Color.White, board.checkWhite).withCheck(Color.Black, board.checkBlack)
+    }
+
+    override def specialEnd(situation: Situation) = situation.check && {
+      val checks = situation.board.history.checkCount
+      situation.color.fold(checks.white, checks.black) >= 3
+    }
+  }
+
+  val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck)
   val byId = all map { v => (v.id, v) } toMap
-  val byName = all map { v => (v.name, v) } toMap
 
   val default = Standard
 
   def apply(id: Int): Option[Variant] = byId get id
   def orDefault(id: Int): Variant = apply(id) | default
 
-  def apply(name: String): Option[Variant] = byName get name.toLowerCase
+  def byName(name: String): Option[Variant] =
+    all find (_.name.toLowerCase == name.toLowerCase)
 
   def exists(id: Int): Boolean = byId contains id
 

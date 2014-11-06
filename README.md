@@ -4,6 +4,12 @@ It is functional, immutable, and free of side effects.
 INSTALL
 -------
 
+Build dependencies
+
+    git clone https://github.com/ornicar/scalalib
+    cd scalalib
+    sbt publish-local
+
 Clone scalachess
 
     git clone git://github.com/ornicar/scalachess

@@ -31,7 +31,7 @@ package object chess
   type PositionHash = Array[Byte]
 
   object implicitFailures {
-    implicit def stringToFailures(str: String): Failures = str.wrapNel
+    implicit def stringToFailures(str: String): Failures = scalaz.NonEmptyList(str)
   }
 
   def parseIntOption(str: String): Option[Int] = try {

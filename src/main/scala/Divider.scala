@@ -36,7 +36,7 @@ object Divider {
         case a => Option(a + 1)
       }
     ,
-      boards.map(sparsity)indexWhere( _ <= 20) match {
+      boards.map(sparsity)indexWhere( _ <= 40) match {
         case -1 => None
         case a => Option(a + 1)
       }

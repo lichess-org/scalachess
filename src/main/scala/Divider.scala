@@ -65,7 +65,6 @@ object Divider {
   def mixedness(board: Board): Int = {
     (1 to 7).map( y =>
       (1 to 7).map( x =>
-
         (0 to 1).map( yp =>
           (0 to 1).map( xp =>
             board(x + xp, y + yp).map(
@@ -76,7 +75,6 @@ object Divider {
         ).flatten.groupBy(i => i).mapValues(_.size) match {
           case cell => Cell(cell.getOrElse(1, 0), cell.getOrElse(-1, 0), x, y).score
         }
-
       )
     ).flatten.sum
   }

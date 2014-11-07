@@ -33,9 +33,9 @@ object Divider {
     val boards = replay.chronoMoves.map { _.before }
       
     (
-      indexOption(boards.map(mixedness).indexWhere( _ > 230))
+      indexOption(boards.toStream.map(mixedness).indexWhere( _ > 230))
     ,
-      indexOption(boards.map(value).indexWhere( _ <= 40))
+      indexOption(boards.toStream.map(value).indexWhere( _ <= 40))
     )
 
   }

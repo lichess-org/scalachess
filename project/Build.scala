@@ -8,16 +8,16 @@ trait Resolvers {
 }
 
 trait Dependencies {
-  val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
+  val scalaz = "org.scalaz" %% "scalaz-core" % "7.1.0"
   val specs2 = "org.specs2" %% "specs2" % "2.3.12" % "test"
-  val scalalib = "com.github.ornicar" %% "scalalib" % "5.0"
+  val scalalib = "com.github.ornicar" %% "scalalib" % "5.1"
   val jodaTime = "joda-time" % "joda-time" % "2.3"
 }
 
 object ApplicationBuild extends Build with Resolvers with Dependencies {
 
   private val buildSettings = Project.defaultSettings ++ Seq(
-    scalaVersion := "2.11.2",
+    scalaVersion := "2.11.4",
     organization := "org.lichess",
     version := "4.0",
     resolvers := Seq(iliaz, sonatype, awesomepom),

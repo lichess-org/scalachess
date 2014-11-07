@@ -26,5 +26,9 @@ class DividerTest extends ChessTest {
       val replay = makeReplay("e4 c5 Nf3 d6 Bc4 Nf6 d3 g6 c3 Bg7 Bg5 O-O h3 Nc6 Nbd2 a6 Bb3 b5 Bc2 Bb7 O-O Nd7 Nh2 f6 Be3 e5 Ndf3 Ne7 Qd2 f5 Qe2 h6 Bd2 g5 g4 f4 Bb3+ d5 exd5 Bxd5 c4 Bf7 cxb5 axb5 Bxf7+ Rxf7 Bc3 Ng6 a3 b4 axb4 Rxa1 Rxa1 cxb4 Bxb4 Qb6 Bc3 Re7 Ra8+ Kh7 Kg2 Nc5 Qc2 Qb3 Qxb3 Nxb3 Rb8 Nc5 Rb5 Nxd3 Nf1 e4 Ng1 Nh4+ Kh2 Bxc3 bxc3 Nxf2 Rd5 e3 Ne2 Nf3+ Kg2 Ne1+ Kh2 f3 Neg3 e2 Nd2 Ng2 Nxf3 e1=Q Nxe1 Nxe1 c4 Nc2 c5 Ne4 c6 Nxg3 Kxg3 Re3+ Kf2 Rc3 Rd7+ Kg6 c7 Nb4 Rd6+ Kf7 Rxh6 Rxc7 Rh7+ Ke6 Rxc7 Nd3+ Kf3 Nf4 Kg3 Ne2+ Kf2 Nf4 Kg3 Ne2+ Kh2 Nf4 Rc5 Kf6 Rf5+ Kg6 Kg3 Ne2+ Kf3 Nd4+ Ke4 Nxf5 gxf5+ Kf6 h4 gxh4 Kf4 h3 Kg3 Kxf5 Kxh3")
       Divider(replay) === (Option(20), Option(40))
     }
+    "game6" in {
+      val replay = makeReplay("c4 e6 Nc3 d5 cxd5 exd5 d4 Nf6 g3 c5 e3 Nc6 Nf3 Bg4 Bg2 Be7 O-O O-O h3 Bh5 b3 cxd4 exd4 Re8 Bf4 a6 Rc1 Qb6 g4 Bg6 Ne5 Nxd4 Bxd5 Ba3 Nc4 Qc5 Bd6 Ne2+ Qxe2 Qd4 Qf3 Bxc1 Rxc1 Nxd5 Nxd5 Be4 Qe3 Qxd5 Nb6 Qxd6 Nxa8 Bc6 Rxc6 Qd1+ Kg2 Qd5+ f3 Qxc6 Qa7 Qc2+ Kg3 Qe2 Qxb7 Qe5+ Kf2 Qd4+ Kg3 Qg1+ Kh4 Qf2+ Kg5 f6+ Kf4 Qh2+ Kf5 Re5#")
+      Divider(replay) === (Option(20), Option(40))
+    }
   }
 }

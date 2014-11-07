@@ -27,22 +27,21 @@ object Divider {
     }
   }
 
-  def apply(replay: Replay): (Int, Int) = {
-      val boards = replay.chronoMoves.map { _.before }
+  def apply(replay: Replay): (Option[Int], Option[Int]) = {
+    val boards = replay.chronoMoves.map { _.before }
       
-      val midGame: Int = boards.map( 
-        board => {
-          mixedness(board)
-        }
-      ).indexWhere( _ > 40)
+    (
+      boards.map(mixedness)indexWhere( _ > 40) match {
+        case -1 => None
+        case a => Option(a + 1)
+      }
+    ,
+      boards.map(sparsity)indexWhere( _ <= 20) match {
+        case -1 => None
+        case a => Option(a + 1)
+      }
+    )
 
-      val endGame: Int = boards.map(
-        board => {
-          sparsity(board)
-        }
-      ).indexWhere( _ <= 20)
-      
-      return (midGame + 1, endGame + 1)
   }
 
   def sparsity(board: Board): Int = {

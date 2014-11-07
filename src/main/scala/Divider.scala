@@ -7,23 +7,23 @@ object Divider {
       case (0, 0) => 0
 
       case (1, 0) => 1
-      case (2, 0) => 2 * (y - 2)
-      case (3, 0) => 3 * (y - 1)
-      case (4, 0) => 4 * (y - 1) // group of 4 on the homerow = 0
+      case (2, 0) => if (y > 2) 2 + (y - 2) else 0
+      case (3, 0) => if (y > 1) 3 + (y - 1) else 0
+      case (4, 0) => if (y > 1) 4 + (y - 1) else 0 // group of 4 on the homerow = 0
 
       case (0, 1) => 1
       case (1, 1) => 3
       case (2, 1) => 3 + y
       case (3, 1) => 4 + y
 
-      case (0, 2) => 2 * (6 - y)
+      case (0, 2) => if (y < 6) 2 + (6 - y) else 0
       case (1, 2) => 3 + (6 - y)
       case (2, 2) => 7
 
-      case (0, 3) => 3 * (7 - y)
+      case (0, 3) => if (y < 7) 3 + (7 - y) else 0
       case (1, 3) => 4 + (6 - y)
 
-      case (0, 4) => 4 * (7 - y)
+      case (0, 4) => if (y < 7) 4 + (7 - y) else 0
     }
   }
 
@@ -31,12 +31,12 @@ object Divider {
     val boards = replay.chronoMoves.map { _.before }
       
     (
-      boards.map(mixedness)indexWhere( _ > 40) match {
+      boards.map(mixedness).indexWhere( _ > 80) match {
         case -1 => None
         case a => Option(a + 1)
       }
     ,
-      boards.map(sparsity)indexWhere( _ <= 40) match {
+      boards.map(value).indexWhere( _ <= 40) match {
         case -1 => None
         case a => Option(a + 1)
       }
@@ -44,7 +44,7 @@ object Divider {
 
   }
 
-  def sparsity(board: Board): Int = {
+  def value(board: Board): Int = {
     (1 to 8).map( y => 
       (1 to 8).map( x => 
         board(x, y).map(
@@ -75,6 +75,6 @@ object Divider {
           case cell => Cell(cell.getOrElse(1, 0), cell.getOrElse(-1, 0), x, y).score
         }
       )
-    ).flatten.sum
+    ).flatten.sum + 78 - value(board)
   }
 }

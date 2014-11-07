@@ -6,13 +6,13 @@ object Divider {
     def score: Int = (white, black) match {
       case (0, 0) => 0
 
-      case (1, 0) => 1
+      case (1, 0) => 1 + (8-y)
       case (2, 0) => if (y > 2) 2 + (y - 2) else 0
       case (3, 0) => if (y > 1) 3 + (y - 1) else 0
       case (4, 0) => if (y > 1) 4 + (y - 1) else 0 // group of 4 on the homerow = 0
 
-      case (0, 1) => 1
-      case (1, 1) => 3
+      case (0, 1) => 1 + y
+      case (1, 1) => 5
       case (2, 1) => 3 + y
       case (3, 1) => 4 + y
 
@@ -31,7 +31,7 @@ object Divider {
     val boards = replay.chronoMoves.map { _.before }
       
     (
-      boards.map(mixedness).indexWhere( _ > 80) match {
+      boards.map(mixedness).indexWhere( _ > 160) match {
         case -1 => None
         case a => Option(a + 1)
       }

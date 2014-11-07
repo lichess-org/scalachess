@@ -42,7 +42,7 @@ object Divider {
 
   def value(board: Board): Int = {
     (1 to 8).map( y => 
-      (1 to 8).map( x => 
+      (1 to 8).flatMap( x => 
         board(x, y).map(
           _.role match {
             case King => 0
@@ -54,7 +54,7 @@ object Divider {
           }
         ).sum
       )
-    ).flatten.sum
+    ).sum
   }
 
   def mixedness(board: Board): Int = {

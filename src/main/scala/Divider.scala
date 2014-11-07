@@ -41,8 +41,8 @@ object Divider {
   }
 
   def value(board: Board): Int = {
-    (1 to 8).map( y => 
-      (1 to 8).flatMap( x => 
+    (1 to 8).flatMap( y => 
+      (1 to 8).map( x => 
         board(x, y).map(
           _.role match {
             case King => 0

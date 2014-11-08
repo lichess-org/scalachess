@@ -5,8 +5,8 @@ object Divider {
   def apply(replay: Replay): (Option[Int], Option[Int]) = {
     val boards = replay.chronoMoves.map { _.before }
 
-    val midGame = boards.toStream.map(mixedness).indexWhere( _ > 230)
-    val endGame = boards.toStream.map(value).indexWhere( _ <= 40)
+    val midGame = boards.toStream.map(mixedness).indexWhere( _ > 90)
+    val endGame = boards.toStream.map(value).indexWhere( _ <= 50)
       
     (
       if (midGame >= endGame) None else indexOption(midGame) 
@@ -38,28 +38,28 @@ object Divider {
     case (0, 0) => 0
 
     case (1, 0) => 1 + (8-y)
-    case (2, 0) => if (y > 2) 2 + (y - 2) else 0
-    case (3, 0) => if (y > 1) 3 + (y - 1) else 0
-    case (4, 0) => if (y > 1) 4 + (y - 1) else 0 // group of 4 on the homerow = 0
+    case (2, 0) => if (y > 2) 1 + (y - 2) else 0
+    case (3, 0) => if (y > 1) 2 + (y - 1) else 0
+    case (4, 0) => if (y > 1) 2 + (y - 1) else 0 // group of 4 on the homerow = 0
 
     case (0, 1) => 1 + y
     case (1, 1) => 5
     case (2, 1) => 3 + y
-    case (3, 1) => 4 + y
+    case (3, 1) => 5 + y
 
-    case (0, 2) => if (y < 6) 2 + (6 - y) else 0
+    case (0, 2) => if (y < 6) 1 + (6 - y) else 0
     case (1, 2) => 3 + (6 - y)
     case (2, 2) => 7
 
-    case (0, 3) => if (y < 7) 3 + (7 - y) else 0
-    case (1, 3) => 4 + (6 - y)
+    case (0, 3) => if (y < 7) 2 + (7 - y) else 0
+    case (1, 3) => 5 + (6 - y)
 
-    case (0, 4) => if (y < 7) 4 + (7 - y) else 0
+    case (0, 4) => if (y < 7) 2 + (7 - y) else 0
 
     case _ => 0
   }
 
-  def indexOption(index: Int) = if (index == -1) None else Some(index+1)
+  def indexOption(index: Int) = if (index == -1) None else Some(index)
 
   def mixedness(board: Board): Int = {
     (1 to 7).flatMap( y =>
@@ -77,6 +77,6 @@ object Divider {
           score(cell.getOrElse(1, 0), cell.getOrElse(-1, 0), x, y)
         }
       )
-    ).sum + value(board)
+    ).sum - (0.68*value(board)).toInt
   }
 }

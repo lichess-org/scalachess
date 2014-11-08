@@ -5,67 +5,64 @@ class DividerTest extends ChessTest {
   def makeReplay(moves: String) = format.pgn.Reader(moves).err
 
   "the divider finds middlegame and endgame" should {
-
     "game1" in {
-      val replay = makeReplay("e3 Nc6 d4 Nf6 c3 e5 dxe5 Nxe5 Bb5 a6 Ba4 b5 Bb3 d5 e4 dxe4 f4 Qxd1+ Kxd1 Nd3 Be3 Ng4 Bd4 Ngf2+ Bxf2 Nxf2+ Ke1 Nxh1 Bd5 Ra7 Bc6+ Kd8 Bxe4 Bd6 g3 Re8 Nd2 f5 Ne2 fxe4 Kf1 e3 Kg2 exd2 Rxh1 Bb7+ Kf2 Bc5+ Kf1 d1=Q#")
-      val divided = Divider(replay) 
+      // http://en.l.org/KrTnOvuD
+      val replay = makeReplay("1. e3 g6 2. d4 Bg7 3. Nf3 Nf6 4. Bd3 O-O 5. O-O b6 6. c4 Bb7 7. Nbd2 d5 8. b3 Nbd7 9. Bb2 Re8 10. Qc2 dxc4 11. bxc4 c5 12. d5 e5 13. e4 h5 14. a4 Nf8 15. h3 Qd6 16. Nxe5 Rxe5 17. Nf3 N6d7 18. Nxe5 Bxe5 19. Bxe5 Nxe5 20. Be2 Bc8 21. f4 Ned7 22. e5 Qe7 23. Bf3 Rb8 24. Rae1 f5 25. d6 Qh4 26. e6 Nxe6 27. Rxe6 Nf6 28. Ree1 Qxf4 29. Bd5+ Nxd5 30. Rxf4 Nxf4 31. Qd2 g5 32. d7 Bb7 33. d8=Q+ Rxd8 34. Qxd8+ Kh7 35. Qc7+ Kh6 36. Qxb7 g4 37. Qc6+ Ng6 38. Re6 gxh3 39. Rxg6+ Kh7 40. Rh6+ Kg7 41. Qf6+ Kg8 42. Rh8#")
+      val divided = Divider(replay)
       println("Game 1 => " + divided)
-      divided._1 must beNone
+      divided._1 must beSome.like {
+        case x => x must beBetween(30, 40)
+      }
       divided._2 must beSome.like {
-        case x => x must beBetween(43, 46)
+        case x => x must beBetween(50, 65)
       }
     }
     "game2" in {
-      val replay = makeReplay("c4 Nc6 e3 Nf6 h3 Ne4 d3 Nc5 a3 Ne5 d4 d6 dxe5 dxe5 b4 Qxd1+ Kxd1 Ne4 f3 Nf2+ Ke2 Nxh1 Nd2 Ng3+ Ke1 Bf5 Bd3 Bxd3 Rb1 Bxb1 Nxb1 Rd8 Bd2 e6 h4 Be7 Nh3 Bxh4 Nf2 Ke7 Bc3 f6 Nd2 h5 c5 g5 Nc4 Rhg8 Na5 Nh1 Ke2 Nxf2 Be1 Nd3 Nxb7 Bxe1 Nxd8 Rxd8 c6 a5 bxa5 Bxa5 a4 f5 Kd1 Nf4+ Kc2 Rd2+ Kc1 Nxg2 Kb1 Nxe3 Kc1 h4 Kb1 h3 Kc1 h2 Kb1 h1=Q#")
+      // http://en.l.org/gk3gNFN7/black
+      val replay = makeReplay("1. e4 c5 2. Nf3 d6 3. Bc4 Nf6 4. d3 g6 5. c3 Bg7 6. Bg5 O-O 7. h3 Nc6 8. Nbd2 a6 9. Bb3 b5 10. Bc2 Bb7 11. O-O Nd7 12. Nh2 f6 13. Be3 e5 14. Ndf3 Ne7 15. Qd2 f5 16. Qe2 h6 17. Bd2 g5 18. g4 f4 19. Bb3+ d5 20. exd5 Bxd5 21. c4 Bf7 22. cxb5 axb5 23. Bxf7+ Rxf7 24. Bc3 Ng6 25. a3 b4 26. axb4 Rxa1 27. Rxa1 cxb4 28. Bxb4 Qb6 29. Bc3 Re7 30. Ra8+ Kh7 31. Kg2 Nc5 32. Qc2 Qb3 33. Qxb3 Nxb3 34. Rb8 Nc5 35. Rb5 Nxd3 36. Nf1 e4 37. Ng1 Nh4+ 38. Kh2 Bxc3 39. bxc3 Nxf2 40. Rd5 e3 41. Ne2 Nf3+ 42. Kg2 Ne1+ 43. Kh2 f3 44. Neg3 e2 45. Nd2 Ng2 46. Nxf3 e1=Q 47. Nxe1 Nxe1 48. c4 Nc2 49. c5 Ne4 50. c6 Nxg3 51. Kxg3 Re3+ 52. Kf2 Rc3 53. Rd7+ Kg6 54. c7 Nb4 55. Rd6+ Kf7 56. Rxh6 Rxc7 57. Rh7+ Ke6 58. Rxc7 Nd3+ 59. Kf3 Nf4 60. Kg3 Ne2+ 61. Kf2 Nf4 62. Kg3 Ne2+ 63. Kh2 Nf4 64. Rc5 Kf6 65. Rf5+ Kg6 66. Kg3 Ne2+ 67. Kf3 Nd4+ 68. Ke4 Nxf5 69. gxf5+ Kf6 70. h4 gxh4 71. Kf4 h3 72. Kg3 Kxf5 73. Kxh3 1/2-1/2")
       val divided = Divider(replay)
       println("Game 2 => " + divided)
-      divided._1 must beNone
+      divided._1 must beSome.like {
+        case x => x must beBetween(17, 30)
+      }
       divided._2 must beSome.like {
-        case x => x must beBetween(30, 35)
+        case x => x must beBetween(50, 65)
       }
     }
     "game3" in {
-      val replay = makeReplay("e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nc6 Nc3 e5 Nb3 Nf6 f3 Be7 Be3 O-O Qd2 b6 O-O-O Bb7 g4 Rc8 h4 a5 h5 Nb4 g5 Nd7 g6 Nc5 h6 Nxb3+ axb3 fxg6 hxg7 Rxf3 Bxb6 Qxb6 Qh6 Qe3+ Qxe3 Rxe3 Bd3 Nxd3+ cxd3 Bg5 Kb1 Kxg7 Rh2 Bf4 Rh4 h5 Rhh1 Rf8 Rhg1 g5 Rg2 g4 Nb5 Rf6 Nc7 Rg3 Rxg3 Bxg3 Ne8+ Kf7 Nxf6 Kxf6 Rf1+ Kg5 Rf7 Ba6 Ra7 Bxd3+ Kc1 Bf4+ Kd1 Bxe4 Rxa5 g3 Ke2 g2 Ra1 h4 Kf2 h3 b4 Kg4 b5 h2 b6 h1=Q Rg1 Be3+ Kxe3 Qxg1+ Kxe4 Qxb6 Kd5 g1=Q Ke6 Qgf2 Kd5 Qf3+ Ke6 Qbb3+ Ke7 Qff7+ Kxd6 Qbd5#")
+      // http://en.l.org/v9drYYoa
+      val replay = makeReplay("1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nc6 5. Nc3 e5 6. Nb3 Nf6 7. f3 Be7 8. Be3 O-O 9. Qd2 b6 10. O-O-O Bb7 11. g4 Rc8 12. h4 a5 13. h5 Nb4 14. g5 Nd7 15. g6 Nc5 16. h6 Nxb3+ 17. axb3 fxg6 18. hxg7 Rxf3 19. Bxb6 Qxb6 20. Qh6 Qe3+ 21. Qxe3 Rxe3 22. Bd3 Nxd3+ 23. cxd3 Bg5 24. Kb1 Kxg7 25. Rh2 Bf4 26. Rh4 h5 27. Rhh1 Rf8 28. Rhg1 g5 29. Rg2 g4 30. Nb5 Rf6 31. Nc7 Rg3 32. Rxg3 Bxg3 33. Ne8+ Kf7 34. Nxf6 Kxf6 35. Rf1+ Kg5 36. Rf7 Ba6 37. Ra7 Bxd3+ 38. Kc1 Bf4+ 39. Kd1 Bxe4 40. Rxa5 g3 41. Ke2 g2 42. Ra1 h4 43. Kf2 h3 44. b4 Kg4 45. b5 h2 46. b6 h1=Q 47. Rg1 Be3+ 48. Kxe3 Qxg1+ 49. Kxe4 Qxb6 50. Kd5 g1=Q 51. Ke6 Qgf2 52. Kd5 Qf3+ 53. Ke6 Qbb3+ 54. Ke7 Qff7+ 55. Kxd6 Qbd5# 0-1")
       val divided = Divider(replay)
       println("Game 3 => " + divided)
       divided._1 must beSome.like {
-        case x => x must beBetween(23, 28)
+        case x => x must beBetween(24, 28)
       }
       divided._2 must beSome.like {
-        case x => x must beBetween(43, 48)
+        case x => x must beBetween(40, 46)
       }
     }
     "game4" in {
-      val replay = makeReplay("e4 c5 f4 Nc6 Nf3 d6 Bb5 Bd7 O-O g6 d3 Bg7 c4 Nf6 Nc3 O-O Qe1 a6 Bxc6 Bxc6 Bd2 Rb8 b3 b5 Rd1 bxc4 dxc4 e6 e5 Ne8 exd6 Nxd6 Bc1 Qc7 Ne5 Ba8 Qe2 Rfd8 Be3 Nf5 Na4 Bxe5 fxe5 Qxe5 Rde1 Nd4 Bxd4 Qxd4+ Kh1 Bc6 Rd1 Qh4 Nxc5 Rxd1 Rxd1 Qg5 Ne4 Bxe4 Qxe4 Qh5 Qd3 Kg7 Qd4+ f6 Qd7+ Kh6 Re1 Rd8 Qxe6 Rd1 Kg1 Rd2 Qe3+ Qg5 Qxg5+ fxg5 Ra1 g4 a3 Kg5 b4 Rd4 b5 axb5 cxb5 h5 a4 Rb4 g3 h4 a5 Rxb5 a6 Rb8 a7 Ra8 Kf2 hxg3+ Kxg3 Kf5 Ra6 g5 Ra5+ Kf6 Kxg4 Ke6 Kxg5 Kd6 h4 Kc6 h5 Kb6 Ra1 Kb7 h6 Rg8+ Kf6 Ra8 h7 Kb6 Kg7 Rd8 h8=Q Rd7+ Kf6 Rd6+ Ke5 Rc6 Qb8+ Kc5 Rc1#")
+      // http://en.l.org/v9drYYoa
+      val replay = makeReplay("1. f3 g6 2. e4 Bg7 3. d4 d5 4. Qe2 Bxd4 5. c3 Bg7 6. Nd2 Nc6 7. exd5 Qxd5 8. Ne4 Nf6 9. Nxf6+ Bxf6 10. Be3 O-O 11. Rd1 Qxa2 12. Qd2 Rd8 13. Qc2 Rxd1+ 14. Kxd1 Bf5 15. Qc1 Rd8+ 16. Ke1 Ne5 17. Kf2 Bd3 18. Ne2 Ba6 19. Nd4 Bxf1 20. Kxf1 Nd3 21. Qc2 Qa1+ 22. Ke2 Qxh1 23. Qxd3 c5 24. Qb5 Qxg2+ 25. Kd3 Qf1+ 26. Kc2 Qxb5 27. Nxb5 a6 28. Na3 Rc8 29. Nc4 b5 30. Nd2 h5 31. Ne4 Be5 32. f4 Bd6 33. b3 f5 34. Ng5 e5 35. fxe5 Bxe5 36. Bg1 Bf4 37. Ne6 Bd6 38. h3 c4 39. b4 Re8 40. Nd4 Be5 41. Nf3 Bg7 42. Nd2 Re2 43. Kd1 Rg2 44. Bc5 Bxc3 45. Nf3 Rg3 46. Ke2 Rxh3 47. Ng5 Rh2+ 48. Kd1 Bf6 49. Ne6 Rh1+ 50. Ke2 Kf7 51. Nc7 Rh2+ 52. Kf3 g5 53. Nxa6 g4+ 54. Kg3 Be5# 0-1")
       val divided = Divider(replay)
       println("Game 4 => " + divided)
       divided._1 must beSome.like {
-        case x => x must beBetween(10, 15)
+        case x => x must beBetween(16, 34)
       }
       divided._2 must beSome.like {
-        case x => x must beBetween(55, 65)
+        case x => x must beBetween(40, 47)
       }
     }
     "game5" in {
-      val replay = makeReplay("e4 c5 Nf3 d6 Bc4 Nf6 d3 g6 c3 Bg7 Bg5 O-O h3 Nc6 Nbd2 a6 Bb3 b5 Bc2 Bb7 O-O Nd7 Nh2 f6 Be3 e5 Ndf3 Ne7 Qd2 f5 Qe2 h6 Bd2 g5 g4 f4 Bb3+ d5 exd5 Bxd5 c4 Bf7 cxb5 axb5 Bxf7+ Rxf7 Bc3 Ng6 a3 b4 axb4 Rxa1 Rxa1 cxb4 Bxb4 Qb6 Bc3 Re7 Ra8+ Kh7 Kg2 Nc5 Qc2 Qb3 Qxb3 Nxb3 Rb8 Nc5 Rb5 Nxd3 Nf1 e4 Ng1 Nh4+ Kh2 Bxc3 bxc3 Nxf2 Rd5 e3 Ne2 Nf3+ Kg2 Ne1+ Kh2 f3 Neg3 e2 Nd2 Ng2 Nxf3 e1=Q Nxe1 Nxe1 c4 Nc2 c5 Ne4 c6 Nxg3 Kxg3 Re3+ Kf2 Rc3 Rd7+ Kg6 c7 Nb4 Rd6+ Kf7 Rxh6 Rxc7 Rh7+ Ke6 Rxc7 Nd3+ Kf3 Nf4 Kg3 Ne2+ Kf2 Nf4 Kg3 Ne2+ Kh2 Nf4 Rc5 Kf6 Rf5+ Kg6 Kg3 Ne2+ Kf3 Nd4+ Ke4 Nxf5 gxf5+ Kf6 h4 gxh4 Kf4 h3 Kg3 Kxf5 Kxh3")
+      // http://en.l.org/PaaBKHRO
+      val replay = makeReplay("1. c4 e5 2. Nc3 f5 3. d3 Nf6 4. g3 Bb4 5. Bd2 O-O 6. Bg2 c6 7. Nf3 d5 8. cxd5 Bxc3 9. Bxc3 e4 10. dxe4 Nxe4 11. dxc6 Nxc6 12. Qb3+ Kh8 13. Rd1 Qc7 14. O-O Nxc3 15. Qxc3 Be6 16. a3 Rac8 17. Nd4 Nxd4 18. Qxd4 b6 19. e4 fxe4 20. Bxe4 Rcd8 21. Qe3 Qe5 22. b4 Bc4 23. Rfe1 Qh5 24. Rxd8 Rxd8 25. Bf3 Qf5 26. Rd1 Rf8 27. Bg2 h6 28. Qd4 Qf6 29. Qxc4 Qxf2+ 30. Kh1 Qb2 31. Qd3 h5 32. h4 Qf6 33. Rf1 Qe7 34. Rxf8+ Qxf8 35. Qf3 Qe7 36. Qxh5+ Kg8 37. Bd5+ 1-0")
       val divided = Divider(replay)
       println("Game 5 => " + divided)
       divided._1 must beSome.like {
-        case x => x must beBetween(15, 20)
+        case x => x must beBetween(19, 26)
       }
       divided._2 must beSome.like {
-        case x => x must beBetween(65, 70)
-      }
-    }
-    "game6" in {
-      val replay = makeReplay("c4 e6 Nc3 d5 cxd5 exd5 d4 Nf6 g3 c5 e3 Nc6 Nf3 Bg4 Bg2 Be7 O-O O-O h3 Bh5 b3 cxd4 exd4 Re8 Bf4 a6 Rc1 Qb6 g4 Bg6 Ne5 Nxd4 Bxd5 Ba3 Nc4 Qc5 Bd6 Ne2+ Qxe2 Qd4 Qf3 Bxc1 Rxc1 Nxd5 Nxd5 Be4 Qe3 Qxd5 Nb6 Qxd6 Nxa8 Bc6 Rxc6 Qd1+ Kg2 Qd5+ f3 Qxc6 Qa7 Qc2+ Kg3 Qe2 Qxb7 Qe5+ Kf2 Qd4+ Kg3 Qg1+ Kh4 Qf2+ Kg5 f6+ Kf4 Qh2+ Kf5 Re5#")
-      val divided = Divider(replay)
-      println("Game 6 => " + divided)
-      divided._1 must beSome.like {
-        case x => x must beBetween(20, 25)
-      }
-      divided._2 must beSome.like {
-        case x => x must beBetween(55, 60)
+        case x => x must beBetween(36, 48)
       }
     }
   }

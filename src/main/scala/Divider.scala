@@ -17,22 +17,16 @@ object Divider {
 
   }
 
-  def value(board: Board): Int = {
-    (1 to 8).flatMap( y => 
-      (1 to 8).map( x => 
-        board(x, y).map(
-          _.role match {
-            case King => 0
-            case Queen => 9
-            case Bishop => 3
-            case Knight => 3
-            case Rook => 5
-            case Pawn => 1
-          }
-        ).sum
-      )
-    ).sum
-  }
+  def value(board: Board): Int = board.pieces.values.map {
+    _.role match {
+      case King => 0
+      case Queen => 9
+      case Bishop => 3
+      case Knight => 3
+      case Rook => 5
+      case Pawn => 1
+    }
+  }.sum
 
   def score(white: Int, black: Int, x: Int, y: Int): Int = (white, black) match {
     case (0, 0) => 0

@@ -59,7 +59,7 @@ object Divider {
     case _ => 0
   }
 
-  def indexOption(index: Int) = if (index == -1) None else Some(index)
+  def indexOption(index: Int) = if (index == -1) None else Some(index+1)
 
   def mixedness(board: Board): Int = {
     (1 to 7).flatMap( y =>

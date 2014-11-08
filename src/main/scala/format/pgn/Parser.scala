@@ -31,7 +31,7 @@ object Parser
     def apply(pgn: String): Valid[(List[String], Option[Tag])] =
       parseAll(moves, pgn) match {
         case Success((moves, result), _) => scalaz.Validation.success(moves, result map { r => Tag(_.Result, r) })
-        case err                         => "Cannot parse moves: %s\n%s".format(err.toString, pgn).failNel
+        case err                         => "Cannot parse moves: %s\n%s".format(err.toString, pgn).failureNel
       }
 
     def moves: Parser[(List[String], Option[String])] = as("moves") {
@@ -81,7 +81,7 @@ object Parser
     def apply(str: String): Valid[San] =
       parseAll(move, str) match {
         case Success(san, _) => scalaz.Validation.success(san)
-        case err             => "Cannot parse move: %s\n%s".format(err.toString, str).failNel
+        case err             => "Cannot parse move: %s\n%s".format(err.toString, str).failureNel
       }
 
     def move: Parser[San] = castle | standard
@@ -165,9 +165,9 @@ object Parser
   private object TagParser extends RegexParsers with Logging {
 
     def apply(pgn: String): Valid[List[Tag]] = parseAll(all, pgn) match {
-      case f: Failure       => "Cannot parse tags: %s\n%s".format(f.toString, pgn).failNel
+      case f: Failure       => "Cannot parse tags: %s\n%s".format(f.toString, pgn).failureNel
       case Success(sans, _) => scalaz.Validation.success(sans)
-      case err              => "Cannot parse tags: %s\n%s".format(err.toString, pgn).failNel
+      case err              => "Cannot parse tags: %s\n%s".format(err.toString, pgn).failureNel
     }
 
     def all: Parser[List[Tag]] = as("all") {

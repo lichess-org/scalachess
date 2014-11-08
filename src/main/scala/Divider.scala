@@ -2,6 +2,38 @@ package chess
 
 object Divider {
 
+  def apply(replay: Replay): (Option[Int], Option[Int]) = {
+    val boards = replay.chronoMoves.map { _.before }
+
+    val midGame = boards.toStream.map(mixedness).indexWhere( _ > 230)
+    val endGame = boards.toStream.map(value).indexWhere( _ <= 40)
+      
+    (
+      if (midGame >= endGame) None else indexOption(midGame) 
+      // If the midgame condition occurs after the endgame condition, there is no midgame
+    ,
+      indexOption(endGame)
+    )
+
+  }
+
+  def value(board: Board): Int = {
+    (1 to 8).flatMap( y => 
+      (1 to 8).map( x => 
+        board(x, y).map(
+          _.role match {
+            case King => 0
+            case Queen => 9
+            case Bishop => 3
+            case Knight => 3
+            case Rook => 5
+            case Pawn => 1
+          }
+        ).sum
+      )
+    ).sum
+  }
+
   def score(white: Int, black: Int, x: Int, y: Int): Int = (white, black) match {
     case (0, 0) => 0
 
@@ -28,34 +60,6 @@ object Divider {
   }
 
   def indexOption(index: Int) = if (index == -1) None else Some(index)
-
-  def apply(replay: Replay): (Option[Int], Option[Int]) = {
-    val boards = replay.chronoMoves.map { _.before }
-      
-    (
-      indexOption(boards.toStream.map(mixedness).indexWhere( _ > 230))
-    ,
-      indexOption(boards.toStream.map(value).indexWhere( _ <= 40))
-    )
-
-  }
-
-  def value(board: Board): Int = {
-    (1 to 8).flatMap( y => 
-      (1 to 8).map( x => 
-        board(x, y).map(
-          _.role match {
-            case King => 0
-            case Queen => 9
-            case Bishop => 3
-            case Knight => 3
-            case Rook => 5
-            case Pawn => 1
-          }
-        ).sum
-      )
-    ).sum
-  }
 
   def mixedness(board: Board): Int = {
     (1 to 7).flatMap( y =>

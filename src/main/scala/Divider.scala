@@ -5,12 +5,11 @@ object Divider {
   def apply(replay: Replay): (Option[Int], Option[Int]) = {
     val boards = replay.chronoMoves.map { _.before }
 
-    val midGame = boards.toStream.map(mixedness).indexWhere( _ > 98)
+    val midGame = boards.toStream.map( i => (mixedness(i), majorsAndMinors(i)) ).indexWhere( i => i._1 > 150 || i._2 <= 10 )
     val endGame = boards.toStream.map(majorsAndMinors).indexWhere( _ <= 7)
       
     (
-      if (midGame >= endGame) None else indexOption(midGame) 
-      // If the midgame condition occurs after the endgame condition, there is no midgame
+      if (midGame >= endGame) None else indexOption(midGame)
     ,
       indexOption(endGame)
     )
@@ -63,8 +62,6 @@ object Divider {
     case _ => 0
   }
 
-  def indexOption(index: Int) = if (index == -1) None else Some(index)
-
   def mixedness(board: Board): Int = {
     (1 to 7).flatMap( y =>
       (1 to 7).map( x =>
@@ -76,11 +73,13 @@ object Divider {
                   if (piece is Color.white) 1 else -1
               ).sum
             )
-          ).groupBy(i => i).mapValues(_.size)
+          ).groupBy( i => i ).mapValues(_.size)
 
           score(cell.getOrElse(1, 0), cell.getOrElse(-1, 0), x, y)
         }
       )
-    ).sum - (0.7*value(board)).toInt
+    ).sum
   }
+
+  def indexOption(index: Int) = if (index == -1) None else Some(index)
 }

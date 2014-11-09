@@ -65,5 +65,17 @@ class DividerTest extends ChessTest {
         case x => x must beBetween(36, 48)
       }
     }
+    "game6" in {
+      // http://en.l.org/PaaBKHRO
+      val replay = makeReplay("1. d4 Nf6 2. c4 g6 3. Nc3 d5 4. cxd5 Nxd5 5. Bd2 Bg7 6. e4 Nxc3 7. Bxc3 O-O 8. Qd2 Nc6 9. Nf3 Bg4 10. d5 Bxf3 11. Bxg7 Kxg7 12. gxf3 Ne5 13. O-O-O c6 14. Qc3 f6 15. Bh3 cxd5 16. exd5 Nf7 17. f4 Qd6 18. Qd4 Rad8 19. Be6 Qb6 20. Qd2 Rd6 21. Rhe1 Nd8 22. f5 Nxe6 23. Rxe6 Qc7+ 24. Kb1 Rc8 25. Rde1 Rxe6 26. Rxe6 Rd8 27. Qe3 Rd7 28. d6 exd6 29. Qd4 Rf7 30. fxg6 hxg6 31. Rxd6 a6 32. a3 Qa5 33. f4 Qh5 34. Qd2 Qc5 35. Rd5 Qc4 36. Rd7 Qc6 37. Rd6 Qe4+ 38. Ka2 Re7 39. Qc1 a5 40. Qf1 a4 41. Rd1 Qc2 42. Rd4 Re2 43. Rb4 b5 44. Qh1 Re7 45. Qd5 Re1 46. Qd7+ Kh6 47. Qh3+ Kg7 48. Qd7+ 1/2-1/2")
+      val divided = Divider(replay)
+      println("Game 6 => " + divided)
+      divided._1 must beSome.like {
+        case x => x must beBetween(19, 26)
+      }
+      divided._2 must beSome.like {
+        case x => x must beBetween(36, 48)
+      }
+    }
   }
 }

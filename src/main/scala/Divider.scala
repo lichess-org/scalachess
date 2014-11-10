@@ -1,14 +1,16 @@
 package chess
 
+case class Division(mid: Option[Int], end: Option[Int])
+
 object Divider {
 
-  def apply(replay: Replay): (Option[Int], Option[Int]) = {
+  def apply(replay: Replay): Division = {
     val boards = replay.chronoMoves.map { _.before }
 
     val midGame = boards.toStream.map( i => (mixedness(i), majorsAndMinors(i)) ).indexWhere( i => i._1 > 150 || i._2 <= 10 )
     val endGame = boards.toStream.map(majorsAndMinors).indexWhere( _ <= 7)
       
-    (
+    Division(
       if (midGame >= endGame) None else indexOption(midGame)
     ,
       indexOption(endGame)

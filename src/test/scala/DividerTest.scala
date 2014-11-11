@@ -38,7 +38,7 @@ class DividerTest extends ChessTest {
         case x => x must beBetween(20, 28)
       }
       divided._2 must beSome.like {
-        case x => x must beBetween(40, 46)
+        case x => x must beBetween(50, 65)
       }
     }
     "game4" in {

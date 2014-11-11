@@ -6,7 +6,7 @@ object Divider {
     val boards = replay.chronoMoves.map { _.before }
 
     val midGame = boards.toStream.map( i => (mixedness(i), majorsAndMinors(i)) ).indexWhere( i => i._1 > 150 || i._2 <= 10 )
-    val endGame = boards.toStream.map(majorsAndMinors).indexWhere( _ <= 7)
+    val endGame = boards.toStream.map(majorsAndMinors).indexWhere( _ <= 6)
       
     (
       if (midGame >= endGame) None else indexOption(midGame)

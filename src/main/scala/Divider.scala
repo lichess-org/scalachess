@@ -11,7 +11,7 @@ object Divider {
     val endGame = boards.toStream.map(majorsAndMinors).indexWhere( _ <= 6)
       
     Division(
-      if (midGame >= endGame) None else indexOption(midGame)
+      if (midGame < endGame || endGame == -1) indexOption(midGame) else None
     ,
       indexOption(endGame)
     )

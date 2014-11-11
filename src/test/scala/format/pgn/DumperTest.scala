@@ -233,5 +233,12 @@ NRKNRQBB
         case ms => ms must_== "f4 Nc6 Nc3 g6 Nb5 O-O-O O-O-O".split(' ').toList
       }
     }
+    "tricky rook disambiguation" in {
+      val fen = """r5k1/1b5p/N3p1p1/Q4p2/4r3/2P1q3/1PK2RP1/5R2 w - - 1 38"""
+      val sit = chess.format.Forsyth.<<(fen).get
+      val game1 = Game(sit.board, sit.color)
+      val (game2, move) = game1(Pos.F2, Pos.F3).toOption.get
+      Dumper(game1.situation, move, game2.situation) must_== "Rf3"
+    }
   }
 }

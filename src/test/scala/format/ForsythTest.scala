@@ -145,4 +145,49 @@ class ForsythTest extends ChessTest {
       }
     }
   }
+  "fix impossible castle flags" should {
+    "messed up" in {
+      val fen = "yayyyyyyyyyyy"
+      f fixCastles fen must beNone
+    }
+    "initial" in {
+      val fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+      f fixCastles fen must beSome(fen)
+    }
+    "white king out" in {
+      val fen = "rnbqkbnr/pppppppp/8/8/4K3/8/PPPPPPPP/RNBQ1BNR w KQkq - 0 1"
+      val fix = "rnbqkbnr/pppppppp/8/8/4K3/8/PPPPPPPP/RNBQ1BNR w kq - 0 1"
+      f fixCastles fen must beSome(fix)
+    }
+    "black king out" in {
+      val fen = "rnbq1bnr/pppppppp/3k4/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+      val fix = "rnbq1bnr/pppppppp/3k4/8/8/8/PPPPPPPP/RNBQKBNR w KQ - 0 1"
+      f fixCastles fen must beSome(fix)
+    }
+    "white king rook out" in {
+      val fen = "rnbqkbnr/pppppppp/8/8/8/7R/PPPPPPPP/RNBQKBN1 w KQkq - 0 1"
+      val fix = "rnbqkbnr/pppppppp/8/8/8/7R/PPPPPPPP/RNBQKBN1 w Qkq - 0 1"
+      f fixCastles fen must beSome(fix)
+    }
+    "white queen rook out" in {
+      val fen = "rnbqkbnr/pppppppp/8/8/8/R7/PPPPPPPP/1NBQKBNR w KQkq - 0 1"
+      val fix = "rnbqkbnr/pppppppp/8/8/8/R7/PPPPPPPP/1NBQKBNR w Kkq - 0 1"
+      f fixCastles fen must beSome(fix)
+    }
+    "white king rook out" in {
+      val fen = "rnbqkbnr/pppppppp/8/8/8/7R/PPPPPPPP/RNBQKBN1 w KQkq - 0 1"
+      val fix = "rnbqkbnr/pppppppp/8/8/8/7R/PPPPPPPP/RNBQKBN1 w Qkq - 0 1"
+      f fixCastles fen must beSome(fix)
+    }
+    "white both rooks out" in {
+      val fen = "rnbqkbnr/pppppppp/8/8/8/R6R/PPPPPPPP/1NBQKBN1 w KQkq - 0 1"
+      val fix = "rnbqkbnr/pppppppp/8/8/8/R6R/PPPPPPPP/1NBQKBN1 w kq - 0 1"
+      f fixCastles fen must beSome(fix)
+    }
+    "white and black both rooks out" in {
+      val fen = "1nbqkbn1/pppppppp/8/8/8/R6R/PPPPPPPP/1NBQKBN1 w KQkq - 0 1"
+      val fix = "1nbqkbn1/pppppppp/8/8/8/R6R/PPPPPPPP/1NBQKBN1 w - - 0 1"
+      f fixCastles fen must beSome(fix)
+    }
+  }
 }

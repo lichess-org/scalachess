@@ -8,15 +8,22 @@ object Parser
     extends scalaz.std.OptionInstances
     with scalaz.syntax.ToTraverseOps {
 
-  def apply(pgn: String): Valid[ParsedPgn] = for {
-    splitted ← splitTagAndMoves(pgn)
-    (tagStr, moveStr) = splitted
-    tags ← TagParser(tagStr)
-    parsedMoves ← MovesParser(moveStr)
-    (sanStrs, resultOption) = parsedMoves
-    tags2 = resultOption.filterNot(_ => tags.exists(_.name == Tag.Result)).fold(tags)(t => tags :+ t)
-    sans ← sanStrs.map(MoveParser.apply).sequence
-  } yield ParsedPgn(tags2, sans)
+  def apply(pgn: String): Valid[ParsedPgn] = try {
+    for {
+      splitted ← splitTagAndMoves(pgn)
+      (tagStr, moveStr) = splitted
+      tags ← TagParser(tagStr)
+      parsedMoves ← MovesParser(moveStr)
+      (sanStrs, resultOption) = parsedMoves
+      tags2 = resultOption.filterNot(_ => tags.exists(_.name == Tag.Result)).fold(tags)(t => tags :+ t)
+      sans ← sanStrs.map(MoveParser.apply).sequence
+    } yield ParsedPgn(tags2, sans)
+  }
+  catch {
+    case e: StackOverflowError =>
+      println(pgn)
+      sys error s"### StackOverflowError ### in PGN parser"
+  }
 
   trait Logging { self: Parsers =>
     protected val loggingEnabled = false

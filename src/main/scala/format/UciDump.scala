@@ -10,12 +10,6 @@ object UciDump {
   def apply(moves: List[String], initialFen: Option[String], variant: Variant): Valid[List[String]] =
     moves.isEmpty.fold(
       success(Nil),
-      Replay(moves mkString " ", initialFen, variant) map apply
-    )
-
-  def apply(moves: String, initialFen: Option[String], variant: Variant): Valid[List[String]] =
-    moves.isEmpty.fold(
-      success(Nil),
       Replay(moves, initialFen, variant) map apply
     )
 

@@ -5,14 +5,17 @@ import format.Forsyth
 
 object Reader {
 
-  def apply(pgn: String, tags: List[Tag] = Nil): Valid[Replay] =
-    withSans(pgn, identity, tags)
+  def full(pgn: String, tags: List[Tag] = Nil): Valid[Replay] =
+    fullWithSans(pgn, identity, tags)
 
-  def withSans(
+  def moves(moveStrs: List[String], tags: List[Tag] = Nil): Valid[Replay] =
+    movesWithSans(moveStrs, identity, tags)
+
+  def fullWithSans(
     pgn: String,
     op: List[San] => List[San],
     tags: List[Tag] = Nil): Valid[Replay] = for {
-    parsed ← Parser(pgn)
+    parsed ← Parser.full(pgn)
     game ← makeGame(parsed.tags ::: tags)
     replay ← makeReplay(game, op(parsed.sans))
   } yield replay

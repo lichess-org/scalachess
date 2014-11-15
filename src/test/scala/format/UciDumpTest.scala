@@ -19,14 +19,15 @@ class UciDumpTest extends ChessTest {
       }
     }
     "complete" in {
-      UciDump(fromWikipedia, None, Variant.Standard) must beSuccess.like {
-        case moves => moves must_== "e2e4 e7e5 g1f3 b8c6 f1b5 a7a6 b5a4 g8f6 e1g1 f8e7 f1e1 b7b5 a4b3 d7d6 c2c3 e8g8 h2h3 c6b8 d2d4 b8d7 c3c4 c7c6 c4b5 a6b5 b1c3 c8b7 c1g5 b5b4 c3b1 h7h6 g5h4 c6c5 d4e5 f6e4 h4e7 d8e7 e5d6 e7f6 b1d2 e4d6 d2c4 d6c4 b3c4 d7b6 f3e5 a8e8 c4f7 f8f7 e5f7 e8e1 d1e1 g8f7 e1e3 f6g5 e3g5 h6g5 b2b3 f7e6 a2a3 e6d6 a3b4 c5b4 a1a5 b6d5 f2f3 b7c8 g1f2 c8f5 a5a7 g7g6 a7a6 d6c5 f2e1 d5f4 g2g3 f4h3 e1d2 c5b5 a6d6 b5c5 d6a6 h3f2 g3g4 f5d3 a6e6".split(" ").toList
+      UciDump(fromProd2.split(' ').toList, None, Variant.Standard) must beSuccess.like {
+        case moves => 
+          moves must_== List("e2e4", "c7c5", "g1f3", "b8c6", "d2d4", "c5d4", "f3d4", "g8f6", "b1c3", "e7e5", "d4f5", "d7d5", "g2g4", "c8f5", "e4f5", "d5d4", "c3e2", "f6g4", "f1h3", "d8d5", "e2g3", "f8b4", "c1d2", "b4d2", "d1d2", "d5f3", "d2e2", "f3e2", "e1e2", "g4h6", "h3g2", "e8f8", "h1e1", "f8e7", "e2d3", "c6b4", "d3d2", "h8c8", "c2c3", "d4c3", "b2c3", "c8d8", "d2c1", "b4d3", "c1c2", "d3e1", "a1e1", "e7f6", "g2e4", "d8b8", "e1d1", "f6g5", "d1d7", "a7a6", "e4b7", "a8a7", "b7c6", "a7d7", "c6d7", "b8d8", "d7c6", "h6f5", "g3f5", "g5f5", "f2f3", "d8b8", "c6e4", "f5f4", "c3c4", "b8h8", "c4c5", "a6a5", "c5c6", "f7f5", "e4d5", "h8c8", "c2c3", "g7g6", "c3c4", "h7h5", "c4b5", "c8b8", "b5a6", "a5a4", "c6c7", "b8c8", "a6b7", "c8h8", "c7c8q", "h8c8", "b7c8", "g6g5", "c8d7", "g5g4", "f3g4", "h5g4", "d7e6", "e5e4", "d5c4", "f4g5", "e6e5", "e4e3", "c4d3", "f5f4", "e5e4", "g4g3", "e4f3", "g3h2", "f3g2", "f4f3", "g2h2", "e3e2", "d3e2", "f3e2", "h2h3", "e2e1q", "h3g2", "e1e6")
       }
     }
-    "960" in {
-      UciDump(complete960, None, Variant.Chess960) must beSuccess.like {
-        case moves => moves must_== "e2e3 e8f6 f1g3 f8e6 e1f3 d7d5 f3d4 e6d4 e3d4 e7e6 d1e1 f6g4 e1e2 f7f6 c2c4 d5c4 b1e4 d8d4 e4f3 g4e5 g3e4 e5f3 g2f3 g8f7 e4f6 g7f6 c1d1 e6e5 h2h4 f7g6 g1h2 g6f5 e2e5 f6e5 h2e5 h8e5 h1f1 e5f4 d2d3 d4d3 d1e1 f4d2".split(" ").toList
-      }
-    }
+    // "960" in {
+    //   UciDump(complete960, None, Variant.Chess960) must beSuccess.like {
+    //     case moves => moves must_== "e2e3 e8f6 f1g3 f8e6 e1f3 d7d5 f3d4 e6d4 e3d4 e7e6 d1e1 f6g4 e1e2 f7f6 c2c4 d5c4 b1e4 d8d4 e4f3 g4e5 g3e4 e5f3 g2f3 g8f7 e4f6 g7f6 c1d1 e6e5 h2h4 f7g6 g1h2 g6f5 e2e5 f6e5 h2e5 h8e5 h1f1 e5f4 d2d3 d4d3 d1e1 f4d2".split(" ").toList
+    //   }
+    // }
   }
 }

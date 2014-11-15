@@ -7,7 +7,7 @@ class ParserTest extends ChessTest {
 
   import Fixtures._
 
-  val parser = Parser
+  val parser = Parser.full _
 
   "promotion check" should {
     "as a queen" in {

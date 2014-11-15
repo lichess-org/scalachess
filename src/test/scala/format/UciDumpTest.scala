@@ -14,7 +14,7 @@ class UciDumpTest extends ChessTest {
       }
     }
     "simple" in {
-      UciDump(simple, None, Variant.Standard) must beSuccess.like {
+      UciDump(simple.split(' ').toList, None, Variant.Standard) must beSuccess.like {
         case moves => moves must_== "e2e3 b8c6 d2d4 g8f6".split(" ").toList
       }
     }

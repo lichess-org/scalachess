@@ -2,11 +2,11 @@ package chess
 package format.pgn
 
 import scala.util.parsing.combinator._
+import scalaz.Validation.FlatMap._
+import scalaz.Validation.{success => succezz}
 
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
-object Parser
-    extends scalaz.std.OptionInstances
-    with scalaz.syntax.ToTraverseOps {
+object Parser extends scalaz.syntax.ToTraverseOps {
 
   def apply(pgn: String): Valid[ParsedPgn] = for {
     splitted ← splitTagAndMoves(pgn)
@@ -15,8 +15,11 @@ object Parser
     parsedMoves ← MovesParser(moveStr)
     (sanStrs, resultOption) = parsedMoves
     tags2 = resultOption.filterNot(_ => tags.exists(_.name == Tag.Result)).fold(tags)(t => tags :+ t)
-    sans ← sanStrs.map(MoveParser.apply).sequence
+    sans ← moves(sanStrs)
   } yield ParsedPgn(tags2, sans)
+
+  def moves(str: String): Valid[List[San]] = moves(str.split(' ').toList)
+  def moves(strs: List[String]): Valid[List[San]] = strs.map(MoveParser.fast).sequence
 
   trait Logging { self: Parsers =>
     protected val loggingEnabled = false
@@ -30,7 +33,7 @@ object Parser
 
     def apply(pgn: String): Valid[(List[String], Option[Tag])] =
       parseAll(moves, pgn) match {
-        case Success((moves, result), _) => scalaz.Validation.success(moves, result map { r => Tag(_.Result, r) })
+        case Success((moves, result), _) => succezz(moves, result map { r => Tag(_.Result, r) })
         case err                         => "Cannot parse moves: %s\n%s".format(err.toString, pgn).failureNel
       }
 
@@ -78,9 +81,38 @@ object Parser
 
     override def skipWhitespace = false
 
-    def apply(str: String): Valid[San] =
+    private def rangeToMap(r: Iterable[Char]) = r.zipWithIndex.toMap mapValues (_ + 1)
+    val fileMap = rangeToMap('a' to 'h')
+    val rankMap = rangeToMap('1' to '8')
+
+    private val Move = """^(N|B|R|Q|K|)([a-h]?)([1-8]?)(x?)([a-h][0-9])([=Q]?)(\+?)(\#?)$""".r
+
+    def fast(str: String): Valid[San] = {
+      if (str.size == 2) Pos.posAt(str).fold(slow(str)) { pos => succezz(Std(pos, Pawn)) }
+      else str match {
+        case "O-O"   => succezz(Castle(KingSide))
+        case "O-O-O" => succezz(Castle(QueenSide))
+        case Move(role, file, rank, capture, pos, prom, check, mate) =>
+          role.headOption.fold[Option[Role]](Some(Pawn))(Role.allByPgn.get) flatMap { role =>
+            Pos posAt pos map { dest =>
+              succezz(Std(
+                dest = dest,
+                role = role,
+                capture = capture != "",
+                check = check != "",
+                checkmate = mate != "",
+                file = if (file == "") None else fileMap get file.head,
+                rank = if (rank == "") None else rankMap get rank.head,
+                promotion = if (prom == "") None else Some(Queen)))
+            }
+          } getOrElse slow(str)
+        case _ => slow(str)
+      }
+    }
+
+    def slow(str: String): Valid[San] =
       parseAll(move, str) match {
-        case Success(san, _) => scalaz.Validation.success(san)
+        case Success(san, _) => succezz(san)
         case err             => "Cannot parse move: %s\n%s".format(err.toString, str).failureNel
       }
 
@@ -142,9 +174,9 @@ object Parser
 
     val role = mapParser(Role.allByPgn, "role") | success(Pawn)
 
-    val file = mapParser(rangeToMap('a' to 'h'), "file")
+    val file = mapParser(fileMap, "file")
 
-    val rank = mapParser(rangeToMap('1' to '8'), "rank")
+    val rank = mapParser(rankMap, "rank")
 
     val promotion = ("="?) ~> mapParser(promotable, "promotion")
 
@@ -153,8 +185,6 @@ object Parser
     val dest = mapParser(Pos.allKeys, "dest")
 
     def exists(c: String): Parser[Boolean] = c ^^^ true | success(false)
-
-    def rangeToMap(r: Iterable[Char]) = r.zipWithIndex.toMap mapValues (_ + 1)
 
     def mapParser[A, B](map: Map[A, B], name: String): Parser[B] =
       map.foldLeft(failure(name + " not found"): Parser[B]) {
@@ -166,7 +196,7 @@ object Parser
 
     def apply(pgn: String): Valid[List[Tag]] = parseAll(all, pgn) match {
       case f: Failure       => "Cannot parse tags: %s\n%s".format(f.toString, pgn).failureNel
-      case Success(sans, _) => scalaz.Validation.success(sans)
+      case Success(sans, _) => succezz(sans)
       case err              => "Cannot parse tags: %s\n%s".format(err.toString, pgn).failureNel
     }
 

@@ -7,7 +7,7 @@ case class Piece(color: Color, role: Role) {
 
   def oneOf(rs: Set[Role]) = rs(role)
 
-  def forsyth: Char = if (color == White) role.forsyth.toUpper else role.forsyth
+  def forsyth: Char = if (color == White) role.forsythUpper else role.forsyth
 
   // attackable positions assuming empty board
   def eyes(from: Pos, to: Pos): Boolean = role match {

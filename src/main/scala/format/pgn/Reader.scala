@@ -14,15 +14,27 @@ object Reader {
     tags: List[Tag] = Nil): Valid[Replay] = for {
     parsed ← Parser(pgn)
     game ← makeGame(parsed.tags ::: tags)
-    replay ← op(parsed.sans).foldLeft[Valid[Replay]](Replay(game).success) {
+    replay ← makeReplay(game, op(parsed.sans))
+  } yield replay
+
+  def movesWithSans(
+    moveStrs: List[String],
+    op: List[San] => List[San],
+    tags: List[Tag] = Nil): Valid[Replay] = for {
+    moves ← Parser.moves(moveStrs)
+    game ← makeGame(tags)
+    replay ← makeReplay(game, op(moves))
+  } yield replay
+
+  private def makeReplay(game: Game, sans: List[San]) =
+    sans.foldLeft[Valid[Replay]](Replay(game).success) {
       case (replayValid, san) => for {
         replay ← replayValid
         move ← san(replay.state)
       } yield replay addMove move
     }
-  } yield replay
 
-  def makeGame(tags: List[Tag]): Valid[Game] =
+  private def makeGame(tags: List[Tag]): Valid[Game] =
     tags.foldLeft(success(Game(chess.Variant.default)): Valid[Game]) {
       case (vg, Tag(Tag.FEN, fen)) => for {
         g1 ← vg

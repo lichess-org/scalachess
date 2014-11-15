@@ -85,19 +85,26 @@ object Forsyth {
   )
 
   def exportBoard(board: Board): String = {
-    {
-      for (y ← 8 to 1 by -1) yield {
-        (1 to 8).map(board(_, y)).foldLeft(("", 0)) {
-          case ((out, empty), None)        => (out, empty + 1)
-          case ((out, 0), Some(piece))     => (out + piece.forsyth.toString, 0)
-          case ((out, empty), Some(piece)) => (out + empty.toString + piece.forsyth, 0)
-        } match {
-          case (out, 0)     => out
-          case (out, empty) => out + empty
+    val fen = new scala.collection.mutable.StringBuilder(70)
+    var empty = 0
+    for (y ← 8 to 1 by -1) {
+      empty = 0
+      for (x <- 1 to 8) {
+        board(x, y) match {
+          case None => empty = empty + 1
+          case Some(piece) =>
+            if (empty == 0) fen append piece.forsyth.toString
+            else {
+              fen append (empty.toString + piece.forsyth)
+              empty = 0
+            }
         }
-      } mkString
-    } mkString "/"
-  } mkString
+      }
+      if (empty > 0) fen append empty
+      if (y > 1) fen append "/"
+    }
+    fen.toString
+  }
 
   def fixCastles(fen: String): Option[String] = fen.trim.split(' ').toList match {
     case boardStr :: color :: castlesStr :: rest => makeBoard(boardStr) map { board =>

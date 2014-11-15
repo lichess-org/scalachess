@@ -8,15 +8,22 @@ import scalaz.Validation.{success => succezz}
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 object Parser extends scalaz.syntax.ToTraverseOps {
 
-  def apply(pgn: String): Valid[ParsedPgn] = for {
-    splitted ← splitTagAndMoves(pgn)
-    (tagStr, moveStr) = splitted
-    tags ← TagParser(tagStr)
-    parsedMoves ← MovesParser(moveStr)
-    (sanStrs, resultOption) = parsedMoves
-    tags2 = resultOption.filterNot(_ => tags.exists(_.name == Tag.Result)).fold(tags)(t => tags :+ t)
-    sans ← moves(sanStrs)
-  } yield ParsedPgn(tags2, sans)
+  def apply(pgn: String): Valid[ParsedPgn] = try {
+    for {
+      splitted ← splitTagAndMoves(pgn)
+      (tagStr, moveStr) = splitted
+      tags ← TagParser(tagStr)
+      parsedMoves ← MovesParser(moveStr)
+      (sanStrs, resultOption) = parsedMoves
+      tags2 = resultOption.filterNot(_ => tags.exists(_.name == Tag.Result)).fold(tags)(t => tags :+ t)
+      sans ← moves(sanStrs)
+    } yield ParsedPgn(tags2, sans)
+  }
+  catch {
+    case e: StackOverflowError =>
+      println(pgn)
+      sys error s"### StackOverflowError ### in PGN parser"
+  }
 
   def moves(str: String): Valid[List[San]] = moves(str.split(' ').toList)
   def moves(strs: List[String]): Valid[List[San]] = strs.map(MoveParser.fast).sequence

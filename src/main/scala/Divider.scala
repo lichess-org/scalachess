@@ -7,11 +7,14 @@ object Divider {
   def apply(replay: Replay): Division = {
     val boards = replay.chronoMoves.map { _.before }
 
-    val midGame = boards.toStream.map( i => (mixedness(i), majorsAndMinors(i)) ).indexWhere( i => i._1 > 150 || i._2 <= 10 )
-    val endGame = boards.toStream.map(majorsAndMinors).indexWhere( _ <= 7)
+    val midGame = boards.toStream.map( i => 
+      (mixedness(i), majorsAndMinors(i), backRankSparse(i)) 
+    ).indexWhere( i => i._1 > 150 || i._2 <= 10 || i._3 == true )
+
+    val endGame = boards.toStream.map(majorsAndMinors).indexWhere( _ <= 6)
       
     Division(
-      if (midGame >= endGame) None else indexOption(midGame)
+      if (midGame < endGame || endGame == -1) indexOption(midGame) else None
     ,
       indexOption(endGame)
     )
@@ -27,6 +30,23 @@ object Divider {
       case _ => 0
     }
   }.sum
+
+  def backRankSparse(board: Board): Boolean = {
+    // Sparse back-rank indicates that pieces have been developed
+    val white = (1 to 8).flatMap( x => 
+      board(x, 1).map( piece =>
+        if (piece is Color.white) 1 else 0
+      )
+    ).sum
+
+    val black = (1 to 8).flatMap( x => 
+      board(x, 8).map( piece =>
+        if (piece is Color.black) 1 else 0
+      )
+    ).sum
+
+    if (black <= 3 || white <= 3 ) true else false
+  }
 
   def score(white: Int, black: Int, x: Int, y: Int): Int = (white, black) match {
     case (0, 0) => 0

@@ -1,27 +1,22 @@
 package chess
+package format.pgn
 
 import Pos._
 
-class PlayPerfTest extends ChessTest {
+class ParserPerfTest extends ChessTest {
 
-  val nb = 20
+  val nb = 100
   val iterations = 10
   // val nb = 1
   // val iterations = 1
-  val moves = Seq(E2 -> E4, D7 -> D5, E4 -> D5, D8 -> D5, B1 -> C3, D5 -> A5, D2 -> D4, C7 -> C6, G1 -> F3, C8 -> G4, C1 -> F4, E7 -> E6, H2 -> H3, G4 -> F3, D1 -> F3, F8 -> B4, F1 -> E2, B8 -> D7, A2 -> A3, E8 -> C8, A3 -> B4, A5 -> A1, E1 -> D2, A1 -> H1, F3 -> C6, B7 -> C6, E2 -> A6)
-  // val moves = Seq(E2 -> E4, D7 -> D5, E4 -> D5, D8 -> D5, B1 -> C3, D5 -> A5, D2 -> D4, C7 -> C6, G1 -> F3)
-  // val moves = Seq(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5, D8 -> D5, D2 -> D4, G8 -> F6, G1 -> F3, C8 -> G4, F1 -> E2, E7 -> E6, H2 -> H3, G4 -> H5, E1 -> G1, B8 -> C6, C1 -> E3, C5 -> D4, C3 -> D4, F8 -> B4) 
-  // val moves = format.pgn.Reader(
-  //   format.pgn.Fixtures.fromChessgames
-  // ).toOption.get.chronoMoves map { m => m.orig -> m.dest }
-  val game = makeGame
+  val game = "d4 Nf6 Nf3 Nc6 Nbd2 e6 e4 d6 c4 Qe7 Bd3 e5 d5 Nd4 Nxd4 exd4 O-O Bg4 f3 Bd7 Nb3 Qe5 Be2 c5 dxc6 bxc6 Qxd4 Qxd4+ Nxd4 Rb8 b3 Be7 Be3 Bd8 Rfd1 Bb6 Kf2 Ke7 Rd2 Ba5 Rd3 Bb6 Rad1 Rhd8 g4 h6 Bf4 g5 Bg3 h5 h3 h4 Bh2 Rb7 e5 dxe5 Bxe5 Ne8 Kg2 Bc7 Bxc7 Rxc7 Nf5+ Kf8 f4 gxf4 Nxh4 Ng7 Bf3 Ne6 Nf5 Nc5 Rd4 Ne6 Rd6 c5 h4 Ng7 Nxg7 Kxg7 g5 a5 Kf2 Kf8 Bc6 Ke7 Ba4 Bxa4 Rxd8 Bc6 h5 Ke6 h6 Be4 Rh8 Re7 Re1 Kf5 h7 Kg6 Rc8 Kxh7 Rxc5 a4 b4 Kg6 b5 f6 gxf6 Kxf6 b6 a3 Rc7 Rxc7 bxc7 Bb7 Re8 Kf5 c5 Ba6 Ra8 Bb7 Rf8+ Ke5 c6 Ba6 Ra8 Kd6 Rxa6 Kxc7 Kf3 Kb8 Kxf4 Kc8 Ke5 Kc7 Ke6 Kd8 Kd6 Ke8 Ra7 Kf8 c7 Kf7 c8=Q+ Kg6 Qg4+ Kf6 Ra8 Kf7 Qf5+ Kg7 Ra7+ Kg8 Qc8#"
 
-  def runOne = game.playMoves(moves: _*)
+  def runOne = Parser.moves(game)
   def run { for (i ← 1 to nb) runOne }
 
   "playing a game" should {
     "many times" in {
-      // runOne must beSuccess
+      runOne must beSuccess
       if (nb * iterations > 1) {
         println("warming up")
         run
@@ -34,10 +29,10 @@ class PlayPerfTest extends ChessTest {
         println(s"$nb games in $duration ms")
         duration
       }
-      val nbMoves = iterations * nb * moves.size
-      val moveMicros = (1000 * durations.sum) / nbMoves
-      println(s"Average = $moveMicros microseconds per move")
-      println(s"          ${1000000 / moveMicros} moves per second")
+      val nbGames = iterations * nb
+      val moveMicros = (1000 * durations.sum) / nbGames
+      println(s"Average = $moveMicros microseconds per game")
+      println(s"          ${1000000 / moveMicros} games per second")
       true === true
     }
   }

@@ -6,8 +6,7 @@ case class Replay(setup: Game, moves: List[Move], state: Game) {
 
   lazy val chronoMoves = moves.reverse
 
-  def addMove(move: Move) = Replay(
-    setup = setup,
+  def addMove(move: Move) = copy(
     moves = move :: moves,
     state = state(move))
 

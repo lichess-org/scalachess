@@ -6,46 +6,48 @@ object Divider {
 
   def apply(replay: Replay): Division = {
 
-    val boards = replay.chronoMoves.map { _.before }
+    val indexedBoards: List[(Board, Int)] = replay.chronoMoves.map(_.before).zipWithIndex
 
-    val midGame = boards.toStream.map(i =>
-      (mixedness(i), majorsAndMinors(i), backRankSparse(i))
-    ).indexWhere(i => i._1 > 150 || i._2 <= 10 || i._3 == true)
+    val midGame = indexedBoards.foldLeft(none[Int]) {
+      case (found@Some(index), _) => found
+      case (_, (board, index)) =>
+        (majorsAndMinors(board) <= 10 ||
+          backRankSparse(board) ||
+          mixedness(board) > 150) option index
+    }
 
-    val endGame = boards.toStream.map(majorsAndMinors).indexWhere(_ <= 6)
+    val endGame =
+      if (midGame.isDefined) indexedBoards.foldLeft(none[Int]) {
+        case (found@Some(index), _) => found
+        case (_, (board, index))    => (majorsAndMinors(board) <= 6) option index
+      }
+      else None
 
     Division(
-      if (midGame < endGame || endGame == -1) indexOption(midGame) else None,
-      indexOption(endGame)
+      midGame.filter(m => endGame.fold(true)(m <)),
+      endGame
     )
   }
 
-  private def majorsAndMinors(board: Board): Int = board.pieces.values.map {
-    _.role match {
-      case Queen  => 1
-      case Bishop => 1
-      case Knight => 1
-      case Rook   => 1
-      case _      => 0
+  private def majorsAndMinors(board: Board): Int =
+    board.pieces.values.foldLeft(0) { (v, p) =>
+      if (p.role == Pawn || p.role == King) v else v + 1
     }
-  }.sum
 
-  private def backRankSparse(board: Board): Boolean = {
+  private val whiteBackRank: List[Pos] = (1 to 8).toList flatMap { Pos.posAt(_, 1) }
+  private val blackBackRank: List[Pos] = (1 to 8).toList flatMap { Pos.posAt(_, 8) }
+
+  private def backRankSparse(board: Board): Boolean =
     // Sparse back-rank indicates that pieces have been developed
-    val white = (1 to 8).flatMap(x =>
-      board(x, 1).map(piece =>
-        if (piece is Color.white) 1 else 0
-      )
-    ).sum
-
-    val black = (1 to 8).flatMap(x =>
-      board(x, 8).map(piece =>
-        if (piece is Color.black) 1 else 0
-      )
-    ).sum
-
-    (black <= 3 || white <= 3)
-  }
+    {
+      whiteBackRank.foldLeft(0) { (v, p) =>
+        board(p).fold(v) { a => if (a is Color.white) v + 1 else v }
+      } < 3
+    } || {
+      blackBackRank.foldLeft(0) { (v, p) =>
+        board(p).fold(v) { a => if (a is Color.black) v + 1 else v }
+      } < 3
+    }
 
   private def score(white: Int, black: Int, x: Int, y: Int): Int = (white, black) match {
     case (0, 0) => 0
@@ -72,23 +74,32 @@ object Divider {
     case _      => 0
   }
 
-  private def mixedness(board: Board): Int = {
-    (1 to 7).flatMap(y =>
-      (1 to 7).map(x =>
-        {
-          val cell = (0 to 1).flatMap(yp =>
-            (0 to 1).map(xp =>
-              board(x + xp, y + yp).map(
-                piece =>
-                  if (piece is Color.white) 1 else -1
-              ).sum
-            )
-          ).groupBy(i => i).mapValues(_.size)
+  private val mixednessRegions: List[List[Pos]] = {
+    for {
+      y <- 1 to 7
+      x <- 1 to 7
+    } yield {
+      for {
+        dy <- 0 to 1
+        dx <- 0 to 1
+      } yield Pos.posAt(x + dx, y + dy)
+    }.toList.flatten
+  }.toList
 
-          score(cell.getOrElse(1, 0), cell.getOrElse(-1, 0), x, y)
+  private def mixedness(board: Board): Int = {
+    val boardValues = board.pieces.mapValues(_ is Color.white)
+    mixednessRegions.foldLeft(0) {
+      case (mix, region) =>
+        var white = 0
+        var black = 0
+        region foreach { p =>
+          boardValues get p foreach { v =>
+            if (v) white = white + 1
+            else black = black + 1
+          }
         }
-      )
-    ).sum
+        mix + score(white, black, region.head.x, region.head.y)
+    }
   }
 
   private def indexOption(index: Int) = if (index == -1) None else Some(index)

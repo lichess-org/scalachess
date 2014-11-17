@@ -10,7 +10,7 @@ object UciDump {
   def apply(moves: List[String], initialFen: Option[String], variant: Variant): Valid[List[String]] =
     moves.isEmpty.fold(
       success(Nil),
-      Replay(moves, initialFen, variant) map apply
+      Replay(moves, initialFen, variant, trusted = true) map apply
     )
 
   def move(variant: Variant)(m: Move): String = m.castle.fold(

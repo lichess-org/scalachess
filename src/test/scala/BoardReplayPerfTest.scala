@@ -2,23 +2,20 @@ package chess
 
 import Pos._
 
-class DividerPerfTest extends ChessTest {
+class BoardReplayPerfTest extends ChessTest {
 
-  val nb = 500
+  val nb = 100
   val iterations = 10
   // val nb = 1
   // val iterations = 1
 
-  val moves = format.pgn.Fixtures.fromProd2
-  val gameReplay = Replay.boards(moves.split(' ').toList, None).err
-  def runOne = Divider(gameReplay)
+  val moves = format.pgn.Fixtures.fromProd2.split(' ').toList
+  def runOne = Replay.boards(moves, None)
   def run { for (i ← 1 to nb) runOne }
 
   "playing a game" should {
     "many times" in {
-      // runOne.end must beSome.like {
-      //   case x => x must beBetween(65, 80)
-      // }
+      runOne must beSuccess
       if (nb * iterations > 1) {
         println("warming up")
         run

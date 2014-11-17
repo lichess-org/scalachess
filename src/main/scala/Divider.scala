@@ -4,9 +4,9 @@ case class Division(mid: Option[Int], end: Option[Int])
 
 object Divider {
 
-  def apply(replay: Replay): Division = {
+  def apply(boards: List[Board]): Division = {
 
-    val indexedBoards: List[(Board, Int)] = replay.chronoMoves.map(_.before).zipWithIndex
+    val indexedBoards: List[(Board, Int)] = boards.zipWithIndex
 
     val midGame = indexedBoards.foldLeft(none[Int]) {
       case (found@Some(index), _) => found

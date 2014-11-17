@@ -3,7 +3,7 @@ package format.pgn
 
 import scala.util.parsing.combinator._
 import scalaz.Validation.FlatMap._
-import scalaz.Validation.{success => succezz}
+import scalaz.Validation.{ success => succezz }
 
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 object Parser extends scalaz.syntax.ToTraverseOps {
@@ -92,13 +92,13 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     val fileMap = rangeToMap('a' to 'h')
     val rankMap = rangeToMap('1' to '8')
 
-    private val Move = """^(N|B|R|Q|K|)([a-h]?)([1-8]?)(x?)([a-h][0-9])([=Q]?)(\+?)(\#?)$""".r
+    private val Move = """^(N|B|R|Q|K|)([a-h]?)([1-8]?)(x?)([a-h][0-9])(=?[NBRQ]?)(\+?)(\#?)$""".r
 
     def fast(str: String): Valid[San] = {
       if (str.size == 2) Pos.posAt(str).fold(slow(str)) { pos => succezz(Std(pos, Pawn)) }
       else str match {
-        case "O-O"   => succezz(Castle(KingSide))
-        case "O-O-O" => succezz(Castle(QueenSide))
+        case "O-O" | "o-o" | "0-0"       => succezz(Castle(KingSide))
+        case "O-O-O" | "o-o-o" | "0-0-0" => succezz(Castle(QueenSide))
         case Move(role, file, rank, capture, pos, prom, check, mate) =>
           role.headOption.fold[Option[Role]](Some(Pawn))(Role.allByPgn.get) flatMap { role =>
             Pos posAt pos map { dest =>
@@ -110,7 +110,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
                 checkmate = mate != "",
                 file = if (file == "") None else fileMap get file.head,
                 rank = if (rank == "") None else rankMap get rank.head,
-                promotion = if (prom == "") None else Some(Queen)))
+                promotion = if (prom == "") None else Role.allPromotableByPgn get prom.last))
             }
           } getOrElse slow(str)
         case _ => slow(str)

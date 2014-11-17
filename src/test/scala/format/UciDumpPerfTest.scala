@@ -18,7 +18,7 @@ class UciDumpPerfTest extends ChessTest {
       // runOne must beSuccess
       if (nb * iterations > 1) {
         println("warming up")
-        runOne.pp
+        runOne
         run
       }
       println("running tests")

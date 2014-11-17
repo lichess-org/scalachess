@@ -1,6 +1,6 @@
 package chess
 
-import format.pgn.{ Reader, Tag }
+import format.pgn.{ Parser, Reader, Tag }
 
 case class Replay(setup: Game, moves: List[Move], state: Game) {
 
@@ -17,14 +17,32 @@ object Replay {
 
   def apply(game: Game) = new Replay(game, Nil, game)
 
-  def apply(moveStrs: List[String], initialFen: Option[String], variant: Variant): Valid[Replay] =
+  def apply(
+    moveStrs: List[String],
+    initialFen: Option[String],
+    variant: Variant,
+    trusted: Boolean): Valid[Replay] =
     moveStrs.some.filter(_.nonEmpty) toValid "[replay] pgn is empty" flatMap { nonEmptyMoves =>
       Reader.moves(
         nonEmptyMoves,
         List(
           initialFen map { fen => Tag(_.FEN, fen) },
           variant.some.filterNot(_.standard) map { v => Tag(_.Variant, v.name) }
-        ).flatten
-      )
+        ).flatten,
+        trusted = trusted)
     }
+
+  def boards(moveStrs: List[String], initialFen: Option[String]): Valid[List[Board]] = {
+    val sit = initialFen.flatMap(format.Forsyth.<<) | Situation(Variant.Standard)
+    val init = sit -> List(sit.board)
+    Parser moves moveStrs flatMap { sans =>
+      sans.foldLeft[Valid[(Situation, List[Board])]](init.success) {
+        case (scalaz.Success((sit, boards)), san) =>
+          san(sit, true) map { move =>
+            Situation(move.after, !sit.color) -> (move.after :: boards)
+          }
+        case (x, _) => x
+      }
+    }
+  }.map(_._2.reverse)
 }

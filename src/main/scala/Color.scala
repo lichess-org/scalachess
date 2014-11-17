@@ -30,6 +30,14 @@ sealed trait Color {
 
 object Color {
 
+  case class Map[A](white: A, black: A) {
+    def apply(color: Color) = if (color.white) white else black
+  }
+
+  object Map {
+    def apply[A](f: Color => A): Map[A] = Map(white = f(White), black = f(Black))
+  }
+
   case object White extends Color {
 
     lazy val unary_! = Black

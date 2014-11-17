@@ -9,7 +9,9 @@ case class Actor(
 
   import Actor._
 
-  lazy val moves: List[Move] = kingSafety(piece.role match {
+  lazy val moves: List[Move] = kingSafety(trustedMoves)
+
+  def trustedMoves: List[Move] = piece.role match {
 
     case Bishop => longRange(Bishop.dirs)
 
@@ -22,7 +24,7 @@ case class Actor(
     case Rook   => longRange(Rook.dirs)
 
     case Pawn => pawnDir(pos) map { next =>
-      val fwd = Some(next) filterNot board.occupations
+      val fwd = Some(next) filterNot board.pieces.contains
       def capture(horizontal: Direction): Option[Move] = {
         for {
           p ← horizontal(next)
@@ -52,8 +54,10 @@ case class Actor(
       List(
         fwd flatMap forward,
         for {
-          p ← fwd; if pos.y == color.unmovedPawnY
-          p2 ← pawnDir(p); if !(board occupations p2)
+          p ← fwd
+          if pos.y == color.unmovedPawnY
+          p2 ← pawnDir(p)
+          if !(board.pieces contains p2)
           b ← board.move(pos, p2)
         } yield move(p2, b),
         capture(_.left),
@@ -62,7 +66,7 @@ case class Actor(
         enpassant(_.right)
       ).flatten
     } getOrElse Nil
-  })
+  }
 
   lazy val destinations: List[Pos] = moves map (_.dest)
 
@@ -118,10 +122,10 @@ case class Actor(
   ) map { move(_, b4, castle = castle) }) getOrElse Nil
 
   private def shortRange(dirs: Directions): List[Move] =
-    (pos mapply dirs).flatten filterNot friends map { to =>
+    (pos mapply dirs).flatten filterNot friends flatMap { to =>
       if (enemies(to)) board.taking(pos, to) map { move(to, _, Some(to)) }
       else board.move(pos, to) map { move(to, _) }
-    } flatten
+    }
 
   private def longRange(dirs: Directions): List[Move] = {
 
@@ -171,8 +175,8 @@ case class Actor(
     enpassant = enpassant)
 
   private def history = board.history
-  private def friends = board occupation color
-  private def enemies = board occupation !color
+  private val friends = board occupation color
+  private val enemies = board occupation !color
 }
 
 object Actor {

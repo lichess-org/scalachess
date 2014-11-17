@@ -59,8 +59,6 @@ case class Move(
 
   def color = piece.color
 
-  def spaceNotation = orig + " " + dest
-
   def withPromotion(op: Option[PromotableRole]): Option[Move] = op.fold(some(this)) { p =>
     if ((after count color.queen) > (before count color.queen)) for {
       b2 ← after take dest

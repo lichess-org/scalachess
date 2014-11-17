@@ -18,14 +18,13 @@ case class Board(
     case (pos, piece) => (pos, Actor(piece, pos, this))
   }
 
-  lazy val colorActors: Map[Color, List[Actor]] =
-    actors.values groupBy (_.color) mapValues (_.toList)
+  lazy val actorsOf: Color.Map[List[Actor]] = Color Map { color =>
+    actors.values filter (_.color == color) toList
+  }
 
   def rolesOf(c: Color): List[Role] = pieces.values.toList collect {
     case piece if piece.color == c => piece.role
   }
-
-  def actorsOf(c: Color): List[Actor] = colorActors get c getOrElse Nil
 
   def actorAt(at: Pos): Option[Actor] = actors get at
 
@@ -75,7 +74,7 @@ case class Board(
     piece ← pieces get orig
     takenPos = taking getOrElse dest
     if (pieces contains takenPos)
-  } yield copy(pieces = pieces - takenPos - orig + ((dest, piece)))
+  } yield copy(pieces = pieces - takenPos - orig + (dest -> piece))
 
   def move(orig: Pos) = new {
     def to(dest: Pos): Valid[Board] = {
@@ -86,11 +85,9 @@ case class Board(
     }
   }
 
-  lazy val occupation: Map[Color, Set[Pos]] = Color.all map { color =>
-    (color, pieces collect { case (pos, piece) if piece is color => pos } toSet)
-  } toMap
-
-  lazy val occupations = pieces.keySet
+  lazy val occupation: Color.Map[Set[Pos]] = Color.Map { color =>
+    pieces collect { case (pos, piece) if piece is color => pos } toSet
+  }
 
   def promote(pos: Pos): Option[Board] = for {
     pawn ← apply(pos)

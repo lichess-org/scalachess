@@ -6,7 +6,8 @@ case class ParsedPgn(tags: List[Tag], sans: List[San])
 // Standard Algebraic Notation
 sealed trait San {
 
-  def apply(game: Game): Valid[chess.Move]
+  // if trusted, don't check the move for validity, just apply it to the game
+  def apply(situation: Situation, trusted: Boolean): Valid[chess.Move]
 }
 
 case class Std(
@@ -24,20 +25,19 @@ case class Std(
     checkmate = s.checkmate,
     promotion = s.promotion)
 
-  def apply(game: Game): Valid[chess.Move] = {
-    def compare[A](a: Option[A], b: => A) = a map (_ == b) getOrElse true
-    game.situation.moves map {
-      case (orig, moves) => moves find { move =>
-        move.dest == dest && move.piece.role == role
-      }
-    } collect {
-      case Some(m) if compare(file, m.orig.x) && compare(rank, m.orig.y) => m
+  def apply(situation: Situation, trusted: Boolean): Valid[chess.Move] = {
+    situation.board.pieces.foldLeft(none[chess.Move]) {
+      case (None, (pos, piece)) if (piece.color == situation.color && piece.role == role && compare(file, pos.x) && compare(rank, pos.y) && piece.eyesMovable(pos, dest)) =>
+        val a = Actor(piece, pos, situation.board)
+        (if (trusted) a.trustedMoves else a.moves) find (_.dest == dest)
+      case (m, _) => m
     } match {
-      case Nil        => s"No move found: $this\n${game.board}".failureNel
-      case one :: Nil => one withPromotion promotion toValid "Wrong promotion"
-      case many       => s"Many moves found: $many\n${game.board}".failureNel
+      case None       => s"No move found: $this\n${situation.board}".failureNel
+      case Some(move) => move withPromotion promotion toValid "Wrong promotion"
     }
   }
+
+  private def compare[A](a: Option[A], b: => A) = a.fold(true)(b==)
 
   // override def toString = role.forsyth + dest.toString
 }
@@ -56,9 +56,9 @@ case class Castle(
     check = s.check,
     checkmate = s.checkmate)
 
-  def apply(game: Game): Valid[chess.Move] = for {
-    kingPos ← game.board kingPosOf game.player toValid "No king found"
-    actor ← game.board actorAt kingPos toValid "No actor found"
-    move ← actor.castleOn(side).headOption toValid "Cannot castle / variant is " + game.board.variant
+  def apply(situation: Situation, trusted: Boolean): Valid[chess.Move] = for {
+    kingPos ← situation.board kingPosOf situation.color toValid "No king found"
+    actor ← situation.board actorAt kingPos toValid "No actor found"
+    move ← actor.castleOn(side).headOption toValid "Cannot castle / variant is " + situation.board.variant
   } yield move
 }

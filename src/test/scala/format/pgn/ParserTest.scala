@@ -56,7 +56,7 @@ class ParserTest extends ChessTest {
 
   "disambiguated" in {
     parser(disambiguated) must beSuccess.like {
-      case a => a.sans.pp.size must_== 3
+      case a => a.sans.size must_== 3
     }
   }
 

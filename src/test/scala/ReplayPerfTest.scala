@@ -10,7 +10,7 @@ class ReplayPerfTest extends ChessTest {
   // val iterations = 1
 
   val moves = format.pgn.Fixtures.fromProd2.split(' ').toList
-  def runOne = Replay(moves, None, Variant.Standard, trusted = true)
+  def runOne = Replay(moves, None, Variant.Standard)
   def run { for (i ← 1 to nb) runOne }
 
   "playing a game" should {

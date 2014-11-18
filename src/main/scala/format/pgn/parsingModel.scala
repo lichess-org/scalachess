@@ -6,8 +6,7 @@ case class ParsedPgn(tags: List[Tag], sans: List[San])
 // Standard Algebraic Notation
 sealed trait San {
 
-  // if trusted, don't check the move for validity, just apply it to the game
-  def apply(situation: Situation, trusted: Boolean): Valid[chess.Move]
+  def apply(situation: Situation): Valid[chess.Move]
 }
 
 case class Std(
@@ -25,17 +24,15 @@ case class Std(
     checkmate = s.checkmate,
     promotion = s.promotion)
 
-  def apply(situation: Situation, trusted: Boolean): Valid[chess.Move] = {
+  def apply(situation: Situation): Valid[chess.Move] =
     situation.board.pieces.foldLeft(none[chess.Move]) {
-      case (None, (pos, piece)) if (piece.color == situation.color && piece.role == role && compare(file, pos.x) && compare(rank, pos.y) && piece.eyesMovable(pos, dest)) =>
-        val a = Actor(piece, pos, situation.board)
-        (if (trusted) a.trustedMoves else a.moves) find (_.dest == dest)
+      case (None, (pos, piece)) if piece.color == situation.color && piece.role == role && compare(file, pos.x) && compare(rank, pos.y) && piece.eyesMovable(pos, dest) =>
+        Actor(piece, pos, situation.board).moves find (_.dest == dest)
       case (m, _) => m
     } match {
       case None       => s"No move found: $this\n${situation.board}".failureNel
       case Some(move) => move withPromotion promotion toValid "Wrong promotion"
     }
-  }
 
   private def compare[A](a: Option[A], b: => A) = a.fold(true)(b==)
 
@@ -56,7 +53,7 @@ case class Castle(
     check = s.check,
     checkmate = s.checkmate)
 
-  def apply(situation: Situation, trusted: Boolean): Valid[chess.Move] = for {
+  def apply(situation: Situation): Valid[chess.Move] = for {
     kingPos ← situation.board kingPosOf situation.color toValid "No king found"
     actor ← situation.board actorAt kingPos toValid "No actor found"
     move ← actor.castleOn(side).headOption toValid "Cannot castle / variant is " + situation.board.variant

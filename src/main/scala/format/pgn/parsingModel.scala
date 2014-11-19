@@ -27,7 +27,10 @@ case class Std(
   def apply(situation: Situation): Valid[chess.Move] =
     situation.board.pieces.foldLeft(none[chess.Move]) {
       case (None, (pos, piece)) if piece.color == situation.color && piece.role == role && compare(file, pos.x) && compare(rank, pos.y) && piece.eyesMovable(pos, dest) =>
-        Actor(piece, pos, situation.board).moves find (_.dest == dest)
+        val a = Actor(piece, pos, situation.board)
+        a trustedMoves false find { m =>
+          m.dest == dest && (a kingSafety m)
+        }
       case (m, _) => m
     } match {
       case None       => s"No move found: $this\n${situation.board}".failureNel

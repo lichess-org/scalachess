@@ -9,17 +9,20 @@ case class Actor(
 
   import Actor._
 
-  lazy val moves: List[Move] = kingSafety(piece.role match {
+  lazy val moves: List[Move] = kingSafetyMoveFilter(trustedMoves(true))
 
-    case Bishop => longRange(Bishop.dirs)
+  def trustedMoves(withCastle: Boolean): List[Move] = piece.role match {
 
-    case Queen  => longRange(Queen.dirs)
+    case Bishop             => longRange(Bishop.dirs)
 
-    case Knight => shortRange(Knight.dirs)
+    case Queen              => longRange(Queen.dirs)
 
-    case King   => shortRange(King.dirs) ++ castle
+    case Knight             => shortRange(Knight.dirs)
 
-    case Rook   => longRange(Rook.dirs)
+    case King if withCastle => shortRange(King.dirs) ++ castle
+    case King               => shortRange(King.dirs)
+
+    case Rook               => longRange(Rook.dirs)
 
     case Pawn => pawnDir(pos) map { next =>
       val fwd = Some(next) filterNot board.pieces.contains
@@ -64,7 +67,7 @@ case class Actor(
         enpassant(_.right)
       ).flatten
     } getOrElse Nil
-  })
+  }
 
   lazy val destinations: List[Pos] = moves map (_.dest)
 
@@ -73,16 +76,23 @@ case class Actor(
   def is(p: Piece) = p == piece
 
   // critical function. optimize for performance
-  private def kingSafety(ms: List[Move]): List[Move] = {
+  private def kingSafetyMoveFilter(ms: List[Move]): List[Move] = {
     val filter: Piece => Boolean =
       if (piece is King) (_ => true) else if (check) (_.role.attacker) else (_.role.projection)
     val stableKingPos = if (piece.role == King) None else board kingPosOf color
-    ms filterNot { m =>
-      stableKingPos orElse (m.after kingPosOf color) exists { kingPos =>
-        threatens(m.after, !color, kingPos, filter)
-      }
+    ms filter { m =>
+      kingSafety(m, filter, stableKingPos orElse (m.after kingPosOf color))
     }
   }
+
+  private def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean = !{
+    kingPos exists { threatens(m.after, !color, _, filter) }
+  }
+
+  def kingSafety(m: Move): Boolean = kingSafety(
+    m,
+    if (piece is King) (_ => true) else if (check) (_.role.attacker) else (_.role.projection),
+    if (piece.role == King) None else board kingPosOf color)
 
   lazy val check: Boolean = board check color
 

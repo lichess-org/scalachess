@@ -8,26 +8,26 @@ sealed trait Role {
   lazy val pgn: Char = forsythUpper
   lazy val name = toString.toLowerCase
   val attacker: Boolean = true
-  val projection: Boolean = false
-  def dirs: Directions
+  val projection: Boolean
+  val dirs: Directions
+  def dir(from: Pos, to: Pos): Option[Direction]
 }
 sealed trait PromotableRole extends Role
-sealed trait Projection extends Role {
-  def dir(from: Pos, to: Pos): Option[Direction]
-  override val projection = true
-}
 
 case object King extends Role {
   val forsyth = 'k'
   val dirs: Directions = Queen.dirs
+  def dir(from: Pos, to: Pos) = None
   override val attacker = false
+  val projection = false
 }
-case object Queen extends PromotableRole with Projection {
+case object Queen extends PromotableRole {
   val forsyth = 'q'
   val dirs: Directions = Rook.dirs ::: Bishop.dirs
   def dir(from: Pos, to: Pos) = Rook.dir(from, to) orElse Bishop.dir(from, to)
+  val projection = true
 }
-case object Rook extends PromotableRole with Projection {
+case object Rook extends PromotableRole {
   val forsyth = 'r'
   val dirs: Directions = List(_.up, _.down, _.left, _.right)
   def dir(from: Pos, to: Pos) = if (to ?| from) Some(
@@ -37,17 +37,21 @@ case object Rook extends PromotableRole with Projection {
     if (to ?< from) (_.left) else (_.right)
   )
   else None
+  val projection = true
 }
-case object Bishop extends PromotableRole with Projection {
+case object Bishop extends PromotableRole {
   val forsyth = 'b'
   val dirs: Directions = List(_.upLeft, _.upRight, _.downLeft, _.downRight)
   def dir(from: Pos, to: Pos) = if (to onSameDiagonal from) Some(
     if (to ?^ from) {
       if (to ?< from) (_.upLeft) else (_.upRight)
-    } else {
+    }
+    else {
       if (to ?< from) (_.downLeft) else (_.downRight)
     }
-  ) else None
+  )
+  else None
+  val projection = true
 }
 case object Knight extends PromotableRole {
   val forsyth = 'n'
@@ -60,10 +64,14 @@ case object Knight extends PromotableRole {
     _.right flatMap (_.downRight),
     _.down flatMap (_.downLeft),
     _.down flatMap (_.downRight))
+  def dir(from: Pos, to: Pos) = None
+  val projection = false
 }
 case object Pawn extends Role {
   val forsyth = 'p'
   val dirs: Directions = Nil
+  def dir(from: Pos, to: Pos) = None
+  val projection = false
 }
 
 object Role {

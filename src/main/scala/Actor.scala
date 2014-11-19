@@ -86,9 +86,6 @@ case class Actor(
     }
   }
 
-  def attacker = piece.role.attacker
-  def projection = piece.role.projection
-
   lazy val check: Boolean = board check color
 
   private def castle: List[Move] = castleOn(KingSide) ::: castleOn(QueenSide)
@@ -184,12 +181,10 @@ object Actor {
   // critical function. optimize for performance
   def threatens(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean =
     board.pieces exists {
-      case (pos, piece) if piece.color == color && filter(piece) => piece.role match {
-        case x: Projection => x.dir(pos, to) exists {
+      case (pos, piece) if piece.color == color && filter(piece) && piece.eyes(pos, to) =>
+        (!piece.role.projection) || piece.role.dir(pos, to).exists {
           longRangeThreatens(board, pos, _, to)
         }
-        case _ => piece.eyes(pos, to)
-      }
       case _ => false
     }
 

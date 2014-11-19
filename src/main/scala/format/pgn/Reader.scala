@@ -8,8 +8,8 @@ object Reader {
   def full(pgn: String, tags: List[Tag] = Nil): Valid[Replay] =
     fullWithSans(pgn, identity, tags)
 
-  def moves(moveStrs: List[String], tags: List[Tag], trusted: Boolean): Valid[Replay] =
-    movesWithSans(moveStrs, identity, tags, trusted)
+  def moves(moveStrs: List[String], tags: List[Tag]): Valid[Replay] =
+    movesWithSans(moveStrs, identity, tags)
 
   def fullWithSans(
     pgn: String,
@@ -17,24 +17,23 @@ object Reader {
     tags: List[Tag] = Nil): Valid[Replay] = for {
     parsed ← Parser.full(pgn)
     game ← makeGame(parsed.tags ::: tags)
-    replay ← makeReplay(game, op(parsed.sans), trusted = false)
+    replay ← makeReplay(game, op(parsed.sans))
   } yield replay
 
   def movesWithSans(
     moveStrs: List[String],
     op: List[San] => List[San],
-    tags: List[Tag],
-    trusted: Boolean): Valid[Replay] = for {
+    tags: List[Tag]): Valid[Replay] = for {
     moves ← Parser.moves(moveStrs)
     game ← makeGame(tags)
-    replay ← makeReplay(game, op(moves), trusted)
+    replay ← makeReplay(game, op(moves))
   } yield replay
 
-  private def makeReplay(game: Game, sans: List[San], trusted: Boolean) =
+  private def makeReplay(game: Game, sans: List[San]) =
     sans.foldLeft[Valid[Replay]](Replay(game).success) {
       case (replayValid, san) => for {
         replay ← replayValid
-        move ← san(replay.state.situation, trusted)
+        move ← san(replay.state.situation)
       } yield replay addMove move
     }
 

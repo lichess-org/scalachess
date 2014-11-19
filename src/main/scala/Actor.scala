@@ -9,9 +9,7 @@ case class Actor(
 
   import Actor._
 
-  lazy val moves: List[Move] = kingSafety(trustedMoves)
-
-  def trustedMoves: List[Move] = piece.role match {
+  lazy val moves: List[Move] = kingSafety(piece.role match {
 
     case Bishop => longRange(Bishop.dirs)
 
@@ -66,7 +64,7 @@ case class Actor(
         enpassant(_.right)
       ).flatten
     } getOrElse Nil
-  }
+  })
 
   lazy val destinations: List[Pos] = moves map (_.dest)
 

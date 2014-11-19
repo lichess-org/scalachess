@@ -20,16 +20,14 @@ object Replay {
   def apply(
     moveStrs: List[String],
     initialFen: Option[String],
-    variant: Variant,
-    trusted: Boolean): Valid[Replay] =
+    variant: Variant): Valid[Replay] =
     moveStrs.some.filter(_.nonEmpty) toValid "[replay] pgn is empty" flatMap { nonEmptyMoves =>
       Reader.moves(
         nonEmptyMoves,
         List(
           initialFen map { fen => Tag(_.FEN, fen) },
           variant.some.filterNot(_.standard) map { v => Tag(_.Variant, v.name) }
-        ).flatten,
-        trusted = trusted)
+        ).flatten)
     }
 
   def boards(moveStrs: List[String], initialFen: Option[String]): Valid[List[Board]] = {
@@ -38,7 +36,7 @@ object Replay {
     Parser moves moveStrs flatMap { sans =>
       sans.foldLeft[Valid[(Situation, List[Board])]](init.success) {
         case (scalaz.Success((sit, boards)), san) =>
-          san(sit, true) map { move =>
+          san(sit) map { move =>
             Situation(move.after, !sit.color) -> (move.after :: boards)
           }
         case (x, _) => x

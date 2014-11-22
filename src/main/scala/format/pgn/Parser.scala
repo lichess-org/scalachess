@@ -26,7 +26,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
   }
 
   def moves(str: String): Valid[List[San]] = moves(str.split(' ').toList)
-  def moves(strs: List[String]): Valid[List[San]] = strs.map(MoveParser.fast).sequence
+  def moves(strs: List[String]): Valid[List[San]] = strs.map(MoveParser.apply).sequence
 
   trait Logging { self: Parsers =>
     protected val loggingEnabled = false
@@ -94,7 +94,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
     private val Move = """^(N|B|R|Q|K|)([a-h]?)([1-8]?)(x?)([a-h][0-9])(=?[NBRQ]?)(\+?)(\#?)$""".r
 
-    def fast(str: String): Valid[San] = {
+    def apply(str: String): Valid[San] = {
       if (str.size == 2) Pos.posAt(str).fold(slow(str)) { pos => succezz(Std(pos, Pawn)) }
       else str match {
         case "O-O" | "o-o" | "0-0"       => succezz(Castle(KingSide))
@@ -117,7 +117,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       }
     }
 
-    def slow(str: String): Valid[San] =
+    private def slow(str: String): Valid[San] =
       parseAll(move, str) match {
         case Success(san, _) => succezz(san)
         case err             => "Cannot parse move: %s\n%s".format(err.toString, str).failureNel

@@ -149,7 +149,9 @@ object Clock {
       color = White,
       whiteTime = 0f,
       blackTime = 0f)
-    if (clock.limit == 0) clock.giveTime(White, minInitLimit).giveTime(Black, minInitLimit)
+    if (clock.limit == 0) clock
+      .giveTime(White, increment.max(2))
+      .giveTime(Black, increment.max(2))
     else clock
   }
 

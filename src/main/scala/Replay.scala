@@ -37,7 +37,8 @@ object Replay {
       sans.foldLeft[Valid[(Situation, List[Board])]](init.success) {
         case (scalaz.Success((sit, boards)), san) =>
           san(sit) map { move =>
-            Situation(move.after, !sit.color) -> (move.after :: boards)
+            val after = move.afterWithLastMove
+            Situation(after, !sit.color) -> (after :: boards)
           }
         case (x, _) => x
       }

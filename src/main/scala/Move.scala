@@ -50,6 +50,9 @@ case class Move(
     }
   }
 
+  def afterWithLastMove = after.copy(
+    history = after.history.copy(lastMove = Some(orig, dest)))
+
   // does this move capture an opponent piece?
   def captures = capture.isDefined
 

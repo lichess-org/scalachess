@@ -22,7 +22,7 @@ object ApplicationBuild extends Build with Resolvers with Dependencies {
     version := "4.0",
     resolvers := Seq(iliaz, sonatype, awesomepom),
     libraryDependencies := Seq(scalaz, scalalib, jodaTime, specs2),
-    incOptions := incOptions.value.withNameHashing(true),
+    updateOptions := updateOptions.value.withCachedResolution(true),
     scalacOptions := Seq(
       "-deprecation",
       "-unchecked",

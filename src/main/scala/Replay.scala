@@ -33,7 +33,7 @@ object Replay {
   def boards(moveStrs: List[String], initialFen: Option[String]): Valid[List[Board]] = {
     val sit = initialFen.flatMap(format.Forsyth.<<) | Situation(Variant.Standard)
     val init = sit -> List(sit.board)
-    Parser moves moveStrs flatMap { sans =>
+    Parser moves(moveStrs, sit.board.variant)  flatMap { sans =>
       sans.foldLeft[Valid[(Situation, List[Board])]](init.success) {
         case (scalaz.Success((sit, boards)), san) =>
           san(sit) map { move =>

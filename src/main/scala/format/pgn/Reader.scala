@@ -24,7 +24,7 @@ object Reader {
     moveStrs: List[String],
     op: List[San] => List[San],
     tags: List[Tag]): Valid[Replay] = for {
-    moves ← Parser.moves(moveStrs)
+    moves ← Parser.moves(moveStrs, Parser.getVariantFromTags(tags))
     game ← makeGame(tags)
     replay ← makeReplay(game, op(moves))
   } yield replay

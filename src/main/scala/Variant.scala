@@ -22,14 +22,59 @@ sealed abstract class Variant(
     IndexedSeq(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
   )
 
+  def isValidPromotion(promotion : Option[PromotableRole]) = promotion match {
+    case None => true
+    case Some(Queen) => true
+    case Some(Rook) => true
+    case Some(Knight) => true
+    case Some(Bishop) => true
+    case _ => false
+  }
+
+  def move(situation : Situation, from: Pos, to: Pos, promotion : Option[PromotableRole]): Valid[Move] = for {
+    actor ← situation.board.actors get from toValid "No piece on " + from
+    myActor ← actor.validIf(actor is situation.color, "Not my piece on " + from)
+    m1 ← myActor.moves find (_.dest == to) toValid "Piece on " + from + " cannot move to " + to
+    m2 ← m1 withPromotion promotion toValid "Piece on " + from + " cannot promote to " + promotion
+    m3 <- m2 validIf (isValidPromotion(promotion), "Cannot promote to " + promotion + " in this game mode")
+  } yield m3
+
   def specialEnd(situation: Situation) = false
+
+  def specialDraw(situation: Situation) = false
+
+  def specialStatemate(situation: Situation) = false
 
   def drawsOnInsufficientMaterial = true
 
   def finalizeMove(board: Board): Board = board
 
+  // Some variants, such as kamikaze chess, give different properties to pieces by replacing them with
+  // different piece objects
+  def convertPiecesFromStandard(originalPieces : PieceMap) : PieceMap = originalPieces
+
+  def valid(board : Board, strict: Boolean) = {
+    Color.all map board.rolesOf forall { roles =>
+      ((roles count (_ == King)) == 1) :: {
+        if (strict) List((roles count (_ == Pawn)) <= 8, roles.size <= 16) else Nil
+      } forall identity
+    }
+  }
+
+  def roles = List(Rook, Knight, King, Bishop, King, Queen, Pawn)
+
+  def promotableRoles : List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
+
+  def rolesByForsyth: Map[Char, Role] = this.roles map { r => (r.forsyth, r) } toMap
+
+  def rolesByPgn: Map[Char, Role] = this.roles map { r => (r.pgn, r) } toMap
+
+  def rolesPromotableByPgn: Map[Char, PromotableRole] =
+    promotableRoles map { r => (r.pgn, r) } toMap
+
   override def toString = name
-}
+
+  }
 
 object Variant {
 
@@ -99,6 +144,82 @@ object Variant {
     override def drawsOnInsufficientMaterial = false
   }
 
+  case object SuicideChess extends Variant(
+    id = 5,
+    key = "suicide",
+    name = "suicide",
+    shortName= "suicide",
+    title= "Lose all your pieces to win the game"
+  ) {
+
+    override def pieces = {
+      // In this chess variant, the king can ignore check and be captured, so we replace the normal king with the
+      // antichess king
+      convertPiecesFromStandard(super.pieces)
+    }
+
+    override def move(situation : Situation, from: Pos, to: Pos, promotion : Option[PromotableRole]) = for {
+      // We inherit the standard rules, such as where peices may move
+      m1 <- super.move(situation, from, to, promotion)
+
+      // However, in antichess, the player may only move without capturing if no capturing moves are available.
+      m2 <- m1 validIf (m1.captures || !situation.playerCanCapture, "there are capturing moves available")
+
+    } yield m2
+
+    override def specialEnd(situation: Situation) =
+    {
+      // The game ends with a win when one player manages to lose all their pieces
+      situation.board.actorsOf(situation.color).isEmpty
+    }
+
+    // This mode has no checkmates
+    override def drawsOnInsufficientMaterial = false
+
+    override def specialDraw(situation: Situation) = {
+      val actors = situation.board.actors
+      if (actors.size != 2) false
+      else actors.values.toList match {
+        // No player can win if the only remaining pieces are two bishops of different colours
+        case List(act1, act2) => (act1.color != act2.color) && act1.piece.is(Bishop) && act2.piece.is(Bishop)
+        case _ => false
+      }
+    }
+
+    override def convertPiecesFromStandard(pieces : PieceMap) : PieceMap = {
+      pieces.mapValues {
+        case Piece (color, King) => Piece (color, SuicideKing)
+        case x => x
+      }
+    }
+
+    override def valid (board: Board, strict: Boolean) = {
+      // This variant cannot work with a 'normal' king as it assumes an AntiKing
+
+      board.pieces.values.find(_.is(King)).isEmpty &&  {
+         Color.all map board.rolesOf forall { roles =>
+             (if (strict) List((roles count (_ == Pawn)) <= 8, roles.size <= 16) else Nil) forall identity
+         }
+       }
+    }
+
+    // In this game variant, a king is a valid promotion
+    override def isValidPromotion(promotion : Option[PromotableRole]) = promotion match {
+      case None => true
+      case Some(Queen) => true
+      case Some(Rook) => true
+      case Some(Knight) => true
+      case Some(Bishop) => true
+      case Some(SuicideKing) => true
+      case _ => false
+    }
+
+    override def roles = List(Rook, Knight, SuicideKing, Bishop, Queen, Pawn)
+
+    override def promotableRoles : List[PromotableRole] = List(Queen, Rook, Bishop, Knight, SuicideKing)
+
+  }
+
   case object ThreeCheck extends Variant(
     id = 5,
     key = "threeCheck",
@@ -116,7 +237,7 @@ object Variant {
     }
   }
 
-  val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck)
+  val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, SuicideChess)
   val byId = all map { v => (v.id, v) } toMap
 
   val default = Standard

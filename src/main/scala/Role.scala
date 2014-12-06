@@ -21,6 +21,17 @@ case object King extends Role {
   override val attacker = false
   val projection = false
 }
+
+/**
+ * King for antichess variant where there is no check or checkmate. Additionally, a pawn is promotable to a king.
+ */
+case object SuicideKing extends PromotableRole {
+  val forsyth = 'k'
+  val dirs: Directions = Queen.dirs
+  def dir(from: Pos, to: Pos) = None
+  val projection = false
+}
+
 case object Queen extends PromotableRole {
   val forsyth = 'q'
   val dirs: Directions = Rook.dirs ::: Bishop.dirs
@@ -77,7 +88,7 @@ case object Pawn extends Role {
 object Role {
 
   val all: List[Role] = List(King, Queen, Rook, Bishop, Knight, Pawn)
-  val allPromotable: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
+  val allPromotable: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, SuicideKing)
   val allByForsyth: Map[Char, Role] = all map { r => (r.forsyth, r) } toMap
   val allByPgn: Map[Char, Role] = all map { r => (r.pgn, r) } toMap
   val allPromotableByName: Map[String, PromotableRole] =

@@ -8,6 +8,10 @@ case class Situation(board: Board, color: Color) {
     case actor if actor.moves.nonEmpty => actor.pos -> actor.moves
   } toMap
 
+  lazy val capturingMoves : Map[Pos, List[Move]] = moves mapValues (_.filter(_.captures) ) filterNot (_._2.isEmpty)
+
+  lazy val playerCanCapture : Boolean = moves exists (_._2 exists (_.captures))
+
   lazy val destinations: Map[Pos, List[Pos]] = moves mapValues { _ map (_.dest) }
 
   lazy val kingPos: Option[Pos] = board kingPosOf color
@@ -24,7 +28,9 @@ case class Situation(board: Board, color: Color) {
 
   def variantEnd = board.variant specialEnd this
 
-  def end: Boolean = checkMate || staleMate || autoDraw || variantEnd
+  def variantDraw = board.variant specialDraw this
+
+  def end: Boolean = checkMate || staleMate || autoDraw || variantEnd || variantDraw
 
   def playable(strict: Boolean): Boolean =
     (board valid strict) && !end && !copy(color = !color).check
@@ -36,15 +42,15 @@ case class Situation(board: Board, color: Color) {
     else if (variantEnd) Status.VariantEnd.some
     else none
 
-  def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Valid[Move] = for {
-    actor ← board.actors get from toValid "No piece on " + from
-    myActor ← actor.validIf(actor is color, "Not my piece on " + from)
-    m1 ← myActor.moves find (_.dest == to) toValid "Piece on " + from + " cannot move to " + to
-    m2 ← m1 withPromotion promotion toValid "Piece on " + from + " cannot promote to " + promotion
-  } yield m2
+  def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Valid[Move] =
+    board.variant.move(this, from, to, promotion)
 
   def withHistory(history: History) = copy(
     board = board withHistory history
+  )
+
+  def withVariant(variant: Variant) = copy(
+    board = board withVariant variant
   )
 
   def canCastle = board.history.canCastle _

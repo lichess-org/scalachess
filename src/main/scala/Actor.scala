@@ -20,7 +20,7 @@ case class Actor(
     case Knight             => shortRange(Knight.dirs)
 
     case King if withCastle => shortRange(King.dirs) ++ castle
-    case King               => shortRange(King.dirs)
+    case King | SuicideKing    => shortRange(King.dirs)
 
     case Rook               => longRange(Rook.dirs)
 

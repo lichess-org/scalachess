@@ -1,6 +1,7 @@
 package chess
 
-import format.Visual
+import chess.Variant.SuicideChess
+import chess.format.{Forsyth, Visual}
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.Specification
 import ornicar.scalalib.test.ValidationMatchers
@@ -65,6 +66,14 @@ trait ChessTest
       game.apply(orig, dest, promotion) map (_._1)
 
     def withClock(c: Clock) = game.copy(clock = Some(c))
+  }
+
+  def fenToGame(positionString: String, variant: Variant) = {
+    val situation = Forsyth << positionString
+
+    val maybeBoard = situation map (sit => sit.color -> sit.withVariant(variant).board) toValid "Could not construct situation from FEN"
+
+    maybeBoard map {case (color, board) => Game(SuicideChess).copy(board = board) withPlayer(color)}
   }
 
   def makeBoard(pieces: (Pos, Piece)*): Board =

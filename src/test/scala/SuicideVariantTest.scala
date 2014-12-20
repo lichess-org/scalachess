@@ -211,6 +211,12 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
           val game = replay.state
 
           game.situation.end must beTrue
+
+          // In antichess, the player who has just lost all their pieces is the winner
+          game.situation.winner must beSome.like {
+            case color =>
+              color == Black;
+          }
       }
     }
 

@@ -41,6 +41,10 @@ sealed abstract class Variant(
     m3 <- m2 validIf (isValidPromotion(promotion), "Cannot promote to " + promotion + " in this game mode")
   } yield m3
 
+  def staleMate(situation: Situation) : Boolean = !situation.check && situation.moves.isEmpty
+
+  def winner(situation: Situation) : Option[Color] =  if (situation.checkMate) Some(!situation.color) else None
+
   def specialEnd(situation: Situation) = false
 
   def specialDraw(situation: Situation) = false
@@ -194,8 +198,11 @@ object Variant {
 
     } yield m2
 
-    override def specialEnd(situation: Situation) =
-    {
+    override def staleMate(situation: Situation) : Boolean = specialDraw(situation)
+
+    override def winner (situation: Situation): Option[Color] = if (specialEnd(situation)) Some(situation.color) else None
+
+    override def specialEnd(situation: Situation) = {
       // The game ends with a win when one player manages to lose all their pieces
       situation.board.actorsOf(situation.color).isEmpty
     }

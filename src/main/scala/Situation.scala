@@ -16,7 +16,7 @@ case class Situation(board: Board, color: Color) {
 
   def checkMate: Boolean = check && moves.isEmpty
 
-  def staleMate: Boolean = !check && moves.isEmpty
+  def staleMate: Boolean = board.variant.staleMate(this)
 
   def autoDraw: Boolean = board.autoDraw
 
@@ -27,6 +27,8 @@ case class Situation(board: Board, color: Color) {
   def variantDraw = board.variant specialDraw this
 
   def end: Boolean = checkMate || staleMate || autoDraw || variantEnd || variantDraw
+
+  def winner : Option[Color] = board.variant.winner(this)
 
   def playable(strict: Boolean): Boolean =
     (board valid strict) && !end && !copy(color = !color).check

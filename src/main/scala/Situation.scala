@@ -4,11 +4,7 @@ case class Situation(board: Board, color: Color) {
 
   lazy val actors = board actorsOf color
 
-  lazy val moves: Map[Pos, List[Move]] = actors collect {
-    case actor if actor.moves.nonEmpty => actor.pos -> actor.moves
-  } toMap
-
-  lazy val capturingMoves : Map[Pos, List[Move]] = moves mapValues (_.filter(_.captures) ) filterNot (_._2.isEmpty)
+  lazy val moves: Map[Pos, List[Move]] = board.variant.validMoves(this)
 
   lazy val playerCanCapture : Boolean = moves exists (_._2 exists (_.captures))
 

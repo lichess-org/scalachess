@@ -15,6 +15,7 @@ sealed abstract class Variant(
   def chess960 = this == Variant.Chess960
   def kingOfTheHill = this == Variant.KingOfTheHill
   def threeCheck = this == Variant.ThreeCheck
+  def suicide = this == Variant.SuicideChess
 
   def exotic = !standard
 
@@ -24,12 +25,13 @@ sealed abstract class Variant(
 
   def isValidPromotion(promotion : Option[PromotableRole]) = promotion match {
     case None => true
-    case Some(Queen) => true
-    case Some(Rook) => true
-    case Some(Knight) => true
-    case Some(Bishop) => true
+    case Some(Queen | Rook | Knight | Bishop) => true
     case _ => false
   }
+
+  def validMoves(situation: Situation) =  situation.actors collect {
+    case actor if actor.moves.nonEmpty => actor.pos -> actor.moves
+  } toMap
 
   def move(situation : Situation, from: Pos, to: Pos, promotion : Option[PromotableRole]): Valid[Move] = for {
     actor ← situation.board.actors get from toValid "No piece on " + from
@@ -144,8 +146,25 @@ object Variant {
     override def drawsOnInsufficientMaterial = false
   }
 
-  case object SuicideChess extends Variant(
+  case object ThreeCheck extends Variant(
     id = 5,
+    key = "threeCheck",
+    name = "Three-check",
+    shortName = "3+",
+    title = "Check your opponent 3 times to win the game") {
+
+    override def finalizeMove(board: Board) = board updateHistory {
+      _.withCheck(Color.White, board.checkWhite).withCheck(Color.Black, board.checkBlack)
+    }
+
+    override def specialEnd(situation: Situation) = situation.check && {
+      val checks = situation.board.history.checkCount
+      situation.color.fold(checks.white, checks.black) >= 3
+    }
+  }
+
+  case object SuicideChess extends Variant(
+    id = 6,
     key = "suicide",
     name = "suicide",
     shortName= "suicide",
@@ -158,8 +177,16 @@ object Variant {
       convertPiecesFromStandard(super.pieces)
     }
 
+    // In this variant, a player must capture if a capturing move is available
+    override def validMoves(situation: Situation) = {
+      val allMoves = super.validMoves(situation)
+      val capturingMoves = super.validMoves(situation) mapValues (_.filter(_.captures) ) filterNot (_._2.isEmpty)
+
+      if (!capturingMoves.isEmpty) capturingMoves else allMoves
+    }
+
     override def move(situation : Situation, from: Pos, to: Pos, promotion : Option[PromotableRole]) = for {
-      // We inherit the standard rules, such as where peices may move
+    // We inherit the standard rules, such as where peices may move
       m1 <- super.move(situation, from, to, promotion)
 
       // However, in antichess, the player may only move without capturing if no capturing moves are available.
@@ -197,20 +224,16 @@ object Variant {
       // This variant cannot work with a 'normal' king as it assumes an AntiKing
 
       board.pieces.values.find(_.is(King)).isEmpty &&  {
-         Color.all map board.rolesOf forall { roles =>
-             (if (strict) List((roles count (_ == Pawn)) <= 8, roles.size <= 16) else Nil) forall identity
-         }
-       }
+        Color.all map board.rolesOf forall { roles =>
+          (if (strict) List((roles count (_ == Pawn)) <= 8, roles.size <= 16) else Nil) forall identity
+        }
+      }
     }
 
     // In this game variant, a king is a valid promotion
     override def isValidPromotion(promotion : Option[PromotableRole]) = promotion match {
       case None => true
-      case Some(Queen) => true
-      case Some(Rook) => true
-      case Some(Knight) => true
-      case Some(Bishop) => true
-      case Some(SuicideKing) => true
+      case Some(Queen | Rook | Knight | Bishop | SuicideKing) => true
       case _ => false
     }
 
@@ -218,23 +241,6 @@ object Variant {
 
     override def promotableRoles : List[PromotableRole] = List(Queen, Rook, Bishop, Knight, SuicideKing)
 
-  }
-
-  case object ThreeCheck extends Variant(
-    id = 5,
-    key = "threeCheck",
-    name = "Three-check",
-    shortName = "3+",
-    title = "Check your opponent 3 times to win the game") {
-
-    override def finalizeMove(board: Board) = board updateHistory {
-      _.withCheck(Color.White, board.checkWhite).withCheck(Color.Black, board.checkBlack)
-    }
-
-    override def specialEnd(situation: Situation) = situation.check && {
-      val checks = situation.board.history.checkCount
-      situation.color.fold(checks.white, checks.black) >= 3
-    }
   }
 
   val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, SuicideChess)

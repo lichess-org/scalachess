@@ -26,7 +26,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
   }
 
   def getVariantFromTags(tags: List[Tag]) : Variant = {
-    val variant = tags.find(_.name.name == "Variant")
+    val variant = tags.find(_.name == Tag.Variant)
 
     variant flatMap (tag => Variant.byName(tag.value)) getOrElse (Variant.default)
   }

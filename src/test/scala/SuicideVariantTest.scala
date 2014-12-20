@@ -177,8 +177,6 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         case drawnGame =>
           drawnGame.situation.end must beTrue
       }
-
-      1 + 1 mustEqual 2
     }
 
     "Not be drawn on insufficient mating material" in {

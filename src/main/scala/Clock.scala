@@ -48,6 +48,8 @@ sealed trait Clock {
 
   def switch: Clock
 
+  def takeback: Clock
+
   def reset = Clock(
     limit = limit,
     increment = increment)
@@ -82,8 +84,7 @@ case class RunningClock(
       (math.max(0, spentTime - lagCompensation) - increment)
     ).copy(
         color = !color,
-        timer = t
-      )
+        timer = t)
   }
 
   def stop = PausedClock(
@@ -101,6 +102,14 @@ case class RunningClock(
   def giveTime(c: Color, t: Float): RunningClock = addTime(c, -t)
 
   def switch: RunningClock = copy(color = !color)
+
+  def takeback: RunningClock = {
+    val t = now
+    val spentTime = (t - timer).toFloat
+    addTime(color, spentTime).copy(
+      color = !color,
+      timer = t)
+  }
 }
 
 case class PausedClock(
@@ -122,6 +131,8 @@ case class PausedClock(
   def giveTime(c: Color, t: Float): PausedClock = addTime(c, -t)
 
   def switch: PausedClock = copy(color = !color)
+
+  def takeback: PausedClock = switch
 
   def start = RunningClock(
     color = color,

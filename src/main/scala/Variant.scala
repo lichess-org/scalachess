@@ -15,7 +15,7 @@ sealed abstract class Variant(
   def chess960 = this == Variant.Chess960
   def kingOfTheHill = this == Variant.KingOfTheHill
   def threeCheck = this == Variant.ThreeCheck
-  def suicide = this == Variant.SuicideChess
+  def suicide = this == Variant.Antichess
 
   def exotic = !standard
 
@@ -167,11 +167,11 @@ object Variant {
     }
   }
 
-  case object SuicideChess extends Variant(
+  case object Antichess extends Variant(
     id = 6,
-    key = "suicide",
-    name = "suicide",
-    shortName= "suicide",
+    key = "antichess",
+    name = "Antichess",
+    shortName= "ant",
     title= "Lose all your pieces to win the game"
   ) {
 
@@ -222,7 +222,7 @@ object Variant {
 
     override def convertPiecesFromStandard(pieces : PieceMap) : PieceMap = {
       pieces.mapValues {
-        case Piece (color, King) => Piece (color, SuicideKing)
+        case Piece (color, King) => Piece (color, Antiking)
         case x => x
       }
     }
@@ -240,17 +240,17 @@ object Variant {
     // In this game variant, a king is a valid promotion
     override def isValidPromotion(promotion : Option[PromotableRole]) = promotion match {
       case None => true
-      case Some(Queen | Rook | Knight | Bishop | SuicideKing) => true
+      case Some(Queen | Rook | Knight | Bishop | Antiking) => true
       case _ => false
     }
 
-    override def roles = List(Rook, Knight, SuicideKing, Bishop, Queen, Pawn)
+    override def roles = List(Rook, Knight, Antiking, Bishop, Queen, Pawn)
 
-    override def promotableRoles : List[PromotableRole] = List(Queen, Rook, Bishop, Knight, SuicideKing)
+    override def promotableRoles : List[PromotableRole] = List(Queen, Rook, Bishop, Knight, Antiking)
 
   }
 
-  val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, SuicideChess)
+  val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, Antichess)
   val byId = all map { v => (v.id, v) } toMap
 
   val default = Standard

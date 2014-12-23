@@ -1,12 +1,12 @@
 package chess
 package format
 
-import chess.Variant.SuicideChess
+import chess.Variant.Antichess
 
-class SuicideVariantTest extends ChessTest {
+class AntichessVariantTest extends ChessTest {
 
   // Random PGN taken from FICS
-  val fullGame = """[Event "3 0 rated suicide"]
+  val fullGame = """[Event "3 0 rated antichess"]
 [Site "freechess.org"]
 [Date "2014.12.12"]
 [Round "?"]
@@ -17,7 +17,7 @@ class SuicideVariantTest extends ChessTest {
 [WhiteElo "1778"]
 [BlackElo "2025"]
 [PlyCount "67"]
-[Variant "suicide"]
+[Variant "antichess"]
 [TimeControl "180+0"]
 [WhiteClock "00:03:00.0"]
 [BlackClock "00:03:00.0"]
@@ -48,23 +48,23 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
   "Antichess " should {
 
     "Set up the game with the pieces set up in the same way as standard, but with takeable kings" in {
-      val antiChessVariant = Variant.SuicideChess
+      val antiChessVariant = Variant.Antichess
       val standardVariant = Variant.Standard
 
-      antiChessVariant.pieces must havePair(Pos.E1 -> (White - SuicideKing))
-      antiChessVariant.pieces must havePair(Pos.E8 -> (Black - SuicideKing))
+      antiChessVariant.pieces must havePair(Pos.E1 -> (White - Antiking))
+      antiChessVariant.pieces must havePair(Pos.E8 -> (Black - Antiking))
 
       val antiChessSet = antiChessVariant.pieces.toSet
       val standardChessSet = standardVariant.pieces.toSet
       val variantDiff = antiChessSet.toSet.diff(standardChessSet)
 
       variantDiff must haveSize(2)
-      variantDiff must havePairs(Pos.E1 -> (White - SuicideKing), Pos.E8 -> (Black - SuicideKing))
+      variantDiff must havePairs(Pos.E1 -> (White - Antiking), Pos.E8 -> (Black - Antiking))
 
     }
 
     "Allow an opening move for white taking into account a player may move without taking if possible" in {
-      val startingPosition = Game(Variant.SuicideChess)
+      val startingPosition = Game(Variant.Antichess)
       val afterFirstMove = startingPosition.playMove(Pos.E2, Pos.E4, None)
 
       afterFirstMove must beSuccess.like {
@@ -75,7 +75,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Not allow a player to make a non capturing move if a capturing move is available" in {
-      val game = Game(Variant.SuicideChess)
+      val game = Game(Variant.Antichess)
       val gameAfterOpening = game.playMoves((Pos.E2, Pos.E4), (Pos.F7, Pos.F5))
 
       val invalidGame = gameAfterOpening flatMap (_.playMove(Pos.H2,Pos.H4))
@@ -87,14 +87,14 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Allow a capturing move to be made" in {
-      val game = Game(Variant.SuicideChess).playMoves((Pos.E2, Pos.E4), (Pos.F7, Pos.F5), (Pos.E4, Pos.F5))
+      val game = Game(Variant.Antichess).playMoves((Pos.E2, Pos.E4), (Pos.F7, Pos.F5), (Pos.E4, Pos.F5))
       game must beSuccess
     }
 
 
     "Not permit a player to castle" in {
       // Castling is not allowed in antichess
-      val game = Game(Variant.SuicideChess).playMoves(
+      val game = Game(Variant.Antichess).playMoves(
         (Pos.E2, Pos.E4),
         (Pos.E7, Pos.E5),
         (Pos.F1, Pos.E2),
@@ -113,7 +113,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Not allow a king to be put into check" in {
-      val game = Game(Variant.SuicideChess).playMoves(
+      val game = Game(Variant.Antichess).playMoves(
         Pos.E2 -> Pos.E4,
         Pos.E7 -> Pos.E5,
         Pos.D1 -> Pos.H5
@@ -126,7 +126,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Allow kings to be captured" in {
-      val game = Game(Variant.SuicideChess).playMoves(
+      val game = Game(Variant.Antichess).playMoves(
         Pos.E2 -> Pos.E4,
         Pos.E7 -> Pos.E5,
         Pos.D1 -> Pos.H5,
@@ -141,7 +141,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Not allow a king to be check mated" in {
-      val game = Game(Variant.SuicideChess).playMoves(
+      val game = Game(Variant.Antichess).playMoves(
         Pos.F2 -> Pos.F3,
         Pos.E7 -> Pos.E6,
         Pos.G2 -> Pos.G4,
@@ -156,20 +156,20 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
     "Allow a pawn to be promoted to a king" in {
       val positionString = "8/5P2/8/2b5/8/8/4B3/8 w - -"
-      val originalGame = fenToGame(positionString, SuicideChess)
+      val originalGame = fenToGame(positionString, Antichess)
 
-      val newGame = originalGame flatMap (_.apply(Pos.F7, Pos.F8, Some(SuicideKing))) map (_._1)
+      val newGame = originalGame flatMap (_.apply(Pos.F7, Pos.F8, Some(Antiking))) map (_._1)
 
       newGame must beSuccess.like {
         case gameWithPromotion =>
-          gameWithPromotion.board(Pos.F8).mustEqual(Some(White - SuicideKing))
+          gameWithPromotion.board(Pos.F8).mustEqual(Some(White - Antiking))
       }
 
     }
 
     "Be drawn when there are only opposite colour bishops remaining" in {
       val positionString = "8/2b5/8/8/8/6Q1/4B3/8 b - -"
-      val originalGame = fenToGame(positionString, SuicideChess)
+      val originalGame = fenToGame(positionString, Antichess)
 
       val newGame = originalGame flatMap (_.apply(Pos.C7, Pos.G3, None)) map (_._1)
 
@@ -181,7 +181,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
     "Not be drawn on insufficient mating material" in {
       val positionString = "4K3/8/1b6/8/8/8/5B2/3k4 b - -"
-      val maybeGame = fenToGame(positionString, SuicideChess)
+      val maybeGame = fenToGame(positionString, Antichess)
 
       maybeGame must beSuccess.like {
         case game =>
@@ -190,7 +190,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Be drawn on a three move repetition" in {
-      val game = Game(SuicideChess)
+      val game = Game(Antichess)
 
       val moves = List((Pos.G1, Pos.F3), (Pos.G8, Pos.F6), (Pos.F3, Pos.G1), (Pos.F6, Pos.G8))
       val repeatedMoves = List.fill(3)(moves).flatten

@@ -1,6 +1,6 @@
 package chess
 
-import chess.Variant.SuicideChess
+import chess.Variant.Antichess
 import chess.format.{Forsyth, Visual}
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.Specification
@@ -73,7 +73,7 @@ trait ChessTest
 
     val maybeBoard = situation map (sit => sit.color -> sit.withVariant(variant).board) toValid "Could not construct situation from FEN"
 
-    maybeBoard map {case (color, board) => Game(SuicideChess).copy(board = board) withPlayer(color)}
+    maybeBoard map {case (color, board) => Game(Antichess).copy(board = board) withPlayer(color)}
   }
 
   def makeBoard(pieces: (Pos, Piece)*): Board =

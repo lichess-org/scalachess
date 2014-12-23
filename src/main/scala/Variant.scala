@@ -15,7 +15,7 @@ sealed abstract class Variant(
   def chess960 = this == Variant.Chess960
   def kingOfTheHill = this == Variant.KingOfTheHill
   def threeCheck = this == Variant.ThreeCheck
-  def suicide = this == Variant.Antichess
+  def antichess = this == Variant.Antichess
 
   def exotic = !standard
 

@@ -198,7 +198,7 @@ object Variant {
 
     } yield m2
 
-    override def staleMate(situation: Situation) : Boolean = specialDraw(situation)
+    override def staleMate(situation: Situation) : Boolean = super.staleMate(situation) || specialDraw(situation)
 
     override def winner (situation: Situation): Option[Color] = if (specialEnd(situation)) Some(situation.color) else None
 

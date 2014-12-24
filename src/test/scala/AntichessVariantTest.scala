@@ -220,6 +220,21 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       }
     }
 
+    "Be drawn on a traditional stalemate where on player has no valid moves" in {
+      val positionString = "8/p7/8/P7/8/8/8/8 w - -"
+      val maybeGame = fenToGame(positionString, Antichess)
+
+      val drawnGame = maybeGame flatMap (_.playMoves((Pos.A5, Pos.A6)))
+
+      drawnGame must beSuccess.like {
+        case game =>
+          game.situation.end must beTrue
+          game.situation.staleMate must beTrue
+      }
+
+
+    }
+
   }
 
 

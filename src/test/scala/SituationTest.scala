@@ -70,5 +70,29 @@ K
 """ as White).staleMate must beFalse
       }
     }
+
+    "Give the correct winner for a game" in {
+      val game =
+        ("""
+PP
+K  r
+""" as White)
+
+      game.checkMate must beTrue
+      game.winner must beSome.like {
+        case color => color == Black
+      }
+    }
+
+    "Not give a winner if the game is still in progress" in {
+      val game = """
+    p
+     K
+    """ as White
+
+      game.winner must beNone
+
+    }
+
   }
 }

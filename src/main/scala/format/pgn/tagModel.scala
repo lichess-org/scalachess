@@ -45,4 +45,5 @@ object Tag {
 
   def tagType(name: String) =
     (tagTypesByLowercase get name.toLowerCase) | Unknown(name)
+
 }

@@ -3,7 +3,7 @@ package chess
 import format.Visual
 import Pos.posAt
 
-case class Board(
+case class Board (
     pieces: PieceMap,
     history: History,
     variant: Variant) {
@@ -98,7 +98,10 @@ case class Board(
 
   def withHistory(h: History): Board = copy(history = h)
 
-  def withVariant(v: Variant): Board = copy(variant = v)
+  def withVariant(v: Variant): Board = {
+    val updatedPieces = v convertPiecesFromStandard pieces
+    copy(variant = v, pieces = updatedPieces)
+  }
 
   def updateHistory(f: History => History) = copy(history = f(history))
 

@@ -22,7 +22,7 @@ object Binary {
   private object Encoding {
     val pieceInts: Map[String, Int] = Map("K" -> 1, "Q" -> 2, "R" -> 3, "N" -> 4, "B" -> 5, "O-O" -> 6, "O-O-O" -> 7)
     val pieceStrs: Map[Int, String] = (pieceInts map { case (k, v) => v -> k }).toMap
-    val promotionInts: Map[String, Int] = Map("" -> 0, "Q" -> 1, "R" -> 2, "N" -> 3, "B" -> 4)
+    val promotionInts: Map[String, Int] = Map("" -> 0, "Q" -> 1, "R" -> 2, "N" -> 3, "B" -> 4, "K" -> 6)
     val promotionStrs: Map[Int, String] = (promotionInts map { case (k, v) => v -> k }).toMap
     val checkInts: Map[String, Int] = Map("" -> 0, "+" -> 1, "#" -> 2)
     val checkStrs: Map[Int, String] = (checkInts map { case (k, v) => v -> k }).toMap
@@ -174,7 +174,7 @@ object Binary {
     val posR = "([a-h][1-9])"
     val captureR = "(x?)"
     val checkR = "([\\+#]?)"
-    val promotionR = "(?:\\=?([QRNB]))?"
+    val promotionR = "(?:\\=?([QRNBK]))?"
     val origR = "([a-h]?[1-8]?)".r
     val SimplePieceR = s"^$pieceR$captureR$posR$checkR$$".r
     val FullPawnR = s"^${fileR}$posR$promotionR$checkR$$".r

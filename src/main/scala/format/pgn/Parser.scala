@@ -16,7 +16,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       parsedMoves ← MovesParser(moveStr)
       (sanStrs, resultOption) = parsedMoves
       tags2 = resultOption.filterNot(_ => tags.exists(_.name == Tag.Result)).fold(tags)(t => tags :+ t)
-      sans ← moves(sanStrs)
+      sans ← moves(sanStrs, getVariantFromTags(tags2))
     } yield ParsedPgn(tags2, sans)
   }
   catch {
@@ -25,8 +25,15 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       sys error s"### StackOverflowError ### in PGN parser"
   }
 
-  def moves(str: String): Valid[List[San]] = moves(str.split(' ').toList)
-  def moves(strs: List[String]): Valid[List[San]] = strs.map(MoveParser.apply).sequence
+  def getVariantFromTags(tags: List[Tag]) : Variant = {
+    val variant = tags.find(_.name == Tag.Variant)
+
+    variant flatMap (tag => Variant.byName(tag.value)) getOrElse (Variant.default)
+  }
+
+  def moves(str: String, variant: Variant): Valid[List[San]] = moves(str.split(' ').toList, variant)
+  def moves(strs: List[String], variant: Variant): Valid[List[San]] =
+    strs.map(str => MoveParser.apply(str,variant)).sequence
 
   trait Logging { self: Parsers =>
     protected val loggingEnabled = false
@@ -94,13 +101,13 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
     private val Move = """^(N|B|R|Q|K|)([a-h]?)([1-8]?)(x?)([a-h][0-9])(=?[NBRQ]?)(\+?)(\#?)$""".r
 
-    def apply(str: String): Valid[San] = {
+    def apply(str: String, variant: Variant): Valid[San] = {
       if (str.size == 2) Pos.posAt(str).fold(slow(str)) { pos => succezz(Std(pos, Pawn)) }
       else str match {
         case "O-O" | "o-o" | "0-0"       => succezz(Castle(KingSide))
         case "O-O-O" | "o-o-o" | "0-0-0" => succezz(Castle(QueenSide))
         case Move(role, file, rank, capture, pos, prom, check, mate) =>
-          role.headOption.fold[Option[Role]](Some(Pawn))(Role.allByPgn.get) flatMap { role =>
+          role.headOption.fold[Option[Role]](Some(Pawn))(variant.rolesByPgn.get) flatMap { role =>
             Pos posAt pos map { dest =>
               succezz(Std(
                 dest = dest,
@@ -110,7 +117,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
                 checkmate = mate != "",
                 file = if (file == "") None else fileMap get file.head,
                 rank = if (rank == "") None else rankMap get rank.head,
-                promotion = if (prom == "") None else Role.allPromotableByPgn get prom.last))
+                promotion = if (prom == "") None else variant.rolesPromotableByPgn get prom.last))
             }
           } getOrElse slow(str)
         case _ => slow(str)

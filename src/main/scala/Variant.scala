@@ -165,6 +165,9 @@ object Variant {
       val checks = situation.board.history.checkCount
       situation.color.fold(checks.white, checks.black) >= 3
     }
+
+    override def winner(situation: Situation) = if (specialEnd(situation)) Some(!situation.color) else None
+
   }
 
   case object Antichess extends Variant(

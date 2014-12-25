@@ -76,6 +76,11 @@ K  r
           E2 -> E4, E7 -> E6, D2 -> D4, F8 -> B4, C2 -> C3,
           B4 -> C3, B1 -> C3, D8 -> H4, A2 -> A3, H4 -> F2).toOption.get
         game.situation.end must beTrue
+
+        game.situation.winner must beSome.like{
+          case color =>
+            color == Black
+        }
       }
     }
   }

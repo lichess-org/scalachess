@@ -43,6 +43,10 @@ PP
    K
 """.kingOfTheHill, White).situation
         sit.end must beTrue
+        sit.winner must beSome.like{
+          case color => color == White
+        }
+
       }
     }
   }

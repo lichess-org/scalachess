@@ -198,13 +198,13 @@ object Variant {
 
     } yield m2
 
-    override def staleMate(situation: Situation) : Boolean = super.staleMate(situation) || specialDraw(situation)
+    override def staleMate(situation: Situation) : Boolean = specialDraw(situation)
 
     override def winner (situation: Situation): Option[Color] = if (specialEnd(situation)) Some(situation.color) else None
 
     override def specialEnd(situation: Situation) = {
-      // The game ends with a win when one player manages to lose all their pieces
-      situation.board.actorsOf(situation.color).isEmpty
+      // The game ends with a win when one player manages to lose all their pieces or is in stalemate
+      situation.board.actorsOf(situation.color).isEmpty || situation.moves.isEmpty
     }
 
     // This mode has no checkmates

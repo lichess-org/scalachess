@@ -229,7 +229,10 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       drawnGame must beSuccess.like {
         case game =>
           game.situation.end must beTrue
-          game.situation.staleMate must beTrue
+          game.situation.winner must beSome.like {
+            case color =>
+              color == Black;
+          }
       }
 
 

@@ -144,7 +144,7 @@ object Variant {
 
     private val center = Set(Pos.D4, Pos.D5, Pos.E4, Pos.E5)
 
-    override def winner(situation: Situation) = if (specialEnd(situation)) Some(situation.color) else None
+    override def winner(situation: Situation) = if (specialEnd(situation)) Some(!situation.color) else None
 
     override def specialEnd(situation: Situation) =
       situation.board.kingPosOf(!situation.color) exists center.contains

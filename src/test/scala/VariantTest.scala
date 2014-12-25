@@ -35,7 +35,7 @@ PP
 K  r
 """.kingOfTheHill, White).situation.end must beTrue
       }
-      "centered white king" in {
+      "centered black king" in {
         val sit = Game("""
    k
 
@@ -43,6 +43,10 @@ PP
    K
 """.kingOfTheHill, White).situation
         sit.end must beTrue
+        sit.winner must beSome.like{
+          case color => color == Black
+        }
+
       }
     }
   }

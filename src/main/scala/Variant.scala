@@ -171,7 +171,7 @@ object Variant {
     id = 6,
     key = "antichess",
     name = "Antichess",
-    shortName= "ant",
+    shortName= "Anti",
     title= "Lose all your pieces to win the game"
   ) {
 

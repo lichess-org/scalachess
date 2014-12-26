@@ -144,7 +144,12 @@ object Variant {
 
     private val center = Set(Pos.D4, Pos.D5, Pos.E4, Pos.E5)
 
-    override def winner(situation: Situation) = if (specialEnd(situation)) Some(!situation.color) else None
+    override def winner(situation: Situation) = {
+      val kingCenterWin = if (specialEnd(situation)) Some(!situation.color) else None
+      val normalWin = super.winner(situation)
+
+      normalWin orElse kingCenterWin
+    }
 
     override def specialEnd(situation: Situation) =
       situation.board.kingPosOf(!situation.color) exists center.contains
@@ -168,7 +173,12 @@ object Variant {
       situation.color.fold(checks.white, checks.black) >= 3
     }
 
-    override def winner(situation: Situation) = if (specialEnd(situation)) Some(!situation.color) else None
+    override def winner(situation: Situation) = {
+      val threeCheckWin = if (specialEnd(situation)) Some(!situation.color) else None
+      val normalWin = super.winner(situation)
+
+      threeCheckWin orElse normalWin
+    }
 
   }
 

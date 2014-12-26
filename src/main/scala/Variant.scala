@@ -189,7 +189,7 @@ object Variant {
     // In this variant, a player must capture if a capturing move is available
     override def validMoves(situation: Situation) = {
       val allMoves = super.validMoves(situation)
-      val capturingMoves = super.validMoves(situation) mapValues (_.filter(_.captures) ) filterNot (_._2.isEmpty)
+      val capturingMoves = allMoves mapValues (_.filter(_.captures) ) filterNot (_._2.isEmpty)
 
       if (!capturingMoves.isEmpty) capturingMoves else allMoves
     }

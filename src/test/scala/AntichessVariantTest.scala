@@ -83,6 +83,17 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       invalidGame must beFailure.like {
         case failMsg => failMsg mustEqual scalaz.NonEmptyList("there are capturing moves available")
       }
+    }
+
+    "A situation in antichess should only present the capturing moves if the player can capture" in {
+      val game = Game(Variant.Antichess)
+      val gameAfterOpening = game.playMoves((Pos.E2, Pos.E4), (Pos.F7, Pos.F5))
+
+      gameAfterOpening must beSuccess.like {
+        case newGame =>
+          newGame.situation.moves.size must beEqualTo(1)
+          newGame.situation.moves.values.find(_.find(_.captures == false).nonEmpty) must beNone
+      }
 
     }
 

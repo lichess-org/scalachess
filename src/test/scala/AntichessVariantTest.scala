@@ -188,6 +188,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         case drawnGame =>
           drawnGame.situation.end must beTrue
           drawnGame.situation.variantDraw must beTrue
+          drawnGame.situation.staleMate must beTrue
           drawnGame.situation.winner must beNone
       }
     }

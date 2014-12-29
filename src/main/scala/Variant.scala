@@ -143,7 +143,12 @@ object Variant {
 
     private val center = Set(Pos.D4, Pos.D5, Pos.E4, Pos.E5)
 
-    override def winner(situation: Situation) = if (specialEnd(situation)) Some(!situation.color) else None
+    override def winner(situation: Situation) = {
+      val kingCenterWin = if (specialEnd(situation)) Some(!situation.color) else None
+      val normalWin = super.winner(situation)
+
+      normalWin orElse kingCenterWin
+    }
 
     override def specialEnd(situation: Situation) =
       situation.board.kingPosOf(!situation.color) exists center.contains
@@ -167,7 +172,12 @@ object Variant {
       situation.color.fold(checks.white, checks.black) >= 3
     }
 
-    override def winner(situation: Situation) = if (specialEnd(situation)) Some(!situation.color) else None
+    override def winner(situation: Situation) = {
+      val threeCheckWin = if (specialEnd(situation)) Some(!situation.color) else None
+      val normalWin = super.winner(situation)
+
+      threeCheckWin orElse normalWin
+    }
 
   }
 
@@ -218,8 +228,14 @@ object Variant {
       val actors = situation.board.actors
       if (actors.size != 2) false
       else actors.values.toList match {
-        // No player can win if the only remaining pieces are two bishops of different colours
-        case List(act1, act2) => (act1.color != act2.color) && act1.piece.is(Bishop) && act2.piece.is(Bishop)
+        // No player can win if the only remaining pieces are two bishops of different colours on different coloured
+        // diagonals
+        case List(act1, act2) =>
+          val bothPiecesAreBishops = act1.piece.is(Bishop) && act2.piece.is(Bishop)
+          val notSamePlayerColour = (act1.color != act2.color)
+          val notOnSameColouredDiagonals = act1.pos.color != act2.pos.color
+
+          bothPiecesAreBishops && notOnSameColouredDiagonals && notSamePlayerColour
         case _ => false
       }
     }

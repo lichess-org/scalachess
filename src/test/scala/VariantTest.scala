@@ -30,10 +30,16 @@ K
 """.kingOfTheHill, White).situation.end must beFalse
       }
       "regular checkMate" in {
-        Game("""
+        val game = Game("""
 PP
 K  r
-""".kingOfTheHill, White).situation.end must beTrue
+""".kingOfTheHill, White)
+
+        game.situation.end must beTrue
+        game.situation.winner must beSome.like {
+          case color =>
+            color == Black
+        }
       }
       "centered black king" in {
         val sit = Game("""
@@ -60,10 +66,15 @@ K
 """.threeCheck, White).situation.end must beFalse
       }
       "regular checkMate" in {
-        Game("""
+        val game = Game("""
 PP
 K  r
-""".threeCheck, White).situation.end must beTrue
+""".threeCheck, White)
+        game.situation.end must beTrue
+        game.situation.winner must beSome.like {
+          case color =>
+            color == Black
+        }
       }
       "1 check" in {
         val game = Game(Board init Variant.ThreeCheck).playMoves(

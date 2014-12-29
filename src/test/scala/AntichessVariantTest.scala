@@ -187,6 +187,23 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       newGame must beSuccess.like{
         case drawnGame =>
           drawnGame.situation.end must beTrue
+          drawnGame.situation.variantDraw must beTrue
+          drawnGame.situation.staleMate must beTrue
+          drawnGame.situation.winner must beNone
+      }
+    }
+
+    "Not be drawn when the black and white bishops are on the same coloured squares " in {
+      val position = "7b/8/1p6/8/8/8/5B2/8 w - -"
+      val originalGame = fenToGame(position, Antichess)
+
+      val newGame = originalGame flatMap(_.apply(Pos.F2,Pos.B6,None)) map (_._1)
+
+      newGame must beSuccess.like{
+        case nonDrawnGame =>
+          nonDrawnGame.situation.end must beFalse
+          nonDrawnGame.situation.variantDraw must beFalse
+          nonDrawnGame.situation.winner must beNone
       }
     }
 

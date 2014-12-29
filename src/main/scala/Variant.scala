@@ -23,17 +23,17 @@ sealed abstract class Variant(
     IndexedSeq(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
   )
 
-  def isValidPromotion(promotion : Option[PromotableRole]) = promotion match {
-    case None => true
+  def isValidPromotion(promotion: Option[PromotableRole]) = promotion match {
+    case None                                 => true
     case Some(Queen | Rook | Knight | Bishop) => true
-    case _ => false
+    case _                                    => false
   }
 
-  def validMoves(situation: Situation) =  situation.actors collect {
+  def validMoves(situation: Situation) = situation.actors collect {
     case actor if actor.moves.nonEmpty => actor.pos -> actor.moves
   } toMap
 
-  def move(situation : Situation, from: Pos, to: Pos, promotion : Option[PromotableRole]): Valid[Move] = for {
+  def move(situation: Situation, from: Pos, to: Pos, promotion: Option[PromotableRole]): Valid[Move] = for {
     actor ← situation.board.actors get from toValid "No piece on " + from
     myActor ← actor.validIf(actor is situation.color, "Not my piece on " + from)
     m1 ← myActor.moves find (_.dest == to) toValid "Piece on " + from + " cannot move to " + to
@@ -41,9 +41,9 @@ sealed abstract class Variant(
     m3 <- m2 validIf (isValidPromotion(promotion), "Cannot promote to " + promotion + " in this game mode")
   } yield m3
 
-  def staleMate(situation: Situation) : Boolean = !situation.check && situation.moves.isEmpty
+  def staleMate(situation: Situation): Boolean = !situation.check && situation.moves.isEmpty
 
-  def winner(situation: Situation) : Option[Color] =  if (situation.checkMate) Some(!situation.color) else None
+  def winner(situation: Situation): Option[Color] = if (situation.checkMate) Some(!situation.color) else None
 
   def specialEnd(situation: Situation) = false
 
@@ -57,9 +57,9 @@ sealed abstract class Variant(
 
   // Some variants, such as kamikaze chess, give different properties to pieces by replacing them with
   // different piece objects
-  def convertPiecesFromStandard(originalPieces : PieceMap) : PieceMap = originalPieces
+  def convertPiecesFromStandard(originalPieces: PieceMap): PieceMap = originalPieces
 
-  def valid(board : Board, strict: Boolean) = {
+  def valid(board: Board, strict: Boolean) = {
     Color.all map board.rolesOf forall { roles =>
       ((roles count (_ == King)) == 1) :: {
         if (strict) List((roles count (_ == Pawn)) <= 8, roles.size <= 16) else Nil
@@ -69,7 +69,7 @@ sealed abstract class Variant(
 
   def roles = List(Rook, Knight, King, Bishop, King, Queen, Pawn)
 
-  def promotableRoles : List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
+  def promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
 
   def rolesByForsyth: Map[Char, Role] = this.roles map { r => (r.forsyth, r) } toMap
 
@@ -79,8 +79,7 @@ sealed abstract class Variant(
     promotableRoles map { r => (r.pgn, r) } toMap
 
   override def toString = name
-
-  }
+}
 
 object Variant {
 
@@ -176,8 +175,8 @@ object Variant {
     id = 6,
     key = "antichess",
     name = "Antichess",
-    shortName= "Anti",
-    title= "Lose all your pieces to win the game"
+    shortName = "Anti",
+    title = "Lose all your pieces to win the game"
   ) {
 
     override def pieces = {
@@ -189,13 +188,13 @@ object Variant {
     // In this variant, a player must capture if a capturing move is available
     override def validMoves(situation: Situation) = {
       val allMoves = super.validMoves(situation)
-      val capturingMoves = allMoves mapValues (_.filter(_.captures) ) filterNot (_._2.isEmpty)
+      val capturingMoves = allMoves mapValues (_.filter(_.captures)) filterNot (_._2.isEmpty)
 
       if (!capturingMoves.isEmpty) capturingMoves else allMoves
     }
 
-    override def move(situation : Situation, from: Pos, to: Pos, promotion : Option[PromotableRole]) = for {
-    // We inherit the standard rules, such as where peices may move
+    override def move(situation: Situation, from: Pos, to: Pos, promotion: Option[PromotableRole]) = for {
+      // We inherit the standard rules, such as where peices may move
       m1 <- super.move(situation, from, to, promotion)
 
       // However, in antichess, the player may only move without capturing if no capturing moves are available.
@@ -203,9 +202,9 @@ object Variant {
 
     } yield m2
 
-    override def staleMate(situation: Situation) : Boolean = specialDraw(situation)
+    override def staleMate(situation: Situation): Boolean = specialDraw(situation)
 
-    override def winner (situation: Situation): Option[Color] = if (specialEnd(situation)) Some(situation.color) else None
+    override def winner(situation: Situation): Option[Color] = if (specialEnd(situation)) Some(situation.color) else None
 
     override def specialEnd(situation: Situation) = {
       // The game ends with a win when one player manages to lose all their pieces or is in stalemate
@@ -225,17 +224,17 @@ object Variant {
       }
     }
 
-    override def convertPiecesFromStandard(pieces : PieceMap) : PieceMap = {
+    override def convertPiecesFromStandard(pieces: PieceMap): PieceMap = {
       pieces.mapValues {
-        case Piece (color, King) => Piece (color, Antiking)
-        case x => x
+        case Piece(color, King) => Piece(color, Antiking)
+        case x                  => x
       }
     }
 
-    override def valid (board: Board, strict: Boolean) = {
+    override def valid(board: Board, strict: Boolean) = {
       // This variant cannot work with a 'normal' king as it assumes an AntiKing
 
-      board.pieces.values.find(_.is(King)).isEmpty &&  {
+      board.pieces.values.find(_.is(King)).isEmpty && {
         Color.all map board.rolesOf forall { roles =>
           (if (strict) List((roles count (_ == Pawn)) <= 8, roles.size <= 16) else Nil) forall identity
         }
@@ -243,7 +242,7 @@ object Variant {
     }
 
     // In this game variant, a king is a valid promotion
-    override def isValidPromotion(promotion : Option[PromotableRole]) = promotion match {
+    override def isValidPromotion(promotion: Option[PromotableRole]) = promotion match {
       case None => true
       case Some(Queen | Rook | Knight | Bishop | Antiking) => true
       case _ => false
@@ -251,7 +250,7 @@ object Variant {
 
     override def roles = List(Rook, Knight, Antiking, Bishop, Queen, Pawn)
 
-    override def promotableRoles : List[PromotableRole] = List(Queen, Rook, Bishop, Knight, Antiking)
+    override def promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, Antiking)
 
   }
 

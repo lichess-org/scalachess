@@ -272,7 +272,7 @@ object Variant {
   }
 
   case object AtomicChess extends Variant(
-    id = 6,
+    id = 7,
     key = "atomicchess",
     name = "Atomic chess",
     shortName= "Atom",
@@ -306,12 +306,12 @@ object Variant {
         val afterBoard = move.after
         val destination = move.dest
 
-        val surroundingPieces = afterBoard.pieces
+        val boardPieces = afterBoard.pieces
 
         // Pawns are immune (for some reason), but all pieces surrounding the captured piece and the capturing piece
         // itself explode
-        val piecesToExplode = destination :: surroundingPositions.filter(surroundingPieces.get(_).fold(false)(_.isNot(Pawn)))
-        val afterExplosions = surroundingPieces -- piecesToExplode
+        val piecesToExplode = destination :: surroundingPositions.filter(boardPieces.get(_).fold(false)(_.isNot(Pawn)))
+        val afterExplosions = boardPieces -- piecesToExplode
 
         val newBoard = afterBoard withPieces afterExplosions
         move withAfter newBoard

@@ -15,6 +15,10 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
   lazy val downLeft: Option[Pos] = down flatMap (_ left)
   lazy val downRight: Option[Pos] = down flatMap (_ right)
 
+  /** The positions surrounding a given position on the board. Any square at the edge of the board has
+    * less surrounding positions than the usual eight. */
+  lazy val surroundingPositions : List[Pos] = List(up, down, left, right, upLeft, upRight, downLeft, downRight).flatten;
+
   def >|(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.right)
   def |<(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.left)
   def |<>|(stop: Pos => Boolean, dir: Direction): List[Pos] = dir(this) map { p =>

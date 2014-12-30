@@ -70,6 +70,8 @@ case class Move(
     else None
   }
 
+  def withAfter(newBoard: Board) = copy(after = newBoard)
+
   def withLag(l: FiniteDuration) = copy(lag = l)
 
   def keyString = s"$orig$dest"

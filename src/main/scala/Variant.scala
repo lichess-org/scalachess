@@ -29,7 +29,7 @@ sealed abstract class Variant(
     case _ => false
   }
 
-  def validMoves(situation: Situation) =  situation.actors collect {
+  def validMoves(situation: Situation) : Map[Pos, List[Move]] =  situation.actors collect {
     case actor if actor.moves.nonEmpty => actor.pos -> actor.moves
   } toMap
 
@@ -268,6 +268,65 @@ object Variant {
     override def roles = List(Rook, Knight, Antiking, Bishop, Queen, Pawn)
 
     override def promotableRoles : List[PromotableRole] = List(Queen, Rook, Bishop, Knight, Antiking)
+
+  }
+
+  case object AtomicChess extends Variant(
+    id = 6,
+    key = "atomicchess",
+    name = "Atomic chess",
+    shortName= "Atom",
+    title= "Nuke your opponent's king to win."
+  ) {
+
+    override def validMoves(situation: Situation): Map[Pos, List[Move]] = {
+      // In atomic chess, the pieces have the same roles as usual
+      val usualMoves = super.validMoves(situation)
+
+      /* However, it is illegal for a king to capture as that would result in it exploding. */
+      val validAtomicMoves = for {
+        kingPos <- situation.kingPos
+        newMoves <- (usualMoves.get(kingPos) map (_.filterNot(_.captures)))
+      } yield (usualMoves.updated(kingPos, newMoves))
+
+      validAtomicMoves getOrElse usualMoves
+    }
+
+    override def move(situation : Situation, from: Pos, to: Pos, promotion : Option[PromotableRole]) = for {
+      m1 <- super.move(situation, from, to, promotion)
+      m2 <- m1.validIf(m1.piece != King || !m1.captures, "A king cannot capture in atomic chess")
+      m3 <- explodeSurroundingPieces(m2).success
+    } yield m3
+
+    /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
+    def explodeSurroundingPieces(move: Move) : Move = {
+      if (!move.captures) move
+      else {
+        val surroundingPositions = move.dest.surroundingPositions
+        val afterBoard = move.after
+        val destination = move.dest
+
+        val surroundingPieces = afterBoard.pieces
+
+        // Pawns are immune (for some reason), but all pieces surrounding the captured piece and the capturing piece
+        // itself explode
+        val piecesToExplode = destination :: surroundingPositions.filter(surroundingPieces.get(_).fold(false)(_.isNot(Pawn)))
+        val afterExplosions = surroundingPieces -- piecesToExplode
+
+        val newBoard = afterBoard withPieces afterExplosions
+        move withAfter newBoard
+      }
+    }
+
+    /** Atomic chess has a special end where the king has been killed by exploding with an adjacent captured piece */
+    override def specialEnd(situation: Situation) = situation.kingPos.isEmpty
+
+    override def winner(situation: Situation) = {
+      val kingExplodedWin = if (specialEnd(situation)) Some(!situation.color) else None
+      val atomicCheckmate = super.winner(situation)
+
+      kingExplodedWin orElse atomicCheckmate
+    }
 
   }
 

@@ -98,6 +98,8 @@ case class Board (
 
   def withHistory(h: History): Board = copy(history = h)
 
+  def withPieces(newPieces: PieceMap) = copy(pieces = newPieces)
+
   def withVariant(v: Variant): Board = {
     val updatedPieces = v convertPiecesFromStandard pieces
     copy(variant = v, pieces = updatedPieces)

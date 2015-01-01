@@ -315,14 +315,6 @@ object Variant {
 
     /** Atomic chess has a special end where the king has been killed by exploding with an adjacent captured piece */
     override def specialEnd(situation: Situation) = situation.kingPos.isEmpty
-
-    override def winner(situation: Situation) = {
-      val kingExplodedWin = if (specialEnd(situation)) Some(!situation.color) else None
-      val atomicCheckmate = super.winner(situation)
-
-      kingExplodedWin orElse atomicCheckmate
-    }
-
   }
 
   val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, Antichess)

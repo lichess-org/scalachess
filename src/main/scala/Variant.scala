@@ -43,7 +43,14 @@ sealed abstract class Variant(
 
   def staleMate(situation: Situation) : Boolean = !situation.check && situation.moves.isEmpty
 
-  def winner(situation: Situation) : Option[Color] =  if (situation.checkMate) Some(!situation.color) else None
+  // In most variants, the winner is the last player to have played and there is a possibility of either a traditional
+  // checkmate or a variant end condition
+  def winner(situation: Situation) : Option[Color] =  {
+    val standardCheckmate = if (situation.checkMate) Some(!situation.color) else None
+    val variantWin =  if (specialEnd(situation)) Some(!situation.color) else None
+
+    standardCheckmate orElse variantWin
+  }
 
   def specialEnd(situation: Situation) = false
 
@@ -144,13 +151,6 @@ object Variant {
 
     private val center = Set(Pos.D4, Pos.D5, Pos.E4, Pos.E5)
 
-    override def winner(situation: Situation) = {
-      val kingCenterWin = if (specialEnd(situation)) Some(!situation.color) else None
-      val normalWin = super.winner(situation)
-
-      normalWin orElse kingCenterWin
-    }
-
     override def specialEnd(situation: Situation) =
       situation.board.kingPosOf(!situation.color) exists center.contains
 
@@ -171,13 +171,6 @@ object Variant {
     override def specialEnd(situation: Situation) = situation.check && {
       val checks = situation.board.history.checkCount
       situation.color.fold(checks.white, checks.black) >= 3
-    }
-
-    override def winner(situation: Situation) = {
-      val threeCheckWin = if (specialEnd(situation)) Some(!situation.color) else None
-      val normalWin = super.winner(situation)
-
-      threeCheckWin orElse normalWin
     }
 
   }
@@ -215,6 +208,7 @@ object Variant {
 
     override def staleMate(situation: Situation) : Boolean = specialDraw(situation)
 
+    // In antichess, there is no checkmate condition, and the winner is the current player if they have no legal moves
     override def winner (situation: Situation): Option[Color] = if (specialEnd(situation)) Some(situation.color) else None
 
     override def specialEnd(situation: Situation) = {
@@ -286,15 +280,16 @@ object Variant {
       /* However, it is illegal for a king to capture as that would result in it exploding. */
       val validAtomicMoves = for {
         kingPos <- situation.kingPos
-        newMoves <- (usualMoves.get(kingPos) map (_.filterNot(_.captures)))
-      } yield (usualMoves.updated(kingPos, newMoves))
+        newKingMoves <- usualMoves.get(kingPos) map (_.filterNot(_.captures))
+        newMap = usualMoves.updated(kingPos, newKingMoves)
+      } yield if (!newKingMoves.isEmpty) newMap else newMap - kingPos // If a pos has no valid moves, we remove it
 
       validAtomicMoves getOrElse usualMoves
     }
 
     override def move(situation : Situation, from: Pos, to: Pos, promotion : Option[PromotableRole]) = for {
       m1 <- super.move(situation, from, to, promotion)
-      m2 <- m1.validIf(m1.piece != King || !m1.captures, "A king cannot capture in atomic chess")
+      m2 <- m1.validIf(m1.piece.isNot(King) || !m1.captures, "A king cannot capture in atomic chess")
       m3 <- explodeSurroundingPieces(m2).success
     } yield m3
 

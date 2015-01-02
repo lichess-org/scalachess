@@ -46,12 +46,8 @@ sealed abstract class Variant(
 
   // In most variants, the winner is the last player to have played and there is a possibility of either a traditional
   // checkmate or a variant end condition
-  def winner(situation: Situation) : Option[Color] =  {
-    val standardCheckmate = if (situation.checkMate) Some(!situation.color) else None
-    val variantWin =  if (specialEnd(situation)) Some(!situation.color) else None
-
-    standardCheckmate orElse variantWin
-  }
+  def winner(situation: Situation) : Option[Color] =
+    if (situation.checkMate || specialEnd(situation)) Some(!situation.color) else None
 
   def specialEnd(situation: Situation) = false
 

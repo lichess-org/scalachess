@@ -101,6 +101,32 @@ class AtomicVariantTest extends ChessTest {
           game.situation.staleMate must beTrue
       }
 
+      "In atomic check, an opportunity at exploding the opponent's king takes priority over getting out of check" in {
+        val positionFen = "k7/pp5R/8/8/3Q4/P7/1P6/K1r5 w - -"
+        val threatenedGame = fenToGame(positionFen, AtomicChess)
+
+        threatenedGame must beSuccess.like{
+          case game =>
+            game.situation.end must beFalse
+            game.situation.winner must beNone
+            game.situation.moves must haveKeys(Pos.D4, Pos.H7)
+            game.situation.moves.values.forall(_.forall(_.captures)) must beTrue
+        }
+      }
+
+      "In atomic mate, an opportunity at exploding the opponent's king takes priority over getting out of mate" in {
+        val positionFen = "k7/pp5R/8/8/3Q4/8/PP6/K1r5 w - -"
+        val threatenedGame = fenToGame(positionFen, AtomicChess)
+
+        threatenedGame must beSuccess.like{
+          case game =>
+            game.situation.end must beFalse
+            game.situation.winner must beNone
+            game.situation.moves must haveKeys(Pos.D4, Pos.H7)
+            game.situation.moves.values.forall(_.forall(_.captures)) must beTrue
+        }
+      }
+
     }
 
   }

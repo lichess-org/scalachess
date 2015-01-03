@@ -333,23 +333,26 @@ object Variant {
     private def insufficientAtomicWinningMaterial(board: Board) = {
       val whiteActors = board.actorsOf(White)
       val blackActors = board.actorsOf(Black)
-      lazy val allActors = board.actors.values.map(_.piece).filter(_ isNot King)
+      val allActors = board.actors
+      lazy val allPieces = board.actors.values.map(_.piece).filter(_ isNot King)
 
+      // One player must only have their king left
       if (whiteActors.size != 1 && blackActors.size != 1) false
       else {
-        // You can mate with a king and a rook or queen, but not a king and a bishop or knight
-        allActors.size == 1 && allActors.exists(_ isMinor)
+        // You can easily mate with a king and a rook or queen, but not very easily with a king and a bishop or knight
+        // or just two opposing kings
+        allPieces.size == 1 && allPieces.exists(_ isMinor) || allActors.size == 2
       }
     }
 
     override def specialDraw(situation: Situation) = {
-      // Bishops on opposite coloured squares can never capture each other to cause a king to explode
-      // and a rook and a king vs a king is not winnable
+      // Bishops on opposite coloured squares can never capture each other to cause a king to explode and a traditional
+      // mate would be difficult
       val board = situation.board
       InsufficientMatingMaterial.bishopsOnDifferentColor(board) || insufficientAtomicWinningMaterial(board)
     }
 
-    // On insufficient mating material, a win may still be achieved by exploding a piece next to a king
+    // On insufficient mating material, a win may still be commonly achieved by exploding a piece next to a king
     override def drawsOnInsufficientMaterial = false
 
     /** Atomic chess has a special end where the king has been killed by exploding with an adjacent captured piece */

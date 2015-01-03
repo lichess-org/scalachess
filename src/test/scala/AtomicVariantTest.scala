@@ -200,6 +200,21 @@ class AtomicVariantTest extends ChessTest {
       }
     }
 
+    "Draw on a king vs a king" in {
+      val position = "6r1/8/8/1k6/8/8/2K5/6R1 w - -"
+      val game = fenToGame(position, AtomicChess)
+      val successGame = game flatMap (_.playMoves((Pos.G1, Pos.G8)))
+
+      successGame must beSuccess.like {
+        case game =>
+          game.situation.end must beTrue
+          game.situation.status must beSome.like{
+            case status => status == Status.Draw
+          }
+      }
+
+    }
+
   }
 
 }

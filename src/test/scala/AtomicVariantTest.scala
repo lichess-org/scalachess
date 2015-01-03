@@ -118,16 +118,22 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "In atomic check, an opportunity at exploding the opponent's king takes priority over getting out of check" in {
-      val positionFen = "k7/pp5R/8/8/3Q4/P7/1P6/K1r5 w - -"
+      val positionFen = "k1K5/pp5R/8/8/3Q4/P7/1P6/2r5 w - -"
       val threatenedGame = fenToGame(positionFen, AtomicChess)
 
       threatenedGame must beSuccess.like {
         case game =>
+          game.situation.check must beTrue
           game.situation.end must beFalse
           game.situation.winner must beNone
-          game.situation.moves must haveKeys(Pos.D4, Pos.H7, Pos.A1)
+          game.situation.moves must haveKeys(Pos.D4, Pos.H7, Pos.C8)
           game.situation.moves.get(Pos.D4) must beSome.like {
             case mvs => mvs.forall(_.captures) must beTrue
+          }
+
+          // The king cannot capture a piece in the perimeter of the opponent king, exploding itself
+          game.situation.moves.get(Pos.C8) must beSome.like {
+            case mvs => mvs.forall(_.captures) must beFalse
           }
 
           game.situation.moves.get(Pos.H7) must beSome.like {

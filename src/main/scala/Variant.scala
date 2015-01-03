@@ -36,8 +36,8 @@ sealed abstract class Variant(
 
   def move(situation : Situation, from: Pos, to: Pos, promotion : Option[PromotableRole]): Valid[Move] = {
 
-    def findMove(from: Pos, to: Pos) =
-      situation.moves.values.flatten.find(mv => mv.dest == to && mv.orig == from)
+    // Find the move in the variant specific list of valid moves
+    def findMove(from: Pos, to: Pos) = situation.moves get from flatMap (_.find(_.dest == to))
 
     for {
       actor ← situation.board.actors get from toValid "No piece on " + from
@@ -274,9 +274,10 @@ object Variant {
 
         kingAttackingMoves = situation.actors map {
           act =>
-            // Filter to moves which take a piece next to the king
+            // Filter to moves which take a piece next to the king, exploding the king. The player's king cannot
+            // capture, however
             act.pos -> act.rawMoves.filter(
-              mv => kingPerimeter.contains(mv.dest) && mv.captures)
+              mv => kingPerimeter.contains(mv.dest) && mv.captures && (mv.piece isNot King))
         } filter (!_._2.isEmpty)
 
       } yield kingAttackingMoves.toMap

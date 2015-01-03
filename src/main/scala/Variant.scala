@@ -270,13 +270,17 @@ object Variant {
 
       val moves = for {
         opponentKingPerimeter <- situation.board.kingPosOf(!situation.color) map (_.surroundingPositions)
+        myKingPerimeter <- situation.kingPos map (_.surroundingPositions)
 
         kingAttackingMoves = situation.actors map {
           act =>
             // Filter to moves which take a piece next to the king, exploding the king. The player's king cannot
-            // capture, however
+            // capture, however and it is illegal to capture a piece that would result in your own king exploding
+            // (e.g. an opponent piece next to the king)
             act.pos -> act.rawMoves.filter(
-              mv => opponentKingPerimeter.contains(mv.dest) && mv.captures && (mv.piece isNot King))
+              mv => opponentKingPerimeter.contains(mv.dest) &&
+                mv.captures && (mv.piece isNot King) &&
+                !myKingPerimeter.contains(mv.dest))
         } filter (!_._2.isEmpty)
 
       } yield kingAttackingMoves.toMap
@@ -319,7 +323,7 @@ object Variant {
 
         // Pawns are immune (for some reason), but all pieces surrounding the captured piece and the capturing piece
         // itself explode
-        val piecesToExplode = destination :: surroundingPositions.filter(boardPieces.get(_).fold(false)(_.isNot(Pawn)))
+        val piecesToExplode = surroundingPositions.filter(boardPieces.get(_).fold(false)(_.isNot(Pawn))) + destination
         val afterExplosions = boardPieces -- piecesToExplode
 
         val newBoard = afterBoard withPieces afterExplosions
@@ -356,17 +360,6 @@ object Variant {
 
     /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
     override def specialEnd(situation: Situation) = situation.board.kingPos.size != 2
-
-    /** The winner is the non-checkmated player or the player who does not have their king exploded */
-    override def winner(situation: Situation) = {
-      val board = situation.board
-      val playing = situation.color
-      val gameWon = situation.checkMate || specialEnd(situation)
-
-      if (!gameWon) None else {
-        if (situation.checkMate || !situation.kingPos.isDefined) Some(!playing) else Some(playing)
-      }
-    }
   }
 
   val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, Antichess, AtomicChess)

@@ -136,8 +136,13 @@ class AtomicVariantTest extends ChessTest {
             case mvs => mvs.forall(_.captures) must beFalse
           }
 
+          // The rook cannot capture, as that would result in our own king exploding
           game.situation.moves.get(Pos.H7) must beSome.like {
-            case mvs => mvs.forall(_.captures) must beTrue
+            case mvs =>
+              mvs.find(_.captures) must beNone
+              // It can, however, defend the king
+              mvs.find(_.dest == Pos.C7) must beSome
+              mvs.size must beEqualTo(1)
           }
       }
     }
@@ -223,20 +228,6 @@ class AtomicVariantTest extends ChessTest {
           game.situation.end must beTrue
           game.situation.status must beSome.like{
             case status => status == Status.Draw
-          }
-      }
-    }
-
-    "Correct win if a player explodes their own king" in {
-      val position = "4K3/8/8/8/8/8/8/kB5r b - -"
-      val game = fenToGame(position, AtomicChess)
-      val successGame = game flatMap (_.playMoves((Pos.H1, Pos.B1)))
-
-      successGame must beSuccess.like {
-        case game =>
-          game.situation.end must beTrue
-          game.situation.winner must beSome.like{
-            case color => color == White
           }
       }
     }

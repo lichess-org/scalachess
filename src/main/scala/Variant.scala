@@ -200,8 +200,6 @@ object Variant {
       if (!capturingMoves.isEmpty) capturingMoves else allMoves
     }
 
-    override def staleMate(situation: Situation) : Boolean = specialDraw(situation)
-
     // In antichess, there is no checkmate condition, and the winner is the current player if they have no legal moves
     override def winner (situation: Situation): Option[Color] = if (specialEnd(situation)) Some(situation.color) else None
 
@@ -327,6 +325,22 @@ object Variant {
         val newBoard = afterBoard withPieces afterExplosions
         move withAfter newBoard
       }
+    }
+
+    /** Since a king may walk into the path of another king, it is more difficult to win when your opponent only has a
+      * king left.
+      **/
+    private def threeOrLessVsKing(situation: Situation) = {
+      val whiteActors = situation.board.actorsOf(White)
+      val blackActors = situation.board.actorsOf(Black)
+      val allActors = situation.board.actors
+
+      false
+    }
+
+    override def specialDraw(situation: Situation) = {
+      // Bishops on opposite coloured squares can never capture each other to cause a king to explode
+      InsufficientMatingMaterial.bishopsOnDifferentColor(situation.board)
     }
 
     // On insufficient mating material, a win may still be achieved by exploding a piece next to a king

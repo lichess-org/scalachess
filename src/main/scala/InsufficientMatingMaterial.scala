@@ -4,7 +4,18 @@ package chess
 
 object InsufficientMatingMaterial {
 
+  def nonKingPieces(board: Board) = board.pieces.filter(_._2.role != King).toList
+
+  def bishopsOnDifferentColor(board: Board) = {
+    val notKingPieces = nonKingPieces(board)
+
+    notKingPieces.map(_._2.role).distinct == List(Bishop) &&
+      notKingPieces.map(_._1.color).distinct.size == 2
+  }
+
   def apply(board: Board) = {
+
+    lazy val notKingPieces = nonKingPieces(board)
 
     def kingsOnly = board.pieces.size < 3
 
@@ -13,8 +24,6 @@ object InsufficientMatingMaterial {
         notKingPieces.map(_._1.color).distinct.size == 1
 
     def singleKnight = notKingPieces.map(_._2.role) == List(Knight)
-
-    lazy val notKingPieces = board.pieces.filter(_._2.role != King).toList
 
     kingsOnly || bishopsOnSameColor || singleKnight
   }

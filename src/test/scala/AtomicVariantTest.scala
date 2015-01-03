@@ -102,18 +102,20 @@ class AtomicVariantTest extends ChessTest {
       }
     }
 
-/*    "It is stalemate if there are only two kings and two opposite square coloured bishops remaining" in {
+    "It is stalemate if there are only two kings and two opposite square coloured bishops remaining" in {
       val positionFen = "4K3/8/2b5/8/8/8/5B2/3k4 b - -"
       val game = fenToGame(positionFen, AtomicChess)
 
       game must beSuccess.like {
         case game =>
           game.situation.end must beTrue
-          game.situation.staleMate must beTrue
+          game.situation.variantDraw must beTrue
           game.situation.winner must beNone
+          game.situation.status must beSome.like{
+            case status => status == Status.Draw
+          }
       }
-
-    }*/
+    }
 
     "In atomic check, an opportunity at exploding the opponent's king takes priority over getting out of check" in {
       val positionFen = "k7/pp5R/8/8/3Q4/P7/1P6/K1r5 w - -"

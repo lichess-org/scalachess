@@ -8,6 +8,9 @@ case class Piece(color: Color, role: Role) {
 
   def oneOf(rs: Set[Role]) = rs(role)
 
+  def isMinor = oneOf(Set(Knight, Bishop))
+  def isMajor = oneOf(Set(Queen, Rook))
+
   def forsyth: Char = if (color == White) role.forsythUpper else role.forsyth
 
   // attackable positions assuming empty board

@@ -65,7 +65,7 @@ sealed abstract class Variant(
 
   def finalizeMove(board: Board): Board = board
 
-  // Some variants, such as kamikaze chess, give different properties to pieces by replacing them with
+  // Some variants, such as atomic chess, give different properties to pieces by replacing them with
   // different piece objects
   def convertPiecesFromStandard(originalPieces : PieceMap) : PieceMap = originalPieces
 
@@ -267,17 +267,16 @@ object Variant {
 
     /** Moves which threaten to explode the opponent's king */
     private def kingThreateningMoves(situation: Situation): Map[Pos,List[Move]] = {
-      val opponentKingPerimeter = situation.board.kingPosOf(!situation.color) map (_.surroundingPositions)
 
       val moves = for {
-        kingPerimeter <- opponentKingPerimeter
+        opponentKingPerimeter <- situation.board.kingPosOf(!situation.color) map (_.surroundingPositions)
 
         kingAttackingMoves = situation.actors map {
           act =>
             // Filter to moves which take a piece next to the king, exploding the king. The player's king cannot
             // capture, however
             act.pos -> act.rawMoves.filter(
-              mv => kingPerimeter.contains(mv.dest) && mv.captures && (mv.piece isNot King))
+              mv => opponentKingPerimeter.contains(mv.dest) && mv.captures && (mv.piece isNot King))
         } filter (!_._2.isEmpty)
 
       } yield kingAttackingMoves.toMap
@@ -331,17 +330,23 @@ object Variant {
     /** Since a king may walk into the path of another king, it is more difficult to win when your opponent only has a
       * king left.
       **/
-    private def threeOrLessVsKing(situation: Situation) = {
-      val whiteActors = situation.board.actorsOf(White)
-      val blackActors = situation.board.actorsOf(Black)
-      val allActors = situation.board.actors
+    private def insufficientAtomicWinningMaterial(board: Board) = {
+      val whiteActors = board.actorsOf(White)
+      val blackActors = board.actorsOf(Black)
+      lazy val allActors = board.actors.values.map(_.piece).filter(_ isNot King)
 
-      false
+      if (whiteActors.size != 1 && blackActors.size != 1) false
+      else {
+        // You can mate with a king and a rook or queen, but not a king and a bishop or knight
+        allActors.size == 1 && allActors.exists(_ isMinor)
+      }
     }
 
     override def specialDraw(situation: Situation) = {
       // Bishops on opposite coloured squares can never capture each other to cause a king to explode
-      InsufficientMatingMaterial.bishopsOnDifferentColor(situation.board)
+      // and a rook and a king vs a king is not winnable
+      val board = situation.board
+      InsufficientMatingMaterial.bishopsOnDifferentColor(board) || insufficientAtomicWinningMaterial(board)
     }
 
     // On insufficient mating material, a win may still be achieved by exploding a piece next to a king

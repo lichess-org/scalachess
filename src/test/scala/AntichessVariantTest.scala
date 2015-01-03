@@ -81,7 +81,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       val invalidGame = gameAfterOpening flatMap (_.playMove(Pos.H2,Pos.H4))
 
       invalidGame must beFailure.like {
-        case failMsg => failMsg mustEqual scalaz.NonEmptyList("there are capturing moves available")
+        case failMsg => failMsg mustEqual scalaz.NonEmptyList("Piece on h2 cannot move to h4")
       }
     }
 
@@ -262,8 +262,6 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
               color == Black;
           }
       }
-
-
     }
 
   }

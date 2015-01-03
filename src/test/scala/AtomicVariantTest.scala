@@ -1,6 +1,6 @@
 package chess
 
-import chess.Variant.{AtomicChess}
+import chess.Variant.{Antichess, AtomicChess}
 
 class AtomicVariantTest extends ChessTest {
 
@@ -12,9 +12,9 @@ class AtomicVariantTest extends ChessTest {
       val explodedSquares = List(Pos.H8, Pos.G8)
       val intactPawns = List(Pos.F7, Pos.G6, Pos.H7)
 
-      val explosionGame = maybeGame flatMap (_.playMoves( (Pos.B2, Pos.H8) ))
+      val explosionGame = maybeGame flatMap (_.playMoves((Pos.B2, Pos.H8)))
 
-      explosionGame must beSuccess.like{
+      explosionGame must beSuccess.like {
         case game =>
           explodedSquares.forall(pos => game.situation.board(pos).isEmpty) must beTrue
           intactPawns.forall(pos => game.situation.board(pos).isDefined) must beTrue
@@ -26,7 +26,7 @@ class AtomicVariantTest extends ChessTest {
       val maybeGame = fenToGame(fenPosition, AtomicChess)
       val explodedSquares = List(Pos.D5, Pos.E5, Pos.D6, Pos.E6, Pos.F6, Pos.D7, Pos.E7, Pos.F7)
 
-      val explosionGame = maybeGame flatMap (_.playMoves( (Pos.H3, Pos.E6) ))
+      val explosionGame = maybeGame flatMap (_.playMoves((Pos.H3, Pos.E6)))
 
       explosionGame must beSuccess.like {
         case game =>
@@ -39,7 +39,7 @@ class AtomicVariantTest extends ChessTest {
       val maybeGame = fenToGame(fenPosition, AtomicChess)
       val explodedSquares = List(Pos.F5, Pos.E5, Pos.D6, Pos.E6, Pos.F6, Pos.D7, Pos.E7, Pos.F7)
 
-      val explosionGame = maybeGame flatMap (_.playMoves( (Pos.B3, Pos.E6) ))
+      val explosionGame = maybeGame flatMap (_.playMoves((Pos.B3, Pos.E6)))
 
       explosionGame must beSuccess.like {
         case game =>
@@ -51,10 +51,10 @@ class AtomicVariantTest extends ChessTest {
       val fenPosition = "8/8/8/1k6/8/8/8/1Kr5 w - -"
       val maybeGame = fenToGame(fenPosition, AtomicChess)
 
-      val errorGame = maybeGame flatMap (_.playMoves((Pos.B1,Pos.C1)))
+      val errorGame = maybeGame flatMap (_.playMoves((Pos.B1, Pos.C1)))
 
       errorGame must beFailure.like {
-        case failMsg => failMsg mustEqual scalaz.NonEmptyList("A king cannot capture in atomic chess")
+        case failMsg => failMsg mustEqual scalaz.NonEmptyList("Piece on b1 cannot move to c1")
       }
     }
 
@@ -62,13 +62,13 @@ class AtomicVariantTest extends ChessTest {
       val fenPosition = "rnb1kbnr/ppp1pppp/8/3q4/8/7P/PPPP1PP1/RNBQKBNR b KQkq -"
       val maybeGame = fenToGame(fenPosition, AtomicChess)
 
-      val gameWin = maybeGame flatMap (_.playMoves((Pos.D5,Pos.D2)))
+      val gameWin = maybeGame flatMap (_.playMoves((Pos.D5, Pos.D2)))
 
-      gameWin must beSuccess.like{
+      gameWin must beSuccess.like {
         case winningGame =>
           winningGame.situation.end must beTrue
           winningGame.situation.variantEnd must beTrue
-          winningGame.situation.winner must beSome.like{
+          winningGame.situation.winner must beSome.like {
             case winner => winner == Black
           }
       }
@@ -78,13 +78,13 @@ class AtomicVariantTest extends ChessTest {
       val fenPosition = "1k6/8/8/8/8/8/PP5r/K7 b - -"
       val maybeGame = fenToGame(fenPosition, AtomicChess)
 
-      val gameWin = maybeGame flatMap (_.playMoves((Pos.H2,Pos.H1)))
+      val gameWin = maybeGame flatMap (_.playMoves((Pos.H2, Pos.H1)))
 
-      gameWin must beSuccess.like{
+      gameWin must beSuccess.like {
         case winningGame =>
           winningGame.situation.end must beTrue
           winningGame.situation.variantEnd must beFalse
-          winningGame.situation.winner must beSome.like{case color => color == Black}
+          winningGame.situation.winner must beSome.like { case color => color == Black}
       }
     }
 
@@ -92,41 +92,74 @@ class AtomicVariantTest extends ChessTest {
       val positionFen = "k7/8/1R6/8/8/8/8/5K2 w - -"
       val maybeGame = fenToGame(positionFen, AtomicChess)
 
-      val gameWin = maybeGame flatMap (_.playMoves((Pos.B6,Pos.B7)))
+      val gameWin = maybeGame flatMap (_.playMoves((Pos.B6, Pos.B7)))
 
-      gameWin must beSuccess.like{
+      gameWin must beSuccess.like {
         case game =>
           game.situation.moves
           game.situation.end must beTrue
           game.situation.staleMate must beTrue
       }
+    }
 
-      "In atomic check, an opportunity at exploding the opponent's king takes priority over getting out of check" in {
-        val positionFen = "k7/pp5R/8/8/3Q4/P7/1P6/K1r5 w - -"
-        val threatenedGame = fenToGame(positionFen, AtomicChess)
+/*    "It is stalemate if there are only two kings and two opposite square coloured bishops remaining" in {
+      val positionFen = "4K3/8/2b5/8/8/8/5B2/3k4 b - -"
+      val game = fenToGame(positionFen, AtomicChess)
 
-        threatenedGame must beSuccess.like{
-          case game =>
-            game.situation.end must beFalse
-            game.situation.winner must beNone
-            game.situation.moves must haveKeys(Pos.D4, Pos.H7)
-            game.situation.moves.values.forall(_.forall(_.captures)) must beTrue
-        }
+      game must beSuccess.like {
+        case game =>
+          game.situation.end must beTrue
+          game.situation.staleMate must beTrue
+          game.situation.winner must beNone
       }
 
-      "In atomic mate, an opportunity at exploding the opponent's king takes priority over getting out of mate" in {
-        val positionFen = "k7/pp5R/8/8/3Q4/8/PP6/K1r5 w - -"
-        val threatenedGame = fenToGame(positionFen, AtomicChess)
+    }*/
 
-        threatenedGame must beSuccess.like{
-          case game =>
-            game.situation.end must beFalse
-            game.situation.winner must beNone
-            game.situation.moves must haveKeys(Pos.D4, Pos.H7)
-            game.situation.moves.values.forall(_.forall(_.captures)) must beTrue
-        }
+    "In atomic check, an opportunity at exploding the opponent's king takes priority over getting out of check" in {
+      val positionFen = "k7/pp5R/8/8/3Q4/P7/1P6/K1r5 w - -"
+      val threatenedGame = fenToGame(positionFen, AtomicChess)
+
+      threatenedGame must beSuccess.like {
+        case game =>
+          game.situation.end must beFalse
+          game.situation.winner must beNone
+          game.situation.moves must haveKeys(Pos.D4, Pos.H7, Pos.A1)
+          game.situation.moves.get(Pos.D4) must beSome.like {
+            case mvs => mvs.forall(_.captures) must beTrue
+          }
+
+          game.situation.moves.get(Pos.H7) must beSome.like {
+            case mvs => mvs.forall(_.captures) must beTrue
+          }
       }
+    }
 
+    "In atomic mate, an opportunity at exploding the opponent's king takes priority over getting out of mate" in {
+      val positionFen = "k1r5/pp5R/8/8/3Q4/8/PP6/K7 b - -"
+      val game = fenToGame(positionFen, AtomicChess)
+
+      val mateThreatedGame = game flatMap (_.playMoves((Pos.C8, Pos.C1)))
+
+      mateThreatedGame must beSuccess.like {
+        case game =>
+          game.situation.end must beFalse
+          game.situation.winner must beNone
+          game.situation.moves must haveKeys(Pos.D4, Pos.H7)
+          game.situation.moves.values.forall(_.forall(_.captures)) must beTrue
+      }
+    }
+
+    "In atomic chess a king may walk into a square that is in the perimeter of the opponent king since it can't capture" in {
+      val positionFen = "3k4/8/3K4/8/8/8/7r/8 w - -"
+      val game = fenToGame(positionFen, AtomicChess)
+
+      val successGame = game flatMap (_.playMoves((Pos.D6, Pos.D7)))
+
+      successGame must beSuccess.like {
+        case game =>
+          game.situation.board(Pos.D7) must beSome
+          game.situation.check must beFalse
+      }
     }
 
   }

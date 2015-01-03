@@ -34,13 +34,19 @@ sealed abstract class Variant(
     case actor if actor.moves.nonEmpty => actor.pos -> actor.moves
   } toMap
 
-  def move(situation : Situation, from: Pos, to: Pos, promotion : Option[PromotableRole]): Valid[Move] = for {
-    actor ← situation.board.actors get from toValid "No piece on " + from
-    myActor ← actor.validIf(actor is situation.color, "Not my piece on " + from)
-    m1 ← myActor.moves find (_.dest == to) toValid "Piece on " + from + " cannot move to " + to
-    m2 ← m1 withPromotion promotion toValid "Piece on " + from + " cannot promote to " + promotion
-    m3 <- m2 validIf (isValidPromotion(promotion), "Cannot promote to " + promotion + " in this game mode")
-  } yield m3
+  def move(situation : Situation, from: Pos, to: Pos, promotion : Option[PromotableRole]): Valid[Move] = {
+
+    def findMove(from: Pos, to: Pos) =
+      situation.moves.values.flatten.find(mv => mv.dest == to && mv.orig == from)
+
+    for {
+      actor ← situation.board.actors get from toValid "No piece on " + from
+      myActor ← actor.validIf(actor is situation.color, "Not my piece on " + from)
+      m1 ← findMove(from,to) toValid "Piece on " + from + " cannot move to " + to
+      m2 ← m1 withPromotion promotion toValid "Piece on " + from + " cannot promote to " + promotion
+      m3 <- m2 validIf (isValidPromotion(promotion), "Cannot promote to " + promotion + " in this game mode")
+    } yield m3
+  }
 
   def staleMate(situation: Situation) : Boolean = !situation.check && situation.moves.isEmpty
 
@@ -194,15 +200,6 @@ object Variant {
       if (!capturingMoves.isEmpty) capturingMoves else allMoves
     }
 
-    override def move(situation : Situation, from: Pos, to: Pos, promotion : Option[PromotableRole]) = for {
-    // We inherit the standard rules, such as where peices may move
-      m1 <- super.move(situation, from, to, promotion)
-
-      // However, in antichess, the player may only move without capturing if no capturing moves are available.
-      m2 <- m1 validIf (m1.captures || !situation.playerCanCapture, "there are capturing moves available")
-
-    } yield m2
-
     override def staleMate(situation: Situation) : Boolean = specialDraw(situation)
 
     // In antichess, there is no checkmate condition, and the winner is the current player if they have no legal moves
@@ -270,28 +267,50 @@ object Variant {
     title= "Nuke your opponent's king to win."
   ) {
 
+    /** Moves which threaten to explode the opponent's king */
+    private def kingThreateningMoves(situation: Situation): Map[Pos,List[Move]] = {
+      val opponentKingPerimeter = situation.board.kingPosOf(!situation.color) map (_.surroundingPositions)
+
+      val moves = for {
+        kingPerimeter <- opponentKingPerimeter
+
+        kingAttackingMoves = situation.actors map {
+          act =>
+            // Filter to moves which take a piece next to the king
+            act.pos -> act.rawMoves.filter(
+              mv => kingPerimeter.contains(mv.dest) && mv.captures)
+        } filter (!_._2.isEmpty)
+
+      } yield kingAttackingMoves.toMap
+
+      moves getOrElse Map.empty
+    }
+
     override def validMoves(situation: Situation): Map[Pos, List[Move]] = {
       // In atomic chess, the pieces have the same roles as usual
       val usualMoves = super.validMoves(situation)
 
       /* However, it is illegal for a king to capture as that would result in it exploding. */
-      val validAtomicMoves = for {
+      val atomicMoves = for {
         kingPos <- situation.kingPos
         newKingMoves <- usualMoves.get(kingPos) map (_.filterNot(_.captures))
         newMap = usualMoves.updated(kingPos, newKingMoves)
       } yield if (!newKingMoves.isEmpty) newMap else newMap - kingPos // If a pos has no valid moves, we remove it
 
-      validAtomicMoves getOrElse usualMoves
+      val kingSafeMoves = atomicMoves getOrElse usualMoves
+
+      // Additionally, if the player's king is in check they may prioritise exploding the opponent's king over defending
+      // their own
+      if (!situation.check) kingSafeMoves else kingSafeMoves ++ kingThreateningMoves(situation)
     }
 
     override def move(situation : Situation, from: Pos, to: Pos, promotion : Option[PromotableRole]) = for {
       m1 <- super.move(situation, from, to, promotion)
-      m2 <- m1.validIf(m1.piece.isNot(King) || !m1.captures, "A king cannot capture in atomic chess")
-      m3 <- explodeSurroundingPieces(m2).success
-    } yield m3
+      m2 <- explodeSurroundingPieces(m1).success
+    } yield m2
 
     /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
-    def explodeSurroundingPieces(move: Move) : Move = {
+    private def explodeSurroundingPieces(move: Move) : Move = {
       if (!move.captures) move
       else {
         val surroundingPositions = move.dest.surroundingPositions
@@ -309,6 +328,9 @@ object Variant {
         move withAfter newBoard
       }
     }
+
+    // On insufficient mating material, a win may still be achieved by exploding a piece next to a king
+    override def drawsOnInsufficientMaterial = false
 
     /** Atomic chess has a special end where the king has been killed by exploding with an adjacent captured piece */
     override def specialEnd(situation: Situation) = situation.kingPos.isEmpty

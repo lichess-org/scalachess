@@ -9,7 +9,10 @@ case class Actor(
 
   import Actor._
 
-  lazy val moves: List[Move] = kingSafetyMoveFilter(trustedMoves(true))
+  /** The moves without taking defending the king into account */
+  lazy val rawMoves = trustedMoves(true)
+
+  lazy val moves: List[Move] = kingSafetyMoveFilter(rawMoves)
 
   def trustedMoves(withCastle: Boolean): List[Move] = piece.role match {
 
@@ -75,10 +78,13 @@ case class Actor(
   def is(c: Color) = c == piece.color
   def is(p: Piece) = p == piece
 
+  // In atomic chess, kings may touch since they cannot capture pieces
+  private val isNotAtomicChess = !board.variant.atomicChess
+
   // critical function. optimize for performance
   private def kingSafetyMoveFilter(ms: List[Move]): List[Move] = {
     val filter: Piece => Boolean =
-      if (piece is King) (_ => true) else if (check) (_.role.attacker) else (_.role.projection)
+      if ((piece is King) && isNotAtomicChess) (_ => true) else if (check) (_.role.attacker) else (_.role.projection)
     val stableKingPos = if (piece.role == King) None else board kingPosOf color
     ms filter { m =>
       kingSafety(m, filter, stableKingPos orElse (m.after kingPosOf color))

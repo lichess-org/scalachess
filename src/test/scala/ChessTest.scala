@@ -73,7 +73,7 @@ trait ChessTest
 
     val maybeBoard = situation map (sit => sit.color -> sit.withVariant(variant).board) toValid "Could not construct situation from FEN"
 
-    maybeBoard map {case (color, board) => Game(Antichess).copy(board = board) withPlayer(color)}
+    maybeBoard map {case (color, board) => Game(variant).copy(board = board) withPlayer(color)}
   }
 
   def makeBoard(pieces: (Pos, Piece)*): Board =

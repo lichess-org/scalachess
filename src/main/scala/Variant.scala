@@ -354,8 +354,19 @@ object Variant {
     // On insufficient mating material, a win may still be commonly achieved by exploding a piece next to a king
     override def drawsOnInsufficientMaterial = false
 
-    /** Atomic chess has a special end where the king has been killed by exploding with an adjacent captured piece */
-    override def specialEnd(situation: Situation) = situation.kingPos.isEmpty
+    /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
+    override def specialEnd(situation: Situation) = situation.board.kingPos.size != 2
+
+    /** The winner is the non-checkmated player or the player who does not have their king exploded */
+    override def winner(situation: Situation) = {
+      val board = situation.board
+      val playing = situation.color
+      val gameWon = situation.checkMate || specialEnd(situation)
+
+      if (!gameWon) None else {
+        if (situation.checkMate || !situation.kingPos.isDefined) Some(!playing) else Some(playing)
+      }
+    }
   }
 
   val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, Antichess, AtomicChess)

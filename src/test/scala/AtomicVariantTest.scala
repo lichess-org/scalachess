@@ -225,7 +225,20 @@ class AtomicVariantTest extends ChessTest {
             case status => status == Status.Draw
           }
       }
+    }
 
+    "Correct win if a player explodes their own king" in {
+      val position = "4K3/8/8/8/8/8/8/kB5r b - -"
+      val game = fenToGame(position, AtomicChess)
+      val successGame = game flatMap (_.playMoves((Pos.H1, Pos.B1)))
+
+      successGame must beSuccess.like {
+        case game =>
+          game.situation.end must beTrue
+          game.situation.winner must beSome.like{
+            case color => color == White
+          }
+      }
     }
 
   }

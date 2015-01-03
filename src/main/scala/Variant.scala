@@ -339,15 +339,14 @@ object Variant {
       // One player must only have their king left
       if (whiteActors.size != 1 && blackActors.size != 1) false
       else {
-        // You can easily mate with a king and a rook or queen, but not very easily with a king and a bishop or knight
-        // or just two opposing kings
-        allPieces.size == 1 && allPieces.exists(_ isMinor) || allActors.size == 2
+        // You can mate with a queen, with just one of any other piece or with just a king
+        allPieces.size == 1 && !allPieces.exists(_ is Queen) || allActors.size == 2
       }
     }
 
     override def specialDraw(situation: Situation) = {
       // Bishops on opposite coloured squares can never capture each other to cause a king to explode and a traditional
-      // mate would be difficult
+      // mate would be not be
       val board = situation.board
       InsufficientMatingMaterial.bishopsOnDifferentColor(board) || insufficientAtomicWinningMaterial(board)
     }

@@ -79,7 +79,7 @@ case class Actor(
   def is(p: Piece) = p == piece
 
   // In atomic chess, kings may touch since they cannot capture pieces
-  private val isNotAtomicChess = !board.variant.atomicChess
+  private val isNotAtomicChess = !board.variant.atomic
 
   // critical function. optimize for performance
   private def kingSafetyMoveFilter(ms: List[Move]): List[Move] = {

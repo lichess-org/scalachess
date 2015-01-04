@@ -16,7 +16,7 @@ sealed abstract class Variant(
   def kingOfTheHill = this == Variant.KingOfTheHill
   def threeCheck = this == Variant.ThreeCheck
   def antichess = this == Variant.Antichess
-  def atomicChess = this == Variant.AtomicChess
+  def atomic = this == Variant.AtomicChess
 
   def exotic = !standard
 

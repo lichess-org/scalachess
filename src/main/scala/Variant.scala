@@ -16,7 +16,7 @@ sealed abstract class Variant(
   def kingOfTheHill = this == Variant.KingOfTheHill
   def threeCheck = this == Variant.ThreeCheck
   def antichess = this == Variant.Antichess
-  def atomic = this == Variant.AtomicChess
+  def atomic = this == Variant.Atomic
 
   def exotic = !standard
 
@@ -257,7 +257,7 @@ object Variant {
 
   }
 
-  case object AtomicChess extends Variant(
+  case object Atomic extends Variant(
     id = 7,
     key = "atomic",
     name = "Atomic chess",
@@ -362,7 +362,7 @@ object Variant {
     override def specialEnd(situation: Situation) = situation.board.kingPos.size != 2
   }
 
-  val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, Antichess, AtomicChess)
+  val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, Antichess, Atomic)
   val byId = all map { v => (v.id, v) } toMap
 
   val default = Standard

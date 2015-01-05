@@ -126,6 +126,11 @@ class ForsythTest extends ChessTest {
           case s => s.turns must_== 23
         }
       }
+      "last move (for en passant)" in {
+        f <<< "2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6 w - f6 0 36" must beSome.like {
+          case s => s.situation.board.history.lastMove must_== Some(Pos.F7, Pos.F5)
+        }
+      }
     }
     "with history" in {
       "starting" in {

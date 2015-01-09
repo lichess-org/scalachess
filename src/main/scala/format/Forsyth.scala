@@ -52,7 +52,15 @@ object Forsyth {
   def <<<(source: String): Option[SituationPlus] = {
     val fixedSource = fixCastles(source) | source
     <<(fixedSource) map { situation =>
-      val history = fixedSource split " " lift 2 map { History.make(none, _) }
+      val splitted = fixedSource split ' '
+      val history = splitted lift 2 map { castles =>
+        val lastMove = splitted lift 3 flatMap Pos.posAt match {
+          case Some(pos) if pos.y == 3 => Some(s"${pos.file}2${pos.file}4")
+          case Some(pos) if pos.y == 6 => Some(s"${pos.file}7${pos.file}5")
+          case _                       => None
+        }
+        History.make(lastMove, castles)
+      }
       val situation2 = situation withHistory (history | History.make(none, ""))
       val fullMoveNumber = fixedSource split " " lift 5 flatMap parseIntOption
       SituationPlus(situation2, fullMoveNumber | 1)

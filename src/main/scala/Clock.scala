@@ -33,6 +33,8 @@ sealed trait Clock {
 
   def giveTime(c: Color, t: Float): Clock
 
+  def halfTime(c: Color): Clock
+
   def show = s"$limitInMinutes+$increment"
 
   def showTime(t: Float) = {
@@ -101,6 +103,8 @@ case class RunningClock(
 
   def giveTime(c: Color, t: Float): RunningClock = addTime(c, -t)
 
+  def halfTime(c: Color): RunningClock = addTime(c, remainingTime(c) / 2)
+
   def switch: RunningClock = copy(color = !color)
 
   def takeback: RunningClock = {
@@ -129,6 +133,8 @@ case class PausedClock(
   }
 
   def giveTime(c: Color, t: Float): PausedClock = addTime(c, -t)
+
+  def halfTime(c: Color): PausedClock = addTime(c, remainingTime(c) / 2)
 
   def switch: PausedClock = copy(color = !color)
 

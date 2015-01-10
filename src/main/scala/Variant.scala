@@ -260,7 +260,7 @@ object Variant {
   case object Atomic extends Variant(
     id = 7,
     key = "atomic",
-    name = "Atomic chess",
+    name = "Atomic",
     shortName= "Atom",
     title= "Nuke your opponent's king to win."
   ) {

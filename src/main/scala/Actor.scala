@@ -9,11 +9,9 @@ case class Actor(
 
   import Actor._
 
+  lazy val moves: List[Move] = kingSafetyMoveFilter(trustedMoves(true))
+
   /** The moves without taking defending the king into account */
-  lazy val rawMoves = trustedMoves(true)
-
-  lazy val moves: List[Move] = kingSafetyMoveFilter(rawMoves)
-
   def trustedMoves(withCastle: Boolean): List[Move] = piece.role match {
 
     case Bishop             => longRange(Bishop.dirs)

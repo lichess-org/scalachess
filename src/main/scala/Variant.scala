@@ -277,7 +277,9 @@ object Variant {
             // Filter to moves which take a piece next to the king, exploding the king. The player's king cannot
             // capture, however and it is illegal to capture a piece that would result in your own king exploding
             // (e.g. an opponent piece next to the king)
-            act.pos -> act.rawMoves.filter(
+            val rawMoves = act.trustedMoves(true)
+
+            act.pos -> rawMoves.filter(
               mv => opponentKingPerimeter.contains(mv.dest) &&
                 mv.captures && (mv.piece isNot King) &&
                 !myKingPerimeter.contains(mv.dest))

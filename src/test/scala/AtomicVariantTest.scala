@@ -242,6 +242,19 @@ class AtomicVariantTest extends ChessTest {
       }
     }
 
+    "In an en-passant capture, the pieces surrounding the pawn's destination are exploded along with the pawn" in {
+      val position = "4k3/2pppb1p/3r1r2/3P1b2/8/8/1K6/4NB2 b - -"
+      val game = fenToGame(position, Atomic)
+      val validGame = game flatMap (_.playMoves( (Pos.E7, Pos.E5), (Pos.D5, Pos.E6) ))
+
+      validGame must beSuccess.like {
+        case game =>
+          game.board(Pos.E6) must beNone // The pawn must be captured
+          // Every piece surrounding the en-passant destination square that is not a pawn should be empty
+          Pos.E6.surroundingPositions.forall(pos => game.board(pos) == None || pos == Pos.E7 || pos == Pos.D7) must beTrue
+      }
+    }
+
   }
 
 }

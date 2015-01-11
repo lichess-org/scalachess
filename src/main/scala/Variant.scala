@@ -364,7 +364,7 @@ object Variant {
     override def specialEnd(situation: Situation) = situation.board.kingPos.size != 2
   }
 
-  val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, Antichess, Atomic)
+  val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, Antichess)
   val byId = all map { v => (v.id, v) } toMap
 
   val default = Standard

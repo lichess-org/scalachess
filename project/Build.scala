@@ -11,15 +11,15 @@ trait Dependencies {
   val scalaz = "org.scalaz" %% "scalaz-core" % "7.1.0"
   val specs2 = "org.specs2" %% "specs2" % "2.3.12" % "test"
   val scalalib = "com.github.ornicar" %% "scalalib" % "5.1"
-  val jodaTime = "joda-time" % "joda-time" % "2.3"
+  val jodaTime = "joda-time" % "joda-time" % "2.6"
 }
 
 object ApplicationBuild extends Build with Resolvers with Dependencies {
 
   private val buildSettings = Project.defaultSettings ++ Seq(
-    scalaVersion := "2.11.4",
+    scalaVersion := "2.11.5",
     organization := "org.lichess",
-    version := "4.0",
+    version := "4.1",
     resolvers := Seq(iliaz, sonatype, awesomepom),
     libraryDependencies := Seq(scalaz, scalalib, jodaTime, specs2),
     updateOptions := updateOptions.value.withCachedResolution(true),

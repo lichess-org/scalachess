@@ -266,6 +266,22 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       }
     }
 
+    "Stalemate is a win - second test" in {
+      val fen = "2Q5/8/p7/8/8/8/6PR/8 w - -"
+      val maybeGame = fenToGame(fen, Antichess)
+
+      val drawnGame = maybeGame flatMap (_.playMoves((Pos.C8, Pos.A6)))
+
+      drawnGame must beSuccess.like {
+        case game =>
+          game.situation.end must beTrue
+          game.situation.winner must beSome.like {
+            case color =>
+              color == Black;
+          }
+      }
+    }
+
   }
 
 

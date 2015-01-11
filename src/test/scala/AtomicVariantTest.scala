@@ -232,6 +232,16 @@ class AtomicVariantTest extends ChessTest {
       }
     }
 
+    "It should not be possible to capture a piece resulting in your own king exploding" in {
+      val position = "rnbqkbnr/pppNp1pp/5p2/3p4/8/8/PPPPPPPP/RNBQKB1R b KQkq - 1 3"
+      val game = fenToGame(position, Atomic)
+      val failureGame = game flatMap (_.playMoves((Pos.D8, Pos.D7)))
+
+      failureGame must beFailure.like {
+        case failMsg => failMsg mustEqual scalaz.NonEmptyList("Piece on d8 cannot move to d7")
+      }
+    }
+
   }
 
 }

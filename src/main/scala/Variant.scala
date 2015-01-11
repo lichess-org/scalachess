@@ -59,8 +59,6 @@ sealed abstract class Variant(
 
   def specialDraw(situation: Situation) = false
 
-  def specialStatemate(situation: Situation) = false
-
   def drawsOnInsufficientMaterial = true
 
   def finalizeMove(board: Board): Board = board
@@ -294,14 +292,14 @@ object Variant {
       // In atomic chess, the pieces have the same roles as usual
       val usualMoves = super.validMoves(situation)
 
-      /* However, it is illegal for a king to capture as that would result in it exploding. */
-      val atomicMoves = for {
-        kingPos <- situation.kingPos
-        newKingMoves <- usualMoves.get(kingPos) map (_.filterNot(_.captures))
-        newMap = usualMoves.updated(kingPos, newKingMoves)
-      } yield if (!newKingMoves.isEmpty) newMap else newMap - kingPos // If a pos has no valid moves, we remove it
+      /* However, it is illegal to make a capture that would result in your own king exploding. */
+      val moves = for {
+        surroundingKing <- situation.kingPos map (_.surroundingPositions)
+        mvs1 = usualMoves.mapValues (_.filter(mv => !mv.captures || mv.captures && !surroundingKing.contains(mv.dest)))
+        mvs2 = mvs1.filter(!_._2.isEmpty)
+      } yield mvs2
 
-      val kingSafeMoves = atomicMoves getOrElse usualMoves
+      val kingSafeMoves = moves getOrElse usualMoves
 
       // Additionally, if the player's king is in check they may prioritise exploding the opponent's king over defending
       // their own

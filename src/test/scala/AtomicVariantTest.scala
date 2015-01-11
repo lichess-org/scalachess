@@ -1,6 +1,6 @@
 package chess
 
-import chess.Variant.{Antichess, Atomic}
+import Variant.Atomic
 
 class AtomicVariantTest extends ChessTest {
 

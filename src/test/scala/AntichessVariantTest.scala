@@ -1,7 +1,7 @@
 package chess
-package format
 
-import chess.Variant.Antichess
+import Variant.Antichess
+import format.Forsyth
 
 class AntichessVariantTest extends ChessTest {
 

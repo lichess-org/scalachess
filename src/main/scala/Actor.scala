@@ -76,13 +76,10 @@ case class Actor(
   def is(c: Color) = c == piece.color
   def is(p: Piece) = p == piece
 
-  // In atomic chess, kings may touch since they cannot capture pieces
-  private val isNotAtomicChess = !board.variant.atomic
-
   // critical function. optimize for performance
   private def kingSafetyMoveFilter(ms: List[Move]): List[Move] = {
     val filter: Piece => Boolean =
-      if ((piece is King) && isNotAtomicChess) (_ => true) else if (check) (_.role.attacker) else (_.role.projection)
+      if ((piece is King)) (_ => true) else if (check) (_.role.attacker) else (_.role.projection)
     val stableKingPos = if (piece.role == King) None else board kingPosOf color
     ms filter { m =>
       kingSafety(m, filter, stableKingPos orElse (m.after kingPosOf color))
@@ -190,10 +187,14 @@ case class Actor(
 
 object Actor {
 
+  // In atomic chess, kings may touch since they cannot capture pieces
+  private def atomicKingsTouch(board: Board, p: Piece) = board.variant.atomic && p.is(King)
+
   // critical function. optimize for performance
   def threatens(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean =
+
     board.pieces exists {
-      case (pos, piece) if piece.color == color && filter(piece) && piece.eyes(pos, to) =>
+      case (pos, piece) if piece.color == color && filter(piece) && piece.eyes(pos, to) && !atomicKingsTouch(board, piece) =>
         (!piece.role.projection) || piece.role.dir(pos, to).exists {
           longRangeThreatens(board, pos, _, to)
         }

@@ -255,6 +255,18 @@ class AtomicVariantTest extends ChessTest {
       }
     }
 
+    "Verify it is not possible to walk into check" in {
+      val position = "rnbqkbnr/ppp1pppp/8/3pN3/8/8/PPPPPPPP/RNBQKB1R b KQkq - 1 2"
+      val game = fenToGame(position, Atomic)
+
+      val failureGame = game flatMap (_.playMoves((Pos.E8, Pos.D7)))
+
+      failureGame must beFailure.like {
+        case failure => failure mustEqual scalaz.NonEmptyList("Piece on e8 cannot move to d7")
+      }
+
+    }
+
   }
 
 }

@@ -1,6 +1,8 @@
 package chess
 package format.pgn
 
+import variant.Variant
+
 import scala.util.parsing.combinator._
 import scalaz.Validation.FlatMap._
 import scalaz.Validation.{ success => succezz }

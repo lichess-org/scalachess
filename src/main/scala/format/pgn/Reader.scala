@@ -38,7 +38,7 @@ object Reader {
     }
 
   private def makeGame(tags: List[Tag]): Valid[Game] =
-    tags.foldLeft(success(Game(chess.Variant.default)): Valid[Game]) {
+    tags.foldLeft(success(Game(chess.variant.Variant.default)): Valid[Game]) {
       case (vg, Tag(Tag.FEN, fen)) => for {
         g1 ← vg
         parsed ← (Forsyth <<< fen) toValid "Invalid fen " + fen
@@ -47,7 +47,7 @@ object Reader {
         player = parsed.situation.color,
         turns = parsed.turns)
       case (vg, Tag(Tag.Variant, name)) => vg map { g1 =>
-        val variant = chess.Variant.byName(name) | chess.Variant.default
+        val variant = chess.variant.Variant.byName(name) | chess.variant.Variant.default
         g1 updateBoard (_ withVariant variant)
       }
       case (vg, _) => vg

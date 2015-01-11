@@ -41,7 +41,7 @@ case class Game(
 
   lazy val situation = Situation(board, player)
 
-  def isStandardInit = board.pieces == Variant.Standard.pieces
+  def isStandardInit = board.pieces == chess.variant.Standard.pieces
 
   def withPgnMoves(x: List[String]) = copy(pgnMoves = x)
 
@@ -64,7 +64,7 @@ case class Game(
 
 object Game {
 
-  def apply(variant: Variant): Game = new Game(
+  def apply(variant: chess.variant.Variant): Game = new Game(
     board = Board init variant
   )
 }

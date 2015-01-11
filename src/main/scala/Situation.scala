@@ -47,7 +47,7 @@ case class Situation(board: Board, color: Color) {
     board = board withHistory history
   )
 
-  def withVariant(variant: Variant) = copy(
+  def withVariant(variant: chess.variant.Variant) = copy(
     board = board withVariant variant
   )
 
@@ -56,5 +56,5 @@ case class Situation(board: Board, color: Color) {
 
 object Situation {
 
-  def apply(variant: Variant): Situation = Situation(Board init variant, White)
+  def apply(variant: chess.variant.Variant): Situation = Situation(Board init variant, White)
 }

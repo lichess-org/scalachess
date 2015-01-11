@@ -1,6 +1,6 @@
 package chess
 
-import chess.Variant.Antichess
+import chess.variant.Variant
 import chess.format.{Forsyth, Visual}
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.Specification
@@ -15,11 +15,11 @@ trait ChessTest
 
   implicit def stringToBoardBuilder(str: String) = new {
 
-    def chess960: Board = makeBoard(str, Variant.Chess960)
+    def chess960: Board = makeBoard(str, chess.variant.Chess960)
 
-    def kingOfTheHill: Board = makeBoard(str, Variant.KingOfTheHill)
+    def kingOfTheHill: Board = makeBoard(str, chess.variant.KingOfTheHill)
 
-    def threeCheck: Board = makeBoard(str, Variant.ThreeCheck)
+    def threeCheck: Board = makeBoard(str, chess.variant.ThreeCheck)
   }
 
   implicit def stringToSituationBuilder(str: String) = new {
@@ -77,14 +77,14 @@ trait ChessTest
   }
 
   def makeBoard(pieces: (Pos, Piece)*): Board =
-    Board(pieces toMap, History(), Variant.Standard)
+    Board(pieces toMap, History(), chess.variant.Standard)
 
   def makeBoard(str: String, variant: Variant) =
     Visual << str withVariant variant
 
-  def makeBoard: Board = Board init Variant.Standard
+  def makeBoard: Board = Board init chess.variant.Standard
 
-  def makeEmptyBoard: Board = Board empty Variant.Standard
+  def makeEmptyBoard: Board = Board empty chess.variant.Standard
 
   def bePoss(poss: Pos*): Matcher[Option[Iterable[Pos]]] = beSome.like {
     case p => sortPoss(p.toList) must_== sortPoss(poss.toList)

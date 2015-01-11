@@ -125,7 +125,7 @@ case class Actor(
     b3 ← b2.place(color.rook, newRookPos)
     b4 = b3 updateHistory (_ withoutCastles color)
     castle = Some((kingPos -> newKingPos, rookPos -> newRookPos))
-  } yield (board.variant == Variant.Chess960).fold(
+  } yield (board.variant == chess.variant.Chess960).fold(
     List(rookPos),
     List(rookPos, newKingPos).distinct
   ) map { move(_, b4, castle = castle) }) getOrElse Nil

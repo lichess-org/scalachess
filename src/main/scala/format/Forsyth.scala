@@ -28,7 +28,7 @@ object Forsyth {
   // only cares about pieces positions on the board (first part of FEN string)
   def makeBoard(source: String): Option[Board] =
     makePieces(source.trim.takeWhile(' '!=).replace("/", "").toList, Pos.A8) map { pieces =>
-      Board(pieces, variant = chess.Variant.default)
+      Board(pieces, variant = chess.variant.Variant.default)
     }
 
   private def makePieces(chars: List[Char], pos: Pos): Option[List[(Pos, Piece)]] = chars match {

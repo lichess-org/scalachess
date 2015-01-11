@@ -1,6 +1,8 @@
 package chess
 package format
 
+import chess.variant.Variant
+
 object UciDump {
 
   // a2a4, b8c6

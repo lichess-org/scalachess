@@ -61,7 +61,7 @@ class ReaderTest extends ChessTest {
     }
     "invalid variant" in {
       Reader.full(invalidVariant) must beSuccess.like {
-        case replay => replay.setup.board.variant must_== Variant.Standard
+        case replay => replay.setup.board.variant must_== variant.Standard
       }
     }
     "promoting to a rook" in {

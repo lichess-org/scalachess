@@ -20,7 +20,7 @@ object Replay {
   def apply(
     moveStrs: List[String],
     initialFen: Option[String],
-    variant: Variant): Valid[Replay] =
+    variant: chess.variant.Variant): Valid[Replay] =
     moveStrs.some.filter(_.nonEmpty) toValid "[replay] pgn is empty" flatMap { nonEmptyMoves =>
       Reader.moves(
         nonEmptyMoves,
@@ -31,7 +31,7 @@ object Replay {
     }
 
   def boards(moveStrs: List[String], initialFen: Option[String]): Valid[List[Board]] = {
-    val sit = initialFen.flatMap(format.Forsyth.<<) | Situation(Variant.Standard)
+    val sit = initialFen.flatMap(format.Forsyth.<<) | Situation(chess.variant.Standard)
     val init = sit -> List(sit.board)
     Parser moves(moveStrs, sit.board.variant)  flatMap { sans =>
       sans.foldLeft[Valid[(Situation, List[Board])]](init.success) {

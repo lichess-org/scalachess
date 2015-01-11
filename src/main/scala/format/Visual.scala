@@ -32,7 +32,7 @@ object Visual {
       } yield {
         posAt(x + 1, 8 - y) map { pos => pos -> (Color(c isUpper) - role) }
       }) flatten,
-      variant = chess.Variant.default
+      variant = chess.variant.Variant.default
     )
   }
 

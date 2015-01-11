@@ -9,7 +9,7 @@ class ForsythPerfTest extends ChessTest {
   val iterations = 10
   // val nb = 1
   // val iterations = 1
-  val board = Board.init(Variant.Standard)
+  val board = Board.init(variant.Standard)
 
   def runOne = Forsyth.exportBoard(board)
   def run { for (i ← 1 to nb) runOne }

@@ -1,6 +1,6 @@
 package chess
 
-import format.Visual
+import variant.Variant
 import Pos.posAt
 
 case class Board (
@@ -116,7 +116,7 @@ case class Board (
 
   def situationOf(color: Color) = Situation(this, color)
 
-  def visual = Visual >> this
+  def visual = format.Visual >> this
 
   def valid(strict: Boolean) = Color.all map rolesOf forall { roles =>
     ((roles count (_ == King)) == 1) :: {

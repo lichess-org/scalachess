@@ -1,6 +1,6 @@
 package chess
 
-import Variant.Antichess
+import variant.{ Antichess, Standard }
 import format.Forsyth
 
 class AntichessVariantTest extends ChessTest {
@@ -48,8 +48,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
   "Antichess " should {
 
     "Set up the game with the pieces set up in the same way as standard, but with takeable kings" in {
-      val antiChessVariant = Variant.Antichess
-      val standardVariant = Variant.Standard
+      val antiChessVariant = Antichess
+      val standardVariant = Standard
 
       antiChessVariant.pieces must havePair(Pos.E1 -> (White - Antiking))
       antiChessVariant.pieces must havePair(Pos.E8 -> (Black - Antiking))
@@ -64,7 +64,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Allow an opening move for white taking into account a player may move without taking if possible" in {
-      val startingPosition = Game(Variant.Antichess)
+      val startingPosition = Game(Antichess)
       val afterFirstMove = startingPosition.playMove(Pos.E2, Pos.E4, None)
 
       afterFirstMove must beSuccess.like {
@@ -75,10 +75,10 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Not allow a player to make a non capturing move if a capturing move is available" in {
-      val game = Game(Variant.Antichess)
+      val game = Game(Antichess)
       val gameAfterOpening = game.playMoves((Pos.E2, Pos.E4), (Pos.F7, Pos.F5))
 
-      val invalidGame = gameAfterOpening flatMap (_.playMove(Pos.H2,Pos.H4))
+      val invalidGame = gameAfterOpening flatMap (_.playMove(Pos.H2, Pos.H4))
 
       invalidGame must beFailure.like {
         case failMsg => failMsg mustEqual scalaz.NonEmptyList("Piece on h2 cannot move to h4")
@@ -86,7 +86,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "A situation in antichess should only present the capturing moves if the player can capture" in {
-      val game = Game(Variant.Antichess)
+      val game = Game(Antichess)
       val gameAfterOpening = game.playMoves((Pos.E2, Pos.E4), (Pos.F7, Pos.F5))
 
       gameAfterOpening must beSuccess.like {
@@ -98,14 +98,13 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Allow a capturing move to be made" in {
-      val game = Game(Variant.Antichess).playMoves((Pos.E2, Pos.E4), (Pos.F7, Pos.F5), (Pos.E4, Pos.F5))
+      val game = Game(Antichess).playMoves((Pos.E2, Pos.E4), (Pos.F7, Pos.F5), (Pos.E4, Pos.F5))
       game must beSuccess
     }
 
-
     "Not permit a player to castle" in {
       // Castling is not allowed in antichess
-      val game = Game(Variant.Antichess).playMoves(
+      val game = Game(Antichess).playMoves(
         (Pos.E2, Pos.E4),
         (Pos.E7, Pos.E5),
         (Pos.F1, Pos.E2),
@@ -124,7 +123,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Not allow a king to be put into check" in {
-      val game = Game(Variant.Antichess).playMoves(
+      val game = Game(Antichess).playMoves(
         Pos.E2 -> Pos.E4,
         Pos.E7 -> Pos.E5,
         Pos.D1 -> Pos.H5
@@ -137,7 +136,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Allow kings to be captured" in {
-      val game = Game(Variant.Antichess).playMoves(
+      val game = Game(Antichess).playMoves(
         Pos.E2 -> Pos.E4,
         Pos.E7 -> Pos.E5,
         Pos.D1 -> Pos.H5,
@@ -152,7 +151,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Not allow a king to be check mated" in {
-      val game = Game(Variant.Antichess).playMoves(
+      val game = Game(Antichess).playMoves(
         Pos.F2 -> Pos.F3,
         Pos.E7 -> Pos.E6,
         Pos.G2 -> Pos.G4,
@@ -184,7 +183,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.apply(Pos.C7, Pos.G3, None)) map (_._1)
 
-      newGame must beSuccess.like{
+      newGame must beSuccess.like {
         case drawnGame =>
           drawnGame.situation.end must beTrue
           drawnGame.situation.variantDraw must beTrue
@@ -199,9 +198,9 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       val position = "7b/8/1p6/8/8/8/5B2/8 w - -"
       val originalGame = fenToGame(position, Antichess)
 
-      val newGame = originalGame flatMap(_.apply(Pos.F2,Pos.B6,None)) map (_._1)
+      val newGame = originalGame flatMap (_.apply(Pos.F2, Pos.B6, None)) map (_._1)
 
-      newGame must beSuccess.like{
+      newGame must beSuccess.like {
         case nonDrawnGame =>
           nonDrawnGame.situation.end must beFalse
           nonDrawnGame.situation.variantDraw must beFalse
@@ -287,6 +286,5 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
   }
-
 
 }

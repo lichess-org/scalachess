@@ -171,7 +171,7 @@ k
       Game(makeBoard("""
 PPPPPPPP
 NRK RQBB
-""", Variant.Chess960)).playMoves(C1 -> B1) map (_.pgnMoves) must beSuccess.like {
+""", variant.Chess960)).playMoves(C1 -> B1) map (_.pgnMoves) must beSuccess.like {
         case ms => ms must_== List("O-O-O")
       }
     }
@@ -179,7 +179,7 @@ NRK RQBB
       Game(makeBoard("""
 PP PPPPP
 NRK R  B
-""", Variant.Chess960)).playMoves(C1 -> E1) map (_.pgnMoves) must beSuccess.like {
+""", variant.Chess960)).playMoves(C1 -> E1) map (_.pgnMoves) must beSuccess.like {
         case ms => ms must_== List("O-O")
       }
     }
@@ -193,7 +193,7 @@ pppppppp
 
 PPPPPPPP
 NRK RQBB
-""", Variant.Chess960)).withPlayer(Black).playMoves(C8 -> B8) map (_.pgnMoves) must beSuccess.like {
+""", variant.Chess960)).withPlayer(Black).playMoves(C8 -> B8) map (_.pgnMoves) must beSuccess.like {
         case ms => ms must_== List("O-O-O")
       }
     }
@@ -207,7 +207,7 @@ pppppppp
 
 PPPPPPPP
 NRK RQBB
-""", Variant.Chess960)).withPlayer(Black).playMoves(C8 -> E8) map (_.pgnMoves) must beSuccess.like {
+""", variant.Chess960)).withPlayer(Black).playMoves(C8 -> E8) map (_.pgnMoves) must beSuccess.like {
         case ms => ms must_== List("O-O")
       }
     }
@@ -221,7 +221,7 @@ pppppppp
 
 PPPPPPPP
 NRKNRQBB
-""", Variant.Chess960)).playMoves(
+""", variant.Chess960)).playMoves(
   F2 -> F4,
   D8 -> C6,
   D1 -> C3,

@@ -35,9 +35,9 @@ case class Situation(board: Board, color: Color) {
 
   def status: Option[Status] =
     if (checkMate) Status.Mate.some
+    else if (variantEnd) Status.VariantEnd.some
     else if (staleMate) Status.Stalemate.some
     else if (autoDraw || variantDraw) Status.Draw.some
-    else if (variantEnd) Status.VariantEnd.some
     else none
 
   def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Valid[Move] =

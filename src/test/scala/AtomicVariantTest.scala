@@ -249,7 +249,7 @@ class AtomicVariantTest extends ChessTest {
 
       validGame must beSuccess.like {
         case game =>
-          game.board(Pos.E6) must beNone // The pawn must be captured
+          game.board(Pos.E6) must beNone // The pawn that captures during en-passant should explode
           // Every piece surrounding the en-passant destination square that is not a pawn should be empty
           Pos.E6.surroundingPositions.forall(pos => game.board(pos) == None || pos == Pos.E7 || pos == Pos.D7) must beTrue
       }

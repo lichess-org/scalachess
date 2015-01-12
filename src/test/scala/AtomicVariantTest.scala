@@ -127,8 +127,13 @@ class AtomicVariantTest extends ChessTest {
           game.situation.end must beFalse
           game.situation.winner must beNone
           game.situation.moves must haveKeys(Pos.D4, Pos.H7, Pos.C8)
-          game.situation.moves.get(Pos.D4) must beSome.like {
-            case mvs => mvs.forall(_.captures) must beTrue
+          game.situation.moves.get(Pos.D4) must beSome.like{
+            case moves =>
+            // The queen can defend the king from check
+            moves.find(_.dest == Pos.A7) must beSome
+
+            // Or explode the opponent's king to win the game
+            moves.find(_.dest == Pos.C4) must beSome
           }
 
           // The king cannot capture a piece in the perimeter of the opponent king, exploding itself
@@ -284,6 +289,21 @@ class AtomicVariantTest extends ChessTest {
       successGame must beSuccess.like {
         case game =>
           game.situation.check must beTrue
+      }
+    }
+
+    "Can move into discovered check in order to explode the opponent's king" in {
+      val position = "R2r2k1/1p2ppbp/8/6p1/2p5/5P1N/P2Pn1PP/2B1K2R b K - 3 19"
+      val game = fenToGame(position, Atomic)
+
+      val successGame = game flatMap (_.playMoves((Pos.D8,Pos.D2)))
+
+      successGame must beSuccess.like {
+        case game =>
+          game.situation.end must beTrue
+          game.situation.winner must beSome.like{
+            case color => color == Black
+          }
       }
     }
 

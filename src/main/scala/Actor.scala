@@ -193,9 +193,8 @@ object Actor {
    * king.
    * */
   private def protectedByOtherKing(board: Board, to: Pos, color: Color) : Boolean = {
-    if (!board.variant.atomic) false
-    else
-      board.kingPosOf(color) map (_.surroundingPositions.contains(to)) getOrElse false
+    if (board.variant.atomic) board.kingPosOf(color) map (_.surroundingPositions.contains(to)) getOrElse false
+    else false
   }
 
   // critical function. optimize for performance

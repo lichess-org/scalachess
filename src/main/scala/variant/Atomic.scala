@@ -9,7 +9,7 @@ case object Atomic extends Variant(
   title = "Nuke your opponent's king to win."
 ) {
 
-  /** Moves which threaten to explode the opponent's king */
+  /** Moves which threaten to explode the opponent's king without exploding the player's own king */
   private def kingThreateningMoves(situation: Situation): Map[Pos, List[Move]] = {
 
     val moves = for {
@@ -18,9 +18,6 @@ case object Atomic extends Variant(
 
       kingAttackingMoves = situation.actors map {
         act =>
-          // Filter to moves which take a piece next to the king, exploding the king. The player's king cannot
-          // capture, however and it is illegal to capture a piece that would result in your own king exploding
-          // (e.g. an opponent piece next to the king)
           val rawMoves = act.trustedMoves(true)
 
           act.pos -> rawMoves.filter(
@@ -32,6 +29,12 @@ case object Atomic extends Variant(
     } yield kingAttackingMoves.toMap
 
     moves getOrElse Map.empty
+  }
+
+  def mergeMap[A, B](ms: List[Map[A, B]])(f: (B, B) => B): Map[A, B] = {
+    (Map[A, B]() /: (for (m <- ms; kv <- m) yield kv)) { (a, kv) =>
+      a + (if (a.contains(kv._1)) kv._1 -> f(a(kv._1), kv._2) else kv)
+    }
   }
 
   override def validMoves(situation: Situation): Map[Pos, List[Move]] = {
@@ -46,10 +49,13 @@ case object Atomic extends Variant(
     } yield mvs2
 
     val kingSafeMoves = moves getOrElse usualMoves
+    val kingExplodingMoves = kingThreateningMoves(situation)
 
-    // Additionally, if the player's king is in check they may prioritise exploding the opponent's king over defending
-    // their own
-    if (!situation.check) kingSafeMoves else kingSafeMoves ++ kingThreateningMoves(situation)
+    // A player may prioritise exploding the opponent's king over defending their own. This means they may ignore check
+    // or move into a discovered check in order to explode their opponent's king if it doesn't explode their king in the
+    // process.
+    val maps = List(kingSafeMoves,kingExplodingMoves)
+    mergeMap(maps){case (v1, v2) => v1 ++ v2}
   }
 
   override def move(situation: Situation, from: Pos, to: Pos, promotion: Option[PromotableRole]) = for {
@@ -75,6 +81,7 @@ case object Atomic extends Variant(
       val newBoard = afterBoard withPieces afterExplosions
       move withAfter newBoard
     }
+
   }
 
   /**

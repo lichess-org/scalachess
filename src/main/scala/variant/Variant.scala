@@ -60,7 +60,7 @@ abstract class Variant(
 
   def drawsOnInsufficientMaterial = true
 
-  def finalizeMove(board: Board): Board = board
+  def finalizeMove(move: Move): Board = move.after
 
   // Some variants, such as atomic chess, give different properties to pieces by replacing them with
   // different piece objects

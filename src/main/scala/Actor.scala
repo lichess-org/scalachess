@@ -87,7 +87,7 @@ case class Actor(
   }
 
   private def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean = !{
-    kingPos exists { threatens(m.after, !color, _, filter) }
+    kingPos exists { threatensKing(m.after, !color, _, filter) }
   }
 
   def kingSafety(m: Move): Boolean = kingSafety(
@@ -112,7 +112,7 @@ case class Actor(
       case Some(piece) => true
       case _ => false
     }
-    if !travelPoss.exists(p => threatens(board, !color, p))
+    if !travelPoss.exists(p => threatensKing(board, !color, p))
     newRookPos ← posAt(side.castledRookX, rookPos.y)
     b1 ← board take rookPos
     b2 ← newKingPos match {
@@ -187,14 +187,22 @@ case class Actor(
 
 object Actor {
 
-  // In atomic chess, kings may touch since they cannot capture pieces
-  private def atomicKingsTouch(board: Board, p: Piece) = board.variant.atomic && p.is(King)
+  /**
+   * In atomic chess, a king cannot be threatened while it is in the perimeter of the other king as were the other player
+   * to capture it, their own king would explode. This effectively makes a king invincible while connected with another
+   * king.
+   * */
+  private def protectedByOtherKing(board: Board, to: Pos, color: Color) : Boolean = {
+    if (!board.variant.atomic) false
+    else
+      board.kingPosOf(color) map (_.surroundingPositions.contains(to)) getOrElse false
+  }
 
   // critical function. optimize for performance
-  def threatens(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean =
+  def threatensKing(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean =
 
     board.pieces exists {
-      case (pos, piece) if piece.color == color && filter(piece) && piece.eyes(pos, to) && !atomicKingsTouch(board, piece) =>
+      case (pos, piece) if piece.color == color && filter(piece) && piece.eyes(pos, to) && !protectedByOtherKing(board, to, color) =>
         (!piece.role.projection) || piece.role.dir(pos, to).exists {
           longRangeThreatens(board, pos, _, to)
         }

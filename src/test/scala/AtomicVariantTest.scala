@@ -264,7 +264,27 @@ class AtomicVariantTest extends ChessTest {
       failureGame must beFailure.like {
         case failure => failure mustEqual scalaz.NonEmptyList("Piece on e8 cannot move to d7")
       }
+    }
 
+    "Verify that a king can move into what would traditionally be check when touching the opponent king" in {
+      val position = "r1bq1bnr/pppp1ppp/5k2/4p3/4P1K1/8/PPPP1PPP/RNBQ1B1R b - - 5 6"
+      val game = fenToGame(position, Atomic)
+
+      val successGame = game flatMap (_.playMoves((Pos.F6, Pos.F5)))
+
+      successGame must beSuccess
+    }
+
+    "After kings have been touching, and one moves away, a king that was protected is under attack again" in {
+      val position = "r1bq1bnr/pppp1ppp/5k2/4p3/4P1K1/8/PPPP1PPP/RNBQ1B1R b - - 5 6"
+      val game = fenToGame(position, Atomic)
+
+      val successGame = game flatMap (_.playMoves( (Pos.F6, Pos.F5), (Pos.G4, Pos.H3) ))
+
+      successGame must beSuccess.like {
+        case game =>
+          game.situation.check must beTrue
+      }
     }
 
   }

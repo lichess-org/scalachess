@@ -42,7 +42,7 @@ case class Board (
   lazy val checkBlack = checkOf(Black)
 
   private def checkOf(c: Color): Boolean = kingPosOf(c) exists { kingPos =>
-    Actor.threatens(this, !c, kingPos, _.role != King)
+    Actor.threatensKing(this, !c, kingPos, _.role != King)
   }
 
   def destsFrom(from: Pos): Option[List[Pos]] = actorAt(from) map (_.destinations)

@@ -84,6 +84,8 @@ case object Atomic extends Variant(
 
   }
 
+  override def finalizeMove(move: Move) : Board = explodeSurroundingPieces(move).after
+
   /**
    * Since a king may walk into the path of another king, it is more difficult to win when your opponent only has a
    * king left.

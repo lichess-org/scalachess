@@ -8,8 +8,8 @@ case object ThreeCheck extends Variant(
   shortName = "3+",
   title = "Check your opponent 3 times to win the game") {
 
-  override def finalizeMove(board: Board) = board updateHistory {
-    _.withCheck(Color.White, board.checkWhite).withCheck(Color.Black, board.checkBlack)
+  override def finalizeMove(move: Move) = move.after updateHistory {
+    _.withCheck(Color.White, move.after.checkWhite).withCheck(Color.Black, move.after.checkBlack)
   }
 
   override def specialEnd(situation: Situation) = situation.check && {

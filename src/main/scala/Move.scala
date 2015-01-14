@@ -20,7 +20,6 @@ case class Move(
   def withHistory(h: History) = copy(after = after withHistory h)
 
   def finalizeAfter: Board = {
-    val newBoard = {
       after updateHistory { h1 =>
         // last move and position hashes
         val h2 = h1.copy(
@@ -49,12 +48,9 @@ case class Move(
           if h3 canCastle !color on side
         } yield h3.withoutCastle(!color, side)) | h3
       }
-    }
-
-    val move = this.copy(after = newBoard)
-
-    before.variant finalizeMove(move)
   }
+
+  def applyVariantEffect : Move = before.variant addVariantEffect this
 
   def afterWithLastMove = after.copy(
     history = after.history.copy(lastMove = Some(orig, dest)))

@@ -187,30 +187,11 @@ case class Actor(
 
 object Actor {
 
-  /**
-   * In atomic chess, a king cannot be threatened while it is in the perimeter of the other king as were the other player
-   * to capture it, their own king would explode. This effectively makes a king invincible while connected with another
-   * king.
-   * */
-  private def protectedByOtherKing(board: Board, to: Pos, color: Color) : Boolean = {
-    if (board.variant.atomic) board.kingPosOf(color) map (_.surroundingPositions.contains(to)) getOrElse false
-    else false
-  }
-
-  // critical function. optimize for performance
   def threatensKing(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean =
+    board.variant.kingThreatened(board, color, to, filter)
 
-    board.pieces exists {
-      case (pos, piece) if piece.color == color && filter(piece) && piece.eyes(pos, to) && !protectedByOtherKing(board, to, color) =>
-        (!piece.role.projection) || piece.role.dir(pos, to).exists {
-          longRangeThreatens(board, pos, _, to)
-        }
-      case _ => false
-    }
-
-  def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean = dir(p) exists { next =>
-    next == to || (!board.pieces.contains(next) && longRangeThreatens(board, next, dir, to))
-  }
+  def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
+    board.variant.longRangeThreatens(board, p, dir, to)
 
   private def pawnDirOf(color: Color): Direction = if (color.white) _.up else _.down
 }

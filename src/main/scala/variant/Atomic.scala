@@ -31,6 +31,24 @@ case object Atomic extends Variant(
     moves getOrElse Map.empty
   }
 
+  /**
+   * In atomic chess, a king cannot be threatened while it is in the perimeter of the other king as were the other player
+   * to capture it, their own king would explode. This effectively makes a king invincible while connected with another
+   * king.
+   * */
+  private def protectedByOtherKing(board: Board, to: Pos, color: Color) : Boolean =
+    board.kingPosOf(color) map (_.surroundingPositions.contains(to)) getOrElse false
+
+  override def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean = {
+    board.pieces exists {
+      case (pos, piece) if piece.color == color && filter(piece) && piece.eyes(pos, to) && !protectedByOtherKing(board,to,color) =>
+        (!piece.role.projection) || piece.role.dir(pos, to).exists {
+          longRangeThreatens(board, pos, _, to)
+        }
+      case _ => false
+    }
+  }
+
   def mergeMap[A, B](ms: List[Map[A, B]])(f: (B, B) => B): Map[A, B] = {
     (Map[A, B]() /: (for (m <- ms; kv <- m) yield kv)) { (a, kv) =>
       a + (if (a.contains(kv._1)) kv._1 -> f(a(kv._1), kv._2) else kv)

@@ -33,6 +33,21 @@ abstract class Variant(
     case actor if actor.moves.nonEmpty => actor.pos -> actor.moves
   } toMap
 
+  // Optimised for performance
+  def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean = {
+    board.pieces exists {
+      case (pos, piece) if piece.color == color && filter(piece) && piece.eyes(pos, to) =>
+        (!piece.role.projection) || piece.role.dir(pos, to).exists {
+          longRangeThreatens(board, pos, _, to)
+        }
+      case _ => false
+    }
+  }
+
+  def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean = dir(p) exists { next =>
+    next == to || (!board.pieces.contains(next) && longRangeThreatens(board, next, dir, to))
+  }
+
   def move(situation: Situation, from: Pos, to: Pos, promotion: Option[PromotableRole]): Valid[Move] = {
 
     // Find the move in the variant specific list of valid moves

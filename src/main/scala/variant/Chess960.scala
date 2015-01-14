@@ -8,7 +8,8 @@ case object Chess960 extends Variant(
   key = "chess960",
   name = "Chess960",
   shortName = "960",
-  title = "Starting position of the home rank pieces is randomized") {
+  title = "Starting position of the home rank pieces is randomized",
+  standardInitialPosition = false) {
 
   override def pieces = Variant.symmetricRank {
     val size = 8

@@ -6,7 +6,8 @@ case object ThreeCheck extends Variant(
   key = "threeCheck",
   name = "Three-check",
   shortName = "3+",
-  title = "Check your opponent 3 times to win the game") {
+  title = "Check your opponent 3 times to win the game",
+  standardInitialPosition = true) {
 
   override def finalizeMove(move: Move) = move.after updateHistory {
     _.withCheck(Color.White, move.after.checkWhite).withCheck(Color.Black, move.after.checkBlack)

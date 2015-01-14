@@ -6,4 +6,5 @@ case object FromPosition extends Variant(
   key = "fromPosition",
   name = "From Position",
   shortName = "FEN",
-  title = "Custom starting position")
+  title = "Custom starting position",
+  standardInitialPosition = false)

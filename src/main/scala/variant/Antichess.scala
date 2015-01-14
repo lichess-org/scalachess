@@ -6,8 +6,8 @@ case object Antichess extends Variant(
   key = "antichess",
   name = "Antichess",
   shortName = "Anti",
-  title = "Lose all your pieces to win the game"
-) {
+  title = "Lose all your pieces to win the game",
+  standardInitialPosition = true) {
 
   override def pieces = {
     // In this chess variant, the king can ignore check and be captured, so we replace the normal king with the

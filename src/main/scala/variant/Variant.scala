@@ -8,7 +8,8 @@ abstract class Variant(
     val key: String,
     val name: String,
     val shortName: String,
-    val title: String) {
+    val title: String,
+    val standardInitialPosition: Boolean) {
 
   def standard = this == Standard
   def chess960 = this == Chess960

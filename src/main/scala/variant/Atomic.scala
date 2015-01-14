@@ -6,8 +6,8 @@ case object Atomic extends Variant(
   key = "atomic",
   name = "Atomic",
   shortName = "Atom",
-  title = "Nuke your opponent's king to win."
-) {
+  title = "Nuke your opponent's king to win.",
+  standardInitialPosition = true) {
 
   /** Moves which threaten to explode the opponent's king without exploding the player's own king */
   private def kingThreateningMoves(situation: Situation): Map[Pos, List[Move]] = {

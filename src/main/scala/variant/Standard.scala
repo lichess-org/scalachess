@@ -6,4 +6,5 @@ case object Standard extends Variant(
   key = "standard",
   name = "Standard",
   shortName = "STD",
-  title = "Standard rules of chess (FIDE)")
+  title = "Standard rules of chess (FIDE)",
+  standardInitialPosition = true)

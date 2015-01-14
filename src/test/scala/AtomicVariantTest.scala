@@ -126,24 +126,29 @@ class AtomicVariantTest extends ChessTest {
           game.situation.check must beTrue
           game.situation.end must beFalse
           game.situation.winner must beNone
-          game.situation.moves must haveKeys(Pos.D4)
+          game.situation.moves must haveKeys(Pos.D4, Pos.H7, Pos.C8)
           game.situation.moves.get(Pos.D4) must beSome.like{
             case moves =>
-            // The queen cannot defend the king from check because the player has the opportunity to win by exploding
-            // the opponent's king. So we force them to do so
-            moves.find(_.dest == Pos.C4) must beNone
-
-            // Must be able to explode the opponent's king to win the game
+            // The queen can defend the king from check
             moves.find(_.dest == Pos.A7) must beSome
+
+            // Or explode the opponent's king to win the game
+            moves.find(_.dest == Pos.C4) must beSome
           }
 
-          // The king cannot move since the player has the opportunity to win the game by exploding the opponent king
-          // and is forced to do so
-          game.situation.moves.get(Pos.C8) must beNone
+          // The king cannot capture a piece in the perimeter of the opponent king, exploding itself
+          game.situation.moves.get(Pos.C8) must beSome.like {
+            case mvs => mvs.forall(_.captures) must beFalse
+          }
 
-          // The rook cannot capture, as that would result in our own king exploding. Nor can it defend the king
-          // from check, as the player is forced to make the winning move
-          game.situation.moves.get(Pos.H7) must beNone
+          // The rook cannot capture, as that would result in our own king exploding
+          game.situation.moves.get(Pos.H7) must beSome.like {
+            case mvs =>
+              mvs.find(_.captures) must beNone
+              // It can, however, defend the king
+              mvs.find(_.dest == Pos.C7) must beSome
+              mvs.size must beEqualTo(1)
+          }
       }
     }
 

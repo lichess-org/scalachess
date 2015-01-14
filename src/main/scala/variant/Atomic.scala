@@ -51,18 +51,11 @@ case object Atomic extends Variant(
     val kingSafeMoves = moves getOrElse usualMoves
     val kingExplodingMoves = kingThreateningMoves(situation)
 
-    if (situation.check && !kingExplodingMoves.isEmpty)
-    {
-      // If a player is in a direct attack and can explode the opponent's king, winning the game, we force them to do so
-      kingExplodingMoves
-    }
-    else
-    {
-      // Otherwise, we permit them to make any move that would not result in their king exploding. If possible, the player
-      // may move into a discovered check in order to explode the opponent's king.
-      val maps = List(kingSafeMoves,kingExplodingMoves)
-      mergeMap(maps){case (v1, v2) => v1 ++ v2}
-    }
+    // A player may prioritise exploding the opponent's king over defending their own. This means they may ignore check
+    // or move into a discovered check in order to explode their opponent's king if it doesn't explode their king in the
+    // process.
+    val maps = List(kingSafeMoves,kingExplodingMoves)
+    mergeMap(maps){case (v1, v2) => v1 ++ v2}
   }
 
   override def move(situation: Situation, from: Pos, to: Pos, promotion: Option[PromotableRole]) = for {

@@ -9,14 +9,8 @@ case object ThreeCheck extends Variant(
   title = "Check your opponent 3 times to win the game",
   standardInitialPosition = true) {
 
-  override def hasMoveEffects = true
-
-  override def addVariantEffect(move: Move) : Move = {
-    val board = move.after updateHistory {
-      _.withCheck(Color.White, move.after.checkWhite).withCheck(Color.Black, move.after.checkBlack)
-    }
-
-    move.copy(after = board)
+  override def finalizeBoard(board: Board): Board = board updateHistory {
+      _.withCheck(Color.White, board.checkWhite).withCheck(Color.Black, board.checkBlack)
   }
 
   override def specialEnd(situation: Situation) = situation.check && {

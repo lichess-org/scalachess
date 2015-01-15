@@ -80,8 +80,14 @@ abstract class Variant(
   // pieces surrounding a capture explode
   def hasMoveEffects = false
 
-  /** Applies a variant specific effect to the move. */
+  /** Applies a variant specific effect to the move. This helps decide whether a king is endangered by a move, for
+    * example */
   def addVariantEffect(move: Move): Move = move
+
+  /**
+   * Once a move has been decided upon from the available legal moves, the board is finalized
+   */
+  def finalizeBoard(board: Board) : Board = board
 
   // Some variants, such as atomic chess, give different properties to pieces by replacing them with
   // different piece objects

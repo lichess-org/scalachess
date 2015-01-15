@@ -76,7 +76,12 @@ abstract class Variant(
 
   def drawsOnInsufficientMaterial = true
 
-  def finalizeMove(move: Move): Board = move.after
+  // Some variants have an extra effect on the board on a move. For example, in Atomic, some
+  // pieces surrounding a capture explode
+  def hasMoveEffects = false
+
+  /** Applies a variant specific effect to the move. */
+  def addVariantEffect(move: Move): Move = move
 
   // Some variants, such as atomic chess, give different properties to pieces by replacing them with
   // different piece objects

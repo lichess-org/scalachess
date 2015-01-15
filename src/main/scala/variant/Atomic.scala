@@ -9,6 +9,8 @@ case object Atomic extends Variant(
   title = "Nuke your opponent's king to win.",
   standardInitialPosition = true) {
 
+  override def hasMoveEffects = true
+
   /** Moves which threaten to explode the opponent's king without exploding the player's own king */
   private def kingThreateningMoves(situation: Situation): Map[Pos, List[Move]] = {
 
@@ -80,15 +82,10 @@ case object Atomic extends Variant(
     }
   }
 
-  override def move(situation: Situation, from: Pos, to: Pos, promotion: Option[PromotableRole]) = for {
-    m1 <- super.move(situation, from, to, promotion)
-    m2 <- explodeSurroundingPieces(m1).success
-  } yield m2
-
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
   private def explodeSurroundingPieces(move: Move): Move = {
-    if (!move.captures) move
-    else {
+    if (move.captures)
+    {
       val surroundingPositions = move.dest.surroundingPositions
       val afterBoard = move.after
       val destination = move.dest
@@ -103,10 +100,10 @@ case object Atomic extends Variant(
       val newBoard = afterBoard withPieces afterExplosions
       move withAfter newBoard
     }
-
+    else move
   }
 
-  override def finalizeMove(move: Move) : Board = explodeSurroundingPieces(move).after
+  override def addVariantEffect(move: Move) : Move = explodeSurroundingPieces(move)
 
   /**
    * Since a king may walk into the path of another king, it is more difficult to win when your opponent only has a

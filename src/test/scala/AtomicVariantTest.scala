@@ -307,6 +307,29 @@ class AtomicVariantTest extends ChessTest {
       }
     }
 
+    "It must be possible to remove yourself from check by exploding a piece next to the piece threatening the king" in {
+      val position = "5k1r/p1ppq1pp/5p2/1B6/1b3P2/2P5/PP4PP/RNB1K2R w KQ - 0 12"
+      val game = fenToGame(position,Atomic)
+
+      val successGame = game flatMap (_.playMoves( (Pos.B5, Pos.D7) ))
+
+      successGame must beSuccess.like {
+        case game =>
+          game.situation.check must beFalse
+      }
+    }
+
+    "It should not be possible to explode a piece, exploding a piece next to it which would result in a check" in {
+      val position = "r1b1k2r/pp1pBppp/2p1p2n/q3P3/B2P4/2N2Q2/PPn2PPP/R3K1NR w KQkq - 9 11"
+      val game = fenToGame(position, Atomic)
+
+      val failureGame = game flatMap (_.playMoves( (Pos.A4, Pos.C2) ))
+
+      failureGame must beFailure.like {
+        case failure => failure mustEqual scalaz.NonEmptyList("Piece on a4 cannot move to c2")
+      }
+    }
+
   }
 
 }

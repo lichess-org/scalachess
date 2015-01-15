@@ -7,7 +7,7 @@ case class Replay(setup: Game, moves: List[Move], state: Game) {
   lazy val chronoMoves = moves.reverse
 
   def addMove(move: Move) = copy(
-    moves = move :: moves,
+    moves = move.applyVariantEffect :: moves,
     state = state(move))
 
   def moveAtPly(ply: Int): Option[Move] = chronoMoves lift (ply - 1)

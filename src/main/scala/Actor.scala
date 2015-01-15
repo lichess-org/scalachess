@@ -12,62 +12,68 @@ case class Actor(
   lazy val moves: List[Move] = kingSafetyMoveFilter(trustedMoves(true))
 
   /** The moves without taking defending the king into account */
-  def trustedMoves(withCastle: Boolean): List[Move] = piece.role match {
+  def trustedMoves(withCastle: Boolean): List[Move] = {
+    val moves = piece.role match {
 
-    case Bishop             => longRange(Bishop.dirs)
+      case Bishop             => longRange(Bishop.dirs)
 
-    case Queen              => longRange(Queen.dirs)
+      case Queen              => longRange(Queen.dirs)
 
-    case Knight             => shortRange(Knight.dirs)
+      case Knight             => shortRange(Knight.dirs)
 
-    case King if withCastle => shortRange(King.dirs) ++ castle
-    case King | Antiking    => shortRange(King.dirs)
+      case King if withCastle => shortRange(King.dirs) ++ castle
+      case King | Antiking    => shortRange(King.dirs)
 
-    case Rook               => longRange(Rook.dirs)
+      case Rook               => longRange(Rook.dirs)
 
-    case Pawn => pawnDir(pos) map { next =>
-      val fwd = Some(next) filterNot board.pieces.contains
-      def capture(horizontal: Direction): Option[Move] = {
-        for {
-          p ← horizontal(next)
-          if enemies(p)
-          b ← board.taking(pos, p)
-        } yield move(p, b, Some(p))
-      } flatMap maybePromote
-      def enpassant(horizontal: Direction): Option[Move] = for {
-        victimPos ← horizontal(pos)
-        if pos.y == color.passablePawnY
-        victim ← board(victimPos)
-        if victim == !color - Pawn
-        targetPos ← horizontal(next)
-        victimFrom ← pawnDir(victimPos) flatMap pawnDir
-        if history.lastMove == Some(victimFrom, victimPos)
-        b ← board.taking(pos, targetPos, Some(victimPos))
-      } yield move(targetPos, b, Some(victimPos), enpassant = true)
-      def forward(p: Pos): Option[Move] =
-        board.move(pos, p) map { move(p, _) } flatMap maybePromote
-      def maybePromote(m: Move): Option[Move] =
-        if (m.dest.y == m.color.promotablePawnY)
-          (m.after promote m.dest) map { b2 =>
-            m.copy(after = b2, promotion = Some(Queen))
-          }
-        else Some(m)
+      case Pawn => pawnDir(pos) map { next =>
+        val fwd = Some(next) filterNot board.pieces.contains
+        def capture(horizontal: Direction): Option[Move] = {
+          for {
+            p ← horizontal(next)
+            if enemies(p)
+            b ← board.taking(pos, p)
+          } yield move(p, b, Some(p))
+        } flatMap maybePromote
+        def enpassant(horizontal: Direction): Option[Move] = for {
+          victimPos ← horizontal(pos)
+          if pos.y == color.passablePawnY
+          victim ← board(victimPos)
+          if victim == !color - Pawn
+          targetPos ← horizontal(next)
+          victimFrom ← pawnDir(victimPos) flatMap pawnDir
+          if history.lastMove == Some(victimFrom, victimPos)
+          b ← board.taking(pos, targetPos, Some(victimPos))
+        } yield move(targetPos, b, Some(victimPos), enpassant = true)
+        def forward(p: Pos): Option[Move] =
+          board.move(pos, p) map { move(p, _) } flatMap maybePromote
+        def maybePromote(m: Move): Option[Move] =
+          if (m.dest.y == m.color.promotablePawnY)
+            (m.after promote m.dest) map { b2 =>
+              m.copy(after = b2, promotion = Some(Queen))
+            }
+          else Some(m)
 
-      List(
-        fwd flatMap forward,
-        for {
-          p ← fwd
-          if pos.y == color.unmovedPawnY
-          p2 ← pawnDir(p)
-          if !(board.pieces contains p2)
-          b ← board.move(pos, p2)
-        } yield move(p2, b),
-        capture(_.left),
-        capture(_.right),
-        enpassant(_.left),
-        enpassant(_.right)
-      ).flatten
-    } getOrElse Nil
+        List(
+          fwd flatMap forward,
+          for {
+            p ← fwd
+            if pos.y == color.unmovedPawnY
+            p2 ← pawnDir(p)
+            if !(board.pieces contains p2)
+            b ← board.move(pos, p2)
+          } yield move(p2, b),
+          capture(_.left),
+          capture(_.right),
+          enpassant(_.left),
+          enpassant(_.right)
+        ).flatten
+      } getOrElse Nil
+    }
+
+    // We apply the current game variant's effects if there are any so that we can accurately decide if the king would
+    // be in danger after the move was made.
+    if (board.variant.hasMoveEffects)  moves map (_.applyVariantEffect) else moves
   }
 
   lazy val destinations: List[Pos] = moves map (_.dest)

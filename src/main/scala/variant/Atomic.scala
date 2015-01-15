@@ -118,8 +118,9 @@ case object Atomic extends Variant(
     // One player must only have their king left
     if (whiteActors.size != 1 && blackActors.size != 1) false
     else {
-      // You can mate with a queen, with just one of any other piece or with just a king
-      allPieces.size == 1 && !allPieces.exists(_ is Queen) || allActors.size == 2
+      // You can mate with a queen or a pawn that is later promoted a a queen, but not with just one of any other piece
+      // or with just a king
+      allPieces.size == 1 && !allPieces.exists(p => p.is(Queen) || p.is(Pawn)) || allActors.size == 2
     }
   }
 

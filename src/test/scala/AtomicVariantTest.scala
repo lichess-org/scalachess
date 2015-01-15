@@ -330,6 +330,18 @@ class AtomicVariantTest extends ChessTest {
       }
     }
 
+    "Game is not a draw when the last piece a player has other than their king is a pawn " in {
+      val position = "3Q4/2b2k2/5P2/8/8/8/6K1/8 b - - 0 57"
+      val game = fenToGame(position,Atomic)
+
+      val successGame = game flatMap (_.playMoves((Pos.C7,Pos.D8)))
+
+      successGame must beSuccess.like{
+        case game =>
+          game.situation.end must beFalse
+      }
+    }
+
   }
 
 }

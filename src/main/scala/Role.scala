@@ -14,21 +14,14 @@ sealed trait Role {
 }
 sealed trait PromotableRole extends Role
 
-case object King extends Role {
+/**
+ * Promotable in antichess.
+ */
+case object King extends PromotableRole {
   val forsyth = 'k'
   val dirs: Directions = Queen.dirs
   def dir(from: Pos, to: Pos) = None
   override val attacker = false
-  val projection = false
-}
-
-/**
- * King for antichess variant where there is no check or checkmate. Additionally, a pawn is promotable to a king.
- */
-case object Antiking extends PromotableRole {
-  val forsyth = 'k'
-  val dirs: Directions = Queen.dirs
-  def dir(from: Pos, to: Pos) = None
   val projection = false
 }
 
@@ -88,7 +81,7 @@ case object Pawn extends Role {
 object Role {
 
   val all: List[Role] = List(King, Queen, Rook, Bishop, Knight, Pawn)
-  val allPromotable: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, Antiking)
+  val allPromotable: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, King)
   val allByForsyth: Map[Char, Role] = all map { r => (r.forsyth, r) } toMap
   val allByPgn: Map[Char, Role] = all map { r => (r.pgn, r) } toMap
   val allPromotableByName: Map[String, PromotableRole] =

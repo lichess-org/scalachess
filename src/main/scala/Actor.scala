@@ -9,7 +9,7 @@ case class Actor(
 
   import Actor._
 
-  lazy val moves: List[Move] = kingSafetyMoveFilter(trustedMoves(true))
+  lazy val moves: List[Move] = kingSafetyMoveFilter(trustedMoves(board.variant.allowsCastling))
 
   /** The moves without taking defending the king into account */
   def trustedMoves(withCastle: Boolean): List[Move] = {
@@ -22,7 +22,7 @@ case class Actor(
       case Knight             => shortRange(Knight.dirs)
 
       case King if withCastle => shortRange(King.dirs) ++ castle
-      case King | Antiking    => shortRange(King.dirs)
+      case King               => shortRange(King.dirs)
 
       case Rook               => longRange(Rook.dirs)
 

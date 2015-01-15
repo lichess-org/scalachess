@@ -1,5 +1,6 @@
 package chess
 
+import chess.King
 import variant.{ Antichess, Standard }
 import format.Forsyth
 
@@ -46,22 +47,6 @@ b5 {[%emt 0.223]} 32. Rxd4 {[%emt 0.359]} b4 {[%emt 0.202]} 33. Rxb4 {[%emt 0.50
 g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
   "Antichess " should {
-
-    "Set up the game with the pieces set up in the same way as standard, but with takeable kings" in {
-      val antiChessVariant = Antichess
-      val standardVariant = Standard
-
-      antiChessVariant.pieces must havePair(Pos.E1 -> (White - Antiking))
-      antiChessVariant.pieces must havePair(Pos.E8 -> (Black - Antiking))
-
-      val antiChessSet = antiChessVariant.pieces.toSet
-      val standardChessSet = standardVariant.pieces.toSet
-      val variantDiff = antiChessSet.toSet.diff(standardChessSet)
-
-      variantDiff must haveSize(2)
-      variantDiff must havePairs(Pos.E1 -> (White - Antiking), Pos.E8 -> (Black - Antiking))
-
-    }
 
     "Allow an opening move for white taking into account a player may move without taking if possible" in {
       val startingPosition = Game(Antichess)
@@ -168,11 +153,11 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       val positionString = "8/5P2/8/2b5/8/8/4B3/8 w - -"
       val originalGame = fenToGame(positionString, Antichess)
 
-      val newGame = originalGame flatMap (_.apply(Pos.F7, Pos.F8, Some(Antiking))) map (_._1)
+      val newGame = originalGame flatMap (_.apply(Pos.F7, Pos.F8, Some(King))) map (_._1)
 
       newGame must beSuccess.like {
         case gameWithPromotion =>
-          gameWithPromotion.board(Pos.F8).mustEqual(Some(White - Antiking))
+          gameWithPromotion.board(Pos.F8).mustEqual(Some(White - King))
       }
 
     }

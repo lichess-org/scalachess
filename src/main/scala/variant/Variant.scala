@@ -20,6 +20,9 @@ abstract class Variant(
 
   def exotic = !standard
 
+  // Some variants do not allow castling
+  def allowsCastling = true
+
   def pieces: Map[Pos, Piece] = Variant.symmetricRank(
     IndexedSeq(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
   )
@@ -83,9 +86,10 @@ abstract class Variant(
   /** Applies a variant specific effect to the move. */
   def addVariantEffect(move: Move): Move = move
 
-  // Some variants, such as atomic chess, give different properties to pieces by replacing them with
-  // different piece objects
-  def convertPiecesFromStandard(originalPieces: PieceMap): PieceMap = originalPieces
+  /**
+   * Once a move has been decided upon from the available legal moves, the board is finalized
+   */
+  def finalizeBoard(board: Board) : Board = board
 
   def valid(board: Board, strict: Boolean) = {
     Color.all map board.rolesOf forall { roles =>

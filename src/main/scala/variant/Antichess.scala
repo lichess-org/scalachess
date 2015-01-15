@@ -9,11 +9,11 @@ case object Antichess extends Variant(
   title = "Lose all your pieces to win the game",
   standardInitialPosition = true) {
 
-  override def pieces = {
-    // In this chess variant, the king can ignore check and be captured, so we replace the normal king with the
-    // antichess king
-    convertPiecesFromStandard(super.pieces)
-  }
+  // In antichess, it is not permitted to castle
+  override def allowsCastling = false
+
+  // In antichess, the king can't be put into check so we always return false
+  override def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) = false
 
   // In this variant, a player must capture if a capturing move is available
   override def validMoves(situation: Situation) = {
@@ -50,13 +50,6 @@ case object Antichess extends Variant(
     }
   }
 
-  override def convertPiecesFromStandard(pieces: PieceMap): PieceMap = {
-    pieces.mapValues {
-      case Piece(color, King) => Piece(color, Antiking)
-      case x                  => x
-    }
-  }
-
   override def valid(board: Board, strict: Boolean) = {
     // This variant cannot work with a 'normal' king as it assumes an AntiKing
 
@@ -70,11 +63,11 @@ case object Antichess extends Variant(
   // In this game variant, a king is a valid promotion
   override def isValidPromotion(promotion: Option[PromotableRole]) = promotion match {
     case None => true
-    case Some(Queen | Rook | Knight | Bishop | Antiking) => true
+    case Some(Queen | Rook | Knight | Bishop | King) => true
     case _ => false
   }
 
-  override def roles = List(Rook, Knight, Antiking, Bishop, Queen, Pawn)
+  override def roles = List(Rook, Knight, King, Bishop, Queen, Pawn)
 
-  override def promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, Antiking)
+  override def promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, King)
 }

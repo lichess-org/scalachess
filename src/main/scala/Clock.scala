@@ -153,7 +153,7 @@ object Clock {
 
   val minInitLimit = 2f
   // no more than this time will be offered to the lagging player
-  val maxLagToCompensate = 10f
+  val maxLagToCompensate = 1f
   // substracted from lag compensation
   val naturalLag = 0f
 

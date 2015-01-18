@@ -1,6 +1,5 @@
 package chess
 
-import chess.King
 import variant.{ Antichess, Standard }
 import format.Forsyth
 

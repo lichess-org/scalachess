@@ -11,20 +11,15 @@ case object Atomic extends Variant(
 
   override def hasMoveEffects = true
 
-  /** Move threatens to explode the opponent's king without exploding our own */
+  /** Move threatens to explode the opponent's king */
   private def explodesOpponentKing(situation: Situation, move: Move): Boolean = {
-
-    val explodesKing = for {
-      opponentKingPerimeter <- situation.board.kingPosOf(!situation.color) map (_.surroundingPositions)
-      myKingPerimeter <- situation.kingPos map (_.surroundingPositions)
-
-      explodes = move.captures && opponentKingPerimeter.contains(move.dest)
-    } yield explodes
+    val opponentKingPerimeter = situation.board.kingPosOf(!situation.color) map (_.surroundingPositions)
+    val explodesKing = opponentKingPerimeter map (move.captures && _.contains(move.dest))
 
     explodesKing getOrElse false
   }
 
-  /** Move threatening to illegally explode our own king */
+  /** Move threatens to illegally explode our own king */
   private def explodesOwnKing(situation: Situation, move: Move) : Boolean = {
     move.captures && (situation.kingPos map (_.surroundingPositions contains(move.dest)) getOrElse false)
   }
@@ -58,10 +53,16 @@ case object Atomic extends Variant(
 
         // Moves which explode the opponent's king, regardless of whether it puts us into check or not.
         // In FICS atomic chess, exploding the opponent's king takes priority over removing yourself from check
+        // or preventing yourself going into check.
         val explodesOpponentKingMoves = rawMoves filter (explodesOpponentKing(situation, _))
 
+        val allMoves = if (explodesOpponentKingMoves.isEmpty) kingSafeMoves else {
+          // Avoid repeating moves that fit both criteria using .distinct
+          (explodesOpponentKingMoves ::: kingSafeMoves).distinct
+        }
+
         // However, we may never explode our own king
-        val legalMoves = (explodesOpponentKingMoves ++ kingSafeMoves) filter (!explodesOwnKing(situation, _))
+        val legalMoves = allMoves filter (!explodesOwnKing(situation, _))
 
         actor.pos -> legalMoves
     } toMap

@@ -1,6 +1,7 @@
 package chess
 
 import variant.Atomic
+import scala.collection.immutable.HashSet
 
 class AtomicVariantTest extends ChessTest {
 
@@ -340,6 +341,26 @@ class AtomicVariantTest extends ChessTest {
         case game =>
           game.situation.end must beFalse
       }
+    }
+
+    // This would probably be harmless, but there might be a use case where the count of available moves matters,
+    // or similar, so best to code defensively.
+    "There are no repeated moves in the list of available moves for the situation" in {
+
+      // Situation where the queen can capture a pawn to both win and remove itself from check
+      val position = "k1r5/pp5Q/8/8/8/8/PP6/2K5 w - -"
+      val successGame = fenToGame(position, Atomic)
+
+      successGame must beSuccess.like {
+        case game =>
+          val moves = game.situation.moves.get(Pos.H7)
+
+          moves must beSome.like{
+            case queenMoves =>
+              queenMoves.pp.size must beEqualTo(queenMoves.toSet.pp.size)
+          }
+      }
+
     }
 
   }

@@ -11,36 +11,27 @@ case object Atomic extends Variant(
 
   override def hasMoveEffects = true
 
-  /** Moves which threaten to explode the opponent's king without exploding the player's own king */
-  private def kingThreateningMoves(situation: Situation): Map[Pos, List[Move]] = {
+  /** Move threatens to explode the opponent's king */
+  private def explodesOpponentKing(situation: Situation, move: Move): Boolean = {
+    val opponentKingPerimeter = situation.board.kingPosOf(!situation.color) map (_.surroundingPositions)
+    val explodesKing = opponentKingPerimeter map (move.captures && _.contains(move.dest))
 
-    val moves = for {
-      opponentKingPerimeter <- situation.board.kingPosOf(!situation.color) map (_.surroundingPositions)
-      myKingPerimeter <- situation.kingPos map (_.surroundingPositions)
-
-      kingAttackingMoves = situation.actors map {
-        act =>
-          val rawMoves = act.trustedMoves(true)
-
-          act.pos -> rawMoves.filter(
-            mv => opponentKingPerimeter.contains(mv.dest) &&
-              mv.captures && (mv.piece isNot King) &&
-              !myKingPerimeter.contains(mv.dest))
-      } filter (!_._2.isEmpty)
-
-    } yield kingAttackingMoves.toMap
-
-    moves getOrElse Map.empty
+    explodesKing getOrElse false
   }
+
+  /** Move threatens to illegally explode our own king */
+  private def explodesOwnKing(situation: Situation, move: Move) : Boolean = {
+    move.captures && (situation.kingPos map (_.surroundingPositions contains(move.dest)) getOrElse false)
+  }
+
+  private def protectedByOtherKing(board: Board, to: Pos, color: Color) : Boolean =
+    board.kingPosOf(color) map (_.surroundingPositions.contains(to)) getOrElse false
 
   /**
    * In atomic chess, a king cannot be threatened while it is in the perimeter of the other king as were the other player
    * to capture it, their own king would explode. This effectively makes a king invincible while connected with another
    * king.
    * */
-  private def protectedByOtherKing(board: Board, to: Pos, color: Color) : Boolean =
-    board.kingPosOf(color) map (_.surroundingPositions.contains(to)) getOrElse false
-
   override def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean = {
     board.pieces exists {
       case (pos, piece) if piece.color == color && filter(piece) && piece.eyes(pos, to) && !protectedByOtherKing(board,to,color) =>
@@ -51,35 +42,32 @@ case object Atomic extends Variant(
     }
   }
 
-  def mergeMap[A, B](ms: List[Map[A, B]])(f: (B, B) => B): Map[A, B] = {
-    (Map[A, B]() /: (for (m <- ms; kv <- m) yield kv)) { (a, kv) =>
-      a + (if (a.contains(kv._1)) kv._1 -> f(a(kv._1), kv._2) else kv)
-    }
-  }
-
   override def validMoves(situation: Situation): Map[Pos, List[Move]] = {
-    // In atomic chess, the pieces have the same roles as usual
-    val usualMoves = super.validMoves(situation)
+    val moves = situation.actors map {
+      actor =>
+        // All the moves the piece can make not taking 'check' into account
+        val rawMoves = actor.trustedMoves(true)
 
-    /* However, it is illegal to make a capture that would result in your own king exploding. */
-    val moves = for {
-      surroundingKing <- situation.kingPos map (_.surroundingPositions)
-      mvs1 = usualMoves.mapValues(_.filter(mv => !mv.captures || mv.captures && !surroundingKing.contains(mv.dest)))
-      mvs2 = mvs1.filter(!_._2.isEmpty)
-    } yield mvs2
+        // Moves which can be performed without putting our king in check
+        val kingSafeMoves = actor.kingSafetyMoveFilter(rawMoves)
 
-    val kingSafeMoves = moves getOrElse usualMoves
-    val kingExplodingMoves = kingThreateningMoves(situation)
+        // Moves which explode the opponent's king, regardless of whether it puts us into check or not.
+        // In FICS atomic chess, exploding the opponent's king takes priority over removing yourself from check
+        // or preventing yourself going into check.
+        val explodesOpponentKingMoves = rawMoves filter (explodesOpponentKing(situation, _))
 
-    if (kingExplodingMoves.isEmpty)
-      kingSafeMoves
-    else {
-      // A player may prioritise exploding the opponent's king over defending their own. This means they may ignore check
-      // or move into a discovered check in order to explode their opponent's king if it doesn't explode their king in the
-      // process.
-      val maps = List(kingSafeMoves,kingExplodingMoves)
-      mergeMap(maps){case (v1, v2) => v1 ++ v2}
-    }
+        val allMoves = if (explodesOpponentKingMoves.isEmpty) kingSafeMoves else {
+          // Avoid repeating moves that fit both criteria using .distinct
+          (explodesOpponentKingMoves ::: kingSafeMoves).distinct
+        }
+
+        // However, we may never explode our own king
+        val legalMoves = allMoves filter (!explodesOwnKing(situation, _))
+
+        actor.pos -> legalMoves
+    } toMap
+
+    moves.filterNot(_._2.isEmpty)
   }
 
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */

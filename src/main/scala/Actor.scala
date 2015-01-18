@@ -82,8 +82,12 @@ case class Actor(
   def is(c: Color) = c == piece.color
   def is(p: Piece) = p == piece
 
-  // critical function. optimize for performance
-  private def kingSafetyMoveFilter(ms: List[Move]): List[Move] = {
+  /*
+   *  Filters out moves that would put the king in check.
+   *
+   *  critical function. optimize for performance.
+   */
+  def kingSafetyMoveFilter(ms: List[Move]): List[Move] = {
     val filter: Piece => Boolean =
       if ((piece is King)) (_ => true) else if (check) (_.role.attacker) else (_.role.projection)
     val stableKingPos = if (piece.role == King) None else board kingPosOf color

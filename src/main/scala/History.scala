@@ -9,6 +9,8 @@ case class CheckCount(white: Int = 0, black: Int = 0) {
     black = black + color.fold(0, 1))
 
   def nonEmpty = white > 0 || black > 0
+
+  def apply(color: Color) = color.fold(white, black)
 }
 
 case class History(

@@ -1285,7 +1285,7 @@ object Openings {
     ("C45", "Scotch Game, Steinitz Variation", "e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Qh4"),
     ("D45", "Semi-Slav Defense, Accelerated Meran Variation", "d4 d5 c4 e6 Nc3 Nf6 Nf3 c6 e3 a6"),
     ("D44", "Semi-Slav Defense, Accepted", "d4 d5 c4 e6 Nc3 Nf6 Nf3 c6 Bg5 dxc4"),
-    ("D31", "Semi-Slav Defense, Acclerated Move Order", "d4 d5 c4 e6 Nc3 c6"),
+    ("D31", "Semi-Slav Defense, Accelerated Move Order", "d4 d5 c4 e6 Nc3 c6"),
     ("D44", "Semi-Slav Defense, Anti-Moscow Gambit", "d4 d5 c4 e6 Nc3 Nf6 Nf3 c6 Bg5 h6 Bh4"),
     ("D46", "Semi-Slav Defense, Bogoljubow Variation", "d4 d5 c4 e6 Nc3 Nf6 Nf3 c6 e3 Nbd7 Bd3 Be7"),
     ("D44", "Semi-Slav Defense, Botvinnik System", "d4 d5 c4 e6 Nc3 Nf6 Nf3 c6 Bg5 dxc4 e4 b5 e5 h6 Bh4 g5 Nxg5"),

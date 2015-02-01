@@ -1,9 +1,23 @@
 package chess
 package format.pgn
 
+import format.Forsyth
 import Pos._
 
 class DumperTest extends ChessTest {
+
+  "Check with pawn" should {
+    "not be checkmate if pawn can be taken en passant" in {
+      val game = Forsyth.<<<("8/3b4/6R1/1P2kp2/6pp/2N1P3/4KPPP/8 w - -").get match {
+        case Forsyth.SituationPlus(sit, turns) => Game(
+          board = sit.board,
+          player = sit.color,
+          turns = turns)
+      }
+      val move = game(Pos.F2, Pos.F4).toOption.get._2
+      Dumper(move) must_== "f4+"
+    }
+  }
 
   val gioachineGreco = makeGame.playMoves(D2 -> D4, D7 -> D5, C2 -> C4, D5 -> C4, E2 -> E3, B7 -> B5, A2 -> A4, C7 -> C6, A4 -> B5, C6 -> B5, D1 -> F3)
 

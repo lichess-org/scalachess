@@ -49,5 +49,5 @@ object Dumper {
   def apply(data: chess.Move): String = apply(
     data.before situationOf data.color,
     data,
-    data.after situationOf !data.color)
+    data.afterWithLastMove situationOf !data.color)
 }

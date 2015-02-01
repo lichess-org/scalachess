@@ -34,30 +34,45 @@ case object Antichess extends Variant(
   // This mode has no checkmates
   override def drawsOnInsufficientMaterial = false
 
+  // No player can win if the only remaining pieces are opposing bishops on different coloured
+  // diagonals. There may be pawns that are incapable of moving and do not attack the right color
+  // of square to allow the player to force their opponent to capture their bishop, also resulting in a draw
   override def specialDraw(situation: Situation) = {
-    val actors = situation.board.actors
-    if (actors.size != 2) false
-    else actors.values.toList match {
-      // No player can win if the only remaining pieces are two bishops of different colours on different coloured
-      // diagonals
-      case List(act1, act2) =>
-        val bothPiecesAreBishops = act1.piece.is(Bishop) && act2.piece.is(Bishop)
-        val notSamePlayerColour = (act1.color != act2.color)
-        val notOnSameColouredDiagonals = act1.pos.color != act2.pos.color
+    val actors = situation.board.actors.values
 
-        bothPiecesAreBishops && notOnSameColouredDiagonals && notSamePlayerColour
-      case _ => false
+    // Exit early if we are not in a situation with only bishops and pawns
+    val bishopsAndPawns = actors.forall(act => act.piece.is(Bishop) || act.piece.is(Pawn)) &&
+      actors.find(_.piece.is(Bishop)).isDefined
+
+    lazy val drawnBishops = actors.partition(_.color == White) match {
+      case (whitePieces, blackPieces) =>
+        val whiteBishops = whitePieces.filter(_.piece.is(Bishop))
+        val blackBishops = blackPieces.filter(_.piece.is(Bishop))
+        lazy val whitePawns = whitePieces.filter(_.piece.is(Pawn))
+        lazy val blackPawns = blackPieces.filter(_.piece.is(Pawn))
+
+        // We consider the case where a player has two bishops on the same diagonal after promoting by using .distinct
+        if (whiteBishops.isEmpty || blackBishops.isEmpty || whiteBishops.map(_.pos.color).toList.distinct.size != 1 ||
+          blackBishops.map(_.pos.color).toList.distinct.size != 1) false
+        else {
+          for {
+            whiteSquareColor <- whiteBishops.headOption map (_.pos.color)
+            blackSquareColor <- blackBishops.headOption map (_.pos.color)
+          } yield {
+            whiteSquareColor != blackSquareColor && whitePawns.forall(pawnAttacksOppositeColor(_, blackSquareColor)) &&
+              blackPawns.forall(pawnAttacksOppositeColor(_, whiteSquareColor))
+          }
+        } getOrElse false
     }
+
+    bishopsAndPawns && drawnBishops
   }
 
-  override def valid(board: Board, strict: Boolean) = {
-    // This variant cannot work with a 'normal' king as it assumes an AntiKing
+  private def pawnAttacksOppositeColor(pawn: Actor, oppositeBishopColor: Color) = {
+    val pawnImmobile = pawn.moves.isEmpty
+    val cannotAttackBishop = List(pawn.pos.upLeft, pawn.pos.upRight).flatten.find(_.color == oppositeBishopColor).isEmpty
 
-    board.pieces.values.find(_.is(King)).isEmpty && {
-      Color.all map board.rolesOf forall { roles =>
-        (if (strict) List((roles count (_ == Pawn)) <= 8, roles.size <= 16) else Nil) forall identity
-      }
-    }
+    pawnImmobile && cannotAttackBishop
   }
 
   // In this game variant, a king is a valid promotion

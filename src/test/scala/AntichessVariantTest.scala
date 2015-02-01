@@ -178,6 +178,24 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       }
     }
 
+    "Be drawn on multiple bishops on the opposite color" in {
+      val positionString = "8/6P1/8/8/1b6/8/8/5B2 w - -"
+      val originalGame = fenToGame(positionString, Antichess)
+
+      val newGame = originalGame flatMap (_.apply(Pos.G7, Pos.G8, Bishop.some)) map (_._1)
+
+      newGame must beSuccess.like {
+        case drawnGame =>
+          drawnGame.situation.end must beTrue
+          drawnGame.situation.variantDraw must beTrue
+          drawnGame.situation.winner must beNone
+          drawnGame.situation.status must beSome.like {
+            case status => status == Status.Draw
+          }
+      }
+
+    }
+
     "Not be drawn when the black and white bishops are on the same coloured squares " in {
       val position = "7b/8/1p6/8/8/8/5B2/8 w - -"
       val originalGame = fenToGame(position, Antichess)
@@ -189,6 +207,36 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
           nonDrawnGame.situation.end must beFalse
           nonDrawnGame.situation.variantDraw must beFalse
           nonDrawnGame.situation.winner must beNone
+      }
+    }
+
+    "Be drawn when there are only opposite colour bishops and pawns which could not attack those bishops remaining" in {
+      val position = "8/6p1/4B1P1/4p3/4P3/8/2p5/8 b - - 1 28"
+      val originalGame = fenToGame(position, Antichess)
+
+      val newGame = originalGame flatMap(_.apply(Pos.C2, Pos.C1, Some(Bishop))) map (_._1)
+
+      newGame must beSuccess.like {
+        case drawnGame =>
+          drawnGame.situation.end must beTrue
+          drawnGame.situation.variantDraw must beTrue
+          drawnGame.situation.status must beSome.like {
+            case status => status == Status.Draw
+          }
+      }
+    }
+
+    "Not be drawn on opposite color bishops but with pawns that could be forced to attack a bishop" in {
+      val position = "8/6p1/1B4P1/4p3/4P3/8/3p4/8 b - -"
+      val originalGame = fenToGame(position, Antichess)
+
+      val newGame = originalGame flatMap(_.apply(Pos.D2, Pos.D1, Some(Bishop))) map (_._1)
+
+      newGame must beSuccess.like {
+        case nonDrawnGame =>
+          nonDrawnGame.situation.end must beFalse
+          nonDrawnGame.situation.variantDraw must beFalse
+          nonDrawnGame.situation.status must beNone
       }
     }
 

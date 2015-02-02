@@ -98,5 +98,29 @@ K  r
         }
       }
     }
+
+    "Not force a draw when there is insufficient mating material" in {
+      val position = "8/6K1/8/8/8/8/k6p/8 b - - 1 39"
+      val game = fenToGame(position, ThreeCheck)
+
+      val successGame = game flatMap (_.playMove(Pos.H2, Pos.H1, Knight.some))
+
+      successGame must beSuccess.like{
+        case game =>
+          game.situation.end must beFalse
+      }
+    }
+
+    "Force a draw when there are only kings remaining" in {
+      val position = "8/6K1/8/8/8/8/k7/8 b - -"
+      val game = fenToGame(position, ThreeCheck)
+
+      game must beSuccess.like{
+        case game =>
+          game.situation.end must beTrue
+          game.situation.status must beEqualTo(Status.Draw.some)
+      }
+    }
+
   }
 }

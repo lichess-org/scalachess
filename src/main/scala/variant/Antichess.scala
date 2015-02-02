@@ -38,13 +38,13 @@ case object Antichess extends Variant(
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color
   // of square to allow the player to force their opponent to capture their bishop, also resulting in a draw
   override def specialDraw(situation: Situation) = {
-    val actors = situation.board.actors.values
+    val actors = situation.board.actors
 
     // Exit early if we are not in a situation with only bishops and pawns
-    val bishopsAndPawns = actors.forall(act => act.piece.is(Bishop) || act.piece.is(Pawn)) &&
-      actors.find(_.piece.is(Bishop)).isDefined
+    val bishopsAndPawns = actors.forall(act => act._2.piece.is(Bishop) || act._2.piece.is(Pawn)) &&
+      actors.find(_._2.piece.is(Bishop)).isDefined
 
-    lazy val drawnBishops = actors.partition(_.color == White) match {
+    lazy val drawnBishops = actors.values.partition(_.color == White) match {
       case (whitePieces, blackPieces) =>
         val whiteBishops = whitePieces.filter(_.piece.is(Bishop))
         val blackBishops = blackPieces.filter(_.piece.is(Bishop))

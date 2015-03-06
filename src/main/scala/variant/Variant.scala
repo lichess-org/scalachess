@@ -23,9 +23,9 @@ abstract class Variant(
   // Some variants do not allow castling
   def allowsCastling = true
 
-  def pieces: Map[Pos, Piece] = Variant.symmetricRank(
-    IndexedSeq(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
-  )
+  protected def backRank = IndexedSeq(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
+
+  def pieces: Map[Pos, Piece] = Variant.symmetricRank(backRank)
 
   def isValidPromotion(promotion: Option[PromotableRole]) = promotion match {
     case None                                 => true
@@ -116,7 +116,7 @@ abstract class Variant(
 
 object Variant {
 
-  val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, Antichess, Atomic)
+  val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, Antichess, Atomic, Horde)
   val byId = all map { v => (v.id, v) } toMap
 
   val default = Standard

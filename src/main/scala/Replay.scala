@@ -1,6 +1,7 @@
 package chess
 
 import format.pgn.{ Parser, Reader, Tag }
+import scalaz.Validation.FlatMap._
 
 case class Replay(setup: Game, moves: List[Move], state: Game) {
 

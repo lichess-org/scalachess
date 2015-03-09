@@ -1,6 +1,8 @@
 package chess
 package format.pgn
 
+import scalaz.Validation.FlatMap._
+
 case class ParsedPgn(tags: List[Tag], sans: List[San])
 
 // Standard Algebraic Notation

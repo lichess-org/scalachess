@@ -17,6 +17,7 @@ abstract class Variant(
   def threeCheck = this == ThreeCheck
   def antichess = this == Antichess
   def atomic = this == Atomic
+  def horde = this == Horde
 
   def exotic = !standard
 

@@ -17,10 +17,11 @@ case object Horde extends Variant(
   override lazy val pieces: Map[Pos, Piece] = {
 
     // In horde chess, black has a block of pawns for their first 4 rows but swaps the pawns on d8 and e8 to d4 and e4
-    val frontPawns = List(Pos.D4 -> Black.pawn, Pos.E4 -> Black.pawn)
+    val frontPawns = List(Pos.B4, Pos.C4, Pos.F4, Pos.G4).map { _ -> Black.pawn }
 
     val blackPawnsHoard = frontPawns ++ (for {
-      x <- 1 to 8; y <- 5 to 8
+      x <- 1 to 8
+      y <- 5 to 8
     } yield Pos.posAt(x, y) map (_ -> Black.pawn)).flatten toMap
 
     val whitePieces = (for (y <- 1 to 2; x <- 1 to 8) yield {

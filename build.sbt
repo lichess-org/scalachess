@@ -13,7 +13,7 @@ libraryDependencies ++= List(
   "joda-time" % "joda-time" % "2.7"
 )
 
-updateOptions := updateOptions.value.withCachedResolution(true)
+// updateOptions := updateOptions.value.withCachedResolution(true)
 
 resolvers ++= Seq(
   "sonatype" at "http://oss.sonatype.org/content/repositories/releases",

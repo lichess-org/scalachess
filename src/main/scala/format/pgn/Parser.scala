@@ -11,8 +11,11 @@ import scalaz.Validation.{ success => succezz }
 object Parser extends scalaz.syntax.ToTraverseOps {
 
   def full(pgn: String): Valid[ParsedPgn] = try {
+    val withoutEscaped = pgn.lines.map(_.trim).filter {
+      _.headOption != Some('%')
+    }.mkString("\n")
     for {
-      splitted ← splitTagAndMoves(pgn)
+      splitted ← splitTagAndMoves(withoutEscaped)
       (tagStr, moveStr) = splitted
       tags ← TagParser(tagStr)
       parsedMoves ← MovesParser(moveStr)
@@ -27,7 +30,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       sys error s"### StackOverflowError ### in PGN parser"
   }
 
-  def getVariantFromTags(tags: List[Tag]) : Variant = {
+  def getVariantFromTags(tags: List[Tag]): Variant = {
     val variant = tags.find(_.name == Tag.Variant)
 
     variant flatMap (tag => Variant.byName(tag.value)) getOrElse (Variant.default)
@@ -35,7 +38,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
   def moves(str: String, variant: Variant): Valid[List[San]] = moves(str.split(' ').toList, variant)
   def moves(strs: List[String], variant: Variant): Valid[List[San]] =
-    strs.map(str => MoveParser.apply(str,variant)).sequence
+    strs.map(str => MoveParser.apply(str, variant)).sequence
 
   trait Logging { self: Parsers =>
     protected val loggingEnabled = false

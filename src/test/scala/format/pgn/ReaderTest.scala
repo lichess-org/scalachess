@@ -47,6 +47,9 @@ class ReaderTest extends ChessTest {
     "example from chessgames.com" in {
       Reader.full(fromChessgames) must beSuccess
     }
+    "example from chessgames.com with escape chars" in {
+      Reader.full(fromChessgamesWithEscapeChar) must beSuccess
+    }
     "immortal with NAG" in {
       Reader.full(withNag) must beSuccess
     }

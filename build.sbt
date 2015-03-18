@@ -16,7 +16,6 @@ libraryDependencies ++= List(
 // updateOptions := updateOptions.value.withCachedResolution(true)
 
 resolvers ++= Seq(
-  "sonatype" at "http://oss.sonatype.org/content/repositories/releases",
   "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases")
 
 scalacOptions ++= Seq(

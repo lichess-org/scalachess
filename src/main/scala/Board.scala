@@ -2,6 +2,7 @@ package chess
 
 import variant.Variant
 import Pos.posAt
+import scalaz.Validation.FlatMap._
 
 case class Board (
     pieces: PieceMap,

@@ -2,6 +2,7 @@ package chess
 package variant
 
 import Pos.posAt
+import scalaz.Validation.FlatMap._
 
 abstract class Variant(
     val id: Int,

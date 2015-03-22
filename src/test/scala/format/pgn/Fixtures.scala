@@ -128,6 +128,13 @@ Ne5 37. Rg7 Rf8 38. h3 c4 39. Re7 Nd3 40. f7 Nxf2 41. Re8+ Kd7
 c3 47. h4 Ra6 48. Bd4 Ra4 49. Bxc3 Nxc3 50. Rxc3 Rxh4 51. Rf3
 Rh5 52. Kf2 Rg5 53. Rf8 Ke5 1/2-1/2"""
 
+val withDelimiters = """[pgn] 1. e4 e6 2. d4 d5 3. Nc3 Nf6 4. e5 Nfd7 5. Nf3 a6 6. Bd3 f6 7. O-O (7. Ng5 {is also good, but I was still in \"bullet opening mode\" at this point}) 7. .. fxe5 8. Ng5 Qe7 9. Qh5+ g6 10. Bxg6+ hxg6 11. Qxg6+ Kd8 12. Nf7+ Ke8 13. Nxh8+ Kd8 14. Bg5 Nc6 15. Nf7+ Ke8 16. Nd6+ Kd8 17. Qe8# [/pgn]"""
+
+val withDelimitersOnNewLines = """
+[pgn] 
+1. e4 e6 2. d4 d5 3. Nc3 Nf6 4. e5 Nfd7 5. Nf3 a6 6. Bd3 f6 7. O-O (7. Ng5 {is also good, but I was still in \"bullet opening mode\" at this point}) 7. .. fxe5 8. Ng5 Qe7 9. Qh5+ g6 10. Bxg6+ hxg6 11. Qxg6+ Kd8 12. Nf7+ Ke8 13. Nxh8+ Kd8 14. Bg5 Nc6 15. Nf7+ Ke8 16. Nd6+ Kd8 17. Qe8# 
+[/pgn]"""
+
 val fromCrafty = """[Event "Live Chess"]
 [Site "Chess.com"]
 [Date "2014.01.15"]

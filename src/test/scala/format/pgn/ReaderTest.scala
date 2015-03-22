@@ -30,6 +30,16 @@ class ReaderTest extends ChessTest {
     "castle checkmate O-O#" in {
       Reader.full(castleCheck2) must beSuccess
     }
+    "and delimiters" in {
+      Reader.full(withDelimiters) must beSuccess.like {
+        case replay => replay.moves must have size 33
+      }
+    }
+    "and delimiters on new lines" in {
+      Reader.full(withDelimitersOnNewLines) must beSuccess.like {
+        case replay => replay.moves must have size 33
+      }
+    }
   }
   "tags and moves" should {
     "chess960" in {

@@ -11,11 +11,13 @@ import scalaz.Validation.{ success => succezz }
 object Parser extends scalaz.syntax.ToTraverseOps {
 
   def full(pgn: String): Valid[ParsedPgn] = try {
-    val withoutEscaped = pgn.lines.map(_.trim).filter {
+    val preprocessed = pgn.lines.map(_.trim).filter {
       _.headOption != Some('%')
     }.mkString("\n")
+      .replace("[pgn]", "")
+      .replace("[/pgn]", "")
     for {
-      splitted ← splitTagAndMoves(withoutEscaped)
+      splitted ← splitTagAndMoves(preprocessed)
       (tagStr, moveStr) = splitted
       tags ← TagParser(tagStr)
       parsedMoves ← MovesParser(moveStr)

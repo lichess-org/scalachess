@@ -44,6 +44,8 @@ sealed trait Clock {
     s"${if (hours > 0) hours else ""}:$minutes:$seconds"
   }
 
+  def moretimeable(c: Color) = remainingTime(c) < 60 * 60 * 2
+
   def isRunning = timerOption.isDefined
 
   def isInit = elapsedTime(White) == 0 && elapsedTime(Black) == 0

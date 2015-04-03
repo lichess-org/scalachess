@@ -120,10 +120,12 @@ object Variant {
 
   val all = List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, Antichess, Atomic, Horde)
   val byId = all map { v => (v.id, v) } toMap
+  val byKey = all map { v => (v.key, v) } toMap
 
   val default = Standard
 
   def apply(id: Int): Option[Variant] = byId get id
+  def apply(key: String): Option[Variant] = byKey get key
   def orDefault(id: Int): Variant = apply(id) | default
 
   def byName(name: String): Option[Variant] =

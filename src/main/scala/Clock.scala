@@ -153,7 +153,7 @@ case class PausedClock(
 
 object Clock {
 
-  val minInitLimit = 3f
+  val minInitLimit = 3
   // no more than this time will be offered to the lagging player
   val maxLagToCompensate = 1f
   // substracted from lag compensation

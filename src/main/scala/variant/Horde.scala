@@ -37,6 +37,8 @@ case object Horde extends Variant(
   }
 
   /** The game has a special end condition when white manages to capture all of black's pawns */
-  override def specialEnd(situation: Situation) = situation.board.piecesOf(Black).isEmpty
+  override def specialEnd(situation: Situation) =
+    situation.board.piecesOf(Black).isEmpty
 
+  override val drawsOnInsufficientMaterial = false
 }

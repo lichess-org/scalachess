@@ -17,7 +17,7 @@ object InsufficientMatingMaterial {
 
     lazy val notKingPieces = nonKingPieces(board)
 
-    def kingsOnly = board.pieces.size < 3
+    def kingsOnly = board.pieces forall { _._2 is King }
 
     def bishopsOnSameColor =
       notKingPieces.map(_._2.role).distinct == List(Bishop) &&

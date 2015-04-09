@@ -8,7 +8,6 @@ sealed trait Color {
 
   val unary_! : Color
 
-  val unmovedPawnY: Int
   val passablePawnY: Int
   val promotablePawnY: Int
 
@@ -42,7 +41,6 @@ object Color {
 
     lazy val unary_! = Black
 
-    val unmovedPawnY = 2
     val passablePawnY = 5
     val promotablePawnY = 8
 
@@ -54,7 +52,6 @@ object Color {
 
     lazy val unary_! = White
 
-    val unmovedPawnY = 7
     val passablePawnY = 4
     val promotablePawnY = 1
 

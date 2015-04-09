@@ -12,33 +12,39 @@ case object Horde extends Variant(
   standardInitialPosition = false) {
 
   /**
-   * In Horde chess black advances against white with a horde of pawns.
+   * In Horde chess white advances against black with a horde of pawns.
    */
   override lazy val pieces: Map[Pos, Piece] = {
 
-    // In horde chess, black has a block of pawns for their first 4 rows but swaps the pawns on d8 and e8 to d4 and e4
-    val frontPawns = List(Pos.B4, Pos.C4, Pos.F4, Pos.G4).map { _ -> Black.pawn }
+    val frontPawns = List(Pos.B5, Pos.C5, Pos.F5, Pos.G5).map { _ -> White.pawn }
 
-    val blackPawnsHoard = frontPawns ++ (for {
+    val whitePawnsHoard = frontPawns ++ (for {
       x <- 1 to 8
-      y <- 5 to 8
-    } yield Pos.posAt(x, y) map (_ -> Black.pawn)).flatten toMap
+      y <- 1 to 4
+    } yield Pos.posAt(x, y) map (_ -> White.pawn)).flatten toMap
 
-    val whitePieces = (for (y <- 1 to 2; x <- 1 to 8) yield {
+    val blackPieces = (for (y <- 7 to 8; x <- 1 to 8) yield {
       posAt(x, y) map { pos =>
         (pos, y match {
-          case 1 => White - backRank(x - 1)
-          case 2 => White.pawn
+          case 8 => Black - backRank(x - 1)
+          case 7 => Black.pawn
         })
       }
     }).flatten.toMap
 
-    whitePieces ++ blackPawnsHoard
+    blackPieces ++ whitePawnsHoard
   }
 
   /** The game has a special end condition when white manages to capture all of black's pawns */
   override def specialEnd(situation: Situation) =
-    situation.board.piecesOf(Black).isEmpty
+    situation.board.piecesOf(White).isEmpty
 
+  // is that right?
   override val drawsOnInsufficientMaterial = false
+
+  override def isUnmovedPawn(color: Color, pos: Pos) = {
+    color == White && (pos.y == 1 || pos.y == 2)
+  } || {
+    color == Black && pos.y == 7
+  }
 }

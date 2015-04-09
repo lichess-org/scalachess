@@ -113,6 +113,12 @@ abstract class Variant(
   def rolesPromotableByPgn: Map[Char, PromotableRole] =
     promotableRoles map { r => (r.pgn, r) } toMap
 
+  def isUnmovedPawn(color: Color, pos: Pos) = {
+    color == White && pos.y == 2
+  } || {
+    color == Black && pos.y == 7
+  }
+
   override def toString = s"Variant($name)"
 }
 

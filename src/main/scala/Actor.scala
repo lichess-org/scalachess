@@ -58,7 +58,7 @@ case class Actor(
           fwd flatMap forward,
           for {
             p ← fwd
-            if pos.y == color.unmovedPawnY
+            if board.variant.isUnmovedPawn(color, pos)
             p2 ← pawnDir(p)
             if !(board.pieces contains p2)
             b ← board.move(pos, p2)

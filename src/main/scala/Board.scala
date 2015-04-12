@@ -124,7 +124,7 @@ case class Board (
     } forall identity
   }
 
-  override def toString = visual
+  override def toString = variant + " " + visual
 }
 
 object Board {

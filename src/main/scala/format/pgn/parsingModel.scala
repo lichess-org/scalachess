@@ -39,7 +39,7 @@ case class Std(
       case Some(move) => move withPromotion promotion toValid "Wrong promotion"
     }
 
-  private def compare[A](a: Option[A], b: => A) = a.fold(true)(b==)
+  private def compare[A](a: Option[A], b: A) = a.fold(true)(b==)
 
   // override def toString = role.forsyth + dest.toString
 }

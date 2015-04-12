@@ -44,7 +44,7 @@ object Reader {
         g1 ← vg
         parsed ← (Forsyth <<< fen) toValid "Invalid fen " + fen
       } yield g1.copy(
-        board = parsed.situation.board,
+        board = parsed.situation.board withVariant g1.board.variant,
         player = parsed.situation.color,
         turns = parsed.turns)
       case (vg, Tag(Tag.Variant, name)) => vg map { g1 =>

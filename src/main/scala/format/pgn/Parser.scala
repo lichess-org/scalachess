@@ -235,7 +235,9 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
     val tagName: Parser[String] = "[" ~> """[a-zA-Z]+""".r
 
-    val tagValue: Parser[String] = "\"" ~> """[^"]+""".r <~ "\"]"
+    val tagValue: Parser[String] = """[^\]]+""".r <~ "]" ^^ {
+      _.replace("\"", "")
+    }
   }
 
   private def splitTagAndMoves(pgn: String): Valid[(String, String)] =

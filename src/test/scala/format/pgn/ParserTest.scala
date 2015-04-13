@@ -75,6 +75,22 @@ class ParserTest extends ChessTest {
     }
   }
 
+  "unclosed quote" in {
+    parser(unclosedQuote) must beSuccess.like {
+      case a => a.tags must contain { (tag: Tag) =>
+        tag.name == Tag.White && tag.value == "Blazquez, Denis"
+      }
+    }
+  }
+
+  "inline tags" in {
+    parser(inlineTags) must beSuccess.like {
+      case a => a.tags must contain { (tag: Tag) =>
+        tag.name == Tag.White && tag.value == "Blazquez, Denis"
+      }
+    }
+  }
+
   "game from wikipedia" in {
     parser(fromWikipedia) must beSuccess.like {
       case a => a.sans.size must_== 85

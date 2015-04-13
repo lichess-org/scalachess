@@ -44,6 +44,6 @@ class OpeningExplorerTest extends ChessTest {
   }
   val transvestite2 = "d6 ?? Qd7 ?? Kd8 ?? Qe8 ?? ?? ??"
   transvestite2 in {
-    name(transvestite2) must_== Some("Transvestite Defense, Discourteous, Straight Variation")
+    name(transvestite2) must_== Some("Transvestite Defence, Discourteous, Straight Variation")
   }
 }

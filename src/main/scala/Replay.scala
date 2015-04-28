@@ -31,10 +31,12 @@ object Replay {
         ).flatten)
     }
 
-  def boards(moveStrs: List[String], initialFen: Option[String]): Valid[List[Board]] = {
-    val sit = initialFen.flatMap(format.Forsyth.<<) | Situation(chess.variant.Standard)
+  def boards(moveStrs: List[String], initialFen: Option[String], variant: chess.variant.Variant): Valid[List[Board]] = {
+    val sit = {
+      initialFen.flatMap(format.Forsyth.<<) | Situation(chess.variant.Standard)
+    } withVariant variant
     val init = sit -> List(sit.board)
-    Parser moves(moveStrs, sit.board.variant)  flatMap { sans =>
+    Parser.moves(moveStrs, sit.board.variant) flatMap { sans =>
       sans.foldLeft[Valid[(Situation, List[Board])]](init.success) {
         case (scalaz.Success((sit, boards)), san) =>
           san(sit) map { move =>

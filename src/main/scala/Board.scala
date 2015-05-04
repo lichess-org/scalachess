@@ -1,10 +1,10 @@
 package chess
 
-import variant.Variant
 import Pos.posAt
 import scalaz.Validation.FlatMap._
+import variant.Variant
 
-case class Board (
+case class Board(
     pieces: PieceMap,
     history: History,
     variant: Variant) {
@@ -124,7 +124,10 @@ case class Board (
     } forall identity
   }
 
-  override def toString = variant + " " + visual
+  override def toString = List(
+    variant + " Position after " + history.lastMoveString,
+    visual
+  ) mkString "\n"
 }
 
 object Board {

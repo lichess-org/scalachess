@@ -35,7 +35,7 @@ case class Std(
         }
       case (m, _) => m
     } match {
-      case None       => s"No move found: $this\n${situation.board}".failureNel
+      case None       => s"No move found: $this\n$situation".failureNel
       case Some(move) => move withPromotion promotion toValid "Wrong promotion"
     }
 

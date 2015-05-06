@@ -33,17 +33,26 @@ object Dumper {
 
         val disambiguation = if (candidates.isEmpty) {
           ""
-        } else if (!candidates.exists(_ ?| orig)) {
+        }
+        else if (!candidates.exists(_ ?| orig)) {
           orig.file
-        } else if (!candidates.exists(_ ?- orig)) {
+        }
+        else if (!candidates.exists(_ ?- orig)) {
           orig.rank
-        } else {
+        }
+        else {
           orig.file + orig.rank
         }
 
         role.pgn + disambiguation + captures.fold("x", "") + dest.key
       }
-    }) + (if (next.check) if (next.checkMate) "#" else "+" else "")
+    }) + {
+      if (next.check) {
+        if (next.checkMate) "#" else "+"
+      }
+      else if (next.winner.isDefined) "#"
+      else ""
+    }
   }
 
   def apply(data: chess.Move): String = apply(

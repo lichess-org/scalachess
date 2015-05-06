@@ -17,7 +17,7 @@ object Reader {
     op: List[San] => List[San],
     tags: List[Tag] = Nil): Valid[Replay] = for {
     parsed ← Parser.full(pgn)
-    game ← makeGame(parsed.tags ::: tags)
+    game = makeGame(parsed.tags ::: tags)
     replay ← makeReplay(game, op(parsed.sans))
   } yield replay
 
@@ -26,7 +26,7 @@ object Reader {
     op: List[San] => List[San],
     tags: List[Tag]): Valid[Replay] = for {
     moves ← Parser.moves(moveStrs, Parser.getVariantFromTags(tags))
-    game ← makeGame(tags)
+    game = makeGame(tags)
     replay ← makeReplay(game, op(moves))
   } yield replay
 
@@ -38,19 +38,8 @@ object Reader {
       } yield replay addMove move
     }
 
-  private def makeGame(tags: List[Tag]): Valid[Game] =
-    tags.foldLeft(success(Game(chess.variant.Variant.default)): Valid[Game]) {
-      case (vg, Tag(Tag.FEN, fen)) => for {
-        g1 ← vg
-        parsed ← (Forsyth <<< fen) toValid "Invalid fen " + fen
-      } yield g1.copy(
-        board = parsed.situation.board withVariant g1.board.variant,
-        player = parsed.situation.color,
-        turns = parsed.turns)
-      case (vg, Tag(Tag.Variant, name)) => vg map { g1 =>
-        val variant = chess.variant.Variant.byName(name) | chess.variant.Variant.default
-        g1 updateBoard (_ withVariant variant)
-      }
-      case (vg, _) => vg
-    }
+  private def makeGame(tags: List[Tag]) = Game(
+    variant = tags.find(_.name == Tag.Variant).map(_.value).flatMap(chess.variant.Variant.byName),
+    fen = tags.find(_.name == Tag.Variant).map(_.value)
+  )
 }

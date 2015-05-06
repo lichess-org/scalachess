@@ -67,4 +67,14 @@ object Game {
   def apply(variant: chess.variant.Variant): Game = new Game(
     board = Board init variant
   )
+
+  def apply(variant: Option[chess.variant.Variant], fen: Option[String]): Game = {
+    val g = apply(variant | chess.variant.Standard)
+    fen.flatMap(format.Forsyth.<<<).fold(g) { parsed =>
+      g.copy(
+        board = parsed.situation.board withVariant g.board.variant,
+        player = parsed.situation.color,
+        turns = parsed.turns)
+    }
+  }
 }

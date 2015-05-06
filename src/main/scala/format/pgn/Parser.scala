@@ -32,15 +32,14 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       sys error s"### StackOverflowError ### in PGN parser"
   }
 
-  def getVariantFromTags(tags: List[Tag]): Variant = {
-    val variant = tags.find(_.name == Tag.Variant)
-
-    variant flatMap (tag => Variant.byName(tag.value)) getOrElse (Variant.default)
-  }
+  def getVariantFromTags(tags: List[Tag]): Variant =
+    tags.find(_.name == Tag.Variant).flatMap { tag =>
+      Variant byName tag.value
+    } | Variant.default
 
   def moves(str: String, variant: Variant): Valid[List[San]] = moves(str.split(' ').toList, variant)
   def moves(strs: List[String], variant: Variant): Valid[List[San]] =
-    strs.map(str => MoveParser.apply(str, variant)).sequence
+    strs.map(str => MoveParser(str, variant)).sequence
 
   trait Logging { self: Parsers =>
     protected val loggingEnabled = false

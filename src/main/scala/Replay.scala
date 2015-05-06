@@ -31,6 +31,33 @@ object Replay {
         ).flatten)
     }
 
+  private def recursiveGames(game: Game, sans: List[chess.format.pgn.San]): Valid[List[Game]] =
+    sans match {
+      case Nil => success(Nil)
+      case san :: rest => san(game.situation) flatMap { move =>
+        val newGame = game(move)
+        recursiveGames(newGame, rest) map { newGame :: _ }
+      }
+    }
+
+  def games(
+    moveStrs: List[String],
+    initialFen: Option[String],
+    variant: chess.variant.Variant): Valid[List[Game]] =
+    Parser.moves(moveStrs, variant) flatMap { moves =>
+      val game = Game(variant.some, initialFen)
+      recursiveGames(game, moves) map { game :: _ }
+    }
+
+  private def recursiveBoards(sit: Situation, sans: List[chess.format.pgn.San]): Valid[List[Board]] =
+    sans match {
+      case Nil => success(Nil)
+      case san :: rest => san(sit) flatMap { move =>
+        val after = move.afterWithLastMove
+        recursiveBoards(Situation(after, !sit.color), rest) map { after :: _ }
+      }
+    }
+
   def boards(
     moveStrs: List[String],
     initialFen: Option[String],
@@ -39,16 +66,8 @@ object Replay {
     val sit = {
       initialFen.flatMap(format.Forsyth.<<) | Situation(chess.variant.Standard)
     }.copy(color = color) withVariant variant
-    val init = sit -> List(sit.board)
-    Parser.moves(moveStrs, sit.board.variant) flatMap { sans =>
-      sans.foldLeft[Valid[(Situation, List[Board])]](init.success) {
-        case (scalaz.Success((sit, boards)), san) =>
-          san(sit) map { move =>
-            val after = move.afterWithLastMove
-            Situation(after, !sit.color) -> (after :: boards)
-          }
-        case (x, _) => x
-      }
+    Parser.moves(moveStrs, sit.board.variant) flatMap { moves =>
+      recursiveBoards(sit, moves) map { sit.board :: _ }
     }
-  }.map(_._2.reverse)
+  }
 }

@@ -40,6 +40,6 @@ object Reader {
 
   private def makeGame(tags: List[Tag]) = Game(
     variant = tags.find(_.name == Tag.Variant).map(_.value).flatMap(chess.variant.Variant.byName),
-    fen = tags.find(_.name == Tag.Variant).map(_.value)
+    fen = tags.find(_.name == Tag.FEN).map(_.value)
   )
 }

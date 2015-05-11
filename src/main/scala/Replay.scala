@@ -50,18 +50,21 @@ object Replay {
       recursiveGames(game, moves) map { game :: _ }
     }
 
+  type ErrorMessage = String
   def gameWhileValid(
     moveStrs: List[String],
     initialFen: Option[String],
-    variant: chess.variant.Variant): List[Game] = {
-    def mk(g: Game, moves: Stream[San]): List[Game] = moves match {
+    variant: chess.variant.Variant): (List[Game], Option[ErrorMessage]) = {
+    def mk(g: Game, moves: Stream[San]): (List[Game], Option[ErrorMessage]) = moves match {
       case san #:: rest => san(g.situation).fold(
-        _ => Nil,
+        err => (Nil, err.head.some),
         move => {
           val newGame = g(move)
-          newGame :: mk(newGame, rest)
+          mk(newGame, rest) match {
+            case (next, msg) => (newGame :: next, msg)
+          }
         })
-      case _ => Nil
+      case _ => (Nil, None)
     }
     mk(Game(variant.some, initialFen), Parser.moveStream(moveStrs, variant))
   }

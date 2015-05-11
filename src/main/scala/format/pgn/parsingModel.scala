@@ -31,7 +31,7 @@ case class Std(
       case (None, (pos, piece)) if piece.color == situation.color && piece.role == role && compare(file, pos.x) && compare(rank, pos.y) && piece.eyesMovable(pos, dest) =>
         val a = Actor(piece, pos, situation.board)
         a trustedMoves false find { m =>
-          m.dest == dest && (a kingSafety m)
+          m.dest == dest && a.board.variant.kingSafety(a, m)
         }
       case (m, _) => m
     } match {

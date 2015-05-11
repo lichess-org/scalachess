@@ -12,29 +12,26 @@ case object Atomic extends Variant(
   override def hasMoveEffects = true
 
   /** Move threatens to explode the opponent's king */
-  private def explodesOpponentKing(situation: Situation, move: Move): Boolean = {
-    val opponentKingPerimeter = situation.board.kingPosOf(!situation.color) map (_.surroundingPositions)
-    val explodesKing = opponentKingPerimeter map (move.captures && _.contains(move.dest))
-
-    explodesKing getOrElse false
+  private def explodesOpponentKing(situation: Situation)(move: Move): Boolean = move.captures && {
+    situation.board.kingPosOf(!situation.color) exists (_.surroundingPositions contains move.dest)
   }
 
   /** Move threatens to illegally explode our own king */
-  private def explodesOwnKing(situation: Situation, move: Move) : Boolean = {
-    move.captures && (situation.kingPos map (_.surroundingPositions contains(move.dest)) getOrElse false)
+  private def explodesOwnKing(situation: Situation)(move: Move): Boolean = {
+    move.captures && (situation.kingPos map (_.surroundingPositions contains (move.dest)) getOrElse false)
   }
 
-  private def protectedByOtherKing(board: Board, to: Pos, color: Color) : Boolean =
+  private def protectedByOtherKing(board: Board, to: Pos, color: Color): Boolean =
     board.kingPosOf(color) map (_.surroundingPositions.contains(to)) getOrElse false
 
   /**
    * In atomic chess, a king cannot be threatened while it is in the perimeter of the other king as were the other player
    * to capture it, their own king would explode. This effectively makes a king invincible while connected with another
    * king.
-   * */
+   */
   override def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean = {
     board.pieces exists {
-      case (pos, piece) if piece.color == color && filter(piece) && piece.eyes(pos, to) && !protectedByOtherKing(board,to,color) =>
+      case (pos, piece) if piece.color == color && filter(piece) && piece.eyes(pos, to) && !protectedByOtherKing(board, to, color) =>
         (!piece.role.projection) || piece.role.dir(pos, to).exists {
           longRangeThreatens(board, pos, _, to)
         }
@@ -42,38 +39,15 @@ case object Atomic extends Variant(
     }
   }
 
-  override def validMoves(situation: Situation): Map[Pos, List[Move]] = {
-    val moves = situation.actors map {
-      actor =>
-        // All the moves the piece can make not taking 'check' into account
-        val rawMoves = actor.trustedMoves(true)
-
-        // Moves which can be performed without putting our king in check
-        val kingSafeMoves = actor.kingSafetyMoveFilter(rawMoves)
-
-        // Moves which explode the opponent's king, regardless of whether it puts us into check or not.
-        // In FICS atomic chess, exploding the opponent's king takes priority over removing yourself from check
-        // or preventing yourself going into check.
-        val explodesOpponentKingMoves = rawMoves filter (explodesOpponentKing(situation, _))
-
-        val allMoves = if (explodesOpponentKingMoves.isEmpty) kingSafeMoves else {
-          // Avoid repeating moves that fit both criteria using .distinct
-          (explodesOpponentKingMoves ::: kingSafeMoves).distinct
-        }
-
-        // However, we may never explode our own king
-        val legalMoves = allMoves filter (!explodesOwnKing(situation, _))
-
-        actor.pos -> legalMoves
-    } toMap
-
-    moves.filterNot(_._2.isEmpty)
-  }
+  // moves exploding opponent king are always playable
+  override def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean = {
+    !kingPos.exists(kingThreatened(m.after, !m.color, _, filter)) ||
+      explodesOpponentKing(m.situationBefore)(m)
+  } && !explodesOwnKing(m.situationBefore)(m)
 
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
   private def explodeSurroundingPieces(move: Move): Move = {
-    if (move.captures)
-    {
+    if (move.captures) {
       val surroundingPositions = move.dest.surroundingPositions
       val afterBoard = move.after
       val destination = move.dest
@@ -91,7 +65,7 @@ case object Atomic extends Variant(
     else move
   }
 
-  override def addVariantEffect(move: Move) : Move = explodeSurroundingPieces(move)
+  override def addVariantEffect(move: Move): Move = explodeSurroundingPieces(move)
 
   /**
    * Since a king may walk into the path of another king, it is more difficult to win when your opponent only has a

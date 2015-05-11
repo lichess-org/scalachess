@@ -50,6 +50,14 @@ abstract class Variant(
     }
   }
 
+  def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean = !{
+    kingPos exists { kingThreatened(m.after, !m.color, _, filter) }
+  }
+
+  def kingSafety(a: Actor, m: Move): Boolean = kingSafety(m,
+    if (a.piece is King) (_ => true) else if (a.check) (_.role.attacker) else (_.role.projection),
+    if (a.piece.role == King) None else a.board kingPosOf a.color)
+
   def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean = dir(p) exists { next =>
     next == to || (!board.pieces.contains(next) && longRangeThreatens(board, next, dir, to))
   }

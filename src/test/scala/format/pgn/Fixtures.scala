@@ -862,4 +862,11 @@ Nc5d3 20. Rc3xd3 Bg6xd3 21. Qd1xd3 Qb8c7 22. c4c5 Bd6e7 23. Nf3e5 Be7xc5 24. Bc1
 28. Bf1a6+ Kc8c7 29. Bc5d6+ Rd5xd6 30. e5xd6+ Kc7xd6 31. g3g4 h7h5 32. g4g5 h5h4 33. Kg1g2 Rh8g8 34. g5g6 Rg8xg6+ 35. Kg2h3 f7f5 36. Kh3xh4
 e6e5 37. Kh4h5 Rg6g7 38. Ba6c8 Rg7h7+ 39. Kh5g5 Rh7xh2 40. Bc8xf5 Rh2d2 41. Kg5f6 Rd2d5 42. Bf5e4 Rd5d4 43. Kf6f5 Rd4d2 44. Re1e3 Rd2d4 45.
 Re3d3 Rd4xd3 46. Be4xd3 Kd6d5 47. Bd3b5 Kd5c5 48. a3a4 Kc5b4 49. Kf5xe5 a7a6 50. Bb5xa6 Kb4xa4  1/2-1/2"""
+
+  val atomicRegression = """
+[White "me"]
+[Black "you"]
+[Variant "Atomic"]
+1. e4 d5 2. Nf3 dxe4 3. Bb5+ Qxd2#"""
+
 }

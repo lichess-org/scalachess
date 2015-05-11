@@ -92,18 +92,9 @@ case class Actor(
       if ((piece is King)) (_ => true) else if (check) (_.role.attacker) else (_.role.projection)
     val stableKingPos = if (piece.role == King) None else board kingPosOf color
     ms filter { m =>
-      kingSafety(m, filter, stableKingPos orElse (m.after kingPosOf color))
+      board.variant.kingSafety(m, filter, stableKingPos orElse (m.after kingPosOf color))
     }
   }
-
-  private def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean = !{
-    kingPos exists { threatensKing(m.after, !color, _, filter) }
-  }
-
-  def kingSafety(m: Move): Boolean = kingSafety(
-    m,
-    if (piece is King) (_ => true) else if (check) (_.role.attacker) else (_.role.projection),
-    if (piece.role == King) None else board kingPosOf color)
 
   lazy val check: Boolean = board check color
 
@@ -122,7 +113,7 @@ case class Actor(
       case Some(piece) => true
       case _ => false
     }
-    if !travelPoss.exists(p => threatensKing(board, !color, p))
+    if !travelPoss.exists(p => board.variant.kingThreatened(board, !color, p))
     newRookPos ← posAt(side.castledRookX, rookPos.y)
     b1 ← board take rookPos
     b2 ← newKingPos match {
@@ -196,9 +187,6 @@ case class Actor(
 }
 
 object Actor {
-
-  def threatensKing(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean =
-    board.variant.kingThreatened(board, color, to, filter)
 
   def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
     board.variant.longRangeThreatens(board, p, dir, to)

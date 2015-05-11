@@ -50,21 +50,20 @@ object Replay {
       recursiveGames(game, moves) map { game :: _ }
     }
 
-  def gameStream(
+  def gameWhileValid(
     moveStrs: List[String],
     initialFen: Option[String],
-    variant: chess.variant.Variant): Stream[Game] = {
-    def mk(g: Game, moves: Stream[San]): Stream[Game] = moves match {
-      case san #:: rest => san(g.situation) match {
-        case scalaz.Success(move) =>
+    variant: chess.variant.Variant): List[Game] = {
+    def mk(g: Game, moves: Stream[San]): List[Game] = moves match {
+      case san #:: rest => san(g.situation).fold(
+        _ => Nil,
+        move => {
           val newGame = g(move)
-          newGame #:: mk(newGame, rest)
-        case _ => Stream.empty[Game]
-      }
-      case _ => Stream.empty[Game]
+          newGame :: mk(newGame, rest)
+        })
+      case _ => Nil
     }
-    val init = Game(variant.some, initialFen)
-    mk(init, Parser.moveStream(moveStrs, variant))
+    mk(Game(variant.some, initialFen), Parser.moveStream(moveStrs, variant))
   }
 
   private def recursiveBoards(sit: Situation, sans: List[San]): Valid[List[Board]] =

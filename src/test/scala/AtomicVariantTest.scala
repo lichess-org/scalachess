@@ -363,6 +363,23 @@ class AtomicVariantTest extends ChessTest {
 
     }
 
+    "End move regression" in {
+      import Pos._
+      val position = "r1bq1bnr/pppp1ppp/5k2/4p3/4P1K1/8/PPPP1PPP/RNBQ1B1R b - - 5 6"
+      val game = fenToGame(format.Forsyth.initial, Atomic)
+      val successGame = game flatMap (_.playMoves(
+        E2 -> E4,
+        D7 -> D5,
+        G1 -> F3,
+        D5 -> E4,
+        F1 -> B5,
+        D8 -> D2))
+      successGame must beSuccess.like {
+        case game =>
+          game.situation.variantEnd must beTrue
+      }
+    }
+
   }
 
 }

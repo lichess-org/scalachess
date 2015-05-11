@@ -66,9 +66,13 @@ object Replay {
         })
       case _ => (Nil, None)
     }
+    val init = Game(variant.some, initialFen)
     Parser.moves(moveStrs, variant).fold(
       err => Nil -> err.head.some,
-      moves => mk(Game(variant.some, initialFen), moves))
+      moves => mk(init, moves)
+    ) match {
+        case (games, err) => (init :: games, err)
+      }
   }
 
   private def recursiveBoards(sit: Situation, sans: List[San]): Valid[List[Board]] =

@@ -1,5 +1,6 @@
 package chess
 
+import chess.format.pgn.San
 import format.pgn.{ Parser, Reader, Tag }
 import scalaz.Validation.FlatMap._
 
@@ -31,7 +32,7 @@ object Replay {
         ).flatten)
     }
 
-  private def recursiveGames(game: Game, sans: List[chess.format.pgn.San]): Valid[List[Game]] =
+  private def recursiveGames(game: Game, sans: List[San]): Valid[List[Game]] =
     sans match {
       case Nil => success(Nil)
       case san :: rest => san(game.situation) flatMap { move =>
@@ -49,7 +50,24 @@ object Replay {
       recursiveGames(game, moves) map { game :: _ }
     }
 
-  private def recursiveBoards(sit: Situation, sans: List[chess.format.pgn.San]): Valid[List[Board]] =
+  def gameStream(
+    moveStrs: List[String],
+    initialFen: Option[String],
+    variant: chess.variant.Variant): Stream[Game] = {
+    def mk(g: Game, moves: Stream[San]): Stream[Game] = moves match {
+      case san #:: rest => san(g.situation) match {
+        case scalaz.Success(move) =>
+          val newGame = g(move)
+          newGame #:: mk(newGame, rest)
+        case _ => Stream.empty[Game]
+      }
+      case _ => Stream.empty[Game]
+    }
+    val init = Game(variant.some, initialFen)
+    mk(init, Parser.moveStream(moveStrs, variant))
+  }
+
+  private def recursiveBoards(sit: Situation, sans: List[San]): Valid[List[Board]] =
     sans match {
       case Nil => success(Nil)
       case san :: rest => san(sit) flatMap { move =>

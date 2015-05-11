@@ -41,14 +41,6 @@ object Parser extends scalaz.syntax.ToTraverseOps {
   def moves(strs: List[String], variant: Variant): Valid[List[San]] =
     strs.map(str => MoveParser(str, variant)).sequence
 
-  def moveStream(strs: List[String], variant: Variant): Stream[San] = strs match {
-    case Nil => Stream.empty[San]
-    case str :: rest => MoveParser(str, variant) match {
-      case scalaz.Success(san) => san #:: moveStream(rest, variant)
-      case _                   => Stream.empty[San]
-    }
-  }
-
   trait Logging { self: Parsers =>
     protected val loggingEnabled = false
     protected def as[T](msg: String)(p: => Parser[T]): Parser[T] =

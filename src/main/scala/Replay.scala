@@ -55,8 +55,8 @@ object Replay {
     moveStrs: List[String],
     initialFen: Option[String],
     variant: chess.variant.Variant): (List[Game], Option[ErrorMessage]) = {
-    def mk(g: Game, moves: Stream[San]): (List[Game], Option[ErrorMessage]) = moves match {
-      case san #:: rest => san(g.situation).fold(
+    def mk(g: Game, moves: List[San]): (List[Game], Option[ErrorMessage]) = moves match {
+      case san :: rest => san(g.situation).fold(
         err => (Nil, err.head.some),
         move => {
           val newGame = g(move)
@@ -66,7 +66,9 @@ object Replay {
         })
       case _ => (Nil, None)
     }
-    mk(Game(variant.some, initialFen), Parser.moveStream(moveStrs, variant))
+    Parser.moves(moveStrs, variant).fold(
+      err => Nil -> err.head.some,
+      moves => mk(Game(variant.some, initialFen), moves))
   }
 
   private def recursiveBoards(sit: Situation, sans: List[San]): Valid[List[Board]] =

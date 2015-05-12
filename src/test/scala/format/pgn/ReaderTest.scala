@@ -87,5 +87,8 @@ class ReaderTest extends ChessTest {
     "atomic regression" in {
       Reader.full(atomicRegression) must beSuccess
     }
+    "atomic promotion" in {
+      Reader.full(atomicPromotion) must beSuccess
+    }
   }
 }

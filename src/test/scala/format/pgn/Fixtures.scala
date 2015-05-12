@@ -869,4 +869,22 @@ Re3d3 Rd4xd3 46. Be4xd3 Kd6d5 47. Bd3b5 Kd5c5 48. a3a4 Kc5b4 49. Kf5xe5 a7a6 50.
 [Variant "Atomic"]
 1. e4 d5 2. Nf3 dxe4 3. Bb5+ Qxd2#"""
 
+val atomicPromotion = """
+[Event "Rated game"]
+[Site "http://lichess.org/MyjOSGx4"]
+[Date "2015.02.25"]
+[White "AngryBishop"]
+[Black "Nyanta"]
+[Result "1-0"]
+[WhiteElo "1711"]
+[BlackElo "1581"]
+[PlyCount "37"]
+[Variant "Atomic"]
+[TimeControl "60+1"]
+[ECO "?"]
+[Opening "?"]
+[Annotator "lichess.org"]
+
+1. Nf3 f6 2. Nc3 c6 3. d4 d5 4. e3 e5 5. dxe5 d4 6. Ne4 d3 7. Nd6+ Bxd6 8. Nd4 d2+ 9. Ke2 dxc1=Q 10. g4 Nh6 11. Bg2 Nxg4 12. h3 Na6 13. Rad1 Nc5 14. Kf1 Ne4 15. f4 Nf2 16. Ne6 Qxd1 17. Nc7+ Ke7 18. Ne6 Kd6 19. Bxc6 1-0
+"""
 }

@@ -52,7 +52,7 @@ case class Move(
     board.variant.finalizeBoard(board)
   }
 
-  def applyVariantEffect : Move = before.variant addVariantEffect this
+  def applyVariantEffect: Move = before.variant addVariantEffect this
 
   def afterWithLastMove = after.copy(
     history = after.history.copy(lastMove = Some(orig, dest)))
@@ -66,13 +66,14 @@ case class Move(
 
   def color = piece.color
 
-  def withPromotion(op: Option[PromotableRole]): Option[Move] = op.fold(some(this)) { p =>
-    if ((after count color.queen) > (before count color.queen)) for {
-      b2 ← after take dest
-      b3 ← b2.place(color - p, dest)
-    } yield copy(after = b3, promotion = Some(p))
-    else None
-  }
+  def withPromotion(op: Option[PromotableRole]): Option[Move] =
+    op.fold(this.some) { p =>
+      if ((after count color.queen) > (before count color.queen)) for {
+        b2 ← after take dest
+        b3 ← b2.place(color - p, dest)
+      } yield copy(after = b3, promotion = Some(p))
+      else this.some
+    }
 
   def withAfter(newBoard: Board) = copy(after = newBoard)
 

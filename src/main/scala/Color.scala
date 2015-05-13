@@ -46,6 +46,8 @@ object Color {
 
     val letter = 'w'
     val name = "white"
+
+    override val hashCode = 1
   }
 
   case object Black extends Color {
@@ -57,6 +59,8 @@ object Color {
 
     val letter = 'b'
     val name = "black"
+
+    override val hashCode = 2
   }
 
   def apply(b: Boolean): Color = if (b) White else Black

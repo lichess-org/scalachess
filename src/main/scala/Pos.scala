@@ -52,6 +52,8 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
   val piotrStr = piotr.toString
 
   override val toString = key
+
+  override val hashCode = 8 * x + y
 }
 
 object Pos {

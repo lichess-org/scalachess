@@ -4,22 +4,22 @@ import Pos._
 
 class ReplayPerfTest extends ChessTest {
 
-  val nb = 100
-  val iterations = 10
+  val nb = 500
+  val gameMoves = (format.pgn.Fixtures.prod500standard take nb).map {
+    _.split(' ').toList
+  }
+  val iterations = 5
   // val nb = 1
   // val iterations = 1
 
-  val moves = format.pgn.Fixtures.fromProd2.split(' ').toList
-  def runOne = Replay(moves, None, chess.variant.Standard)
-  def run { for (i ← 1 to nb) runOne }
+  def runOne(moves: List[String]) =
+   Replay.gameWhileValid(moves, None, chess.variant.Standard)
+  def run { gameMoves foreach runOne }
 
   "playing a game" should {
     "many times" in {
-      runOne must beSuccess
-      if (nb * iterations > 1) {
-        println("warming up")
-        run
-      }
+      runOne(gameMoves.head)._2 must beEmpty
+      run
       println("running tests")
       val durations = for (i ← 1 to iterations) yield {
         val start = System.currentTimeMillis

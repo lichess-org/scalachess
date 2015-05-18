@@ -2378,7 +2378,7 @@ object Openings {
     ("C20", "King Pawn Game, Wayward Queen Attack, Kiddie Countergambit", "e4 e5 Qh5 Nf6"),
     ("C20", "King Pawn Game, Wayward Queen Attack, Mellon Gambit", "e4 e5 Qh5 Nc6 Bc4 Nh6 d3 g6 Qf3 f6 Ne2 d5"),
     ("C20", "King Pawn Game, Weber Gambit", "e4 e5 d3 d5 exd5 c6 dxc6 Nxc6"),
-    ("C20", "King Pawn Opening, Not Named", "e4 e5 b3"),
+    ("C20", "King Pawn Game, Czyzewski Opening", "e4 e5 b3"),
     ("B20", "King Pawn Opening, Speers Opening", "e4 e5 Qg4 Nf6 Qf5"),
     ("B20", "King Pawn Opening, Van Hooydoon Gambit", "e4 e5 Qe2 Nc6 c3 Nf6 Nf3 Bc5 d4 exd4 cxd4 Nxd4"),
     ("C36", "King's Gambit, Accepted, Abbazia Defence, Main Line", "e4 e5 f4 exf4 Nf3 d5 exd5 Nf6 Bb5+ c6 dxc6 bxc6 Bc4 Nd5"),

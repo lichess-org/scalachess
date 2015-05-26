@@ -53,7 +53,7 @@ object Replay {
   type ErrorMessage = String
   def gameWhileValid(
     moveStrs: List[String],
-    initialFen: Option[String],
+    initialFen: String,
     variant: chess.variant.Variant): (List[Game], Option[ErrorMessage]) = {
     def mk(g: Game, moves: List[San]): (List[Game], Option[ErrorMessage]) = moves match {
       case san :: rest => san(g.situation).fold(
@@ -66,7 +66,7 @@ object Replay {
         })
       case _ => (Nil, None)
     }
-    val init = Game(variant.some, initialFen)
+    val init = Game(variant.some, initialFen.some)
     Parser.moves(moveStrs, variant).fold(
       err => Nil -> err.head.some,
       moves => mk(init, moves)

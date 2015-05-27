@@ -1,7 +1,7 @@
 package chess
 
+import chess.format.{ Forsyth, Visual }
 import chess.variant.Variant
-import chess.format.{Forsyth, Visual}
 import org.specs2.matcher.Matcher
 import org.specs2.mutable.Specification
 import ornicar.scalalib.test.ValidationMatchers
@@ -70,10 +70,11 @@ trait ChessTest
 
   def fenToGame(positionString: String, variant: Variant) = {
     val situation = Forsyth << positionString
-
-    val maybeBoard = situation map (sit => sit.color -> sit.withVariant(variant).board) toValid "Could not construct situation from FEN"
-
-    maybeBoard map {case (color, board) => Game(variant).copy(board = board) withPlayer(color)}
+    situation map { sit =>
+      sit.color -> sit.withVariant(variant).board
+    } toValid "Could not construct situation from FEN" map {
+      case (color, board) => Game(variant).copy(board = board) withPlayer color
+    }
   }
 
   def makeBoard(pieces: (Pos, Piece)*): Board =

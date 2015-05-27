@@ -9,21 +9,15 @@ object Forsyth {
 
   val initial = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-  def <<(source: String): Option[Situation] = {
-
-    val boardChars = source.trim.takeWhile(' '!=).replace("/", "").toList
-
-    val colorOption = source split " " lift 1 flatMap (_ lift 0) flatMap Color.apply
-
-    makeBoard(source) flatMap { board =>
-      val c = colorOption | White
-      if (board check !c) {
-        if (board check c) none // both sides cannot be in check
-        else Situation(board, !c).some // user in check will move first
+  def <<(source: String): Option[Situation] =
+    makeBoard(source) map { board =>
+      val colorOption = source split " " lift 1 flatMap (_ lift 0) flatMap Color.apply
+      colorOption match {
+        case Some(color)             => Situation(board, color)
+        case _ if board.check(Black) => Situation(board, Black) // user in check will move first
+        case _                       => Situation(board, White)
       }
-      else Situation(board, c).some
     }
-  }
 
   // only cares about pieces positions on the board (first part of FEN string)
   def makeBoard(source: String): Option[Board] =

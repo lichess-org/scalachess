@@ -390,5 +390,16 @@ class AtomicVariantTest extends ChessTest {
 
     }
 
+    "Not escaping a check that would blow up both kings" in {
+      val position = "rnbq1bnr/pp1pp1pp/8/2pk1p2/3K1P2/P6P/1PPPP1P1/RNBQ1BNR b - - 0 6"
+      val game = fenToGame(position, Atomic)
+
+      val newGame = game flatMap (_.playMoves(
+        Pos.A7 -> Pos.A6
+      ))
+
+      newGame must beSuccess
+    }
+
   }
 }

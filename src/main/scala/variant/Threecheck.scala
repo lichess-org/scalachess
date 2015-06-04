@@ -5,7 +5,7 @@ case object ThreeCheck extends Variant(
   id = 5,
   key = "threeCheck",
   name = "Three-check",
-  shortName = "3+",
+  shortName = "3check",
   title = "Check your opponent 3 times to win the game",
   standardInitialPosition = true) {
 

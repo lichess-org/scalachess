@@ -111,6 +111,16 @@ object Forsyth {
     fen.toString
   }
 
+  def getFullMove(fen: String): Option[Int] =
+    fen.split(' ').lift(5) flatMap parseIntOption
+
+  def getColor(fen: String): Option[Color] =
+    fen.split(' ').lift(1) flatMap (_.headOption) flatMap Color.apply
+
+  def getPly(fen: String): Option[Int] = getFullMove(fen) map { fullMove =>
+    fullMove * 2 - (if (getColor(fen).exists(_.white)) 2 else 1)
+  }
+
   def fixCastles(fen: String): Option[String] = fen.trim.split(' ').toList match {
     case boardStr :: color :: castlesStr :: rest => makeBoard(boardStr) map { board =>
       val c1 = Castles(castlesStr)

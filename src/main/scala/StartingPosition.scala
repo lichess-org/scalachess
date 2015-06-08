@@ -8,6 +8,8 @@ case class StartingPosition(
   val shortName = name takeWhile (':'!=)
 
   def fullName = s"$eco $name"
+
+  def initial = fen == format.Forsyth.initial
 }
 
 object StartingPosition {
@@ -151,17 +153,17 @@ object StartingPosition {
       StartingPosition("A01", "Nimzo-Larsen Attack", "rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 1 1")
     )))
 
-  val all: IndexedSeq = categories.flatMap(_.positions).toIndexedSeq
+  val all: IndexedSeq[StartingPosition] = categories.flatMap(_.positions).toIndexedSeq
 
   val initial = StartingPosition("---", "Initial position", format.Forsyth.initial)
 
-  def allWithInitial = initial :: all
+  def allWithInitial = initial +: all
 
   private val ecoIndex: Map[String, StartingPosition] = all.map { p =>
     p.eco -> p
   }.toMap
 
-  def random = all(scala.util.Random.nextInt(all.size)
+  def random = all(scala.util.Random.nextInt(all.size))
 
   def byEco(eco: String): Option[StartingPosition] = ecoIndex get eco
 }

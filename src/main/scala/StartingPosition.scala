@@ -5,6 +5,8 @@ case class StartingPosition(
     name: String,
     fen: String) {
 
+  val shortName = name takeWhile (':'!=)
+
   def fullName = s"$eco $name"
 }
 
@@ -149,7 +151,7 @@ object StartingPosition {
       StartingPosition("A01", "Nimzo-Larsen Attack", "rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 1 1")
     )))
 
-  val all = categories.flatMap(_.positions)
+  val all: IndexedSeq = categories.flatMap(_.positions).toIndexedSeq
 
   val initial = StartingPosition("---", "Initial position", format.Forsyth.initial)
 
@@ -158,6 +160,8 @@ object StartingPosition {
   private val ecoIndex: Map[String, StartingPosition] = all.map { p =>
     p.eco -> p
   }.toMap
+
+  def random = all(scala.util.Random.nextInt(all.size)
 
   def byEco(eco: String): Option[StartingPosition] = ecoIndex get eco
 }

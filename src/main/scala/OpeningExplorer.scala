@@ -3,6 +3,7 @@ package chess
 object OpeningExplorer {
 
   private type Move = String
+  private val any: Move = "**"
 
   case class Opening(code: String, name: String, size: Int) {
 
@@ -15,7 +16,13 @@ object OpeningExplorer {
       moves: Map[Move, Branch] = Map.empty,
       opening: Option[Opening] = None) {
 
-    def get(move: Move) = moves get move
+    def get(move: Move): Option[Branch] = {
+      val precise = moves get move
+      val wildcard = moves get any
+      wildcard.fold(precise) { wild =>
+        precise.fold(wild)(_ merge wild).some
+      }
+    }
 
     def apply(move: Move) = get(move) getOrElse Branch()
 
@@ -34,7 +41,11 @@ object OpeningExplorer {
         case (m, b) => margin + m + b.render(margin + " ")
       } mkString "\n")
 
-    override def toString = opening.fold("")(_.toString)
+    private def merge(other: Branch) = Branch(
+      moves = other.moves ++ moves,
+      opening = opening orElse other.opening)
+
+    override def toString = "branch " + opening.fold("")(_.toString) + moves.keys
   }
 
   def openingOf(moves: List[String]): Option[Opening] = {
@@ -44,7 +55,7 @@ object OpeningExplorer {
       last: Option[Opening]): Option[Opening] =
       moves match {
         case Nil => branch.opening orElse last
-        case m :: ms => (branch get m).orElse(branch get "**").fold(last) { b =>
+        case m :: ms => (branch get m).fold(last) { b =>
           next(b, ms, b.opening orElse last)
         }
       }

@@ -38,6 +38,14 @@ class OpeningExplorerTest extends ChessTest {
   g8 in {
     code(g8) must_== Some("B03")
   }
+  val bongcloudAttack = "e4 e5 Ke2 Nc6 d3 Nf6 Nc3"
+  bongcloudAttack in {
+    name(bongcloudAttack) must_== Some("Bongcloud Attack")
+  }
+  val bongcloudDefence = "e4 e5 d4 Ke7 a3 Nf6 Nc3"
+  bongcloudDefence in {
+    name(bongcloudDefence) must_== Some("Bongcloud Defence")
+  }
   val transvestite1 = "d3 d5 Kd2 e6 Qe1 Qh4 Kd1 Nf6"
   transvestite1 in {
     name(transvestite1) must_== Some("Transvestite Attack, Courteous, Gay Variation")

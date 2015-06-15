@@ -102,13 +102,14 @@ abstract class Variant(
    */
   def finalizeBoard(board: Board) : Board = board
 
-  def valid(board: Board, strict: Boolean) = {
-    Color.all map board.rolesOf forall { roles =>
-      ((roles count (_ == King)) == 1) :: {
-        if (strict) List((roles count (_ == Pawn)) <= 8, roles.size <= 16) else Nil
-      } forall identity
-    }
+  protected def validSide(board: Board, strict: Boolean)(color: Color) = {
+    val roles = board rolesOf color
+    ((roles count (_ == King)) == 1) :: {
+      if (strict) List((roles count (_ == Pawn)) <= 8, roles.size <= 16) else Nil
+    } forall identity
   }
+
+  def valid(board: Board, strict: Boolean) = Color.all forall validSide(board, strict)_
 
   def roles = List(Rook, Knight, King, Bishop, King, Queen, Pawn)
 

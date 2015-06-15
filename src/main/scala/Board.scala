@@ -118,11 +118,7 @@ case class Board(
 
   def visual = format.Visual >> this
 
-  def valid(strict: Boolean) = Color.all map rolesOf forall { roles =>
-    ((roles count (_ == King)) == 1) :: {
-      if (strict) List((roles count (_ == Pawn)) <= 8, roles.size <= 16) else Nil
-    } forall identity
-  }
+  def valid(strict: Boolean) = variant.valid(this, strict)
 
   override def toString = List(
     variant + " Position after " + history.lastMoveString,

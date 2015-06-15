@@ -12,7 +12,7 @@ case class Replay(setup: Game, moves: List[Move], state: Game) {
     moves = move.applyVariantEffect :: moves,
     state = state(move))
 
-  def moveAtPly(ply: Int): Option[Move] = chronoMoves lift (ply - 1)
+  def moveAtPly(ply: Int): Option[Move] = chronoMoves lift (ply - 1 - setup.startedAtTurn)
 }
 
 object Replay {

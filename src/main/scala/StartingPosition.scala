@@ -6,7 +6,9 @@ case class StartingPosition(
     fen: String,
     wikiPath: String,
     moves: String,
-  featurable: Boolean = true) {
+    featurable: Boolean = true) {
+
+  def url = s"https://en.wikipedia.org/wiki/$wikiPath"
 
   val shortName = name takeWhile (':'!=)
 

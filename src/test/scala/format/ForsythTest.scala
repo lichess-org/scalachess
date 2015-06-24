@@ -131,6 +131,16 @@ class ForsythTest extends ChessTest {
           case s => s.situation.board.history.lastMove must_== Some(Pos.F7, Pos.F5)
         }
       }
+      "last move (for en passant in Pretrov's defense)" in {
+        f <<< "rnbqkb1r/ppp2ppp/8/3pP3/3Qn3/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 6" must beSome.like {
+          case s => s.situation.board.history.lastMove must_== Some(Pos.D7, Pos.D5)
+        }
+      }
+      "last move (for en passant with black to move)" in {
+        f <<< "4k3/8/8/8/4pP2/8/2K5/8 b - f3 0 1" must beSome.like {
+          case s => s.situation.board.history.lastMove must_== Some(Pos.F2, Pos.F4)
+        }
+      }
     }
     "with history" in {
       "starting" in {
@@ -193,6 +203,28 @@ class ForsythTest extends ChessTest {
       val fen = "1nbqkbn1/pppppppp/8/8/8/R6R/PPPPPPPP/1NBQKBN1 w KQkq - 0 1"
       val fix = "1nbqkbn1/pppppppp/8/8/8/R6R/PPPPPPPP/1NBQKBN1 w - - 0 1"
       f fixCastles fen must beSome(fix)
+    }
+  }
+  "ignore impossible en passant squares" should {
+    "with queen instead of pawn" in {
+      f <<< "8/4k3/8/6K1/1pp5/2q5/1P6/8 w - c3 0 1" must beSome.like {
+        case s => s.situation.board.history.lastMove isEmpty
+      }
+    }
+    "with no pawn" in {
+      f <<< "8/8/8/5k2/5p2/8/5K2/8 b - g3 0 1" must beSome.like {
+        case s => s.situation.board.history.lastMove isEmpty
+      }
+    }
+    "with non empty en passant squares" should {
+      f <<< "8/8/8/5k2/5pP1/8/6K1/8 b - g3 0 1" must beSome.like {
+        case s => s.situation.board.history.lastMove isEmpty
+      }
+    }
+    "with wrong side to move" should {
+      f <<< "8/8/8/5k2/5pP1/8/1K6/8 w - g3 0 1" must beSome.like {
+        case s => s.situation.board.history.lastMove isEmpty
+      }
     }
   }
 }

@@ -104,14 +104,19 @@ abstract class Variant(
    */
   def finalizeBoard(board: Board): Board = board
 
+  protected def pawnsOnPromotionRank(board: Board, color: Color) = {
+    val promotionRank = if (color == White) 8 else 1
+    board.pieces.exists {
+      case (pos, Piece(c, r)) if c == color && r == Pawn && pos.y == promotionRank => true
+      case _ => false
+    }
+  }
+
   protected def validSide(board: Board, strict: Boolean)(color: Color) = {
     val roles = board rolesOf color
     roles.count(_ == King) == 1 &&
       (!strict || { roles.count(_ == Pawn) <= 8 && roles.size <= 16 }) &&
-      board.pieces.forall {
-        case (pos, Piece(c, r)) if c == color && r == Pawn && (pos.y == 1 || pos.y == 8) => false
-        case _ => true
-      }
+      !pawnsOnPromotionRank(board, color)
   }
 
   def valid(board: Board, strict: Boolean) = Color.all forall validSide(board, strict)_

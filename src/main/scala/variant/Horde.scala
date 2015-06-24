@@ -36,7 +36,7 @@ case object Horde extends Variant(
   }
 
   override def valid(board: Board, strict: Boolean) =
-    board.kingPosOf(White).isEmpty && validSide(board, strict)(Black)
+    board.kingPosOf(White).isEmpty && validSide(board, strict)(Black) && !pawnsOnPromotionRank(board, White)
 
   /** The game has a special end condition when white manages to capture all of black's pawns */
   override def specialEnd(situation: Situation) =

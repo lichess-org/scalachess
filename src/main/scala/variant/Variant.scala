@@ -93,20 +93,25 @@ abstract class Variant(
   // pieces surrounding a capture explode
   def hasMoveEffects = false
 
-  /** Applies a variant specific effect to the move. This helps decide whether a king is endangered by a move, for
-    * example */
+  /**
+   * Applies a variant specific effect to the move. This helps decide whether a king is endangered by a move, for
+   * example
+   */
   def addVariantEffect(move: Move): Move = move
 
   /**
    * Once a move has been decided upon from the available legal moves, the board is finalized
    */
-  def finalizeBoard(board: Board) : Board = board
+  def finalizeBoard(board: Board): Board = board
 
   protected def validSide(board: Board, strict: Boolean)(color: Color) = {
     val roles = board rolesOf color
-    ((roles count (_ == King)) == 1) :: {
-      if (strict) List((roles count (_ == Pawn)) <= 8, roles.size <= 16) else Nil
-    } forall identity
+    roles.count(_ == King) == 1 &&
+      (!strict || { roles.count(_ == Pawn) <= 8 && roles.size <= 16 }) &&
+      board.pieces.forall {
+        case (pos, Piece(c, r)) if c == color && r == Pawn && (pos.y == 1 || pos.y == 8) => false
+        case _ => true
+      }
   }
 
   def valid(board: Board, strict: Boolean) = Color.all forall validSide(board, strict)_

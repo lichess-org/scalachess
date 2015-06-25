@@ -48,10 +48,17 @@ object Forsyth {
     <<(fixedSource) map { situation =>
       val splitted = fixedSource split ' '
       val history = splitted lift 2 map { castles =>
+        val fifthRank = if (situation.color == White) 5 else 4
+        val sixthRank = if (situation.color == White) 6 else 3
+        val seventhRank = if (situation.color == White) 7 else 2
         val lastMove = splitted lift 3 flatMap Pos.posAt match {
-          case Some(pos) if pos.y == 3 => Some(s"${pos.file}2${pos.file}4")
-          case Some(pos) if pos.y == 6 => Some(s"${pos.file}7${pos.file}5")
-          case _                       => None
+          case Some(pos) if pos.y == sixthRank
+            && Pos.posAt(pos.x, fifthRank).flatMap(situation.board.apply).contains(Piece(!situation.color, Pawn))
+            && Pos.posAt(pos.x, sixthRank).flatMap(situation.board.apply).isEmpty
+            && Pos.posAt(pos.x, seventhRank).flatMap(situation.board.apply).isEmpty =>
+              Some(s"${pos.file}${seventhRank}${pos.file}${fifthRank}")
+          case _ =>
+            None
         }
         History.make(lastMove, castles)
       }

@@ -27,6 +27,10 @@ case class Pgn(
     List(t.white, t.black).flatten
   }
 
+  def withEvent(title: String) = copy(
+    tags = Tag(_.Event, title) :: tags.filterNot(_.name == Tag.Event)
+  )
+
   override def toString = "%s\n\n%s %s".format(
     tags mkString "\n",
     turns mkString " ",

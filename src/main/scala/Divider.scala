@@ -1,6 +1,17 @@
 package chess
 
-case class Division(mid: Option[Int], end: Option[Int])
+case class Division(middle: Option[Int], end: Option[Int], plies: Int) {
+
+  def openingSize: Int = middle | plies
+  def middleSize: Option[Int] = middle.map { m =>
+    (end | plies) - m
+  }
+  def endSize = end.map(plies -)
+}
+
+object Division {
+  val empty = Division(None, None, 0)
+}
 
 object Divider {
 
@@ -9,7 +20,7 @@ object Divider {
     val indexedBoards: List[(Board, Int)] = boards.zipWithIndex
 
     val midGame = indexedBoards.foldLeft(none[Int]) {
-      case (found@Some(index), _) => found
+      case (found: Some[_], _) => found
       case (_, (board, index)) =>
         (majorsAndMinors(board) <= 10 ||
           backRankSparse(board) ||
@@ -18,14 +29,15 @@ object Divider {
 
     val endGame =
       if (midGame.isDefined) indexedBoards.foldLeft(none[Int]) {
-        case (found@Some(index), _) => found
-        case (_, (board, index))    => (majorsAndMinors(board) <= 6) option index
+        case (found: Some[_], _) => found
+        case (_, (board, index)) => (majorsAndMinors(board) <= 6) option index
       }
       else None
 
     Division(
       midGame.filter(m => endGame.fold(true)(m <)),
-      endGame
+      endGame,
+      boards.size
     )
   }
 

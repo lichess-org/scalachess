@@ -5,13 +5,6 @@ object OpeningExplorer {
   private type Move = String
   private val any: Move = "**"
 
-  case class Opening(code: String, name: String, size: Int) {
-
-    def fullName = s"$code $name"
-
-    override def toString = s"$code $name ($size)"
-  }
-
   case class Branch(
       moves: Map[Move, Branch] = Map.empty,
       opening: Option[Opening] = None) {
@@ -63,8 +56,6 @@ object OpeningExplorer {
   }
 
   val tree: Branch = Openings.db.foldLeft(Branch()) {
-    case (tree, (code, name, moves)) =>
-      val moveList = moves.split(' ').toList
-      tree.add(moveList, Opening(code, name, moveList.size))
+    case (tree, opening) => tree.add(opening.moveList, opening)
   }
 }

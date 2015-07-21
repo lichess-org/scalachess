@@ -55,7 +55,7 @@ object OpeningExplorer {
     next(tree, moves, none)
   }
 
-  val tree: Branch = Openings.db.foldLeft(Branch()) {
+  val tree: Branch = OpeningDB.db.foldLeft(Branch()) {
     case (tree, opening) => tree.add(opening.moveList, opening)
   }
 }

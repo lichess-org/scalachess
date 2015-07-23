@@ -7,6 +7,13 @@ case class Division(middle: Option[Int], end: Option[Int], plies: Int) {
     (end | plies) - m
   }
   def endSize = end.map(plies -)
+
+  def openingBounds = middle.map(0 -> _)
+  def middleBounds = for {
+    m <- middle
+    e <- end
+  } yield m -> e
+  def endBounds = end.map(_ -> plies)
 }
 
 object Division {

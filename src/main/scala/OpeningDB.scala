@@ -2790,7 +2790,6 @@ object OpeningDB {
     Opening("B27", "Sicilian Defence, Jalalabad Variation", "e4 c5 Nf3 e5"),
     Opening("B41", "Sicilian Defence, Kan Variation, Maroczy Bind, Hedgehog Variation", "e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 c4 g6"),
     Opening("B43", "Sicilian Defence, Kan Variation, Wing Attack, Christiansen's Dream", "e4 c5 Nf3 e6 d4 cxd4 Nxd4 a6 Nc3 b5 Bd3 Qb6 Be3 Bc5 Qg4"),
-    Opening("B20", "Sicilian Defence, King David's Opening", "e4 c5 Ke2"),
     Opening("B50", "Sicilian Defence, Kotov Gambit", "e4 c5 Nf3 d6 g3 b5"),
     Opening("B20", "Sicilian Defence, Kronberger Variation, Nemeth Gambit", "e4 c5 Na3 Nc6 d4 cxd4 Bc4"),
     Opening("B23", "Sicilian Defence, Marshall Gambit", "e4 c5 Nc3 e6 d4 d5"),

@@ -63,7 +63,7 @@ object Forsyth {
         History.make(lastMove, castles)
       }
       val situation2 = situation withHistory (history | History.make(none, ""))
-      val fullMoveNumber = fixedSource split " " lift 5 flatMap parseIntOption map (_ max 1)
+      val fullMoveNumber = fixedSource split " " lift 5 flatMap parseIntOption map (_ max 1 min 500)
       SituationPlus(situation2, fullMoveNumber | 1)
     }
   }

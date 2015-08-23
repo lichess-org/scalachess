@@ -13,10 +13,10 @@ libraryDependencies ++= List(
   "joda-time" % "joda-time" % "2.8.1"
 )
 
-// updateOptions := updateOptions.value.withCachedResolution(true)
-
 resolvers ++= Seq(
-  "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases")
+  "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases",
+  Resolver.bintrayRepo("holograph", "maven")    // Local dependencies not on Maven Central
+)
 
 scalacOptions ++= Seq(
   "-deprecation",

@@ -664,7 +664,7 @@ object OpeningDB {
     Opening("A08", "King's Indian Attack, Sicilian Variation", "Nf3 d5 g3 c5 Bg2"),
     Opening("A05", "King's Indian Attack, Smyslov Variation", "Nf3 Nf6 g3 g6 b4"),
     Opening("A05", "King's Indian Attack, Spassky Variation", "Nf3 Nf6 g3 b5"),
-    Opening("A05", "King's Indian Attack, Symmterical Defence", "Nf3 Nf6 g3 g6"),
+    Opening("A05", "King's Indian Attack, Symmetrical Defence", "Nf3 Nf6 g3 g6"),
     Opening("A05", "King's Indian Attack, Wahls Defence", "Nf3 Nf6 g3 g6 Bg2 Bg7 O-O O-O d3 d5"),
     Opening("A07", "King's Indian Attack, Yugoslav Variation", "Nf3 d5 g3 Nf6 Bg2 c6 O-O Bg4"),
     Opening("E70", "King's Indian Defence, Accelerated Averbakh Variation", "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Bg5"),

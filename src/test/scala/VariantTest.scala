@@ -123,4 +123,92 @@ K  r
     }
 
   }
+
+  "racingKings" should {
+    "call it stalemate when there is no legal move" in {
+      val position = "8/8/8/8/3K4/8/1k6/b7 b - - 5 3"
+      val game = fenToGame(position, RacingKings)
+
+      game must beSuccess.like {
+        case game =>
+          game.situation.end must beTrue
+          game.situation.staleMate must beTrue
+      }
+    }
+
+    "should not draw because of insufficient material" in {
+      val position = "8/8/8/8/5K2/8/2k5/8 w - - 0 1"
+      val game = fenToGame(position, RacingKings)
+
+      game must beSuccess.like {
+        case game =>
+          game.situation.end must beFalse
+          game.situation.staleMate must beFalse
+      }
+    }
+
+    "should recognize a king in the goal" in {
+      "white" in {
+        val position = "2K5/8/6k1/8/8/8/8/Q6q w - - 0 1"
+        val game = fenToGame(position, RacingKings)
+
+        game must beSuccess.like {
+          case game =>
+            game.situation.end must beTrue
+            game.situation.winner must beSome.like {
+              case color => color == White
+            }
+        }
+      }
+
+      "black" in {
+        val position = "6k1/8/8/8/8/2r5/1KB5/2B5 w - - 0 1"
+        val game = fenToGame(position, RacingKings)
+
+        game must beSuccess.like {
+          case game =>
+            game.situation.end must beTrue
+            game.situation.winner must beSome.like {
+              case color => color == Black
+          }
+        }
+      }
+    }
+
+    "should give black one more move" in {
+      "when white is in the goal" in {
+        val position = "2K5/5k2/8/8/8/8/8/8 b - - 0 1"
+        val game = fenToGame(position, RacingKings)
+
+        game must beSuccess.like {
+          case game =>
+            game.situation.end must beFalse
+        }
+      }
+
+      "but not if it does not matter anyway" in {
+        val position = "2K5/8/2n1nk2/8/8/8/8/4r3 b - - 0 1"
+        val game = fenToGame(position, RacingKings)
+
+        game must beSuccess.like {
+          case game =>
+            game.situation.end must beTrue
+            game.situation.winner must beSome.like {
+              case color => color == White
+            }
+        }
+      }
+    }
+
+    "should call it a draw with both kings in the goal" in {
+      val position = "2K2k2/8/8/8/8/1b6/1b6/8 w - - 0 1"
+      val game = fenToGame(position, RacingKings)
+
+      game must beSuccess.like {
+        case game =>
+          game.situation.end must beTrue
+          game.situation.status must beEqualTo(Status.Draw.some)
+      }
+    }
+  }
 }

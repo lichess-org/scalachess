@@ -36,7 +36,7 @@ case object RacingKings extends Variant(
   )
 
   // The goal for the kings is the eighth rank.
-  private val goal = Set(Pos.A8, Pos.B8, Pos.C8, Pos.D8, Pos.E8, Pos.F8, Pos.G8, Pos.H8)
+  private val goal = Pos.A8 <-> Pos.H8 toSet
 
   private def reachedGoal(situation: Situation, color: Color) =
     situation.board.kingPosOf(color) exists goal.contains

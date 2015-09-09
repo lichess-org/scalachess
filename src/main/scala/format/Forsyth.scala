@@ -9,7 +9,7 @@ object Forsyth {
 
   val initial = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-  def <<(source: String): Option[Situation] =
+  def <<(rawSource: String): Option[Situation] = read(rawSource) { source =>
     makeBoard(source) map { board =>
       val colorOption = source split " " lift 1 flatMap (_ lift 0) flatMap Color.apply
       colorOption match {
@@ -18,12 +18,14 @@ object Forsyth {
         case _                       => Situation(board, White)
       }
     }
+  }
 
   // only cares about pieces positions on the board (first part of FEN string)
-  def makeBoard(source: String): Option[Board] =
-    makePieces(source.trim.takeWhile(' '!=).replace("/", "").toList, Pos.A8) map { pieces =>
+  def makeBoard(rawSource: String): Option[Board] = read(rawSource) { source =>
+    makePieces(source.takeWhile(' '!=).replace("/", "").toList, Pos.A8) map { pieces =>
       Board(pieces, variant = chess.variant.Variant.default)
     }
+  }
 
   private def makePieces(chars: List[Char], pos: Pos): Option[List[(Pos, Piece)]] = chars match {
     case Nil => Some(Nil)
@@ -43,7 +45,7 @@ object Forsyth {
     def turns = fullMoveNumber * 2 - (if (situation.color.white) 2 else 1)
   }
 
-  def <<<(source: String): Option[SituationPlus] = {
+  def <<<(rawSource: String): Option[SituationPlus] = read(rawSource) { source =>
     val fixedSource = fixCastles(source) | source
     <<(fixedSource) map { situation =>
       val splitted = fixedSource split ' '
@@ -56,7 +58,7 @@ object Forsyth {
             && Pos.posAt(pos.x, fifthRank).flatMap(situation.board.apply).contains(Piece(!situation.color, Pawn))
             && Pos.posAt(pos.x, sixthRank).flatMap(situation.board.apply).isEmpty
             && Pos.posAt(pos.x, seventhRank).flatMap(situation.board.apply).isEmpty =>
-              Some(s"${pos.file}${seventhRank}${pos.file}${fifthRank}")
+            Some(s"${pos.file}${seventhRank}${pos.file}${fifthRank}")
           case _ =>
             None
         }
@@ -118,35 +120,43 @@ object Forsyth {
     fen.toString
   }
 
-  def getFullMove(fen: String): Option[Int] =
+  def getFullMove(rawSource: String): Option[Int] = read(rawSource) { fen =>
     fen.split(' ').lift(5) flatMap parseIntOption
+  }
 
-  def getColor(fen: String): Option[Color] =
+  def getColor(rawSource: String): Option[Color] = read(rawSource) { fen =>
     fen.split(' ').lift(1) flatMap (_.headOption) flatMap Color.apply
-
-  def getPly(fen: String): Option[Int] = getFullMove(fen) map { fullMove =>
-    fullMove * 2 - (if (getColor(fen).exists(_.white)) 2 else 1)
   }
 
-  def fixCastles(fen: String): Option[String] = fen.trim.split(' ').toList match {
-    case boardStr :: color :: castlesStr :: rest => makeBoard(boardStr) map { board =>
-      val c1 = Castles(castlesStr)
-      val wkPos = board.kingPosOf(White)
-      val bkPos = board.kingPosOf(Black)
-      val wkReady = wkPos.fold(false)(_.y == 1)
-      val bkReady = bkPos.fold(false)(_.y == 8)
-      def rookReady(color: Color, kPos: Option[Pos], left: Boolean) = kPos.fold(false) { kp =>
-        board actorsOf color exists { a =>
-          a.piece.role == Rook && a.pos.y == kp.y && (left ^ (a.pos.x > kp.x))
-        }
-      }
-      val c2 = Castles(
-        whiteKingSide = c1.whiteKingSide && wkReady && rookReady(White, wkPos, false),
-        whiteQueenSide = c1.whiteQueenSide && wkReady && rookReady(White, wkPos, true),
-        blackKingSide = c1.blackKingSide && bkReady && rookReady(Black, bkPos, false),
-        blackQueenSide = c1.blackQueenSide && bkReady && rookReady(Black, bkPos, true))
-      s"$boardStr $color $c2 ${rest.mkString(" ")}"
+  def getPly(rawSource: String): Option[Int] = read(rawSource) { fen =>
+    getFullMove(fen) map { fullMove =>
+      fullMove * 2 - (if (getColor(fen).exists(_.white)) 2 else 1)
     }
-    case _ => None
   }
+
+  def fixCastles(rawSource: String): Option[String] = read(rawSource) { fen =>
+    fen.split(' ').toList match {
+      case boardStr :: color :: castlesStr :: rest => makeBoard(boardStr) map { board =>
+        val c1 = Castles(castlesStr)
+        val wkPos = board.kingPosOf(White)
+        val bkPos = board.kingPosOf(Black)
+        val wkReady = wkPos.fold(false)(_.y == 1)
+        val bkReady = bkPos.fold(false)(_.y == 8)
+        def rookReady(color: Color, kPos: Option[Pos], left: Boolean) = kPos.fold(false) { kp =>
+          board actorsOf color exists { a =>
+            a.piece.role == Rook && a.pos.y == kp.y && (left ^ (a.pos.x > kp.x))
+          }
+        }
+        val c2 = Castles(
+          whiteKingSide = c1.whiteKingSide && wkReady && rookReady(White, wkPos, false),
+          whiteQueenSide = c1.whiteQueenSide && wkReady && rookReady(White, wkPos, true),
+          blackKingSide = c1.blackKingSide && bkReady && rookReady(Black, bkPos, false),
+          blackQueenSide = c1.blackQueenSide && bkReady && rookReady(Black, bkPos, true))
+        s"$boardStr $color $c2 ${rest.mkString(" ")}"
+      }
+      case _ => None
+    }
+  }
+
+  private def read[A](source: String)(f: String => A): A = f(source.replace("_", " ").trim)
 }

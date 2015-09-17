@@ -16,6 +16,8 @@ object UciMove
     extends scalaz.std.OptionInstances
     with scalaz.syntax.ToTraverseOps {
 
+  def apply(move: Move): UciMove = UciMove(move.orig, move.dest, move.promotion)
+
   def apply(move: String): Option[UciMove] = for {
     orig ← Pos.posAt(move take 2)
     dest ← Pos.posAt(move drop 2 take 2)

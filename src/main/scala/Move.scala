@@ -81,5 +81,7 @@ case class Move(
 
   def keyString = s"$orig$dest"
 
+  def uciString = s"$orig$dest${promotion.fold("")(_.forsyth.toString)}"
+
   override def toString = s"$piece $keyString"
 }

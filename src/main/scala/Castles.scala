@@ -43,6 +43,8 @@ case class Castles(
   }
 
   def toList = List(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
+
+  def isEmpty = !(whiteKingSide || whiteQueenSide || blackKingSide || blackQueenSide)
 }
 
 object Castles {

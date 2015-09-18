@@ -11,11 +11,28 @@ object Forsyth {
 
   def <<(rawSource: String): Option[Situation] = read(rawSource) { source =>
     makeBoard(source) map { board =>
-      val colorOption = source split " " lift 1 flatMap (_ lift 0) flatMap Color.apply
-      colorOption match {
+      val fixedSource = fixCastles(source) | source
+      val splitted = fixedSource split ' '
+      val colorOption = splitted lift 1 flatMap (_ lift 0) flatMap Color.apply
+      val situation = colorOption match {
         case Some(color)             => Situation(board, color)
         case _ if board.check(Black) => Situation(board, Black) // user in check will move first
         case _                       => Situation(board, White)
+      }
+      splitted.lift(2).fold(situation) { castles =>
+        val fifthRank = if (situation.color == White) 5 else 4
+        val sixthRank = if (situation.color == White) 6 else 3
+        val seventhRank = if (situation.color == White) 7 else 2
+        val lastMove = splitted lift 3 flatMap Pos.posAt match {
+          case Some(pos) if pos.y == sixthRank
+            && Pos.posAt(pos.x, fifthRank).flatMap(situation.board.apply).contains(Piece(!situation.color, Pawn))
+            && Pos.posAt(pos.x, sixthRank).flatMap(situation.board.apply).isEmpty
+            && Pos.posAt(pos.x, seventhRank).flatMap(situation.board.apply).isEmpty =>
+            Some(s"${pos.file}${seventhRank}${pos.file}${fifthRank}")
+          case _ =>
+            None
+        }
+        situation withHistory History.make(lastMove, castles)
       }
     }
   }
@@ -46,27 +63,9 @@ object Forsyth {
   }
 
   def <<<(rawSource: String): Option[SituationPlus] = read(rawSource) { source =>
-    val fixedSource = fixCastles(source) | source
-    <<(fixedSource) map { situation =>
-      val splitted = fixedSource split ' '
-      val history = splitted lift 2 map { castles =>
-        val fifthRank = if (situation.color == White) 5 else 4
-        val sixthRank = if (situation.color == White) 6 else 3
-        val seventhRank = if (situation.color == White) 7 else 2
-        val lastMove = splitted lift 3 flatMap Pos.posAt match {
-          case Some(pos) if pos.y == sixthRank
-            && Pos.posAt(pos.x, fifthRank).flatMap(situation.board.apply).contains(Piece(!situation.color, Pawn))
-            && Pos.posAt(pos.x, sixthRank).flatMap(situation.board.apply).isEmpty
-            && Pos.posAt(pos.x, seventhRank).flatMap(situation.board.apply).isEmpty =>
-            Some(s"${pos.file}${seventhRank}${pos.file}${fifthRank}")
-          case _ =>
-            None
-        }
-        History.make(lastMove, castles)
-      }
-      val situation2 = situation withHistory (history | History.make(none, ""))
-      val fullMoveNumber = fixedSource split " " lift 5 flatMap parseIntOption map (_ max 1 min 500)
-      SituationPlus(situation2, fullMoveNumber | 1)
+    <<(source) map { situation =>
+      val fullMoveNumber = source split ' ' lift 5 flatMap parseIntOption map (_ max 1 min 500)
+      SituationPlus(situation, fullMoveNumber | 1)
     }
   }
 

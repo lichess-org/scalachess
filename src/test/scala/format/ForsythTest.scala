@@ -211,6 +211,9 @@ class ForsythTest extends ChessTest {
       f <<< "rk6/p1r3p1/P3B1K1/1p2B3/8/8/8/8 w - - 0 1" map f.>> must beSome.like {
         case s => s must_== "rk6/p1r3p1/P3B1K1/1p2B3/8/8/8/8 w - - 0 1"
       }
+      f << "rk6/p1r3p1/P3B1K1/1p2B3/8/8/8/8 w - - 0 1" must beSome.like {
+        case s => s.board.history.castles must_== Castles.none
+      }
     }
   }
   "ignore impossible en passant squares" should {

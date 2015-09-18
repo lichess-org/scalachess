@@ -99,6 +99,8 @@ case class Board(
 
   def withHistory(h: History): Board = copy(history = h)
 
+  def withCastles(c: Castles) = withHistory(history withCastles c)
+
   def withPieces(newPieces: PieceMap) = copy(pieces = newPieces)
 
   def withVariant(v: Variant): Board = {

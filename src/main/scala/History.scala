@@ -55,6 +55,8 @@ case class History(
 
   def withoutCastle(color: Color, side: Side) = copy(castles = castles.without(color, side))
 
+  def withCastles(c: Castles) = copy(castles = c)
+
   def positionHashesWith(hash: PositionHash): PositionHash =
     hash ++ positionHashes
 

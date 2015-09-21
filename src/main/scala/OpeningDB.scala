@@ -2781,7 +2781,7 @@ object OpeningDB {
     Opening("B28", "Sicilian Defence, Double-Dutch Gambit", "e4 c5 Nf3 f5 exf5 Nh6"),
     Opening("B74", "Sicilian Defence, Dragon Variation, Classical Variation, Stockholm Attack", "e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be2 Bg7 Be3 Nc6 O-O O-O Nb3 Be6 f4 Na5 f5 Bc4 Nxa5 Bxe2 Qxe2 Qxa5 g4"),
     Opening("B79", "Sicilian Defence, Dragon Variation, Yugoslav Attack, Soltis Variation", "e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6 Bc4 Bd7 O-O-O Qa5 Bb3 Rfc8 h4 h5"),
-    Opening("B32", "Sicilian Defence, Franco-Scilian Variation", "e4 c5 Nf3 Nc6 d4 e6"),
+    Opening("B32", "Sicilian Defence, Franco-Sicilian Variation", "e4 c5 Nf3 Nc6 d4 e6"),
     Opening("B27", "Sicilian Defence, Frederico Variation", "e4 c5 Nf3 g6 d4 f5"),
     Opening("B20", "Sicilian Defence, General", "e4 c5"),
     Opening("B20", "Sicilian Defence, Grob Variation", "e4 c5 g4"),

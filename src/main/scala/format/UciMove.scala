@@ -10,6 +10,8 @@ case class UciMove(orig: Pos, dest: Pos, promotion: Option[PromotableRole] = Non
   def piotr = keysPiotr + promotionString
 
   def promotionString = promotion.fold("")(_.forsyth.toString)
+
+  def origDest = orig -> dest
 }
 
 object UciMove

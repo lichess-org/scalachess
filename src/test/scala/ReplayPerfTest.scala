@@ -13,7 +13,7 @@ class ReplayPerfTest extends ChessTest {
   // val iterations = 1
 
   def runOne(moves: List[String]) =
-   Replay.gameWhileValid(moves, format.Forsyth.initial, chess.variant.Standard)
+    Replay.gameWhileValid(moves, format.Forsyth.initial, chess.variant.Standard)
   def run { gameMoves foreach runOne }
 
   "playing a game" should {

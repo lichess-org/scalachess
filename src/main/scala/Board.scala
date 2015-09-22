@@ -123,7 +123,7 @@ case class Board(
   def valid(strict: Boolean) = variant.valid(this, strict)
 
   override def toString = List(
-    variant + " Position after " + history.lastMoveString,
+    variant + " Position after " + history.lastMove,
     visual
   ) mkString "\n"
 }

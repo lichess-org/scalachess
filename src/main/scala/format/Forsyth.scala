@@ -81,11 +81,10 @@ object Forsyth {
     game.board.history.castles.toString,
     ((for {
       lastMove ← game.board.history.lastMove
-      (orig, dest) = lastMove
-      piece ← game board dest
+      piece ← game board lastMove.dest
       if piece is Pawn
-      pos ← if (orig.y == 2 && dest.y == 4) dest.down
-      else if (orig.y == 7 && dest.y == 5) dest.up
+      pos ← if (lastMove.orig.y == 2 && lastMove.dest.y == 4) lastMove.dest.down
+      else if (lastMove.orig.y == 7 && lastMove.dest.y == 5) lastMove.dest.up
       else None
     } yield pos.toString) getOrElse "-"),
     game.halfMoveClock,

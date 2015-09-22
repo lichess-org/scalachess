@@ -1,6 +1,7 @@
 package chess
 
 import Pos.posAt
+import format.UciMove
 
 case class CheckCount(white: Int = 0, black: Int = 0) {
 
@@ -14,14 +15,10 @@ case class CheckCount(white: Int = 0, black: Int = 0) {
 }
 
 case class History(
-    lastMove: Option[(Pos, Pos)] = None,
+    lastMove: Option[UciMove] = None,
     positionHashes: PositionHash = Array(),
     castles: Castles = Castles.all,
     checkCount: CheckCount = CheckCount(0, 0)) {
-
-  def lastMoveString: Option[String] = lastMove map {
-    case (p1, p2) => p1.toString + p2.toString
-  }
 
   /**
    * Halfmove clock: This is the number of halfmoves
@@ -60,9 +57,7 @@ case class History(
   def positionHashesWith(hash: PositionHash): PositionHash =
     hash ++ positionHashes
 
-  def withLastMove(orig: Pos, dest: Pos) = copy(
-    lastMove = Some((orig, dest))
-  )
+  def withLastMove(m: UciMove) = copy(lastMove = Some(m))
 
   def withCheck(color: Color, v: Boolean) =
     if (v) copy(checkCount = checkCount add color) else this
@@ -70,10 +65,8 @@ case class History(
 
 object History {
 
-  val MoveString = """^([a-h][1-8])([a-h][1-8])$""".r
-
   def make(
-    lastMove: Option[(Pos, Pos)],
+    lastMove: Option[UciMove],
     positionHashes: PositionHash,
     castles: Castles): History = new History(
     lastMove = lastMove,
@@ -83,10 +76,7 @@ object History {
   def make(
     lastMove: Option[String], // a2a4
     castles: String): History = make(
-    lastMove = lastMove flatMap {
-      case MoveString(a, b) => for (o ← posAt(a); d ← posAt(b)) yield (o, d)
-      case _                => None
-    },
+    lastMove = lastMove flatMap UciMove.apply,
     positionHashes = Array(),
     castles = Castles(castles))
 

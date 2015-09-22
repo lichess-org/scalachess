@@ -1,5 +1,6 @@
 package chess
 
+import format.UciMove
 import scala.concurrent.duration._
 
 case class Move(
@@ -26,7 +27,7 @@ case class Move(
         positionHashes =
           if ((piece is Pawn) || captures || promotes || castles) Array()
           else h1 positionHashesWith Hash(after.actors.values, piece.color),
-        lastMove = Some(orig, dest)
+        lastMove = Some(UciMove(orig, dest, promotion))
       )
       // my broken castles
       val h3 =
@@ -55,7 +56,7 @@ case class Move(
   def applyVariantEffect: Move = before.variant addVariantEffect this
 
   def afterWithLastMove = after.copy(
-    history = after.history.copy(lastMove = Some(orig, dest)))
+    history = after.history.withLastMove(UciMove(orig, dest, promotion)))
 
   // does this move capture an opponent piece?
   def captures = capture.isDefined

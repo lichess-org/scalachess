@@ -3,7 +3,12 @@ package format.pgn
 
 import scalaz.Validation.FlatMap._
 
-case class ParsedPgn(tags: List[Tag], sans: List[San])
+case class ParsedPgn(tags: List[Tag], sans: List[San]) {
+
+  def tag(name: String): Option[String] = (Tag tagType name) |> { tagType =>
+    tags.find(_.name == tagType).map(_.value)
+  }
+}
 
 // Standard Algebraic Notation
 sealed trait San {

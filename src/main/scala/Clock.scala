@@ -15,7 +15,15 @@ sealed trait Clock {
 
   def outoftime(c: Color) = remainingTime(c) == 0
 
+  def outoftimeWithGrace(c: Color, graceMillis: Int) =
+    millisSinceFlag(c).exists(graceMillis.min(Clock.maxGraceMillis).<)
+
   def remainingTime(c: Color) = math.max(0, limit - elapsedTime(c))
+
+  private def millisSinceFlag(c: Color): Option[Int] = (limit - elapsedTime(c)) match {
+    case s if s <= 0 => Some((s * -1000).toInt)
+    case _           => None
+  }
 
   def remainingTimes = Color.all map { c => c -> remainingTime(c) } toMap
 
@@ -79,10 +87,7 @@ case class RunningClock(
     val t = now
     val spentTime = (t - timer).toFloat
     val lagSeconds = lag.toMillis.toFloat / 1000
-    val lagCompensation = math.max(0,
-      math.min(
-        lagSeconds - Clock.naturalLag,
-        Clock.maxLagToCompensate))
+    val lagCompensation = lagSeconds min Clock.maxLagToCompensate max 0
     addTime(
       color,
       (math.max(0, spentTime - lagCompensation) - increment)
@@ -156,8 +161,8 @@ object Clock {
   val minInitLimit = 3
   // no more than this time will be offered to the lagging player
   val maxLagToCompensate = 1f
-  // substracted from lag compensation
-  val naturalLag = 0f
+  // no more than this time to get the last move in
+  val maxGraceMillis = 800
 
   def apply(
     limit: Int,

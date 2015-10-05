@@ -17,7 +17,7 @@ case class Game(
     dest: Pos,
     promotion: Option[PromotableRole] = None,
     lag: FiniteDuration = 0.millis): Valid[(Game, Move)] =
-    situation.move(orig, dest, promotion) map (_ withLag lag) map { move =>
+    situation.move(orig, dest, promotion).map(_ withLag lag) map { move =>
       apply(move) -> move
     }
 

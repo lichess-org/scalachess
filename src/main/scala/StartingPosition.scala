@@ -94,9 +94,9 @@ object StartingPosition {
       StartingPosition("B80", "Sicilian Defence: Scheveningen Variation", "rnbqkb1r/pp3ppp/3ppn2/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 1 6", "Sicilian_Defence,_Scheveningen_Variation", "1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 e6"),
       StartingPosition("B21", "Sicilian Defence: Smith-Morra Gambit", "rnbqkbnr/pp1ppppp/8/8/3pP3/2P5/PP3PPP/RNBQKBNR b KQkq - 1 3", "Sicilian_Defence,_Smith–Morra_Gambit", "1. e4 c5 2. d4 cxd4 3. c3"),
       StartingPosition("C27", "Vienna Game", "rnbqkbnr/pppp1ppp/8/4p3/4P3/2N5/PPPP1PPP/R1BQKBNR b KQkq - 2 2", "Vienna_Game", "1. e4 e5 2.  Nc3"),
-      StartingPosition("420", "Bongcloud Attack", "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPPKPPP/RNBQ1BNR b kq - 0 2", "Bong", "1. e4 e5 2. Ke2", false),
+      StartingPosition("C27", "Frankenstein-Dracula Variation", "rnbqkb1r/pppp1ppp/8/4p3/2B1n3/2N5/PPPP1PPP/R1BQK1NR w KQkq - 0 4", "Frankenstein-Dracula_Variation", "1. e4 e5 2. Nc3 Nf6 3. Bc4 Nxe4"),
       StartingPosition("C47", "Halloween Gambit", "r1bqkb1r/pppp1ppp/2n2n2/4N3/4P3/2N5/PPPP1PPP/R1BQKB1R b KQkq - 1 4", "Halloween_Gambit", "1. e4 e5 2. Nf3 Nc6 3. Nc3 Nf6 4. Nxe5"),
-      StartingPosition("C27", "Frankenstein-Dracula Variation", "rnbqkb1r/pppp1ppp/8/4p3/2B1n3/2N5/PPPP1PPP/R1BQK1NR w KQkq - 0 4", "Frankenstein-Dracula_Variation", "1. e4 e5 2. Nc3 Nf6 3. Bc4 Nxe4")
+      StartingPosition("420", "Bongcloud Attack", "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPPKPPP/RNBQ1BNR b kq - 0 2", "Bong", "1. e4 e5 2. Ke2", false)
     )),
     Category("d4", List(
       StartingPosition("A40", "Queen's Pawn", "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 1 1", "Queen's_Pawn_Game", "1. d4", false),

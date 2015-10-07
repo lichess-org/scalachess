@@ -180,5 +180,10 @@ object StartingPosition {
 
   def randomFeaturable = featurable(scala.util.Random.nextInt(featurable.size))
 
+  object presets {
+    val halloween = StartingPosition("C47", "Halloween Gambit", "r1bqkb1r/pppp1ppp/2n2n2/4N3/4P3/2N5/PPPP1PPP/R1BQKB1R b KQkq - 1 4", "Halloween_Gambit", "1. e4 e5 2. Nf3 Nc6 3. Nc3 Nf6 4. Nxe5")
+    val frankenstein = StartingPosition("C27", "Frankenstein-Dracula Variation", "rnbqkb1r/pppp1ppp/8/4p3/2B1n3/2N5/PPPP1PPP/R1BQK1NR w KQkq - 0 4", "Frankenstein-Dracula_Variation", "1. e4 e5 2. Nc3 Nf6 3. Bc4 Nxe4")
+  }
+
   def byEco(eco: String): Option[StartingPosition] = ecoIndex get eco
 }

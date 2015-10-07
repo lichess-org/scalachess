@@ -37,6 +37,7 @@ object StartingPosition {
       StartingPosition("C21", "Danish Gambit", "rnbqkbnr/pppp1ppp/8/8/3pP3/2P5/PP3PPP/RNBQKBNR b KQkq - 1 3", "Danish_Gambit", "1. e4 e5 2. d4 exd4 3. c3"),
       StartingPosition("C46", "Four Knights Game", "r1bqkb1r/pppp1ppp/2n2n2/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq - 5 4", "Four_Knights_Game", "1. e4 e5 2. Nf3 Nc6 3. Nc3 Nf6"),
       StartingPosition("C47", "Four Knights Game: Scotch Variation", "r1bqkb1r/pppp1ppp/2n2n2/4p3/3PP3/2N2N2/PPP2PPP/R1BQKB1R b KQkq d3 1 4", "Four_Knights_Game#4.d4", "1. e4 e5 2. Nf3 Nc6 3. Nc3 Nf6 4. d4"),
+      StartingPosition("C47", "Four Knights Game: Halloween Gambit", "r1bqkb1r/pppp1ppp/2n2n2/4N3/4P3/2N5/PPPP1PPP/R1BQKB1R b KQkq - 1 4", "Halloween_Gambit", "1. e4 e5 2. Nf3 Nc6 3. Nc3 Nf6 4. Nxe5"),
       StartingPosition("C48", "Four Knights Game: Spanish Variation", "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/2N2N2/PPPP1PPP/R1BQK2R b KQkq - 0 4", "Four_Knights_Game#4.Bb5", "1. e4 e5 2. Nf3 Nf6 3. Nc3 Nc6 4. Bb5"),
       StartingPosition("C00", "French Defence", "rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2", "French_Defence", "1. e4 e6"),
       StartingPosition("C02", "French Defence: Advance Variation", "rnbqkbnr/ppp2ppp/4p3/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 1 3", "French_Defence#Advance_Variation:_3.e5", "1. e4 e6 2. d4 d5 3. e5"),

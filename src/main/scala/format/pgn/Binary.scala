@@ -69,9 +69,9 @@ object Binary {
     def fullPawn(b1: Int, b2: Int): String = {
       val pos = posString(right(b1, 6))
       val fileCapture = (b2 >> 6) match {
-        case 0 => ""
         case 1 => (pos(0) - 1).toChar + "x"
         case 2 => (pos(0) + 1).toChar + "x"
+        case _ => ""
       }
       val check = checkStrs(cut(b2, 6, 4))
       val prom = promotionStrs(cut(b2, 4, 1))
@@ -92,17 +92,17 @@ object Binary {
       s"$piece$disamb$capture$pos$check"
     }
 
-    def moveType(i: Int) = i >> 6
-    def posString(i: Int) = fileChar(i >> 3).toString + rankChar(right(i, 3))
-    def fileChar(i: Int) = (i + 97).toChar
-    def rankChar(i: Int) = (i + 49).toChar
+    private def moveType(i: Int) = i >> 6
+    private def posString(i: Int) = fileChar(i >> 3).toString + rankChar(right(i, 3))
+    private def fileChar(i: Int) = (i + 97).toChar
+    private def rankChar(i: Int) = (i + 49).toChar
 
-    @inline private def right(i: Int, x: Int): Int = i & lengthMasks(x)
-    @inline private def cut(i: Int, from: Int, to: Int): Int = right(i, from) >> to
-    @inline private def bitAt(i: Int, p: Int): Boolean = cut(i, p, p - 1) != 0
-    val bitMasks = Map(0 -> 0x80, 1 -> 0x40, 2 -> 0x20, 3 -> 0x10, 4 -> 0x08, 5 -> 0x04, 6 -> 0x02, 7 -> 0x01)
-    val lengthMasks = Map(1 -> 0x01, 2 -> 0x03, 3 -> 0x07, 4 -> 0x0F, 5 -> 0x1F, 6 -> 0x3F, 7 -> 0x7F, 8 -> 0xFF)
-    def !!(msg: String) = throw new Exception("Binary reader failed: " + msg)
+    private def right(i: Int, x: Int): Int = i & lengthMasks(x)
+    private def cut(i: Int, from: Int, to: Int): Int = right(i, from) >> to
+    private def bitAt(i: Int, p: Int): Boolean = cut(i, p, p - 1) != 0
+    private val bitMasks = Map(0 -> 0x80, 1 -> 0x40, 2 -> 0x20, 3 -> 0x10, 4 -> 0x08, 5 -> 0x04, 6 -> 0x02, 7 -> 0x01)
+    private val lengthMasks = Map(1 -> 0x01, 2 -> 0x03, 3 -> 0x07, 4 -> 0x0F, 5 -> 0x1F, 6 -> 0x3F, 7 -> 0x7F, 8 -> 0xFF)
+    private def !!(msg: String) = throw new Exception("Binary reader failed: " + msg)
   }
 
   private object Writer {

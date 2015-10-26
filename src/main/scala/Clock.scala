@@ -41,7 +41,9 @@ sealed trait Clock {
 
   def giveTime(c: Color, t: Float): Clock
 
-  def halfTime(c: Color): Clock
+  def berserkable = increment == 0 || limit > 0
+
+  def berserk(c: Color): Clock
 
   def show = s"$limitInMinutes+$increment"
 
@@ -75,6 +77,8 @@ case class RunningClock(
     color: Color,
     whiteTime: Float,
     blackTime: Float,
+    whiteBerserk: Boolean,
+    blackBerserk: Boolean,
     timer: Double) extends Clock {
 
   val timerOption = Some(timer)
@@ -83,6 +87,9 @@ case class RunningClock(
     if (c == color) now - timer else 0
   }.toFloat
 
+  def incrementOf(c: Color) =
+    c.fold(whiteBerserk, blackBerserk).fold(0, increment)
+
   def step(lag: FiniteDuration = 0.millis) = {
     val t = now
     val spentTime = (t - timer).toFloat
@@ -90,7 +97,7 @@ case class RunningClock(
     val lagCompensation = lagSeconds min Clock.maxLagToCompensate max 0
     addTime(
       color,
-      (math.max(0, spentTime - lagCompensation) - increment)
+      (math.max(0, spentTime - lagCompensation) - incrementOf(color))
     ).copy(
         color = !color,
         timer = t)
@@ -101,7 +108,9 @@ case class RunningClock(
     increment = increment,
     color = color,
     whiteTime = whiteTime + (if (color == White) (now - timer).toFloat else 0),
-    blackTime = blackTime + (if (color == Black) (now - timer).toFloat else 0))
+    blackTime = blackTime + (if (color == Black) (now - timer).toFloat else 0),
+    whiteBerserk = whiteBerserk,
+    blackBerserk = blackBerserk)
 
   def addTime(c: Color, t: Float): RunningClock = c match {
     case White => copy(whiteTime = whiteTime + t)
@@ -110,7 +119,9 @@ case class RunningClock(
 
   def giveTime(c: Color, t: Float): RunningClock = addTime(c, -t)
 
-  def halfTime(c: Color): RunningClock = addTime(c, remainingTime(c) / 2)
+  def berserk(c: Color): RunningClock = addTime(c, Clock.berserkPenalty(this, color)).copy(
+    whiteBerserk = c.fold(true, whiteBerserk),
+    blackBerserk = c.fold(blackBerserk, true))
 
   def switch: RunningClock = copy(color = !color)
 
@@ -128,7 +139,9 @@ case class PausedClock(
     increment: Int,
     color: Color,
     whiteTime: Float,
-    blackTime: Float) extends Clock {
+    blackTime: Float,
+    whiteBerserk: Boolean,
+    blackBerserk: Boolean) extends Clock {
 
   val timerOption = None
 
@@ -141,7 +154,9 @@ case class PausedClock(
 
   def giveTime(c: Color, t: Float): PausedClock = addTime(c, -t)
 
-  def halfTime(c: Color): PausedClock = addTime(c, remainingTime(c) / 2)
+  def berserk(c: Color): PausedClock = addTime(c, Clock.berserkPenalty(this, color)).copy(
+    whiteBerserk = c.fold(true, whiteBerserk),
+    blackBerserk = c.fold(blackBerserk, true))
 
   def switch: PausedClock = copy(color = !color)
 
@@ -151,6 +166,8 @@ case class PausedClock(
     color = color,
     whiteTime = whiteTime,
     blackTime = blackTime,
+    whiteBerserk = whiteBerserk,
+    blackBerserk = blackBerserk,
     increment = increment,
     limit = limit,
     timer = now)
@@ -172,12 +189,18 @@ object Clock {
       increment = increment,
       color = White,
       whiteTime = 0f,
-      blackTime = 0f)
+      blackTime = 0f,
+      whiteBerserk = false,
+      blackBerserk = false)
     if (clock.limit == 0) clock
       .giveTime(White, increment.max(minInitLimit))
       .giveTime(Black, increment.max(minInitLimit))
     else clock
   }
+
+  private[chess] def berserkPenalty(clock: Clock, color: Color): Int = {
+    clock.remainingTime(color) / 2
+  }.toInt
 
   def timeString(t: Int) = periodFormatter.print(
     org.joda.time.Duration.standardSeconds(t).toPeriod

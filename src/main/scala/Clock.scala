@@ -31,7 +31,9 @@ sealed trait Clock {
 
   def limitInMinutes = limit / 60
 
-  def estimateTotalTime = limit + 40 * increment
+  def estimateTotalIncrement = 40 * increment
+
+  def estimateTotalTime = limit + estimateTotalIncrement
 
   def emergTime: Int = math.round(math.min(20, math.max(2, estimateTotalTime / 15)))
 
@@ -199,7 +201,9 @@ object Clock {
   }
 
   private[chess] def berserkPenalty(clock: Clock, color: Color): Int = {
-    clock.remainingTime(color) / 2
+    val incTime = clock.estimateTotalIncrement
+    val iniTime = clock.limit
+    if (iniTime < incTime / 2) 0 else iniTime / 2
   }.toInt
 
   def timeString(t: Int) = periodFormatter.print(

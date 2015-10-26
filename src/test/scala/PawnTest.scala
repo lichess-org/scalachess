@@ -1,6 +1,7 @@
 package chess
 
 import Pos._
+import format.UciMove
 
 class PawnTest extends ChessTest {
 
@@ -81,17 +82,17 @@ class PawnTest extends ChessTest {
         }
         "with irrelevant history" in {
           board withHistory History(
-            lastMove = Some(A2 -> A4)
+            lastMove = Some(UciMove(A2, A4))
           ) destsFrom D5 must bePoss(D6)
         }
         "with relevant history on the left" in {
           board withHistory History(
-            lastMove = Some(C7 -> C5)
+            lastMove = Some(UciMove(C7, C5))
           ) destsFrom D5 must bePoss(D6, C6)
         }
         "with relevant history on the right" in {
           board withHistory History(
-            lastMove = Some(E7 -> E5)
+            lastMove = Some(UciMove(E7, E5))
           ) destsFrom D5 must bePoss(D6, E6)
         }
       }
@@ -100,7 +101,7 @@ class PawnTest extends ChessTest {
           D5 -> White.pawn,
           E5 -> Black.rook
         ) withHistory History(
-          lastMove = Some(E7 -> E5)
+          lastMove = Some(UciMove(E7, E5))
         ) destsFrom D5 must bePoss(D6)
       }
       "friend pawn (?!)" in {
@@ -108,7 +109,7 @@ class PawnTest extends ChessTest {
           D5 -> White.pawn,
           E5 -> White.pawn
         ) withHistory History(
-          lastMove = Some(E7 -> E5)
+          lastMove = Some(UciMove(E7, E5))
         ) destsFrom D5 must bePoss(D6)
       }
     }
@@ -191,7 +192,7 @@ class PawnTest extends ChessTest {
         }
         "with relevant history on the left" in {
           board withHistory History(
-            lastMove = Some(C2 -> C4)
+            lastMove = Some(UciMove(C2, C4))
           ) destsFrom D4 must bePoss(D3, C3)
         }
       }
@@ -200,7 +201,7 @@ class PawnTest extends ChessTest {
           D4 -> Black.pawn,
           E4 -> White.rook
         ) withHistory History(
-          lastMove = Some(E2 -> E4)
+          lastMove = Some(UciMove(E2, E4))
         ) destsFrom D4 must bePoss(D3)
       }
     }

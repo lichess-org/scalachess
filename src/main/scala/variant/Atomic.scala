@@ -18,11 +18,11 @@ case object Atomic extends Variant(
 
   /** Move threatens to illegally explode our own king */
   private def explodesOwnKing(situation: Situation)(move: Move): Boolean = {
-    move.captures && (situation.kingPos map (_.surroundingPositions contains (move.dest)) getOrElse false)
+    move.captures && (situation.kingPos exists (_.surroundingPositions contains (move.dest)))
   }
 
   private def protectedByOtherKing(board: Board, to: Pos, color: Color): Boolean =
-    board.kingPosOf(color) map (_.surroundingPositions.contains(to)) getOrElse false
+    board.kingPosOf(color) exists (_.surroundingPositions.contains(to))
 
   /**
    * In atomic chess, a king cannot be threatened while it is in the perimeter of the other king as were the other player

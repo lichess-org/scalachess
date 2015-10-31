@@ -3,6 +3,7 @@ package variant
 
 import Pos.posAt
 import scalaz.Validation.FlatMap._
+import InsufficientMatingMaterial.apply
 
 abstract class Variant(
     val id: Int,
@@ -87,7 +88,17 @@ abstract class Variant(
 
   def specialDraw(situation: Situation) = false
 
-  def drawsOnInsufficientMaterial = true
+  /**
+   * Returns true if neither player can win
+   */
+  def insufficientWinningMaterial(board: Board) = InsufficientMatingMaterial(board)
+
+  /**
+   * Returns true if the player of the given colour has sufficient material to win.
+   * This can be used to determine whether a player losing on time against a player
+   * who doesn't have enough material to win should draw instead.
+   */
+  def insufficientWinningMaterial(situation: Situation, color: Color) = InsufficientMatingMaterial(situation.board, color)
 
   // Some variants have an extra effect on the board on a move. For example, in Atomic, some
   // pieces surrounding a capture explode

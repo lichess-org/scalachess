@@ -170,7 +170,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       newGame must beSuccess.like {
         case drawnGame =>
           drawnGame.situation.end must beTrue
-          drawnGame.situation.variantDraw must beTrue
+          drawnGame.situation.autoDraw must beTrue
           drawnGame.situation.winner must beNone
           drawnGame.situation.status must beSome.like {
             case status => status == Status.Draw
@@ -187,7 +187,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       newGame must beSuccess.like {
         case drawnGame =>
           drawnGame.situation.end must beTrue
-          drawnGame.situation.variantDraw must beTrue
+          drawnGame.situation.autoDraw must beTrue
           drawnGame.situation.winner must beNone
           drawnGame.situation.status must beSome.like {
             case status => status == Status.Draw
@@ -205,7 +205,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       newGame must beSuccess.like {
         case nonDrawnGame =>
           nonDrawnGame.situation.end must beFalse
-          nonDrawnGame.situation.variantDraw must beFalse
+          nonDrawnGame.situation.autoDraw must beFalse
           nonDrawnGame.situation.winner must beNone
       }
     }
@@ -219,7 +219,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       newGame must beSuccess.like {
         case drawnGame =>
           drawnGame.situation.end must beTrue
-          drawnGame.situation.variantDraw must beTrue
+          drawnGame.situation.autoDraw must beTrue
           drawnGame.situation.status must beSome.like {
             case status => status == Status.Draw
           }
@@ -235,7 +235,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       newGame must beSuccess.like {
         case nonDrawnGame =>
           nonDrawnGame.situation.end must beFalse
-          nonDrawnGame.situation.variantDraw must beFalse
+          nonDrawnGame.situation.autoDraw must beFalse
           nonDrawnGame.situation.status must beNone
       }
     }

@@ -110,7 +110,7 @@ class AtomicVariantTest extends ChessTest {
       game must beSuccess.like {
         case game =>
           game.situation.end must beTrue
-          game.situation.variantDraw must beTrue
+          game.situation.autoDraw must beTrue
           game.situation.winner must beNone
           game.situation.status must beSome.like {
             case status => status == Status.Draw
@@ -399,6 +399,24 @@ class AtomicVariantTest extends ChessTest {
       ))
 
       newGame must beSuccess
+    }
+
+    "Identify that a player does not have sufficient material to win when they only have a king" in {
+      val position = "8/8/8/8/7p/2k3q1/2K3P1/8 b - - 19 54"
+      val game = fenToGame(position, Atomic)
+
+      game must beSuccess.like {
+        case gm =>
+          gm.situation.end must beFalse
+      }
+
+      val drawGame = game flatMap(_.playMoves(Pos.G3 -> Pos.G2))
+
+      drawGame must beSuccess.like {
+        case gm =>
+          gm.situation.board.variant.insufficientWinningMaterial(gm.situation, Color.White) must beTrue
+      }
+
     }
 
     "Not draw inappropriately on bishops vs bishops (where an explosion taking out the king is possible)" in {

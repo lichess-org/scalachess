@@ -31,14 +31,15 @@ case object Antichess extends Variant(
     situation.board.actorsOf(situation.color).isEmpty || situation.moves.isEmpty
   }
 
-  // This mode has no checkmates
-  override def drawsOnInsufficientMaterial = false
+  // In antichess, there is no checkmate condition therefore a player may only draw either by agreement
+  // or blockade (see specialDraw).
+  override def insufficientWinningMaterial(situation: Situation, color: Color) = false
 
   // No player can win if the only remaining pieces are opposing bishops on different coloured
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color
   // of square to allow the player to force their opponent to capture their bishop, also resulting in a draw
-  override def specialDraw(situation: Situation) = {
-    val actors = situation.board.actors
+  override def insufficientWinningMaterial (board: Board) = {
+    val actors = board.actors
 
     // Exit early if we are not in a situation with only bishops and pawns
     val bishopsAndPawns = actors.forall(act => act._2.piece.is(Bishop) || act._2.piece.is(Pawn)) &&

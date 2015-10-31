@@ -42,8 +42,8 @@ case object Horde extends Variant(
   override def specialEnd(situation: Situation) =
     situation.board.piecesOf(White).isEmpty
 
-  // is that right?
-  override val drawsOnInsufficientMaterial = false
+  // TODO: There are some situations where there is insufficient winning material: https://github.com/ornicar/lila/issues/773
+  override def insufficientWinningMaterial(situation: Situation, color: Color) = false
 
   override def isUnmovedPawn(color: Color, pos: Pos) = {
     color == White && (pos.y == 1 || pos.y == 2)

@@ -24,9 +24,7 @@ case class Situation(board: Board, color: Color) {
 
   def variantEnd = board.variant specialEnd this
 
-  def variantDraw = board.variant specialDraw this
-
-  def end: Boolean = checkMate || staleMate || autoDraw || variantEnd || variantDraw
+  def end: Boolean = checkMate || staleMate || autoDraw || variantEnd
 
   def winner : Option[Color] = board.variant.winner(this)
 
@@ -37,7 +35,7 @@ case class Situation(board: Board, color: Color) {
     if (checkMate) Status.Mate.some
     else if (variantEnd) Status.VariantEnd.some
     else if (staleMate) Status.Stalemate.some
-    else if (autoDraw || variantDraw) Status.Draw.some
+    else if (autoDraw) Status.Draw.some
     else none
 
   def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Valid[Move] =

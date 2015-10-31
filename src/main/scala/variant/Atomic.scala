@@ -86,15 +86,22 @@ case object Atomic extends Variant(
     }
   }
 
-  override def specialDraw(situation: Situation) = {
-    // Bishops on opposite coloured squares can never capture each other to cause a king to explode and a traditional
-    // mate would be not be
-    val board = situation.board
+  // Bishops on opposite coloured squares can never capture each other to cause a king to explode and a traditional
+  // mate would be not be
+  override def insufficientWinningMaterial(board: Board) = {
     InsufficientMatingMaterial.bishopsOnDifferentColor(board) || insufficientAtomicWinningMaterial(board)
   }
 
-  // On insufficient mating material, a win may still be commonly achieved by exploding a piece next to a king
-  override def drawsOnInsufficientMaterial = false
+  /**
+   * In atomic chess, it is possible to win with a single knight, bishop, etc, by exploding
+   * a piece in the opponent's king's proximity. On the other hand, a king alone or a king with
+   * immobile pawns is not sufficient material to win with.
+   */
+  override def insufficientWinningMaterial(situation: Situation, color: Color) = {
+    situation.board rolesOf color match {
+      case List(King) => true
+    }
+  }
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
   override def specialEnd(situation: Situation) = situation.board.kingPos.size != 2

@@ -19,12 +19,6 @@ case object ThreeCheck extends Variant(
   }
 
   // When there is insufficient mating material, there is still potential to win by checking the opponent 3 times
-  // by the variant ending
-  override def drawsOnInsufficientMaterial = false
-
-  // Although we do not draw on a traditional 'insufficient mating material', we do draw if only kings remain
-  override def specialDraw(situation: Situation) = {
-    situation.board.actors.forall(_._2.piece is King)
-  }
-
+  // by the variant ending. However, no players can check if there are only kings remaining
+  override def insufficientWinningMaterial(board: Board) = board.actors.forall(_._2.piece is King)
 }

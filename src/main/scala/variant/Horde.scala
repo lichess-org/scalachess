@@ -42,8 +42,14 @@ case object Horde extends Variant(
   override def specialEnd(situation: Situation) =
     situation.board.piecesOf(White).isEmpty
 
-  // TODO: There are some situations where there is insufficient winning material: https://github.com/ornicar/lila/issues/773
-  override def insufficientWinningMaterial(situation: Situation, color: Color) = false
+  /**
+   * In horde chess, white cannot win on * V K or [BN]{2} v K or just one piece since they don't have a king
+   * for support.
+   */
+  override def insufficientWinningMaterial(situation: Situation, color: Color) = {
+    color == Color.white && situation.board.pieces.size == 1 ||
+      situation.board.pieces.size == 2 && situation.board.piecesOf(Color.white).forall(_._2.isMinor)
+  }
 
   override def isUnmovedPawn(color: Color, pos: Pos) = {
     color == White && (pos.y == 1 || pos.y == 2)

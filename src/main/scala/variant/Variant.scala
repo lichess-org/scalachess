@@ -94,7 +94,7 @@ abstract class Variant(
   def insufficientWinningMaterial(board: Board) = InsufficientMatingMaterial(board)
 
   /**
-   * Returns true if the player of the given colour has sufficient material to win.
+   * Returns true if the player of the given colour has insufficient material to win.
    * This can be used to determine whether a player losing on time against a player
    * who doesn't have enough material to win should draw instead.
    */

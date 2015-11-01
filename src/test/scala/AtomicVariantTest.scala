@@ -331,7 +331,7 @@ class AtomicVariantTest extends ChessTest {
       }
     }
 
-    "Game is not a draw when the last piece a player has other than their king is a pawn " in {
+    "Game is not a draw when the last piece a player has other than their king is a pawn that is blocked by a mobile piece" in {
       val position = "3Q4/2b2k2/5P2/8/8/8/6K1/8 b - - 0 57"
       val game = fenToGame(position, Atomic)
 
@@ -416,6 +416,21 @@ class AtomicVariantTest extends ChessTest {
         case gm =>
           gm.situation.board.variant.insufficientWinningMaterial(gm.situation, Color.White) must beTrue
       }
+
+    }
+
+    "An automatic draw in a closed position with only kings and pawns which cannot move" in {
+      val position = "8/8/6p1/3K4/6P1/2k5/8/8 w - -"
+      val originalGame = fenToGame(position, Atomic)
+
+      val game = originalGame flatMap(_.playMoves(Pos.G4 -> Pos.G5))
+
+      game must beSuccess.like {
+        case gm =>
+          gm.situation.autoDraw must beTrue
+          gm.situation.end must beTrue
+      }
+
 
     }
 

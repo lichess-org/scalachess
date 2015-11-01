@@ -72,16 +72,10 @@ case object Antichess extends Variant(
   }
 
   private def pawnNotAttackable(pawn: Actor, oppositeBishopColor: Color, board: Board) = {
-    // A pawn is immobile if it is blocked by an opponent pawn (not a bishop)
-    val pawnImmobile = pawn.moves.isEmpty && {
-      val blockingPosition = Actor.posAheadOfPawn(pawn.pos, pawn.piece.color)
-      blockingPosition.flatMap(pos => board.actorAt(pos)).exists(act => act.piece.is(Pawn))
-    }
-
     // The pawn cannot attack a bishop or be attacked by a bishop
     val cannotAttackBishop = Actor.pawnAttacks(pawn.pos, pawn.piece.color).find(_.color == oppositeBishopColor).isEmpty
 
-    pawnImmobile && cannotAttackBishop
+    InsufficientMatingMaterial.pawnImmobile(pawn, board) && cannotAttackBishop
   }
 
   // In this game variant, a king is a valid promotion

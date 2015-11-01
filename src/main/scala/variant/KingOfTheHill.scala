@@ -14,6 +14,11 @@ case object KingOfTheHill extends Variant(
   override def specialEnd(situation: Situation) =
     situation.board.kingPosOf(!situation.color) exists center.contains
 
+  /**
+   * You only need a king to be able to win in this variant
+   */
+  override def insufficientWinningMaterial(situation: Situation, color: Color) = false
+
   override def insufficientWinningMaterial(board: Board) = false
 }
 

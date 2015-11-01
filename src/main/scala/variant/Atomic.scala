@@ -87,9 +87,13 @@ case object Atomic extends Variant(
   }
 
   // Bishops on opposite coloured squares can never capture each other to cause a king to explode and a traditional
-  // mate would be not be
+  // mate would be not be very likely
   override def insufficientWinningMaterial(board: Board) = {
     InsufficientMatingMaterial.bishopsOnDifferentColor(board) || insufficientAtomicWinningMaterial(board)
+  }
+
+  private def atomicClosedPosition(board: Board) = {
+    board.actors.values.forall(actor => actor.piece.is(Pawn) && actor.moves.isEmpty)
   }
 
   /**

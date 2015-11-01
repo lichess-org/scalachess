@@ -54,8 +54,8 @@ object InsufficientMatingMaterial {
   }
 
   def apply(board: Board, color: Color) =
-     board rolesOf color filter (King !=) match {
-        case Nil | List(Knight) | List(Bishop) => true
-        case _                                 => false
+    board rolesOf color filter (King !=) match {
+       case Nil | List(Knight) | List(Bishop) => true
+       case _                                 => false
   }
 }

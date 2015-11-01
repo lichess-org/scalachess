@@ -194,5 +194,19 @@ object Actor {
   def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
     board.variant.longRangeThreatens(board, p, dir, to)
 
-  private def pawnDirOf(color: Color): Direction = if (color.white) _.up else _.down
+  def pawnDirOf(color: Color): Direction = if (color.white) _.up else _.down
+
+  /**
+   * Determines the position one ahead of a pawn based on the color of the piece.
+   * White pawns move up and black pawns move down.
+   */
+  def posAheadOfPawn(pos: Pos, color: Color) = pawnDirOf(color)(pos)
+
+  /**
+   * Determines the squares that a pawn attacks based on the colour of the pawn.
+   */
+  def pawnAttacks(pos: Pos, color : Color) : List[Pos] = {
+    if (color.white) List(pos.upLeft, pos.upRight)
+    else List(pos.downLeft, pos.downRight)
+  }.flatten
 }

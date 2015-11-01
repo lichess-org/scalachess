@@ -240,6 +240,35 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       }
     }
 
+    "Not be drawn where a white bishop can attack a black pawn in an almost closed position" in {
+      val position = "5b2/1P4p1/4B1P1/4p3/4P3/8/8/8 w - -"
+      val originalGame = fenToGame(position, Antichess)
+
+      val newGame = originalGame flatMap(_.apply(Pos.B7, Pos.B8, Bishop.some)) map (_._1)
+ 
+      newGame must beSuccess.like {
+        case nonDrawnGame =>
+          nonDrawnGame.situation.end must beFalse
+          nonDrawnGame.situation.autoDraw must beFalse
+          nonDrawnGame.situation.status must beNone
+      }
+ 
+    }
+
+    "Not be drawn where a pawn is unattackable, but is blocked by a bishop, not a pawn" in {
+      val position = "8/8/4BbP1/4p3/4P3/8/8/8 b - -"
+      val originalGame = fenToGame(position, Antichess)
+
+      val newGame = originalGame flatMap(_.playMoves(Pos.F6 -> Pos.G7))
+
+      newGame must beSuccess.like {
+        case nonDrawnGame =>
+          nonDrawnGame.situation.end must beFalse
+          nonDrawnGame.situation.autoDraw must beFalse
+          nonDrawnGame.situation.status must beNone
+      }
+    }
+
     "Not be drawn on insufficient mating material" in {
       val positionString = "4K3/8/1b6/8/8/8/5B2/3k4 b - -"
       val maybeGame = fenToGame(positionString, Antichess)

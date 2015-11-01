@@ -62,8 +62,8 @@ case object Antichess extends Variant(
             whiteSquareColor <- whiteBishops.headOption map (_.pos.color)
             blackSquareColor <- blackBishops.headOption map (_.pos.color)
           } yield {
-            whiteSquareColor != blackSquareColor && whitePawns.forall(pawnAttacksOppositeColor(_, blackSquareColor)) &&
-              blackPawns.forall(pawnAttacksOppositeColor(_, whiteSquareColor))
+            whiteSquareColor != blackSquareColor && whitePawns.forall(pawnNotAttackable(_, blackSquareColor, board)) &&
+              blackPawns.forall(pawnNotAttackable(_, whiteSquareColor, board))
           }
         } getOrElse false
     }
@@ -71,9 +71,15 @@ case object Antichess extends Variant(
     bishopsAndPawns && drawnBishops
   }
 
-  private def pawnAttacksOppositeColor(pawn: Actor, oppositeBishopColor: Color) = {
-    val pawnImmobile = pawn.moves.isEmpty
-    val cannotAttackBishop = List(pawn.pos.upLeft, pawn.pos.upRight).flatten.find(_.color == oppositeBishopColor).isEmpty
+  private def pawnNotAttackable(pawn: Actor, oppositeBishopColor: Color, board: Board) = {
+    // A pawn is immobile if it is blocked by an opponent pawn (not a bishop)
+    val pawnImmobile = pawn.moves.isEmpty && {
+      val blockingPosition = Actor.posAheadOfPawn(pawn.pos, pawn.piece.color)
+      blockingPosition.flatMap(pos => board.actorAt(pos)).exists(act => act.piece.is(Pawn))
+    }
+
+    // The pawn cannot attack a bishop or be attacked by a bishop
+    val cannotAttackBishop = Actor.pawnAttacks(pawn.pos, pawn.piece.color).find(_.color == oppositeBishopColor).isEmpty
 
     pawnImmobile && cannotAttackBishop
   }

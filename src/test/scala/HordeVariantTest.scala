@@ -13,7 +13,6 @@ class HordeVariantTest extends ChessTest {
       game must beSuccess.like {
         case gm =>
           gm.situation.board.variant.insufficientWinningMaterial(gm.situation, Color.white) must beTrue
-      
       }
     }
 
@@ -35,6 +34,16 @@ class HordeVariantTest extends ChessTest {
       game must beSuccess.like {
         case gm =>
           gm.situation.board.variant.insufficientWinningMaterial(gm.situation, Color.white) must beTrue
+      }
+    }
+
+    "Must not be insufficient winning material with 3 minor pieces left" in {
+      val position = "8/2k5/3q4/8/8/3B4/4NB2/8 w - -"
+      val game = fenToGame(position, Horde)
+
+      game must beSuccess.like {
+        case gm =>
+          gm.situation.board.variant.insufficientWinningMaterial(gm.situation, Color.white) must beFalse
       }
     }
   }

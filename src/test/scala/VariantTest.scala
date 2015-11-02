@@ -12,6 +12,27 @@ class VariantTest extends ChessTest {
     "position pieces correctly" in {
       Standard.pieces must havePairs(A1 -> (White - Rook), B1 -> (White - Knight), C1 -> (White - Bishop), D1 -> (White - Queen), E1 -> (White - King), F1 -> (White - Bishop), G1 -> (White - Knight), H1 -> (White - Rook), A2 -> (White - Pawn), B2 -> (White - Pawn), C2 -> (White - Pawn), D2 -> (White - Pawn), E2 -> (White - Pawn), F2 -> (White - Pawn), G2 -> (White - Pawn), H2 -> (White - Pawn), A7 -> (Black - Pawn), B7 -> (Black - Pawn), C7 -> (Black - Pawn), D7 -> (Black - Pawn), E7 -> (Black - Pawn), F7 -> (Black - Pawn), G7 -> (Black - Pawn), H7 -> (Black - Pawn), A8 -> (Black - Rook), B8 -> (Black - Knight), C8 -> (Black - Bishop), D8 -> (Black - Queen), E8 -> (Black - King), F8 -> (Black - Bishop), G8 -> (Black - Knight), H8 -> (Black - Rook))
     }
+
+    "Identify insufficient mating material when called (bishop)." in {
+      val position = "8/3k4/2q5/8/8/K1B5/8/8 w - -"
+      val game = fenToGame(position, Standard)
+
+      game should beSuccess.like {
+        case gm =>
+          gm.situation.board.variant.insufficientWinningMaterial(gm.situation, Color.white) must beTrue
+      }
+    }
+
+    "Identify insufficient mating material when called (knight)." in {
+      val position = "8/3k4/2q5/8/8/K1N5/8/8 w - -"
+      val game = fenToGame(position, Standard)
+
+      game should beSuccess.like {
+        case gm =>
+          gm.situation.board.variant.insufficientWinningMaterial(gm.situation, Color.white) must beTrue
+      }
+    
+    }
   }
 
   "chess960" should {

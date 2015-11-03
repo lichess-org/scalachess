@@ -86,8 +86,11 @@ case object Atomic extends Variant(
     }
   }
 
-  // Bishops on opposite coloured squares can never capture each other to cause a king to explode and a traditional
-  // mate would be not be very likely
+  /*
+   * Bishops on opposite coloured squares can never capture each other to cause a king to explode and a traditional
+   * mate would be not be very likely. Additionally, a player can only mate another player with sufficient material.
+   * We also look out for closed positions (pawns that cannot move and kings which cannot capture them.)
+   */
   override def insufficientWinningMaterial(board: Board) = {
     InsufficientMatingMaterial.bishopsOnDifferentColor(board) || insufficientAtomicWinningMaterial(board) || atomicClosedPosition(board)
   }

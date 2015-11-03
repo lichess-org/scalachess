@@ -32,6 +32,9 @@ class ClockTest extends ChessTest {
     "with few time" in {
       Clock(0, 10).limit must_== 0
     }
+    "with 30 seconds" in {
+      Clock(30, 0).limitInMinutes must_== 0.5
+    }
   }
   "lag compensation" should {
     def durOf(lag: Float) = FiniteDuration((lag * 1000).toLong, MILLISECONDS)

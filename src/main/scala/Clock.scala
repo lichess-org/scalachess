@@ -2,6 +2,8 @@ package chess
 
 import scala.concurrent.duration._
 
+import java.text.DecimalFormat
+
 // All durations are expressed in seconds
 sealed trait Clock {
   val limit: Int
@@ -29,7 +31,7 @@ sealed trait Clock {
 
   def elapsedTime(c: Color) = time(c)
 
-  def limitInMinutes = limit / 60
+  def limitInMinutes = limit / 60d
 
   def estimateTotalIncrement = 40 * increment
 
@@ -47,7 +49,7 @@ sealed trait Clock {
 
   def berserk(c: Color): Clock
 
-  def show = s"$limitInMinutes+$increment"
+  def show = s"${new DecimalFormat("#.#").format(limitInMinutes)}+$increment"
 
   def showTime(t: Float) = {
     val hours = math.floor(t / 3600).toInt
@@ -187,7 +189,7 @@ object Clock {
     limit: Int,
     increment: Int): PausedClock = {
     val clock = PausedClock(
-      limit = limit / 60 * 60, // round to minutes
+      limit = limit,
       increment = increment,
       color = White,
       whiteTime = 0f,

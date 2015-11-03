@@ -75,7 +75,7 @@ case object Antichess extends Variant(
     // The pawn cannot attack a bishop or be attacked by a bishop
     val cannotAttackBishop = Actor.pawnAttacks(pawn.pos, pawn.piece.color).find(_.color == oppositeBishopColor).isEmpty
 
-    InsufficientMatingMaterial.pawnImmobile(pawn, board) && cannotAttackBishop
+    InsufficientMatingMaterial.pawnBlockedByPawn(pawn, board) && cannotAttackBishop
   }
 
   // In this game variant, a king is a valid promotion

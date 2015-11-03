@@ -97,7 +97,7 @@ case object Atomic extends Variant(
    */
   private def atomicClosedPosition(board: Board) = {
     board.actors.values.forall(actor => (actor.piece.is(Pawn) && actor.moves.isEmpty
-      && InsufficientMatingMaterial.pawnImmobile(actor, board)) || actor.piece.is(King))
+      && InsufficientMatingMaterial.pawnBlockedByPawn(actor, board)) || actor.piece.is(King))
   }
 
   /**

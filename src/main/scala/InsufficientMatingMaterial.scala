@@ -33,10 +33,12 @@ object InsufficientMatingMaterial {
     }
   }
 
-  // A pawn is immobile if it is blocked by an opponent pawn (not a bishop)
-  def pawnImmobile(pawn: Actor, board: Board) = pawn.moves.isEmpty && {
+  /*
+   * Returns true if a pawn cannot progress forward because it is blocked by a pawn
+   */
+  def pawnBlockedByPawn(pawn: Actor, board: Board) = pawn.moves.isEmpty && {
       val blockingPosition = Actor.posAheadOfPawn(pawn.pos, pawn.piece.color)
-      blockingPosition.flatMap(pos => board.actorAt(pos)).exists(act => act.piece.is(Pawn))
+      blockingPosition.flatMap(board.actorAt(_)).exists(_.piece.is(Pawn))
     }
   /*
    * Determines whether a board position is an automatic draw due to neither player

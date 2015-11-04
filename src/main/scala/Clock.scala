@@ -49,7 +49,7 @@ sealed trait Clock {
 
   def berserk(c: Color): Clock
 
-  def show = s"${new DecimalFormat("#.#").format(limitInMinutes)}+$increment"
+  def show = s"${new DecimalFormat("#.##").format(limitInMinutes)}+$increment"
 
   def showTime(t: Float) = {
     val hours = math.floor(t / 3600).toInt

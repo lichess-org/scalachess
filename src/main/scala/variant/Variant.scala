@@ -3,7 +3,6 @@ package variant
 
 import Pos.posAt
 import scalaz.Validation.FlatMap._
-import InsufficientMatingMaterial.apply
 
 abstract class Variant(
     val id: Int,

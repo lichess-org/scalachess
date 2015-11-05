@@ -113,7 +113,7 @@ case class Board(
   def count(c: Color): Int = pieces.values count (_.color == c)
 
   def autoDraw: Boolean = history.fiftyMoves || {
-    variant.drawsOnInsufficientMaterial && InsufficientMatingMaterial(this)
+    variant.insufficientWinningMaterial(this)
   }
 
   def situationOf(color: Color) = Situation(this, color)

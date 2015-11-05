@@ -1,7 +1,11 @@
 package chess
 
-// http://www.e4ec.org/immr.html
-
+/**
+ * Utility methods for helping to determine whether a situation is a draw or a draw
+ * on a player flagging.
+ *
+ * See http://www.e4ec.org/immr.html
+ */
 object InsufficientMatingMaterial {
 
   def nonKingPieces(board: Board) = board.pieces.filter(_._2.role != King).toList
@@ -29,6 +33,18 @@ object InsufficientMatingMaterial {
     }
   }
 
+  /*
+   * Returns true if a pawn cannot progress forward because it is blocked by a pawn
+   */
+  def pawnBlockedByPawn(pawn: Actor, board: Board) = pawn.moves.isEmpty && {
+      val blockingPosition = Actor.posAheadOfPawn(pawn.pos, pawn.piece.color)
+      blockingPosition.flatMap(board.actorAt(_)).exists(_.piece.is(Pawn))
+    }
+  /*
+   * Determines whether a board position is an automatic draw due to neither player
+   * being able to mate the other as informed by the traditional chess rules.
+   *
+   */
   def apply(board: Board) = {
 
     lazy val notKingPieces = nonKingPieces(board)
@@ -46,7 +62,7 @@ object InsufficientMatingMaterial {
 
   def apply(board: Board, color: Color) =
     board rolesOf color filter (King !=) match {
-      case Nil | List(Knight) | List(Bishop) => true
-      case _                                 => false
-    }
+       case Nil | List(Knight) | List(Bishop) => true
+       case _                                 => false
+  }
 }

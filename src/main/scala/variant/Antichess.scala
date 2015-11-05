@@ -31,14 +31,15 @@ case object Antichess extends Variant(
     situation.board.actorsOf(situation.color).isEmpty || situation.moves.isEmpty
   }
 
-  // This mode has no checkmates
-  override def drawsOnInsufficientMaterial = false
+  // In antichess, there is no checkmate condition therefore a player may only draw either by agreement
+  // , blockade or stalemate - a player always has sufficient material to win otherwise
+  override def insufficientWinningMaterial(situation: Situation, color: Color) = false
 
   // No player can win if the only remaining pieces are opposing bishops on different coloured
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color
   // of square to allow the player to force their opponent to capture their bishop, also resulting in a draw
-  override def specialDraw(situation: Situation) = {
-    val actors = situation.board.actors
+  override def insufficientWinningMaterial (board: Board) = {
+    val actors = board.actors
 
     // Exit early if we are not in a situation with only bishops and pawns
     val bishopsAndPawns = actors.forall(act => act._2.piece.is(Bishop) || act._2.piece.is(Pawn)) &&
@@ -61,8 +62,8 @@ case object Antichess extends Variant(
             whiteSquareColor <- whiteBishops.headOption map (_.pos.color)
             blackSquareColor <- blackBishops.headOption map (_.pos.color)
           } yield {
-            whiteSquareColor != blackSquareColor && whitePawns.forall(pawnAttacksOppositeColor(_, blackSquareColor)) &&
-              blackPawns.forall(pawnAttacksOppositeColor(_, whiteSquareColor))
+            whiteSquareColor != blackSquareColor && whitePawns.forall(pawnNotAttackable(_, blackSquareColor, board)) &&
+              blackPawns.forall(pawnNotAttackable(_, whiteSquareColor, board))
           }
         } getOrElse false
     }
@@ -70,11 +71,11 @@ case object Antichess extends Variant(
     bishopsAndPawns && drawnBishops
   }
 
-  private def pawnAttacksOppositeColor(pawn: Actor, oppositeBishopColor: Color) = {
-    val pawnImmobile = pawn.moves.isEmpty
-    val cannotAttackBishop = List(pawn.pos.upLeft, pawn.pos.upRight).flatten.find(_.color == oppositeBishopColor).isEmpty
+  private def pawnNotAttackable(pawn: Actor, oppositeBishopColor: Color, board: Board) = {
+    // The pawn cannot attack a bishop or be attacked by a bishop
+    val cannotAttackBishop = Actor.pawnAttacks(pawn.pos, pawn.piece.color).find(_.color == oppositeBishopColor).isEmpty
 
-    pawnImmobile && cannotAttackBishop
+    InsufficientMatingMaterial.pawnBlockedByPawn(pawn, board) && cannotAttackBishop
   }
 
   // In this game variant, a king is a valid promotion

@@ -42,8 +42,15 @@ case object Horde extends Variant(
   override def specialEnd(situation: Situation) =
     situation.board.piecesOf(White).isEmpty
 
-  // is that right?
-  override val drawsOnInsufficientMaterial = false
+  /**
+   * In horde chess, white cannot win on * V K or [BN]{2} v K or just one piece since they don't have a king
+   * for support.
+   */
+  override def insufficientWinningMaterial(situation: Situation, color: Color) = {
+    color == Color.white && situation.board.piecesOf(Color.white).size == 1 ||
+      situation.board.piecesOf(Color.white).size == 2 &&
+        situation.board.piecesOf(Color.white).forall(_._2.isMinor)
+  }
 
   override def isUnmovedPawn(color: Color, pos: Pos) = {
     color == White && (pos.y == 1 || pos.y == 2)

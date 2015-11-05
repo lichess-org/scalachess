@@ -108,11 +108,8 @@ case object Atomic extends Variant(
    * a piece in the opponent's king's proximity. On the other hand, a king alone or a king with
    * immobile pawns is not sufficient material to win with.
    */
-  override def insufficientWinningMaterial(situation: Situation, color: Color) = {
-    situation.board rolesOf color match {
-      case List(King) => true
-    }
-  }
+  override def insufficientWinningMaterial(situation: Situation, color: Color) =
+    situation.board rolesOf color == List(King)
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
   override def specialEnd(situation: Situation) = situation.board.kingPos.size != 2

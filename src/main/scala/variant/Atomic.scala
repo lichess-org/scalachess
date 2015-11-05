@@ -109,7 +109,7 @@ case object Atomic extends Variant(
    * immobile pawns is not sufficient material to win with.
    */
   override def insufficientWinningMaterial(situation: Situation, color: Color) =
-    situation.board rolesOf color == List(King)
+    situation.board.rolesOf(color) == List(King)
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
   override def specialEnd(situation: Situation) = situation.board.kingPos.size != 2

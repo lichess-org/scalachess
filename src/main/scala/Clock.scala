@@ -49,9 +49,7 @@ sealed trait Clock {
 
   def berserk(c: Color): Clock
 
-  def show =
-    if (limit % 60 == 0) s"$limitInMinutes+$increment"
-    else s"${new DecimalFormat("#.##").format(limitInMinutes)}+$increment"
+  def show = s"${Clock.showLimit(limit)}+$increment"
 
   def showTime(t: Float) = {
     val hours = math.floor(t / 3600).toInt
@@ -202,6 +200,14 @@ object Clock {
       .giveTime(White, increment.max(minInitLimit))
       .giveTime(Black, increment.max(minInitLimit))
     else clock
+  }
+
+  def showLimit(limit: Int) = limit match {
+    case l if l % 60 == 0 => l / 60
+    case 30               => "½"
+    case 45               => "¾"
+    case 90               => "1.5"
+    case _                => new DecimalFormat("#.##").format(limit / 60d)
   }
 
   private[chess] def berserkPenalty(clock: Clock, color: Color): Int = {

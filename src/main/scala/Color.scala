@@ -23,8 +23,6 @@ sealed trait Color {
 
   val white = this == Color.White
   val black = this == Color.Black
-
-  override def toString = name
 }
 
 object Color {

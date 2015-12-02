@@ -96,4 +96,25 @@ object Replay {
       recursiveBoards(sit, moves) map { sit.board :: _ }
     }
   }
+
+  private def recursiveLastBoard(sit: Situation, sans: List[San]): Valid[Board] =
+    sans match {
+      case Nil => success(sit.board)
+      case san :: rest => san(sit) flatMap { move =>
+        recursiveLastBoard(Situation(move.afterWithLastMove, !sit.color), rest)
+      }
+    }
+
+  def lastBoard(
+    moveStrs: List[String],
+    initialFen: Option[String],
+    variant: chess.variant.Variant,
+    color: Color = White): Valid[Board] = {
+    val sit = {
+      initialFen.flatMap(format.Forsyth.<<) | Situation(chess.variant.Standard)
+    }.copy(color = color) withVariant variant
+    Parser.moves(moveStrs, sit.board.variant) flatMap { moves =>
+      recursiveLastBoard(sit, moves)
+    }
+  }
 }

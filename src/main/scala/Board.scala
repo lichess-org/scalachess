@@ -124,6 +124,12 @@ case class Board(
 
   def valid(strict: Boolean) = variant.valid(this, strict)
 
+  def materialImbalance: Int = pieces.values.foldLeft(0) {
+    case (acc, Piece(color, role)) => Role.valueOf(role).fold(acc) { value =>
+      acc + value * color.fold(1, -1)
+    }
+  }
+
   override def toString = List(
     variant + " Position after " + history.lastMove,
     visual

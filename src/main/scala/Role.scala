@@ -101,4 +101,13 @@ object Role {
 
   def promotable(name: Option[String]): Option[PromotableRole] =
     name flatMap promotable
+
+  def valueOf(r: Role): Option[Int] = r match {
+    case Pawn   => Some(1)
+    case Knight => Some(3)
+    case Bishop => Some(3)
+    case Rook   => Some(5)
+    case Queen  => Some(9)
+    case King   => None
+  }
 }

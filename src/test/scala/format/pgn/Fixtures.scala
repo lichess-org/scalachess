@@ -1389,4 +1389,11 @@ val atomicPromotion = """
 
 1. Nf3 f6 2. Nc3 c6 3. d4 d5 4. e3 e5 5. dxe5 d4 6. Ne4 d3 7. Nd6+ Bxd6 8. Nd4 d2+ 9. Ke2 dxc1=Q 10. g4 Nh6 11. Bg2 Nxg4 12. h3 Na6 13. Rad1 Nc5 14. Kf1 Ne4 15. f4 Nf2 16. Ne6 Qxd1 17. Nc7+ Ke7 18. Ne6 Kd6 19. Bxc6 1-0
 """
+
+val weirdDashes = """
+1. Nf3 d5 2. d4 Nf6 3. g3 g6 4. Bg2 c6 5. Bf4 Bg7 6. c3 b6 7. Nbd2 Nbd7 8. O‑O Ba6 9. Re1 O‑O 10. Qc2 Re8 11. b3 Nh5 12. Be5 f6 13. Bf4 Nxf4
+14. gxf4 e5 15. fxe5 fxe5 16. dxe5 Nxe5 17. c4 Nxf3+ 18. Bxf3 Qg5+ 19. Kh1 Be5 20. Nf1 Bxa1 21. Rxa1 Rad8 22. Rd1 dxc4 23. Bxc6 Rxd1 24.
+Qxd1 Rd8 25. Qc2 cxb3 26. Qxb3+ Kg7 27. Qc3+ Kh6 28. Qh3+ Qh5 29. Qe3+ Qg5 30. Qh3+ Kg7 31. Qc3+ Qf6 32. Qxf6+ Kxf6 33. Bf3 Rd7 34. Ne3 Rd2
+35. Nd5+ Ke5 36. e3 Rxf2 37. Kg1 Rxf3 0-1
+"""
 }

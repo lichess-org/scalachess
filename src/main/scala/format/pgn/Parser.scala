@@ -16,6 +16,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     }.mkString("\n")
       .replace("[pgn]", "")
       .replace("[/pgn]", "")
+      .replace("‑", "-")
     for {
       splitted ← splitTagAndMoves(preprocessed)
       (tagStr, moveStr) = splitted

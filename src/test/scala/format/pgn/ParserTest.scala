@@ -162,4 +162,10 @@ class ParserTest extends ChessTest {
       case a => a.sans.size must_== 69
     }
   }
+
+  "weird dashes" in {
+    parser(weirdDashes) must beSuccess.like {
+      case a => a.sans.size must_== 74
+    }
+  }
 }

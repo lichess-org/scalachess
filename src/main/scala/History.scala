@@ -1,7 +1,7 @@
 package chess
 
-import Pos.posAt
 import format.UciMove
+import Pos.posAt
 
 case class CheckCount(white: Int = 0, black: Int = 0) {
 
@@ -27,6 +27,13 @@ case class History(
    * can be claimed under the fifty-move rule.
    */
   def halfMoveClock = positionHashes.size / Hash.size
+
+  // generates random positionHashes to satisfy the half move clock
+  def setHalfMoveClock(v: Int) = {
+    val bytes = Array.ofDim[Byte](v * Hash.size)
+    scala.util.Random.nextBytes(bytes)
+    copy(positionHashes = bytes)
+  }
 
   def threefoldRepetition: Boolean = halfMoveClock > 6 && {
     val positions = (positionHashes grouped Hash.size).toList

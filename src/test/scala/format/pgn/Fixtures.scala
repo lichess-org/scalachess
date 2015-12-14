@@ -1396,4 +1396,30 @@ val weirdDashes = """
 Qxd1 Rd8 25. Qc2 cxb3 26. Qxb3+ Kg7 27. Qc3+ Kh6 28. Qh3+ Qh5 29. Qe3+ Qg5 30. Qh3+ Kg7 31. Qc3+ Qf6 32. Qxf6+ Kxf6 33. Bf3 Rd7 34. Ne3 Rd2
 35. Nd5+ Ke5 36. e3 Rxf2 37. Kg1 Rxf3 0-1
 """
+
+val lichobile = """
+[Event "Casual game"]
+[Site "http://lichess.org"]
+[Date "2015.12.13"]
+[Result "0-1"]
+[Variant "Standard"]
+[Fen "1k1r4/6Q1/6pp/2p5/1nB1pPPb/B3n3/P2qK3/1R4R1 w - - 2 35"]
+
+1. d4 d5 2. f4 Nc6 3. Nf3 f6
+4. e3 Bg4 5. Be2 Bxf3
+6. Bxf3 e5 7. Nc3 e4 8. Bh5+ g6
+9. Be2 Qe7 10. Nxd5 Qd7
+11. Nc3 f5 12. Nb5 Bb4+
+13. c3 Be7 14. Rg1 a6
+15. Na3 Nf6 16. h3 O-O-O
+17. g4 Rhg8 18. Qb3 Na5
+19. Qc2 h6 20. Rb1 c5
+21. b4 cxb4 22. cxb4+ Nc6
+23. Bc4 Rg7 24. b5 axb5
+25. Nxb5 fxg4 26. Na7+ Kc7
+27. d5 Nb4 28. Qc3 Kb8
+29. Nc6+ bxc6 30. Ba3 c5
+31. hxg4 Nxd5 32. Qxg7 Bh4+
+33. Kf1 Nxe3+ 34. Ke2 Qd2# 0-1
+"""
 }

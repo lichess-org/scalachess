@@ -168,4 +168,10 @@ class ParserTest extends ChessTest {
       case a => a.sans.size must_== 74
     }
   }
+
+  "lichobile" in {
+    parser(lichobile) must beSuccess.like {
+      case a => a.sans.size must_== 68
+    }
+  }
 }

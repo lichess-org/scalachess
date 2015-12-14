@@ -1403,7 +1403,6 @@ val lichobile = """
 [Date "2015.12.13"]
 [Result "0-1"]
 [Variant "Standard"]
-[Fen "1k1r4/6Q1/6pp/2p5/1nB1pPPb/B3n3/P2qK3/1R4R1 w - - 2 35"]
 
 1. d4 d5 2. f4 Nc6 3. Nf3 f6
 4. e3 Bg4 5. Be2 Bxf3

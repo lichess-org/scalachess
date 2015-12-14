@@ -90,5 +90,8 @@ class ReaderTest extends ChessTest {
     "atomic promotion" in {
       Reader.full(atomicPromotion) must beSuccess
     }
+    "lichobile export" in {
+      Reader.full(lichobile) must beSuccess
+    }
   }
 }

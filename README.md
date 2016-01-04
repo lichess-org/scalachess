@@ -7,9 +7,7 @@ INSTALL
 
 Build dependencies
 
-    git clone https://github.com/ornicar/scalalib
-    cd scalalib
-    sbt publish-local
+    ./build-deps.sh
 
 Clone scalachess
 

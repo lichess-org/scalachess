@@ -1,5 +1,22 @@
 language: scala
-scala:
-  - 2.11.7
 
-script: sbt ++$TRAVIS_SCALA_VERSION test
+# https://docs.travis-ci.com/user/notifications/#IRC-notification
+notifications:
+  irc:
+    channels:
+      - "chat.freenode.net#lichess"
+    on_success: change
+    on_failure: always
+    use_notice: true
+    skip_join: true
+
+# https://docs.travis-ci.com/user/languages/java/#Testing-Against-Multiple-JDKs
+jdk:
+  - oraclejdk8
+
+install:
+  - ./build-deps.sh
+
+script:
+  - sbt compile
+  - sbt test

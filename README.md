@@ -1,5 +1,6 @@
-Chess API written in scala.
-It is functional, immutable, and free of side effects.
+Chess API written in scala for [lichess.org](http://lichess.org) [![Build Status](https://travis-ci.org/ornicar/scalachess.svg?branch=master)](https://travis-ci.org/ornicar/scalachess)
+
+It is entirely functional, immutable, and free of side effects.
 
 INSTALL
 -------

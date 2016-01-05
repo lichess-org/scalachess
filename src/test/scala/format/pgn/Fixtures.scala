@@ -1421,4 +1421,29 @@ val lichobile = """
 31. hxg4 Nxd5 32. Qxg7 Bh4+
 33. Kf1 Nxe3+ 34. Ke2 Qd2# 0-1
 """
+
+val overflow = """
+[pgn]
+[White "Him"]
+[Black "Me"]
+
+1. d4 d5 2. Nf3 Nc6 {variation on Chigorin's defense. White always plays Nf3 on move two, so I've been able to prepare against him. Getting him to play 2.c4 is like pulling teeth. It should be stated that I studied the theory to the Chigorin's and I believe without
+ 2.c4 and 3.Nc3 that black gets relatively easy equality, or practical equality.} 3. Bf4 Bg4 {He had been playing 3.c4 but he'd been losing all our games. I usually get the best of him maybe 3 out of 4 games, but lately he's been getting stronger and decided to try Bf4 in a London} 4. e3 Nf6 5. c4 e6 {positions with strategic ideas I'm familiar w
+ith} 6. Nc3 Bb4 7. h3 Bh5 {Retreating the Bishop. I would've traded if it doubled his pawns. I tend to have an easier time playing closed games against double pawns.} 8. g4 Bg6 9. Bg5 h6 {Either he gives me the bishop pair or he gets a sub optimal bishop} 10. Bxf6 (10. Bxf6 Qxf6 {I have a hard time finding safe ideas for white}) gxf6 (10. Bh4 Qd7
+ {If I was dead set on gxf6, perhaps just developing my queen to a square and preparing castling is better. The way I played it seems slow}){My idea. This is not the best move, infact, looking back on it, I think Qxf6 is much better. I had a hard time finding what to do with my queen, my King experienced safety issues, and I didn't even get to us
+e the open g-file for pressure. Tactically and practically this is an alright move, but the position would've been much easier to play} 11. Qb3 dxc4 {I over looked this Queenmove. I've noticed I miss Qb3 in other Chigorin games like this, but it never proves to be a good move. I think I missed it because it was a bad move in other games. Here, i
+t adds real pressure to d5. I take the c pawn because of my next idea.} 12. Bxc4 Be4 {I played this because I saw that the pin on the knight and control of e4 was strong. I felt the strength and saw the difficulty of getting out of the pin, and saw the tempos I would gain from this pin.} 13. Be2 (13. Be2 Qd5 14. Qxd5 Bxd5 15. O-O-O Bxc3 {with a p
+ositions full of ideas.}) (13. Be2 a5 {This seems like an active way to continue the attack, trying for a4}) Bd5 {I think this is where I lose the thread of the game. After 13. Be2 I saw this position and I felt it was good. I have a nasty pin on the knight, I have the bishop pair and the game can open quic
+kly, my king is safer and I have quick attacking ideas. However, in this 20|10 game, I had a hard time figuring out what to do next. I wanted to open the queenside and attackquickly while his king was still in the middle. I assumed it would be suicide for him to castle king side. I floundered in this great position just after 13 moves, and start
+ed playing poorly with 13. ... Bd5} 14. Qa4 Qd7 {I missed this pin entirely, but I started having ideas. I feel like I missed a good opportunity, but I started looking at further ideas here. I have about 8 minutes to his 14 here.} 15. O-O-O Bxc3 16. bxc3 b5! {I love this move, technically I think I've blown my good position that I had just 3 move
+s earlier, but I like the looks of this counter play I'm going to get against his king.} 17. Qxb5 Rb8 18. Qa4 O-O 19. Rh1g1 Rb6 {the position grows sharp and double edged. I ake up my mind to sac a piece.} 20. Nd2 Rf8b8 21. c4! (21. c4! Nb4! 22. Qxd7 Nxa2+ 23. Kc2 Rb2+ 24. Kd3 Nb4+ 25.Kc3 Na2+ {perpetual check and draw}) Rb4?! {I must admit that
+ I wanted to sac a piece, but white forces the issue. Im getting low on time here. I'm at 3 minutes to his 8 and I had completely mis-evaluated c4, which seems obvious to me ow. I think I got tunnel vision with my double rooks. I found a really cool idea for sacing my queen with Nb4 instead of the howler Rb4. I saw that I got a lot of pressure a
+nd I worked out a draw. However, this guy is usually a regular costumer for me and I got cocky and decided to go for the win. After Rb4, it dawned on me just how poor my position really was and I began to get very worried. I usually have a really good idea for evaluation of positions, but I began to see no real concrete threats and wondered if I 
+had mis-evaluated my attack.} 22. Qa3 Nxd4 23. exd4 Bc6 24. Nb3 Qd6 {I'm still in a worse position, but he hasn't defended accurately. Stockfish put the position around +1.6 in his favor, which isn't a good sign considering I'm a piece down. I try a cheapo with Qd6} 25. Qb2 a5 26. Qd2 a4 {all of a sudden I 
+feel like I've turned around my position. I calculated that Qh6 isn't going to be mating and my attack is coming MUCH sooner. I feel hopeful again. I have around 1 minute} 27. Qxh6?? axb3 {Joy!}28. Bd3!? {Pain. I have a minute on my clock and I missed his bishop idea. I knew that Qh7+ wasnt mate and stopped calculating his attack to conserve time
+. What I missed was the Bishop check with Queen on h6 idea that I had seen a million times on tactics trainers. What I didn't know, was that I played the right move, and actually stockfish gives this position -3.5 in my favor. I found the correct idea, but I missed the follow up and ruined a great knockout. 30 seconds on my clock} Rxc4!? 29. Bxc4
+?? (29. Bxc4?? bxa2!! 30.Kc2 Be4+ 31. Bd3 Qxd4! 32. Qc1 Qc4+ 33.Kd2 Qxd3+ 34. Ke1 Rb1! 35. Rxd3 Rxc1+ 36. Kd2 Rxg1 {this is the best line stockfish can come up with for whiteafter Bxc4}) Qa3+?? {this super blunders the game back in his direction. After taking the rook the position is around -10.0 for black} 30. Kd2 Qb2+ 31. Ke3 Qc3+ 32. Bd3 e5? 
+33. Qh7+ Kf8 34. Qh8+ {resigns}
+[/pgn]
+"""
 }

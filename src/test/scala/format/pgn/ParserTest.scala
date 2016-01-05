@@ -174,4 +174,10 @@ class ParserTest extends ChessTest {
       case a => a.sans.size must_== 68
     }
   }
+
+  "overflow" in {
+    parser(overflow) must beSuccess.like {
+      case a => a.sans.size must_== 67
+    }
+  }
 }

@@ -9,7 +9,7 @@ case object RacingKings extends Variant(
   title = "Race to the eighth rank to win.",
   standardInitialPosition = false) {
 
-  override val drawsOnInsufficientMaterial = false
+  override def insufficientWinningMaterial(situation: Situation, color: Color) = false
 
   override def allowsCastling = false
 

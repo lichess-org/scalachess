@@ -46,10 +46,10 @@ case object Horde extends Variant(
    * In horde chess, white cannot win on * V K or [BN]{2} v K or just one piece since they don't have a king
    * for support.
    */
-  override def insufficientWinningMaterial(situation: Situation, color: Color) = {
-    color == Color.white && situation.board.piecesOf(Color.white).size == 1 ||
-      situation.board.piecesOf(Color.white).size == 2 &&
-        situation.board.piecesOf(Color.white).forall(_._2.isMinor)
+  override def insufficientWinningMaterial(board: Board, color: Color) = {
+    color == Color.white && board.piecesOf(Color.white).size == 1 ||
+      board.piecesOf(Color.white).size == 2 &&
+        board.piecesOf(Color.white).forall(_._2.isMinor)
   }
 
   override def isUnmovedPawn(color: Color, pos: Pos) = {

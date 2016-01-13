@@ -52,6 +52,8 @@ case class Situation(board: Board, color: Color) {
   )
 
   def canCastle = board.history.canCastle _
+
+  def unary_! = copy(color = !color)
 }
 
 object Situation {

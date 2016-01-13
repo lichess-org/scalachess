@@ -86,8 +86,6 @@ abstract class Variant(
 
   def specialEnd(situation: Situation) = false
 
-  def specialDraw(situation: Situation) = false
-
   /**
    * Returns true if neither player can win
    */

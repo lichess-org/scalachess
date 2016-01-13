@@ -9,8 +9,6 @@ case object RacingKings extends Variant(
   title = "Race to the eighth rank to win.",
   standardInitialPosition = false) {
 
-  override def insufficientWinningMaterial(board: Board, color: Color) = false
-
   override def allowsCastling = false
 
   // Both sides start on the first two ranks:
@@ -34,8 +32,8 @@ case object RacingKings extends Variant(
     Pos.H1 -> White.queen,
     Pos.H2 -> White.king)
 
-  def insufficientWinningMaterial(board: Board) = false
-  def insufficientWinningMaterial(board: Board, color: Color) = false
+  override def insufficientWinningMaterial(board: Board) = false
+  override def insufficientWinningMaterial(board: Board, color: Color) = false
 
   private def reachedGoal(board: Board, color: Color) =
     board.kingPosOf(color) exists (_.y == 8)

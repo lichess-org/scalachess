@@ -16,7 +16,7 @@ case object RacingKings extends Variant(
   // Both sides start on the first two ranks:
   // krbnNBRK
   // qrbnNBRQ
-  override lazy val pieces: Map[Pos, Piece] = Map(
+  override val pieces: Map[Pos, Piece] = Map(
     Pos.A1 -> Black.queen,
     Pos.A2 -> Black.king,
     Pos.B1 -> Black.rook,
@@ -32,17 +32,13 @@ case object RacingKings extends Variant(
     Pos.G1 -> White.rook,
     Pos.G2 -> White.rook,
     Pos.H1 -> White.queen,
-    Pos.H2 -> White.king
-  )
+    Pos.H2 -> White.king)
 
-  // The goal for the kings is the eighth rank.
-  private val goal = Pos.A8 <-> Pos.H8 toSet
-
-  private def reachedGoal(situation: Situation, color: Color) =
-    situation.board.kingPosOf(color) exists goal.contains
+  private def reachedGoal(board: Board, color: Color) =
+    board.kingPosOf(color) exists (_.y == 8)
 
   private def reachesGoal(move: Move) =
-    reachedGoal(move.situationAfter, move.piece.color)
+    reachedGoal(move.situationAfter.board, move.piece.color)
 
   // It is a win, when exactly one king made it to the goal. When white reaches
   // the goal and black can make it on the next ply, he is given a chance to
@@ -51,20 +47,20 @@ case object RacingKings extends Variant(
   override def specialEnd(situation: Situation) = {
     situation.color match {
       case White =>
-        reachedGoal(situation, White) ^ reachedGoal(situation, Black)
+        reachedGoal(situation.board, White) ^ reachedGoal(situation.board, Black)
       case Black =>
-        reachedGoal(situation, White) && (validMoves(situation) mapValues (_.filter(reachesGoal))).forall(_._2.isEmpty)
+        reachedGoal(situation.board, White) && (validMoves(situation) mapValues (_.filter(reachesGoal))).forall(_._2.isEmpty)
     }
   }
 
   // If white reaches the goal and black also reaches the goal directly after,
   // then it is a draw.
   override def specialDraw(situation: Situation) =
-    situation.color.white && reachedGoal(situation, White) && reachedGoal(situation, Black)
+    situation.color.pp.white && reachedGoal(situation.board, White).pp && reachedGoal(situation.board, Black).pp
 
   override def winner(situation: Situation): Option[Color] = {
     if (specialEnd(situation)) {
-      if (reachedGoal(situation, White)) Some(White) else Some(Black)
+      if (reachedGoal(situation.board, White)) Some(White) else Some(Black)
     } else None
   }
 

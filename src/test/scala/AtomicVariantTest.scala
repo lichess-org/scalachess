@@ -410,11 +410,11 @@ class AtomicVariantTest extends ChessTest {
           gm.situation.end must beFalse
       }
 
-      val drawGame = game flatMap(_.playMoves(Pos.G3 -> Pos.G2))
+      val drawGame = game flatMap (_.playMoves(Pos.G3 -> Pos.G2))
 
       drawGame must beSuccess.like {
         case gm =>
-          gm.situation.board.variant.insufficientWinningMaterial(gm.situation, Color.White) must beTrue
+          gm.situation.board.variant.insufficientWinningMaterial(gm.situation.board, Color.White) must beTrue
       }
 
     }
@@ -423,7 +423,7 @@ class AtomicVariantTest extends ChessTest {
       val position = "8/8/6p1/3K4/6P1/2k5/8/8 w - -"
       val originalGame = fenToGame(position, Atomic)
 
-      val game = originalGame flatMap(_.playMoves(Pos.G4 -> Pos.G5))
+      val game = originalGame flatMap (_.playMoves(Pos.G4 -> Pos.G5))
 
       game must beSuccess.like {
         case gm =>
@@ -431,20 +431,19 @@ class AtomicVariantTest extends ChessTest {
           gm.situation.end must beTrue
       }
 
-
     }
 
     "Not draw inappropriately on bishops vs bishops (where an explosion taking out the king is possible)" in {
-        val position = "B2BBBB1/7P/8/8/8/8/3kb3/4K3 w - - 1 53"
-        val game = fenToGame(position, Atomic)
-        val newGame = game flatMap (_.playMove(
-            Pos.H7,Pos.H8,Bishop.some
-        ))
+      val position = "B2BBBB1/7P/8/8/8/8/3kb3/4K3 w - - 1 53"
+      val game = fenToGame(position, Atomic)
+      val newGame = game flatMap (_.playMove(
+        Pos.H7, Pos.H8, Bishop.some
+      ))
 
-        newGame must beSuccess.like {
-            case game =>
-                game.situation.end must beFalse
-        }
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.end must beFalse
+      }
     }
   }
 }

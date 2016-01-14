@@ -19,7 +19,7 @@ class VariantTest extends ChessTest {
 
       game should beSuccess.like {
         case gm =>
-          gm.situation.board.variant.insufficientWinningMaterial(gm.situation, Color.white) must beTrue
+          gm.situation.board.variant.insufficientWinningMaterial(gm.situation.board, Color.white) must beTrue
       }
     }
 
@@ -29,9 +29,9 @@ class VariantTest extends ChessTest {
 
       game should beSuccess.like {
         case gm =>
-          gm.situation.board.variant.insufficientWinningMaterial(gm.situation, Color.white) must beTrue
+          gm.situation.board.variant.insufficientWinningMaterial(gm.situation.board, Color.white) must beTrue
       }
-    
+
     }
   }
 
@@ -70,7 +70,7 @@ PP
    K
 """.kingOfTheHill, White).situation
         sit.end must beTrue
-        sit.winner must beSome.like{
+        sit.winner must beSome.like {
           case color => color == Black
         }
 
@@ -113,7 +113,7 @@ K  r
           B4 -> C3, B1 -> C3, D8 -> H4, A2 -> A3, H4 -> F2).toOption.get
         game.situation.end must beTrue
 
-        game.situation.winner must beSome.like{
+        game.situation.winner must beSome.like {
           case color =>
             color == Black
         }
@@ -126,7 +126,7 @@ K  r
 
       val successGame = game flatMap (_.playMove(Pos.H2, Pos.H1, Knight.some))
 
-      successGame must beSuccess.like{
+      successGame must beSuccess.like {
         case game =>
           game.situation.end must beFalse
       }
@@ -136,7 +136,7 @@ K  r
       val position = "8/6K1/8/8/8/8/k7/8 b - -"
       val game = fenToGame(position, ThreeCheck)
 
-      game must beSuccess.like{
+      game must beSuccess.like {
         case game =>
           game.situation.end must beTrue
           game.situation.status must beEqualTo(Status.Draw.some)
@@ -191,7 +191,7 @@ K  r
             game.situation.end must beTrue
             game.situation.winner must beSome.like {
               case color => color == Black
-          }
+            }
         }
       }
     }

@@ -60,12 +60,14 @@ case object RacingKings extends Variant(
   override def winner(situation: Situation): Option[Color] =
     specialEnd(situation) option Color(reachedGoal(situation.board, White))
 
-  private def givesCheck(move: Move) =
-    move.situationAfter.check
-
-  // Giving check is not allowed.
-  override def validMoves(situation: Situation) =
-    super.validMoves(situation) mapValues (_.filterNot(givesCheck))
+  // Not only check that our king is safe,
+  // but also check the opponent's
+  override def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean =
+    super.kingSafety(m, filter, kingPos) && !{
+      m.after.kingPos get !m.color exists { theirKingPos =>
+        kingThreatened(m.after, m.color, theirKingPos, (_ => true))
+      }
+    }
 
   // When considering stalemate, take into account that checks are not allowed.
   override def staleMate(situation: Situation): Boolean =

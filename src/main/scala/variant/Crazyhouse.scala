@@ -1,6 +1,8 @@
 package chess
 package variant
 
+import format.Uci
+
 import scalaz.Validation.FlatMap._
 
 case object Crazyhouse extends Variant(
@@ -23,10 +25,16 @@ case object Crazyhouse extends Variant(
     before = situation.board,
     after = board1 withCrazyData d2)
 
-  override def finalizeBoard(board: Board, capture: Option[Piece]): Board = (for {
-    piece <- capture
-    data <- board.crazyData
-  } yield board.withCrazyData(data store piece)) | board
+  override def finalizeBoard(board: Board, uci: Uci, capture: Option[Piece]): Board =
+    board.crazyData.fold(board) { data =>
+      val d1 = capture.fold(data)(data.store)
+      val d2 = uci match {
+        case Uci.Move(_, dest, Some(_)) => d1 promote dest
+        case Uci.Move(orig, dest, _)    => d1.move(orig, dest)
+        case _                          => d1
+      }
+      board withCrazyData d2
+    }
 
   case class Data(
       pockets: Pockets,
@@ -34,14 +42,20 @@ case object Crazyhouse extends Variant(
       // when captured and put in the pocket.
       // there we need to remember which pieces are issued from promotions.
       // we do that by tracking their positions on the board.
-      promoted: List[Pos]) {
+      promoted: Set[Pos]) {
 
     def drop(piece: Piece, pos: Pos): Option[Data] =
       pockets take piece map { nps =>
-        copy(pockets = nps, promoted = pos :: promoted)
+        copy(pockets = nps)
       }
 
     def store(piece: Piece) = copy(pockets = pockets store piece)
+
+    def promote(pos: Pos) = copy(promoted = promoted + pos)
+
+    def move(orig: Pos, dest: Pos) = copy(
+      promoted = if (promoted(orig)) promoted - orig + dest else promoted
+    )
   }
 
   case class Pockets(white: Pocket, black: Pocket) {

@@ -21,7 +21,7 @@ case class Drop(
         positionHashes = Array(),
         lastMove = Some(Uci.Drop(piece.role, pos))
       )
-    }, none)
+    }, toUci, none)
 
   def afterWithLastMove = after.copy(
     history = after.history.withLastMove(Uci.Drop(piece.role, pos)))
@@ -32,7 +32,7 @@ case class Drop(
 
   def withLag(l: FiniteDuration) = copy(lag = l)
 
-  def uciString = s"${piece.role.pgn}@$pos"
+  def toUci = Uci.Drop(piece.role, pos)
 
-  override def toString = uciString
+  override def toString = toUci.uci
 }

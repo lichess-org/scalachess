@@ -25,7 +25,7 @@ case class Move(
       // last move and position hashes
       val h2 = h1.copy(
         positionHashes = Array(),
-        lastMove = Some(Uci.Move(orig, dest, promotion))
+        lastMove = Some(toUci)
       )
       // my broken castles
       val h3 =
@@ -48,13 +48,13 @@ case class Move(
       } yield h3.withoutCastle(!color, side)) | h3
     }
 
-    board.variant.finalizeBoard(board, capture flatMap before.apply)
+    board.variant.finalizeBoard(board, toUci, capture flatMap before.apply)
   }
 
   def applyVariantEffect: Move = before.variant addVariantEffect this
 
   def afterWithLastMove = after.copy(
-    history = after.history.withLastMove(Uci.Move(orig, dest, promotion)))
+    history = after.history.withLastMove(toUci))
 
   // does this move capture an opponent piece?
   def captures = capture.isDefined
@@ -78,9 +78,7 @@ case class Move(
 
   def withLag(l: FiniteDuration) = copy(lag = l)
 
-  def keyString = s"$orig$dest"
+  def toUci = Uci.Move(orig, dest, promotion)
 
-  def uciString = s"$orig$dest${promotion.fold("")(_.forsyth.toString)}"
-
-  override def toString = s"$piece $keyString"
+  override def toString = s"$piece ${toUci.uci}"
 }

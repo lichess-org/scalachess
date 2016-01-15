@@ -9,7 +9,7 @@ class OpeningsTest extends Specification with Matchers {
       Openings.codeFamily must havePair("E50" -> "Nimzo-Indian Defence")
     }
     "for a given code, select the family with the highest cardinality" in {
-      Openings.codeFamily must havePair("D02" -> "Queen Pawn Game")
+      Openings.codeFamily must havePair("D02" -> "Queen's Pawn Game")
     }
   }
 

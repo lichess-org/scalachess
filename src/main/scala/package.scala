@@ -30,6 +30,8 @@ package object chess
 
   type PositionHash = Array[Byte]
 
+  type MoveOrDrop = Either[Move, Drop]
+
   object implicitFailures {
     implicit def stringToFailures(str: String): Failures = scalaz.NonEmptyList(str)
   }

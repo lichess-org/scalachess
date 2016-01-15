@@ -55,7 +55,22 @@ object Dumper {
     }
   }
 
+  def apply(situation: Situation, data: chess.Drop, next: Situation): String = {
+     data.toUci.uci + {
+      if (next.check) {
+        if (next.checkMate) "#" else "+"
+      }
+      else if (next.winner.isDefined) "#"
+      else ""
+    }
+  }
+
   def apply(data: chess.Move): String = apply(
+    data.before situationOf data.color,
+    data,
+    data.afterWithLastMove situationOf !data.color)
+
+  def apply(data: chess.Drop): String = apply(
     data.before situationOf data.color,
     data,
     data.afterWithLastMove situationOf !data.color)

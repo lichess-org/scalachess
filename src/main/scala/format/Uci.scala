@@ -29,6 +29,27 @@ object Uci
     def origDest = orig -> dest
   }
 
+  case object Move {
+
+    def apply(move: String): Option[Move] = for {
+      orig ← Pos.posAt(move take 2)
+      dest ← Pos.posAt(move drop 2 take 2)
+      promotion = move lift 4 flatMap Role.promotable
+    } yield Uci.Move(orig, dest, promotion)
+
+    def piotr(move: String) = for {
+      orig ← move.headOption flatMap Pos.piotr
+      dest ← move lift 1 flatMap Pos.piotr
+      promotion = move lift 2 flatMap Role.promotable
+    } yield Uci.Move(orig, dest, promotion)
+
+    def fromStrings(origS: String, destS: String, promS: Option[String]) = for {
+      orig ← Pos.posAt(origS)
+      dest ← Pos.posAt(destS)
+      promotion = Role promotable promS
+    } yield Move(orig, dest, promotion)
+  }
+
   case class Drop(role: Role, pos: Pos) extends Uci {
 
     def uci = s"${role.pgn}@${pos.key}"
@@ -38,29 +59,29 @@ object Uci
     def origDest = pos -> pos
   }
 
-  def apply(move: Move): Uci = Uci.Move(move.orig, move.dest, move.promotion)
+  object Drop {
+
+    def fromStrings(roleS: String, posS: String) = for {
+      role ← roleS.headOption flatMap Role.allByPgn.get
+      pos ← Pos.posAt(posS)
+    } yield Drop(role, pos)
+  }
+
+  def apply(move: chess.Move) = Uci.Move(move.orig, move.dest, move.promotion)
 
   def apply(move: String): Option[Uci] =
     if (move lift 1 contains "@") for {
       role ← move.headOption flatMap Role.allByPgn.get
       pos ← Pos.posAt(move drop 2 take 2)
     } yield Uci.Drop(role, pos)
-    else for {
-      orig ← Pos.posAt(move take 2)
-      dest ← Pos.posAt(move drop 2 take 2)
-      promotion = move lift 4 flatMap Role.promotable
-    } yield Uci.Move(orig, dest, promotion)
+    else Uci.Move(move)
 
   def piotr(move: String): Option[Uci] =
     if (move lift 1 contains "@") for {
       role ← move.headOption flatMap Role.allByPgn.get
       pos ← move lift 2 flatMap Pos.piotr
     } yield Uci.Drop(role, pos)
-    else for {
-      orig ← move.headOption flatMap Pos.piotr
-      dest ← move lift 1 flatMap Pos.piotr
-      promotion = move lift 2 flatMap Role.promotable
-    } yield Uci.Move(orig, dest, promotion)
+    else Uci.Move.piotr(move)
 
   def readList(moves: String): Option[List[Uci]] =
     moves.split(' ').toList.map(apply).sequence

@@ -117,7 +117,7 @@ abstract class Variant(
   /**
    * Once a move has been decided upon from the available legal moves, the board is finalized
    */
-  def finalizeBoard(board: Board): Board = board
+  def finalizeBoard(board: Board, captured: Option[Piece]): Board = board
 
   protected def pawnsOnPromotionRank(board: Board, color: Color) = {
     val promotionRank = if (color == White) 8 else 1

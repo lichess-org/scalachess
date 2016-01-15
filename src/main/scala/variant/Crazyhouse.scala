@@ -21,7 +21,12 @@ case object Crazyhouse extends Variant(
     piece = piece,
     pos = pos,
     before = situation.board,
-    after = board1)
+    after = board1 withCrazyData d2)
+
+  override def finalizeBoard(board: Board, capture: Option[Piece]): Board = (for {
+    piece <- capture
+    data <- board.crazyData
+  } yield board.withCrazyData(data store piece)) | board
 
   case class Data(
       pockets: Pockets,
@@ -35,6 +40,8 @@ case object Crazyhouse extends Variant(
       pockets take piece map { nps =>
         copy(pockets = nps, promoted = pos :: promoted)
       }
+
+    def store(piece: Piece) = copy(pockets = pockets store piece)
   }
 
   case class Pockets(white: Pocket, black: Pocket) {
@@ -42,6 +49,10 @@ case object Crazyhouse extends Variant(
     def take(piece: Piece): Option[Pockets] = piece.color.fold(
       white take piece.role map { np => copy(white = np) },
       black take piece.role map { np => copy(black = np) })
+
+    def store(piece: Piece) = copy(
+      white = piece.color.fold(white store piece.role, white),
+      black = piece.color.fold(black, black store piece.role))
   }
 
   case class Pocket(roles: List[Role]) {
@@ -49,5 +60,7 @@ case object Crazyhouse extends Variant(
     def take(role: Role) =
       if (roles contains role) Some(copy(roles = roles diff List(role)))
       else None
+
+    def store(role: Role) = copy(roles = role :: roles)
   }
 }

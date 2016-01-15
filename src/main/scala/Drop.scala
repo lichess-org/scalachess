@@ -15,14 +15,13 @@ case class Drop(
 
   def withHistory(h: History) = copy(after = after withHistory h)
 
-  def finalizeAfter: Board = after.variant.finalizeBoard {
+  def finalizeAfter: Board = after.variant.finalizeBoard(
     after updateHistory {
       _.copy(
         positionHashes = Array(),
         lastMove = Some(Uci.Drop(piece.role, pos))
       )
-    }
-  }
+    }, none)
 
   def afterWithLastMove = after.copy(
     history = after.history.withLastMove(Uci.Drop(piece.role, pos)))

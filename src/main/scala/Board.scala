@@ -2,13 +2,13 @@ package chess
 
 import Pos.posAt
 import scalaz.Validation.FlatMap._
-import variant.Variant
+import variant.{ Variant, Crazyhouse }
 
 case class Board(
     pieces: PieceMap,
     history: History,
     variant: Variant,
-    crazyData: Option[chess.variant.Crazyhouse.Data] = None) {
+    crazyData: Option[Crazyhouse.Data] = None) {
 
   import implicitFailures._
 
@@ -109,6 +109,8 @@ case class Board(
   def withVariant(v: Variant): Board = {
     copy(variant = v)
   }
+
+  def withCrazyData(data: Crazyhouse.Data) = copy(crazyData = Some(data))
 
   def updateHistory(f: History => History) = copy(history = f(history))
 

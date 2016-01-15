@@ -48,7 +48,7 @@ case class Move(
       } yield h3.withoutCastle(!color, side)) | h3
     }
 
-    board.variant.finalizeBoard(board)
+    board.variant.finalizeBoard(board, capture flatMap before.apply)
   }
 
   def applyVariantEffect: Move = before.variant addVariantEffect this

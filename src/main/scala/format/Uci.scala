@@ -62,7 +62,7 @@ object Uci
   object Drop {
 
     def fromStrings(roleS: String, posS: String) = for {
-      role ← roleS.headOption flatMap Role.allByPgn.get
+      role ← Role.allByName get roleS
       pos ← Pos.posAt(posS)
     } yield Drop(role, pos)
   }

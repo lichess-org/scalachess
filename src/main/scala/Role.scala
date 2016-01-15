@@ -84,6 +84,7 @@ object Role {
   val allPromotable: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, King)
   val allByForsyth: Map[Char, Role] = all map { r => (r.forsyth, r) } toMap
   val allByPgn: Map[Char, Role] = all map { r => (r.pgn, r) } toMap
+  val allByName: Map[String, Role] = all map { r => (r.name, r) } toMap
   val allPromotableByName: Map[String, PromotableRole] =
     allPromotable map { r => (r.toString, r) } toMap
   val allPromotableByForsyth: Map[Char, PromotableRole] =

@@ -41,9 +41,26 @@ case class Game(
 
   def drop(role: Role, pos: Pos, lag: FiniteDuration = 0.millis): Valid[(Game, Drop)] =
     situation.drop(role, pos).map(_ withLag lag) map { drop =>
-      // apply(move) -> move
-      ???
+      applyDrop(drop) -> drop
     }
+
+  def applyDrop(drop: Drop): Game = {
+    val newTurns = turns + 1
+    val newGame = copy(
+      board = drop.finalizeAfter,
+      player = !player,
+      turns = newTurns,
+      clock = clock map {
+        case c: RunningClock => c step drop.lag
+        case c: PausedClock if (newTurns - startedAtTurn) == 2 => c.start.switch
+        case c => c
+      }
+    )
+    val pgnMove = pgn.Dumper(situation, drop, newGame.situation)
+    newGame.copy(pgnMoves = pgnMoves.isEmpty.fold(
+      List(pgnMove),
+      pgnMoves :+ pgnMove))
+  }
 
   lazy val situation = Situation(board, player)
 

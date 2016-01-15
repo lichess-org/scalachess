@@ -5,6 +5,8 @@ sealed trait Uci {
 
   def uci: String
   def piotr: String
+
+  def origDest: (Pos, Pos)
 }
 
 object Uci
@@ -32,6 +34,8 @@ object Uci
     def uci = s"${role.pgn}@${pos.key}"
 
     def piotr = s"${role.pgn}@${pos.piotrStr}"
+
+    def origDest = pos -> pos
   }
 
   def apply(move: Move): Uci = Uci.Move(move.orig, move.dest, move.promotion)

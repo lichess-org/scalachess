@@ -43,6 +43,10 @@ case class Piece(color: Color, role: Role) {
 
 object Piece {
 
+  def fromChar(c: Char): Option[Piece] = Role.allByPgn get c.toUpper map {
+    Piece(Color(c.isUpper), _)
+  }
+
   private def pawnEyes(color: Color, from: Pos, to: Pos) =
     (from xDist to) == 1 && (to.y - from.y) == {
       if (color.white) 1 else -1

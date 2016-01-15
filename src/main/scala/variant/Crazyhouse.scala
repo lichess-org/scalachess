@@ -35,6 +35,8 @@ case object Crazyhouse extends Variant(
     case _ => board
   }
 
+  val storableRoles = List(Pawn, Knight, Bishop, Rook, Queen)
+
   case class Data(
       pockets: Pockets,
       // in crazyhouse, a promoted piece becomes a pawn
@@ -79,6 +81,8 @@ case object Crazyhouse extends Variant(
       if (roles contains role) Some(copy(roles = roles diff List(role)))
       else None
 
-    def store(role: Role) = copy(roles = role :: roles)
+    def store(role: Role) =
+      if (storableRoles contains role) copy(roles = role :: roles)
+      else this
   }
 }

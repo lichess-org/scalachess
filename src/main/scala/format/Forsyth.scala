@@ -80,22 +80,31 @@ object Forsyth {
   }
 
   def >>(game: Game): String = List(
-    exportBoard(game.board),
+    exportBoard(game.board) + crazyPocket(game.board),
     game.player.letter,
     game.board.history.castles.toString,
-    ((for {
-      lastMove ← game.board.history.lastMove
-      piece ← game board lastMove.dest
-      if piece is Pawn
-      pos ← if (lastMove.orig.y == 2 && lastMove.dest.y == 4) lastMove.dest.down
-      else if (lastMove.orig.y == 7 && lastMove.dest.y == 5) lastMove.dest.up
-      else None
-    } yield pos.toString) getOrElse "-"),
+    (game.board.history.lastMove match {
+      case Some(lastMove: Uci.Move) => for {
+        piece ← game board lastMove.dest
+        if piece is Pawn
+        pos ← if (lastMove.orig.y == 2 && lastMove.dest.y == 4) lastMove.dest.down
+        else if (lastMove.orig.y == 7 && lastMove.dest.y == 5) lastMove.dest.up
+        else None
+      } yield pos.toString
+      case _ => None
+    }) getOrElse "-",
     game.halfMoveClock,
     game.fullMoveNumber
   ) mkString " "
 
-  def tore(pos: Pos, n: Int): Option[Pos] = Pos.posAt(
+  private def crazyPocket(board: Board) = board.crazyData match {
+    case Some(variant.Crazyhouse.Data(pockets, _)) => "/" +
+      pockets.white.roles.map(_.forsythUpper).mkString +
+      pockets.black.roles.map(_.forsyth).mkString
+    case _ => ""
+  }
+
+  private[chess] def tore(pos: Pos, n: Int): Option[Pos] = Pos.posAt(
     ((pos.x + n - 1) % 8 + 1),
     (pos.y - (pos.x + n - 1) / 8)
   )

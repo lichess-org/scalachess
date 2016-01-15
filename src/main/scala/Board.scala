@@ -7,7 +7,8 @@ import variant.Variant
 case class Board(
     pieces: PieceMap,
     history: History,
-    variant: Variant) {
+    variant: Variant,
+    crazyData: Option[chess.variant.Crazyhouse.Data] = None) {
 
   import implicitFailures._
 

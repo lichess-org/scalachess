@@ -1,7 +1,7 @@
 package chess
 
-import Pos.posAt
 import format.Uci
+import Pos.posAt
 
 case class Actor(
     piece: Piece,
@@ -45,6 +45,7 @@ case class Actor(
           victimFrom ← pawnDir(victimPos) flatMap pawnDir
           if history.lastMove.exists {
             case Uci.Move(orig, dest, _) => orig == victimFrom && dest == victimPos
+            case _                       => false
           }
           b ← board.taking(pos, targetPos, Some(victimPos))
         } yield move(targetPos, b, Some(victimPos), enpassant = true)
@@ -76,7 +77,7 @@ case class Actor(
 
     // We apply the current game variant's effects if there are any so that we can accurately decide if the king would
     // be in danger after the move was made.
-    if (board.variant.hasMoveEffects)  moves map (_.applyVariantEffect) else moves
+    if (board.variant.hasMoveEffects) moves map (_.applyVariantEffect) else moves
   }
 
   lazy val destinations: List[Pos] = moves map (_.dest)
@@ -205,7 +206,7 @@ object Actor {
   /**
    * Determines the squares that a pawn attacks based on the colour of the pawn.
    */
-  def pawnAttacks(pos: Pos, color : Color) : List[Pos] = {
+  def pawnAttacks(pos: Pos, color: Color): List[Pos] = {
     if (color.white) List(pos.upLeft, pos.upRight)
     else List(pos.downLeft, pos.downRight)
   }.flatten

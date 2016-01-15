@@ -2,6 +2,7 @@ package chess
 package variant
 
 import Pos.posAt
+import scalaz.NonEmptyList
 import scalaz.Validation.FlatMap._
 
 abstract class Variant(
@@ -76,6 +77,9 @@ abstract class Variant(
       m3 <- m2 validIf (isValidPromotion(promotion), "Cannot promote to " + promotion + " in this game mode")
     } yield m3
   }
+
+  def drop(situation: Situation, role: Role, pos: Pos): Valid[Drop] =
+    s"$this variant cannot drop pieces".failureNel
 
   def staleMate(situation: Situation): Boolean = !situation.check && situation.moves.isEmpty
 

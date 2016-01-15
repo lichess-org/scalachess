@@ -43,6 +43,9 @@ case class Situation(board: Board, color: Color) {
   def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Valid[Move] =
     board.variant.move(this, from, to, promotion)
 
+  def drop(role: Role, pos: Pos): Valid[Drop] =
+    board.variant.drop(this, role, pos)
+
   def withHistory(history: History) = copy(
     board = board withHistory history
   )

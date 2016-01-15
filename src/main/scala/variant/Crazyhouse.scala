@@ -51,7 +51,9 @@ case object Crazyhouse extends Variant(
       }
 
     def store(piece: Piece, from: Pos) =
-      copy(pockets = pockets store promoted(from).fold(piece.color.pawn, piece))
+      copy(
+        pockets = pockets store promoted(from).fold(piece.color.pawn, piece),
+        promoted = promoted - from)
 
     def promote(pos: Pos) = copy(promoted = promoted + pos)
 

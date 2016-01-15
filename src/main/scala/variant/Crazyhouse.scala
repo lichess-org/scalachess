@@ -15,7 +15,7 @@ case object Crazyhouse extends Variant(
 
   override def drop(situation: Situation, role: Role, pos: Pos): Valid[Drop] = for {
     d1 <- situation.board.crazyData toValid "Board has no crazyhouse data"
-    _ <- d1 validIf (role == Pawn && pos.y == 1 || pos.y == 8, s"Can't drop $role on $pos")
+    _ <- d1 validIf (role != Pawn || pos.y != 1 || pos.y != 8, s"Can't drop $role on $pos")
     piece = Piece(situation.color, role)
     d2 <- d1.drop(piece, pos) toValid s"No $piece to drop"
     board1 <- situation.board.place(piece, pos) toValid s"Can't drop $role on $pos, it's occupied"

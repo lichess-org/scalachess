@@ -1,7 +1,7 @@
 package chess
 
 import Pos.posAt
-import format.UciMove
+import format.Uci
 
 case class Actor(
     piece: Piece,
@@ -44,7 +44,7 @@ case class Actor(
           targetPos ← horizontal(next)
           victimFrom ← pawnDir(victimPos) flatMap pawnDir
           if history.lastMove.exists {
-            case UciMove(orig, dest, _) => orig == victimFrom && dest == victimPos
+            case Uci.Move(orig, dest, _) => orig == victimFrom && dest == victimPos
           }
           b ← board.taking(pos, targetPos, Some(victimPos))
         } yield move(targetPos, b, Some(victimPos), enpassant = true)

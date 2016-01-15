@@ -9,6 +9,7 @@ case class Game(
     player: Color = White,
     pgnMoves: List[String] = Nil,
     clock: Option[Clock] = None,
+    pockets: Option[Pockets] = None,
     turns: Int = 0,
     startedAtTurn: Int = 0) {
 
@@ -38,6 +39,10 @@ case class Game(
       List(pgnMove),
       pgnMoves :+ pgnMove))
   }
+
+  // def drop(role: Role, pos: Pos): Valid[(Game, Drop)] = {
+  //   ???
+  // }
 
   lazy val situation = Situation(board, player)
 

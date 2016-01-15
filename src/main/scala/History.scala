@@ -1,6 +1,6 @@
 package chess
 
-import format.UciMove
+import format.Uci
 import Pos.posAt
 
 case class CheckCount(white: Int = 0, black: Int = 0) {
@@ -15,7 +15,7 @@ case class CheckCount(white: Int = 0, black: Int = 0) {
 }
 
 case class History(
-    lastMove: Option[UciMove] = None,
+    lastMove: Option[Uci] = None,
     positionHashes: PositionHash = Array(),
     castles: Castles = Castles.all,
     checkCount: CheckCount = CheckCount(0, 0)) {
@@ -64,7 +64,7 @@ case class History(
   def positionHashesWith(hash: PositionHash): PositionHash =
     hash ++ positionHashes
 
-  def withLastMove(m: UciMove) = copy(lastMove = Some(m))
+  def withLastMove(m: Uci) = copy(lastMove = Some(m))
 
   def withCheck(color: Color, v: Boolean) =
     if (v) copy(checkCount = checkCount add color) else this
@@ -73,7 +73,7 @@ case class History(
 object History {
 
   def make(
-    lastMove: Option[UciMove],
+    lastMove: Option[Uci],
     positionHashes: PositionHash,
     castles: Castles): History = new History(
     lastMove = lastMove,
@@ -83,7 +83,7 @@ object History {
   def make(
     lastMove: Option[String], // a2a4
     castles: String): History = make(
-    lastMove = lastMove flatMap UciMove.apply,
+    lastMove = lastMove flatMap Uci.apply,
     positionHashes = Array(),
     castles = Castles(castles))
 

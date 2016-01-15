@@ -25,16 +25,15 @@ case object Crazyhouse extends Variant(
     before = situation.board,
     after = board1 withCrazyData d2)
 
-  override def finalizeBoard(board: Board, uci: Uci, capture: Option[Piece]): Board =
-    board.crazyData.fold(board) { data =>
-      val d1 = capture.fold(data)(data.store)
-      val d2 = uci match {
-        case Uci.Move(_, dest, Some(_)) => d1 promote dest
-        case Uci.Move(orig, dest, _)    => d1.move(orig, dest)
-        case _                          => d1
+  override def finalizeBoard(board: Board, uci: Uci, capture: Option[Piece]): Board = uci match {
+    case Uci.Move(orig, dest, promOption) =>
+      board.crazyData.fold(board) { data =>
+        val d1 = capture.fold(data) { data.store(_, dest) }
+        val d2 = promOption.fold(d1.move(orig, dest)) { _ => d1 promote dest }
+        board withCrazyData d2
       }
-      board withCrazyData d2
-    }
+    case _ => board
+  }
 
   case class Data(
       pockets: Pockets,
@@ -49,13 +48,18 @@ case object Crazyhouse extends Variant(
         copy(pockets = nps)
       }
 
-    def store(piece: Piece) = copy(pockets = pockets store piece)
+    def store(piece: Piece, from: Pos) =
+      copy(pockets = pockets store promoted(from).fold(piece.color.pawn, piece))
 
     def promote(pos: Pos) = copy(promoted = promoted + pos)
 
     def move(orig: Pos, dest: Pos) = copy(
       promoted = if (promoted(orig)) promoted - orig + dest else promoted
     )
+  }
+
+  object Data {
+    val init = Data(Pockets(Pocket(Nil), Pocket(Nil)), Set.empty)
   }
 
   case class Pockets(white: Pocket, black: Pocket) {
@@ -65,8 +69,8 @@ case object Crazyhouse extends Variant(
       black take piece.role map { np => copy(black = np) })
 
     def store(piece: Piece) = copy(
-      white = piece.color.fold(white store piece.role, white),
-      black = piece.color.fold(black, black store piece.role))
+      white = piece.color.fold(white, white store piece.role),
+      black = piece.color.fold(black store piece.role, black))
   }
 
   case class Pocket(roles: List[Role]) {

@@ -39,7 +39,7 @@ object Binary {
 
     def intMoves(bs: List[Int], pliesToGo: Int): List[String] = bs match {
       case _ if pliesToGo <= 0 => Nil
-      case Nil                              => Nil
+      case Nil                 => Nil
       case b1 :: rest if moveType(b1) == MoveType.SimplePawn =>
         simplePawn(b1) :: intMoves(rest, pliesToGo - 1)
       case b1 :: b2 :: rest if moveType(b1) == MoveType.SimplePiece =>
@@ -118,6 +118,7 @@ object Binary {
         fullPawn(Option(file), pos, check, Option(promotion))
       case FullPieceR(piece, orig, capture, pos, check) =>
         fullPiece(piece, orig, pos, capture, check)
+      case DropR(role, pos) => drop(role, pos)
     }) map (_.toByte)
 
     def moves(strs: List[String]): List[Byte] = strs flatMap move
@@ -145,6 +146,11 @@ object Binary {
       (MoveType.FullPiece << 6) + posInt(pos),
       (pieceInts(piece) << 5) + (checkInts(check) << 3) + (boolInt(capture) << 2),
       (disambTypeInt(orig) << 6) + disambiguationInt(orig)
+    )
+
+    def drop(role: String, pos: String, check: String) = List(
+      (MoveType.SimplePiece << 6) + posInt(pos),
+      (pieceInts(piece) << 5) + (checkInts(check) << 3) + (boolInt(capture) << 2)
     )
 
     def disambTypeInt(orig: String): Int =
@@ -180,6 +186,7 @@ object Binary {
     val FullPawnR = s"^${fileR}$posR$promotionR$checkR$$".r
     val CastlingR = s"^(O-O|O-O-O)$checkR$$".r
     val FullPieceR = s"^$pieceR$origR$captureR$posR$checkR$$".r
+    val DropR = s"^$pieceR@$posR$checkR$$".r
   }
 
   @inline private def toInt(b: Byte): Int = b & 0xff

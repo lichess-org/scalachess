@@ -21,6 +21,8 @@ object Binary {
   private object Encoding {
     val pieceInts: Map[String, Int] = Map("K" -> 1, "Q" -> 2, "R" -> 3, "N" -> 4, "B" -> 5, "O-O" -> 6, "O-O-O" -> 7)
     val pieceStrs: Map[Int, String] = (pieceInts map { case (k, v) => v -> k }).toMap
+    val dropPieceInts: Map[String, Int] = Map("P" -> 1, "Q" -> 2, "R" -> 3, "N" -> 4, "B" -> 5)
+    val dropPieceStrs: Map[Int, String] = (pieceInts map { case (k, v) => v -> k }).toMap
     val promotionInts: Map[String, Int] = Map("" -> 0, "Q" -> 1, "R" -> 2, "N" -> 3, "B" -> 4, "K" -> 6)
     val promotionStrs: Map[Int, String] = (promotionInts map { case (k, v) => v -> k }).toMap
     val checkInts: Map[String, Int] = Map("" -> 0, "+" -> 1, "#" -> 2)
@@ -75,7 +77,7 @@ object Binary {
         }
       }
     def drop(b1: Int, b2: Int): String = {
-      val piece = pieceStrs(b2 >> 5)
+      val piece = dropPieceStrs(b2 >> 5)
       val pos = posString(right(b1, 6))
       val check = checkStrs(cut(b2, 5, 3))
       s"$piece@$pos$check"
@@ -149,7 +151,7 @@ object Binary {
 
     def drop(piece: String, pos: String, check: String) = List(
       (MoveType.SimplePiece << 6) + posInt(pos),
-      (pieceInts(piece) << 5) + (checkInts(check) << 3) + (1 << 1)
+      (dropPieceInts(piece) << 5) + (checkInts(check) << 3) + (1 << 1)
     )
 
     def castling(str: String, check: String) = List(
@@ -201,7 +203,7 @@ object Binary {
     val FullPawnR = s"^${fileR}$posR$promotionR$checkR$$".r
     val CastlingR = s"^(O-O|O-O-O)$checkR$$".r
     val FullPieceR = s"^$pieceR$origR$captureR$posR$checkR$$".r
-    val DropR = s"^$pieceR@$posR$checkR$$".r
+    val DropR = s"^([QRNBP])@$posR$checkR$$".r
   }
 
   @inline private def toInt(b: Byte): Int = b & 0xff

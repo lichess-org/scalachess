@@ -128,34 +128,34 @@ class ForsythTest extends ChessTest {
       }
       "last move (for en passant)" in {
         f <<< "2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6 w - f6 0 36" must beSome.like {
-          case s => s.situation.board.history.lastMove must_== Some(UciMove(Pos.F7, Pos.F5))
+          case s => s.situation.board.history.lastMove must_== Some(Uci.Move(Pos.F7, Pos.F5))
         }
       }
       "last move (for en passant in Pretrov's defense)" in {
         f <<< "rnbqkb1r/ppp2ppp/8/3pP3/3Qn3/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 6" must beSome.like {
-          case s => s.situation.board.history.lastMove must_== Some(UciMove(Pos.D7, Pos.D5))
+          case s => s.situation.board.history.lastMove must_== Some(Uci.Move(Pos.D7, Pos.D5))
         }
       }
       "last move (for en passant with black to move)" in {
         f <<< "4k3/8/8/8/4pP2/8/2K5/8 b - f3 0 1" must beSome.like {
-          case s => s.situation.board.history.lastMove must_== Some(UciMove(Pos.F2, Pos.F4))
+          case s => s.situation.board.history.lastMove must_== Some(Uci.Move(Pos.F2, Pos.F4))
         }
       }
     }
     "with history" in {
       "starting" in {
         f <<< "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" must beSome.like {
-          case SituationPlus(Situation(Board(_, History(_, _, Castles(true, true, true, true), _), _), _), _) => ok
+          case SituationPlus(Situation(Board(_, History(_, _, Castles(true, true, true, true), _), _, _), _), _) => ok
         }
       }
       "white to play" in {
         f <<< "r2q1rk1/ppp2pp1/1bnpbn1p/4p3/4P3/1BNPBN1P/PPPQ1PP1/R3K2R w KQ - 7 10" must beSome.like {
-          case SituationPlus(Situation(Board(_, History(_, _, Castles(true, true, false, false), _), _), _), _) => ok
+          case SituationPlus(Situation(Board(_, History(_, _, Castles(true, true, false, false), _), _, _), _), _) => ok
         }
       }
       "black to play" in {
         f <<< "r1q2rk1/ppp2ppp/3p1n2/8/2PNp3/P1PnP3/2QP1PPP/R1B2K1R b - - 3 12" must beSome.like {
-          case SituationPlus(Situation(Board(_, History(_, _, Castles(false, false, false, false), _), _), _), _) => ok
+          case SituationPlus(Situation(Board(_, History(_, _, Castles(false, false, false, false), _), _, _), _), _) => ok
         }
       }
     }

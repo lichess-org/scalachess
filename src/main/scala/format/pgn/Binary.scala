@@ -12,7 +12,6 @@ object Binary {
   def readMoves(bs: List[Byte], nb: Int) = Try(Reader.moves(bs, nb))
 
   private object MoveType {
-
     val SimplePawn = 0
     val SimplePiece = 1
     val FullPawn = 2
@@ -53,17 +52,33 @@ object Binary {
 
     def simplePawn(i: Int): String = posString(right(i, 6))
 
-    def simplePiece(b1: Int, b2: Int): String = pieceStrs(b2 >> 5) match {
-      case castle@("O-O" | "O-O-O") => {
-        val check = checkStrs(cut(b2, 5, 3))
-        s"$castle$check"
+    // 2 movetype
+    // 6 pos
+    // ----
+    // 3 role
+    // 2 check
+    // 1 capture
+    // 1 drop
+    // 1 nothing
+    def simplePiece(b1: Int, b2: Int): String =
+      if (bitAt(b2, 2)) drop(b1, b2)
+      else pieceStrs(b2 >> 5) match {
+        case castle@("O-O" | "O-O-O") => {
+          val check = checkStrs(cut(b2, 5, 3))
+          s"$castle$check"
+        }
+        case piece => {
+          val pos = posString(right(b1, 6))
+          val capture = if (bitAt(b2, 3)) "x" else ""
+          val check = checkStrs(cut(b2, 5, 3))
+          s"$piece$capture$pos$check"
+        }
       }
-      case piece => {
-        val pos = posString(right(b1, 6))
-        val capture = if (bitAt(b2, 3)) "x" else ""
-        val check = checkStrs(cut(b2, 5, 3))
-        s"$piece$capture$pos$check"
-      }
+    def drop(b1: Int, b2: Int): String = {
+      val piece = pieceStrs(b2 >> 5)
+      val pos = posString(right(b1, 6))
+      val check = checkStrs(cut(b2, 5, 3))
+      s"$piece@$pos$check"
     }
 
     def fullPawn(b1: Int, b2: Int): String = {
@@ -118,7 +133,7 @@ object Binary {
         fullPawn(Option(file), pos, check, Option(promotion))
       case FullPieceR(piece, orig, capture, pos, check) =>
         fullPiece(piece, orig, pos, capture, check)
-      case DropR(role, pos) => drop(role, pos)
+      case DropR(role, pos, check) => drop(role, pos, check)
     }) map (_.toByte)
 
     def moves(strs: List[String]): List[Byte] = strs flatMap move
@@ -130,6 +145,11 @@ object Binary {
     def simplePiece(piece: String, pos: String, capture: String, check: String) = List(
       (MoveType.SimplePiece << 6) + posInt(pos),
       (pieceInts(piece) << 5) + (checkInts(check) << 3) + (boolInt(capture) << 2)
+    )
+
+    def drop(piece: String, pos: String, check: String) = List(
+      (MoveType.SimplePiece << 6) + posInt(pos),
+      (pieceInts(piece) << 5) + (checkInts(check) << 3) + (1 << 1)
     )
 
     def castling(str: String, check: String) = List(
@@ -146,11 +166,6 @@ object Binary {
       (MoveType.FullPiece << 6) + posInt(pos),
       (pieceInts(piece) << 5) + (checkInts(check) << 3) + (boolInt(capture) << 2),
       (disambTypeInt(orig) << 6) + disambiguationInt(orig)
-    )
-
-    def drop(role: String, pos: String, check: String) = List(
-      (MoveType.SimplePiece << 6) + posInt(pos),
-      (pieceInts(piece) << 5) + (checkInts(check) << 3) + (boolInt(capture) << 2)
     )
 
     def disambTypeInt(orig: String): Int =

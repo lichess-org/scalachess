@@ -74,14 +74,26 @@ class BinaryTest extends ChessTest {
         writeMove("O-O+") must_== "01000000,11001000"
         writeMove("O-O-O#") must_== "01000000,11110000"
       }
+      "drop" in {
+        writeMove("N@a1") must_==  "01000000,10000010"
+      }
+      "drop with check" in {
+        writeMove("N@a1+") must_== "01000000,10001010"
+      }
+      "drop with checkmate" in {
+        writeMove("N@a1#") must_== "01000000,10010010"
+      }
       "disambiguated by file" in {
         writeMove("Kfa1") must_== "11000000,00100000,00000101"
+      }
+      "disambiguated by file on h8" in {
+        writeMove("Kfh8") must_== "11111111,00100000,00000101"
       }
       "disambiguated by rank" in {
         writeMove("K8a1") must_== "11000000,00100000,01000111"
       }
       "disambiguated fully" in {
-        writeMove("Kf4a1") must_== "11000000,00100000,10101011"
+        writeMove("Kf4a1") must_==  "11000000,00100000,10101011"
       }
       "disambiguated fully with capture" in {
         writeMove("Kf4xa1") must_== "11000000,00100100,10101011"
@@ -161,6 +173,15 @@ class BinaryTest extends ChessTest {
       "castling with check" in {
         readMove("01000000,11001000") must_== "O-O+"
         readMove("01000000,11110000") must_== "O-O-O#"
+      }
+      "drop" in {
+        readMove("01000000,10000010") must_== "N@a1"
+      }
+      "drop with check" in {
+        readMove("01000000,10001010") must_== "N@a1+"
+      }
+      "drop with checkmate" in {
+        readMove("01000000,10010010") must_== "N@a1#"
       }
       "disambiguated by file" in {
         readMove("11000000,00100000,00000101") must_== "Kfa1"

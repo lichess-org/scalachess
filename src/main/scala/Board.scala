@@ -111,6 +111,7 @@ case class Board(
   }
 
   def withCrazyData(data: Crazyhouse.Data) = copy(crazyData = Some(data))
+  def withCrazyData(data: Option[Crazyhouse.Data]) = copy(crazyData = data)
 
   def updateHistory(f: History => History) = copy(history = f(history))
 
@@ -142,11 +143,12 @@ object Board {
   import Pos._
 
   def apply(pieces: Traversable[(Pos, Piece)], variant: Variant): Board =
-    Board(pieces.toMap, History(), variant)
+    Board(pieces.toMap, History(), variant, variantCrazyData(variant))
 
-  def init(variant: Variant): Board =
-    Board(pieces = variant.pieces, variant = variant)
+  def init(variant: Variant): Board = Board(variant.pieces, variant)
 
-  def empty(variant: Variant): Board =
-    Board(Map.empty, History(), variant)
+  def empty(variant: Variant): Board = Board(Nil, variant)
+
+  private def variantCrazyData(variant: Variant) =
+    (variant == Crazyhouse) option Crazyhouse.Data.init
 }

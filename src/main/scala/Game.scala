@@ -102,7 +102,7 @@ object Game {
     val g = apply(variant | chess.variant.Standard)
     fen.flatMap(format.Forsyth.<<<).fold(g) { parsed =>
       g.copy(
-        board = parsed.situation.board withVariant g.board.variant,
+        board = parsed.situation.board withVariant g.board.variant withCrazyData g.board.crazyData,
         player = parsed.situation.color,
         turns = parsed.turns)
     }

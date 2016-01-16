@@ -107,7 +107,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     val rankMap = rangeToMap('1' to '8')
 
     private val MoveR = """^(N|B|R|Q|K|)([a-h]?)([1-8]?)(x?)([a-h][0-9])(=?[NBRQ]?)(\+?)(\#?)$""".r
-    private val DropR = """^(N|B|R|Q|K|)@([a-h][1-8])(\+?)(\#?)$""".r
+    private val DropR = """^(N|B|R|Q|P)@([a-h][1-8])(\+?)(\#?)$""".r
 
     def apply(str: String, variant: Variant): Valid[San] = {
       if (str.size == 2) Pos.posAt(str).fold(slow(str)) { pos => succezz(Std(pos, Pawn)) }

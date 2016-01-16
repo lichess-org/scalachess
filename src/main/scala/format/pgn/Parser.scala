@@ -106,14 +106,15 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     val fileMap = rangeToMap('a' to 'h')
     val rankMap = rangeToMap('1' to '8')
 
-    private val Move = """^(N|B|R|Q|K|)([a-h]?)([1-8]?)(x?)([a-h][0-9])(=?[NBRQ]?)(\+?)(\#?)$""".r
+    private val MoveR = """^(N|B|R|Q|K|)([a-h]?)([1-8]?)(x?)([a-h][0-9])(=?[NBRQ]?)(\+?)(\#?)$""".r
+    private val DropR = """^(N|B|R|Q|K|)@([a-h][1-8])(\+?)(\#?)$""".r
 
     def apply(str: String, variant: Variant): Valid[San] = {
       if (str.size == 2) Pos.posAt(str).fold(slow(str)) { pos => succezz(Std(pos, Pawn)) }
       else str match {
         case "O-O" | "o-o" | "0-0"       => succezz(Castle(KingSide))
         case "O-O-O" | "o-o-o" | "0-0-0" => succezz(Castle(QueenSide))
-        case Move(role, file, rank, capture, pos, prom, check, mate) =>
+        case MoveR(role, file, rank, capture, pos, prom, check, mate) =>
           role.headOption.fold[Option[Role]](Some(Pawn))(variant.rolesByPgn.get) flatMap { role =>
             Pos posAt pos map { dest =>
               succezz(Std(
@@ -127,6 +128,16 @@ object Parser extends scalaz.syntax.ToTraverseOps {
                 promotion = if (prom == "") None else variant.rolesPromotableByPgn get prom.last))
             }
           } getOrElse slow(str)
+        case DropR(roleS, posS, check, mate) =>
+          roleS.headOption flatMap variant.rolesByPgn.get flatMap { role =>
+            Pos posAt posS map { pos =>
+              succezz(Drop(
+                role = role,
+                pos = pos,
+                check = check != "",
+                checkmate = mate != ""))
+            }
+          } getOrElse s"Cannot parse drop: $str".failureNel
         case _ => slow(str)
       }
     }

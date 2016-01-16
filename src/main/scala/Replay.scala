@@ -4,15 +4,16 @@ import chess.format.pgn.San
 import format.pgn.{ Parser, Reader, Tag }
 import scalaz.Validation.FlatMap._
 
-case class Replay(setup: Game, moves: List[Move], state: Game) {
+case class Replay(setup: Game, moves: List[MoveOrDrop], state: Game) {
 
   lazy val chronoMoves = moves.reverse
 
-  def addMove(move: Move) = copy(
-    moves = move.applyVariantEffect :: moves,
-    state = state(move))
+  def addMove(moveOrDrop: MoveOrDrop) = copy(
+    moves = moveOrDrop.left.map(_.applyVariantEffect) :: moves,
+    state = moveOrDrop.fold(state.apply, state.applyDrop))
 
-  def moveAtPly(ply: Int): Option[Move] = chronoMoves lift (ply - 1 - setup.startedAtTurn)
+  def moveAtPly(ply: Int): Option[MoveOrDrop] =
+    chronoMoves lift (ply - 1 - setup.startedAtTurn)
 }
 
 object Replay {
@@ -35,8 +36,8 @@ object Replay {
   private def recursiveGames(game: Game, sans: List[San]): Valid[List[Game]] =
     sans match {
       case Nil => success(Nil)
-      case san :: rest => san(game.situation) flatMap { move =>
-        val newGame = game(move)
+      case san :: rest => san(game.situation) flatMap { moveOrDrop =>
+        val newGame = moveOrDrop.fold(game.apply, game.applyDrop)
         recursiveGames(newGame, rest) map { newGame :: _ }
       }
     }
@@ -58,8 +59,8 @@ object Replay {
     def mk(g: Game, moves: List[San]): (List[Game], Option[ErrorMessage]) = moves match {
       case san :: rest => san(g.situation).fold(
         err => (Nil, err.head.some),
-        move => {
-          val newGame = g(move)
+        moveOrDrop => {
+          val newGame = moveOrDrop.fold(g.apply, g.applyDrop)
           mk(newGame, rest) match {
             case (next, msg) => (newGame :: next, msg)
           }
@@ -78,8 +79,8 @@ object Replay {
   private def recursiveBoards(sit: Situation, sans: List[San]): Valid[List[Board]] =
     sans match {
       case Nil => success(Nil)
-      case san :: rest => san(sit) flatMap { move =>
-        val after = move.afterWithLastMove
+      case san :: rest => san(sit) flatMap { moveOrDrop =>
+        val after = moveOrDrop.fold(_.afterWithLastMove, _.afterWithLastMove)
         recursiveBoards(Situation(after, !sit.color), rest) map { after :: _ }
       }
     }
@@ -100,8 +101,9 @@ object Replay {
   private def recursiveLastBoard(sit: Situation, sans: List[San]): Valid[Board] =
     sans match {
       case Nil => success(sit.board)
-      case san :: rest => san(sit) flatMap { move =>
-        recursiveLastBoard(Situation(move.afterWithLastMove, !sit.color), rest)
+      case san :: rest => san(sit) flatMap { moveOrDrop =>
+        val after = moveOrDrop.fold(_.afterWithLastMove, _.afterWithLastMove)
+        recursiveLastBoard(Situation(after, !sit.color), rest)
       }
     }
 

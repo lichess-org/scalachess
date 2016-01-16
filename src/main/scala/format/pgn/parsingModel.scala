@@ -13,7 +13,7 @@ case class ParsedPgn(tags: List[Tag], sans: List[San]) {
 // Standard Algebraic Notation
 sealed trait San {
 
-  def apply(situation: Situation): Valid[chess.Move]
+  def apply(situation: Situation): Valid[MoveOrDrop]
 }
 
 case class Std(
@@ -31,7 +31,9 @@ case class Std(
     checkmate = s.checkmate,
     promotion = s.promotion)
 
-  def apply(situation: Situation): Valid[chess.Move] =
+  def apply(situation: Situation) = move(situation) map Left.apply
+
+  def move(situation: Situation): Valid[chess.Move] =
     situation.board.pieces.foldLeft(none[chess.Move]) {
       case (None, (pos, piece)) if piece.color == situation.color && piece.role == role && compare(file, pos.x) && compare(rank, pos.y) && piece.eyesMovable(pos, dest) =>
         val a = Actor(piece, pos, situation.board)
@@ -45,8 +47,22 @@ case class Std(
     }
 
   private def compare[A](a: Option[A], b: A) = a.fold(true)(b==)
+}
 
-  // override def toString = role.forsyth + dest.toString
+case class Drop(
+    role: Role,
+    pos: Pos,
+    check: Boolean = false,
+    checkmate: Boolean = false) extends San {
+
+  def withSuffixes(s: Suffixes) = copy(
+    check = s.check,
+    checkmate = s.checkmate)
+
+  def apply(situation: Situation) = drop(situation) map Right.apply
+
+  def drop(situation: Situation): Valid[chess.Drop] =
+    situation.drop(role, pos)
 }
 
 case class Suffixes(
@@ -63,7 +79,9 @@ case class Castle(
     check = s.check,
     checkmate = s.checkmate)
 
-  def apply(situation: Situation): Valid[chess.Move] = for {
+  def apply(situation: Situation) = move(situation) map Left.apply
+
+  def move(situation: Situation): Valid[chess.Move] = for {
     kingPos ← situation.board kingPosOf situation.color toValid "No king found"
     actor ← situation.board actorAt kingPos toValid "No actor found"
     move ← actor.castleOn(side).headOption toValid "Cannot castle / variant is " + situation.board.variant

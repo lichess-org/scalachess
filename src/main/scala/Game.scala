@@ -2,7 +2,7 @@ package chess
 
 import scala.concurrent.duration._
 
-import format.pgn
+import format.{ pgn, Uci }
 
 case class Game(
     board: Board,
@@ -60,6 +60,13 @@ case class Game(
     newGame.copy(pgnMoves = pgnMoves.isEmpty.fold(
       List(pgnMove),
       pgnMoves :+ pgnMove))
+  }
+
+  def apply(uci: Uci.Move): Valid[(Game, Move)] = apply(uci.orig, uci.dest, uci.promotion)
+  def apply(uci: Uci.Drop): Valid[(Game, Drop)] = drop(uci.role, uci.pos)
+  def apply(uci: Uci): Valid[(Game, MoveOrDrop)] = uci match {
+    case u: Uci.Move => apply(u) map { case (g, m) => g -> Left(m) }
+    case u: Uci.Drop => apply(u) map { case (g, d) => g -> Right(d) }
   }
 
   lazy val situation = Situation(board, player)

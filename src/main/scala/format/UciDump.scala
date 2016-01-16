@@ -15,10 +15,11 @@ object UciDump {
       Replay(moves, initialFen, variant) map apply
     )
 
-  def move(variant: Variant)(m: Move): String = m.castle.fold(
-    m.orig.key + m.dest.key + m.promotion.fold("")(_.forsyth.toString)
-  ) {
+  def move(variant: Variant)(mod: MoveOrDrop): String = mod match {
+    case Left(m) => m.castle.fold(m.toUci.uci) {
       case ((kf, kt), (rf, rt)) if kf == kt || variant.chess960 => kf.key + rf.key
-      case ((kf, kt), _) => kf.key + kt.key
+      case ((kf, kt), _)                                        => kf.key + kt.key
     }
+    case Right(d) => d.toUci.uci
+  }
 }

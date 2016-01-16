@@ -5,7 +5,7 @@ case object RacingKings extends Variant(
   id = 9,
   key = "racingKings",
   name = "Racing Kings",
-  shortName = "Racing",
+  shortName = "Race",
   title = "Race to the eighth rank to win.",
   standardInitialPosition = false) {
 

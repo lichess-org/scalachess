@@ -6,9 +6,14 @@ case class Situation(board: Board, color: Color) {
 
   lazy val moves: Map[Pos, List[Move]] = board.variant.validMoves(this)
 
-  lazy val playerCanCapture : Boolean = moves exists (_._2 exists (_.captures))
+  lazy val playerCanCapture: Boolean = moves exists (_._2 exists (_.captures))
 
   lazy val destinations: Map[Pos, List[Pos]] = moves mapValues { _ map (_.dest) }
+
+  def drops: Option[List[Pos]] = board.variant match {
+    case v@variant.Crazyhouse => v possibleDrops this
+    case _                    => None
+  }
 
   lazy val kingPos: Option[Pos] = board kingPosOf color
 
@@ -28,7 +33,7 @@ case class Situation(board: Board, color: Color) {
 
   def end: Boolean = checkMate || staleMate || autoDraw || variantEnd
 
-  def winner : Option[Color] = board.variant.winner(this)
+  def winner: Option[Color] = board.variant.winner(this)
 
   def playable(strict: Boolean): Boolean =
     (board valid strict) && !end && !copy(color = !color).check

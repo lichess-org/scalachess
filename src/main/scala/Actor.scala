@@ -154,18 +154,6 @@ case class Actor(
     dirs flatMap { dir => forward(pos, dir) }
   }
 
-  private def longRangePoss(dirs: Directions): List[Pos] = {
-
-    def forward(p: Pos, dir: Direction): List[Pos] = dir(p) match {
-      case None                        => Nil
-      case Some(next) if friends(next) => Nil
-      case Some(next) if enemies(next) => List(next)
-      case Some(next)                  => next :: forward(next, dir)
-    }
-
-    dirs flatMap { dir => forward(pos, dir) }
-  }
-
   private val pawnDir = pawnDirOf(color)
 
   private def move(

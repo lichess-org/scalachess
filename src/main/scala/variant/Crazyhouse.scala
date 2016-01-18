@@ -13,9 +13,11 @@ case object Crazyhouse extends Variant(
   title = "Every time a piece is captured the capturing player gets a piece of the same type and of their color in their reserve.",
   standardInitialPosition = true) {
 
+  private def canDropPawnOn(pos: Pos) = (pos.y != 1 && pos.y != 8)
+
   override def drop(situation: Situation, role: Role, pos: Pos): Valid[Drop] = for {
     d1 <- situation.board.crazyData toValid "Board has no crazyhouse data"
-    _ <- d1.validIf(role != Pawn || (pos.y != 1 && pos.y != 8), s"Can't drop $role on $pos")
+    _ <- d1.validIf(role != Pawn || canDropPawnOn(pos), s"Can't drop $role on $pos")
     piece = Piece(situation.color, role)
     d2 <- d1.drop(piece, pos) toValid s"No $piece to drop"
     board1 <- situation.board.place(piece, pos) toValid s"Can't drop $role on $pos, it's occupied"
@@ -35,6 +37,20 @@ case object Crazyhouse extends Variant(
       }
     case _ => board
   }
+
+  private def canDropStuff(situation: Situation) =
+    situation.board.crazyData.fold(false) { (data: Data) =>
+      val roles = data.pockets(situation.color).roles
+      roles.nonEmpty && possibleDrops(situation).fold(true) { squares =>
+        squares.exists(canDropPawnOn) || roles.exists(chess.Pawn !=)
+      }
+    }
+
+  override def staleMate(situation: Situation) =
+    super.staleMate(situation) && !canDropStuff(situation)
+
+  override def checkmate(situation: Situation) =
+    super.checkmate(situation) && !canDropStuff(situation)
 
   def possibleDrops(situation: Situation): Option[List[Pos]] =
     if (!situation.check) None
@@ -87,6 +103,8 @@ case object Crazyhouse extends Variant(
   }
 
   case class Pockets(white: Pocket, black: Pocket) {
+
+    def apply(color: Color) = color.fold(white, black)
 
     def take(piece: Piece): Option[Pockets] = piece.color.fold(
       white take piece.role map { np => copy(white = np) },

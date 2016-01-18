@@ -21,9 +21,9 @@ case class Situation(board: Board, color: Color) {
 
   def history = board.history
 
-  def checkMate: Boolean = check && moves.isEmpty
+  def checkMate: Boolean = board.variant checkmate this
 
-  def staleMate: Boolean = board.variant.staleMate(this)
+  def staleMate: Boolean = board.variant staleMate this
 
   def autoDraw: Boolean = board.autoDraw || board.variant.specialDraw(this)
 

@@ -42,7 +42,9 @@ case object Crazyhouse extends Variant(
     situation.board.crazyData.fold(false) { (data: Data) =>
       val roles = data.pockets(situation.color).roles
       roles.nonEmpty && possibleDrops(situation).fold(true) { squares =>
-        squares.exists(canDropPawnOn) || roles.exists(chess.Pawn !=)
+        squares.nonEmpty && {
+          squares.exists(canDropPawnOn) || roles.exists(chess.Pawn !=)
+        }
       }
     }
 

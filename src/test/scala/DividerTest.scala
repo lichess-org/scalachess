@@ -2,7 +2,7 @@ package chess
 
 class DividerTest extends ChessTest {
 
-  def makeReplay(moves: String) = format.pgn.Reader.full(moves).err.chronoMoves.map(_.before)
+  def makeReplay(moves: String) = format.pgn.Reader.full(moves).err.chronoMoves.map(_.fold(_.before, _.before))
 
   "the divider finds middlegame and endgame" should {
     "game1" in {

@@ -80,7 +80,7 @@ class ReaderTest extends ChessTest {
     "promoting to a rook" in {
       Reader.full(fromLichessBadPromotion) must beSuccess.like {
         case replay => replay.chronoMoves lift 10 must beSome.like {
-          case move => move.promotion must_== Some(Rook)
+          case move => move.fold(_.promotion, _ => None) must_== Some(Rook)
         }
       }
     }

@@ -93,5 +93,17 @@ class ReaderTest extends ChessTest {
     "lichobile export" in {
       Reader.full(lichobile) must beSuccess
     }
+    "crazyhouse 1" in {
+      Reader.full(crazyhouse1) must beSuccess.like {
+        case replay => replay.chronoMoves lift 11 must beSome.like {
+          case move => move.fold(_.toUci.uci, _.toUci.uci) must_== "P@c6"
+        }
+      }
+    }
+    "crazyhouse 2" in {
+      Reader.full(crazyhouse2) must beSuccess.like {
+        case replay => replay.chronoMoves.size must_== 111
+      }
+    }
   }
 }

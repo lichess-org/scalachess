@@ -1446,4 +1446,57 @@ feel like I've turned around my position. I calculated that Qh6 isn't going to b
 33. Qh7+ Kf8 34. Qh8+ {resigns}
 [/pgn]
 """
+
+val crazyhouse1 = """
+[Event "internet, rated crazyhouse match"]
+[Variant "Crazyhouse"]
+[Site "ICS: freechess.org 5000"]
+[Date "2001.01.02"]
+[Time "07:19:??"]
+[Round "-"]
+[White "RabidWombat"]
+[Black "JiggaB"]
+[Result "1-0"]
+[WhiteElo "2512"]
+[BlackElo "2244"]
+[TimeControl "60+0"]
+
+1. e4 Nf6 2. Nc3 d5 3. exd5 Nxd5 4. Nxd5 Qxd5 5. N@e3 Qd8 6. Bb5+ P@c6 7. Bc4
+e6 8. Nf3 N@b6 9. Be2 Bc5 10. d4 Bb4+ 11. Bd2 Be7 12. h4 N8d7 13. P@e5 c5 14.
+dxc5 Nxc5 15. P@d4 Ne4 16. Bd3 Nxf2 17. Kxf2 P@f4 18. Nf1 P@e3+ 19. Bxe3 fxe3+
+20. Nxe3 B@f4 21. Nc4 Nxc4 22. Bxc4 N@b6 23. Bb5+ Bd7 24. Bxd7+ Qxd7 25. Ke1
+B@g3+ 26. P@f2 Bb4+ 27. P@c3 Bxf2+ 28. Kxf2 P@e3+ 29. Kg1 Be7 30. N@d3 Bh6 31.
+N@c5 Bxc5 32. Nxc5 Qc6 33. B@e4 N@f2 34. Bxc6+ bxc6 35. Qe2 Nxh1 36. Kxh1 B@e7
+37. Q@b7 Bxc5 38. Qxc6+ R@d7 39. Qeb5 N@f2+ 40. Kg1 O-O 41. dxc5 a6 42. Qf1
+Rab8 43. cxb6 Rdd8 44. N@e7+ Kh8 45. bxc7 Rdc8 46. cxb8=Q Rxc6 47. Qxf8+ Q@g8
+48. Qxg8#
+{Black checkmated} 1-0
+"""
+
+val crazyhouse2 = """
+[Event "internet, rated crazyhouse match"]
+[Variant "Crazyhouse"]
+[Site "ICS: freechess.org 5000"]
+[Date "2001.01.02"]
+[Time "20:02:??"]
+[Round "-"]
+[White "RabidWombat"]
+[Black "marcusm"]
+[Result "1-0"]
+[WhiteElo "2540"]
+[BlackElo "2235"]
+[TimeControl "120+0"]
+
+1. e4 Nf6 2. Nc3 Nc6 3. d4 e6 4. e5 Nd5 5. Nf3 Bb4 6. Qd3 d6 7. Bg5 Qd7 8. exd6
+cxd6 9. Nd2 Bxc3 10. bxc3 f5 11. B@h5+ g6 12. P@c4 Nc7 13. Bf3 d5 14. cxd5 exd5
+15. Qe3+ P@e4 16. P@d3 N@e6 17. dxe4 dxe4 18. Bxe4 fxe4 19. Nxe4 O-O 20. Nf6+
+Rxf6 21. Bxf6 P@g7 22. Be5 Nxe5 23. dxe5 B@f4 24. P@f7+ Qxf7 25. Qe4 P@d2+ 26.
+Ke2 B@d5 27. Qb4 N@c1+ 28. Kd1 Bd7 29. R@e7 Qxe7 30. P@f7+ Qxf7 31. N@e7+ Kh8
+32. P@e3 Bxe5 33. f4 a5 34. Qa3 P@b4 35. cxb4 Bxa1 36. c4 P@b2 37. cxd5 Qxe7
+38. dxe6 Nxe6 39. B@c2 R@e1+ 40. Kxd2 Rxe3 41. Qxe3 Qxb4+ 42. P@c3 Qe7 43. Bc4
+N@d6 44. B2d3 Nxc4+ 45. Bxc4 b1=Q 46. Rxc1 R@b2+ 47. N@c2 Rxc2+ 48. Rxc2 N@f1+
+49. Bxf1 Qxf1 50. R@f2 B@c1+ 51. Rxc1 Qxc1+ 52. Kxc1 P@b2+ 53. Rxb2 Bxb2+ 54.
+Kxb2 B@a3+ 55. Kc2 R@b2+ 56. Kd1
+{Black ran out of time} 1-0
+"""
 }

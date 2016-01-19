@@ -105,5 +105,8 @@ class ReaderTest extends ChessTest {
         case replay => replay.chronoMoves.size must_== 111
       }
     }
+    "crazyhouse without variant tag" in {
+      Reader.full(crazyhouseNoVariantTag) must beFailure
+    }
   }
 }

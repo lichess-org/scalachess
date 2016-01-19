@@ -238,4 +238,25 @@ class ForsythTest extends ChessTest {
       }
     }
   }
+  "crazyhouse" should {
+    import variant.Crazyhouse._
+    "nope" in {
+      f <<< "2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6 w - f6 0 36" must beSome.like {
+        case s => s.situation.board.crazyData must beNone
+      }
+    }
+    "pockets are not confused as pieces" in {
+      f <<< "2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6/pPP w - f6 0 36" must beSome.like {
+        case s => f exportBoard s.situation.board must_== "2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6"
+      }
+    }
+    "pockets" in {
+      f <<< "2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6/pPP w - f6 0 36" must beSome.like {
+        case s => s.situation.board.crazyData must beSome.like {
+          case Data(Pockets(Pocket(Pawn :: Pawn :: Nil), Pocket(Pawn :: Nil)), promoted) =>
+            promoted must beEmpty
+        }
+      }
+    }
+  }
 }

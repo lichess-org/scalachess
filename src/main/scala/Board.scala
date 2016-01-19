@@ -113,6 +113,8 @@ case class Board(
   def withCrazyData(data: Crazyhouse.Data) = copy(crazyData = Some(data))
   def withCrazyData(data: Option[Crazyhouse.Data]) = copy(crazyData = data)
 
+  def ensureCrazyData = withCrazyData(crazyData | Crazyhouse.Data.init)
+
   def updateHistory(f: History => History) = copy(history = f(history))
 
   def count(p: Piece): Int = pieces.values count (_ == p)

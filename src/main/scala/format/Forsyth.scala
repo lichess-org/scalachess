@@ -39,8 +39,24 @@ object Forsyth {
 
   // only cares about pieces positions on the board (first part of FEN string)
   def makeBoard(rawSource: String): Option[Board] = read(rawSource) { source =>
-    makePieces(source.takeWhile(' '!=).replace("/", "").toList, Pos.A8) map { pieces =>
+    val (position, pockets) = source.takeWhile(' '!=) match {
+      case word if (word.count('/' ==) == 8) =>
+        val splitted = word.split('/')
+        splitted.take(8).mkString -> splitted.lift(8)
+      case word => word -> None
+    }
+    makePieces(position.toList, Pos.A8) map { pieces =>
       Board(pieces, variant = chess.variant.Variant.default)
+    } map { board =>
+      pockets.fold(board) { str =>
+        import variant.Crazyhouse._
+        val (white, black) = str.toList.flatMap(Piece.fromChar).partition(_ is White)
+        board.withCrazyData(Data(
+          pockets = Pockets(
+            white = Pocket(white.map(_.role)),
+            black = Pocket(black.map(_.role))),
+          promoted = Set.empty))
+      }
     }
   }
 

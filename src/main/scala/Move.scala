@@ -24,7 +24,9 @@ case class Move(
     val board = after updateHistory { h1 =>
       // last move and position hashes
       val h2 = h1.copy(
-        positionHashes = Array(),
+        positionHashes =
+          if ((piece is Pawn) || captures || promotes || castles) Array()
+          else h1 positionHashesWith Hash(after.actors.values, piece.color),
         lastMove = Some(toUci)
       )
       // my broken castles

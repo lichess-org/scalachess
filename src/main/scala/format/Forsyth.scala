@@ -163,10 +163,13 @@ object Forsyth {
               fen append (empty.toString + piece.forsyth)
               empty = 0
             }
+            if (piece.role != Pawn && board.crazyData.fold(false)(_.promoted.exists {
+              p => p.x == x && p.y == y
+            })) fen append '~'
         }
       }
       if (empty > 0) fen append empty
-      if (y > 1) fen append "/"
+      if (y > 1) fen append '/'
     }
     fen.toString
   }

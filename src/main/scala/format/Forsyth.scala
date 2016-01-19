@@ -45,17 +45,21 @@ object Forsyth {
         splitted.take(8).mkString -> splitted.lift(8)
       case word => word -> None
     }
-    makePieces(position.toList, Pos.A8) map { pieces =>
-      Board(pieces, variant = chess.variant.Variant.default)
+    {
+      if (position contains '~') makePiecesWithCrazyPromoted(position.toList, Pos.A8)
+      else makePieces(position.toList, Pos.A8) map { _ -> Set.empty[Pos] }
+    } map {
+      case (pieces, promoted) =>
+        val board = Board(pieces, variant = chess.variant.Variant.default)
+        if (promoted.isEmpty) board else board.withCrazyData(_.copy(promoted = promoted))
     } map { board =>
       pockets.fold(board) { str =>
         import variant.Crazyhouse._
         val (white, black) = str.toList.flatMap(Piece.fromChar).partition(_ is White)
-        board.withCrazyData(Data(
+        board.withCrazyData(_.copy(
           pockets = Pockets(
             white = Pocket(white.map(_.role)),
-            black = Pocket(black.map(_.role))),
-          promoted = Set.empty))
+            black = Pocket(black.map(_.role)))))
       }
     }
   }
@@ -70,6 +74,26 @@ object Forsyth {
           tore(pos, 1) flatMap { makePieces(rest, _) } getOrElse Nil
         }
       }
+    }
+  }
+
+  private def makePiecesWithCrazyPromoted(chars: List[Char], pos: Pos): Option[(List[(Pos, Piece)], Set[Pos])] = chars match {
+    case Nil => Some(Nil -> Set.empty)
+    case c :: rest => c match {
+      case '~' => pos match {
+        case Pos.A1 => Some(Nil -> Set(Pos.H1)) // last piece is promoted
+        case pos => for {
+          prevPos <- tore(pos, -1)
+          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, pos)
+        } yield nextPieces -> (nextPromoted + prevPos)
+      }
+      case n if n.toInt < 58 =>
+        makePiecesWithCrazyPromoted(rest, tore(pos, n.toInt - 48) getOrElse pos)
+      case n => for {
+        role <- Role forsyth n.toLower
+        nextPos = tore(pos, 1) getOrElse Pos.A1
+        (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, nextPos)
+      } yield ((pos, Piece(Color(n.isUpper), role)) :: nextPieces) -> nextPromoted
     }
   }
 

@@ -112,6 +112,7 @@ case class Board(
 
   def withCrazyData(data: Crazyhouse.Data) = copy(crazyData = Some(data))
   def withCrazyData(data: Option[Crazyhouse.Data]) = copy(crazyData = data)
+  def withCrazyData(f: Crazyhouse.Data => Crazyhouse.Data): Board = withCrazyData(f(crazyData | Crazyhouse.Data.init))
 
   def ensureCrazyData = withCrazyData(crazyData | Crazyhouse.Data.init)
 

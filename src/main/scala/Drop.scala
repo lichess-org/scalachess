@@ -18,7 +18,7 @@ case class Drop(
   def finalizeAfter: Board = after.variant.finalizeBoard(
     after updateHistory {
       _.copy(
-        positionHashes = Array(),
+        positionHashes = after.variant updatePositionHashes(this, after.history.positionHashes),
         lastMove = Some(Uci.Drop(piece.role, pos))
       )
     }, toUci, none)

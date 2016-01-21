@@ -14,4 +14,6 @@ object Hash {
       s"${a.piece.forsyth}${a.pos.key}"
     }.mkString + color.letter
   }
+
+  def debug(hashes: PositionHash) = hashes.map(_.toInt) mkString " "
 }

@@ -68,6 +68,11 @@ case class History(
 
   def withCheck(color: Color, v: Boolean) =
     if (v) copy(checkCount = checkCount add color) else this
+
+  override def toString = {
+    val positions = (positionHashes grouped Hash.size).toList
+    s"${lastMove.fold("-")(_.uci)} ${positions.map(Hash.debug).mkString(" ")}"
+  }
 }
 
 object History {

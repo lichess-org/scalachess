@@ -15,5 +15,5 @@ object Hash {
     }.mkString + color.letter
   }
 
-  def debug(hashes: PositionHash) = hashes.map(_.toInt) mkString " "
+  def debug(hashes: PositionHash) = hashes.map(_.toInt).sum.toString
 }

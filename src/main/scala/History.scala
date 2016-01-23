@@ -61,9 +61,6 @@ case class History(
 
   def withCastles(c: Castles) = copy(castles = c)
 
-  def positionHashesWith(hash: PositionHash): PositionHash =
-    hash ++ positionHashes
-
   def withLastMove(m: Uci) = copy(lastMove = Some(m))
 
   def withCheck(color: Color, v: Boolean) =

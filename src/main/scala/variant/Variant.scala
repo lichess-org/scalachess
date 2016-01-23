@@ -119,7 +119,7 @@ abstract class Variant(
 
   def updatePositionHashes(move: Move, hash: chess.PositionHash): PositionHash =
     if ((move.piece is Pawn) || move.captures || move.promotes || move.castles) Array()
-    else hash ++ Hash(move.after.actors.values, move.piece.color)
+    else Hash(move.after.actors.values, move.piece.color) ++ hash
 
   def updatePositionHashes(drop: Drop, hash: chess.PositionHash): PositionHash = Array()
 

@@ -37,7 +37,7 @@ case object Crazyhouse extends Variant(
   // don't clear the hash on pawn move or promotion, to preserve threefold repetition
   // but disable 50-moves by truncating the hash at 99
   private def updateHashes(hash: PositionHash, board: Board, color: Color) = {
-    val newHash = hash ++ Hash(board.actors.values, color)
+    val newHash = Hash(board.actors.values, color) ++ hash
     if (newHash.size > 99) newHash take 99 else newHash
   }
 

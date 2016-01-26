@@ -6,7 +6,7 @@ case object RacingKings extends Variant(
   key = "racingKings",
   name = "Racing Kings",
   shortName = "Racing",
-  title = "Race to the eighth rank to win.",
+  title = "Race your King to the eighth rank to win.",
   standardInitialPosition = false) {
 
   override def allowsCastling = false

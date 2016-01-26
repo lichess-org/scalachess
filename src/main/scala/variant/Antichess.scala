@@ -6,7 +6,7 @@ case object Antichess extends Variant(
   key = "antichess",
   name = "Antichess",
   shortName = "Anti",
-  title = "Lose all your pieces to win the game",
+  title = "Lose all your pieces (or reach a stalemate) to win the game.",
   standardInitialPosition = true) {
 
   // In antichess, it is not permitted to castle

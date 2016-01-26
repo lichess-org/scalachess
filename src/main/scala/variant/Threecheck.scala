@@ -6,7 +6,7 @@ case object ThreeCheck extends Variant(
   key = "threeCheck",
   name = "Three-check",
   shortName = "3check",
-  title = "Check your opponent 3 times to win the game",
+  title = "Check your opponent 3 times to win the game.",
   standardInitialPosition = true) {
 
   override def finalizeBoard(board: Board, uci: format.Uci, capture: Option[Piece]): Board =

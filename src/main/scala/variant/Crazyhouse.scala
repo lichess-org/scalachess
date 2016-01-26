@@ -10,7 +10,7 @@ case object Crazyhouse extends Variant(
   key = "crazyhouse",
   name = "Crazyhouse",
   shortName = "crazy",
-  title = "Every time a piece is captured the capturing player gets a piece of the same type and of their color in their reserve.",
+  title = "Captured pieces can be dropped back on the board instead of moving a piece.",
   standardInitialPosition = true) {
 
   private def canDropPawnOn(pos: Pos) = (pos.y != 1 && pos.y != 8)

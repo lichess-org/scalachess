@@ -117,11 +117,11 @@ abstract class Variant(
    */
   def addVariantEffect(move: Move): Move = move
 
-  def updatePositionHashes(move: Move, hash: chess.PositionHash): PositionHash =
-    if ((move.piece is Pawn) || move.captures || move.promotes || move.castles) Array()
-    else Hash(move.after.actors.values, move.piece.color) ++ hash
+  def updatePositionHashes(board: Board, move: Move, hash: chess.PositionHash): PositionHash =
+    if ((move.piece is Pawn) || move.captures || move.promotes) Array()
+    else Hash(Situation(board, !move.piece.color)) ++ hash
 
-  def updatePositionHashes(drop: Drop, hash: chess.PositionHash): PositionHash = Array()
+  def updatePositionHashes(board: Board, drop: Drop, hash: chess.PositionHash): PositionHash = Array()
 
   /**
    * Once a move has been decided upon from the available legal moves, the board is finalized

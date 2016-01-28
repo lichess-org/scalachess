@@ -28,16 +28,16 @@ case object Crazyhouse extends Variant(
     before = situation.board,
     after = board1 withCrazyData d2)
 
-  override def updatePositionHashes(move: Move, hash: chess.PositionHash) =
-    updateHashes(hash, move.after, move.piece.color)
+  override def updatePositionHashes(board: Board, move: Move, hash: chess.PositionHash) =
+    updateHashes(hash, board, !move.piece.color)
 
-  override def updatePositionHashes(drop: Drop, hash: chess.PositionHash) =
-    updateHashes(hash, drop.after, drop.piece.color)
+  override def updatePositionHashes(board: Board, drop: Drop, hash: chess.PositionHash) =
+    updateHashes(hash, board, !drop.piece.color)
 
   // don't clear the hash on pawn move or promotion, to preserve threefold repetition
   // but disable 50-moves by truncating the hash at 99
   private def updateHashes(hash: PositionHash, board: Board, color: Color) = {
-    val newHash = Hash(board.actors.values, color) ++ hash
+    val newHash = Hash(Situation(board, color)) ++ hash
     if (newHash.size > 99) newHash take 99 else newHash
   }
 

@@ -18,18 +18,14 @@ object InsufficientMatingMaterial {
     val notKingPieces = nonKingPieces(board)
     val onlyBishopsRemain = !notKingPieces.exists(_._2.role != Bishop)
 
-    if (!onlyBishopsRemain) {
-        false
-    }
+    if (!onlyBishopsRemain) false
     else {
-        val whitePlayerBishops = notKingPieces.filter(_._2.color == Color.White)
-        val blackPlayerBishops = notKingPieces.filter(_._2.color == Color.Black)
+      val whitePlayerBishops = notKingPieces.filter(_._2.color == Color.White)
+      val blackPlayerBishops = notKingPieces.filter(_._2.color == Color.Black)
 
-        !whitePlayerBishops.exists {
-            case (pos, _) =>
-                val squareColor = pos.color
-                blackPlayerBishops.exists(_._1.color == squareColor)
-        }
+      !whitePlayerBishops.exists {
+        case (pos, _) => blackPlayerBishops.exists(_._1.color == pos.color)
+      }
     }
   }
 
@@ -37,9 +33,9 @@ object InsufficientMatingMaterial {
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
    */
   def pawnBlockedByPawn(pawn: Actor, board: Board) = pawn.moves.isEmpty && {
-      val blockingPosition = Actor.posAheadOfPawn(pawn.pos, pawn.piece.color)
-      blockingPosition.flatMap(board.actorAt(_)).exists(_.piece.is(Pawn))
-    }
+    val blockingPosition = Actor.posAheadOfPawn(pawn.pos, pawn.piece.color)
+    blockingPosition.flatMap(board.actorAt(_)).exists(_.piece.is(Pawn))
+  }
   /*
    * Determines whether a board position is an automatic draw due to neither player
    * being able to mate the other as informed by the traditional chess rules.
@@ -62,7 +58,7 @@ object InsufficientMatingMaterial {
 
   def apply(board: Board, color: Color) =
     board rolesOf color filter (King !=) match {
-       case Nil | List(Knight) | List(Bishop) => true
-       case _                                 => false
-  }
+      case Nil | List(Knight) | List(Bishop) => true
+      case _                                 => false
+    }
 }

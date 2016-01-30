@@ -1,5 +1,7 @@
 package chess
 
+import format.Uci
+
 case class Situation(board: Board, color: Color) {
 
   lazy val actors = board actorsOf color
@@ -60,6 +62,25 @@ case class Situation(board: Board, color: Color) {
   )
 
   def canCastle = board.history.canCastle _
+
+  def enPassantSquare: Option[Pos] = {
+    // Before potentially expensive move generation, first ensure some basic
+    // conditions are met.
+    history.lastMove match {
+      case Some(move: Uci.Move) =>
+        if (move.dest.yDist(move.orig) == 2 &&
+            board.actorAt(move.dest).exists(_.piece.is(Pawn)) &&
+            List(
+              Pos.posAt(move.dest.x - 1, color.passablePawnY),
+              Pos.posAt(move.dest.x + 1, color.passablePawnY)
+            ).flatten.flatMap(board.actorAt).exists(_.piece == color.pawn))
+          moves.values.flatten.find(_.enpassant).map(_.dest)
+        else
+          None
+      case _ =>
+        None
+    }
+  }
 
   def unary_! = copy(color = !color)
 }

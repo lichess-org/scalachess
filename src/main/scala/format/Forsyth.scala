@@ -123,16 +123,7 @@ object Forsyth {
     exportBoard(game.board) + crazyPocket(game.board),
     game.player.letter,
     game.board.history.castles.toString,
-    (game.board.history.lastMove match {
-      case Some(lastMove: Uci.Move) => for {
-        piece ← game board lastMove.dest
-        if piece is Pawn
-        pos ← if (lastMove.orig.y == 2 && lastMove.dest.y == 4) lastMove.dest.down
-        else if (lastMove.orig.y == 7 && lastMove.dest.y == 5) lastMove.dest.up
-        else None
-      } yield pos.toString
-      case _ => None
-    }) getOrElse "-",
+    game.situation.enPassantSquare.map(_.toString).getOrElse("-"),
     game.halfMoveClock,
     game.fullMoveNumber
   ) mkString " "

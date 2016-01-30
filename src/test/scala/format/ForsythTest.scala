@@ -20,12 +20,12 @@ class ForsythTest extends ChessTest {
         }
         "one move" in {
           makeGame.playMoveList(moves take 1) must beSuccess.like {
-            case g => f >> g must_== "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"
+            case g => f >> g must_== "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"
           }
         }
         "2 moves" in {
           makeGame.playMoveList(moves take 2) must beSuccess.like {
-            case g => f >> g must_== "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2"
+            case g => f >> g must_== "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"
           }
         }
         "3 moves" in {
@@ -42,6 +42,12 @@ class ForsythTest extends ChessTest {
           makeGame.playMoveList(moves take 5) must beSuccess.like {
             case g => f >> g must_== "rnbqkb1r/pp1ppppp/7n/2p5/4P3/P4N2/1PPP1PPP/RNBQKB1R b KQkq - 0 3"
           }
+        }
+      }
+
+      "completely legal en-passant" in {
+        makeGame.playMoves(A2 -> A4, G8 -> F6, A4 -> A5, B7 -> B5) must beSuccess.like {
+          case g => f >> g must_== "rnbqkb1r/p1pppppp/5n2/Pp6/8/8/1PPPPPPP/RNBQKBNR w KQkq b6 0 3"
         }
       }
     }

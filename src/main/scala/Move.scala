@@ -22,11 +22,9 @@ case class Move(
 
   def finalizeAfter: Board = {
     val board = after updateHistory { h1 =>
-      // last move and position hashes
-      val h2 = h1.copy(
-        positionHashes = after.variant.updatePositionHashes(this, h1.positionHashes),
-        lastMove = Some(toUci)
-      )
+      // last move
+      val h2 = h1.copy(lastMove = Some(toUci))
+
       // my broken castles
       val h3 =
         if ((piece is King) && h2.canCastle(color).any)
@@ -37,6 +35,7 @@ case class Move(
           if h2 canCastle color on side
         } yield h2.withoutCastle(color, side)) | h2
         else h2
+
       // opponent broken castles
       (for {
         cPos ← capture
@@ -48,7 +47,11 @@ case class Move(
       } yield h3.withoutCastle(!color, side)) | h3
     }
 
-    board.variant.finalizeBoard(board, toUci, capture flatMap before.apply)
+    board.variant.finalizeBoard(board, toUci, capture flatMap before.apply) updateHistory { h =>
+      // Update position hashes last, only after updating the board,
+      // castling rights and en-passant rights.
+      h.copy(positionHashes = board.variant.updatePositionHashes(board, this, h.positionHashes))
+    }
   }
 
   def applyVariantEffect: Move = before.variant addVariantEffect this

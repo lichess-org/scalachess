@@ -17,7 +17,7 @@ final class Hash(size: Int) {
     roleIndex(piece.role) * 2 + piece.color.fold(0, 1)
 
   private def posIndex(pos: Pos) =
-    8 * pos.y + pos.x - 9
+    8 * (pos.y - 1) + (pos.x - 1)
 
   private def actorIndex(actor: Actor) =
     64 * pieceIndex(actor.piece) + posIndex(actor.pos)

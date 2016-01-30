@@ -14,7 +14,7 @@ final class Hash(size: Int) {
   }
 
   private def pieceIndex(piece: Piece) =
-    roleIndex(piece.role) * 2 + piece.color.fold(0, 1)
+    roleIndex(piece.role) * 2 + piece.color.fold(1, 0)
 
   private def posIndex(pos: Pos) =
     8 * (pos.y - 1) + (pos.x - 1)
@@ -26,7 +26,7 @@ final class Hash(size: Int) {
     // There should be no kings and at most 16 pieces of any given type
     // in a pocket.
     if (0 < count && count <= 16 && roleIndex(role) < 5) Some {
-      16 * roleIndex(role) + (count - 1) + color.fold(0, 16 * 5)
+      16 * roleIndex(role) + (count - 1) + color.fold(16 * 5, 0)
     }
     else None
   }
@@ -45,7 +45,7 @@ final class Hash(size: Int) {
       actorMasks compose actorIndex _
     }
 
-    val turn = stm.fold(List.empty, List(whiteTurnMask))
+    val turn = stm.fold(List(whiteTurnMask), List.empty)
 
     val castling = (situation.history.castles.toList zip castlingMasks).map {
       case (canCastle, castlingMask) =>

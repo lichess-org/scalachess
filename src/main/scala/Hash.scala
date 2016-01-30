@@ -2,8 +2,7 @@ package chess
 
 import chess.format.Uci
 
-class Hash(
-    size: Int) {
+final class Hash(size: Int) {
 
   private def roleIndex(role: Role) = role match {
     case Pawn   => 0
@@ -14,13 +13,11 @@ class Hash(
     case King   => 5
   }
 
-  private def pieceIndex(piece: Piece) = piece.color match {
-    case Black => roleIndex(piece.role) * 2
-    case White => roleIndex(piece.role) * 2 + 1
-  }
+  private def pieceIndex(piece: Piece) =
+    roleIndex(piece.role) * 2 + piece.color.fold(0, 1)
 
   private def posIndex(pos: Pos) =
-    8 * (pos.y - 1) + (pos.x - 1)
+    8 * pos.y + pos.x - 9
 
   private def actorIndex(actor: Actor) =
     64 * pieceIndex(actor.piece) + posIndex(actor.pos)
@@ -28,13 +25,10 @@ class Hash(
   private def crazyPocketIndex(role: Role, color: Color, count: Int) = {
     // There should be no kings and at most 16 pieces of any given type
     // in a pocket.
-    if (0 < count && count <= 16 && roleIndex(role) < 5)
-      Some(color match {
-        case Black => 16 * roleIndex(role) + (count - 1)
-        case White => 16 * roleIndex(role) + (count - 1) + 16 * 5
-      })
-    else
-      None
+    if (0 < count && count <= 16 && roleIndex(role) < 5) Some {
+      16 * roleIndex(role) + (count - 1) + color.fold(0, 16 * 5)
+    }
+    else None
   }
 
   private[chess] def hexToBytes(str: String): PositionHash = {
@@ -47,14 +41,11 @@ class Hash(
     val board = situation.board
     val stm = situation.color
 
-    val actors = board.actors.values.map { a =>
-      actorMasks(actorIndex(a))
+    val actors = board.actors.values.map {
+      actorMasks compose actorIndex _
     }
 
-    val turn = stm match {
-      case Black => List[PositionHash]()
-      case White => List(whiteTurnMask)
-    }
+    val turn = stm.fold(List.empty, List(whiteTurnMask))
 
     val castling = (situation.history.castles.toList zip castlingMasks).map {
       case (canCastle, castlingMask) =>
@@ -62,10 +53,8 @@ class Hash(
     }
 
     val ep = situation.enPassantSquare match {
-      case Some(pos) =>
-        List(enPassantMasks(pos.x - 1))
-      case None =>
-        List[PositionHash]()
+      case Some(pos) => List(enPassantMasks(pos.x - 1))
+      case None      => List.empty
     }
 
     // Hash in sepcial three-check data.
@@ -78,30 +67,19 @@ class Hash(
           if (blackCount > 0) threeCheckMasks(blackCount - 1) else zeroMask,
           if (whiteCount > 0) threeCheckMasks(whiteCount - 1 + 3) else zeroMask
         )
-      case _ =>
-        List[PositionHash]()
+      case _ => List.empty
     }
 
     // Hash in special crazyhouse data.
     val crazy = board.crazyData match {
-      case Some(data) =>
-        val pocketIndexes = (
-          data.pockets.white.roles.groupBy(identity).flatMap {
-            case (role, list) =>
-              crazyPocketIndex(role, White, list.size)
-          }
-        ) ++ (
-          data.pockets.black.roles.groupBy(identity).flatMap {
-            case (role, list) =>
-              crazyPocketIndex(role, Black, list.size)
-          }
-        )
-
-        (pocketIndexes.map(crazyPocketMasks) ++ (data.promoted.map {
-          pos => crazyPromotionMasks(posIndex(pos))
-        }))
-      case None =>
-        List[PositionHash]()
+      case Some(data) => Color.all.flatMap { color =>
+        data.pockets(color).roles.groupBy(identity).flatMap {
+          case (role, list) => crazyPocketIndex(role, color, list.size)
+        }
+      }.map(crazyPocketMasks) ++ data.promoted.map {
+        crazyPromotionMasks compose posIndex _
+      }
+      case None => List.empty
     }
 
     val masks = actors ++ turn ++ castling ++ ep ++ checks ++ crazy

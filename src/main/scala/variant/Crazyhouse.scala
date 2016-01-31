@@ -21,7 +21,7 @@ case object Crazyhouse extends Variant(
     piece = Piece(situation.color, role)
     d2 <- d1.drop(piece, pos) toValid s"No $piece to drop"
     board1 <- situation.board.place(piece, pos) toValid s"Can't drop $role on $pos, it's occupied"
-    _ <- board1.validIf(!board1.check(situation.color), s"Droping $role on $pos doesn't uncheck the king")
+    _ <- board1.validIf(!board1.check(situation.color), s"Dropping $role on $pos doesn't uncheck the king")
   } yield Drop(
     piece = piece,
     pos = pos,

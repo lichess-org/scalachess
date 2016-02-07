@@ -21,6 +21,9 @@ object Reader {
     replay ← makeReplay(game, op(parsed.sans))
   } yield replay
 
+  def fullWithSans(parsed: ParsedPgn, op: List[San] => List[San]): Valid[Replay] =
+    makeReplay(makeGame(parsed.tags), op(parsed.sans))
+
   def movesWithSans(
     moveStrs: List[String],
     op: List[San] => List[San],

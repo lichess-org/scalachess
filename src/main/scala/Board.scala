@@ -107,7 +107,10 @@ case class Board(
   def withPieces(newPieces: PieceMap) = copy(pieces = newPieces)
 
   def withVariant(v: Variant): Board = {
-    copy(variant = v)
+    if (v == Crazyhouse)
+      copy(variant = v).ensureCrazyData
+    else
+      copy(variant = v)
   }
 
   def withCrazyData(data: Crazyhouse.Data) = copy(crazyData = Some(data))

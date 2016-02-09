@@ -224,7 +224,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       }
   }
 
-  private object TagParser extends RegexParsers with Logging {
+  object TagParser extends RegexParsers with Logging {
 
     def apply(pgn: String): Valid[List[Tag]] = parseAll(all, pgn) match {
       case f: Failure       => "Cannot parse tags: %s\n%s".format(f.toString, pgn).failureNel

@@ -127,7 +127,7 @@ object Forsyth {
     }
   }
 
-  def >>(situation: Situation): String = >>(SituationPlus(situation, 0))
+  def >>(situation: Situation): String = >>(SituationPlus(situation, 1))
 
   def >>(parsed: SituationPlus): String = parsed match {
     case SituationPlus(Situation(board, color), _) => >>(Game(board, color, turns = parsed.turns))

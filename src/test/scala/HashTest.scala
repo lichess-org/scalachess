@@ -106,6 +106,21 @@ class HashTest extends ChessTest {
 
       hash(gameA.situation) mustNotEqual hash(gameB.situation)
     }
+
+    "be consistent in crazyhouse" in {
+      // from http://lichess.org/j4r7XHTB/black
+      val fen = "r2qkb1r/ppp1pppp/2n2n2/3p2B1/3P2b1/4PN2/PPP1BPPP/RN1QK2R/ b KQkq - 9 5"
+      val situation = ((format.Forsyth << fen) get) withVariant Crazyhouse
+      val move = situation.move(Pos.G4, Pos.F3, None).toOption.get
+      val hashAfterMove = hash(move.situationAfter)
+
+      // 5 ... Bxf3
+      val fenAfter = "r2qkb1r/ppp1pppp/2n2n2/3p2B1/3P4/4Pb2/PPP1BPPP/RN1QK2R/n w KQkq - 10 6"
+      val situationAfter = (format.Forsyth << fenAfter) get
+      val hashAfter = hash(situationAfter)
+
+      hashAfterMove mustEqual hashAfter
+    }
   }
 
 }

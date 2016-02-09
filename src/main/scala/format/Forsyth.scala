@@ -4,6 +4,9 @@ package format
 /**
  * Transform a game to standard Forsyth Edwards Notation
  * http://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
+ *
+ * Crazyhouse & Threecheck extensions:
+ * http://scidb.sourceforge.net/help/en/FEN.html#ThreeCheck
  */
 object Forsyth {
 
@@ -32,9 +35,20 @@ object Forsyth {
           case _ =>
             None
         }
-        situation withHistory History.make(lastMove, castles)
+        situation withHistory {
+          val history = History.make(lastMove, castles)
+          (splitted lift 6 flatMap makeCheckCount).fold(history)(history.withCheckCount)
+        }
       }
     }
+  }
+
+  def makeCheckCount(str: String): Option[CheckCount] = str.toList match {
+    case '+' :: w :: '+' :: b :: Nil => for {
+      white <- parseIntOption(w.toString) if white <= 3
+      black <- parseIntOption(b.toString) if black <= 3
+    } yield CheckCount(black, white)
+    case _ => None
   }
 
   // only cares about pieces positions on the board (first part of FEN string)
@@ -119,16 +133,25 @@ object Forsyth {
     case SituationPlus(Situation(board, color), _) => >>(Game(board, color, turns = parsed.turns))
   }
 
-  def >>(game: Game): String = List(
-    exportBoard(game.board) + crazyPocket(game.board),
-    game.player.letter,
-    game.board.history.castles.toString,
-    game.situation.enPassantSquare.map(_.toString).getOrElse("-"),
-    game.halfMoveClock,
-    game.fullMoveNumber
-  ) mkString " "
+  def >>(game: Game): String = {
+    List(
+      exportBoard(game.board) + exportCrazyPocket(game.board),
+      game.player.letter,
+      game.board.history.castles.toString,
+      game.situation.enPassantSquare.map(_.toString).getOrElse("-"),
+      game.halfMoveClock,
+      game.fullMoveNumber
+    ) ::: {
+        if (game.board.variant == variant.ThreeCheck) List(exportCheckCount(game.board))
+        else List()
+      }
+  } mkString " "
 
-  private def crazyPocket(board: Board) = board.crazyData match {
+  private def exportCheckCount(board: Board) = board.history.checkCount match {
+    case CheckCount(white, black) => s"+$black+$white"
+  }
+
+  private def exportCrazyPocket(board: Board) = board.crazyData match {
     case Some(variant.Crazyhouse.Data(pockets, _)) => "/" +
       pockets.white.roles.map(_.forsythUpper).mkString +
       pockets.black.roles.map(_.forsyth).mkString

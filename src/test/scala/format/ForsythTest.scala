@@ -282,17 +282,42 @@ class ForsythTest extends ChessTest {
     }
   }
   "three-check" should {
+    import variant.ThreeCheck
     "write" in {
-      val moves = List(E2 -> E4, E7 -> E5, F1 -> C4, G8 -> F6, B1 -> C3, F6 -> E4, C4 -> F7)
-      Game(variant.ThreeCheck).playMoveList(moves) must beSuccess.like {
-        case g => f >> g must_== "rnbqkb1r/pppp1Bpp/8/4p3/4n3/2N5/PPPP1PPP/R1BQK1NR b KQkq - 0 4 +1+0"
+      "no checks" in {
+        val moves = List(E2 -> E4, C7 -> C5, G1 -> F3, G8 -> H6, A2 -> A3)
+          Game(ThreeCheck).playMoveList(moves take 5) must beSuccess.like {
+            case g => f >> g must_== "rnbqkb1r/pp1ppppp/7n/2p5/4P3/P4N2/1PPP1PPP/RNBQKB1R b KQkq - 0 3 +0+0"
+          }
+      }
+      "checks" in {
+        val moves = List(E2 -> E4, E7 -> E5, F1 -> C4, G8 -> F6, B1 -> C3, F6 -> E4, C4 -> F7)
+        Game(ThreeCheck).playMoveList(moves) must beSuccess.like {
+          case g => f >> g must_== "rnbqkb1r/pppp1Bpp/8/4p3/4n3/2N5/PPPP1PPP/R1BQK1NR b KQkq - 0 4 +1+0"
+        }
       }
     }
     "read" in {
-      f <<< "rnb1kbnr/pppp1ppp/8/4p3/4PP1q/8/PPPPK1PP/RNBQ1BNR b kq - 2 3" must beSome.like {
-        case s =>
-          s.situation.board.history.checkCount.white must_== 0
-          s.situation.board.history.checkCount.black must_== 1
+      "no checks" in {
+        f <<< "rnb1kbnr/pppp1ppp/8/4p3/4PP1q/8/PPPPK1PP/RNBQ1BNR b kq - 2 3" must beSome.like {
+          case s =>
+            s.situation.board.history.checkCount.white must_== 0
+            s.situation.board.history.checkCount.black must_== 0
+        }
+      }
+      "explicitely no checks" in {
+        f <<< "rnb1kbnr/pppp1ppp/8/4p3/4PP1q/8/PPPPK1PP/RNBQ1BNR b kq - 2 3 +0+0" must beSome.like {
+          case s =>
+            s.situation.board.history.checkCount.white must_== 0
+            s.situation.board.history.checkCount.black must_== 0
+        }
+      }
+      "checks" in {
+        f <<< "rnb1kbnr/pppp1ppp/8/4p3/4PP1q/8/PPPPK1PP/RNBQ1BNR b kq - 2 3 +1+2" must beSome.like {
+          case s =>
+            s.situation.board.history.checkCount.white must_== 2
+            s.situation.board.history.checkCount.black must_== 1
+        }
       }
     }
   }

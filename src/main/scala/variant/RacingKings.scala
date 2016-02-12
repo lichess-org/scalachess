@@ -32,6 +32,8 @@ case object RacingKings extends Variant(
     Pos.H1 -> White.queen,
     Pos.H2 -> White.king)
 
+  override val initialFen = "8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1"
+
   override def insufficientWinningMaterial(board: Board) = false
   override def insufficientWinningMaterial(board: Board, color: Color) = false
 

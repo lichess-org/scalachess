@@ -35,6 +35,8 @@ case object Horde extends Variant(
     blackPieces ++ whitePawnsHoard
   }
 
+  override val initialFen = "rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1"
+
   override def valid(board: Board, strict: Boolean) =
     board.kingPosOf(White).isEmpty && validSide(board, strict)(Black) && !pawnsOnPromotionRank(board, White)
 

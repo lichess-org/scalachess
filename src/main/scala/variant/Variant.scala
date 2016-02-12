@@ -32,6 +32,8 @@ abstract class Variant(
 
   def pieces: Map[Pos, Piece] = Variant.symmetricRank(backRank)
 
+  def initialFen = format.Forsyth.initial
+
   def isValidPromotion(promotion: Option[PromotableRole]) = promotion match {
     case None                                 => true
     case Some(Queen | Rook | Knight | Bishop) => true

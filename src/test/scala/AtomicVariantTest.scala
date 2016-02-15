@@ -89,7 +89,7 @@ class AtomicVariantTest extends ChessTest {
       }
     }
 
-    "Must be a stalemate if a king could usually take a piece to get out of check, but can't because it would explode" in {
+    "Must be a stalemate if a king could usually take a piece, but can't because it would explode" in {
       val positionFen = "k7/8/1R6/8/8/8/8/5K2 w - -"
       val maybeGame = fenToGame(positionFen, Atomic)
 

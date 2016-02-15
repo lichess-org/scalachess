@@ -60,6 +60,10 @@ class ForsythTest extends ChessTest {
         "C4 + 3" in { f.tore(C4, 3) must_== Some(F4) }
         "C4 + 8" in { f.tore(C4, 8) must_== Some(C3) }
         "F1 + 2" in { f.tore(F1, 2) must_== Some(H1) }
+        "-1" in {
+          f.tore(C8, -1) must_== Some(B8)
+          f.tore(A7, -1) must_== Some(H8)
+        }
       }
       val moves = List(E2 -> E4, C7 -> C5, G1 -> F3, G8 -> H6, A2 -> A3)
       def compare(ms: List[(Pos, Pos)], fen: String) =
@@ -279,6 +283,13 @@ class ForsythTest extends ChessTest {
           }
         }
       }
+      "promoted on H8" in {
+        f << "rnb1k2Q~/pp5p/2pp1p2/8/8/P1N2P2/P1PP1K1P/R1BQ1BNR/RPNBQPp b q - 21 11" must beSome.like {
+          case s => s.board.crazyData must beSome.like {
+            case Data(_, promoted) => promoted must_== Set(H8)
+          }
+        }
+      }
     }
   }
   "three-check" should {
@@ -286,9 +297,9 @@ class ForsythTest extends ChessTest {
     "write" in {
       "no checks" in {
         val moves = List(E2 -> E4, C7 -> C5, G1 -> F3, G8 -> H6, A2 -> A3)
-          Game(ThreeCheck).playMoveList(moves take 5) must beSuccess.like {
-            case g => f >> g must_== "rnbqkb1r/pp1ppppp/7n/2p5/4P3/P4N2/1PPP1PPP/RNBQKB1R b KQkq - 0 3 +0+0"
-          }
+        Game(ThreeCheck).playMoveList(moves take 5) must beSuccess.like {
+          case g => f >> g must_== "rnbqkb1r/pp1ppppp/7n/2p5/4P3/P4N2/1PPP1PPP/RNBQKB1R b KQkq - 0 3 +0+0"
+        }
       }
       "checks" in {
         val moves = List(E2 -> E4, E7 -> E5, F1 -> C4, G8 -> F6, B1 -> C3, F6 -> E4, C4 -> F7)

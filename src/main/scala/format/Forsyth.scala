@@ -82,7 +82,9 @@ object Forsyth {
     case Nil => Some(Nil)
     case c :: rest => c match {
       case n if n.toInt < 58 =>
-        makePieces(rest, tore(pos, n.toInt - 48) getOrElse pos)
+        makePieces(rest,
+          if (n.toInt > 48) tore(pos, n.toInt - 48) getOrElse pos
+          else pos)
       case n => Role forsyth n.toLower map { role =>
         (pos, Piece(Color(n.isUpper), role)) :: {
           tore(pos, 1) flatMap { makePieces(rest, _) } getOrElse Nil
@@ -102,7 +104,9 @@ object Forsyth {
         } yield nextPieces -> (nextPromoted + prevPos)
       }
       case n if n.toInt < 58 =>
-        makePiecesWithCrazyPromoted(rest, tore(pos, n.toInt - 48) getOrElse pos)
+        makePiecesWithCrazyPromoted(rest,
+          if (n.toInt > 48) tore(pos, n.toInt - 48) getOrElse pos
+          else pos)
       case n => for {
         role <- Role forsyth n.toLower
         nextPos = tore(pos, 1) getOrElse Pos.A1
@@ -158,10 +162,14 @@ object Forsyth {
     case _ => ""
   }
 
-  private[chess] def tore(pos: Pos, n: Int): Option[Pos] = Pos.posAt(
-    ((pos.x + n - 1) % 8 + 1),
-    (pos.y - (pos.x + n - 1) / 8)
-  )
+  private[chess] def tore(pos: Pos, n: Int): Option[Pos] =
+    if (n == 0) Some(pos)
+    else if (n > 0) Pos.posAt(
+      ((pos.x + n - 1) % 8 + 1),
+      (pos.y - (pos.x + n - 1) / 8))
+    else Pos.posAt(
+      if (pos.x == 1) 8 else pos.x - 1,
+      if (pos.x == 1) pos.y + 1 else pos.y)
 
   def exportBoard(board: Board): String = {
     val fen = new scala.collection.mutable.StringBuilder(70)

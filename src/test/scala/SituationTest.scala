@@ -94,5 +94,19 @@ K  r
 
     }
 
+    "not be playable" in {
+      "with touching kings" in {
+        val game = "kK BN" as Black
+        game.playable(true) must beFalse
+        game.playable(false) must beFalse
+      }
+
+      "with other side in check" in {
+        val game = "k Q K" as White
+        game.playable(true) must beFalse
+        game.playable(false) must beFalse
+      }
+    }
+
   }
 }

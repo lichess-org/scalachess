@@ -88,11 +88,10 @@ object Replay {
   def boards(
     moveStrs: List[String],
     initialFen: Option[String],
-    variant: chess.variant.Variant,
-    color: Color = White): Valid[List[Board]] = {
+    variant: chess.variant.Variant): Valid[List[Board]] = {
     val sit = {
       initialFen.flatMap(format.Forsyth.<<) | Situation(chess.variant.Standard)
-    }.copy(color = color) withVariant variant
+    } withVariant variant
     Parser.moves(moveStrs, sit.board.variant) flatMap { moves =>
       recursiveBoards(sit, moves) map { sit.board :: _ }
     }
@@ -110,11 +109,10 @@ object Replay {
   def lastBoard(
     moveStrs: List[String],
     initialFen: Option[String],
-    variant: chess.variant.Variant,
-    color: Color = White): Valid[Board] = {
+    variant: chess.variant.Variant): Valid[Board] = {
     val sit = {
       initialFen.flatMap(format.Forsyth.<<) | Situation(chess.variant.Standard)
-    }.copy(color = color) withVariant variant
+    } withVariant variant
     Parser.moves(moveStrs, sit.board.variant) flatMap { moves =>
       recursiveLastBoard(sit, moves)
     }

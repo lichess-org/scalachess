@@ -9,7 +9,7 @@ case class Game(
     player: Color = White,
     pgnMoves: List[String] = Nil,
     clock: Option[Clock] = None,
-    turns: Int = 0,
+    turns: Int = 0, // plies
     startedAtTurn: Int = 0) {
 
   def apply(

@@ -1,5 +1,6 @@
 package chess
 
+import chess.format.Forsyth
 import chess.format.pgn.San
 import format.pgn.{ Parser, Reader, Tag }
 import scalaz.Validation.FlatMap._
@@ -90,31 +91,43 @@ object Replay {
     initialFen: Option[String],
     variant: chess.variant.Variant): Valid[List[Board]] = {
     val sit = {
-      initialFen.flatMap(format.Forsyth.<<) | Situation(chess.variant.Standard)
+      initialFen.flatMap(Forsyth.<<) | Situation(chess.variant.Standard)
     } withVariant variant
     Parser.moves(moveStrs, sit.board.variant) flatMap { moves =>
       recursiveBoards(sit, moves) map { sit.board :: _ }
     }
   }
 
-  private def recursiveLastBoard(sit: Situation, sans: List[San]): Valid[Board] =
-    sans match {
-      case Nil => success(sit.board)
-      case san :: rest => san(sit) flatMap { moveOrDrop =>
-        val after = moveOrDrop.fold(_.afterWithLastMove, _.afterWithLastMove)
-        recursiveLastBoard(Situation(after, !sit.color), rest)
-      }
-    }
-
-  def lastBoard(
+  def plyAtFen(
     moveStrs: List[String],
     initialFen: Option[String],
-    variant: chess.variant.Variant): Valid[Board] = {
-    val sit = {
-      initialFen.flatMap(format.Forsyth.<<) | Situation(chess.variant.Standard)
-    } withVariant variant
-    Parser.moves(moveStrs, sit.board.variant) flatMap { moves =>
-      recursiveLastBoard(sit, moves)
+    variant: chess.variant.Variant,
+    atFen: String): Valid[Int] =
+    if (Forsyth.<<(atFen).isEmpty) s"Invalid FEN $atFen".failureNel
+    else {
+
+      // we don't want to compare the full move number, to match transpositions
+      def truncateFen(fen: String) = fen.split(' ').take(4) mkString " "
+      val atFenTruncated = truncateFen(atFen)
+      def compareFen(fen: String) = truncateFen(fen) == atFenTruncated
+
+      def recursivePlyAtFen(sit: Situation, sans: List[San], ply: Int): Valid[Int] =
+        sans match {
+          case Nil => s"Can't find $atFenTruncated, reached ply $ply".failureNel
+          case san :: rest => san(sit) flatMap { moveOrDrop =>
+            val after = moveOrDrop.fold(_.afterWithLastMove, _.afterWithLastMove)
+            val fen = Forsyth >> Game(after, Color(ply % 2 == 0), turns = ply)
+            if (compareFen(fen)) scalaz.Success(ply)
+            else recursivePlyAtFen(Situation(after, !sit.color), rest, ply + 1)
+          }
+        }
+
+      val sit = {
+        initialFen.flatMap(Forsyth.<<) | Situation(chess.variant.Standard)
+      } withVariant variant
+
+      Parser.moves(moveStrs, sit.board.variant) flatMap { moves =>
+        recursivePlyAtFen(sit, moves, 1)
+      }
     }
-  }
 }

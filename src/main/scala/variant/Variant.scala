@@ -131,9 +131,8 @@ abstract class Variant(
   def finalizeBoard(board: Board, uci: format.Uci, captured: Option[Piece]): Board = board
 
   protected def pawnsOnPromotionRank(board: Board, color: Color) = {
-    val promotionRank = if (color == White) 8 else 1
     board.pieces.exists {
-      case (pos, Piece(c, r)) if c == color && r == Pawn && pos.y == promotionRank => true
+      case (pos, Piece(c, r)) if c == color && r == Pawn && pos.y == color.promotablePawnY => true
       case _ => false
     }
   }

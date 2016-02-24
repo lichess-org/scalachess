@@ -1,4 +1,5 @@
 package chess
+package opening
 
 private object FullOpeningPart2 {
 

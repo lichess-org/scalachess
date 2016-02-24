@@ -1,4 +1,5 @@
 package chess
+package opening
 
 object FullOpeningDB {
 
@@ -12,10 +13,13 @@ object FullOpeningDB {
 
   // assumes standard initial FEN and variant
   def search(moveStrs: List[String]): Option[FullOpening] =
-    Replay.boards(moveStrs take SEARCH_MAX_PLIES, None, variant.Standard).toOption.flatMap {
-      _.foldLeft(none[FullOpening]) {
-        case (None, board) => None
-        case (found, _)    => found
+    chess.Replay.boards(moveStrs take SEARCH_MAX_PLIES, None, variant.Standard).toOption.flatMap {
+      _.zipWithIndex.drop(1).foldRight(none[FullOpening]) {
+        case ((board, ply), None) => 
+          val fen = format.Forsyth.exportStandardPositionTurnCastling(board, ply)
+          println(fen)
+          byFen get fen
+        case (_, found)           => found
       }
     }
 }

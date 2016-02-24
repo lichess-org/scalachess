@@ -1,4 +1,5 @@
 package chess
+package opening
 
 final class Ecopening(
     val eco: Ecopening.ECO,
@@ -49,11 +50,11 @@ object Ecopening {
   //     variant = chess.variant.Standard
   //   ).toOption flatMap matchChronoBoards
 
-  private def matchChronoBoards(boards: List[chess.Board]): Option[Ecopening] =
-    boards.reverse.foldLeft(none[Ecopening]) {
-      case (acc, board) => acc orElse {
-        EcopeningDB.allByFen get chess.format.Forsyth.exportBoard(board)
-      }
-    }
+  // private def matchChronoBoards(boards: List[chess.Board]): Option[Ecopening] =
+  //   boards.reverse.foldLeft(none[Ecopening]) {
+  //     case (acc, board) => acc orElse {
+  //       EcopeningDB.allByFen get chess.format.Forsyth.exportBoard(board)
+  //     }
+  //   }
 }
 

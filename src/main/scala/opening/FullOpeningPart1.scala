@@ -2,7 +2,7 @@ package chess
 
 private object FullOpeningPart1 {
 
-  def db: List[FullOpening] = List(
+  def db: Vector[FullOpening] = Vector(
     new FullOpening(1, "B03", "Alekhine Defense: Balogh Variation", "rnbqkb1r/ppp1pppp/3p4/3nP3/2BP4/8/PPP2PPP/RNBQK1NR b KQkq"),
     new FullOpening(2, "B02", "Alekhine Defense: Brooklyn Variation", "rnbqkbnr/pppppppp/8/4P3/8/8/PPPP1PPP/RNBQKBNR w KQkq"),
     new FullOpening(3, "B03", "Alekhine Defense: Buckley Attack", "rnbqkb1r/pppppppp/8/3nP3/8/N7/PPPP1PPP/R1BQKBNR b KQkq"),

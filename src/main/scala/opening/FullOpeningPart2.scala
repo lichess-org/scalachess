@@ -2,7 +2,7 @@ package chess
 
 private object FullOpeningPart2 {
 
-  def db = List(
+  def db: Vector[FullOpening] = Vector(
     new FullOpening(1508, "C41", "Philidor Defense: Morphy Gambit", "rnbqkbnr/ppp2ppp/3p4/8/2BpP3/5N2/PPP2PPP/RNBQK2R b KQkq"),
     new FullOpening(1509, "C41", "Philidor Defense: Nimzowitsch Variation", "rnbqkb1r/ppp2ppp/3p1n2/4P3/4P3/5N2/PPP2PPP/RNBQKB1R b KQkq"),
     new FullOpening(1510, "C41", "Philidor Defense: Nimzowitsch Variation #2", "rnbqkb1r/ppp2ppp/3p1n2/4p3/3PP3/5N2/PPP2PPP/RNBQKB1R w KQkq"),

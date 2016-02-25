@@ -9,6 +9,8 @@ object FullOpeningDB {
     o.fen -> o
   }.toMap
 
+  def findByFen(fen: String) = byFen get fen.split(' ').take(3).mkString(" ")
+
   val SEARCH_MAX_PLIES = 40
 
   // assumes standard initial FEN and variant

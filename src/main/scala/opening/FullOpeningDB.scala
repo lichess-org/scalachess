@@ -12,12 +12,12 @@ object FullOpeningDB {
   val SEARCH_MAX_PLIES = 40
 
   // assumes standard initial FEN and variant
-  def search(moveStrs: List[String]): Option[FullOpening] =
+  def search(moveStrs: List[String]): Option[FullOpening.AtPly] =
     chess.Replay.boards(moveStrs take SEARCH_MAX_PLIES, None, variant.Standard).toOption.flatMap {
-      _.zipWithIndex.drop(1).foldRight(none[FullOpening]) {
+      _.zipWithIndex.drop(1).foldRight(none[FullOpening.AtPly]) {
         case ((board, ply), None) =>
           val fen = format.Forsyth.exportStandardPositionTurnCastling(board, ply)
-          byFen get fen
+          byFen get fen map (_ atPly ply)
         case (_, found) => found
       }
     }

@@ -108,7 +108,6 @@ private object FullOpeningPart1 {
     new FullOpening("A00", "Sodium Attack: Celadon Variation", "rnbqk1nr/pp3ppp/8/2ppp3/8/P2PP3/P1P2PPP/1RBQKBNR b Kkq"),
     new FullOpening("A00", "Sodium Attack: Chenoboskion Variation", "rnbqkbnr/pppppp1p/6p1/8/6P1/N7/PPPPPP1P/R1BQKBNR b KQkq"),
     new FullOpening("A00", "Sodium Attack: Durkin Gambit", "r1bqkbnr/pppp2pp/2n5/4pp2/2N1P3/8/PPPP1PPP/R1BQKBNR w KQkq"),
-    new FullOpening("A00", "Undefined", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq"),
     new FullOpening("A00", "Valencia Opening", "rnbqkbnr/pppp1ppp/8/4p3/8/3P4/PPPNPPPP/R1BQKBNR b KQkq"),
     new FullOpening("A00", "Van Geet Opening", "rnbqkbnr/pppppppp/8/8/8/2N5/PPPPPPPP/R1BQKBNR b KQkq"),
     new FullOpening("A00", "Van Geet Opening: Battambang Variation", "rnbqkbnr/pppp1ppp/8/4p3/8/P1N5/1PPPPPPP/R1BQKBNR b KQkq"),

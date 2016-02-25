@@ -15,11 +15,10 @@ object FullOpeningDB {
   def search(moveStrs: List[String]): Option[FullOpening] =
     chess.Replay.boards(moveStrs take SEARCH_MAX_PLIES, None, variant.Standard).toOption.flatMap {
       _.zipWithIndex.drop(1).foldRight(none[FullOpening]) {
-        case ((board, ply), None) => 
+        case ((board, ply), None) =>
           val fen = format.Forsyth.exportStandardPositionTurnCastling(board, ply)
-          println(fen)
           byFen get fen
-        case (_, found)           => found
+        case (_, found) => found
       }
     }
 }

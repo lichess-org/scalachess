@@ -29,7 +29,31 @@ object Fixtures {
   val noTagButResult = "1.g4 e5 2.d4 e4 3.c4 Qh4 4.h3 Bb4+ 5.Nc3 Bxc3+ 6.bxc3 Qe7 7.Bf4 d6 8.e3 g5 9.Bg3 Be6 10.Rb1 Bc8 11.Be2 Nf6 12.h4 gxh4 13.Bxh4 Qe6 14.g5 Nfd7 15.Nh3 Rg8 16.Nf4 Qe7 17.Nd5 Qd8 18.g6 f6 19.gxh7 1-0"
 
   val inlineTags = """
-[Event "NII - Lille 2 / Tour Blanche Paris"] [Site "Lille"][Date "2015.03.14"][Round "8"] [White "Blazquez, Denis"] [Black "Soubirou, Oriane"] [Result "1-0"] [ECO "B00"] [WhiteElo "2083"] [BlackElo "2135"] [PlyCount "35"]
+[Event "NII - Lille 2 / Tour Blanche Paris"] [Site "Lille"][Date "2015.03.14"][Round "8"] [White "Blazquez, Denis"] [Black "Soubirou, Oriane"] [Result "0-1"] [ECO "B00"] [WhiteElo "2083"] [BlackElo "2135"] [PlyCount "35"]
+
+1. d4 a6 2. e4 e6 3. c4 b5 4. cxb5 axb5 5. Bxb5 Bb7 6. Nc3 Bb4 7. Qe2 Qh4 8.
+Bd3 f5 9. g3 Qf6 10. Nf3 c5 11. O-O Ne7 12. Bg5 Qf8 13. Nb5 Bxe4 14. Bxe4 fxe4
+15. Qxe4 Nd5 16. Ne5 cxd4 17. Qxd5 Ra7 18. Qa8 0-1
+"""
+
+  val whiteResignsInTags = """
+[Event "NII - Lille 2 / Tour Blanche Paris"] [Site "Lille"][Date "2015.03.14"][Round "8"] [White "Blazquez, Denis"] [Black "Soubirou, Oriane"] [Result "0-1"] [ECO "B00"] [WhiteElo "2083"] [BlackElo "2135"] [PlyCount "35"]
+
+1. d4 a6 2. e4 e6 3. c4 b5 4. cxb5 axb5 5. Bxb5 Bb7 6. Nc3 Bb4 7. Qe2 Qh4 8.
+Bd3 f5 9. g3 Qf6 10. Nf3 c5 11. O-O Ne7 12. Bg5 Qf8 13. Nb5 Bxe4 14. Bxe4 fxe4
+15. Qxe4 Nd5 16. Ne5 cxd4 17. Qxd5 Ra7 18. Qa8
+"""
+
+  val whiteResignsInMoves = """
+[Event "NII - Lille 2 / Tour Blanche Paris"] [Site "Lille"][Date "2015.03.14"][Round "8"] [White "Blazquez, Denis"] [Black "Soubirou, Oriane"] [ECO "B00"] [WhiteElo "2083"] [BlackElo "2135"] [PlyCount "35"]
+
+1. d4 a6 2. e4 e6 3. c4 b5 4. cxb5 axb5 5. Bxb5 Bb7 6. Nc3 Bb4 7. Qe2 Qh4 8.
+Bd3 f5 9. g3 Qf6 10. Nf3 c5 11. O-O Ne7 12. Bg5 Qf8 13. Nb5 Bxe4 14. Bxe4 fxe4
+15. Qxe4 Nd5 16. Ne5 cxd4 17. Qxd5 Ra7 18. Qa8 0-1
+"""
+
+  val whiteResignsInTagsAndMoves = """
+[Event "NII - Lille 2 / Tour Blanche Paris"] [Site "Lille"][Date "2015.03.14"][Round "8"] [White "Blazquez, Denis"] [Black "Soubirou, Oriane"] [Result "0-1"] [ECO "B00"] [WhiteElo "2083"] [BlackElo "2135"] [PlyCount "35"]
 
 1. d4 a6 2. e4 e6 3. c4 b5 4. cxb5 axb5 5. Bxb5 Bb7 6. Nc3 Bb4 7. Qe2 Qh4 8.
 Bd3 f5 9. g3 Qf6 10. Nf3 c5 11. O-O Ne7 12. Bg5 Qf8 13. Nb5 Bxe4 14. Bxe4 fxe4

@@ -5,7 +5,8 @@ import org.specs2.mutable.Specification
 
 class FullOpeningTest extends Specification {
 
-  def searchStr(str: String) = FullOpeningDB search str.split(' ').toList
+  def searchStr(str: String) = 
+    FullOpeningDB search str.split(' ').toList map (_.opening)
 
   "search" should {
     "find nothing on invalid PGN" in {

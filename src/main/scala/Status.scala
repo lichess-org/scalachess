@@ -24,9 +24,10 @@ object Status {
   case object Outoftime extends Status(35) // clock flag
   case object Cheat extends Status(36)
   case object NoStart extends Status(37) // the player did not make the first move in time
+  case object UnknownFinish extends Status(38) // we don't know why the game ended
   case object VariantEnd extends Status(60) // the variant has a special ending
 
-  val all = List(Created, Started, Aborted, Mate, Resign, Stalemate, Timeout, Draw, Outoftime, Cheat, NoStart, VariantEnd)
+  val all = List(Created, Started, Aborted, Mate, Resign, Stalemate, Timeout, Draw, Outoftime, Cheat, NoStart, UnknownFinish, VariantEnd)
 
   val finishedNotCheated = all filter { s =>
     s.id >= Mate.id && s.id != Cheat.id

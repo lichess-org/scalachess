@@ -37,7 +37,7 @@ case class Move(
         else h2
 
       // opponent broken castles
-      (for {
+      val h4 = (for {
         cPos ← capture
         cPiece ← before(cPos)
         if cPiece is Rook
@@ -45,6 +45,9 @@ case class Move(
         side ← Side.kingRookSide(kingPos, cPos)
         if h3 canCastle !color on side
       } yield h3.withoutCastle(!color, side)) | h3
+
+      // captured king
+      if (after kingPosOf !color isDefined) h4 else h4 withoutCastles !color
     }
 
     board.variant.finalizeBoard(board, toUci, capture flatMap before.apply) updateHistory { h =>

@@ -47,10 +47,13 @@ final class Hash(size: Int) {
 
     val turn = stm.fold(List(whiteTurnMask), List.empty)
 
-    val castling = (situation.history.castles.toList zip castlingMasks).map {
-      case (canCastle, castlingMask) =>
-        if (canCastle) castlingMask else zeroMask
-    }
+    val castling =
+      if (board.variant.allowsCastling)
+        (situation.history.castles.toList zip castlingMasks).map {
+          case (canCastle, castlingMask) =>
+            if (canCastle) castlingMask else zeroMask
+        }
+      else List.empty
 
     val ep = situation.enPassantSquare match {
       case Some(pos) => List(enPassantMasks(pos.x - 1))

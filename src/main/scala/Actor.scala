@@ -133,7 +133,7 @@ case class Actor(
   ) map { move(_, b4, castle = castle) }) getOrElse Nil
 
   private def shortRange(dirs: Directions): List[Move] =
-    (pos mapply dirs).flatten filterNot friends flatMap { to =>
+    dirs flatMap { _(pos) } filterNot friends flatMap { to =>
       if (enemies(to)) board.taking(pos, to) map { move(to, _, Some(to)) }
       else board.move(pos, to) map { move(to, _) }
     }

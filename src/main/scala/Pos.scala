@@ -35,7 +35,7 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
   def ?-(other: Pos): Boolean = y == other.y
 
   def <->(other: Pos): Iterable[Pos] =
-    min(x, other.x) to max(x, other.x) map { posAt(_, y) } flatten
+    min(x, other.x) to max(x, other.x) flatMap { posAt(_, y) }
 
   def touches(other: Pos): Boolean = xDist(other) <= 1 && yDist(other) <= 1
 
@@ -53,7 +53,7 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
 
   override val toString = key
 
-  override val hashCode = 8 * x + y
+  override val hashCode = 8 * x + y - 8
 }
 
 object Pos {

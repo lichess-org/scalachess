@@ -67,6 +67,8 @@ object Uci
     } yield Drop(role, pos)
   }
 
+  case class WithSan(uci: Uci, san: String)
+
   def apply(move: chess.Move) = Uci.Move(move.orig, move.dest, move.promotion)
 
   def apply(drop: chess.Drop) = Uci.Drop(drop.piece.role, drop.pos)

@@ -1,7 +1,7 @@
 package chess
 
-import chess.format.Forsyth
 import chess.format.pgn.San
+import chess.format.{ Forsyth, Uci }
 import format.pgn.{ Parser, Reader, Tag }
 import scalaz.Validation.FlatMap._
 
@@ -53,27 +53,29 @@ object Replay {
     }
 
   type ErrorMessage = String
-  def gameWhileValid(
+  def gameMoveWhileValid(
     moveStrs: List[String],
     initialFen: String,
-    variant: chess.variant.Variant): (List[Game], Option[ErrorMessage]) = {
-    def mk(g: Game, moves: List[San]): (List[Game], Option[ErrorMessage]) = moves match {
-      case san :: rest => san(g.situation).fold(
+    variant: chess.variant.Variant): (Game, List[(Game, Uci.WithSan)], Option[ErrorMessage]) = {
+
+    def mk(g: Game, moves: List[(San, String)]): (List[(Game, Uci.WithSan)], Option[ErrorMessage]) = moves match {
+      case (san, sanStr) :: rest => san(g.situation).fold(
         err => (Nil, err.head.some),
         moveOrDrop => {
           val newGame = moveOrDrop.fold(g.apply, g.applyDrop)
+          val uci = moveOrDrop.fold(_.toUci, _.toUci)
           mk(newGame, rest) match {
-            case (next, msg) => (newGame :: next, msg)
+            case (next, msg) => ((newGame, Uci.WithSan(uci, sanStr)) :: next, msg)
           }
         })
       case _ => (Nil, None)
     }
     val init = Game(variant.some, initialFen.some)
     Parser.moves(moveStrs, variant).fold(
-      err => Nil -> err.head.some,
-      moves => mk(init, moves)
+      err => List.empty[(Game, Uci.WithSan)] -> err.head.some,
+      moves => mk(init, moves zip moveStrs)
     ) match {
-        case (games, err) => (init :: games, err)
+        case (games, err) => (init, games, err)
       }
   }
 

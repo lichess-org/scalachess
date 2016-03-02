@@ -7,8 +7,6 @@ sealed trait Uci {
   def piotr: String
 
   def origDest: (Pos, Pos)
-
-  def uciCharPair: UciCharPair
 }
 
 object Uci

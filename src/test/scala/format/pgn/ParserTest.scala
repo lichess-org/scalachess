@@ -26,9 +26,26 @@ class ParserTest extends ChessTest {
     }
   }
 
-  "no tag but inline result" in {
-    parser(noTagButResult) must beSuccess.like {
-      case ParsedPgn(List(Tag(Tag.Result, result)), _) => result must_== "1-0"
+  "result" in {
+    "no tag but inline result" in {
+      parser(noTagButResult) must beSuccess.like {
+        case parsed => parsed tag "Result" must_== Some("1-0")
+      }
+    }
+    "in tags" in {
+      parser(whiteResignsInTags) must beSuccess.like {
+        case parsed => parsed tag "Result" must_== Some("0-1")
+      }
+    }
+    "in moves" in {
+      parser(whiteResignsInMoves) must beSuccess.like {
+        case parsed => parsed tag "Result" must_== Some("0-1")
+      }
+    }
+    "in tags and moves" in {
+      parser(whiteResignsInTagsAndMoves) must beSuccess.like {
+        case parsed => parsed tag "Result" must_== Some("0-1")
+      }
     }
   }
 

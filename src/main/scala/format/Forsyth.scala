@@ -151,6 +151,12 @@ object Forsyth {
       }
   } mkString " "
 
+  def exportStandardPositionTurnCastling(board: Board, ply: Int): String = List(
+      exportBoard(board),
+      Color(ply % 2 == 0).letter,
+      board.history.castles.toString
+    ) mkString " "
+
   private def exportCheckCount(board: Board) = board.history.checkCount match {
     case CheckCount(white, black) => s"+$black+$white"
   }

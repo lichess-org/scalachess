@@ -16,6 +16,10 @@ class BoardTest extends ChessTest {
       board.pieces must not beEmpty
     }
 
+    "have castling rights by default" in {
+      board.history.castles == Castles.all
+    }
+
     "allow a piece to be placed" in {
       board place White - Rook at E3 must beSuccess.like {
         case b => b(E3) mustEqual Some(White - Rook)

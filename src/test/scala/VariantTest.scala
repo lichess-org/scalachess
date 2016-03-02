@@ -40,6 +40,10 @@ class VariantTest extends ChessTest {
     "position pieces correctly" in {
       Chess960.pieces must havePair(A2 -> (White - Pawn))
     }
+
+    "initialize the board with castling rights" in {
+      Board.init(Chess960).history.castles must_== Castles.all
+    }
   }
 
   "kingOfTheHill" should {
@@ -75,6 +79,10 @@ PP
         }
 
       }
+    }
+
+    "initialize the board with castling rights" in {
+      Board.init(KingOfTheHill).history.castles must_== Castles.all
     }
   }
 
@@ -143,6 +151,9 @@ K  r
       }
     }
 
+    "initialize the board with castling rights" in {
+      Board.init(KingOfTheHill).history.castles must_== Castles.all
+    }
   }
 
   "racingKings" should {
@@ -230,6 +241,22 @@ K  r
           game.situation.end must beTrue
           game.situation.status must beEqualTo(Status.Draw.some)
       }
+    }
+
+    "initialize the board without castling rights" in {
+      Board.init(RacingKings).history.castles.isEmpty must beTrue
+    }
+  }
+
+  "antichess" should {
+    "initialize the board without castling rights" in {
+      Board.init(Antichess).history.castles.isEmpty must beTrue
+    }
+  }
+
+  "horde" should {
+    "initialize the board with black castling rights" in {
+      Board.init(Horde).history.castles must_== Castles("kq")
     }
   }
 }

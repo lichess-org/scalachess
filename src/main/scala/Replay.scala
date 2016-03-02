@@ -103,7 +103,7 @@ object Replay {
     initialFen: Option[String],
     variant: chess.variant.Variant,
     atFen: String): Valid[Int] =
-    if (Forsyth.<<(atFen).isEmpty) s"Invalid FEN $atFen".failureNel
+    if (Forsyth.<<@(variant, atFen).isEmpty) s"Invalid FEN $atFen".failureNel
     else {
 
       // we don't want to compare the full move number, to match transpositions
@@ -115,16 +115,16 @@ object Replay {
         sans match {
           case Nil => s"Can't find $atFenTruncated, reached ply $ply".failureNel
           case san :: rest => san(sit) flatMap { moveOrDrop =>
-            val after = moveOrDrop.fold(_.afterWithLastMove, _.afterWithLastMove)
+            val after = moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter)
             val fen = Forsyth >> Game(after, Color(ply % 2 == 0), turns = ply)
             if (compareFen(fen)) scalaz.Success(ply)
             else recursivePlyAtFen(Situation(after, !sit.color), rest, ply + 1)
           }
         }
 
-      val sit = {
-        initialFen.flatMap(Forsyth.<<) | Situation(chess.variant.Standard)
-      } withVariant variant
+      val sit = initialFen.flatMap {
+        Forsyth.<<@(variant, _)
+      } | Situation(variant)
 
       Parser.moves(moveStrs, sit.board.variant) flatMap { moves =>
         recursivePlyAtFen(sit, moves, 1)

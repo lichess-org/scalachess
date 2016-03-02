@@ -224,6 +224,8 @@ object Forsyth {
 
   private[chess] def fixCastles(variant: Variant, fen: String): Option[String] =
     fen.split(' ').toList match {
+      case boardStr :: color :: castlesStr :: rest if !variant.allowsCastling =>
+        Some(s"$boardStr $color - ${rest.mkString(" ")}")
       case boardStr :: color :: castlesStr :: rest => makeBoard(variant, boardStr) map { board =>
         val c1 = Castles(castlesStr)
         val wkPos = board.kingPosOf(White)

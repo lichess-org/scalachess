@@ -184,6 +184,20 @@ object Variant {
 
   def exists(id: Int): Boolean = byId contains id
 
+  val openingSensibleVariants: Set[Variant] = Set(
+    chess.variant.Standard,
+    chess.variant.Crazyhouse,
+    chess.variant.ThreeCheck,
+    chess.variant.KingOfTheHill)
+
+  val divisionSensibleVariants: Set[Variant] = Set(
+    chess.variant.Standard,
+    chess.variant.Chess960,
+    chess.variant.ThreeCheck,
+    chess.variant.KingOfTheHill,
+    chess.variant.Antichess,
+    chess.variant.FromPosition)
+
   private[variant] def symmetricRank(rank: IndexedSeq[Role]): Map[Pos, Piece] =
     (for (y ← Seq(1, 2, 7, 8); x ← 1 to 8) yield {
       posAt(x, y) map { pos =>

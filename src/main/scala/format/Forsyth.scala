@@ -1,6 +1,8 @@
 package chess
 package format
 
+import variant.{ Variant, Standard }
+
 /**
  * Transform a game to standard Forsyth Edwards Notation
  * http://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
@@ -12,9 +14,9 @@ object Forsyth {
 
   val initial = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-  def <<(rawSource: String): Option[Situation] = read(rawSource) { source =>
-    makeBoard(source) map { board =>
-      val fixedSource = fixCastles(source) | source
+  def <<@(variant: Variant, rawSource: String): Option[Situation] = read(rawSource) { fen =>
+    makeBoard(variant, fen) map { board =>
+      val fixedSource = fixCastles(variant, fen) | fen
       val splitted = fixedSource split ' '
       val colorOption = splitted lift 1 flatMap (_ lift 0) flatMap Color.apply
       val situation = colorOption match {
@@ -43,6 +45,26 @@ object Forsyth {
     }
   }
 
+  def <<(rawSource: String): Option[Situation] = <<@(Standard, rawSource)
+
+  case class SituationPlus(situation: Situation, fullMoveNumber: Int) {
+
+    def turns = fullMoveNumber * 2 - (if (situation.color.white) 2 else 1)
+  }
+
+  def <<<@(variant: Variant, rawSource: String): Option[SituationPlus] = read(rawSource) { source =>
+    <<@(variant, source) map { sit =>
+      val splitted = source split ' '
+      val fullMoveNumber = splitted lift 5 flatMap parseIntOption map (_ max 1 min 500)
+      val halfMoveClock = splitted lift 4 flatMap parseIntOption map (_ max 0 min 50)
+      SituationPlus(
+        halfMoveClock.map(sit.history.setHalfMoveClock).fold(sit)(sit.withHistory),
+        fullMoveNumber | 1)
+    }
+  }
+
+  def <<<(rawSource: String): Option[SituationPlus] = <<<@(Standard, rawSource)
+
   def makeCheckCount(str: String): Option[CheckCount] = str.toList match {
     case '+' :: w :: '+' :: b :: Nil => for {
       white <- parseIntOption(w.toString) if white <= 3
@@ -52,8 +74,8 @@ object Forsyth {
   }
 
   // only cares about pieces positions on the board (first part of FEN string)
-  def makeBoard(rawSource: String): Option[Board] = read(rawSource) { source =>
-    val (position, pockets) = source.takeWhile(' '!=) match {
+  def makeBoard(variant: Variant, rawSource: String): Option[Board] = read(rawSource) { fen =>
+    val (position, pockets) = fen.takeWhile(' '!=) match {
       case word if (word.count('/' ==) == 8) =>
         val splitted = word.split('/')
         splitted.take(8).mkString -> splitted.lift(8)
@@ -64,11 +86,11 @@ object Forsyth {
       else makePieces(position.toList, Pos.A8) map { _ -> Set.empty[Pos] }
     } map {
       case (pieces, promoted) =>
-        val board = Board(pieces, variant = chess.variant.Variant.default)
+        val board = Board(pieces, variant = variant)
         if (promoted.isEmpty) board else board.withCrazyData(_.copy(promoted = promoted))
     } map { board =>
       pockets.fold(board) { str =>
-        import variant.Crazyhouse._
+        import chess.variant.Crazyhouse.{ Pocket, Pockets }
         val (white, black) = str.toList.flatMap(Piece.fromChar).partition(_ is White)
         board.withCrazyData(_.copy(
           pockets = Pockets(
@@ -115,22 +137,6 @@ object Forsyth {
     }
   }
 
-  case class SituationPlus(situation: Situation, fullMoveNumber: Int) {
-
-    def turns = fullMoveNumber * 2 - (if (situation.color.white) 2 else 1)
-  }
-
-  def <<<(rawSource: String): Option[SituationPlus] = read(rawSource) { source =>
-    <<(source) map { sit =>
-      val splitted = source split ' '
-      val fullMoveNumber = splitted lift 5 flatMap parseIntOption map (_ max 1 min 500)
-      val halfMoveClock = splitted lift 4 flatMap parseIntOption map (_ max 0 min 50)
-      SituationPlus(
-        halfMoveClock.map(sit.history.setHalfMoveClock).fold(sit)(sit.withHistory),
-        fullMoveNumber | 1)
-    }
-  }
-
   def >>(situation: Situation): String = >>(SituationPlus(situation, 1))
 
   def >>(parsed: SituationPlus): String = parsed match {
@@ -150,6 +156,12 @@ object Forsyth {
         else List()
       }
   } mkString " "
+
+  def exportStandardPositionTurnCastling(board: Board, ply: Int): String = List(
+    exportBoard(board),
+    Color(ply % 2 == 0).letter,
+    board.history.castles.toString
+  ) mkString " "
 
   private def exportCheckCount(board: Board) = board.history.checkCount match {
     case CheckCount(white, black) => s"+$black+$white"
@@ -210,9 +222,9 @@ object Forsyth {
     }
   }
 
-  def fixCastles(rawSource: String): Option[String] = read(rawSource) { fen =>
+  private[chess] def fixCastles(variant: Variant, fen: String): Option[String] =
     fen.split(' ').toList match {
-      case boardStr :: color :: castlesStr :: rest => makeBoard(boardStr) map { board =>
+      case boardStr :: color :: castlesStr :: rest => makeBoard(variant, boardStr) map { board =>
         val c1 = Castles(castlesStr)
         val wkPos = board.kingPosOf(White)
         val bkPos = board.kingPosOf(Black)
@@ -232,7 +244,6 @@ object Forsyth {
       }
       case _ => None
     }
-  }
 
   private def read[A](source: String)(f: String => A): A = f(source.replace("_", " ").trim)
 }

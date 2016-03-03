@@ -149,9 +149,12 @@ object Board {
   import Pos._
 
   def apply(pieces: Traversable[(Pos, Piece)], variant: Variant): Board =
-    Board(pieces.toMap, History(), variant, variantCrazyData(variant))
+    Board(pieces.toMap, if (variant.allowsCastling) Castles.all else Castles.none, variant)
 
-  def init(variant: Variant): Board = Board(variant.pieces, variant)
+  def apply(pieces: Traversable[(Pos, Piece)], castles: Castles, variant: Variant): Board =
+    Board(pieces.toMap, History(castles = castles), variant, variantCrazyData(variant))
+
+  def init(variant: Variant): Board = Board(variant.pieces, variant.castles, variant)
 
   def empty(variant: Variant): Board = Board(Nil, variant)
 

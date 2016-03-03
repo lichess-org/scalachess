@@ -25,12 +25,13 @@ abstract class Variant(
 
   def exotic = !standard
 
-  // Some variants do not allow castling
-  def allowsCastling = true
+  def allowsCastling = !castles.isEmpty
 
   protected def backRank = IndexedSeq(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
 
   def pieces: Map[Pos, Piece] = Variant.symmetricRank(backRank)
+
+  def castles: Castles = Castles.all
 
   def initialFen = format.Forsyth.initial
 

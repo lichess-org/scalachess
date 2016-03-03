@@ -100,6 +100,8 @@ case class Board(
     b3 ← b2.place(pawn.color.queen, pos)
   } yield b3
 
+  def castles: Castles = history.castles
+
   def withHistory(h: History): Board = copy(history = h)
 
   def withCastles(c: Castles) = withHistory(history withCastles c)
@@ -118,6 +120,25 @@ case class Board(
   def withCrazyData(f: Crazyhouse.Data => Crazyhouse.Data): Board = withCrazyData(f(crazyData | Crazyhouse.Data.init))
 
   def ensureCrazyData = withCrazyData(crazyData | Crazyhouse.Data.init)
+
+  def fixCastles: Board = withCastles {
+    if (variant.allowsCastling) {
+      val wkPos = kingPosOf(White)
+      val bkPos = kingPosOf(Black)
+      val wkReady = wkPos.fold(false)(_.y == 1)
+      val bkReady = bkPos.fold(false)(_.y == 8)
+      def rookReady(color: Color, kPos: Option[Pos], left: Boolean) = kPos.fold(false) { kp =>
+        actorsOf(color) exists { a =>
+          a.piece.role == Rook && a.pos.y == kp.y && (left ^ (a.pos.x > kp.x))
+        }
+      }
+      Castles(
+        whiteKingSide = castles.whiteKingSide && wkReady && rookReady(White, wkPos, false),
+        whiteQueenSide = castles.whiteQueenSide && wkReady && rookReady(White, wkPos, true),
+        blackKingSide = castles.blackKingSide && bkReady && rookReady(Black, bkPos, false),
+        blackQueenSide = castles.blackQueenSide && bkReady && rookReady(Black, bkPos, true))
+    } else Castles.none
+  }
 
   def updateHistory(f: History => History) = copy(history = f(history))
 

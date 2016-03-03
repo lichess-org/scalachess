@@ -16,8 +16,7 @@ object Forsyth {
 
   def <<@(variant: Variant, rawSource: String): Option[Situation] = read(rawSource) { fen =>
     makeBoard(variant, fen) map { board =>
-      val fixedSource = fixCastles(variant, fen) | fen
-      val splitted = fixedSource split ' '
+      val splitted = fen split ' '
       val colorOption = splitted lift 1 flatMap (_ lift 0) flatMap Color.apply
       val situation = colorOption match {
         case Some(color)             => Situation(board, color)
@@ -41,7 +40,7 @@ object Forsyth {
           val history = History.make(lastMove, castles)
           (splitted lift 6 flatMap makeCheckCount).fold(history)(history.withCheckCount)
         }
-      }
+      } fixCastles
     }
   }
 
@@ -221,31 +220,6 @@ object Forsyth {
       fullMove * 2 - (if (getColor(fen).exists(_.white)) 2 else 1)
     }
   }
-
-  private[chess] def fixCastles(variant: Variant, fen: String): Option[String] =
-    fen.split(' ').toList match {
-      case boardStr :: color :: castlesStr :: rest if !variant.allowsCastling =>
-        Some(s"$boardStr $color - ${rest.mkString(" ")}")
-      case boardStr :: color :: castlesStr :: rest => makeBoard(variant, boardStr) map { board =>
-        val c1 = Castles(castlesStr)
-        val wkPos = board.kingPosOf(White)
-        val bkPos = board.kingPosOf(Black)
-        val wkReady = wkPos.fold(false)(_.y == 1)
-        val bkReady = bkPos.fold(false)(_.y == 8)
-        def rookReady(color: Color, kPos: Option[Pos], left: Boolean) = kPos.fold(false) { kp =>
-          board actorsOf color exists { a =>
-            a.piece.role == Rook && a.pos.y == kp.y && (left ^ (a.pos.x > kp.x))
-          }
-        }
-        val c2 = Castles(
-          whiteKingSide = c1.whiteKingSide && wkReady && rookReady(White, wkPos, false),
-          whiteQueenSide = c1.whiteQueenSide && wkReady && rookReady(White, wkPos, true),
-          blackKingSide = c1.blackKingSide && bkReady && rookReady(Black, bkPos, false),
-          blackQueenSide = c1.blackQueenSide && bkReady && rookReady(Black, bkPos, true))
-        s"$boardStr $color $c2 ${rest.mkString(" ")}"
-      }
-      case _ => None
-    }
 
   private def read[A](source: String)(f: String => A): A = f(source.replace("_", " ").trim)
 }

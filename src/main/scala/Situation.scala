@@ -53,6 +53,10 @@ case class Situation(board: Board, color: Color) {
   def drop(role: Role, pos: Pos): Valid[Drop] =
     board.variant.drop(this, role, pos)
 
+  def fixCastles = copy(
+    board = board fixCastles
+  )
+
   def withHistory(history: History) = copy(
     board = board withHistory history
   )

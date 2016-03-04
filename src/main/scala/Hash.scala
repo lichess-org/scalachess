@@ -60,7 +60,7 @@ final class Hash(size: Int) {
       case None      => List.empty
     }
 
-    // Hash in sepcial three-check data.
+    // Hash in special three-check data.
     val checks = board.variant match {
       case variant.ThreeCheck =>
         val blackCount = math.min(situation.history.checkCount.black, 3)

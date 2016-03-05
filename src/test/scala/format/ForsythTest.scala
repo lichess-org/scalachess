@@ -184,7 +184,7 @@ class ForsythTest extends ChessTest {
     }
   }
   "fix impossible castle flags" should {
-    def fixCastles(fen: String) = f.fixCastles(Standard, fen)
+    def fixCastles(fen: String) = (f << fen).map(f >> _)
     "messed up" in {
       val fen = "yayyyyyyyyyyy"
       fixCastles(fen) must beNone
@@ -238,6 +238,11 @@ class ForsythTest extends ChessTest {
       f << "rk6/p1r3p1/P3B1K1/1p2B3/8/8/8/8 w - - 0 1" must beSome.like {
         case s => s.board.history.castles must_== Castles.none
       }
+    }
+    "castling not allowed in variant" in {
+      val fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+      val fix = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1"
+      (f <<@(Antichess, fen)).map(f >> _) must beSome(fix)
     }
   }
   "ignore impossible en passant squares" should {

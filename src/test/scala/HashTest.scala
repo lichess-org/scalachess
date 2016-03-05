@@ -2,7 +2,7 @@ package chess
 
 import Pos._
 import format.Uci
-import variant.{Standard, Crazyhouse, ThreeCheck, Antichess}
+import variant.{ Standard, Crazyhouse, ThreeCheck, Antichess, Atomic }
 
 class HashTest extends ChessTest {
 
@@ -122,7 +122,7 @@ class HashTest extends ChessTest {
       hashAfterMove mustEqual hashAfter
     }
 
-    "be consistent in antichess" in {
+    "be consistent when king is captured in antichess" in {
       val fen = "rnbqkb1r/ppp1pppp/3p1n2/1B6/8/4P3/PPPP1PPP/RNBQK1NR w KQkq - 2 3"
       val situation = ((format.Forsyth << fen) get) withVariant Antichess
       val move = situation.move(Pos.B5, Pos.E8, None).toOption.get
@@ -131,6 +131,20 @@ class HashTest extends ChessTest {
       // 3. BxK
       val fenAfter = "rnbqBb1r/ppp1pppp/3p1n2/8/8/4P3/PPPP1PPP/RNBQK1NR b KQkq - 0 3"
       val situationAfter = ((format.Forsyth << fenAfter) get) withVariant Antichess
+      val hashAfter = hash(situationAfter)
+
+      hashAfterMove mustEqual hashAfter
+    }
+
+    "be consistent when rook is exploded in atomic" in {
+      val fen = "rnbqkb1r/ppppp1pp/5p1n/6N1/8/8/PPPPPPPP/RNBQKB1R w KQkq - 2 3"
+      val situation = format.Forsyth.<<@(Atomic, fen).get
+      val move = situation.move(Pos.G5, Pos.H7, None).toOption.get
+      val hashAfterMove = hash(move.situationAfter)
+
+      // 3. Nxh7
+      val fenAfter = "rnbqkb2/ppppp1p1/5p2/8/8/8/PPPPPPPP/RNBQKB1R b KQkq - 0 3"
+      val situationAfter = format.Forsyth.<<@(Atomic, fenAfter).get
       val hashAfter = hash(situationAfter)
 
       hashAfterMove mustEqual hashAfter

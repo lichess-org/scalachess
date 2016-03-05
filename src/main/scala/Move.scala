@@ -26,29 +26,15 @@ case class Move(
       val h2 = h1.copy(lastMove = Some(toUci))
 
       // my broken castles
-      val h3 =
-        if ((piece is King) && h2.canCastle(color).any)
-          h2 withoutCastles color
-        else if (piece is Rook) (for {
-          kingPos ← after kingPosOf color
-          side ← Side.kingRookSide(kingPos, orig)
-          if h2 canCastle color on side
-        } yield h2.withoutCastle(color, side)) | h2
-        else h2
-
-      // opponent broken castles
-      val h4 = (for {
-        cPos ← capture
-        cPiece ← before(cPos)
-        if cPiece is Rook
-        kingPos ← after kingPosOf !color
-        side ← Side.kingRookSide(kingPos, cPos)
-        if h3 canCastle !color on side
-      } yield h3.withoutCastle(!color, side)) | h3
-
-      // captured king
-      if (after kingPosOf !color isDefined) h4 else h4 withoutCastles !color
-    }
+      if ((piece is King) && h2.canCastle(color).any)
+        h2 withoutCastles color
+      else if (piece is Rook) (for {
+        kingPos ← after kingPosOf color
+        side ← Side.kingRookSide(kingPos, orig)
+        if h2 canCastle color on side
+      } yield h2.withoutCastle(color, side)) | h2
+      else h2
+    } fixCastles
 
     board.variant.finalizeBoard(board, toUci, capture flatMap before.apply) updateHistory { h =>
       // Update position hashes last, only after updating the board,

@@ -10,7 +10,8 @@ case object Antichess extends Variant(
   standardInitialPosition = true) {
 
   // In antichess, it is not permitted to castle
-  override def allowsCastling = false
+  override val castles = Castles.none
+  override val initialFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1"
 
   // In antichess, the king can't be put into check so we always return false
   override def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) = false

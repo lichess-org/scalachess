@@ -29,7 +29,7 @@ object Uci
     def origDest = orig -> dest
   }
 
-  case object Move {
+  object Move {
 
     def apply(move: String): Option[Move] = for {
       orig ← Pos.posAt(move take 2)

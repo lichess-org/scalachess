@@ -22,16 +22,11 @@ case class Game(
     }
 
   def apply(move: Move): Game = {
-    val newTurns = turns + 1
     val newGame = copy(
       board = move.finalizeAfter,
       player = !player,
-      turns = newTurns,
-      clock = clock map {
-        case c: RunningClock => c step move.lag
-        case c: PausedClock if (newTurns - startedAtTurn) == 2 => c.start.switch
-        case c => c
-      }
+      turns = turns + 1,
+      clock = applyClock(move.lag)
     )
     val pgnMove = pgn.Dumper(situation, move, newGame.situation)
     newGame.copy(pgnMoves = pgnMoves.isEmpty.fold(
@@ -45,21 +40,22 @@ case class Game(
     }
 
   def applyDrop(drop: Drop): Game = {
-    val newTurns = turns + 1
     val newGame = copy(
       board = drop.finalizeAfter,
       player = !player,
-      turns = newTurns,
-      clock = clock map {
-        case c: RunningClock => c step drop.lag
-        case c: PausedClock if (newTurns - startedAtTurn) == 2 => c.start.switch
-        case c => c
-      }
+      turns = turns + 1,
+      clock = applyClock(drop.lag)
     )
     val pgnMove = pgn.Dumper(situation, drop, newGame.situation)
     newGame.copy(pgnMoves = pgnMoves.isEmpty.fold(
       List(pgnMove),
       pgnMoves :+ pgnMove))
+  }
+
+  private def applyClock(lag: FiniteDuration) = clock map {
+    case c: RunningClock => c step lag
+    case c: PausedClock if (turns - startedAtTurn) == 1 => c.start.switch
+    case c => c.switch
   }
 
   def apply(uci: Uci.Move): Valid[(Game, Move)] = apply(uci.orig, uci.dest, uci.promotion)

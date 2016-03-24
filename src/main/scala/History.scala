@@ -35,7 +35,7 @@ case class History(
     copy(positionHashes = bytes)
   }
 
-  def threefoldRepetition: Boolean = halfMoveClock > 6 && {
+  def threefoldRepetition: Boolean = halfMoveClock >= 8 && {
     val positions = (positionHashes grouped Hash.size).toList
     positions.headOption match {
       case Some(Array(x, y, z)) => (positions count {

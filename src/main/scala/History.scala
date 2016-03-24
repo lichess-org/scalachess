@@ -26,7 +26,7 @@ case class History(
    * This is used to determine if a draw
    * can be claimed under the fifty-move rule.
    */
-  def halfMoveClock = positionHashes.size / Hash.size
+  def halfMoveClock = math.max(0, (positionHashes.size / Hash.size) - 1)
 
   // generates random positionHashes to satisfy the half move clock
   def setHalfMoveClock(v: Int) = {

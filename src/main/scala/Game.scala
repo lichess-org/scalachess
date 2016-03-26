@@ -94,9 +94,12 @@ object Game {
     board = Board init variant
   )
 
-  def apply(variant: Option[chess.variant.Variant], fen: Option[String]): Game = {
-    val g = apply(variant | chess.variant.Standard)
-    fen.flatMap(format.Forsyth.<<<).fold(g) { parsed =>
+  def apply(variantOption: Option[chess.variant.Variant], fen: Option[String]): Game = {
+    val variant = variantOption | chess.variant.Standard
+    val g = apply(variant)
+    fen.flatMap {
+      format.Forsyth.<<<@(variant, _)
+    }.fold(g) { parsed =>
       g.copy(
         board = parsed.situation.board withVariant g.board.variant withCrazyData {
           parsed.situation.board.crazyData orElse g.board.crazyData

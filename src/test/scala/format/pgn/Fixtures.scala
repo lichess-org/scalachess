@@ -26,6 +26,29 @@ object Fixtures {
     "e3 e5 d3 f5 Qe2 d5 Bd2 Nd7 Nc3 Ngf6 0-0-0 Bb4"
   )
 
+  val fromPosProdCloseChess = """
+[FEN "8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1"]                                                                     [12/1807]
+1. d4 d5 2. Nf4 Nf5 3. g4 g5 4. gxf5 exf5
+5. Nbd3 gxf4 6. Nxf4 Bxf4 7. exf4 Nd6 8. Bh4 Qd8
+9. Bd3 Kd7 10. Kf1 Kc8 11. Rg2 Kb8 12. Qe1 Bh5
+13. Qf2 Rh8 14. Re2 Bf7 15. Rg3 a5 16. Rg2 a4
+17. b4 Rf8 18. Re3 Nc4 19. Bxc4 dxc4 20. Kg1 Qd6
+21. Qd2 Rc7 22. Kh2 b5 23. Rg7 Kb7 24. Re1 Bh5
+25. Rxc7+ Kxc7 26. Qe2 Kd7 27. Rf1 Rg8 28. Qd2 Re8
+29. Qf2 Qxf4+ 30. Kg2 Bxf3+ 31. Qxf3 Qxh4 32. Qxf5+ Kc7
+33. Qf4+ Qxf4 34. Rxf4 Re2+ 35. Rf2 Re3 36. Rf3 Rd3
+37. Kf2 Rd2+ 38. Ke1 Ra2 39. Rxf6 h5 40. Rf7+ Kd6
+41. Rf5 Rxa3 42. Kd2 Ra2+ 43. Kc1 h4 44. Rf4 a3
+45. Kb1 Rb2+ 46. Ka1 Kd5 47. Rxh4 Rc2 48. Rh8 Rxc3
+49. Ka2 Rb3 50. Rd8+ Ke4 51. h4 Rxb4 52. Kxa3 Rb3+
+53. Ka2 Rh3 54. Rd6 b4 55. Rxc6 Kxd4 56. Rg6 Rh2+
+57. Kb1 c3 58. Kc1 Kc4 59. Kd1 Kb3 60. Rc6 c2+
+61. Kc1 Rh1+ 62. Kd2 Rd1+ 63. Ke2 c1=Q 64. Rxc1 Rxc1
+65. Kf3 Rh1 66. Ke3 Kc4 67. Kf3 Rxh4 68. Kg2 b3
+69. Kg3 Rd4 70. Kh3 b2 71. Kg3 b1=R 72. Kf3 Rb3+
+73. Ke2 Rdd3 74. Kf2 Rd2+ 75. Ke1 Ra2 76. Kd1 Rb1#
+"""
+
   val noTagButResult = "1.g4 e5 2.d4 e4 3.c4 Qh4 4.h3 Bb4+ 5.Nc3 Bxc3+ 6.bxc3 Qe7 7.Bf4 d6 8.e3 g5 9.Bg3 Be6 10.Rb1 Bc8 11.Be2 Nf6 12.h4 gxh4 13.Bxh4 Qe6 14.g5 Nfd7 15.Nh3 Rg8 16.Nf4 Qe7 17.Nd5 Qd8 18.g6 f6 19.gxh7 1-0"
 
   val inlineTags = """

@@ -15,6 +15,7 @@ abstract class Variant(
 
   def standard = this == Standard
   def chess960 = this == Chess960
+  def fromPosition = this == FromPosition
   def kingOfTheHill = this == KingOfTheHill
   def threeCheck = this == ThreeCheck
   def antichess = this == Antichess

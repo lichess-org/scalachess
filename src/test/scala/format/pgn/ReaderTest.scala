@@ -115,5 +115,12 @@ class ReaderTest extends ChessTest {
         case replay => replay.chronoMoves.size must_== 152
       }
     }
+    "preserves initial ply" in {
+      Reader.full(caissa) must beSuccess.like {
+        case replay =>
+          replay.setup.startedAtTurn must_== 43
+          replay.state.startedAtTurn must_== 43
+      }
+    }
   }
 }

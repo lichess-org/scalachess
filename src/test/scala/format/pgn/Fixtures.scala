@@ -1314,6 +1314,26 @@ val variations = """
 1. e4 d6 2. d4 c6  3. f4  Qc7 4. Nf3 h6 $6  5. Bd3 (  5. Bc4  e6) 5... Bg4 6. O-O Nd7  7. Nc3 a6 $6  8. Be3 e5 $2  9. fxe5 dxe5 10. d5 $1 ( 10. dxe5 $2 Nxe5 ) 10... c5 (10... cxd5 $6 11. Nxd5 ) ( 10... Ngf6 11. dxc6 ) 
 """
 
+val caissa = """
+[Event "Anime Boston Cosplay Chess 2013 pt 3"]
+[Site "?"]
+[Date "2013.??.??"]
+[Round "3"]
+[White "Living"]
+[Black "Spirit"]
+[Result "0-1"]
+[WhiteELO "?"]
+[BlackELO "?"]
+[SetUp "1"]
+[FEN "b5nr/1p2kB1p/2p3p1/4p1q1/p1P5/N3RP2/P7/4K3 b KQkq - 0 22"]
+
+%Created by Caissa's Web PGN Editor
+22... Nf6 23. Rxe5+?? Kxf7?? 24. Ra5?? Qg1+? 25. Ke2 h5 26. Rxa8? h4?? 27.
+Nc2?? h3?? 28. Rxa4 Rh4 29. f4? Rxf4 30. Kd3 b5 31. Nd4?? bxa4 32. c5 Qa1 33.
+Nxc6 Nd7 34. Nd8+ Ke7 35. c6 Qxa2 36. cxd7 Kxd8 37. Ke3 Kxd7 38. Kxf4 h2 39.
+Kg5 h1=Q 40. Kxg6 Qf2 41. Kg7 Qhg1+ 42. Kh7 Qfh2# 0-1
+"""
+
 val handwritten = """
 [Event "XEQUE-MATEmatica 2014"]
 [Site "Lisbon, Portugal POR"]

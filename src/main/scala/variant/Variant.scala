@@ -15,6 +15,7 @@ abstract class Variant(
 
   def standard = this == Standard
   def chess960 = this == Chess960
+  def fromPosition = this == FromPosition
   def kingOfTheHill = this == KingOfTheHill
   def threeCheck = this == ThreeCheck
   def antichess = this == Antichess
@@ -121,8 +122,10 @@ abstract class Variant(
   def addVariantEffect(move: Move): Move = move
 
   def updatePositionHashes(board: Board, move: Move, hash: chess.PositionHash): PositionHash =
-    if ((move.piece is Pawn) || move.captures || move.promotes) Array()
-    else Hash(Situation(board, !move.piece.color)) ++ hash
+    Hash(Situation(board, !move.piece.color)) ++ {
+      if ((move.piece is Pawn) || move.captures || move.promotes) Array(): PositionHash
+      else hash
+    }
 
   def updatePositionHashes(board: Board, drop: Drop, hash: chess.PositionHash): PositionHash = Array()
 

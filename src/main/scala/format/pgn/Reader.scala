@@ -42,7 +42,7 @@ object Reader {
     }
 
   private def makeGame(tags: List[Tag]) = Game(
-    variant = tags.find(_.name == Tag.Variant).map(_.value).flatMap(chess.variant.Variant.byName),
+    variantOption = tags.find(_.name == Tag.Variant).map(_.value).flatMap(chess.variant.Variant.byName),
     fen = tags.find(_.name == Tag.FEN).map(_.value)
   ) |> { g =>
     g.copy(startedAtTurn = g.turns)

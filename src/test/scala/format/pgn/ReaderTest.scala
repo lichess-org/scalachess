@@ -109,4 +109,18 @@ class ReaderTest extends ChessTest {
       Reader.full(crazyhouseNoVariantTag) must beFailure
     }
   }
+  "from prod" in {
+    "from position close chess" in {
+      Reader.full(fromPosProdCloseChess) must beSuccess.like {
+        case replay => replay.chronoMoves.size must_== 152
+      }
+    }
+    "preserves initial ply" in {
+      Reader.full(caissa) must beSuccess.like {
+        case replay =>
+          replay.setup.startedAtTurn must_== 43
+          replay.state.startedAtTurn must_== 43
+      }
+    }
+  }
 }

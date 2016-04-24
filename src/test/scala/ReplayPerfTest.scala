@@ -13,12 +13,12 @@ class ReplayPerfTest extends ChessTest {
   // val iterations = 1
 
   def runOne(moves: List[String]) =
-    Replay.gameWhileValid(moves, format.Forsyth.initial, chess.variant.Standard)
+    Replay.gameMoveWhileValid(moves, format.Forsyth.initial, chess.variant.Standard)
   def run { gameMoves foreach runOne }
 
   "playing a game" should {
     "many times" in {
-      runOne(gameMoves.head)._2 must beEmpty
+      runOne(gameMoves.head)._3 must beEmpty
       run
       println("running tests")
       val durations = for (i ← 1 to iterations) yield {

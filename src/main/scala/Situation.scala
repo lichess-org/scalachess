@@ -29,7 +29,7 @@ case class Situation(board: Board, color: Color) {
 
   def autoDraw: Boolean = board.autoDraw || board.variant.specialDraw(this)
 
-  lazy val threefoldRepetition: Boolean = board.history.threefoldRepetition
+  lazy val threefoldRepetition: Boolean = board.history.threefoldRepetition(this)
 
   def variantEnd = board.variant specialEnd this
 

@@ -10,19 +10,19 @@ class HistoryTest extends ChessTest {
       case (history, hash) => history.copy(positionHashes = hash ++ history.positionHashes)
     }
     "empty history" in {
-      History().threefoldRepetition must_== false
+      History().threefoldRepetition(toHash(0)) must_== false
     }
     "not 3 same elements" in {
-      val history = makeHistory(List(1, 2, 3, 4, 5, 2, 5, 6, 23, 55))
-      history.threefoldRepetition must_== false
+      val history = makeHistory(List(1, 2, 3, 4, 5, 2, 5, 6, 23))
+      history.threefoldRepetition(toHash(55)) must_== false
     }
     "not 3 elements same to the last one" in {
-      val history = makeHistory(List(1, 2, 3, 4, 5, 2, 5, 6, 23, 2, 55))
-      history.threefoldRepetition must_== false
+      val history = makeHistory(List(1, 2, 3, 4, 5, 2, 5, 6, 23, 2))
+      history.threefoldRepetition(toHash(55)) must_== false
     }
     "positive" in {
-      val history = makeHistory(List(1, 2, 3, 4, 5, 2, 5, 6, 23, 2))
-      history.threefoldRepetition must_== true
+      val history = makeHistory(List(1, 2, 3, 4, 5, 2, 5, 6, 23))
+      history.threefoldRepetition(toHash(2)) must_== true
     }
   }
 

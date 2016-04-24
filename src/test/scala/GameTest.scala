@@ -23,4 +23,20 @@ R   K""", Black)
       }
     }
   }
+
+  "update half move clock" should {
+    "start at 0" in {
+      Game(variant.Standard).halfMoveClock must_== 0
+    }
+    "increment" in {
+      Game(variant.Standard)(G1, F3) must beSuccess.like {
+        case (game, move) => game.halfMoveClock must_== 1
+      }
+    }
+    "not increment" in {
+      Game(variant.Standard)(E2, E4) must beSuccess.like {
+        case (game, move) => game.halfMoveClock must_== 0
+      }
+    }
+  }
 }

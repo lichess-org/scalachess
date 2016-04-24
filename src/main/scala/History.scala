@@ -26,7 +26,7 @@ case class History(
    * This is used to determine if a draw
    * can be claimed under the fifty-move rule.
    */
-  def halfMoveClock = math.max(0, (positionHashes.size / Hash.size) - 1)
+  def halfMoveClock = positionHashes.size / Hash.size
 
   // generates random positionHashes to satisfy the half move clock
   def setHalfMoveClock(v: Int) = {
@@ -35,8 +35,10 @@ case class History(
     copy(positionHashes = bytes)
   }
 
-  def threefoldRepetition: Boolean = halfMoveClock >= 8 && {
-    val positions = (positionHashes grouped Hash.size).toList
+  def threefoldRepetition(situation: Situation): Boolean = threefoldRepetition(Hash(situation))
+
+  def threefoldRepetition(currentHash: PositionHash): Boolean = halfMoveClock >= 8 && {
+    val positions = ((currentHash ++ positionHashes) grouped Hash.size).toList
     positions.headOption match {
       case Some(Array(x, y, z)) => (positions count {
         case Array(x2, y2, z2) => x == x2 && y == y2 && z == z2

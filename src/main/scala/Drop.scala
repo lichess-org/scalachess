@@ -23,7 +23,7 @@ case class Drop(
     )
 
     board updateHistory {
-      _.copy(positionHashes = board.variant updatePositionHashes(board, this, board.history.positionHashes))
+      _.copy(positionHashes = board.variant updatePositionHashes(this, board.history.positionHashes))
     }
   }
 

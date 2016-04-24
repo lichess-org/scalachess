@@ -37,9 +37,7 @@ case class Move(
     } fixCastles
 
     board.variant.finalizeBoard(board, toUci, capture flatMap before.apply) updateHistory { h =>
-      // Update position hashes last, only after updating the board,
-      // castling rights and en-passant rights.
-      h.copy(positionHashes = board.variant.updatePositionHashes(board, this, h.positionHashes))
+      h.copy(positionHashes = board.variant.updatePositionHashes(this, h.positionHashes))
     }
   }
 

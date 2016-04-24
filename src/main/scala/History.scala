@@ -30,7 +30,7 @@ case class History(
 
   // generates random positionHashes to satisfy the half move clock
   def setHalfMoveClock(v: Int) = {
-    val bytes = Array.ofDim[Byte](v * Hash.size)
+    val bytes = Array.ofDim[Byte]((v + 1) * Hash.size)
     scala.util.Random.nextBytes(bytes)
     copy(positionHashes = bytes)
   }

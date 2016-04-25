@@ -16,7 +16,7 @@ case class CheckCount(white: Int = 0, black: Int = 0) {
 
 case class History(
     lastMove: Option[Uci] = None,
-    positionHashes: PositionHash = Array(),
+    positionHashes: PositionHash = History.randomHashes(1),
     castles: Castles = Castles.all,
     checkCount: CheckCount = CheckCount(0, 0)) {
 
@@ -29,11 +29,8 @@ case class History(
   def halfMoveClock = math.max(0, (positionHashes.size / Hash.size) - 1)
 
   // generates random positionHashes to satisfy the half move clock
-  def setHalfMoveClock(v: Int) = {
-    val bytes = Array.ofDim[Byte]((v + 1) * Hash.size)
-    scala.util.Random.nextBytes(bytes)
-    copy(positionHashes = bytes)
-  }
+  def setHalfMoveClock(v: Int) =
+    copy(positionHashes = History.randomHashes(v + 1))
 
   def threefoldRepetition: Boolean = halfMoveClock >= 8 && {
     val positions = (positionHashes grouped Hash.size).toList
@@ -103,4 +100,10 @@ object History {
       })
 
   def noCastle = History() withoutCastles White withoutCastles Black
+
+  private def randomHashes(n: Int): PositionHash = {
+    val bytes = Array.ofDim[Byte](n * Hash.size)
+    scala.util.Random.nextBytes(bytes)
+    bytes
+  }
 }

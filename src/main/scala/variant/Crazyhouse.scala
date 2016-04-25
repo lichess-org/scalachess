@@ -38,7 +38,7 @@ case object Crazyhouse extends Variant(
   // but disable 50-moves by truncating the hash at 99
   private def updateHashes(hash: PositionHash, board: Board, color: Color) = {
     val newHash = Hash(Situation(board, color)) ++ hash
-    if (newHash.size > 99) newHash take 99 else newHash
+    if (newHash.size > 99 * Hash.size) newHash take 99 * Hash.size else newHash
   }
 
   override def finalizeBoard(board: Board, uci: Uci, capture: Option[Piece]): Board = uci match {

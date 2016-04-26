@@ -91,11 +91,11 @@ case class Move(
     comment: Option[String] = None,
     opening: Option[String] = None,
     result: Option[String] = None,
-    variation: List[Turn] = Nil,
+    variations: List[List[Turn]] = Nil,
     // time left for the user who made the move, after he made it
     timeLeft: Option[Int] = None) {
 
-  def isLong = comment.isDefined || variation.nonEmpty
+  def isLong = comment.isDefined || variations.nonEmpty
 
   def timeString(time: Int) = Clock.timeString(time)
 
@@ -108,7 +108,9 @@ case class Move(
       if (comment.isDefined || timeLeft.isDefined || opening.isDefined || result.isDefined)
         List(clockString, opening, result, comment).flatten.mkString(" { ", " ", " }")
       else ""
-    val variationString = if (variation.isEmpty) "" else variation.mkString(" (", " ", ")")
+    val variationString =
+      if (variations.isEmpty) ""
+      else variations.map(_.mkString(" (", " ", ")")).mkString(" ")
     s"$san$nagSymbol$commentOrTime$variationString"
   }
 }

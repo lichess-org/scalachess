@@ -25,4 +25,13 @@ class HistoryTest extends ChessTest {
       history.threefoldRepetition must_== true
     }
   }
+
+  "set half move clock" should {
+    "set 0" in {
+      History().setHalfMoveClock(0).halfMoveClock must_== 0
+    }
+    "set 5" in {
+      History().setHalfMoveClock(5).halfMoveClock must_== 5
+    }
+  }
 }

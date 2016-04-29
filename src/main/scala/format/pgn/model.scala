@@ -88,14 +88,14 @@ object Turn {
 case class Move(
     san: String,
     nag: Option[Int] = None,
-    comment: Option[String] = None,
+    comments: List[String] = Nil,
     opening: Option[String] = None,
     result: Option[String] = None,
     variations: List[List[Turn]] = Nil,
     // time left for the user who made the move, after he made it
     timeLeft: Option[Int] = None) {
 
-  def isLong = comment.isDefined || variations.nonEmpty
+  def isLong = comments.nonEmpty || variations.nonEmpty
 
   def timeString(time: Int) = Clock.timeString(time)
 
@@ -104,13 +104,15 @@ case class Move(
 
   override def toString = {
     val nagSymbol = nag.fold("") { code => Nag(code).fold(" $" + code)(_.symbol) }
-    val commentOrTime =
-      if (comment.isDefined || timeLeft.isDefined || opening.isDefined || result.isDefined)
-        List(clockString, opening, result, comment).flatten.mkString(" { ", " ", " }")
+    val commentsOrTime =
+      if (comments.nonEmpty || timeLeft.isDefined || opening.isDefined || result.isDefined)
+        List(clockString, opening, result).flatten.:::(comments).map { text =>
+          s" { $text }"
+        }.mkString
       else ""
     val variationString =
       if (variations.isEmpty) ""
       else variations.map(_.mkString(" (", " ", ")")).mkString(" ")
-    s"$san$nagSymbol$commentOrTime$variationString"
+    s"$san$nagSymbol$commentsOrTime$variationString"
   }
 }

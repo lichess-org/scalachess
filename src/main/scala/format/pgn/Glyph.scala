@@ -80,9 +80,9 @@ object Glyph {
     val counterplay = new Glyph(132, "⇆", "Counterplay") with Observation
     val timeTrouble = new Glyph(138, "⊕", "Time trouble") with Observation
     val novelty = new Glyph(146, "N", "Novelty") with Observation
-    val space = new Glyph(24, "○", "Space advantage") with Observation
+    val compensation = new Glyph(44, "=/∞", "With compensation") with Observation
 
-    val all = List(zugzwang, development, initiative, attack, counterplay, timeTrouble, novelty, space)
+    val all = List(zugzwang, development, initiative, attack, counterplay, timeTrouble, novelty, compensation)
     val byId = all.map { g => g.id -> g }.toMap
   }
 

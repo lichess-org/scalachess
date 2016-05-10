@@ -87,8 +87,8 @@ object Turn {
 
 case class Move(
     san: String,
-    nag: Option[Int] = None,
     comments: List[String] = Nil,
+    glyphs: Glyphs = Glyphs.empty,
     opening: Option[String] = None,
     result: Option[String] = None,
     variations: List[List[Turn]] = Nil,
@@ -103,7 +103,7 @@ case class Move(
     timeLeft.map(time => "[%clk " + timeString(time) + "]")
 
   override def toString = {
-    val nagSymbol = nag.fold("") { code => Nag(code).fold(" $" + code)(_.symbol) }
+    val glyphStr = glyphs.toList.map(_.symbol).mkString
     val commentsOrTime =
       if (comments.nonEmpty || timeLeft.isDefined || opening.isDefined || result.isDefined)
         List(clockString, opening, result).flatten.:::(comments).map { text =>
@@ -113,6 +113,6 @@ case class Move(
     val variationString =
       if (variations.isEmpty) ""
       else variations.map(_.mkString(" (", " ", ")")).mkString(" ")
-    s"$san$nagSymbol$commentsOrTime$variationString"
+    s"$san$glyphStr$commentsOrTime$variationString"
   }
 }

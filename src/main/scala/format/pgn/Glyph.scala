@@ -42,7 +42,7 @@ object Glyph {
 
   object MoveAssessment {
     val good = new Glyph(1, "!", "Good move") with MoveAssessment
-    val poor = new Glyph(2, "?", "Mistake") with MoveAssessment
+    val mistake = new Glyph(2, "?", "Mistake") with MoveAssessment
     val brillant = new Glyph(3, "!!", "Brillant move") with MoveAssessment
     val blunder = new Glyph(4, "??", "Blunder") with MoveAssessment
     val speculative = new Glyph(5, "!?", "Speculative move") with MoveAssessment
@@ -50,7 +50,7 @@ object Glyph {
     val only = new Glyph(7, "□", "Only move") with MoveAssessment
     val singular = new Glyph(8, "µ", "Singular move") with MoveAssessment
 
-    val all = List(good, poor, brillant, blunder, speculative, questionable, only, singular)
+    val all = List(good, mistake, brillant, blunder, speculative, questionable, only, singular)
     val byId = all.map { g => g.id -> g }.toMap
   }
 

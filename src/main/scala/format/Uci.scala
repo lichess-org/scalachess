@@ -74,14 +74,14 @@ object Uci
   def apply(drop: chess.Drop) = Uci.Drop(drop.piece.role, drop.pos)
 
   def apply(move: String): Option[Uci] =
-    if (move lift 1 contains "@") for {
+    if (move lift 1 contains '@') for {
       role ← move.headOption flatMap Role.allByPgn.get
       pos ← Pos.posAt(move drop 2 take 2)
     } yield Uci.Drop(role, pos)
     else Uci.Move(move)
 
   def piotr(move: String): Option[Uci] =
-    if (move lift 1 contains "@") for {
+    if (move lift 1 contains '@') for {
       role ← move.headOption flatMap Role.allByPgn.get
       pos ← move lift 2 flatMap Pos.piotr
     } yield Uci.Drop(role, pos)

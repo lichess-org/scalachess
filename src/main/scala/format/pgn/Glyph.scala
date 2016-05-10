@@ -61,10 +61,10 @@ object Glyph {
     val unclear = new Glyph(13, "∞", "Unclear position") with PositionAssessment
     val whiteSlightlyBetter = new Glyph(14, "⩲", "White is slightly better") with PositionAssessment
     val blackSlightlyBetter = new Glyph(15, "⩱", "Black is slightly better") with PositionAssessment
-    val whiteQuiteBetter = new Glyph(16, "±", "White is quite better") with PositionAssessment
-    val blackQuiteBetter = new Glyph(17, "∓", "Black is quite better") with PositionAssessment
-    val whiteMuchBetter = new Glyph(18, "+−", "White is much better") with PositionAssessment
-    val blackMuchBetter = new Glyph(19, "-+", "Black is much better") with PositionAssessment
+    val whiteQuiteBetter = new Glyph(16, "±", "White is better") with PositionAssessment
+    val blackQuiteBetter = new Glyph(17, "∓", "Black is better") with PositionAssessment
+    val whiteMuchBetter = new Glyph(18, "+−", "White is winning") with PositionAssessment
+    val blackMuchBetter = new Glyph(19, "-+", "Black is winning") with PositionAssessment
 
     val all = List(equal, unclear, whiteSlightlyBetter, blackSlightlyBetter, whiteQuiteBetter, blackQuiteBetter, whiteMuchBetter, blackMuchBetter)
     val byId = all.map { g => g.id -> g }.toMap
@@ -80,7 +80,7 @@ object Glyph {
     val counterplay = new Glyph(132, "⇆", "Counterplay") with Observation
     val timeTrouble = new Glyph(138, "⊕", "Time trouble") with Observation
     val novelty = new Glyph(146, "N", "Novelty") with Observation
-    val compensation = new Glyph(44, "=/∞", "With compensation") with Observation
+    val compensation = new Glyph(44, "=∞", "With compensation") with Observation
 
     val all = List(zugzwang, development, initiative, attack, counterplay, timeTrouble, novelty, compensation)
     val byId = all.map { g => g.id -> g }.toMap

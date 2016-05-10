@@ -14,10 +14,26 @@ case class Glyphs(
   def isEmpty = move.isEmpty && position.isEmpty && observations.isEmpty
 
   def nonEmpty: Option[Glyphs] = if (isEmpty) None else Some(this)
+
+  def toggle(glyph: Glyph) = glyph match {
+    case g: Glyph.MoveAssessment     => copy(move = !move.contains(g) option g)
+    case g: Glyph.PositionAssessment => copy(position = !position.contains(g) option g)
+    case g: Glyph.Observation => copy(observations =
+      if (observations contains g) observations.filter(g !=)
+      else g :: observations)
+    case _ => this
+  }
+
+  def toList: List[Glyph] = move.toList ::: position.toList ::: observations
 }
 
 object Glyphs {
   val empty = Glyphs(None, None, Nil)
+
+  def fromList(glyphs: List[Glyph]) = Glyphs(
+    move = glyphs.collectFirst { case g: Glyph.MoveAssessment => g },
+    position = glyphs.collectFirst { case g: Glyph.PositionAssessment => g },
+    observations = glyphs.collect { case g: Glyph.Observation => g })
 }
 
 object Glyph {
@@ -69,4 +85,9 @@ object Glyph {
     val all = List(zugzwang, development, initiative, attack, counterplay, timeTrouble, novelty, space)
     val byId = all.map { g => g.id -> g }.toMap
   }
+
+  def find(id: Int): Option[Glyph] =
+    MoveAssessment.byId.get(id) orElse
+      PositionAssessment.byId.get(id) orElse
+      Observation.byId.get(id)
 }

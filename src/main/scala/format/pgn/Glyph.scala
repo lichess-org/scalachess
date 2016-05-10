@@ -32,8 +32,9 @@ object Glyph {
     val speculative = new Glyph(5, "!?", "Speculative move") with MoveAssessment
     val questionable = new Glyph(6, "?!", "Questionable move") with MoveAssessment
     val only = new Glyph(7, "□", "Only move") with MoveAssessment
+    val singular = new Glyph(8, "µ", "Singular move") with MoveAssessment
 
-    val all = List(good, poor, brillant, blunder, speculative, questionable, only)
+    val all = List(good, poor, brillant, blunder, speculative, questionable, only, singular)
     val byId = all.map { g => g.id -> g }.toMap
   }
 
@@ -63,8 +64,9 @@ object Glyph {
     val counterplay = new Glyph(132, "⇆", "Counterplay") with Observation
     val timeTrouble = new Glyph(138, "⊕", "Time trouble") with Observation
     val novelty = new Glyph(146, "N", "Novelty") with Observation
+    val space = new Glyph(24, "○", "Space advantage") with Observation
 
-    val all = List(zugzwang, development, initiative, attack, counterplay, timeTrouble, novelty)
+    val all = List(zugzwang, development, initiative, attack, counterplay, timeTrouble, novelty, space)
     val byId = all.map { g => g.id -> g }.toMap
   }
 }

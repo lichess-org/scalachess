@@ -80,6 +80,22 @@ class ParserTest extends ChessTest {
     }
   }
 
+  "comments" in {
+    parser("Ne7g6+! {such a neat comment}") must beSuccess.like {
+      case ParsedPgn(_, List(san)) =>
+        san.metas.comments must_== List("such a neat comment")
+    }
+  }
+
+  "variations" in {
+    parser("Ne7g6+! {such a neat comment} (e4 Ng6)") must beSuccess.like {
+      case ParsedPgn(_, List(san)) =>
+        san.metas.variations.headOption must beSome.like {
+          case variation => variation must haveSize(2)
+        }
+    }
+  }
+
   raws foreach { sans =>
     val size = sans.split(' ').size
     "sans only size: " + size in {

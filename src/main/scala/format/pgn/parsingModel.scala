@@ -21,6 +21,10 @@ sealed trait San {
 
   def withSuffixes(s: Suffixes): San = withMetas(metas withSuffixes s)
 
+  def withComments(s: List[String]): San = withMetas(metas withComments s)
+
+  def withVariations(s: List[List[San]]): San = withMetas(metas withVariations s)
+
   def mergeGlyphs(glyphs: Glyphs): San = withMetas(
     metas.withGlyphs(metas.glyphs merge glyphs)
   )
@@ -85,6 +89,10 @@ case class Metas(
     glyphs = s.glyphs)
 
   def withGlyphs(g: Glyphs) = copy(glyphs = g)
+
+  def withComments(c: List[String]) = copy(comments = c)
+
+  def withVariations(v: List[List[San]]) = copy(variations = v)
 }
 
 object Metas {

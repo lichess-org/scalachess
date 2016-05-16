@@ -10,7 +10,11 @@ import scalaz.Validation.{ success => succezz }
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 object Parser extends scalaz.syntax.ToTraverseOps {
 
-  case class StrMove(san: String, glyphs: Glyphs)
+  case class StrMove(
+    san: String,
+    glyphs: Glyphs,
+    comments: List[String],
+    variations: List[List[StrMove]])
 
   def full(pgn: String): Valid[ParsedPgn] = try {
     val preprocessed = pgn.lines.map(_.trim).filter {
@@ -44,12 +48,16 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     str.split(' ').toList,
     variant)
   def moves(strMoves: List[String], variant: Variant): Valid[List[San]] = objMoves(
-    strMoves.map { StrMove(_, Glyphs.empty) },
+    strMoves.map { StrMove(_, Glyphs.empty, Nil, Nil) },
     variant)
   def objMoves(strMoves: List[StrMove], variant: Variant): Valid[List[San]] =
     strMoves.map {
-      case StrMove(san, glyphs) => (
-        MoveParser(san, variant) map { _ mergeGlyphs glyphs }
+      case StrMove(san, glyphs, comments, variations) => (
+        MoveParser(san, variant) map { m =>
+          m withComments comments withVariations {
+            variations.map { objMoves(_, variant) }.sequence | Nil
+          } mergeGlyphs glyphs
+        }
       ): Valid[San]
     }.sequence
 
@@ -78,15 +86,15 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     val moveRegex = """0\-0\-0|0\-0|[PQKRBNOoa-h][QKRBNa-h1-8xOo\-=\+\#\@]{1,6}[\?!□]{0,2}""".r
 
     def strMove: Parser[StrMove] = as("move") {
-      ((number | commentary)*) ~> (moveRegex ~ nagGlyphs) <~ (moveExtras*) ^^ {
-        case san ~ glyphs => StrMove(san, glyphs)
+      ((number | commentary)*) ~> (moveRegex ~ nagGlyphs ~ rep(commentary) ~ rep(variation)) <~ (moveExtras*) ^^ {
+        case san ~ glyphs ~ comments ~ variations => StrMove(san, glyphs, comments, variations)
       }
     }
 
     def number: Parser[String] = """[1-9]\d*[\s\.]*""".r
 
     def moveExtras: Parser[Unit] = as("moveExtras") {
-      (variation | commentary).^^^(())
+      (commentary).^^^(())
     }
 
     def nagGlyphs: Parser[Glyphs] = as("nagGlyphs") {

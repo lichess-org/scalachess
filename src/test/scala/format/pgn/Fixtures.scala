@@ -26,6 +26,25 @@ object Fixtures {
     "e3 e5 d3 f5 Qe2 d5 Bd2 Nd7 Nc3 Ngf6 0-0-0 Bb4"
   )
 
+  val recentChessCom = """[Event "Live Chess"]
+[Site "Chess.com"]
+[Date "2016.05.10"]
+[Round "?"]
+[White "LyonBeast"]
+[Black "FabianoCaruana"]
+[Result "0-1"]
+[WhiteElo "2747"]
+[BlackElo "2699"]
+[ECO "A00"]
+[TimeControl "300+2"]
+[Termination "FabianoCaruana won by resignation"]
+[Annotator "Komodo 9.01 64-bit"]
+[CurrentPosition "3r2k1/p3n1p1/1p5p/2q1p3/2P1B1R1/2Q1P3/P5PP/3r1R1K w - - 6 28"]
+
+1.d4 Nf6 2.c4 e6 3.Nf3 d5 4.Nc3 Be7 5.Bg5 h6 6.Bh4 O-O 7.e3 Ne4 8.Bxe7 Qxe7 9.cxd5 Nxc3 10.bxc3 exd5 11.Qb3 Rd8 12.c4 Be6 13.Rc1 c5 14.dxc5 Qxc5 15.Nd4 Nc6 16.Nxe6 fxe6 17.Be2 d4 18.O-O dxe3 19.fxe3 Ne5 20.Kh1 b6 21.Qc3 Rd6 22.Rf4 Rad8 23.Re4 Nc6 24.Rf1 e5 25.Rg4 Rd2 26.Bf3 Ne7 27.Be4 Rd1 28.Kg1? ( 28.Rg1! { Forced, but Black is clearly much, much better. The silicon companion says Kh8 is now best. #shrug } ) 28...b5? ( 28...R8d3! { This classic interference tactic just ends the game. } 29.Bxd3 Qxe3+ 30.Kh1 Rxf1+ 31.Bxf1 Qxc3 ) 29.Bc2? ( 29.Rxd1 Rxd1+ 30.Kf2 { Black clearly still has a big plus, but is not yet winning. } ) 29...Rxf1+ 30.Kxf1 Nd5 31.Rxg7+ Kf8! { Black simply leaves White to deal with the hanging queen, e3 pawn, and rook. } ( 31...Kxg7? 32.Qxe5+ Kf8 33.Qh8+ Ke7 34.Qe5+ Kf7 35.cxd5 { Unclear. } ) ( 31...Kh8? 32.Rh7+ Kg8 33.Rh8+! ) 
+0-1
+"""
+
   val fromPosProdCloseChess = """
 [FEN "8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1"]                                                                     [12/1807]
 1. d4 d5 2. Nf4 Nf5 3. g4 g5 4. gxf5 exf5
@@ -1508,8 +1527,8 @@ s earlier, but I like the looks of this counter play I'm going to get against hi
 nd I worked out a draw. However, this guy is usually a regular costumer for me and I got cocky and decided to go for the win. After Rb4, it dawned on me just how poor my position really was and I began to get very worried. I usually have a really good idea for evaluation of positions, but I began to see no real concrete threats and wondered if I 
 had mis-evaluated my attack.} 22. Qa3 Nxd4 23. exd4 Bc6 24. Nb3 Qd6 {I'm still in a worse position, but he hasn't defended accurately. Stockfish put the position around +1.6 in his favor, which isn't a good sign considering I'm a piece down. I try a cheapo with Qd6} 25. Qb2 a5 26. Qd2 a4 {all of a sudden I 
 feel like I've turned around my position. I calculated that Qh6 isn't going to be mating and my attack is coming MUCH sooner. I feel hopeful again. I have around 1 minute} 27. Qxh6?? axb3 {Joy!}28. Bd3!? {Pain. I have a minute on my clock and I missed his bishop idea. I knew that Qh7+ wasnt mate and stopped calculating his attack to conserve time
-. What I missed was the Bishop check with Queen on h6 idea that I had seen a million times on tactics trainers. What I didn't know, was that I played the right move, and actually stockfish gives this position -3.5 in my favor. I found the correct idea, but I missed the follow up and ruined a great knockout. 30 seconds on my clock} Rxc4!? 29. Bxc4
-?? (29. Bxc4?? bxa2!! 30.Kc2 Be4+ 31. Bd3 Qxd4! 32. Qc1 Qc4+ 33.Kd2 Qxd3+ 34. Ke1 Rb1! 35. Rxd3 Rxc1+ 36. Kd2 Rxg1 {this is the best line stockfish can come up with for whiteafter Bxc4}) Qa3+?? {this super blunders the game back in his direction. After taking the rook the position is around -10.0 for black} 30. Kd2 Qb2+ 31. Ke3 Qc3+ 32. Bd3 e5? 
+. What I missed was the Bishop check with Queen on h6 idea that I had seen a million times on tactics trainers. What I didn't know, was that I played the right move, and actually stockfish gives this position -3.5 in my favor. I found the correct idea, but I missed the follow up and ruined a great knockout. 30 seconds on my clock} Rxc4!? 29. Bxc4?? 
+(29. Bxc4?? bxa2!! 30.Kc2 Be4+ 31. Bd3 Qxd4! 32. Qc1 Qc4+ 33.Kd2 Qxd3+ 34. Ke1 Rb1! 35. Rxd3 Rxc1+ 36. Kd2 Rxg1 {this is the best line stockfish can come up with for whiteafter Bxc4}) Qa3+?? {this super blunders the game back in his direction. After taking the rook the position is around -10.0 for black} 30. Kd2 Qb2+ 31. Ke3 Qc3+ 32. Bd3 e5? 
 33. Qh7+ Kf8 34. Qh8+ {resigns}
 [/pgn]
 """

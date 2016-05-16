@@ -11,7 +11,7 @@ case class Glyphs(
     position: Option[Glyph.PositionAssessment],
     observations: List[Glyph.Observation]) {
 
-  def isEmpty = move.isEmpty && position.isEmpty && observations.isEmpty
+  def isEmpty = this == Glyphs.empty
 
   def nonEmpty: Option[Glyphs] = if (isEmpty) None else Some(this)
 
@@ -23,6 +23,14 @@ case class Glyphs(
       else g :: observations)
     case _ => this
   }
+
+  def merge(g: Glyphs) =
+    if (isEmpty) g
+    else if (g.isEmpty) this
+    else Glyphs(
+      g.move orElse move,
+      g.position orElse position,
+      (g.observations ::: observations).distinct)
 
   def toList: List[Glyph] = move.toList ::: position.toList ::: observations
 }
@@ -48,9 +56,8 @@ object Glyph {
     val interesting = new Glyph(5, "!?", "Interesting move") with MoveAssessment
     val dubious = new Glyph(6, "?!", "Dubious move") with MoveAssessment
     val only = new Glyph(7, "□", "Only move") with MoveAssessment
-    val singular = new Glyph(8, "µ", "Singular move") with MoveAssessment
 
-    val all = List(good, mistake, brillant, blunder, interesting, dubious, only, singular)
+    val all = List(good, mistake, brillant, blunder, interesting, dubious, only)
     val byId = all.map { g => g.id -> g }.toMap
   }
 

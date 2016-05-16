@@ -1,5 +1,6 @@
 package chess
 package format.pgn
+import variant.Standard
 
 import Pos._
 
@@ -8,6 +9,7 @@ class ParserTest extends ChessTest {
   import Fixtures._
 
   val parser = Parser.full _
+  def parseMove(str: String) = Parser.MoveParser(str, Standard)
 
   "promotion check" should {
     "as a queen" in {
@@ -49,8 +51,33 @@ class ParserTest extends ChessTest {
     }
   }
 
+  "glyphs" in {
+    parseMove("e4") must beSuccess.like {
+      case a => a must_== Std(Pos.E4, Pawn)
+    }
+    parseMove("e4!") must beSuccess.like {
+      case a: Std =>
+        a.dest === Pos.E4
+        a.role === Pawn
+        a.metas.glyphs === Glyphs(Glyph.MoveAssessment.good.some, None, Nil)
+    }
+    parseMove("Ne7g6+?!") must beSuccess.like {
+      case a: Std =>
+        a.dest === Pos.G6
+        a.role === Knight
+        a.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
+    }
+    parser("Ne7g6+!") must beSuccess
+  }
+
   "nags" in {
     parser(withNag) must beSuccess
+
+    parser("Ne7g6+! $13") must beSuccess.like {
+      case ParsedPgn(_, List(san)) =>
+        san.metas.glyphs.move must_== Some(Glyph.MoveAssessment.good)
+        san.metas.glyphs.position must_== Some(Glyph.PositionAssessment.unclear)
+    }
   }
 
   raws foreach { sans =>

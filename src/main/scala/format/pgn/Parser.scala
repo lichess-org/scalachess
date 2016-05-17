@@ -55,7 +55,9 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       case StrMove(san, glyphs, comments, variations) => (
         MoveParser(san, variant) map { m =>
           m withComments comments withVariations {
-            variations.map { objMoves(_, variant) }.sequence | Nil
+            variations.map { v =>
+              objMoves(v, variant) | Nil
+            }.filter(_.nonEmpty)
           } mergeGlyphs glyphs
         }
       ): Valid[San]

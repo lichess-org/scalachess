@@ -32,6 +32,7 @@ object Tag {
   case object ECO extends TagType
   case object Opening extends TagType
   case object Termination extends TagType
+  case object Annotator extends TagType
   case class Unknown(n: String) extends TagType {
     override def toString = n
   }
@@ -39,7 +40,7 @@ object Tag {
   val tagTypes = List(
     Event, Site, Date, Round, White, Black, TimeControl,
     WhiteClock, BlackClock, WhiteElo, BlackElo, WhiteTitle, BlackTitle,
-    Result, FEN, Variant, ECO, Opening, Termination)
+    Result, FEN, Variant, ECO, Opening, Termination, Annotator)
   val tagTypesByLowercase = tagTypes map { t => t.lowercase -> t } toMap
 
   def apply(name: String, value: Any): Tag = new Tag(

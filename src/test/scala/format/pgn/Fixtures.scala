@@ -1330,7 +1330,7 @@ Kd5 48. Nb6+ Ke6 49. Kg7 Bh5 50. a4 Be8 51. a5 Bh5 52. a6 Ke5 53. f7 Bxf7 54. Kx
 h5 c3 60. Qc4+ Kd2 61. Na4 c2 62. Qc3+ Ke2 63. Qxc2+ Ke1 64. Kf6 Kf1 65. Kf5 Ke1 66. Kf4 Kf1 67. Kf3 Ke1 68. Qe2# 1-0"""
 
 val variations = """
-1. e4 d6 2. d4 c6  3. f4  Qc7 4. Nf3 h6 $6  5. Bd3 (  5. Bc4  e6) 5... Bg4 6. O-O Nd7  7. Nc3 a6 $6  8. Be3 e5 $2  9. fxe5 dxe5 10. d5 $1 ( 10. dxe5 $2 Nxe5 ) 10... c5 (10... cxd5 $6 11. Nxd5 ) ( 10... Ngf6 11. dxc6 ) 
+1. e4 (1. d4 d5) d6 (1... d5 2. h3) 2. d4 {choudidou d4} (2. d3 h6 3. h3) c6 {yep c6!} 3. f4  Qc7 4. Nf3 h6 $6  5. Bd3 (  5. Bc4  e6) 5... Bg4 6. O-O Nd7  7. Nc3 a6 $6  8. Be3 e5 $2  9. fxe5 dxe5 10. d5 $1 ( 10. dxe5 $2 Nxe5 ) 10... c5 (10... cxd5 $6 11. Nxd5 ) ( 10... Ngf6 11. dxc6 ) 
 """
 
 val caissa = """

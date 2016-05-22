@@ -103,7 +103,10 @@ case class Move(
     timeLeft.map(time => "[%clk " + timeString(time) + "]")
 
   override def toString = {
-    val glyphStr = glyphs.toList.map(_.symbol).mkString
+    val glyphStr = glyphs.toList.map({
+        case glyph if glyph.id <= 6 => glyph.symbol
+        case glyph => s" $$${glyph.id}"
+      }).mkString
     val commentsOrTime =
       if (comments.nonEmpty || timeLeft.isDefined || opening.isDefined || result.isDefined)
         List(clockString, opening, result).flatten.:::(comments).map { text =>

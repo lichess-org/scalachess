@@ -121,5 +121,32 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
 
 1. a4 { [%clk 0:04:58] } Nf6 { [%clk 0:04:59] } 2. d4 { [%clk 0:04:55] } d5 { [%clk 0:04:58] } 3. h4 { [%clk 0:04:52] } e6 { [%clk 0:04:57] } 4. Qd3! { An invention of true genius. } { [%clk 0:04:48] } 4... c5 { [%clk 0:04:56] } 5. dxc5 { [%clk 0:04:18] } Bxc5! { [%clk 0:04:55] }"""
     }
+
+    "be correct with NAGs" in {
+      val pgn = Pgn(
+        tags = List(),
+        turns = List(
+          Turn(
+            number = 1,
+            white = Move("d3", glyphs = glyphs(6)).some,
+            black = Move("Nc6", glyphs = glyphs(10)).some
+          ),
+          Turn(
+            number = 2,
+            white = Move("Qd2").some,
+            black = Move("Nb4", glyphs = Glyphs(
+              Glyph.MoveAssessment.blunder.some,
+              Glyph.PositionAssessment.whiteMuchBetter.some,
+              List(Glyph.Observation.timeTrouble))).some
+          ),
+          Turn(
+            number = 3,
+            white = Move("Qxb4", glyphs = glyphs(7)).some,
+            black = None
+          )
+        )
+      )
+      pgn.toString must_== """1. d3?! Nc6 $10 2. Qd2 Nb4?? $18 $138 3. Qxb4 $7"""
+    }
   }
 }

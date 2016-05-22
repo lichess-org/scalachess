@@ -54,4 +54,8 @@ object Tag {
   def tagType(name: String) =
     (tagTypesByLowercase get name.toLowerCase) | Unknown(name)
 
+  def find(tags: List[Tag], name: String): Option[String] =
+    (Tag tagType name) |> { tagType =>
+      tags.find(_.name == tagType).map(_.value)
+    }
 }

@@ -5,9 +5,7 @@ import scalaz.Validation.FlatMap._
 
 case class ParsedPgn(tags: List[Tag], sans: List[San]) {
 
-  def tag(name: String): Option[String] = (Tag tagType name) |> { tagType =>
-    tags.find(_.name == tagType).map(_.value)
-  }
+  def tag(name: String): Option[String] = Tag.find(tags, name)
 }
 
 // Standard Algebraic Notation

@@ -183,7 +183,7 @@ object Clock {
   // no more than this time will be offered to the lagging player
   val maxLagToCompensate = 1f
   // no more than this time to get the last move in
-  val maxGraceMillis = 800
+  val maxGraceMillis = 1000
 
   def apply(
     limit: Int,

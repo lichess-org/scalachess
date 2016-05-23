@@ -1128,7 +1128,7 @@ val chessbaseArrows = """[Event "?"]
 [PlyCount "0"]
 [SourceDate "2016.05.23"]
 
-{[%csl Gb4,Yd5,Rf6][%cal Ge2e4,Ye2d4,Re2g4]} *
+{[%csl Gb4,Yd5,Rf6][%cal Ge2e4,Ye2d4,Re2g4]} 1. e4 {[%csl Gb4,Yd5,Rf6] blabla}
 """
 
 val commentsAndVariations = """

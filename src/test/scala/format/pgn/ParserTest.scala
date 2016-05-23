@@ -74,7 +74,7 @@ class ParserTest extends ChessTest {
     parser(withNag) must beSuccess
 
     parser("Ne7g6+! $13") must beSuccess.like {
-      case ParsedPgn(_, List(san)) =>
+      case ParsedPgn(_, _, List(san)) =>
         san.metas.glyphs.move must_== Some(Glyph.MoveAssessment.good)
         san.metas.glyphs.position must_== Some(Glyph.PositionAssessment.unclear)
     }
@@ -82,14 +82,14 @@ class ParserTest extends ChessTest {
 
   "comments" in {
     parser("Ne7g6+! {such a neat comment}") must beSuccess.like {
-      case ParsedPgn(_, List(san)) =>
+      case ParsedPgn(_, _, List(san)) =>
         san.metas.comments must_== List("such a neat comment")
     }
   }
 
   "variations" in {
     parser("Ne7g6+! {such a neat comment} (e4 Ng6)") must beSuccess.like {
-      case ParsedPgn(_, List(san)) =>
+      case ParsedPgn(_, _, List(san)) =>
         san.metas.variations.headOption must beSome.like {
           case variation => variation must haveSize(2)
         }
@@ -238,6 +238,13 @@ class ParserTest extends ChessTest {
   "overflow" in {
     parser(overflow) must beSuccess.like {
       case a => a.sans.size must_== 67
+    }
+  }
+  "chessbase arrows" in {
+    parser(chessbaseArrows) must beSuccess.like {
+      case a => a.initialPosition.comments must_== List(
+        "[%csl Gb4,Yd5,Rf6][%cal Ge2e4,Ye2d4,Re2g4]"
+      )
     }
   }
 }

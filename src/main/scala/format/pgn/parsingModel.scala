@@ -3,7 +3,10 @@ package format.pgn
 
 import scalaz.Validation.FlatMap._
 
-case class ParsedPgn(tags: List[Tag], sans: List[San]) {
+case class ParsedPgn(
+    initialPosition: InitialPosition,
+    tags: List[Tag],
+    sans: List[San]) {
 
   def tag(name: String): Option[String] = Tag.find(tags, name)
 }
@@ -73,6 +76,9 @@ case class Drop(
   def drop(situation: Situation): Valid[chess.Drop] =
     situation.drop(role, pos)
 }
+
+case class InitialPosition(
+  comments: List[String])
 
 case class Metas(
     check: Boolean,

@@ -28,10 +28,10 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       (tagStr, moveStr) = splitted
       tags ← TagParser(tagStr)
       parsedMoves ← MovesParser(moveStr)
-      (strMoves, resultOption) = parsedMoves
+      (init, strMoves, resultOption) = parsedMoves
       tags2 = resultOption.filterNot(_ => tags.exists(_.name == Tag.Result)).fold(tags)(t => tags :+ t)
       sans ← objMoves(strMoves, getVariantFromTags(tags2))
-    } yield ParsedPgn(tags2, sans)
+    } yield ParsedPgn(init, tags2, sans)
   }
   catch {
     case e: StackOverflowError =>
@@ -73,15 +73,15 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
     override val whiteSpace = """(\s|\t|\r?\n)+""".r
 
-    def apply(pgn: String): Valid[(List[StrMove], Option[Tag])] =
+    def apply(pgn: String): Valid[(InitialPosition, List[StrMove], Option[Tag])] =
       parseAll(strMoves, pgn) match {
-        case Success((moves, result), _) => succezz(moves, result map { r => Tag(_.Result, r) })
-        case err                         => "Cannot parse moves: %s\n%s".format(err.toString, pgn).failureNel
+        case Success((init, moves, result), _) => succezz(init, moves, result map { r => Tag(_.Result, r) })
+        case err                               => "Cannot parse moves: %s\n%s".format(err.toString, pgn).failureNel
       }
 
-    def strMoves: Parser[(List[StrMove], Option[String])] = as("moves") {
-      rep(strMove) ~ (result?) ~ (commentary*) ^^ {
-        case sans ~ res ~ _ => sans -> res
+    def strMoves: Parser[(InitialPosition, List[StrMove], Option[String])] = as("moves") {
+      (commentary*) ~ (strMove*) ~ (result?) ~ (commentary*) ^^ {
+        case coms ~ sans ~ res ~ _ => (InitialPosition(coms), sans, res)
       }
     }
 
@@ -112,7 +112,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     }
 
     def variation: Parser[List[StrMove]] = as("variation") {
-      "(" ~> strMoves <~ ")" ^^ { case (sms, _) => sms }
+      "(" ~> strMoves <~ ")" ^^ { case (_, sms, _) => sms }
     }
 
     def commentary: Parser[String] = blockCommentary | inlineCommentary

@@ -1117,6 +1117,20 @@ g6 59. Ra5 Ncd7 60. Kd2 Nf8 61. Ra6+ Ne6 62. h4 Ng4 63. Bxe6 fxe6 64. Kd3 Ne5+
 65. Ke4 Ng4 66. Kd4 Ne5 67. Ra8 Nd7 68. Rc8 Ke7 69. e4 Nf6 70. Rc7+ Kd6 71. Rg7
 Ng4 1-0"""
 
+val chessbaseArrows = """[Event "?"]
+[Site "?"]
+[Date "2016.05.23"]
+[Round "?"]
+[White "Pgn pour thibault fleches"]
+[Black "?"]
+[Result "*"]
+[ECO "A00"]
+[PlyCount "0"]
+[SourceDate "2016.05.23"]
+
+{[%csl Gb4,Yd5,Rf6][%cal Ge2e4,Ye2d4,Re2g4]} *
+"""
+
 val commentsAndVariations = """
 [Event "ICC"]
 [Site "Internet Chess Club"]

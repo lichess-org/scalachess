@@ -38,7 +38,7 @@ sealed trait Clock {
   def estimateTotalTime = limit + estimateTotalIncrement
 
   // Emergency time cutoff, in seconds.
-  def emergTime: Int = math.round(math.min(60, math.max(10, estimateTotalTime / 8)))
+  def emergTime: Int = math.round(math.min(60, math.max(10, limit / 8)))
 
   def stop: PausedClock
 

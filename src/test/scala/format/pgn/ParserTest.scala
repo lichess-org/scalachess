@@ -96,6 +96,15 @@ class ParserTest extends ChessTest {
     }
   }
 
+  "first move variation" in {
+    parser("1. e4 (1. d4)") must beSuccess.like {
+      case ParsedPgn(_, _, List(san)) =>
+        san.metas.variations.headOption must beSome.like {
+          case variation => variation must haveSize(1)
+        }
+    }
+  }
+
   raws foreach { sans =>
     val size = sans.split(' ').size
     "sans only size: " + size in {

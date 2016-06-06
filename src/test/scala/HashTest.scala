@@ -108,7 +108,7 @@ class HashTest extends ChessTest {
     }
 
     "be consistent in crazyhouse" in {
-      // from http://lichess.org/j4r7XHTB/black
+      // from https://lichess.org/j4r7XHTB/black
       val fen = "r2qkb1r/ppp1pppp/2n2n2/3p2B1/3P2b1/4PN2/PPP1BPPP/RN1QK2R/ b KQkq - 9 5"
       val situation = ((format.Forsyth << fen) get) withVariant Crazyhouse
       val move = situation.move(Pos.G4, Pos.F3, None).toOption.get

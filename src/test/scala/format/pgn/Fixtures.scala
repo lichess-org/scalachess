@@ -1473,7 +1473,7 @@ Re3d3 Rd4xd3 46. Be4xd3 Kd6d5 47. Bd3b5 Kd5c5 48. a3a4 Kc5b4 49. Kf5xe5 a7a6 50.
 
 val atomicPromotion = """
 [Event "Rated game"]
-[Site "http://lichess.org/MyjOSGx4"]
+[Site "https://lichess.org/MyjOSGx4"]
 [Date "2015.02.25"]
 [White "AngryBishop"]
 [Black "Nyanta"]
@@ -1499,7 +1499,7 @@ Qxd1 Rd8 25. Qc2 cxb3 26. Qxb3+ Kg7 27. Qc3+ Kh6 28. Qh3+ Qh5 29. Qe3+ Qg5 30. Q
 
 val lichobile = """
 [Event "Casual game"]
-[Site "http://lichess.org"]
+[Site "https://lichess.org"]
 [Date "2015.12.13"]
 [Result "0-1"]
 [Variant "Standard"]

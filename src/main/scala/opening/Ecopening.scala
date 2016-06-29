@@ -42,19 +42,17 @@ object Ecopening {
       })
     }
 
-  // def fromGame(game: lila.game.Game): Option[Ecopening] =
-  //   if (game.playable || game.turns < 4 || game.fromPosition || game.variant.exotic) none
-  //   else chess.Replay.boards(
-  //     moveStrs = game.pgnMoves take EcopeningDB.MAX_MOVES,
-  //     initialFen = none,
-  //     variant = chess.variant.Standard
-  //   ).toOption flatMap matchChronoBoards
+  def fromGame(pgnMoves: List[String]): Option[Ecopening] = Replay.boards(
+    moveStrs = pgnMoves take EcopeningDB.MAX_MOVES,
+    initialFen = none,
+    variant = variant.Standard
+  ).toOption flatMap matchChronoBoards
 
-  // private def matchChronoBoards(boards: List[chess.Board]): Option[Ecopening] =
-  //   boards.reverse.foldLeft(none[Ecopening]) {
-  //     case (acc, board) => acc orElse {
-  //       EcopeningDB.allByFen get chess.format.Forsyth.exportBoard(board)
-  //     }
-  //   }
+  private def matchChronoBoards(boards: List[Board]): Option[Ecopening] =
+    boards.reverse.foldLeft(none[Ecopening]) {
+      case (acc, board) => acc orElse {
+        EcopeningDB.allByFen get format.Forsyth.exportBoard(board)
+      }
+    }
 }
 

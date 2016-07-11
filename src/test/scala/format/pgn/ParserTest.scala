@@ -251,7 +251,7 @@ class ParserTest extends ChessTest {
   }
   "overflow 2" in {
     parser(stackOverflow) must beSuccess.like {
-      case a => a.sans.size must_== 67
+      case a => a.sans.size must_== 8
     }
   }
   "chessbase arrows" in {

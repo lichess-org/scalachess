@@ -299,8 +299,12 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     }
   }
 
+  // there must be a newline between the tags and the first move
+  private def ensureTagsNewline(pgn: String): String =
+    """"\]\s*(\d+\.)""".r.replaceAllIn(pgn, m => "\"]\n" + m.group(1))
+
   private def splitTagAndMoves(pgn: String): Valid[(String, String)] =
-    pgn.lines.toList.map(_.trim).filter(_.nonEmpty) span { line =>
+    ensureTagsNewline(pgn).lines.toList.map(_.trim).filter(_.nonEmpty) span { line =>
       line lift 0 contains '['
     } match {
       case (tagLines, moveLines) => success(tagLines.mkString("\n") -> moveLines.mkString("\n"))

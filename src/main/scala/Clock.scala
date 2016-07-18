@@ -216,7 +216,7 @@ object Clock {
   private[chess] def berserkPenalty(clock: Clock, color: Color): Int = {
     val incTime = clock.estimateTotalIncrement
     val iniTime = clock.limit
-    if (iniTime < incTime / 2) 0 else iniTime / 2
+    if (iniTime < incTime) 0 else iniTime / 2
   }.toInt
 
   def timeString(t: Int) = periodFormatter.print(

@@ -63,7 +63,7 @@ class BerserkTest extends ChessTest {
       whiteBerserk(1, 1) must_== 0.5 * 60
     }
     "1+3" in {
-      whiteBerserk(1, 3) must_== 0.5 * 60
+      whiteBerserk(1, 3) must_== 1 * 60
     }
     "1+5" in {
       whiteBerserk(1, 5) must_== 1 * 60

@@ -2,15 +2,15 @@ name := "scalachess"
 
 organization := "org.lichess"
 
-version := "5.1"
+version := "5.2"
 
 scalaVersion := "2.11.8"
 
 libraryDependencies ++= List(
-  "org.scalaz" %% "scalaz-core" % "7.1.7",
+  "org.scalaz" %% "scalaz-core" % "7.1.9",
   "org.specs2" %% "specs2-core" % "3.6" % "test",
-  "com.github.ornicar" %% "scalalib" % "5.4",
-  "joda-time" % "joda-time" % "2.9.2",
+  "com.github.ornicar" %% "scalalib" % "5.5",
+  "joda-time" % "joda-time" % "2.9.4",
   "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0"
 )
 

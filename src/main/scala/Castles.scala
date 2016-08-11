@@ -32,6 +32,13 @@ case class Castles(
     case (Black, QueenSide) => copy(blackQueenSide = false)
   }
 
+  def add(color: Color, side: Side) = (color, side) match {
+    case (White, KingSide)  => copy(whiteKingSide = true)
+    case (White, QueenSide) => copy(whiteQueenSide = true)
+    case (Black, KingSide)  => copy(blackKingSide = true)
+    case (Black, QueenSide) => copy(blackQueenSide = true)
+  }
+
   override lazy val toString: String = {
     (if (whiteKingSide) "K" else "") +
       (if (whiteQueenSide) "Q" else "") +
@@ -66,4 +73,3 @@ object Castles {
   val none = new Castles(false, false, false, false)
   def init = all
 }
-

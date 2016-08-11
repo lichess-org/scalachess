@@ -22,8 +22,9 @@ case class Move(
 
   def finalizeAfter: Board = {
     val board = after updateHistory { h1 =>
-      // last move
-      val h2 = h1.copy(lastMove = Some(toUci))
+      val h2 = h1.copy(
+        lastMove = Some(toUci),
+        unmovedRooks = before.unmovedRooks)
 
       // my broken castles
       if ((piece is King) && h2.canCastle(color).any)
@@ -32,6 +33,7 @@ case class Move(
         kingPos ← after kingPosOf color
         side ← Side.kingRookSide(kingPos, orig)
         if h2 canCastle color on side
+        if h1.unmovedRooks(orig)
       } yield h2.withoutCastle(color, side)) | h2
       else h2
     } fixCastles

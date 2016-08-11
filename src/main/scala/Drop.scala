@@ -17,8 +17,10 @@ case class Drop(
 
   def finalizeAfter: Board = {
     val board = after.variant.finalizeBoard(
-      after updateHistory {
-        _.copy(lastMove = Some(Uci.Drop(piece.role, pos)))
+      after updateHistory { h =>
+        h.copy(
+          lastMove = Some(Uci.Drop(piece.role, pos)),
+          unmovedRooks = before.unmovedRooks)
       }, toUci, none
     )
 

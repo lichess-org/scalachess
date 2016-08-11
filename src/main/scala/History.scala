@@ -18,7 +18,8 @@ case class History(
     lastMove: Option[Uci] = None,
     positionHashes: PositionHash = History.randomHashes(1),
     castles: Castles = Castles.all,
-    checkCount: CheckCount = CheckCount(0, 0)) {
+    checkCount: CheckCount = CheckCount(0, 0),
+    unmovedRooks: Set[Pos] = Pos.allBackrank.toSet) {
 
   /**
    * Halfmove clock: This is the number of halfmoves
@@ -76,17 +77,20 @@ object History {
   def make(
     lastMove: Option[Uci],
     positionHashes: PositionHash,
-    castles: Castles): History = new History(
+    castles: Castles,
+    unmovedRooks: Set[Pos] = Pos.allBackrank.toSet): History = new History(
     lastMove = lastMove,
     castles = castles,
-    positionHashes = positionHashes)
+    positionHashes = positionHashes,
+    unmovedRooks = unmovedRooks)
 
   def make(
     lastMove: Option[String], // a2a4
     castles: String): History = make(
     lastMove = lastMove flatMap Uci.apply,
+    castles = Castles(castles),
     positionHashes = Array(),
-    castles = Castles(castles))
+    unmovedRooks = Pos.allBackrank.toSet)
 
   def castle(color: Color, kingSide: Boolean, queenSide: Boolean) =
     History().copy(

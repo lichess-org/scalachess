@@ -373,12 +373,16 @@ class ForsythTest extends ChessTest {
     "wikipedia example" in {
       val canonical = "rn2k1r1/ppp1pp1p/3p2p1/5bn1/P7/2N2B2/1PPPPP2/2BNK1RR w Gkq - 4 11"
       f <<< canonical must beSome.like {
-        case s => f >> s must_== canonical
+        case s =>
+          s.situation.board.unmovedRooks must_== Set(A8, G8, G1)
+          f >> s must_== canonical
       }
     }
     "shredder fen of chess960 pos 284" in {
       f <<< "rkbqrbnn/pppppppp/8/8/8/8/PPPPPPPP/RKBQRBNN w EAea - 0 1" must beSome.like {
-        case s => f >> s must_== "rkbqrbnn/pppppppp/8/8/8/8/PPPPPPPP/RKBQRBNN w KQkq - 0 1"
+        case s =>
+          s.situation.board.unmovedRooks must_== Set(E1, E8, A1, A8)
+          f >> s must_== "rkbqrbnn/pppppppp/8/8/8/8/PPPPPPPP/RKBQRBNN w KQkq - 0 1"
       }
     }
   }

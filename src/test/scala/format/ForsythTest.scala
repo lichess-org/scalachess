@@ -51,6 +51,24 @@ class ForsythTest extends ChessTest {
           case g => f >> g must_== "rnbqkb1r/p1pppppp/5n2/Pp6/8/8/1PPPPPPP/RNBQKBNR w KQkq b6 0 3"
         }
       }
+
+      "standard castling rights" in {
+        val moves = List(H2 -> H4, H7 -> H5, H1 -> H3, H8 -> H6, B2 -> B4,
+          B7 -> B5, H3 -> B3, H6 -> B6, B1 -> A3, B8 -> A6, B3 -> B1, B6 -> B8,
+          B1 -> B3, B8 -> B6)
+
+        "inner rook" in {
+          makeGame.playMoveList(moves dropRight 2) must beSuccess.like {
+            case g => f >> g must_== "rrbqkbn1/p1ppppp1/n7/1p5p/1P5P/N7/P1PPPPP1/RRBQKBN1 w Qq - 6 7"
+          }
+        }
+
+        "inner rook removed" in {
+          makeGame.playMoveList(moves) must beSuccess.like {
+            case g => f >> g must_== "r1bqkbn1/p1ppppp1/nr6/1p5p/1P5P/NR6/P1PPPPP1/R1BQKBN1 w Qq - 8 8"
+          }
+        }
+      }
     }
     "import" in {
       "torus" in {

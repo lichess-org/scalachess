@@ -385,5 +385,17 @@ class ForsythTest extends ChessTest {
           f >> s must_== "rkbqrbnn/pppppppp/8/8/8/8/PPPPPPPP/RKBQRBNN w KQkq - 0 1"
       }
     }
+    "wikipedia example" in {
+      val canonical = "rn2k1r1/ppp1pp1p/3p2p1/5bn1/P7/2N2B2/1PPPPP2/2BNK1RR w Gkq - 4 11"
+      f <<< canonical must beSome.like {
+        case s =>
+          s.situation.board.unmovedRooks must_== Set(A8, G8, G1)
+          f >> s must_== canonical
+      }
+    }
+    "invalid castling rights" in {
+      val board = Board.empty(Standard)
+      f exportCastles board must_== "-"
+    }
   }
 }

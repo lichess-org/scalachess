@@ -123,7 +123,7 @@ case class Board(
 
   def unmovedRooks: Set[Pos] =
     history.unmovedRooks.filter(pos =>
-      apply(pos).exists(piece => piece.is(Rook) && piece.color.fold(1, 8) == pos.y))
+      apply(pos).exists(piece => piece.is(Rook) && piece.color.backrankY == pos.y))
 
   def fixCastles: Board = withCastles {
     if (variant.allowsCastling) {

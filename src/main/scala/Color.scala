@@ -10,6 +10,7 @@ sealed trait Color {
 
   val passablePawnY: Int
   val promotablePawnY: Int
+  val backrankY: Int
 
   val letter: Char
   val name: String
@@ -41,6 +42,7 @@ object Color {
 
     val passablePawnY = 5
     val promotablePawnY = 8
+    val backrankY = 1
 
     val letter = 'w'
     val name = "white"
@@ -54,6 +56,7 @@ object Color {
 
     val passablePawnY = 4
     val promotablePawnY = 1
+    val backrankY = 8
 
     val letter = 'b'
     val name = "black"

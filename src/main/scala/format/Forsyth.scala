@@ -191,8 +191,9 @@ object Forsyth {
     case _ => ""
   }
 
-  private def exportCastles(board: Board): String = {
-    implicit val posOrdering = Ordering.by((p: Pos) => p.x)
+  private implicit val posOrdering = Ordering.by[Pos, Int](_.x)
+
+  private[chess] def exportCastles(board: Board): String = {
 
     val wr = board.pieces.collect {
       case (pos, piece) if pos.y == White.backrankY && piece == White.rook => pos

@@ -121,10 +121,9 @@ case class Board(
 
   def ensureCrazyData = withCrazyData(crazyData | Crazyhouse.Data.init)
 
-  def unmovedRooks: Set[Pos] = history.unmovedRooks.intersect(
-    pieces.filter { case (pos, piece) =>
-      piece.is(Rook) && (piece.color.white ^ pos.y == 8)
-    }.keys.toSet)
+  def unmovedRooks: Set[Pos] =
+    history.unmovedRooks.filter(pos =>
+      apply(pos).exists(piece => piece.is(Rook) && piece.color.fold(1, 8) == pos.y))
 
   def fixCastles: Board = withCastles {
     if (variant.allowsCastling) {

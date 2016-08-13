@@ -51,6 +51,24 @@ class ForsythTest extends ChessTest {
           case g => f >> g must_== "rnbqkb1r/p1pppppp/5n2/Pp6/8/8/1PPPPPPP/RNBQKBNR w KQkq b6 0 3"
         }
       }
+
+      "standard castling rights" in {
+        val moves = List(H2 -> H4, H7 -> H5, H1 -> H3, H8 -> H6, B2 -> B4,
+          B7 -> B5, H3 -> B3, H6 -> B6, B1 -> A3, B8 -> A6, B3 -> B1, B6 -> B8,
+          B1 -> B3, B8 -> B6)
+
+        "inner rook" in {
+          makeGame.playMoveList(moves dropRight 2) must beSuccess.like {
+            case g => f >> g must_== "rrbqkbn1/p1ppppp1/n7/1p5p/1P5P/N7/P1PPPPP1/RRBQKBN1 w Qq - 6 7"
+          }
+        }
+
+        "inner rook removed" in {
+          makeGame.playMoveList(moves) must beSuccess.like {
+            case g => f >> g must_== "r1bqkbn1/p1ppppp1/nr6/1p5p/1P5P/NR6/P1PPPPP1/R1BQKBN1 w Qq - 8 8"
+          }
+        }
+      }
     }
     "import" in {
       "torus" in {
@@ -168,17 +186,17 @@ class ForsythTest extends ChessTest {
     "with history" in {
       "starting" in {
         f <<< "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" must beSome.like {
-          case SituationPlus(Situation(Board(_, History(_, _, Castles(true, true, true, true), _), _, _), _), _) => ok
+          case SituationPlus(Situation(Board(_, History(_, _, Castles(true, true, true, true), _, _), _, _), _), _) => ok
         }
       }
       "white to play" in {
         f <<< "r2q1rk1/ppp2pp1/1bnpbn1p/4p3/4P3/1BNPBN1P/PPPQ1PP1/R3K2R w KQ - 7 10" must beSome.like {
-          case SituationPlus(Situation(Board(_, History(_, _, Castles(true, true, false, false), _), _, _), _), _) => ok
+          case SituationPlus(Situation(Board(_, History(_, _, Castles(true, true, false, false), _, _), _, _), _), _) => ok
         }
       }
       "black to play" in {
         f <<< "r1q2rk1/ppp2ppp/3p1n2/8/2PNp3/P1PnP3/2QP1PPP/R1B2K1R b - - 3 12" must beSome.like {
-          case SituationPlus(Situation(Board(_, History(_, _, Castles(false, false, false, false), _), _, _), _), _) => ok
+          case SituationPlus(Situation(Board(_, History(_, _, Castles(false, false, false, false), _, _), _, _), _), _) => ok
         }
       }
     }
@@ -348,6 +366,23 @@ class ForsythTest extends ChessTest {
             s.situation.board.history.checkCount.white must_== 2
             s.situation.board.history.checkCount.black must_== 1
         }
+      }
+    }
+  }
+  "x-fen" should {
+    "wikipedia example" in {
+      val canonical = "rn2k1r1/ppp1pp1p/3p2p1/5bn1/P7/2N2B2/1PPPPP2/2BNK1RR w Gkq - 4 11"
+      f <<< canonical must beSome.like {
+        case s =>
+          s.situation.board.unmovedRooks must_== Set(A8, G8, G1)
+          f >> s must_== canonical
+      }
+    }
+    "shredder fen of chess960 pos 284" in {
+      f <<< "rkbqrbnn/pppppppp/8/8/8/8/PPPPPPPP/RKBQRBNN w EAea - 0 1" must beSome.like {
+        case s =>
+          s.situation.board.unmovedRooks must_== Set(E1, E8, A1, A8)
+          f >> s must_== "rkbqrbnn/pppppppp/8/8/8/8/PPPPPPPP/RKBQRBNN w KQkq - 0 1"
       }
     }
   }

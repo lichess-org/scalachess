@@ -121,6 +121,10 @@ case class Board(
 
   def ensureCrazyData = withCrazyData(crazyData | Crazyhouse.Data.init)
 
+  def unmovedRooks: Set[Pos] =
+    history.unmovedRooks.filter(pos =>
+      apply(pos).exists(piece => piece.is(Rook) && piece.color.fold(1, 8) == pos.y))
+
   def fixCastles: Board = withCastles {
     if (variant.allowsCastling) {
       val wkPos = kingPosOf(White)
@@ -129,7 +133,7 @@ case class Board(
       val bkReady = bkPos.fold(false)(_.y == 8)
       def rookReady(color: Color, kPos: Option[Pos], left: Boolean) = kPos.fold(false) { kp =>
         actorsOf(color) exists { a =>
-          a.piece.role == Rook && a.pos.y == kp.y && (left ^ (a.pos.x > kp.x))
+          a.piece.is(Rook) && a.pos.y == kp.y && (left ^ (a.pos.x > kp.x)) && history.unmovedRooks(a.pos)
         }
       }
       Castles(

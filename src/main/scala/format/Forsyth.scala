@@ -23,21 +23,39 @@ object Forsyth {
         case _ if board.check(Black) => Situation(board, Black) // user in check will move first
         case _                       => Situation(board, White)
       }
-      splitted.lift(2).fold(situation) { castles =>
+      splitted.lift(2).fold(situation) { strCastles =>
+        val (castles, unmovedRooks) = strCastles.foldLeft(Castles.none, Set.empty[Pos]) {
+          case ((c, r), ch) =>
+            val color = Color(ch.isUpper)
+            val rooks = board.piecesOf(color).filter { case (pos, piece) =>
+              piece.is(Rook) && pos.y == color.fold(1, 8)
+            }.keys.toList.sortBy((p: Pos) => p.x)
+            (for {
+              kingPos <- board.kingPosOf(color)
+              rookPos <- (ch.toLower match {
+                case 'k' => rooks.reverse.find(_.x > kingPos.x)
+                case 'q' => rooks.find(_.x < kingPos.x)
+                case file => rooks.find(_.file == file.toString)
+              })
+              side <- Side.kingRookSide(kingPos, rookPos)
+            } yield (c.add(color, side), r + rookPos)).getOrElse((c, r))
+        }
+
         val fifthRank = if (situation.color == White) 5 else 4
         val sixthRank = if (situation.color == White) 6 else 3
         val seventhRank = if (situation.color == White) 7 else 2
-        val lastMove = splitted lift 3 flatMap Pos.posAt match {
-          case Some(pos) if pos.y == sixthRank
-            && Pos.posAt(pos.x, fifthRank).flatMap(situation.board.apply).contains(Piece(!situation.color, Pawn))
-            && Pos.posAt(pos.x, sixthRank).flatMap(situation.board.apply).isEmpty
-            && Pos.posAt(pos.x, seventhRank).flatMap(situation.board.apply).isEmpty =>
-            Some(s"${pos.file}${seventhRank}${pos.file}${fifthRank}")
-          case _ =>
-            None
-        }
+        val lastMove = for {
+          pos <- splitted lift 3 flatMap Pos.posAt
+          if (pos.y == sixthRank)
+          orig <- Pos.posAt(pos.x, seventhRank)
+          dest <- Pos.posAt(pos.x, fifthRank)
+          if (situation.board(dest).contains(Piece(!situation.color, Pawn)))
+          if (Pos.posAt(pos.x, sixthRank).flatMap(situation.board.apply).isEmpty)
+          if (situation.board(orig).isEmpty)
+        } yield Uci.Move(orig, dest)
+
         situation withHistory {
-          val history = History.make(lastMove, castles)
+          val history = History.make(lastMove, Array.empty, castles, unmovedRooks)
           (splitted lift 6 flatMap makeCheckCount).fold(history)(history.withCheckCount)
         }
       } fixCastles
@@ -146,7 +164,7 @@ object Forsyth {
     List(
       exportBoard(game.board) + exportCrazyPocket(game.board),
       game.player.letter,
-      game.board.history.castles.toString,
+      exportCastles(game.board),
       game.situation.enPassantSquare.map(_.toString).getOrElse("-"),
       game.halfMoveClock,
       game.fullMoveNumber
@@ -159,7 +177,7 @@ object Forsyth {
   def exportStandardPositionTurnCastling(board: Board, ply: Int): String = List(
     exportBoard(board),
     Color(ply % 2 == 0).letter,
-    board.history.castles.toString
+    exportCastles(board)
   ) mkString " "
 
   private def exportCheckCount(board: Board) = board.history.checkCount match {
@@ -171,6 +189,27 @@ object Forsyth {
       pockets.white.roles.map(_.forsythUpper).mkString +
       pockets.black.roles.map(_.forsyth).mkString
     case _ => ""
+  }
+
+  private def exportCastles(board: Board): String = {
+    implicit val posOrdering = Ordering.by((p: Pos) => p.x)
+
+    val wr = board.pieces.filter { case (pos, piece) => pos.y == 1 && piece == White.rook }.keys
+    val br = board.pieces.filter { case (pos, piece) => pos.y == 8 && piece == Black.rook }.keys
+
+    val wur = board.unmovedRooks.filter(_.y == 1)
+    val bur = board.unmovedRooks.filter(_.y == 8)
+
+    {
+      // castling rights with inner rooks are represented by their file name
+      (if (board.castles.whiteKingSide) (if (wur.nonEmpty && wr.max == wur.max) "K" else wur.max.file.toUpperCase) else "") +
+        (if (board.castles.whiteQueenSide) (if (wur.nonEmpty && wr.min == wur.min) "Q" else wur.min.file.toUpperCase) else "") +
+        (if (board.castles.blackKingSide) (if (bur.nonEmpty && br.max == bur.max) "k" else bur.max.file) else "") +
+        (if (board.castles.blackQueenSide) (if (bur.nonEmpty && br.min == bur.min) "q" else bur.min.file) else "")
+    } match {
+      case "" => "-"
+      case n => n
+    }
   }
 
   private[chess] def tore(pos: Pos, n: Int): Option[Pos] =

@@ -94,7 +94,7 @@ case class Actor(
   def kingSafetyMoveFilter(ms: List[Move]): List[Move] = {
     val filter: Piece => Boolean =
       if ((piece is King)) (_ => true) else if (check) (_.role.attacker) else (_.role.projection)
-    val stableKingPos = if (piece.role == King) None else board kingPosOf color
+    val stableKingPos = if (piece is King) None else board kingPosOf color
     ms filter { m =>
       board.variant.kingSafety(m, filter, stableKingPos orElse (m.after kingPosOf color))
     }
@@ -109,7 +109,7 @@ case class Actor(
     if history canCastle color on side
     tripToRook = side.tripToRook(kingPos, board)
     rookPos ← tripToRook.lastOption
-    if board(rookPos) == Some(color.rook)
+    if board(rookPos) contains color.rook
     if history.unmovedRooks.contains(rookPos)
     newKingPos ← posAt(side.castledKingX, kingPos.y)
     travelPoss = kingPos <-> newKingPos

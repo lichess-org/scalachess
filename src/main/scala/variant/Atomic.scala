@@ -13,16 +13,16 @@ case object Atomic extends Variant(
 
   /** Move threatens to explode the opponent's king */
   private def explodesOpponentKing(situation: Situation)(move: Move): Boolean = move.captures && {
-    situation.board.kingPosOf(!situation.color) exists (_.surroundingPositions contains move.dest)
+    situation.board.kingPosOf(!situation.color) exists move.dest.touches
   }
 
   /** Move threatens to illegally explode our own king */
   private def explodesOwnKing(situation: Situation)(move: Move): Boolean = {
-    move.captures && (situation.kingPos exists (_.surroundingPositions contains (move.dest)))
+    move.captures && (situation.kingPos exists move.dest.touches)
   }
 
   private def protectedByOtherKing(board: Board, to: Pos, color: Color): Boolean =
-    board.kingPosOf(color) exists (_.surroundingPositions.contains(to))
+    board.kingPosOf(color) exists to.touches
 
   /**
    * In atomic chess, a king cannot be threatened while it is in the perimeter of the other king as were the other player
@@ -48,7 +48,7 @@ case object Atomic extends Variant(
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
   private def explodeSurroundingPieces(move: Move): Move = {
     if (move.captures) {
-      val surroundingPositions = move.dest.surroundingPositions
+      val affectedPos = surroundingPositions(move.dest)
       val afterBoard = move.after
       val destination = move.dest
 
@@ -56,7 +56,7 @@ case object Atomic extends Variant(
 
       // Pawns are immune (for some reason), but all pieces surrounding the captured piece and the capturing piece
       // itself explode
-      val piecesToExplode = surroundingPositions.filter(boardPieces.get(_).fold(false)(_.isNot(Pawn))) + destination
+      val piecesToExplode = affectedPos.filter(boardPieces.get(_).fold(false)(_.isNot(Pawn))) + destination
       val afterExplosions = boardPieces -- piecesToExplode
 
       val newBoard = afterBoard withPieces afterExplosions
@@ -64,6 +64,12 @@ case object Atomic extends Variant(
     }
     else move
   }
+  /**
+   * The positions surrounding a given position on the board. Any square at the edge of the board has
+   * less surrounding positions than the usual eight.
+   */
+  private[chess] def surroundingPositions(pos: Pos): Set[Pos] =
+    Set(pos.up, pos.down, pos.left, pos.right, pos.upLeft, pos.upRight, pos.downLeft, pos.downRight).flatten
 
   override def addVariantEffect(move: Move): Move = explodeSurroundingPieces(move)
 

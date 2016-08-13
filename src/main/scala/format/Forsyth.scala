@@ -191,36 +191,26 @@ object Forsyth {
     case _ => ""
   }
 
+  private implicit val posOrdering = Ordering.by[Pos, Int](_.x)
+
   private[chess] def exportCastles(board: Board): String = {
 
-    def colorMin(color: Color): Option[Pos] = (1 to 8) find { x =>
-      board(x, color.backrankY) contains color.rook
-    } flatMap { Pos.posAt(_, color.backrankY) }
-    def colorMax(color: Color): Option[Pos] = (8 to 1 by -1) find { x =>
-      board(x, color.backrankY) contains color.rook
-    } flatMap { Pos.posAt(_, color.backrankY) }
+    lazy val wr = board.pieces.collect {
+      case (pos, piece) if pos.y == White.backrankY && piece == White.rook => pos
+    }
+    lazy val br = board.pieces.collect {
+      case (pos, piece) if pos.y == Black.backrankY && piece == Black.rook => pos
+    }
 
-    def findUnmovedFile(color: Color, compare: (Int, Int) => Boolean): String = board.unmovedRooks.foldLeft(none[Pos]) {
-      case (Some(found), pos) if pos.y == color.backrankY && compare(found.x, pos.x) => Some(pos)
-      case (Some(found), _) => Some(found)
-      case (None, pos) if pos.y == color.backrankY => Some(pos)
-      case (None, _) => None
-    }.fold("")(_.file)
+    lazy val wur = board.unmovedRooks.filter(_.y == White.backrankY)
+    lazy val bur = board.unmovedRooks.filter(_.y == Black.backrankY)
 
     {
       // castling rights with inner rooks are represented by their file name
-      (if (board.castles.whiteKingSide)
-        colorMax(White).fold("")(p => if (board.unmovedRooks(p)) "K" else findUnmovedFile(White, _ > _).toUpperCase)
-      else "") +
-        (if (board.castles.whiteQueenSide)
-          colorMin(White).fold("")(p => if (board.unmovedRooks(p)) "Q" else findUnmovedFile(White, _ < _).toUpperCase)
-        else "") +
-        (if (board.castles.blackKingSide)
-          colorMax(Black).fold("")(p => if (board.unmovedRooks(p)) "k" else findUnmovedFile(Black, _ > _))
-        else "") +
-        (if (board.castles.blackQueenSide)
-          colorMin(Black).fold("")(p => if (board.unmovedRooks(p)) "q" else findUnmovedFile(Black, _ < _))
-        else "")
+      (if (board.castles.whiteKingSide && wr.nonEmpty && wur.nonEmpty) (if (wur contains wr.max) "K" else wur.max.file.toUpperCase) else "") +
+        (if (board.castles.whiteQueenSide && wr.nonEmpty && wur.nonEmpty) (if (wur contains wr.min) "Q" else wur.min.file.toUpperCase) else "") +
+        (if (board.castles.blackKingSide && br.nonEmpty && bur.nonEmpty) (if (bur contains br.max) "k" else bur.max.file) else "") +
+        (if (board.castles.blackQueenSide && br.nonEmpty && bur.nonEmpty) (if (bur contains br.min) "q" else bur.min.file) else "")
     } match {
       case "" => "-"
       case n  => n

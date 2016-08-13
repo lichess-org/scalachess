@@ -207,10 +207,10 @@ object Forsyth {
 
     {
       // castling rights with inner rooks are represented by their file name
-      (if (board.castles.whiteKingSide && wr.nonEmpty && wur.nonEmpty) (if (wr.max == wur.max) "K" else wur.max.file.toUpperCase) else "") +
-        (if (board.castles.whiteQueenSide && wr.nonEmpty && wur.nonEmpty) (if (wr.min == wur.min) "Q" else wur.min.file.toUpperCase) else "") +
-        (if (board.castles.blackKingSide && br.nonEmpty && bur.nonEmpty) (if (br.max == bur.max) "k" else bur.max.file) else "") +
-        (if (board.castles.blackQueenSide && br.nonEmpty && bur.nonEmpty) (if (br.min == bur.min) "q" else bur.min.file) else "")
+      (if (board.castles.whiteKingSide && wr.nonEmpty && wur.nonEmpty) (if (wur contains wr.max) "K" else wur.max.file.toUpperCase) else "") +
+        (if (board.castles.whiteQueenSide && wr.nonEmpty && wur.nonEmpty) (if (wur contains wr.min) "Q" else wur.min.file.toUpperCase) else "") +
+        (if (board.castles.blackKingSide && br.nonEmpty && bur.nonEmpty) (if (bur contains br.max) "k" else bur.max.file) else "") +
+        (if (board.castles.blackQueenSide && br.nonEmpty && bur.nonEmpty) (if (bur contains br.min) "q" else bur.min.file) else "")
     } match {
       case "" => "-"
       case n  => n

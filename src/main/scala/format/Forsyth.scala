@@ -195,15 +195,15 @@ object Forsyth {
 
   private[chess] def exportCastles(board: Board): String = {
 
-    val wr = board.pieces.collect {
+    lazy val wr = board.pieces.collect {
       case (pos, piece) if pos.y == White.backrankY && piece == White.rook => pos
     }
-    val br = board.pieces.collect {
+    lazy val br = board.pieces.collect {
       case (pos, piece) if pos.y == Black.backrankY && piece == Black.rook => pos
     }
 
-    val wur = board.unmovedRooks.filter(_.y == White.backrankY)
-    val bur = board.unmovedRooks.filter(_.y == Black.backrankY)
+    lazy val wur = board.unmovedRooks.filter(_.y == White.backrankY)
+    lazy val bur = board.unmovedRooks.filter(_.y == Black.backrankY)
 
     {
       // castling rights with inner rooks are represented by their file name

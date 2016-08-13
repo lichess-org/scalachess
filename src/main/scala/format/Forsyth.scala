@@ -27,14 +27,14 @@ object Forsyth {
         val (castles, unmovedRooks) = strCastles.foldLeft(Castles.none, Set.empty[Pos]) {
           case ((c, r), ch) =>
             val color = Color(ch.isUpper)
-            val rooks = board.piecesOf(color).filter { case (pos, piece) =>
-              piece.is(Rook) && pos.y == color.backrankY
-            }.keys.toList.sortBy((p: Pos) => p.x)
+            val rooks = board.piecesOf(color).collect {
+              case (pos, piece) if piece.is(Rook) && pos.y == color.backrankY => pos
+            }.toList.sortBy(_.x)
             (for {
               kingPos <- board.kingPosOf(color)
               rookPos <- (ch.toLower match {
-                case 'k' => rooks.reverse.find(_.x > kingPos.x)
-                case 'q' => rooks.find(_.x < kingPos.x)
+                case 'k'  => rooks.reverse.find(_.x > kingPos.x)
+                case 'q'  => rooks.find(_.x < kingPos.x)
                 case file => rooks.find(_.file == file.toString)
               })
               side <- Side.kingRookSide(kingPos, rookPos)
@@ -194,8 +194,12 @@ object Forsyth {
   private def exportCastles(board: Board): String = {
     implicit val posOrdering = Ordering.by((p: Pos) => p.x)
 
-    val wr = board.pieces.filter { case (pos, piece) => pos.y == White.backrankY && piece == White.rook }.keys
-    val br = board.pieces.filter { case (pos, piece) => pos.y == Black.backrankY && piece == Black.rook }.keys
+    val wr = board.pieces.collect {
+      case (pos, piece) if pos.y == White.backrankY && piece == White.rook => pos
+    }
+    val br = board.pieces.collect {
+      case (pos, piece) if pos.y == Black.backrankY && piece == Black.rook => pos
+    }
 
     val wur = board.unmovedRooks.filter(_.y == White.backrankY)
     val bur = board.unmovedRooks.filter(_.y == Black.backrankY)
@@ -208,7 +212,7 @@ object Forsyth {
         (if (board.castles.blackQueenSide) (if (bur.nonEmpty && br.min == bur.min) "q" else bur.min.file) else "")
     } match {
       case "" => "-"
-      case n => n
+      case n  => n
     }
   }
 

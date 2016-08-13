@@ -5,18 +5,44 @@ import Pos._
 
 class ForsythPerfTest extends ChessTest {
 
-  val nb = 10000
-  val iterations = 10
-  // val nb = 1
-  // val iterations = 1
-  val board = Board.init(variant.Standard)
+  val initialBoard = Board.init(variant.Standard)
+  val emptyBoard = (Forsyth << "8/8/8/8/8/8/8/8").get.board
 
-  def runOne = Forsyth.exportBoard(board)
-  def run { for (i ← 1 to nb) runOne }
-
-  "playing a game" should {
+  // "export one position board" should {
+  //   "many times" in {
+  //     val nb = 10000
+  //     val iterations = 10
+  //   def runOne = Forsyth.exportBoard(initialBoard)
+  //   def run { for (i ← 1 to nb) runOne }
+  //     runOne must_== Forsyth.initial.takeWhile(' '!=)
+  //     if (nb * iterations > 1) {
+  //       println("warming up")
+  //       run
+  //     }
+  //     println("running tests")
+  //     val durations = for (i ← 1 to iterations) yield {
+  //       val start = System.currentTimeMillis
+  //       run
+  //       val duration = System.currentTimeMillis - start
+  //       println(s"$nb positions in $duration ms")
+  //       duration
+  //     }
+  //     val nbPositions = iterations * nb
+  //     val moveNanos = (1000000 * durations.sum) / nbPositions
+  //     println(s"Average = $moveNanos nanoseconds per position")
+  //     println(s"          ${1000000000 / moveNanos} positions per second")
+  //     true === true
+  //   }
+  // }
+  "export castles" should {
     "many times" in {
-      runOne must_== Forsyth.initial.takeWhile(' '!=)
+      val nb = 100000
+      val iterations = 10
+      def runOne = {
+        // Forsyth.exportCastles(emptyBoard)
+        Forsyth.exportCastles(initialBoard)
+      }
+      def run { for (i ← 1 to nb) runOne }
       if (nb * iterations > 1) {
         println("warming up")
         run
@@ -26,13 +52,13 @@ class ForsythPerfTest extends ChessTest {
         val start = System.currentTimeMillis
         run
         val duration = System.currentTimeMillis - start
-        println(s"$nb games in $duration ms")
+        println(s"$nb positions in $duration ms")
         duration
       }
-      val nbGames = iterations * nb
-      val moveMicros = (1000 * durations.sum) / nbGames
-      println(s"Average = $moveMicros microseconds per game")
-      println(s"          ${1000000 / moveMicros} games per second")
+      val nbPositions = iterations * nb
+      val moveNanos = (1000000 * durations.sum) / nbPositions
+      println(s"Average = $moveNanos nanoseconds per position")
+      println(s"          ${1000000000 / moveNanos} positions per second")
       true === true
     }
   }

@@ -13,6 +13,12 @@ case object Crazyhouse extends Variant(
   title = "Captured pieces can be dropped back on the board instead of moving a piece.",
   standardInitialPosition = true) {
 
+  override def valid(board: Board, strict: Boolean) = {
+    val pieces = board.pieces.values
+    (Color.all forall validSide(board, false)_) &&
+      (!strict || (pieces.count(_ is Pawn) <= 16 && pieces.size <= 32))
+  }
+
   private def canDropPawnOn(pos: Pos) = (pos.y != 1 && pos.y != 8)
 
   override def drop(situation: Situation, role: Role, pos: Pos): Valid[Drop] = for {

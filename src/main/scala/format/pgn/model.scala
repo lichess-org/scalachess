@@ -6,7 +6,8 @@ import scala._
 
 case class Pgn(
     tags: List[Tag],
-    turns: List[Turn]) {
+    turns: List[Turn],
+    initial: Initial = Initial.empty) {
 
   def updateTurn(fullMove: Int, f: Turn => Turn) = {
     val index = fullMove - 1
@@ -31,11 +32,21 @@ case class Pgn(
     tags = Tag(_.Event, title) :: tags.filterNot(_.name == Tag.Event)
   )
 
-  override def toString = "%s\n\n%s %s".format(
-    tags mkString "\n",
-    turns mkString " ",
-    tags find (_.name == Tag.Result) map (_.value) getOrElse ""
-  ).trim
+  override def toString = {
+    val tagStr = tags mkString "\n"
+    val initStr = 
+      if (initial.comments.nonEmpty) initial.comments.mkString("{ ", " } { ", " }\n") 
+      else ""
+    val turnStr = turns mkString " "
+    val endStr = tags find (_.name == Tag.Result) map (_.value) getOrElse ""
+    s"$tagStr\n\n$initStr$turnStr $endStr"
+  }.trim
+}
+
+case class Initial(comments: List[String] = Nil)
+
+object Initial {
+  val empty = Initial(Nil)
 }
 
 case class Turn(
@@ -104,9 +115,9 @@ case class Move(
 
   override def toString = {
     val glyphStr = glyphs.toList.map({
-        case glyph if glyph.id <= 6 => glyph.symbol
-        case glyph => s" $$${glyph.id}"
-      }).mkString
+      case glyph if glyph.id <= 6 => glyph.symbol
+      case glyph                  => s" $$${glyph.id}"
+    }).mkString
     val commentsOrTime =
       if (comments.nonEmpty || timeLeft.isDefined || opening.isDefined || result.isDefined)
         List(clockString, opening, result).flatten.:::(comments).map { text =>

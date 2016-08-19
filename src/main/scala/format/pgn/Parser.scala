@@ -196,8 +196,8 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
     val kCastle: Parser[Side] = ("O-O" | "o-o" | "0-0") ^^^ KingSide
 
-    def standard: Parser[Std] = as("standard") {
-      (disambiguatedPawn | pawn | disambiguated | ambiguous) ~ suffixes ^^ {
+    def standard: Parser[San] = as("standard") {
+      (disambiguatedPawn | pawn | disambiguated | ambiguous | drop) ~ suffixes ^^ {
         case std ~ suf => std withSuffixes suf
       }
     }
@@ -213,6 +213,13 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     def ambiguous: Parser[Std] = as("ambiguous") {
       role ~ x ~ dest ^^ {
         case ro ~ ca ~ de => Std(dest = de, role = ro, capture = ca)
+      }
+    }
+
+    // B@g5
+    def drop: Parser[Drop] = as("drop") {
+      role ~ "@" ~ dest ^^ {
+        case ro ~ _ ~ po => Drop(role = ro, pos = po)
       }
     }
 

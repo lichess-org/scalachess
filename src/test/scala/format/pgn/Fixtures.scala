@@ -102,6 +102,26 @@ Bd3 f5 9. g3 Qf6 10. Nf3 c5 11. O-O Ne7 12. Bg5 Qf8 13. Nb5 Bxe4 14. Bxe4 fxe4
 15. Qxe4 Nd5 16. Ne5 cxd4 17. Qxd5 Ra7 18. Qa8 0-1
 """
 
+val crazyhouseFromProd = """
+[Event "Hourly Crazyhouse Inc Arena"]
+[Site "https://lichess.org/vjT6KovO"]
+[Date "2016.08.19"]
+[White "danieldima"]
+[Black "Hesar"]
+[Result "1-0"]
+[WhiteElo "2319"]
+[BlackElo "1943"]
+[PlyCount "49"]
+[Variant "Crazyhouse"]
+[TimeControl "180+1"]
+[ECO "?"]
+[Opening "?"]
+[Termination "Normal"]
+[Annotator "lichess.org"]
+
+1. e4 Nf6 2. e5 d5?! { (0.37 → 0.89) Inaccuracy. Best move was Nd5. } (2... Nd5 3. d4 d6 4. c4 Nb4 5. Nf3 Bf5) 3. Nc3?! { (0.89 → 0.23) Inaccuracy. Best move was exf6. } (3. exf6 exf6 4. d4 Nc6 5. N@c5 Bxc5 6. dxc5) 3... Ng4 4. Nf3?! { (0.64 → -0.10) Inaccuracy. Best move was d4. } (4. d4 Nxe5 5. dxe5 d4 6. Bf4 Na6) 4... e6?! { (-0.10 → 0.43) Inaccuracy. Best move was d4. } (4... d4 5. Na4 e6 6. d3 Nc6) 5. d4 Bb4 6. Bd2 Bxc3 7. Bxc3 Nxf2 8. Kxf2 N@e4+ 9. Ke2?! { (0.47 → -0.24) Inaccuracy. Best move was Ke1. } (9. Ke1 P@f2+ 10. Ke2 Bd7) 9... P@f2? { (-0.24 → 1.19) Mistake. Best move was Nxc3+. } (9... Nxc3+ 10. bxc3 P@e4 11. B@b5+ B@c6 12. Ke1 exf3 13. Qxf3) 10. B@d3 Nc6 11. N@h5 O-O 12. Nxg7?! { (1.30 → 0.60) Inaccuracy. Best move was Ng3. } (12. Ng3 Nxc3+ 13. bxc3 f5 14. exf6 B@h6 15. Kxf2 Rxf6) 12... Kxg7 13. P@f6+? { (1.05 → -0.10) Mistake. Best move was Bxe4. } (13. Bxe4 dxe4 14. N@h5+ Kg8 15. Nf6+ Qxf6 16. exf6 N@f4+ 17. Kxf2) 13... Kg8? { (-0.10 → 2.31) Mistake. Best move was Kh8. } (13... Kh8 14. Bxe4 dxe4 15. Ng5 B@b5+ 16. Kxf2 e3+ 17. Kxe3 N@f5+) 14. Bxe4 dxe4 15. Kxf2?? { (2.14 → -1.11) Blunder. Best move was N@h6+. } (15. N@h6+ Kh8 16. Ng5 Nxd4+ 17. Bxd4) 15... N@g4+ 16. Kg3 h5? { (-1.58 → 0.42) Mistake. Best move was exf3. } (16... exf3 17. Qxf3 N@f5+ 18. Kh3 Nge3) 17. P@g7?! { (0.42 → -0.28) Inaccuracy. Best move was Ng5. } (17. Ng5 Nxf6 18. P@f4 B@g4 19. N@h6+ Kg7 20. exf6+ Kxh6) 17... B@f2+ 18. Kh3 exf3? { (-1.84 → -0.26) Mistake. Best move was Nxf6. } (18... Nxf6 19. gxf8=Q+ Kxf8 20. R@h8+ Kg7 21. exf6+ Kxh8 22. N@g6+ fxg6) 19. gxf8=Q+ Qxf8 20. R@g5+ P@g6 21. Qxf3 Ncxe5?? { (0.55 → 5.63) Blunder. Best move was Be3. } (21... Be3 22. P@f4 N@f2+ 23. Kh4 Bxd4 24. Bd3) 22. dxe5? { (5.63 → 3.18) Mistake. Best move was P@g7. } (22. P@g7 Qe8 23. dxe5 N@f5) 22... Qh6? { (3.18 → 4.26) Mistake. Best move was N@h7. } (22... N@h7 23. Rxg4 hxg4+ 24. Qxg4 Qh6+ 25. P@h4 Nxf6 26. N@e7+ Kh8) 23. N@e7+ Kh7 24. P@g7? { (4.21 → 3.04) Mistake. Best move was N@f8+. } (24. N@f8+ Qxf8 25. P@g7 Qd8 26. Rd1) 24... N@g8?? { (3.04 → Mate in 1) Checkmate is now unavoidable. Best move was Bd7. } (24... Bd7 25. N@f8+ Rxf8 26. gxf8=Q Qxf8 27. R@g8 Qxg8 28. a3 Nxe5) 25. N@f8# { Black is checkmated } 1-0
+"""
+
   val unclosedQuote = """
 [Event "NII - Lille 2 / Tour Blanche Paris]
 [Site "Lille"]

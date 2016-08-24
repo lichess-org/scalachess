@@ -287,6 +287,11 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       case err              => "Cannot parse tags: %s\n%s".format(err.toString, pgn).failureNel
     }
 
+    def fromFullPgn(pgn: String): Valid[List[Tag]] =
+      splitTagAndMoves(pgn) flatMap {
+        case (tags, _) => apply(tags)
+      }
+
     def all: Parser[List[Tag]] = as("all") {
       tags <~ """(.|\n)*""".r
     }

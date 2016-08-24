@@ -260,6 +260,16 @@ class ParserTest extends ChessTest {
       case a => a.sans.size must_== 8
     }
   }
+  "overflow 3" in {
+    parser(overflow3) must beSuccess.like {
+      case a => a.sans.size must_== 343
+    }
+  }
+  "overflow 3: tags" in {
+    Parser.TagParser.fromFullPgn(overflow3) must beSuccess.like {
+      case tags => tags.size must_== 9
+    }
+  }
   "chessbase arrows" in {
     parser(chessbaseArrows) must beSuccess.like {
       case a => a.initialPosition.comments must_== List(

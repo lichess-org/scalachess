@@ -1567,6 +1567,20 @@ feel like I've turned around my position. I calculated that Qh6 isn't going to b
 [/pgn]
 """
 
+val overflow3 = """
+[Event "8th Grand Slam Masters"]
+[Site "Bilbao ESP"]
+[Date "2015.10.28"]
+[Round "3.1"]
+[White "Ding Liren"]
+[Black "Giri, A."]
+[Result "1/2-1/2"]
+[WhiteElo "2782"]
+[BlackElo "2798"]
+1. d4 Nf6 2. c4 g6 3. g3 c6 4. Bg2 d5 5. Nf3 Bg7 6. O-O O-O 7. Qb3 Qb6 8. Nc3 Rd8 9. Na4 Qxb3 10. axb3 Na6 11. Bf4 Ne8 12. Nc3 Nac7 13. Ra5 Be6 14. Ra4 a6 15. Rfa1 h6 16. h4 Nd6 17. e3 Rac8 18. Nd2 f6 19. Ra5 dxc4 20. Bxd6 exd6 21. bxc4 f5 22. R5a4 c5 23. Ne2 Rb8 24. b4 b5 25. cxb5 Nxb5 26. bxc5 dxc5 27. Rxa6 cxd4 28. Nxd4 Nxd4 29. exd4 Bxd4 30. Rf1 Bb6 31. Re1 Bxf2+ 32. Kxf2 Rxd2+ 33. Kg1 Bf7 34. Ra3 Rbb2 35. Bf3 g5 36. hxg5 hxg5 37. Rae3 g4 38. Be2 Bd5 39. Bf1 Rh2 40. R1e2 Rh1+ 41. Kf2 Rb1 42. Re1 Rb4 43. Re7 f4 44. Rc1 Rb2+ 45. Ke1 Rb8 46. gxf4 Bg2 47. Kf2 Bxf1 48. f5 Kf8 49. Ree1 Rb2+ 50. Kg3 Rh3+ 51. Kxg4 Rb4+ 52. Kg5 Rg3+ 53. Kf6 Bc4 54. Rcd1 Bd3 55. Rc1 Bc4 56. Rcd1 Rb8 57. Rd7 Bb3 58. Ree7 Rc3 59. Rd6 Kg8 60. Rg7+ Kh8 61. Rg5 Rh3 62. Ke5 Bg8 63. Kf6 Rh6+ 64. Rg6 Rh5 65. Ke5 Rb5+ 66. Kf4 Rhxf5+ 67. Kg4 Rf1 68. Rh6+ Kg7 69. Rdg6+ Kf7 70. Rb6 Re5 71. Rhc6 Re7 72. Rc3 Kg7 73. Rbc6 Be6+ 74. Kg3 Bd7 75. Rd6 Be8 76. Rf3 Rfe1 77. Rd2 Bc6 78. Rc3 Rg1+ 79. Kh2 Rh1+ 80. Kg3 Rh6 81. Rd4 Re2 82. Rg4+ Kf7 83. Rcc4 Rg2+ 84. Kf4 Rf6+ 85. Ke5 Re6+ 86. Kf5 Rge2 87. Rgf4 Rg6 88. Rcd4 Re7 89. Rh4 Bd7+ 90. Kf4 Rf6+ 91. Kg3 Re3+ 92. Kh2 Re2+ 93. Kg3 Re3+ 94. Kh2 Bf5 95. Kg2 Kg6 96. Kf2 Rc3 97. Rhf4 Rc2+ 98. Kg3 Re6 99. Rd8 Ree2 100. Rg8+ Kh7 101. Rd8 Be6 102. Rdd4 Kg6 103. Rfe4 Rg2+ 104. Kf4 Rgf2+ 105. Ke5 Bf5 106. Re3 Ra2 107. Rd6+ Kg5 108. Rg3+ Bg4 109. Rd4 Ra5+ 110. Kd6 Ra6+ 111. Kc5 Rf5+ 112. Kb4 Rb6+ 113. Kc4 Rc6+ 114. Kb4 Rf4 115. Rxf4 Kxf4 116. Rc3 Rg6 117. Rc4+ Ke5 118. Rc5+ Kd6 119. Rc4 Be6 120. Rd4+ Bd5 121. Kc3 Ke5 122. Rd3 Rc6+ 123. Kd2 Be4 124. Rc3 Rh6 125. Ke2 Rf6 126. Ke3 Rf8 127. Ke2 Kd4 128. Ra3 Bc2 129. Rh3 Rg8 130. Kf3 Be4+ 131. Kf4 Rf8+ 132. Kg5 Ke5 133. Rg3 Bf3 134. Kh4 Ke4 135. Rg7 Rf5 136. Kg3 Ke3 137. Rg8 Rh5 138. Rg7 Be4 139. Rg8 Rh1 140. Rg5 Rf1 141. Kg4 Bf3+ 142. Kf5 Kd4 143. Ke6 Rh1 144. Rg6 Be4 145. Rf6 Rh8 146. Kd6 Ra8 147. Ke7 Ra5 148. Rd6+ Bd5 149. Kf6 Ra7 150. Kf5 Re7 151. Rf6 Re1 152. Kg5 Be6 153. Kf4 Re3 154. Rf8 Bd5 155. Rf6 Re1 156. Kf5 Re5+ 157. Kf4 Be6 158. Kf3 Re3+ 159. Kf4 Re4+ 160. Kf3
+Bg4+ 161. Kg3 Ke3 162. Rg6 Bf3 163. Rg5 Ra4 164. Re5+ Be4 165. Kg4 Ra1 166. Rg5 Rf1 167. Kh4 Bf5 168. Rg3+ Kf4 169. Rg4+ Ke5 170. Rg3 Kf6 171. Ra3 Rg1 172. Ra4 1/2-1/2
+"""
+
 val crazyhouse1 = """
 [Event "internet, rated crazyhouse match"]
 [Variant "Crazyhouse"]

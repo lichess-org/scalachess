@@ -149,6 +149,20 @@ class HashTest extends ChessTest {
 
       hashAfterMove mustEqual hashAfter
     }
+    "prod 5 Three-Check games accumulate hash" in {
+      val gameMoves = format.pgn.Fixtures.prod5threecheck.map {
+        _.split(' ').toList
+      }
+      def runOne(moves: List[String]) =
+        Replay.gameMoveWhileValid(moves, format.Forsyth.initial, chess.variant.ThreeCheck)
+      def hex(buf: Array[Byte]): String = buf.map("%02x" format _).mkString
+      val g = gameMoves.map(runOne)
+      g.exists(_._3.nonEmpty) must beFalse
+      val m16 = java.security.MessageDigest getInstance "MD5"
+      val h = new Hash(16)
+      g.foreach(_._2.foreach(x => m16.update(h(x._1.situation))))
+      hex(m16.digest) must beEqualTo("21281304d25ccf9c1dfd640775800087")
+    }
   }
 
 }

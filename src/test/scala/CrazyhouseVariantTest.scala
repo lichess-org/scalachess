@@ -56,5 +56,21 @@ class CrazyhouseVariantTest extends ChessTest {
         }
       }
     }
+    "prod 50 games accumulate hash" in {
+      val gameMoves = format.pgn.Fixtures.prod50crazyhouse.map {
+        _.split(' ').toList
+      }
+      def runOne(moves: List[String]) =
+        Replay.gameMoveWhileValid(moves, format.Forsyth.initial, chess.variant.Crazyhouse)
+      def hex(buf: Array[Byte]): String = buf.map("%02x" format _).mkString
+      val g = gameMoves.map(runOne)
+      g.exists(_._3.nonEmpty) must beFalse
+      val m8 = java.security.MessageDigest getInstance "MD5"
+      val m16 = java.security.MessageDigest getInstance "MD5"
+      val h = new Hash(16)
+      g.foreach(_._2.foreach(x => { val ph = h(x._1.situation); m8.update(ph.slice(0, 8)); m16.update(ph) } ))
+      hex(m8.digest) must beEqualTo("fcf5867ad3324c4be6d28108ff27212c")
+      hex(m16.digest) must beEqualTo("80c4edf5fbd41eff78d3d563777beb61")
+    }
   }
 }

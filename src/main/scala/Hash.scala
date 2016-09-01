@@ -87,9 +87,8 @@ object Hash {
         }.fold(hactors)(_ ^ _)
       else hactors
 
-    val hep = situation.enPassantSquare match {
-      case Some(pos) => hcastling ^ table.enPassantMasks(pos.x - 1)
-      case None      => hcastling
+    val hep = situation.enPassantSquare.fold(hcastling) { pos =>
+      hcastling ^ table.enPassantMasks(pos.x - 1)
     }
 
     // Hash in special three-check data.
@@ -103,16 +102,14 @@ object Hash {
     }
 
     // Hash in special crazyhouse data.
-    val hcrazy = board.crazyData match {
-      case Some(data) =>
-        val hcrazypromotions = data.promoted.toList.map { table.crazyPromotionMasks compose posIndex _ }.fold(hchecks)(_ ^ _)
-        Color.all.flatMap { color =>
+    val hcrazy = board.crazyData.fold(hchecks) { data =>
+      val hcrazypromotions = data.promoted.toList.map { table.crazyPromotionMasks compose posIndex _ }.fold(hchecks)(_ ^ _)
+      Color.all.flatMap { color =>
         val colorshift = color.fold(79, -1)
         data.pockets(color).roles.groupBy(identity).flatMap {
           case (role, list) => crazyPocketMask(role, colorshift, list.size)
         }
       }.fold(hcrazypromotions)(_ ^ _)
-      case None => hchecks
     }
 
     hcrazy

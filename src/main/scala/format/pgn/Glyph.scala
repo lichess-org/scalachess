@@ -59,6 +59,8 @@ object Glyph {
 
     val all = List(good, mistake, brillant, blunder, interesting, dubious, only)
     val byId = all.map { g => g.id -> g }.toMap
+
+    def display = all
   }
 
   sealed trait PositionAssessment extends Glyph
@@ -75,6 +77,8 @@ object Glyph {
 
     val all = List(equal, unclear, whiteSlightlyBetter, blackSlightlyBetter, whiteQuiteBetter, blackQuiteBetter, whiteMuchBetter, blackMuchBetter)
     val byId = all.map { g => g.id -> g }.toMap
+
+    def display = all
   }
 
   sealed trait Observation extends Glyph
@@ -88,9 +92,12 @@ object Glyph {
     val timeTrouble = new Glyph(138, "⊕", "Time trouble") with Observation
     val novelty = new Glyph(146, "N", "Novelty") with Observation
     val compensation = new Glyph(44, "=∞", "With compensation") with Observation
+    val withIdea = new Glyph(140, "∆", "With the idea") with Observation
 
-    val all = List(zugzwang, development, initiative, attack, counterplay, timeTrouble, novelty, compensation)
+    val all = List(zugzwang, development, initiative, attack, counterplay, timeTrouble, novelty, compensation, withIdea)
     val byId = all.map { g => g.id -> g }.toMap
+
+    def display = all.filterNot(novelty ==)
   }
 
   def find(id: Int): Option[Glyph] =

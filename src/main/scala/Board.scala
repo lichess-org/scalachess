@@ -91,7 +91,7 @@ case class Board(
     pieces collect { case (pos, piece) if piece is color => pos } toSet
   }
 
-  def hasPiece(p: Piece) = pieces.values exists (p ==)
+  def hasPiece(p: Piece) = pieces.values contains p
 
   def promote(pos: Pos): Option[Board] = for {
     pawn ← apply(pos)

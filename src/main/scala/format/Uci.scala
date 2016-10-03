@@ -7,6 +7,8 @@ sealed trait Uci {
   def piotr: String
 
   def origDest: (Pos, Pos)
+
+  def apply(situation: Situation): Valid[MoveOrDrop]
 }
 
 object Uci
@@ -27,6 +29,8 @@ object Uci
     def promotionString = promotion.fold("")(_.forsyth.toString)
 
     def origDest = orig -> dest
+
+    def apply(situation: Situation) = situation.move(orig, dest, promotion) map Left.apply
   }
 
   object Move {
@@ -35,13 +39,13 @@ object Uci
       orig ← Pos.posAt(move take 2)
       dest ← Pos.posAt(move drop 2 take 2)
       promotion = move lift 4 flatMap Role.promotable
-    } yield Uci.Move(orig, dest, promotion)
+    } yield Move(orig, dest, promotion)
 
     def piotr(move: String) = for {
       orig ← move.headOption flatMap Pos.piotr
       dest ← move lift 1 flatMap Pos.piotr
       promotion = move lift 2 flatMap Role.promotable
-    } yield Uci.Move(orig, dest, promotion)
+    } yield Move(orig, dest, promotion)
 
     def fromStrings(origS: String, destS: String, promS: Option[String]) = for {
       orig ← Pos.posAt(origS)
@@ -57,6 +61,8 @@ object Uci
     def piotr = s"${role.pgn}@${pos.piotrStr}"
 
     def origDest = pos -> pos
+
+    def apply(situation: Situation) = situation.drop(role, pos) map Right.apply
   }
 
   object Drop {

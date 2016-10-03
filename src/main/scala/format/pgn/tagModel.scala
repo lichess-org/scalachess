@@ -3,7 +3,7 @@ package format.pgn
 
 case class Tag(name: TagType, value: String) {
 
-  override def toString = """[%s "%s"]""".format(name, value)
+  override def toString = s"""[$name "$value"]"""
 }
 
 sealed trait TagType {

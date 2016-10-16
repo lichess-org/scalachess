@@ -9,6 +9,8 @@ case object ThreeCheck extends Variant(
   title = "Check your opponent 3 times to win the game.",
   standardInitialPosition = true) {
 
+  override val initialFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 +0+0"
+
   override def finalizeBoard(board: Board, uci: format.Uci, capture: Option[Piece]): Board =
     board updateHistory {
       _.withCheck(Color.White, board.checkWhite).withCheck(Color.Black, board.checkBlack)

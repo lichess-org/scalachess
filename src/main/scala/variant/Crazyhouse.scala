@@ -13,6 +13,8 @@ case object Crazyhouse extends Variant(
   title = "Captured pieces can be dropped back on the board instead of moving a piece.",
   standardInitialPosition = true) {
 
+  override val initialFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1"
+
   override def valid(board: Board, strict: Boolean) = {
     val pieces = board.pieces.values
     (Color.all forall validSide(board, false)_) &&

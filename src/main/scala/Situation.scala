@@ -21,6 +21,8 @@ case class Situation(board: Board, color: Color) {
 
   lazy val check: Boolean = board check color
 
+  def checkSquare = if (check) kingPos else None
+
   def history = board.history
 
   def checkMate: Boolean = board.variant checkmate this

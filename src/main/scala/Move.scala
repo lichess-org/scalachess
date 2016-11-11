@@ -33,7 +33,7 @@ case class Move(
         kingPos ← after kingPosOf color
         side ← Side.kingRookSide(kingPos, orig)
         if h2 canCastle color on side
-        if h1.unmovedRooks(orig)
+        if h1.unmovedRooks.pos(orig)
       } yield h2.withoutCastle(color, side)) | h2
       else h2
     } fixCastles

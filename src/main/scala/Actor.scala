@@ -110,7 +110,7 @@ case class Actor(
     tripToRook = side.tripToRook(kingPos, board)
     rookPos ← tripToRook.lastOption
     if board(rookPos) contains color.rook
-    if history.unmovedRooks.contains(rookPos)
+    if history.unmovedRooks.pos.contains(rookPos)
     newKingPos ← posAt(side.castledKingX, kingPos.y)
     travelPoss = kingPos <-> newKingPos
     if !travelPoss.map(board.apply).exists {

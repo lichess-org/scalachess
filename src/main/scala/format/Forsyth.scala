@@ -55,7 +55,7 @@ object Forsyth {
         } yield Uci.Move(orig, dest)
 
         situation withHistory {
-          val history = History.make(lastMove, Array.empty, castles, unmovedRooks)
+          val history = History.make(lastMove, Array.empty, castles, UnmovedRooks(unmovedRooks))
           (splitted lift 6 flatMap makeCheckCount).fold(history)(history.withCheckCount)
         }
       } fixCastles
@@ -202,8 +202,8 @@ object Forsyth {
       case (pos, piece) if pos.y == Black.backrankY && piece == Black.rook => pos
     }
 
-    lazy val wur = board.unmovedRooks.filter(_.y == White.backrankY)
-    lazy val bur = board.unmovedRooks.filter(_.y == Black.backrankY)
+    lazy val wur = board.unmovedRooks.pos.filter(_.y == White.backrankY)
+    lazy val bur = board.unmovedRooks.pos.filter(_.y == Black.backrankY)
 
     {
       // castling rights with inner rooks are represented by their file name

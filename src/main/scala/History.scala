@@ -14,12 +14,18 @@ case class CheckCount(white: Int = 0, black: Int = 0) {
   def apply(color: Color) = color.fold(white, black)
 }
 
+case class UnmovedRooks(pos: Set[Pos]) extends AnyVal
+
+object UnmovedRooks {
+  val default = UnmovedRooks(Pos.allBackrank)
+}
+
 case class History(
     lastMove: Option[Uci] = None,
     positionHashes: PositionHash = History.randomHashes(1),
     castles: Castles = Castles.all,
     checkCount: CheckCount = CheckCount(0, 0),
-    unmovedRooks: Set[Pos] = Pos.allBackrank) {
+    unmovedRooks: UnmovedRooks = UnmovedRooks.default) {
 
   /**
    * Halfmove clock: This is the number of halfmoves
@@ -79,7 +85,7 @@ object History {
     lastMove: Option[Uci],
     positionHashes: PositionHash,
     castles: Castles,
-    unmovedRooks: Set[Pos] = Pos.allBackrank): History = new History(
+    unmovedRooks: UnmovedRooks = UnmovedRooks.default): History = new History(
     lastMove = lastMove,
     castles = castles,
     positionHashes = positionHashes,

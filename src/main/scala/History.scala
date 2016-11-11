@@ -82,18 +82,8 @@ case class History(
 object History {
 
   def make(
-    lastMove: Option[Uci],
-    positionHashes: PositionHash,
-    castles: Castles,
-    unmovedRooks: UnmovedRooks = UnmovedRooks.default): History = new History(
-    lastMove = lastMove,
-    castles = castles,
-    positionHashes = positionHashes,
-    unmovedRooks = unmovedRooks)
-
-  def make(
     lastMove: Option[String], // a2a4
-    castles: String): History = make(
+    castles: String): History = History(
     lastMove = lastMove flatMap Uci.apply,
     castles = Castles(castles),
     positionHashes = Array())

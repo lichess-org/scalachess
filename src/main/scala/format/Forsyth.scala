@@ -55,7 +55,11 @@ object Forsyth {
         } yield Uci.Move(orig, dest)
 
         situation withHistory {
-          val history = History.make(lastMove, Array.empty, castles, UnmovedRooks(unmovedRooks))
+          val history = History(
+            lastMove = lastMove,
+            positionHashes = Array.empty,
+            castles = castles,
+            unmovedRooks = UnmovedRooks(unmovedRooks))
           (splitted lift 6 flatMap makeCheckCount).fold(history)(history.withCheckCount)
         }
       } fixCastles
@@ -121,7 +125,8 @@ object Forsyth {
     case Nil => Some(Nil)
     case c :: rest => c match {
       case n if n.toInt < 58 =>
-        makePieces(rest,
+        makePieces(
+          rest,
           if (n.toInt > 48) tore(pos, n.toInt - 48) getOrElse pos
           else pos)
       case n => Role forsyth n.toLower map { role =>
@@ -143,7 +148,8 @@ object Forsyth {
         } yield nextPieces -> (nextPromoted + prevPos)
       }
       case n if n.toInt < 58 =>
-        makePiecesWithCrazyPromoted(rest,
+        makePiecesWithCrazyPromoted(
+          rest,
           if (n.toInt > 48) tore(pos, n.toInt - 48) getOrElse pos
           else pos)
       case n => for {

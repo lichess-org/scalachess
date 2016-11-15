@@ -24,6 +24,9 @@ case object Antichess extends Variant(
     if (!capturingMoves.isEmpty) capturingMoves else allMoves
   }
 
+  override def valid(board: Board, strict: Boolean) =
+    board.pieces.size >= 2 && board.pieces.size <= 32
+
   // In antichess, there is no checkmate condition, and the winner is the current player if they have no legal moves
   override def winner(situation: Situation): Option[Color] = if (specialEnd(situation)) Some(situation.color) else None
 

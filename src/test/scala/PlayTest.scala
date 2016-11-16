@@ -1,5 +1,6 @@
 package chess
 
+import scalaz.Validation.FlatMap._
 import format.Visual.addNewLines
 import Pos._
 

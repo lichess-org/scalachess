@@ -1,5 +1,6 @@
 package chess
 
+import scalaz.Validation.FlatMap._
 import Pos._
 import variant._
 

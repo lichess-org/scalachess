@@ -282,4 +282,9 @@ class ParserTest extends ChessTest {
       case a => a.sans.size must_== 49
     }
   }
+  "crazyhouse from chess.com" in {
+    parser(chessComCrazyhouse) must beSuccess.like {
+      case a => a.sans.size must_== 42
+    }
+  }
 }

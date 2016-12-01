@@ -111,6 +111,9 @@ class ReaderTest extends ChessTest {
     "crazyhouse without variant tag" in {
       Reader.full(crazyhouseNoVariantTag) must beFailure
     }
+    "crazyhouse from chess.com" in {
+      Reader.full(chessComCrazyhouse) must beSuccess
+    }
   }
   "from prod" in {
     "from position close chess" in {

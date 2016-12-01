@@ -45,6 +45,25 @@ object Fixtures {
 0-1
 """
 
+  val chessComCrazyhouse = """
+[Event "Live Chess - Crazyhouse"]
+[Site "Chess.com"]
+[Date "2016.11.30"]
+[White "eekarf"]
+[Black "JannLeeCrazyhouse"]
+[Result "0-1"]
+[ECO "C46"]
+[WhiteElo "2071"]
+[BlackElo "2593"]
+[TimeControl "180"]
+[Termination "JannLeeCrazyhouse won by checkmate"]
+[Variant "Crazyhouse"]
+[CurrentPosition "r1bBk1r1/ppp2p1p/1b1p3p/3Pp3/6N1/2PPn2n/PP2B1pP/R2Q3K w q - 0 22 QNrp"]
+
+1.e4 e5 2.Nf3 Nc6 3.Nc3 Bc5 4.Be2 Nf6 5.O-O d6 6.d3 Nd4 7.Nxd4 Bxd4 8.Nd5 Nxd5 9.exd5 N@f6 10.c3 Bb6 11.Bg5 N@f4 12.N@e4 Rg8 13.N@h6 Nxe4 14.Bxd8 N@h3+ 15.gxh3 Nxh3+ 16.Kh1 Nexf2+ 17.Rxf2 Nxf2+ 18.Kg2 gxh6+ 19.N@g4 N@e3+ 20.Kg1 Nh3+ 21.Kh1 @g2# 
+0-1
+"""
+
   val fromPosProdCloseChess = """
 [FEN "8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1"]                                                                     [12/1807]
 1. d4 d5 2. Nf4 Nf5 3. g4 g5 4. gxf5 exf5

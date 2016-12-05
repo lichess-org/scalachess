@@ -23,6 +23,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       .replace("[pgn]", "")
       .replace("[/pgn]", "")
       .replace("‑", "-")
+      .replace("e.p.", "") // silly en-passant notation
     for {
       splitted ← splitTagAndMoves(preprocessed)
       (tagStr, moveStr) = splitted

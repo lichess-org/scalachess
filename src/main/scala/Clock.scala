@@ -33,14 +33,14 @@ sealed trait Clock {
 
   def elapsedTime(c: Color) = time(c)
 
-  def limitInMinutes = limit / 60d
+  def limitInMinutes = config.limitInMinutes
 
-  def estimateTotalIncrement = 40 * increment
+  def estimateTotalIncrement = config.estimateTotalIncrement
 
-  def estimateTotalTime = limit + estimateTotalIncrement
+  def estimateTotalTime = config.estimateTotalTime
 
   // Emergency time cutoff, in seconds.
-  def emergTime: Int = math.round(math.min(60, math.max(10, limit / 8)))
+  def emergTime = config.emergTime
 
   def stop: PausedClock
 
@@ -52,7 +52,7 @@ sealed trait Clock {
 
   def berserk(c: Color): Clock
 
-  def show = s"${Clock.showLimit(limit)}+$increment"
+  def show = config.show
 
   def showTime(t: Float) = {
     val hours = math.floor(t / 3600).toInt
@@ -71,9 +71,7 @@ sealed trait Clock {
 
   def takeback: Clock
 
-  def reset = Clock(
-    limit = limit,
-    increment = increment)
+  def reset = Clock(config)
 
   protected def now = System.currentTimeMillis / 1000d
 }
@@ -179,7 +177,19 @@ case class PausedClock(
 object Clock {
 
   // All durations are expressed in seconds
-  case class Config(limit: Int, increment: Int)
+  case class Config(limit: Int, increment: Int) {
+
+    def show = s"${Clock.showLimit(limit)}+$increment"
+
+    def limitInMinutes = limit / 60d
+
+    def estimateTotalIncrement = 40 * increment
+
+    def estimateTotalTime = limit + estimateTotalIncrement
+
+    // Emergency time cutoff, in seconds.
+    def emergTime = math.min(60, math.max(10, limit / 8))
+  }
 
   val minInitLimit = 3
   // no more than this time will be offered to the lagging player

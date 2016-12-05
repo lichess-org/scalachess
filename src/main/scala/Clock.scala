@@ -48,8 +48,6 @@ sealed trait Clock {
 
   def giveTime(c: Color, t: Float): Clock
 
-  def berserkable = increment == 0 || limit > 0
-
   def berserk(c: Color): Clock
 
   def show = config.show
@@ -189,6 +187,14 @@ object Clock {
 
     // Emergency time cutoff, in seconds.
     def emergTime = math.min(60, math.max(10, limit / 8))
+
+    def hasIncrement = increment > 0
+
+    def berserkable = increment == 0 || limit > 0
+
+    def toClock = Clock(this)
+
+    override def toString = show
   }
 
   val minInitLimit = 3

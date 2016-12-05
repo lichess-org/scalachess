@@ -6,12 +6,14 @@ import java.text.DecimalFormat
 
 // All durations are expressed in seconds
 sealed trait Clock {
-  val limit: Int
-  val increment: Int
+  val config: Clock.Config
   val color: Color
   val whiteTime: Float
   val blackTime: Float
   val timerOption: Option[Double]
+
+  def limit = config.limit
+  def increment = config.increment
 
   def time(c: Color) = c.fold(whiteTime, blackTime)
 
@@ -77,8 +79,7 @@ sealed trait Clock {
 }
 
 case class RunningClock(
-    limit: Int,
-    increment: Int,
+    config: Clock.Config,
     color: Color,
     whiteTime: Float,
     blackTime: Float,
@@ -109,8 +110,7 @@ case class RunningClock(
   }
 
   def stop = PausedClock(
-    limit = limit,
-    increment = increment,
+    config = config,
     color = color,
     whiteTime = whiteTime + (if (color == White) (now - timer).toFloat else 0),
     blackTime = blackTime + (if (color == Black) (now - timer).toFloat else 0),
@@ -140,8 +140,7 @@ case class RunningClock(
 }
 
 case class PausedClock(
-    limit: Int,
-    increment: Int,
+    config: Clock.Config,
     color: Color,
     whiteTime: Float,
     blackTime: Float,
@@ -168,17 +167,19 @@ case class PausedClock(
   def takeback: PausedClock = switch
 
   def start = RunningClock(
+    config = config,
     color = color,
     whiteTime = whiteTime,
     blackTime = blackTime,
     whiteBerserk = whiteBerserk,
     blackBerserk = blackBerserk,
-    increment = increment,
-    limit = limit,
     timer = now)
 }
 
 object Clock {
+
+  // All durations are expressed in seconds
+  case class Config(limit: Int, increment: Int)
 
   val minInitLimit = 3
   // no more than this time will be offered to the lagging player
@@ -186,20 +187,19 @@ object Clock {
   // no more than this time to get the last move in
   val maxGraceMillis = 1000
 
-  def apply(
-    limit: Int,
-    increment: Int): PausedClock = {
+  def apply(limit: Int, increment: Int): PausedClock = apply(Config(limit, increment))
+
+  def apply(config: Config): PausedClock = {
     val clock = PausedClock(
-      limit = limit,
-      increment = increment,
+      config = config,
       color = White,
       whiteTime = 0f,
       blackTime = 0f,
       whiteBerserk = false,
       blackBerserk = false)
     if (clock.limit == 0) clock
-      .giveTime(White, increment.max(minInitLimit))
-      .giveTime(Black, increment.max(minInitLimit))
+      .giveTime(White, config.increment.max(minInitLimit))
+      .giveTime(Black, config.increment.max(minInitLimit))
     else clock
   }
 

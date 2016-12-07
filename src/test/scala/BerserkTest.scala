@@ -9,14 +9,14 @@ class BerserkTest extends ChessTest {
 
   "berserkable" should {
     "yep" in {
-      Clock(60 * 60, 0).berserkable must_== true
-      Clock(1 * 60, 0).berserkable must_== true
-      Clock(60 * 60, 60).berserkable must_== true
-      Clock(1 * 60, 0).berserkable must_== true
+      Clock.Config(60 * 60, 0).berserkable must_== true
+      Clock.Config(1 * 60, 0).berserkable must_== true
+      Clock.Config(60 * 60, 60).berserkable must_== true
+      Clock.Config(1 * 60, 0).berserkable must_== true
     }
     "nope" in {
-      Clock(0 * 60, 1).berserkable must_== false
-      Clock(0 * 60, 10).berserkable must_== false
+      Clock.Config(0 * 60, 1).berserkable must_== false
+      Clock.Config(0 * 60, 10).berserkable must_== false
     }
   }
   "berserk flags" should {

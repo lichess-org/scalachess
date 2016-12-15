@@ -141,7 +141,7 @@ object Forsyth {
     case Nil => Some(Nil -> Set.empty)
     case c :: rest => c match {
       case '~' => pos match {
-        case Pos.A1 => Some(Nil -> Set(Pos.H1)) // last piece is promoted
+        case Pos.A8 => Some(Nil -> Set(Pos.H1)) // last piece is promoted
         case pos => for {
           prevPos <- tore(pos, -1)
           (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, pos)
@@ -154,7 +154,7 @@ object Forsyth {
           else pos)
       case n => for {
         role <- Role forsyth n.toLower
-        nextPos = tore(pos, 1) getOrElse Pos.A1
+        nextPos = tore(pos, 1) getOrElse Pos.A8
         (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, nextPos)
       } yield ((pos, Piece(Color(n.isUpper), role)) :: nextPieces) -> nextPromoted
     }

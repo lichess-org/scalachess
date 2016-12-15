@@ -327,6 +327,13 @@ class ForsythTest extends ChessTest {
           }
         }
       }
+      "promoted on H2" in {
+        f << "r2q1b1r/p2k1Ppp/2p2p2/4p3/P2nP2n/3P1PRP/1PPB1K1q~/RN1Q1B2/Npb w - - 40 21" must beSome.like {
+          case s => s.board.crazyData must beSome.like {
+            case Data(_, promoted) => promoted must_== Set(H2)
+          }
+        }
+      }
     }
   }
   "three-check" should {

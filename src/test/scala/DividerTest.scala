@@ -77,5 +77,15 @@ class DividerTest extends ChessTest {
         case x => x must beBetween(36, 48)
       }
     }
+    "game7" in {
+      // http://en.l.org/W2RS81OY
+      val replay = makeReplay("1. e4 e5 2. f4 d6 3. Nf3 exf4 4. Bc4 h6 5. O-O Bg4 6. d4 Nc6 7. Bxf4 Nf6 8. Nc3 Be7 9. e5 dxe5 10. dxe5 Nh5 11. Be3 O-O 12. h3 Bxf3 13. Qxf3 Nxe5 14. Bxf7+ Rxf7 15. Qxh5 Qf8")
+      val divided = Divider(replay)
+      println("Game 7 => " + divided)
+      divided.middle must beSome.like {
+        case x => x must beBetween(19, 25)
+      }
+      divided.end must beNone
+    }
   }
 }

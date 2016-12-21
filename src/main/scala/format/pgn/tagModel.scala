@@ -9,6 +9,7 @@ case class Tag(name: TagType, value: String) {
 sealed trait TagType {
   lazy val name = toString
   lazy val lowercase = name.toLowerCase
+  val isUnknown = false
 }
 
 object Tag {
@@ -26,6 +27,8 @@ object Tag {
   case object BlackElo extends TagType
   case object WhiteTitle extends TagType
   case object BlackTitle extends TagType
+  case object WhiteTeam extends TagType
+  case object BlackTeam extends TagType
   case object Result extends TagType
   case object FEN extends TagType
   case object Variant extends TagType
@@ -35,12 +38,13 @@ object Tag {
   case object Annotator extends TagType
   case class Unknown(n: String) extends TagType {
     override def toString = n
+    override val isUnknown = true
   }
 
   val tagTypes = List(
     Event, Site, Date, Round, White, Black, TimeControl,
     WhiteClock, BlackClock, WhiteElo, BlackElo, WhiteTitle, BlackTitle,
-    Result, FEN, Variant, ECO, Opening, Termination, Annotator)
+    WhiteTeam, BlackTeam, Result, FEN, Variant, ECO, Opening, Termination, Annotator)
   val tagTypesByLowercase = tagTypes map { t => t.lowercase -> t } toMap
 
   def apply(name: String, value: Any): Tag = new Tag(

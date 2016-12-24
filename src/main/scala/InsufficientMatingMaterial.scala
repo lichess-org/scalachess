@@ -12,13 +12,17 @@ object InsufficientMatingMaterial {
 
   /**
    * Returns true when the only non-king pieces that remain are bishops that cannot
-   * capture each other.
+   * capture each other and cannot checkmate (in atomic chess).
    */
   def bishopsOnDifferentColor(board: Board) = {
     val notKingPieces = nonKingPieces(board)
     val onlyBishopsRemain = !notKingPieces.exists(_._2.role != Bishop)
 
+    def bishopsOnSameColor  = notKingPieces.map(_._1.color).distinct.size == 1
+    def bishopsAreSameColor = notKingPieces.map(_._2.color).distinct.size == 1
+
     if (!onlyBishopsRemain) false
+    else if (bishopsAreSameColor) notKingPieces.size < 3 || bishopsOnSameColor
     else {
       val whitePlayerBishops = notKingPieces.filter(_._2.color == Color.White)
       val blackPlayerBishops = notKingPieces.filter(_._2.color == Color.Black)
@@ -36,10 +40,10 @@ object InsufficientMatingMaterial {
     val blockingPosition = Actor.posAheadOfPawn(pawn.pos, pawn.piece.color)
     blockingPosition.flatMap(board.actorAt(_)).exists(_.piece.is(Pawn))
   }
+
   /*
    * Determines whether a board position is an automatic draw due to neither player
    * being able to mate the other as informed by the traditional chess rules.
-   *
    */
   def apply(board: Board) = {
 

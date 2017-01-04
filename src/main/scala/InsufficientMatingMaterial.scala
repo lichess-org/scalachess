@@ -8,32 +8,45 @@ package chess
  */
 object InsufficientMatingMaterial {
 
-  def nonKingPieces(board: Board) = board.pieces.filter(_._2.role != King).toList
+  def nonKingPieceMap(board: Board) = board.pieces.filter(_._2.role != King)
+  def nonKingNonBishopPieceMap(board: Board) = board.pieces.filter(p => (p._2.role != King && p._2.role != Bishop))
+  def nonKingPieces(board: Board) = nonKingPieceMap(board).toList
+  def boardWithNonKingPieces(board: Board) = board withPieces nonKingPieceMap(board)
+  def boardWithNonKingNonBishopPieces(board: Board) = board withPieces nonKingNonBishopPieceMap(board)
 
   /**
-   * Returns true when the only non-king pieces that remain are bishops that cannot
-   * capture each other and cannot checkmate (in atomic chess).
+   * Returns true when only the bishops are mobile and the bishops cannot capture.
+   * Assumes bishops can move through friendly pieces.
    */
-  def bishopsOnDifferentColor(board: Board) = {
+  def bishopsCannotCapture(board: Board) = mate(boardWithNonKingNonBishopPieces(board)) && {
     val notKingPieces = nonKingPieces(board)
-    val onlyBishopsRemain = !notKingPieces.exists(_._2.role != Bishop)
+    val whitePlayerPieces = notKingPieces.filter(_._2.color == Color.White)
+    val whitePlayerBishops = whitePlayerPieces.filter(_._2.role == Bishop)
+    val blackPlayerPieces = notKingPieces.filter(_._2.color == Color.Black)
+    val blackPlayerBishops = blackPlayerPieces.filter(_._2.role == Bishop)
 
-    def bishopsOnSameColor = notKingPieces.map(_._1.color).distinct.size == 1
-    def bishopsAreSameColor = notKingPieces.map(_._2.color).distinct.size == 1
-
-    if (!onlyBishopsRemain) false
-    else if (bishopsAreSameColor) notKingPieces.size < 3 || bishopsOnSameColor
-    else {
-      val whitePlayerBishops = notKingPieces.filter(_._2.color == Color.White)
-      val blackPlayerBishops = notKingPieces.filter(_._2.color == Color.Black)
-
-      !whitePlayerBishops.exists {
-        case (pos, _) => blackPlayerBishops.exists(_._1.color == pos.color)
-      }
+    !whitePlayerBishops.exists {
+      case (pos, _) => blackPlayerPieces.exists(_._1.color == pos.color)
+    } && !blackPlayerBishops.exists {
+      case (pos, _) => whitePlayerPieces.exists(_._1.color == pos.color)
     }
   }
 
-  /*
+  /**
+   * Returns true when the only non-king pieces that remain are bishops that cannot checkmate.
+   */
+  def bishopsCannotCheckmate(board: Board) = {
+    val notKingPieces = nonKingPieces(board)
+    val onlyBishopsRemain = !notKingPieces.exists(_._2.role != Bishop)
+
+    def piecesOnSameColor  = notKingPieces.map(_._1.color).distinct.size == 1
+    def piecesAreSameColor = notKingPieces.map(_._2.color).distinct.size == 1
+
+    if (onlyBishopsRemain && piecesAreSameColor) notKingPieces.size < 3 || piecesOnSameColor
+    else bishopsCannotCapture(board)
+  }
+
+  /**
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
    */
   def pawnBlockedByPawn(pawn: Actor, board: Board) = pawn.moves.isEmpty && {
@@ -41,7 +54,12 @@ object InsufficientMatingMaterial {
     blockingPosition.flatMap(board.actorAt(_)).exists(_.piece.is(Pawn))
   }
 
-  /*
+  /**
+   * Returns true if no pieces can move (checkmate or stalemate)
+   */
+  def mate(board: Board) = board.actors.values.forall(actor => actor.moves.isEmpty)
+
+  /**
    * Determines whether a board position is an automatic draw due to neither player
    * being able to mate the other as informed by the traditional chess rules.
    */

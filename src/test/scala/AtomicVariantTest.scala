@@ -434,6 +434,30 @@ class AtomicVariantTest extends ChessTest {
 
     }
 
+    "An automatic draw in a closed position" in {
+      val position = "8/8/8/8/1p2k3/1Pp1p1p1/2P1P1P1/N3KB2 w - - 0 1"
+      val game = fenToGame(position, Atomic)
+
+      game must beSuccess.like {
+        case gm =>
+          gm.situation.autoDraw must beTrue
+          gm.situation.end must beTrue
+      }
+
+    }
+
+    "An automatic draw in another closed position" in {
+      val position = "8/8/8/8/1p2k3/1Pp1p1p1/2P1P1P1/NB2K3 w - - 0 1"
+      val game = fenToGame(position, Atomic)
+
+      game must beSuccess.like {
+        case gm =>
+          gm.situation.autoDraw must beTrue
+          gm.situation.end must beTrue
+      }
+
+    }
+
     "Not draw inappropriately on bishops vs bishops (where an explosion taking out the king is possible)" in {
       val position = "B2BBBB1/7P/8/8/8/8/3kb3/4K3 w - - 1 53"
       val game = fenToGame(position, Atomic)

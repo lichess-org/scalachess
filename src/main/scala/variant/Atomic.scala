@@ -76,8 +76,8 @@ case object Atomic extends Variant(
   override def addVariantEffect(move: Move): Move = explodeSurroundingPieces(move)
 
   /**
-   * Since a king may walk into the path of another king, it is more difficult to win when your opponent only has a
-   * king left.
+   * Since a king may walk into the path of another king, it is more difficult
+   * to win when your opponent only has a king remaining.
    */
   private def insufficientAtomicWinningMaterial(board: Board) = {
     val whiteActors = board.actorsOf(White)
@@ -100,15 +100,17 @@ case object Atomic extends Variant(
    * We also look out for closed positions (pawns that cannot move and kings which cannot capture them.)
    */
   override def insufficientWinningMaterial(board: Board) = {
-    InsufficientMatingMaterial.bishopsOnDifferentColor(board) || insufficientAtomicWinningMaterial(board) || atomicClosedPosition(board)
+    insufficientAtomicWinningMaterial(board) || atomicClosedPosition(board)
   }
 
   /**
-   * Since a king cannot capture, K + P vs K + P where none of the pawns can move is an automatic draw
+   * Since a king cannot capture, positions without mobile pieces or where
+   * bishops can move and cannot checkmate are automatic draws
    */
   private def atomicClosedPosition(board: Board) = {
-    board.actors.values.forall(actor => (actor.piece.is(Pawn) && actor.moves.isEmpty
-      && InsufficientMatingMaterial.pawnBlockedByPawn(actor, board)) || actor.piece.is(King))
+    val nonKingBoard = InsufficientMatingMaterial.boardWithNonKingPieces(board)
+
+    InsufficientMatingMaterial.mate(nonKingBoard) || InsufficientMatingMaterial.bishopsCannotCheckmate(board)
   }
 
   /**
@@ -116,8 +118,11 @@ case object Atomic extends Variant(
    * a piece in the opponent's king's proximity. On the other hand, a king alone or a king with
    * immobile pawns is not sufficient material to win with.
    */
-  override def insufficientWinningMaterial(board: Board, color: Color) =
-    board.rolesOf(color) == List(King)
+  override def insufficientWinningMaterial(board: Board, color: Color) = {
+    def onlyBishopsRemain = board.rolesOf(color) == List(King, Bishop)
+
+    board.rolesOf(color) == List(King) || (onlyBishopsRemain && InsufficientMatingMaterial.bishopsCannotCheckmate(board))
+  }
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
   override def specialEnd(situation: Situation) = situation.board.kingPos.size != 2

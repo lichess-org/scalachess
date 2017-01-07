@@ -38,9 +38,8 @@ object InsufficientMatingMaterial {
   def bishopsCannotCheckmate(board: Board) = {
     val notKingPieces = nonKingPieces(board)
     val onlyBishopsRemain = nonKingNonBishopPieceMap(board).isEmpty
-
-    def piecesOnSameColor  = notKingPieces.map {case (pos, _) => pos.color}.distinct.size < 2
-    def piecesAreSameColor = notKingPieces.map {case (_, piece) => piece.color}.distinct.size < 2
+    lazy val piecesOnSameColor  = notKingPieces.map {case (pos, _) => pos.color}.distinct.size < 2
+    lazy val piecesAreSameColor = notKingPieces.map {case (_, piece) => piece.color}.distinct.size < 2
 
     if (onlyBishopsRemain && piecesAreSameColor) piecesOnSameColor
     else bishopsCannotCapture(board)
@@ -67,13 +66,13 @@ object InsufficientMatingMaterial {
 
     lazy val notKingPieces = nonKingPieces(board)
 
-    def kingsOnly = board.pieces forall { case (_, piece) => piece is King }
+    val kingsOnly = board.pieces forall { case (_, piece) => piece is King }
 
-    def bishopsOnSameColor =
+    lazy val bishopsOnSameColor =
       notKingPieces.map {case (_, piece) => piece.role}.distinct == List(Bishop) &&
         notKingPieces.map {case (pos, _) => pos.color}.distinct.size == 1
 
-    def singleKnight = notKingPieces.map {case (_, piece) => piece.role} == List(Knight)
+    lazy val singleKnight = notKingPieces.map {case (_, piece) => piece.role} == List(Knight)
 
     kingsOnly || bishopsOnSameColor || singleKnight
   }

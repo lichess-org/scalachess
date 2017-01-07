@@ -120,7 +120,7 @@ case object Atomic extends Variant(
    */
   override def insufficientWinningMaterial(board: Board, color: Color) = {
     val colorRoles = board.rolesOf(color)
-    def onlyBishopsRemain = colorRoles.toSet == Set(King, Bishop)
+    lazy val onlyBishopsRemain = colorRoles.toSet == Set(King, Bishop)
 
     colorRoles == List(King) || (onlyBishopsRemain && InsufficientMatingMaterial.bishopsCannotCheckmate(board))
   }

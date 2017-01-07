@@ -8,8 +8,8 @@ package chess
  */
 object InsufficientMatingMaterial {
 
-  def nonKingPieceMap(board: Board) = board.pieces.filter(_._2.role != King)
-  def nonKingNonBishopPieceMap(board: Board) = board.pieces.filter(p => (p._2.role != King && p._2.role != Bishop))
+  def nonKingPieceMap(board: Board) = board.pieces.filter {case (_, piece) => piece isNot King}
+  def nonKingNonBishopPieceMap(board: Board) = board.pieces.filter {case (_, piece) => (piece isNot King) && (piece isNot Bishop)}
   def nonKingPieces(board: Board) = nonKingPieceMap(board).toList
   def boardWithNonKingPieces(board: Board) = board withPieces nonKingPieceMap(board)
   def boardWithNonKingNonBishopPieces(board: Board) = board withPieces nonKingNonBishopPieceMap(board)
@@ -18,17 +18,17 @@ object InsufficientMatingMaterial {
    * Returns true when only the bishops are mobile and the bishops cannot capture.
    * Assumes bishops can move through friendly pieces.
    */
-  def bishopsCannotCapture(board: Board) = mate(boardWithNonKingNonBishopPieces(board)) && {
+  def bishopsCannotCapture(board: Board) = noPieceMoves(boardWithNonKingNonBishopPieces(board)) && {
     val notKingPieces = nonKingPieces(board)
-    val whitePlayerPieces = notKingPieces.filter(_._2.color == Color.White)
-    val whitePlayerBishops = whitePlayerPieces.filter(_._2.role == Bishop)
-    val blackPlayerPieces = notKingPieces.filter(_._2.color == Color.Black)
-    val blackPlayerBishops = blackPlayerPieces.filter(_._2.role == Bishop)
+    val whitePlayerPieces = notKingPieces.filter {case (_, piece) => piece is Color.White}
+    val whitePlayerBishops = whitePlayerPieces.filter {case (_, piece) => piece is Bishop}
+    val blackPlayerPieces = notKingPieces.filter {case (_, piece) => piece is Color.Black}
+    val blackPlayerBishops = blackPlayerPieces.filter {case (_, piece) => piece is Bishop}
 
-    !whitePlayerBishops.exists {
-      case (pos, _) => blackPlayerPieces.exists(_._1.color == pos.color)
-    } && !blackPlayerBishops.exists {
-      case (pos, _) => whitePlayerPieces.exists(_._1.color == pos.color)
+    !whitePlayerBishops.map {case (pos, _) => pos.color}.exists {
+      case color => blackPlayerPieces.exists {case (pos, _) => pos.color == color}
+    } && !blackPlayerBishops.map {case (pos, _) => pos.color}.exists {
+      case color => whitePlayerPieces.exists {case (pos, _) => pos.color == color}
     }
   }
 
@@ -37,12 +37,12 @@ object InsufficientMatingMaterial {
    */
   def bishopsCannotCheckmate(board: Board) = {
     val notKingPieces = nonKingPieces(board)
-    val onlyBishopsRemain = !notKingPieces.exists(_._2.role != Bishop)
+    var onlyBishopsRemain = nonKingNonBishopPieceMap(board).isEmpty
 
-    def piecesOnSameColor  = notKingPieces.map(_._1.color).distinct.size == 1
-    def piecesAreSameColor = notKingPieces.map(_._2.color).distinct.size == 1
+    def piecesOnSameColor  = notKingPieces.map {case (pos, _) => pos.color}.distinct.size < 2
+    def piecesAreSameColor = notKingPieces.map {case (_, piece) => piece.color}.distinct.size < 2
 
-    if (onlyBishopsRemain && piecesAreSameColor) notKingPieces.size < 3 || piecesOnSameColor
+    if (onlyBishopsRemain && piecesAreSameColor) piecesOnSameColor
     else bishopsCannotCapture(board)
   }
 
@@ -55,9 +55,9 @@ object InsufficientMatingMaterial {
   }
 
   /**
-   * Returns true if no pieces can move (checkmate or stalemate)
+   * Returns true if no pieces can move
    */
-  def mate(board: Board) = board.actors.values.forall(actor => actor.moves.isEmpty)
+  def noPieceMoves(board: Board) = board.actors.values.forall(_.moves.isEmpty)
 
   /**
    * Determines whether a board position is an automatic draw due to neither player
@@ -67,13 +67,13 @@ object InsufficientMatingMaterial {
 
     lazy val notKingPieces = nonKingPieces(board)
 
-    def kingsOnly = board.pieces forall { _._2 is King }
+    def kingsOnly = board.pieces forall { case (_, piece) => piece is King }
 
     def bishopsOnSameColor =
-      notKingPieces.map(_._2.role).distinct == List(Bishop) &&
-        notKingPieces.map(_._1.color).distinct.size == 1
+      notKingPieces.map {case (_, piece) => piece.role}.distinct == List(Bishop) &&
+        notKingPieces.map {case (pos, _) => pos.color}.distinct.size == 1
 
-    def singleKnight = notKingPieces.map(_._2.role) == List(Knight)
+    def singleKnight = notKingPieces.map {case (_, piece) => piece.role} == List(Knight)
 
     kingsOnly || bishopsOnSameColor || singleKnight
   }

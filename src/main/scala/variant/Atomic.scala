@@ -110,7 +110,7 @@ case object Atomic extends Variant(
   private def atomicClosedPosition(board: Board) = {
     val nonKingBoard = InsufficientMatingMaterial.boardWithNonKingPieces(board)
 
-    InsufficientMatingMaterial.mate(nonKingBoard) || InsufficientMatingMaterial.bishopsCannotCheckmate(board)
+    InsufficientMatingMaterial.noPieceMoves(nonKingBoard) || InsufficientMatingMaterial.bishopsCannotCheckmate(board)
   }
 
   /**
@@ -119,9 +119,10 @@ case object Atomic extends Variant(
    * immobile pawns is not sufficient material to win with.
    */
   override def insufficientWinningMaterial(board: Board, color: Color) = {
-    def onlyBishopsRemain = board.rolesOf(color) == List(King, Bishop)
+    val colorRoles = board.rolesOf(color)
+    def onlyBishopsRemain = colorRoles.toSet == Set(King, Bishop)
 
-    board.rolesOf(color) == List(King) || (onlyBishopsRemain && InsufficientMatingMaterial.bishopsCannotCheckmate(board))
+    colorRoles == List(King) || (onlyBishopsRemain && InsufficientMatingMaterial.bishopsCannotCheckmate(board))
   }
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */

@@ -37,7 +37,7 @@ object InsufficientMatingMaterial {
    */
   def bishopsCannotCheckmate(board: Board) = {
     val notKingPieces = nonKingPieces(board)
-    var onlyBishopsRemain = nonKingNonBishopPieceMap(board).isEmpty
+    val onlyBishopsRemain = nonKingNonBishopPieceMap(board).isEmpty
 
     def piecesOnSameColor  = notKingPieces.map {case (pos, _) => pos.color}.distinct.size < 2
     def piecesAreSameColor = notKingPieces.map {case (_, piece) => piece.color}.distinct.size < 2

@@ -42,7 +42,22 @@ object InsufficientMatingMaterial {
     lazy val piecesAreSameColor = notKingPieces.map {case (_, piece) => piece.color}.distinct.size < 2
 
     if (onlyBishopsRemain && piecesAreSameColor) piecesOnSameColor
+    else if (onlyBishopsRemain && !piecesOnSameColor) notKingPieces.size < 3
     else bishopsCannotCapture(board)
+  }
+
+  /**
+   * Returns true when the only non-king pieces of a color that remain are bishops that cannot checkmate.
+   */
+  def bishopsCannotCheckmate(board: Board, color: Color) = {
+    val notKingPieces = nonKingPieces(board)
+    lazy val opponentPieces = notKingPieces.filter {case (_, piece) => piece.color != color}
+    val onlyBishopsRemain = nonKingNonBishopPieceMap(board).isEmpty
+    lazy val piecesOnSameColor  = notKingPieces.map {case (pos, _) => pos.color}.distinct.size < 2
+    lazy val piecesAreSameColor = notKingPieces.map {case (_, piece) => piece.color}.distinct.size < 2
+
+    if (onlyBishopsRemain && piecesAreSameColor) piecesOnSameColor
+    else opponentPieces.size >= 2 || bishopsCannotCapture(board)
   }
 
   /**

@@ -122,7 +122,7 @@ case object Atomic extends Variant(
     val colorRoles = board.rolesOf(color)
     lazy val onlyBishopsRemain = colorRoles.toSet == Set(King, Bishop)
 
-    colorRoles == List(King) || (onlyBishopsRemain && InsufficientMatingMaterial.bishopsCannotCheckmate(board))
+    colorRoles == List(King) || (onlyBishopsRemain && InsufficientMatingMaterial.bishopsCannotCheckmate(board, color))
   }
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */

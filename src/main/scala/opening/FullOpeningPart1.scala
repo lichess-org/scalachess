@@ -1,7 +1,7 @@
 package chess
 package opening
 
-private object FullOpeningPart1 {
+private[opening] object FullOpeningPart1 {
 
   def db: Vector[FullOpening] = Vector(
     new FullOpening("A00", "Amar Gambit", "rn1qkbnr/ppp2ppp/8/3p4/5p2/6PB/PPPPP2P/RNBQK2R w KQkq"),

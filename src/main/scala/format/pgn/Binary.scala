@@ -117,7 +117,6 @@ object Binary {
     private def right(i: Int, x: Int): Int = i & lengthMasks(x)
     private def cut(i: Int, from: Int, to: Int): Int = right(i, from) >> to
     private def bitAt(i: Int, p: Int): Boolean = cut(i, p, p - 1) != 0
-    private val bitMasks = Map(0 -> 0x80, 1 -> 0x40, 2 -> 0x20, 3 -> 0x10, 4 -> 0x08, 5 -> 0x04, 6 -> 0x02, 7 -> 0x01)
     private val lengthMasks = Map(1 -> 0x01, 2 -> 0x03, 3 -> 0x07, 4 -> 0x0F, 5 -> 0x1F, 6 -> 0x3F, 7 -> 0x7F, 8 -> 0xFF)
     private def !!(msg: String) = throw new Exception("Binary reader failed: " + msg)
   }

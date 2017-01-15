@@ -112,6 +112,4 @@ object Divider {
         mix + score(white, black, region.head.x, region.head.y)
     }
   }
-
-  private def indexOption(index: Int) = if (index == -1) None else Some(index)
 }

@@ -1,7 +1,5 @@
 package chess
 
-import chess.format.Uci
-
 final class Hash(size: Int) {
 
   private[chess] def hexToBytes(str: String): PositionHash = {

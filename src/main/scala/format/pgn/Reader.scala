@@ -1,7 +1,6 @@
 package chess
 package format.pgn
 
-import format.Forsyth
 import scalaz.Validation.FlatMap._
 
 object Reader {

@@ -172,8 +172,6 @@ case class Board(
 
 object Board {
 
-  import Pos._
-
   def apply(pieces: Traversable[(Pos, Piece)], variant: Variant): Board =
     Board(pieces.toMap, if (variant.allowsCastling) Castles.all else Castles.none, variant)
 

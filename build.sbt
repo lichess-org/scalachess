@@ -10,7 +10,7 @@ libraryDependencies ++= List(
   "org.scalaz" %% "scalaz-core" % "7.1.11",
   "org.specs2" %% "specs2-core" % "3.6" % "test",
   "com.github.ornicar" %% "scalalib" % "5.7",
-  "joda-time" % "joda-time" % "2.9.4",
+  "joda-time" % "joda-time" % "2.9.7",
   "org.joda" % "joda-convert" % "1.8",
   "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
 )
@@ -21,9 +21,8 @@ resolvers ++= Seq(
   "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases")
 
 scalacOptions ++= Seq(
-  "-deprecation",
-  "-unchecked",
-  "-feature",
-  "-language:_",
+  "-deprecation", "-unchecked", "-feature", "-language:_",
   "-Xfatal-warnings",
+  "-Ywarn-unused-import", "-Ywarn-value-discard", "-Ywarn-dead-code",
+  "-Ywarn-unused", "-Xlint:missing-interpolator",
   "-Ybackend:GenBCode", "-Ydelambdafy:method", "-target:jvm-1.8")

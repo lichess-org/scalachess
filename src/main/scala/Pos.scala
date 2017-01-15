@@ -1,6 +1,5 @@
 package chess
 
-import scala.collection.immutable.HashSet
 import scala.math.{ min, max, abs }
 
 sealed case class Pos private (x: Int, y: Int, piotr: Char) {

@@ -1,7 +1,5 @@
 package chess
 
-import Pos._
-
 sealed trait Role {
   val forsyth: Char
   lazy val forsythUpper: Char = forsyth.toUpper

@@ -1,7 +1,6 @@
 package chess
 
 import format.Uci
-import Pos.posAt
 
 case class CheckCount(white: Int = 0, black: Int = 0) {
 

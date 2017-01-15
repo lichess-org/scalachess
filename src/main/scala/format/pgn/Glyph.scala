@@ -56,7 +56,7 @@ object Glyph {
     val interesting = new Glyph(5, "!?", "Interesting move") with MoveAssessment
     val dubious = new Glyph(6, "?!", "Dubious move") with MoveAssessment
     val only = new Glyph(7, "□", "Only move") with MoveAssessment
-    val novelty = new Glyph(146, "N", "Novelty") with Observation
+    val novelty = new Glyph(146, "N", "Novelty") with MoveAssessment
 
     val all = List(good, mistake, brillant, blunder, interesting, dubious, only, novelty)
     val byId = all.map { g => g.id -> g }.toMap

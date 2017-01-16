@@ -1,8 +1,6 @@
 package chess
 package format
 
-import Pos._
-
 class ForsythPerfTest extends ChessTest {
 
   val initialBoard = Board.init(variant.Standard)

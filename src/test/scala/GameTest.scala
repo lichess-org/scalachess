@@ -1,6 +1,5 @@
 package chess
 
-import format.Visual.addNewLines
 import Pos._
 
 class GameTest extends ChessTest {

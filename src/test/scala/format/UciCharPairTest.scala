@@ -6,8 +6,6 @@ import Uci._
 
 class UciCharPairTest extends ChessTest {
 
-  import pgn.Fixtures._
-
   // println(UciCharPair.implementation.pos2charMap.toList.sortBy(_._2.toInt))
   // println(UciCharPair.implementation.promotion2charMap.toList.sortBy(_._2.toInt))
   // println(UciCharPair.implementation.dropRole2charMap.toList.sortBy(_._2.toInt).map(x => x._1 -> x._2.toInt))

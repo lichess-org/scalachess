@@ -1,7 +1,5 @@
 package chess
 
-import Pos._
-
 class HistoryTest extends ChessTest {
 
   "threefold repetition" should {

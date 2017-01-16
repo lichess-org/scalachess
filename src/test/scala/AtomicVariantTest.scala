@@ -1,7 +1,6 @@
 package chess
 
 import scalaz.Validation.FlatMap._
-import scala.collection.immutable.HashSet
 import variant.Atomic
 
 class AtomicVariantTest extends ChessTest {

@@ -1,6 +1,5 @@
 package chess
 
-import scala.collection.immutable.HashSet
 import variant.RacingKings
 
 class RacingKingsVariantTest extends ChessTest {

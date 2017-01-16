@@ -114,7 +114,6 @@ class BinaryTest extends ChessTest {
       "all games" in {
         forall(pgn200) { pgn =>
           val bin = (Binary writeMoves pgn.split(' ').toList).get
-          val pct = ((pgn.size * 100) / bin.size)
           bin.size must be_<=(pgn.size)
         }
       }

@@ -1,7 +1,5 @@
 package chess
 
-import Pos._
-
 class BerserkTest extends ChessTest {
 
     def whiteBerserk(minutes: Int, seconds: Int) =

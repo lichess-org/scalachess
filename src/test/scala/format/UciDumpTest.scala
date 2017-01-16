@@ -1,8 +1,6 @@
 package chess
 package format
 
-import Pos._
-
 class UciDumpTest extends ChessTest {
 
   import pgn.Fixtures._

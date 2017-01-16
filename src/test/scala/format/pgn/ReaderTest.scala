@@ -1,8 +1,6 @@
 package chess
 package format.pgn
 
-import Pos._
-
 class ReaderTest extends ChessTest {
 
   import Fixtures._

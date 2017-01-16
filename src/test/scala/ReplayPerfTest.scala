@@ -1,7 +1,5 @@
 package chess
 
-import Pos._
-
 class ReplayPerfTest extends ChessTest {
 
   val nb = 500

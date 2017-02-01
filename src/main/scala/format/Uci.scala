@@ -102,6 +102,6 @@ object Uci
   def readListPiotr(moves: String): Option[List[Uci]] =
     moves.split(' ').toList.map(piotr).sequence
 
-  def writeListPiotr(moves: List[Uci.Move]): String =
+  def writeListPiotr(moves: List[Uci]): String =
     moves.map(_.piotr) mkString " "
 }

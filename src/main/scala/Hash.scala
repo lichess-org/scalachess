@@ -12,7 +12,8 @@ final class Hash(size: Int) {
     val l = Hash.get(situation, Hash.polyglotTable)
     if (size <= 8) {
       Array.tabulate(size)(i => (l >>> ((7 - i) * 8)).toByte)
-    } else {
+    }
+    else {
       val m = Hash.get(situation, Hash.randomTable)
       Array.tabulate(size)(i =>
         if (i < 8) (l >>> ((7 - i) * 8)).toByte
@@ -28,7 +29,7 @@ object Hash {
 
   class ZobristConstants(start: Int) {
     def hexToLong(s: String): Long = (java.lang.Long.parseLong(s.substring(start, start + 8), 16) << 32) |
-                                      java.lang.Long.parseLong(s.substring(start + 8, start + 16), 16)
+      java.lang.Long.parseLong(s.substring(start + 8, start + 16), 16)
     val whiteTurnMask = hexToLong(ZobristTables.whiteTurnMask)
     val actorMasks = ZobristTables.actorMasks.map(hexToLong)
     val castlingMasks = ZobristTables.castlingMasks.map(hexToLong)
@@ -43,24 +44,25 @@ object Hash {
   private val polyglotTable = new ZobristConstants(0)
   private lazy val randomTable = new ZobristConstants(16)
 
+  private def roleIndex(role: Role) = role match {
+    case Pawn   => 0
+    case Knight => 1
+    case Bishop => 2
+    case Rook   => 3
+    case Queen  => 4
+    case King   => 5
+  }
+
+  private def pieceIndex(piece: Piece) =
+    roleIndex(piece.role) * 2 + piece.color.fold(1, 0)
+
+  private def posIndex(pos: Pos) =
+    8 * pos.y + (pos.x - 9)
+
+  private def actorIndex(actor: Actor) =
+    64 * pieceIndex(actor.piece) + posIndex(actor.pos)
+
   private def get(situation: Situation, table: ZobristConstants): Long = {
-    def roleIndex(role: Role) = role match {
-      case Pawn   => 0
-      case Knight => 1
-      case Bishop => 2
-      case Rook   => 3
-      case Queen  => 4
-      case King   => 5
-    }
-
-    def pieceIndex(piece: Piece) =
-      roleIndex(piece.role) * 2 + piece.color.fold(1, 0)
-
-    def posIndex(pos: Pos) =
-      8 * pos.y + (pos.x - 9)
-
-    def actorIndex(actor: Actor) =
-      64 * pieceIndex(actor.piece) + posIndex(actor.pos)
 
     def crazyPocketMask(role: Role, colorshift: Int, count: Int) = {
       // There should be no kings and at most 16 pieces of any given type

@@ -46,6 +46,11 @@ case object Horde extends Variant(
   override def specialEnd(situation: Situation) =
     situation.board.piecesOf(White).isEmpty
 
+  /** In horde chess, black always has a possibility to win the game.
+   *  Auto-drawing the game should never happen, but it did in https://en.lichess.org/xQ2RsU8N#121
+   */
+  override def insufficientWinningMaterial(board: Board) = false
+
   /**
    * In horde chess, white cannot win on * V K or [BN]{2} v K or just one piece since they don't have a king
    * for support.

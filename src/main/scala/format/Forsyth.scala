@@ -19,9 +19,9 @@ object Forsyth {
       val splitted = fen split ' '
       val colorOption = splitted lift 1 flatMap (_ lift 0) flatMap Color.apply
       val situation = colorOption match {
-        case Some(color)             => Situation(board, color)
+        case Some(color) => Situation(board, color)
         case _ if board.check(Black) => Situation(board, Black) // user in check will move first
-        case _                       => Situation(board, White)
+        case _ => Situation(board, White)
       }
       splitted.lift(2).fold(situation) { strCastles =>
         val (castles, unmovedRooks) = strCastles.foldLeft(Castles.none, Set.empty[Pos]) {
@@ -33,8 +33,8 @@ object Forsyth {
             (for {
               kingPos <- board.kingPosOf(color)
               rookPos <- (ch.toLower match {
-                case 'k'  => rooks.reverse.find(_.x > kingPos.x)
-                case 'q'  => rooks.find(_.x < kingPos.x)
+                case 'k' => rooks.reverse.find(_.x > kingPos.x)
+                case 'q' => rooks.find(_.x < kingPos.x)
                 case file => rooks.find(_.file == file.toString)
               })
               side <- Side.kingRookSide(kingPos, rookPos)
@@ -59,7 +59,8 @@ object Forsyth {
             lastMove = lastMove,
             positionHashes = Array.empty,
             castles = castles,
-            unmovedRooks = UnmovedRooks(unmovedRooks))
+            unmovedRooks = UnmovedRooks(unmovedRooks)
+          )
           (splitted lift 6 flatMap makeCheckCount).fold(history)(history.withCheckCount)
         }
       } fixCastles
@@ -80,7 +81,8 @@ object Forsyth {
       val halfMoveClock = splitted lift 4 flatMap parseIntOption map (_ max 0 min 100)
       SituationPlus(
         halfMoveClock.map(sit.history.setHalfMoveClock).fold(sit)(sit.withHistory),
-        fullMoveNumber | 1)
+        fullMoveNumber | 1
+      )
     }
   }
 
@@ -116,7 +118,9 @@ object Forsyth {
         board.withCrazyData(_.copy(
           pockets = Pockets(
             white = Pocket(white.map(_.role)),
-            black = Pocket(black.map(_.role)))))
+            black = Pocket(black.map(_.role))
+          )
+        ))
       }
     }
   }
@@ -128,7 +132,8 @@ object Forsyth {
         makePieces(
           rest,
           if (n.toInt > 48) tore(pos, n.toInt - 48) getOrElse pos
-          else pos)
+          else pos
+        )
       case n => Role forsyth n.toLower map { role =>
         (pos, Piece(Color(n.isUpper), role)) :: {
           tore(pos, 1) flatMap { makePieces(rest, _) } getOrElse Nil
@@ -151,7 +156,8 @@ object Forsyth {
         makePiecesWithCrazyPromoted(
           rest,
           if (n.toInt > 48) tore(pos, n.toInt - 48) getOrElse pos
-          else pos)
+          else pos
+        )
       case n => for {
         role <- Role forsyth n.toLower
         nextPos = tore(pos, 1) getOrElse Pos.A8
@@ -219,7 +225,7 @@ object Forsyth {
         (if (board.castles.blackQueenSide && br.nonEmpty && bur.nonEmpty) (if (bur contains br.min) "q" else bur.min.file) else "")
     } match {
       case "" => "-"
-      case n  => n
+      case n => n
     }
   }
 
@@ -227,10 +233,12 @@ object Forsyth {
     if (n == 0) Some(pos)
     else if (n > 0) Pos.posAt(
       ((pos.x + n - 1) % 8 + 1),
-      (pos.y - (pos.x + n - 1) / 8))
+      (pos.y - (pos.x + n - 1) / 8)
+    )
     else Pos.posAt(
       if (pos.x == 1) 8 else pos.x - 1,
-      if (pos.x == 1) pos.y + 1 else pos.y)
+      if (pos.x == 1) pos.y + 1 else pos.y
+    )
 
   def exportBoard(board: Board): String = {
     val fen = new scala.collection.mutable.StringBuilder(70)

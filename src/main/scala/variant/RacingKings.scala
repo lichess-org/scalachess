@@ -7,7 +7,8 @@ case object RacingKings extends Variant(
   name = "Racing Kings",
   shortName = "Racing",
   title = "Race your King to the eighth rank to win.",
-  standardInitialPosition = false) {
+  standardInitialPosition = false
+) {
 
   override def allowsCastling = false
 
@@ -30,7 +31,8 @@ case object RacingKings extends Variant(
     Pos.G1 -> White.rook,
     Pos.G2 -> White.rook,
     Pos.H1 -> White.queen,
-    Pos.H2 -> White.king)
+    Pos.H2 -> White.king
+  )
 
   override val castles = Castles.none
 

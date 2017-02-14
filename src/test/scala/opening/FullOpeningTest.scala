@@ -5,7 +5,7 @@ import org.specs2.mutable.Specification
 
 class FullOpeningTest extends Specification {
 
-  def searchStr(str: String) = 
+  def searchStr(str: String) =
     FullOpeningDB search str.split(' ').toList map (_.opening)
 
   "search" should {

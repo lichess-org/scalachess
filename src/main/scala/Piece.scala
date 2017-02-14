@@ -15,9 +15,9 @@ case class Piece(color: Color, role: Role) {
 
   // attackable positions assuming empty board
   def eyes(from: Pos, to: Pos): Boolean = role match {
-    case King   => from touches to
-    case Queen  => (from onSameLine to) || (from onSameDiagonal to)
-    case Rook   => from onSameLine to
+    case King => from touches to
+    case Queen => (from onSameLine to) || (from onSameDiagonal to)
+    case Rook => from onSameLine to
     case Bishop => from onSameDiagonal to
     case Knight => from.color != to.color && {
       val xd = from xDist to

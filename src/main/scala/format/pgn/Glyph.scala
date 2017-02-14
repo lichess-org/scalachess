@@ -9,14 +9,15 @@ case class Glyph(id: Int, symbol: String, name: String) {
 case class Glyphs(
     move: Option[Glyph.MoveAssessment],
     position: Option[Glyph.PositionAssessment],
-    observations: List[Glyph.Observation]) {
+    observations: List[Glyph.Observation]
+) {
 
   def isEmpty = this == Glyphs.empty
 
   def nonEmpty: Option[Glyphs] = if (isEmpty) None else Some(this)
 
   def toggle(glyph: Glyph) = glyph match {
-    case g: Glyph.MoveAssessment     => copy(move = !move.contains(g) option g)
+    case g: Glyph.MoveAssessment => copy(move = !move.contains(g) option g)
     case g: Glyph.PositionAssessment => copy(position = !position.contains(g) option g)
     case g: Glyph.Observation => copy(observations =
       if (observations contains g) observations.filter(g !=)
@@ -30,7 +31,8 @@ case class Glyphs(
     else Glyphs(
       g.move orElse move,
       g.position orElse position,
-      (g.observations ::: observations).distinct)
+      (g.observations ::: observations).distinct
+    )
 
   def toList: List[Glyph] = move.toList ::: position.toList ::: observations
 }
@@ -41,7 +43,8 @@ object Glyphs {
   def fromList(glyphs: List[Glyph]) = Glyphs(
     move = glyphs.collectFirst { case g: Glyph.MoveAssessment => g },
     position = glyphs.collectFirst { case g: Glyph.PositionAssessment => g },
-    observations = glyphs.collect { case g: Glyph.Observation => g })
+    observations = glyphs.collect { case g: Glyph.Observation => g }
+  )
 }
 
 object Glyph {

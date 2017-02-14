@@ -13,8 +13,8 @@ case class Situation(board: Board, color: Color) {
   lazy val destinations: Map[Pos, List[Pos]] = moves mapValues { _ map (_.dest) }
 
   def drops: Option[List[Pos]] = board.variant match {
-    case v@variant.Crazyhouse => v possibleDrops this
-    case _                    => None
+    case v @ variant.Crazyhouse => v possibleDrops this
+    case _ => None
   }
 
   lazy val kingPos: Option[Pos] = board kingPosOf color
@@ -76,11 +76,11 @@ case class Situation(board: Board, color: Color) {
     history.lastMove match {
       case Some(move: Uci.Move) =>
         if (move.dest.yDist(move.orig) == 2 &&
-            board.actorAt(move.dest).exists(_.piece.is(Pawn)) &&
-            List(
-              Pos.posAt(move.dest.x - 1, color.passablePawnY),
-              Pos.posAt(move.dest.x + 1, color.passablePawnY)
-            ).flatten.flatMap(board.actorAt).exists(_.piece == color.pawn))
+          board.actorAt(move.dest).exists(_.piece.is(Pawn)) &&
+          List(
+            Pos.posAt(move.dest.x - 1, color.passablePawnY),
+            Pos.posAt(move.dest.x + 1, color.passablePawnY)
+          ).flatten.flatMap(board.actorAt).exists(_.piece == color.pawn))
           moves.values.flatten.find(_.enpassant).map(_.dest)
         else None
       case _ => None

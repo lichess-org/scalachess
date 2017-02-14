@@ -69,6 +69,5 @@ K n    """)
       failureGame must beFailure
     }
 
-
   }
 }

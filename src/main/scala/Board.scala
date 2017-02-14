@@ -8,7 +8,8 @@ case class Board(
     pieces: PieceMap,
     history: History,
     variant: Variant,
-    crazyData: Option[Crazyhouse.Data] = None) {
+    crazyData: Option[Crazyhouse.Data] = None
+) {
 
   import implicitFailures._
 
@@ -141,8 +142,10 @@ case class Board(
         whiteKingSide = castles.whiteKingSide && wkReady && rookReady(White, wkPos, false),
         whiteQueenSide = castles.whiteQueenSide && wkReady && rookReady(White, wkPos, true),
         blackKingSide = castles.blackKingSide && bkReady && rookReady(Black, bkPos, false),
-        blackQueenSide = castles.blackQueenSide && bkReady && rookReady(Black, bkPos, true))
-    } else Castles.none
+        blackQueenSide = castles.blackQueenSide && bkReady && rookReady(Black, bkPos, true)
+      )
+    }
+    else Castles.none
   }
 
   def updateHistory(f: History => History) = copy(history = f(history))

@@ -6,7 +6,8 @@ import Pos.posAt
 case class Actor(
     piece: Piece,
     pos: Pos,
-    board: Board) {
+    board: Board
+) {
 
   import Actor._
 
@@ -16,16 +17,16 @@ case class Actor(
   def trustedMoves(withCastle: Boolean): List[Move] = {
     val moves = piece.role match {
 
-      case Bishop             => longRange(Bishop.dirs)
+      case Bishop => longRange(Bishop.dirs)
 
-      case Queen              => longRange(Queen.dirs)
+      case Queen => longRange(Queen.dirs)
 
-      case Knight             => shortRange(Knight.dirs)
+      case Knight => shortRange(Knight.dirs)
 
       case King if withCastle => shortRange(King.dirs) ++ castle
-      case King               => shortRange(King.dirs)
+      case King => shortRange(King.dirs)
 
-      case Rook               => longRange(Rook.dirs)
+      case Rook => longRange(Rook.dirs)
 
       case Pawn => pawnDir(pos) map { next =>
         val fwd = Some(next) filterNot board.pieces.contains
@@ -45,7 +46,7 @@ case class Actor(
           victimFrom ← pawnDir(victimPos) flatMap pawnDir
           if history.lastMove.exists {
             case Uci.Move(orig, dest, _) => orig == victimFrom && dest == victimPos
-            case _                       => false
+            case _ => false
           }
           b ← board.taking(pos, targetPos, Some(victimPos))
         } yield move(targetPos, b, Some(victimPos), enpassant = true)
@@ -123,7 +124,7 @@ case class Actor(
     b1 ← board take rookPos
     b2 ← newKingPos match {
       case p if p == kingPos => Some(b1)
-      case p                 => b1.move(kingPos, p)
+      case p => b1.move(kingPos, p)
     }
     b3 ← b2.place(color.rook, newRookPos)
     b4 = b3 updateHistory (_ withoutCastles color)
@@ -142,7 +143,7 @@ case class Actor(
   private def longRange(dirs: Directions): List[Move] = {
 
     def forward(p: Pos, dir: Direction): List[Move] = dir(p) match {
-      case None                        => Nil
+      case None => Nil
       case Some(next) if friends(next) => Nil
       case Some(next) if enemies(next) => board.taking(pos, next) map { b =>
         move(next, b, Some(next))
@@ -163,7 +164,8 @@ case class Actor(
     capture: Option[Pos] = None,
     castle: Option[((Pos, Pos), (Pos, Pos))] = None,
     promotion: Option[PromotableRole] = None,
-    enpassant: Boolean = false) = Move(
+    enpassant: Boolean = false
+  ) = Move(
     piece = piece,
     orig = pos,
     dest = dest,
@@ -172,7 +174,8 @@ case class Actor(
     capture = capture,
     castle = castle,
     promotion = promotion,
-    enpassant = enpassant)
+    enpassant = enpassant
+  )
 
   private def history = board.history
   private val friends = board occupation color

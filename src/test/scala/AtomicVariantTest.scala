@@ -373,7 +373,8 @@ class AtomicVariantTest extends ChessTest {
           G1 -> F3,
           D5 -> E4,
           F1 -> B5,
-          D8 -> D2))
+          D8 -> D2
+        ))
         successGame must beSuccess.like {
           case game =>
             game.situation.pp.variantEnd must beTrue

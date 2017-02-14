@@ -6,7 +6,8 @@ case class StartingPosition(
     fen: String,
     wikiPath: String,
     moves: String,
-    featurable: Boolean = true) {
+    featurable: Boolean = true
+) {
 
   def url = s"https://en.wikipedia.org/wiki/$wikiPath"
 
@@ -164,7 +165,8 @@ object StartingPosition {
     )),
     Category("g3", List(
       StartingPosition("A00", "Hungarian Opening", "rnbqkbnr/pppppppp/8/8/8/6P1/PPPPPP1P/RNBQKBNR b KQkq - 1 1", "King's_Fianchetto_Opening", "1. g3", false)
-    )))
+    ))
+  )
 
   val all: IndexedSeq[StartingPosition] = categories.flatMap(_.positions).toIndexedSeq
 

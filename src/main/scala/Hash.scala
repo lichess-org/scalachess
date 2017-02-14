@@ -4,8 +4,7 @@ final class Hash(size: Int) {
 
   private[chess] def hexToBytes(str: String): PositionHash = {
     str.grouped(2).map(cc =>
-      (Character.digit(cc(0), 16) << 4 | Character.digit(cc(1), 16)).toByte
-    ).take(size).toArray
+      (Character.digit(cc(0), 16) << 4 | Character.digit(cc(1), 16)).toByte).take(size).toArray
   }
 
   def apply(situation: Situation): PositionHash = {
@@ -17,8 +16,7 @@ final class Hash(size: Int) {
       val m = Hash.get(situation, Hash.randomTable)
       Array.tabulate(size)(i =>
         if (i < 8) (l >>> ((7 - i) * 8)).toByte
-        else (m >>> ((15 - i) * 8)).toByte
-      )
+        else (m >>> ((15 - i) * 8)).toByte)
     }
   }
 }
@@ -45,12 +43,12 @@ object Hash {
   private lazy val randomTable = new ZobristConstants(16)
 
   private def roleIndex(role: Role) = role match {
-    case Pawn   => 0
+    case Pawn => 0
     case Knight => 1
     case Bishop => 2
-    case Rook   => 3
-    case Queen  => 4
-    case King   => 5
+    case Rook => 3
+    case Queen => 4
+    case King => 5
   }
 
   private def pieceIndex(piece: Piece) =

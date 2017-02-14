@@ -9,7 +9,8 @@ case object Horde extends Variant(
   name = "Horde",
   shortName = "horde",
   title = "Destroy the horde to win!",
-  standardInitialPosition = false) {
+  standardInitialPosition = false
+) {
 
   /**
    * In Horde chess white advances against black with a horde of pawns.
@@ -46,7 +47,8 @@ case object Horde extends Variant(
   override def specialEnd(situation: Situation) =
     situation.board.piecesOf(White).isEmpty
 
-  /** In horde chess, black always has a possibility to win the game.
+  /**
+   * In horde chess, black always has a possibility to win the game.
    *  Auto-drawing the game should never happen, but it did in https://en.lichess.org/xQ2RsU8N#121
    */
   override def insufficientWinningMaterial(board: Board) = false
@@ -58,7 +60,7 @@ case object Horde extends Variant(
   override def insufficientWinningMaterial(board: Board, color: Color) = {
     color == Color.white && board.piecesOf(Color.white).size == 1 ||
       board.piecesOf(Color.white).size == 2 &&
-        board.piecesOf(Color.white).forall(_._2.isMinor)
+      board.piecesOf(Color.white).forall(_._2.isMinor)
   }
 
   override def isUnmovedPawn(color: Color, pos: Pos) = {

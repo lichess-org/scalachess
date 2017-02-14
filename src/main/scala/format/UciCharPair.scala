@@ -11,11 +11,12 @@ object UciCharPair {
   import implementation._
 
   def apply(uci: Uci): UciCharPair = uci match {
-    case Uci.Move(orig, dest, None)       => UciCharPair(toChar(orig), toChar(dest))
+    case Uci.Move(orig, dest, None) => UciCharPair(toChar(orig), toChar(dest))
     case Uci.Move(orig, dest, Some(role)) => UciCharPair(toChar(orig), toChar(dest.x, role))
     case Uci.Drop(role, pos) => UciCharPair(
       toChar(pos),
-      dropRole2charMap.getOrElse(role, voidChar))
+      dropRole2charMap.getOrElse(role, voidChar)
+    )
   }
 
   private[format] object implementation {

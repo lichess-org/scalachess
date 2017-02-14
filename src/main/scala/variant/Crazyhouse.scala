@@ -11,7 +11,8 @@ case object Crazyhouse extends Variant(
   name = "Crazyhouse",
   shortName = "crazy",
   title = "Captured pieces can be dropped back on the board instead of moving a piece.",
-  standardInitialPosition = true) {
+  standardInitialPosition = true
+) {
 
   override val initialFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1"
 
@@ -34,7 +35,8 @@ case object Crazyhouse extends Variant(
     piece = piece,
     pos = pos,
     before = situation.board,
-    after = board1 withCrazyData d2)
+    after = board1 withCrazyData d2
+  )
 
   override def updatePositionHashes(board: Board, move: Move, hash: chess.PositionHash) =
     updateHashes(hash, board, !move.piece.color)
@@ -102,7 +104,8 @@ case object Crazyhouse extends Variant(
       // when captured and put in the pocket.
       // there we need to remember which pieces are issued from promotions.
       // we do that by tracking their positions on the board.
-      promoted: Set[Pos]) {
+      promoted: Set[Pos]
+  ) {
 
     def drop(piece: Piece, pos: Pos): Option[Data] =
       pockets take piece map { nps =>
@@ -112,7 +115,8 @@ case object Crazyhouse extends Variant(
     def store(piece: Piece, from: Pos) =
       copy(
         pockets = pockets store promoted(from).fold(piece.color.pawn, piece),
-        promoted = promoted - from)
+        promoted = promoted - from
+      )
 
     def promote(pos: Pos) = copy(promoted = promoted + pos)
 
@@ -131,11 +135,13 @@ case object Crazyhouse extends Variant(
 
     def take(piece: Piece): Option[Pockets] = piece.color.fold(
       white take piece.role map { np => copy(white = np) },
-      black take piece.role map { np => copy(black = np) })
+      black take piece.role map { np => copy(black = np) }
+    )
 
     def store(piece: Piece) = copy(
       white = piece.color.fold(white, white store piece.role),
-      black = piece.color.fold(black store piece.role, black))
+      black = piece.color.fold(black store piece.role, black)
+    )
   }
 
   case class Pocket(roles: List[Role]) {

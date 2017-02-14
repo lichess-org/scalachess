@@ -7,7 +7,8 @@ case object Antichess extends Variant(
   name = "Antichess",
   shortName = "Anti",
   title = "Lose all your pieces (or reach a stalemate) to win the game.",
-  standardInitialPosition = true) {
+  standardInitialPosition = true
+) {
 
   // In antichess, it is not permitted to castle
   override val castles = Castles.none
@@ -42,7 +43,7 @@ case object Antichess extends Variant(
   // No player can win if the only remaining pieces are opposing bishops on different coloured
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color
   // of square to allow the player to force their opponent to capture their bishop, also resulting in a draw
-  override def insufficientWinningMaterial (board: Board) = {
+  override def insufficientWinningMaterial(board: Board) = {
     val actors = board.actors
 
     // Exit early if we are not in a situation with only bishops and pawns

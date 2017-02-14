@@ -14,7 +14,8 @@ object Reader {
   def fullWithSans(
     pgn: String,
     op: List[San] => List[San],
-    tags: List[Tag] = Nil): Valid[Replay] = for {
+    tags: List[Tag] = Nil
+  ): Valid[Replay] = for {
     parsed ← Parser.full(pgn)
     game = makeGame(parsed.tags ::: tags)
     replay ← makeReplay(game, op(parsed.sans))
@@ -26,7 +27,8 @@ object Reader {
   def movesWithSans(
     moveStrs: List[String],
     op: List[San] => List[San],
-    tags: List[Tag]): Valid[Replay] = for {
+    tags: List[Tag]
+  ): Valid[Replay] = for {
     moves ← Parser.moves(moveStrs, Parser.getVariantFromTags(tags))
     game = makeGame(tags)
     replay ← makeReplay(game, op(moves))
@@ -44,6 +46,6 @@ object Reader {
     variantOption = tags.find(_.name == Tag.Variant).map(_.value).flatMap(chess.variant.Variant.byName),
     fen = tags.find(_.name == Tag.FEN).map(_.value)
   ) |> { g =>
-    g.copy(startedAtTurn = g.turns)
-  }
+      g.copy(startedAtTurn = g.turns)
+    }
 }

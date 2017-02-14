@@ -4,7 +4,8 @@ package opening
 final class FullOpening(
     val eco: String,
     val name: String,
-    val fen: String) {
+    val fen: String
+) {
 
   def ecoName = s"$eco $name"
 

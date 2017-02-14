@@ -7,7 +7,8 @@ case object Chess960 extends Variant(
   name = "Chess960",
   shortName = "960",
   title = "Starting position of the home rank pieces is randomized.",
-  standardInitialPosition = false) {
+  standardInitialPosition = false
+) {
 
   override def pieces = Variant.symmetricRank {
     positions(scala.util.Random.nextInt(960)) flatMap Role.allByForsyth.get
@@ -976,5 +977,6 @@ case object Chess960 extends Variant(
     "rbkrnnbq",
     "rkrbnnbq",
     "rkrnnbbq",
-    "rkrnnqbb")
+    "rkrnnqbb"
+  )
 }

@@ -9,7 +9,7 @@ class PieceTest extends ChessTest {
       }
       "value and - method" in {
         val color = White
-        !color-Pawn must_== Black - Pawn
+        !color - Pawn must_== Black - Pawn
       }
     }
   }

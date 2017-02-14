@@ -14,7 +14,8 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     san: String,
     glyphs: Glyphs,
     comments: List[String],
-    variations: List[List[StrMove]])
+    variations: List[List[StrMove]]
+  )
 
   def full(pgn: String): Valid[ParsedPgn] = try {
     val preprocessed = pgn.lines.map(_.trim).filter {
@@ -50,10 +51,12 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
   def moves(str: String, variant: Variant): Valid[List[San]] = moves(
     str.split(' ').toList,
-    variant)
+    variant
+  )
   def moves(strMoves: List[String], variant: Variant): Valid[List[San]] = objMoves(
     strMoves.map { StrMove(_, Glyphs.empty, Nil, Nil) },
-    variant)
+    variant
+  )
   def objMoves(strMoves: List[StrMove], variant: Variant): Valid[List[San]] =
     strMoves.map {
       case StrMove(san, glyphs, comments, variations) => (
@@ -80,7 +83,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     def apply(pgn: String): Valid[(InitialPosition, List[StrMove], Option[Tag])] =
       parseAll(strMoves, pgn) match {
         case Success((init, moves, result), _) => succezz(init, moves, result map { r => Tag(_.Result, r) })
-        case err                               => "Cannot parse moves: %s\n%s".format(err.toString, pgn).failureNel
+        case err => "Cannot parse moves: %s\n%s".format(err.toString, pgn).failureNel
       }
 
     def strMoves: Parser[(InitialPosition, List[StrMove], Option[String])] = as("moves") {
@@ -146,7 +149,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     def apply(str: String, variant: Variant): Valid[San] = {
       if (str.size == 2) Pos.posAt(str).fold(slow(str)) { pos => succezz(Std(pos, Pawn)) }
       else str match {
-        case "O-O" | "o-o" | "0-0"       => succezz(Castle(KingSide))
+        case "O-O" | "o-o" | "0-0" => succezz(Castle(KingSide))
         case "O-O-O" | "o-o-o" | "0-0-0" => succezz(Castle(QueenSide))
         case MoveR(role, file, rank, capture, pos, prom, check, mate) =>
           role.headOption.fold[Option[Role]](Some(Pawn))(variant.rolesByPgn.get) flatMap { role =>
@@ -163,7 +166,9 @@ object Parser extends scalaz.syntax.ToTraverseOps {
                   checkmate = mate.nonEmpty,
                   comments = Nil,
                   glyphs = Glyphs.empty,
-                  variations = Nil)))
+                  variations = Nil
+                )
+              ))
             }
           } getOrElse slow(str)
         case DropR(roleS, posS, check, mate) =>
@@ -177,7 +182,9 @@ object Parser extends scalaz.syntax.ToTraverseOps {
                   checkmate = mate.nonEmpty,
                   comments = Nil,
                   glyphs = Glyphs.empty,
-                  variations = Nil)))
+                  variations = Nil
+                )
+              ))
             }
           } getOrElse s"Cannot parse drop: $str".failureNel
         case _ => slow(str)
@@ -187,7 +194,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     private def slow(str: String): Valid[San] =
       parseAll(move, str) match {
         case Success(san, _) => succezz(san)
-        case err             => "Cannot parse move: %s\n%s".format(err.toString, str).failureNel
+        case err => "Cannot parse move: %s\n%s".format(err.toString, str).failureNel
       }
 
     def move: Parser[San] = castle | standard
@@ -231,7 +238,8 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     def disambiguated: Parser[Std] = as("disambiguated") {
       role ~ opt(file) ~ opt(rank) ~ x ~ dest ^^ {
         case ro ~ fi ~ ra ~ ca ~ de => Std(
-          dest = de, role = ro, capture = ca, file = fi, rank = ra)
+          dest = de, role = ro, capture = ca, file = fi, rank = ra
+        )
       }
     }
 
@@ -239,7 +247,8 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     def disambiguatedPawn: Parser[Std] = as("disambiguated") {
       opt(file) ~ opt(rank) ~ x ~ dest ^^ {
         case fi ~ ra ~ ca ~ de => Std(
-          dest = de, role = Pawn, capture = ca, file = fi, rank = ra)
+          dest = de, role = Pawn, capture = ca, file = fi, rank = ra
+        )
       }
     }
 
@@ -254,7 +263,8 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     def glyph: Parser[Glyph] = as("glyph") {
       mapParser(
         Glyph.MoveAssessment.all.sortBy(_.symbol.size).map { g => g.symbol -> g },
-        "glyph")
+        "glyph"
+      )
     }
 
     val x = exists("x")
@@ -286,9 +296,9 @@ object Parser extends scalaz.syntax.ToTraverseOps {
   object TagParser extends RegexParsers with Logging {
 
     def apply(pgn: String): Valid[List[Tag]] = parseAll(all, pgn) match {
-      case f: Failure       => "Cannot parse tags: %s\n%s".format(f.toString, pgn).failureNel
+      case f: Failure => "Cannot parse tags: %s\n%s".format(f.toString, pgn).failureNel
       case Success(sans, _) => succezz(sans)
-      case err              => "Cannot parse tags: %s\n%s".format(err.toString, pgn).failureNel
+      case err => "Cannot parse tags: %s\n%s".format(err.toString, pgn).failureNel
     }
 
     def fromFullPgn(pgn: String): Valid[List[Tag]] =

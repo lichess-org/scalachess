@@ -82,7 +82,7 @@ object Divider {
 
     case (0, 4) => if (y < 7) 3 + (7 - y) else 0
 
-    case _      => 0
+    case _ => 0
   }
 
   private val mixednessRegions: List[List[Pos]] = {

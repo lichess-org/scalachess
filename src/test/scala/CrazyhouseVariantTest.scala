@@ -14,8 +14,10 @@ class CrazyhouseVariantTest extends ChessTest {
         b.withCrazyData(Crazyhouse.Data(
           pockets = Crazyhouse.Pockets(
             Crazyhouse.Pocket(Nil),
-            Crazyhouse.Pocket(Nil)),
-          promoted = Set.empty))
+            Crazyhouse.Pocket(Nil)
+          ),
+          promoted = Set.empty
+        ))
       }
       game.situation.checkMate must beTrue
     }
@@ -28,8 +30,10 @@ class CrazyhouseVariantTest extends ChessTest {
         b.withCrazyData(Crazyhouse.Data(
           pockets = Crazyhouse.Pockets(
             Crazyhouse.Pocket(Queen :: Nil),
-            Crazyhouse.Pocket(Rook :: Pawn :: Pawn :: Nil)),
-          promoted = Set.empty))
+            Crazyhouse.Pocket(Rook :: Pawn :: Pawn :: Nil)
+          ),
+          promoted = Set.empty
+        ))
       }
       game.situation.checkMate must beTrue
     }

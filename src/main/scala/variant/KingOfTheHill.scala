@@ -7,7 +7,8 @@ case object KingOfTheHill extends Variant(
   name = "King of the Hill",
   shortName = "KotH",
   title = "Bring your King to the center to win the game.",
-  standardInitialPosition = true) {
+  standardInitialPosition = true
+) {
 
   private val center = Set(Pos.D4, Pos.D5, Pos.E4, Pos.E5)
 

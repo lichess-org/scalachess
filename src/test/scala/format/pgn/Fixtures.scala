@@ -1,6 +1,7 @@
 package chess
 package format.pgn
 
+// format: OFF
 object Fixtures {
 
   val simple = "e3 Nc6 d4 Nf6"

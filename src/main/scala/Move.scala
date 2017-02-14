@@ -13,7 +13,8 @@ case class Move(
     promotion: Option[PromotableRole],
     castle: Option[((Pos, Pos), (Pos, Pos))],
     enpassant: Boolean,
-    lag: FiniteDuration = 0.millis) {
+    lag: FiniteDuration = 0.millis
+) {
 
   def situationBefore = before situationOf piece.color
   def situationAfter = finalizeAfter situationOf !piece.color
@@ -24,7 +25,8 @@ case class Move(
     val board = after updateHistory { h1 =>
       val h2 = h1.copy(
         lastMove = Some(toUci),
-        unmovedRooks = before.unmovedRooks)
+        unmovedRooks = before.unmovedRooks
+      )
 
       // my broken castles
       if ((piece is King) && h2.canCastle(color).any)
@@ -48,7 +50,8 @@ case class Move(
   def applyVariantEffect: Move = before.variant addVariantEffect this
 
   def afterWithLastMove = after.copy(
-    history = after.history.withLastMove(toUci))
+    history = after.history.withLastMove(toUci)
+  )
 
   // does this move capture an opponent piece?
   def captures = capture.isDefined

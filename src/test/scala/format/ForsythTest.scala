@@ -260,7 +260,7 @@ class ForsythTest extends ChessTest {
     "castling not allowed in variant" in {
       val fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
       val fix = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1"
-      (f <<@(Antichess, fen)).map(f >> _) must beSome(fix)
+      (f <<@ (Antichess, fen)).map(f >> _) must beSome(fix)
     }
   }
   "ignore impossible en passant squares" should {

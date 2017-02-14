@@ -6,7 +6,8 @@ import scalaz.Validation.FlatMap._
 case class ParsedPgn(
     initialPosition: InitialPosition,
     tags: List[Tag],
-    sans: List[San]) {
+    sans: List[San]
+) {
 
   def tag(name: String): Option[String] = Tag.find(tags, name)
 }
@@ -38,13 +39,15 @@ case class Std(
     file: Option[Int] = None,
     rank: Option[Int] = None,
     promotion: Option[PromotableRole] = None,
-    metas: Metas = Metas.empty) extends San {
+    metas: Metas = Metas.empty
+) extends San {
 
   def apply(situation: Situation) = move(situation) map Left.apply
 
   override def withSuffixes(s: Suffixes) = copy(
     metas = metas withSuffixes s,
-    promotion = s.promotion)
+    promotion = s.promotion
+  )
 
   def withMetas(m: Metas) = copy(metas = m)
 
@@ -57,7 +60,7 @@ case class Std(
         }
       case (m, _) => m
     } match {
-      case None       => s"No move found: $this\n$situation".failureNel
+      case None => s"No move found: $this\n$situation".failureNel
       case Some(move) => move withPromotion promotion toValid "Wrong promotion"
     }
 
@@ -67,7 +70,8 @@ case class Std(
 case class Drop(
     role: Role,
     pos: Pos,
-    metas: Metas = Metas.empty) extends San {
+    metas: Metas = Metas.empty
+) extends San {
 
   def apply(situation: Situation) = drop(situation) map Right.apply
 
@@ -78,19 +82,22 @@ case class Drop(
 }
 
 case class InitialPosition(
-  comments: List[String])
+  comments: List[String]
+)
 
 case class Metas(
     check: Boolean,
     checkmate: Boolean,
     comments: List[String],
     glyphs: Glyphs,
-    variations: List[List[San]]) {
+    variations: List[List[San]]
+) {
 
   def withSuffixes(s: Suffixes) = copy(
     check = s.check,
     checkmate = s.checkmate,
-    glyphs = s.glyphs)
+    glyphs = s.glyphs
+  )
 
   def withGlyphs(g: Glyphs) = copy(glyphs = g)
 
@@ -105,7 +112,8 @@ object Metas {
 
 case class Castle(
     side: Side,
-    metas: Metas = Metas.empty) extends San {
+    metas: Metas = Metas.empty
+) extends San {
 
   def apply(situation: Situation) = move(situation) map Left.apply
 
@@ -122,4 +130,5 @@ case class Suffixes(
   check: Boolean,
   checkmate: Boolean,
   promotion: Option[PromotableRole],
-  glyphs: Glyphs)
+  glyphs: Glyphs
+)

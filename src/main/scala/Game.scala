@@ -10,13 +10,15 @@ case class Game(
     pgnMoves: List[String] = Nil,
     clock: Option[Clock] = None,
     turns: Int = 0, // plies
-    startedAtTurn: Int = 0) {
+    startedAtTurn: Int = 0
+) {
 
   def apply(
     orig: Pos,
     dest: Pos,
     promotion: Option[PromotableRole] = None,
-    lag: FiniteDuration = 0.millis): Valid[(Game, Move)] =
+    lag: FiniteDuration = 0.millis
+  ): Valid[(Game, Move)] =
     situation.move(orig, dest, promotion).map(_.normalizeCastle withLag lag) map { move =>
       apply(move) -> move
     }
@@ -31,7 +33,8 @@ case class Game(
     val pgnMove = pgn.Dumper(situation, move, newGame.situation)
     newGame.copy(pgnMoves = pgnMoves.isEmpty.fold(
       List(pgnMove),
-      pgnMoves :+ pgnMove))
+      pgnMoves :+ pgnMove
+    ))
   }
 
   def drop(role: Role, pos: Pos, lag: FiniteDuration = 0.millis): Valid[(Game, Drop)] =
@@ -49,7 +52,8 @@ case class Game(
     val pgnMove = pgn.Dumper(situation, drop, newGame.situation)
     newGame.copy(pgnMoves = pgnMoves.isEmpty.fold(
       List(pgnMove),
-      pgnMoves :+ pgnMove))
+      pgnMoves :+ pgnMove
+    ))
   }
 
   private def applyClock(lag: FiniteDuration) = clock map {
@@ -102,10 +106,11 @@ object Game {
     }.fold(g) { parsed =>
       g.copy(
         board = parsed.situation.board withVariant g.board.variant withCrazyData {
-          parsed.situation.board.crazyData orElse g.board.crazyData
-        },
+        parsed.situation.board.crazyData orElse g.board.crazyData
+      },
         player = parsed.situation.color,
-        turns = parsed.turns)
+        turns = parsed.turns
+      )
     }
   }
 }

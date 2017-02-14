@@ -7,7 +7,8 @@ import scala._
 case class Pgn(
     tags: List[Tag],
     turns: List[Turn],
-    initial: Initial = Initial.empty) {
+    initial: Initial = Initial.empty
+) {
 
   def updateTurn(fullMove: Int, f: Turn => Turn) = {
     val index = fullMove - 1
@@ -54,7 +55,8 @@ object Initial {
 case class Turn(
     number: Int,
     white: Option[Move],
-    black: Option[Move]) {
+    black: Option[Move]
+) {
 
   def update(color: Color, f: Move => Move) = color.fold(
     copy(white = white map f),
@@ -75,10 +77,10 @@ case class Turn(
   override def toString = {
     val text = (white, black) match {
       case (Some(w), Some(b)) if w.isLong => s" $w $number... $b"
-      case (Some(w), Some(b))             => s" $w $b"
-      case (Some(w), None)                => s" $w"
-      case (None, Some(b))                => s".. $b"
-      case _                              => ""
+      case (Some(w), Some(b)) => s" $w $b"
+      case (Some(w), None) => s" $w"
+      case (None, Some(b)) => s".. $b"
+      case _ => ""
     }
     s"$number.$text"
   }
@@ -106,7 +108,8 @@ case class Move(
     result: Option[String] = None,
     variations: List[List[Turn]] = Nil,
     // time left for the user who made the move, after he made it
-    timeLeft: Option[Int] = None) {
+    timeLeft: Option[Int] = None
+) {
 
   def isLong = comments.nonEmpty || variations.nonEmpty
 
@@ -118,7 +121,7 @@ case class Move(
   override def toString = {
     val glyphStr = glyphs.toList.map({
       case glyph if glyph.id <= 6 => glyph.symbol
-      case glyph                  => s" $$${glyph.id}"
+      case glyph => s" $$${glyph.id}"
     }).mkString
     val commentsOrTime =
       if (comments.nonEmpty || timeLeft.isDefined || opening.isDefined || result.isDefined)

@@ -6,7 +6,8 @@ case class CheckCount(white: Int = 0, black: Int = 0) {
 
   def add(color: Color) = copy(
     white = white + color.fold(1, 0),
-    black = black + color.fold(0, 1))
+    black = black + color.fold(0, 1)
+  )
 
   def nonEmpty = white > 0 || black > 0
 
@@ -24,7 +25,8 @@ case class History(
     positionHashes: PositionHash = History.randomHashes(1),
     castles: Castles = Castles.all,
     checkCount: CheckCount = CheckCount(0, 0),
-    unmovedRooks: UnmovedRooks = UnmovedRooks.default) {
+    unmovedRooks: UnmovedRooks = UnmovedRooks.default
+) {
 
   /**
    * Halfmove clock: This is the number of halfmoves
@@ -44,7 +46,7 @@ case class History(
     positions.headOption match {
       case Some(Array(x, y, z)) => (positions count {
         case Array(x2, y2, z2) => x == x2 && y == y2 && z == z2
-        case _                 => false
+        case _ => false
       }) >= 3
       case _ => false
     }
@@ -82,21 +84,26 @@ object History {
 
   def make(
     lastMove: Option[String], // a2a4
-    castles: String): History = History(
+    castles: String
+  ): History = History(
     lastMove = lastMove flatMap Uci.apply,
     castles = Castles(castles),
-    positionHashes = Array())
+    positionHashes = Array()
+  )
 
   def castle(color: Color, kingSide: Boolean, queenSide: Boolean) =
     History().copy(
       castles = color match {
         case White => Castles.init.copy(
           whiteKingSide = kingSide,
-          whiteQueenSide = queenSide)
+          whiteQueenSide = queenSide
+        )
         case Black => Castles.init.copy(
           blackKingSide = kingSide,
-          blackQueenSide = queenSide)
-      })
+          blackQueenSide = queenSide
+        )
+      }
+    )
 
   def noCastle = History() withoutCastles White withoutCastles Black
 

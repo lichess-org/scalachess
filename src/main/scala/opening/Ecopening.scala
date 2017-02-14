@@ -7,7 +7,8 @@ final class Ecopening(
     val name: String,
     private val moves: String,
     val fen: Ecopening.FEN,
-    val lastMoveUci: String) extends Ordered[Ecopening] {
+    val lastMoveUci: String
+) extends Ordered[Ecopening] {
 
   private lazy val moveList = moves.split(' ').toList
 
@@ -18,8 +19,8 @@ final class Ecopening(
   lazy val formattedMoves: String =
     moveList.grouped(2).zipWithIndex.map {
       case (List(w, b), i) => s"${i + 1}. $w $b"
-      case (List(w), i)    => s"${i + 1}. $w"
-      case _               => ""
+      case (List(w), i) => s"${i + 1}. $w"
+      case _ => ""
     }.mkString(" ")
 
   def ecoName = s"$eco $name"

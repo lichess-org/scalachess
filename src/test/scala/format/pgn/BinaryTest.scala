@@ -75,7 +75,7 @@ class BinaryTest extends ChessTest {
         writeMove("O-O-O#") must_== "01000000,11110000"
       }
       "drop" in {
-        writeMove("N@a1") must_==  "01000000,10000010"
+        writeMove("N@a1") must_== "01000000,10000010"
       }
       "drop with check" in {
         writeMove("N@a1+") must_== "01000000,10001010"
@@ -93,7 +93,7 @@ class BinaryTest extends ChessTest {
         writeMove("K8a1") must_== "11000000,00100000,01000111"
       }
       "disambiguated fully" in {
-        writeMove("Kf4a1") must_==  "11000000,00100000,10101011"
+        writeMove("Kf4a1") must_== "11000000,00100000,10101011"
       }
       "disambiguated fully with capture" in {
         writeMove("Kf4xa1") must_== "11000000,00100100,10101011"
@@ -241,7 +241,7 @@ object BinaryTestUtils {
       s.charAt(i) match {
         case '1' => sum += mult
         case '0' =>
-        case x   => sys error s"invalid binary literal: $x in $s"
+        case x => sys error s"invalid binary literal: $x in $s"
       }
       mult *= 2
       i -= 1

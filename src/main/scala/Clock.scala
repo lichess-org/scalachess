@@ -26,7 +26,7 @@ sealed trait Clock {
 
   private def millisSinceFlag(c: Color): Option[Int] = (limit - elapsedTime(c)) match {
     case s if s <= 0 => Some((s * -1000).toInt)
-    case _           => None
+    case _ => None
   }
 
   def remainingTimes = Color.all map { c => c -> remainingTime(c) } toMap
@@ -81,7 +81,8 @@ case class RunningClock(
     blackTime: Float,
     whiteBerserk: Boolean,
     blackBerserk: Boolean,
-    timer: Double) extends Clock {
+    timer: Double
+) extends Clock {
 
   val timerOption = Some(timer)
 
@@ -102,7 +103,8 @@ case class RunningClock(
       (math.max(0, spentTime - lagCompensation) - incrementOf(color))
     ).copy(
         color = !color,
-        timer = t)
+        timer = t
+      )
   }
 
   def stop = PausedClock(
@@ -111,7 +113,8 @@ case class RunningClock(
     whiteTime = whiteTime + (if (color == White) (now - timer).toFloat else 0),
     blackTime = blackTime + (if (color == Black) (now - timer).toFloat else 0),
     whiteBerserk = whiteBerserk,
-    blackBerserk = blackBerserk)
+    blackBerserk = blackBerserk
+  )
 
   def addTime(c: Color, t: Float): RunningClock = c match {
     case White => copy(whiteTime = whiteTime + t)
@@ -122,7 +125,8 @@ case class RunningClock(
 
   def berserk(c: Color): RunningClock = addTime(c, Clock.berserkPenalty(this, color)).copy(
     whiteBerserk = whiteBerserk || c.white,
-    blackBerserk = blackBerserk || c.black)
+    blackBerserk = blackBerserk || c.black
+  )
 
   def switch: RunningClock = copy(color = !color)
 
@@ -131,7 +135,8 @@ case class RunningClock(
     val spentTime = (t - timer).toFloat
     addTime(color, spentTime).copy(
       color = !color,
-      timer = t)
+      timer = t
+    )
   }
 }
 
@@ -141,7 +146,8 @@ case class PausedClock(
     whiteTime: Float,
     blackTime: Float,
     whiteBerserk: Boolean,
-    blackBerserk: Boolean) extends Clock {
+    blackBerserk: Boolean
+) extends Clock {
 
   val timerOption = None
 
@@ -156,7 +162,8 @@ case class PausedClock(
 
   def berserk(c: Color): PausedClock = addTime(c, Clock.berserkPenalty(this, color)).copy(
     whiteBerserk = c.fold(true, whiteBerserk),
-    blackBerserk = c.fold(blackBerserk, true))
+    blackBerserk = c.fold(blackBerserk, true)
+  )
 
   def switch: PausedClock = copy(color = !color)
 
@@ -169,7 +176,8 @@ case class PausedClock(
     blackTime = blackTime,
     whiteBerserk = whiteBerserk,
     blackBerserk = blackBerserk,
-    timer = now)
+    timer = now
+  )
 }
 
 object Clock {
@@ -212,7 +220,8 @@ object Clock {
       whiteTime = 0f,
       blackTime = 0f,
       whiteBerserk = false,
-      blackBerserk = false)
+      blackBerserk = false
+    )
     if (clock.limit == 0) clock
       .giveTime(White, config.increment.max(minInitLimit))
       .giveTime(Black, config.increment.max(minInitLimit))
@@ -223,10 +232,10 @@ object Clock {
 
   def showLimit(limit: Int) = limit match {
     case l if l % 60 == 0 => l / 60
-    case 30               => "½"
-    case 45               => "¾"
-    case 90               => "1.5"
-    case _                => limitFormatter.format(limit / 60d)
+    case 30 => "½"
+    case 45 => "¾"
+    case 90 => "1.5"
+    case _ => limitFormatter.format(limit / 60d)
   }
 
   private[chess] def berserkPenalty(clock: Clock, color: Color): Int = {

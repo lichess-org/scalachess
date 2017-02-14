@@ -101,16 +101,16 @@ class PawnTest extends ChessTest {
           D5 -> White.pawn,
           E5 -> Black.rook
         ) withHistory History(
-          lastMove = Some(Uci.Move(E7, E5))
-        ) destsFrom D5 must bePoss(D6)
+            lastMove = Some(Uci.Move(E7, E5))
+          ) destsFrom D5 must bePoss(D6)
       }
       "friend pawn (?!)" in {
         makeBoard(
           D5 -> White.pawn,
           E5 -> White.pawn
         ) withHistory History(
-          lastMove = Some(Uci.Move(E7, E5))
-        ) destsFrom D5 must bePoss(D6)
+            lastMove = Some(Uci.Move(E7, E5))
+          ) destsFrom D5 must bePoss(D6)
       }
     }
   }
@@ -201,8 +201,8 @@ class PawnTest extends ChessTest {
           D4 -> Black.pawn,
           E4 -> White.rook
         ) withHistory History(
-          lastMove = Some(Uci.Move(E2, E4))
-        ) destsFrom D4 must bePoss(D3)
+            lastMove = Some(Uci.Move(E2, E4))
+          ) destsFrom D4 must bePoss(D3)
       }
     }
   }

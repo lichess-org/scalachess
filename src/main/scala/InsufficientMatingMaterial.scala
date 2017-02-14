@@ -18,7 +18,7 @@ object InsufficientMatingMaterial {
     val notKingPieces = nonKingPieces(board)
     val onlyBishopsRemain = !notKingPieces.exists(_._2.role != Bishop)
 
-    def bishopsOnSameColor  = notKingPieces.map(_._1.color).distinct.size == 1
+    def bishopsOnSameColor = notKingPieces.map(_._1.color).distinct.size == 1
     def bishopsAreSameColor = notKingPieces.map(_._2.color).distinct.size == 1
 
     if (!onlyBishopsRemain) false
@@ -63,6 +63,6 @@ object InsufficientMatingMaterial {
   def apply(board: Board, color: Color) =
     board rolesOf color filter (King !=) match {
       case Nil | List(Knight) | List(Bishop) => true
-      case _                                 => false
+      case _ => false
     }
 }

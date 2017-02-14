@@ -135,7 +135,8 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
             black = Move("Nb4", glyphs = Glyphs(
               Glyph.MoveAssessment.blunder.some,
               Glyph.PositionAssessment.whiteMuchBetter.some,
-              List(Glyph.Observation.timeTrouble))).some
+              List(Glyph.Observation.timeTrouble)
+            )).some
           ),
           Turn(
             number = 3,
@@ -182,14 +183,16 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
     "empty" in {
       val pgn = Pgn(
         tags = List(),
-        turns = List())
+        turns = List()
+      )
       pgn.toString must_== """"""
     }
     "empty with initial comment" in {
       val pgn = Pgn(
         tags = List(),
         turns = List(),
-        initial = Initial(List("Why hello there!")))
+        initial = Initial(List("Why hello there!"))
+      )
       pgn.toString must_== """{ Why hello there! }"""
     }
     "empty with initial comments" in {
@@ -199,7 +202,8 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         initial = Initial(List(
           "Why hello there!",
           "The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one"
-        )))
+        ))
+      )
       pgn.toString must_== """{ Why hello there! } { The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one }"""
     }
     "moves with initial comments" in {
@@ -231,7 +235,8 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         initial = Initial(List(
           "Why hello there!",
           "The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one"
-        )))
+        ))
+      )
       pgn.toString must_== """{ Why hello there! } { The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one }
 1. d4 (1. e4) 1... Nf6 (1... d5)"""
     }

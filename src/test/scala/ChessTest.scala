@@ -63,7 +63,8 @@ trait ChessTest
     def playMove(
       orig: Pos,
       dest: Pos,
-      promotion: Option[PromotableRole] = None): Valid[Game] =
+      promotion: Option[PromotableRole] = None
+    ): Valid[Game] =
       game.apply(orig, dest, promotion) map (_._1)
 
     def withClock(c: Clock) = game.copy(clock = Some(c))

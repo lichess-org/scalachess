@@ -22,17 +22,13 @@ class VisualTest extends ChessTest {
     // "import partial board representation" in {
     //   f << """
     // P n
-// PPPP   P
-// RNBQK  R""" must_== (f << """
-
-
-
-
+    // PPPP   P
+    // RNBQK  R""" must_== (f << """
 
     // P n
-// PPPP   P
-// RNBQK  R
-// """)
+    // PPPP   P
+    // RNBQK  R
+    // """)
     // }
     "export with special marks" in {
       val board = Visual << """
@@ -45,7 +41,7 @@ N B    P
 PPPPPPPP
  NBQKBNR
 """
-      val markedBoard = f >>|(board, Map(Set(B3, D3, B5, D5, A6, E6, F7, G8) -> 'x'))
+      val markedBoard = f >>| (board, Map(Set(B3, D3, B5, D5, A6, E6, F7, G8) -> 'x'))
       f addNewLines markedBoard must_== """
 k B   x
      x
@@ -70,7 +66,8 @@ PPPPPPPP
 RNBQKBNR
 """
 
-  val examples = Seq(newBoardFormat,
+  val examples = Seq(
+    newBoardFormat,
     """
 rnbqkp r
 pppppppp

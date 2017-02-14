@@ -40,7 +40,7 @@ object Binary {
 
     def intMoves(bs: List[Int], pliesToGo: Int): List[String] = bs match {
       case _ if pliesToGo <= 0 => Nil
-      case Nil                 => Nil
+      case Nil => Nil
       case b1 :: rest if moveType(b1) == MoveType.SimplePawn =>
         simplePawn(b1) :: intMoves(rest, pliesToGo - 1)
       case b1 :: b2 :: rest if moveType(b1) == MoveType.SimplePiece =>
@@ -65,7 +65,7 @@ object Binary {
     def simplePiece(b1: Int, b2: Int): String =
       if (bitAt(b2, 2)) drop(b1, b2)
       else pieceStrs(b2 >> 5) match {
-        case castle@("O-O" | "O-O-O") => {
+        case castle @ ("O-O" | "O-O-O") => {
           val check = checkStrs(cut(b2, 5, 3))
           s"$castle$check"
         }
@@ -126,7 +126,7 @@ object Binary {
     import Encoding._
 
     def move(str: String): List[Byte] = (str match {
-      case pos if pos.size == 2  => simplePawn(pos)
+      case pos if pos.size == 2 => simplePawn(pos)
       case CastlingR(str, check) => castling(str, check)
       case SimplePieceR(piece, capture, pos, check) =>
         simplePiece(piece, pos, capture, check)

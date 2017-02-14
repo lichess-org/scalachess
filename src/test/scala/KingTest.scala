@@ -19,7 +19,7 @@ class KingTest extends ChessTest {
     "move behind pawn barrier" in {
       """
 PPPPPPPP
-R  QK NR""" destsFrom(E1) must bePoss(F1)
+R  QK NR""" destsFrom (E1) must bePoss(F1)
     }
 
     "not move to positions that are occupied by the same colour" in {

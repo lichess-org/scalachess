@@ -4,7 +4,8 @@ sealed abstract class Speed(
     val id: Int,
     val range: Range,
     val name: String,
-    val title: String) {
+    val title: String
+) {
 
   lazy val key = toString.toLowerCase
 }

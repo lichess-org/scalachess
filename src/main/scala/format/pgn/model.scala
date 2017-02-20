@@ -125,7 +125,7 @@ case class Move(
     }).mkString
     val commentsOrTime =
       if (comments.nonEmpty || timeLeft.isDefined || opening.isDefined || result.isDefined)
-        List(clockString, opening, result).flatten.:::(comments).map { text =>
+        List(clockString, opening, result).flatten.:::(comments map Move.noDoubleLineBreak).map { text =>
           s" { $text }"
         }.mkString
       else ""
@@ -134,4 +134,12 @@ case class Move(
       else variations.map(_.mkString(" (", " ", ")")).mkString(" ")
     s"$san$glyphStr$commentsOrTime$variationString"
   }
+}
+
+private object Move {
+
+  private val noDoubleLineBreakRegex = "(\r?\n){2,}".r
+
+  private def noDoubleLineBreak(txt: String) =
+    noDoubleLineBreakRegex.replaceAllIn(txt, "\n")
 }

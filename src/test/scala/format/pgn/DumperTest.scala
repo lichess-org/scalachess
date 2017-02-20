@@ -42,7 +42,7 @@ class DumperTest extends ChessTest {
   "dump a promotion move" should {
     "without check" in {
       val game = Game("""
-   
+
 P    k
 
 
@@ -58,7 +58,7 @@ KNBQ BNR
     "with check" in {
       val game = Game("""
     k
-P     
+P
 
 
 
@@ -73,7 +73,7 @@ KNBQ BNR
     "with checkmate" in {
       val game = Game("""
     k
-P  ppp  
+P  ppp
 
 
 
@@ -254,6 +254,29 @@ NRKNRQBB
       val game1 = Game(sit.board, sit.color)
       val (game2, move) = game1(Pos.F2, Pos.F3).toOption.get
       Dumper(game1.situation, move, game2.situation) must_== "Rf3"
+    }
+  }
+  "move comment" should {
+    "simple" in {
+      Move("e4", List("Some comment")).toString must_== "e4 { Some comment }"
+    }
+    "one line break" in {
+      Move("e4", List("""Some
+comment""")).toString must_== """e4 { Some
+comment }"""
+    }
+    "two line breaks" in {
+      Move("e4", List("""Some
+
+comment""")).toString must_== """e4 { Some
+comment }"""
+    }
+    "three line breaks" in {
+      Move("e4", List("""Some
+
+
+comment""")).toString must_== """e4 { Some
+comment }"""
     }
   }
 }

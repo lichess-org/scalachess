@@ -136,7 +136,7 @@ case class Move(
   }
 }
 
-private object Move {
+object Move {
 
   private val noDoubleLineBreakRegex = "(\r?\n){2,}".r
 

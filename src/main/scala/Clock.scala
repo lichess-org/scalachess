@@ -24,6 +24,9 @@ sealed trait Clock {
 
   def remainingTime(c: Color) = math.max(0, limit - elapsedTime(c))
 
+  def remainingDuration(c: Color): FiniteDuration =
+    (remainingTime(c) * 1000).toLong.millis
+
   private def millisSinceFlag(c: Color): Option[Int] = (limit - elapsedTime(c)) match {
     case s if s <= 0 => Some((s * -1000).toInt)
     case _ => None

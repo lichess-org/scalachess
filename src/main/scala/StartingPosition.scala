@@ -176,7 +176,7 @@ object StartingPosition {
 
   private val ecoIndex: Map[String, StartingPosition] = all.map { p =>
     p.eco -> p
-  }.toMap
+  }(scala.collection.breakOut)
 
   val featurable = all.filter(_.featurable)
 

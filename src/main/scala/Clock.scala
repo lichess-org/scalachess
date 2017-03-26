@@ -32,7 +32,7 @@ sealed trait Clock {
     case _ => None
   }
 
-  def remainingTimes = Color.all map { c => c -> remainingTime(c) } toMap
+  def remainingTimes = Map(White -> remainingTime(White), Black -> remainingTime(Black))
 
   def elapsedTime(c: Color) = time(c)
 

@@ -10,6 +10,8 @@ case object KingOfTheHill extends Variant(
   standardInitialPosition = true
 ) {
 
+  def pieces = Standard.pieces
+
   private val center = Set(Pos.D4, Pos.D5, Pos.E4, Pos.E5)
 
   override def specialEnd(situation: Situation) =

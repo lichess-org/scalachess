@@ -33,9 +33,9 @@ case class Board(
 
   def piecesOf(c: Color): Map[Pos, Piece] = pieces filter (_._2 is c)
 
-  lazy val kingPos: Map[Color, Pos] = pieces collect {
+  lazy val kingPos: Map[Color, Pos] = pieces.collect {
     case (pos, Piece(color, King)) => color -> pos
-  } toMap
+  }(scala.collection.breakOut)
 
   def kingPosOf(c: Color): Option[Pos] = kingPos get c
 

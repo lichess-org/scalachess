@@ -2,6 +2,7 @@ package chess
 package format.pgn
 
 import scala.util.Try
+import scala.collection.breakOut
 
 object Binary {
 
@@ -20,13 +21,13 @@ object Binary {
 
   private object Encoding {
     val pieceInts: Map[String, Int] = Map("K" -> 1, "Q" -> 2, "R" -> 3, "N" -> 4, "B" -> 5, "O-O" -> 6, "O-O-O" -> 7)
-    val pieceStrs: Map[Int, String] = (pieceInts map { case (k, v) => v -> k }).toMap
+    val pieceStrs: Map[Int, String] = (pieceInts map { case (k, v) => v -> k })(breakOut)
     val dropPieceInts: Map[String, Int] = Map("P" -> 1, "Q" -> 2, "R" -> 3, "N" -> 4, "B" -> 5)
-    val dropPieceStrs: Map[Int, String] = (dropPieceInts map { case (k, v) => v -> k }).toMap
+    val dropPieceStrs: Map[Int, String] = (dropPieceInts map { case (k, v) => v -> k })(breakOut)
     val promotionInts: Map[String, Int] = Map("" -> 0, "Q" -> 1, "R" -> 2, "N" -> 3, "B" -> 4, "K" -> 6)
-    val promotionStrs: Map[Int, String] = (promotionInts map { case (k, v) => v -> k }).toMap
+    val promotionStrs: Map[Int, String] = (promotionInts map { case (k, v) => v -> k })(breakOut)
     val checkInts: Map[String, Int] = Map("" -> 0, "+" -> 1, "#" -> 2)
-    val checkStrs: Map[Int, String] = (checkInts map { case (k, v) => v -> k }).toMap
+    val checkStrs: Map[Int, String] = (checkInts map { case (k, v) => v -> k })(breakOut)
   }
 
   private object Reader {

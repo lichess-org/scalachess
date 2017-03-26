@@ -7,9 +7,9 @@ object FullOpeningDB {
 
   private def all: Vector[FullOpening] = FullOpeningPart1.db ++ FullOpeningPart2.db
 
-  lazy val byFen = all.map { o =>
+  lazy val byFen: Map[String, FullOpening] = all.map { o =>
     o.fen -> o
-  }.toMap
+  }(scala.collection.breakOut)
 
   def findByFen(fen: String) = byFen get fen.split(' ').take(3).mkString(" ")
 

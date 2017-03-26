@@ -15,7 +15,7 @@ case object Horde extends Variant(
   /**
    * In Horde chess white advances against black with a horde of pawns.
    */
-  override lazy val pieces: Map[Pos, Piece] = {
+  lazy val pieces: Map[Pos, Piece] = {
 
     val frontPawns = List(Pos.B5, Pos.C5, Pos.F5, Pos.G5).map { _ -> White.pawn }
 
@@ -63,9 +63,7 @@ case object Horde extends Variant(
       board.piecesOf(Color.white).forall(_._2.isMinor)
   }
 
-  override def isUnmovedPawn(color: Color, pos: Pos) = {
-    color == White && (pos.y == 1 || pos.y == 2)
-  } || {
-    color == Black && pos.y == 7
-  }
+  override def isUnmovedPawn(color: Color, pos: Pos) =
+    if (color.white) pos.y == 1 || pos.y == 2
+    else pos.y == 7
 }

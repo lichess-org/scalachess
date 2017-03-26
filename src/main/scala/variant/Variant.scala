@@ -1,8 +1,10 @@
 package chess
 package variant
 
-import Pos.posAt
+import scala.collection.breakOut
 import scalaz.Validation.FlatMap._
+
+import Pos.posAt
 
 abstract class Variant(
     val id: Int,
@@ -12,6 +14,8 @@ abstract class Variant(
     val title: String,
     val standardInitialPosition: Boolean
 ) {
+
+  def pieces: Map[Pos, Piece]
 
   def standard = this == Standard
   def chess960 = this == Chess960
@@ -28,9 +32,7 @@ abstract class Variant(
 
   def allowsCastling = !castles.isEmpty
 
-  protected def backRank = IndexedSeq(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
-
-  def pieces: Map[Pos, Piece] = Variant.symmetricRank(backRank)
+  protected val backRank = Vector(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
 
   def castles: Castles = Castles.all
 
@@ -42,9 +44,9 @@ abstract class Variant(
     case _ => false
   }
 
-  def validMoves(situation: Situation): Map[Pos, List[Move]] = situation.actors collect {
+  def validMoves(situation: Situation): Map[Pos, List[Move]] = situation.actors.collect {
     case actor if actor.moves.nonEmpty => actor.pos -> actor.moves
-  } toMap
+  }(breakOut)
 
   // Optimised for performance
   def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean = {
@@ -152,22 +154,16 @@ abstract class Variant(
 
   def valid(board: Board, strict: Boolean) = Color.all forall validSide(board, strict)_
 
-  def roles = List(Rook, Knight, King, Bishop, King, Queen, Pawn)
+  val roles = List(Rook, Knight, King, Bishop, King, Queen, Pawn)
 
-  def promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
+  val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
 
-  def rolesByForsyth: Map[Char, Role] = this.roles map { r => (r.forsyth, r) } toMap
+  lazy val rolesByPgn: Map[Char, Role] = roles.map { r => (r.pgn, r) }(breakOut)
 
-  def rolesByPgn: Map[Char, Role] = this.roles map { r => (r.pgn, r) } toMap
+  lazy val rolesPromotableByPgn: Map[Char, PromotableRole] =
+    promotableRoles.map { r => (r.pgn, r) }(breakOut)
 
-  def rolesPromotableByPgn: Map[Char, PromotableRole] =
-    promotableRoles map { r => (r.pgn, r) } toMap
-
-  def isUnmovedPawn(color: Color, pos: Pos) = {
-    color == White && pos.y == 2
-  } || {
-    color == Black && pos.y == 7
-  }
+  def isUnmovedPawn(color: Color, pos: Pos) = pos.y == color.fold(2, 7)
 
   override def toString = s"Variant($name)"
 }

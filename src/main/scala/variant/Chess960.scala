@@ -10,7 +10,7 @@ case object Chess960 extends Variant(
   standardInitialPosition = false
 ) {
 
-  override def pieces = Variant.symmetricRank {
+  def pieces = Variant.symmetricRank {
     positions(scala.util.Random.nextInt(960)) flatMap Role.allByForsyth.get
   }
 

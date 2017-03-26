@@ -10,6 +10,8 @@ case object Atomic extends Variant(
   standardInitialPosition = true
 ) {
 
+  def pieces = Standard.pieces
+
   override def hasMoveEffects = true
 
   /** Move threatens to explode the opponent's king */

@@ -8,4 +8,7 @@ case object FromPosition extends Variant(
   shortName = "FEN",
   title = "Custom starting position",
   standardInitialPosition = false
-)
+) {
+
+  def pieces = Standard.pieces
+}

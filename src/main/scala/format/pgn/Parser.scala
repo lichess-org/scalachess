@@ -140,8 +140,8 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     override def skipWhitespace = false
 
     private def rangeToMap(r: Iterable[Char]) = r.zipWithIndex.toMap mapValues (_ + 1)
-    val fileMap = rangeToMap('a' to 'h')
-    val rankMap = rangeToMap('1' to '8')
+    private val fileMap = rangeToMap('a' to 'h')
+    private val rankMap = rangeToMap('1' to '8')
 
     private val MoveR = """^(N|B|R|Q|K|)([a-h]?)([1-8]?)(x?)([a-h][0-9])(=?[NBRQ]?)(\+?)(\#?)$""".r
     private val DropR = """^(N|B|R|Q|P)@([a-h][1-8])(\+?)(\#?)$""".r

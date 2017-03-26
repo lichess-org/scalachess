@@ -10,6 +10,8 @@ case object Antichess extends Variant(
   standardInitialPosition = true
 ) {
 
+  def pieces = Standard.pieces
+
   // In antichess, it is not permitted to castle
   override val castles = Castles.none
   override val initialFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1"
@@ -90,7 +92,7 @@ case object Antichess extends Variant(
     case _ => false
   }
 
-  override def roles = List(Rook, Knight, King, Bishop, Queen, Pawn)
+  override val roles = List(Rook, Knight, King, Bishop, Queen, Pawn)
 
-  override def promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, King)
+  override val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, King)
 }

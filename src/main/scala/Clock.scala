@@ -29,6 +29,9 @@ sealed trait Clock {
 
   def remainingCentis(c: Color): Int = (remainingTime(c) * 100).toInt
 
+  def setRemainingCentis(c: Color, centis: Int) =
+    addTime(c, (remainingCentis(c) - centis).toFloat / 100)
+
   private def millisSinceFlag(c: Color): Option[Int] = (limit - elapsedTime(c)) match {
     case s if s <= 0 => Some((s * -1000).toInt)
     case _ => None
@@ -136,11 +139,9 @@ case class RunningClock(
   def switch: RunningClock = copy(color = !color)
 
   def takeback: RunningClock = {
-    val t = now
-    val spentTime = (t - timer).toFloat
-    addTime(color, spentTime).copy(
+    copy(
       color = !color,
-      timer = t
+      timer = now
     )
   }
 }

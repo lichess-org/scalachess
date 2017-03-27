@@ -101,14 +101,15 @@ case class RunningClock(
   def incrementOf(c: Color) =
     c.fold(whiteBerserk, blackBerserk).fold(0, increment)
 
-  def step(lag: FiniteDuration = 0.millis) = {
+  def step(lag: FiniteDuration = 0.millis, withInc: Boolean = true) = {
     val t = now
     val spentTime = (t - timer).toFloat
     val lagSeconds = lag.toMillis.toFloat / 1000
     val lagCompensation = lagSeconds min Clock.maxLagToCompensate max 0
+    val inc = if (withInc) incrementOf(color) else 0
     addTime(
       color,
-      (math.max(0, spentTime - lagCompensation) - incrementOf(color))
+      (math.max(0, spentTime - lagCompensation) - inc)
     ).copy(
         color = !color,
         timer = t

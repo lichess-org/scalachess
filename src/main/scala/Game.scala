@@ -27,14 +27,13 @@ case class Game(
     val newGame = copy(
       board = move.finalizeAfter,
       player = !player,
-      turns = turns + 1,
-      clock = applyClock(move.lag)
+      turns = turns + 1
     )
     val pgnMove = pgn.Dumper(situation, move, newGame.situation)
-    newGame.copy(pgnMoves = pgnMoves.isEmpty.fold(
-      List(pgnMove),
-      pgnMoves :+ pgnMove
-    ))
+    newGame.copy(
+      pgnMoves = pgnMoves.isEmpty.fold(List(pgnMove), pgnMoves :+ pgnMove),
+      clock = applyClock(move.lag, newGame.situation.status.isEmpty)
+    )
   }
 
   def drop(role: Role, pos: Pos, lag: FiniteDuration = 0.millis): Valid[(Game, Drop)] =
@@ -46,18 +45,17 @@ case class Game(
     val newGame = copy(
       board = drop.finalizeAfter,
       player = !player,
-      turns = turns + 1,
-      clock = applyClock(drop.lag)
+      turns = turns + 1
     )
     val pgnMove = pgn.Dumper(situation, drop, newGame.situation)
-    newGame.copy(pgnMoves = pgnMoves.isEmpty.fold(
-      List(pgnMove),
-      pgnMoves :+ pgnMove
-    ))
+    newGame.copy(
+      pgnMoves = pgnMoves.isEmpty.fold(List(pgnMove), pgnMoves :+ pgnMove),
+      clock = applyClock(drop.lag, newGame.situation.status.isEmpty)
+    )
   }
 
-  private def applyClock(lag: FiniteDuration) = clock map {
-    case c: RunningClock => c step lag
+  private def applyClock(lag: FiniteDuration, withInc: Boolean) = clock map {
+    case c: RunningClock => c.step(lag, withInc)
     case c: PausedClock if (turns - startedAtTurn) == 1 => c.start.switch
     case c => c.switch
   }

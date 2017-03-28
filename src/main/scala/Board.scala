@@ -22,12 +22,12 @@ case class Board(
   }
 
   lazy val actorsOf: Color.Map[List[Actor]] = Color Map { color =>
-    actors.values filter (_.color == color) toList
+    actors.values.filter(_.color == color) toList
   }
 
-  def rolesOf(c: Color): List[Role] = pieces.values.toList collect {
+  def rolesOf(c: Color): List[Role] = pieces.values.collect {
     case piece if piece.color == c => piece.role
-  }
+  }(scala.collection.breakOut)
 
   def actorAt(at: Pos): Option[Actor] = actors get at
 

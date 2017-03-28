@@ -1,5 +1,7 @@
 package chess
 
+import scala.collection.breakOut
+
 final class Hash(size: Int) {
 
   private[chess] def hexToBytes(str: String): PositionHash = {
@@ -101,7 +103,7 @@ object Hash {
 
     // Hash in special crazyhouse data.
     val hcrazy = board.crazyData.fold(hchecks) { data =>
-      val hcrazypromotions = data.promoted.toList.map { table.crazyPromotionMasks compose posIndex _ }.fold(hchecks)(_ ^ _)
+      val hcrazypromotions = data.promoted.map { table.crazyPromotionMasks compose posIndex _ }(breakOut).fold(hchecks)(_ ^ _)
       Color.all.flatMap { color =>
         val colorshift = color.fold(79, -1)
         data.pockets(color).roles.groupBy(identity).flatMap {

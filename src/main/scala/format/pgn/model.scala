@@ -108,15 +108,13 @@ case class Move(
     result: Option[String] = None,
     variations: List[List[Turn]] = Nil,
     // time left for the user who made the move, after he made it
-    timeLeft: Option[Int] = None
+    secondsLeft: Option[Int] = None
 ) {
 
   def isLong = comments.nonEmpty || variations.nonEmpty
 
-  def timeString(time: Int) = Clock.timeString(time)
-
   private def clockString: Option[String] =
-    timeLeft.map(time => "[%clk " + timeString(time) + "]")
+    secondsLeft.map(seconds => "[%clk " + Clock.formatSeconds(seconds) + "]")
 
   override def toString = {
     val glyphStr = glyphs.toList.map({
@@ -124,7 +122,7 @@ case class Move(
       case glyph => s" $$${glyph.id}"
     }).mkString
     val commentsOrTime =
-      if (comments.nonEmpty || timeLeft.isDefined || opening.isDefined || result.isDefined)
+      if (comments.nonEmpty || secondsLeft.isDefined || opening.isDefined || result.isDefined)
         List(clockString, opening, result).flatten.:::(comments map Move.noDoubleLineBreak).map { text =>
           s" { $text }"
         }.mkString

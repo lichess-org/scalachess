@@ -251,14 +251,14 @@ object Clock {
     if (iniTime < incTime) 0 else iniTime / 2
   }.toInt
 
-  def timeString(t: Int) = periodFormatter.print(
+  def formatSeconds(t: Int) = periodFormatter.print(
     org.joda.time.Duration.standardSeconds(t).toPeriod
   )
 
-  private val periodFormatter = new org.joda.time.format.PeriodFormatterBuilder().
-    printZeroAlways.
-    minimumPrintedDigits(1).appendHours.appendSeparator(":").
-    minimumPrintedDigits(2).appendMinutes.appendSeparator(":").
-    appendSeconds.
-    toFormatter
+  private val periodFormatter = new org.joda.time.format.PeriodFormatterBuilder()
+    .printZeroAlways
+    .minimumPrintedDigits(1).appendHours.appendSeparator(":")
+    .minimumPrintedDigits(2).appendMinutes.appendSeparator(":")
+    .appendSeconds
+    .toFormatter
 }

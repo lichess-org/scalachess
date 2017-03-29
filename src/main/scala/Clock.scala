@@ -212,6 +212,15 @@ object Clock {
     override def toString = show
   }
 
+  // [TimeControl "600+2"] -> 10+2
+  def readPgnConfig(str: String): Option[Clock.Config] = str.split('+') match {
+    case Array(initStr, incStr) => for {
+      init <- parseIntOption(initStr)
+      inc <- parseIntOption(incStr)
+    } yield Clock.Config(init, inc)
+    case _ => none
+  }
+
   val minInitLimit = 3
   // no more than this time will be offered to the lagging player
   val maxLagToCompensate = 1f

@@ -10,6 +10,11 @@ case class ParsedPgn(
 ) {
 
   def tag(name: String): Option[String] = Tag.find(tags, name)
+
+  def clockConfig: Option[Clock.Config] =
+    tags.collectFirst {
+      case Tag(Tag.TimeControl, str) => str
+    } flatMap Clock.readPgnConfig
 }
 
 // Standard Algebraic Notation

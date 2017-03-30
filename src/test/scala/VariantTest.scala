@@ -19,8 +19,8 @@ class VariantTest extends ChessTest {
       val game = fenToGame(position, Standard)
 
       game should beSuccess.like {
-        case gm =>
-          gm.situation.board.variant.insufficientWinningMaterial(gm.situation.board, Color.white) must beTrue
+        case game =>
+          game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.white) must beTrue
       }
     }
 
@@ -29,8 +29,8 @@ class VariantTest extends ChessTest {
       val game = fenToGame(position, Standard)
 
       game should beSuccess.like {
-        case gm =>
-          gm.situation.board.variant.insufficientWinningMaterial(gm.situation.board, Color.white) must beTrue
+        case game =>
+          game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.white) must beTrue
       }
 
     }

@@ -407,15 +407,15 @@ class AtomicVariantTest extends ChessTest {
       val game = fenToGame(position, Atomic)
 
       game must beSuccess.like {
-        case gm =>
-          gm.situation.end must beFalse
+        case game =>
+          game.situation.end must beFalse
       }
 
       val drawGame = game flatMap (_.playMoves(Pos.G3 -> Pos.G2))
 
       drawGame must beSuccess.like {
-        case gm =>
-          gm.situation.board.variant.insufficientWinningMaterial(gm.situation.board, Color.White) must beTrue
+        case game =>
+          game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.White) must beTrue
       }
 
     }
@@ -427,9 +427,9 @@ class AtomicVariantTest extends ChessTest {
       val game = originalGame flatMap (_.playMoves(Pos.G4 -> Pos.G5))
 
       game must beSuccess.like {
-        case gm =>
-          gm.situation.autoDraw must beTrue
-          gm.situation.end must beTrue
+        case game =>
+          game.situation.autoDraw must beTrue
+          game.situation.end must beTrue
       }
 
     }

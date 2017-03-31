@@ -248,6 +248,7 @@ object Clock {
 
   def showLimit(limit: Int) = limit match {
     case l if l % 60 == 0 => l / 60
+    case 15 => "¼"
     case 30 => "½"
     case 45 => "¾"
     case 90 => "1.5"

@@ -29,6 +29,8 @@ sealed trait Clock {
 
   def remainingCentis(c: Color): Int = (remainingTime(c) * 100).toInt
 
+  def incrementOf(c: Color): Int
+
   def setRemainingCentis(c: Color, centis: Int) =
     addTime(c, (remainingCentis(c) - centis).toFloat / 100)
 
@@ -159,6 +161,9 @@ case class PausedClock(
   val timerOption = None
 
   def stop = this
+
+  def incrementOf(c: Color) =
+    c.fold(whiteBerserk, blackBerserk).fold(0, increment)
 
   def addTime(c: Color, t: Float): PausedClock = c match {
     case White => copy(whiteTime = whiteTime + t)

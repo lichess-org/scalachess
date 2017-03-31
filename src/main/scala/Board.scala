@@ -1,6 +1,7 @@
 package chess
 
 import Pos.posAt
+import scala.collection.breakOut
 import scalaz.Validation.FlatMap._
 import variant.{ Variant, Crazyhouse }
 
@@ -27,7 +28,7 @@ case class Board(
 
   def rolesOf(c: Color): List[Role] = pieces.values.collect {
     case piece if piece.color == c => piece.role
-  }(scala.collection.breakOut)
+  }(breakOut)
 
   def actorAt(at: Pos): Option[Actor] = actors get at
 
@@ -35,7 +36,7 @@ case class Board(
 
   lazy val kingPos: Map[Color, Pos] = pieces.collect {
     case (pos, Piece(color, King)) => color -> pos
-  }(scala.collection.breakOut)
+  }(breakOut)
 
   def kingPosOf(c: Color): Option[Pos] = kingPos get c
 
@@ -89,7 +90,7 @@ case class Board(
   }
 
   lazy val occupation: Color.Map[Set[Pos]] = Color.Map { color =>
-    pieces collect { case (pos, piece) if piece is color => pos } toSet
+    pieces.collect { case (pos, piece) if piece is color => pos }(breakOut)
   }
 
   def hasPiece(p: Piece) = pieces.values exists (p ==)

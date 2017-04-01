@@ -47,9 +47,6 @@ sealed trait Clock {
 
   def estimateTotalTime = config.estimateTotalTime
 
-  // Emergency time cutoff, in seconds.
-  def emergTime = config.emergTime
-
   def stop: PausedClock
 
   def addTime(c: Color, t: Float): Clock
@@ -199,9 +196,6 @@ object Clock {
     def estimateTotalIncrement = 40 * increment
 
     def estimateTotalTime = limit + estimateTotalIncrement
-
-    // Emergency time cutoff, in seconds.
-    def emergTime = math.min(60, math.max(10, limit / 8))
 
     def hasIncrement = increment > 0
 

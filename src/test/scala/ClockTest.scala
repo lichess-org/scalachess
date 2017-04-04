@@ -56,7 +56,7 @@ class ClockTest extends ChessTest {
       clockStep(0, 0.2f) must beCloseTo(60, delta)
     }
     "premove, big lag" in {
-      clockStep(0, 2f) must beCloseTo(59, delta)
+      clockStep(0, 1 + maxLag) must beCloseTo(59, delta)
     }
     "1s move, no lag" in {
       clockStep(1f, 0) must beCloseTo(59, delta)
@@ -65,7 +65,7 @@ class ClockTest extends ChessTest {
       clockStep(1f, 0.2f) must beCloseTo(59, delta)
     }
     "1s move, big lag" in {
-      clockStep(1f, 2f) must beCloseTo(58, delta)
+      clockStep(1f, 1 + maxLag) must beCloseTo(58, delta)
     }
     "start, no lag" in {
       clockStart(0) must beCloseTo(60, delta)

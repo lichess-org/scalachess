@@ -228,9 +228,9 @@ object Clock {
 
   val minInitLimit = 3
   // no more than this time will be offered to the lagging player
-  val maxLagToCompensate = 1f
+  val maxLagToCompensate = 1.5f
   // no more than this time to get the last move in
-  val maxGraceMillis = 1000
+  val maxGraceMillis = 1500
 
   def apply(limit: Int, increment: Int): PausedClock = apply(Config(limit, increment))
 

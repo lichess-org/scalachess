@@ -1,7 +1,5 @@
 package chess
 
-import scala.concurrent.duration._
-
 import format.{ pgn, Uci }
 
 case class Game(
@@ -17,7 +15,7 @@ case class Game(
     orig: Pos,
     dest: Pos,
     promotion: Option[PromotableRole] = None,
-    lag: FiniteDuration = 0.millis
+    lag: Centis = Centis(0)
   ): Valid[(Game, Move)] =
     situation.move(orig, dest, promotion).map(_.normalizeCastle withLag lag) map { move =>
       apply(move) -> move
@@ -36,7 +34,7 @@ case class Game(
     )
   }
 
-  def drop(role: Role, pos: Pos, lag: FiniteDuration = 0.millis): Valid[(Game, Drop)] =
+  def drop(role: Role, pos: Pos, lag: Centis = Centis(0)): Valid[(Game, Drop)] =
     situation.drop(role, pos).map(_ withLag lag) map { drop =>
       applyDrop(drop) -> drop
     }
@@ -54,7 +52,7 @@ case class Game(
     )
   }
 
-  private def applyClock(lag: FiniteDuration, withInc: Boolean) = clock map {
+  private def applyClock(lag: Centis, withInc: Boolean) = clock map {
     case c: RunningClock => c.step(lag, withInc)
     case c: PausedClock if (turns - startedAtTurn) == 1 => c.start.switch
     case c => c.switch

@@ -23,9 +23,9 @@ object Speed {
 
   def apply(id: Int): Option[Speed] = byId get id
 
-  def apply(clock: Clock.Config) = byTime(clock.estimateTotalTime)
+  def apply(clock: Clock.Config) = byTime(clock.estimateTotalSeconds)
 
-  def apply(clock: Option[Clock.Config]) = byTime(clock.fold(Int.MaxValue)(_.estimateTotalTime))
+  def apply(clock: Option[Clock.Config]) = byTime(clock.fold(Int.MaxValue)(_.estimateTotalSeconds))
 
   def byTime(seconds: Int): Speed = all.find(_.range contains seconds) | Correspondence
 

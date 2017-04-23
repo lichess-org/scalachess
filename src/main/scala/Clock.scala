@@ -30,9 +30,7 @@ sealed trait Clock {
   def outoftimeWithGrace(c: Color, grace: Centis) =
     timeSinceFlag(c).exists((grace atMost Clock.maxGrace).<)
 
-  def remainingTime(c: Color): Centis = limit - elapsedTime(c) nonNeg
-
-  def remainingDuration(c: Color): FiniteDuration = remainingTime(c).toDuration
+  def remainingTime(c: Color): Centis = (limit - elapsedTime(c)) nonNeg
 
   def incrementOf(c: Color): Centis =
     if (c.fold(whiteBerserk, blackBerserk)) 0 else increment
@@ -105,7 +103,6 @@ case class RunningClock(
     val t = now
     val lagComp: Centis = lag atMost Clock.maxLagToCompensate nonNeg
     val inc: Centis = if (withInc) incrementOf(color) else 0
-    // println(s"${t - timer}, $lagComp, ${((t - timer - lagComp) nonNeg)}")
     addTime(
       color,
       (((timer to t) - lagComp) nonNeg) - inc

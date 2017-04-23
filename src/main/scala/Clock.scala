@@ -23,7 +23,7 @@ sealed trait Clock {
 
   def time(c: Color): Centis = c.fold(whiteTime, blackTime)
 
-  def outoftime(c: Color) = remainingTime(c).value == 0
+  def outoftime(c: Color) = remainingTime(c).centis == 0
 
   def outoftimeWithGrace(c: Color, grace: Centis) =
     timeSinceFlag(c).exists((grace atMost Clock.maxGrace).<)
@@ -37,7 +37,7 @@ sealed trait Clock {
     addTime(c, remainingTime(c) - centis)
 
   private def timeSinceFlag(c: Color): Option[Centis] = (limit - elapsedTime(c)) match {
-    case s if s.value <= 0 => Some(-s)
+    case s if s.centis <= 0 => Some(-s)
     case _ => None
   }
 
@@ -66,11 +66,11 @@ sealed trait Clock {
 
   def show = config.show
 
-  def moretimeable(c: Color) = remainingTime(c).value < 100 * 60 * 60 * 2
+  def moretimeable(c: Color) = remainingTime(c).centis < 100 * 60 * 60 * 2
 
   def isRunning = timerOption.isDefined
 
-  def isInit = elapsedTime(White).value == 0 && elapsedTime(Black).value == 0
+  def isInit = elapsedTime(White).centis == 0 && elapsedTime(Black).centis == 0
 
   def switch: Clock
 
@@ -240,7 +240,7 @@ object Clock {
       whiteBerserk = false,
       blackBerserk = false
     )
-    if (clock.limit.value == 0) clock
+    if (clock.limitSeconds == 0) clock
       .giveTime(White, config.increment atLeast minInitLimit)
       .giveTime(Black, config.increment atLeast minInitLimit)
     else clock

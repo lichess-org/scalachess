@@ -2,44 +2,44 @@ package chess
 
 import scala.concurrent.duration._
 
-// maximum value = Int.MaxValue / 100 / 60 / 60 / 24 = 248 days
-case class Centis(value: Int) extends AnyVal with Ordered[Centis] {
+// maximum centis = Int.MaxValue / 100 / 60 / 60 / 24 = 248 days
+case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
 
   def roundTenths: Int =
-    if (value > 0) (value + 5) / 10 else (value - 4) / 10
+    if (centis > 0) (centis + 5) / 10 else (centis - 4) / 10
   def roundSeconds: Int = math.round(toSeconds)
 
-  def toSeconds: Float = value / 100f
-  def millis: Long = value * 10l
+  def toSeconds: Float = centis / 100f
+  def millis: Long = centis * 10l
   def toDuration = FiniteDuration(millis, MILLISECONDS)
 
-  def +(other: Centis) = Centis(value + other.value)
-  def -(other: Centis) = Centis(value - other.value)
-  def *(scalar: Int) = Centis(scalar * value)
-  def unary_- = Centis(-value)
+  def +(other: Centis) = Centis(centis + other.centis)
+  def -(other: Centis) = Centis(centis - other.centis)
+  def *(scalar: Int) = Centis(scalar * centis)
+  def unary_- = Centis(-centis)
 
-  def compare(other: Centis) = value compare other.value
+  def compare(other: Centis) = centis compare other.centis
 
-  def abs: Centis = Centis(value.abs)
+  def abs: Centis = Centis(centis.abs)
 
-  def atMost(o: Centis) = if (value > o.value) o else this
-  def atLeast(o: Centis) = if (value < o.value) o else this
+  def atMost(o: Centis) = if (centis > o.centis) o else this
+  def atLeast(o: Centis) = if (centis < o.centis) o else this
 
-  def nonNeg = if (value >= 0) this else Centis(0)
+  def nonNeg = if (centis >= 0) this else Centis(0)
 }
 
 object Centis {
 
-  def apply(centis: Long): Centis = Centis {
-    if (centis > Int.MaxValue) {
-      // lila.log("common").error(s"Truncating Centis! $centis")
+  def apply(value: Long): Centis = Centis {
+    if (value > Int.MaxValue) {
+      // lila.log("common").error(s"Truncating Centis! $value")
       Int.MaxValue
     }
-    else if (centis < Int.MinValue) {
-      // lila.log("common").error(s"Truncating Centis! $centis")
+    else if (value < Int.MinValue) {
+      // lila.log("common").error(s"Truncating Centis! $value")
       Int.MinValue
     }
-    else centis.toInt
+    else value.toInt
   }
 
   def apply(d: FiniteDuration): Centis = Centis {

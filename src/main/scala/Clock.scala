@@ -1,7 +1,5 @@
 package chess
 
-import scala.concurrent.duration._
-
 import java.text.DecimalFormat
 
 // All unspecified durations are expressed in seconds

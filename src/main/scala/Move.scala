@@ -1,7 +1,6 @@
 package chess
 
 import format.Uci
-import scala.concurrent.duration._
 
 case class Move(
     piece: Piece,
@@ -13,7 +12,7 @@ case class Move(
     promotion: Option[PromotableRole],
     castle: Option[((Pos, Pos), (Pos, Pos))],
     enpassant: Boolean,
-    lag: FiniteDuration = 0.millis
+    lag: Centis = Centis(0)
 ) {
 
   def situationBefore = before situationOf piece.color
@@ -77,7 +76,7 @@ case class Move(
 
   def withAfter(newBoard: Board) = copy(after = newBoard)
 
-  def withLag(l: FiniteDuration) = copy(lag = l)
+  def withLag(l: Centis) = copy(lag = l)
 
   def toUci = Uci.Move(orig, dest, promotion)
 

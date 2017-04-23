@@ -1,7 +1,5 @@
 package chess
 
-import scala.concurrent.duration.{ FiniteDuration, MILLISECONDS }
-
 import Pos._
 
 class ClockTest extends ChessTest {
@@ -24,31 +22,32 @@ class ClockTest extends ChessTest {
   }
   "create a clock" should {
     "with time" in {
-      Clock(60, 10).limit must_== 60
+      Clock(60, 10).limitSeconds must_== 60
     }
     "with increment" in {
-      Clock(60, 10).increment must_== 10
+      Clock(60, 10).incrementSeconds must_== 10
     }
     "with few time" in {
-      Clock(0, 10).limit must_== 0
+      Clock(0, 10).limitSeconds must_== 0
     }
     "with 30 seconds" in {
       Clock(30, 0).limitInMinutes must_== 0.5
     }
   }
   "lag compensation" should {
-    def durOf(lag: Float) = FiniteDuration((lag * 1000).toLong, MILLISECONDS)
+    def durOf(lag: Float) = Centis((100 * lag).toInt)
     def clockStep(wait: Float, lag: Float): Double = {
       val clock = Clock(60, 0).start.step()
+      // TODO: we should stub Clock::now instead of sleeping.
       Thread sleep ((wait + lag) * 1000).toInt
-      (clock step durOf(lag) remainingTime Black).toDouble
+      (clock step durOf(lag) remainingTime Black) toSeconds
     }
     def clockStart(lag: Float): Double = {
       val clock = Clock(60, 0).start.step()
-      (clock step durOf(lag) remainingTime White).toDouble
+      (clock step durOf(lag) remainingTime White) toSeconds
     }
     val delta = 0.2
-    val maxLag = Clock.maxLagToCompensate
+    val maxLag = Clock.maxLagToCompensate.toSeconds
     "premove, no lag" in {
       clockStep(0, 0) must beCloseTo(60, delta)
     }

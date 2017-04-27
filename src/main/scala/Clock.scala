@@ -113,8 +113,8 @@ case class RunningClock(
   def stop = PausedClock(
     config = config,
     color = color,
-    whiteTime = color.fold(whiteTime, whiteTime + (timer to now)),
-    blackTime = color.fold(blackTime + (timer to now), blackTime),
+    whiteTime = color.fold(whiteTime + (timer to now), whiteTime),
+    blackTime = color.fold(blackTime, blackTime + (timer to now)),
     whiteBerserk = whiteBerserk,
     blackBerserk = blackBerserk
   )

@@ -8,6 +8,7 @@ import variant.{ Variant, Standard }
  * http://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
  *
  * Crazyhouse & Threecheck extensions:
+ * https://github.com/ddugovic/Stockfish/wiki/FEN-extensions
  * http://scidb.sourceforge.net/help/en/FEN.html#ThreeCheck
  */
 object Forsyth {
@@ -102,6 +103,10 @@ object Forsyth {
       case word if (word.count('/' ==) == 8) =>
         val splitted = word.split('/')
         splitted.take(8).mkString -> splitted.lift(8)
+      case word if word.contains('[') && word.endsWith("]") =>
+        word.span('['!=) match {
+          case (position, pockets) => position -> pockets.stripPrefix("[").stripSuffix("]").some
+        }
       case word => word -> None
     }
     {

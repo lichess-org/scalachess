@@ -306,6 +306,14 @@ class ForsythTest extends ChessTest {
           }
         }
       }
+      "winboard pockets" in {
+        f <<< "r1bk3r/ppp2ppp/4p3/1B1pP3/1b1N4/2N2qPp/PPP2NbP/4R1KR[PNq] b - - 39 20" must beSome.like {
+          case s => s.situation.board.crazyData must beSome.like {
+            case Data(Pockets(Pocket(Pawn :: Knight :: Nil), Pocket(Queen :: Nil)), promoted) =>
+              promoted must beEmpty
+          }
+        }
+      }
       "promoted none" in {
         f <<< "2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6/pPP w - f6 0 36" must beSome.like {
           case s => s.situation.board.crazyData must beSome.like {

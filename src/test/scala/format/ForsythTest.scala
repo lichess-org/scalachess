@@ -382,6 +382,13 @@ class ForsythTest extends ChessTest {
             s.situation.board.history.checkCount.black must_== 1
         }
       }
+      "winboard checks" in {
+        f <<< "r1bqkbnr/pppp1Qpp/2n5/4p3/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 2+3 0 3" must beSome.like {
+          case s =>
+            s.situation.board.history.checkCount.white must_== 0
+            s.situation.board.history.checkCount.black must_== 1
+        }
+      }
     }
   }
   "x-fen" should {

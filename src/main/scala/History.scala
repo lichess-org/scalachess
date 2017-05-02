@@ -2,6 +2,7 @@ package chess
 
 import format.Uci
 
+// Checks received by the respective side.
 case class CheckCount(white: Int = 0, black: Int = 0) {
 
   def add(color: Color) = copy(

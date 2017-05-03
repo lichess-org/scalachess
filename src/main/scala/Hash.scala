@@ -4,11 +4,6 @@ import scala.collection.breakOut
 
 final class Hash(size: Int) {
 
-  private[chess] def hexToBytes(str: String): PositionHash = {
-    str.grouped(2).map(cc =>
-      (Character.digit(cc(0), 16) << 4 | Character.digit(cc(1), 16)).toByte).take(size).toArray
-  }
-
   def apply(situation: Situation): PositionHash = {
     val l = Hash.get(situation, Hash.polyglotTable)
     if (size <= 8) {

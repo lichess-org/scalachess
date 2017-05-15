@@ -252,7 +252,7 @@ object Clock {
   def apply(limit: Int, increment: Int): PausedClock = apply(Config(limit, increment))
 
   def apply(config: Config): PausedClock = {
-    PausedClock(
+    val clock = PausedClock(
       config = config,
       color = White,
       whiteTime = Centis(0),
@@ -260,5 +260,9 @@ object Clock {
       whiteBerserk = false,
       blackBerserk = false
     )
+    if (clock.limitSeconds == 0) clock
+      .giveTime(White, config.increment atLeast minInitLimit)
+      .giveTime(Black, config.increment atLeast minInitLimit)
+    else clock
   }
 }

@@ -31,23 +31,19 @@ class ClockTest extends ChessTest {
     }
   }
   "lag compensation" should {
-    def fakeTime(c: RunningClock, t: Int) = c.copy(timestamper = new Timestamper {
+    def fakeTime(c: Clock, t: Int = 0) = c.copy(timestamper = new Timestamper {
       def now = Timestamp(10 * t)
     })
 
-    def fakeTimeP(c: PausedClock) = c.copy(timestamper = new Timestamper {
-      def now = Timestamp(0)
-    })
-
-    def durOf(lag: Int) = Centis(lag)
-    def clockStep(wait: Int, lag: Int) = {
-      val clock = fakeTimeP(Clock(60, 0)).start.step()
-      val clockStep = fakeTime(clock, wait + lag) step durOf(lag)
+    def durOf(lag: Int) = MoveMetrics(clientLag = Some(Centis(lag)))
+    def clockStep(wait: Int, lag: Int): Double = {
+      val clock = fakeTime(Clock(60, 0)).start.step().get
+      val clockStep = (fakeTime(clock, wait + lag) step durOf(lag)).get
       (clockStep remainingTime Black).centis
     }
-    def clockStart(lag: Int) = {
-      val clock = fakeTimeP(Clock(60, 0)).start.step()
-      (clock step durOf(lag) remainingTime White).centis
+    def clockStart(lag: Int): Double = {
+      val clock = fakeTime(Clock(60, 0)).start.step().get
+      ((clock step durOf(lag)).get remainingTime White).centis
     }
 
     "premove, no lag" in {

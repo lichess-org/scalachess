@@ -29,7 +29,6 @@ case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
 }
 
 object Centis {
-
   def apply(value: Long): Centis = Centis {
     if (value > Int.MaxValue) {
       // lila.log("common").error(s"Truncating Centis! $value")

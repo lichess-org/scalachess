@@ -232,11 +232,6 @@ object Clock {
     def berserkPenalty =
       if (limitSeconds < 40 * incrementSeconds) Centis(0)
       else Centis(limitSeconds * (100 / 2))
-
-    def initTime = {
-      if (limitSeconds == 0) increment atLeast Centis(300)
-      else limit
-    }
   }
 
   // [TimeControl "600+2"] -> 10+2

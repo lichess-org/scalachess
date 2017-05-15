@@ -114,7 +114,7 @@ case class Move(
   def isLong = comments.nonEmpty || variations.nonEmpty
 
   private def clockString: Option[String] =
-    secondsLeft.map(seconds => "[%clk " + Clock.formatSeconds(seconds) + "]")
+    secondsLeft.map(seconds => "[%clk " + Move.formatPgnSeconds(seconds) + "]")
 
   override def toString = {
     val glyphStr = glyphs.toList.map({
@@ -140,4 +140,16 @@ object Move {
 
   private def noDoubleLineBreak(txt: String) =
     noDoubleLineBreakRegex.replaceAllIn(txt, "\n")
+
+  private def formatPgnSeconds(t: Int) = periodFormatter.print(
+    org.joda.time.Duration.standardSeconds(t).toPeriod
+  )
+
+  private[this] val periodFormatter = new org.joda.time.format.PeriodFormatterBuilder()
+    .printZeroAlways
+    .minimumPrintedDigits(1).appendHours.appendSeparator(":")
+    .minimumPrintedDigits(2).appendMinutes.appendSeparator(":")
+    .appendSeconds
+    .toFormatter
+
 }

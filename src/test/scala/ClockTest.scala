@@ -8,15 +8,11 @@ class ClockTest extends ChessTest {
     val clock = Clock(5 * 60 * 1000, 0)
     val game = makeGame withClock clock.start
     "new game" in {
-      game.clock must beSome.like {
-        case c => c.color must_== White
-      }
+      game.clock map { _.color } must_== Some(White)
     }
     "one move played" in {
       game.playMoves(E2 -> E4) must beSuccess.like {
-        case g => g.clock must beSome.like {
-          case c => c.color must_== Black
-        }
+        case g: Game => g.clock map { _.color } must_== Some(Black)
       }
     }
   }
@@ -35,45 +31,51 @@ class ClockTest extends ChessTest {
     }
   }
   "lag compensation" should {
-    def durOf(lag: Float) = Centis((100 * lag).toInt)
-    def clockStep(wait: Float, lag: Float): Double = {
-      val clock = Clock(60, 0).start.step()
-      // TODO: we should stub Clock::now instead of sleeping.
-      Thread sleep ((wait + lag) * 1000).toInt
-      (clock step durOf(lag) remainingTime Black) toSeconds
+    def fakeTime(c: RunningClock, t: Int) = c.copy(timestamper = new Timestamper {
+      def now = Timestamp(10 * t)
+    })
+
+    def fakeTimeP(c: PausedClock) = c.copy(timestamper = new Timestamper {
+      def now = Timestamp(0)
+    })
+
+    def durOf(lag: Int) = Centis(lag)
+    def clockStep(wait: Int, lag: Int) = {
+      val clock = fakeTimeP(Clock(60, 0)).start.step()
+      val clockStep = fakeTime(clock, wait + lag) step durOf(lag)
+      (clockStep remainingTime Black).centis
     }
-    def clockStart(lag: Float): Double = {
-      val clock = Clock(60, 0).start.step()
-      (clock step durOf(lag) remainingTime White) toSeconds
+    def clockStart(lag: Int) = {
+      val clock = fakeTimeP(Clock(60, 0)).start.step()
+      (clock step durOf(lag) remainingTime White).centis
     }
-    val delta = 0.2
-    val maxLag = Clock.maxLagToCompensate.toSeconds
+
     "premove, no lag" in {
-      clockStep(0, 0) must beCloseTo(60, delta)
+      clockStep(0, 0) must_== 60 * 100
     }
     "premove, small lag" in {
-      clockStep(0, 0.2f) must beCloseTo(60, delta)
+      clockStep(0, 20) must_== 60 * 100
     }
     "premove, big lag" in {
-      clockStep(0, 2f) must beCloseTo(59, delta)
+      clockStep(0, 200) must_== 59 * 100
     }
     "1s move, no lag" in {
-      clockStep(1f, 0) must beCloseTo(59, delta)
+      clockStep(100, 0) must_== 59 * 100
     }
     "1s move, small lag" in {
-      clockStep(1f, 0.2f) must beCloseTo(59, delta)
+      clockStep(100, 20) must_== 59 * 100
     }
     "1s move, big lag" in {
-      clockStep(1f, 2f) must beCloseTo(58, delta)
+      clockStep(100, 200) must_== 58 * 100
     }
     "start, no lag" in {
-      clockStart(0) must beCloseTo(60, delta)
+      clockStart(0) must_== 60 * 100
     }
     "start, small lag" in {
-      clockStart(0.2f) must beCloseTo(60, delta)
+      clockStart(20) must_== 60 * 100
     }
     "start, big lag" in {
-      clockStart(maxLag * 5) must beCloseTo(60, delta)
+      clockStart(500) must_== 60 * 100
     }
   }
 }

@@ -1,14 +1,21 @@
 package chess
 
-case class Timestamp(value: Long) extends AnyVal with Ordered[Timestamp] {
-  // Convert to centi duration with simple int round.
-  def to(end: Timestamp) =
-    if (end.value > value) Centis((end.value - value + 5) / 10)
-    else Centis((end.value - value - 4) / 10)
+case class Timestamp(value: Long)
+    extends AnyVal with Ordered[Timestamp] {
+
+  def -(o: Timestamp) = Centis.ofMillis(value - o.value)
+
+  def +(o: Centis) = Timestamp(value + o.millis)
 
   def compare(other: Timestamp) = value compare other.value
 }
 
-object Timestamp {
-  def now = Timestamp(System.currentTimeMillis)
+trait Timestamper {
+  def now: Timestamp
+
+  def toNow(ts: Timestamp) = now - ts
+}
+
+private[chess] object RealTimestamper extends Timestamper {
+  def now = new Timestamp(System.currentTimeMillis)
 }

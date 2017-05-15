@@ -3,7 +3,7 @@ package chess
 class BerserkTest extends ChessTest {
 
   def whiteBerserk(minutes: Int, seconds: Int) =
-    Clock(minutes * 60, seconds).berserk(White).remainingTime(White).toSeconds
+    Clock(minutes * 60, seconds).goBerserk(White).remainingTime(White).toSeconds
 
   "berserkable" should {
     "yep" in {
@@ -19,12 +19,12 @@ class BerserkTest extends ChessTest {
   }
   "berserk flags" should {
     "white" in {
-      Clock(60, 0).whiteBerserk must_== false
-      Clock(60, 0).berserk(White).whiteBerserk must_== true
+      Clock(60, 0).berserked(White) must_== false
+      Clock(60, 0).goBerserk(White).berserked(White) must_== true
     }
     "black" in {
-      Clock(60, 0).blackBerserk must_== false
-      Clock(60, 0).berserk(Black).blackBerserk must_== true
+      Clock(60, 0).berserked(Black) must_== false
+      Clock(60, 0).goBerserk(Black).berserked(Black) must_== true
     }
   }
   "initial time penalty, no increment" should {

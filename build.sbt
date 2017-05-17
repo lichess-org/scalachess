@@ -4,7 +4,7 @@ organization := "org.lichess"
 
 version := "5.3"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.11.11"
 
 libraryDependencies ++= List(
   "org.scalaz" %% "scalaz-core" % "7.1.11",
@@ -17,6 +17,7 @@ libraryDependencies ++= List(
 // updateOptions := updateOptions.value.withCachedResolution(true)
 
 resolvers ++= Seq(
+  "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-maven/master",
   "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases")
 
 scalacOptions ++= Seq(

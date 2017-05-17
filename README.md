@@ -5,10 +5,6 @@ It is entirely functional, immutable, and free of side effects.
 INSTALL
 -------
 
-Build dependencies
-
-    ./build-deps.sh
-
 Clone scalachess
 
     git clone git://github.com/ornicar/scalachess

@@ -20,9 +20,6 @@ notifications:
 jdk:
   - oraclejdk8
 
-install:
-  - ./build-deps.sh
-
 script:
   - sbt compile
   - sbt test

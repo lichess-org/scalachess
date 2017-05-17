@@ -1,3 +1,4 @@
+sudo: false
 language: scala
 
 # https://docs.travis-ci.com/user/notifications/#IRC-notification
@@ -21,5 +22,4 @@ jdk:
   - oraclejdk8
 
 script:
-  - sbt compile
   - sbt test

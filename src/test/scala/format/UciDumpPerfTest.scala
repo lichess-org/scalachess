@@ -3,6 +3,8 @@ package format
 
 class UciDumpPerfTest extends ChessTest {
 
+  args(skipAll = true)
+
   val nb = 5
   val iterations = 10
   // val pgn = format.pgn.Fixtures.fromChessgames

@@ -2,6 +2,8 @@ package chess
 
 class DividerPerfTest extends ChessTest {
 
+  args(skipAll = true)
+
   val nb = 500
   val iterations = 10
   // val nb = 1

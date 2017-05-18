@@ -2,6 +2,8 @@ package chess
 
 class BoardReplayPerfTest extends ChessTest {
 
+  args(skipAll = true)
+
   val nb = 100
   val iterations = 10
   // val nb = 1

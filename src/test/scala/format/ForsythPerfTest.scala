@@ -3,6 +3,8 @@ package format
 
 class ForsythPerfTest extends ChessTest {
 
+  args(skipAll = true)
+
   val initialBoard = Board.init(variant.Standard)
   val emptyBoard = (Forsyth << "8/8/8/8/8/8/8/8").get.board
 

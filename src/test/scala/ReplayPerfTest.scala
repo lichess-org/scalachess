@@ -2,6 +2,8 @@ package chess
 
 class ReplayPerfTest extends ChessTest {
 
+  args(skipAll = true)
+
   val nb = 500
   val gameMoves = (format.pgn.Fixtures.prod500standard take nb).map {
     _.split(' ').toList

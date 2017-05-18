@@ -24,9 +24,10 @@ case class Clock(
 
   def remainingTime(c: Color) = rawRemaining(c) nonNeg
 
-  def outOfTimeWithGrace(c: Color) = players(c).remainingGrace < pending(c)
+  def outOfTimeWithGrace(c: Color) = rawRemaining(c) < -LagTracker.maxLagComp
 
-  def moretimea
+  def moretimeable(c: Color) = rawRemaining(c).centis < 100 * 60 * 60 * 2
+
   def isInit = players.forall(_.isInit)
 
   def isRunning = timer.isDefined
@@ -58,13 +59,15 @@ case class Clock(
 
     val reportedLag = metrics.reportedLag(elapsed)
 
-    val lagComp = reportedLag.fold(Centis(0)) { _ atMost ClockPlayer.maxLagComp }
+    val (lagComp, newLag) = reportedLag.fold((Centis(0), player.lag)) {
+      player.lag.onMove _
+    }
 
     val inc = if (withInc) player.increment else Centis(0)
 
     updatePlayer(color) {
       _.takeTime(((elapsed - lagComp) nonNeg) - inc)
-        .copy(lag = reportedLag)
+        .copy(lag = newLag)
     }.switch
   }
 
@@ -86,7 +89,7 @@ case class Clock(
   def goBerserk(c: Color) = updatePlayer(c) { _.copy(berserk = true) }
 
   def berserked(c: Color) = players(c).berserk
-  def lag(c: Color) = players(c).lag
+  def lag(c: Color) = players(c).lag.bestEstimate
 
   def estimateTotalSeconds = config.estimateTotalSeconds
   def estimateTotalTime = config.estimateTotalTime
@@ -100,11 +103,9 @@ case class Clock(
 case class ClockPlayer(
     config: Clock.Config,
     elapsed: Centis = Centis(0),
-    lag: Option[Centis] = None,
+    lag: LagTracker = LagTracker(),
     berserk: Boolean = false
 ) {
-  import ClockPlayer._
-
   val limit = {
     if (berserk) config.initTime - config.berserkPenalty
     else config.initTime
@@ -120,14 +121,7 @@ case class ClockPlayer(
 
   def setRemaining(t: Centis) = copy(elapsed = limit - t)
 
-  def remainingGrace = remaining + maxGrace
-
   def increment = if (berserk) Centis(0) else config.increment
-}
-
-object ClockPlayer {
-  val maxLagComp = Centis(100)
-  val maxGrace = Centis(100)
 }
 
 object Clock {

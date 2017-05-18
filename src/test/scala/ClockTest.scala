@@ -36,12 +36,12 @@ class ClockTest extends ChessTest {
     })
 
     def durOf(lag: Int) = MoveMetrics(clientLag = Some(Centis(lag)))
-    def clockStep(wait: Int, lag: Int): Double = {
+    def clockStep(wait: Int, lag: Int) = {
       val clock = fakeTime(Clock(60, 0)).start.step().get
       val clockStep = (fakeTime(clock, wait + lag) step durOf(lag)).get
       (clockStep remainingTime Black).centis
     }
-    def clockStart(lag: Int): Double = {
+    def clockStart(lag: Int) = {
       val clock = fakeTime(Clock(60, 0)).start.step().get
       ((clock step durOf(lag)).get remainingTime White).centis
     }
@@ -53,7 +53,7 @@ class ClockTest extends ChessTest {
       clockStep(0, 20) must_== 60 * 100
     }
     "premove, big lag" in {
-      clockStep(0, 200) must_== 59 * 100
+      clockStep(0, 300) must_== 59 * 100
     }
     "1s move, no lag" in {
       clockStep(100, 0) must_== 59 * 100
@@ -62,7 +62,7 @@ class ClockTest extends ChessTest {
       clockStep(100, 20) must_== 59 * 100
     }
     "1s move, big lag" in {
-      clockStep(100, 200) must_== 58 * 100
+      clockStep(100, 300) must_== 58 * 100
     }
     "start, no lag" in {
       clockStart(0) must_== 60 * 100

@@ -120,7 +120,7 @@ case class ClockPlayer(
 
   def setRemaining(t: Centis) = copy(elapsed = limit - t)
 
-  def remainingGrace = lag.fold(remaining)(l => remaining + ((l * 2) atMost maxGrace))
+  def remainingGrace = remaining + maxGrace
 
   def increment = if (berserk) Centis(0) else config.increment
 }

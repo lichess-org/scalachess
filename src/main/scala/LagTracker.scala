@@ -4,28 +4,31 @@ import LagTracker._
 
 case class LagTracker(
     quota: Centis = Centis(200),
-    history: DecayingStats = initialHistory
+    history: Option[DecayingStats] = None
 ) {
 
   def onMove(lag: Centis) = {
     val lagComp = lag.nonNeg atMost maxLagComp atMost quota
 
+    val recorder = history getOrElse initialHistory
+
     (lagComp, copy(
       quota = (quota + quotaGain - lagComp) atMost quotaMax,
-      history = history.record(lagComp.centis)
+      history = Some(recorder.record(lagComp.centis))
     ))
   }
 
-  private def toCentis(f: Float) = if (f > 0) Centis(f.toInt) else Centis(0)
+  def bestEstimate = Centis(history.fold(0) { _.mean.toInt })
 
-  def bestEstimate = toCentis(history.mean)
-  def lowEstimate = toCentis(history.mean - history.stdDev)
+  def lowEstimate = history.fold(Centis(0)) { h =>
+    Centis((h.mean - h.stdDev).toInt).nonNeg
+  }
 }
 
 object LagTracker {
   val quotaGain = Centis(100)
   val quotaMax = Centis(500)
   val maxLagComp = Centis(300)
-  private val initialHistory = DecayingStats.empty(variance = 1e4f)
+  private val initialHistory = DecayingStats.empty(baseVarience = 10 * 10)
 }
 

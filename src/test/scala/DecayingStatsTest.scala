@@ -3,8 +3,6 @@ package chess
 import org.specs2.mutable.Specification
 import ornicar.scalalib.test.ValidationMatchers
 
-import scala.collection.breakOut
-
 import DecayingStats.{ empty => dEmpty }
 
 class DecayingStatsTest extends Specification with ValidationMatchers {
@@ -75,7 +73,7 @@ class DecayingStatsTest extends Specification with ValidationMatchers {
   }
 
   "flip flop data" should {
-    val data: Array[Float] = (1 to 1000).map { i => (i & 1).toFloat }(breakOut)
+    val data = Array.iterate(0f, 1000) { 1f - _ }
     val stats = dEmpty(10).record(0).record(data)
     "converge reasonably" in {
       stats.mean must beCloseTo(.5f +/- 0.05f)

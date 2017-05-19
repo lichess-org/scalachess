@@ -12,7 +12,7 @@ notifications:
     skip_join: true
   slack:
     rooms:
-      - lichess:sVTqlE0OQNMPq1n6qRnVnfrz
+      - secure: "I9aVV+C0cFCUxXgt8gtSHBFPBRBN6fI36n7l7ZtmN2bR+1L1gXw1uFwZBPEPJtyWvGGKRTwk5diPySOTGE0sjDczEXDLuNht36v+ehnqmg6sVfOkQcqaLt/LhGkcaBJ/85e+hknEMuOOtQvDqlcQ1P7xckW2Mj7l211donlrU94="
     on_success: change
     on_failure: always
   email: false

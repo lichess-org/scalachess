@@ -18,9 +18,9 @@ case class LagTracker(
     ))
   }
 
-  def bestEstimate = Centis(history.fold(0) { _.mean.toInt })
+  def estimate = history.map { h => Centis(h.mean.toInt) }
 
-  def lowEstimate = history.fold(Centis(0)) { h =>
+  def lowEstimate = history.map { h =>
     Centis((h.mean - h.stdDev).toInt).nonNeg
   }
 }

@@ -24,7 +24,10 @@ case class Clock(
 
   def remainingTime(c: Color) = rawRemaining(c) nonNeg
 
-  def outOfTimeWithGrace(c: Color) = rawRemaining(c) < -LagTracker.maxLagComp
+  def outOfTime(c: Color, withGrace: Boolean) = {
+    val minTime = if (withGrace) -LagTracker.maxLagComp else Centis(0)
+    rawRemaining(c) <= minTime
+  }
 
   def moretimeable(c: Color) = rawRemaining(c).centis < 100 * 60 * 60 * 2
 
@@ -89,7 +92,7 @@ case class Clock(
   def goBerserk(c: Color) = updatePlayer(c) { _.copy(berserk = true) }
 
   def berserked(c: Color) = players(c).berserk
-  def lag(c: Color) = players(c).lag.bestEstimate
+  def lag(c: Color) = players(c).lag.estimate
 
   def estimateTotalSeconds = config.estimateTotalSeconds
   def estimateTotalTime = config.estimateTotalTime

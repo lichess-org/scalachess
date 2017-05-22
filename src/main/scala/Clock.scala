@@ -25,7 +25,7 @@ case class Clock(
   def remainingTime(c: Color) = rawRemaining(c) nonNeg
 
   def outOfTime(c: Color, withGrace: Boolean) = {
-    val minTime = if (withGrace) -LagTracker.maxLagComp else Centis(0)
+    val minTime = if (withGrace) -players(c).lag.maxNextComp else Centis(0)
     rawRemaining(c) <= minTime
   }
 

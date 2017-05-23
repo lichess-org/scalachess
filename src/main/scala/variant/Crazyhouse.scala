@@ -44,7 +44,7 @@ case object Crazyhouse
 
   override def fiftyMoves(board: Board): Boolean = false
 
-  override def isIrreversible(move: Move): Boolean = false
+  override def isIrreversible(move: Move): Boolean = move.castles
 
   override def finalizeBoard(board: Board, uci: Uci, capture: Option[Piece]): Board = uci match {
     case Uci.Move(orig, dest, promOption) =>

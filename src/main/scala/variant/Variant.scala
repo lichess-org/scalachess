@@ -136,7 +136,7 @@ abstract class Variant private[variant] (
   def fiftyMoves(board: Board): Boolean = board.history.halfMoveClock >= 100
 
   def isIrreversible(move: Move): Boolean =
-    (move.piece is Pawn) || move.captures || move.promotes
+    (move.piece is Pawn) || move.captures || move.promotes || move.castles
 
   /**
     * Once a move has been decided upon from the available legal moves, the board is finalized

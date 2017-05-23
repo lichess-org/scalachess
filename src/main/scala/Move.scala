@@ -24,7 +24,10 @@ case class Move(
     val board = after updateHistory { h1 =>
       val h2 = h1.copy(
         lastMove = Some(toUci),
-        unmovedRooks = before.unmovedRooks
+        unmovedRooks = before.unmovedRooks,
+        halfMoveClock =
+          if ((piece is Pawn) || captures || promotes) 0
+          else h1.halfMoveClock + 1
       )
 
       // my broken castles
@@ -43,7 +46,10 @@ case class Move(
     board.variant.finalizeBoard(board, toUci, capture flatMap before.apply) updateHistory { h =>
       // Update position hashes last, only after updating the board,
       // castling rights and en-passant rights.
-      h.copy(positionHashes = board.variant.updatePositionHashes(board, this, h.positionHashes))
+      h.copy(positionHashes = Hash(Situation(board, !piece.color)) ++ {
+        if (board.variant.isIrreversible(this)) Array.empty: PositionHash
+        else h.positionHashes
+      })
     }
   }
 

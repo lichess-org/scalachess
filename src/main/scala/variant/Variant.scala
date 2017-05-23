@@ -133,13 +133,10 @@ abstract class Variant private[variant] (
     */
   def addVariantEffect(move: Move): Move = move
 
-  def updatePositionHashes(board: Board, move: Move, hash: chess.PositionHash): PositionHash = {
-    val newHash = Hash(Situation(board, !move.piece.color))
-    if ((move.piece is Pawn) || move.captures || move.promotes) newHash
-    else newHash ++ hash
-  }
+  def fiftyMoves(board: Board): Boolean = board.history.halfMoveClock >= 100
 
-  @silent def updatePositionHashes(board: Board, drop: Drop, hash: chess.PositionHash): PositionHash = Array()
+  def isIrreversible(move: Move): Boolean =
+    (move.piece is Pawn) || move.captures || move.promotes
 
   /**
     * Once a move has been decided upon from the available legal moves, the board is finalized

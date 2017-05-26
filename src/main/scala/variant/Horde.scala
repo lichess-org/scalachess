@@ -49,7 +49,7 @@ case object Horde extends Variant(
 
   /**
    * In horde chess, black always has a possibility to win the game.
-   *  Auto-drawing the game should never happen, but it did in https://en.lichess.org/xQ2RsU8N#121
+   *  Auto-drawing the game should never happen, but it did in https://lichess.org/xQ2RsU8N#121
    */
   override def insufficientWinningMaterial(board: Board) = false
 

@@ -178,7 +178,7 @@ Bd3 f5 9. g3 Qf6 10. Nf3 c5 11. O-O Ne7 12. Bg5 Qf8 13. Nb5 Bxe4 14. Bxe4 fxe4
 """
 
   val complete960 = """[Event "Casual game"]
-[Site "http://en.lichess.org/analyse/---qxr00"]
+[Site "http://lichess.org/analyse/---qxr00"]
 [Date "2010.10.30"]
 [White "Anonymous"]
 [Black "Crafty level 1"]

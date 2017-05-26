@@ -5,7 +5,6 @@ sealed trait Role {
   lazy val forsythUpper: Char = forsyth.toUpper
   lazy val pgn: Char = forsythUpper
   lazy val name = toString.toLowerCase
-  val attacker: Boolean = true
   val projection: Boolean
   val dirs: Directions
   def dir(from: Pos, to: Pos): Option[Direction]
@@ -19,7 +18,6 @@ case object King extends PromotableRole {
   val forsyth = 'k'
   val dirs: Directions = Queen.dirs
   def dir(from: Pos, to: Pos) = None
-  override val attacker = false
   val projection = false
 }
 

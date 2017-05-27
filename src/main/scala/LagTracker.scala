@@ -12,11 +12,11 @@ case class LagTracker(
   def onMove(lag: Centis) = {
     val lagComp = lag.nonNeg atMost maxNextComp
 
-    val recorder = history getOrElse initialHistory
-
     (lagComp, copy(
       quota = (quota + quotaGain - lagComp) atMost quotaMax,
-      history = Some(recorder.record(lagComp.centis))
+      history = Some(history.fold(
+        DecayingStats.empty(baseVarience = 100)(lagComp.centis)
+      )(_.record(lagComp.centis)))
     ))
   }
 
@@ -31,6 +31,5 @@ object LagTracker {
   val quotaGain = Centis(100)
   val quotaMax = Centis(500)
   val maxMoveComp = Centis(300)
-  private val initialHistory = DecayingStats.empty(baseVarience = 10 * 10)
 }
 

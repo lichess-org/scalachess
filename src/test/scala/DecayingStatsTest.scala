@@ -22,9 +22,9 @@ class DecayingStatsTest extends Specification with ValidationMatchers {
 
   "empty stats" should {
     "propogate initial state" in {
-      dEmpty(0.5f).record(0).mean must_== 0
-      dEmpty(0.5f).record(0).variance must_== 0.5f
-      dEmpty(0, decay = 0.9f).record(0).decay must_== 0.9f
+      dEmpty(0.5f)(0).mean must_== 0
+      dEmpty(0.5f)(0).variance must_== 0.5f
+      dEmpty(0, decay = 0.9f)(0).decay must_== 0.9f
     }
   }
 
@@ -32,8 +32,8 @@ class DecayingStatsTest extends Specification with ValidationMatchers {
     val randoms = Array.fill(1000) { random.nextGaussian.toFloat }
     val data10 = randoms map { _ + 10 }
 
-    val stats10 = dEmpty(100).record(10).record(data10)
-    val stats10d = dEmpty(100, decay = 0.99f).record(10).record(data10)
+    val stats10 = dEmpty(100)(10).record(data10)
+    val stats10d = dEmpty(100, decay = 0.99f)(10).record(data10)
     "eventually converge with constant mean" in {
       stats10.stdDev must beCloseTo(1f +/- 0.2f)
       stats10.mean must beCloseTo(10f +/- 0.25f)
@@ -61,8 +61,8 @@ class DecayingStatsTest extends Specification with ValidationMatchers {
 
     "converge with interleave" in {
       val dataI = Array(data10, randoms).flatMap(_.zipWithIndex).sortBy(_._2).map(_._1)
-      val statsIa = dEmpty(100).record(10).record(dataI)
-      val statsIb = dEmpty(100, decay = 0.99f).record(10).record(dataI)
+      val statsIa = dEmpty(100)(10).record(dataI)
+      val statsIb = dEmpty(100, decay = 0.99f)(10).record(dataI)
 
       statsIa.stdDev must beCloseTo(5f +/- 1f)
       statsIa.mean must beCloseTo(5f +/- 1f)
@@ -74,7 +74,7 @@ class DecayingStatsTest extends Specification with ValidationMatchers {
 
   "flip flop data" should {
     val data = Array.iterate(0f, 1000) { 1f - _ }
-    val stats = dEmpty(10).record(0).record(data)
+    val stats = dEmpty(10)(0).record(data)
     "converge reasonably" in {
       stats.mean must beCloseTo(.5f +/- 0.05f)
       stats.stdDev must beCloseTo(.5f +/- 0.05f)

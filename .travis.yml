@@ -21,5 +21,14 @@ notifications:
 jdk:
   - oraclejdk8
 
+before_cache:
+ - find $HOME/.ivy2/cache -name 'ivydata-*.properties' -delete
+ - find $HOME/.sbt -name '*.lock' -delete
+ - rm -rf $HOME/.sbt/0.13/dependency/module/dynamic
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt
+
 script:
   - sbt test

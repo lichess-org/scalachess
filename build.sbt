@@ -27,6 +27,8 @@ scalacOptions ++= Seq(
   "-Ywarn-unused", "-Xlint:missing-interpolator",
   "-Ybackend:GenBCode", "-Ydelambdafy:method", "-target:jvm-1.8")
 
+publishTo := Some(Resolver.file("file",  new File(sys.props.getOrElse("publishTo", ""))))
+
 import scalariform.formatter.preferences._
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys

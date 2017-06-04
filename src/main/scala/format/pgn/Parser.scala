@@ -40,9 +40,9 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     } yield ParsedPgn(init, tags2, sans)
   }
   catch {
-    case e: StackOverflowError =>
+    case _: StackOverflowError =>
       println(pgn)
-      sys error s"### StackOverflowError ### in PGN parser"
+      sys error "### StackOverflowError ### in PGN parser"
   }
 
   def getVariantFromTags(tags: List[Tag]): Variant =
@@ -334,6 +334,6 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     ensureTagsNewline(pgn).lines.toList.map(_.trim).filter(_.nonEmpty) span { line =>
       line lift 0 contains '['
     } match {
-      case (tagLines, moveLines) => success(tagLines.mkString("\n") -> moveLines.mkString("\n"))
+      case (tagLines, moveLines) => succezz(tagLines.mkString("\n") -> moveLines.mkString("\n"))
     }
 }

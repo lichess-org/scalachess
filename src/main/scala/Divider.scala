@@ -60,7 +60,7 @@ object Divider {
     case (backrank, color) => backrank.count { pos => board(pos).fold(false)(_ is color) } < 4
   }
 
-  private def score(white: Int, black: Int, x: Int, y: Int): Int = (white, black) match {
+  private def score(white: Int, black: Int, y: Int): Int = (white, black) match {
     case (0, 0) => 0
 
     case (1, 0) => 1 + (8 - y)
@@ -109,7 +109,7 @@ object Divider {
             else black = black + 1
           }
         }
-        mix + score(white, black, region.head.x, region.head.y)
+        mix + score(white, black, region.head.y)
     }
   }
 }

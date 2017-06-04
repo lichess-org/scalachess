@@ -45,7 +45,7 @@ case class Game(
       player = !player,
       turns = turns + 1
     )
-    val pgnMove = pgn.Dumper(situation, drop, newGame.situation)
+    val pgnMove = pgn.Dumper(drop, newGame.situation)
     newGame.copy(
       pgnMoves = pgnMoves.isEmpty.fold(List(pgnMove), pgnMoves :+ pgnMove),
       clock = applyClock(drop.lag, newGame.situation.status.isEmpty)

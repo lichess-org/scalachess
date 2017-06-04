@@ -3,6 +3,7 @@ package variant
 
 import scala.collection.breakOut
 import scalaz.Validation.FlatMap._
+import scalaz.Validation.failureNel
 
 import Pos.posAt
 
@@ -88,7 +89,7 @@ abstract class Variant(
   }
 
   def drop(situation: Situation, role: Role, pos: Pos): Valid[Drop] =
-    s"$this variant cannot drop pieces".failureNel
+    failureNel(s"$this variant cannot drop $situation $role $pos")
 
   def staleMate(situation: Situation): Boolean = !situation.check && situation.moves.isEmpty
 

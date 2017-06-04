@@ -30,7 +30,7 @@ case object Crazyhouse extends Variant(
     d1 <- situation.board.crazyData toValid "Board has no crazyhouse data"
     _ <- d1.validIf(role != Pawn || canDropPawnOn(pos), s"Can't drop $role on $pos")
     piece = Piece(situation.color, role)
-    d2 <- d1.drop(piece, pos) toValid s"No $piece to drop"
+    d2 <- d1.drop(piece) toValid s"No $piece to drop"
     board1 <- situation.board.place(piece, pos) toValid s"Can't drop $role on $pos, it's occupied"
     _ <- board1.validIf(!board1.check(situation.color), s"Dropping $role on $pos doesn't uncheck the king")
   } yield Drop(
@@ -109,7 +109,7 @@ case object Crazyhouse extends Variant(
       promoted: Set[Pos]
   ) {
 
-    def drop(piece: Piece, pos: Pos): Option[Data] =
+    def drop(piece: Piece): Option[Data] =
       pockets take piece map { nps =>
         copy(pockets = nps)
       }

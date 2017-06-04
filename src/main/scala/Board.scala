@@ -3,6 +3,7 @@ package chess
 import Pos.posAt
 import scala.collection.breakOut
 import scalaz.Validation.FlatMap._
+import scalaz.Validation.{ failureNel, success }
 import variant.{ Variant, Crazyhouse }
 
 case class Board(
@@ -56,7 +57,7 @@ case class Board(
 
   def place(piece: Piece) = new {
     def at(at: Pos): Valid[Board] =
-      if (pieces contains at) failure("Cannot place at occupied " + at)
+      if (pieces contains at) failureNel("Cannot place at occupied " + at)
       else success(copy(pieces = pieces + ((at, piece))))
   }
 
@@ -82,7 +83,7 @@ case class Board(
 
   def move(orig: Pos) = new {
     def to(dest: Pos): Valid[Board] = {
-      if (pieces contains dest) failure("Cannot move to occupied " + dest)
+      if (pieces contains dest) failureNel("Cannot move to occupied " + dest)
       else pieces get orig map { piece =>
         copy(pieces = (pieces - orig) + ((dest, piece)))
       } toSuccess ("No piece at " + orig + " to move")

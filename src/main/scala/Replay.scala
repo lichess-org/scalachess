@@ -4,6 +4,7 @@ import chess.format.pgn.San
 import chess.format.{ Forsyth, FEN, Uci }
 import format.pgn.{ Parser, Reader, Tag }
 import scalaz.Validation.FlatMap._
+import scalaz.Validation.{ failureNel, success }
 
 case class Replay(setup: Game, moves: List[MoveOrDrop], state: Game) {
 
@@ -133,7 +134,7 @@ object Replay {
     variant: chess.variant.Variant,
     atFen: String
   ): Valid[Int] =
-    if (Forsyth.<<@(variant, atFen).isEmpty) s"Invalid FEN $atFen".failureNel
+    if (Forsyth.<<@(variant, atFen).isEmpty) failureNel(s"Invalid FEN $atFen")
     else {
 
       // we don't want to compare the full move number, to match transpositions
@@ -143,7 +144,7 @@ object Replay {
 
       def recursivePlyAtFen(sit: Situation, sans: List[San], ply: Int): Valid[Int] =
         sans match {
-          case Nil => s"Can't find $atFenTruncated, reached ply $ply".failureNel
+          case Nil => failureNel(s"Can't find $atFenTruncated, reached ply $ply")
           case san :: rest => san(sit) flatMap { moveOrDrop =>
             val after = moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter)
             val fen = Forsyth >> Game(after, Color(ply % 2 == 0), turns = ply)

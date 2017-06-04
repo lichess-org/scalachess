@@ -116,7 +116,7 @@ case class Actor(
     travelPoss = kingPos <-> newKingPos
     if !travelPoss.map(board.apply).exists {
       case Some(piece) if piece == color.rook || piece == color.king => false
-      case Some(piece) => true
+      case Some(_) => true
       case _ => false
     }
     if !travelPoss.exists(p => board.variant.kingThreatened(board, !color, p))

@@ -4,8 +4,8 @@ organization := "org.lichess"
 
 version := "6.0"
 
-scalaVersion := "2.12.2"
-crossScalaVersions := Seq("2.12.2", "2.11.11")
+scalaVersion := "2.11.11"
+crossScalaVersions := Seq("2.11.11", "2.12.2")
 
 libraryDependencies ++= List(
   "org.scalaz" %% "scalaz-core" % "7.2.13",

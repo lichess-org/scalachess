@@ -2,6 +2,8 @@ package chess
 
 import scala.concurrent.duration._
 
+import ornicar.scalalib.Zero
+
 // maximum centis = Int.MaxValue / 100 / 60 / 60 / 24 = 248 days
 case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
 
@@ -29,6 +31,7 @@ case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
 }
 
 object Centis {
+  implicit val zeroInstance = Zero.instance(Centis(0))
 
   def apply(value: Long): Centis = Centis {
     if (value > Int.MaxValue) {

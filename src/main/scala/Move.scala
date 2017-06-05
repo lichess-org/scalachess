@@ -12,7 +12,7 @@ case class Move(
     promotion: Option[PromotableRole],
     castle: Option[((Pos, Pos), (Pos, Pos))],
     enpassant: Boolean,
-    lag: Centis = Centis(0)
+    metrics: MoveMetrics = MoveMetrics()
 ) {
 
   def situationBefore = before situationOf piece.color
@@ -76,7 +76,7 @@ case class Move(
 
   def withAfter(newBoard: Board) = copy(after = newBoard)
 
-  def withLag(l: Centis) = copy(lag = l)
+  def withMetrics(m: MoveMetrics) = copy(metrics = m)
 
   def toUci = Uci.Move(orig, dest, promotion)
 

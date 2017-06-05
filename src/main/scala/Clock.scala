@@ -2,186 +2,129 @@ package chess
 
 import java.text.DecimalFormat
 
+import Clock.Config
+
 // All unspecified durations are expressed in seconds
-sealed trait Clock {
-  @inline implicit def CentisWrapper(c: Int) = new Centis(c)
-  @inline implicit def CentisWrapper(c: Long) = Centis(c)
-
-  val config: Clock.Config
-  val color: Color
-  val whiteTime: Centis
-  val blackTime: Centis
-  val whiteBerserk: Boolean
-  val blackBerserk: Boolean
-  val timerOption: Option[Timestamp]
-  val timestamper: Timestamper
-
-  def limitSeconds = config.limitSeconds
-  def limit = config.limit
-
-  def incrementSeconds = config.incrementSeconds
-  def increment = config.increment
-
-  def time(c: Color): Centis = c.fold(whiteTime, blackTime)
-
-  def outoftime(c: Color) = remainingTime(c).centis == 0
-
-  def outoftimeWithGrace(c: Color, grace: Centis) =
-    timeSinceFlag(c).exists((grace atMost Clock.maxGrace).<)
-
-  def remainingTime(c: Color): Centis = (limit - elapsedTime(c)) nonNeg
-
-  def incrementOf(c: Color): Centis =
-    if (c.fold(whiteBerserk, blackBerserk)) 0 else increment
-
-  def setRemainingTime(c: Color, centis: Centis) =
-    addTime(c, remainingTime(c) - centis)
-
-  private def timeSinceFlag(c: Color): Option[Centis] = (limit - elapsedTime(c)) match {
-    case s if s.centis <= 0 => Some(-s)
-    case _ => None
-  }
-
-  def remainingTimes = Map(White -> remainingTime(White), Black -> remainingTime(Black))
-
-  def elapsedTime(c: Color) = time(c)
-
-  def limitInMinutes = config.limitInMinutes
-
-  def estimateTotalIncrement = config.estimateTotalIncrement
-
-  def estimateTotalTime = config.estimateTotalTime
-
-  def estimateTotalSeconds = config.estimateTotalSeconds
-
-  def stop: PausedClock
-
-  def addTime(c: Color, t: Centis): Clock
-
-  def giveTime(c: Color, t: Centis): Clock
-
-  def berserked(c: Color) = c.fold(whiteBerserk, blackBerserk)
-
-  def goBerserk(c: Color): Clock
-
-  def show = config.show
-
-  def moretimeable(c: Color) = remainingTime(c).centis < 100 * 60 * 60 * 2
-
-  def isRunning = timerOption.isDefined
-
-  def isInit = elapsedTime(White).centis == 0 && elapsedTime(Black).centis == 0
-
-  def switch: Clock
-
-  def takeback: Clock
-
-  def reset = Clock(config)
-}
-
-case class RunningClock(
-    config: Clock.Config,
+case class Clock(
+    config: Config,
     color: Color,
-    whiteTime: Centis,
-    blackTime: Centis,
-    whiteBerserk: Boolean,
-    blackBerserk: Boolean,
-    timer: Timestamp,
+    players: Color.Map[ClockPlayer],
+    timer: Option[Timestamp] = None,
     timestamper: Timestamper = RealTimestamper
-) extends Clock {
+) {
   import timestamper.{ now, toNow }
 
-  val timerOption = Some(timer)
-
-  override def elapsedTime(c: Color) = {
-    if (c == color) toNow(timer) + time(c) else time(c)
+  @inline private def pending(c: Color) = timer match {
+    case Some(t) if c == color => toNow(t)
+    case _ => Centis(0)
   }
 
-  def step(lag: Centis = 0, withInc: Boolean = true) = {
-    val t = now
-    val lagComp: Centis = lag atMost Clock.maxLagToCompensate nonNeg
-    val inc: Centis = if (withInc) incrementOf(color) else 0
-    addTime(
-      color,
-      (((t - timer) - lagComp) nonNeg) - inc
-    ).copy(
-        color = !color,
-        timer = t
-      )
+  @inline private def rawRemaining(c: Color) =
+    players(c).remaining - pending(c)
+
+  def remainingTime(c: Color) = rawRemaining(c) nonNeg
+
+  def outOfTime(c: Color, withGrace: Boolean) = {
+    val minTime = if (withGrace) -players(c).lag.maxNextComp else Centis(0)
+    rawRemaining(c) <= minTime
   }
 
-  def stop = PausedClock(
-    config = config,
-    color = color,
-    whiteTime = color.fold(whiteTime + toNow(timer), whiteTime),
-    blackTime = color.fold(blackTime, blackTime + toNow(timer)),
-    whiteBerserk = whiteBerserk,
-    blackBerserk = blackBerserk,
-    timestamper = timestamper
-  )
+  def moretimeable(c: Color) = rawRemaining(c).centis < 100 * 60 * 60 * 2
 
-  def addTime(c: Color, t: Centis): RunningClock = c match {
-    case White => copy(whiteTime = whiteTime + t)
-    case Black => copy(blackTime = blackTime + t)
-  }
+  def isInit = players.forall(_.isInit)
 
-  def giveTime(c: Color, t: Centis): RunningClock = addTime(c, -t)
+  def isRunning = timer.isDefined
 
-  def goBerserk(c: Color): RunningClock = addTime(c, config.berserkPenalty).copy(
-    whiteBerserk = whiteBerserk || c.white,
-    blackBerserk = blackBerserk || c.black
-  )
+  def start = if (isRunning) this else copy(timer = Some(now))
 
-  def switch: RunningClock = copy(color = !color)
-
-  def takeback: RunningClock = {
+  def stop = timer.fold(this) { t =>
     copy(
-      color = !color,
-      timer = now
+      players = players.update(color, _.takeTime(toNow(t))),
+      timer = None
     )
   }
-}
 
-case class PausedClock(
-    config: Clock.Config,
-    color: Color,
-    whiteTime: Centis,
-    blackTime: Centis,
-    whiteBerserk: Boolean,
-    blackBerserk: Boolean,
-    timestamper: Timestamper = RealTimestamper
-) extends Clock {
+  def updatePlayer(c: Color)(f: ClockPlayer => ClockPlayer) =
+    copy(players = players.update(c, f))
 
-  val timerOption = None
+  def switch = copy(
+    color = !color,
+    timer = timer.map(_ => now)
+  )
 
-  def stop = this
+  def step(
+    metrics: MoveMetrics = MoveMetrics(),
+    withInc: Boolean = true
+  ) = timer.map { t =>
+    val elapsed = toNow(t)
 
-  def addTime(c: Color, t: Centis): PausedClock = c match {
-    case White => copy(whiteTime = whiteTime + t)
-    case Black => copy(blackTime = blackTime + t)
+    val player = players(color)
+
+    val reportedLag = metrics.reportedLag(elapsed)
+
+    val (lagComp, newLag) = reportedLag.fold((Centis(0), player.lag)) {
+      player.lag.onMove _
+    }
+
+    val inc = if (withInc) player.increment else Centis(0)
+
+    updatePlayer(color) {
+      _.takeTime(((elapsed - lagComp) nonNeg) - inc)
+        .copy(lag = newLag)
+    }.switch
   }
 
-  def giveTime(c: Color, t: Centis): PausedClock = addTime(c, -t)
+  // To do: safely add this to takeback to remove inc from player.
+  // def deinc = updatePlayer(color, _.giveTime(-incrementOf(color)))
 
-  def goBerserk(c: Color): PausedClock = addTime(c, config.berserkPenalty).copy(
-    whiteBerserk = c.fold(true, whiteBerserk),
-    blackBerserk = c.fold(blackBerserk, true)
-  )
+  def takeback = switch
 
-  def switch: PausedClock = copy(color = !color)
+  def giveTime(c: Color, t: Centis) = updatePlayer(c) {
+    _.giveTime(t)
+  }
 
-  def takeback: PausedClock = switch
+  def setRemainingTime(c: Color, centis: Centis) = updatePlayer(c) {
+    _.setRemaining(centis)
+  }
 
-  def start = RunningClock(
-    config = config,
-    color = color,
-    whiteTime = whiteTime,
-    blackTime = blackTime,
-    whiteBerserk = whiteBerserk,
-    blackBerserk = blackBerserk,
-    timer = timestamper.now,
-    timestamper = timestamper
-  )
+  def incrementOf(c: Color) = players(c).increment
+
+  def goBerserk(c: Color) = updatePlayer(c) { _.copy(berserk = true) }
+
+  def berserked(c: Color) = players(c).berserk
+  def lag(c: Color) = players(c).lag.estimate
+
+  def estimateTotalSeconds = config.estimateTotalSeconds
+  def estimateTotalTime = config.estimateTotalTime
+  def increment = config.increment
+  def incrementSeconds = config.incrementSeconds
+  def limit = config.limit
+  def limitInMinutes = config.limitInMinutes
+  def limitSeconds = config.limitSeconds
+}
+
+case class ClockPlayer(
+    config: Clock.Config,
+    elapsed: Centis = Centis(0),
+    lag: LagTracker = LagTracker(),
+    berserk: Boolean = false
+) {
+  val limit = {
+    if (berserk) config.initTime - config.berserkPenalty
+    else config.initTime
+  }
+
+  def isInit = elapsed.centis == 0
+
+  def remaining = limit - elapsed
+
+  def takeTime(t: Centis) = copy(elapsed = elapsed + t)
+
+  def giveTime(t: Centis) = takeTime(-t)
+
+  def setRemaining(t: Centis) = copy(elapsed = limit - t)
+
+  def increment = if (berserk) Centis(0) else config.increment
 }
 
 object Clock {
@@ -190,25 +133,21 @@ object Clock {
   // All unspecified durations are expressed in seconds
   case class Config(limitSeconds: Int, incrementSeconds: Int) {
 
-    def limitInMinutes = limitSeconds / 60d
-
-    def limit = Centis.ofSeconds(limitSeconds)
-
-    def estimateTotalIncrement = Centis.ofSeconds(estimateTotalIncSeconds)
-
-    def estimateTotalIncSeconds = 40 * incrementSeconds
-
-    def estimateTotalTime = Centis.ofSeconds(estimateTotalSeconds)
-
-    def estimateTotalSeconds = limitSeconds + estimateTotalIncSeconds
+    def berserkable = incrementSeconds == 0 || limitSeconds > 0
 
     def emergSeconds = math.min(60, math.max(10, limitSeconds / 8))
+
+    def estimateTotalSeconds = limitSeconds + 40 * incrementSeconds
+
+    def estimateTotalTime = Centis.ofSeconds(estimateTotalSeconds)
 
     def hasIncrement = incrementSeconds > 0
 
     def increment = Centis.ofSeconds(incrementSeconds)
 
-    def berserkable = incrementSeconds == 0 || limitSeconds > 0
+    def limit = Centis.ofSeconds(limitSeconds)
+
+    def limitInMinutes = limitSeconds / 60d
 
     def toClock = Clock(this)
 
@@ -228,6 +167,11 @@ object Clock {
     def berserkPenalty =
       if (limitSeconds < 40 * incrementSeconds) Centis(0)
       else Centis(limitSeconds * (100 / 2))
+
+    def initTime = {
+      if (limitSeconds == 0) increment atLeast Centis(300)
+      else limit
+    }
   }
 
   // [TimeControl "600+2"] -> 10+2
@@ -239,26 +183,15 @@ object Clock {
     case _ => none
   }
 
-  val minInitLimit = Centis(300)
-  // no more than this time will be offered to the lagging player
-  val maxLagToCompensate = Centis(100)
-  // no more than this time to get the last move in
-  val maxGrace = Centis(100)
+  def apply(limit: Int, increment: Int): Clock = apply(Config(limit, increment))
 
-  def apply(limit: Int, increment: Int): PausedClock = apply(Config(limit, increment))
-
-  def apply(config: Config): PausedClock = {
-    val clock = PausedClock(
+  def apply(config: Config): Clock = {
+    val player = ClockPlayer(config = config)
+    Clock(
       config = config,
       color = White,
-      whiteTime = Centis(0),
-      blackTime = Centis(0),
-      whiteBerserk = false,
-      blackBerserk = false
+      players = Color.Map(player, player),
+      timer = None
     )
-    if (clock.limitSeconds == 0) clock
-      .giveTime(White, config.increment atLeast minInitLimit)
-      .giveTime(Black, config.increment atLeast minInitLimit)
-    else clock
   }
 }

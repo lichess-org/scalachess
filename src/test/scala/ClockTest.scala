@@ -31,51 +31,80 @@ class ClockTest extends ChessTest {
     }
   }
   "lag compensation" should {
-    def fakeTime(c: RunningClock, t: Int) = c.copy(timestamper = new Timestamper {
-      def now = Timestamp(10 * t)
+    def fakeTime(c: Clock) = c.copy(timestamper = new Timestamper {
+      val now = Timestamp(0)
+    })
+    def advance(c: Clock, t: Int) = c.copy(timestamper = new Timestamper {
+      val now = c.timestamper.now + Centis(t)
     })
 
-    def fakeTimeP(c: PausedClock) = c.copy(timestamper = new Timestamper {
-      def now = Timestamp(0)
-    })
+    def durOf(lag: Int) = MoveMetrics(clientLag = Some(Centis(lag)))
 
-    def durOf(lag: Int) = Centis(lag)
-    def clockStep(wait: Int, lag: Int) = {
-      val clock = fakeTimeP(Clock(60, 0)).start.step()
-      val clockStep = fakeTime(clock, wait + lag) step durOf(lag)
-      (clockStep remainingTime Black).centis
+    def clockStep(wait: Int, lags: Int*) = {
+      (lags.foldLeft(fakeTime(Clock(60, 0)).start) { (clk, lag) =>
+        (advance(clk.step().get, wait + lag) step durOf(lag)).get
+      } remainingTime Black).centis
     }
+
     def clockStart(lag: Int) = {
-      val clock = fakeTimeP(Clock(60, 0)).start.step()
-      (clock step durOf(lag) remainingTime White).centis
+      val clock = fakeTime(Clock(60, 0)).start.step().get
+      ((clock step durOf(lag)).get remainingTime White).centis
     }
 
-    "premove, no lag" in {
-      clockStep(0, 0) must_== 60 * 100
+    "start" in {
+      "no lag" in {
+        clockStart(0) must_== 60 * 100
+      }
+      "small lag" in {
+        clockStart(20) must_== 60 * 100
+      }
+      "big lag" in {
+        clockStart(500) must_== 60 * 100
+      }
     }
-    "premove, small lag" in {
-      clockStep(0, 20) must_== 60 * 100
+
+    "1 move" in {
+      "premove, no lag" in {
+        clockStep(0, 0) must_== 60 * 100
+      }
+      "premove, small lag" in {
+        clockStep(0, 20) must_== 60 * 100
+      }
+      "premove, big lag" in {
+        clockStep(0, 300) must_== 59 * 100
+      }
+      "1s move, no lag" in {
+        clockStep(100, 0) must_== 59 * 100
+      }
+      "1s move, small lag" in {
+        clockStep(100, 20) must_== 59 * 100
+      }
+      "1s move, big lag" in {
+        clockStep(100, 300) must_== 58 * 100
+      }
     }
-    "premove, big lag" in {
-      clockStep(0, 200) must_== 59 * 100
-    }
-    "1s move, no lag" in {
-      clockStep(100, 0) must_== 59 * 100
-    }
-    "1s move, small lag" in {
-      clockStep(100, 20) must_== 59 * 100
-    }
-    "1s move, big lag" in {
-      clockStep(100, 200) must_== 58 * 100
-    }
-    "start, no lag" in {
-      clockStart(0) must_== 60 * 100
-    }
-    "start, small lag" in {
-      clockStart(20) must_== 60 * 100
-    }
-    "start, big lag" in {
-      clockStart(500) must_== 60 * 100
+
+    "multiple premoves" in {
+      "no lag" in {
+        clockStep(0, 0, 0) must_== 60 * 100
+      }
+      "medium lag x2" in {
+        clockStep(0, 300, 300) must_== 57 * 100
+      }
+      "no -> medium lag" in {
+        clockStep(0, 0, 300) must_== 60 * 100
+      }
+      "no x8 -> big lag" in {
+        clockStep(0, 0, 0, 0, 0, 0, 0, 0, 0, 500) must_== 58 * 100
+      }
+
+      "no x5 -> big lag x2" in {
+        clockStep(0, 0, 0, 0, 0, 0, 500, 500) must_== 56 * 100
+      }
+
+      "no x5 -> big lag x3" in {
+        clockStep(0, 0, 0, 0, 0, 0, 500, 500, 500) must_== 52 * 100
+      }
     }
   }
 }

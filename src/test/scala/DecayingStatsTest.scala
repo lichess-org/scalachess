@@ -1,11 +1,10 @@
 package chess
 
 import org.specs2.mutable.Specification
-import ornicar.scalalib.test.ValidationMatchers
 
 import DecayingStats.{ empty => dEmpty }
 
-class DecayingStatsTest extends Specification with ValidationMatchers {
+class DecayingStatsTest extends Specification {
 
   val random = new java.util.Random(2286825201242408115l)
 

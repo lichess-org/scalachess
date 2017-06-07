@@ -81,6 +81,8 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
     override val whiteSpace = """(\s|\t|\r?\n)+""".r
 
+    private def cleanComments(comments: List[String]) = comments.map(_.trim).filter(_.nonEmpty)
+
     def apply(pgn: String): Valid[(InitialPosition, List[StrMove], Option[Tag])] =
       parseAll(strMoves, pgn) match {
         case Success((init, moves, result), _) => succezz(init, moves, result map { r => Tag(_.Result, r) })
@@ -89,7 +91,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
     def strMoves: Parser[(InitialPosition, List[StrMove], Option[String])] = as("moves") {
       (commentary*) ~ (strMove*) ~ (result?) ~ (commentary*) ^^ {
-        case coms ~ sans ~ res ~ _ => (InitialPosition(coms), sans, res)
+        case coms ~ sans ~ res ~ _ => (InitialPosition(cleanComments(coms)), sans, res)
       }
     }
 
@@ -97,7 +99,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
     def strMove: Parser[StrMove] = as("move") {
       ((number | commentary)*) ~> (moveRegex ~ nagGlyphs ~ rep(commentary) ~ rep(variation)) <~ (moveExtras*) ^^ {
-        case san ~ glyphs ~ comments ~ variations => StrMove(san, glyphs, comments, variations)
+        case san ~ glyphs ~ comments ~ variations => StrMove(san, glyphs, cleanComments(comments), variations)
       }
     }
 
@@ -126,7 +128,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     def commentary: Parser[String] = blockCommentary | inlineCommentary
 
     def blockCommentary: Parser[String] = as("block comment") {
-      "{" ~> """[^\}]+""".r <~ "}"
+      "{" ~> """[^\}]*""".r <~ "}"
     }
 
     def inlineCommentary: Parser[String] = as("inline comment") {

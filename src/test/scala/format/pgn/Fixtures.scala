@@ -1250,6 +1250,25 @@ g6 59. Ra5 Ncd7 60. Kd2 Nf8 61. Ra6+ Ne6 62. h4 Ng4 63. Bxe6 fxe6 64. Kd3 Ne5+
 65. Ke4 Ng4 66. Kd4 Ne5 67. Ra8 Nd7 68. Rc8 Ke7 69. e4 Nf6 70. Rc7+ Kd6 71. Rg7
 Ng4 1-0"""
 
+val chessbaseWeird = """[Event "Altibox Norway Chess 2017"]
+[White "Aronian, Levon"]
+[Black "Caruana, Fabiano"]
+[Site "Stavanger"]
+[Round "1"]
+[Annotator "TA"]
+[Result "1/2-1/2"]
+[Date "2017.06.06"]
+[WhiteElo "2793"]
+[BlackElo "2805"]
+[PlyCount "115"]
+
+1. d4 {} d5 2. c4 dxc4 3. e3 Nf6 4. Bxc4 e6 5. Nf3 c5 6. 0-0 a6 7. b3 Nbd7 8. Bb2 b5 9. Be2 Bb7 10. a4 b4 11. Nbd2 Be7 12. Rc1 {D27: Queen's Gambit Accepted: Classical main line: 7 e4!?
+and 7 a4} 0-0 13. dxc5 {LiveBook: 4 Games} Bxc5 14. Ne5 {White is slightly
+better.} Rc8 15. Bf3 $146 ({Predecessor:} 15. Nxd7 Nxd7 16. Bf3 Bxf3 17. Qxf3 Be7 18. Rxc8 Qxc8 19. Rc1 Qd8 20. Ne4 f5 21. Qg3 e5 22. Nd2 {1/2-1/2 (22)
+Akesson,R (2465)-Van Wely,L (2585) Antwerp 1995} )Nd5 16. Nxd7 Qxd7 17. Nc4 Qe7 18. Qe2 Ba7 19. g3 Bb8 20. Rfd1 Rfd8 21. Bg2 Bc7 22. Qg4 {
+[#]} f6 23. h4 {} a5 24. Rd2 Ba6 25. Rdc2 Rb8 26. h5 Rd7 27. Qh4 Rf8 28. Bh3 Bb7 29. Bd4 (29. Qg4 $5 {} f5 30. Qe2 $11 )Qf7 30. Rd2 (30. h6 $5 {} )h6 31. Qg4 Re8 32. Qg6 Red8 33. Bg2 Ba6 34. Be4 {[#] aiming for Qh7+.} Qxg6 35. hxg6 Ne7 36. Bc5 f5 (36... Nd5 $1 $11 )37. Bxe7 $16 Rxe7 38. Bf3 ({Better is} 38. Rxd8+ $14 Bxd8 39. Bc6 )Rxd2 $11 39. Nxd2 Kf8 40. Rc5 Rd7 41. Nc4 Bxc4 $1 42. Rxc4 { Endgame KRB-KRB} Ke7 43. Rc6 Bd8 44. Be2 Rd6 45. Rxd6 (45. Rc8 {is interesting.} Kf6 46. Bc4 Bb6 47. Re8 Rc6 48. Kf1 )Kxd6 {KB-KB} 46. Bc4 e5 47. f4 Bb6 48. Kf2 exf4 49. gxf4 h5 50. Kf3 h4 51. Bf1 (51. Bd3 $5 {
+} )Ke6 52. e4 fxe4+ 53. Kxe4 Kf6 54. f5 Bd8 55. Bh3 Bb6 56. Bf1 Bd8 57. Bh3 Bb6 58. Bf1 {Precision: White = 68%, Black = 58%.} 1/2-1/2"""
+
 val chessbaseArrows = """[Event "?"]
 [Site "?"]
 [Date "2016.05.23"]

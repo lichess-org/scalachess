@@ -275,6 +275,11 @@ class ParserTest extends ChessTest {
       )
     }
   }
+  "chessbase weird" in {
+    parser(chessbaseWeird) must beSuccess.like {
+      case a => a.sans.size must_== 115
+    }
+  }
   "crazyhouse from prod" in {
     parser(crazyhouseFromProd) must beSuccess.like {
       case a => a.sans.size must_== 49

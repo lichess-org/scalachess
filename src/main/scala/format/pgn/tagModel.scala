@@ -34,6 +34,8 @@ object Tag {
   case object BlackClock extends TagType
   case object WhiteElo extends TagType
   case object BlackElo extends TagType
+  case object WhiteGlicko2 extends TagType
+  case object BlackGlicko2 extends TagType
   case object WhiteTitle extends TagType
   case object BlackTitle extends TagType
   case object WhiteTeam extends TagType
@@ -52,7 +54,7 @@ object Tag {
 
   val tagTypes = List(
     Event, Site, Date, UTCDate, UTCTime, Round, White, Black, TimeControl,
-    WhiteClock, BlackClock, WhiteElo, BlackElo, WhiteTitle, BlackTitle,
+    WhiteClock, BlackClock, WhiteElo, BlackElo, WhiteGlicko2, BlackGlicko2, WhiteTitle, BlackTitle,
     WhiteTeam, BlackTeam, Result, FEN, Variant, ECO, Opening, Termination, Annotator
   )
   val tagTypesByLowercase: Map[String, TagType] =

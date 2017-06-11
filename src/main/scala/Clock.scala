@@ -14,22 +14,21 @@ case class Clock(
 ) {
   import timestamper.{ now, toNow }
 
-  @inline private def pending(c: Color) = timer match {
-    case Some(t) if c == color => toNow(t)
-    case _ => Centis(0)
-  }
+  @inline def timerFor(c: Color) = if (c == color) timer else None
 
-  @inline private def rawRemaining(c: Color) =
-    players(c).remaining - pending(c)
+  @inline def pending(c: Color) = timerFor(c).fold(Centis(0))(toNow)
 
-  def remainingTime(c: Color) = rawRemaining(c) nonNeg
+  @inline def minPending(c: Color) =
+    (pending(c) - players(c).lag.maxNextComp) nonNeg
+
+  def remainingTime(c: Color) = (players(c).remaining - pending(c)) nonNeg
 
   def outOfTime(c: Color, withGrace: Boolean) = {
-    val minTime = if (withGrace) -players(c).lag.maxNextComp else Centis(0)
-    rawRemaining(c) <= minTime
+    val cutoff = if (withGrace) minPending(c) else pending(c)
+    players(c).remaining <= cutoff
   }
 
-  def moretimeable(c: Color) = rawRemaining(c).centis < 100 * 60 * 60 * 2
+  def moretimeable(c: Color) = players(c).remaining.centis < 100 * 60 * 60 * 2
 
   def isInit = players.forall(_.isInit)
 

@@ -3,6 +3,13 @@ package chess
 import Pos._
 
 class ClockTest extends ChessTest {
+  val fakeClock60 = Clock(60, 0).copy(timestamper = new Timestamper {
+    val now = Timestamp(0)
+  }).start
+
+  def advance(c: Clock, t: Int) = c.copy(timestamper = new Timestamper {
+    val now = c.timestamper.now + Centis(t)
+  })
 
   "play with a clock" should {
     val clock = Clock(5 * 60 * 1000, 0)
@@ -31,23 +38,16 @@ class ClockTest extends ChessTest {
     }
   }
   "lag compensation" should {
-    def fakeTime(c: Clock) = c.copy(timestamper = new Timestamper {
-      val now = Timestamp(0)
-    })
-    def advance(c: Clock, t: Int) = c.copy(timestamper = new Timestamper {
-      val now = c.timestamper.now + Centis(t)
-    })
-
     def durOf(lag: Int) = MoveMetrics(clientLag = Some(Centis(lag)))
 
     def clockStep(wait: Int, lags: Int*) = {
-      (lags.foldLeft(fakeTime(Clock(60, 0)).start) { (clk, lag) =>
+      (lags.foldLeft(fakeClock60) { (clk, lag) =>
         (advance(clk.step().get, wait + lag) step durOf(lag)).get
       } remainingTime Black).centis
     }
 
     def clockStart(lag: Int) = {
-      val clock = fakeTime(Clock(60, 0)).start.step().get
+      val clock = fakeClock60.step().get
       ((clock step durOf(lag)).get remainingTime White).centis
     }
 
@@ -105,6 +105,26 @@ class ClockTest extends ChessTest {
       "no x5 -> big lag x3" in {
         clockStep(0, 0, 0, 0, 0, 0, 500, 500, 500) must_== 52 * 100
       }
+    }
+  }
+
+  "live time checks" in {
+    "60s stall" in {
+      val clock60 = advance(fakeClock60, 60 * 100)
+
+      clock60.minPending(White).centis must_== 58 * 100
+      clock60.remainingTime(White).centis must_== 0
+      clock60.outOfTime(Black, withGrace = true) must beFalse
+      clock60.outOfTime(White, withGrace = true) must beFalse
+      clock60.outOfTime(White, withGrace = false) must beTrue
+    }
+    "62s stall" in {
+      val clock62 = advance(fakeClock60, 62 * 100)
+
+      clock62.minPending(White).centis must_== 60 * 100
+      clock62.remainingTime(White).centis must_== 0
+      clock62.outOfTime(White, withGrace = true) must beTrue
+      clock62.outOfTime(White, withGrace = false) must beTrue
     }
   }
 }

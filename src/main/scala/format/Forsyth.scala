@@ -187,14 +187,13 @@ object Forsyth {
       exportBoard(game.board) + exportCrazyPocket(game.board),
       game.player.letter,
       exportCastles(game.board),
-      game.situation.enPassantSquare.map(_.toString).getOrElse("-")
+      game.situation.enPassantSquare.map(_.toString).getOrElse("-"),
+      game.halfMoveClock,
+      game.fullMoveNumber
     ) ::: {
         if (game.board.variant == variant.ThreeCheck) List(exportCheckCount(game.board))
         else List()
-      } ::: List(
-        game.halfMoveClock,
-        game.fullMoveNumber
-      )
+      }
   } mkString " "
 
   def exportStandardPositionTurnCastling(board: Board, ply: Int): String = List(
@@ -204,13 +203,13 @@ object Forsyth {
   ) mkString " "
 
   private def exportCheckCount(board: Board) = board.history.checkCount match {
-    case CheckCount(white, black) => s"${3 - black}+${3 - white}"
+    case CheckCount(white, black) => s"+$black+$white"
   }
 
   private def exportCrazyPocket(board: Board) = board.crazyData match {
-    case Some(variant.Crazyhouse.Data(pockets, _)) => "[" +
+    case Some(variant.Crazyhouse.Data(pockets, _)) => "/" +
       pockets.white.roles.map(_.forsythUpper).mkString +
-      pockets.black.roles.map(_.forsyth).mkString + "]"
+      pockets.black.roles.map(_.forsyth).mkString
     case _ => ""
   }
 

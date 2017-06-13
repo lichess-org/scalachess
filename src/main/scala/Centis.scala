@@ -20,8 +20,6 @@ case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
   def *(scalar: Int) = Centis(scalar * centis)
   def unary_- = Centis(-centis)
 
-  def abs: Centis = Centis(centis.abs)
-
   def compare(other: Centis) = centis - other.centis
 
   def atMost(o: Centis) = if (centis > o.centis) o else this

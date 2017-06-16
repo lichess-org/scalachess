@@ -23,7 +23,9 @@ case class LagTracker(
   def estimate = history.map { h => Centis(h.mean.toInt) }
 
   def lowEstimate = history.map { h =>
-    Centis((h.mean - h.stdDev).toInt).nonNeg
+    // Note: Can switch this to an arithmatic deviation if
+    // sqrt becomes a performance bottleneck.
+    Centis((h.mean - h.stdDev).toInt).nonNeg atMost quota
   }
 }
 

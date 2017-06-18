@@ -24,7 +24,7 @@ object DecayingStats {
   def empty(baseVariance: Float, decay: Float = 0.9f)(value: Float) =
     new DecayingStats(
       mean = value,
-      variance = baseVariance + 0.5f * value * value,
+      variance = baseVariance + 0.1f * value * value,
       decay = decay
     )
 }

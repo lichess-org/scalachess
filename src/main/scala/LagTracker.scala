@@ -15,7 +15,7 @@ case class LagTracker(
     (lagComp, copy(
       quota = (quota + quotaGain - lagComp) atMost quotaMax,
       history = Some(history.fold(
-        DecayingStats.empty(baseVariance = 100)(lagComp.centis)
+        DecayingStats.empty(baseVariance = 1000)(lagComp.centis)
       )(_.record(lagComp.centis)))
     ))
   }

@@ -3,7 +3,8 @@ package chess
 final case class DecayingStats(
     mean: Float,
     variance: Float,
-    decay: Float
+    decay: Float,
+    decayVar: Float
 ) {
   def record[T](values: Traversable[T])(implicit n: Numeric[T]): DecayingStats =
     values.foldLeft(this) { (s, v) => s record n.toFloat(v) }
@@ -13,7 +14,7 @@ final case class DecayingStats(
 
     copy(
       mean = value + decay * delta,
-      variance = decay * variance + (1 - decay) * delta * delta
+      variance = decayVar * variance + (1 - decayVar) * delta * delta
     )
   }
 
@@ -24,7 +25,8 @@ object DecayingStats {
   def empty(baseVariance: Float, decay: Float = 0.9f)(value: Float) =
     new DecayingStats(
       mean = value,
-      variance = baseVariance + 0.1f * value * value,
-      decay = decay
+      variance = baseVariance + .02f * value * value,
+      decay = decay,
+      decayVar = decay * Math.sqrt(decay).toFloat
     )
 }

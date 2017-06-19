@@ -34,7 +34,7 @@ class DecayingStatsTest extends Specification {
     val stats10 = dEmpty(100)(10).record(data10)
     val stats10d = dEmpty(100, decay = 0.99f)(10).record(data10)
     "eventually converge with constant mean" in {
-      stats10.stdDev must beCloseTo(1f +/- 0.2f)
+      stats10.stdDev must beCloseTo(1f +/- 0.25f)
       stats10.mean must beCloseTo(10f +/- 0.25f)
 
       stats10d.stdDev must beCloseTo(1f +/- 0.005f)
@@ -45,7 +45,7 @@ class DecayingStatsTest extends Specification {
       val stats2 = stats10.record(randoms)
       val stats2d = stats10d.record(randoms)
 
-      stats2.stdDev must beCloseTo(1f +/- 0.2f)
+      stats2.stdDev must beCloseTo(1f +/- 0.25f)
       stats2.mean must beCloseTo(0f +/- 0.25f)
 
       stats2d.stdDev must beCloseTo(1f +/- 0.005f)

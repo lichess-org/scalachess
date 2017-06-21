@@ -15,8 +15,13 @@ case class LagTracker(
     (lagComp, copy(
       quota = (quota + quotaGain - lagComp) atMost quotaMax,
       history = Some(history.fold(
-        DecayingStats.empty(baseVariance = 500)(lagComp.centis)
-      )(_.record(lagComp.centis)))
+        DecayingStats(
+          mean = lagComp.centis,
+          variance = 300f,
+          decay = 0.9f,
+          decayVar = 0.85f
+        )
+      ) { _.record(lagComp.centis) })
     ))
   }
 
@@ -24,7 +29,7 @@ case class LagTracker(
 
   def lowEstimate = history.map { h =>
     {
-      val c = h.mean - Math.max(0.5f * h.stdDev, 10f)
+      val c = h.mean - Math.max(h.stdDev, 5f)
       Centis(c.toInt max 0) atMost quota
     }
   }

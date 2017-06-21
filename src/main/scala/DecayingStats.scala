@@ -22,10 +22,10 @@ final case class DecayingStats(
 }
 
 object DecayingStats {
-  def empty(baseVariance: Float, decay: Float = 0.9f)(value: Float) =
-    new DecayingStats(
+  def empty(variance: Float, decay: Float = 0.9f)(value: Float) =
+    DecayingStats(
       mean = value,
-      variance = baseVariance + .02f * value * value,
+      variance = variance,
       decay = decay,
       decayVar = decay * Math.sqrt(decay).toFloat
     )

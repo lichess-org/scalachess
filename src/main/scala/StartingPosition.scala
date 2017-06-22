@@ -178,7 +178,7 @@ object StartingPosition {
     p.eco -> p
   }(scala.collection.breakOut)
 
-  val featurable = all.filter(_.featurable)
+  lazy val featurable = new scala.util.Random(475591).shuffle(all.filter(_.featurable)).toIndexedSeq
 
   def randomFeaturable = featurable(scala.util.Random.nextInt(featurable.size))
 

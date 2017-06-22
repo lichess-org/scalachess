@@ -5,7 +5,7 @@ import format.{ pgn, Uci }
 case class Game(
     board: Board,
     player: Color = White,
-    pgnMoves: List[String] = Nil,
+    pgnMoves: Vector[String] = Vector(),
     clock: Option[Clock] = None,
     turns: Int = 0, // plies
     startedAtTurn: Int = 0
@@ -27,9 +27,8 @@ case class Game(
       player = !player,
       turns = turns + 1
     )
-    val pgnMove = pgn.Dumper(situation, move, newGame.situation)
     newGame.copy(
-      pgnMoves = pgnMoves.isEmpty.fold(List(pgnMove), pgnMoves :+ pgnMove),
+      pgnMoves = pgnMoves :+ pgn.Dumper(situation, move, newGame.situation),
       clock = applyClock(move.metrics, newGame.situation.status.isEmpty)
     )
   }
@@ -49,9 +48,8 @@ case class Game(
       player = !player,
       turns = turns + 1
     )
-    val pgnMove = pgn.Dumper(drop, newGame.situation)
     newGame.copy(
-      pgnMoves = pgnMoves.isEmpty.fold(List(pgnMove), pgnMoves :+ pgnMove),
+      pgnMoves = pgnMoves :+ pgn.Dumper(drop, newGame.situation),
       clock = applyClock(drop.metrics, newGame.situation.status.isEmpty)
     )
   }
@@ -73,8 +71,6 @@ case class Game(
   lazy val situation = Situation(board, player)
 
   def isStandardInit = board.pieces == chess.variant.Standard.pieces
-
-  def withPgnMoves(x: List[String]) = copy(pgnMoves = x)
 
   def halfMoveClock: Int = board.history.halfMoveClock
 

@@ -3,6 +3,8 @@ package chess
 import format.Uci
 import Pos.posAt
 
+import scala.collection.mutable.ArrayBuffer
+
 case class Actor(
     piece: Piece,
     pos: Pos,
@@ -33,7 +35,7 @@ case class Actor(
         def capture(horizontal: Direction): Option[Move] = {
           for {
             p ← horizontal(next)
-            if enemies(p)
+            if board.pieces.get(p).exists { _.color != color }
             b ← board.taking(pos, p)
           } yield move(p, b, Some(p))
         } flatMap maybePromote
@@ -135,25 +137,36 @@ case class Actor(
   ) map { move(_, b4, castle = castle) }) getOrElse Nil
 
   private def shortRange(dirs: Directions): List[Move] =
-    dirs flatMap { _(pos) } filterNot friends flatMap { to =>
-      if (enemies(to)) board.taking(pos, to) map { move(to, _, Some(to)) }
-      else board.move(pos, to) map { move(to, _) }
+    dirs flatMap { _(pos) } flatMap { to =>
+      board.pieces.get(to) match {
+        case Some(piece) =>
+          if (piece is color) Nil
+          else board.taking(pos, to) map { move(to, _, Some(to)) }
+        case None => board.move(pos, to) map { move(to, _) }
+      }
     }
+
+  // @scala.annotation.tailrec :-\
+  private def longAddAll(p: Pos, dir: Direction, buf: ArrayBuffer[Move]): Unit = {
+    dir(p) foreach { to =>
+      board.pieces.get(to) match {
+        case Some(piece) =>
+          if (piece.color != color) board.taking(pos, to) foreach {
+            buf += move(to, _, Some(to))
+          }
+
+        case None => {
+          board.move(pos, to).foreach { b => buf += move(to, b) }
+          longAddAll(to, dir, buf)
+        }
+      }
+    }
+  }
 
   private def longRange(dirs: Directions): List[Move] = {
-
-    def forward(p: Pos, dir: Direction): List[Move] = dir(p) match {
-      case None => Nil
-      case Some(next) if friends(next) => Nil
-      case Some(next) if enemies(next) => board.taking(pos, next) map { b =>
-        move(next, b, Some(next))
-      } toList
-      case Some(next) => board.move(pos, next) map { b =>
-        move(next, b) :: forward(next, dir)
-      } getOrElse Nil
-    }
-
-    dirs flatMap { dir => forward(pos, dir) }
+    val buf = new ArrayBuffer[Move]
+    dirs foreach { longAddAll(pos, _, buf) }
+    buf.toList
   }
 
   private val pawnDir = pawnDirOf(color)
@@ -169,7 +182,7 @@ case class Actor(
     piece = piece,
     orig = pos,
     dest = dest,
-    before = board,
+    situationBefore = Situation(board, piece.color),
     after = after,
     capture = capture,
     castle = castle,
@@ -178,8 +191,6 @@ case class Actor(
   )
 
   private def history = board.history
-  private val friends = board occupation color
-  private val enemies = board occupation !color
 }
 
 object Actor {
@@ -187,7 +198,7 @@ object Actor {
   def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
     board.variant.longRangeThreatens(board, p, dir, to)
 
-  def pawnDirOf(color: Color): Direction = if (color.white) _.up else _.down
+  def pawnDirOf(color: Color): Direction = color.fold(_.up, _.down)
 
   /**
    * Determines the position one ahead of a pawn based on the color of the piece.
@@ -198,8 +209,8 @@ object Actor {
   /**
    * Determines the squares that a pawn attacks based on the colour of the pawn.
    */
-  def pawnAttacks(pos: Pos, color: Color): List[Pos] = {
-    if (color.white) List(pos.upLeft, pos.upRight)
-    else List(pos.downLeft, pos.downRight)
-  }.flatten
+  def pawnAttacks(pos: Pos, color: Color): List[Pos] = color.fold(
+    List(pos.upLeft, pos.upRight),
+    List(pos.downLeft, pos.downRight)
+  ).flatten
 }

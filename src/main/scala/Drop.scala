@@ -5,13 +5,14 @@ import format.Uci
 case class Drop(
     piece: Piece,
     pos: Pos,
-    before: Board,
+    situationBefore: Situation,
     after: Board,
     metrics: MoveMetrics = MoveMetrics()
 ) {
 
-  def situationBefore = before situationOf piece.color
-  def situationAfter = finalizeAfter situationOf !piece.color
+  def before = situationBefore.board
+
+  def situationAfter = Situation(finalizeAfter, !piece.color)
 
   def withHistory(h: History) = copy(after = after withHistory h)
 

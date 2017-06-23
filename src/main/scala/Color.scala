@@ -77,6 +77,8 @@ object Color {
     override val hashCode = 2
   }
 
+  def fromPly(ply: Int) = apply((ply & 1) == 0)
+
   def apply(b: Boolean): Color = if (b) White else Black
 
   def apply(n: String): Option[Color] =

@@ -4,6 +4,7 @@ import format.Uci
 import Pos.posAt
 
 import scala.collection.mutable.ArrayBuffer
+import scala.annotation.tailrec
 
 case class Actor(
     piece: Piece,
@@ -146,26 +147,27 @@ case class Actor(
       }
     }
 
-  // @scala.annotation.tailrec :-\
-  private def longAddAll(p: Pos, dir: Direction, buf: ArrayBuffer[Move]): Unit = {
-    dir(p) foreach { to =>
-      board.pieces.get(to) match {
-        case Some(piece) =>
-          if (piece.color != color) board.taking(pos, to) foreach {
-            buf += move(to, _, Some(to))
-          }
+  private def longRange(dirs: Directions): List[Move] = {
+    val buf = new ArrayBuffer[Move]
 
-        case None => {
-          board.move(pos, to).foreach { b => buf += move(to, b) }
-          longAddAll(to, dir, buf)
+    @tailrec
+    def addAll(p: Pos, dir: Direction): Unit = {
+      dir(p) match {
+        case None => ()
+        case s @ Some(to) => board.pieces.get(to) match {
+          case None => {
+            board.move(pos, to).foreach { buf += move(to, _) }
+            addAll(to, dir)
+          }
+          case Some(piece) =>
+            if (piece.color != color) board.taking(pos, to) foreach {
+              buf += move(to, _, s)
+            }
         }
       }
     }
-  }
 
-  private def longRange(dirs: Directions): List[Move] = {
-    val buf = new ArrayBuffer[Move]
-    dirs foreach { longAddAll(pos, _, buf) }
+    dirs foreach { addAll(pos, _) }
     buf.toList
   }
 

@@ -140,10 +140,10 @@ case class Actor(
   private def shortRange(dirs: Directions): List[Move] =
     dirs flatMap { _(pos) } flatMap { to =>
       board.pieces.get(to) match {
+        case None => board.move(pos, to) map { move(to, _) }
         case Some(piece) =>
           if (piece is color) Nil
           else board.taking(pos, to) map { move(to, _, Some(to)) }
-        case None => board.move(pos, to) map { move(to, _) }
       }
     }
 

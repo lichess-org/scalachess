@@ -23,8 +23,9 @@ case class Board(
     case (pos, piece) => (pos, Actor(piece, pos, this))
   }
 
-  lazy val actorsOf: Color.Map[List[Actor]] = Color Map { color =>
-    actors.values.filter(_.color == color) toList
+  lazy val actorsOf: Color.Map[Seq[Actor]] = {
+    val (w, b) = actors.values.toSeq.partition { _.color == White }
+    Color.Map(w, b)
   }
 
   def rolesOf(c: Color): List[Role] = pieces.values.collect {
@@ -85,7 +86,7 @@ case class Board(
     def to(dest: Pos): Valid[Board] = {
       if (pieces contains dest) failureNel("Cannot move to occupied " + dest)
       else pieces get orig map { piece =>
-        copy(pieces = (pieces - orig) + ((dest, piece)))
+        copy(pieces = pieces - orig + (dest -> piece))
       } toSuccess ("No piece at " + orig + " to move")
     }
   }

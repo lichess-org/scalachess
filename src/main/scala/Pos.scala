@@ -52,7 +52,7 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
 }
 
 object Pos {
-  val posCache = new Array[Option[Pos]](64)
+  val posCache = new Array[Some[Pos]](64)
 
   def posAt(x: Int, y: Int): Option[Pos] =
     if (x < 1 || x > 8 || y < 1 || y > 8) None

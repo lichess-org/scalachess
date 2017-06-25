@@ -19,18 +19,6 @@ case class Actor(
   /** The moves without taking defending the king into account */
   def trustedMoves(withCastle: Boolean): List[Move] = {
     val moves = piece.role match {
-
-      case Bishop => longRange(Bishop.dirs)
-
-      case Queen => longRange(Queen.dirs)
-
-      case Knight => shortRange(Knight.dirs)
-
-      case King if withCastle => shortRange(King.dirs) ++ castle
-      case King => shortRange(King.dirs)
-
-      case Rook => longRange(Rook.dirs)
-
       case Pawn => pawnDir(pos) map { next =>
         val fwd = Some(next) filterNot board.pieces.contains
         def capture(horizontal: Direction): Option[Move] = {
@@ -77,6 +65,17 @@ case class Actor(
           enpassant(_.right)
         ).flatten
       } getOrElse Nil
+
+      case Bishop => longRange(Bishop.dirs)
+
+      case Knight => shortRange(Knight.dirs)
+
+      case Rook => longRange(Rook.dirs)
+
+      case Queen => longRange(Queen.dirs)
+
+      case King if withCastle => shortRange(King.dirs) ++ castle
+      case King => shortRange(King.dirs)
     }
 
     // We apply the current game variant's effects if there are any so that we can accurately decide if the king would

@@ -52,7 +52,7 @@ case class Castles(
     case n => n
   }
 
-  def toList = List(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
+  def toSeq = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
 
   def isEmpty = !(whiteKingSide || whiteQueenSide || blackKingSide || blackQueenSide)
 }

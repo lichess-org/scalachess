@@ -65,7 +65,7 @@ object Color {
 
   case object Black extends Color {
 
-    lazy val unary_! = White
+    val unary_! = White
 
     val passablePawnY = 4
     val promotablePawnY = 1

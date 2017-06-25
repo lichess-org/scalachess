@@ -126,11 +126,11 @@ abstract class Variant(
    */
   def addVariantEffect(move: Move): Move = move
 
-  def updatePositionHashes(board: Board, move: Move, hash: chess.PositionHash): PositionHash =
-    Hash(Situation(board, !move.piece.color)) ++ {
-      if ((move.piece is Pawn) || move.captures || move.promotes) Array(): PositionHash
-      else hash
-    }
+  def updatePositionHashes(board: Board, move: Move, hash: chess.PositionHash): PositionHash = {
+    val newHash = Hash(Situation(board, !move.piece.color))
+    if ((move.piece is Pawn) || move.captures || move.promotes) newHash
+    else newHash ++ hash
+  }
 
   def updatePositionHashes(board: Board, drop: Drop, hash: chess.PositionHash): PositionHash = Array()
 

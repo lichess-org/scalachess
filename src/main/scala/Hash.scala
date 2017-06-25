@@ -105,7 +105,7 @@ object Hash {
     hcrazy
   }
 
-  private lazy val h = new Hash(size)
+  private val h = new Hash(size)
 
   def apply(situation: Situation): PositionHash = h.apply(situation)
 

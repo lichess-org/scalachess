@@ -23,7 +23,7 @@ object UnmovedRooks {
 
 case class History(
     lastMove: Option[Uci] = None,
-    positionHashes: PositionHash = History.randomHashes(1),
+    positionHashes: PositionHash = Hash.zero,
     castles: Castles = Castles.all,
     checkCount: CheckCount = CheckCount(0, 0),
     unmovedRooks: UnmovedRooks = UnmovedRooks.default
@@ -39,7 +39,7 @@ case class History(
 
   // generates random positionHashes to satisfy the half move clock
   def setHalfMoveClock(v: Int) =
-    copy(positionHashes = History.randomHashes(v + 1))
+    copy(positionHashes = History.spoofHashes(v + 1))
 
   def threefoldRepetition: Boolean = halfMoveClock >= 8 && {
     // compare only hashes for positions with the same side to move
@@ -93,7 +93,7 @@ object History {
   )
 
   def castle(color: Color, kingSide: Boolean, queenSide: Boolean) =
-    History().copy(
+    History(
       castles = color match {
         case White => Castles.init.copy(
           whiteKingSide = kingSide,
@@ -106,11 +106,11 @@ object History {
       }
     )
 
-  def noCastle = History() withoutCastles White withoutCastles Black
+  def noCastle = History(castles = Castles.none)
 
-  private def randomHashes(n: Int): PositionHash = {
-    val bytes = Array.ofDim[Byte](n * Hash.size)
-    scala.util.Random.nextBytes(bytes)
-    bytes
+  private def spoofHashes(n: Int): PositionHash = {
+    (1 to n).toArray.flatMap {
+      i => Array((i >> 16).toByte, (i >> 8).toByte, i.toByte)
+    }
   }
 }

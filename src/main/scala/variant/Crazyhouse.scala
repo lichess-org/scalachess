@@ -36,7 +36,7 @@ case object Crazyhouse extends Variant(
   } yield Drop(
     piece = piece,
     pos = pos,
-    before = situation.board,
+    situationBefore = situation,
     after = board1 withCrazyData d2
   )
 
@@ -140,9 +140,9 @@ case object Crazyhouse extends Variant(
       black take piece.role map { np => copy(black = np) }
     )
 
-    def store(piece: Piece) = copy(
-      white = piece.color.fold(white, white store piece.role),
-      black = piece.color.fold(black store piece.role, black)
+    def store(piece: Piece) = piece.color.fold(
+      copy(black = black store piece.role),
+      copy(white = white store piece.role)
     )
   }
 

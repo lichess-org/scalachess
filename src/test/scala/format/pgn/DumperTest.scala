@@ -10,8 +10,7 @@ class DumperTest extends ChessTest {
     "not be checkmate if pawn can be taken en passant" in {
       val game = Forsyth.<<<("8/3b4/6R1/1P2kp2/6pp/2N1P3/4KPPP/8 w - -").get match {
         case Forsyth.SituationPlus(sit, turns) => Game(
-          board = sit.board,
-          player = sit.color,
+          sit,
           turns = turns
         )
       }

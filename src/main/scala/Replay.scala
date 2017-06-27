@@ -147,7 +147,7 @@ object Replay {
           case Nil => failureNel(s"Can't find $atFenTruncated, reached ply $ply")
           case san :: rest => san(sit) flatMap { moveOrDrop =>
             val after = moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter)
-            val fen = Forsyth >> Game(after, Color(ply % 2 == 0), turns = ply)
+            val fen = Forsyth >> Game(Situation(after, Color.fromPly(ply)), turns = ply)
             if (compareFen(fen)) scalaz.Success(ply)
             else recursivePlyAtFen(Situation(after, !sit.color), rest, ply + 1)
           }

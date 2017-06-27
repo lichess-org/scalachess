@@ -65,7 +65,7 @@ object Color {
 
   case object Black extends Color {
 
-    lazy val unary_! = White
+    val unary_! = White
 
     val passablePawnY = 4
     val promotablePawnY = 1
@@ -76,6 +76,8 @@ object Color {
 
     override val hashCode = 2
   }
+
+  def fromPly(ply: Int) = apply((ply & 1) == 0)
 
   def apply(b: Boolean): Color = if (b) White else Black
 

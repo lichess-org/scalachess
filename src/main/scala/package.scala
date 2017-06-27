@@ -1,5 +1,7 @@
 import ornicar.scalalib
 
+import scala.util.Try
+
 package object chess
 
     extends scalalib.Validation
@@ -36,10 +38,6 @@ package object chess
     implicit def stringToFailures(str: String): Failures = scalaz.NonEmptyList(str)
   }
 
-  def parseIntOption(str: String): Option[Int] = try {
-    Some(java.lang.Integer.parseInt(str))
-  }
-  catch {
-    case _: NumberFormatException => None
-  }
+  def parseIntOption(str: String): Option[Int] =
+    Try(Integer.parseInt(str)).toOption
 }

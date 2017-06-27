@@ -1,7 +1,5 @@
 package chess
 
-import scala.collection.breakOut
-
 final class Hash(size: Int) {
 
   def apply(situation: Situation): PositionHash = {
@@ -21,6 +19,8 @@ final class Hash(size: Int) {
 object Hash {
 
   val size = 3
+
+  val zero: PositionHash = Array(0, 0, 0)
 
   class ZobristConstants(start: Int) {
     def hexToLong(s: String): Long = (java.lang.Long.parseLong(s.substring(start, start + 8), 16) << 32) |
@@ -51,11 +51,8 @@ object Hash {
   private def pieceIndex(piece: Piece) =
     roleIndex(piece.role) * 2 + piece.color.fold(1, 0)
 
-  private def posIndex(pos: Pos) =
-    8 * pos.y + (pos.x - 9)
-
   private def actorIndex(actor: Actor) =
-    64 * pieceIndex(actor.piece) + posIndex(actor.pos)
+    64 * pieceIndex(actor.piece) + actor.pos.hashCode
 
   private def get(situation: Situation, table: ZobristConstants): Long = {
 
@@ -77,7 +74,7 @@ object Hash {
 
     val hcastling =
       if (board.variant.allowsCastling)
-        (situation.history.castles.toList zip table.castlingMasks).collect {
+        (situation.history.castles.toSeq.view zip table.castlingMasks).collect {
           case (true, castlingMask) => castlingMask
         }.fold(hactors)(_ ^ _)
       else hactors
@@ -98,7 +95,7 @@ object Hash {
 
     // Hash in special crazyhouse data.
     val hcrazy = board.crazyData.fold(hchecks) { data =>
-      val hcrazypromotions = data.promoted.map { table.crazyPromotionMasks compose posIndex _ }(breakOut).fold(hchecks)(_ ^ _)
+      val hcrazypromotions = data.promoted.view.map { p => table.crazyPromotionMasks(p.hashCode) }.fold(hchecks)(_ ^ _)
       Color.all.flatMap { color =>
         val colorshift = color.fold(79, -1)
         data.pockets(color).roles.groupBy(identity).flatMap {
@@ -110,7 +107,7 @@ object Hash {
     hcrazy
   }
 
-  private lazy val h = new Hash(size)
+  private val h = new Hash(size)
 
   def apply(situation: Situation): PositionHash = h.apply(situation)
 

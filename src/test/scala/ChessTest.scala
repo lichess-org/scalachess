@@ -38,7 +38,7 @@ trait ChessTest extends Specification with ValidationMatchers {
 
   implicit def richGame(game: Game) = new {
 
-    def as(color: Color): Game = game.copy(player = color)
+    def as(color: Color): Game = game.withPlayer(color)
 
     def playMoves(moves: (Pos, Pos)*): Valid[Game] = playMoveList(moves)
 
@@ -72,7 +72,9 @@ trait ChessTest extends Specification with ValidationMatchers {
     situation map { sit =>
       sit.color -> sit.withVariant(variant).board
     } toValid "Could not construct situation from FEN" map {
-      case (color, board) => Game(variant).copy(board = board) withPlayer color
+      case (color, board) => Game(variant).copy(
+        situation = Situation(board, color)
+      )
     }
   }
 
@@ -90,7 +92,7 @@ trait ChessTest extends Specification with ValidationMatchers {
     case p => sortPoss(p.toList) must_== sortPoss(poss.toList)
   }
 
-  def makeGame: Game = Game(makeBoard)
+  def makeGame: Game = Game(makeBoard, White)
 
   def bePoss(board: Board, visual: String): Matcher[Option[Iterable[Pos]]] = beSome.like {
     case p => Visual.addNewLines(Visual.>>|(board, Map(p -> 'x'))) must_== visual

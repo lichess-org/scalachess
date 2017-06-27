@@ -23,7 +23,7 @@ object UnmovedRooks {
 
 case class History(
     lastMove: Option[Uci] = None,
-    positionHashes: PositionHash = Array(0, 0, 0),
+    positionHashes: PositionHash = Hash.zero,
     castles: Castles = Castles.all,
     checkCount: CheckCount = CheckCount(0, 0),
     unmovedRooks: UnmovedRooks = UnmovedRooks.default

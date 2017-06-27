@@ -20,6 +20,8 @@ object Hash {
 
   val size = 3
 
+  val zero: PositionHash = Array(0, 0, 0)
+
   class ZobristConstants(start: Int) {
     def hexToLong(s: String): Long = (java.lang.Long.parseLong(s.substring(start, start + 8), 16) << 32) |
       java.lang.Long.parseLong(s.substring(start + 8, start + 16), 16)

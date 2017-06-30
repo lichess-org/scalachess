@@ -129,7 +129,7 @@ object Replay {
   }
 
   def plyAtFen(
-    moveStrs: List[String],
+    moveStrs: Traversable[String],
     initialFen: Option[String],
     variant: chess.variant.Variant,
     atFen: String

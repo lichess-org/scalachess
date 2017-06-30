@@ -7,6 +7,8 @@ import scala.util.parsing.combinator._
 import scalaz.Validation.FlatMap._
 import scalaz.Validation.{ success => succezz }
 
+import scala.collection.breakOut
+
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 object Parser extends scalaz.syntax.ToTraverseOps {
 
@@ -54,8 +56,8 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     str.split(' ').toList,
     variant
   )
-  def moves(strMoves: List[String], variant: Variant): Valid[List[San]] = objMoves(
-    strMoves.map { StrMove(_, Glyphs.empty, Nil, Nil) },
+  def moves(strMoves: Traversable[String], variant: Variant): Valid[List[San]] = objMoves(
+    strMoves.map { StrMove(_, Glyphs.empty, Nil, Nil) }(breakOut),
     variant
   )
   def objMoves(strMoves: List[StrMove], variant: Variant): Valid[List[San]] =

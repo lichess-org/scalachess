@@ -8,7 +8,7 @@ object Reader {
   def full(pgn: String, tags: List[Tag] = Nil): Valid[Replay] =
     fullWithSans(pgn, identity, tags)
 
-  def moves(moveStrs: List[String], tags: List[Tag]): Valid[Replay] =
+  def moves(moveStrs: Traversable[String], tags: List[Tag]): Valid[Replay] =
     movesWithSans(moveStrs, identity, tags)
 
   def fullWithSans(
@@ -25,7 +25,7 @@ object Reader {
     makeReplay(makeGame(parsed.tags), op(parsed.sans))
 
   def movesWithSans(
-    moveStrs: List[String],
+    moveStrs: Traversable[String],
     op: List[San] => List[San],
     tags: List[Tag]
   ): Valid[Replay] = for {

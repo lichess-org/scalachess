@@ -7,7 +7,7 @@ import scala.collection.breakOut
 object Binary {
 
   def writeMove(m: String) = Try(Writer move m)
-  def writeMoves(ms: List[String]) = Try(Writer moves ms)
+  def writeMoves(ms: Traversable[String]) = Try(Writer moves ms)
 
   def readMoves(bs: List[Byte]) = Try(Reader moves bs)
   def readMoves(bs: List[Byte], nb: Int) = Try(Reader.moves(bs, nb))
@@ -138,7 +138,7 @@ object Binary {
       case DropR(role, pos, check) => drop(role, pos, check)
     }) map (_.toByte)
 
-    def moves(strs: List[String]): List[Byte] = strs flatMap move
+    def moves(strs: Traversable[String]): Array[Byte] = strs.flatMap(move)(breakOut)
 
     def simplePawn(pos: String) = List(
       (MoveType.SimplePawn << 6) + posInt(pos)

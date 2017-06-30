@@ -24,7 +24,7 @@ object Replay {
   def apply(game: Game) = new Replay(game, Nil, game)
 
   def apply(
-    moveStrs: List[String],
+    moveStrs: Traversable[String],
     initialFen: Option[String],
     variant: chess.variant.Variant
   ): Valid[Replay] =
@@ -48,7 +48,7 @@ object Replay {
     }
 
   def games(
-    moveStrs: List[String],
+    moveStrs: Traversable[String],
     initialFen: Option[String],
     variant: chess.variant.Variant
   ): Valid[List[Game]] =
@@ -59,7 +59,7 @@ object Replay {
 
   type ErrorMessage = String
   def gameMoveWhileValid(
-    moveStrs: List[String],
+    moveStrs: Seq[String],
     initialFen: String,
     variant: chess.variant.Variant
   ): (Game, List[(Game, Uci.WithSan)], Option[ErrorMessage]) = {
@@ -109,7 +109,7 @@ object Replay {
   } withVariant variant
 
   def boards(
-    moveStrs: List[String],
+    moveStrs: Traversable[String],
     initialFen: Option[FEN],
     variant: chess.variant.Variant
   ): Valid[List[Board]] = {

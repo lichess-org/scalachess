@@ -11,7 +11,7 @@ object UciDump {
   def apply(replay: Replay): List[String] =
     replay.chronoMoves map move(replay.setup.board.variant)
 
-  def apply(moves: List[String], initialFen: Option[String], variant: Variant): Valid[List[String]] =
+  def apply(moves: Seq[String], initialFen: Option[String], variant: Variant): Valid[List[String]] =
     moves.isEmpty.fold(
       success(Nil),
       Replay(moves, initialFen, variant) map apply

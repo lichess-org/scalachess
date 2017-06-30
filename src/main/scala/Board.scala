@@ -24,7 +24,7 @@ case class Board(
   }
 
   lazy val actorsOf: Color.Map[Seq[Actor]] = {
-    val (w, b) = actors.values.toSeq.partition { _.color == White }
+    val (w, b) = actors.values.toSeq.partition { _.color.white }
     Color.Map(w, b)
   }
 

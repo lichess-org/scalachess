@@ -64,7 +64,7 @@ class CrazyhouseVariantTest extends ChessTest {
         _.split(' ').toList
       }
       def runOne(moves: List[String]) =
-        Replay.gameMoveWhileValid(moves, format.Forsyth.initial, chess.variant.Crazyhouse)
+        Replay.gameMoveWhileValid(moves, format.Forsyth.initial, Crazyhouse)
       def hex(buf: Array[Byte]): String = buf.map("%02x" format _).mkString
       val g = gameMoves.map(runOne)
       g.exists(_._3.nonEmpty) must beFalse
@@ -79,13 +79,23 @@ class CrazyhouseVariantTest extends ChessTest {
     "destinations prod bug on game VVXRgsQT" in {
       import chess.Pos._
       chess.Game(
-        chess.variant.Crazyhouse.some,
+        Crazyhouse.some,
         "r2q1b1r/p2k1Ppp/2p2p2/4p3/P2nP2n/3P1PRP/1PPB1K1q~/RN1Q1B2/Npb w - - 40 21".some
       ).situation.destinations must_== Map(
         F2 -> List(E3, E1),
         G3 -> List(G2),
         F1 -> List(G2)
       )
+    }
+
+    "replay ZH" in {
+      chess.Replay.boards(
+        moveStrs = Vector("e4", "c5", "Na3", "d6", "Nf3", "Bg4", "Bc4", "Bxf3", "Qxf3", "N@b4", "Bxf7+", "Kd7", "P@d5", "Nf6", "O-O", "Nxc2", "Nb5", "P@c4", "Be6+", "Ke8", "B@f7#"),
+        initialFen = None,
+        variant = Crazyhouse
+      ) must beSuccess.like {
+          case r => 1 must_== 1
+        }
     }
   }
 }

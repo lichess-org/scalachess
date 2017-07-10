@@ -17,9 +17,9 @@ case class LagTracker(
       history = Some(history.fold(
         DecayingStats(
           mean = lagComp.centis,
-          variance = 300f,
+          variance = 150f,
           decay = 0.9f,
-          decayVar = 0.85f
+          decayVar = 0.8f
         )
       ) { _.record(lagComp.centis) })
     ))

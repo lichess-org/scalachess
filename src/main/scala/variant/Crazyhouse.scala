@@ -9,7 +9,7 @@ case object Crazyhouse extends Variant(
   id = 10,
   key = "crazyhouse",
   name = "Crazyhouse",
-  shortName = "crazy",
+  shortName = "Crazy",
   title = "Captured pieces can be dropped back on the board instead of moving a piece.",
   standardInitialPosition = true
 ) {

@@ -7,7 +7,7 @@ case object Horde extends Variant(
   id = 8,
   key = "horde",
   name = "Horde",
-  shortName = "horde",
+  shortName = "Horde",
   title = "Destroy the horde to win!",
   standardInitialPosition = false
 ) {

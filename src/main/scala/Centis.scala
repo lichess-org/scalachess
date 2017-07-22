@@ -9,9 +9,9 @@ case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
 
   def roundTenths: Int =
     if (centis > 0) (centis + 5) / 10 else (centis - 4) / 10
-  def roundSeconds: Int = math.round(toSeconds)
+  def roundSeconds: Int = math.round(centis.toFloat * 0.01f)
 
-  def toSeconds: Float = centis * 0.01f
+  def toSeconds: BigDecimal = java.math.BigDecimal.valueOf(centis, 2)
   def millis: Long = centis * 10l
   def toDuration = FiniteDuration(millis, MILLISECONDS)
 

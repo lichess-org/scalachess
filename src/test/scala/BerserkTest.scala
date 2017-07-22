@@ -3,7 +3,7 @@ package chess
 class BerserkTest extends ChessTest {
 
   def whiteBerserk(minutes: Int, seconds: Int) =
-    Clock(minutes * 60, seconds).goBerserk(White).remainingTime(White).toSeconds
+    Clock(minutes * 60, seconds).goBerserk(White).remainingTime(White).centis * .01
 
   "berserkable" should {
     "yep" in {

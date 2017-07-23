@@ -43,6 +43,8 @@ case class Clock(
     )
   }
 
+  def hardStop = copy(timer = None)
+
   def updatePlayer(c: Color)(f: ClockPlayer => ClockPlayer) =
     copy(players = players.update(c, f))
 
@@ -111,7 +113,7 @@ case class ClockPlayer(
     lag: LagTracker = LagTracker(),
     berserk: Boolean = false
 ) {
-  val limit = {
+  def limit = {
     if (berserk) config.initTime - config.berserkPenalty
     else config.initTime
   }

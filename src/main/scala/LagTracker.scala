@@ -29,7 +29,7 @@ case class LagTracker(
 
   def lowEstimate = history.map { h =>
     {
-      val c = h.mean - Math.max(h.stdDev, 5f)
+      val c = h.mean - Math.max(h.stdDev, 2f)
       Centis(c.toInt max 0) atMost quota
     }
   }

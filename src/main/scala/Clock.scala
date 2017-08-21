@@ -19,7 +19,7 @@ case class Clock(
   @inline def pending(c: Color) = timerFor(c).fold(Centis(0))(toNow)
 
   @inline def minPending(c: Color) =
-    (pending(c) - players(c).lag.maxNextComp) nonNeg
+    (pending(c) - players(c).lag.quota) nonNeg
 
   def remainingTime(c: Color) = (players(c).remaining - pending(c)) nonNeg
 
@@ -109,8 +109,8 @@ case class Clock(
 
 case class ClockPlayer(
     config: Clock.Config,
+    lag: LagTracker,
     elapsed: Centis = Centis(0),
-    lag: LagTracker = LagTracker(),
     berserk: Boolean = false
 ) {
   def limit = {
@@ -190,7 +190,10 @@ object Clock {
   def apply(limit: Int, increment: Int): Clock = apply(Config(limit, increment))
 
   def apply(config: Config): Clock = {
-    val player = ClockPlayer(config = config)
+    val player = ClockPlayer(
+      config = config,
+      lag = LagTracker.forClock(config.estimateTotalSeconds)
+    )
     Clock(
       config = config,
       color = White,

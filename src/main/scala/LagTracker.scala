@@ -36,8 +36,8 @@ case class LagTracker(
 object LagTracker {
   val quotaMax = Centis(500)
 
-  def forClock(secs: Int) = LagTracker(
-    quotaGain = Centis(secs max 50 min 100)
+  def forClock(config: Clock.Config) = LagTracker(
+    quotaGain = Centis(config.estimateTotalSeconds max 50 min 100)
   )
 }
 

@@ -192,7 +192,7 @@ object Clock {
   def apply(config: Config): Clock = {
     val player = ClockPlayer(
       config = config,
-      lag = LagTracker.forClock(config.estimateTotalSeconds)
+      lag = LagTracker.forClock(config)
     )
     Clock(
       config = config,

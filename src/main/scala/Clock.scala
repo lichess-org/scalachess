@@ -131,6 +131,13 @@ case class ClockPlayer(
   def increment = if (berserk) Centis(0) else config.increment
 }
 
+object ClockPlayer {
+  def withConfig(config: Clock.Config) = ClockPlayer(
+    config,
+    LagTracker.forClock(config)
+  )
+}
+
 object Clock {
   private val limitFormatter = new DecimalFormat("#.##")
 
@@ -190,10 +197,7 @@ object Clock {
   def apply(limit: Int, increment: Int): Clock = apply(Config(limit, increment))
 
   def apply(config: Config): Clock = {
-    val player = ClockPlayer(
-      config = config,
-      lag = LagTracker.forClock(config)
-    )
+    val player = ClockPlayer.withConfig(config)
     Clock(
       config = config,
       color = White,

@@ -1,11 +1,11 @@
 package chess
 
 sealed abstract class Speed(
-  val id: Int,
-  val key: String,
-  val range: Range,
-  val name: String,
-  val title: String
+    val id: Int,
+    val key: String,
+    val range: Range,
+    val name: String,
+    val title: String
 )
 
 object Speed {

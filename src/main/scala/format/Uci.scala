@@ -12,8 +12,8 @@ sealed trait Uci {
 }
 
 object Uci
-    extends scalaz.std.OptionInstances
-    with scalaz.syntax.ToTraverseOps {
+  extends scalaz.std.OptionInstances
+  with scalaz.syntax.ToTraverseOps {
 
   case class Move(
       orig: Pos,

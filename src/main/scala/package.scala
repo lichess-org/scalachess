@@ -4,23 +4,23 @@ import scala.util.Try
 
 package object chess
 
-    extends scalalib.Validation
-    with scalalib.Common
-    with scalalib.OrnicarNonEmptyList
-    with scalalib.OrnicarMonoid.Instances
+  extends scalalib.Validation
+  with scalalib.Common
+  with scalalib.OrnicarNonEmptyList
+  with scalalib.OrnicarMonoid.Instances
 
-    with scalaz.syntax.std.ToBooleanOps
+  with scalaz.syntax.std.ToBooleanOps
 
-    with scalaz.std.OptionFunctions
-    with scalaz.syntax.std.ToOptionOps
-    with scalaz.syntax.std.ToOptionIdOps
+  with scalaz.std.OptionFunctions
+  with scalaz.syntax.std.ToOptionOps
+  with scalaz.syntax.std.ToOptionIdOps
 
-    with scalaz.std.ListInstances
-    with scalaz.syntax.std.ToListOps
+  with scalaz.std.ListInstances
+  with scalaz.syntax.std.ToListOps
 
-    with scalaz.syntax.ToValidationOps
-    with scalaz.syntax.ToFunctorOps
-    with scalaz.syntax.ToIdOps {
+  with scalaz.syntax.ToValidationOps
+  with scalaz.syntax.ToFunctorOps
+  with scalaz.syntax.ToIdOps {
 
   val White = Color.White
   val Black = Color.Black

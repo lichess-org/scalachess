@@ -13,10 +13,10 @@ import scala.collection.breakOut
 object Parser extends scalaz.syntax.ToTraverseOps {
 
   case class StrMove(
-    san: String,
-    glyphs: Glyphs,
-    comments: List[String],
-    variations: List[List[StrMove]]
+      san: String,
+      glyphs: Glyphs,
+      comments: List[String],
+      variations: List[List[StrMove]]
   )
 
   def full(pgn: String): Valid[ParsedPgn] = try {

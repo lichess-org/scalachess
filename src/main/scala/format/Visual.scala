@@ -24,12 +24,12 @@ object Visual {
     }
     Board(
       pieces = (for {
-      (l, y) ← (filtered zipWithIndex)
-      (c, x) ← (l zipWithIndex)
-      role ← Role forsyth c.toLower
-    } yield {
-      posAt(x + 1, 8 - y) map { pos => pos -> (Color(c isUpper) - role) }
-    }) flatten,
+        (l, y) ← (filtered zipWithIndex)
+        (c, x) ← (l zipWithIndex)
+        role ← Role forsyth c.toLower
+      } yield {
+        posAt(x + 1, 8 - y) map { pos => pos -> (Color(c isUpper) - role) }
+      }) flatten,
       variant = chess.variant.Variant.default
     )
   }

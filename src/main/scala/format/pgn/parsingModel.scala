@@ -87,7 +87,7 @@ case class Drop(
 }
 
 case class InitialPosition(
-  comments: List[String]
+    comments: List[String]
 )
 
 case class Metas(
@@ -132,8 +132,8 @@ case class Castle(
 }
 
 case class Suffixes(
-  check: Boolean,
-  checkmate: Boolean,
-  promotion: Option[PromotableRole],
-  glyphs: Glyphs
+    check: Boolean,
+    checkmate: Boolean,
+    promotion: Option[PromotableRole],
+    glyphs: Glyphs
 )

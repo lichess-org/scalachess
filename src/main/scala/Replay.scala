@@ -32,9 +32,9 @@ object Replay {
       Reader.moves(
         nonEmptyMoves,
         List(
-        initialFen map { fen => Tag(_.FEN, fen) },
-        variant.some.filterNot(_.standard) map { v => Tag(_.Variant, v.name) }
-      ).flatten
+          initialFen map { fen => Tag(_.FEN, fen) },
+          variant.some.filterNot(_.standard) map { v => Tag(_.Variant, v.name) }
+        ).flatten
       )
     }
 

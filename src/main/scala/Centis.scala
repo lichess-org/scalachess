@@ -37,12 +37,10 @@ object Centis {
     if (value > Int.MaxValue) {
       // lila.log("common").error(s"Truncating Centis! $value")
       Int.MaxValue
-    }
-    else if (value < Int.MinValue) {
+    } else if (value < Int.MinValue) {
       // lila.log("common").error(s"Truncating Centis! $value")
       Int.MinValue
-    }
-    else value.toInt
+    } else value.toInt
   }
 
   def apply(d: FiniteDuration): Centis = Centis {

@@ -64,8 +64,7 @@ case object Atomic extends Variant(
 
       val newBoard = afterBoard withPieces afterExplosions
       move withAfter newBoard
-    }
-    else move
+    } else move
   }
   /**
    * The positions surrounding a given position on the board. Any square at the edge of the board has

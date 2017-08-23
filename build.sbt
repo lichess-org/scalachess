@@ -37,7 +37,6 @@ import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 
 val preferences =
   ScalariformKeys.preferences := ScalariformKeys.preferences.value
-  .setPreference(CompactControlReadability, true)
   .setPreference(DoubleIndentConstructorArguments, true)
   .setPreference(DanglingCloseParenthesis, Force)
 

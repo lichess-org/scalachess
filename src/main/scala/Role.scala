@@ -47,8 +47,7 @@ case object Bishop extends PromotableRole {
   def dir(from: Pos, to: Pos) = if (to onSameDiagonal from) Some(
     if (to ?^ from) {
       if (to ?< from) (_.upLeft) else (_.upRight)
-    }
-    else {
+    } else {
       if (to ?< from) (_.downLeft) else (_.downRight)
     }
   )

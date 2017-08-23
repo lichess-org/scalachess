@@ -147,8 +147,7 @@ case class Board(
         blackKingSide = castles.blackKingSide && bkReady && rookReady(Black, bkPos, false),
         blackQueenSide = castles.blackQueenSide && bkReady && rookReady(Black, bkPos, true)
       )
-    }
-    else Castles.none
+    } else Castles.none
   }
 
   def updateHistory(f: History => History) = copy(history = f(history))

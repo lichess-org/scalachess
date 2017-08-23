@@ -33,14 +33,11 @@ object Dumper {
 
         val disambiguation = if (candidates.isEmpty) {
           ""
-        }
-        else if (!candidates.exists(_ ?| orig)) {
+        } else if (!candidates.exists(_ ?| orig)) {
           orig.file
-        }
-        else if (!candidates.exists(_ ?- orig)) {
+        } else if (!candidates.exists(_ ?- orig)) {
           orig.rank
-        }
-        else {
+        } else {
           orig.file + orig.rank
         }
 
@@ -49,8 +46,7 @@ object Dumper {
     }) + {
       if (next.check) {
         if (next.checkMate) "#" else "+"
-      }
-      else if (next.winner.isDefined) "#"
+      } else if (next.winner.isDefined) "#"
       else ""
     }
   }
@@ -59,8 +55,7 @@ object Dumper {
     data.toUci.uci + {
       if (next.check) {
         if (next.checkMate) "#" else "+"
-      }
-      else if (next.winner.isDefined) "#"
+      } else if (next.winner.isDefined) "#"
       else ""
     }
   }

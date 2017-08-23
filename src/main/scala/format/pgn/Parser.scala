@@ -40,8 +40,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       tags2 = resultOption.filterNot(_ => tags.exists(_.name == Tag.Result)).fold(tags)(t => tags :+ t)
       sans ← objMoves(strMoves, getVariantFromTags(tags2))
     } yield ParsedPgn(init, tags2, sans)
-  }
-  catch {
+  } catch {
     case _: StackOverflowError =>
       println(pgn)
       sys error "### StackOverflowError ### in PGN parser"

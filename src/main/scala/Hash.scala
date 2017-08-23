@@ -6,8 +6,7 @@ final class Hash(size: Int) {
     val l = Hash.get(situation, Hash.polyglotTable)
     if (size <= 8) {
       Array.tabulate(size)(i => (l >>> ((7 - i) * 8)).toByte)
-    }
-    else {
+    } else {
       val m = Hash.get(situation, Hash.randomTable)
       Array.tabulate(size)(i =>
         if (i < 8) (l >>> ((7 - i) * 8)).toByte

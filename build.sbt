@@ -2,21 +2,18 @@ name := "scalachess"
 
 organization := "org.lichess"
 
-version := "6.5"
+version := "6.6"
 
 scalaVersion := "2.11.11"
 crossScalaVersions := Seq("2.11.11", "2.12.3")
 
 libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.6",
-  "org.scalaz" %% "scalaz-core" % "7.2.13",
-  "org.specs2" %% "specs2-core" % "3.9.0" % "test",
-  "com.github.ornicar" %% "scalalib" % "6.3",
-  "joda-time" % "joda-time" % "2.9.7",
-  "org.joda" % "joda-convert" % "1.8",
-  "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0")
-
-// updateOptions := updateOptions.value.withCachedResolution(true)
+  "org.scalaz" %% "scalaz-core" % "7.2.15",
+  "org.specs2" %% "specs2-core" % "3.9.2" % "test",
+  "com.github.ornicar" %% "scalalib" % "6.4",
+  "joda-time" % "joda-time" % "2.9.9",
+  "org.joda" % "joda-convert" % "1.8.3")
 
 resolvers ++= Seq(
   "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-maven/master",

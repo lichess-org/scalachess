@@ -119,10 +119,10 @@ class ClockTest extends ChessTest {
         clockStep60(0, 0, 0) must_== 60 * 100
       }
       "no -> medium lag" in {
-        clockStep60(0, 0, 300) must_== 5960
+        clockStep60(0, 0, 300) must_== 5880
       }
       "no x4 -> big lag" in {
-        clockStep60(0, 0, 0, 0, 0, 700) must_== 5740
+        clockStep60(0, 0, 0, 0, 0, 700) must_== 5600
       }
     }
   }
@@ -131,7 +131,7 @@ class ClockTest extends ChessTest {
     "60s stall" in {
       val clock60 = advance(fakeClock60, 60 * 100)
 
-      clock60.minPending(White).centis must_== 58 * 100
+      clock60.minPending(White).centis must_== 5880
       clock60.remainingTime(White).centis must_== 0
       clock60.outOfTime(Black, withGrace = true) must beFalse
       clock60.outOfTime(White, withGrace = true) must beFalse
@@ -140,7 +140,7 @@ class ClockTest extends ChessTest {
     "62s stall" in {
       val clock62 = advance(fakeClock60, 62 * 100)
 
-      clock62.minPending(White).centis must_== 60 * 100
+      clock62.minPending(White).centis must_== 6080
       clock62.remainingTime(White).centis must_== 0
       clock62.outOfTime(White, withGrace = true) must beTrue
       clock62.outOfTime(White, withGrace = false) must beTrue

@@ -12,8 +12,7 @@ libraryDependencies ++= List(
   "org.scalaz" %% "scalaz-core" % "7.2.15",
   "org.specs2" %% "specs2-core" % "3.9.2" % "test",
   "com.github.ornicar" %% "scalalib" % "6.4",
-  "joda-time" % "joda-time" % "2.9.9",
-  "org.joda" % "joda-convert" % "1.8.3")
+  "joda-time" % "joda-time" % "2.9.9")
 
 resolvers ++= Seq(
   "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-maven/master",

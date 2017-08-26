@@ -22,7 +22,7 @@ class DecayingStatsTest extends Specification {
   "empty stats" should {
     "propogate initial state" in {
       dEmpty(0.5f)(0).mean must_== 0
-      dEmpty(0.5f)(0).variance must_== 0.5f
+      dEmpty(0.5f)(0).deviation must_== 0.5f
       dEmpty(0, decay = 0.9f)(0).decay must_== 0.9f
     }
   }
@@ -34,10 +34,10 @@ class DecayingStatsTest extends Specification {
     val stats10 = dEmpty(100)(10).record(data10)
     val stats10d = dEmpty(100, decay = 0.99f)(10).record(data10)
     "eventually converge with constant mean" in {
-      stats10.stdDev must beCloseTo(1f +/- 0.25f)
+      stats10.deviation must beCloseTo(1f +/- 0.25f)
       stats10.mean must beCloseTo(10f +/- 0.25f)
 
-      stats10d.stdDev must beCloseTo(1f +/- 0.005f)
+      stats10d.deviation must beCloseTo(1f +/- 0.25f)
       stats10d.mean must beCloseTo(10f +/- 0.1f)
     }
 
@@ -45,10 +45,10 @@ class DecayingStatsTest extends Specification {
       val stats2 = stats10.record(randoms)
       val stats2d = stats10d.record(randoms)
 
-      stats2.stdDev must beCloseTo(1f +/- 0.25f)
+      stats2.deviation must beCloseTo(1f +/- 0.25f)
       stats2.mean must beCloseTo(0f +/- 0.25f)
 
-      stats2d.stdDev must beCloseTo(1f +/- 0.005f)
+      stats2d.deviation must beCloseTo(1f +/- 0.25f)
       stats2d.mean must beCloseTo(0f +/- 0.1f)
     }
 
@@ -63,10 +63,10 @@ class DecayingStatsTest extends Specification {
       val statsIa = dEmpty(100)(10).record(dataI)
       val statsIb = dEmpty(100, decay = 0.99f)(10).record(dataI)
 
-      statsIa.stdDev must beCloseTo(5f +/- 1f)
+      statsIa.deviation must beCloseTo(5f +/- 1f)
       statsIa.mean must beCloseTo(5f +/- 1f)
 
-      statsIb.stdDev must beCloseTo(5f +/- 0.25f)
+      statsIb.deviation must beCloseTo(5f +/- 0.25f)
       statsIb.mean must beCloseTo(5f +/- 0.25f)
     }
   }
@@ -76,7 +76,7 @@ class DecayingStatsTest extends Specification {
     val stats = dEmpty(10)(0).record(data)
     "converge reasonably" in {
       stats.mean must beCloseTo(.5f +/- 0.05f)
-      stats.stdDev must beCloseTo(.5f +/- 0.05f)
+      stats.deviation must beCloseTo(.5f +/- 0.05f)
     }
   }
 }

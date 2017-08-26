@@ -1,10 +1,9 @@
 package chess
 
-import LagTracker._
-
 case class LagTracker(
     quotaGain: Centis,
-    quota: Centis = Centis(200),
+    quota: Centis,
+    quotaMax: Centis,
     history: Option[DecayingStats] = None
 ) {
   def onMove(lag: Centis) = {
@@ -15,9 +14,8 @@ case class LagTracker(
       history = Some(history.fold(
         DecayingStats(
           mean = lagComp.centis,
-          variance = 20f,
-          decay = 0.9f,
-          decayVar = 0.8f
+          deviation = 5f,
+          decay = 0.9f
         )
       ) { _.record(lagComp.centis) })
     ))
@@ -27,17 +25,20 @@ case class LagTracker(
 
   def lowEstimate = history.map { h =>
     {
-      val c = h.mean - Math.max(1.5f * h.stdDev, 2f)
+      val c = h.mean - Math.max(h.deviation, 2f)
       Centis(c.toInt max 0) atMost quota
     }
   }
 }
 
 object LagTracker {
-  val quotaMax = Centis(500)
-
-  def forClock(config: Clock.Config) = LagTracker(
-    quotaGain = Centis(config.estimateTotalSeconds max 50 min 100)
-  )
+  def forClock(config: Clock.Config) = {
+    val quotaGain = Centis(config.estimateTotalSeconds max 50 min 100)
+    LagTracker(
+      quotaGain = quotaGain,
+      quota = quotaGain * 2,
+      quotaMax = quotaGain * 5
+    )
+  }
 }
 

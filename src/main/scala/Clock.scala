@@ -67,10 +67,13 @@ case class Clock(
       player.lag.onMove _
     }
 
-    val inc = if (withInc) player.increment else Centis(0)
+    val moveTime = (elapsed - lagComp) nonNeg
+    val inc =
+      if (moveTime < player.remaining && withInc) player.increment
+      else Centis(0)
 
     updatePlayer(color) {
-      _.takeTime(((elapsed - lagComp) nonNeg) - inc)
+      _.takeTime(moveTime - inc)
         .copy(lag = newLag)
     }.switch
   }

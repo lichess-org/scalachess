@@ -24,9 +24,9 @@ final case class LagTracker(
   def recordLag(lag: Centis) =
     copy(history = history.record((lag atMost quota).centis))
 
-  def avgLagComp = lagSteps > 0 option totalComp / lagSteps
+  def avgLagComp = totalComp / lagSteps
 
-  def avgLag = lagSteps > 0 option totalLag / lagSteps
+  def avgLag = totalLag / lagSteps
 
   def lowEstimate = history match {
     case h: DecayingStats => {

@@ -19,7 +19,7 @@ case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
   def +(other: Centis) = Centis(centis + other.centis)
   def -(other: Centis) = Centis(centis - other.centis)
   def *(scalar: Int) = Centis(scalar * centis)
-  def /(div: Int) = Centis(centis / div)
+  def /(div: Int) = div != 0 option Centis(centis / div)
   def unary_- = Centis(-centis)
 
   def avg(other: Centis) = Centis((centis + other.centis) >> 1)
@@ -37,6 +37,10 @@ object Centis {
   implicit object CentisMonoid extends Monoid[Centis] {
     def append(c1: Centis, c2: => Centis) = c1 + c2
     val zero = Centis(0)
+  }
+
+  implicit class CentisScalar(val scalar: Int) extends AnyVal {
+    def *(o: Centis) = o * scalar
   }
 
   def apply(value: Long): Centis = Centis {

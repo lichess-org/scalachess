@@ -46,7 +46,7 @@ class ClockTest extends ChessTest {
 
     def clockStep(clock: Clock, wait: Int, lags: Int*) = {
       (lags.foldLeft(clock) { (clk, lag) =>
-        (advance(clk.step().get, wait + lag) step durOf(lag)).get
+        advance(clk.step(), wait + lag) step durOf(lag)
       } remainingTime Black).centis
     }
 
@@ -54,8 +54,8 @@ class ClockTest extends ChessTest {
     def clockStep600(w: Int, l: Int*) = clockStep(fakeClock600, w, l: _*)
 
     def clockStart(lag: Int) = {
-      val clock = fakeClock60.step().get
-      ((clock step durOf(lag)).get remainingTime White).centis
+      val clock = fakeClock60.step()
+      ((clock step durOf(lag)) remainingTime White).centis
     }
 
     "start" in {

@@ -55,28 +55,31 @@ case class Clock(
 
   def step(
     metrics: MoveMetrics = MoveMetrics(),
-    withInc: Boolean = true
-  ) = timer.map { t =>
-    val elapsed = toNow(t)
-
-    val player = players(color)
-
-    val reportedLag = metrics.reportedLag(elapsed)
-
-    val (lagComp, newLag) = reportedLag.fold((Centis(0), player.lag)) {
-      player.lag.onMove _
+    gameActive: Boolean = true
+  ) = (timer match {
+    case None => metrics.clientLag.fold(this) { l =>
+      updatePlayer(color) { _.recordLag(l) }
     }
+    case Some(t) => {
+      val elapsed = toNow(t)
+      val lag = ~metrics.reportedLag(elapsed) nonNeg
 
-    val moveTime = (elapsed - lagComp) nonNeg
-    val inc =
-      if (moveTime < player.remaining && withInc) player.increment
-      else Centis(0)
+      val player = players(color)
+      val (lagComp, lagTrack) = player.lag.onMove(lag)
 
-    updatePlayer(color) {
-      _.takeTime(moveTime - inc)
-        .copy(lag = newLag)
-    }.switch
-  }
+      val moveTime = (elapsed - lagComp) nonNeg
+
+      val clockActive = gameActive && moveTime < player.remaining
+      val inc = clockActive ?? player.increment
+
+      val newC = updatePlayer(color) {
+        _.takeTime(moveTime - inc)
+          .copy(lag = lagTrack)
+      }
+
+      if (clockActive) newC else newC.hardStop
+    }
+  }).switch
 
   // To do: safely add this to takeback to remove inc from player.
   // def deinc = updatePlayer(color, _.giveTime(-incrementOf(color)))
@@ -96,7 +99,14 @@ case class Clock(
   def goBerserk(c: Color) = updatePlayer(c) { _.copy(berserk = true) }
 
   def berserked(c: Color) = players(c).berserk
-  def lag(c: Color) = players(c).lag.estimate
+  def lag(c: Color) = players(c).lag.avgLag
+
+  def avgLagComp = {
+    val lag1 = players.white.lag
+    val lag2 = players.black.lag
+    val lagSteps = lag1.lagSteps + lag2.lagSteps
+    lagSteps > 0 option ((lag1.totalComp + lag2.totalComp) / lagSteps)
+  }
 
   // Lowball estimate of next move's lag comp for UI butter.
   def lagCompEstimate(c: Color) = players(c).lag.lowEstimate
@@ -121,6 +131,8 @@ case class ClockPlayer(
     else config.initTime
   }
 
+  def recordLag(l: Centis) = copy(lag = lag.recordLag(l))
+
   def isInit = elapsed.centis == 0
 
   def remaining = limit - elapsed
@@ -137,7 +149,7 @@ case class ClockPlayer(
 object ClockPlayer {
   def withConfig(config: Clock.Config) = ClockPlayer(
     config,
-    LagTracker.forClock(config)
+    LagTracker.init(config)
   )
 }
 

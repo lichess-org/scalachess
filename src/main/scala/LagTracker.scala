@@ -1,43 +1,50 @@
 package chess
 
-case class LagTracker(
+final case class LagTracker(
     quotaGain: Centis,
     quota: Centis,
     quotaMax: Centis,
-    history: Option[DecayingStats] = None
+    history: DecayingRecorder,
+    totalComp: Centis = Centis(0),
+    totalLag: Centis = Centis(0),
+    lagSteps: Int = 0
 ) {
   def onMove(lag: Centis) = {
-    val lagComp = lag.nonNeg atMost quota
+    val comp = lag atMost quota
 
-    (lagComp, copy(
-      quota = (quota + quotaGain - lagComp) atMost quotaMax,
-      history = Some(history.fold(
-        DecayingStats(
-          mean = lagComp.centis,
-          deviation = 5f,
-          decay = 0.9f
-        )
-      ) { _.record(lagComp.centis) })
+    (comp, copy(
+      quota = (quota + quotaGain - comp) atMost quotaMax,
+      history = history.record(comp.centis),
+      totalComp = totalComp + comp,
+      totalLag = totalLag + lag,
+      lagSteps = lagSteps + 1
     ))
   }
 
-  def estimate = history.map { h => Centis(h.mean.toInt) }
+  def recordLag(lag: Centis) =
+    copy(history = history.record((lag atMost quota).centis))
 
-  def lowEstimate = history.map { h =>
-    {
+  def avgLagComp = totalComp / lagSteps
+
+  def avgLag = totalLag / lagSteps
+
+  def lowEstimate = history match {
+    case h: DecayingStats => {
       val c = h.mean - Math.max(h.deviation, 2f)
-      Centis(c.toInt max 0) atMost quota
+      Some(Centis(c.toInt).nonNeg atMost quota)
     }
+    case _ => None
   }
 }
 
 object LagTracker {
-  def forClock(config: Clock.Config) = {
+  def init(config: Clock.Config) = {
     val quotaGain = Centis(config.estimateTotalSeconds max 50 min 100)
     LagTracker(
       quotaGain = quotaGain,
       quota = quotaGain * 2,
-      quotaMax = quotaGain * 5
+      quotaMax = quotaGain * 5,
+      history = DecayingStats.empty(deviation = 5f, decay = 0.9f)
     )
   }
 }

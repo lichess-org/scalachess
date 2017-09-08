@@ -2,6 +2,7 @@ package chess
 
 import scala.concurrent.duration._
 
+import scalaz.Monoid
 import ornicar.scalalib.Zero
 
 // maximum centis = Int.MaxValue / 100 / 60 / 60 / 24 = 248 days
@@ -18,6 +19,7 @@ case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
   def +(other: Centis) = Centis(centis + other.centis)
   def -(other: Centis) = Centis(centis - other.centis)
   def *(scalar: Int) = Centis(scalar * centis)
+  def /(div: Int) = div != 0 option Centis(centis / div)
   def unary_- = Centis(-centis)
 
   def avg(other: Centis) = Centis((centis + other.centis) >> 1)
@@ -32,6 +34,14 @@ case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
 
 object Centis {
   implicit val zeroInstance = Zero.instance(Centis(0))
+  implicit object CentisMonoid extends Monoid[Centis] {
+    def append(c1: Centis, c2: => Centis) = c1 + c2
+    val zero = Centis(0)
+  }
+
+  implicit class CentisScalar(val scalar: Int) extends AnyVal {
+    def *(o: Centis) = o * scalar
+  }
 
   def apply(value: Long): Centis = Centis {
     if (value > Int.MaxValue) {

@@ -42,10 +42,15 @@ object Reader {
       } yield replay addMove move
     }
 
-  private def makeGame(tags: List[Tag]) = Game(
-    variantOption = tags.find(_.name == Tag.Variant).map(_.value).flatMap(chess.variant.Variant.byName),
-    fen = tags.find(_.name == Tag.FEN).map(_.value)
-  ) |> { g =>
-      g.copy(startedAtTurn = g.turns)
-    }
+  private def makeGame(tags: List[Tag]) = {
+    def tag(which: TagType): Option[String] = tags find (_.name == which) map (_.value)
+    val g = Game(
+      variantOption = tag(Tag.Variant) flatMap chess.variant.Variant.byName,
+      fen = tag(Tag.FEN)
+    )
+    g.copy(
+      startedAtTurn = g.turns,
+      clock = tag(Tag.TimeControl) flatMap Clock.readPgnConfig map Clock.apply
+    )
+  }
 }

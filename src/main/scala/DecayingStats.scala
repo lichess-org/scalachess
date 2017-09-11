@@ -22,12 +22,17 @@ final case class DecayingStats(
     values.foldLeft(this) { (s, v) => s record n.toFloat(v) }
 }
 
+final case class EmptyDecayingStats(
+    deviation: Float,
+    decay: Float
+) extends DecayingRecorder {
+  def record(value: Float) = DecayingStats(
+    mean = value,
+    deviation = deviation,
+    decay = decay
+  )
+}
+
 object DecayingStats {
-  def empty(deviation: Float, decay: Float) = new DecayingRecorder {
-    def record(value: Float) = DecayingStats(
-      mean = value,
-      deviation = deviation,
-      decay = decay
-    )
-  }
+  val empty = EmptyDecayingStats
 }

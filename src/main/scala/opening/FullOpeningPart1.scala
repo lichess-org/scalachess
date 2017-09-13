@@ -506,7 +506,7 @@ new FullOpening("A43", "Old Benoni Defense", "rnbqkbnr/pp1ppppp/8/2p5/3P4/8/PPP1
 new FullOpening("A43", "Old Benoni Defense: Mujannah Formation", "rnbqkbnr/pp1pp1pp/8/2pP1p2/8/8/PPP1PPPP/RNBQKBNR w KQkq"),
 new FullOpening("A43", "Queen's Pawn Game: Liedmann Gambit", "rnbqkbnr/pp1ppppp/8/8/2Pp4/4P3/PP3PPP/RNBQKBNR b KQkq"),
 new FullOpening("A44", "Old Benoni Defense", "rnbqkbnr/pp1p1ppp/8/2pPp3/8/8/PPP1PPPP/RNBQKBNR w KQkq"),
-new FullOpening("A44", "Semi-Bononi", "rnbqkbnr/pp3ppp/3p4/2pPp3/4P3/8/PPP2PPP/RNBQKBNR w KQkq"),
+new FullOpening("A44", "Semi-Benoni", "rnbqkbnr/pp3ppp/3p4/2pPp3/4P3/8/PPP2PPP/RNBQKBNR w KQkq"),
 new FullOpening("A45", "Bronstein Gambit", "rnbqkb1r/pppppppp/5n2/8/3P2P1/8/PPP1PP1P/RNBQKBNR b KQkq"),
 new FullOpening("A45", "Canard Opening", "rnbqkb1r/pppppppp/5n2/8/3P1P2/8/PPP1P1PP/RNBQKBNR b KQkq"),
 new FullOpening("A45", "Indian Game", "rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq"),

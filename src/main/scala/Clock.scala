@@ -99,7 +99,7 @@ case class Clock(
   def goBerserk(c: Color) = updatePlayer(c) { _.copy(berserk = true) }
 
   def berserked(c: Color) = players(c).berserk
-  def lag(c: Color) = players(c).lag.avgLag
+  def lag(c: Color) = players(c).lag
 
   def avgLagComp = players map { _.lag.avgLagComp }
 

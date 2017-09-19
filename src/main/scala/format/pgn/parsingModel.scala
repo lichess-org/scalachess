@@ -11,6 +11,9 @@ case class ParsedPgn(
 
   def tag(name: String): Option[String] = Tag.find(tags, name)
 
+  def tag(which: Tag.type => TagType): Option[String] =
+    tags find (_.name == which(Tag)) map (_.value)
+
   def clockConfig: Option[Clock.Config] =
     tags.collectFirst {
       case Tag(Tag.TimeControl, str) => str

@@ -31,7 +31,12 @@ case class Tags(value: List[Tag]) extends AnyVal {
     } flatMap Clock.readPgnConfig
 
   def variant: Option[chess.variant.Variant] =
-    apply(_.Variant).flatMap(chess.variant.Variant.byName)
+    apply(_.Variant).flatMap {
+      case "chess 960" => chess.variant.Chess960.some // some spell it wrong
+      case name => chess.variant.Variant byName name
+    }
+
+  def anyDate: Option[String] = apply(_.UTCDate) orElse apply(_.Date)
 
   def exists(which: Tag.type => TagType): Boolean =
     value.exists(_.name == which(Tag))

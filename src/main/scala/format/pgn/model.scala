@@ -5,7 +5,7 @@ package pgn
 import scala._
 
 case class Pgn(
-    tags: List[Tag],
+    tags: Tags,
     turns: List[Turn],
     initial: Initial = Initial.empty
 ) {
@@ -30,16 +30,16 @@ case class Pgn(
   }
 
   def withEvent(title: String) = copy(
-    tags = Tag(_.Event, title) :: tags.filterNot(_.name == Tag.Event)
+    tags = tags + Tag(_.Event, title)
   )
 
   def render: String = {
-    val tagStr = tags mkString "\n"
+    val tagStr = tags.value mkString "\n"
     val initStr =
       if (initial.comments.nonEmpty) initial.comments.mkString("{ ", " } { ", " }\n")
       else ""
     val turnStr = turns mkString " "
-    val endStr = tags find (_.name == Tag.Result) map (_.value) getOrElse ""
+    val endStr = tags(_.Result) | ""
     s"$tagStr\n\n$initStr$turnStr $endStr"
   }.trim
 

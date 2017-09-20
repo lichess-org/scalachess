@@ -38,11 +38,14 @@ case class Tags(value: List[Tag]) extends AnyVal {
 
   def anyDate: Option[String] = apply(_.UTCDate) orElse apply(_.Date)
 
+  def fen: Option[format.FEN] = apply(_.FEN) map format.FEN.apply
+
   def exists(which: Tag.type => TagType): Boolean =
     value.exists(_.name == which(Tag))
 
-  def ++(tags: Tags) = Tags(value ::: tags.value)
-  def +(tag: Tag) = Tags(value :+ tag)
+  def ++(tags: Tags) = tags.value.foldLeft(this)(_ + _)
+
+  def +(tag: Tag) = Tags(value.filterNot(_.name == tag.name) :+ tag)
 }
 
 object Tags {

@@ -36,11 +36,11 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
   "PGN string output" should {
     "be correct when there are no move times" in {
       val pgn = Pgn(
-        tags = List(
+        tags = Tags(List(
           Tag(_.White, "Kramnik,V"),
           Tag(_.Black, "Anand,V"),
           Tag(_.ECO, "D14")
-        ),
+        )),
         turns = List(
           Turn(
             number = 1,
@@ -77,12 +77,12 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
     }
     "be correct when there are move times" in {
       val pgn = Pgn(
-        tags = List(
+        tags = Tags(List(
           Tag(_.White, "tsinnema"),
           Tag(_.Black, "stockfish"),
           Tag(_.TimeControl, "300"),
           Tag(_.ECO, "A00e")
-        ),
+        )),
         turns = List(
           Turn(
             number = 1,
@@ -122,7 +122,7 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
 
     "be correct with NAGs" in {
       val pgn = Pgn(
-        tags = List(),
+        tags = Tags.empty,
         turns = List(
           Turn(
             number = 1,
@@ -150,7 +150,7 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
 
     "be correct with variations" in {
       val pgn = Pgn(
-        tags = List(),
+        tags = Tags.empty,
         turns = List(
           Turn(
             number = 1,
@@ -182,14 +182,14 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
   "initial comments" should {
     "empty" in {
       val pgn = Pgn(
-        tags = List(),
+        tags = Tags.empty,
         turns = List()
       )
       pgn.toString must_== """"""
     }
     "empty with initial comment" in {
       val pgn = Pgn(
-        tags = List(),
+        tags = Tags.empty,
         turns = List(),
         initial = Initial(List("Why hello there!"))
       )
@@ -197,7 +197,7 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
     }
     "empty with initial comments" in {
       val pgn = Pgn(
-        tags = List(),
+        tags = Tags.empty,
         turns = List(),
         initial = Initial(List(
           "Why hello there!",
@@ -208,7 +208,7 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
     }
     "moves with initial comments" in {
       val pgn = Pgn(
-        tags = List(),
+        tags = Tags.empty,
         turns = List(
           Turn(
             number = 1,

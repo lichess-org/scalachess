@@ -12,14 +12,14 @@ class ParserTest extends ChessTest {
   "promotion check" should {
     "as a queen" in {
       parser("b8=Q ") must beSuccess.like {
-        case a => a.sans.headOption must beSome.like {
+        case a => a.sans.value.headOption must beSome.like {
           case san: Std => san.promotion must_== Some(Queen)
         }
       }
     }
     "as a rook" in {
       parser("b8=R ") must beSuccess.like {
-        case a => a.sans.headOption must beSome.like {
+        case a => a.sans.value.headOption must beSome.like {
           case san: Std => san.promotion must_== Some(Rook)
         }
       }
@@ -29,22 +29,22 @@ class ParserTest extends ChessTest {
   "result" in {
     "no tag but inline result" in {
       parser(noTagButResult) must beSuccess.like {
-        case parsed => parsed tag "Result" must_== Some("1-0")
+        case parsed => parsed.tags("Result") must_== Some("1-0")
       }
     }
     "in tags" in {
       parser(whiteResignsInTags) must beSuccess.like {
-        case parsed => parsed tag "Result" must_== Some("0-1")
+        case parsed => parsed.tags("Result") must_== Some("0-1")
       }
     }
     "in moves" in {
       parser(whiteResignsInMoves) must beSuccess.like {
-        case parsed => parsed tag "Result" must_== Some("0-1")
+        case parsed => parsed.tags("Result") must_== Some("0-1")
       }
     }
     "in tags and moves" in {
       parser(whiteResignsInTagsAndMoves) must beSuccess.like {
-        case parsed => parsed tag "Result" must_== Some("0-1")
+        case parsed => parsed.tags("Result") must_== Some("0-1")
       }
     }
   }
@@ -78,7 +78,7 @@ class ParserTest extends ChessTest {
     parser(withNag) must beSuccess
 
     parser("Ne7g6+! $13") must beSuccess.like {
-      case ParsedPgn(_, _, List(san)) =>
+      case ParsedPgn(_, _, Sans(List(san))) =>
         san.metas.glyphs.move must_== Some(Glyph.MoveAssessment.good)
         san.metas.glyphs.position must_== Some(Glyph.PositionAssessment.unclear)
     }
@@ -86,25 +86,25 @@ class ParserTest extends ChessTest {
 
   "comments" in {
     parser("Ne7g6+! {such a neat comment}") must beSuccess.like {
-      case ParsedPgn(_, _, List(san)) =>
+      case ParsedPgn(_, _, Sans(List(san))) =>
         san.metas.comments must_== List("such a neat comment")
     }
   }
 
   "variations" in {
     parser("Ne7g6+! {such a neat comment} (e4 Ng6)") must beSuccess.like {
-      case ParsedPgn(_, _, List(san)) =>
+      case ParsedPgn(_, _, Sans(List(san))) =>
         san.metas.variations.headOption must beSome.like {
-          case variation => variation must haveSize(2)
+          case variation => variation.value must haveSize(2)
         }
     }
   }
 
   "first move variation" in {
     parser("1. e4 (1. d4)") must beSuccess.like {
-      case ParsedPgn(_, _, List(san)) =>
+      case ParsedPgn(_, _, Sans(List(san))) =>
         san.metas.variations.headOption must beSome.like {
-          case variation => variation must haveSize(1)
+          case variation => variation.value must haveSize(1)
         }
     }
   }
@@ -113,7 +113,7 @@ class ParserTest extends ChessTest {
     val size = sans.split(' ').size
     "sans only size: " + size in {
       parser(sans) must beSuccess.like {
-        case a => a.sans.size must_== size
+        case a => a.sans.value.size must_== size
       }
     }
   }
@@ -122,14 +122,14 @@ class ParserTest extends ChessTest {
     val size = sans.split(' ').size
     "sans only size: " + size in {
       parser(sans) must beSuccess.like {
-        case a => a.sans.size must_== size
+        case a => a.sans.value.size must_== size
       }
     }
   }
 
   "disambiguated" in {
     parser(disambiguated) must beSuccess.like {
-      case a => a.sans.size must_== 3
+      case a => a.sans.value.size must_== 3
     }
   }
 
@@ -137,20 +137,20 @@ class ParserTest extends ChessTest {
     val size = sans.split(' ').size
     "sans only from prod size: " + size in {
       parser(sans) must beSuccess.like {
-        case a => a.sans.size must_== size
+        case a => a.sans.value.size must_== size
       }
     }
   }
 
   "variations" in {
     parser(variations) must beSuccess.like {
-      case a => a.sans.size must_== 20
+      case a => a.sans.value.size must_== 20
     }
   }
 
   "unclosed quote" in {
     parser(unclosedQuote) must beSuccess.like {
-      case a => a.tags must contain { (tag: Tag) =>
+      case a => a.tags.value must contain { (tag: Tag) =>
         tag.name == Tag.White && tag.value == "Blazquez, Denis"
       }
     }
@@ -158,7 +158,7 @@ class ParserTest extends ChessTest {
 
   "inline tags" in {
     parser(inlineTags) must beSuccess.like {
-      case a => a.tags must contain { (tag: Tag) =>
+      case a => a.tags.value must contain { (tag: Tag) =>
         tag.name == Tag.White && tag.value == "Blazquez, Denis"
       }
     }
@@ -166,106 +166,106 @@ class ParserTest extends ChessTest {
 
   "game from wikipedia" in {
     parser(fromWikipedia) must beSuccess.like {
-      case a => a.sans.size must_== 85
+      case a => a.sans.value.size must_== 85
     }
   }
 
   "game from crafty" in {
     parser(fromCrafty) must beSuccess.like {
-      case a => a.sans.size must_== 68
+      case a => a.sans.value.size must_== 68
     }
   }
 
   "inline comments" in {
     parser(inlineComments) must beSuccess.like {
-      case a => a.sans.size must_== 85
+      case a => a.sans.value.size must_== 85
     }
   }
 
   "comments and variations" in {
     parser(commentsAndVariations) must beSuccess.like {
-      case a => a.sans.size must_== 103
+      case a => a.sans.value.size must_== 103
     }
   }
 
   "comments and lines by smartchess" in {
     parser(bySmartChess) must beSuccess.like {
-      case a => a.sans.size must_== 65
+      case a => a.sans.value.size must_== 65
     }
   }
 
   "complete 960" in {
     parser(complete960) must beSuccess.like {
-      case a => a.sans.size must_== 42
+      case a => a.sans.value.size must_== 42
     }
   }
 
   "TCEC" in {
     parser(fromTcec) must beSuccess.like {
-      case a => a.sans.size must_== 142
+      case a => a.sans.value.size must_== 142
     }
   }
 
   "TCEC with engine output" in {
     parser(fromTcecWithEngineOutput) must beSuccess.like {
-      case a => a.sans.size must_== 165
+      case a => a.sans.value.size must_== 165
     }
   }
 
   "chesskids iphone" in {
     parser(chesskids) must beSuccess.like {
-      case a => a.sans.size must_== 135
+      case a => a.sans.value.size must_== 135
     }
   }
 
   "handwritten" in {
     parser(handwritten) must beSuccess.like {
-      case a => a.sans.size must_== 139
+      case a => a.sans.value.size must_== 139
     }
   }
 
   "chess by post" in {
     parser(chessByPost) must beSuccess.like {
-      case a => a.sans.size must_== 100
+      case a => a.sans.value.size must_== 100
     }
   }
 
   "Android device" in {
     parser(android) must beSuccess.like {
-      case a => a.sans.size must_== 69
+      case a => a.sans.value.size must_== 69
     }
   }
 
   "weird dashes" in {
     parser(weirdDashes) must beSuccess.like {
-      case a => a.sans.size must_== 74
+      case a => a.sans.value.size must_== 74
     }
   }
 
   "lichobile" in {
     parser(lichobile) must beSuccess.like {
-      case a => a.sans.size must_== 68
+      case a => a.sans.value.size must_== 68
     }
   }
 
   "overflow" in {
     parser(overflow) must beSuccess.like {
-      case a => a.sans.size must_== 67
+      case a => a.sans.value.size must_== 67
     }
   }
   "overflow 2" in {
     parser(stackOverflow) must beSuccess.like {
-      case a => a.sans.size must_== 8
+      case a => a.sans.value.size must_== 8
     }
   }
   "overflow 3" in {
     parser(overflow3) must beSuccess.like {
-      case a => a.sans.size must_== 343
+      case a => a.sans.value.size must_== 343
     }
   }
   "overflow 3: tags" in {
     Parser.TagParser.fromFullPgn(overflow3) must beSuccess.like {
-      case tags => tags.size must_== 9
+      case tags => tags.value.size must_== 9
     }
   }
   "chessbase arrows" in {
@@ -277,25 +277,25 @@ class ParserTest extends ChessTest {
   }
   "chessbase weird" in {
     parser(chessbaseWeird) must beSuccess.like {
-      case a => a.sans.size must_== 115
+      case a => a.sans.value.size must_== 115
     }
   }
   "crazyhouse from prod" in {
     parser(crazyhouseFromProd) must beSuccess.like {
-      case a => a.sans.size must_== 49
+      case a => a.sans.value.size must_== 49
     }
   }
   "crazyhouse from chess.com" in {
     parser(chessComCrazyhouse) must beSuccess.like {
-      case a => a.sans.size must_== 42
+      case a => a.sans.value.size must_== 42
     }
   }
   "en passant e.p. notation" in {
     parser(enpassantEP) must beSuccess.like {
-      case a => a.sans.size must_== 36
+      case a => a.sans.value.size must_== 36
     }
     parser(enpassantEP2) must beSuccess.like {
-      case a => a.sans.size must_== 36
+      case a => a.sans.value.size must_== 36
     }
   }
 }

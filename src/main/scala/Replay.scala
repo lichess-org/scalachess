@@ -2,7 +2,7 @@ package chess
 
 import chess.format.pgn.San
 import chess.format.{ Forsyth, FEN, Uci }
-import format.pgn.{ Parser, Reader, Tag }
+import format.pgn.{ Parser, Reader, Tag, Tags }
 import scalaz.Validation.FlatMap._
 import scalaz.Validation.{ failureNel, success }
 
@@ -31,10 +31,10 @@ object Replay {
     moveStrs.some.filter(_.nonEmpty) toValid "[replay] pgn is empty" flatMap { nonEmptyMoves =>
       Reader.moves(
         nonEmptyMoves,
-        List(
+        Tags(List(
           initialFen map { fen => Tag(_.FEN, fen) },
           variant.some.filterNot(_.standard) map { v => Tag(_.Variant, v.name) }
-        ).flatten
+        ).flatten)
       )
     }
 
@@ -54,7 +54,7 @@ object Replay {
   ): Valid[List[Game]] =
     Parser.moves(moveStrs, variant) flatMap { moves =>
       val game = Game(variant.some, initialFen)
-      recursiveGames(game, moves) map { game :: _ }
+      recursiveGames(game, moves.value) map { game :: _ }
     }
 
   type ErrorMessage = String
@@ -80,7 +80,7 @@ object Replay {
     val init = Game(variant.some, initialFen.some)
     Parser.moves(moveStrs, variant).fold(
       err => List.empty[(Game, Uci.WithSan)] -> err.head.some,
-      moves => mk(init, moves zip moveStrs)
+      moves => mk(init, moves.value zip moveStrs)
     ) match {
         case (games, err) => (init, games, err)
       }
@@ -115,7 +115,7 @@ object Replay {
   ): Valid[List[Board]] = {
     val sit = initialFenToSituation(initialFen, variant)
     Parser.moves(moveStrs, sit.board.variant) flatMap { moves =>
-      recursiveBoards(sit, moves) map { sit.board :: _ }
+      recursiveBoards(sit, moves.value) map { sit.board :: _ }
     }
   }
 
@@ -158,7 +158,7 @@ object Replay {
       } | Situation(variant)
 
       Parser.moves(moveStrs, sit.board.variant) flatMap { moves =>
-        recursivePlyAtFen(sit, moves, 1)
+        recursivePlyAtFen(sit, moves.value, 1)
       }
     }
 }

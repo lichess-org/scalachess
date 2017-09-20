@@ -32,45 +32,40 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       splitted ← splitTagAndMoves(preprocessed)
       tagStr = splitted._1
       moveStr = splitted._2
-      tags ← TagParser(tagStr)
+      preTags ← TagParser(tagStr)
       parsedMoves ← MovesParser(moveStr)
       init = parsedMoves._1
       strMoves = parsedMoves._2
       resultOption = parsedMoves._3
-      tags2 = resultOption.filterNot(_ => tags.exists(_.name == Tag.Result)).fold(tags)(t => tags :+ t)
-      sans ← objMoves(strMoves, getVariantFromTags(tags2))
-    } yield ParsedPgn(init, tags2, sans)
+      tags = resultOption.filterNot(_ => preTags.exists(_.Result)).fold(preTags)(t => preTags + t)
+      sans ← objMoves(strMoves, tags.variant | Variant.default)
+    } yield ParsedPgn(init, tags, sans)
   } catch {
     case _: StackOverflowError =>
       println(pgn)
       sys error "### StackOverflowError ### in PGN parser"
   }
 
-  def getVariantFromTags(tags: List[Tag]): Variant =
-    tags.find(_.name == Tag.Variant).flatMap { tag =>
-      Variant byName tag.value
-    } | Variant.default
-
-  def moves(str: String, variant: Variant): Valid[List[San]] = moves(
+  def moves(str: String, variant: Variant): Valid[Sans] = moves(
     str.split(' ').toList,
     variant
   )
-  def moves(strMoves: Traversable[String], variant: Variant): Valid[List[San]] = objMoves(
+  def moves(strMoves: Traversable[String], variant: Variant): Valid[Sans] = objMoves(
     strMoves.map { StrMove(_, Glyphs.empty, Nil, Nil) }(breakOut),
     variant
   )
-  def objMoves(strMoves: List[StrMove], variant: Variant): Valid[List[San]] =
+  def objMoves(strMoves: List[StrMove], variant: Variant): Valid[Sans] =
     strMoves.map {
       case StrMove(san, glyphs, comments, variations) => (
         MoveParser(san, variant) map { m =>
           m withComments comments withVariations {
             variations.map { v =>
-              objMoves(v, variant) | Nil
-            }.filter(_.nonEmpty)
+              objMoves(v, variant) | Sans.empty
+            }.filter(_.value.nonEmpty)
           } mergeGlyphs glyphs
         }
       ): Valid[San]
-    }.sequence
+    }.sequence map Sans.apply
 
   trait Logging { self: Parsers =>
     protected val loggingEnabled = false
@@ -299,13 +294,13 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
   object TagParser extends RegexParsers with Logging {
 
-    def apply(pgn: String): Valid[List[Tag]] = parseAll(all, pgn) match {
+    def apply(pgn: String): Valid[Tags] = parseAll(all, pgn) match {
       case f: Failure => "Cannot parse tags: %s\n%s".format(f.toString, pgn).failureNel
-      case Success(sans, _) => succezz(sans)
+      case Success(tags, _) => succezz(Tags(tags))
       case err => "Cannot parse tags: %s\n%s".format(err.toString, pgn).failureNel
     }
 
-    def fromFullPgn(pgn: String): Valid[List[Tag]] =
+    def fromFullPgn(pgn: String): Valid[Tags] =
       splitTagAndMoves(pgn) flatMap {
         case (tags, _) => apply(tags)
       }

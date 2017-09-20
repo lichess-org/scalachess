@@ -5,19 +5,14 @@ import scalaz.Validation.FlatMap._
 
 case class ParsedPgn(
     initialPosition: InitialPosition,
-    tags: List[Tag],
-    sans: List[San]
-) {
+    tags: Tags,
+    sans: Sans
+)
 
-  def tag(name: String): Option[String] = Tag.find(tags, name)
+case class Sans(value: List[San]) extends AnyVal
 
-  def tag(which: Tag.type => TagType): Option[String] =
-    tags find (_.name == which(Tag)) map (_.value)
-
-  def clockConfig: Option[Clock.Config] =
-    tags.collectFirst {
-      case Tag(Tag.TimeControl, str) => str
-    } flatMap Clock.readPgnConfig
+object Sans {
+  val empty = Sans(Nil)
 }
 
 // Standard Algebraic Notation
@@ -33,7 +28,7 @@ sealed trait San {
 
   def withComments(s: List[String]): San = withMetas(metas withComments s)
 
-  def withVariations(s: List[List[San]]): San = withMetas(metas withVariations s)
+  def withVariations(s: List[Sans]): San = withMetas(metas withVariations s)
 
   def mergeGlyphs(glyphs: Glyphs): San = withMetas(
     metas.withGlyphs(metas.glyphs merge glyphs)
@@ -98,7 +93,7 @@ case class Metas(
     checkmate: Boolean,
     comments: List[String],
     glyphs: Glyphs,
-    variations: List[List[San]]
+    variations: List[Sans]
 ) {
 
   def withSuffixes(s: Suffixes) = copy(
@@ -111,7 +106,7 @@ case class Metas(
 
   def withComments(c: List[String]) = copy(comments = c)
 
-  def withVariations(v: List[List[San]]) = copy(variations = v)
+  def withVariations(v: List[Sans]) = copy(variations = v)
 }
 
 object Metas {

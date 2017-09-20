@@ -15,6 +15,35 @@ sealed trait TagType {
   val isUnknown = false
 }
 
+case class Tags(value: List[Tag]) extends AnyVal {
+
+  def apply(name: String): Option[String] = {
+    val tagType = Tag tagType name
+    value.find(_.name == tagType).map(_.value)
+  }
+
+  def apply(which: Tag.type => TagType): Option[String] =
+    value find (_.name == which(Tag)) map (_.value)
+
+  def clockConfig: Option[Clock.Config] =
+    value.collectFirst {
+      case Tag(Tag.TimeControl, str) => str
+    } flatMap Clock.readPgnConfig
+
+  def variant: Option[chess.variant.Variant] =
+    apply(_.Variant).flatMap(chess.variant.Variant.byName)
+
+  def exists(which: Tag.type => TagType): Boolean =
+    value.exists(_.name == which(Tag))
+
+  def ++(tags: Tags) = Tags(value ::: tags.value)
+  def +(tag: Tag) = Tags(value :+ tag)
+}
+
+object Tags {
+  val empty = Tags(Nil)
+}
+
 object Tag {
 
   case object Event extends TagType
@@ -72,9 +101,4 @@ object Tag {
 
   def tagType(name: String) =
     (tagTypesByLowercase get name.toLowerCase) | Unknown(name)
-
-  def find(tags: List[Tag], name: String): Option[String] =
-    (Tag tagType name) |> { tagType =>
-      tags.find(_.name == tagType).map(_.value)
-    }
 }

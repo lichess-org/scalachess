@@ -43,6 +43,11 @@ case class Tags(value: List[Tag]) extends AnyVal {
   def exists(which: Tag.type => TagType): Boolean =
     value.exists(_.name == which(Tag))
 
+  def resultColor: Option[Option[Color]] = apply(_.Result) map {
+    case "*" => None
+    case res => Color fromResult res
+  }
+
   def ++(tags: Tags) = tags.value.foldLeft(this)(_ + _)
 
   def +(tag: Tag) = Tags(value.filterNot(_.name == tag.name) :+ tag)

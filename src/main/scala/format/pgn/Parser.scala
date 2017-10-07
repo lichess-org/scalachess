@@ -131,7 +131,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       ";" ~> """.+""".r
     }
 
-    val result: Parser[String] = "*" | "1/2-1/2" | "0-1" | "1-0"
+    val result: Parser[String] = "*" | "1/2-1/2" | "½-½" | "0-1" | "1-0"
   }
 
   object MoveParser extends RegexParsers with Logging {

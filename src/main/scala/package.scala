@@ -7,7 +7,6 @@ package object chess
   extends scalalib.Validation
   with scalalib.Common
   with scalalib.OrnicarNonEmptyList
-  with scalalib.OrnicarMonoid.Instances
 
   with scalaz.syntax.std.ToBooleanOps
 

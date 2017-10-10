@@ -103,7 +103,7 @@ object Color {
   def showResult(color: Option[Color]) = color match {
     case Some(chess.White) => "1-0"
     case Some(chess.Black) => "0-1"
-    case None => "½-½"
+    case None => "1/2-1/2"
   }
 
   def fromResult(result: String): Option[Color] = result match {

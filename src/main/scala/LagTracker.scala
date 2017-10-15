@@ -48,7 +48,7 @@ object LagTracker {
       quotaGain = quotaGain,
       quota = quotaGain * 3,
       quotaMax = quotaGain * 6,
-      history = EmptyDecayingStats(deviation = 5f, decay = 0.9f)
+      history = EmptyDecayingStats(deviation = 2f, decay = 0.9f)
     )
   }
 }

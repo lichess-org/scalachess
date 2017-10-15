@@ -30,7 +30,7 @@ final case class LagTracker(
 
   def lowEstimate = history match {
     case h: DecayingStats => {
-      val c = h.mean - Math.max(h.deviation, 2f)
+      val c = h.mean - h.deviation
       Some(Centis(c.toInt).nonNeg atMost quota)
     }
     case _ => None

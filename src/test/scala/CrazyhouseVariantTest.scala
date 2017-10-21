@@ -94,7 +94,7 @@ class CrazyhouseVariantTest extends ChessTest {
         initialFen = None,
         variant = Crazyhouse
       ) must beSuccess.like {
-          case r => 1 must_== 1
+          case _ => 1 must_== 1
         }
     }
   }

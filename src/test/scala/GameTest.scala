@@ -29,12 +29,12 @@ R   K""", Black)
     }
     "increment" in {
       Game(variant.Standard)(G1, F3) must beSuccess.like {
-        case (game, move) => game.halfMoveClock must_== 1
+        case (game, _) => game.halfMoveClock must_== 1
       }
     }
     "not increment" in {
       Game(variant.Standard)(E2, E4) must beSuccess.like {
-        case (game, move) => game.halfMoveClock must_== 0
+        case (game, _) => game.halfMoveClock must_== 0
       }
     }
   }

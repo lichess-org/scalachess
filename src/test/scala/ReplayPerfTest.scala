@@ -14,7 +14,7 @@ class ReplayPerfTest extends ChessTest {
 
   def runOne(moves: List[String]) =
     Replay.gameMoveWhileValid(moves, format.Forsyth.initial, chess.variant.Standard)
-  def run { gameMoves foreach runOne }
+  def run: Unit = { gameMoves foreach runOne }
 
   "playing a game" should {
     "many times" in {

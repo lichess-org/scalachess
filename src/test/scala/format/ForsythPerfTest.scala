@@ -42,7 +42,7 @@ class ForsythPerfTest extends ChessTest {
         // Forsyth.exportCastles(emptyBoard)
         Forsyth.exportCastles(initialBoard)
       }
-      def run { for (i ← 1 to nb) runOne }
+      def run: Unit = { for (i ← 1 to nb) runOne }
       if (nb * iterations > 1) {
         println("warming up")
         run

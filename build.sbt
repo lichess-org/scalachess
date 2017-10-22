@@ -29,6 +29,14 @@ scalacOptions ++= Seq(
   "-Ydelambdafy:method", "-target:jvm-1.8"
 )
 
+scalacOptions := {
+  val old = scalacOptions.value
+  scalaBinaryVersion.value match {
+    case "2.11" => old filterNot (_ == "-Ywarn-unused:-params,_")
+    case _      => old
+  }
+}
+
 // dark magic to keep scalafix away from test code
 scalafix := ScalafixPlugin.scalafixTaskImpl(Seq(Compile)).evaluated
 

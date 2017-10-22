@@ -131,19 +131,18 @@ class ClockTest extends ChessTest {
     "60s stall" in {
       val clock60 = advance(fakeClock60, 60 * 100)
 
-      clock60.minPending(White).centis must_== 5820
       clock60.remainingTime(White).centis must_== 0
       clock60.outOfTime(Black, withGrace = true) must beFalse
       clock60.outOfTime(White, withGrace = true) must beFalse
       clock60.outOfTime(White, withGrace = false) must beTrue
     }
-    "62s stall" in {
-      val clock62 = advance(fakeClock60, 62 * 100)
-
-      clock62.minPending(White).centis must_== 6020
-      clock62.remainingTime(White).centis must_== 0
-      clock62.outOfTime(White, withGrace = true) must beTrue
-      clock62.outOfTime(White, withGrace = false) must beTrue
+    "61s stall" in {
+      val clock61 = advance(fakeClock60, 61 * 100)
+      clock61.remainingTime(White).centis must_== 0
+      clock61.outOfTime(White, withGrace = true) must beFalse
     }
+    "over quota stall" >> advance(fakeClock60, 6190).outOfTime(White, true)
+    "stall within quota" >> !advance(fakeClock600, 60190).outOfTime(White, true)
+    "max grace stall" >> advance(fakeClock600, 602 * 100).outOfTime(White, true)
   }
 }

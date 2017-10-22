@@ -18,15 +18,13 @@ case class Clock(
 
   @inline def pending(c: Color) = timerFor(c).fold(Centis(0))(toNow)
 
-  @inline def minPending(c: Color) =
-    (pending(c) - players(c).lag.quota) nonNeg
-
   def remainingTime(c: Color) = (players(c).remaining - pending(c)) nonNeg
 
-  def outOfTime(c: Color, withGrace: Boolean) = {
-    val cutoff = if (withGrace) minPending(c) else pending(c)
-    players(c).remaining <= cutoff
-  }
+  def outOfTime(c: Color, withGrace: Boolean) = players(c).remaining <=
+    timerFor(c).fold(Centis(0)) { t =>
+      if (withGrace) (toNow(t) - (players(c).lag.quota atMost Centis(200))) nonNeg
+      else toNow(t)
+    }
 
   def moretimeable(c: Color) = players(c).remaining.centis < 100 * 60 * 60 * 2
 

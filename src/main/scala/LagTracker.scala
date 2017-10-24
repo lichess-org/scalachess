@@ -14,7 +14,7 @@ final case class LagTracker(
 
     (comp, copy(
       quota = (quota + quotaGain - comp) atMost quotaMax,
-      history = history.record(comp.centis),
+      history = history.record((lag atMost quotaMax).centis),
       totalComp = totalComp + comp,
       totalLag = totalLag + lag,
       lagSteps = lagSteps + 1
@@ -22,7 +22,7 @@ final case class LagTracker(
   }
 
   def recordLag(lag: Centis) =
-    copy(history = history.record((lag atMost quota).centis))
+    copy(history = history.record((lag atMost quotaMax).centis))
 
   def avgLagComp = totalComp / lagSteps
 

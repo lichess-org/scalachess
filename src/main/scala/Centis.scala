@@ -6,11 +6,11 @@ import scalaz.Monoid
 import ornicar.scalalib.Zero
 
 // maximum centis = Int.MaxValue / 100 / 60 / 60 / 24 = 248 days
-case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
+final case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
 
   def roundTenths: Int =
     if (centis > 0) (centis + 5) / 10 else (centis - 4) / 10
-  def roundSeconds: Int = math.round(centis * 0.01f)
+  def roundSeconds: Int = Math.round(centis * 0.01f)
 
   def toSeconds: BigDecimal = java.math.BigDecimal.valueOf(centis, 2)
   def millis: Long = centis * 10l
@@ -43,19 +43,15 @@ object Centis {
     def *(o: Centis) = o * scalar
   }
 
-  def apply(value: Long): Centis = Centis {
-    if (value > Int.MaxValue) {
-      // lila.log("common").error(s"Truncating Centis! $value")
-      Int.MaxValue
-    } else if (value < Int.MinValue) {
-      // lila.log("common").error(s"Truncating Centis! $value")
-      Int.MinValue
-    } else value.toInt
+  def apply(l: Long): Centis = Centis {
+    if (l.toInt == l) l.toInt
+    else if (l > 0) Integer.MAX_VALUE
+    else Integer.MIN_VALUE
   }
 
-  def apply(d: FiniteDuration): Centis = Centis {
-    if (d.unit eq MILLISECONDS) d.length / 10
-    else d.toMillis / 10
+  def apply(d: FiniteDuration): Centis = Centis.ofMillis {
+    if (d.unit eq MILLISECONDS) d.length
+    else d.toMillis
   }
 
   def ofSeconds(s: Int) = Centis(100 * s)

@@ -2,7 +2,7 @@ package chess
 package format
 
 import scalaz.Validation.FlatMap._
-import scalaz.Validation.{ success, failure }
+import scalaz.Validation.success
 
 import chess.variant.Variant
 
@@ -15,10 +15,7 @@ object UciDump {
   def apply(moves: Seq[String], initialFen: Option[String], variant: Variant): Valid[List[String]] =
     moves.isEmpty.fold(
       success(Nil),
-      Replay(moves, initialFen, variant) flatMap {
-        case pgn.Reader.Result.Incomplete(_, errs) => failure(errs)
-        case pgn.Reader.Result.Complete(replay) => success(apply(replay))
-      }
+      Replay(moves, initialFen, variant) flatMap (_.valid) map apply
     )
 
   def move(variant: Variant)(mod: MoveOrDrop): String = mod match {

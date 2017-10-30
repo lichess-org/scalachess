@@ -1,13 +1,21 @@
 package chess
 package format.pgn
 
+import scalaz.Validation.{ success, failure }
+
 object Reader {
 
-  sealed trait Result
+  sealed trait Result {
+    def valid: Valid[Replay]
+  }
 
   object Result {
-    case class Complete(replay: Replay) extends Result
-    case class Incomplete(replay: Replay, failures: Failures) extends Result
+    case class Complete(replay: Replay) extends Result {
+      def valid = success(replay)
+    }
+    case class Incomplete(replay: Replay, failures: Failures) extends Result {
+      def valid = failure(failures)
+    }
   }
 
   def full(pgn: String, tags: Tags = Tags.empty): Valid[Result] =

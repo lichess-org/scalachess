@@ -2,7 +2,11 @@ package chess
 
 class DividerTest extends ChessTest {
 
-  def makeReplay(moves: String) = format.pgn.Reader.full(moves).err.chronoMoves.map(_.fold(_.before, _.before))
+  def makeReplay(moves: String) =
+    format.pgn.Reader.full(moves).err match {
+      case format.pgn.Reader.Result.Complete(replay) => replay.chronoMoves.map(_.fold(_.before, _.before))
+      case x => sys error s"Unexpected incomplete replay $x"
+    }
 
   "the divider finds middlegame and endgame" should {
     "game1" in {

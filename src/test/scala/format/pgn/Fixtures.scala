@@ -139,6 +139,54 @@ Bd3 f5 9. g3 Qf6 10. Nf3 c5 11. O-O Ne7 12. Bg5 Qf8 13. Nb5 Bxe4 14. Bxe4 fxe4
 15. Qxe4 Nd5 16. Ne5 cxd4 17. Qxd5 Ra7 18. Qa8 0-1
 """
 
+val festivalFigueira = """
+[Event "figueira"]
+[Site "?"]
+[Date "2017.10.29"]
+[Round "1.21"]
+[White "Paiva, Henrique M A Albergaria"]
+[Black "Morais, Mario Martins Freitas"]
+[Result "1-0"]
+[BlackElo "1457"]
+[WhiteElo "2110"]
+[LiveChessVersion "1.4.8"]
+[ECO "B35"]
+
+1. e4 {[%clk 1:30:58]} c5 {[%clk 1:30:58]} 2. Nf3 {[%clk 1:31:07]} g6
+{[%clk 1:31:18]} 3. d4 {[%clk 1:31:30]} cxd4 {[%clk 1:31:37]} 4. Nxd4
+{[%clk 1:31:52]} Nc6 {[%clk 1:31:42]} 5. Nc3 {[%clk 1:32:03]} Nf6 6. Bc4
+{[%clk 1:31:26]} Bg7 {[%clk 1:27:34]} 7. Be3 {[%clk 1:31:10]} Qa5
+{[%clk 1:24:02]} 8. O-O {[%clk 1:29:40]} O-O {[%clk 1:21:27]} 9. Bb3
+{[%clk 1:27:53]} d6 {[%clk 1:17:26]} 10. h3 {[%clk 1:27:38]} Bd7 {[%clk 1:15:56]}
+11. f4 Nxd4 12. Bxd4 Bc6 {[%clk 1:11:22]} 13. Re1 {[%clk 1:19:12]} Nd7
+{[%clk 1:06:46]} 14. Bxg7 {[%clk 1:13:57]} Kxg7 {[%clk 1:07:08]} 15. Qd4+
+{[%clk 1:14:21]} Kg8 {[%clk 1:06:55]} 16. Rad1 {[%clk 1:14:32]} Qc5
+{[%clk 1:04:24]} 17. Nd5 {[%clk 1:09:40]} Bxd5 {[%clk 1:01:12]} 18. exd5
+{[%clk 1:09:44]} Qxd4+ {[%clk 0:51:57]} 19. Rxd4 {[%clk 1:09:58]} Nc5
+{[%clk 0:51:59]} 20. Rxe7 {[%clk 1:09:08]} Rfe8 {[%clk 0:52:17]} 21. Rxe8+
+{[%clk 1:07:56]} Rxe8 {[%clk 0:52:37]} 22. Kf2 {[%clk 1:05:57]} f5
+{[%clk 0:44:33]} 23. c4 {[%clk 1:00:52]} Nxb3 {[%clk 0:41:17]} 24. axb3
+{[%clk 1:01:17]} a5 {[%clk 0:41:40]} 25. g3 {[%clk 1:01:15]} Kf7 {[%clk 0:41:46]}
+26. Rd3 {[%clk 1:00:09]} b5 {[%clk 0:36:07]} 27. Rc3 {[%clk 0:55:05]} Rc8
+{[%clk 0:35:36]} 28. Ke3 {[%clk 0:47:55]} Ke7 {[%clk 0:35:54]} 29. Kd4
+{[%clk 0:48:05]} Kd7 {[%clk 0:36:00]} 30. c5 {[%clk 0:44:27]} dxc5+
+{[%clk 0:36:29]} 31. Rxc5 {[%clk 0:44:52]} Rb8 {[%clk 0:36:45]} 32. Rc6
+{[%clk 0:45:16]} a4 {[%clk 0:35:24]} 33. b4 {[%clk 0:45:10]} a3 {[%clk 0:34:48]}
+34. bxa3 {[%clk 0:45:34]} Ra8 {[%clk 0:35:17]} 35. Rc3 {[%clk 0:44:17]} Kd6
+{[%clk 0:35:43]} 36. Re3 {[%clk 0:37:51]} Ra7 {[%clk 0:33:33]} 37. g4
+{[%clk 0:37:42]} Rc7 {[%clk 0:31:26]} 38. Re6+ {[%clk 0:37:31]} Kd7
+{[%clk 0:31:45]} 39. gxf5 {[%clk 0:37:28]} gxf5 40. Rh6 Rc4+ {[%clk 0:24:34]} 41.
+Ke5 {[%clk 0:37:50]} Re4+ {[%clk 0:24:21]} 42. Kxf5 {[%clk 1:08:14]} Re3
+{[%clk 0:54:44]} 43. Rxh7+ {[%clk 1:08:19]} Kd6 {[%clk 0:54:59]} 44. Rb7
+{[%clk 1:08:30]} Rxa3 45. Rxb5 Rxh3 {[%clk 0:54:36]} 46. Ke4 {[%clk 1:08:56]} Rh1
+{[%clk 0:54:18]} 47. Rb6+ {[%clk 1:09:12]} Kd7 {[%clk 0:54:19]} 48. f5
+{[%clk 1:07:41]} Re1+ {[%clk 0:52:42]} 49. Kd4 {[%clk 1:08:04]} Rd1+
+{[%clk 0:52:45]} 50. Ke5 {[%clk 1:08:26]} Re1+ 51. Kf6 Rd1 {[%clk 0:50:48]} 52.
+Rb5 {[%clk 1:07:13]} Kd6 {[%clk 0:50:12]} 53. Kf7 {[%clk 1:07:12]} Re1
+{[%clk 0:46:28]} 54. f6 {[%clk 1:07:52]} Re4 {[%clk 0:43:59]} 55. Kf8 Rg4 56. f7
+Re4 57. Rb6+ {[%clk 1:08:13]} Re1 {[%clk 0:37:03]} 58. Kg7+ Kd7 1-0
+"""
+
 val crazyhouseFromProd = """
 [Event "Hourly Crazyhouse Inc Arena"]
 [Site "https://lichess.org/vjT6KovO"]

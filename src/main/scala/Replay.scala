@@ -27,7 +27,7 @@ object Replay {
     moveStrs: Traversable[String],
     initialFen: Option[String],
     variant: chess.variant.Variant
-  ): Valid[Replay] =
+  ): Valid[Reader.Result] =
     moveStrs.some.filter(_.nonEmpty) toValid "[replay] pgn is empty" flatMap { nonEmptyMoves =>
       Reader.moves(
         nonEmptyMoves,

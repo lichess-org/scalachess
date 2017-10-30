@@ -1,45 +1,41 @@
 package chess
 package format.pgn
 
-import scalaz.Validation.FlatMap._
-
 object Reader {
 
-  def full(pgn: String, tags: Tags = Tags.empty): Valid[Replay] =
+  sealed trait Result
+
+  object Result {
+    case class Complete(replay: Replay) extends Result
+    case class Incomplete(replay: Replay, failures: Failures) extends Result
+  }
+
+  def full(pgn: String, tags: Tags = Tags.empty): Valid[Result] =
     fullWithSans(pgn, identity, tags)
 
-  def moves(moveStrs: Traversable[String], tags: Tags): Valid[Replay] =
+  def moves(moveStrs: Traversable[String], tags: Tags): Valid[Result] =
     movesWithSans(moveStrs, identity, tags)
 
-  def fullWithSans(
-    pgn: String,
-    op: Sans => Sans,
-    tags: Tags = Tags.empty
-  ): Valid[Replay] = for {
-    parsed ← Parser.full(pgn)
-    game = makeGame(parsed.tags ++ tags)
-    replay ← makeReplay(game, op(parsed.sans))
-  } yield replay
+  def fullWithSans(pgn: String, op: Sans => Sans, tags: Tags = Tags.empty): Valid[Result] =
+    Parser.full(pgn) map { parsed =>
+      makeReplay(makeGame(parsed.tags ++ tags), op(parsed.sans))
+    }
 
-  def fullWithSans(parsed: ParsedPgn, op: Sans => Sans): Valid[Replay] =
+  def fullWithSans(parsed: ParsedPgn, op: Sans => Sans): Result =
     makeReplay(makeGame(parsed.tags), op(parsed.sans))
 
-  def movesWithSans(
-    moveStrs: Traversable[String],
-    op: Sans => Sans,
-    tags: Tags
-  ): Valid[Replay] = for {
-    moves ← Parser.moves(moveStrs, tags.variant | variant.Variant.default)
-    game = makeGame(tags)
-    replay ← makeReplay(game, op(moves))
-  } yield replay
+  def movesWithSans(moveStrs: Traversable[String], op: Sans => Sans, tags: Tags): Valid[Result] =
+    Parser.moves(moveStrs, tags.variant | variant.Variant.default) map { moves =>
+      makeReplay(makeGame(tags), op(moves))
+    }
 
-  private def makeReplay(game: Game, sans: Sans) =
-    sans.value.foldLeft[Valid[Replay]](Replay(game).success) {
-      case (replayValid, san) => for {
-        replay ← replayValid
-        move ← san(replay.state.situation)
-      } yield replay addMove move
+  private def makeReplay(game: Game, sans: Sans): Result =
+    sans.value.foldLeft[Result](Result.Complete(Replay(game))) {
+      case (Result.Complete(replay), san) => san(replay.state.situation).fold(
+        err => Result.Incomplete(replay, err),
+        move => Result.Complete(replay addMove move)
+      )
+      case (r: Result.Incomplete, _) => r
     }
 
   private def makeGame(tags: Tags) = {

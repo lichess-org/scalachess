@@ -3,6 +3,7 @@ package chess
 import scalaz.Validation.FlatMap._
 import variant.Antichess
 import format.Forsyth
+import format.pgn.Reader
 
 class AntichessVariantTest extends ChessTest {
 
@@ -295,10 +296,10 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Successfully play through a full game until one player loses all their pieces" in {
-      val game = format.pgn.Reader.full(fullGame)
+      val game = Reader.full(fullGame)
 
       game must beSuccess.like {
-        case replay =>
+        case Reader.Result.Complete(replay) =>
           val game = replay.state
 
           game.situation.end must beTrue

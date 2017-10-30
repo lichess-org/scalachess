@@ -4,12 +4,13 @@ package format.pgn
 class ReaderTest extends ChessTest {
 
   import Fixtures._
+  import Reader.Result._
 
   "only raw moves" should {
     "many games" in {
       forall(raws) { (c: String) =>
         Reader.full(c) must beSuccess.like {
-          case replay => replay.moves must have size (c.split(' ').size)
+          case Complete(replay) => replay.moves must have size (c.split(' ').size)
         }
       }
     }
@@ -30,12 +31,12 @@ class ReaderTest extends ChessTest {
     }
     "and delimiters" in {
       Reader.full(withDelimiters) must beSuccess.like {
-        case replay => replay.moves must have size 33
+        case Complete(replay) => replay.moves must have size 33
       }
     }
     "and delimiters on new lines" in {
       Reader.full(withDelimitersOnNewLines) must beSuccess.like {
-        case replay => replay.moves must have size 33
+        case Complete(replay) => replay.moves must have size 33
       }
     }
   }
@@ -75,12 +76,12 @@ class ReaderTest extends ChessTest {
     }
     "invalid variant" in {
       Reader.full(invalidVariant) must beSuccess.like {
-        case replay => replay.setup.board.variant must_== variant.Standard
+        case Complete(replay) => replay.setup.board.variant must_== variant.Standard
       }
     }
     "promoting to a rook" in {
       Reader.full(fromLichessBadPromotion) must beSuccess.like {
-        case replay => replay.chronoMoves lift 10 must beSome.like {
+        case Complete(replay) => replay.chronoMoves lift 10 must beSome.like {
           case move => move.fold(_.promotion, _ => None) must_== Some(Rook)
         }
       }
@@ -99,18 +100,20 @@ class ReaderTest extends ChessTest {
     }
     "crazyhouse 1" in {
       Reader.full(crazyhouse1) must beSuccess.like {
-        case replay => replay.chronoMoves lift 11 must beSome.like {
+        case Complete(replay) => replay.chronoMoves lift 11 must beSome.like {
           case move => move.fold(_.toUci.uci, _.toUci.uci) must_== "P@c6"
         }
       }
     }
     "crazyhouse 2" in {
       Reader.full(crazyhouse2) must beSuccess.like {
-        case replay => replay.chronoMoves.size must_== 111
+        case Complete(replay) => replay.chronoMoves.size must_== 111
       }
     }
     "crazyhouse without variant tag" in {
-      Reader.full(crazyhouseNoVariantTag) must beFailure
+      Reader.full(crazyhouseNoVariantTag) must beSuccess.like {
+        case Incomplete(replay, _) => replay.chronoMoves.size must_== 8
+      }
     }
     "crazyhouse from chess.com" in {
       Reader.full(chessComCrazyhouse) must beSuccess
@@ -119,20 +122,25 @@ class ReaderTest extends ChessTest {
   "from prod" in {
     "from position close chess" in {
       Reader.full(fromPosProdCloseChess) must beSuccess.like {
-        case replay => replay.chronoMoves.size must_== 152
+        case Complete(replay) => replay.chronoMoves.size must_== 152
       }
     }
     "from position empty FEN" in {
       Reader.full(fromPositionEmptyFen) must beSuccess.like {
-        case replay => replay.chronoMoves.size must_== 164
+        case Complete(replay) => replay.chronoMoves.size must_== 164
       }
     }
     "preserves initial ply" in {
       Reader.full(caissa) must beSuccess.like {
-        case replay =>
+        case Complete(replay) =>
           replay.setup.startedAtTurn must_== 43
           replay.state.startedAtTurn must_== 43
       }
+    }
+  }
+  "partial from broadcast" in {
+    Reader.full(festivalFigueira) must beSuccess.like {
+      case Incomplete(replay, _) => replay.chronoMoves.size must_== 113
     }
   }
 }

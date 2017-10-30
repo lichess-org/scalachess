@@ -24,7 +24,7 @@ scalacOptions ++= Seq(
   "-deprecation", "-unchecked", "-feature", "-language:_",
   "-Xfatal-warnings",
   "-Ywarn-unused-import", "-Ywarn-value-discard", "-Ywarn-dead-code",
-  "-Ywarn-unused:-params,_",
+  // "-Ywarn-unused:-params,_",
   "-Xlint:missing-interpolator",
   "-Ydelambdafy:method", "-target:jvm-1.8"
 )
@@ -36,9 +36,6 @@ scalacOptions := {
     case _      => old
   }
 }
-
-// dark magic to keep scalafix away from test code
-scalafix := ScalafixPlugin.scalafixTaskImpl(Seq(Compile)).evaluated
 
 publishTo := Some(Resolver.file("file", new File(sys.props.getOrElse("publishTo", ""))))
 

@@ -48,10 +48,18 @@ case object Horde extends Variant(
     situation.board.piecesOf(White).isEmpty
 
   /**
-   * In horde chess, black always has a possibility to win the game.
-   *  Auto-drawing the game should never happen, but it did in https://lichess.org/xQ2RsU8N#121
+   * P vs K + P where none of the pawns can move is a fortress draw
    */
-  override def insufficientWinningMaterial(board: Board) = false
+  private def hordeClosedPosition(board: Board) = {
+    board.actors.values.forall(actor => (actor.piece.is(Pawn) && actor.moves.isEmpty
+      && InsufficientMatingMaterial.pawnBlockedByPawn(actor, board)) || actor.piece.is(King))
+  }
+
+  /**
+   * In horde chess, black can win unless a fortress stalemate is unavoidable.
+   *  Auto-drawing the game should almost never happen, but it did in https://lichess.org/xQ2RsU8N#121
+   */
+  override def insufficientWinningMaterial(board: Board) = hordeClosedPosition(board)
 
   /**
    * In horde chess, white cannot win on * V K or [BN]{2} v K or just one piece since they don't have a king
@@ -61,7 +69,7 @@ case object Horde extends Variant(
     lazy val insufficientHordeMaterial = board.piecesOf(Color.white).size == 1 ||
       board.piecesOf(Color.white).size == 2 &&
       board.piecesOf(Color.white).forall(_._2.isMinor)
-    color == Color.white && insufficientHordeMaterial
+    color == Color.white && insufficientHordeMaterial || hordeClosedPosition(board)
   }
 
   override def isUnmovedPawn(color: Color, pos: Pos) =

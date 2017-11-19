@@ -6,16 +6,6 @@ class HordeVariantTest extends ChessTest {
 
   "Horde chess" should {
 
-    "Must recognise insufficient winning material for horde with simple fortress." in {
-      val position = "8/pk6/P7/P7/P7/P7/P7/P7 b - -"
-      val game = fenToGame(position, Horde)
-
-      game must beSuccess.like {
-        case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.white) must beTrue
-      }
-    }
-
     "Must recognise insufficient winning material for horde with only 1 pawn left." in {
       val position = "8/2k5/3q4/8/8/8/1P6/8 b - -"
       val game = fenToGame(position, Horde)
@@ -83,6 +73,16 @@ class HordeVariantTest extends ChessTest {
       game must beSuccess.like {
         case game =>
           game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.white) must beFalse
+      }
+    }
+
+    "Must auto-draw in simple pawn fortress" in {
+      val position = "k7/p7/P7/P7/P7/P7/P7/P7 b - -"
+      val game = fenToGame(position, Horde)
+
+      game must beSuccess.like {
+        case game =>
+          game.situation.board.variant.insufficientWinningMaterial(game.situation.board) must beTrue
       }
     }
 

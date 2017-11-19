@@ -77,7 +77,17 @@ class HordeVariantTest extends ChessTest {
     }
 
     "Must auto-draw in simple pawn fortress" in {
-      val position = "k7/p7/P7/P7/P7/P7/P7/P7 b - -"
+      val position = "8/p7/pk6/P7/P7/8/8/8 b - -"
+      val game = fenToGame(position, Horde)
+
+      game must beSuccess.like {
+        case game =>
+          game.situation.board.variant.insufficientWinningMaterial(game.situation.board) must beTrue
+      }
+    }
+
+    "Must auto-draw if horde is stalemated and only king can move" in {
+      val position = "QNBRRBNQ/PPpPPpPP/P1P2PkP/8/8/8/8/8 b - -"
       val game = fenToGame(position, Horde)
 
       game must beSuccess.like {

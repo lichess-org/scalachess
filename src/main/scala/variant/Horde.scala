@@ -19,7 +19,7 @@ case object Horde extends Variant(
 
     val frontPawns = List(Pos.B5, Pos.C5, Pos.F5, Pos.G5).map { _ -> White.pawn }
 
-    val whitePawnsHoard = frontPawns ++ (for {
+    val whitePawnsHorde = frontPawns ++ (for {
       x <- 1 to 8
       y <- 1 to 4
     } yield Pos.posAt(x, y) map (_ -> White.pawn)).flatten toMap
@@ -33,7 +33,7 @@ case object Horde extends Variant(
       }
     }).flatten.toMap
 
-    blackPieces ++ whitePawnsHoard
+    blackPieces ++ whitePawnsHorde
   }
 
   override val castles = Castles("kq")
@@ -48,11 +48,15 @@ case object Horde extends Variant(
     situation.board.piecesOf(White).isEmpty
 
   /**
-   * P vs K + P where none of the pawns can move is a fortress draw
+   * Any vs K + any where horde is stalemated and only king can move is a fortress draw
+   * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
+   * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
    */
   private def hordeClosedPosition(board: Board) = {
-    board.actors.values.forall(actor => (actor.piece.is(Pawn) && actor.moves.isEmpty
-      && InsufficientMatingMaterial.pawnBlockedByPawn(actor, board)) || actor.piece.is(King))
+    lazy val notKingBoard = board.take(board.kingPos(Color.black)).getOrElse(board)
+    val hordePos = board.occupation(Color.white) // may include promoted pieces
+    val mateInOne = hordePos.size == 1 && hordePos.forall(pos => pieceThreatened(board, Color.black, pos, (_ => true)))
+    !mateInOne && notKingBoard.actors.values.forall(actor => actor.moves.isEmpty)
   }
 
   /**
@@ -62,8 +66,10 @@ case object Horde extends Variant(
   override def insufficientWinningMaterial(board: Board) = hordeClosedPosition(board)
 
   /**
-   * In horde chess, white cannot win on * V K or [BN]{2} v K or just one piece since they don't have a king
-   * for support.
+   * In horde chess, the horde cannot win on * V K or [BN]{2} v K or just one piece
+   * since they lack a king for checkmate support.
+   * Technically there are some positions where stalemate is unavoidable which
+   * this method does not detect; however, such are trivial to premove.
    */
   override def insufficientWinningMaterial(board: Board, color: Color) = {
     lazy val insufficientHordeMaterial = board.piecesOf(Color.white).size == 1 ||

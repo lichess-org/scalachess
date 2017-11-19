@@ -58,9 +58,10 @@ case object Horde extends Variant(
    * for support.
    */
   override def insufficientWinningMaterial(board: Board, color: Color) = {
-    color == Color.white && board.piecesOf(Color.white).size == 1 ||
+    lazy val insufficientHordeMaterial = board.piecesOf(Color.white).size == 1 ||
       board.piecesOf(Color.white).size == 2 &&
       board.piecesOf(Color.white).forall(_._2.isMinor)
+    color == Color.white && insufficientHordeMaterial
   }
 
   override def isUnmovedPawn(color: Color, pos: Pos) =

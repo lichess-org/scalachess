@@ -71,11 +71,38 @@ case object Horde extends Variant(
    * Technically there are some positions where stalemate is unavoidable which
    * this method does not detect; however, such are trivial to premove.
    */
-  override def insufficientWinningMaterial(board: Board, color: Color) = {
-    lazy val insufficientHordeMaterial = board.piecesOf(Color.white).size == 1 ||
-      board.piecesOf(Color.white).size == 2 &&
-      board.piecesOf(Color.white).forall(_._2.isMinor)
-    color == Color.white && insufficientHordeMaterial || hordeClosedPosition(board)
+  override def insufficientWinningMaterial(board: Board, color: Color): Boolean = {
+    if (color == Color.white) {
+      lazy val notKingPieces = InsufficientMatingMaterial.nonKingPieces(board)
+      val horde = board.piecesOf(Color.white)
+      lazy val hordeBishopSquareColors = horde.filter(_._2.is(Bishop)).toList.map(_._1.color).distinct
+      lazy val hordeRoles = horde.map(_._2.role)
+      lazy val army = board.piecesOf(Color.black)
+      lazy val armyRooks = army.filter(p => p._2.is(Pawn) || p._2.is(Rook))
+      lazy val armyBishops = army.filter(p => p._2.is(Pawn) || p._2.is(Bishop))
+      lazy val armyKnights = army.filter(p => p._2.is(Pawn) || p._2.is(Knight))
+      lazy val armyPawns = army.filter(_._2.is(Pawn))
+      lazy val armyNonQueens = army.filter(_._2.isNot(Queen))
+      lazy val armyNonRooks = army.filter(p => p._2.isNot(Queen) && p._2.isNot(Rook))
+      lazy val armyNonBishops = army.filter(p => p._2.isNot(Queen) && p._2.isNot(Bishop))
+      lazy val armyBishopSquareColors = armyBishops.toList.map(_._1.color).distinct
+      if (horde.size == 1) {
+        if (hordeRoles == List(Knight)) {
+          if (army.size < 4 || armyNonRooks.isEmpty || armyNonBishops.isEmpty || armyPawns.isEmpty && (armyNonBishops.size + armyBishopSquareColors.size < 4)) return true
+        } else if (hordeRoles == List(Bishop)) {
+          if (!notKingPieces.exists(_._2.role != Bishop) && notKingPieces.map(_._1.color).distinct.size == 1) return true
+        } else if (hordeRoles == List(Rook)) {
+          if (army.size < 3 || armyRooks.isEmpty || armyKnights.isEmpty) return true
+        } else {
+          if (armyRooks.isEmpty) return true
+        }
+      } else if (hordeRoles.forall(_ == Bishop) && hordeBishopSquareColors.size == 1) {
+        if (armyBishops.size < 2 || (armyPawns.isEmpty && armyBishops.size == armyBishopSquareColors.size)) return true
+      } else if (horde.size == 2 && armyNonQueens.size <= 1) {
+        if (armyNonQueens.size == 0 || horde.forall(_._2.isMinor)) return true
+      } else if (notKingPieces.map(_._2.role).distinct == List(Bishop) && !InsufficientMatingMaterial.bishopsOnDifferentColor(board)) return true
+    }
+    hordeClosedPosition(board)
   }
 
   override def isUnmovedPawn(color: Color, pos: Pos) =

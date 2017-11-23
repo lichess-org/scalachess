@@ -146,7 +146,7 @@ object StartingPosition {
       StartingPosition("D03", "Torre Attack", "rnbqkb1r/ppp1pppp/5n2/3p2B1/3P4/5N2/PPP1PPPP/RN1QKB1R b KQkq - 4 3", "Torre_Attack", "1. d4 d5 2. Nf3 Nf6 3. Bg5"),
       StartingPosition("D01", "Richter-Veresov Attack", "rnbqkb1r/ppp1pppp/5n2/3p2B1/3P4/2N5/PPP1PPPP/R2QKBNR b KQkq - 4 3", "Richter-Veresov_Attack", "1. d4 d5 2. Nc3 Nf6 3. Bg5"),
       StartingPosition("A52", "Budapest Defence", "rnbqkb1r/pppp1ppp/5n2/4p3/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3", "Budapest_Gambit", "1.  d4 Nf6 2. c4 e5", false),
-      StartingPosition("B00", "Closed Game", "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2", "Closed_Game", "1. d4 d5", false),
+      StartingPosition("D00", "Closed Game", "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2", "Closed_Game", "1. d4 d5", false),
       StartingPosition("A45", "Trompowsky Attack", "rnbqkb1r/pppppppp/5n2/6B1/3P4/8/PPP1PPPP/RN1QKBNR b KQkq - 3 2", "Trompowsky_Attack", "1. d4 Nf6 2. Bg5")
     )),
     Category("Nf3", List(

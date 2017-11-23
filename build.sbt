@@ -48,3 +48,5 @@ val preferences =
     .setPreference(DanglingCloseParenthesis, Force)
 
 Seq(preferences)
+
+excludeFilter in scalariformFormat := "FullOpeningPart*" || "EcopeningDB.scala" || "Fixtures.scala"

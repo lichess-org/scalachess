@@ -86,21 +86,21 @@ object Replay {
       }
   }
 
-  private def recursiveBoards(sit: Situation, sans: List[San]): Valid[List[Board]] =
+  private def recursiveSituations(sit: Situation, sans: List[San]): Valid[List[Situation]] =
     sans match {
       case Nil => success(Nil)
       case san :: rest => san(sit) flatMap { moveOrDrop =>
-        val after = moveOrDrop.fold(_.afterWithLastMove, _.afterWithLastMove)
-        recursiveBoards(Situation(after, !sit.color), rest) map { after :: _ }
+        val after = Situation(moveOrDrop.fold(_.afterWithLastMove, _.afterWithLastMove), !sit.color)
+        recursiveSituations(after, rest) map { after :: _ }
       }
     }
 
-  private def recursiveBoardsFromUci(sit: Situation, ucis: List[Uci]): Valid[List[Board]] =
+  private def recursiveSituationsFromUci(sit: Situation, ucis: List[Uci]): Valid[List[Situation]] =
     ucis match {
       case Nil => success(Nil)
       case uci :: rest => uci(sit) flatMap { moveOrDrop =>
-        val after = moveOrDrop.fold(_.afterWithLastMove, _.afterWithLastMove)
-        recursiveBoardsFromUci(Situation(after, !sit.color), rest) map { after :: _ }
+        val after = Situation(moveOrDrop.fold(_.afterWithLastMove, _.afterWithLastMove), !sit.color)
+        recursiveSituationsFromUci(after, rest) map { after :: _ }
       }
     }
 
@@ -112,10 +112,16 @@ object Replay {
     moveStrs: Traversable[String],
     initialFen: Option[FEN],
     variant: chess.variant.Variant
-  ): Valid[List[Board]] = {
+  ): Valid[List[Board]] = situations(moveStrs, initialFen, variant) map (_ map (_.board))
+
+  def situations(
+    moveStrs: Traversable[String],
+    initialFen: Option[FEN],
+    variant: chess.variant.Variant
+  ): Valid[List[Situation]] = {
     val sit = initialFenToSituation(initialFen, variant)
     Parser.moves(moveStrs, sit.board.variant) flatMap { moves =>
-      recursiveBoards(sit, moves.value) map { sit.board :: _ }
+      recursiveSituations(sit, moves.value) map { sit :: _ }
     }
   }
 
@@ -123,9 +129,15 @@ object Replay {
     moves: List[Uci],
     initialFen: Option[FEN],
     variant: chess.variant.Variant
-  ): Valid[List[Board]] = {
+  ): Valid[List[Board]] = situationsFromUci(moves, initialFen, variant) map (_ map (_.board))
+
+  def situationsFromUci(
+    moves: List[Uci],
+    initialFen: Option[FEN],
+    variant: chess.variant.Variant
+  ): Valid[List[Situation]] = {
     val sit = initialFenToSituation(initialFen, variant)
-    recursiveBoardsFromUci(sit, moves) map { sit.board :: _ }
+    recursiveSituationsFromUci(sit, moves) map { sit :: _ }
   }
 
   def plyAtFen(

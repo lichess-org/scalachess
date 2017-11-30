@@ -26,10 +26,10 @@ final case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
 
   def compare(other: Centis) = centis - other.centis
 
-  def atMost(o: Centis) = if (centis > o.centis) o else this
-  def atLeast(o: Centis) = if (centis < o.centis) o else this
+  def atMost(o: Centis) = Centis(Math.min(centis, o.centis))
+  def atLeast(o: Centis) = Centis(Math.max(centis, o.centis))
 
-  def nonNeg = if (centis >= 0) this else Centis(0)
+  def nonNeg = Centis(Math.max(centis, 0))
 }
 
 object Centis {
@@ -53,6 +53,9 @@ object Centis {
     if (d.unit eq MILLISECONDS) d.length
     else d.toMillis
   }
+
+  def apply(f: Float): Centis = Centis(Math.round(f))
+  def apply(d: Double): Centis = Centis(Math.round(d))
 
   def ofSeconds(s: Int) = Centis(100 * s)
   def ofMillis(i: Int) = Centis((if (i > 0) i + 5 else i - 4) / 10)

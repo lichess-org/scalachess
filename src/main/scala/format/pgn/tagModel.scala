@@ -38,6 +38,11 @@ case class Tags(value: List[Tag]) extends AnyVal {
 
   def anyDate: Option[String] = apply(_.UTCDate) orElse apply(_.Date)
 
+  def year: Option[Int] = anyDate flatMap {
+    case Tags.DateRegex(y, _, _) => parseIntOption(y)
+    case _ => None
+  }
+
   def fen: Option[format.FEN] = apply(_.FEN) map format.FEN.apply
 
   def exists(which: Tag.type => TagType): Boolean =
@@ -53,6 +58,8 @@ case class Tags(value: List[Tag]) extends AnyVal {
 
 object Tags {
   val empty = Tags(Nil)
+
+  private val DateRegex = """(\d{4}|\?{4})\.(\d\d|\?\?)\.(\d\d|\?\?)""".r
 }
 
 object Tag {

@@ -298,4 +298,17 @@ class ParserTest extends ChessTest {
       case a => a.sans.value.size must_== 36
     }
   }
+
+  "year" in {
+    "full date" in {
+      parser(recentChessCom) must beSuccess.like {
+        case parsed => parsed.tags.year must_== Some(2016)
+      }
+    }
+    "only year" in {
+      parser(explorerPartialDate) must beSuccess.like {
+        case parsed => parsed.tags.year must_== Some(1978)
+      }
+    }
+  }
 }

@@ -107,17 +107,14 @@ object Forsyth {
     val (position, pockets) = fen.takeWhile(' '!=) match {
       case word if (word.count('/' ==) == 8) =>
         val splitted = word.split('/')
-        splitted.take(8).mkString -> splitted.lift(8)
+        splitted.take(8).mkString("/") -> splitted.lift(8)
       case word if word.contains('[') && word.endsWith("]") =>
         word.span('['!=) match {
           case (position, pockets) => position -> pockets.stripPrefix("[").stripSuffix("]").some
         }
       case word => word -> None
     }
-    {
-      if (position contains '~') makePiecesWithCrazyPromoted(position.toList, Pos.A8)
-      else makePieces(position.toList, Pos.A8) map { _ -> Set.empty[Pos] }
-    } map {
+    makePiecesWithCrazyPromoted(position.toList, 1, 8) map {
       case (pieces, promoted) =>
         val board = Board(pieces, variant = variant)
         if (promoted.isEmpty) board else board.withCrazyData(_.copy(promoted = promoted))
@@ -135,45 +132,20 @@ object Forsyth {
     }
   }
 
-  private def makePieces(chars: List[Char], pos: Pos): Option[List[(Pos, Piece)]] = chars match {
-    case Nil => Some(Nil)
-    case c :: rest => c match {
-      case n if n.toInt < 58 =>
-        makePieces(
-          rest,
-          if (n.toInt > 48) tore(pos, n.toInt - 48) getOrElse pos
-          else pos
-        )
-      case n => Role forsyth n.toLower map { role =>
-        (pos, Piece(Color(n.isUpper), role)) :: {
-          tore(pos, 1) flatMap { makePieces(rest, _) } getOrElse Nil
-        }
-      }
-    }
-  }
-
-  private def makePiecesWithCrazyPromoted(chars: List[Char], pos: Pos): Option[(List[(Pos, Piece)], Set[Pos])] = chars match {
-    case Nil => Some(Nil -> Set.empty)
-    case c :: rest => c match {
-      case '~' => pos match {
-        case Pos.A8 => Some(Nil -> Set(Pos.H1)) // last piece is promoted
-        case pos => for {
-          prevPos <- tore(pos, -1)
-          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, pos)
-        } yield nextPieces -> (nextPromoted + prevPos)
-      }
-      case n if n.toInt < 58 =>
-        makePiecesWithCrazyPromoted(
-          rest,
-          if (n.toInt > 48) tore(pos, n.toInt - 48) getOrElse pos
-          else pos
-        )
-      case n => for {
-        role <- Role forsyth n.toLower
-        nextPos = tore(pos, 1) getOrElse Pos.A8
-        (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, nextPos)
-      } yield ((pos, Piece(Color(n.isUpper), role)) :: nextPieces) -> nextPromoted
-    }
+  private def makePiecesWithCrazyPromoted(chars: List[Char], x: Int, y: Int): Option[(List[(Pos, Piece)], Set[Pos])] = chars match {
+    case Nil => Some((Nil, Set.empty))
+    case '/' :: rest => makePiecesWithCrazyPromoted(rest, 1, y - 1)
+    case c :: rest if '1' <= c && c <= '9' => makePiecesWithCrazyPromoted(rest, x + (c - '0').toInt, y)
+    case c :: '~' :: rest => for {
+      pos <- Pos.posAt(x, y)
+      piece <- Piece.fromChar(c)
+      (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
+    } yield (pos -> piece :: nextPieces, nextPromoted + pos)
+    case c :: rest => for {
+      pos <- Pos.posAt(x, y)
+      piece <- Piece.fromChar(c)
+      (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
+    } yield (pos -> piece :: nextPieces, nextPromoted)
   }
 
   def >>(situation: Situation): String = >>(SituationPlus(situation, 1))
@@ -238,17 +210,6 @@ object Forsyth {
       case n => n
     }
   }
-
-  private[chess] def tore(pos: Pos, n: Int): Option[Pos] =
-    if (n == 0) Some(pos)
-    else if (n > 0) Pos.posAt(
-      ((pos.x + n - 1) % 8 + 1),
-      (pos.y - (pos.x + n - 1) / 8)
-    )
-    else Pos.posAt(
-      if (pos.x == 1) 8 else pos.x - 1,
-      if (pos.x == 1) pos.y + 1 else pos.y
-    )
 
   def exportBoard(board: Board): String = {
     val fen = new scala.collection.mutable.StringBuilder(70)

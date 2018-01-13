@@ -71,19 +71,6 @@ class ForsythTest extends ChessTest {
       }
     }
     "import" in {
-      "torus" in {
-        "A8 + 1" in { f.tore(A8, 1) must_== Some(B8) }
-        "A8 + 2" in { f.tore(A8, 2) must_== Some(C8) }
-        "A8 + 7" in { f.tore(A8, 7) must_== Some(H8) }
-        "A8 + 8" in { f.tore(A8, 8) must_== Some(A7) }
-        "C4 + 3" in { f.tore(C4, 3) must_== Some(F4) }
-        "C4 + 8" in { f.tore(C4, 8) must_== Some(C3) }
-        "F1 + 2" in { f.tore(F1, 2) must_== Some(H1) }
-        "-1" in {
-          f.tore(C8, -1) must_== Some(B8)
-          f.tore(A7, -1) must_== Some(H8)
-        }
-      }
       val moves = List(E2 -> E4, C7 -> C5, G1 -> F3, G8 -> H6, A2 -> A3)
       def compare(ms: List[(Pos, Pos)], fen: String) =
         makeGame.playMoveList(ms) must beSuccess.like {

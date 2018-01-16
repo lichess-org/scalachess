@@ -104,6 +104,14 @@ object Replay {
       }
     }
 
+  private def recursiveReplayFromUci(replay: Replay, ucis: List[Uci]): Valid[Replay] =
+    ucis match {
+      case Nil => success(replay)
+      case uci :: rest => uci(replay.state.situation) flatMap { moveOrDrop =>
+        recursiveReplayFromUci(replay addMove moveOrDrop, rest)
+      }
+    }
+
   private def initialFenToSituation(initialFen: Option[FEN], variant: chess.variant.Variant): Situation = {
     initialFen.flatMap { fen => Forsyth << fen.value } | Situation(chess.variant.Standard)
   } withVariant variant
@@ -139,6 +147,13 @@ object Replay {
     val sit = initialFenToSituation(initialFen, variant)
     recursiveSituationsFromUci(sit, moves) map { sit :: _ }
   }
+
+  def apply(
+    moves: List[Uci],
+    initialFen: Option[String],
+    variant: chess.variant.Variant
+  ): Valid[Replay] =
+    recursiveReplayFromUci(Replay(Game(variant.some, initialFen)), moves)
 
   def plyAtFen(
     moveStrs: Traversable[String],

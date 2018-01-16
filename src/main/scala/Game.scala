@@ -1,6 +1,7 @@
 package chess
 
 import format.{ pgn, Uci }
+
 case class Game(
     situation: Situation,
     pgnMoves: Vector[String] = Vector(),

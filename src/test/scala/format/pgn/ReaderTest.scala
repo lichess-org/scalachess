@@ -143,4 +143,9 @@ class ReaderTest extends ChessTest {
       case Incomplete(replay, _) => replay.chronoMoves.size must_== 113
     }
   }
+  "invisible char" in {
+    Reader.full(invisibleChar) must beSuccess.like {
+      case Complete(replay) => replay.chronoMoves.size must_== 19
+    }
+  }
 }

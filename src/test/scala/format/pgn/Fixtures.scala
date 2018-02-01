@@ -73,6 +73,40 @@ object Fixtures {
 0-1
 """
 
+val invisibleChar = """
+﻿[Event "Potsdam"]
+[Site "?"]
+[Date "2018.01.21"]
+[Round "5.1"]
+[White "XXXXX, XXXXX"]
+[Black "YYYYY, YYYYY"]
+[Result "1/2-1/2"]
+[ECO "A40"]
+[WhiteElo "1637"]
+[BlackElo "1859"]
+[Annotator "ZZZZZ"]
+[PlyCount "19"]
+[SourceDate "2017.09.30"]
+[SourceVersionDate "2017.09.30"]
+[WhiteTeam "XXXXX"]
+[BlackTeam "YYYYY"]
+
+{A40: Verschiedene (seltene) Antworten auf 1.d4} 1. e4 g6 2. d4 Bg7 3. c4 Nc6
+4. Nf3 e5 5. d5 Nd4 6. Nxd4 exd4 7. f4 (7. Bd3 d6 (7... c5 8. O-O d6 9. Nd2 Nh6
+10. b4 b6 11. bxc5 bxc5 12. Rb1 O-O 13. Qa4 Ng4 14. Nf3 f5 15. Bg5 Bf6 16. Bxf6
+Qxf6 17. Qc6 fxe4 18. Bxe4 Bf5 19. Bxf5 gxf5 20. Rfe1 Rab8 21. Rxb8 Rxb8 22. h3
+{Duessel,U (2204)-Schwierskott,M (2232) Baden 2013 1/2-1/2 (43)}) 8. O-O Nf6 9.
+Bg5 h6 10. Bh4 O-O 11. Nd2 g5 12. Bg3 Ng4 13. Rc1 Ne5 14. Bb1 h5 15. f3 h4 16.
+Bf2 d3 17. Qb3 Qf6 18. Be3 Ng6 19. Bxd3 Qxb2 20. Bxg5 Qd4+ 21. Kh1 f6 {Hansen,
+C (2621)-Sebastian,D (2384) Germany 2007 0-1}) 7... d6 $146 (7... c5 8. Bd3 d6
+9. O-O Nh6 10. Nd2 O-O 11. Nf3 f6 12. Bd2 b6 13. Qc2 Qd7 14. h3 Ba6 15. a4 Rae8
+16. Rae1 Bc8 17. Re2 Re7 18. Rfe1 Rfe8 19. e5 fxe5 20. fxe5 dxe5 21. Nxe5 Qd6
+22. Bf4 {Putz,G-Kirschner,C Pocking 2001 1/2-1/2}) 8. Be2 f5 9. exf5 Bxf5 10.
+O-O {Viel gibt es nicht zur Partie zu sagen. Obwohl Stockfish 8 die Stellung
+mit -0.10 minimal Schwarz vorne sieht, ist doch die Remisbreite sehr hoch.}
+1/2-1/2
+"""
+
   val fromPosProdCloseChess = """
 [FEN "8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1"]                                                                     [12/1807]
 1. d4 d5 2. Nf4 Nf5 3. g4 g5 4. gxf5 exf5

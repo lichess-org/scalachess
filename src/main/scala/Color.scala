@@ -40,6 +40,10 @@ object Color {
 
     def map[B](f: A => B): Map[B] = map(f, f)
 
+    def all: Seq[A] = Seq(white, black)
+
+    def reduce[B](f: (A, A) => B) = f(white, black)
+
     def forall(pred: A => Boolean) = pred(white) && pred(black)
 
     def exists(pred: A => Boolean) = pred(white) || pred(black)

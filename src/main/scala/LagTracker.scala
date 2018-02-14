@@ -4,37 +4,49 @@ final case class LagTracker(
     quotaGain: Centis,
     quota: Centis,
     quotaMax: Centis,
-    history: DecayingRecorder,
+    lagEstimator: DecayingRecorder,
     totalComp: Centis = Centis(0),
-    totalLag: Centis = Centis(0),
-    lagSteps: Int = 0
+    lagStats: Stats = EmptyStats,
+    // We can remove compEst fields after tuning estimate.
+    compEstSqErr: Int = 0,
+    compEstOvers: Centis = Centis(0),
+    compEstimate: Option[Centis] = None
 ) {
   def onMove(lag: Centis) = {
     val comp = lag atMost quota
+    val ceDiff = compEstimate.getOrElse(Centis(1)) - comp
 
     (comp, copy(
       quota = (quota + quotaGain - comp) atMost quotaMax,
-      history = history.record((lag atMost quotaMax).centis),
       totalComp = totalComp + comp,
-      totalLag = totalLag + lag,
-      lagSteps = lagSteps + 1
-    ))
+      lagStats = lagStats record (lag atMost Centis(2000)).centis,
+      compEstSqErr = compEstSqErr + ceDiff.centis * ceDiff.centis,
+      compEstOvers = compEstOvers + ceDiff.nonNeg
+    ).recordLag(lag))
   }
 
-  def recordLag(lag: Centis) =
-    copy(history = history.record((lag atMost quotaMax).centis))
-
-  def avgLagComp = totalComp / lagSteps
-
-  def avgLag = totalLag / lagSteps
-
-  def lowEstimate = history match {
-    case h: DecayingStats => {
-      val c = h.mean - .6f * h.deviation
-      Some(Centis(Math.round(c)).nonNeg atMost quota)
-    }
-    case _ => None
+  def recordLag(lag: Centis) = {
+    val e = lagEstimator.record((lag atMost quotaMax).centis)
+    copy(
+      lagEstimator = e,
+      compEstimate = Some {
+        Centis(e.mean - .6f * e.deviation).nonNeg atMost quota
+      }
+    )
   }
+
+  def moves = lagStats.samples
+
+  def lagMean: Option[Centis] = moves > 0 option Centis(lagStats.mean)
+
+  def compEstStdErr: Option[Float] =
+    moves > 2 option Math.sqrt(compEstSqErr).toFloat / (moves - 2)
+
+  def compAvg: Option[Centis] = totalComp / moves
+
+  def totalLag: Centis = Centis(lagStats.total)
+
+  def totalUncomped = totalLag - totalComp
 }
 
 object LagTracker {
@@ -48,7 +60,7 @@ object LagTracker {
       quotaGain = quotaGain,
       quota = quotaGain * 3,
       quotaMax = quotaGain * 6,
-      history = EmptyDecayingStats(deviation = 2f, decay = 0.9f)
+      lagEstimator = EmptyDecayingStats(deviation = 2f, decay = 0.9f)
     )
   }
 }

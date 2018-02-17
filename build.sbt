@@ -11,7 +11,7 @@ libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.6",
   "org.scalaz" %% "scalaz-core" % "7.2.15",
   "org.specs2" %% "specs2-core" % "3.9.2" % "test",
-  "com.github.ornicar" %% "scalalib" % "6.5",
+  "com.github.ornicar" %% "scalalib" % "6.6",
   "joda-time" % "joda-time" % "2.9.9"
 )
 

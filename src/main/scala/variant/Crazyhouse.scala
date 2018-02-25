@@ -79,6 +79,10 @@ case object Crazyhouse extends Variant(
   override def checkmate(situation: Situation) =
     super.checkmate(situation) && !canDropStuff(situation)
 
+  // there is always sufficient mating material in Crazyhouse
+  override def insufficientWinningMaterial(board: Board, color: Color) = false
+  override def insufficientWinningMaterial(board: Board) = false
+
   def possibleDrops(situation: Situation): Option[List[Pos]] =
     if (!situation.check) None
     else situation.kingPos.map { blockades(situation, _) }

@@ -58,6 +58,13 @@ class CrazyhouseVariantTest extends ChessTest {
           case g => g.board.history.threefoldRepetition must beFalse
         }
       }
+      "not draw when only kings left" in {
+        val fenPosition = "k6K/8/8/8/8/8/8/8 w - - 0 25"
+        val game = {
+          fenToGame(fenPosition, Crazyhouse).toOption err "error"
+        }
+        game.board.autoDraw must beFalse
+      }
     }
     "prod 50 games accumulate hash" in {
       val gameMoves = format.pgn.Fixtures.prod50crazyhouse.map {

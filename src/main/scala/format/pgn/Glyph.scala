@@ -61,9 +61,9 @@ object Glyph {
     val interesting = new Glyph(5, "!?", "Interesting move") with MoveAssessment
     val dubious = new Glyph(6, "?!", "Dubious move") with MoveAssessment
     val only = new Glyph(7, "□", "Only move") with MoveAssessment
-    val novelty = new Glyph(146, "N", "Novelty") with MoveAssessment
+    val zugzwang = new Glyph(22, "⨀", "Zugzwang") with MoveAssessment
 
-    val all = List(good, mistake, brillant, blunder, interesting, dubious, only, novelty)
+    val all = List(good, mistake, brillant, blunder, interesting, dubious, only, zugzwang)
     val byId: Map[Int, Glyph] = all.map { g => g.id -> g }(breakOut)
 
     def display = all
@@ -90,7 +90,7 @@ object Glyph {
   sealed trait Observation extends Glyph
 
   object Observation {
-    val zugzwang = new Glyph(22, "⨀", "Zugzwang") with Observation
+    val novelty = new Glyph(146, "N", "Novelty") with Observation
     val development = new Glyph(32, "↑↑", "Development") with Observation
     val initiative = new Glyph(36, "↑", "Initiative") with Observation
     val attack = new Glyph(40, "→", "Attack") with Observation
@@ -99,7 +99,7 @@ object Glyph {
     val compensation = new Glyph(44, "=∞", "With compensation") with Observation
     val withIdea = new Glyph(140, "∆", "With the idea") with Observation
 
-    val all = List(zugzwang, development, initiative, attack, counterplay, timeTrouble, compensation, withIdea)
+    val all = List(novelty, development, initiative, attack, counterplay, timeTrouble, compensation, withIdea)
     val byId: Map[Int, Glyph] = all.map { g => g.id -> g }(breakOut)
 
     def display = all

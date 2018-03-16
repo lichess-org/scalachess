@@ -53,7 +53,7 @@ object Replay {
     variant: chess.variant.Variant
   ): Valid[List[Game]] =
     Parser.moves(moveStrs, variant) flatMap { moves =>
-      val game = Game(variant.some, initialFen)
+      val game = makeGame(variant, initialFen)
       recursiveGames(game, moves.value) map { game :: _ }
     }
 
@@ -77,7 +77,7 @@ object Replay {
       )
       case _ => (Nil, None)
     }
-    val init = Game(variant.some, initialFen.some)
+    val init = makeGame(variant, initialFen.some)
     Parser.moves(moveStrs, variant).fold(
       err => List.empty[(Game, Uci.WithSan)] -> err.head.some,
       moves => mk(init, moves.value zip moveStrs)
@@ -153,7 +153,7 @@ object Replay {
     initialFen: Option[String],
     variant: chess.variant.Variant
   ): Valid[Replay] =
-    recursiveReplayFromUci(Replay(Game(variant.some, initialFen)), moves)
+    recursiveReplayFromUci(Replay(makeGame(variant, initialFen)), moves)
 
   def plyAtFen(
     moveStrs: Traversable[String],
@@ -188,4 +188,9 @@ object Replay {
         recursivePlyAtFen(sit, moves.value, 1)
       }
     }
+
+  private def makeGame(variant: chess.variant.Variant, initialFen: Option[String]): Game = {
+    val g = Game(variant.some, initialFen)
+    g.copy(startedAtTurn = g.turns)
+  }
 }

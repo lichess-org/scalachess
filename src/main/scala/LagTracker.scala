@@ -60,7 +60,7 @@ object LagTracker {
       quotaGain = quotaGain,
       quota = quotaGain * 3,
       quotaMax = quotaGain * 6,
-      lagEstimator = EmptyDecayingStats(deviation = 2f, decay = 0.9f)
+      lagEstimator = EmptyDecayingStats(deviation = 6f, decay = 0.9f)
     )
   }
 }

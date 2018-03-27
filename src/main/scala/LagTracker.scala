@@ -52,9 +52,9 @@ final case class LagTracker(
 object LagTracker {
   def init(config: Clock.Config) = {
     val quotaGain = Centis(config.estimateTotalSeconds match {
-      case i if i >= 136 => 100
+      case i if i >= 180 => 100
       case i if i <= 15 => 35
-      case i => i / 2 + 32
+      case i => i / 3 + 40
     })
     LagTracker(
       quotaGain = quotaGain,

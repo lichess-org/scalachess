@@ -5,7 +5,7 @@ final case class LagTracker(
     quota: Centis,
     quotaMax: Centis,
     lagEstimator: DecayingRecorder,
-    totalComp: Centis = Centis(0),
+    uncompStats: Stats = EmptyStats,
     lagStats: Stats = EmptyStats,
     // We can remove compEst fields after tuning estimate.
     compEstSqErr: Int = 0,
@@ -14,11 +14,16 @@ final case class LagTracker(
 ) {
   def onMove(lag: Centis) = {
     val comp = lag atMost quota
+    val uncomped = lag - comp
     val ceDiff = compEstimate.getOrElse(Centis(1)) - comp
 
     (comp, copy(
       quota = (quota + quotaGain - comp) atMost quotaMax,
-      totalComp = totalComp + comp,
+      uncompStats = {
+        // start recording after first uncomp.
+        if (uncomped == Centis(0) && uncompStats eq EmptyStats) uncompStats
+        else uncompStats record uncomped.centis
+      },
       lagStats = lagStats record (lag atMost Centis(2000)).centis,
       compEstSqErr = compEstSqErr + ceDiff.centis * ceDiff.centis,
       compEstOvers = compEstOvers + ceDiff.nonNeg
@@ -44,9 +49,11 @@ final case class LagTracker(
 
   def compAvg: Option[Centis] = totalComp / moves
 
+  def totalComp: Centis = totalLag - totalUncomped
+
   def totalLag: Centis = Centis(lagStats.total)
 
-  def totalUncomped = totalLag - totalComp
+  def totalUncomped: Centis = Centis(uncompStats.total)
 }
 
 object LagTracker {

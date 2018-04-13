@@ -102,15 +102,15 @@ class ClockTest extends ChessTest {
         clockStep600(0, 0, 300) must_== 600 * 100
       }
       "no x8 -> big lag" in {
-        clockStep600(0, 0, 0, 0, 0, 0, 0, 0, 0, 700) must_== 599 * 100
+        clockStep600(0, 0, 0, 0, 0, 0, 0, 0, 0, 800) must_== 599 * 100
       }
 
       "no x5 -> big lag x2" in {
-        clockStep600(0, 0, 0, 0, 0, 0, 500, 500) must_== 597 * 100
+        clockStep600(0, 0, 0, 0, 0, 0, 500, 600) must_== 597 * 100
       }
 
       "no x5 -> big lag x3" in {
-        clockStep600(0, 0, 0, 0, 0, 0, 500, 500, 500) must_== 593 * 100
+        clockStep600(0, 0, 0, 0, 0, 0, 500, 500, 500) must_== 594 * 100
       }
     }
 
@@ -122,7 +122,7 @@ class ClockTest extends ChessTest {
         clockStep60(0, 0, 300) must_== 5940
       }
       "no x4 -> big lag" in {
-        clockStep60(0, 0, 0, 0, 0, 700) must_== 5660
+        clockStep60(0, 0, 0, 0, 0, 700) must_== 5720
       }
     }
   }

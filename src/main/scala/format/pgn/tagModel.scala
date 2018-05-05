@@ -60,6 +60,8 @@ case class Tags(value: List[Tag]) extends AnyVal {
       Tags.tagIndex.getOrElse(tag.name, 999)
     }
   )
+
+  override def toString = sorted.value mkString "\n"
 }
 
 object Tags {

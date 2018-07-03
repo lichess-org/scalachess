@@ -72,7 +72,7 @@ case object Horde extends Variant(
    * this method does not detect; however, such are trivial to premove.
    */
   override def insufficientWinningMaterial(board: Board, color: Color): Boolean = {
-    lazy val fortress = hordeClosedPosition(board)
+    lazy val fortress = hordeClosedPosition(board) // costly function call
     if (color == Color.white) {
       lazy val notKingPieces = InsufficientMatingMaterial.nonKingPieces(board)
       val horde = board.piecesOf(Color.white)
@@ -94,12 +94,10 @@ case object Horde extends Variant(
           case List(Rook) => (army.size < 3 || armyRooks.isEmpty || armyKnights.isEmpty)
           case _ => armyRooks.isEmpty
         }
-      } else if (hordeRoles.forall(_ == Bishop) && hordeBishopSquareColors.size == 1) {
-        (armyBishops.size < 2 || (armyPawns.isEmpty && armyBishops.size == armyBishopSquareColors.size)) || fortress
-      } else if (horde.size == 2 && armyNonQueens.size <= 1) {
-        (armyNonQueens.size == 0 || horde.forall(_._2.isMinor)) || fortress
-      } else
-        (notKingPieces.map(_._2.role).distinct == List(Bishop) && !InsufficientMatingMaterial.bishopsOnDifferentColor(board)) || fortress
+      } else if ((hordeRoles.forall(_ == Bishop) && hordeBishopSquareColors.size == 1) && (armyBishops.size < 2 || (armyPawns.isEmpty && armyBishops.size == armyBishopSquareColors.size))) true
+      else if ((horde.size == 2 && armyNonQueens.size <= 1) && (armyNonQueens.size == 0 || horde.forall(_._2.isMinor))) true
+      else if (notKingPieces.map(_._2.role).distinct == List(Bishop) && !InsufficientMatingMaterial.bishopsOnDifferentColor(board)) true
+      else fortress
     } else fortress
   }
 

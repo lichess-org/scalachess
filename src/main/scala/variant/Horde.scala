@@ -72,6 +72,7 @@ case object Horde extends Variant(
    * this method does not detect; however, such are trivial to premove.
    */
   override def insufficientWinningMaterial(board: Board, color: Color): Boolean = {
+    lazy val fortress = hordeClosedPosition(board)
     if (color == Color.white) {
       lazy val notKingPieces = InsufficientMatingMaterial.nonKingPieces(board)
       val horde = board.piecesOf(Color.white)
@@ -87,22 +88,19 @@ case object Horde extends Variant(
       lazy val armyNonBishops = army.filter(p => p._2.isNot(Queen) && p._2.isNot(Bishop))
       lazy val armyBishopSquareColors = armyBishops.toList.map(_._1.color).distinct
       if (horde.size == 1) {
-        if (hordeRoles == List(Knight)) {
-          if (army.size < 4 || armyNonRooks.isEmpty || armyNonBishops.isEmpty || armyPawns.isEmpty && (armyNonBishops.size + armyBishopSquareColors.size < 4)) return true
-        } else if (hordeRoles == List(Bishop)) {
-          if (!notKingPieces.exists(_._2.role != Bishop) && notKingPieces.map(_._1.color).distinct.size == 1) return true
-        } else if (hordeRoles == List(Rook)) {
-          if (army.size < 3 || armyRooks.isEmpty || armyKnights.isEmpty) return true
-        } else {
-          if (armyRooks.isEmpty) return true
+        hordeRoles match {
+          case List(Knight) => (army.size < 4 || armyNonRooks.isEmpty || armyNonBishops.isEmpty || armyPawns.isEmpty && (armyNonBishops.size + armyBishopSquareColors.size < 4))
+          case List(Bishop) => (!notKingPieces.exists(_._2.role != Bishop) && notKingPieces.map(_._1.color).distinct.size == 1)
+          case List(Rook) => (army.size < 3 || armyRooks.isEmpty || armyKnights.isEmpty)
+          case _ => armyRooks.isEmpty
         }
       } else if (hordeRoles.forall(_ == Bishop) && hordeBishopSquareColors.size == 1) {
-        if (armyBishops.size < 2 || (armyPawns.isEmpty && armyBishops.size == armyBishopSquareColors.size)) return true
+        (armyBishops.size < 2 || (armyPawns.isEmpty && armyBishops.size == armyBishopSquareColors.size)) || fortress
       } else if (horde.size == 2 && armyNonQueens.size <= 1) {
-        if (armyNonQueens.size == 0 || horde.forall(_._2.isMinor)) return true
-      } else if (notKingPieces.map(_._2.role).distinct == List(Bishop) && !InsufficientMatingMaterial.bishopsOnDifferentColor(board)) return true
-    }
-    hordeClosedPosition(board)
+        (armyNonQueens.size == 0 || horde.forall(_._2.isMinor)) || fortress
+      } else
+        (notKingPieces.map(_._2.role).distinct == List(Bishop) && !InsufficientMatingMaterial.bishopsOnDifferentColor(board)) || fortress
+    } else fortress
   }
 
   override def isUnmovedPawn(color: Color, pos: Pos) =

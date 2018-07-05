@@ -16,12 +16,11 @@ object InsufficientMatingMaterial {
    */
   def bishopsOnDifferentColor(board: Board) = {
     val notKingPieces = nonKingPieces(board)
-    val onlyBishopsRemain = !notKingPieces.exists(_._2.role != Bishop)
 
     def bishopsOnSameColor = notKingPieces.map(_._1.color).distinct.size == 1
     def bishopsAreSameColor = notKingPieces.map(_._2.color).distinct.size == 1
 
-    if (!onlyBishopsRemain) false
+    if (notKingPieces.exists(_._2.role != Bishop)) false
     else if (bishopsAreSameColor) notKingPieces.size < 3 || bishopsOnSameColor
     else {
       val whitePlayerBishops = notKingPieces.filter(_._2.color == Color.White)

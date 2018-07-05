@@ -50,7 +50,7 @@ abstract class Variant(
   }(breakOut)
 
   // Optimised for performance
-  def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean = {
+  def pieceThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean = {
     board.pieces exists {
       case (pos, piece) if piece.color == color && filter(piece) && piece.eyes(pos, to) =>
         (!piece.role.projection) || piece.role.dir(pos, to).exists {
@@ -59,6 +59,8 @@ abstract class Variant(
       case _ => false
     }
   }
+
+  def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) = pieceThreatened(board, color, to, filter)
 
   def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean = !{
     kingPos exists { kingThreatened(m.after, !m.color, _, filter) }

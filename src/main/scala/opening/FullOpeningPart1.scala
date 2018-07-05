@@ -5,6 +5,7 @@ package opening
 private[opening] object FullOpeningPart1 {
 
   def db: Vector[FullOpening] = Vector(
+new FullOpening("A00", "Amar Opening", "rnbqkbnr/pppppppp/8/8/8/7N/PPPPPPPP/RNBQKB1R b KQkq"),
 new FullOpening("A00", "Amar Gambit", "rn1qkbnr/ppp2ppp/8/3p4/5p2/6PB/PPPPP2P/RNBQK2R w KQkq"),
 new FullOpening("A00", "Amar Opening: Gent Gambit", "rn1qkbnr/ppp2ppp/8/3p4/8/6PB/PPPPP3/RNBQ1RK1 b kq"),
 new FullOpening("A00", "Amar Opening: Paris Gambit", "rnbqkbnr/ppp2ppp/8/3pp3/5P2/6PN/PPPPP2P/RNBQKB1R b KQkq"),

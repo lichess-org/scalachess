@@ -1507,7 +1507,6 @@ new FullOpening("D98", "Grünfeld Defense: Russian Variation, Smyslov Variation"
 new FullOpening("D98", "Grünfeld Defense: Russian, Keres Variation", "r2q1rk1/ppp1ppbp/1nn3p1/8/3PP1b1/2NQBN2/PP2BPPP/2KR3R b -"),
 new FullOpening("D99", "Grünfeld Defense: Russian Variation, Smyslov Variation", "rn1q1rk1/pppnppbp/6p1/8/3PP1b1/1QN1BN2/PP3PPP/R3KB1R b KQ"),
 new FullOpening("D99", "Grünfeld Defense: Russian Variation, Yugoslav Variation", "rn1q1rk1/pp1nppbp/6p1/2p5/3PP1b1/1QN1BN2/PP3PPP/R3KB1R w KQ"),
-new FullOpening("E00", "Amar Opening", "rnbqkbnr/pppppppp/8/8/8/7N/PPPPPPPP/RNBQKB1R b KQkq"),
 new FullOpening("E00", "Catalan Opening", "rnbqkb1r/pppp1ppp/4pn2/8/2PP4/6P1/PP2PP1P/RNBQKBNR b KQkq"),
 new FullOpening("E00", "Catalan Opening: Hungarian Gambit", "rnbqkb1r/pppp1ppp/5n2/4p3/2PP4/6P1/PP2PP1P/RNBQKBNR w KQkq"),
 new FullOpening("E00", "Indian Game: Devin Gambit", "rnbqkb1r/pppp1ppp/4pn2/8/2PP2P1/8/PP2PP1P/RNBQKBNR b KQkq"),

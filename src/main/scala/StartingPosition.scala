@@ -163,6 +163,9 @@ object StartingPosition {
     Category("b3", List(
       StartingPosition("A01", "Nimzo-Larsen Attack", "rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 1 1", "Larsen's_Opening", "1. b3", false)
     )),
+    Category("b4", List(
+      StartingPosition("A00", "Sokolsky Opening", "rnbqkbnr/pppppppp/8/8/1P6/8/P1PPPPPP/RNBQKBNR b KQkq - 1 1", "Sokolsky_Opening", "1. b4", false)
+    )),
     Category("g3", List(
       StartingPosition("A00", "Hungarian Opening", "rnbqkbnr/pppppppp/8/8/8/6P1/PPPPPP1P/RNBQKBNR b KQkq - 1 1", "King's_Fianchetto_Opening", "1. g3", false)
     ))

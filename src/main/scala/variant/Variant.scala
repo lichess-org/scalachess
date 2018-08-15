@@ -7,7 +7,8 @@ import scalaz.Validation.failureNel
 
 import Pos.posAt
 
-abstract class Variant(
+// Correctness depends on singletons for each variant ID
+abstract class Variant private[variant] (
     val id: Int,
     val key: String,
     val name: String,
@@ -169,6 +170,10 @@ abstract class Variant(
   def isUnmovedPawn(color: Color, pos: Pos) = pos.y == color.fold(2, 7)
 
   override def toString = s"Variant($name)"
+
+  override def equals(that: Any): Boolean = this eq that.asInstanceOf[AnyRef]
+
+  override def hashCode: Int = id
 }
 
 object Variant {

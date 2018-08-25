@@ -53,7 +53,7 @@ case object Horde extends Variant(
    * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
    */
   private def hordeClosedPosition(board: Board) = {
-    lazy val notKingBoard = board.take(board.kingPos(Color.black)).getOrElse(board)
+    lazy val notKingBoard = board.kingPos.get(Color.black).flatMap(board.take).getOrElse(board)
     val hordePos = board.occupation(Color.white) // may include promoted pieces
     val mateInOne = hordePos.size == 1 && hordePos.forall(pos => pieceThreatened(board, Color.black, pos, (_ => true)))
     !mateInOne && notKingBoard.actors.values.forall(actor => actor.moves.isEmpty)

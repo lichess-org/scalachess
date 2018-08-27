@@ -11,8 +11,8 @@ object InsufficientMatingMaterial {
   def nonKingPieces(board: Board) = board.pieces.filter(_._2.role != King).toList
 
   /**
-   * Returns true when the only non-king pieces that remain are bishops that cannot
-   * capture each other and cannot checkmate (in atomic chess).
+   * Returns true when remaining non-King pieces are only bishops that cannot
+   * capture each other and cannot checkmate
    */
   def bishopsOnDifferentColor(board: Board) = {
     val notKingPieces = nonKingPieces(board)
@@ -63,7 +63,7 @@ object InsufficientMatingMaterial {
     board rolesOf color filter (King !=) match {
       case Nil => true
       case List(Knight) => board rolesOf !color filter (King !=) filter (Queen !=) isEmpty
-      case List(Bishop) => board rolesOf !color filter (King !=) filter (Queen !=) filter (Rook !=) isEmpty
+      case List(Bishop) => (board rolesOf !color filter (King !=) filter (Queen !=) filter (Rook !=) filter (Bishop !=) isEmpty) || bishopsOnDifferentColor(board)
       case _ => false
     }
 }

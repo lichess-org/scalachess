@@ -15,7 +15,7 @@ class VariantTest extends ChessTest {
     }
 
     "Identify insufficient mating material when called (bishop)." in {
-      val position = "8/3k4/2q5/8/8/K1B5/8/8 w - -"
+      val position = "krq5/bqqq4/qqr5/1qq5/8/8/8/3qB2K b - -"
       val game = fenToGame(position, Standard)
 
       game should beSuccess.like {
@@ -25,14 +25,13 @@ class VariantTest extends ChessTest {
     }
 
     "Identify insufficient mating material when called (knight)." in {
-      val position = "8/3k4/2q5/8/8/K1N5/8/8 w - -"
+      val position = "8/3k4/2q5/8/8/K1N5/8/8 b - -"
       val game = fenToGame(position, Standard)
 
       game should beSuccess.like {
         case game =>
           game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.white) must beTrue
       }
-
     }
   }
 

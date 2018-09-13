@@ -63,7 +63,7 @@ object InsufficientMatingMaterial {
     board rolesOf color filter (King !=) match {
       case Nil => true
       case List(Knight) => board rolesOf !color filter (King !=) filter (Queen !=) isEmpty
-      case List(Bishop) => (board rolesOf !color filter (King !=) filter (Queen !=) filter (Rook !=) filter (Bishop !=) isEmpty) || bishopsOnDifferentColor(board)
+      case List(Bishop) => (board rolesOf !color filter (King !=) filter (Queen !=) filter (Rook !=) filter (Bishop !=) isEmpty) && !bishopsOnDifferentColor(board)
       case _ => false
     }
 }

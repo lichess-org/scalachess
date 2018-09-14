@@ -32,7 +32,7 @@ case class Tags(value: List[Tag]) extends AnyVal {
 
   def variant: Option[chess.variant.Variant] =
     apply(_.Variant).flatMap {
-      case "chess 960" | "fisherandom" | "fisherrandom" => chess.variant.Chess960.some
+      case "chess 960" | "fischerandom" | "fischerrandom" => chess.variant.Chess960.some
       case name => chess.variant.Variant byName name
     }
 

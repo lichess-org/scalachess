@@ -110,19 +110,16 @@ case class Actor(
   def castleOn(side: Side): List[Move] = (for {
     kingPos ← board kingPosOf color
     if history canCastle color on side
-    tripToRook = side.tripToRook(kingPos, board)
-    rookPos ← tripToRook.lastOption
+    rookPos ← side.tripToRook(kingPos, board).lastOption
     if board(rookPos) contains color.rook
     if history.unmovedRooks.pos.contains(rookPos)
     newKingPos ← posAt(side.castledKingX, kingPos.y)
-    travelPoss = kingPos <-> newKingPos
-    if !travelPoss.map(board.apply).exists {
-      case Some(piece) if piece == color.rook || piece == color.king => false
-      case Some(_) => true
-      case _ => false
-    }
-    if !travelPoss.exists(p => board.variant.kingThreatened(board, !color, p))
     newRookPos ← posAt(side.castledRookX, rookPos.y)
+    kingPath = kingPos <-> newKingPos
+    rookPath = rookPos <-> newRookPos
+    mustBeUnoccupied = (kingPath ++ rookPath).filter(_ != kingPos).filter(_ != rookPos)
+    if !mustBeUnoccupied.exists(board.pieces.contains)
+    if !kingPath.exists(p => board.variant.kingThreatened(board, !color, p))
     b1 ← board take rookPos
     b2 ← newKingPos match {
       case p if p == kingPos => Some(b1)

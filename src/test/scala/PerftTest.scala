@@ -101,5 +101,10 @@ class PerftTest extends ChessTest {
       val game = Game(Some(Chess960), Some("r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1"))
       perft(game, 3) must be equalTo (9467)
     }
+    // https://github.com/ornicar/lila/issues/4625
+    "h-side rook blocks a-side castling" in {
+      val game = Game(Some(Chess960), Some("4rrk1/pbbp2p1/1ppnp3/3n1pqp/3N1PQP/1PPNP3/PBBP2P1/4RRK1 w Ff - 0 1"))
+      perft(game, 3) must be equalTo (71908)
+    }
   }
 }

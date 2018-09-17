@@ -31,7 +31,7 @@ case class Tags(value: List[Tag]) extends AnyVal {
     } flatMap Clock.readPgnConfig
 
   def variant: Option[chess.variant.Variant] =
-    apply(_.Variant).flatMap {
+    apply(_.Variant).map(_.toLowerCase).flatMap {
       case "chess 960" | "fischerandom" | "fischerrandom" => chess.variant.Chess960.some
       case name => chess.variant.Variant byName name
     }

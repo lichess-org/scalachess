@@ -290,6 +290,54 @@ hxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5
 35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6
 Nf2 42. g4 Bd3 43. Re6 1/2-1/2"""
 
+  val stLouisFischerandom = """[ePGN "0.1;DGT LiveChess/2.2.3"]
+[Event "Champions Showdown 2018"]
+[Site "Saint Louis, United States"]
+[Date "2018.09.12"]
+[Round "6.1"]
+[White "Kasparov, Garry"]
+[Black "Topalov, Veselin"]
+[Result "*"]
+[WhiteClock "00:04:08"]
+[BlackClock "00:07:03"]
+[ReferenceTime "B/2018-09-12T15:26:56.191-05:00"]
+[FEN "rbnnqkbr/pppppppp/8/8/8/8/PPPPPPPP/RBNNQKBR w HAha - 0 1"]
+[Variant "Fischerandom"]
+[WhiteTitle "GM"]
+[BlackTitle "GM"]
+[WhiteElo "2734"]
+[BlackElo "2722"]
+
+1. d4 {[%clk 00:30:00]} {[%emt 00:00:05]} d5 {[%clk 00:29:57]} {[%emt
+00:00:14]} 2. f3 {[%clk 00:30:00]} {[%emt 00:00:04]} f6 {[%clk 00:29:16]}
+{[%emt 00:00:51]} 3. Nd3 {[%clk 00:29:58]} {[%emt 00:00:13]} c6 {[%clk
+00:28:46]} {[%emt 00:00:40]} 4. e4 {[%clk 00:29:06]} {[%emt 00:01:02]} dxe4
+{[%clk 00:28:14]} {[%emt 00:00:43]} 5. fxe4 {[%clk 00:27:57]} {[%emt 00:01:18]}
+e5 {[%clk 00:28:03]} {[%emt 00:00:20]} 6. dxe5 {[%clk 00:23:33]} {[%emt
+00:04:34]} Bxe5 {[%clk 00:26:44]} {[%emt 00:01:29]} 7. Bc5+ {[%clk 00:23:11]}
+{[%emt 00:00:32]} Bd6 {[%clk 00:26:44]} {[%emt 00:00:03]} 8. Bxd6+ {[%clk
+00:23:11]} {[%emt 00:00:03]} Nxd6 {[%clk 00:26:44]} {[%emt 00:00:01]} 9. e5
+{[%clk 00:23:11]} {[%emt 00:00:01]} fxe5 {[%clk 00:25:53]} {[%emt 00:01:00]} 10.
+O-O+ {[%clk 00:22:47]} {[%emt 00:00:34]} Bf7 {[%clk 00:23:55]} {[%emt
+00:02:09]} 11. Nxe5 {[%clk 00:22:13]} {[%emt 00:00:44]} O-O {[%clk 00:23:52]}
+{[%emt 00:00:12]} 12. c3 {[%clk 00:22:13]} {[%emt 00:00:02]} Qe7 {[%clk
+00:18:39]} {[%emt 00:05:21]} 13. Nxf7 {[%clk 00:19:46]} {[%emt 00:02:38]} Rxf7
+{[%clk 00:18:19]} {[%emt 00:00:30]} 14. Bc2 {[%clk 00:19:35]} {[%emt 00:00:22]}
+Rxf1+ {[%clk 00:18:06]} {[%emt 00:00:22]} 15. Qxf1 {[%clk 00:19:32]} {[%emt
+00:00:13]} N8f7 {[%clk 00:18:06]} {[%emt 00:00:08]} 16. Nf2 {[%clk 00:19:26]}
+{[%emt 00:00:15]} Re8 {[%clk 00:18:06]} {[%emt 00:00:08]} 17. Rd1 {[%clk
+00:15:06]} {[%emt 00:04:30]} Ne5 {[%clk 00:13:44]} {[%emt 00:04:33]} 18. Nd3
+{[%clk 00:12:31]} {[%emt 00:02:46]} Nec4 {[%clk 00:07:44]} {[%emt 00:06:10]} 19.
+Re1 {[%clk 00:12:14]} {[%emt 00:00:26]} Qf8 {[%clk 00:07:18]} {[%emt 00:00:36]}
+20. Bb3 {[%clk 00:04:16]} {[%emt 00:08:08]} Qxf1+ {[%clk 00:07:18]} {[%emt
+00:00:06]} 21. Kxf1 {[%clk 00:04:16]} {[%emt 00:00:02]} Kf8 {[%clk 00:07:18]}
+{[%emt 00:00:02]} 22. Rxe8+ {[%clk 00:04:16]} {[%emt 00:00:03]} Kxe8 {[%clk
+00:07:18]} {[%emt 00:00:01]} 23. Ke2 {[%clk 00:04:16]} {[%emt 00:00:02]} Ke7
+{[%clk 00:07:18]} {[%emt 00:00:03]} 24. Bxc4 {[%clk 00:04:08]} {[%emt
+00:00:18]} Nxc4 {[%clk 00:07:18]} {[%emt 00:00:02]} 25. b3 {[%clk 00:04:08]}
+Nd6 {[%clk 00:07:18]} {[%emt 00:00:10]} 26. Ke3 {[%clk 00:04:08]} {[%emt
+00:00:03]} *"""
+
   val inlineComments = """[Event "F/S Return Match"]
 [Site "Belgrade, Serbia Yugoslavia|JUG"]
 [Date "1992.11.04"]

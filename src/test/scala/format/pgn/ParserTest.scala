@@ -311,4 +311,10 @@ class ParserTest extends ChessTest {
       }
     }
   }
+
+  "weird variant names" in {
+    parser(stLouisFischerandom) must beSuccess.like {
+      case parsed => parsed.tags.variant must_== Some(variant.Chess960)
+    }
+  }
 }

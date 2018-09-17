@@ -37,7 +37,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       init = parsedMoves._1
       strMoves = parsedMoves._2
       resultOption = parsedMoves._3
-      tags = resultOption.filterNot(_ => preTags.exists(_.Result)).fold(preTags)(t => preTags + t)
+      tags = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + _)
       sans ← objMoves(strMoves, tags.variant | Variant.default)
     } yield ParsedPgn(init, tags, sans)
   } catch {

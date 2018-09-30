@@ -1219,7 +1219,7 @@ new FullOpening("B32", "Sicilian Defense: Flohr Variation", "r1b1kbnr/ppqppppp/2
 new FullOpening("B32", "Sicilian Defense: Franco-Sicilian Variation", "r1bqkbnr/pp1p1ppp/2n1p3/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R w KQkq"),
 new FullOpening("B32", "Sicilian Defense: Godiva Variation", "r1b1kbnr/pp1ppppp/1qn5/8/3NP3/8/PPP2PPP/RNBQKB1R w KQkq"),
 new FullOpening("B32", "Sicilian Defense: Kalashnikov Variation", "r1bqkbnr/pp3ppp/2np4/1N2p3/4P3/8/PPP2PPP/RNBQKB1R w KQkq"),
-new FullOpening("B32", "Sicilian Defense: Loewenthal Variation", "r1bqkbnr/pp1p1ppp/2n5/4p3/3NP3/8/PPP2PPP/RNBQKB1R w KQkq"),
+new FullOpening("B32", "Sicilian Defense: Löwenthal Variation", "r1bqkbnr/pp1p1ppp/2n5/4p3/3NP3/8/PPP2PPP/RNBQKB1R w KQkq"),
 new FullOpening("B32", "Sicilian Defense: Nimzo-American Variation", "r1bqkbnr/pp2pppp/2n5/3p4/3NP3/8/PPP2PPP/RNBQKB1R w KQkq"),
 new FullOpening("B32", "Sicilian Defense: Open", "r1bqkbnr/pp1ppppp/2n5/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq"),
 new FullOpening("B32", "Sicilian Defense: Open", "r1bqkbnr/pp1ppppp/2n5/8/3pP3/5N2/PPP2PPP/RNBQKB1R w KQkq"),

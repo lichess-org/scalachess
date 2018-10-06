@@ -37,12 +37,8 @@ case object Antichess extends Variant(
 
   override def specialEnd(situation: Situation) = {
     // The game ends with a win when one player manages to lose all their pieces or is in stalemate
-    situation.board.actorsOf(situation.color).isEmpty || situation.moves.isEmpty
+    situation.board.piecesOf(situation.color).isEmpty || situation.moves.isEmpty
   }
-
-  // In antichess, there is no checkmate condition therefore a player may only draw either by agreement
-  // , blockade or stalemate - a player always has sufficient material to win otherwise
-  override def insufficientWinningMaterial(board: Board, color: Color) = false
 
   // No player can win if the only remaining pieces are opposing bishops on different coloured
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color
@@ -78,6 +74,16 @@ case object Antichess extends Variant(
     }
 
     bishopsAndPawns && drawnBishops
+  }
+
+  /**
+   * In antichess, knight versus knight is only winnable by one player
+   */
+  override def insufficientWinningMaterial(situation: Situation) = {
+    val board = situation.board
+    lazy val piecesOnSameColor = board.pieces.map(_._1.color).toStream.distinct.size == 1
+
+    board.rolesOf(White) == List(Knight) && board.rolesOf(Black) == List(Knight) && piecesOnSameColor
   }
 
   private def pawnNotAttackable(pawn: Actor, oppositeBishopColor: Color, board: Board) = {

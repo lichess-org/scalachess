@@ -12,7 +12,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.white) must beFalse
+          game.situation.board.variant.insufficientWinningMaterial(game.situation) must beFalse
       }
     }
 
@@ -22,7 +22,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.white) must beTrue
+          game.situation.board.variant.insufficientWinningMaterial(game.situation) must beTrue
       }
     }
 
@@ -32,7 +32,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.black) must beFalse
+          game.situation.board.variant.insufficientWinningMaterial(game.situation) must beFalse
       }
     }
 
@@ -42,7 +42,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.white) must beTrue
+          game.situation.board.variant.insufficientWinningMaterial(game.situation) must beTrue
       }
     }
 
@@ -52,7 +52,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.black) must beFalse
+          game.situation.board.variant.insufficientWinningMaterial(game.situation) must beFalse
       }
     }
 
@@ -62,7 +62,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.white) must beTrue
+          game.situation.board.variant.insufficientWinningMaterial(game.situation) must beTrue
       }
     }
 
@@ -72,7 +72,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.black) must beFalse
+          game.situation.board.variant.insufficientWinningMaterial(game.situation) must beFalse
       }
     }
 
@@ -82,7 +82,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.white) must beFalse
+          game.situation.board.variant.insufficientWinningMaterial(game.situation) must beFalse
       }
     }
 
@@ -92,7 +92,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board) must beTrue
+          game.situation.board.autoDraw must beTrue
       }
     }
 
@@ -102,7 +102,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board) must beTrue
+          game.situation.board.autoDraw must beTrue
       }
     }
 
@@ -112,7 +112,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board) must beFalse
+          game.situation.board.autoDraw must beFalse
       }
     }
   }

@@ -80,27 +80,13 @@ case object Atomic extends Variant(
    * king left.
    */
   private def insufficientAtomicWinningMaterial(board: Board) = {
-    val whiteActors = board.actorsOf(White)
-    val blackActors = board.actorsOf(Black)
-    val allActors = board.actors
-    lazy val allPieces = board.actors.values.map(_.piece).filter(_ isNot King)
+    lazy val notKingPieces = InsufficientMatingMaterial.nonKingPieces(board)
 
     // One player must only have their king left
-    if (whiteActors.size != 1 && blackActors.size != 1) false
-    else {
-      // You can mate with a queen or a pawn that is later promoted a a queen, but not with just one of any other piece
-      // or with just a king
-      allPieces.size == 1 && !allPieces.exists(p => p.is(Queen) || p.is(Pawn)) || allActors.size == 2
-    }
-  }
-
-  /*
-   * Bishops on opposite coloured squares can never capture each other to cause a king to explode and a traditional
-   * mate would be not be very likely. Additionally, a player can only mate another player with sufficient material.
-   * We also look out for closed positions (pawns that cannot move and kings which cannot capture them.)
-   */
-  override def insufficientWinningMaterial(board: Board) = {
-    InsufficientMatingMaterial.bishopsOnDifferentColor(board) || insufficientAtomicWinningMaterial(board) || atomicClosedPosition(board)
+    // You can mate with a queen or a pawn that is later promoted a a queen,
+    // but not with just one of any other piece or with just a king
+    (board.count(White) == 1 || board.count(Black) == 1) &&
+      (board.pieces.size == 2 || (notKingPieces.size == 1 && !notKingPieces.exists(p => p._2.is(Queen) || p._2.is(Pawn))))
   }
 
   /**
@@ -112,12 +98,21 @@ case object Atomic extends Variant(
   }
 
   /**
-   * In atomic chess, it is possible to win with a single knight, bishop, etc, by exploding
-   * a piece in the opponent's king's proximity. On the other hand, a king alone or a king with
-   * immobile pawns is not sufficient material to win with.
+   * Bishops on opposite coloured squares can never capture each other to cause a king to explode and a traditional
+   * mate would be not be very likely. Additionally, a player can only mate another player with sufficient material.
+   * We also look out for closed positions (pawns that cannot move and kings which cannot capture them.)
    */
-  override def insufficientWinningMaterial(board: Board, color: Color) =
-    board.rolesOf(color) == List(King)
+  override def insufficientWinningMaterial(board: Board) = {
+    InsufficientMatingMaterial.bishopsOnDifferentColor(board) || insufficientAtomicWinningMaterial(board) || atomicClosedPosition(board)
+  }
+
+  /**
+   * In atomic chess, it is possible to win with a single knight, bishop, etc,
+   * by exploding a piece or pawn in the opponent's king's proximity.
+   * A lone king is not sufficient material to win.
+   */
+  override def insufficientWinningMaterial(situation: Situation) =
+    situation.board.rolesOf(!situation.color) == List(King)
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
   override def specialEnd(situation: Situation) = situation.board.kingPos.size != 2

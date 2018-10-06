@@ -48,11 +48,13 @@ case object Horde extends Variant(
     situation.board.piecesOf(White).isEmpty
 
   /**
+   * In horde chess, black can win unless a fortress stalemate is unavoidable.
+   *
    * Any vs K + any where horde is stalemated and only king can move is a fortress draw
    * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
    * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
    */
-  private def hordeClosedPosition(board: Board) = {
+  override def insufficientWinningMaterial(board: Board) = {
     lazy val notKingBoard = board.kingPos.get(Color.black).flatMap(board.take).getOrElse(board)
     val hordePos = board.occupation(Color.white) // may include promoted pieces
     val mateInOne = hordePos.size == 1 && hordePos.forall(pos => pieceThreatened(board, Color.black, pos, (_ => true)))
@@ -60,20 +62,15 @@ case object Horde extends Variant(
   }
 
   /**
-   * In horde chess, black can win unless a fortress stalemate is unavoidable.
-   *  Auto-drawing the game should almost never happen, but it did in https://lichess.org/xQ2RsU8N#121
-   */
-  override def insufficientWinningMaterial(board: Board) = hordeClosedPosition(board)
-
-  /**
    * In horde chess, the horde cannot win on * V K or [BN]{2} v K or just one piece
    * since they lack a king for checkmate support.
    * Technically there are some positions where stalemate is unavoidable which
    * this method does not detect; however, such are trivial to premove.
    */
-  override def insufficientWinningMaterial(board: Board, color: Color): Boolean = {
-    lazy val fortress = hordeClosedPosition(board) // costly function call
-    if (color == Color.white) {
+  override def insufficientWinningMaterial(situation: Situation): Boolean = {
+    lazy val board = situation.board
+    lazy val fortress = insufficientWinningMaterial(board) // costly function call
+    if (situation.color == Color.black) {
       lazy val notKingPieces = InsufficientMatingMaterial.nonKingPieces(board)
       val horde = board.piecesOf(Color.white)
       lazy val hordeBishopSquareColors = horde.filter(_._2.is(Bishop)).toList.map(_._1.color).distinct

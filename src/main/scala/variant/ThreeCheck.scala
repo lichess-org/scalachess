@@ -24,13 +24,13 @@ case object ThreeCheck extends Variant(
     situation.color.fold(checks.white, checks.black) >= 3
   }
 
-  /**
-   * It's not possible to check or checkmate the opponent with only a king
-   */
-  override def insufficientWinningMaterial(board: Board, color: Color) =
-    board.rolesOf(color) == List(King)
-
   // When there is insufficient mating material, there is still potential to win by checking the opponent 3 times
   // by the variant ending. However, no players can check if there are only kings remaining
   override def insufficientWinningMaterial(board: Board) = board.actors.forall(_._2.piece is King)
+
+  /**
+   * It's not possible to check or checkmate the opponent with only a king
+   */
+  override def insufficientWinningMaterial(situation: Situation) =
+    situation.board.rolesOf(!situation.color) == List(King)
 }

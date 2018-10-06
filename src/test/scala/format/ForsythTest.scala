@@ -159,7 +159,7 @@ class ForsythTest extends ChessTest {
           case s => s.situation.board.history.lastMove must_== Some(Uci.Move(Pos.F7, Pos.F5))
         }
       }
-      "last move (for en passant in Pretrov's defense)" in {
+      "last move (for en passant in Petrov's defense)" in {
         f <<< "rnbqkb1r/ppp2ppp/8/3pP3/3Qn3/5N2/PPP2PPP/RNB1KB1R w KQkq d6 0 6" must beSome.like {
           case s => s.situation.board.history.lastMove must_== Some(Uci.Move(Pos.D7, Pos.D5))
         }

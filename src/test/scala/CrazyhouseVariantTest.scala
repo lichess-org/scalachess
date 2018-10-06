@@ -43,7 +43,7 @@ class CrazyhouseVariantTest extends ChessTest {
       "tons of pointless moves but shouldn't apply 50-moves" in {
         val moves = List.fill(30)(List(B1 -> C3, B8 -> C6, C3 -> B1, C6 -> B8))
         Game(Crazyhouse).playMoves(moves.flatten: _*) must beSuccess.like {
-          case g => g.board.autoDraw must beFalse
+          case g => g.situation.autoDraw must beFalse
         }
       }
       "from prod should 3fold" in {
@@ -63,7 +63,7 @@ class CrazyhouseVariantTest extends ChessTest {
         val game = {
           fenToGame(fenPosition, Crazyhouse).toOption err "error"
         }
-        game.board.autoDraw must beFalse
+        game.situation.autoDraw must beFalse
       }
     }
     "prod 50 games accumulate hash" in {

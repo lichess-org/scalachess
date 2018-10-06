@@ -357,7 +357,7 @@ class AtomicVariantTest extends ChessTest {
 
           moves must beSome.like {
             case queenMoves =>
-              queenMoves.pp.size must beEqualTo(queenMoves.toSet.pp.size)
+              queenMoves.size must beEqualTo(queenMoves.toSet.size)
           }
       }
 
@@ -377,7 +377,7 @@ class AtomicVariantTest extends ChessTest {
         ))
         successGame must beSuccess.like {
           case game =>
-            game.situation.pp.variantEnd must beTrue
+            game.situation.variantEnd must beTrue
         }
       }
       "from position" in {
@@ -403,19 +403,19 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "Identify that a player does not have sufficient material to win when they only have a king" in {
-      val position = "8/8/8/8/7p/2k3q1/2K3P1/8 b - - 19 54"
-      val game = fenToGame(position, Atomic)
+      val position = "8/8/8/8/7p/2k3q1/2K3P1/8 b - -"
+      val originalGame = fenToGame(position, Atomic)
 
-      game must beSuccess.like {
+      originalGame must beSuccess.like {
         case game =>
           game.situation.end must beFalse
       }
 
-      val drawGame = game flatMap (_.playMoves(Pos.G3 -> Pos.G2))
+      val newGame = originalGame flatMap (_.playMoves(Pos.G3 -> Pos.G2, Pos.C2 -> Pos.D2))
 
-      drawGame must beSuccess.like {
+      newGame must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.White) must beTrue
+          game.situation.board.variant.insufficientWinningMaterial(game.situation) must beTrue
       }
 
     }

@@ -20,8 +20,7 @@ case object KingOfTheHill extends Variant(
   /**
    * You only need a king to be able to win in this variant
    */
-  override def insufficientWinningMaterial(board: Board, color: Color) = false
-
   override def insufficientWinningMaterial(board: Board) = false
+  override def insufficientWinningMaterial(situation: Situation) = false
 }
 

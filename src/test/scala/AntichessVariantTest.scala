@@ -271,6 +271,46 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       }
     }
 
+    "Be drawn on knight versus knight (opposite color)" in {
+      val positionString = "n7/8/8/8/8/8/8/N7 w - -"
+      val maybeGame = fenToGame(positionString, Antichess)
+
+      maybeGame must beSuccess.like {
+        case game =>
+          game.situation.board.variant.insufficientWinningMaterial(game.situation) must beFalse
+      }
+    }
+
+    "Be drawn on knight versus knight (opposite color)" in {
+      val positionString = "n7/8/8/8/8/8/8/N7 b - -"
+      val maybeGame = fenToGame(positionString, Antichess)
+
+      maybeGame must beSuccess.like {
+        case game =>
+          game.situation.board.variant.insufficientWinningMaterial(game.situation) must beFalse
+      }
+    }
+
+    "Not be drawn on knight versus knight (same color)" in {
+      val positionString = "n7/8/8/8/8/8/8/7N w - -"
+      val maybeGame = fenToGame(positionString, Antichess)
+
+      maybeGame must beSuccess.like {
+        case game =>
+          game.situation.board.variant.insufficientWinningMaterial(game.situation) must beTrue
+      }
+    }
+
+    "Not be drawn on knight versus knight (same color)" in {
+      val positionString = "n7/8/8/8/8/8/8/7N b - -"
+      val maybeGame = fenToGame(positionString, Antichess)
+
+      maybeGame must beSuccess.like {
+        case game =>
+          game.situation.board.variant.insufficientWinningMaterial(game.situation) must beTrue
+      }
+    }
+
     "Not be drawn on insufficient mating material" in {
       val positionString = "4K3/8/1b6/8/8/8/5B2/3k4 b - -"
       val maybeGame = fenToGame(positionString, Antichess)

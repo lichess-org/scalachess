@@ -17,8 +17,8 @@ object InsufficientMatingMaterial {
   def bishopsOnDifferentColor(board: Board) = {
     val notKingPieces = nonKingPieces(board)
 
-    def bishopsOnSameColor = notKingPieces.map(_._1.color).distinct.size == 1
-    def bishopsAreSameColor = notKingPieces.map(_._2.color).distinct.size == 1
+    lazy val bishopsOnSameColor = notKingPieces.map(_._1.color).distinct.size == 1
+    lazy val bishopsAreSameColor = notKingPieces.map(_._2.color).distinct.size == 1
 
     if (notKingPieces.exists(_._2.role != Bishop)) false
     else if (bishopsAreSameColor) notKingPieces.size < 3 || bishopsOnSameColor
@@ -46,24 +46,27 @@ object InsufficientMatingMaterial {
    */
   def apply(board: Board) = {
 
+    val kingsOnly = board.pieces forall { _._2 is King }
+
     lazy val notKingPieces = nonKingPieces(board)
 
-    def kingsOnly = board.pieces forall { _._2 is King }
+    lazy val singleKnight = notKingPieces.map(_._2.role) == List(Knight)
 
-    def bishopsOnSameColor =
+    lazy val bishopsOnSameColor =
       notKingPieces.map(_._2.role).distinct == List(Bishop) &&
         notKingPieces.map(_._1.color).distinct.size == 1
 
-    def singleKnight = notKingPieces.map(_._2.role) == List(Knight)
-
-    kingsOnly || bishopsOnSameColor || singleKnight
+    kingsOnly || singleKnight || bishopsOnSameColor
   }
 
-  def apply(board: Board, color: Color) =
-    board rolesOf color filter (King !=) match {
+  def apply(situation: Situation) = {
+    val board = situation.board
+    val color = situation.color
+    board rolesOf !color filter (King !=) match {
       case Nil => true
-      case List(Knight) => board rolesOf !color filter (King !=) filter (Queen !=) isEmpty
-      case List(Bishop) => (board rolesOf !color filter (King !=) filter (Queen !=) filter (Rook !=) filter (Bishop !=) isEmpty) && !bishopsOnDifferentColor(board)
+      case List(Knight) => board rolesOf color filter (King !=) filter (Queen !=) isEmpty
+      case List(Bishop) => (board rolesOf color filter (King !=) filter (Queen !=) filter (Rook !=) filter (Bishop !=) isEmpty) && !bishopsOnDifferentColor(board)
       case _ => false
     }
+  }
 }

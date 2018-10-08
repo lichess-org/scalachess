@@ -20,7 +20,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
   )
 
   def full(pgn: String): Valid[ParsedPgn] = try {
-    val preprocessed = pgn.lines.map(_.trim).filter {
+    val preprocessed = augmentString(pgn).lines.map(_.trim).filter {
       _.headOption != Some('%')
     }.mkString("\n")
       .replace("[pgn]", "")
@@ -329,7 +329,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     """"\]\s*(\d+\.)""".r.replaceAllIn(pgn, m => "\"]\n" + m.group(1))
 
   private def splitTagAndMoves(pgn: String): Valid[(String, String)] =
-    ensureTagsNewline(pgn).lines.toList.map(_.trim).filter(_.nonEmpty) span { line =>
+    augmentString(ensureTagsNewline(pgn)).lines.toList.map(_.trim).filter(_.nonEmpty) span { line =>
       line lift 0 contains '['
     } match {
       case (tagLines, moveLines) => succezz(tagLines.mkString("\n") -> moveLines.mkString("\n"))

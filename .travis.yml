@@ -20,6 +20,7 @@ notifications:
 # https://docs.travis-ci.com/user/languages/java/#Testing-Against-Multiple-JDKs
 jdk:
   - oraclejdk8
+  - openjdk11
 
 before_cache:
  - find $HOME/.ivy2/cache -name 'ivydata-*.properties' -delete

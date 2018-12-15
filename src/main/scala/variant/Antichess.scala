@@ -8,7 +8,7 @@ case object Antichess extends Variant(
   key = "antichess",
   name = "Antichess",
   shortName = "Anti",
-  title = "Lose all your pieces (or reach a stalemate) to win the game.",
+  title = "Lose all your pieces (or get stalemated) to win the game.",
   standardInitialPosition = true
 ) {
 

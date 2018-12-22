@@ -91,7 +91,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       }
     }
 
-    val moveRegex = """0\-0\-0|0\-0|[PQKRBNOoa-h@][QKRBNa-h1-8xOo\-=\+\#\@]{1,6}[\?!□]{0,2}""".r
+    val moveRegex = """(?:0\-0\-0[+#]?|0\-0[+#]?|[PQKRBNOoa-h@][QKRBNa-h1-8xOo\-=\+\#\@]{1,6})[\?!□]{0,2}""".r
 
     def strMove: Parser[StrMove] = as("move") {
       ((number | commentary)*) ~> (moveRegex ~ nagGlyphs ~ rep(commentary) ~ rep(variation)) <~ (moveExtras*) ^^ {

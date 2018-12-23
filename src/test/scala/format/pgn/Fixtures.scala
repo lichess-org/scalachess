@@ -27,6 +27,11 @@ object Fixtures {
     "e3 e5 d3 f5 Qe2 d5 Bd2 Nd7 Nc3 Ngf6 0-0-0 Bb4"
   )
 
+  lazy val annotatedCastles = for {
+    castle <- List("O-O", "o-o", "0-0", "O-O-O", "o-o-o", "0-0-0")
+    annotation <- List("+", "#", "+?", "#!")
+  } yield s"$castle$annotation"
+
   // https://github.com/ornicar/lila/issues/2441
   val enpassantEP = """
 1. d4 Nf6 2. c4 e6 3. Nf3 c5 4. d5 exd5 5. cxd5 d6 6. Nc3 g6 7. Nd2 Bg7 8. e4 O-O 9. Be2 Na6 10. O-O Qe7 11. Re1 Nc7 12. a4 b6 13. h3 Nd7 14. Nb5 Nxb5 15. axb5 Qd8 16. Ra4 Nf6 17. Nf3 a5 18. bxa6 e.p. Bd7 1-0

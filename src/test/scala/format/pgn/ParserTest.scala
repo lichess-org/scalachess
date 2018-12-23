@@ -118,7 +118,7 @@ class ParserTest extends ChessTest {
     }
   }
 
-  (shortCastles ++ longCastles) foreach { sans =>
+  (shortCastles ++ longCastles ++ annotatedCastles) foreach { sans =>
     val size = sans.split(' ').size
     "sans only size: " + size in {
       parser(sans) must beSuccess.like {

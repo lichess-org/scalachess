@@ -152,5 +152,17 @@ K   bB""".autoDraw must_== false
           game.situation.end must beFalse
       }
     }
+    "on opposite bishops with queen" in {
+      val position = "8/8/3Q4/2bK4/B7/8/8/k7 b - - 0 67"
+      val game = fenToGame(position, Standard)
+      val newGame = game flatMap (_.playMove(
+        Pos.A1, Pos.B2
+      ))
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.autoDraw must beFalse
+          game.situation.end must beFalse
+      }
+    }
   }
 }

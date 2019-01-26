@@ -357,7 +357,7 @@ class AtomicVariantTest extends ChessTest {
 
           moves must beSome.like {
             case queenMoves =>
-              queenMoves.pp.size must beEqualTo(queenMoves.toSet.pp.size)
+              queenMoves.size must beEqualTo(queenMoves.toSet.size)
           }
       }
 
@@ -377,7 +377,7 @@ class AtomicVariantTest extends ChessTest {
         ))
         successGame must beSuccess.like {
           case game =>
-            game.situation.pp.variantEnd must beTrue
+            game.situation.variantEnd must beTrue
         }
       }
       "from position" in {

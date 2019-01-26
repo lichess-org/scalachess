@@ -49,10 +49,10 @@ K N    """.autoDraw must_== false
       k
 K r   B""".autoDraw must_== false
       }
-      "one bishop and one bishop of same colors" in {
+      "two bishops and one bishop of same colors" in {
         """
       k
-K   b B""".autoDraw must_== true
+K B b B""".autoDraw must_== true
       }
       "one bishop and one bishop of different colors" in {
         """
@@ -116,8 +116,8 @@ K   bB""".autoDraw must_== false
           game.situation.end must beFalse
       }
     }
-    "on bishop versus pawn" in {
-      val position = "1b5K/8/5k1P/8/8/8/8/8 b - - 0 40"
+    "on bishops versus pawn" in {
+      val position = "1b1b3K/8/5k1P/8/8/8/8/8 b - - 0 40"
       val game = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
         Pos.B8, Pos.E5

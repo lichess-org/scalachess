@@ -13,28 +13,6 @@ object InsufficientMatingMaterial {
   def bishopsOnOppositeColors(board: Board) =
     (board.pieces filter (_._2.role == Bishop) map (_._1.color) toList).distinct.size == 2
 
-  /**
-   * Returns true when remaining non-King pieces are only bishops that cannot
-   * capture each other and cannot checkmate
-   */
-  def bishopsOnDifferentColor(board: Board) = {
-    val notKingPieces = nonKingPieces(board) toList
-
-    def bishopsOnSameColor = notKingPieces.map(_._1.color).distinct.size == 1
-    def bishopsAreSameColor = notKingPieces.map(_._2.color).distinct.size == 1
-
-    if (notKingPieces.exists(_._2.role != Bishop)) false
-    else if (bishopsAreSameColor) notKingPieces.size < 3 || bishopsOnSameColor
-    else {
-      val whitePlayerBishops = notKingPieces.filter(_._2.color == Color.White)
-      val blackPlayerBishops = notKingPieces.filter(_._2.color == Color.Black)
-
-      !whitePlayerBishops.exists {
-        case (pos, _) => blackPlayerBishops.exists(_._1.color == pos.color)
-      }
-    }
-  }
-
   /*
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
    */

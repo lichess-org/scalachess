@@ -96,7 +96,7 @@ case object Horde extends Variant(
         }
       } else if ((hordeRoles.forall(_ == Bishop) && hordeBishopSquareColors.size == 1) && (armyBishops.size < 2 || (armyPawns.isEmpty && armyBishops.size == armyBishopSquareColors.size))) true
       else if ((horde.size == 2 && armyNonQueens.size <= 1) && (armyNonQueens.size == 0 || horde.forall(_._2.isMinor))) true
-      else if (notKingPieces.map(_._2.role).distinct == List(Bishop) && !InsufficientMatingMaterial.bishopsOnDifferentColor(board)) true
+      else if (notKingPieces.map(_._2.role).distinct == List(Bishop) && !InsufficientMatingMaterial.bishopsOnOppositeColors(board)) true
       else fortress
     } else fortress
   }

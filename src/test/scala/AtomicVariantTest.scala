@@ -459,5 +459,109 @@ class AtomicVariantTest extends ChessTest {
           game.situation.end must beFalse
       }
     }
+
+    "Not draw inappropriately on three bishops (of both square colors)" in {
+      val position = "8/5k2/8/8/8/8/4pKB1/5B2 b - - 1 44"
+      val game = fenToGame(position, Atomic)
+      val newGame = game flatMap (_.playMove(
+        Pos.E2, Pos.E1, Bishop.some
+      ))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.end must beFalse
+      }
+    }
+
+    "Not draw inappropriately on three bishops (of both square colors)" in {
+      val position = "8/5k2/8/8/8/8/4pKB1/6B1 b - - 1 44"
+      val game = fenToGame(position, Atomic)
+      val newGame = game flatMap (_.playMove(
+        Pos.E2, Pos.E1, Bishop.some
+      ))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.end must beFalse
+      }
+    }
+
+    "Not draw inappropriately on two bishops and a knight" in {
+      val position = "8/5k2/8/8/8/8/4pKB1/6N1 b - - 1 44"
+      val game = fenToGame(position, Atomic)
+      val newGame = game flatMap (_.playMove(
+        Pos.E2, Pos.E1, Bishop.some
+      ))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.end must beFalse
+      }
+    }
+
+    "Not draw inappropriately on two bishops and a knight" in {
+      val position = "8/5k2/8/8/8/8/4pKN1/6B1 b - - 1 44"
+      val game = fenToGame(position, Atomic)
+      val newGame = game flatMap (_.playMove(
+        Pos.E2, Pos.E1, Bishop.some
+      ))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.end must beFalse
+      }
+    }
+
+    "Not draw inappropriately on two knights and a bishop" in {
+      val position = "8/5k2/8/8/8/8/4pKN1/6N1 b - - 1 44"
+      val game = fenToGame(position, Atomic)
+      val newGame = game flatMap (_.playMove(
+        Pos.E2, Pos.E1, Bishop.some
+      ))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.end must beFalse
+      }
+    }
+
+    "Not draw inappropriately on three knights (of two colors)" in {
+      val position = "8/5k2/8/8/8/8/4pKN1/6N1 b - - 1 44"
+      val game = fenToGame(position, Atomic)
+      val newGame = game flatMap (_.playMove(
+        Pos.E2, Pos.E1, Knight.some
+      ))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.end must beFalse
+      }
+    }
+
+    "Not draw inappropriately on three knights (of two colors)" in {
+      val position = "8/5k2/8/8/8/8/4pKN1/6n1 b - - 1 44"
+      val game = fenToGame(position, Atomic)
+      val newGame = game flatMap (_.playMove(
+        Pos.E2, Pos.E1, Knight.some
+      ))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.end must beFalse
+      }
+    }
+
+    "Not draw inappropriately on three knights (of the same color)" in {
+      val position = "8/5k2/8/8/8/8/4pKn1/6n1 b - - 1 44"
+      val game = fenToGame(position, Atomic)
+      val newGame = game flatMap (_.playMove(
+        Pos.E2, Pos.E1, Knight.some
+      ))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.end must beFalse
+      }
+    }
   }
 }

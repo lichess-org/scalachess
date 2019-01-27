@@ -34,6 +34,11 @@ K      """.autoDraw must_== false
       k
 K     B""".autoDraw must_== true
       }
+      "one knight" in {
+        """
+      k
+K     N""".autoDraw must_== true
+      }
       "one bishop and one knight of different colors" in {
         """
       k
@@ -104,6 +109,16 @@ K   bB""".autoDraw must_== false
     }
   }
   "do not detect insufficient material" should {
+    "on two knights" in {
+      val position = "1n2k1n1/8/8/8/8/8/8/4K3 w - - 0 1"
+      fenToGame(position, Standard) must beSuccess.like {
+        case game =>
+          game.situation.autoDraw must beFalse
+          game.situation.end must beFalse
+          game.board.variant.insufficientWinningMaterial(game.board, White) must beTrue
+          game.board.variant.insufficientWinningMaterial(game.board, Black) must beFalse
+      }
+    }
     "on knight versus pawn" in {
       val position = "7K/5k2/7P/6n1/8/8/8/8 b - - 0 40"
       val game = fenToGame(position, Standard)

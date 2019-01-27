@@ -81,17 +81,17 @@ case object Atomic extends Variant(
    * then either a queen or multiple pieces are required for checkmate.
    */
   private def insufficientAtomicWinningMaterial(board: Board) = {
-    val bishopsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Bishop) }
+    val kingsAndBishopsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Bishop) }
     lazy val bishopsOnOppositeColors = InsufficientMatingMaterial.bishopsOnOppositeColors(board)
-    lazy val minorsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Rook) || (p._2 is Bishop) || (p._2 is Knight) }
+    lazy val kingsAndMinorsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Rook) || (p._2 is Bishop) || (p._2 is Knight) }
     lazy val rookExists = board.pieces exists { _._2 is Rook }
 
     // Bishops of opposite color (no other pieces) endgames are dead drawn
     // except if either player has multiple bishops so a helpmate is possible
-    if (board.count(White) >= 2 && board.count(Black) >= 2) bishopsOnly && board.pieces.size <= 4 && bishopsOnOppositeColors
+    if (board.count(White) >= 2 && board.count(Black) >= 2) kingsAndBishopsOnly && board.pieces.size <= 4 && bishopsOnOppositeColors
 
     // Queen, rook + any, bishop pair, or any 3 minor pieces can mate
-    else minorsOnly && !bishopsOnOppositeColors && board.pieces.size <= (if (rookExists) 3 else 4)
+    else kingsAndMinorsOnly && !bishopsOnOppositeColors && board.pieces.size <= (if (rookExists) 3 else 4)
   }
 
   /*

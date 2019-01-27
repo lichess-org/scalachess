@@ -128,6 +128,34 @@ K   bB""".autoDraw must_== false
           game.situation.end must beFalse
       }
     }
+    "on bishops versus queen" in {
+      val position = "b2b3K/8/5k1Q/8/8/8/8/8 b - -"
+      val game = fenToGame(position, Standard)
+      val newGame = game flatMap (_.playMove(
+        Pos.F6, Pos.E5
+      ))
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.autoDraw must beFalse
+          game.situation.end must beFalse
+          game.board.variant.insufficientWinningMaterial(game.board, White) must beFalse
+          game.board.variant.insufficientWinningMaterial(game.board, Black) must beFalse
+      }
+    }
+    "on bishops versus queen" in {
+      val position = "1b1b3K/8/5k1Q/8/8/8/8/8 b - -"
+      val game = fenToGame(position, Standard)
+      val newGame = game flatMap (_.playMove(
+        Pos.F6, Pos.E5
+      ))
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.autoDraw must beFalse
+          game.situation.end must beFalse
+          game.board.variant.insufficientWinningMaterial(game.board, White) must beFalse
+          game.board.variant.insufficientWinningMaterial(game.board, Black) must beTrue
+      }
+    }
     "on knight versus pawns" in {
       val position = "8/8/5N2/8/6p1/8/5K1p/7k w - - 0 37"
       val game = fenToGame(position, Standard)

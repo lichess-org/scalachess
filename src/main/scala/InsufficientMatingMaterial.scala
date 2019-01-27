@@ -42,11 +42,12 @@ object InsufficientMatingMaterial {
   def apply(board: Board, color: Color) = {
 
     val kingsAndMinorsOnlyOfColor = board.piecesOf(color) forall { p => (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight) }
+    lazy val rolesOfColor = board.piecesOf(color) map { _._2.role }
     lazy val rolesOfOpponentColor = board rolesOf !color
 
-    kingsAndMinorsOnlyOfColor && ((board.piecesOf(color) map { _._2.role } toList).distinct filter (King !=) match {
+    kingsAndMinorsOnlyOfColor && ((rolesOfColor toList).distinct filter (King !=) match {
       case Nil => true
-      case List(Knight) => rolesOfOpponentColor filter (King !=) filter (Queen !=) isEmpty
+      case List(Knight) => (rolesOfColor.size == 2) && (rolesOfOpponentColor filter (King !=) filter (Queen !=) isEmpty)
       case List(Bishop) => !(rolesOfOpponentColor.exists(r => r == Knight || r == Pawn) || bishopsOnOppositeColors(board))
       case _ => false
     })

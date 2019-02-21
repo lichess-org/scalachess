@@ -38,6 +38,40 @@ class CrazyhouseVariantTest extends ChessTest {
       game.situation.checkMate must beTrue
     }
 
+    "correctly produce possible drops" in {
+      import Pos._
+      val fenPosition = "r1bk1b1r/2p1p1pp/2p1p2n/1BP5/pP3P1P/6P1/P1n2K1n/R6R b kq - 0 22"
+      val game = {
+        fenToGame(fenPosition, Crazyhouse).toOption err "ooopses"
+      }.updateBoard { b =>
+        b.withCrazyData(Crazyhouse.Data(
+          pockets = Crazyhouse.Pockets(
+            Crazyhouse.Pocket(Queen :: Bishop :: Pawn :: Nil),
+            Crazyhouse.Pocket(Rook :: Knight :: Nil)
+          ),
+          promoted = Set.empty
+        ))
+      }
+      game.situation.checkMate must beFalse
+      game.situation.drops must beEqualTo(Some(List(B1, C1, D1, E1, F1, G1, B2, D2, E2, G2, A3, B3, C3, D3, E3, F3, H3, C4, D4, E4, G4, A5, D5, E5, F5, G5, H5, A6, B6, D6, F6, G6, A7, B7, D7, F7, B8, E8, G8)))
+    }
+
+    "not stalemate with stuff in pocket" in {
+      val fenPosition = "8/8/8/3k4/1nn5/2n5/8/K7 w - - 0 22"
+      val game = {
+        fenToGame(fenPosition, Crazyhouse).toOption err "ooopses"
+      }.updateBoard { b =>
+        b.withCrazyData(Crazyhouse.Data(
+          pockets = Crazyhouse.Pockets(
+            Crazyhouse.Pocket(Queen :: Bishop :: Pawn :: Nil),
+            Crazyhouse.Pocket(Rook :: Knight :: Nil)
+          ),
+          promoted = Set.empty
+        ))
+      }
+      game.situation.staleMate must beFalse
+    }
+
     "autodraw" in {
       import Pos._
       "tons of pointless moves but shouldn't apply 50-moves" in {

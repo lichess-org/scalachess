@@ -84,8 +84,14 @@ case object Crazyhouse extends Variant(
   override def insufficientWinningMaterial(board: Board) = false
 
   def possibleDrops(situation: Situation): Option[List[Pos]] =
-    if (!situation.check) None
-    else situation.kingPos.map { blockades(situation, _) }
+    if (situation.check) situation.kingPos.map { blockades(situation, _) }
+    else Some(emptySquares(situation))
+
+  private def emptySquares(situation: Situation): List[Pos] = {
+    Pos.all filter { square =>
+      !(situation.board.pieces contains square)
+    }
+  }
 
   private def blockades(situation: Situation, kingPos: Pos): List[Pos] = {
     def attacker(piece: Piece) = piece.role.projection && piece.color != situation.color

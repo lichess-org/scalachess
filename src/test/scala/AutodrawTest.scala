@@ -34,6 +34,11 @@ K      """.autoDraw must_== false
       k
 K     B""".autoDraw must_== true
       }
+      "one knight" in {
+        """
+      k
+K     N""".autoDraw must_== true
+      }
       "one bishop and one knight of different colors" in {
         """
       k
@@ -49,10 +54,10 @@ K N    """.autoDraw must_== false
       k
 K r   B""".autoDraw must_== false
       }
-      "one bishop and one bishop of same colors" in {
+      "two bishops and one bishop of same colors" in {
         """
       k
-K   b B""".autoDraw must_== true
+K B b B""".autoDraw must_== true
       }
       "one bishop and one bishop of different colors" in {
         """
@@ -104,6 +109,16 @@ K   bB""".autoDraw must_== false
     }
   }
   "do not detect insufficient material" should {
+    "on two knights" in {
+      val position = "1n2k1n1/8/8/8/8/8/8/4K3 w - - 0 1"
+      fenToGame(position, Standard) must beSuccess.like {
+        case game =>
+          game.situation.autoDraw must beFalse
+          game.situation.end must beFalse
+          game.board.variant.insufficientWinningMaterial(game.board, White) must beTrue
+          game.board.variant.insufficientWinningMaterial(game.board, Black) must beFalse
+      }
+    }
     "on knight versus pawn" in {
       val position = "7K/5k2/7P/6n1/8/8/8/8 b - - 0 40"
       val game = fenToGame(position, Standard)
@@ -116,8 +131,8 @@ K   bB""".autoDraw must_== false
           game.situation.end must beFalse
       }
     }
-    "on bishop versus pawn" in {
-      val position = "1b5K/8/5k1P/8/8/8/8/8 b - - 0 40"
+    "on bishops versus pawn" in {
+      val position = "1b1b3K/8/5k1P/8/8/8/8/8 b - - 0 40"
       val game = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
         Pos.B8, Pos.E5
@@ -126,6 +141,34 @@ K   bB""".autoDraw must_== false
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
+      }
+    }
+    "on bishops versus queen" in {
+      val position = "b2b3K/8/5k1Q/8/8/8/8/8 b - -"
+      val game = fenToGame(position, Standard)
+      val newGame = game flatMap (_.playMove(
+        Pos.F6, Pos.E5
+      ))
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.autoDraw must beFalse
+          game.situation.end must beFalse
+          game.board.variant.insufficientWinningMaterial(game.board, White) must beFalse
+          game.board.variant.insufficientWinningMaterial(game.board, Black) must beFalse
+      }
+    }
+    "on bishops versus queen" in {
+      val position = "1b1b3K/8/5k1Q/8/8/8/8/8 b - -"
+      val game = fenToGame(position, Standard)
+      val newGame = game flatMap (_.playMove(
+        Pos.F6, Pos.E5
+      ))
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.autoDraw must beFalse
+          game.situation.end must beFalse
+          game.board.variant.insufficientWinningMaterial(game.board, White) must beFalse
+          game.board.variant.insufficientWinningMaterial(game.board, Black) must beTrue
       }
     }
     "on knight versus pawns" in {
@@ -145,6 +188,18 @@ K   bB""".autoDraw must_== false
       val game = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
         Pos.E5, Pos.F7
+      ))
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.autoDraw must beFalse
+          game.situation.end must beFalse
+      }
+    }
+    "on opposite bishops with queen" in {
+      val position = "8/8/3Q4/2bK4/B7/8/8/k7 b - - 0 67"
+      val game = fenToGame(position, Standard)
+      val newGame = game flatMap (_.playMove(
+        Pos.A1, Pos.B2
       ))
       newGame must beSuccess.like {
         case game =>

@@ -66,6 +66,7 @@ case object Atomic extends Variant(
       move withAfter newBoard
     } else move
   }
+
   /**
    * The positions surrounding a given position on the board. Any square at the edge of the board has
    * less surrounding positions than the usual eight.
@@ -76,22 +77,21 @@ case object Atomic extends Variant(
   override def addVariantEffect(move: Move): Move = explodeSurroundingPieces(move)
 
   /**
-   * Since a king may walk into the path of another king, it is more difficult to win when your opponent only has a
-   * king left.
+   * Since kings cannot confine each other, if either player has only a king
+   * then either a queen or multiple pieces are required for checkmate.
    */
   private def insufficientAtomicWinningMaterial(board: Board) = {
-    val whiteActors = board.actorsOf(White)
-    val blackActors = board.actorsOf(Black)
-    val allActors = board.actors
-    lazy val allPieces = board.actors.values.map(_.piece).filter(_ isNot King)
+    val kingsAndBishopsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Bishop) }
+    lazy val bishopsOnOppositeColors = InsufficientMatingMaterial.bishopsOnOppositeColors(board)
+    lazy val kingsRooksAndMinorsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Rook) || (p._2 is Bishop) || (p._2 is Knight) }
+    lazy val rookExists = board.pieces exists { _._2 is Rook }
 
-    // One player must only have their king left
-    if (whiteActors.size != 1 && blackActors.size != 1) false
-    else {
-      // You can mate with a queen or a pawn that is later promoted a a queen, but not with just one of any other piece
-      // or with just a king
-      allPieces.size == 1 && !allPieces.exists(p => p.is(Queen) || p.is(Pawn)) || allActors.size == 2
-    }
+    // Bishops of opposite color (no other pieces) endgames are dead drawn
+    // except if either player has multiple bishops so a helpmate is possible
+    if (board.count(White) >= 2 && board.count(Black) >= 2) kingsAndBishopsOnly && board.pieces.size <= 4 && bishopsOnOppositeColors
+
+    // Queen, rook + any, bishop pair, or any 3 minor pieces can mate
+    else kingsRooksAndMinorsOnly && !bishopsOnOppositeColors && board.pieces.size <= (if (rookExists) 3 else 4)
   }
 
   /*
@@ -100,7 +100,7 @@ case object Atomic extends Variant(
    * We also look out for closed positions (pawns that cannot move and kings which cannot capture them.)
    */
   override def insufficientWinningMaterial(board: Board) = {
-    InsufficientMatingMaterial.bishopsOnDifferentColor(board) || insufficientAtomicWinningMaterial(board) || atomicClosedPosition(board)
+    insufficientAtomicWinningMaterial(board) || atomicClosedPosition(board)
   }
 
   /**

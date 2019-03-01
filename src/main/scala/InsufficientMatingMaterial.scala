@@ -8,29 +8,10 @@ package chess
  */
 object InsufficientMatingMaterial {
 
-  def nonKingPieces(board: Board) = board.pieces.filter(_._2.role != King).toList
+  def nonKingPieces(board: Board) = board.pieces filter (_._2.role != King)
 
-  /**
-   * Returns true when remaining non-King pieces are only bishops that cannot
-   * capture each other and cannot checkmate
-   */
-  def bishopsOnDifferentColor(board: Board) = {
-    val notKingPieces = nonKingPieces(board)
-
-    def bishopsOnSameColor = notKingPieces.map(_._1.color).distinct.size == 1
-    def bishopsAreSameColor = notKingPieces.map(_._2.color).distinct.size == 1
-
-    if (notKingPieces.exists(_._2.role != Bishop)) false
-    else if (bishopsAreSameColor) notKingPieces.size < 3 || bishopsOnSameColor
-    else {
-      val whitePlayerBishops = notKingPieces.filter(_._2.color == Color.White)
-      val blackPlayerBishops = notKingPieces.filter(_._2.color == Color.Black)
-
-      !whitePlayerBishops.exists {
-        case (pos, _) => blackPlayerBishops.exists(_._1.color == pos.color)
-      }
-    }
-  }
+  def bishopsOnOppositeColors(board: Board) =
+    (board.pieces collect { case (pos, Piece(_, Bishop)) => pos.color } toList).distinct.size == 2
 
   /*
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
@@ -45,25 +26,30 @@ object InsufficientMatingMaterial {
    * being able to mate the other as informed by the traditional chess rules.
    */
   def apply(board: Board) = {
+    lazy val kingsAndBishopsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Bishop) }
+    val kingsAndMinorsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight) }
 
-    lazy val notKingPieces = nonKingPieces(board)
-
-    def kingsOnly = board.pieces forall { _._2 is King }
-
-    def bishopsOnSameColor =
-      notKingPieces.map(_._2.role).distinct == List(Bishop) &&
-        notKingPieces.map(_._1.color).distinct.size == 1
-
-    def singleKnight = notKingPieces.map(_._2.role) == List(Knight)
-
-    kingsOnly || bishopsOnSameColor || singleKnight
+    kingsAndMinorsOnly && (board.pieces.size <= 3 || (kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
   }
 
-  def apply(board: Board, color: Color) =
-    board rolesOf color filter (King !=) match {
+  /*
+   * Determines whether a color does not have mating material. In general:
+   * King by itself is not mating material
+   * King + knight mates against king + any(rook, bishop, knight, pawn)
+   * King + bishop mates against king + any(bishop, knight, pawn)
+   * King + bishop(s) versus king + bishop(s) depends upon bishop square colors
+   */
+  def apply(board: Board, color: Color) = {
+
+    val kingsAndMinorsOnlyOfColor = board.piecesOf(color) forall { p => (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight) }
+    lazy val nonKingRolesOfColor = board rolesOf color filter (King !=)
+    lazy val rolesOfOpponentColor = board rolesOf !color
+
+    kingsAndMinorsOnlyOfColor && ((nonKingRolesOfColor toList).distinct match {
       case Nil => true
-      case List(Knight) => board rolesOf !color filter (King !=) filter (Queen !=) isEmpty
-      case List(Bishop) => (board rolesOf !color filter (King !=) filter (Queen !=) filter (Rook !=) filter (Bishop !=) isEmpty) && !bishopsOnDifferentColor(board)
+      case List(Knight) => (nonKingRolesOfColor.size == 1) && (rolesOfOpponentColor filter (King !=) filter (Queen !=) isEmpty)
+      case List(Bishop) => !(rolesOfOpponentColor.exists(r => r == Knight || r == Pawn) || bishopsOnOppositeColors(board))
       case _ => false
-    }
+    })
+  }
 }

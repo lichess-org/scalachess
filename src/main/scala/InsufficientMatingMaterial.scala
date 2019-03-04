@@ -25,7 +25,7 @@ object InsufficientMatingMaterial {
    * Determines whether a board position is an automatic draw due to neither player
    * being able to mate the other as informed by the traditional chess rules.
    */
-  def apply(board: Board) = {
+  def apply(board: Board): Boolean = {
     lazy val kingsAndBishopsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Bishop) }
     val kingsAndMinorsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight) }
 
@@ -39,7 +39,7 @@ object InsufficientMatingMaterial {
    * King + bishop mates against king + any(bishop, knight, pawn)
    * King + bishop(s) versus king + bishop(s) depends upon bishop square colors
    */
-  def apply(situation: Situation) = {
+  def apply(situation: Situation): Boolean = {
     val board = situation.board
     val opponentColor = !situation.color
     val kingsAndMinorsOnlyOfOpponentColor = board.piecesOf(opponentColor) forall { p => (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight) }
@@ -52,5 +52,13 @@ object InsufficientMatingMaterial {
       case List(Bishop) => !(rolesOfColor.exists(r => r == Knight || r == Pawn) || bishopsOnOppositeColors(board))
       case _ => false
     })
+  }
+
+  /*
+   * Determines whether a color (of a game in progress) has mating material
+   */
+  def apply(game: Game, color: Color): Boolean = {
+    if (game.situation.color != color) apply(game.situation)
+    else game.situation.moves.values forall { _ forall { move => apply(game.apply(move).situation) } }
   }
 }

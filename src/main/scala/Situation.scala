@@ -31,6 +31,8 @@ case class Situation(board: Board, color: Color) {
 
   def autoDraw: Boolean = board.autoDraw || board.variant.specialDraw(this)
 
+  def insufficientWinningMaterial: Boolean = board.variant insufficientWinningMaterial this
+
   lazy val threefoldRepetition: Boolean = board.history.threefoldRepetition
 
   def variantEnd = board.variant specialEnd this

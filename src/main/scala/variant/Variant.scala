@@ -107,17 +107,38 @@ abstract class Variant private[variant] (
 
   def specialDraw(situation: Situation) = false
 
-  /**
-   * Returns true if neither player can win
+  /*
+   * Determines whether a board position is an automatic draw due to neither player
+   * being able to mate the other as informed by the traditional chess rules.
    */
-  def insufficientWinningMaterial(board: Board) = InsufficientMatingMaterial(board)
+  def insufficientWinningMaterial(board: Board): Boolean = {
+    lazy val kingsAndBishopsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Bishop) }
+    val kingsAndMinorsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight) }
 
-  /**
-   * Returns true if the player of the given colour has insufficient material to win.
-   * This can be used to determine whether a player losing on time against a player
-   * who doesn't have enough material to win should draw instead.
+    kingsAndMinorsOnly && (board.pieces.size <= 3 || (kingsAndBishopsOnly && !InsufficientMatingMaterial.bishopsOnOppositeColors(board)))
+  }
+
+  /*
+   * Determines whether the color not on move has mating material. In general:
+   * King by itself is not mating material
+   * King + knight mates against king + any(rook, bishop, knight, pawn)
+   * King + bishop mates against king + any(bishop, knight, pawn)
+   * King + bishop(s) versus king + bishop(s) depends upon bishop square colors
    */
-  def insufficientWinningMaterial(situation: Situation) = InsufficientMatingMaterial(situation)
+  def insufficientWinningMaterial(situation: Situation): Boolean = {
+    val board = situation.board
+    val opponentColor = !situation.color
+    val kingsAndMinorsOnlyOfOpponentColor = board.piecesOf(opponentColor) forall { p => (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight) }
+    lazy val nonKingRolesOfOpponentColor = board rolesOf opponentColor filter (King !=)
+    lazy val rolesOfColor = board rolesOf situation.color
+
+    kingsAndMinorsOnlyOfOpponentColor && ((nonKingRolesOfOpponentColor toList).distinct match {
+      case Nil => true
+      case List(Knight) => (nonKingRolesOfOpponentColor.size == 1) && (rolesOfColor filter (King !=) filter (Queen !=) isEmpty)
+      case List(Bishop) => !(rolesOfColor.exists(r => r == Knight || r == Pawn) || InsufficientMatingMaterial.bishopsOnOppositeColors(board))
+      case _ => false
+    })
+  }
 
   // Some variants have an extra effect on the board on a move. For example, in Atomic, some
   // pieces surrounding a capture explode

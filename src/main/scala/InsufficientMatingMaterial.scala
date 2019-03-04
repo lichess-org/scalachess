@@ -22,47 +22,14 @@ object InsufficientMatingMaterial {
   }
 
   /*
-   * Determines whether a board position is an automatic draw due to neither player
-   * being able to mate the other as informed by the traditional chess rules.
-   */
-  def apply(board: Board): Boolean = {
-    lazy val kingsAndBishopsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Bishop) }
-    val kingsAndMinorsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight) }
-
-    kingsAndMinorsOnly && (board.pieces.size <= 3 || (kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
-  }
-
-  /*
-   * Determines whether the color not on move has mating material. In general:
-   * King by itself is not mating material
-   * King + knight mates against king + any(rook, bishop, knight, pawn)
-   * King + bishop mates against king + any(bishop, knight, pawn)
-   * King + bishop(s) versus king + bishop(s) depends upon bishop square colors
-   */
-  def apply(situation: Situation): Boolean = {
-    val board = situation.board
-    val opponentColor = !situation.color
-    val kingsAndMinorsOnlyOfOpponentColor = board.piecesOf(opponentColor) forall { p => (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight) }
-    lazy val nonKingRolesOfOpponentColor = board rolesOf opponentColor filter (King !=)
-    lazy val rolesOfColor = board rolesOf situation.color
-
-    kingsAndMinorsOnlyOfOpponentColor && ((nonKingRolesOfOpponentColor toList).distinct match {
-      case Nil => true
-      case List(Knight) => (nonKingRolesOfOpponentColor.size == 1) && (rolesOfColor filter (King !=) filter (Queen !=) isEmpty)
-      case List(Bishop) => !(rolesOfColor.exists(r => r == Knight || r == Pawn) || bishopsOnOppositeColors(board))
-      case _ => false
-    })
-  }
-
-  /*
    * Determines whether a color (of a game in progress) has mating material
    */
   def apply(game: Game, color: Color): Boolean = {
-    if (game.situation.color != color) game.board.variant.insufficientWinningMaterial(game.situation)
+    if (game.situation.color != color) game.situation.insufficientWinningMaterial
     else {
       // Crazyhouse drop moves are not accounted for in game.situation.moves
       val moves = game.situation.moves;
-      (!(moves isEmpty)) && (moves.values forall { _ forall { move => game.board.variant.insufficientWinningMaterial(game.apply(move).situation) } })
+      (!(moves isEmpty)) && (moves.values forall { _ forall { move => game.apply(move).situation.insufficientWinningMaterial } })
     }
   }
 }

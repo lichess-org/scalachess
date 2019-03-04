@@ -37,7 +37,7 @@ case object Antichess extends Variant(
 
   override def specialEnd(situation: Situation) = {
     // The game ends with a win when one player manages to lose all their pieces or is in stalemate
-    situation.board.actorsOf(situation.color).isEmpty || situation.moves.isEmpty
+    situation.board.piecesOf(situation.color).isEmpty || situation.moves.isEmpty
   }
 
   // In antichess, there is no checkmate condition therefore a player may only draw either by agreement

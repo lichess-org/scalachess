@@ -71,7 +71,9 @@ case object Horde extends Variant(
    * Technically there are some positions where stalemate is unavoidable which
    * this method does not detect; however, such are trivial to premove.
    */
-  override def insufficientWinningMaterial(board: Board, color: Color): Boolean = {
+  override def insufficientWinningMaterial(situation: Situation): Boolean = {
+    val board = situation.board
+    val color = !situation.color
     lazy val fortress = hordeClosedPosition(board) // costly function call
     if (color == Color.white) {
       lazy val notKingPieces = InsufficientMatingMaterial.nonKingPieces(board) toList

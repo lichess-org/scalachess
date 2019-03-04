@@ -117,7 +117,7 @@ abstract class Variant private[variant] (
    * This can be used to determine whether a player losing on time against a player
    * who doesn't have enough material to win should draw instead.
    */
-  def insufficientWinningMaterial(board: Board, color: Color) = InsufficientMatingMaterial(board, color)
+  def insufficientWinningMaterial(situation: Situation) = InsufficientMatingMaterial(situation)
 
   // Some variants have an extra effect on the board on a move. For example, in Atomic, some
   // pieces surrounding a capture explode

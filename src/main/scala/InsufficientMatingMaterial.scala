@@ -33,14 +33,15 @@ object InsufficientMatingMaterial {
   }
 
   /*
-   * Determines whether a color does not have mating material. In general:
+   * Determines whether the color not on move has mating material. In general:
    * King by itself is not mating material
    * King + knight mates against king + any(rook, bishop, knight, pawn)
    * King + bishop mates against king + any(bishop, knight, pawn)
    * King + bishop(s) versus king + bishop(s) depends upon bishop square colors
    */
-  def apply(board: Board, color: Color) = {
-
+  def apply(situation: Situation) = {
+    val board = situation.board
+    val color = !situation.color
     val kingsAndMinorsOnlyOfColor = board.piecesOf(color) forall { p => (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight) }
     lazy val nonKingRolesOfColor = board rolesOf color filter (King !=)
     lazy val rolesOfOpponentColor = board rolesOf !color

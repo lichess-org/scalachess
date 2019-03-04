@@ -27,8 +27,8 @@ case object ThreeCheck extends Variant(
   /**
    * It's not possible to check or checkmate the opponent with only a king
    */
-  override def insufficientWinningMaterial(board: Board, color: Color) =
-    board.rolesOf(color) == List(King)
+  override def insufficientWinningMaterial(situation: Situation) =
+    situation.board.rolesOf(!situation.color) == List(King)
 
   // When there is insufficient mating material, there is still potential to win by checking the opponent 3 times
   // by the variant ending. However, no players can check if there are only kings remaining

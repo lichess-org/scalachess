@@ -20,6 +20,8 @@ class CrazyhouseVariantTest extends ChessTest {
         ))
       }
       game.situation.checkMate must beTrue
+      game.board.variant.insufficientWinningMaterial(game.situation) must beFalse
+      InsufficientMatingMaterial(game, game.situation.color) must beFalse
     }
 
     "pieces to drop, in vain" in {
@@ -36,6 +38,8 @@ class CrazyhouseVariantTest extends ChessTest {
         ))
       }
       game.situation.checkMate must beTrue
+      game.board.variant.insufficientWinningMaterial(game.situation) must beFalse
+      InsufficientMatingMaterial(game, game.situation.color) must beFalse
     }
 
     "autodraw" in {
@@ -59,11 +63,14 @@ class CrazyhouseVariantTest extends ChessTest {
         }
       }
       "not draw when only kings left" in {
-        val fenPosition = "k6K/8/8/8/8/8/8/8 w - - 0 25"
+        val fenPosition = "k6K/8/8/8/8/8/8/8/QRRBBNNPPPPPPPPqrrbbnnpppppppp w - - 0 25"
         val game = {
           fenToGame(fenPosition, Crazyhouse).toOption err "error"
         }
-        game.board.autoDraw must beFalse
+        game.situation.autoDraw must beFalse
+        game.situation.end must beFalse
+        game.board.variant.insufficientWinningMaterial(game.situation) must beFalse
+        InsufficientMatingMaterial(game, game.situation.color) must beFalse
       }
     }
     "prod 50 games accumulate hash" in {

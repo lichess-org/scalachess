@@ -58,7 +58,11 @@ object InsufficientMatingMaterial {
    * Determines whether a color (of a game in progress) has mating material
    */
   def apply(game: Game, color: Color): Boolean = {
-    if (game.situation.color != color) apply(game.situation)
-    else game.situation.moves.values forall { _ forall { move => apply(game.apply(move).situation) } }
+    if (game.situation.color != color) game.board.variant.insufficientWinningMaterial(game.situation)
+    else {
+      // Crazyhouse drop moves are not accounted for in game.situation.moves
+      val moves = game.situation.moves;
+      (!(moves isEmpty)) && (moves.values forall { _ forall { move => game.board.variant.insufficientWinningMaterial(game.apply(move).situation) } })
+    }
   }
 }

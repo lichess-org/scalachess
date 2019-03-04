@@ -73,9 +73,9 @@ case object Horde extends Variant(
    */
   override def insufficientWinningMaterial(situation: Situation): Boolean = {
     val board = situation.board
-    val color = !situation.color
+    val opponentColor = !situation.color
     lazy val fortress = hordeClosedPosition(board) // costly function call
-    if (color == Color.white) {
+    if (opponentColor == Color.white) {
       lazy val notKingPieces = InsufficientMatingMaterial.nonKingPieces(board) toList
       val horde = board.piecesOf(Color.white)
       lazy val hordeBishopSquareColors = horde.filter(_._2.is(Bishop)).toList.map(_._1.color).distinct

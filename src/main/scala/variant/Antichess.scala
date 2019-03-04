@@ -48,28 +48,27 @@ case object Antichess extends Variant(
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color
   // of square to allow the player to force their opponent to capture their bishop, also resulting in a draw
   override def insufficientWinningMaterial(board: Board) = {
-    val actors = board.actors
+    val pieces = board.pieces
 
     // Exit early if we are not in a situation with only bishops and pawns
-    val bishopsAndPawns = actors.forall(act => act._2.piece.is(Bishop) || act._2.piece.is(Pawn)) &&
-      actors.find(_._2.piece.is(Bishop)).isDefined
+    val bishopsAndPawns = pieces.forall(p => p._2.is(Bishop) || p._2.is(Pawn)) &&
+      pieces.find(_._2.is(Bishop)).isDefined
 
-    lazy val drawnBishops = actors.values.partition(_.color == White) match {
+    lazy val drawnBishops = board.pieces.partition(_._2.color == White) match {
       case (whitePieces, blackPieces) =>
-        val whiteBishops = whitePieces.filter(_.piece.is(Bishop))
-        val blackBishops = blackPieces.filter(_.piece.is(Bishop))
-        lazy val whitePawns = whitePieces.filter(_.piece.is(Pawn))
-        lazy val blackPawns = blackPieces.filter(_.piece.is(Pawn))
+        val whiteBishops = whitePieces.filter(_._2.is(Bishop))
+        val blackBishops = blackPieces.filter(_._2.is(Bishop))
+        lazy val whitePawns = board.actorsOf(White).filter(_.piece.is(Pawn))
+        lazy val blackPawns = board.actorsOf(Black).filter(_.piece.is(Pawn))
 
         // We consider the case where a player has two bishops on the same diagonal after promoting by using .distinct.
-        // If after applying .distinct the size of the list is greater than one, then the player has bishops on both
-        // colours
-        if (whiteBishops.map(_.pos.color)(breakOut).distinct.size != 1 ||
-          blackBishops.map(_.pos.color)(breakOut).distinct.size != 1) false
+        // If after applying .distinct the size of the list is greater than one, then the player has bishops on both colours
+        if (whiteBishops.map(_._1.color)(breakOut).distinct.size != 1 ||
+          blackBishops.map(_._1.color)(breakOut).distinct.size != 1) false
         else {
           for {
-            whiteSquareColor <- whiteBishops.headOption map (_.pos.color)
-            blackSquareColor <- blackBishops.headOption map (_.pos.color)
+            whiteSquareColor <- whiteBishops.headOption map (_._1.color)
+            blackSquareColor <- blackBishops.headOption map (_._1.color)
           } yield {
             whiteSquareColor != blackSquareColor && whitePawns.forall(pawnNotAttackable(_, blackSquareColor, board)) &&
               blackPawns.forall(pawnNotAttackable(_, whiteSquareColor, board))

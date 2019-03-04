@@ -41,15 +41,15 @@ object InsufficientMatingMaterial {
    */
   def apply(situation: Situation) = {
     val board = situation.board
-    val color = !situation.color
-    val kingsAndMinorsOnlyOfColor = board.piecesOf(color) forall { p => (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight) }
-    lazy val nonKingRolesOfColor = board rolesOf color filter (King !=)
-    lazy val rolesOfOpponentColor = board rolesOf !color
+    val opponentColor = !situation.color
+    val kingsAndMinorsOnlyOfOpponentColor = board.piecesOf(opponentColor) forall { p => (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight) }
+    lazy val nonKingRolesOfOpponentColor = board rolesOf opponentColor filter (King !=)
+    lazy val rolesOfColor = board rolesOf situation.color
 
-    kingsAndMinorsOnlyOfColor && ((nonKingRolesOfColor toList).distinct match {
+    kingsAndMinorsOnlyOfOpponentColor && ((nonKingRolesOfOpponentColor toList).distinct match {
       case Nil => true
-      case List(Knight) => (nonKingRolesOfColor.size == 1) && (rolesOfOpponentColor filter (King !=) filter (Queen !=) isEmpty)
-      case List(Bishop) => !(rolesOfOpponentColor.exists(r => r == Knight || r == Pawn) || bishopsOnOppositeColors(board))
+      case List(Knight) => (nonKingRolesOfOpponentColor.size == 1) && (rolesOfColor filter (King !=) filter (Queen !=) isEmpty)
+      case List(Bishop) => !(rolesOfColor.exists(r => r == Knight || r == Pawn) || bishopsOnOppositeColors(board))
       case _ => false
     })
   }

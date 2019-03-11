@@ -13,13 +13,21 @@ object InsufficientMatingMaterial {
   def bishopsOnOppositeColors(board: Board) =
     (board.pieces collect { case (pos, Piece(_, Bishop)) => pos.color } toList).distinct.size == 2
 
+  def piecesOnOppositeColors(pieces: PieceMap) =
+    (pieces map { _._1.color } toList).distinct.size == 2
+
+  def bishopCanCaptureNonKing(board: Board) = {
+    board.pieces exists { b => (b._2 is Bishop) && (board.pieces exists { p => p._2.color != b._2.color && !p._2.is(King) && p._1.color == b._1.color }) }
+  }
+
   /*
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
    */
-  def pawnBlockedByPawn(pawn: Actor, board: Board) = pawn.moves.isEmpty && {
-    val blockingPosition = Actor.posAheadOfPawn(pawn.pos, pawn.piece.color)
-    blockingPosition.flatMap(board.actorAt(_)).exists(_.piece.is(Pawn))
-  }
+  def pawnBlockedByPawn(pawn: Actor, board: Board) =
+    pawn.moves.isEmpty && (Actor.posAheadOfPawn(pawn.pos, pawn.piece.color) match {
+      case Some(pos) => board.pieces(pos) is Pawn
+      case _ => false
+    })
 
   /*
    * Determines whether a color (of a game in progress) has mating material

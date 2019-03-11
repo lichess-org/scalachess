@@ -415,7 +415,9 @@ class AtomicVariantTest extends ChessTest {
 
       drawGame must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation) must beTrue
+          game.situation.end must beFalse
+          game.board.variant.insufficientWinningMaterial(game.situation) must beTrue
+          InsufficientMatingMaterial(game, game.situation.color) must beFalse
       }
 
     }
@@ -425,6 +427,20 @@ class AtomicVariantTest extends ChessTest {
       val originalGame = fenToGame(position, Atomic)
 
       val game = originalGame flatMap (_.playMoves(Pos.G4 -> Pos.G5))
+
+      game must beSuccess.like {
+        case game =>
+          game.situation.autoDraw must beTrue
+          game.situation.end must beTrue
+      }
+
+    }
+
+    "An automatic draw in a closed position with immobile pawns and bishops which cannot capture" in {
+      val position = "8/8/7p/3Kkb2/p6P/P7/8/8 b - - 45 64"
+      val originalGame = fenToGame(position, Atomic)
+
+      val game = originalGame flatMap (_.playMoves(Pos.H6 -> Pos.H5))
 
       game must beSuccess.like {
         case game =>
@@ -444,6 +460,23 @@ class AtomicVariantTest extends ChessTest {
       newGame must beSuccess.like {
         case game =>
           game.situation.end must beFalse
+          game.board.variant.insufficientWinningMaterial(game.situation) must beFalse
+          InsufficientMatingMaterial(game, game.situation.color) must beFalse
+      }
+    }
+
+    "Not draw inappropriately on blocked pawns plus bishops (of both square colors)" in {
+      val position = "kbB5/pK6/8/P7/8/8/8/8 w - - 1 44"
+      val game = fenToGame(position, Atomic)
+      val newGame = game flatMap (_.playMove(
+        Pos.A5, Pos.A6, Bishop.some
+      ))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.end must beFalse
+          game.board.variant.insufficientWinningMaterial(game.situation) must beTrue
+          InsufficientMatingMaterial(game, game.situation.color) must beFalse
       }
     }
 

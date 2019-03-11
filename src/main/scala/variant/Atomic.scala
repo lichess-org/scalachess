@@ -88,7 +88,7 @@ case object Atomic extends Variant(
 
     // Bishops of opposite color (no other pieces) endgames are dead drawn
     // except if either player has multiple bishops so a helpmate is possible
-    if (board.count(White) >= 2 && board.count(Black) >= 2) kingsAndBishopsOnly && board.pieces.size <= 4 && bishopsOnOppositeColors
+    if (board.count(White) >= 2 && board.count(Black) >= 2) kingsAndBishopsOnly && (board.pieces.size <= 3 || (board.pieces.size == 4 && bishopsOnOppositeColors))
 
     // Queen, rook + any, bishop pair, or any 3 minor pieces can mate
     else kingsRooksAndMinorsOnly && !bishopsOnOppositeColors && board.pieces.size <= (if (rookExists) 3 else 4)
@@ -107,8 +107,19 @@ case object Atomic extends Variant(
    * Since a king cannot capture, K + P vs K + P where none of the pawns can move is an automatic draw
    */
   private def atomicClosedPosition(board: Board) = {
-    board.actors.values.forall(actor => (actor.piece.is(Pawn) && actor.moves.isEmpty
-      && InsufficientMatingMaterial.pawnBlockedByPawn(actor, board)) || actor.piece.is(King))
+    val kingsAndBishopsAndPawnsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Bishop) || (p._2 is Pawn) }
+    lazy val whiteBishops = board.pieces filter { p => (p._2.color == White) && (p._2 is Bishop) }
+    lazy val blackBishops = board.pieces filter { p => (p._2.color == Black) && (p._2 is Bishop) }
+    lazy val cornerPawn = board.pieces exists { p => (p._1 == Pos.A2 || p._1 == Pos.H2 || p._1 == Pos.A7 || p._1 == Pos.H7) && (p._2 is Pawn) }
+    lazy val unblockedPawns = board.pieces exists { p => (p._2 is Pawn) && !InsufficientMatingMaterial.pawnBlockedByPawn(Actor(p._2, p._1, board), board)
+    }
+
+    kingsAndBishopsAndPawnsOnly &&
+      (whiteBishops.isEmpty || blackBishops.isEmpty || whiteBishops.size + blackBishops.size < 3) &&
+      !InsufficientMatingMaterial.piecesOnOppositeColors(whiteBishops) &&
+      !InsufficientMatingMaterial.piecesOnOppositeColors(blackBishops) &&
+      !InsufficientMatingMaterial.bishopCanCaptureNonKing(board) &&
+      !((cornerPawn && !whiteBishops.isEmpty && !blackBishops.isEmpty) || unblockedPawns)
   }
 
   /**
@@ -116,8 +127,22 @@ case object Atomic extends Variant(
    * a piece in the opponent's king's proximity. On the other hand, a king alone or a king with
    * immobile pawns is not sufficient material to win with.
    */
-  override def insufficientWinningMaterial(situation: Situation) =
-    situation.board.rolesOf(!situation.color) == List(King)
+  override def insufficientWinningMaterial(situation: Situation) = {
+    val board = situation.board
+    lazy val kingsAndBishopsAndPawnsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Bishop) || (p._2 is Pawn) }
+    lazy val whiteBishops = board.pieces filter { p => (p._2.color == White) && (p._2 is Bishop) }
+    lazy val blackBishops = board.pieces filter { p => (p._2.color == Black) && (p._2 is Bishop) }
+    lazy val corneredByPawn = board.pieces exists { p => (if (situation.color == White) (p._1 == Pos.A7 || p._1 == Pos.H7) else (p._1 == Pos.A2 || p._1 == Pos.H2)) && (p._2 is Pawn) }
+    lazy val unblockedPawns = board.pieces exists { p => (p._2 is Pawn) && !InsufficientMatingMaterial.pawnBlockedByPawn(Actor(p._2, p._1, board), board)
+    }
+
+    board.rolesOf(!situation.color) == List(King) || (kingsAndBishopsAndPawnsOnly &&
+      (whiteBishops.isEmpty || blackBishops.isEmpty || whiteBishops.size + blackBishops.size < 3) &&
+      !InsufficientMatingMaterial.piecesOnOppositeColors(whiteBishops) &&
+      !InsufficientMatingMaterial.piecesOnOppositeColors(blackBishops) &&
+      !InsufficientMatingMaterial.bishopCanCaptureNonKing(board) &&
+      !((corneredByPawn && !whiteBishops.isEmpty && !blackBishops.isEmpty) || unblockedPawns))
+  }
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
   override def specialEnd(situation: Situation) = situation.board.kingPos.size != 2

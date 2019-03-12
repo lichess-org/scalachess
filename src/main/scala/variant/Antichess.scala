@@ -42,7 +42,10 @@ case object Antichess extends Variant(
 
   // In antichess, there is no checkmate condition therefore a player may only draw either by agreement
   // , blockade or stalemate - a player always has sufficient material to win otherwise
-  override def insufficientWinningMaterial(situation: Situation) = false
+  override def insufficientWinningMaterial(situation: Situation) =
+    situation.board.pieces.size == 2 &&
+      situation.board.hasPiece(Piece(White, Knight)) && situation.board.hasPiece(Piece(Black, Knight)) &&
+      (situation.board.pieces map { _._1.color } toList).distinct.size == 1
 
   // No player can win if the only remaining pieces are opposing bishops on different coloured
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color

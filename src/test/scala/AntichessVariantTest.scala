@@ -281,6 +281,18 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       }
     }
 
+    "Not be drawn on knight versus knight" in {
+      val positionString = "4N3/8/8/8/8/8/8/3n4 b - - 0 42"
+      val maybeGame = fenToGame(positionString, Antichess)
+
+      maybeGame must beSuccess.like {
+        case game =>
+          game.situation.end must beFalse
+          game.board.variant.insufficientWinningMaterial(game.situation) must beTrue
+          InsufficientMatingMaterial(game, game.situation.color) must beFalse
+      }
+    }
+
     "Be drawn on a three move repetition" in {
       val game = Game(Antichess)
 

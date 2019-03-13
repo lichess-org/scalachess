@@ -77,10 +77,10 @@ case object Horde extends Variant(
     lazy val fortress = hordeClosedPosition(board) // costly function call
     if (opponentColor == Color.white) {
       lazy val notKingPieces = InsufficientMatingMaterial.nonKingPieces(board) toList
-      val horde = board.piecesOf(Color.white)
-      lazy val hordeBishopSquareColors = horde.filter(_._2.is(Bishop)).toList.map(_._1.color).distinct
+      val horde = board.piecesOf(White)
+      lazy val hordeBishopSquareColors = (board.pieces collect { case (pos, Piece(White, Bishop)) => pos.color } toList).distinct
       lazy val hordeRoles = horde.map(_._2.role)
-      lazy val army = board.piecesOf(Color.black)
+      lazy val army = board.piecesOf(Black)
       lazy val armyRooks = army.filter(p => p._2.is(Pawn) || p._2.is(Rook))
       lazy val armyBishops = army.filter(p => p._2.is(Pawn) || p._2.is(Bishop))
       lazy val armyKnights = army.filter(p => p._2.is(Pawn) || p._2.is(Knight))

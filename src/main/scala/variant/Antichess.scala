@@ -61,8 +61,8 @@ case object Antichess extends Variant(
       case (whitePieces, blackPieces) =>
         val whiteBishops = whitePieces.filter(_._2.is(Bishop))
         val blackBishops = blackPieces.filter(_._2.is(Bishop))
-        lazy val whitePawns = board.piecesOf(White).filter(_._2.is(Pawn)).map { case (pos, piece) => Actor(piece, pos, board) }
-        lazy val blackPawns = board.piecesOf(Black).filter(_._2.is(Pawn)).map { case (pos, piece) => Actor(piece, pos, board) }
+        lazy val whitePawns = whitePieces.collect { case (pos, Piece(color, Pawn)) => Actor(Piece(color, Pawn), pos, board) }
+        lazy val blackPawns = blackPieces.collect { case (pos, Piece(color, Pawn)) => Actor(Piece(color, Pawn), pos, board) }
 
         // We consider the case where a player has two bishops on the same diagonal after promoting by using .distinct.
         // If after applying .distinct the size of the list is greater than one, then the player has bishops on both colours

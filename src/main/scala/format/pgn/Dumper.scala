@@ -10,9 +10,6 @@ object Dumper {
       case _ if castles =>
         if (orig ?> dest) "O-O-O" else "O-O"
 
-      case _ if enpassant =>
-        orig.file + 'x' + dest.key
-
       case (promotion, Pawn) =>
         captures.fold(orig.file + "x", "") +
           promotion.fold(dest.key)(p => dest.key + "=" + p.pgn)

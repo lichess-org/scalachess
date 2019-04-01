@@ -28,19 +28,6 @@ case class Actor(
             b ← board.taking(pos, p)
           } yield move(p, b, Some(p))
         } flatMap maybePromote
-        def enpassant(horizontal: Direction): Option[Move] = for {
-          victimPos ← horizontal(pos)
-          if pos.y == color.passablePawnY
-          victim ← board(victimPos)
-          if victim == !color - Pawn
-          targetPos ← horizontal(next)
-          victimFrom ← pawnDir(victimPos) flatMap pawnDir
-          if history.lastMove.exists {
-            case Uci.Move(orig, dest, _) => orig == victimFrom && dest == victimPos
-            case _ => false
-          }
-          b ← board.taking(pos, targetPos, Some(victimPos))
-        } yield move(targetPos, b, Some(victimPos), enpassant = true)
         def forward(p: Pos): Option[Move] =
           board.move(pos, p) map { move(p, _) } flatMap maybePromote
         def maybePromote(m: Move): Option[Move] =
@@ -60,9 +47,7 @@ case class Actor(
             b ← board.move(pos, p2)
           } yield move(p2, b),
           capture(_.left),
-          capture(_.right),
-          enpassant(_.left),
-          enpassant(_.right)
+          capture(_.right)
         ).flatten
       } getOrElse Nil
 
@@ -175,7 +160,6 @@ case class Actor(
     capture: Option[Pos] = None,
     castle: Option[((Pos, Pos), (Pos, Pos))] = None,
     promotion: Option[PromotableRole] = None,
-    enpassant: Boolean = false
   ) = Move(
     piece = piece,
     orig = pos,
@@ -184,8 +168,7 @@ case class Actor(
     after = after,
     capture = capture,
     castle = castle,
-    promotion = promotion,
-    enpassant = enpassant
+    promotion = promotion
   )
 
   private def history = board.history

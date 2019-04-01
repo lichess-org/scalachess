@@ -11,7 +11,6 @@ case class Move(
     capture: Option[Pos],
     promotion: Option[PromotableRole],
     castle: Option[((Pos, Pos), (Pos, Pos))],
-    enpassant: Boolean,
     metrics: MoveMetrics = MoveMetrics()
 ) {
   def before = situationBefore.board

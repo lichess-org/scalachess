@@ -290,14 +290,6 @@ class ParserTest extends ChessTest {
       case a => a.sans.value.size must_== 42
     }
   }
-  "en passant e.p. notation" in {
-    parser(enpassantEP) must beSuccess.like {
-      case a => a.sans.value.size must_== 36
-    }
-    parser(enpassantEP2) must beSuccess.like {
-      case a => a.sans.value.size must_== 36
-    }
-  }
 
   "year" in {
     "full date" in {

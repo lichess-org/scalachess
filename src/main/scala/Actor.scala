@@ -1,6 +1,5 @@
 package chess
 
-import format.Uci
 import Pos.posAt
 
 import scala.collection.mutable.ArrayBuffer

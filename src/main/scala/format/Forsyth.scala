@@ -159,7 +159,7 @@ object Forsyth {
       exportBoard(game.board) + exportCrazyPocket(game.board),
       game.player.letter,
       exportCastles(game.board),
-      game.situation.enPassantSquare.map(_.toString).getOrElse("-"),
+      "-",
       game.halfMoveClock,
       game.fullMoveNumber
     ) ::: {

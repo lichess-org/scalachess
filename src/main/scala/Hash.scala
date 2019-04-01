@@ -27,7 +27,6 @@ object Hash {
     val whiteTurnMask = hexToLong(ZobristTables.whiteTurnMask)
     val actorMasks = ZobristTables.actorMasks.map(hexToLong)
     val castlingMasks = ZobristTables.castlingMasks.map(hexToLong)
-    val enPassantMasks = ZobristTables.enPassantMasks.map(hexToLong)
     val threeCheckMasks = ZobristTables.threeCheckMasks.map(hexToLong)
     val crazyPromotionMasks = ZobristTables.crazyPromotionMasks.map(hexToLong)
     val crazyPocketMasks = ZobristTables.crazyPocketMasks.map(hexToLong)
@@ -78,18 +77,14 @@ object Hash {
         }.fold(hactors)(_ ^ _)
       else hactors
 
-    val hep = situation.enPassantSquare.fold(hcastling) { pos =>
-      hcastling ^ table.enPassantMasks(pos.x - 1)
-    }
-
     // Hash in special three-check data.
     val hchecks = board.variant match {
       case variant.ThreeCheck =>
         val blackCount = math.min(situation.history.checkCount.black, 3)
         val whiteCount = math.min(situation.history.checkCount.white, 3)
-        val hblackchecks = if (blackCount > 0) hep ^ table.threeCheckMasks(blackCount - 1) else hep
+        val hblackchecks = if (blackCount > 0) hcastling ^ table.threeCheckMasks(blackCount - 1) else hcastling
         if (whiteCount > 0) hblackchecks ^ table.threeCheckMasks(whiteCount + 2) else hblackchecks
-      case _ => hep
+      case _ => hcastling
     }
 
     // Hash in special crazyhouse data.
@@ -507,13 +502,6 @@ private object ZobristTables {
   val castlingMasks = Array(
     "31d71dce64b2c310ca3c7f8d050c44ba", "f165b587df8981908f50a115834e5414",
     "a57e6339dd2cf3a077568e6e61516b92", "1ef6e6dbb1961ec9d153e6cf8d1984ea"
-  )
-
-  val enPassantMasks = Array(
-    "70cc73d90bc26e2413099942ab633504", "e21a6b35df0c3ad7946c73529a2f3850",
-    "003a93d8b28069623d1adc27d706b921", "1c99ded33cb890a1994b8bd260c3fad2",
-    "cf3145de0add4289f4cf0c83cace7fe4", "d0e4427a5514fb7254807a18b6952e27",
-    "77c621cc9fb3a483e2a1aff40d08315c", "67a34dac4356550b47ec43ffbc092584"
   )
 
   val threeCheckMasks = Array(

@@ -447,11 +447,24 @@ class AtomicVariantTest extends ChessTest {
       }
     }
 
-    "Not draw inappropriately on three bishops (of both square colors)" in {
-      val position = "8/5k2/8/8/8/8/4pKb1/5b2 b - - 1 44"
+    "Not draw inappropriately on two bishops (of both square colors)" in {
+      val position = "8/5k2/8/8/8/8/4pK2/5b2 b - - 1 44"
       val game = fenToGame(position, Atomic)
       val newGame = game flatMap (_.playMove(
         Pos.E2, Pos.E1, Bishop.some
+      ))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.end must beFalse
+      }
+    }
+
+    "Not draw inappropriately on bishop and knight" in {
+      val position = "8/5k2/8/8/8/8/4pK2/5b2 b - - 1 44"
+      val game = fenToGame(position, Atomic)
+      val newGame = game flatMap (_.playMove(
+        Pos.E2, Pos.E1, Knight.some
       ))
 
       newGame must beSuccess.like {

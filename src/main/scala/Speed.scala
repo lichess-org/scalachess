@@ -21,7 +21,7 @@ object Speed {
   case object Correspondence extends Speed(4, "correspondence", 21600 to Int.MaxValue, "Correspondence", "Correspondence games")
 
   val all = List(UltraBullet, Bullet, Blitz, Rapid, Classical, Correspondence)
-  val limited = List(Bullet, Blitz, Rapid, Classical)
+  val limited = List(UltraBullet, Bullet, Blitz, Rapid, Classical)
 
   val byId = all map { v => (v.id, v) } toMap
 

@@ -49,7 +49,7 @@ object StartingPosition {
       StartingPosition("C15", "French Defence: Winawer Variation", "rnbqk1nr/ppp2ppp/4p3/3p4/1b1PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 3 4", "French_Defence#Winawer_Variation:_3...Bb4", "1. e4 e6 2. d4 d5 3. Nc3 Bb4"),
       StartingPosition("C50", "Giuoco Piano", "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 5 4", "Giuoco_Piano", "1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5"),
       StartingPosition("C50", "Italian Game", "r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 4 3", "Italian_Game", "1. e4 e5 2. Nf3 Nc6 3. Bc4"),
-      StartingPosition("C51", "Italian Game: Evans Gambit", "r1bqk1nr/pppp1ppp/2n5/2b1p3/1PB1P3/5N2/P1PP1PPP/RNBQK2R b KQkq b3 1 4", "Evans_Gambit", "1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. b4"),
+      StartingPosition("C51", "Evans Gambit", "r1bqk1nr/pppp1ppp/2n5/2b1p3/1PB1P3/5N2/P1PP1PPP/RNBQK2R b KQkq b3 1 4", "Evans_Gambit", "1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. b4"),
       StartingPosition("C50", "Italian Game: Hungarian Defence", "r1bqk1nr/ppppbppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 5 4", "Hungarian_Defense", "1. e4 e5 2. Nf3 Nc6 3. Bc4 Be7"),
       StartingPosition("C55", "Italian Game: Two Knights Defence", "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 5 4", "Two_Knights_Defense", "1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6"),
       StartingPosition("C30", "King's Gambit", "rnbqkbnr/pppp1ppp/8/4p3/4PP2/8/PPPP2PP/RNBQKBNR b KQkq f3 1 2", "King's_Gambit", "1. e4 e5 2. f4"),

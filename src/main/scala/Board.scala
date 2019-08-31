@@ -1,7 +1,6 @@
 package chess
 
 import Pos.posAt
-import scala.collection.breakOut
 import scalaz.Validation.FlatMap._
 import scalaz.Validation.{ failureNel, success }
 import variant.{ Variant, Crazyhouse }
@@ -30,7 +29,7 @@ case class Board(
 
   def rolesOf(c: Color): List[Role] = pieces.values.collect {
     case piece if piece.color == c => piece.role
-  }(breakOut)
+  }.to(List)
 
   def actorAt(at: Pos): Option[Actor] = actors get at
 
@@ -38,7 +37,7 @@ case class Board(
 
   lazy val kingPos: Map[Color, Pos] = pieces.collect {
     case (pos, Piece(color, King)) => color -> pos
-  }(breakOut)
+  }
 
   def kingPosOf(c: Color): Option[Pos] = kingPos get c
 
@@ -92,7 +91,7 @@ case class Board(
   }
 
   lazy val occupation: Color.Map[Set[Pos]] = Color.Map { color =>
-    pieces.collect { case (pos, piece) if piece is color => pos }(breakOut)
+    pieces.collect { case (pos, piece) if piece is color => pos }.to(Set)
   }
 
   def hasPiece(p: Piece) = pieces.values exists (p ==)
@@ -169,18 +168,15 @@ case class Board(
     }
   }
 
-  override def toString = List(
-    variant + " Position after " + history.lastMove,
-    visual
-  ) mkString "\n"
+  override def toString = s"$variant Position after ${history.lastMove}\n$visual"
 }
 
 object Board {
 
-  def apply(pieces: Traversable[(Pos, Piece)], variant: Variant): Board =
+  def apply(pieces: Iterable[(Pos, Piece)], variant: Variant): Board =
     Board(pieces.toMap, if (variant.allowsCastling) Castles.all else Castles.none, variant)
 
-  def apply(pieces: Traversable[(Pos, Piece)], castles: Castles, variant: Variant): Board =
+  def apply(pieces: Iterable[(Pos, Piece)], castles: Castles, variant: Variant): Board =
     Board(pieces.toMap, History(castles = castles), variant, variantCrazyData(variant))
 
   def init(variant: Variant): Board = Board(variant.pieces, variant.castles, variant)

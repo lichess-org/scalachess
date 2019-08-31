@@ -10,14 +10,14 @@ object FullOpeningDB {
   lazy val byFen: collection.Map[String, FullOpening] =
     all.map { o =>
       o.fen -> o
-    }(scala.collection.breakOut[Vector[_], (String, FullOpening), collection.mutable.AnyRefMap[String, FullOpening]])
+    }.to(Map)
 
   def findByFen(fen: String) = byFen get fen.split(' ').take(3).mkString(" ")
 
   val SEARCH_MAX_PLIES = 40
 
   // assumes standard initial FEN and variant
-  def search(moveStrs: Traversable[String]): Option[FullOpening.AtPly] =
+  def search(moveStrs: Iterable[String]): Option[FullOpening.AtPly] =
     chess.Replay.boards(moveStrs take SEARCH_MAX_PLIES, None, variant.Standard).toOption.flatMap {
       _.zipWithIndex.drop(1).foldRight(none[FullOpening.AtPly]) {
         case ((board, ply), None) =>

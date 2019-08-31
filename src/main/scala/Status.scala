@@ -2,7 +2,7 @@ package chess
 
 sealed abstract class Status(val id: Int) extends Ordered[Status] {
 
-  val name = toString.head.toLower + toString.tail
+  val name = s"${toString.head.toLower}${toString.tail}"
 
   def compare(other: Status) = id compare other.id
 

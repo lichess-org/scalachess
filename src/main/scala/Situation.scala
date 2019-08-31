@@ -10,10 +10,10 @@ case class Situation(board: Board, color: Color) {
 
   lazy val playerCanCapture: Boolean = moves exists (_._2 exists (_.captures))
 
-  lazy val destinations: Map[Pos, List[Pos]] = moves mapValues { _ map (_.dest) }
+  lazy val destinations: Map[Pos, List[Pos]] = moves.view.mapValues { _ map (_.dest) }.to(Map)
 
   def drops: Option[List[Pos]] = board.variant match {
-    case v @ variant.Crazyhouse => v possibleDrops this
+    case v: variant.Crazyhouse.type => v possibleDrops this
     case _ => None
   }
 

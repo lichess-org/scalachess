@@ -38,7 +38,7 @@ case class Piece(color: Color, role: Role) {
     }
     else eyes(from, to)
 
-  override def toString = (color + "-" + role).toLowerCase
+  override def toString = s"$color-$role".toLowerCase
 }
 
 object Piece {

@@ -9,7 +9,7 @@ sealed trait Stats {
   def record(value: Float): Stats
   def +(o: Stats): Stats
 
-  def record[T](values: Traversable[T])(implicit n: Numeric[T]): Stats =
+  def record[T](values: Iterable[T])(implicit n: Numeric[T]): Stats =
     values.foldLeft(this) { (s, v) => s record n.toFloat(v) }
 
   def stdDev = variance.map { Math.sqrt(_).toFloat }
@@ -75,5 +75,5 @@ object Stats {
   val empty = EmptyStats
 
   def apply(value: Float) = empty.record(value)
-  def apply[T: Numeric](values: Traversable[T]) = empty.record(values)
+  def apply[T: Numeric](values: Iterable[T]) = empty.record(values)
 }

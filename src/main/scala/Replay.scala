@@ -24,7 +24,7 @@ object Replay {
   def apply(game: Game) = new Replay(game, Nil, game)
 
   def apply(
-    moveStrs: Traversable[String],
+    moveStrs: Iterable[String],
     initialFen: Option[String],
     variant: chess.variant.Variant
   ): Valid[Reader.Result] =
@@ -48,7 +48,7 @@ object Replay {
     }
 
   def games(
-    moveStrs: Traversable[String],
+    moveStrs: Iterable[String],
     initialFen: Option[String],
     variant: chess.variant.Variant
   ): Valid[List[Game]] =
@@ -117,13 +117,13 @@ object Replay {
   } withVariant variant
 
   def boards(
-    moveStrs: Traversable[String],
+    moveStrs: Iterable[String],
     initialFen: Option[FEN],
     variant: chess.variant.Variant
   ): Valid[List[Board]] = situations(moveStrs, initialFen, variant) map (_ map (_.board))
 
   def situations(
-    moveStrs: Traversable[String],
+    moveStrs: Iterable[String],
     initialFen: Option[FEN],
     variant: chess.variant.Variant
   ): Valid[List[Situation]] = {
@@ -156,7 +156,7 @@ object Replay {
     recursiveReplayFromUci(Replay(makeGame(variant, initialFen)), moves)
 
   def plyAtFen(
-    moveStrs: Traversable[String],
+    moveStrs: Iterable[String],
     initialFen: Option[String],
     variant: chess.variant.Variant,
     atFen: String

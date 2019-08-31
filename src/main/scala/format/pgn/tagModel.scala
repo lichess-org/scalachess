@@ -119,7 +119,7 @@ object Tag {
     WhiteTeam, BlackTeam, Result, FEN, Variant, ECO, Opening, Termination, Annotator
   )
   val tagTypesByLowercase: Map[String, TagType] =
-    tagTypes.map { t => t.lowercase -> t }(scala.collection.breakOut)
+    tagTypes.map { t => t.lowercase -> t }.to(Map)
 
   def apply(name: String, value: Any): Tag = new Tag(
     name = tagType(name),

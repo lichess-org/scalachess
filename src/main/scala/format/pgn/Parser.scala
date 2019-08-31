@@ -7,8 +7,6 @@ import scala.util.parsing.combinator._
 import scalaz.Validation.FlatMap._
 import scalaz.Validation.{ success => succezz }
 
-import scala.collection.breakOut
-
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 object Parser extends scalaz.syntax.ToTraverseOps {
 
@@ -20,7 +18,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
   )
 
   def full(pgn: String): Valid[ParsedPgn] = try {
-    val preprocessed = augmentString(pgn).lines.map(_.trim).filter {
+    val preprocessed = augmentString(pgn).linesIterator.map(_.trim).filter {
       _.headOption != Some('%')
     }.mkString("\n")
       .replace("[pgn]", "")
@@ -50,8 +48,8 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     str.split(' ').toList,
     variant
   )
-  def moves(strMoves: Traversable[String], variant: Variant): Valid[Sans] = objMoves(
-    strMoves.map { StrMove(_, Glyphs.empty, Nil, Nil) }(breakOut),
+  def moves(strMoves: Iterable[String], variant: Variant): Valid[Sans] = objMoves(
+    strMoves.map { StrMove(_, Glyphs.empty, Nil, Nil) }.to(List),
     variant
   )
   def objMoves(strMoves: List[StrMove], variant: Variant): Valid[Sans] =
@@ -141,7 +139,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
     override def skipWhitespace = false
 
-    private def rangeToMap(r: Iterable[Char]) = r.zipWithIndex.toMap mapValues (_ + 1)
+    private def rangeToMap(r: Iterable[Char]) = r.zipWithIndex.to(Map).view.mapValues(_ + 1)
     private val fileMap = rangeToMap('a' to 'h')
     private val rankMap = rangeToMap('1' to '8')
 
@@ -332,7 +330,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     """"\]\s*(\d+\.)""".r.replaceAllIn(pgn, m => "\"]\n" + m.group(1))
 
   private def splitTagAndMoves(pgn: String): Valid[(String, String)] =
-    augmentString(ensureTagsNewline(pgn)).lines.toList.map(_.trim).filter(_.nonEmpty) span { line =>
+    augmentString(ensureTagsNewline(pgn)).linesIterator.to(List).map(_.trim).filter(_.nonEmpty) span { line =>
       line lift 0 contains '['
     } match {
       case (tagLines, moveLines) => succezz(tagLines.mkString("\n") -> moveLines.mkString("\n"))

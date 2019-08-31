@@ -55,7 +55,7 @@ case object RacingKings extends Variant(
     case White =>
       reachedGoal(situation.board, White) ^ reachedGoal(situation.board, Black)
     case Black =>
-      reachedGoal(situation.board, White) && (validMoves(situation) mapValues (_.filter(reachesGoal))).forall(_._2.isEmpty)
+      reachedGoal(situation.board, White) && (validMoves(situation).view mapValues (_.filter(reachesGoal))).forall(_._2.isEmpty)
   }
 
   // If white reaches the goal and black also reaches the goal directly after,

@@ -1,8 +1,6 @@
 package chess
 package format.pgn
 
-import scala.collection.breakOut
-
 case class Glyph(id: Int, symbol: String, name: String) {
 
   override def toString = s"$symbol ($$$id $name)"
@@ -64,7 +62,7 @@ object Glyph {
     val zugzwang = new Glyph(22, "⨀", "Zugzwang") with MoveAssessment
 
     val all = List(good, mistake, brillant, blunder, interesting, dubious, only, zugzwang)
-    val byId: Map[Int, Glyph] = all.map { g => g.id -> g }(breakOut)
+    val byId: Map[Int, Glyph] = all.map { g => g.id -> g }.to(Map)
 
     def display = all
   }
@@ -82,7 +80,7 @@ object Glyph {
     val blackMuchBetter = new Glyph(19, "-+", "Black is winning") with PositionAssessment
 
     val all = List(equal, unclear, whiteSlightlyBetter, blackSlightlyBetter, whiteQuiteBetter, blackQuiteBetter, whiteMuchBetter, blackMuchBetter)
-    val byId: Map[Int, Glyph] = all.map { g => g.id -> g }(breakOut)
+    val byId: Map[Int, Glyph] = all.map { g => g.id -> g }.to(Map)
 
     def display = all
   }
@@ -100,7 +98,7 @@ object Glyph {
     val withIdea = new Glyph(140, "∆", "With the idea") with Observation
 
     val all = List(novelty, development, initiative, attack, counterplay, timeTrouble, compensation, withIdea)
-    val byId: Map[Int, Glyph] = all.map { g => g.id -> g }(breakOut)
+    val byId: Map[Int, Glyph] = all.map { g => g.id -> g }.to(Map)
 
     def display = all
   }

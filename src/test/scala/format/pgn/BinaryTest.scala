@@ -455,5 +455,5 @@ e4 e5 Nf3 Nf6 Nc3 Nc6 Bb5 Bd6 d3 a6 Ba4 h6 h3 Qe7 Nd5 Nxd5 exd5 Nd4 Nxd4 exd4+ K
 e4 d5 Qh5 dxe4 Bc4 e3 Qxf7+ Kd7 Qe6+ Ke8 Qf7+ Kd7 Be6+ Kc6 Bd5+ Kd7 Qf5+ Ke8 Qf7+ Kd7 dxe3 Nf6 Nf3 Nxd5 Qxd5+ Ke8 Ne5 Qxd5 f4
 e3 e5 Qf3 Nf6 Qe2 Nc6 d3 d5 f4 Bd6 fxe5 Nxe5 Nf3 O-O Nxe5 Bxe5 Nc3 Bg4 Qd2 c5 h3 Bh5 g4 Bg3+ Ke2 Bg6 Rg1 Bh4 Bg2 Re8 b3 Qd6 Bb2 Rad8 Kd1 Qh2
 Re1 Bxe1 Kxe1 Qg3+ Kd1 Rxe3 Kc1 Re1+ Nd1 d4 a3 Nd5 Kb1 Nc3+ Bxc3 dxc3 Qc1 Qxg2 Ka2 Rxd3 Rb1 Rdxd1 Qxd1 Rxd1 a4 Qxc2+ Ka3 Rxb1
-""").lines.filter(_.nonEmpty).toList
+""").linesIterator.filter(_.nonEmpty).toList
 }

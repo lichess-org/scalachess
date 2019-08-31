@@ -41,7 +41,7 @@ object Dumper {
           orig.file + orig.rank
         }
 
-        role.pgn + disambiguation + captures.fold("x", "") + dest.key
+        s"${role.pgn}$disambiguation${captures.fold("x", "")}${dest.key}"
       }
     }) + {
       if (next.check) {

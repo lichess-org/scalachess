@@ -1,7 +1,6 @@
 package chess
 package variant
 
-import scala.collection.breakOut
 import scalaz.Validation.FlatMap._
 import scalaz.Validation.failureNel
 
@@ -48,7 +47,7 @@ abstract class Variant private[variant] (
 
   def validMoves(situation: Situation): Map[Pos, List[Move]] = situation.actors.collect {
     case actor if actor.moves.nonEmpty => actor.pos -> actor.moves
-  }(breakOut)
+  }.to(Map)
 
   // Optimised for performance
   def pieceThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean = {
@@ -162,10 +161,10 @@ abstract class Variant private[variant] (
 
   val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
 
-  lazy val rolesByPgn: Map[Char, Role] = roles.map { r => (r.pgn, r) }(breakOut)
+  lazy val rolesByPgn: Map[Char, Role] = roles.map { r => (r.pgn, r) }.to(Map)
 
   lazy val rolesPromotableByPgn: Map[Char, PromotableRole] =
-    promotableRoles.map { r => (r.pgn, r) }(breakOut)
+    promotableRoles.map { r => (r.pgn, r) }.to(Map)
 
   def isUnmovedPawn(color: Color, pos: Pos) = pos.y == color.fold(2, 7)
 

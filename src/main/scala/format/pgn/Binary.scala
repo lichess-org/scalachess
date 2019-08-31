@@ -2,12 +2,11 @@ package chess
 package format.pgn
 
 import scala.util.Try
-import scala.collection.breakOut
 
 object Binary {
 
   def writeMove(m: String) = Try(Writer move m)
-  def writeMoves(ms: Traversable[String]) = Try(Writer moves ms)
+  def writeMoves(ms: Iterable[String]) = Try(Writer moves ms)
 
   def readMoves(bs: List[Byte]) = Try(Reader moves bs)
   def readMoves(bs: List[Byte], nb: Int) = Try(Reader.moves(bs, nb))
@@ -21,13 +20,13 @@ object Binary {
 
   private object Encoding {
     val pieceInts: Map[String, Int] = Map("K" -> 1, "Q" -> 2, "R" -> 3, "N" -> 4, "B" -> 5, "O-O" -> 6, "O-O-O" -> 7)
-    val pieceStrs: Map[Int, String] = (pieceInts map { case (k, v) => v -> k })(breakOut)
+    val pieceStrs: Map[Int, String] = (pieceInts map { case (k, v) => v -> k })
     val dropPieceInts: Map[String, Int] = Map("P" -> 1, "Q" -> 2, "R" -> 3, "N" -> 4, "B" -> 5)
-    val dropPieceStrs: Map[Int, String] = (dropPieceInts map { case (k, v) => v -> k })(breakOut)
+    val dropPieceStrs: Map[Int, String] = (dropPieceInts map { case (k, v) => v -> k })
     val promotionInts: Map[String, Int] = Map("" -> 0, "Q" -> 1, "R" -> 2, "N" -> 3, "B" -> 4, "K" -> 6)
-    val promotionStrs: Map[Int, String] = (promotionInts map { case (k, v) => v -> k })(breakOut)
+    val promotionStrs: Map[Int, String] = (promotionInts map { case (k, v) => v -> k })
     val checkInts: Map[String, Int] = Map("" -> 0, "+" -> 1, "#" -> 2)
-    val checkStrs: Map[Int, String] = (checkInts map { case (k, v) => v -> k })(breakOut)
+    val checkStrs: Map[Int, String] = (checkInts map { case (k, v) => v -> k })
   }
 
   private object Reader {
@@ -87,8 +86,8 @@ object Binary {
     def fullPawn(b1: Int, b2: Int): String = {
       val pos = posString(right(b1, 6))
       val fileCapture = (b2 >> 6) match {
-        case 1 => (pos(0) - 1).toChar + "x"
-        case 2 => (pos(0) + 1).toChar + "x"
+        case 1 => s"${(pos(0) - 1).toChar}x"
+        case 2 => s"${(pos(0) + 1).toChar}x"
         case _ => ""
       }
       val check = checkStrs(cut(b2, 6, 4))
@@ -138,7 +137,7 @@ object Binary {
       case DropR(role, pos, check) => drop(role, pos, check)
     }) map (_.toByte)
 
-    def moves(strs: Traversable[String]): Array[Byte] = strs.flatMap(move)(breakOut)
+    def moves(strs: Iterable[String]): Array[Byte] = strs.flatMap(move).to(Array)
 
     def simplePawn(pos: String) = List(
       (MoveType.SimplePawn << 6) + posInt(pos)

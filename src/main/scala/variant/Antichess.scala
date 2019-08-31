@@ -1,8 +1,6 @@
 package chess
 package variant
 
-import scala.collection.breakOut
-
 case object Antichess extends Variant(
   id = 6,
   key = "antichess",
@@ -24,9 +22,9 @@ case object Antichess extends Variant(
   // In this variant, a player must capture if a capturing move is available
   override def validMoves(situation: Situation) = {
     val allMoves = super.validMoves(situation)
-    val capturingMoves = allMoves mapValues (_.filter(_.captures)) filterNot (_._2.isEmpty)
+    val capturingMoves = allMoves.view mapValues (_.filter(_.captures)) filterNot (_._2.isEmpty)
 
-    if (!capturingMoves.isEmpty) capturingMoves else allMoves
+    (if (!capturingMoves.isEmpty) capturingMoves else allMoves).to(Map)
   }
 
   override def valid(board: Board, strict: Boolean) =
@@ -64,8 +62,8 @@ case object Antichess extends Variant(
         // We consider the case where a player has two bishops on the same diagonal after promoting by using .distinct.
         // If after applying .distinct the size of the list is greater than one, then the player has bishops on both
         // colours
-        if (whiteBishops.map(_.pos.color)(breakOut).distinct.size != 1 ||
-          blackBishops.map(_.pos.color)(breakOut).distinct.size != 1) false
+        if (whiteBishops.map(_.pos.color).to(Set).size != 1 ||
+          blackBishops.map(_.pos.color).to(Set).size != 1) false
         else {
           for {
             whiteSquareColor <- whiteBishops.headOption map (_.pos.color)

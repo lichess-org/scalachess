@@ -6,7 +6,7 @@ class DecayingStatsTest extends Specification {
 
   import chess.{ DecayingStats => DS }
 
-  val random = new java.util.Random(2286825201242408115l)
+  val random = new java.util.Random(2286825201242408115L)
 
   def realMean(elts: Seq[Float]): Float = elts.sum / elts.size
 

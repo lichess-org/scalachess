@@ -1,7 +1,6 @@
 package chess
 
 import scala.math.{ min, max, abs }
-import scala.collection.breakOut
 
 sealed case class Pos private (x: Int, y: Int, piotr: Char) {
 
@@ -150,7 +149,7 @@ object Pos {
   val whiteBackrank = (A1 <-> H1).toList
   val blackBackrank = (A8 <-> H8).toList
 
-  val allKeys: Map[String, Pos] = all.map { pos => pos.key -> pos }(breakOut)
+  val allKeys: Map[String, Pos] = all.map { pos => pos.key -> pos }.to(Map)
 
-  val allPiotrs: Map[Char, Pos] = all.map { pos => pos.piotr -> pos }(breakOut)
+  val allPiotrs: Map[Char, Pos] = all.map { pos => pos.piotr -> pos }.to(Map)
 }

@@ -21,7 +21,7 @@ class ReplayPerfTest extends ChessTest {
       runOne(gameMoves.head)._3 must beEmpty
       run
       println("running tests")
-      val durations = for (i ← 1 to iterations) yield {
+      val durations = for (i <- 1 to iterations) yield {
         val start = System.currentTimeMillis
         run
         val duration = System.currentTimeMillis - start

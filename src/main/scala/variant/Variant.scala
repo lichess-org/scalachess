@@ -83,10 +83,10 @@ abstract class Variant private[variant] (
     def findMove(from: Pos, to: Pos) = situation.moves get from flatMap (_.find(_.dest == to))
 
     for {
-      actor ← situation.board.actors get from toValid "No piece on " + from
-      myActor ← actor.validIf(actor is situation.color, "Not my piece on " + from)
-      m1 ← findMove(from, to) toValid "Piece on " + from + " cannot move to " + to
-      m2 ← m1 withPromotion promotion toValid "Piece on " + from + " cannot promote to " + promotion
+      actor <- situation.board.actors get from toValid "No piece on " + from
+      myActor <- actor.validIf(actor is situation.color, "Not my piece on " + from)
+      m1 <- findMove(from, to) toValid "Piece on " + from + " cannot move to " + to
+      m2 <- m1 withPromotion promotion toValid "Piece on " + from + " cannot promote to " + promotion
       m3 <- m2 validIf (isValidPromotion(promotion), "Cannot promote to " + promotion + " in this game mode")
     } yield m3
   }
@@ -211,7 +211,7 @@ object Variant {
   )
 
   private[variant] def symmetricRank(rank: IndexedSeq[Role]): Map[Pos, Piece] =
-    (for (y ← Seq(1, 2, 7, 8); x ← 1 to 8) yield {
+    (for (y <- Seq(1, 2, 7, 8); x <- 1 to 8) yield {
       posAt(x, y) map { pos =>
         (pos, y match {
           case 1 => White - rank(x - 1)

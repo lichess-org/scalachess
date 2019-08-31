@@ -23,23 +23,23 @@ case class Actor(
         val fwd = Some(next) filterNot board.pieces.contains
         def capture(horizontal: Direction): Option[Move] = {
           for {
-            p ← horizontal(next)
+            p <- horizontal(next)
             if board.pieces.get(p).exists { _.color != color }
-            b ← board.taking(pos, p)
+            b <- board.taking(pos, p)
           } yield move(p, b, Some(p))
         } flatMap maybePromote
         def enpassant(horizontal: Direction): Option[Move] = for {
-          victimPos ← horizontal(pos)
+          victimPos <- horizontal(pos)
           if pos.y == color.passablePawnY
-          victim ← board(victimPos)
+          victim <- board(victimPos)
           if victim == !color - Pawn
-          targetPos ← horizontal(next)
-          victimFrom ← pawnDir(victimPos) flatMap pawnDir
+          targetPos <- horizontal(next)
+          victimFrom <- pawnDir(victimPos) flatMap pawnDir
           if history.lastMove.exists {
             case Uci.Move(orig, dest, _) => orig == victimFrom && dest == victimPos
             case _ => false
           }
-          b ← board.taking(pos, targetPos, Some(victimPos))
+          b <- board.taking(pos, targetPos, Some(victimPos))
         } yield move(targetPos, b, Some(victimPos), enpassant = true)
         def forward(p: Pos): Option[Move] =
           board.move(pos, p) map { move(p, _) } flatMap maybePromote
@@ -53,11 +53,11 @@ case class Actor(
         List(
           fwd flatMap forward,
           for {
-            p ← fwd
+            p <- fwd
             if board.variant.isUnmovedPawn(color, pos)
-            p2 ← pawnDir(p)
+            p2 <- pawnDir(p)
             if !(board.pieces contains p2)
-            b ← board.move(pos, p2)
+            b <- board.move(pos, p2)
           } yield move(p2, b),
           capture(_.left),
           capture(_.right),
@@ -108,24 +108,24 @@ case class Actor(
   private def castle: List[Move] = castleOn(KingSide) ::: castleOn(QueenSide)
 
   def castleOn(side: Side): List[Move] = (for {
-    kingPos ← board kingPosOf color
+    kingPos <- board kingPosOf color
     if history canCastle color on side
-    rookPos ← side.tripToRook(kingPos, board).lastOption
+    rookPos <- side.tripToRook(kingPos, board).lastOption
     if board(rookPos) contains color.rook
     if history.unmovedRooks.pos.contains(rookPos)
-    newKingPos ← posAt(side.castledKingX, kingPos.y)
-    newRookPos ← posAt(side.castledRookX, rookPos.y)
+    newKingPos <- posAt(side.castledKingX, kingPos.y)
+    newRookPos <- posAt(side.castledRookX, rookPos.y)
     kingPath = kingPos <-> newKingPos
     rookPath = rookPos <-> newRookPos
     mustBeUnoccupied = (kingPath ++ rookPath).filter(_ != kingPos).filter(_ != rookPos)
     if !mustBeUnoccupied.exists(board.pieces.contains)
     if !kingPath.exists(p => board.variant.kingThreatened(board, !color, p))
-    b1 ← board take rookPos
-    b2 ← newKingPos match {
+    b1 <- board take rookPos
+    b2 <- newKingPos match {
       case p if p == kingPos => Some(b1)
       case p => b1.move(kingPos, p)
     }
-    b3 ← b2.place(color.rook, newRookPos)
+    b3 <- b2.place(color.rook, newRookPos)
     b4 = b3 updateHistory (_ withoutCastles color)
     castle = Some((kingPos -> newKingPos, rookPos -> newRookPos))
   } yield (board.variant == chess.variant.Chess960).fold(

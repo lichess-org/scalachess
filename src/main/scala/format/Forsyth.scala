@@ -214,7 +214,7 @@ object Forsyth {
   def exportBoard(board: Board): String = {
     val fen = new scala.collection.mutable.StringBuilder(70)
     var empty = 0
-    for (y ← 8 to 1 by -1) {
+    for (y <- 8 to 1 by -1) {
       empty = 0
       for (x <- 1 to 8) {
         board(x, y) match {

@@ -66,12 +66,12 @@ object Pos {
 
   def keyToPiotr(key: String) = posAt(key) map (_.piotr)
   def doubleKeyToPiotr(key: String) = for {
-    a ← keyToPiotr(key take 2)
-    b ← keyToPiotr(key drop 2)
+    a <- keyToPiotr(key take 2)
+    b <- keyToPiotr(key drop 2)
   } yield s"$a$b"
   def doublePiotrToKey(piotrs: String) = for {
-    a ← piotr(piotrs.head)
-    b ← piotr(piotrs(1))
+    a <- piotr(piotrs.head)
+    b <- piotr(piotrs(1))
   } yield s"${a.key}${b.key}"
 
   private[this] def createPos(x: Int, y: Int, piotr: Char): Pos = {

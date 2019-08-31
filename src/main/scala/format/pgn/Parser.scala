@@ -29,16 +29,16 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       .replace("–", "-")
       .replace("e.p.", "") // silly en-passant notation
     for {
-      splitted ← splitTagAndMoves(preprocessed)
+      splitted <- splitTagAndMoves(preprocessed)
       tagStr = splitted._1
       moveStr = splitted._2
-      preTags ← TagParser(tagStr)
-      parsedMoves ← MovesParser(moveStr)
+      preTags <- TagParser(tagStr)
+      parsedMoves <- MovesParser(moveStr)
       init = parsedMoves._1
       strMoves = parsedMoves._2
       resultOption = parsedMoves._3
       tags = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + _)
-      sans ← objMoves(strMoves, tags.variant | Variant.default)
+      sans <- objMoves(strMoves, tags.variant | Variant.default)
     } yield ParsedPgn(init, tags, sans)
   } catch {
     case _: StackOverflowError =>

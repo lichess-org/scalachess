@@ -588,5 +588,12 @@ class AtomicVariantTest extends ChessTest {
           game.board(Pos.D1) must beEqualTo(White.rook.some)
       }
     }
+
+    "Disallow castling through atomic check" in {
+      val position = "8/8/8/8/8/8/5k2/R3K2r w Q - 0 1"
+      val game = fenToGame(position, Atomic)
+      val errorGame = game flatMap (_.playMove(Pos.E1, Pos.C1))
+      errorGame must beFailure
+    }
   }
 }

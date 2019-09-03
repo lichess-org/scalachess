@@ -108,30 +108,38 @@ case class Actor(
   private def castle: List[Move] = castleOn(KingSide) ::: castleOn(QueenSide)
 
   def castleOn(side: Side): List[Move] = (for {
+    // Check castling rights.
     kingPos <- board kingPosOf color
     if history canCastle color on side
     rookPos <- side.tripToRook(kingPos, board).lastOption
     if board(rookPos) contains color.rook
     if history.unmovedRooks.pos.contains(rookPos)
+    // Check impeded castling.
     newKingPos <- posAt(side.castledKingX, kingPos.y)
     newRookPos <- posAt(side.castledRookX, rookPos.y)
     kingPath = kingPos <-> newKingPos
     rookPath = rookPos <-> newRookPos
     mustBeUnoccupied = (kingPath ++ rookPath).filter(_ != kingPos).filter(_ != rookPos)
     if !mustBeUnoccupied.exists(board.pieces.contains)
-    if !kingPath.exists(p => board.variant.kingThreatened(board, !color, p))
-    b1 <- board take rookPos
-    b2 <- newKingPos match {
-      case p if p == kingPos => Some(b1)
-      case p => b1.move(kingPos, p)
-    }
-    b3 <- b2.place(color.rook, newRookPos)
-    b4 = b3 updateHistory (_ withoutCastles color)
+    // Check the king is not currently attacked, and none of the squares it
+    // passes *through* are attacked. We do this after removing the old king,
+    // to ensure the old king does not shield attacks. This is important in
+    // Atomic chess, where touching kings can shield attacks without being in
+    // check.
+    b1 <- board take kingPos
+    mustNotBeAttacked = kingPath.filter(_ != newKingPos || kingPos == newKingPos)
+    if !mustNotBeAttacked.exists(p => board.variant.kingThreatened(b1, !color, p))
+    // Test the final king position seperately, after the rook has been moved.
+    b2 <- b1 take rookPos
+    b3 <- b2.place(color.king, newKingPos)
+    b4 <- b3.place(color.rook, newRookPos)
+    if !board.variant.kingThreatened(b4, !color, newKingPos)
+    b5 = b4 updateHistory (_ withoutCastles color)
     castle = Some((kingPos -> newKingPos, rookPos -> newRookPos))
   } yield (board.variant == chess.variant.Chess960).fold(
     List(rookPos),
     List(rookPos, newKingPos).distinct
-  ) map { move(_, b4, castle = castle) }) getOrElse Nil
+  ) map { move(_, b5, castle = castle) }) getOrElse Nil
 
   private def shortRange(dirs: Directions): List[Move] =
     dirs flatMap { _(pos) } flatMap { to =>

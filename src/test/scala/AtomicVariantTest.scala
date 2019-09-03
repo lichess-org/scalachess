@@ -595,5 +595,12 @@ class AtomicVariantTest extends ChessTest {
       val errorGame = game flatMap (_.playMove(Pos.E1, Pos.C1))
       errorGame must beFailure
     }
+
+    "Disallow castling into atomic check" in {
+      val position = "4k3/8/8/8/8/8/8/rR2K3 w Q - 0 1"
+      val game = fenToGame(position, Atomic)
+      val errorGame = game flatMap (_.playMove(Pos.E1, Pos.B1))
+      errorGame must beFailure
+    }
   }
 }

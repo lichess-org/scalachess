@@ -206,7 +206,6 @@ object Variant {
     chess.variant.Chess960,
     chess.variant.ThreeCheck,
     chess.variant.KingOfTheHill,
-    chess.variant.Antichess,
     chess.variant.FromPosition
   )
 

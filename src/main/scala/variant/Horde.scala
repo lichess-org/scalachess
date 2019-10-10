@@ -93,7 +93,7 @@ case object Horde extends Variant(
           case List(Rook) => army.size < 3 || armyPawnsOrRooks.isEmpty || armyPawnsOrKnights.isEmpty
           case _ => armyPawnsOrRooks.isEmpty
         }
-      } else if ((hordeRoles.forall(_ == Bishop) && hordeBishopSquareColors.size == 1) && (armyPawnsOrKnights.size + armyPawnsOrBishops.filter(p => p._1.color != horde.head._1.color).size < 2)) true
+      } else if ((hordeRoles.forall(_ == Bishop) && hordeBishopSquareColors.size == 1) && (armyPawnsOrKnights.size + armyPawnsOrBishops.count(p => p._1.color != horde.head._1.color) < 2)) true
       else if (horde.size == 2 && hordeRoles.count(r => r == Queen || r == Rook || r == Pawn) < 2 && armyNonQueens.size <= 1) true
       else fortress
     } else fortress

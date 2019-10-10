@@ -36,6 +36,16 @@ class HordeVariantTest extends ChessTest {
       }
     }
 
+    "Must recognise insufficient winning material for horde with only 1 bishop left" in {
+      val position = "r7/2Bb4/q3k3/8/8/3q4/8/5qqr b - -"
+      val game = fenToGame(position, Horde)
+
+      game must beSuccess.like {
+        case game =>
+          game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.white) must beTrue
+      }
+    }
+
     "Must recognise insufficient winning material for horde with only 1 queen left" in {
       val position = "8/2k5/3q4/8/8/1Q6/8/8 b - -"
       val game = fenToGame(position, Horde)

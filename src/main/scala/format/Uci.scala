@@ -37,20 +37,20 @@ object Uci
   object Move {
 
     def apply(move: String): Option[Move] = for {
-      orig ← Pos.posAt(move take 2)
-      dest ← Pos.posAt(move drop 2 take 2)
+      orig <- Pos.posAt(move take 2)
+      dest <- Pos.posAt(move drop 2 take 2)
       promotion = move lift 4 flatMap Role.promotable
     } yield Move(orig, dest, promotion)
 
     def piotr(move: String) = for {
-      orig ← move.headOption flatMap Pos.piotr
-      dest ← move lift 1 flatMap Pos.piotr
+      orig <- move.headOption flatMap Pos.piotr
+      dest <- move lift 1 flatMap Pos.piotr
       promotion = move lift 2 flatMap Role.promotable
     } yield Move(orig, dest, promotion)
 
     def fromStrings(origS: String, destS: String, promS: Option[String]) = for {
-      orig ← Pos.posAt(origS)
-      dest ← Pos.posAt(destS)
+      orig <- Pos.posAt(origS)
+      dest <- Pos.posAt(destS)
       promotion = Role promotable promS
     } yield Move(orig, dest, promotion)
   }
@@ -69,8 +69,8 @@ object Uci
   object Drop {
 
     def fromStrings(roleS: String, posS: String) = for {
-      role ← Role.allByName get roleS
-      pos ← Pos.posAt(posS)
+      role <- Role.allByName get roleS
+      pos <- Pos.posAt(posS)
     } yield Drop(role, pos)
   }
 
@@ -82,15 +82,15 @@ object Uci
 
   def apply(move: String): Option[Uci] =
     if (move lift 1 contains '@') for {
-      role ← move.headOption flatMap Role.allByPgn.get
-      pos ← Pos.posAt(move drop 2 take 2)
+      role <- move.headOption flatMap Role.allByPgn.get
+      pos <- Pos.posAt(move drop 2 take 2)
     } yield Uci.Drop(role, pos)
     else Uci.Move(move)
 
   def piotr(move: String): Option[Uci] =
     if (move lift 1 contains '@') for {
-      role ← move.headOption flatMap Role.allByPgn.get
-      pos ← move lift 2 flatMap Pos.piotr
+      role <- move.headOption flatMap Role.allByPgn.get
+      pos <- move lift 2 flatMap Pos.piotr
     } yield Uci.Drop(role, pos)
     else Uci.Move.piotr(move)
 

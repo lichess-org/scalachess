@@ -65,7 +65,7 @@ object Hash {
     }
 
     val board = situation.board
-    val hturn = situation.color.fold(table.whiteTurnMask, 0l)
+    val hturn = situation.color.fold(table.whiteTurnMask, 0L)
 
     val hactors = board.actors.values.view.map {
       table.actorMasks compose actorIndex _

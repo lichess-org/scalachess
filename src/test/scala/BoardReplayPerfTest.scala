@@ -11,7 +11,7 @@ class BoardReplayPerfTest extends ChessTest {
 
   val moves = format.pgn.Fixtures.fromProd2.split(' ').toList
   def runOne = Replay.boards(moves, None, variant.Standard)
-  def run: Unit = { for (i ← 1 to nb) runOne }
+  def run: Unit = { for (i <- 1 to nb) runOne }
 
   "playing a game" should {
     "many times" in {
@@ -21,7 +21,7 @@ class BoardReplayPerfTest extends ChessTest {
         run
       }
       println("running tests")
-      val durations = for (i ← 1 to iterations) yield {
+      val durations = for (i <- 1 to iterations) yield {
         val start = System.currentTimeMillis
         run
         val duration = System.currentTimeMillis - start

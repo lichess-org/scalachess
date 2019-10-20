@@ -77,7 +77,7 @@ case class Board(
     }
 
   def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] = for {
-    piece ← pieces get orig
+    piece <- pieces get orig
     takenPos = taking getOrElse dest
     if (pieces contains takenPos)
   } yield copy(pieces = pieces - takenPos - orig + (dest -> piece))
@@ -98,10 +98,10 @@ case class Board(
   def hasPiece(p: Piece) = pieces.values exists (p ==)
 
   def promote(pos: Pos): Option[Board] = for {
-    pawn ← apply(pos)
+    pawn <- apply(pos)
     if (pawn is Pawn)
-    b2 ← take(pos)
-    b3 ← b2.place(pawn.color.queen, pos)
+    b2 <- take(pos)
+    b3 <- b2.place(pawn.color.queen, pos)
   } yield b3
 
   def castles: Castles = history.castles

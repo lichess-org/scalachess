@@ -83,15 +83,16 @@ case object Atomic extends Variant(
   private def insufficientAtomicWinningMaterial(board: Board) = {
     val kingsAndBishopsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Bishop) }
     lazy val bishopsOnOppositeColors = InsufficientMatingMaterial.bishopsOnOppositeColors(board)
+    lazy val kingsAndKnightsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Knight) }
     lazy val kingsRooksAndMinorsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Rook) || (p._2 is Bishop) || (p._2 is Knight) }
-    lazy val rookExists = board.pieces exists { _._2 is Rook }
 
     // Bishops of opposite color (no other pieces) endgames are dead drawn
     // except if either player has multiple bishops so a helpmate is possible
     if (board.count(White) >= 2 && board.count(Black) >= 2) kingsAndBishopsOnly && board.pieces.size <= 4 && bishopsOnOppositeColors
 
-    // Queen, rook + any, bishop pair, or any 3 minor pieces can mate
-    else kingsRooksAndMinorsOnly && !bishopsOnOppositeColors && board.pieces.size <= (if (rookExists) 3 else 4)
+    // Queen, rook + any, bishop + any (same piece color), or 3 knights can mate
+    else if (kingsAndKnightsOnly) board.pieces.size <= 4
+    else kingsRooksAndMinorsOnly && !bishopsOnOppositeColors && board.pieces.size <= 3
   }
 
   /*

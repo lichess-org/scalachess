@@ -317,4 +317,8 @@ class ParserTest extends ChessTest {
       case parsed => parsed.tags.variant must_== Some(variant.Chess960)
     }
   }
+
+  "example from chessgames.com with weird comments" in {
+    parser(chessgamesWeirdComments) must beSuccess
+  }
 }

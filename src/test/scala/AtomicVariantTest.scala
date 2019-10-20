@@ -447,11 +447,24 @@ class AtomicVariantTest extends ChessTest {
       }
     }
 
-    "Not draw inappropriately on three bishops (of both square colors)" in {
-      val position = "8/5k2/8/8/8/8/4pKb1/5b2 b - - 1 44"
+    "Not draw inappropriately on two bishops (of both square colors)" in {
+      val position = "8/5k2/8/8/8/8/4pK2/5b2 b - - 1 44"
       val game = fenToGame(position, Atomic)
       val newGame = game flatMap (_.playMove(
         Pos.E2, Pos.E1, Bishop.some
+      ))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.end must beFalse
+      }
+    }
+
+    "Not draw inappropriately on bishop and knight" in {
+      val position = "8/5k2/8/8/8/8/4pK2/5b2 b - - 1 44"
+      val game = fenToGame(position, Atomic)
+      val newGame = game flatMap (_.playMove(
+        Pos.E2, Pos.E1, Knight.some
       ))
 
       newGame must beSuccess.like {
@@ -562,6 +575,32 @@ class AtomicVariantTest extends ChessTest {
         case game =>
           game.situation.end must beFalse
       }
+    }
+
+    "Allow castling with touching kings and rook shielding final attack" in {
+      val position = "8/8/8/8/8/8/4k3/R3K2r w Q - 0 1"
+      val game = fenToGame(position, Atomic)
+      val newGame = game flatMap (_.playMove(Pos.E1, Pos.C1))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.board(Pos.C1) must beEqualTo(White.king.some)
+          game.board(Pos.D1) must beEqualTo(White.rook.some)
+      }
+    }
+
+    "Disallow castling through atomic check" in {
+      val position = "8/8/8/8/8/8/5k2/R3K2r w Q - 0 1"
+      val game = fenToGame(position, Atomic)
+      val errorGame = game flatMap (_.playMove(Pos.E1, Pos.C1))
+      errorGame must beFailure
+    }
+
+    "Disallow castling into atomic check" in {
+      val position = "4k3/8/8/8/8/8/8/rR2K3 w Q - 0 1"
+      val game = fenToGame(position, Atomic)
+      val errorGame = game flatMap (_.playMove(Pos.E1, Pos.B1))
+      errorGame must beFailure
     }
   }
 }

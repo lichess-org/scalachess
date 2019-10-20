@@ -24,9 +24,9 @@ object Visual {
     }
     Board(
       pieces = (for {
-        (l, y) ← (filtered zipWithIndex)
-        (c, x) ← (l zipWithIndex)
-        role ← Role forsyth c.toLower
+        (l, y) <- (filtered zipWithIndex)
+        (c, x) <- (l zipWithIndex)
+        role <- Role forsyth c.toLower
       } yield {
         posAt(x + 1, 8 - y) map { pos => pos -> (Color(c isUpper) - role) }
       }) flatten,
@@ -40,8 +40,8 @@ object Visual {
     val markedPoss: Map[Pos, Char] = marks.foldLeft(Map[Pos, Char]()) {
       case (marks, (poss, char)) => marks ++ (poss.toList map { pos => (pos, char) })
     }
-    for (y ← 8 to 1 by -1) yield {
-      for (x ← 1 to 8) yield {
+    for (y <- 8 to 1 by -1) yield {
+      for (x <- 1 to 8) yield {
         posAt(x, y) flatMap markedPoss.get getOrElse board(x, y).fold(' ')(_ forsyth)
       }
     } mkString

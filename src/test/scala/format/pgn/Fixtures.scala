@@ -412,6 +412,39 @@ Ne5 37. Rg7 Rf8 38. h3 c4 39. Re7 Nd3 40. f7 Nxf2 41. Re8+ Kd7
 c3 47. h4 Ra6 48. Bd4 Ra4 49. Bxc3 Nxc3 50. Rxc3 Rxh4 51. Rf3
 Rh5 52. Kf2 Rg5 53. Rf8 Ke5 1/2-1/2"""
 
+val chessgamesWeirdComments = """[Event "Hastings"]
+[Site "Hastings ENG"]
+[Date "1895.08.05"]
+[EventDate "1895.08.05"]
+[Round "1"]
+[Result "1/2-1/2"]
+[White "Carl Schlechter"]
+[Black "William Henry Krause Pollock"]
+[ECO "C77"]
+[WhiteElo "?"]
+[BlackElo "?"]
+[PlyCount "47"]
+
+1. e4 {Notes by E. Schiffers} e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4
+Nf6 5. Nc3 Bb4 {The 'Handbuch' considers that Black's best
+move here is Be7; White continues 6 O-O b5 7 Bb3 d6 8 a3 0r
+a4.} 6. Nd5 Bc5 {After Be7 would follow 7 d3 h6 and an even
+game. It would not be good to play ...Nxd5 7 exd5 Ne7 8 c3 Ba5
+(?) 9 Nxe5.} 7. d3 {The 'Handbuch' gives the continuation 7 c3
+Nxe4 8 d4 exd4 9 cxd4 Bb4+ 10 Kf1 in White's favour.} h6
+8. Be3 Bxe3 {Also good would have been Nxe3.} 9. fxe3 d6
+10. O-O Be6 {...Bg4 is better.} 11. Nxf6+ {An enterprising
+move} Qxf6 12. Nd4 Qg5 13. Nxc6 {After 13 Nxe6 fxe6 (...Qxe3+
+14 Kh1 fxe6 15 Qh5+) 14 Bxc6+ bxc6 15 Qf3; White's game is
+preferable.} Qxe3+ 14. Kh1 Bd7 15. Nxe5 {And other moves still
+do not give White the superiority, e.g. 15 Nb4 Bxa4 16 Nd5
+Qc5, etc.} Bxa4 16. Nxf7 O-O {!} $14 17. Qh5 Be8 18. Rf3 Bxf7
+19. Qxf7+ Rxf7 20. Rxe3 Rf2 21. Rae1 {21 Rc1 Raf8 followed by
+...Rd2 and the other rook to f2 would have been worse as White
+would then get into difficulties, whereas now the draw is
+secure.} Raf8 22. Kg1 Rxc2 23. R3e2 Rxe2 24. Rxe2 1/2-1/2
+"""
+
 val withDelimiters = """[pgn] 1. e4 e6 2. d4 d5 3. Nc3 Nf6 4. e5 Nfd7 5. Nf3 a6 6. Bd3 f6 7. O-O (7. Ng5 {is also good, but I was still in \"bullet opening mode\" at this point}) 7. .. fxe5 8. Ng5 Qe7 9. Qh5+ g6 10. Bxg6+ hxg6 11. Qxg6+ Kd8 12. Nf7+ Ke8 13. Nxh8+ Kd8 14. Bg5 Nc6 15. Nf7+ Ke8 16. Nd6+ Kd8 17. Qe8# [/pgn]"""
 
 val withDelimitersOnNewLines = """

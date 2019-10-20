@@ -29,16 +29,16 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       .replace("–", "-")
       .replace("e.p.", "") // silly en-passant notation
     for {
-      splitted ← splitTagAndMoves(preprocessed)
+      splitted <- splitTagAndMoves(preprocessed)
       tagStr = splitted._1
       moveStr = splitted._2
-      preTags ← TagParser(tagStr)
-      parsedMoves ← MovesParser(moveStr)
+      preTags <- TagParser(tagStr)
+      parsedMoves <- MovesParser(moveStr)
       init = parsedMoves._1
       strMoves = parsedMoves._2
       resultOption = parsedMoves._3
       tags = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + _)
-      sans ← objMoves(strMoves, tags.variant | Variant.default)
+      sans <- objMoves(strMoves, tags.variant | Variant.default)
     } yield ParsedPgn(init, tags, sans)
   } catch {
     case _: StackOverflowError =>
@@ -94,9 +94,12 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     val moveRegex = """(?:(?:0\-0(?:\-0|)[\+\#]?)|[PQKRBNOoa-h@][QKRBNa-h1-8xOo\-=\+\#\@]{1,6})[\?!□]{0,2}""".r
 
     def strMove: Parser[StrMove] = as("move") {
-      ((number | commentary)*) ~> (moveRegex ~ nagGlyphs ~ rep(commentary) ~ rep(variation)) <~ (moveExtras*) ^^ {
-        case san ~ glyphs ~ comments ~ variations => StrMove(san, glyphs, cleanComments(comments), variations)
-      }
+      ((number | commentary)*) ~>
+        (moveRegex ~ nagGlyphs ~ rep(commentary) ~ nagGlyphs ~ rep(variation)) <~
+        (moveExtras*) ^^ {
+          case san ~ glyphs ~ comments ~ glyphs2 ~ variations =>
+            StrMove(san, glyphs merge glyphs2, cleanComments(comments), variations)
+        }
     }
 
     def number: Parser[String] = """[1-9]\d*[\s\.]*""".r

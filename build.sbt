@@ -2,18 +2,18 @@ name := "scalachess"
 
 organization := "org.lichess"
 
-version := "8.6.22"
+version := "8.6.25"
 
-scalaVersion := "2.12.6"
-crossScalaVersions := Seq("2.11.12", "2.12.6")
+scalaVersion := "2.12.9"
+crossScalaVersions := Seq("2.11.12", "2.12.9")
 
 libraryDependencies ++= List(
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.0",
-  "org.scalaz" %% "scalaz-core" % "7.2.23",
-  "org.specs2" %% "specs2-core" % "4.2.0" % "test",
-  "org.specs2" %% "specs2-scalaz" % "4.2.0" % "test",
-  "com.github.ornicar" %% "scalalib" % "6.6",
-  "joda-time" % "joda-time" % "2.9.9"
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
+  "org.scalaz" %% "scalaz-core" % "7.2.28",
+  "org.specs2" %% "specs2-core" % "4.7.0" % "test",
+  "org.specs2" %% "specs2-scalaz" % "4.7.0" % "test",
+  "com.github.ornicar" %% "scalalib" % "6.7",
+  "joda-time" % "joda-time" % "2.10.3"
 )
 
 resolvers ++= Seq(
@@ -24,7 +24,7 @@ resolvers ++= Seq(
 scalacOptions ++= Seq(
   "-deprecation", "-unchecked", "-feature", "-language:_",
   "-Xfatal-warnings",
-  "-Ywarn-unused-import", "-Ywarn-value-discard", "-Ywarn-dead-code",
+  "-Ywarn-value-discard", "-Ywarn-dead-code",
   // "-Ywarn-unused:-params,_",
   "-Xlint:missing-interpolator",
   "-Ydelambdafy:method", "-target:jvm-1.8"

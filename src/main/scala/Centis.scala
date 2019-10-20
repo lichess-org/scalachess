@@ -13,7 +13,7 @@ final case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
   def roundSeconds: Int = Math.round(centis * 0.01f)
 
   def toSeconds: BigDecimal = java.math.BigDecimal.valueOf(centis, 2)
-  def millis: Long = centis * 10l
+  def millis: Long = centis * 10L
   def toDuration = FiniteDuration(millis, MILLISECONDS)
 
   def +(other: Centis) = Centis(centis + other.centis)
@@ -26,7 +26,7 @@ final case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
 
   def avg(other: Centis) = Centis((centis + other.centis) >> 1)
 
-  def compare(other: Centis) = centis - other.centis
+  def compare(other: Centis) = Integer.compare(centis, other.centis)
 
   def atMost(o: Centis) = Centis(Math.min(centis, o.centis))
   def atLeast(o: Centis) = Centis(Math.max(centis, o.centis))

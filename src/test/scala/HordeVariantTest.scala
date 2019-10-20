@@ -42,7 +42,9 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board, Color.white) must beTrue
+          game.situation.autoDraw must beFalse
+          game.situation.end must beFalse
+          game.board.variant.insufficientWinningMaterial(game.situation) must beTrue
       }
     }
 

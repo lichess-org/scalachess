@@ -116,7 +116,6 @@ K   bB""".autoDraw must_== false
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
           game.board.variant.insufficientWinningMaterial(game.situation) must beFalse
-          InsufficientMatingMaterial(game, game.situation.color) must beTrue
       }
     }
     "on knight versus pawn" in {
@@ -130,7 +129,6 @@ K   bB""".autoDraw must_== false
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
           game.board.variant.insufficientWinningMaterial(game.situation) must beFalse
-          InsufficientMatingMaterial(game, game.situation.color) must beFalse
       }
     }
     "on bishops versus pawn" in {
@@ -144,7 +142,6 @@ K   bB""".autoDraw must_== false
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
           game.board.variant.insufficientWinningMaterial(game.situation) must beFalse
-          InsufficientMatingMaterial(game, game.situation.color) must beFalse
       }
     }
     "on bishops versus queen" in {
@@ -158,7 +155,6 @@ K   bB""".autoDraw must_== false
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
           game.board.variant.insufficientWinningMaterial(game.situation) must beFalse
-          InsufficientMatingMaterial(game, game.situation.color) must beFalse
       }
     }
     "on bishops versus queen" in {
@@ -172,7 +168,6 @@ K   bB""".autoDraw must_== false
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
           game.board.variant.insufficientWinningMaterial(game.situation) must beTrue
-          InsufficientMatingMaterial(game, game.situation.color) must beFalse
       }
     }
     "on knight versus pawns" in {
@@ -186,7 +181,6 @@ K   bB""".autoDraw must_== false
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
           game.board.variant.insufficientWinningMaterial(game.situation) must beFalse
-          InsufficientMatingMaterial(game, game.situation.color) must beFalse
       }
     }
     "on knight versus pieces" in {
@@ -200,7 +194,6 @@ K   bB""".autoDraw must_== false
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
           game.board.variant.insufficientWinningMaterial(game.situation) must beFalse
-          InsufficientMatingMaterial(game, game.situation.color) must beFalse
       }
     }
     "on opposite bishops with queen" in {
@@ -214,7 +207,6 @@ K   bB""".autoDraw must_== false
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
           game.board.variant.insufficientWinningMaterial(game.situation) must beFalse
-          InsufficientMatingMaterial(game, game.situation.color) must beFalse
       }
     }
   }

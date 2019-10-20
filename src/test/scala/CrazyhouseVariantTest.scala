@@ -21,7 +21,6 @@ class CrazyhouseVariantTest extends ChessTest {
       }
       game.situation.checkMate must beTrue
       game.situation.insufficientWinningMaterial must beFalse
-      InsufficientMatingMaterial(game, game.situation.color) must beFalse
     }
 
     "pieces to drop, in vain" in {
@@ -39,7 +38,6 @@ class CrazyhouseVariantTest extends ChessTest {
       }
       game.situation.checkMate must beTrue
       game.situation.insufficientWinningMaterial must beFalse
-      InsufficientMatingMaterial(game, game.situation.color) must beFalse
     }
 
     "autodraw" in {
@@ -70,7 +68,6 @@ class CrazyhouseVariantTest extends ChessTest {
         game.situation.autoDraw must beFalse
         game.situation.end must beFalse
         game.situation.insufficientWinningMaterial must beFalse
-        InsufficientMatingMaterial(game, game.situation.color) must beFalse
       }
     }
     "prod 50 games accumulate hash" in {

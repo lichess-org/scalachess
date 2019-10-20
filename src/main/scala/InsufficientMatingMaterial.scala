@@ -20,16 +20,4 @@ object InsufficientMatingMaterial {
     val blockingPosition = Actor.posAheadOfPawn(pawn.pos, pawn.piece.color)
     blockingPosition.flatMap(board.actorAt(_)).exists(_.piece.is(Pawn))
   }
-
-  /*
-   * Determines whether a color (of a game in progress) has mating material
-   */
-  def apply(game: Game, color: Color): Boolean = {
-    if (game.situation.color != color) game.situation.insufficientWinningMaterial
-    else {
-      // Crazyhouse drop moves are not accounted for in game.situation.moves
-      val moves = game.situation.moves;
-      (!(moves isEmpty)) && (moves.values forall { _ forall { move => game.apply(move).situation.insufficientWinningMaterial } })
-    }
-  }
 }

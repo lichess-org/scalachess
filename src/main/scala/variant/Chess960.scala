@@ -15,7 +15,7 @@ case object Chess960 extends Variant(
   }
 
   def positionNumber(fen: String): Option[Int] =
-    positions.indexOf(fen.takeWhile('/'!=)).some.filter(-1!=)
+    positionsMap.get(fen.takeWhile('/'!=))
 
   private val positions = Array(
     "bbqnnrkr",
@@ -979,4 +979,6 @@ case object Chess960 extends Variant(
     "rkrnnbbq",
     "rkrnnqbb"
   )
+
+  private val positionsMap: Map[String, Int] = positions.zipWithIndex.toMap
 }

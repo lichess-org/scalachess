@@ -113,7 +113,7 @@ object StartingPosition {
       StartingPosition("E00", "Catalan Opening", "rnbqkb1r/pppp1ppp/4pn2/8/2PP4/6P1/PP2PP1P/RNBQKBNR b KQkq - 1 3", "Catalan_Opening", "1. d4 Nf6 2. c4 e6 3. g3"),
       StartingPosition("E06", "Catalan Opening: Closed Variation", "rnbqk2r/ppp1bppp/4pn2/3p4/2PP4/5NP1/PP2PPBP/RNBQK2R b KQkq - 4 5", "Catalan_Opening", "1. d4 Nf6 2. c4 e6 3. g3 d5 4. Nf3 Be7 5. Bg2"),
       StartingPosition("A80", "Dutch Defence", "rnbqkbnr/ppppp1pp/8/5p2/3P4/8/PPP1PPPP/RNBQKBNR w KQkq f6 1 2", "Dutch_Defence", "1. d4 f5"),
-      StartingPosition("A96", "Dutch Defense: Classical Variation", "rnbq1rk1/ppp1b1pp/3ppn2/5p2/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w - 0 7" , "Dutch_Defence", ("1. d4 f5 2. c4 e6 3. Nc3 Nf6 4. Nf3 Be7 5. g3 O-O 6. Bg2 d6"),
+      StartingPosition("A96", "Dutch Defense: Classical Variation", "rnbq1rk1/ppp1b1pp/3ppn2/5p2/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w - 0 7", "Dutch_Defence", "1. d4 f5 2. c4 e6 3. Nc3 Nf6 4. Nf3 Be7 5. g3 O-O 6. Bg2 d6"),
       StartingPosition("A87", "Dutch Defence: Leningrad Variation", "rnbqk2r/ppppp1bp/5np1/5p2/2PP4/5NP1/PP2PPBP/RNBQK2R b KQkq - 4 5" , "Dutch_Defence", "1. d4 f5 2. c4 Nf6 3. g3 g6 4. Bg2 Bg7 5. Nf3"),
       StartingPosition("A83", "Dutch Defence: Staunton Gambit", "rnbqkb1r/ppppp1pp/5n2/6B1/3Pp3/2N5/PPP2PPP/R2QKBNR b KQkq - 4 4", "Dutch_Defence", "1. d4 f5 2. e4 fxe4 3. Nc3 Nf6 4. Bg5"),
       StartingPosition("A92", "Dutch Defence: Stonewall Variation", "rnbq1rk1/ppp1b1pp/4pn2/3p1p2/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w - d6 1 7", "Dutch_Defence", "1. d4 f5 2. c4 Nf6 3. g3 e6 4. Bg2 Be7 5. Nf3 O-O 6. O-O d5"),

@@ -146,7 +146,7 @@ object StartingPosition {
       StartingPosition("D32", "Queen's Gambit Declined: Tarrasch Defence", "rnbqkbnr/pp3ppp/4p3/2pp4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq - 0 4", "Tarrasch_Defense", "1. d4 d5 2. c4 e6 3. Nc3 c5"),
       StartingPosition("D08", "Queen's Gambit: Albin Countergambit", "rnbqkbnr/ppp2ppp/8/3pp3/2PP4/8/PP2PPPP/RNBQKBNR w KQkq e6 1 3", "Albin_Countergambit", "1. d4 d5 2. c4 e5"),
       StartingPosition("D07", "Queen's Gambit: Chigorin Defence", "r1bqkbnr/ppp1pppp/2n5/3p4/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 2 3", "Chigorin_Defense", "1. d4 d5 2. c4 Nc6"),
-      StartingPosition("E12", "Queen's Indian Defence", "rnbqkb1r/p1pp1ppp/1p2pn2/8/2PP4/5N2/PP2PPPP/RNBQKB1R w KQkq - 1 4", "Queen's_Indian_Defense", "1. d4 Nf6 2. c4 e6 3. Nf3 b6")
+      StartingPosition("E12", "Queen's Indian Defence", "rnbqkb1r/p1pp1ppp/1p2pn2/8/2PP4/5N2/PP2PPPP/RNBQKB1R w KQkq - 1 4", "Queen's_Indian_Defense", "1. d4 Nf6 2. c4 e6 3. Nf3 b6"),
       StartingPosition("D02", "London System", "rnbqkb1r/ppp1pppp/5n2/3p4/3P1B2/5N2/PPP1PPPP/RN1QKB1R b KQkq - 4 3", "London_System", "1. d4 d5 2. Nf3 Nf6 3. Bf4"),
       StartingPosition("D00", "London System: Mason Attack", "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2", "London_System", "1. d4 d5 2. Bf4"),     
       StartingPosition("D03", "Torre Attack", "rnbqkb1r/ppp1pppp/5n2/3p2B1/3P4/5N2/PPP1PPPP/RN1QKB1R b KQkq - 4 3", "Torre_Attack", "1. d4 d5 2. Nf3 Nf6 3. Bg5"),

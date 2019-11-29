@@ -9,11 +9,11 @@ crossScalaVersions := Seq("2.11.12", "2.12.10")
 
 libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
-  "org.scalaz" %% "scalaz-core" % "7.2.28",
+  "org.scalaz" %% "scalaz-core" % "7.2.29",
   "org.specs2" %% "specs2-core" % "4.7.0" % "test",
   "org.specs2" %% "specs2-scalaz" % "4.7.0" % "test",
   "com.github.ornicar" %% "scalalib" % "6.7",
-  "joda-time" % "joda-time" % "2.10.3"
+  "joda-time" % "joda-time" % "2.10.5"
 )
 
 resolvers ++= Seq(

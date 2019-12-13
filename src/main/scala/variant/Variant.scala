@@ -1,8 +1,9 @@
 package chess
 package variant
 
-import scalaz.Validation.FlatMap._
+import com.github.ghik.silencer.silent
 import scalaz.Validation.failureNel
+import scalaz.Validation.FlatMap._
 
 import Pos.posAt
 
@@ -86,11 +87,11 @@ abstract class Variant private[variant] (
     def findMove(from: Pos, to: Pos) = situation.moves get from flatMap (_.find(_.dest == to))
 
     for {
-      actor   <- situation.board.actors get from toValid "No piece on " + from
-      myActor <- actor.validIf(actor is situation.color, "Not my piece on " + from)
-      m1      <- findMove(from, to) toValid "Piece on " + from + " cannot move to " + to
-      m2      <- m1 withPromotion promotion toValid "Piece on " + from + " cannot promote to " + promotion
-      m3      <- m2 validIf (isValidPromotion(promotion), "Cannot promote to " + promotion + " in this game mode")
+      actor <- situation.board.actors get from toValid "No piece on " + from
+      _     <- actor.validIf(actor is situation.color, "Not my piece on " + from)
+      m1    <- findMove(from, to) toValid "Piece on " + from + " cannot move to " + to
+      m2    <- m1 withPromotion promotion toValid "Piece on " + from + " cannot promote to " + promotion
+      m3    <- m2 validIf (isValidPromotion(promotion), "Cannot promote to " + promotion + " in this game mode")
     } yield m3
   }
 
@@ -106,9 +107,9 @@ abstract class Variant private[variant] (
   def winner(situation: Situation): Option[Color] =
     if (situation.checkMate || specialEnd(situation)) Some(!situation.color) else None
 
-  def specialEnd(situation: Situation) = false
+  @silent def specialEnd(situation: Situation) = false
 
-  def specialDraw(situation: Situation) = false
+  @silent def specialDraw(situation: Situation) = false
 
   /**
     * Returns true if neither player can win
@@ -138,12 +139,12 @@ abstract class Variant private[variant] (
     else newHash ++ hash
   }
 
-  def updatePositionHashes(board: Board, drop: Drop, hash: chess.PositionHash): PositionHash = Array()
+  @silent def updatePositionHashes(board: Board, drop: Drop, hash: chess.PositionHash): PositionHash = Array()
 
   /**
     * Once a move has been decided upon from the available legal moves, the board is finalized
     */
-  def finalizeBoard(board: Board, uci: format.Uci, captured: Option[Piece]): Board = board
+  @silent def finalizeBoard(board: Board, uci: format.Uci, captured: Option[Piece]): Board = board
 
   protected def pawnsOnPromotionRank(board: Board, color: Color) = {
     board.pieces.exists {

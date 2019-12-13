@@ -87,9 +87,9 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     def apply(pgn: String): Valid[(InitialPosition, List[StrMove], Option[Tag])] =
       parseAll(strMoves, pgn) match {
         case Success((init, moves, result), _) =>
-          succezz(init, moves, result map { r =>
+          succezz((init, moves, result map { r =>
             Tag(_.Result, r)
-          })
+          }))
         case err => "Cannot parse moves: %s\n%s".format(err.toString, pgn).failureNel
       }
 

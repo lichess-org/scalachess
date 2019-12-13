@@ -56,10 +56,7 @@ case class History(
 
   def fiftyMoves: Boolean = halfMoveClock >= 100
 
-  def canCastle(color: Color) = new {
-    def on(side: Side): Boolean = castles can color on side
-    def any                     = (castles can color).any
-  }
+  def canCastle(color: Color) = castles can color
 
   def withoutCastles(color: Color) = copy(castles = castles without color)
 

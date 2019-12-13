@@ -27,7 +27,7 @@ object Forsyth {
       splitted
         .lift(2)
         .fold(situation) { strCastles =>
-          val (castles, unmovedRooks) = strCastles.foldLeft(Castles.none, Set.empty[Pos]) {
+          val (castles, unmovedRooks) = strCastles.foldLeft(Castles.none -> Set.empty[Pos]) {
             case ((c, r), ch) =>
               val color = Color(ch.isUpper)
               val rooks = board
@@ -55,10 +55,11 @@ object Forsyth {
             pos <- splitted lift 3 flatMap Pos.posAt
             if pos.y == sixthRank
             orig <- Pos.posAt(pos.x, seventhRank)
-            dest <- Pos.posAt(pos.x, fifthRank)
-            if situation.board(dest).contains(Piece(!situation.color, Pawn))
-            if Pos.posAt(pos.x, sixthRank).flatMap(situation.board.apply).isEmpty
-            if situation.board(orig).isEmpty
+            dest <- Pos.posAt(pos.x, fifthRank) filter { d =>
+              situation.board(d).contains(Piece(!situation.color, Pawn)) &&
+              Pos.posAt(pos.x, sixthRank).flatMap(situation.board.apply).isEmpty &&
+              situation.board(orig).isEmpty
+            }
           } yield Uci.Move(orig, dest)
 
           situation withHistory {

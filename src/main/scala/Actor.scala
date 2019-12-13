@@ -3,10 +3,10 @@ package chess
 import format.Uci
 import Pos.posAt
 
-import scala.collection.mutable.ArrayBuffer
 import scala.annotation.tailrec
+import scala.collection.mutable.ArrayBuffer
 
-case class Actor(
+final case class Actor(
     piece: Piece,
     pos: Pos,
     board: Board
@@ -31,15 +31,14 @@ case class Actor(
           } flatMap maybePromote
           def enpassant(horizontal: Direction): Option[Move] =
             for {
-              victimPos <- horizontal(pos)
-              if pos.y == color.passablePawnY
-              victim <- board(victimPos)
-              if victim == !color - Pawn
-              targetPos  <- horizontal(next)
-              victimFrom <- pawnDir(victimPos) flatMap pawnDir
-              if history.lastMove.exists {
-                case Uci.Move(orig, dest, _) => orig == victimFrom && dest == victimPos
-                case _                       => false
+              victimPos <- horizontal(pos).filter(_ => pos.y == color.passablePawnY)
+              _         <- board(victimPos).filter(v => v == !color - Pawn)
+              targetPos <- horizontal(next)
+              _ <- pawnDir(victimPos) flatMap pawnDir filter { vf =>
+                history.lastMove.exists {
+                  case Uci.Move(orig, dest, _) => orig == vf && dest == victimPos
+                  case _                       => false
+                }
               }
               b <- board.taking(pos, targetPos, Some(victimPos))
             } yield move(targetPos, b, Some(victimPos), enpassant = true)
@@ -54,8 +53,7 @@ case class Actor(
           List(
             fwd flatMap forward,
             for {
-              p <- fwd
-              if board.variant.isUnmovedPawn(color, pos)
+              p  <- fwd.filter(_ => board.variant.isUnmovedPawn(color, pos))
               p2 <- pawnDir(p)
               if !(board.pieces contains p2)
               b <- board.move(pos, p2)
@@ -111,8 +109,7 @@ case class Actor(
   def castleOn(side: Side): List[Move] =
     (for {
       // Check castling rights.
-      kingPos <- board kingPosOf color
-      if history canCastle color on side
+      kingPos <- board kingPosOf color filter (_ => history canCastle color on side)
       rookPos <- side.tripToRook(kingPos, board).lastOption
       if board(rookPos) contains color.rook
       if history.unmovedRooks.pos.contains(rookPos)

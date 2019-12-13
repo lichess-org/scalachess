@@ -1,21 +1,13 @@
 package chess
 
-case class Castles(
+final case class Castles(
     whiteKingSide: Boolean,
     whiteQueenSide: Boolean,
     blackKingSide: Boolean,
     blackQueenSide: Boolean
 ) {
 
-  def can(color: Color) = new {
-    def on(side: Side): Boolean = (color, side) match {
-      case (White, KingSide)  => whiteKingSide
-      case (White, QueenSide) => whiteQueenSide
-      case (Black, KingSide)  => blackKingSide
-      case (Black, QueenSide) => blackQueenSide
-    }
-    def any = on(KingSide) || on(QueenSide)
-  }
+  def can(color: Color) = new Castles.Can(this, color)
 
   def without(color: Color) = color match {
     case White =>
@@ -80,4 +72,14 @@ object Castles {
   val all  = new Castles(true, true, true, true)
   val none = new Castles(false, false, false, false)
   def init = all
+
+  final class Can(castles: Castles, color: Color) {
+    def on(side: Side): Boolean = (color, side) match {
+      case (White, KingSide)  => castles.whiteKingSide
+      case (White, QueenSide) => castles.whiteQueenSide
+      case (Black, KingSide)  => castles.blackKingSide
+      case (Black, QueenSide) => castles.blackQueenSide
+    }
+    def any = on(KingSide) || on(QueenSide)
+  }
 }

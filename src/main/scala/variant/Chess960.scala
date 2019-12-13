@@ -1,21 +1,22 @@
 package chess
 package variant
 
-case object Chess960 extends Variant(
-  id = 2,
-  key = "chess960",
-  name = "Chess960",
-  shortName = "960",
-  title = "Starting position of the home rank pieces is randomized.",
-  standardInitialPosition = false
-) {
+case object Chess960
+    extends Variant(
+      id = 2,
+      key = "chess960",
+      name = "Chess960",
+      shortName = "960",
+      title = "Starting position of the home rank pieces is randomized.",
+      standardInitialPosition = false
+    ) {
 
   def pieces = Variant.symmetricRank {
     positions(scala.util.Random.nextInt(960)) flatMap Role.allByForsyth.get
   }
 
   def positionNumber(fen: String): Option[Int] =
-    positionsMap.get(fen.takeWhile('/'!=))
+    positionsMap.get(fen.takeWhile('/' !=))
 
   private val positions = Array(
     "bbqnnrkr",

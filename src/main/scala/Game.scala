@@ -10,10 +10,10 @@ case class Game(
     startedAtTurn: Int = 0
 ) {
   def apply(
-    orig: Pos,
-    dest: Pos,
-    promotion: Option[PromotableRole] = None,
-    metrics: MoveMetrics = MoveMetrics()
+      orig: Pos,
+      dest: Pos,
+      promotion: Option[PromotableRole] = None,
+      metrics: MoveMetrics = MoveMetrics()
   ): Valid[(Game, Move)] =
     situation.move(orig, dest, promotion).map(_.normalizeCastle withMetrics metrics) map { move =>
       apply(move) -> move
@@ -31,9 +31,9 @@ case class Game(
   }
 
   def drop(
-    role: Role,
-    pos: Pos,
-    metrics: MoveMetrics = MoveMetrics()
+      role: Role,
+      pos: Pos,
+      metrics: MoveMetrics = MoveMetrics()
   ): Valid[(Game, Drop)] =
     situation.drop(role, pos).map(_ withMetrics metrics) map { drop =>
       applyDrop(drop) -> drop
@@ -73,9 +73,9 @@ case class Game(
   def halfMoveClock: Int = board.history.halfMoveClock
 
   /**
-   * Fullmove number: The number of the full move.
-   * It starts at 1, and is incremented after Black's move.
-   */
+    * Fullmove number: The number of the full move.
+    * It starts at 1, and is incremented after Black's move.
+    */
   def fullMoveNumber: Int = 1 + turns / 2
 
   def moveString = s"${fullMoveNumber}${player.fold(".", "...")}"
@@ -100,19 +100,21 @@ object Game {
 
   def apply(variantOption: Option[chess.variant.Variant], fen: Option[String]): Game = {
     val variant = variantOption | chess.variant.Standard
-    val g = apply(variant)
-    fen.flatMap {
-      format.Forsyth.<<<@(variant, _)
-    }.fold(g) { parsed =>
-      g.copy(
-        situation = Situation(
-          board = parsed.situation.board withVariant g.board.variant withCrazyData {
-            parsed.situation.board.crazyData orElse g.board.crazyData
-          },
-          color = parsed.situation.color
-        ),
-        turns = parsed.turns
-      )
-    }
+    val g       = apply(variant)
+    fen
+      .flatMap {
+        format.Forsyth.<<<@(variant, _)
+      }
+      .fold(g) { parsed =>
+        g.copy(
+          situation = Situation(
+            board = parsed.situation.board withVariant g.board.variant withCrazyData {
+              parsed.situation.board.crazyData orElse g.board.crazyData
+            },
+            color = parsed.situation.color
+          ),
+          turns = parsed.turns
+        )
+      }
   }
 }

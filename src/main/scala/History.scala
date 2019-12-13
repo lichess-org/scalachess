@@ -30,11 +30,11 @@ case class History(
 ) {
 
   /**
-   * Halfmove clock: This is the number of halfmoves
-   * since the last pawn advance or capture.
-   * This is used to determine if a draw
-   * can be claimed under the fifty-move rule.
-   */
+    * Halfmove clock: This is the number of halfmoves
+    * since the last pawn advance or capture.
+    * This is used to determine if a draw
+    * can be claimed under the fifty-move rule.
+    */
   def halfMoveClock = math.max(0, (positionHashes.size / Hash.size) - 1)
 
   // generates random positionHashes to satisfy the half move clock
@@ -45,10 +45,11 @@ case class History(
     // compare only hashes for positions with the same side to move
     val positions = (positionHashes grouped Hash.size).sliding(1, 2).flatten.toList
     positions.headOption match {
-      case Some(Array(x, y, z)) => (positions count {
-        case Array(x2, y2, z2) => x == x2 && y == y2 && z == z2
-        case _ => false
-      }) >= 3
+      case Some(Array(x, y, z)) =>
+        (positions count {
+          case Array(x2, y2, z2) => x == x2 && y == y2 && z == z2
+          case _                 => false
+        }) >= 3
       case _ => false
     }
   }
@@ -57,7 +58,7 @@ case class History(
 
   def canCastle(color: Color) = new {
     def on(side: Side): Boolean = castles can color on side
-    def any = (castles can color).any
+    def any                     = (castles can color).any
   }
 
   def withoutCastles(color: Color) = copy(castles = castles without color)
@@ -84,8 +85,8 @@ case class History(
 object History {
 
   def make(
-    lastMove: Option[String], // a2a4
-    castles: String
+      lastMove: Option[String], // a2a4
+      castles: String
   ): History = History(
     lastMove = lastMove flatMap Uci.apply,
     castles = Castles(castles),
@@ -95,22 +96,24 @@ object History {
   def castle(color: Color, kingSide: Boolean, queenSide: Boolean) =
     History(
       castles = color match {
-        case White => Castles.init.copy(
-          whiteKingSide = kingSide,
-          whiteQueenSide = queenSide
-        )
-        case Black => Castles.init.copy(
-          blackKingSide = kingSide,
-          blackQueenSide = queenSide
-        )
+        case White =>
+          Castles.init.copy(
+            whiteKingSide = kingSide,
+            whiteQueenSide = queenSide
+          )
+        case Black =>
+          Castles.init.copy(
+            blackKingSide = kingSide,
+            blackQueenSide = queenSide
+          )
       }
     )
 
   def noCastle = History(castles = Castles.none)
 
   private def spoofHashes(n: Int): PositionHash = {
-    (1 to n).toArray.flatMap {
-      i => Array((i >> 16).toByte, (i >> 8).toByte, i.toByte)
+    (1 to n).toArray.flatMap { i =>
+      Array((i >> 16).toByte, (i >> 8).toByte, i.toByte)
     }
   }
 }

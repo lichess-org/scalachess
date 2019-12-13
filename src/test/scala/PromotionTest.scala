@@ -10,7 +10,7 @@ class PromotionTest extends ChessTest {
     val board = """
   p
 K      """
-    val game = Game(board, Black)
+    val game  = Game(board, Black)
     "promote to a queen" in {
       game.playMove(C2, C1, Queen.some) must beGame("""
 
@@ -61,7 +61,7 @@ K n    """)
     }
 
     "Not allow promotion to a king in a standard game " in {
-      val fen = "8/1P6/8/8/8/8/7k/1K6 w - -"
+      val fen  = "8/1P6/8/8/8/8/7k/1K6 w - -"
       val game = fenToGame(fen, Standard)
 
       val failureGame = game flatMap (_.apply(Pos.B7, Pos.B8, Some(King))) map (_._1)

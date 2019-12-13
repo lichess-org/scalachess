@@ -1,7 +1,7 @@
 package chess
 package opening
 
-// format: OFF
+// format: off
 private[opening] object FullOpeningPart2 {
 
   def db: Vector[FullOpening] = Vector(

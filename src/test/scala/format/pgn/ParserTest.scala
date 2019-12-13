@@ -6,22 +6,24 @@ class ParserTest extends ChessTest {
 
   import Fixtures._
 
-  val parser = Parser.full _
+  val parser                 = Parser.full _
   def parseMove(str: String) = Parser.MoveParser(str, Standard)
 
   "promotion check" should {
     "as a queen" in {
       parser("b8=Q ") must beSuccess.like {
-        case a => a.sans.value.headOption must beSome.like {
-          case san: Std => san.promotion must_== Some(Queen)
-        }
+        case a =>
+          a.sans.value.headOption must beSome.like {
+            case san: Std => san.promotion must_== Some(Queen)
+          }
       }
     }
     "as a rook" in {
       parser("b8=R ") must beSuccess.like {
-        case a => a.sans.value.headOption must beSome.like {
-          case san: Std => san.promotion must_== Some(Rook)
-        }
+        case a =>
+          a.sans.value.headOption must beSome.like {
+            case san: Std => san.promotion must_== Some(Rook)
+          }
       }
     }
   }
@@ -150,17 +152,19 @@ class ParserTest extends ChessTest {
 
   "unclosed quote" in {
     parser(unclosedQuote) must beSuccess.like {
-      case a => a.tags.value must contain { (tag: Tag) =>
-        tag.name == Tag.White && tag.value == "Blazquez, Denis"
-      }
+      case a =>
+        a.tags.value must contain { (tag: Tag) =>
+          tag.name == Tag.White && tag.value == "Blazquez, Denis"
+        }
     }
   }
 
   "inline tags" in {
     parser(inlineTags) must beSuccess.like {
-      case a => a.tags.value must contain { (tag: Tag) =>
-        tag.name == Tag.White && tag.value == "Blazquez, Denis"
-      }
+      case a =>
+        a.tags.value must contain { (tag: Tag) =>
+          tag.name == Tag.White && tag.value == "Blazquez, Denis"
+        }
     }
   }
 
@@ -270,9 +274,10 @@ class ParserTest extends ChessTest {
   }
   "chessbase arrows" in {
     parser(chessbaseArrows) must beSuccess.like {
-      case a => a.initialPosition.comments must_== List(
-        "[%csl Gb4,Yd5,Rf6][%cal Ge2e4,Ye2d4,Re2g4]"
-      )
+      case a =>
+        a.initialPosition.comments must_== List(
+          "[%csl Gb4,Yd5,Rf6][%cal Ge2e4,Ye2d4,Re2g4]"
+        )
     }
   }
   "chessbase weird" in {

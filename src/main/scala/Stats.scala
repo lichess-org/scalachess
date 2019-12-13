@@ -10,14 +10,16 @@ sealed trait Stats {
   def +(o: Stats): Stats
 
   def record[T](values: Iterable[T])(implicit n: Numeric[T]): Stats =
-    values.foldLeft(this) { (s, v) => s record n.toFloat(v) }
+    values.foldLeft(this) { (s, v) =>
+      s record n.toFloat(v)
+    }
 
   def stdDev = variance.map { Math.sqrt(_).toFloat }
 
   def total = samples * mean
 }
 
-protected final case class StatHolder(
+final protected case class StatHolder(
     samples: Int,
     mean: Float,
     sn: Float
@@ -26,9 +28,9 @@ protected final case class StatHolder(
 
   def record(value: Float) = {
     val newSamples = samples + 1
-    val delta = value - mean
-    val newMean = mean + delta / newSamples
-    val newSN = sn + delta * (value - newMean)
+    val delta      = value - mean
+    val newMean    = mean + delta / newSamples
+    val newSN      = sn + delta * (value - newMean)
 
     StatHolder(
       samples = newSamples,
@@ -58,8 +60,8 @@ protected final case class StatHolder(
 }
 
 protected object EmptyStats extends Stats {
-  val samples = 0
-  val mean = 0f
+  val samples  = 0
+  val mean     = 0f
   val variance = None
 
   def record(value: Float) = StatHolder(
@@ -74,6 +76,6 @@ protected object EmptyStats extends Stats {
 object Stats {
   val empty = EmptyStats
 
-  def apply(value: Float) = empty.record(value)
+  def apply(value: Float)                    = empty.record(value)
   def apply[T: Numeric](values: Iterable[T]) = empty.record(values)
 }

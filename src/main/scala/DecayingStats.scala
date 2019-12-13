@@ -19,7 +19,9 @@ final case class DecayingStats(
   }
 
   def record[T](values: Iterable[T])(implicit n: Numeric[T]): DecayingStats =
-    values.foldLeft(this) { (s, v) => s record n.toFloat(v) }
+    values.foldLeft(this) { (s, v) =>
+      s record n.toFloat(v)
+    }
 }
 
 final case class EmptyDecayingStats(

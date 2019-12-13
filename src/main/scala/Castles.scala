@@ -9,36 +9,38 @@ case class Castles(
 
   def can(color: Color) = new {
     def on(side: Side): Boolean = (color, side) match {
-      case (White, KingSide) => whiteKingSide
+      case (White, KingSide)  => whiteKingSide
       case (White, QueenSide) => whiteQueenSide
-      case (Black, KingSide) => blackKingSide
+      case (Black, KingSide)  => blackKingSide
       case (Black, QueenSide) => blackQueenSide
     }
     def any = on(KingSide) || on(QueenSide)
   }
 
   def without(color: Color) = color match {
-    case White => copy(
-      whiteKingSide = false,
-      whiteQueenSide = false
-    )
-    case Black => copy(
-      blackKingSide = false,
-      blackQueenSide = false
-    )
+    case White =>
+      copy(
+        whiteKingSide = false,
+        whiteQueenSide = false
+      )
+    case Black =>
+      copy(
+        blackKingSide = false,
+        blackQueenSide = false
+      )
   }
 
   def without(color: Color, side: Side) = (color, side) match {
-    case (White, KingSide) => copy(whiteKingSide = false)
+    case (White, KingSide)  => copy(whiteKingSide = false)
     case (White, QueenSide) => copy(whiteQueenSide = false)
-    case (Black, KingSide) => copy(blackKingSide = false)
+    case (Black, KingSide)  => copy(blackKingSide = false)
     case (Black, QueenSide) => copy(blackQueenSide = false)
   }
 
   def add(color: Color, side: Side) = (color, side) match {
-    case (White, KingSide) => copy(whiteKingSide = true)
+    case (White, KingSide)  => copy(whiteKingSide = true)
     case (White, QueenSide) => copy(whiteQueenSide = true)
-    case (Black, KingSide) => copy(blackKingSide = true)
+    case (Black, KingSide)  => copy(blackKingSide = true)
     case (Black, QueenSide) => copy(blackQueenSide = true)
   }
 
@@ -49,7 +51,7 @@ case class Castles(
       (if (blackQueenSide) "q" else "")
   } match {
     case "" => "-"
-    case n => n
+    case n  => n
   }
 
   def toSeq = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
@@ -60,7 +62,7 @@ case class Castles(
 object Castles {
 
   def apply(
-    castles: (Boolean, Boolean, Boolean, Boolean)
+      castles: (Boolean, Boolean, Boolean, Boolean)
   ): Castles = new Castles(
     whiteKingSide = castles._1,
     whiteQueenSide = castles._2,
@@ -75,7 +77,7 @@ object Castles {
     str contains 'q'
   )
 
-  val all = new Castles(true, true, true, true)
+  val all  = new Castles(true, true, true, true)
   val none = new Castles(false, false, false, false)
   def init = all
 }

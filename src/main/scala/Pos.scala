@@ -1,25 +1,26 @@
 package chess
 
-import scala.math.{ min, max, abs }
+import scala.math.{ abs, max, min }
 
 sealed case class Pos private (x: Int, y: Int, piotr: Char) {
 
   import Pos.posAt
 
-  val down: Option[Pos] = posAt(x, y - 1)
-  val left: Option[Pos] = posAt(x - 1, y)
-  val downLeft: Option[Pos] = posAt(x - 1, y - 1)
-  val downRight: Option[Pos] = posAt(x + 1, y - 1)
-  lazy val up: Option[Pos] = posAt(x, y + 1)
-  lazy val right: Option[Pos] = posAt(x + 1, y)
-  lazy val upLeft: Option[Pos] = posAt(x - 1, y + 1)
+  val down: Option[Pos]         = posAt(x, y - 1)
+  val left: Option[Pos]         = posAt(x - 1, y)
+  val downLeft: Option[Pos]     = posAt(x - 1, y - 1)
+  val downRight: Option[Pos]    = posAt(x + 1, y - 1)
+  lazy val up: Option[Pos]      = posAt(x, y + 1)
+  lazy val right: Option[Pos]   = posAt(x + 1, y)
+  lazy val upLeft: Option[Pos]  = posAt(x - 1, y + 1)
   lazy val upRight: Option[Pos] = posAt(x + 1, y + 1)
 
   def >|(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.right)
   def |<(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.left)
-  def |<>|(stop: Pos => Boolean, dir: Direction): List[Pos] = dir(this) map { p =>
-    p :: (if (stop(p)) Nil else p.|<>|(stop, dir))
-  } getOrElse Nil
+  def |<>|(stop: Pos => Boolean, dir: Direction): List[Pos] =
+    dir(this) map { p =>
+      p :: (if (stop(p)) Nil else p.|<>|(stop, dir))
+    } getOrElse Nil
 
   def ?<(other: Pos): Boolean = x < other.x
   def ?>(other: Pos): Boolean = x > other.x
@@ -34,15 +35,15 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
   def touches(other: Pos): Boolean = xDist(other) <= 1 && yDist(other) <= 1
 
   def onSameDiagonal(other: Pos): Boolean = color == other.color && xDist(other) == yDist(other)
-  def onSameLine(other: Pos): Boolean = ?-(other) || ?|(other)
+  def onSameLine(other: Pos): Boolean     = ?-(other) || ?|(other)
 
   def xDist(other: Pos) = abs(x - other.x)
   def yDist(other: Pos) = abs(y - other.y)
 
-  val file = Pos xToString x
-  val rank = y.toString
-  val key = file + rank
-  val color = Color((x % 2 == 0) ^ (y % 2 == 0))
+  val file     = Pos xToString x
+  val rank     = y.toString
+  val key      = file + rank
+  val color    = Color((x % 2 == 0) ^ (y % 2 == 0))
   val piotrStr = piotr.toString
 
   override val toString = key
@@ -64,14 +65,16 @@ object Pos {
   def piotr(c: Char): Option[Pos] = allPiotrs get c
 
   def keyToPiotr(key: String) = posAt(key) map (_.piotr)
-  def doubleKeyToPiotr(key: String) = for {
-    a <- keyToPiotr(key take 2)
-    b <- keyToPiotr(key drop 2)
-  } yield s"$a$b"
-  def doublePiotrToKey(piotrs: String) = for {
-    a <- piotr(piotrs.head)
-    b <- piotr(piotrs(1))
-  } yield s"${a.key}${b.key}"
+  def doubleKeyToPiotr(key: String) =
+    for {
+      a <- keyToPiotr(key take 2)
+      b <- keyToPiotr(key drop 2)
+    } yield s"$a$b"
+  def doublePiotrToKey(piotrs: String) =
+    for {
+      a <- piotr(piotrs.head)
+      b <- piotr(piotrs(1))
+    } yield s"${a.key}${b.key}"
 
   private[this] def createPos(x: Int, y: Int, piotr: Char): Pos = {
     val pos = new Pos(x, y, piotr)
@@ -149,7 +152,15 @@ object Pos {
   val whiteBackrank = (A1 <-> H1).toList
   val blackBackrank = (A8 <-> H8).toList
 
-  val allKeys: Map[String, Pos] = all.map { pos => pos.key -> pos }.to(Map)
+  val allKeys: Map[String, Pos] = all
+    .map { pos =>
+      pos.key -> pos
+    }
+    .to(Map)
 
-  val allPiotrs: Map[Char, Pos] = all.map { pos => pos.piotr -> pos }.to(Map)
+  val allPiotrs: Map[Char, Pos] = all
+    .map { pos =>
+      pos.piotr -> pos
+    }
+    .to(Map)
 }

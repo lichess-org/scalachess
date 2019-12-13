@@ -220,9 +220,10 @@ class BinaryTest extends ChessTest {
 
 object BinaryTestUtils {
 
-  def showByte(b: Byte): String = "%08d" format {
-    b & 0xff
-  }.toBinaryString.toInt
+  def showByte(b: Byte): String =
+    "%08d" format {
+      b & 0xff
+    }.toBinaryString.toInt
 
   def writeMove(m: String): String =
     (Binary writeMove m).get map showByte mkString ","
@@ -234,14 +235,14 @@ object BinaryTestUtils {
     (Binary readMoves m.split(',').toList.map(parseBinary)).get
 
   def parseBinary(s: String): Byte = {
-    var i = s.length - 1
-    var sum = 0
+    var i    = s.length - 1
+    var sum  = 0
     var mult = 1
     while (i >= 0) {
       s.charAt(i) match {
         case '1' => sum += mult
         case '0' =>
-        case x => sys error s"invalid binary literal: $x in $s"
+        case x   => sys error s"invalid binary literal: $x in $s"
       }
       mult *= 2
       i -= 1
@@ -252,7 +253,8 @@ object BinaryTestUtils {
 
 object BinaryTestData {
 
-  val pgn200: List[String] = augmentString("""
+  val pgn200: List[String] = augmentString(
+    """
 c7 Rd6+ Kb5 Rd5+ Kb4 Rd4+ Kb3 Rd3+ Kc2 Rd4 c8=R Ra4 Kb3
 d4 Nc6 d5 Ne5 f4 Nc4 b3 Nb6 c4 Nh6 Nc3 e6 dxe6 dxe6 Be3 Nf5 Bxb6 Qxd1+ Kxd1 cxb6 Kd2 Bc5 g3 Bd7 Nf3 Ne3 Ne4 Nxf1+ Rhxf1 Bb4+ Kc2 O-O-O Rfd1 Kb8 Nc3 h5 Rd4 f6 Rad1 Kc7 Ne4 f5 Nd6 Bc6 Nf7 Rxd4 Rxd4 Rf8 Nf7g5 Rf6 h4 Be8 e3 Bc6 Ne5 Be7 Kc3 a6 b4 Bd6 a3 Be7 c5 b5 Nxc6 Kxc6 e4 b6 e5 Rg6 cxb6 Bxg5 Rd6+ Kb7 hxg5 Kb8 Rd7 a5 bxa5 b4+ Kxb4 Ka8 b7+ Kb8 a6 Ka7 Kb5 h4 Rd3 h3 Rd2 h2 Rxh2 Rxg5 fxg5 g6 Rh6 f4 gxf4 Kb8 Rxg6 Ka7 Rg8
 e4 e5 f4 d5 exd5 exf4 Nf3 Nc6 dxc6 bxc6 Bc4 Nf6 d4 Bd6 O-O Qe7 Re1 Rb8 Rxe7+ Kxe7 Qe2+ Ne4 Qxe4+ Be6 Bxe6 fxe6 Ng5 Rhf8 Qxe6+ Kd8 Nf7+ Rxf7 Qxf7 Be7 Bxf4 Rxb2 Nc3 Rxc2 Re1 Rxa2 Qxe7+ Kc8 Qxc7#
@@ -455,5 +457,6 @@ e4 e5 Nf3 Nf6 Nc3 Nc6 Bb5 Bd6 d3 a6 Ba4 h6 h3 Qe7 Nd5 Nxd5 exd5 Nd4 Nxd4 exd4+ K
 e4 d5 Qh5 dxe4 Bc4 e3 Qxf7+ Kd7 Qe6+ Ke8 Qf7+ Kd7 Be6+ Kc6 Bd5+ Kd7 Qf5+ Ke8 Qf7+ Kd7 dxe3 Nf6 Nf3 Nxd5 Qxd5+ Ke8 Ne5 Qxd5 f4
 e3 e5 Qf3 Nf6 Qe2 Nc6 d3 d5 f4 Bd6 fxe5 Nxe5 Nf3 O-O Nxe5 Bxe5 Nc3 Bg4 Qd2 c5 h3 Bh5 g4 Bg3+ Ke2 Bg6 Rg1 Bh4 Bg2 Re8 b3 Qd6 Bb2 Rad8 Kd1 Qh2
 Re1 Bxe1 Kxe1 Qg3+ Kd1 Rxe3 Kc1 Re1+ Nd1 d4 a3 Nd5 Kb1 Nc3+ Bxc3 dxc3 Qc1 Qxg2 Ka2 Rxd3 Rb1 Rdxd1 Qxd1 Rxd1 a4 Qxc2+ Ka3 Rxb1
-""").linesIterator.filter(_.nonEmpty).toList
+"""
+  ).linesIterator.filter(_.nonEmpty).toList
 }

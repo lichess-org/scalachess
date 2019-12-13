@@ -6,15 +6,14 @@ class PerftTest extends ChessTest {
 
   def perft(game: Game, depth: Int): Int = {
     if (depth > 0)
-      game.situation.moves.values.flatten.foldLeft(0)(
-        (p, move) =>
-          if (move.piece.role == Pawn && (move.dest.y == 1 || move.dest.y == 8))
-            p + perft(game.apply(move.withPromotion(Some(Queen)).get), depth - 1)
+      game.situation.moves.values.flatten.foldLeft(0)((p, move) =>
+        if (move.piece.role == Pawn && (move.dest.y == 1 || move.dest.y == 8))
+          p + perft(game.apply(move.withPromotion(Some(Queen)).get), depth - 1)
             + perft(game.apply(move.withPromotion(Some(Rook)).get), depth - 1)
             + perft(game.apply(move.withPromotion(Some(Bishop)).get), depth - 1)
             + perft(game.apply(move.withPromotion(Some(Knight)).get), depth - 1)
-          else
-            p + perft(game.apply(move), depth - 1)
+        else
+          p + perft(game.apply(move), depth - 1)
       )
     else 1
   }
@@ -34,7 +33,8 @@ class PerftTest extends ChessTest {
       perft(game, 3) must be equalTo (5444)
     }
     "gentest-3283" in {
-      val game = Game(Some(Chess960), Some("r1bqkb1r/p1pp1ppp/1p3n2/6B1/Pn1p2P1/7B/RPP1PP1P/1N1QK1NR w Kkq -"))
+      val game =
+        Game(Some(Chess960), Some("r1bqkb1r/p1pp1ppp/1p3n2/6B1/Pn1p2P1/7B/RPP1PP1P/1N1QK1NR w Kkq -"))
       perft(game, 3) must be equalTo (26302)
     }
     "gentest-3523" in {
@@ -94,16 +94,19 @@ class PerftTest extends ChessTest {
   "calculate tricky perfts" should {
     // source: https://chessprogramming.wikispaces.com/Perft+Results
     "kiwipete" in {
-      val game = Game(Some(Chess960), Some("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"))
+      val game =
+        Game(Some(Chess960), Some("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"))
       perft(game, 3) must be equalTo (97862)
     }
     "position 4 mirrored" in {
-      val game = Game(Some(Chess960), Some("r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1"))
+      val game =
+        Game(Some(Chess960), Some("r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1"))
       perft(game, 3) must be equalTo (9467)
     }
     // https://github.com/ornicar/lila/issues/4625
     "h-side rook blocks a-side castling" in {
-      val game = Game(Some(Chess960), Some("4rrk1/pbbp2p1/1ppnp3/3n1pqp/3N1PQP/1PPNP3/PBBP2P1/4RRK1 w Ff - 0 1"))
+      val game =
+        Game(Some(Chess960), Some("4rrk1/pbbp2p1/1ppnp3/3n1pqp/3N1PQP/1PPNP3/PBBP2P1/4RRK1 w Ff - 0 1"))
       perft(game, 3) must be equalTo (71908)
     }
   }

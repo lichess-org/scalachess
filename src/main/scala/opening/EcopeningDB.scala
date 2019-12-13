@@ -1,7 +1,7 @@
 package chess
 package opening
 
-// format: OFF
+// format: off
 object EcopeningDB {
 
   import Ecopening._

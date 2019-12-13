@@ -3,21 +3,26 @@ package chess
 import Pos._
 
 class ClockTest extends ChessTest {
-  val fakeClock60 = Clock(60, 0).copy(timestamper = new Timestamper {
-    val now = Timestamp(0)
-  }).start
+  val fakeClock60 = Clock(60, 0)
+    .copy(timestamper = new Timestamper {
+      val now = Timestamp(0)
+    })
+    .start
 
-  val fakeClock600 = Clock(600, 0).copy(timestamper = new Timestamper {
-    val now = Timestamp(0)
-  }).start
+  val fakeClock600 = Clock(600, 0)
+    .copy(timestamper = new Timestamper {
+      val now = Timestamp(0)
+    })
+    .start
 
-  def advance(c: Clock, t: Int) = c.copy(timestamper = new Timestamper {
-    val now = c.timestamper.now + Centis(t)
-  })
+  def advance(c: Clock, t: Int) =
+    c.copy(timestamper = new Timestamper {
+      val now = c.timestamper.now + Centis(t)
+    })
 
   "play with a clock" should {
     val clock = Clock(5 * 60 * 1000, 0)
-    val game = makeGame withClock clock.start
+    val game  = makeGame withClock clock.start
     "new game" in {
       game.clock map { _.color } must_== Some(White)
     }
@@ -50,7 +55,7 @@ class ClockTest extends ChessTest {
       } remainingTime Black).centis
     }
 
-    def clockStep60(w: Int, l: Int*) = clockStep(fakeClock60, w, l: _*)
+    def clockStep60(w: Int, l: Int*)  = clockStep(fakeClock60, w, l: _*)
     def clockStep600(w: Int, l: Int*) = clockStep(fakeClock600, w, l: _*)
 
     def clockStart(lag: Int) = {

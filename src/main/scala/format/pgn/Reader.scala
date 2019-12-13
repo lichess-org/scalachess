@@ -1,7 +1,7 @@
 package chess
 package format.pgn
 
-import scalaz.Validation.{ success, failure }
+import scalaz.Validation.{ failure, success }
 
 object Reader {
 
@@ -42,10 +42,11 @@ object Reader {
 
   private def makeReplay(game: Game, sans: Sans): Result =
     sans.value.foldLeft[Result](Result.Complete(Replay(game))) {
-      case (Result.Complete(replay), san) => san(replay.state.situation).fold(
-        err => Result.Incomplete(replay, err),
-        move => Result.Complete(replay addMove move)
-      )
+      case (Result.Complete(replay), san) =>
+        san(replay.state.situation).fold(
+          err => Result.Incomplete(replay, err),
+          move => Result.Complete(replay addMove move)
+        )
       case (r: Result.Incomplete, _) => r
     }
 

@@ -1,14 +1,15 @@
 package chess
 package variant
 
-case object RacingKings extends Variant(
-  id = 9,
-  key = "racingKings",
-  name = "Racing Kings",
-  shortName = "Racing",
-  title = "Race your King to the eighth rank to win.",
-  standardInitialPosition = false
-) {
+case object RacingKings
+    extends Variant(
+      id = 9,
+      key = "racingKings",
+      name = "Racing Kings",
+      shortName = "Racing",
+      title = "Race your King to the eighth rank to win.",
+      standardInitialPosition = false
+    ) {
 
   override def allowsCastling = false
 
@@ -38,7 +39,7 @@ case object RacingKings extends Variant(
 
   override val initialFen = "8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1"
 
-  override def insufficientWinningMaterial(board: Board) = false
+  override def insufficientWinningMaterial(board: Board)               = false
   override def insufficientWinningMaterial(board: Board, color: Color) = false
 
   private def reachedGoal(board: Board, color: Color) =
@@ -55,7 +56,8 @@ case object RacingKings extends Variant(
     case White =>
       reachedGoal(situation.board, White) ^ reachedGoal(situation.board, Black)
     case Black =>
-      reachedGoal(situation.board, White) && (validMoves(situation).view mapValues (_.filter(reachesGoal))).forall(_._2.isEmpty)
+      reachedGoal(situation.board, White) && (validMoves(situation).view mapValues (_.filter(reachesGoal)))
+        .forall(_._2.isEmpty)
   }
 
   // If white reaches the goal and black also reaches the goal directly after,
@@ -69,7 +71,7 @@ case object RacingKings extends Variant(
   // Not only check that our king is safe,
   // but also check the opponent's
   override def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean =
-    super.kingSafety(m, filter, kingPos) && !{
+    super.kingSafety(m, filter, kingPos) && ! {
       m.after.kingPos get !m.color exists { theirKingPos =>
         kingThreatened(m.after, m.color, theirKingPos, (_ => true))
       }

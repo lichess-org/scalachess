@@ -81,9 +81,10 @@ class ReaderTest extends ChessTest {
     }
     "promoting to a rook" in {
       Reader.full(fromLichessBadPromotion) must beSuccess.like {
-        case Complete(replay) => replay.chronoMoves lift 10 must beSome.like {
-          case move => move.fold(_.promotion, _ => None) must_== Some(Rook)
-        }
+        case Complete(replay) =>
+          replay.chronoMoves lift 10 must beSome.like {
+            case move => move.fold(_.promotion, _ => None) must_== Some(Rook)
+          }
       }
     }
     "chessbase arrows" in {
@@ -100,9 +101,10 @@ class ReaderTest extends ChessTest {
     }
     "crazyhouse 1" in {
       Reader.full(crazyhouse1) must beSuccess.like {
-        case Complete(replay) => replay.chronoMoves lift 11 must beSome.like {
-          case move => move.fold(_.toUci.uci, _.toUci.uci) must_== "P@c6"
-        }
+        case Complete(replay) =>
+          replay.chronoMoves lift 11 must beSome.like {
+            case move => move.fold(_.toUci.uci, _.toUci.uci) must_== "P@c6"
+          }
       }
     }
     "crazyhouse 2" in {

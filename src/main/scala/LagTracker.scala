@@ -13,21 +13,24 @@ final case class LagTracker(
     compEstimate: Option[Centis] = None
 ) {
   def onMove(lag: Centis) = {
-    val comp = lag atMost quota
+    val comp     = lag atMost quota
     val uncomped = lag - comp
-    val ceDiff = compEstimate.getOrElse(Centis(1)) - comp
+    val ceDiff   = compEstimate.getOrElse(Centis(1)) - comp
 
-    (comp, copy(
-      quota = (quota + quotaGain - comp) atMost quotaMax,
-      uncompStats = {
-        // start recording after first uncomp.
-        if (uncomped == Centis(0) && uncompStats.samples == 0) uncompStats
-        else uncompStats record uncomped.centis
-      },
-      lagStats = lagStats record (lag atMost Centis(2000)).centis,
-      compEstSqErr = compEstSqErr + ceDiff.centis * ceDiff.centis,
-      compEstOvers = compEstOvers + ceDiff.nonNeg
-    ).recordLag(lag))
+    (
+      comp,
+      copy(
+        quota = (quota + quotaGain - comp) atMost quotaMax,
+        uncompStats = {
+          // start recording after first uncomp.
+          if (uncomped == Centis(0) && uncompStats.samples == 0) uncompStats
+          else uncompStats record uncomped.centis
+        },
+        lagStats = lagStats record (lag atMost Centis(2000)).centis,
+        compEstSqErr = compEstSqErr + ceDiff.centis * ceDiff.centis,
+        compEstOvers = compEstOvers + ceDiff.nonNeg
+      ).recordLag(lag)
+    )
   }
 
   def recordLag(lag: Centis) = {
@@ -60,8 +63,8 @@ object LagTracker {
   def init(config: Clock.Config) = {
     val quotaGain = Centis(config.estimateTotalSeconds match {
       case i if i >= 180 => 100
-      case i if i <= 15 => 35
-      case i => i / 3 + 40
+      case i if i <= 15  => 35
+      case i             => i / 3 + 40
     })
     LagTracker(
       quotaGain = quotaGain,
@@ -71,4 +74,3 @@ object LagTracker {
     )
   }
 }
-

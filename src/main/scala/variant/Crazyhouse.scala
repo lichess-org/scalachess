@@ -5,14 +5,15 @@ import format.Uci
 
 import scalaz.Validation.FlatMap._
 
-case object Crazyhouse extends Variant(
-  id = 10,
-  key = "crazyhouse",
-  name = "Crazyhouse",
-  shortName = "Crazy",
-  title = "Captured pieces can be dropped back on the board instead of moving a piece.",
-  standardInitialPosition = true
-) {
+case object Crazyhouse
+    extends Variant(
+      id = 10,
+      key = "crazyhouse",
+      name = "Crazyhouse",
+      shortName = "Crazy",
+      title = "Captured pieces can be dropped back on the board instead of moving a piece.",
+      standardInitialPosition = true
+    ) {
 
   def pieces = Standard.pieces
 
@@ -20,25 +21,26 @@ case object Crazyhouse extends Variant(
 
   override def valid(board: Board, strict: Boolean) = {
     val pieces = board.pieces.values
-    (Color.all forall validSide(board, false)_) &&
-      (!strict || (pieces.count(_ is Pawn) <= 16 && pieces.size <= 32))
+    (Color.all forall validSide(board, false) _) &&
+    (!strict || (pieces.count(_ is Pawn) <= 16 && pieces.size <= 32))
   }
 
   private def canDropPawnOn(pos: Pos) = (pos.y != 1 && pos.y != 8)
 
-  override def drop(situation: Situation, role: Role, pos: Pos): Valid[Drop] = for {
-    d1 <- situation.board.crazyData toValid "Board has no crazyhouse data"
-    _ <- d1.validIf(role != Pawn || canDropPawnOn(pos), s"Can't drop $role on $pos")
-    piece = Piece(situation.color, role)
-    d2 <- d1.drop(piece) toValid s"No $piece to drop on $pos"
-    board1 <- situation.board.place(piece, pos) toValid s"Can't drop $role on $pos, it's occupied"
-    _ <- board1.validIf(!board1.check(situation.color), s"Dropping $role on $pos doesn't uncheck the king")
-  } yield Drop(
-    piece = piece,
-    pos = pos,
-    situationBefore = situation,
-    after = board1 withCrazyData d2
-  )
+  override def drop(situation: Situation, role: Role, pos: Pos): Valid[Drop] =
+    for {
+      d1 <- situation.board.crazyData toValid "Board has no crazyhouse data"
+      _  <- d1.validIf(role != Pawn || canDropPawnOn(pos), s"Can't drop $role on $pos")
+      piece = Piece(situation.color, role)
+      d2     <- d1.drop(piece) toValid s"No $piece to drop on $pos"
+      board1 <- situation.board.place(piece, pos) toValid s"Can't drop $role on $pos, it's occupied"
+      _      <- board1.validIf(!board1.check(situation.color), s"Dropping $role on $pos doesn't uncheck the king")
+    } yield Drop(
+      piece = piece,
+      pos = pos,
+      situationBefore = situation,
+      after = board1 withCrazyData d2
+    )
 
   override def updatePositionHashes(board: Board, move: Move, hash: chess.PositionHash) =
     updateHashes(hash, board, !move.piece.color)
@@ -57,7 +59,9 @@ case object Crazyhouse extends Variant(
     case Uci.Move(orig, dest, promOption) =>
       board.crazyData.fold(board) { data =>
         val d1 = capture.fold(data) { data.store(_, dest) }
-        val d2 = promOption.fold(d1.move(orig, dest)) { _ => d1 promote dest }
+        val d2 = promOption.fold(d1.move(orig, dest)) { _ =>
+          d1 promote dest
+        }
         board withCrazyData d2
       }
     case _ => board
@@ -81,7 +85,7 @@ case object Crazyhouse extends Variant(
 
   // there is always sufficient mating material in Crazyhouse
   override def insufficientWinningMaterial(board: Board, color: Color) = false
-  override def insufficientWinningMaterial(board: Board) = false
+  override def insufficientWinningMaterial(board: Board)               = false
 
   def possibleDrops(situation: Situation): Option[List[Pos]] =
     if (!situation.check) None
@@ -90,10 +94,10 @@ case object Crazyhouse extends Variant(
   private def blockades(situation: Situation, kingPos: Pos): List[Pos] = {
     def attacker(piece: Piece) = piece.role.projection && piece.color != situation.color
     def forward(p: Pos, dir: Direction, squares: List[Pos]): List[Pos] = dir(p) match {
-      case None => Nil
+      case None                                                 => Nil
       case Some(next) if situation.board(next).exists(attacker) => next :: squares
-      case Some(next) if situation.board(next).isDefined => Nil
-      case Some(next) => forward(next, dir, next :: squares)
+      case Some(next) if situation.board(next).isDefined        => Nil
+      case Some(next)                                           => forward(next, dir, next :: squares)
     }
     Queen.dirs flatMap { forward(kingPos, _, Nil) } filter { square =>
       situation.board.place(Piece(situation.color, Knight), square) exists { defended =>
@@ -140,8 +144,12 @@ case object Crazyhouse extends Variant(
     def apply(color: Color) = color.fold(white, black)
 
     def take(piece: Piece): Option[Pockets] = piece.color.fold(
-      white take piece.role map { np => copy(white = np) },
-      black take piece.role map { np => copy(black = np) }
+      white take piece.role map { np =>
+        copy(white = np)
+      },
+      black take piece.role map { np =>
+        copy(black = np)
+      }
     )
 
     def store(piece: Piece) = piece.color.fold(

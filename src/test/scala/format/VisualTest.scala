@@ -31,7 +31,7 @@ class VisualTest extends ChessTest {
     // """)
     // }
     "export with special marks" in {
-      val board = Visual << """
+      val board       = Visual << """
 k B
 
 
@@ -77,7 +77,8 @@ pppppppp
     P n
 PPPP   P
 RNBQK  R
-""", """
+""",
+    """
        k
        P
 
@@ -86,7 +87,8 @@ RNBQK  R
 
 
 K
-""", """
+""",
+    """
 rnbqkbnr
 pppppppp
 
@@ -95,7 +97,8 @@ pppppppp
 
 
 RK    NR
-""", """
+""",
+    """
   bqkb r
 p ppp pp
 pr
@@ -104,7 +107,8 @@ pr
  PP  N
 P    PPP
 RN  K  R
-""", """
+""",
+    """
 r   k nr
 pp n ppp
   p p

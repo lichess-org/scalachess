@@ -23,7 +23,9 @@ case class Drop(
           lastMove = Some(Uci.Drop(piece.role, pos)),
           unmovedRooks = before.unmovedRooks
         )
-      }, toUci, none
+      },
+      toUci,
+      none
     )
 
     board updateHistory {

@@ -1,27 +1,29 @@
 package chess
 package variant
 
-case object Antichess extends Variant(
-  id = 6,
-  key = "antichess",
-  name = "Antichess",
-  shortName = "Anti",
-  title = "Lose all your pieces (or get stalemated) to win the game.",
-  standardInitialPosition = true
-) {
+case object Antichess
+    extends Variant(
+      id = 6,
+      key = "antichess",
+      name = "Antichess",
+      shortName = "Anti",
+      title = "Lose all your pieces (or get stalemated) to win the game.",
+      standardInitialPosition = true
+    ) {
 
   def pieces = Standard.pieces
 
   // In antichess, it is not permitted to castle
-  override val castles = Castles.none
+  override val castles    = Castles.none
   override val initialFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1"
 
   // In antichess, the king can't be put into check so we always return false
-  override def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) = false
+  override def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) =
+    false
 
   // In this variant, a player must capture if a capturing move is available
   override def validMoves(situation: Situation) = {
-    val allMoves = super.validMoves(situation)
+    val allMoves       = super.validMoves(situation)
     val capturingMoves = allMoves.view mapValues (_.filter(_.captures)) filterNot (_._2.isEmpty)
 
     (if (!capturingMoves.isEmpty) capturingMoves else allMoves).to(Map)
@@ -31,7 +33,8 @@ case object Antichess extends Variant(
     board.pieces.size >= 2 && board.pieces.size <= 32
 
   // In antichess, there is no checkmate condition, and the winner is the current player if they have no legal moves
-  override def winner(situation: Situation): Option[Color] = if (specialEnd(situation)) Some(situation.color) else None
+  override def winner(situation: Situation): Option[Color] =
+    if (specialEnd(situation)) Some(situation.color) else None
 
   override def specialEnd(situation: Situation) = {
     // The game ends with a win when one player manages to lose all their pieces or is in stalemate
@@ -54,8 +57,8 @@ case object Antichess extends Variant(
 
     lazy val drawnBishops = actors.values.partition(_.color == White) match {
       case (whitePieces, blackPieces) =>
-        val whiteBishops = whitePieces.filter(_.piece.is(Bishop))
-        val blackBishops = blackPieces.filter(_.piece.is(Bishop))
+        val whiteBishops    = whitePieces.filter(_.piece.is(Bishop))
+        val blackBishops    = blackPieces.filter(_.piece.is(Bishop))
         lazy val whitePawns = whitePieces.filter(_.piece.is(Pawn))
         lazy val blackPawns = blackPieces.filter(_.piece.is(Pawn))
 
@@ -63,14 +66,16 @@ case object Antichess extends Variant(
         // If after applying .distinct the size of the list is greater than one, then the player has bishops on both
         // colours
         if (whiteBishops.map(_.pos.color).to(Set).size != 1 ||
-          blackBishops.map(_.pos.color).to(Set).size != 1) false
+            blackBishops.map(_.pos.color).to(Set).size != 1) false
         else {
           for {
             whiteSquareColor <- whiteBishops.headOption map (_.pos.color)
             blackSquareColor <- blackBishops.headOption map (_.pos.color)
           } yield {
-            whiteSquareColor != blackSquareColor && whitePawns.forall(pawnNotAttackable(_, blackSquareColor, board)) &&
-              blackPawns.forall(pawnNotAttackable(_, whiteSquareColor, board))
+            whiteSquareColor != blackSquareColor && whitePawns.forall(
+              pawnNotAttackable(_, blackSquareColor, board)
+            ) &&
+            blackPawns.forall(pawnNotAttackable(_, whiteSquareColor, board))
           }
         } getOrElse false
     }
@@ -80,16 +85,17 @@ case object Antichess extends Variant(
 
   private def pawnNotAttackable(pawn: Actor, oppositeBishopColor: Color, board: Board) = {
     // The pawn cannot attack a bishop or be attacked by a bishop
-    val cannotAttackBishop = Actor.pawnAttacks(pawn.pos, pawn.piece.color).find(_.color == oppositeBishopColor).isEmpty
+    val cannotAttackBishop =
+      Actor.pawnAttacks(pawn.pos, pawn.piece.color).find(_.color == oppositeBishopColor).isEmpty
 
     InsufficientMatingMaterial.pawnBlockedByPawn(pawn, board) && cannotAttackBishop
   }
 
   // In this game variant, a king is a valid promotion
   override def isValidPromotion(promotion: Option[PromotableRole]) = promotion match {
-    case None => true
+    case None                                        => true
     case Some(Queen | Rook | Knight | Bishop | King) => true
-    case _ => false
+    case _                                           => false
   }
 
   override val roles = List(Rook, Knight, King, Bishop, Queen, Pawn)

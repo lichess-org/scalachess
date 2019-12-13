@@ -6,7 +6,7 @@ class ForsythPerfTest extends ChessTest {
   args(skipAll = true)
 
   val initialBoard = Board.init(variant.Standard)
-  val emptyBoard = (Forsyth << "8/8/8/8/8/8/8/8").get.board
+  val emptyBoard   = (Forsyth << "8/8/8/8/8/8/8/8").get.board
 
   // "export one position board" should {
   //   "many times" in {
@@ -36,7 +36,7 @@ class ForsythPerfTest extends ChessTest {
   // }
   "export castles" should {
     "many times" in {
-      val nb = 100000
+      val nb         = 100000
       val iterations = 10
       def runOne = {
         // Forsyth.exportCastles(emptyBoard)
@@ -56,7 +56,7 @@ class ForsythPerfTest extends ChessTest {
         duration
       }
       val nbPositions = iterations * nb
-      val moveNanos = (1000000 * durations.sum) / nbPositions
+      val moveNanos   = (1000000 * durations.sum) / nbPositions
       println(s"Average = $moveNanos nanoseconds per position")
       println(s"          ${1000000000 / moveNanos} positions per second")
       true === true

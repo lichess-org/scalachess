@@ -18,7 +18,7 @@ case class Pgn(
   }
   def updatePly(ply: Int, f: Move => Move) = {
     val fullMove = (ply + 1) / 2
-    val color = Color(ply % 2 == 1)
+    val color    = Color(ply % 2 == 1)
     updateTurn(fullMove, _.update(color, f))
   }
   def updateLastPly(f: Move => Move) = updatePly(nbPlies, f)
@@ -38,7 +38,7 @@ case class Pgn(
       if (initial.comments.nonEmpty) initial.comments.mkString("{ ", " } { ", " }\n")
       else ""
     val turnStr = turns mkString " "
-    val endStr = tags(_.Result) | ""
+    val endStr  = tags(_.Result) | ""
     s"$tags\n\n$initStr$turnStr $endStr"
   }.trim
 
@@ -76,10 +76,10 @@ case class Turn(
   override def toString = {
     val text = (white, black) match {
       case (Some(w), Some(b)) if w.isLong => s" $w $number... $b"
-      case (Some(w), Some(b)) => s" $w $b"
-      case (Some(w), None) => s" $w"
-      case (None, Some(b)) => s".. $b"
-      case _ => ""
+      case (Some(w), Some(b))             => s" $w $b"
+      case (Some(w), None)                => s" $w"
+      case (None, Some(b))                => s".. $b"
+      case _                              => ""
     }
     s"$number.$text"
   }
@@ -89,7 +89,7 @@ object Turn {
 
   def fromMoves(moves: List[Move], ply: Int): List[Turn] = {
     moves.foldLeft((List[Turn](), ply)) {
-      case ((turns, p), move) if p % 2 == 1 =>
+      case ((turns, p), move) if p                    % 2 == 1 =>
         (Turn((p + 1) / 2, move.some, none) :: turns) -> (p + 1)
       case ((Nil, p), move) =>
         (Turn((p + 1) / 2, none, move.some) :: Nil) -> (p + 1)
@@ -116,15 +116,20 @@ case class Move(
     secondsLeft.map(seconds => "[%clk " + Move.formatPgnSeconds(seconds) + "]")
 
   override def toString = {
-    val glyphStr = glyphs.toList.map({
-      case glyph if glyph.id <= 6 => glyph.symbol
-      case glyph => s" $$${glyph.id}"
-    }).mkString
+    val glyphStr = glyphs.toList
+      .map({
+        case glyph if glyph.id <= 6 => glyph.symbol
+        case glyph                  => s" $$${glyph.id}"
+      })
+      .mkString
     val commentsOrTime =
       if (comments.nonEmpty || secondsLeft.isDefined || opening.isDefined || result.isDefined)
-        List(clockString, opening, result).flatten.:::(comments map Move.noDoubleLineBreak).map { text =>
-          s" { $text }"
-        }.mkString
+        List(clockString, opening, result).flatten
+          .:::(comments map Move.noDoubleLineBreak)
+          .map { text =>
+            s" { $text }"
+          }
+          .mkString
       else ""
     val variationString =
       if (variations.isEmpty) ""
@@ -144,10 +149,13 @@ object Move {
     org.joda.time.Duration.standardSeconds(t).toPeriod
   )
 
-  private[this] val periodFormatter = new org.joda.time.format.PeriodFormatterBuilder()
-    .printZeroAlways
-    .minimumPrintedDigits(1).appendHours.appendSeparator(":")
-    .minimumPrintedDigits(2).appendMinutes.appendSeparator(":")
+  private[this] val periodFormatter = new org.joda.time.format.PeriodFormatterBuilder().printZeroAlways
+    .minimumPrintedDigits(1)
+    .appendHours
+    .appendSeparator(":")
+    .minimumPrintedDigits(2)
+    .appendMinutes
+    .appendSeparator(":")
     .appendSeconds
     .toFormatter
 

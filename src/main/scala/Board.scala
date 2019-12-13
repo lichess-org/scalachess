@@ -3,7 +3,7 @@ package chess
 import Pos.posAt
 import scalaz.Validation.FlatMap._
 import scalaz.Validation.{ failureNel, success }
-import variant.{ Variant, Crazyhouse }
+import variant.{ Crazyhouse, Variant }
 
 case class Board(
     pieces: PieceMap,
@@ -27,9 +27,12 @@ case class Board(
     Color.Map(w, b)
   }
 
-  def rolesOf(c: Color): List[Role] = pieces.values.collect {
-    case piece if piece.color == c => piece.role
-  }.to(List)
+  def rolesOf(c: Color): List[Role] =
+    pieces.values
+      .collect {
+        case piece if piece.color == c => piece.role
+      }
+      .to(List)
 
   def actorAt(at: Pos): Option[Actor] = actors get at
 
@@ -71,22 +74,25 @@ case class Board(
 
   def move(orig: Pos, dest: Pos): Option[Board] =
     if (pieces contains dest) None
-    else pieces get orig map { piece =>
-      copy(pieces = pieces - orig + ((dest, piece)))
-    }
+    else
+      pieces get orig map { piece =>
+        copy(pieces = pieces - orig + ((dest, piece)))
+      }
 
-  def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] = for {
-    piece <- pieces get orig
-    takenPos = taking getOrElse dest
-    if (pieces contains takenPos)
-  } yield copy(pieces = pieces - takenPos - orig + (dest -> piece))
+  def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] =
+    for {
+      piece <- pieces get orig
+      takenPos = taking getOrElse dest
+      if pieces contains takenPos
+    } yield copy(pieces = pieces - takenPos - orig + (dest -> piece))
 
   def move(orig: Pos) = new {
     def to(dest: Pos): Valid[Board] = {
       if (pieces contains dest) failureNel("Cannot move to occupied " + dest)
-      else pieces get orig map { piece =>
-        copy(pieces = pieces - orig + (dest -> piece))
-      } toSuccess ("No piece at " + orig + " to move")
+      else
+        pieces get orig map { piece =>
+          copy(pieces = pieces - orig + (dest -> piece))
+        } toSuccess ("No piece at " + orig + " to move")
     }
   }
 
@@ -96,12 +102,13 @@ case class Board(
 
   def hasPiece(p: Piece) = pieces.values exists (p ==)
 
-  def promote(pos: Pos): Option[Board] = for {
-    pawn <- apply(pos)
-    if (pawn is Pawn)
-    b2 <- take(pos)
-    b3 <- b2.place(pawn.color.queen, pos)
-  } yield b3
+  def promote(pos: Pos): Option[Board] =
+    for {
+      pawn <- apply(pos)
+      if pawn is Pawn
+      b2 <- take(pos)
+      b3 <- b2.place(pawn.color.queen, pos)
+    } yield b3
 
   def castles: Castles = history.castles
 
@@ -118,21 +125,23 @@ case class Board(
       copy(variant = v)
   }
 
-  def withCrazyData(data: Crazyhouse.Data) = copy(crazyData = Some(data))
+  def withCrazyData(data: Crazyhouse.Data)         = copy(crazyData = Some(data))
   def withCrazyData(data: Option[Crazyhouse.Data]) = copy(crazyData = data)
-  def withCrazyData(f: Crazyhouse.Data => Crazyhouse.Data): Board = withCrazyData(f(crazyData | Crazyhouse.Data.init))
+  def withCrazyData(f: Crazyhouse.Data => Crazyhouse.Data): Board =
+    withCrazyData(f(crazyData | Crazyhouse.Data.init))
 
   def ensureCrazyData = withCrazyData(crazyData | Crazyhouse.Data.init)
 
   def unmovedRooks = UnmovedRooks {
     history.unmovedRooks.pos.filter(pos =>
-      apply(pos).exists(piece => piece.is(Rook) && piece.color.backrankY == pos.y))
+      apply(pos).exists(piece => piece.is(Rook) && piece.color.backrankY == pos.y)
+    )
   }
 
   def fixCastles: Board = withCastles {
     if (variant.allowsCastling) {
-      val wkPos = kingPosOf(White)
-      val bkPos = kingPosOf(Black)
+      val wkPos   = kingPosOf(White)
+      val bkPos   = kingPosOf(Black)
       val wkReady = wkPos.fold(false)(_.y == 1)
       val bkReady = bkPos.fold(false)(_.y == 8)
       def rookReady(color: Color, kPos: Option[Pos], left: Boolean) = kPos.fold(false) { kp =>
@@ -163,9 +172,10 @@ case class Board(
   def valid(strict: Boolean) = variant.valid(this, strict)
 
   def materialImbalance: Int = pieces.values.foldLeft(0) {
-    case (acc, Piece(color, role)) => Role.valueOf(role).fold(acc) { value =>
-      acc + value * color.fold(1, -1)
-    }
+    case (acc, Piece(color, role)) =>
+      Role.valueOf(role).fold(acc) { value =>
+        acc + value * color.fold(1, -1)
+      }
   }
 
   override def toString = s"$variant Position after ${history.lastMove}\n$visual"

@@ -31,16 +31,18 @@ play with zero losing chances so an ideal choice for game one } 4... cxd5
 too long of course but this is the most solid choice } 8. Qb3 Bb4 9. Bb5
 O-O { Black breaks the symmetry but this is still the main line of chess
 opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
-  */
+   */
 
   "PGN string output" should {
     "be correct when there are no move times" in {
       val pgn = Pgn(
-        tags = Tags(List(
-          Tag(_.White, "Kramnik,V"),
-          Tag(_.Black, "Anand,V"),
-          Tag(_.ECO, "D14")
-        )),
+        tags = Tags(
+          List(
+            Tag(_.White, "Kramnik,V"),
+            Tag(_.Black, "Anand,V"),
+            Tag(_.ECO, "D14")
+          )
+        ),
         turns = List(
           Turn(
             number = 1,
@@ -59,7 +61,10 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
           ),
           Turn(
             number = 4,
-            white = Move("cxd5", comments = "The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one" :: Nil).some,
+            white = Move(
+              "cxd5",
+              comments = "The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one" :: Nil
+            ).some,
             black = Move("cxd5").some
           ),
           Turn(
@@ -77,12 +82,14 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
     }
     "be correct when there are move times" in {
       val pgn = Pgn(
-        tags = Tags(List(
-          Tag(_.White, "tsinnema"),
-          Tag(_.Black, "stockfish"),
-          Tag(_.TimeControl, "300"),
-          Tag(_.ECO, "A00e")
-        )),
+        tags = Tags(
+          List(
+            Tag(_.White, "tsinnema"),
+            Tag(_.Black, "stockfish"),
+            Tag(_.TimeControl, "300"),
+            Tag(_.ECO, "A00e")
+          )
+        ),
         turns = List(
           Turn(
             number = 1,
@@ -101,8 +108,12 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
           ),
           Turn(
             number = 4,
-            white = Move("Qd3", glyphs = glyphs(1), secondsLeft = 288.some,
-              comments = "An invention of true genius." :: Nil).some,
+            white = Move(
+              "Qd3",
+              glyphs = glyphs(1),
+              secondsLeft = 288.some,
+              comments = "An invention of true genius." :: Nil
+            ).some,
             black = Move("c5", secondsLeft = 296.some).some
           ),
           Turn(
@@ -132,11 +143,14 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
           Turn(
             number = 2,
             white = Move("Qd2").some,
-            black = Move("Nb4", glyphs = Glyphs(
-              Glyph.MoveAssessment.blunder.some,
-              Glyph.PositionAssessment.whiteMuchBetter.some,
-              List(Glyph.Observation.timeTrouble)
-            )).some
+            black = Move(
+              "Nb4",
+              glyphs = Glyphs(
+                Glyph.MoveAssessment.blunder.some,
+                Glyph.PositionAssessment.whiteMuchBetter.some,
+                List(Glyph.Observation.timeTrouble)
+              )
+            ).some
           ),
           Turn(
             number = 3,
@@ -154,24 +168,30 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         turns = List(
           Turn(
             number = 1,
-            white = Move("d4", variations = List(
-              List(
-                Turn(
-                  number = 1,
-                  white = Move("e4").some,
-                  black = None
+            white = Move(
+              "d4",
+              variations = List(
+                List(
+                  Turn(
+                    number = 1,
+                    white = Move("e4").some,
+                    black = None
+                  )
                 )
               )
-            )).some,
-            black = Move("Nf6", variations = List(
-              List(
-                Turn(
-                  number = 1,
-                  white = None,
-                  black = Move("d5").some
+            ).some,
+            black = Move(
+              "Nf6",
+              variations = List(
+                List(
+                  Turn(
+                    number = 1,
+                    white = None,
+                    black = Move("d5").some
+                  )
                 )
               )
-            )).some
+            ).some
           )
         )
       )
@@ -199,10 +219,12 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
       val pgn = Pgn(
         tags = Tags.empty,
         turns = List(),
-        initial = Initial(List(
-          "Why hello there!",
-          "The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one"
-        ))
+        initial = Initial(
+          List(
+            "Why hello there!",
+            "The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one"
+          )
+        )
       )
       pgn.toString must_== """{ Why hello there! } { The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one }"""
     }
@@ -212,30 +234,38 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         turns = List(
           Turn(
             number = 1,
-            white = Move("d4", variations = List(
-              List(
-                Turn(
-                  number = 1,
-                  white = Move("e4").some,
-                  black = None
+            white = Move(
+              "d4",
+              variations = List(
+                List(
+                  Turn(
+                    number = 1,
+                    white = Move("e4").some,
+                    black = None
+                  )
                 )
               )
-            )).some,
-            black = Move("Nf6", variations = List(
-              List(
-                Turn(
-                  number = 1,
-                  white = None,
-                  black = Move("d5").some
+            ).some,
+            black = Move(
+              "Nf6",
+              variations = List(
+                List(
+                  Turn(
+                    number = 1,
+                    white = None,
+                    black = Move("d5").some
+                  )
                 )
               )
-            )).some
+            ).some
           )
         ),
-        initial = Initial(List(
-          "Why hello there!",
-          "The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one"
-        ))
+        initial = Initial(
+          List(
+            "Why hello there!",
+            "The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one"
+          )
+        )
       )
       pgn.toString must_== """{ Why hello there! } { The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one }
 1. d4 (1. e4) 1... Nf6 (1... d5)"""

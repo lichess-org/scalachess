@@ -9,10 +9,11 @@ case class Division(middle: Option[Int], end: Option[Int], plies: Int) {
   def endSize = end.map(plies -)
 
   def openingBounds = middle.map(0 -> _)
-  def middleBounds = for {
-    m <- middle
-    e <- end
-  } yield m -> e
+  def middleBounds =
+    for {
+      m <- middle
+      e <- end
+    } yield m -> e
   def endBounds = end.map(_ -> plies)
 }
 
@@ -57,7 +58,10 @@ object Divider {
 
   // Sparse back-rank indicates that pieces have been developed
   private def backrankSparse(board: Board): Boolean = backranks.exists {
-    case (backrank, color) => backrank.count { pos => board(pos).fold(false)(_ is color) } < 4
+    case (backrank, color) =>
+      backrank.count { pos =>
+        board(pos).fold(false)(_ is color)
+      } < 4
   }
 
   private def score(white: Int, black: Int, y: Int): Int = (white, black) match {

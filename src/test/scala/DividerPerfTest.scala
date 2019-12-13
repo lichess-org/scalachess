@@ -4,15 +4,15 @@ class DividerPerfTest extends ChessTest {
 
   args(skipAll = true)
 
-  val nb = 500
+  val nb         = 500
   val iterations = 10
   // val nb = 1
   // val iterations = 1
 
-  val moves = format.pgn.Fixtures.fromProd2
+  val moves      = format.pgn.Fixtures.fromProd2
   val gameReplay = Replay.boards(moves.split(' ').toList, None, variant.Standard).err
-  def runOne = Divider(gameReplay)
-  def run: Unit = { for (i <- 1 to nb) runOne }
+  def runOne     = Divider(gameReplay)
+  def run: Unit  = { for (i <- 1 to nb) runOne }
 
   "playing a game" should {
     "many times" in {
@@ -31,7 +31,7 @@ class DividerPerfTest extends ChessTest {
         println(s"$nb games in $duration ms")
         duration
       }
-      val nbGames = iterations * nb
+      val nbGames    = iterations * nb
       val moveMicros = (1000 * durations.sum) / nbGames
       println(s"Average = $moveMicros microseconds per game")
       println(s"          ${1000000 / moveMicros} games per second")

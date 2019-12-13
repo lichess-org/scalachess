@@ -30,9 +30,9 @@ trait ChessTest extends Specification with ValidationMatchers {
     def threatens(to: Pos): Boolean =
       actor.piece.eyes(actor.pos, to) && {
         (!actor.piece.role.projection) ||
-          actor.piece.role.dir(actor.pos, to).exists {
-            Actor.longRangeThreatens(actor.board, actor.pos, _, to)
-          }
+        actor.piece.role.dir(actor.pos, to).exists {
+          Actor.longRangeThreatens(actor.board, actor.pos, _, to)
+        }
       }
   }
 
@@ -50,7 +50,9 @@ trait ChessTest extends Specification with ValidationMatchers {
         // because possible moves are asked for player highlight
         // before the move is played (on initial situation)
         vg foreach { _.situation.destinations }
-        val ng = vg flatMap { g => g(move._1, move._2) map (_._1) }
+        val ng = vg flatMap { g =>
+          g(move._1, move._2) map (_._1)
+        }
         ng
       }
       // vg foreach { x => println("========= PGN: " + x.pgnMoves) }
@@ -58,9 +60,9 @@ trait ChessTest extends Specification with ValidationMatchers {
     }
 
     def playMove(
-      orig: Pos,
-      dest: Pos,
-      promotion: Option[PromotableRole] = None
+        orig: Pos,
+        dest: Pos,
+        promotion: Option[PromotableRole] = None
     ): Valid[Game] =
       game.apply(orig, dest, promotion) map (_._1)
 
@@ -72,9 +74,10 @@ trait ChessTest extends Specification with ValidationMatchers {
     situation map { sit =>
       sit.color -> sit.withVariant(variant).board
     } toValid "Could not construct situation from FEN" map {
-      case (color, board) => Game(variant).copy(
-        situation = Situation(board, color)
-      )
+      case (color, board) =>
+        Game(variant).copy(
+          situation = Situation(board, color)
+        )
     }
   }
 

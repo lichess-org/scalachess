@@ -15,12 +15,12 @@ sealed trait Color {
   val letter: Char
   val name: String
 
-  def pawn = this - Pawn
+  def pawn   = this - Pawn
   def bishop = this - Bishop
   def knight = this - Knight
-  def rook = this - Rook
-  def queen = this - Queen
-  def king = this - King
+  def rook   = this - Rook
+  def queen  = this - Queen
+  def king   = this - King
 
   val white = this == Color.White
   val black = this == Color.Black
@@ -57,12 +57,12 @@ object Color {
 
     lazy val unary_! = Black
 
-    val passablePawnY = 5
+    val passablePawnY   = 5
     val promotablePawnY = 8
-    val backrankY = 1
+    val backrankY       = 1
 
     val letter = 'w'
-    val name = "white"
+    val name   = "white"
 
     override val hashCode = 1
   }
@@ -71,12 +71,12 @@ object Color {
 
     val unary_! = White
 
-    val passablePawnY = 4
+    val passablePawnY   = 4
     val promotablePawnY = 1
-    val backrankY = 8
+    val backrankY       = 8
 
     val letter = 'b'
-    val name = "black"
+    val name   = "black"
 
     override val hashCode = 2
   }
@@ -107,12 +107,12 @@ object Color {
   def showResult(color: Option[Color]) = color match {
     case Some(chess.White) => "1-0"
     case Some(chess.Black) => "0-1"
-    case None => "1/2-1/2"
+    case None              => "1/2-1/2"
   }
 
   def fromResult(result: String): Option[Color] = result match {
     case "1-0" => Some(chess.White)
     case "0-1" => Some(chess.Black)
-    case _ => None
+    case _     => None
   }
 }

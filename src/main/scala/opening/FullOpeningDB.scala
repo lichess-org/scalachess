@@ -8,9 +8,11 @@ object FullOpeningDB {
   private def all: Vector[FullOpening] = FullOpeningPart1.db ++ FullOpeningPart2.db
 
   lazy val byFen: collection.Map[String, FullOpening] =
-    all.map { o =>
-      o.fen -> o
-    }.to(Map)
+    all
+      .map { o =>
+        o.fen -> o
+      }
+      .to(Map)
 
   def findByFen(fen: String) = byFen get fen.split(' ').take(3).mkString(" ")
 
@@ -29,9 +31,10 @@ object FullOpeningDB {
 
   def searchInFens(fens: List[FEN]): Option[FullOpening] =
     fens.foldRight(none[FullOpening]) {
-      case (fen, None) => byFen get {
-        fen.value.split(' ').take(3) mkString " "
-      }
+      case (fen, None) =>
+        byFen get {
+          fen.value.split(' ').take(3) mkString " "
+        }
       case (_, found) => found
     }
 }

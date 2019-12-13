@@ -53,9 +53,22 @@ class ForsythTest extends ChessTest {
       }
 
       "standard castling rights" in {
-        val moves = List(H2 -> H4, H7 -> H5, H1 -> H3, H8 -> H6, B2 -> B4,
-          B7 -> B5, H3 -> B3, H6 -> B6, B1 -> A3, B8 -> A6, B3 -> B1, B6 -> B8,
-          B1 -> B3, B8 -> B6)
+        val moves = List(
+          H2 -> H4,
+          H7 -> H5,
+          H1 -> H3,
+          H8 -> H6,
+          B2 -> B4,
+          B7 -> B5,
+          H3 -> B3,
+          H6 -> B6,
+          B1 -> A3,
+          B8 -> A6,
+          B3 -> B1,
+          B6 -> B8,
+          B1 -> B3,
+          B8 -> B6
+        )
 
         "inner rook" in {
           makeGame.playMoveList(moves dropRight 2) must beSuccess.like {
@@ -74,9 +87,10 @@ class ForsythTest extends ChessTest {
       val moves = List(E2 -> E4, C7 -> C5, G1 -> F3, G8 -> H6, A2 -> A3)
       def compare(ms: List[(Pos, Pos)], fen: String) =
         makeGame.playMoveList(ms) must beSuccess.like {
-          case g => (f << fen) must beSome.like {
-            case situation => situation.board.visual must_== g.situation.board.visual
-          }
+          case g =>
+            (f << fen) must beSome.like {
+              case situation => situation.board.visual must_== g.situation.board.visual
+            }
         }
       "new game" in {
         compare(
@@ -132,9 +146,10 @@ class ForsythTest extends ChessTest {
       }
     }
     "crazyhouse" in {
-      f.<<<@(Crazyhouse, "rnbqkb1r/pp1ppppp/7n/2p5/4P3/P4N2/1PPP1PPP/RNBQKB1R b KQkq - 0 3") must beSome.like {
-        case s => s.situation.board.variant must_== Crazyhouse
-      }
+      f.<<<@(Crazyhouse, "rnbqkb1r/pp1ppppp/7n/2p5/4P3/P4N2/1PPP1PPP/RNBQKB1R b KQkq - 0 3") must beSome
+        .like {
+          case s => s.situation.board.variant must_== Crazyhouse
+        }
     }
   }
   "export to situation plus" should {
@@ -173,17 +188,29 @@ class ForsythTest extends ChessTest {
     "with history" in {
       "starting" in {
         f <<< "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" must beSome.like {
-          case SituationPlus(Situation(Board(_, History(_, _, Castles(true, true, true, true), _, _), _, _), _), _) => ok
+          case SituationPlus(
+              Situation(Board(_, History(_, _, Castles(true, true, true, true), _, _), _, _), _),
+              _
+              ) =>
+            ok
         }
       }
       "white to play" in {
         f <<< "r2q1rk1/ppp2pp1/1bnpbn1p/4p3/4P3/1BNPBN1P/PPPQ1PP1/R3K2R w KQ - 7 10" must beSome.like {
-          case SituationPlus(Situation(Board(_, History(_, _, Castles(true, true, false, false), _, _), _, _), _), _) => ok
+          case SituationPlus(
+              Situation(Board(_, History(_, _, Castles(true, true, false, false), _, _), _, _), _),
+              _
+              ) =>
+            ok
         }
       }
       "black to play" in {
         f <<< "r1q2rk1/ppp2ppp/3p1n2/8/2PNp3/P1PnP3/2QP1PPP/R1B2K1R b - - 3 12" must beSome.like {
-          case SituationPlus(Situation(Board(_, History(_, _, Castles(false, false, false, false), _, _), _, _), _), _) => ok
+          case SituationPlus(
+              Situation(Board(_, History(_, _, Castles(false, false, false, false), _, _), _, _), _),
+              _
+              ) =>
+            ok
         }
       }
     }
@@ -287,46 +314,52 @@ class ForsythTest extends ChessTest {
       }
       "pockets" in {
         f <<< "2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6/pPP w - f6 0 36" must beSome.like {
-          case s => s.situation.board.crazyData must beSome.like {
-            case Data(Pockets(Pocket(Pawn :: Pawn :: Nil), Pocket(Pawn :: Nil)), promoted) =>
-              promoted must beEmpty
-          }
+          case s =>
+            s.situation.board.crazyData must beSome.like {
+              case Data(Pockets(Pocket(Pawn :: Pawn :: Nil), Pocket(Pawn :: Nil)), promoted) =>
+                promoted must beEmpty
+            }
         }
       }
       "winboard pockets" in {
         f <<< "r1bk3r/ppp2ppp/4p3/1B1pP3/1b1N4/2N2qPp/PPP2NbP/4R1KR[PNq] b - - 39 20" must beSome.like {
-          case s => s.situation.board.crazyData must beSome.like {
-            case Data(Pockets(Pocket(Pawn :: Knight :: Nil), Pocket(Queen :: Nil)), promoted) =>
-              promoted must beEmpty
-          }
+          case s =>
+            s.situation.board.crazyData must beSome.like {
+              case Data(Pockets(Pocket(Pawn :: Knight :: Nil), Pocket(Queen :: Nil)), promoted) =>
+                promoted must beEmpty
+            }
         }
       }
       "promoted none" in {
         f <<< "2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6/pPP w - f6 0 36" must beSome.like {
-          case s => s.situation.board.crazyData must beSome.like {
-            case Data(_, promoted) => promoted must beEmpty
-          }
+          case s =>
+            s.situation.board.crazyData must beSome.like {
+              case Data(_, promoted) => promoted must beEmpty
+            }
         }
       }
       "promoted some" in {
         f <<< "Q~R~b~2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q4q~R~/pPP w - f6 0 36" must beSome.like {
-          case s => s.situation.board.crazyData must beSome.like {
-            case Data(_, promoted) => promoted must_== Set(A8, B8, C8, G1, H1)
-          }
+          case s =>
+            s.situation.board.crazyData must beSome.like {
+              case Data(_, promoted) => promoted must_== Set(A8, B8, C8, G1, H1)
+            }
         }
       }
       "promoted on H8" in {
         f << "rnb1k2Q~/pp5p/2pp1p2/8/8/P1N2P2/P1PP1K1P/R1BQ1BNR/RPNBQPp b q - 21 11" must beSome.like {
-          case s => s.board.crazyData must beSome.like {
-            case Data(_, promoted) => promoted must_== Set(H8)
-          }
+          case s =>
+            s.board.crazyData must beSome.like {
+              case Data(_, promoted) => promoted must_== Set(H8)
+            }
         }
       }
       "promoted on H2" in {
         f << "r2q1b1r/p2k1Ppp/2p2p2/4p3/P2nP2n/3P1PRP/1PPB1K1q~/RN1Q1B2/Npb w - - 40 21" must beSome.like {
-          case s => s.board.crazyData must beSome.like {
-            case Data(_, promoted) => promoted must_== Set(H2)
-          }
+          case s =>
+            s.board.crazyData must beSome.like {
+              case Data(_, promoted) => promoted must_== Set(H2)
+            }
         }
       }
     }

@@ -1,7 +1,6 @@
 package chess
 
-case class Timestamp(value: Long)
-  extends AnyVal with Ordered[Timestamp] {
+case class Timestamp(value: Long) extends AnyVal with Ordered[Timestamp] {
 
   def -(o: Timestamp) = Centis.ofMillis(value - o.value)
 

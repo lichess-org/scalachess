@@ -1,11 +1,11 @@
 package chess
 
 /**
- * Utility methods for helping to determine whether a situation is a draw or a draw
- * on a player flagging.
- *
- * See http://www.e4ec.org/immr.html
- */
+  * Utility methods for helping to determine whether a situation is a draw or a draw
+  * on a player flagging.
+  *
+  * See http://www.e4ec.org/immr.html
+  */
 object InsufficientMatingMaterial {
 
   def nonKingPieces(board: Board) = board.pieces filter (_._2.role != King)
@@ -26,8 +26,12 @@ object InsufficientMatingMaterial {
    * being able to mate the other as informed by the traditional chess rules.
    */
   def apply(board: Board) = {
-    lazy val kingsAndBishopsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Bishop) }
-    val kingsAndMinorsOnly = board.pieces forall { p => (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight) }
+    lazy val kingsAndBishopsOnly = board.pieces forall { p =>
+      (p._2 is King) || (p._2 is Bishop)
+    }
+    val kingsAndMinorsOnly = board.pieces forall { p =>
+      (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight)
+    }
 
     kingsAndMinorsOnly && (board.pieces.size <= 3 || (kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
   }
@@ -41,14 +45,18 @@ object InsufficientMatingMaterial {
    */
   def apply(board: Board, color: Color) = {
 
-    val kingsAndMinorsOnlyOfColor = board.piecesOf(color) forall { p => (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight) }
-    lazy val nonKingRolesOfColor = board rolesOf color filter (King !=)
+    val kingsAndMinorsOnlyOfColor = board.piecesOf(color) forall { p =>
+      (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight)
+    }
+    lazy val nonKingRolesOfColor  = board rolesOf color filter (King !=)
     lazy val rolesOfOpponentColor = board rolesOf !color
 
     kingsAndMinorsOnlyOfColor && ((nonKingRolesOfColor toList).distinct match {
       case Nil => true
-      case List(Knight) => (nonKingRolesOfColor.size == 1) && (rolesOfOpponentColor filter (King !=) filter (Queen !=) isEmpty)
-      case List(Bishop) => !(rolesOfOpponentColor.exists(r => r == Knight || r == Pawn) || bishopsOnOppositeColors(board))
+      case List(Knight) =>
+        (nonKingRolesOfColor.size == 1) && (rolesOfOpponentColor filter (King !=) filter (Queen !=) isEmpty)
+      case List(Bishop) =>
+        !(rolesOfOpponentColor.exists(r => r == Knight || r == Pawn) || bishopsOnOppositeColors(board))
       case _ => false
     })
   }

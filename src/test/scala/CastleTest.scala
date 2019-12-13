@@ -9,7 +9,7 @@ class CastleTest extends ChessTest {
     val goodHist = """
 PPPPPPPP
 R  QK  R"""
-    val badHist = goodHist updateHistory (_ withoutCastles White)
+    val badHist  = goodHist updateHistory (_ withoutCastles White)
     "impossible" in {
       "standard chess" in {
         "near bishop in the way" in {
@@ -50,7 +50,7 @@ R  Q RK """)
         val board: Board = """
    PPPPP
 B     KR""".chess960
-        val game = Game(board, White)
+        val game         = Game(board, White)
         "viable moves" in {
           board destsFrom G1 must bePoss(F1, H1)
         }
@@ -72,7 +72,7 @@ RKRBB   """.chess960
         val board: Board = """
 PPPPPPPP
 RK     B""".chess960
-        val game = Game(board, White)
+        val game         = Game(board, White)
         "viable moves" in {
           board destsFrom B1 must bePoss(A1, C1)
         }
@@ -114,7 +114,7 @@ p pppppp
     val goodHist = """
 PPPPPPPP
 R   KB R"""
-    val badHist = goodHist updateHistory (_ withoutCastles White)
+    val badHist  = goodHist updateHistory (_ withoutCastles White)
     "impossible" in {
       "near queen in the way" in {
         goodHist place White.queen at D1 flatOption (_ destsFrom E1) must bePoss()
@@ -146,7 +146,7 @@ PPPPPPPP
     val board = """
 PPPPPPPP
 R   K  R""" withHistory History.castle(White, true, true)
-    val game = Game(board, White)
+    val game  = Game(board, White)
     "if king castles kingside" in {
       val g2 = game.playMove(E1, G1)
       "correct new board" in {
@@ -272,13 +272,23 @@ PPPPPPPP
     "king side" in {
       val board: Board = """R  QK  R"""
       board place Black.rook at H3 flatOption (_ destsFrom E1) must bePoss(
-        D2, E2, F1, F2, G1, H1
+        D2,
+        E2,
+        F1,
+        F2,
+        G1,
+        H1
       )
     }
     "queen side" in {
       val board: Board = """R   KB R"""
       board place Black.rook at A3 flatOption (_ destsFrom E1) must bePoss(
-        A1, C1, D1, D2, E2, F2
+        A1,
+        C1,
+        D1,
+        D2,
+        E2,
+        F2
       )
     }
   }

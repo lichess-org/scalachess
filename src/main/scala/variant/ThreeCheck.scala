@@ -1,14 +1,15 @@
 package chess
 package variant
 
-case object ThreeCheck extends Variant(
-  id = 5,
-  key = "threeCheck",
-  name = "Three-check",
-  shortName = "3check",
-  title = "Check your opponent 3 times to win the game.",
-  standardInitialPosition = true
-) {
+case object ThreeCheck
+    extends Variant(
+      id = 5,
+      key = "threeCheck",
+      name = "Three-check",
+      shortName = "3check",
+      title = "Check your opponent 3 times to win the game.",
+      standardInitialPosition = true
+    ) {
 
   def pieces = Standard.pieces
 
@@ -25,8 +26,8 @@ case object ThreeCheck extends Variant(
   }
 
   /**
-   * It's not possible to check or checkmate the opponent with only a king
-   */
+    * It's not possible to check or checkmate the opponent with only a king
+    */
   override def insufficientWinningMaterial(board: Board, color: Color) =
     board.rolesOf(color) == List(King)
 

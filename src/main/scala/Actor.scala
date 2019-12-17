@@ -175,7 +175,7 @@ final case class Actor(
     buf.toList
   }
 
-  private val pawnDir = pawnDirOf(color)
+  private def pawnDir = pawnDirOf(color)
 
   private def move(
       dest: Pos,

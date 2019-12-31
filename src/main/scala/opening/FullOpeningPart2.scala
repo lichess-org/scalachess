@@ -116,8 +116,6 @@ new FullOpening("C25", "Vienna Game: Vienna Gambit, Steinitz Gambit, Paulsen Def
 new FullOpening("C25", "Vienna Game: Vienna Gambit, Steinitz Gambit, Sörensen Defense", "r1b1kbnr/pppp1p1p/2n5/6p1/3PPp1q/2N5/PPP1K1PP/R1BQ1BNR w kq"),
 new FullOpening("C25", "Vienna Game: Vienna Gambit, Steinitz Gambit, Zukertort Defense", "r1b1kbnr/ppp2ppp/2n5/3p4/3PPp1q/2N5/PPP1K1PP/R1BQ1BNR w kq"),
 new FullOpening("C25", "Vienna Game: Zhuravlev Countergambit", "rnbqk2r/pppp1ppp/5n2/4p3/1b2P1Q1/2N5/PPPP1PPP/R1B1KBNR w KQkq"),
-new FullOpening("C25", "Vienna Game: Zhuravlev Countergambit", "rnbqk1nr/pppp1ppp/8/4p3/1b2P3/2N5/PPPP1PPP/R1BQKBNR w KQkq"),
-new FullOpening("C25", "Vienna Game: Zhuravlev Countergambit", "rnbqk1nr/pppp1ppp/8/4p3/1b2P1Q1/2N5/PPPP1PPP/R1B1KBNR b KQkq"),
 new FullOpening("C26", "Bishop's Opening: Vienna Hybrid, Spielmann Attack", "rnbqk2r/pppp1ppp/5n2/2b1p3/2B1P3/2NP4/PPP2PPP/R1BQK1NR b KQkq"),
 new FullOpening("C26", "Vienna Game: Falkbeer Variation", "rnbqkb1r/pppp1ppp/5n2/4p3/4P3/2N5/PPPP1PPP/R1BQKBNR w KQkq"),
 new FullOpening("C26", "Vienna Game: Mengarini Variation", "rnbqkb1r/pppp1ppp/5n2/4p3/4P3/P1N5/1PPP1PPP/R1BQKBNR b KQkq"),

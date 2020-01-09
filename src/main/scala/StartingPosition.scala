@@ -611,7 +611,7 @@ object StartingPosition {
         ),
         StartingPosition(
           "D00",
-          "Blackmar-Diemer Gambit",
+          "Blackmar Gambit",
           "rnbqkbnr/ppp1pppp/8/3p4/3PP3/8/PPP2PPP/RNBQKBNR b KQkq e3 1 2",
           "Blackmar–Diemer_Gambit",
           "1. d4 d5 2. e4"

@@ -86,6 +86,7 @@ final case class Actor(
 
   def color        = piece.color
   def is(c: Color) = c == piece.color
+  def is(r: Role)  = r == piece.role
   def is(p: Piece) = p == piece
 
   /*

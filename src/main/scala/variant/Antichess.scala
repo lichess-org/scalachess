@@ -38,7 +38,7 @@ case object Antichess
 
   override def specialEnd(situation: Situation) = {
     // The game ends with a win when one player manages to lose all their pieces or is in stalemate
-    situation.board.actorsOf(situation.color).isEmpty || situation.moves.isEmpty
+    situation.board.piecesOf(situation.color).isEmpty || situation.moves.isEmpty
   }
 
   // In antichess, there is no checkmate condition therefore a player may only draw either by agreement
@@ -49,22 +49,18 @@ case object Antichess
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color
   // of square to allow the player to force their opponent to capture their bishop, also resulting in a draw
   override def insufficientWinningMaterial(board: Board) = {
-    val actors = board.actors
-
     // Exit early if we are not in a situation with only bishops and pawns
-    val bishopsAndPawns = actors.forall(act => act._2.piece.is(Bishop) || act._2.piece.is(Pawn)) &&
-      actors.find(_._2.piece.is(Bishop)).isDefined
+    val bishopsAndPawns = board.pieces.values.forall(p => p.is(Bishop) || p.is(Pawn)) &&
+      board.pieces.values.exists(_.is(Bishop))
 
-    lazy val drawnBishops = actors.values.partition(_.color == White) match {
+    lazy val drawnBishops = board.actors.values.partition(_.is(White)) match {
       case (whitePieces, blackPieces) =>
-        val whiteBishops    = whitePieces.filter(_.piece.is(Bishop))
-        val blackBishops    = blackPieces.filter(_.piece.is(Bishop))
-        lazy val whitePawns = whitePieces.filter(_.piece.is(Pawn))
-        lazy val blackPawns = blackPieces.filter(_.piece.is(Pawn))
+        val whiteBishops    = whitePieces.filter(_.is(Bishop))
+        val blackBishops    = blackPieces.filter(_.is(Bishop))
+        lazy val whitePawns = whitePieces.filter(_.is(Pawn))
+        lazy val blackPawns = blackPieces.filter(_.is(Pawn))
 
-        // We consider the case where a player has two bishops on the same diagonal after promoting by using .distinct.
-        // If after applying .distinct the size of the list is greater than one, then the player has bishops on both
-        // colours
+        // We consider the case where a player has two bishops on the same diagonal after promoting.
         if (whiteBishops.map(_.pos.color).to(Set).size != 1 ||
             blackBishops.map(_.pos.color).to(Set).size != 1) false
         else {

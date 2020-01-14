@@ -12,8 +12,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant
-            .insufficientWinningMaterial(game.situation.board, Color.white) must beFalse
+          game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
 
@@ -23,8 +22,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant
-            .insufficientWinningMaterial(game.situation.board, Color.white) must beTrue
+          game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
 
@@ -34,8 +32,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant
-            .insufficientWinningMaterial(game.situation.board, Color.black) must beFalse
+          game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
 
@@ -45,8 +42,9 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant
-            .insufficientWinningMaterial(game.situation.board, Color.white) must beTrue
+          game.situation.autoDraw must beFalse
+          game.situation.end must beFalse
+          game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
 
@@ -56,8 +54,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant
-            .insufficientWinningMaterial(game.situation.board, Color.white) must beTrue
+          game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
 
@@ -67,8 +64,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant
-            .insufficientWinningMaterial(game.situation.board, Color.black) must beFalse
+          game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
 
@@ -78,8 +74,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant
-            .insufficientWinningMaterial(game.situation.board, Color.white) must beTrue
+          game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
 
@@ -89,8 +84,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant
-            .insufficientWinningMaterial(game.situation.board, Color.black) must beFalse
+          game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
 
@@ -100,8 +94,7 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant
-            .insufficientWinningMaterial(game.situation.board, Color.white) must beFalse
+          game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
 
@@ -111,7 +104,8 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board) must beTrue
+          game.situation.autoDraw must beTrue
+          game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
 
@@ -121,7 +115,8 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board) must beTrue
+          game.situation.autoDraw must beTrue
+          game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
 
@@ -131,7 +126,8 @@ class HordeVariantTest extends ChessTest {
 
       game must beSuccess.like {
         case game =>
-          game.situation.board.variant.insufficientWinningMaterial(game.situation.board) must beFalse
+          game.situation.autoDraw must beFalse
+          game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
   }

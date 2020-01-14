@@ -84,8 +84,8 @@ case object Crazyhouse
     super.checkmate(situation) && !canDropStuff(situation)
 
   // there is always sufficient mating material in Crazyhouse
-  override def insufficientWinningMaterial(board: Board, color: Color) = false
-  override def insufficientWinningMaterial(board: Board)               = false
+  override def opponentHasInsufficientMaterial(situation: Situation) = false
+  override def isInsufficientMaterial(board: Board)                  = false
 
   def possibleDrops(situation: Situation): Option[List[Pos]] =
     if (!situation.check) None

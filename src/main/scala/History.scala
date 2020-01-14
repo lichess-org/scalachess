@@ -48,8 +48,6 @@ case class History(
 
   def fivefoldRepetition = isRepetition(5)
 
-  def fiftyMoves: Boolean = halfMoveClock >= 100
-
   def canCastle(color: Color) = castles can color
 
   def withoutCastles(color: Color) = copy(castles = castles without color)

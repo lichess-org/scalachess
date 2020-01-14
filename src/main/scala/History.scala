@@ -41,18 +41,22 @@ case class History(
   def setHalfMoveClock(v: Int) =
     copy(positionHashes = History.spoofHashes(v + 1))
 
-  def threefoldRepetition: Boolean = halfMoveClock >= 8 && {
+  private def isRepetition(times: Int) = halfMoveClock >= (times - 1) * 4 && {
     // compare only hashes for positions with the same side to move
-    val positions = (positionHashes grouped Hash.size).sliding(1, 2).flatten.toList
+    val positions = positionHashes.sliding(Hash.size, 2 * Hash.size).toList
     positions.headOption match {
       case Some(Array(x, y, z)) =>
         (positions count {
           case Array(x2, y2, z2) => x == x2 && y == y2 && z == z2
           case _                 => false
-        }) >= 3
-      case _ => false
+        }) >= times
+      case _ => times <= 1
     }
   }
+
+  def threefoldRepetition = isRepetition(3)
+
+  def fivefoldRepetition = isRepetition(5)
 
   def fiftyMoves: Boolean = halfMoveClock >= 100
 

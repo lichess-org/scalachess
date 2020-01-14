@@ -42,18 +42,9 @@ case object Crazyhouse
       after = board1 withCrazyData d2
     )
 
-  override def updatePositionHashes(board: Board, move: Move, hash: chess.PositionHash) =
-    updateHashes(hash, board, !move.piece.color)
+  override def fiftyMoves(history: History): Boolean = false
 
-  override def updatePositionHashes(board: Board, drop: Drop, hash: chess.PositionHash) =
-    updateHashes(hash, board, !drop.piece.color)
-
-  // don't clear the hash on pawn move or promotion, to preserve threefold repetition
-  // but disable 50-moves by truncating the hash at 99
-  private def updateHashes(hash: PositionHash, board: Board, color: Color) = {
-    val newHash = Hash(Situation(board, color)) ++ hash
-    if (newHash.size > 99 * Hash.size) newHash take 99 * Hash.size else newHash
-  }
+  override def isIrreversible(move: Move): Boolean = move.castles
 
   override def finalizeBoard(board: Board, uci: Uci, capture: Option[Piece]): Board = uci match {
     case Uci.Move(orig, dest, promOption) =>

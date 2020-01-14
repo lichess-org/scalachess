@@ -162,8 +162,9 @@ case class Board(
 
   def count(p: Piece): Int = pieces.values count (_ == p)
   def count(c: Color): Int = pieces.values count (_.color == c)
-
-  def autoDraw: Boolean = history.fiftyMoves || variant.isInsufficientMaterial(this) || history.fivefoldRepetition
+  
+  def autoDraw: Boolean =
+    variant.fiftyMoves(history) || variant.isInsufficientMaterial(this) || history.fivefoldRepetition
 
   def situationOf(color: Color) = Situation(this, color)
 

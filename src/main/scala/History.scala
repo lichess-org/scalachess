@@ -23,25 +23,15 @@ object UnmovedRooks {
 
 case class History(
     lastMove: Option[Uci] = None,
-    positionHashes: PositionHash = Hash.zero,
+    positionHashes: PositionHash = Array.empty,
     castles: Castles = Castles.all,
     checkCount: CheckCount = CheckCount(0, 0),
-    unmovedRooks: UnmovedRooks = UnmovedRooks.default
+    unmovedRooks: UnmovedRooks = UnmovedRooks.default,
+    halfMoveClock: Int = 0
 ) {
+  def setHalfMoveClock(v: Int) = copy(halfMoveClock = v)
 
-  /**
-    * Halfmove clock: This is the number of halfmoves
-    * since the last pawn advance or capture.
-    * This is used to determine if a draw
-    * can be claimed under the fifty-move rule.
-    */
-  def halfMoveClock = math.max(0, (positionHashes.size / Hash.size) - 1)
-
-  // generates random positionHashes to satisfy the half move clock
-  def setHalfMoveClock(v: Int) =
-    copy(positionHashes = History.spoofHashes(v + 1))
-
-  private def isRepetition(times: Int) = halfMoveClock >= (times - 1) * 4 && {
+  private def isRepetition(times: Int) = positionHashes.size > (times - 1) * 4 * Hash.size && {
     // compare only hashes for positions with the same side to move
     val positions = positionHashes.sliding(Hash.size, 2 * Hash.size).toList
     positions.headOption match {
@@ -57,8 +47,6 @@ case class History(
   def threefoldRepetition = isRepetition(3)
 
   def fivefoldRepetition = isRepetition(5)
-
-  def fiftyMoves: Boolean = halfMoveClock >= 100
 
   def canCastle(color: Color) = castles can color
 
@@ -111,10 +99,4 @@ object History {
     )
 
   def noCastle = History(castles = Castles.none)
-
-  private def spoofHashes(n: Int): PositionHash = {
-    (1 to n).toArray.flatMap { i =>
-      Array((i >> 16).toByte, (i >> 8).toByte, i.toByte)
-    }
-  }
 }

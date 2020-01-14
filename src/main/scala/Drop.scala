@@ -21,7 +21,8 @@ case class Drop(
       after updateHistory { h =>
         h.copy(
           lastMove = Some(Uci.Drop(piece.role, pos)),
-          unmovedRooks = before.unmovedRooks
+          unmovedRooks = before.unmovedRooks,
+          halfMoveClock = h.halfMoveClock + 1
         )
       },
       toUci,
@@ -29,7 +30,7 @@ case class Drop(
     )
 
     board updateHistory {
-      _.copy(positionHashes = board.variant updatePositionHashes (board, this, board.history.positionHashes))
+      _.copy(positionHashes = Hash(Situation(board, !piece.color)) ++ board.history.positionHashes)
     }
   }
 

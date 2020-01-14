@@ -50,7 +50,7 @@ class CrazyhouseVariantTest extends ChessTest {
         val moves = List.fill(30)(List(B1 -> C3, B8 -> C6, C3 -> B1, C6 -> B8))
         Game(Crazyhouse).playMoves(moves.flatten: _*) must beSuccess.like {
           case g =>
-            g.board.history.fiftyMoves must beFalse
+            g.board.variant.fiftyMoves(g.board.history) must beFalse
             g.board.autoDraw must beTrue // fivefold repetition
         }
       }

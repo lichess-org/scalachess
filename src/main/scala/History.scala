@@ -31,7 +31,7 @@ case class History(
 ) {
   def setHalfMoveClock(v: Int) = copy(halfMoveClock = v)
 
-  private def isRepetition(times: Int) = halfMoveClock >= (times - 1) * 4 && {
+  private def isRepetition(times: Int) = positionHashes.size > (times - 1) * 4 * Hash.size && {
     // compare only hashes for positions with the same side to move
     val positions = positionHashes.sliding(Hash.size, 2 * Hash.size).toList
     positions.headOption match {

@@ -42,7 +42,7 @@ case object Crazyhouse
       after = board1 withCrazyData d2
     )
 
-  override def fiftyMoves(board: Board): Boolean = false
+  override def fiftyMoves(history: History): Boolean = false
 
   override def isIrreversible(move: Move): Boolean = move.castles
 

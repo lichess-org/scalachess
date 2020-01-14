@@ -112,16 +112,17 @@ abstract class Variant private[variant] (
   @silent def specialDraw(situation: Situation) = false
 
   /**
-    * Returns true if neither player can win
+    * Returns true if neither player can win. The game should end immediately.
     */
-  def insufficientWinningMaterial(board: Board) = InsufficientMatingMaterial(board)
+  def isInsufficientMaterial(board: Board) = InsufficientMatingMaterial(board)
 
   /**
-    * Returns true if the player of the given colour has insufficient material to win.
-    * This can be used to determine whether a player losing on time against a player
-    * who doesn't have enough material to win should draw instead.
+    * Returns true if the other player cannot win. This is relevant when the
+    * side to move times out or disconnects. Instead of losing on time,
+    * the game should be drawn.
     */
-  def insufficientWinningMaterial(board: Board, color: Color) = InsufficientMatingMaterial(board, color)
+  def opponentHasInsufficientMaterial(situation: Situation) =
+    InsufficientMatingMaterial(situation.board, !situation.color)
 
   // Some variants have an extra effect on the board on a move. For example, in Atomic, some
   // pieces surrounding a capture explode

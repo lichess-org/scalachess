@@ -66,7 +66,7 @@ case object Horde
     * In horde chess, black can win unless a fortress stalemate is unavoidable.
     *  Auto-drawing the game should almost never happen, but it did in https://lichess.org/xQ2RsU8N#121
     */
-  override def insufficientWinningMaterial(board: Board) = hordeClosedPosition(board)
+  override def isInsufficientMaterial(board: Board) = hordeClosedPosition(board)
 
   /**
     * In horde chess, the horde cannot win on * V K or [BN]{2} v K or just one piece
@@ -74,9 +74,11 @@ case object Horde
     * Technically there are some positions where stalemate is unavoidable which
     * this method does not detect; however, such are trivial to premove.
     */
-  override def insufficientWinningMaterial(board: Board, color: Color): Boolean = {
+  override def opponentHasInsufficientMaterial(situation: Situation): Boolean = {
+    val board         = situation.board
+    val opponentColor = !situation.color
     lazy val fortress = hordeClosedPosition(board) // costly function call
-    if (color == Color.white) {
+    if (opponentColor == Color.white) {
       lazy val notKingPieces           = InsufficientMatingMaterial.nonKingPieces(board) toList
       val horde                        = board.piecesOf(Color.white)
       lazy val hordeBishopSquareColors = horde.filter(_._2.is(Bishop)).toList.map(_._1.color).distinct

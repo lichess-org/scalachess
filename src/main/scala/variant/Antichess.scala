@@ -41,14 +41,14 @@ case object Antichess
     situation.board.piecesOf(situation.color).isEmpty || situation.moves.isEmpty
   }
 
-  // In antichess, there is no checkmate condition therefore a player may only draw either by agreement
-  // , blockade or stalemate - a player always has sufficient material to win otherwise
-  override def insufficientWinningMaterial(board: Board, color: Color) = false
+  // In antichess, there is no checkmate condition therefore a player may only draw either by agreement,
+  // blockade or stalemate. A player always has sufficient material to win otherwise.
+  override def opponentHasInsufficientMaterial(situation: Situation) = false
 
   // No player can win if the only remaining pieces are opposing bishops on different coloured
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color
   // of square to allow the player to force their opponent to capture their bishop, also resulting in a draw
-  override def insufficientWinningMaterial(board: Board) = {
+  override def isInsufficientMaterial(board: Board) = {
     // Exit early if we are not in a situation with only bishops and pawns
     val bishopsAndPawns = board.pieces.values.forall(p => p.is(Bishop) || p.is(Pawn)) &&
       board.pieces.values.exists(_.is(Bishop))

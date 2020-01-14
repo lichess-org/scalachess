@@ -22,6 +22,7 @@ class CrazyhouseVariantTest extends ChessTest {
         )
       }
       game.situation.checkMate must beTrue
+      game.situation.opponentHasInsufficientMaterial must beFalse
     }
 
     "pieces to drop, in vain" in {
@@ -40,6 +41,7 @@ class CrazyhouseVariantTest extends ChessTest {
         )
       }
       game.situation.checkMate must beTrue
+      game.situation.opponentHasInsufficientMaterial must beFalse
     }
 
     "autodraw" in {
@@ -259,7 +261,9 @@ class CrazyhouseVariantTest extends ChessTest {
         val game = {
           fenToGame(fenPosition, Crazyhouse).toOption err "error"
         }
-        game.board.autoDraw must beFalse
+        game.situation.autoDraw must beFalse
+        game.situation.end must beFalse
+        game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
     "prod 50 games accumulate hash" in {

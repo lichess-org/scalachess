@@ -118,7 +118,7 @@ case object Atomic
    * mate would be not be very likely. Additionally, a player can only mate another player with sufficient material.
    * We also look out for closed positions (pawns that cannot move and kings which cannot capture them.)
    */
-  override def insufficientWinningMaterial(board: Board) = {
+  override def isInsufficientMaterial(board: Board) = {
     insufficientAtomicWinningMaterial(board) || atomicClosedPosition(board)
   }
 
@@ -137,8 +137,8 @@ case object Atomic
     * a piece in the opponent's king's proximity. On the other hand, a king alone or a king with
     * immobile pawns is not sufficient material to win with.
     */
-  override def insufficientWinningMaterial(board: Board, color: Color) =
-    board.rolesOf(color) == List(King)
+  override def opponentHasInsufficientMaterial(situation: Situation) =
+    situation.board.rolesOf(!situation.color) == List(King)
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
   override def specialEnd(situation: Situation) = situation.board.kingPos.size != 2

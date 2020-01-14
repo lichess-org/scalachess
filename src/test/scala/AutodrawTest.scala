@@ -404,8 +404,7 @@ K   bB""".autoDraw must_== false
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
-          game.board.variant.insufficientWinningMaterial(game.board, White) must beTrue
-          game.board.variant.insufficientWinningMaterial(game.board, Black) must beFalse
+          game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
     "on knight versus pawn" in {
@@ -419,6 +418,7 @@ K   bB""".autoDraw must_== false
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
+          game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
     "on bishops versus pawn" in {
@@ -432,6 +432,7 @@ K   bB""".autoDraw must_== false
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
+          game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
     "on bishops versus queen" in {
@@ -445,8 +446,7 @@ K   bB""".autoDraw must_== false
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
-          game.board.variant.insufficientWinningMaterial(game.board, White) must beFalse
-          game.board.variant.insufficientWinningMaterial(game.board, Black) must beFalse
+          game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
     "on bishops versus queen" in {
@@ -460,8 +460,7 @@ K   bB""".autoDraw must_== false
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
-          game.board.variant.insufficientWinningMaterial(game.board, White) must beFalse
-          game.board.variant.insufficientWinningMaterial(game.board, Black) must beTrue
+          game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
     "on knight versus pawns" in {
@@ -475,6 +474,7 @@ K   bB""".autoDraw must_== false
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
+          game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
     "on knight versus pieces" in {
@@ -488,6 +488,7 @@ K   bB""".autoDraw must_== false
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
+          game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
     "on opposite bishops with queen" in {
@@ -501,6 +502,7 @@ K   bB""".autoDraw must_== false
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
+          game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
   }

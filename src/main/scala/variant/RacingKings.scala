@@ -39,8 +39,8 @@ case object RacingKings
 
   override val initialFen = "8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1"
 
-  override def insufficientWinningMaterial(board: Board)               = false
-  override def insufficientWinningMaterial(board: Board, color: Color) = false
+  override def isInsufficientMaterial(board: Board)                  = false
+  override def opponentHasInsufficientMaterial(situation: Situation) = false
 
   private def reachedGoal(board: Board, color: Color) =
     board.kingPosOf(color) exists (_.y == 8)

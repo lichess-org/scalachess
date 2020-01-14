@@ -53,8 +53,7 @@ class VariantTest extends ChessTest {
 
       game should beSuccess.like {
         case game =>
-          game.situation.board.variant
-            .insufficientWinningMaterial(game.situation.board, Color.white) must beTrue
+          game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
 
@@ -64,8 +63,7 @@ class VariantTest extends ChessTest {
 
       game should beSuccess.like {
         case game =>
-          game.situation.board.variant
-            .insufficientWinningMaterial(game.situation.board, Color.white) must beFalse
+          game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
 
@@ -75,8 +73,7 @@ class VariantTest extends ChessTest {
 
       game should beSuccess.like {
         case game =>
-          game.situation.board.variant
-            .insufficientWinningMaterial(game.situation.board, Color.white) must beTrue
+          game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
   }

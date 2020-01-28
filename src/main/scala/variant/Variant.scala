@@ -112,6 +112,16 @@ abstract class Variant private[variant] (
   @silent def specialDraw(situation: Situation) = false
 
   /**
+    * Returns the material imbalance in pawns (overridden in Antichess)
+    */
+  def materialImbalance(board: Board): Int = board.pieces.values.foldLeft(0) {
+    case (acc, Piece(color, role)) =>
+      Role.valueOf(role).fold(acc) { value =>
+        acc + value * color.fold(1, -1)
+      }
+  }
+
+  /**
     * Returns true if neither player can win. The game should end immediately.
     */
   def isInsufficientMaterial(board: Board) = InsufficientMatingMaterial(board)

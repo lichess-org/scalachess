@@ -53,6 +53,7 @@ class VariantTest extends ChessTest {
 
       game should beSuccess.like {
         case game =>
+          game.board.materialImbalance must_== -91
           game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
@@ -63,6 +64,7 @@ class VariantTest extends ChessTest {
 
       game should beSuccess.like {
         case game =>
+          game.board.materialImbalance must_== 0
           game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
@@ -73,6 +75,7 @@ class VariantTest extends ChessTest {
 
       game should beSuccess.like {
         case game =>
+          game.board.materialImbalance must_== -6
           game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
@@ -322,6 +325,15 @@ K  r
   "antichess" should {
     "initialize the board without castling rights" in {
       Board.init(Antichess).history.castles.isEmpty must beTrue
+    }
+
+    "calculate material imbalance" in {
+      val position = "8/p7/8/8/2B5/b7/PPPK2PP/RNB3NR w - - 1 16"
+      val game     = fenToGame(position, Antichess)
+
+      game must beSuccess.like {
+        case game => game.situation.board.materialImbalance must_== -20
+      }
     }
   }
 

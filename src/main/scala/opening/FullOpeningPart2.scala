@@ -993,6 +993,7 @@ new FullOpening("C99", "Ruy Lopez: Morphy Defense, Chigorin Defense, Panov Syste
 new FullOpening("D00", "Amazon Attack", "rnbqkbnr/ppp1pppp/8/3p4/3P4/3Q4/PPP1PPPP/RNB1KBNR b KQkq"),
 new FullOpening("D00", "Amazon Attack: Siberian Attack", "rnbqkb1r/ppp1pppp/5n2/3p4/3P4/2NQ4/PPP1PPPP/R1B1KBNR b KQkq"),
 new FullOpening("D00", "Blackmar Gambit", "rnbqkbnr/ppp1pppp/8/3p4/3PP3/8/PPP2PPP/RNBQKBNR b KQkq"),
+new FullOpening("D00", "Blackmar-Diemer Gambit", "rnbqkbnr/ppp1pppp/8/8/3Pp3/2N5/PPP2PPP/R1BQKBNR b KQkq"),
 new FullOpening("D00", "Blackmar-Diemer Gambit", "rnbqkb1r/ppp1pppp/5n2/3p4/3PP3/2N5/PPP2PPP/R1BQKBNR b KQkq"),
 new FullOpening("D00", "Blackmar-Diemer Gambit Declined, Brombacher Countergambit", "rnbqkb1r/pp2pppp/5n2/2p5/3Pp3/2N2P2/PPP3PP/R1BQKBNR w KQkq"),
 new FullOpening("D00", "Blackmar-Diemer Gambit Declined, Elbert Countergambit", "rnbqkb1r/ppp2ppp/5n2/4p3/3Pp3/2N2P2/PPP3PP/R1BQKBNR w KQkq"),

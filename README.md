@@ -19,9 +19,10 @@ In the sbt shell, to compile scalachess, run
 
     compile
 
-To run the tests:
+To run the tests (with coverage):
 
-    test
+    clean coverage test
+    coverageReport
 
 Code formatting
 ###

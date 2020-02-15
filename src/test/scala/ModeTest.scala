@@ -3,6 +3,8 @@ import chess.Mode._
 
 class ModeTest extends ChessTest {
 
+  private val invalidId = 42
+
   "Mode" should {
     "either be Casual or rated" in {
       Casual.casual must_== true
@@ -22,13 +24,16 @@ class ModeTest extends ChessTest {
       Mode(1).get must_== Rated
     }
 
+    "return None if the Mode cannot be found" in {
+      Mode(invalidId) must beNone
+    }
+
     "find a Mode based on whether it is rated or not" in {
       Mode(true) must_== Rated
       Mode(false) must_== Casual
     }
 
     "have a default Mode of Casual" in {
-      val invalidId = 3
       Mode orDefault invalidId must_== Casual
     }
   }

@@ -13,7 +13,7 @@ class SpeedTest extends ChessTest {
       Speed(5).get must_== Rapid
     }
 
-    "return None if the ID does not exist" in {
+    "return None if the Speed cannot be found" in {
       val invalidId = 42
       Speed(invalidId) must beNone
     }

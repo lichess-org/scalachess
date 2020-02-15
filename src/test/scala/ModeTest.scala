@@ -1,3 +1,5 @@
+package chess
+
 import chess.{ ChessTest, Mode }
 import chess.Mode._
 

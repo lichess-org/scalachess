@@ -1,3 +1,5 @@
+package chess
+
 import chess.Speed._
 import chess.{ ChessTest, Clock, Speed }
 

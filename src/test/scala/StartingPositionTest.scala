@@ -1,3 +1,5 @@
+package chess
+
 import chess.ChessTest
 import chess.StartingPosition._
 import chess.StartingPosition.presets._

@@ -1,3 +1,5 @@
+package chess
+
 import chess.Status._
 import chess.{ ChessTest, Status }
 

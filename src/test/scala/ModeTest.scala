@@ -6,7 +6,7 @@ class ModeTest extends ChessTest {
   private val invalidId = 42
 
   "Mode" should {
-    "either be Casual or rated" in {
+    "either be Casual or Rated" in {
       Casual.casual must_== true
       Casual.rated must_== false
 

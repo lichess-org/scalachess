@@ -69,7 +69,7 @@ class SpeedTest extends ChessTest {
       Blitz compare Rapid must_== -1
     }
 
-    "return 0 if they equal" in {
+    "return 0 if they are equal" in {
       Blitz compare Blitz must_== 0
     }
 

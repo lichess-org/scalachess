@@ -3,8 +3,8 @@ import chess.{ ChessTest, Clock, Speed }
 
 class SpeedTest extends ChessTest {
 
-  "Speed" should {
-    "find a Speed by ID" in {
+  "Finding a Speed" should {
+    "return each Speed by ID" in {
       Speed(0).get must_== UltraBullet
       Speed(1).get must_== Bullet
       Speed(2).get must_== Blitz

@@ -14,7 +14,7 @@ class ModeTest extends ChessTest {
       Rated.rated must_== true
     }
 
-    "fold" in {
+    "fold based on type" in {
       Casual.fold(true, false) must_== true
       Rated.fold(true, false) must_== false
     }

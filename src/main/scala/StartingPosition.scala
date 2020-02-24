@@ -43,6 +43,13 @@ object StartingPosition {
           false
         ),
         StartingPosition(
+          "B01",
+          "Scandinavian Defense, Icelandic-Palme Gambit",
+          "rnbqkb1r/ppp2ppp/4pn2/3P4/2P5/8/PP1P1PPP/RNBQKBNR w KQkq - 0 4",
+          "Scandinavian_Defense",
+          "1. e4 d5 2. exd5 Nf6 3. c4 e6"
+        ),
+        StartingPosition(
           "B02",
           "Alekhine's Defence",
           "rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 2 2",

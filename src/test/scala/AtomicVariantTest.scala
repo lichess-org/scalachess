@@ -662,5 +662,17 @@ class AtomicVariantTest extends ChessTest {
           game.situation.end must beFalse
       }
     }
+
+    "Checkmate overrides closed position" in {
+      val position = "8/8/b1p5/kpP5/p3K3/PP6/8/8 w - - 0 1"
+      val game     = fenToGame(position, Atomic)
+      val newGame  = game flatMap (_.playMove(Pos.B3, Pos.B4))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.autoDraw must beFalse
+          game.situation.end must beTrue
+      }
+    }
   }
 }

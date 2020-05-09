@@ -126,9 +126,25 @@ case object Atomic
     * Since a king cannot capture, K + P vs K + P where none of the pawns can move is an automatic draw
     */
   private def atomicClosedPosition(board: Board) = {
-    board.actors.values.forall(actor =>
+    val closedStructure = board.actors.values.forall(actor =>
       (actor.piece.is(Pawn) && actor.moves.isEmpty
-        && InsufficientMatingMaterial.pawnBlockedByPawn(actor, board)) || actor.piece.is(King)
+        && InsufficientMatingMaterial.pawnBlockedByPawn(actor, board))
+        || actor.piece.is(King) || actor.piece.is(Bishop)
+    )
+    val randomBishop = board.pieces.find { case (_, piece) => piece.is(Bishop) }
+    val bishopsAbsentOrPawnitized = randomBishop match {
+      case Some((pos, piece)) => bishopPawnitized(board, piece.color, pos.color)
+      case None               => true
+    }
+    closedStructure && bishopsAbsentOrPawnitized
+  }
+
+  private def bishopPawnitized(board: Board, sideWithBishop: Color, bishopSquares: Color) = {
+    board.actors.values.forall(actor =>
+      (actor.piece.is(Pawn) && actor.piece.is(sideWithBishop)) ||
+        (actor.piece.is(Pawn) && actor.piece.is(!sideWithBishop) && actor.pos.color == !bishopSquares) ||
+        (actor.piece.is(Bishop) && actor.piece.is(sideWithBishop) && actor.pos.color == bishopSquares) ||
+        actor.piece.is(King)
     )
   }
 

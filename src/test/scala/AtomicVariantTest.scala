@@ -626,5 +626,53 @@ class AtomicVariantTest extends ChessTest {
       val errorGame = game flatMap (_.playMove(Pos.E1, Pos.B1))
       errorGame must beFailure
     }
+
+    "An automatic draw in a closed position with kings, pawns and a pawnitized bishop" in {
+      val position = "8/8/2k1p3/5p2/4PP2/1b6/4K3/8 w - - 0 1"
+      val game     = fenToGame(position, Atomic)
+      val newGame  = game flatMap (_.playMove(Pos.E4, Pos.E5))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.autoDraw must beTrue
+          game.situation.end must beTrue
+      }
+    }
+
+    "Not draw inappropriately on blocked pawns with a non-pawnitized bishop" in {
+      val position = "8/8/2k5/5p2/8/2b2P2/8/3K4 w - - 0 1"
+      val game     = fenToGame(position, Atomic)
+      val newGame  = game flatMap (_.playMove(Pos.F3, Pos.F4))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.autoDraw must beFalse
+          game.situation.end must beFalse
+      }
+    }
+
+    "Not draw inappropriately if both sides have a pawnitized bishop" in {
+      val position = "6bk/4B2p/8/7P/4K3/8/8/8 w - - 0 1"
+      val game     = fenToGame(position, Atomic)
+      val newGame  = game flatMap (_.playMove(Pos.H5, Pos.H6))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.autoDraw must beFalse
+          game.situation.end must beFalse
+      }
+    }
+
+    "Checkmate overrides closed position" in {
+      val position = "8/8/b1p5/kpP5/p3K3/PP6/8/8 w - - 0 1"
+      val game     = fenToGame(position, Atomic)
+      val newGame  = game flatMap (_.playMove(Pos.B3, Pos.B4))
+
+      newGame must beSuccess.like {
+        case game =>
+          game.situation.autoDraw must beFalse
+          game.situation.end must beTrue
+      }
+    }
   }
 }

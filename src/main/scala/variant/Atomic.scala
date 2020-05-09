@@ -131,11 +131,12 @@ case object Atomic
         && InsufficientMatingMaterial.pawnBlockedByPawn(actor, board))
         || actor.piece.is(King) || actor.piece.is(Bishop)
     )
-    val bishopColoring =
-      for ((pos, piece) <- board.pieces if piece.is(Bishop))
-        yield (piece.color, pos.color)
-    closedStructure && (bishopColoring.size == 0 ||
-    bishopPawnitized(board, bishopColoring.head._1, bishopColoring.head._2))
+    val randomBishop = board.pieces.find { case (_, piece) => piece.is(Bishop) }
+    val bishopsAbsentOrPawnitized = randomBishop match {
+      case Some((pos, piece)) => bishopPawnitized(board, piece.color, pos.color)
+      case None               => true
+    }
+    closedStructure && bishopsAbsentOrPawnitized
   }
 
   private def bishopPawnitized(board: Board, sideWithBishop: Color, bishopSquares: Color) = {

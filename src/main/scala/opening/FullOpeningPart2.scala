@@ -127,6 +127,7 @@ new FullOpening("C27", "Boden-Kieseritzky Gambit, Lichtenhein Defense", "rnbqkb1
 new FullOpening("C27", "Vienna Game", "rnbqkbnr/pppp1ppp/8/4p3/4P3/2N5/PPPP1PPP/R1BQKBNR b KQkq"),
 new FullOpening("C27", "Vienna Game", "rnbqkb1r/pppp1ppp/8/4p3/2B1n3/2N5/PPPP1PPP/R1BQK1NR w KQkq"),
 new FullOpening("C27", "Vienna Game: Adams' Gambit", "r1bqkb1r/pppp1ppp/2nn4/4p2Q/3P4/1BN5/PPP2PPP/R1B1K1NR b KQkq"),
+new FullOpening("C27", "Vienna Game: Frankenstein-Dracula Variation", "rnbqkb1r/pppp1ppp/8/4p3/2B1n3/2N5/PPPP1PPP/R1BQK1NR w KQkq"),
 new FullOpening("C27", "Vienna Game: Stanley Variation, Alekhine Variation", "r1bqk2r/ppppbppp/2nn4/4N2Q/8/1BN5/PPPP1PPP/R1B1K2R b KQkq"),
 new FullOpening("C27", "Vienna Game: Stanley Variation, Eifel Gambit", "rnbqk2r/p1pp1ppp/5n2/1pb1p3/2B1P3/2N5/PPPPNPPP/R1BQK2R w KQkq"),
 new FullOpening("C27", "Vienna Game: Stanley Variation, Frankenstein-Dracula Variation", "N1bk1b1r/p2pq2p/1pnn2p1/3Qpp2/8/1B6/PPPP1PPP/R1B1K1NR w KQ"),

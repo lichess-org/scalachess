@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import com.github.ghik.silencer.silent
+import scala.annotation.nowarn
 import scalaz.Validation.failureNel
 import scalaz.Validation.FlatMap._
 
@@ -40,11 +40,12 @@ abstract class Variant private[variant] (
 
   def initialFen = format.Forsyth.initial
 
-  def isValidPromotion(promotion: Option[PromotableRole]) = promotion match {
-    case None                                 => true
-    case Some(Queen | Rook | Knight | Bishop) => true
-    case _                                    => false
-  }
+  def isValidPromotion(promotion: Option[PromotableRole]) =
+    promotion match {
+      case None                                 => true
+      case Some(Queen | Rook | Knight | Bishop) => true
+      case _                                    => false
+    }
 
   def validMoves(situation: Situation): Map[Pos, List[Move]] =
     situation.actors
@@ -67,19 +68,22 @@ abstract class Variant private[variant] (
   def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) =
     pieceThreatened(board, color, to, filter)
 
-  def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean = ! {
-    kingPos exists { kingThreatened(m.after, !m.color, _, filter) }
-  }
+  def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean =
+    ! {
+      kingPos exists { kingThreatened(m.after, !m.color, _, filter) }
+    }
 
-  def kingSafety(a: Actor, m: Move): Boolean = kingSafety(
-    m,
-    if ((a.piece is King) || a.check)(_ => true) else (_.role.projection),
-    if (a.piece.role == King) None else a.board kingPosOf a.color
-  )
+  def kingSafety(a: Actor, m: Move): Boolean =
+    kingSafety(
+      m,
+      if ((a.piece is King) || a.check) (_ => true) else (_.role.projection),
+      if (a.piece.role == King) None else a.board kingPosOf a.color
+    )
 
-  def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean = dir(p) exists { next =>
-    next == to || (!board.pieces.contains(next) && longRangeThreatens(board, next, dir, to))
-  }
+  def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
+    dir(p) exists { next =>
+      next == to || (!board.pieces.contains(next) && longRangeThreatens(board, next, dir, to))
+    }
 
   def move(situation: Situation, from: Pos, to: Pos, promotion: Option[PromotableRole]): Valid[Move] = {
 
@@ -107,19 +111,20 @@ abstract class Variant private[variant] (
   def winner(situation: Situation): Option[Color] =
     if (situation.checkMate || specialEnd(situation)) Some(!situation.color) else None
 
-  @silent def specialEnd(situation: Situation) = false
+  @nowarn def specialEnd(situation: Situation) = false
 
-  @silent def specialDraw(situation: Situation) = false
+  @nowarn def specialDraw(situation: Situation) = false
 
   /**
     * Returns the material imbalance in pawns (overridden in Antichess)
     */
-  def materialImbalance(board: Board): Int = board.pieces.values.foldLeft(0) {
-    case (acc, Piece(color, role)) =>
-      Role.valueOf(role).fold(acc) { value =>
-        acc + value * color.fold(1, -1)
-      }
-  }
+  def materialImbalance(board: Board): Int =
+    board.pieces.values.foldLeft(0) {
+      case (acc, Piece(color, role)) =>
+        Role.valueOf(role).fold(acc) { value =>
+          acc + value * color.fold(1, -1)
+        }
+    }
 
   /**
     * Returns true if neither player can win. The game should end immediately.
@@ -152,7 +157,7 @@ abstract class Variant private[variant] (
   /**
     * Once a move has been decided upon from the available legal moves, the board is finalized
     */
-  @silent def finalizeBoard(board: Board, uci: format.Uci, captured: Option[Piece]): Board = board
+  @nowarn def finalizeBoard(board: Board, uci: format.Uci, captured: Option[Piece]): Board = board
 
   protected def pawnsOnPromotionRank(board: Board, color: Color) = {
     board.pieces.exists {
@@ -247,12 +252,15 @@ object Variant {
   private[variant] def symmetricRank(rank: IndexedSeq[Role]): Map[Pos, Piece] =
     (for (y <- Seq(1, 2, 7, 8); x <- 1 to 8) yield {
       posAt(x, y) map { pos =>
-        (pos, y match {
-          case 1 => White - rank(x - 1)
-          case 2 => White.pawn
-          case 7 => Black.pawn
-          case 8 => Black - rank(x - 1)
-        })
+        (
+          pos,
+          y match {
+            case 1 => White - rank(x - 1)
+            case 2 => White.pawn
+            case 7 => Black.pawn
+            case 8 => Black - rank(x - 1)
+          }
+        )
       }
     }).flatten.toMap
 }

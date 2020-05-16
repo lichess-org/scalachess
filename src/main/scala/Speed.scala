@@ -21,7 +21,13 @@ object Speed {
   case object Classical
       extends Speed(3, "classical", 1500 to 21599, "Classical", "Classical games: 25 minutes and more")
   case object Correspondence
-      extends Speed(4, "correspondence", 21600 to Int.MaxValue, "Correspondence", "Correspondence games")
+      extends Speed(
+        4,
+        "correspondence",
+        21600 to Int.MaxValue,
+        "Correspondence",
+        "Correspondence games: one or several days per move"
+      )
 
   val all     = List(UltraBullet, Bullet, Blitz, Rapid, Classical, Correspondence)
   val limited = List(Bullet, Blitz, Rapid, Classical)

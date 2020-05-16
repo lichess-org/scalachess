@@ -104,15 +104,17 @@ object Color {
 
   def exists(name: String) = all exists (_.name == name)
 
-  def showResult(color: Option[Color]) = color match {
-    case Some(chess.White) => "1-0"
-    case Some(chess.Black) => "0-1"
-    case None              => "1/2-1/2"
-  }
+  def showResult(color: Option[Color]) =
+    color match {
+      case Some(chess.White) => "1-0"
+      case Some(chess.Black) => "0-1"
+      case None              => "1/2-1/2"
+    }
 
-  def fromResult(result: String): Option[Color] = result match {
-    case "1-0" => Some(chess.White)
-    case "0-1" => Some(chess.Black)
-    case _     => None
-  }
+  def fromResult(result: String): Option[Color] =
+    result match {
+      case "1-0" => Some(chess.White)
+      case "0-1" => Some(chess.Black)
+      case _     => None
+    }
 }

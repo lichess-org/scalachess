@@ -20,10 +20,11 @@ case object ThreeCheck
       _.withCheck(Color.White, board.checkWhite).withCheck(Color.Black, board.checkBlack)
     }
 
-  override def specialEnd(situation: Situation) = situation.check && {
-    val checks = situation.board.history.checkCount
-    situation.color.fold(checks.white, checks.black) >= 3
-  }
+  override def specialEnd(situation: Situation) =
+    situation.check && {
+      val checks = situation.board.history.checkCount
+      situation.color.fold(checks.white, checks.black) >= 3
+    }
 
   /**
     * It's not possible to check or checkmate the opponent with only a king

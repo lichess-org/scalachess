@@ -73,10 +73,10 @@ K
 
     "Give the correct winner for a game" in {
       val game =
-        ("""
+        """
 PP
 K  r
-""" as White)
+""" as White
 
       game.checkMate must beTrue
       game.winner must beSome.like {

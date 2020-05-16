@@ -40,14 +40,15 @@ object Hash {
   private val polyglotTable    = new ZobristConstants(0)
   private lazy val randomTable = new ZobristConstants(16)
 
-  private def roleIndex(role: Role) = role match {
-    case Pawn   => 0
-    case Knight => 1
-    case Bishop => 2
-    case Rook   => 3
-    case Queen  => 4
-    case King   => 5
-  }
+  private def roleIndex(role: Role) =
+    role match {
+      case Pawn   => 0
+      case Knight => 1
+      case Bishop => 2
+      case Rook   => 3
+      case Queen  => 4
+      case King   => 5
+    }
 
   private def pieceIndex(piece: Piece) =
     roleIndex(piece.role) * 2 + piece.color.fold(1, 0)
@@ -62,7 +63,8 @@ object Hash {
       // in a pocket.
       if (0 < count && count <= 16 && roleIndex(role) < 5) Some {
         table.crazyPocketMasks(16 * roleIndex(role) + count + colorshift)
-      } else None
+      }
+      else None
     }
 
     val board = situation.board

@@ -48,14 +48,16 @@ object Parser extends scalaz.syntax.ToTraverseOps {
         sys error "### StackOverflowError ### in PGN parser"
     }
 
-  def moves(str: String, variant: Variant): Valid[Sans] = moves(
-    str.split(' ').toList,
-    variant
-  )
-  def moves(strMoves: Iterable[String], variant: Variant): Valid[Sans] = objMoves(
-    strMoves.map { StrMove(_, Glyphs.empty, Nil, Nil) }.to(List),
-    variant
-  )
+  def moves(str: String, variant: Variant): Valid[Sans] =
+    moves(
+      str.split(' ').toList,
+      variant
+    )
+  def moves(strMoves: Iterable[String], variant: Variant): Valid[Sans] =
+    objMoves(
+      strMoves.map { StrMove(_, Glyphs.empty, Nil, Nil) }.to(List),
+      variant
+    )
   def objMoves(strMoves: List[StrMove], variant: Variant): Valid[Sans] =
     strMoves.map {
       case StrMove(san, glyphs, comments, variations) =>
@@ -87,61 +89,75 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     def apply(pgn: String): Valid[(InitialPosition, List[StrMove], Option[Tag])] =
       parseAll(strMoves, pgn) match {
         case Success((init, moves, result), _) =>
-          succezz((init, moves, result map { r =>
-            Tag(_.Result, r)
-          }))
+          succezz(
+            (
+              init,
+              moves,
+              result map { r =>
+                Tag(_.Result, r)
+              }
+            )
+          )
         case err => "Cannot parse moves: %s\n%s".format(err.toString, pgn).failureNel
       }
 
-    def strMoves: Parser[(InitialPosition, List[StrMove], Option[String])] = as("moves") {
-      (commentary *) ~ (strMove *) ~ (result ?) ~ (commentary *) ^^ {
-        case coms ~ sans ~ res ~ _ => (InitialPosition(cleanComments(coms)), sans, res)
+    def strMoves: Parser[(InitialPosition, List[StrMove], Option[String])] =
+      as("moves") {
+        (commentary *) ~ (strMove *) ~ (result ?) ~ (commentary *) ^^ {
+          case coms ~ sans ~ res ~ _ => (InitialPosition(cleanComments(coms)), sans, res)
+        }
       }
-    }
 
     val moveRegex =
       """(?:(?:0\-0(?:\-0|)[\+\#]?)|[PQKRBNOoa-h@][QKRBNa-h1-8xOo\-=\+\#\@]{1,6})[\?!□]{0,2}""".r
 
-    def strMove: Parser[StrMove] = as("move") {
-      ((number | commentary) *) ~>
-        (moveRegex ~ nagGlyphs ~ rep(commentary) ~ nagGlyphs ~ rep(variation)) <~
-        (moveExtras *) ^^ {
-        case san ~ glyphs ~ comments ~ glyphs2 ~ variations =>
-          StrMove(san, glyphs merge glyphs2, cleanComments(comments), variations)
+    def strMove: Parser[StrMove] =
+      as("move") {
+        ((number | commentary) *) ~>
+          (moveRegex ~ nagGlyphs ~ rep(commentary) ~ nagGlyphs ~ rep(variation)) <~
+          (moveExtras *) ^^ {
+          case san ~ glyphs ~ comments ~ glyphs2 ~ variations =>
+            StrMove(san, glyphs merge glyphs2, cleanComments(comments), variations)
+        }
       }
-    }
 
     def number: Parser[String] = """[1-9]\d*[\s\.]*""".r
 
-    def moveExtras: Parser[Unit] = as("moveExtras") {
-      (commentary).^^^(())
-    }
+    def moveExtras: Parser[Unit] =
+      as("moveExtras") {
+        commentary.^^^(())
+      }
 
-    def nagGlyphs: Parser[Glyphs] = as("nagGlyphs") {
-      rep(nag) ^^ { nags =>
-        Glyphs fromList nags.flatMap { n =>
-          parseIntOption(n drop 1) flatMap Glyph.find
+    def nagGlyphs: Parser[Glyphs] =
+      as("nagGlyphs") {
+        rep(nag) ^^ { nags =>
+          Glyphs fromList nags.flatMap { n =>
+            parseIntOption(n drop 1) flatMap Glyph.find
+          }
         }
       }
-    }
 
-    def nag: Parser[String] = as("nag") {
-      """\$\d+""".r
-    }
+    def nag: Parser[String] =
+      as("nag") {
+        """\$\d+""".r
+      }
 
-    def variation: Parser[List[StrMove]] = as("variation") {
-      "(" ~> strMoves <~ ")" ^^ { case (_, sms, _) => sms }
-    }
+    def variation: Parser[List[StrMove]] =
+      as("variation") {
+        "(" ~> strMoves <~ ")" ^^ { case (_, sms, _) => sms }
+      }
 
     def commentary: Parser[String] = blockCommentary | inlineCommentary
 
-    def blockCommentary: Parser[String] = as("block comment") {
-      "{" ~> """[^\}]*""".r <~ "}"
-    }
+    def blockCommentary: Parser[String] =
+      as("block comment") {
+        "{" ~> """[^\}]*""".r <~ "}"
+      }
 
-    def inlineCommentary: Parser[String] = as("inline comment") {
-      ";" ~> """.+""".r
-    }
+    def inlineCommentary: Parser[String] =
+      as("inline comment") {
+        ";" ~> """.+""".r
+      }
 
     val result: Parser[String] = "*" | "1/2-1/2" | "½-½" | "0-1" | "1-0"
   }
@@ -160,7 +176,8 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     def apply(str: String, variant: Variant): Valid[San] = {
       if (str.size == 2) Pos.posAt(str).fold(slow(str)) { pos =>
         succezz(Std(pos, Pawn))
-      } else
+      }
+      else
         str match {
           case "O-O" | "o-o" | "0-0"       => succezz(Castle(KingSide))
           case "O-O-O" | "o-o-o" | "0-0-0" => succezz(Castle(QueenSide))
@@ -216,85 +233,95 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
     def move: Parser[San] = castle | standard
 
-    def castle = (qCastle | kCastle) ~ suffixes ^^ {
-      case side ~ suf => Castle(side) withSuffixes suf
-    }
+    def castle =
+      (qCastle | kCastle) ~ suffixes ^^ {
+        case side ~ suf => Castle(side) withSuffixes suf
+      }
 
     val qCastle: Parser[Side] = ("O-O-O" | "o-o-o" | "0-0-0") ^^^ QueenSide
 
     val kCastle: Parser[Side] = ("O-O" | "o-o" | "0-0") ^^^ KingSide
 
-    def standard: Parser[San] = as("standard") {
-      (disambiguatedPawn | pawn | disambiguated | ambiguous | drop) ~ suffixes ^^ {
-        case std ~ suf => std withSuffixes suf
+    def standard: Parser[San] =
+      as("standard") {
+        (disambiguatedPawn | pawn | disambiguated | ambiguous | drop) ~ suffixes ^^ {
+          case std ~ suf => std withSuffixes suf
+        }
       }
-    }
 
     // e5
-    def pawn: Parser[Std] = as("pawn") {
-      dest ^^ {
-        case de => Std(dest = de, role = Pawn)
+    def pawn: Parser[Std] =
+      as("pawn") {
+        dest ^^ {
+          case de => Std(dest = de, role = Pawn)
+        }
       }
-    }
 
     // Bg5
-    def ambiguous: Parser[Std] = as("ambiguous") {
-      role ~ x ~ dest ^^ {
-        case ro ~ ca ~ de => Std(dest = de, role = ro, capture = ca)
+    def ambiguous: Parser[Std] =
+      as("ambiguous") {
+        role ~ x ~ dest ^^ {
+          case ro ~ ca ~ de => Std(dest = de, role = ro, capture = ca)
+        }
       }
-    }
 
     // B@g5
-    def drop: Parser[Drop] = as("drop") {
-      role ~ "@" ~ dest ^^ {
-        case ro ~ _ ~ po => Drop(role = ro, pos = po)
+    def drop: Parser[Drop] =
+      as("drop") {
+        role ~ "@" ~ dest ^^ {
+          case ro ~ _ ~ po => Drop(role = ro, pos = po)
+        }
       }
-    }
 
     // Bac3 Baxc3 B2c3 B2xc3 Ba2xc3
-    def disambiguated: Parser[Std] = as("disambiguated") {
-      role ~ opt(file) ~ opt(rank) ~ x ~ dest ^^ {
-        case ro ~ fi ~ ra ~ ca ~ de =>
-          Std(
-            dest = de,
-            role = ro,
-            capture = ca,
-            file = fi,
-            rank = ra
-          )
+    def disambiguated: Parser[Std] =
+      as("disambiguated") {
+        role ~ opt(file) ~ opt(rank) ~ x ~ dest ^^ {
+          case ro ~ fi ~ ra ~ ca ~ de =>
+            Std(
+              dest = de,
+              role = ro,
+              capture = ca,
+              file = fi,
+              rank = ra
+            )
+        }
       }
-    }
 
     // d7d5
-    def disambiguatedPawn: Parser[Std] = as("disambiguated") {
-      opt(file) ~ opt(rank) ~ x ~ dest ^^ {
-        case fi ~ ra ~ ca ~ de =>
-          Std(
-            dest = de,
-            role = Pawn,
-            capture = ca,
-            file = fi,
-            rank = ra
-          )
+    def disambiguatedPawn: Parser[Std] =
+      as("disambiguated") {
+        opt(file) ~ opt(rank) ~ x ~ dest ^^ {
+          case fi ~ ra ~ ca ~ de =>
+            Std(
+              dest = de,
+              role = Pawn,
+              capture = ca,
+              file = fi,
+              rank = ra
+            )
+        }
       }
-    }
 
-    def suffixes: Parser[Suffixes] = opt(promotion) ~ checkmate ~ check ~ glyphs ^^ {
-      case p ~ cm ~ c ~ g => Suffixes(c, cm, p, g)
-    }
+    def suffixes: Parser[Suffixes] =
+      opt(promotion) ~ checkmate ~ check ~ glyphs ^^ {
+        case p ~ cm ~ c ~ g => Suffixes(c, cm, p, g)
+      }
 
-    def glyphs: Parser[Glyphs] = as("glyphs") {
-      rep(glyph) ^^ Glyphs.fromList
-    }
+    def glyphs: Parser[Glyphs] =
+      as("glyphs") {
+        rep(glyph) ^^ Glyphs.fromList
+      }
 
-    def glyph: Parser[Glyph] = as("glyph") {
-      mapParser(
-        Glyph.MoveAssessment.all.sortBy(_.symbol.size).map { g =>
-          g.symbol -> g
-        },
-        "glyph"
-      )
-    }
+    def glyph: Parser[Glyph] =
+      as("glyph") {
+        mapParser(
+          Glyph.MoveAssessment.all.sortBy(_.symbol.size).map { g =>
+            g.symbol -> g
+          },
+          "glyph"
+        )
+      }
 
     val x = exists("x")
 
@@ -324,28 +351,31 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
   object TagParser extends RegexParsers with Logging {
 
-    def apply(pgn: String): Valid[Tags] = parseAll(all, pgn) match {
-      case f: Failure       => "Cannot parse tags: %s\n%s".format(f.toString, pgn).failureNel
-      case Success(tags, _) => succezz(Tags(tags))
-      case err              => "Cannot parse tags: %s\n%s".format(err.toString, pgn).failureNel
-    }
+    def apply(pgn: String): Valid[Tags] =
+      parseAll(all, pgn) match {
+        case f: Failure       => "Cannot parse tags: %s\n%s".format(f.toString, pgn).failureNel
+        case Success(tags, _) => succezz(Tags(tags))
+        case err              => "Cannot parse tags: %s\n%s".format(err.toString, pgn).failureNel
+      }
 
     def fromFullPgn(pgn: String): Valid[Tags] =
       splitTagAndMoves(pgn) flatMap {
         case (tags, _) => apply(tags)
       }
 
-    def all: Parser[List[Tag]] = as("all") {
-      tags <~ """(.|\n)*""".r
-    }
+    def all: Parser[List[Tag]] =
+      as("all") {
+        tags <~ """(.|\n)*""".r
+      }
 
     def tags: Parser[List[Tag]] = rep(tag)
 
-    def tag: Parser[Tag] = as("tag") {
-      tagName ~ tagValue ^^ {
-        case name ~ value => Tag(name, value)
+    def tag: Parser[Tag] =
+      as("tag") {
+        tagName ~ tagValue ^^ {
+          case name ~ value => Tag(name, value)
+        }
       }
-    }
 
     val tagName: Parser[String] = "[" ~> """[a-zA-Z]+""".r
 

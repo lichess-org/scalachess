@@ -12,10 +12,11 @@ case class Situation(board: Board, color: Color) {
 
   lazy val destinations: Map[Pos, List[Pos]] = moves.view.mapValues { _ map (_.dest) }.to(Map)
 
-  def drops: Option[List[Pos]] = board.variant match {
-    case v: variant.Crazyhouse.type => v possibleDrops this
-    case _                          => None
-  }
+  def drops: Option[List[Pos]] =
+    board.variant match {
+      case v: variant.Crazyhouse.type => v possibleDrops this
+      case _                          => None
+    }
 
   lazy val kingPos: Option[Pos] = board kingPosOf color
 
@@ -62,13 +63,15 @@ case class Situation(board: Board, color: Color) {
 
   def fixCastles = copy(board = board fixCastles)
 
-  def withHistory(history: History) = copy(
-    board = board withHistory history
-  )
+  def withHistory(history: History) =
+    copy(
+      board = board withHistory history
+    )
 
-  def withVariant(variant: chess.variant.Variant) = copy(
-    board = board withVariant variant
-  )
+  def withVariant(variant: chess.variant.Variant) =
+    copy(
+      board = board withVariant variant
+    )
 
   def canCastle = board.history.canCastle _
 
@@ -77,12 +80,14 @@ case class Situation(board: Board, color: Color) {
     // conditions are met.
     history.lastMove match {
       case Some(move: Uci.Move) =>
-        if (move.dest.yDist(move.orig) == 2 &&
-            board.actorAt(move.dest).exists(_.piece.is(Pawn)) &&
-            List(
-              Pos.posAt(move.dest.x - 1, color.passablePawnY),
-              Pos.posAt(move.dest.x + 1, color.passablePawnY)
-            ).flatten.flatMap(board.actorAt).exists(_.piece == color.pawn))
+        if (
+          move.dest.yDist(move.orig) == 2 &&
+          board.actorAt(move.dest).exists(_.piece.is(Pawn)) &&
+          List(
+            Pos.posAt(move.dest.x - 1, color.passablePawnY),
+            Pos.posAt(move.dest.x + 1, color.passablePawnY)
+          ).flatten.flatMap(board.actorAt).exists(_.piece == color.pawn)
+        )
           moves.values.flatten.find(_.enpassant).map(_.dest)
         else None
       case _ => None

@@ -12,7 +12,7 @@ class DividerPerfTest extends ChessTest {
   val moves      = format.pgn.Fixtures.fromProd2
   val gameReplay = Replay.boards(moves.split(' ').toList, None, variant.Standard).err
   def runOne     = Divider(gameReplay)
-  def run: Unit  = { for (i <- 1 to nb) runOne }
+  def run: Unit = { for (i <- 1 to nb) runOne }
 
   "playing a game" should {
     "many times" in {

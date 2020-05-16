@@ -52,13 +52,14 @@ case object RacingKings
   // the goal and black can make it on the next ply, he is given a chance to
   // draw, to compensate for the first-move advantage. The draw is not called
   // automatically, because black should also be given equal chances to flag.
-  override def specialEnd(situation: Situation) = situation.color match {
-    case White =>
-      reachedGoal(situation.board, White) ^ reachedGoal(situation.board, Black)
-    case Black =>
-      reachedGoal(situation.board, White) && (validMoves(situation).view mapValues (_.filter(reachesGoal)))
-        .forall(_._2.isEmpty)
-  }
+  override def specialEnd(situation: Situation) =
+    situation.color match {
+      case White =>
+        reachedGoal(situation.board, White) ^ reachedGoal(situation.board, Black)
+      case Black =>
+        reachedGoal(situation.board, White) && (validMoves(situation).view mapValues (_.filter(reachesGoal)))
+          .forall(_._2.isEmpty)
+    }
 
   // If white reaches the goal and black also reaches the goal directly after,
   // then it is a draw.

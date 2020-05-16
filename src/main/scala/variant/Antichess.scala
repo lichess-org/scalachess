@@ -42,9 +42,10 @@ case object Antichess
   }
 
   // In antichess, it is valuable for your opponent to have pieces.
-  override def materialImbalance(board: Board): Int = board.pieces.values.foldLeft(0) {
-    case (acc, Piece(color, _)) => acc + color.fold(-2, 2)
-  }
+  override def materialImbalance(board: Board): Int =
+    board.pieces.values.foldLeft(0) {
+      case (acc, Piece(color, _)) => acc + color.fold(-2, 2)
+    }
 
   // In antichess, there is no checkmate condition therefore a player may only draw either by agreement,
   // blockade or stalemate. A player always has sufficient material to win otherwise.
@@ -66,8 +67,10 @@ case object Antichess
         lazy val blackPawns = blackPieces.filter(_.is(Pawn))
 
         // We consider the case where a player has two bishops on the same diagonal after promoting.
-        if (whiteBishops.map(_.pos.color).to(Set).size != 1 ||
-            blackBishops.map(_.pos.color).to(Set).size != 1) false
+        if (
+          whiteBishops.map(_.pos.color).to(Set).size != 1 ||
+          blackBishops.map(_.pos.color).to(Set).size != 1
+        ) false
         else {
           for {
             whiteSquareColor <- whiteBishops.headOption map (_.pos.color)
@@ -93,11 +96,12 @@ case object Antichess
   }
 
   // In this game variant, a king is a valid promotion
-  override def isValidPromotion(promotion: Option[PromotableRole]) = promotion match {
-    case None                                        => true
-    case Some(Queen | Rook | Knight | Bishop | King) => true
-    case _                                           => false
-  }
+  override def isValidPromotion(promotion: Option[PromotableRole]) =
+    promotion match {
+      case None                                        => true
+      case Some(Queen | Rook | Knight | Bishop | King) => true
+      case _                                           => false
+    }
 
   override val roles = List(Rook, Knight, King, Bishop, Queen, Pawn)
 

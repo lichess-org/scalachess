@@ -48,7 +48,8 @@ final case class Actor(
             if (m.dest.y == m.color.promotablePawnY)
               (m.after promote m.dest) map { b2 =>
                 m.copy(after = b2, promotion = Some(Queen))
-              } else Some(m)
+              }
+            else Some(m)
 
           List(
             fwd flatMap forward,
@@ -96,7 +97,7 @@ final case class Actor(
    */
   def kingSafetyMoveFilter(ms: List[Move]): List[Move] = {
     val filter: Piece => Boolean =
-      if ((piece is King) || check)(_ => true) else (_.role.projection)
+      if ((piece is King) || check) (_ => true) else (_.role.projection)
     val stableKingPos = if (piece is King) None else board kingPosOf color
     ms filter { m =>
       board.variant.kingSafety(m, filter, stableKingPos orElse (m.after kingPosOf color))
@@ -185,17 +186,18 @@ final case class Actor(
       castle: Option[((Pos, Pos), (Pos, Pos))] = None,
       promotion: Option[PromotableRole] = None,
       enpassant: Boolean = false
-  ) = Move(
-    piece = piece,
-    orig = pos,
-    dest = dest,
-    situationBefore = Situation(board, piece.color),
-    after = after,
-    capture = capture,
-    castle = castle,
-    promotion = promotion,
-    enpassant = enpassant
-  )
+  ) =
+    Move(
+      piece = piece,
+      orig = pos,
+      dest = dest,
+      situationBefore = Situation(board, piece.color),
+      after = after,
+      capture = capture,
+      castle = castle,
+      promotion = promotion,
+      enpassant = enpassant
+    )
 
   private def history = board.history
 }

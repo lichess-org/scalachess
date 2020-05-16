@@ -38,10 +38,11 @@ case class Tags(value: List[Tag]) extends AnyVal {
 
   def anyDate: Option[String] = apply(_.UTCDate) orElse apply(_.Date)
 
-  def year: Option[Int] = anyDate flatMap {
-    case Tags.DateRegex(y, _, _) => parseIntOption(y)
-    case _                       => None
-  }
+  def year: Option[Int] =
+    anyDate flatMap {
+      case Tags.DateRegex(y, _, _) => parseIntOption(y)
+      case _                       => None
+    }
 
   def fen: Option[format.FEN] = apply(_.FEN) map format.FEN.apply
 
@@ -55,11 +56,12 @@ case class Tags(value: List[Tag]) extends AnyVal {
 
   def +(tag: Tag) = Tags(value.filterNot(_.name == tag.name) :+ tag)
 
-  def sorted = copy(
-    value = value.sortBy { tag =>
-      Tags.tagIndex.getOrElse(tag.name, 999)
-    }
-  )
+  def sorted =
+    copy(
+      value = value.sortBy { tag =>
+        Tags.tagIndex.getOrElse(tag.name, 999)
+      }
+    )
 
   override def toString = sorted.value mkString "\n"
 }
@@ -154,21 +156,26 @@ object Tag {
       }
       .to(Map)
 
-  def apply(name: String, value: Any): Tag = new Tag(
-    name = tagType(name),
-    value = value.toString
-  )
+  def apply(name: String, value: Any): Tag =
+    new Tag(
+      name = tagType(name),
+      value = value.toString
+    )
 
-  def apply(name: Tag.type => TagType, value: Any): Tag = new Tag(
-    name = name(this),
-    value = value.toString
-  )
+  def apply(name: Tag.type => TagType, value: Any): Tag =
+    new Tag(
+      name = name(this),
+      value = value.toString
+    )
 
   def tagType(name: String) =
     (tagTypesByLowercase get name.toLowerCase) | Unknown(name)
 
   def timeControl(clock: Option[Clock.Config]) =
-    Tag(TimeControl, clock.fold("-") { c =>
-      s"${c.limit.roundSeconds}+${c.increment.roundSeconds}"
-    })
+    Tag(
+      TimeControl,
+      clock.fold("-") { c =>
+        s"${c.limit.roundSeconds}+${c.increment.roundSeconds}"
+      }
+    )
 }

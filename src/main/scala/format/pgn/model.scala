@@ -25,13 +25,15 @@ case class Pgn(
 
   def nbPlies = turns.foldLeft(0)(_ + _.count)
 
-  def moves = turns.flatMap { t =>
-    List(t.white, t.black).flatten
-  }
+  def moves =
+    turns.flatMap { t =>
+      List(t.white, t.black).flatten
+    }
 
-  def withEvent(title: String) = copy(
-    tags = tags + Tag(_.Event, title)
-  )
+  def withEvent(title: String) =
+    copy(
+      tags = tags + Tag(_.Event, title)
+    )
 
   def render: String = {
     val initStr =
@@ -57,10 +59,11 @@ case class Turn(
     black: Option[Move]
 ) {
 
-  def update(color: Color, f: Move => Move) = color.fold(
-    copy(white = white map f),
-    copy(black = black map f)
-  )
+  def update(color: Color, f: Move => Move) =
+    color.fold(
+      copy(white = white map f),
+      copy(black = black map f)
+    )
 
   def updateLast(f: Move => Move) = {
     black.map(m => copy(black = f(m).some)) orElse
@@ -89,7 +92,7 @@ object Turn {
 
   def fromMoves(moves: List[Move], ply: Int): List[Turn] = {
     moves.foldLeft((List[Turn](), ply)) {
-      case ((turns, p), move) if p                    % 2 == 1 =>
+      case ((turns, p), move) if p % 2 == 1 =>
         (Turn((p + 1) / 2, move.some, none) :: turns) -> (p + 1)
       case ((Nil, p), move) =>
         (Turn((p + 1) / 2, none, move.some) :: Nil) -> (p + 1)
@@ -145,9 +148,10 @@ object Move {
   private def noDoubleLineBreak(txt: String) =
     noDoubleLineBreakRegex.replaceAllIn(txt, "\n")
 
-  private def formatPgnSeconds(t: Int) = periodFormatter.print(
-    org.joda.time.Duration.standardSeconds(t).toPeriod
-  )
+  private def formatPgnSeconds(t: Int) =
+    periodFormatter.print(
+      org.joda.time.Duration.standardSeconds(t).toPeriod
+    )
 
   private[this] val periodFormatter = new org.joda.time.format.PeriodFormatterBuilder().printZeroAlways
     .minimumPrintedDigits(1)

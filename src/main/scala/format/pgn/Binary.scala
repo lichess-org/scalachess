@@ -21,13 +21,13 @@ object Binary {
   private object Encoding {
     val pieceInts: Map[String, Int] =
       Map("K" -> 1, "Q" -> 2, "R" -> 3, "N" -> 4, "B" -> 5, "O-O" -> 6, "O-O-O" -> 7)
-    val pieceStrs: Map[Int, String]     = (pieceInts map { case (k, v) => v -> k })
+    val pieceStrs: Map[Int, String]     = pieceInts map { case (k, v) => v -> k }
     val dropPieceInts: Map[String, Int] = Map("P" -> 1, "Q" -> 2, "R" -> 3, "N" -> 4, "B" -> 5)
-    val dropPieceStrs: Map[Int, String] = (dropPieceInts map { case (k, v) => v -> k })
+    val dropPieceStrs: Map[Int, String] = dropPieceInts map { case (k, v) => v -> k }
     val promotionInts: Map[String, Int] = Map("" -> 0, "Q" -> 1, "R" -> 2, "N" -> 3, "B" -> 4, "K" -> 6)
-    val promotionStrs: Map[Int, String] = (promotionInts map { case (k, v) => v -> k })
+    val promotionStrs: Map[Int, String] = promotionInts map { case (k, v) => v -> k }
     val checkInts: Map[String, Int]     = Map("" -> 0, "+" -> 1, "#" -> 2)
-    val checkStrs: Map[Int, String]     = (checkInts map { case (k, v) => v -> k })
+    val checkStrs: Map[Int, String]     = checkInts map { case (k, v) => v -> k }
   }
 
   private object Reader {
@@ -39,19 +39,20 @@ object Binary {
     def moves(bs: List[Byte]): List[String]          = moves(bs, maxPlies)
     def moves(bs: List[Byte], nb: Int): List[String] = intMoves(bs map toInt, nb)
 
-    def intMoves(bs: List[Int], pliesToGo: Int): List[String] = bs match {
-      case _ if pliesToGo <= 0 => Nil
-      case Nil                 => Nil
-      case b1 :: rest if moveType(b1) == MoveType.SimplePawn =>
-        simplePawn(b1) :: intMoves(rest, pliesToGo - 1)
-      case b1 :: b2 :: rest if moveType(b1) == MoveType.SimplePiece =>
-        simplePiece(b1, b2) :: intMoves(rest, pliesToGo - 1)
-      case b1 :: b2 :: rest if moveType(b1) == MoveType.FullPawn =>
-        fullPawn(b1, b2) :: intMoves(rest, pliesToGo - 1)
-      case b1 :: b2 :: b3 :: rest if moveType(b1) == MoveType.FullPiece =>
-        fullPiece(b1, b2, b3) :: intMoves(rest, pliesToGo - 1)
-      case x => !!(x map showByte mkString ",")
-    }
+    def intMoves(bs: List[Int], pliesToGo: Int): List[String] =
+      bs match {
+        case _ if pliesToGo <= 0 => Nil
+        case Nil                 => Nil
+        case b1 :: rest if moveType(b1) == MoveType.SimplePawn =>
+          simplePawn(b1) :: intMoves(rest, pliesToGo - 1)
+        case b1 :: b2 :: rest if moveType(b1) == MoveType.SimplePiece =>
+          simplePiece(b1, b2) :: intMoves(rest, pliesToGo - 1)
+        case b1 :: b2 :: rest if moveType(b1) == MoveType.FullPawn =>
+          fullPawn(b1, b2) :: intMoves(rest, pliesToGo - 1)
+        case b1 :: b2 :: b3 :: rest if moveType(b1) == MoveType.FullPiece =>
+          fullPiece(b1, b2, b3) :: intMoves(rest, pliesToGo - 1)
+        case x => !!(x map showByte mkString ",")
+      }
 
     def simplePawn(i: Int): String = posString(right(i, 6))
 
@@ -120,7 +121,7 @@ object Binary {
     private def cut(i: Int, from: Int, to: Int): Int = right(i, from) >> to
     private def bitAt(i: Int, p: Int): Boolean       = cut(i, p, p - 1) != 0
     private val lengthMasks =
-      Map(1 -> 0x01, 2 -> 0x03, 3 -> 0x07, 4 -> 0x0F, 5 -> 0x1F, 6 -> 0x3F, 7 -> 0x7F, 8 -> 0xFF)
+      Map(1 -> 0x01, 2 -> 0x03, 3 -> 0x07, 4 -> 0x0f, 5 -> 0x1f, 6 -> 0x3f, 7 -> 0x7f, 8 -> 0xff)
     private def !!(msg: String) = throw new Exception("Binary reader failed: " + msg)
   }
 
@@ -143,35 +144,41 @@ object Binary {
 
     def moves(strs: Iterable[String]): Array[Byte] = strs.flatMap(move).to(Array)
 
-    def simplePawn(pos: String) = List(
-      (MoveType.SimplePawn << 6) + posInt(pos)
-    )
+    def simplePawn(pos: String) =
+      List(
+        (MoveType.SimplePawn << 6) + posInt(pos)
+      )
 
-    def simplePiece(piece: String, pos: String, capture: String, check: String) = List(
-      (MoveType.SimplePiece << 6) + posInt(pos),
-      (pieceInts(piece) << 5) + (checkInts(check) << 3) + (boolInt(capture) << 2)
-    )
+    def simplePiece(piece: String, pos: String, capture: String, check: String) =
+      List(
+        (MoveType.SimplePiece << 6) + posInt(pos),
+        (pieceInts(piece) << 5) + (checkInts(check) << 3) + (boolInt(capture) << 2)
+      )
 
-    def drop(piece: String, pos: String, check: String) = List(
-      (MoveType.SimplePiece << 6) + posInt(pos),
-      (dropPieceInts(piece) << 5) + (checkInts(check) << 3) + (1 << 1)
-    )
+    def drop(piece: String, pos: String, check: String) =
+      List(
+        (MoveType.SimplePiece << 6) + posInt(pos),
+        (dropPieceInts(piece) << 5) + (checkInts(check) << 3) + (1 << 1)
+      )
 
-    def castling(str: String, check: String) = List(
-      MoveType.SimplePiece << 6,
-      (pieceInts(str) << 5) + (checkInts(check) << 3)
-    )
+    def castling(str: String, check: String) =
+      List(
+        MoveType.SimplePiece << 6,
+        (pieceInts(str) << 5) + (checkInts(check) << 3)
+      )
 
-    def fullPawn(file: Option[String], pos: String, check: String, promotion: Option[String]) = List(
-      (MoveType.FullPawn << 6) + posInt(pos),
-      (shiftOptionInt(file, pos) << 6) + (checkInts(check) << 4) + (promotionInts(promotion | "") << 1)
-    )
+    def fullPawn(file: Option[String], pos: String, check: String, promotion: Option[String]) =
+      List(
+        (MoveType.FullPawn << 6) + posInt(pos),
+        (shiftOptionInt(file, pos) << 6) + (checkInts(check) << 4) + (promotionInts(promotion | "") << 1)
+      )
 
-    def fullPiece(piece: String, orig: String, pos: String, capture: String, check: String) = List(
-      (MoveType.FullPiece << 6) + posInt(pos),
-      (pieceInts(piece) << 5) + (checkInts(check) << 3) + (boolInt(capture) << 2),
-      (disambTypeInt(orig) << 6) + disambiguationInt(orig)
-    )
+    def fullPiece(piece: String, orig: String, pos: String, capture: String, check: String) =
+      List(
+        (MoveType.FullPiece << 6) + posInt(pos),
+        (pieceInts(piece) << 5) + (checkInts(check) << 3) + (boolInt(capture) << 2),
+        (disambTypeInt(orig) << 6) + disambiguationInt(orig)
+      )
 
     def disambTypeInt(orig: String): Int =
       if (orig.size > 1) 2

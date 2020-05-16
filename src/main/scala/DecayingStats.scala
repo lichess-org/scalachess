@@ -28,11 +28,12 @@ final case class EmptyDecayingStats(
     deviation: Float,
     decay: Float
 ) extends DecayingRecorder {
-  def record(value: Float) = DecayingStats(
-    mean = value,
-    deviation = deviation,
-    decay = decay
-  )
+  def record(value: Float) =
+    DecayingStats(
+      mean = value,
+      deviation = deviation,
+      decay = decay
+    )
 }
 
 object DecayingStats {

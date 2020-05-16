@@ -18,12 +18,13 @@ object UciDump {
       Replay(moves, initialFen, variant) flatMap (_.valid) map apply
     )
 
-  def move(variant: Variant)(mod: MoveOrDrop): String = mod match {
-    case Left(m) =>
-      m.castle.fold(m.toUci.uci) {
-        case ((kf, kt), (rf, _)) if kf == kt || variant.chess960 || variant.fromPosition => kf.key + rf.key
-        case ((kf, kt), _)                                                               => kf.key + kt.key
-      }
-    case Right(d) => d.toUci.uci
-  }
+  def move(variant: Variant)(mod: MoveOrDrop): String =
+    mod match {
+      case Left(m) =>
+        m.castle.fold(m.toUci.uci) {
+          case ((kf, kt), (rf, _)) if kf == kt || variant.chess960 || variant.fromPosition => kf.key + rf.key
+          case ((kf, kt), _)                                                               => kf.key + kt.key
+        }
+      case Right(d) => d.toUci.uci
+    }
 }

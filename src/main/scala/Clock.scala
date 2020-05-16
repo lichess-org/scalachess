@@ -35,22 +35,24 @@ case class Clock(
 
   def start = if (isRunning) this else copy(timer = Some(now))
 
-  def stop = timer.fold(this) { t =>
-    copy(
-      players = players.update(color, _.takeTime(toNow(t))),
-      timer = None
-    )
-  }
+  def stop =
+    timer.fold(this) { t =>
+      copy(
+        players = players.update(color, _.takeTime(toNow(t))),
+        timer = None
+      )
+    }
 
   def hardStop = copy(timer = None)
 
   def updatePlayer(c: Color)(f: ClockPlayer => ClockPlayer) =
     copy(players = players.update(c, f))
 
-  def switch = copy(
-    color = !color,
-    timer = timer.map(_ => now)
-  )
+  def switch =
+    copy(
+      color = !color,
+      timer = timer.map(_ => now)
+    )
 
   def step(
       metrics: MoveMetrics = MoveMetrics(),
@@ -87,13 +89,15 @@ case class Clock(
 
   def takeback = switch
 
-  def giveTime(c: Color, t: Centis) = updatePlayer(c) {
-    _.giveTime(t)
-  }
+  def giveTime(c: Color, t: Centis) =
+    updatePlayer(c) {
+      _.giveTime(t)
+    }
 
-  def setRemainingTime(c: Color, centis: Centis) = updatePlayer(c) {
-    _.setRemaining(centis)
-  }
+  def setRemainingTime(c: Color, centis: Centis) =
+    updatePlayer(c) {
+      _.setRemaining(centis)
+    }
 
   def incrementOf(c: Color) = players(c).increment
 
@@ -143,10 +147,11 @@ case class ClockPlayer(
 }
 
 object ClockPlayer {
-  def withConfig(config: Clock.Config) = ClockPlayer(
-    config,
-    LagTracker.init(config)
-  )
+  def withConfig(config: Clock.Config) =
+    ClockPlayer(
+      config,
+      LagTracker.init(config)
+    )
 }
 
 object Clock {
@@ -173,14 +178,15 @@ object Clock {
 
     def toClock = Clock(this)
 
-    def limitString: String = limitSeconds match {
-      case l if l % 60 == 0 => (l / 60).toString
-      case 15 => "¼"
-      case 30 => "½"
-      case 45 => "¾"
-      case 90 => "1.5"
-      case _  => limitFormatter.format(limitSeconds / 60d)
-    }
+    def limitString: String =
+      limitSeconds match {
+        case l if l % 60 == 0 => (l / 60).toString
+        case 15 => "¼"
+        case 30 => "½"
+        case 45 => "¾"
+        case 90 => "1.5"
+        case _  => limitFormatter.format(limitSeconds / 60d)
+      }
 
     def show = toString
 
@@ -197,14 +203,15 @@ object Clock {
   }
 
   // [TimeControl "600+2"] -> 10+2
-  def readPgnConfig(str: String): Option[Config] = str.split('+') match {
-    case Array(initStr, incStr) =>
-      for {
-        init <- parseIntOption(initStr)
-        inc  <- parseIntOption(incStr)
-      } yield Config(init, inc)
-    case _ => none
-  }
+  def readPgnConfig(str: String): Option[Config] =
+    str.split('+') match {
+      case Array(initStr, incStr) =>
+        for {
+          init <- parseIntOption(initStr)
+          inc  <- parseIntOption(incStr)
+        } yield Config(init, inc)
+      case _ => none
+    }
 
   def apply(limit: Int, increment: Int): Clock = apply(Config(limit, increment))
 

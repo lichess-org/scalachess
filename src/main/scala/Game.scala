@@ -50,19 +50,21 @@ case class Game(
     )
   }
 
-  private def applyClock(metrics: MoveMetrics, gameActive: Boolean) = clock.map { c =>
-    {
-      val newC = c.step(metrics, gameActive)
-      if (turns - startedAtTurn == 1) newC.start else newC
+  private def applyClock(metrics: MoveMetrics, gameActive: Boolean) =
+    clock.map { c =>
+      {
+        val newC = c.step(metrics, gameActive)
+        if (turns - startedAtTurn == 1) newC.start else newC
+      }
     }
-  }
 
   def apply(uci: Uci.Move): Valid[(Game, Move)] = apply(uci.orig, uci.dest, uci.promotion)
   def apply(uci: Uci.Drop): Valid[(Game, Drop)] = drop(uci.role, uci.pos)
-  def apply(uci: Uci): Valid[(Game, MoveOrDrop)] = uci match {
-    case u: Uci.Move => apply(u) map { case (g, m) => g -> Left(m) }
-    case u: Uci.Drop => apply(u) map { case (g, d) => g -> Right(d) }
-  }
+  def apply(uci: Uci): Valid[(Game, MoveOrDrop)] =
+    uci match {
+      case u: Uci.Move => apply(u) map { case (g, m) => g -> Left(m) }
+      case u: Uci.Drop => apply(u) map { case (g, d) => g -> Right(d) }
+    }
 
   def player = situation.color
 
@@ -90,9 +92,10 @@ case class Game(
 }
 
 object Game {
-  def apply(variant: chess.variant.Variant): Game = new Game(
-    Situation(Board init variant, White)
-  )
+  def apply(variant: chess.variant.Variant): Game =
+    new Game(
+      Situation(Board init variant, White)
+    )
 
   def apply(board: Board): Game = apply(board, White)
 

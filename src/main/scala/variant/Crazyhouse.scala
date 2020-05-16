@@ -25,7 +25,7 @@ case object Crazyhouse
     (!strict || (pieces.count(_ is Pawn) <= 16 && pieces.size <= 32))
   }
 
-  private def canDropPawnOn(pos: Pos) = (pos.y != 1 && pos.y != 8)
+  private def canDropPawnOn(pos: Pos) = pos.y != 1 && pos.y != 8
 
   override def drop(situation: Situation, role: Role, pos: Pos): Valid[Drop] =
     for {
@@ -46,17 +46,18 @@ case object Crazyhouse
 
   override def isIrreversible(move: Move): Boolean = move.castles
 
-  override def finalizeBoard(board: Board, uci: Uci, capture: Option[Piece]): Board = uci match {
-    case Uci.Move(orig, dest, promOption) =>
-      board.crazyData.fold(board) { data =>
-        val d1 = capture.fold(data) { data.store(_, dest) }
-        val d2 = promOption.fold(d1.move(orig, dest)) { _ =>
-          d1 promote dest
+  override def finalizeBoard(board: Board, uci: Uci, capture: Option[Piece]): Board =
+    uci match {
+      case Uci.Move(orig, dest, promOption) =>
+        board.crazyData.fold(board) { data =>
+          val d1 = capture.fold(data) { data.store(_, dest) }
+          val d2 = promOption.fold(d1.move(orig, dest)) { _ =>
+            d1 promote dest
+          }
+          board withCrazyData d2
         }
-        board withCrazyData d2
-      }
-    case _ => board
-  }
+      case _ => board
+    }
 
   private def canDropStuff(situation: Situation) =
     situation.board.crazyData.fold(false) { (data: Data) =>
@@ -84,12 +85,13 @@ case object Crazyhouse
 
   private def blockades(situation: Situation, kingPos: Pos): List[Pos] = {
     def attacker(piece: Piece) = piece.role.projection && piece.color != situation.color
-    def forward(p: Pos, dir: Direction, squares: List[Pos]): List[Pos] = dir(p) match {
-      case None                                                 => Nil
-      case Some(next) if situation.board(next).exists(attacker) => next :: squares
-      case Some(next) if situation.board(next).isDefined        => Nil
-      case Some(next)                                           => forward(next, dir, next :: squares)
-    }
+    def forward(p: Pos, dir: Direction, squares: List[Pos]): List[Pos] =
+      dir(p) match {
+        case None                                                 => Nil
+        case Some(next) if situation.board(next).exists(attacker) => next :: squares
+        case Some(next) if situation.board(next).isDefined        => Nil
+        case Some(next)                                           => forward(next, dir, next :: squares)
+      }
     Queen.dirs flatMap { forward(kingPos, _, Nil) } filter { square =>
       situation.board.place(Piece(situation.color, Knight), square) exists { defended =>
         !defended.check(situation.color)
@@ -121,9 +123,10 @@ case object Crazyhouse
 
     def promote(pos: Pos) = copy(promoted = promoted + pos)
 
-    def move(orig: Pos, dest: Pos) = copy(
-      promoted = if (promoted(orig)) promoted - orig + dest else promoted
-    )
+    def move(orig: Pos, dest: Pos) =
+      copy(
+        promoted = if (promoted(orig)) promoted - orig + dest else promoted
+      )
   }
 
   object Data {
@@ -134,19 +137,21 @@ case object Crazyhouse
 
     def apply(color: Color) = color.fold(white, black)
 
-    def take(piece: Piece): Option[Pockets] = piece.color.fold(
-      white take piece.role map { np =>
-        copy(white = np)
-      },
-      black take piece.role map { np =>
-        copy(black = np)
-      }
-    )
+    def take(piece: Piece): Option[Pockets] =
+      piece.color.fold(
+        white take piece.role map { np =>
+          copy(white = np)
+        },
+        black take piece.role map { np =>
+          copy(black = np)
+        }
+      )
 
-    def store(piece: Piece) = piece.color.fold(
-      copy(black = black store piece.role),
-      copy(white = white store piece.role)
-    )
+    def store(piece: Piece) =
+      piece.color.fold(
+        copy(black = black store piece.role),
+        copy(white = white store piece.role)
+      )
   }
 
   case class Pocket(roles: List[Role]) {

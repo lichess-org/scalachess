@@ -30,9 +30,10 @@ sealed trait San {
 
   def withVariations(s: List[Sans]): San = withMetas(metas withVariations s)
 
-  def mergeGlyphs(glyphs: Glyphs): San = withMetas(
-    metas.withGlyphs(metas.glyphs merge glyphs)
-  )
+  def mergeGlyphs(glyphs: Glyphs): San =
+    withMetas(
+      metas.withGlyphs(metas.glyphs merge glyphs)
+    )
 }
 
 case class Std(
@@ -47,10 +48,11 @@ case class Std(
 
   def apply(situation: Situation) = move(situation) map Left.apply
 
-  override def withSuffixes(s: Suffixes) = copy(
-    metas = metas withSuffixes s,
-    promotion = s.promotion
-  )
+  override def withSuffixes(s: Suffixes) =
+    copy(
+      metas = metas withSuffixes s,
+      promotion = s.promotion
+    )
 
   def withMetas(m: Metas) = copy(metas = m)
 
@@ -100,11 +102,12 @@ case class Metas(
     variations: List[Sans]
 ) {
 
-  def withSuffixes(s: Suffixes) = copy(
-    check = s.check,
-    checkmate = s.checkmate,
-    glyphs = s.glyphs
-  )
+  def withSuffixes(s: Suffixes) =
+    copy(
+      check = s.check,
+      checkmate = s.checkmate,
+      glyphs = s.glyphs
+    )
 
   def withGlyphs(g: Glyphs) = copy(glyphs = g)
 

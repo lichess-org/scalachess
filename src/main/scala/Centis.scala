@@ -53,16 +53,18 @@ object Centis {
     def *~(o: Centis) = o *~ scalar
   }
 
-  def apply(l: Long): Centis = Centis {
-    if (l.toInt == l) l.toInt
-    else if (l > 0) Integer.MAX_VALUE
-    else Integer.MIN_VALUE
-  }
+  def apply(l: Long): Centis =
+    Centis {
+      if (l.toInt == l) l.toInt
+      else if (l > 0) Integer.MAX_VALUE
+      else Integer.MIN_VALUE
+    }
 
-  def apply(d: FiniteDuration): Centis = Centis.ofMillis {
-    if (d.unit eq MILLISECONDS) d.length
-    else d.toMillis
-  }
+  def apply(d: FiniteDuration): Centis =
+    Centis.ofMillis {
+      if (d.unit eq MILLISECONDS) d.length
+      else d.toMillis
+    }
 
   def apply(f: Float): Centis  = Centis(Math.round(f))
   def apply(d: Double): Centis = Centis(Math.round(d))

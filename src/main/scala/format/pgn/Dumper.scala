@@ -60,14 +60,16 @@ object Dumper {
     }
   }
 
-  def apply(data: chess.Move): String = apply(
-    data.situationBefore,
-    data,
-    data.afterWithLastMove situationOf !data.color
-  )
+  def apply(data: chess.Move): String =
+    apply(
+      data.situationBefore,
+      data,
+      data.afterWithLastMove situationOf !data.color
+    )
 
-  def apply(data: chess.Drop): String = apply(
-    data,
-    data.afterWithLastMove situationOf !data.color
-  )
+  def apply(data: chess.Drop): String =
+    apply(
+      data,
+      data.afterWithLastMove situationOf !data.color
+    )
 }

@@ -10,15 +10,16 @@ object UciCharPair {
 
   import implementation._
 
-  def apply(uci: Uci): UciCharPair = uci match {
-    case Uci.Move(orig, dest, None)       => UciCharPair(toChar(orig), toChar(dest))
-    case Uci.Move(orig, dest, Some(role)) => UciCharPair(toChar(orig), toChar(dest.x, role))
-    case Uci.Drop(role, pos) =>
-      UciCharPair(
-        toChar(pos),
-        dropRole2charMap.getOrElse(role, voidChar)
-      )
-  }
+  def apply(uci: Uci): UciCharPair =
+    uci match {
+      case Uci.Move(orig, dest, None)       => UciCharPair(toChar(orig), toChar(dest))
+      case Uci.Move(orig, dest, Some(role)) => UciCharPair(toChar(orig), toChar(dest.x, role))
+      case Uci.Drop(role, pos) =>
+        UciCharPair(
+          toChar(pos),
+          dropRole2charMap.getOrElse(role, voidChar)
+        )
+    }
 
   private[format] object implementation {
 
@@ -35,10 +36,10 @@ object UciCharPair {
 
     def toChar(pos: Pos) = pos2charMap.getOrElse(pos, voidChar)
 
-    val promotion2charMap: Map[(File, PromotableRole), Char] = (for {
+    val promotion2charMap: Map[(File, PromotableRole), Char] = for {
       (role, index) <- Role.allPromotable.zipWithIndex.to(Map)
       file          <- 1 to 8
-    } yield (file, role) -> (charShift + pos2charMap.size + index * 8 + (file - 1)).toChar)
+    } yield (file, role) -> (charShift + pos2charMap.size + index * 8 + (file - 1)).toChar
 
     def toChar(file: File, prom: PromotableRole) =
       promotion2charMap.getOrElse(file -> prom, voidChar)

@@ -5,10 +5,11 @@ import format.Uci
 // Checks received by the respective side.
 case class CheckCount(white: Int = 0, black: Int = 0) {
 
-  def add(color: Color) = copy(
-    white = white + color.fold(1, 0),
-    black = black + color.fold(0, 1)
-  )
+  def add(color: Color) =
+    copy(
+      white = white + color.fold(1, 0),
+      black = black + color.fold(0, 1)
+    )
 
   def nonEmpty = white > 0 || black > 0
 
@@ -31,18 +32,19 @@ case class History(
 ) {
   def setHalfMoveClock(v: Int) = copy(halfMoveClock = v)
 
-  private def isRepetition(times: Int) = positionHashes.size > (times - 1) * 4 * Hash.size && {
-    // compare only hashes for positions with the same side to move
-    val positions = positionHashes.sliding(Hash.size, 2 * Hash.size).toList
-    positions.headOption match {
-      case Some(Array(x, y, z)) =>
-        (positions count {
-          case Array(x2, y2, z2) => x == x2 && y == y2 && z == z2
-          case _                 => false
-        }) >= times
-      case _ => times <= 1
+  private def isRepetition(times: Int) =
+    positionHashes.size > (times - 1) * 4 * Hash.size && {
+      // compare only hashes for positions with the same side to move
+      val positions = positionHashes.sliding(Hash.size, 2 * Hash.size).toList
+      positions.headOption match {
+        case Some(Array(x, y, z)) =>
+          (positions count {
+            case Array(x2, y2, z2) => x == x2 && y == y2 && z == z2
+            case _                 => false
+          }) >= times
+        case _ => times <= 1
+      }
     }
-  }
 
   def threefoldRepetition = isRepetition(3)
 
@@ -76,11 +78,12 @@ object History {
   def make(
       lastMove: Option[String], // a2a4
       castles: String
-  ): History = History(
-    lastMove = lastMove flatMap Uci.apply,
-    castles = Castles(castles),
-    positionHashes = Array()
-  )
+  ): History =
+    History(
+      lastMove = lastMove flatMap Uci.apply,
+      castles = Castles(castles),
+      positionHashes = Array()
+    )
 
   def castle(color: Color, kingSide: Boolean, queenSide: Boolean) =
     History(

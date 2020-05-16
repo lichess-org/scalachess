@@ -38,7 +38,7 @@ object Reader {
     }
 
   // remove invisible byte order mark
-  def cleanUserInput(str: String) = str.replace("""\ufeff""", "")
+  def cleanUserInput(str: String) = str.replace(s"\ufeff", "")
 
   private def makeReplay(game: Game, sans: Sans): Result =
     sans.value.foldLeft[Result](Result.Complete(Replay(game))) {

@@ -39,24 +39,25 @@ final protected case class StatHolder(
     )
   }
 
-  def +(o: Stats) = o match {
-    case EmptyStats => this
-    case StatHolder(oSamples, oMean, oSN) => {
-      val invTotal = 1f / (samples + oSamples)
-      val combMean = {
-        if (samples == oSamples) (mean + oMean) * 0.5f
-        else (mean * samples + oMean * oSamples) * invTotal
+  def +(o: Stats) =
+    o match {
+      case EmptyStats => this
+      case StatHolder(oSamples, oMean, oSN) => {
+        val invTotal = 1f / (samples + oSamples)
+        val combMean = {
+          if (samples == oSamples) (mean + oMean) * 0.5f
+          else (mean * samples + oMean * oSamples) * invTotal
+        }
+
+        val meanDiff = mean - oMean
+
+        StatHolder(
+          samples = samples + oSamples,
+          mean = combMean,
+          sn = sn + oSN + meanDiff * meanDiff * samples * oSamples * invTotal
+        )
       }
-
-      val meanDiff = mean - oMean
-
-      StatHolder(
-        samples = samples + oSamples,
-        mean = combMean,
-        sn = sn + oSN + meanDiff * meanDiff * samples * oSamples * invTotal
-      )
     }
-  }
 }
 
 protected object EmptyStats extends Stats {
@@ -64,11 +65,12 @@ protected object EmptyStats extends Stats {
   val mean     = 0f
   val variance = None
 
-  def record(value: Float) = StatHolder(
-    samples = 1,
-    mean = value,
-    sn = 0f
-  )
+  def record(value: Float) =
+    StatHolder(
+      samples = 1,
+      mean = value,
+      sn = 0f
+    )
 
   def +(o: Stats) = o
 }

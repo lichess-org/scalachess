@@ -16,9 +16,10 @@ case object Atomic
   override def hasMoveEffects = true
 
   /** Move threatens to explode the opponent's king */
-  private def explodesOpponentKing(situation: Situation)(move: Move): Boolean = move.captures && {
-    situation.board.kingPosOf(!situation.color) exists move.dest.touches
-  }
+  private def explodesOpponentKing(situation: Situation)(move: Move): Boolean =
+    move.captures && {
+      situation.board.kingPosOf(!situation.color) exists move.dest.touches
+    }
 
   /** Move threatens to illegally explode our own king */
   private def explodesOwnKing(situation: Situation)(move: Move): Boolean = {

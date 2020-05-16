@@ -55,11 +55,12 @@ case class Move(
 
   def applyVariantEffect: Move = before.variant addVariantEffect this
 
-  def afterWithLastMove = after.variant.finalizeBoard(
-    after.copy(history = after.history.withLastMove(toUci)),
-    toUci,
-    capture flatMap before.apply
-  )
+  def afterWithLastMove =
+    after.variant.finalizeBoard(
+      after.copy(history = after.history.withLastMove(toUci)),
+      toUci,
+      capture flatMap before.apply
+    )
 
   // does this move capture an opponent piece?
   def captures = capture.isDefined
@@ -68,9 +69,10 @@ case class Move(
 
   def castles = castle.isDefined
 
-  def normalizeCastle = castle.fold(this) {
-    case (_, (rookOrig, _)) => copy(dest = rookOrig)
-  }
+  def normalizeCastle =
+    castle.fold(this) {
+      case (_, (rookOrig, _)) => copy(dest = rookOrig)
+    }
 
   def color = piece.color
 

@@ -17,9 +17,10 @@ class DecayingStatsTest extends Specification {
     } sum).toFloat / (elts.size - 1)
   }
 
-  def beApprox(comp: Float) = (f: Float) => {
-    comp must beCloseTo(f +/- 0.1f * comp)
-  }
+  def beApprox(comp: Float) =
+    (f: Float) => {
+      comp must beCloseTo(f +/- 0.1f * comp)
+    }
 
   "gaussian data" should {
     val randoms = Array.fill(1000) { random.nextGaussian.toFloat }

@@ -3,9 +3,10 @@ package format.pgn
 
 class RenderTest extends ChessTest {
 
-  private def glyphs(id: Int) = Glyph.find(id).fold(Glyphs.empty) { g =>
-    Glyphs fromList List(g)
-  }
+  private def glyphs(id: Int) =
+    Glyph.find(id).fold(Glyphs.empty) { g =>
+      Glyphs fromList List(g)
+    }
 
   /*
 [Event "WCh"]
@@ -63,7 +64,8 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
             number = 4,
             white = Move(
               "cxd5",
-              comments = "The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one" :: Nil
+              comments =
+                "The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one" :: Nil
             ).some,
             black = Move("cxd5").some
           ),

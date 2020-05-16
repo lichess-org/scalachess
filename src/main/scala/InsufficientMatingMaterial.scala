@@ -16,10 +16,11 @@ object InsufficientMatingMaterial {
   /*
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
    */
-  def pawnBlockedByPawn(pawn: Actor, board: Board) = pawn.moves.isEmpty && {
-    val blockingPosition = Actor.posAheadOfPawn(pawn.pos, pawn.piece.color)
-    blockingPosition.flatMap(board.apply).exists(_.is(Pawn))
-  }
+  def pawnBlockedByPawn(pawn: Actor, board: Board) =
+    pawn.moves.isEmpty && {
+      val blockingPosition = Actor.posAheadOfPawn(pawn.pos, pawn.piece.color)
+      blockingPosition.flatMap(board.apply).exists(_.is(Pawn))
+    }
 
   /*
    * Determines whether a board position is an automatic draw due to neither player

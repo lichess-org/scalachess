@@ -1030,6 +1030,25 @@ object StartingPosition {
       )
     ),
     Category(
+      "f4",
+      List(
+        StartingPosition(
+          "A02",
+          "Bird's Opening",
+          "rnbqkbnr/pppppppp/8/8/5P2/8/PPPPP1PP/RNBQKBNR b KQkq - 0 1",
+          "Bird's_Opening",
+          "1. f4"
+        ),
+        StartingPosition(
+          "A02",
+          "Bird's Opening: Dutch Variation",
+          "rnbqkbnr/ppp1pppp/8/3p4/5P2/8/PPPPP1PP/RNBQKBNR w KQkq - 0 2",
+          "Bird's_Opening",
+          "1. f4 d5"
+        )
+      )
+    ),
+    Category(
       "g3",
       List(
         StartingPosition(

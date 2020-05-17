@@ -99,7 +99,7 @@ object StartingPosition {
           "1. e4 c6 2. d4 d5 3. exd5 cxd5 4. c4 Nf6 5. Nc3"
         ),
         StartingPosition(
-          "B14",
+          "B17",
           "Caro-Kann Defence: Steinitz Variation",
           "r1bqkbnr/pp1npppp/2p5/8/3PN3/8/PPP2PPP/R1BQKBNR w KQkq - 1 5",
           "Caro–Kann_Defence#Modern_Variation:_4...Nd7",

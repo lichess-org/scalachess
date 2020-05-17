@@ -32,5 +32,4 @@ cache:
     - $HOME/.sbt
 
 script:
-  - sbt clean coverage test
-  - sbt coverageReport
+  - sbt test

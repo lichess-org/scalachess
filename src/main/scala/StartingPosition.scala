@@ -94,14 +94,14 @@ object StartingPosition {
         StartingPosition(
           "B14",
           "Caro-Kann Defence: Panov-Botvinnik Attack",
-          "rnbqkb1r/pp3ppp/4pn2/3p4/2PP4/2N5/PP3PPP/R1BQKBNR w KQkq - 1 6",
+          "rnbqkb1r/pp2pppp/5n2/3p4/2PP4/2N5/PP3PPP/R1BQKBNR b KQkq - 2 5",
           "Caro–Kann_Defence#Panov.E2.80.93Botvinnik_Attack:_4.c4",
           "1. e4 c6 2. d4 d5 3. exd5 cxd5 4. c4 Nf6 5. Nc3"
         ),
         StartingPosition(
           "B14",
           "Caro-Kann Defence: Steinitz Variation",
-          "rnbqkb1r/pp3ppp/4pn2/3p4/2PP4/2N5/PP3PPP/R1BQKBNR w KQkq - 1 6",
+          "r1bqkbnr/pp1npppp/2p5/8/3PN3/8/PPP2PPP/R1BQKBNR w KQkq - 1 5",
           "Caro–Kann_Defence#Modern_Variation:_4...Nd7",
           "1. e4 c6 2. d4 d5 3. Nc3 dxe4 4. Nxe4 Nd7"
         ),

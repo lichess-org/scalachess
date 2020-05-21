@@ -575,7 +575,7 @@ object StartingPosition {
           "1. e4 e5 2. Qh5"
         ),
         StartingPosition(
-          "420",
+          "C20",
           "Bongcloud Attack",
           "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPPKPPP/RNBQ1BNR b kq - 0 2",
           "Bong",
@@ -653,10 +653,10 @@ object StartingPosition {
         ),
         StartingPosition(
           "A96",
-          "Dutch Defense: Classical Variation",
-          "rnbq1rk1/ppp1b1pp/3ppn2/5p2/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w - 0 7",
+          "Dutch Defence: Classical Variation",
+          "rnbq1rk1/ppp1b1pp/3ppn2/5p2/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w - - 0 7",
           "Dutch_Defence",
-          "1. d4 f5 2. c4 e6 3. Nc3 Nf6 4. Nf3 Be7 5. g3 O-O 6. Bg2 d6"
+          "1. d4 f5 2. c4 Nf6 3. g3 e6 4. Bg2 Be7 5. Nf3 O-O 6. O-O d6"
         ),
         StartingPosition(
           "A87",

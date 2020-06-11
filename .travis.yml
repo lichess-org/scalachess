@@ -21,6 +21,7 @@ notifications:
 jdk:
   - openjdk8
   - openjdk11
+  - openjdk13
 
 before_cache:
  - find $HOME/.ivy2/cache -name 'ivydata-*.properties' -delete

@@ -904,6 +904,13 @@ object StartingPosition {
           "1. d4 d5 2. Bf4"
         ),
         StartingPosition(
+          "D01",
+          "Rapport-Jobava System",
+          "r1bqkbnr/ppp1pppp/2n5/3p4/3P1B2/5N2/PPP1PPPP/RN1QKB1R b KQkq - 3 3",
+          "London_System",
+          "1. d4 d5 2. Nc3 Nf6 3. Bf4"
+        ),		
+        StartingPosition(
           "D03",
           "Torre Attack",
           "rnbqkb1r/ppp1pppp/5n2/3p2B1/3P4/5N2/PPP1PPPP/RN1QKB1R b KQkq - 4 3",

@@ -20,7 +20,6 @@ notifications:
 # https://docs.travis-ci.com/user/languages/java/#Testing-Against-Multiple-JDKs
 jdk:
   - openjdk8
-  - openjdk11
   - openjdk13
 
 before_cache:

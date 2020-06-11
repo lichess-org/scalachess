@@ -195,11 +195,12 @@ object Forsyth {
     }
   } mkString " "
 
-  def exportStandardPositionTurnCastling(board: Board, ply: Int): String =
+  def exportStandardPositionTurnCastlingEp(situation: Situation): String =
     List(
-      exportBoard(board),
-      Color(ply % 2 == 0).letter,
-      exportCastles(board)
+      exportBoard(situation.board),
+      situation.color.letter,
+      exportCastles(situation.board),
+      situation.enPassantSquare.map(_.toString).getOrElse("-")
     ) mkString " "
 
   private def exportCheckCount(board: Board) =

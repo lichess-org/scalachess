@@ -2,7 +2,7 @@ name := "scalachess"
 
 organization := "org.lichess"
 
-version := "9.2.2"
+version := "9.3.0"
 
 scalaVersion := "2.13.2"
 

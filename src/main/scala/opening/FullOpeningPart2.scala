@@ -1066,7 +1066,7 @@ new FullOpening("D01", "Queen's Pawn Game: Veresov Attack, Two Knights System, G
 new FullOpening("D01", "Queen's Pawn Game: Veresov Attack, Veresov Variation", "rn1qkb1r/ppp1pppp/5B2/3p1b2/3P4/2N5/PPP1PPPP/R2QKBNR b KQkq"),
 new FullOpening("D01", "Richter-Veresov Attack", "rnbqkb1r/ppp1pppp/5n2/3p2B1/3P4/2N5/PPP1PPPP/R2QKBNR b KQkq"),
 new FullOpening("D01", "Richter-Veresov Attack", "rn1qkb1r/ppp1pppp/5n2/3p1bB1/3P4/2N5/PPP1PPPP/R2QKBNR w KQkq"),
-new FullOpening("D01", "Rapport-Jobava System", "r1bqkbnr/ppp1pppp/2n5/3p4/3P1B2/5N2/PPP1PPPP/RN1QKB1R b KQkq"),
+new FullOpening("D01", "Rapport-Jobava System", "rnbqkb1r/ppp1pppp/5n2/3p4/3P1B2/2N5/PPP1PPPP/R2QKBNR b KQkq"),
 new FullOpening("D02", "London System: Poisoned Pawn Variation", "rnb1kb1r/pp2pppp/1q3n2/2pp4/3P1B2/2N1PN2/PPP2PPP/R2QKB1R b KQkq"),
 new FullOpening("D06", "Queen's Gambit Refused: Baltic Defense", "rn1qkbnr/ppp1pppp/8/3p1b2/2PP4/8/PP2PPPP/RNBQKBNR w KQkq"),
 new FullOpening("D06", "Queen's Gambit Refused: Baltic Defense, Pseudo-Chigorin", "r2qkbnr/ppp2ppp/2n1p3/3p1b2/2PP4/2N2N2/PP2PPPP/R1BQKB1R w KQkq"),

@@ -379,8 +379,8 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
     val tagName: Parser[String] = "[" ~> """[a-zA-Z]+""".r
 
-    val tagValue: Parser[String] = """[^\]]+""".r <~ "]" ^^ {
-      _.replace("\"", "")
+    val tagValue: Parser[String] = """"(?:[^"\\]|\\.)*"""".r <~ "]" ^^ {
+      _.stripPrefix("\"").stripSuffix("\"").replace("\\\"", "\"")
     }
   }
 

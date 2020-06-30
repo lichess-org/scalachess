@@ -150,8 +150,8 @@ class ParserTest extends ChessTest {
     }
   }
 
-  "unclosed quote" in {
-    parser(unclosedQuote) must beSuccess.like {
+  "inline tags" in {
+    parser(inlineTags) must beSuccess.like {
       case a =>
         a.tags.value must contain { (tag: Tag) =>
           tag.name == Tag.White && tag.value == "Blazquez, Denis"
@@ -159,11 +159,20 @@ class ParserTest extends ChessTest {
     }
   }
 
-  "inline tags" in {
-    parser(inlineTags) must beSuccess.like {
+  "tag with nested quotes" in {
+    parser("""[Black "Schwarzenegger, Arnold \"The Terminator\""]""") must beSuccess.like {
       case a =>
         a.tags.value must contain { (tag: Tag) =>
-          tag.name == Tag.White && tag.value == "Blazquez, Denis"
+          tag.name == Tag.Black && tag.value == """Schwarzenegger, Arnold "The Terminator""""
+        }
+    }
+  }
+
+  "tag with inner brackets" in {
+    parser("""[Black "[=0040.34h5a4]"]""") must beSuccess.like {
+      case a =>
+        a.tags.value must contain { (tag: Tag) =>
+          tag.name == Tag.Black && tag.value == "[=0040.34h5a4]"
         }
     }
   }

@@ -272,5 +272,55 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
       pgn.toString must_== """{ Why hello there! } { The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one }
 1. d4 (1. e4) 1... Nf6 (1... d5)"""
     }
+    "handle Elon Musk-style baby names like [=0040.34h5a4] in tags" in {
+      val pgn = Pgn(
+        tags = Tags(
+          List(
+            Tag(_.White, "tsinnema"),
+            Tag(_.Black, "[=0040.34h5a4]"),
+            Tag(_.TimeControl, "300"),
+            Tag(_.ECO, "A00e")
+          )
+        ),
+        turns = List(
+          Turn(
+            number = 1,
+            white = Move("a4", secondsLeft = 298.some).some,
+            black = Move("Nf6", secondsLeft = 299.some).some
+          ),
+          Turn(
+            number = 2,
+            white = Move("d4", secondsLeft = 295.some).some,
+            black = Move("d5", secondsLeft = 298.some).some
+          ),
+          Turn(
+            number = 3,
+            white = Move("h4", secondsLeft = 292.some).some,
+            black = Move("e6", secondsLeft = 297.some).some
+          ),
+          Turn(
+            number = 4,
+            white = Move(
+              "Qd3",
+              glyphs = glyphs(1),
+              secondsLeft = 288.some,
+              comments = "An invention of true genius." :: Nil
+            ).some,
+            black = Move("c5", secondsLeft = 296.some).some
+          ),
+          Turn(
+            number = 5,
+            white = Move("dxc5", secondsLeft = 258.some).some,
+            black = Move("Bxc5", glyphs = glyphs(1), secondsLeft = 295.some).some
+          )
+        )
+      )
+      pgn.toString must_== """[White "tsinnema"]
+[Black "[=0040.34h5a4]"]
+[TimeControl "300"]
+[ECO "A00e"]
+
+1. a4 { [%clk 0:04:58] } Nf6 { [%clk 0:04:59] } 2. d4 { [%clk 0:04:55] } d5 { [%clk 0:04:58] } 3. h4 { [%clk 0:04:52] } e6 { [%clk 0:04:57] } 4. Qd3! { An invention of true genius. } { [%clk 0:04:48] } 4... c5 { [%clk 0:04:56] } 5. dxc5 { [%clk 0:04:18] } Bxc5! { [%clk 0:04:55] }"""
+    }
   }
 }

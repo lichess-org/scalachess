@@ -1,5 +1,7 @@
 package chess
 
+import format.{ Forsyth, Uci }
+
 class ReplayTest extends ChessTest {
 
   "from prod" in {
@@ -13,6 +15,23 @@ class ReplayTest extends ChessTest {
           println(err)
           println(init)
           games.size must_== 8
+      }
+    }
+  }
+
+  "castle rights" in {
+    "bongcloud attack" in {
+      Replay.situationsFromUci(
+        moves = List(Uci("e2e4"), Uci("e7e5"), Uci("e1e2")).flatten,
+        initialFen = None,
+        variant = variant.Standard
+      ) must beSuccess.like { situations =>
+        situations.map(Forsyth.>>) must_== List(
+          "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+          "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+          "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1",
+          "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPPKPPP/RNBQ1BNR b kq - 1 1"
+        )
       }
     }
   }

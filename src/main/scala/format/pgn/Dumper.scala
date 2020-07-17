@@ -64,12 +64,12 @@ object Dumper {
     apply(
       data.situationBefore,
       data,
-      data.afterWithLastMove situationOf !data.color
+      data.finalizeAfter situationOf !data.color
     )
 
   def apply(data: chess.Drop): String =
     apply(
       data,
-      data.afterWithLastMove situationOf !data.color
+      data.finalizeAfter situationOf !data.color
     )
 }

@@ -4,7 +4,7 @@ organization := "org.lichess"
 
 version := "9.3.1"
 
-scalaVersion := "2.13.2"
+scalaVersion := "2.13.3"
 
 libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",

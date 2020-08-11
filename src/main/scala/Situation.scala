@@ -1,6 +1,9 @@
 package chess
 
-import format.Uci
+import cats.data.Validated
+import cats.implicits._
+
+import chess.format.Uci
 
 case class Situation(board: Board, color: Color) {
 
@@ -52,13 +55,13 @@ case class Situation(board: Board, color: Color) {
     else if (autoDraw) Status.Draw.some
     else none
 
-  def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Valid[Move] =
+  def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Validated[String, Move] =
     board.variant.move(this, from, to, promotion)
 
-  def move(uci: Uci.Move): Valid[Move] =
+  def move(uci: Uci.Move): Validated[String, Move] =
     board.variant.move(this, uci.orig, uci.dest, uci.promotion)
 
-  def drop(role: Role, pos: Pos): Valid[Drop] =
+  def drop(role: Role, pos: Pos): Validated[String, Drop] =
     board.variant.drop(this, role, pos)
 
   def fixCastles = copy(board = board fixCastles)

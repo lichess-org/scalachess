@@ -1,5 +1,7 @@
 package chess
 
+import cats.syntax.option.none
+
 case class Division(middle: Option[Int], end: Option[Int], plies: Int) {
 
   def openingSize: Int = middle | plies

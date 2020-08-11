@@ -1,8 +1,6 @@
 package chess
 
 import Pos.posAt
-import scalaz.Validation.FlatMap._
-import scalaz.Validation.{ failureNel, success }
 import variant.{ Crazyhouse, Variant }
 
 case class Board(
@@ -11,8 +9,6 @@ case class Board(
     variant: Variant,
     crazyData: Option[Crazyhouse.Data] = None
 ) {
-
-  import implicitFailures._
 
   def apply(at: Pos): Option[Piece] = pieces get at
 
@@ -44,7 +40,7 @@ case class Board(
 
   def kingPosOf(c: Color): Option[Pos] = kingPos get c
 
-  def check(c: Color): Boolean = c.white.fold(checkWhite, checkBlack)
+  def check(c: Color): Boolean = c.fold(checkWhite, checkBlack)
 
   lazy val checkWhite = checkOf(White)
   lazy val checkBlack = checkOf(Black)
@@ -56,14 +52,14 @@ case class Board(
 
   def destsFrom(from: Pos): Option[List[Pos]] = actorAt(from) map (_.destinations)
 
-  def seq(actions: Board => Valid[Board]*): Valid[Board] =
-    actions.foldLeft(success(this): Valid[Board])(_ flatMap _)
+  def seq(actions: Board => Option[Board]*): Option[Board] =
+    actions.foldLeft(Some(this): Option[Board])(_ flatMap _)
 
   def place(piece: Piece) =
     new {
-      def at(at: Pos): Valid[Board] =
-        if (pieces contains at) failureNel("Cannot place at occupied " + at)
-        else success(copy(pieces = pieces + ((at, piece))))
+      def at(at: Pos): Option[Board] =
+        if (pieces contains at) None
+        else Some(copy(pieces = pieces + ((at, piece))))
     }
 
   def place(piece: Piece, at: Pos): Option[Board] =
@@ -90,12 +86,12 @@ case class Board(
 
   def move(orig: Pos) =
     new {
-      def to(dest: Pos): Valid[Board] = {
-        if (pieces contains dest) failureNel("Cannot move to occupied " + dest)
+      def to(dest: Pos): Option[Board] = {
+        if (pieces contains dest) None
         else
           pieces get orig map { piece =>
             copy(pieces = pieces - orig + (dest -> piece))
-          } toSuccess ("No piece at " + orig + " to move")
+          }
       }
     }
 

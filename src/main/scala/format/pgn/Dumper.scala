@@ -14,8 +14,8 @@ object Dumper {
         orig.file + 'x' + dest.key
 
       case (promotion, Pawn) =>
-        captures.fold(orig.file + "x", "") +
-          promotion.fold(dest.key)(p => dest.key + "=" + p.pgn)
+        (if (captures) s"${orig.file}x" else "") +
+          promotion.fold(dest.key)(p => s"${dest.key}=${p.pgn}")
 
       case (_, role) => {
         // Check whether there is a need to disambiguate:
@@ -28,7 +28,7 @@ object Dumper {
           case (cpos, cpiece) if cpiece == piece && cpos != orig && cpiece.eyes(cpos, dest) => cpos
         } filter { cpos =>
           // We know Role ≠ Pawn, so it is fine to always pass None as promotion target
-          situation.move(cpos, dest, None).isSuccess
+          situation.move(cpos, dest, None).isValid
         }
 
         val disambiguation = if (candidates.isEmpty) {
@@ -41,7 +41,7 @@ object Dumper {
           orig.file + orig.rank
         }
 
-        s"${role.pgn}$disambiguation${captures.fold("x", "")}${dest.key}"
+        s"${role.pgn}$disambiguation${if (captures) "x" else ""}${dest.key}"
       }
     }) + {
       if (next.check) {

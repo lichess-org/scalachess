@@ -1,6 +1,7 @@
 package chess
 package format
 
+import cats.implicits._
 import variant.{ Standard, Variant }
 
 /**
@@ -76,8 +77,8 @@ object Forsyth {
                   .flatMap(makeCheckCount(_))
                   .orElse(splitted.lift(6).flatMap(makeCheckCount(_)))
               checkCount.fold(history)(history.withCheckCount)
-          }
-        } fixCastles
+            }
+          } fixCastles
       }
     }
 
@@ -92,8 +93,8 @@ object Forsyth {
     read(rawSource) { source =>
       <<@(variant, source) map { sit =>
         val splitted       = source.split(' ').drop(4).dropWhile(_.contains('+'))
-        val fullMoveNumber = splitted lift 1 flatMap parseIntOption map (_ max 1 min 500)
-        val halfMoveClock  = splitted lift 0 flatMap parseIntOption map (_ max 0 min 100)
+        val fullMoveNumber = splitted lift 1 flatMap (_.toIntOption) map (_ max 1 min 500)
+        val halfMoveClock  = splitted lift 0 flatMap (_.toIntOption) map (_ max 0 min 100)
         SituationPlus(
           halfMoveClock.map(sit.history.setHalfMoveClock).fold(sit)(sit.withHistory),
           fullMoveNumber | 1
@@ -107,13 +108,13 @@ object Forsyth {
     str.toList match {
       case '+' :: w :: '+' :: b :: Nil =>
         for {
-          white <- parseIntOption(w.toString) if white <= 3
-          black <- parseIntOption(b.toString) if black <= 3
+          white <- w.toString.toIntOption if white <= 3
+          black <- b.toString.toIntOption if black <= 3
         } yield CheckCount(black, white)
       case w :: '+' :: b :: Nil =>
         for {
-          white <- parseIntOption(w.toString) if white <= 3
-          black <- parseIntOption(b.toString) if black <= 3
+          white <- w.toString.toIntOption if white <= 3
+          black <- b.toString.toIntOption if black <= 3
         } yield CheckCount(3 - black, 3 - white)
       case _ => None
     }
@@ -279,8 +280,8 @@ object Forsyth {
   }
 
   def getFullMove(rawSource: String): Option[Int] =
-    read(rawSource) { fen =>
-      fen.split(' ').lift(5) flatMap parseIntOption
+    read(rawSource) {
+      _.split(' ').lift(5).flatMap(_.toIntOption)
     }
 
   def getColor(rawSource: String): Option[Color] =

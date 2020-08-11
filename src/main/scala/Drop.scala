@@ -1,6 +1,8 @@
 package chess
 
-import format.Uci
+import cats.syntax.option.none
+
+import chess.format.Uci
 
 case class Drop(
     piece: Piece,

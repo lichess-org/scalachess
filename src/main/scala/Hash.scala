@@ -18,9 +18,7 @@ final class Hash(size: Int) {
 
 object Hash {
 
-  private val size = 3
-
-  private val zero: PositionHash = Array(0, 0, 0)
+  val size = 3
 
   private class ZobristConstants(start: Int) {
     def hexToLong(s: String): Long =

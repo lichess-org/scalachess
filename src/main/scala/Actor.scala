@@ -2,7 +2,6 @@ package chess
 
 import format.Uci
 import Pos.posAt
-
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
 
@@ -137,10 +136,10 @@ final case class Actor(
       if !board.variant.kingThreatened(b4, !color, newKingPos)
       b5     = b4 updateHistory (_ withoutCastles color)
       castle = Some((kingPos -> newKingPos, rookPos -> newRookPos))
-    } yield (board.variant == chess.variant.Chess960).fold(
-      List(rookPos),
-      List(rookPos, newKingPos).distinct
-    ) map { move(_, b5, castle = castle) }) getOrElse Nil
+    } yield {
+      if (board.variant == chess.variant.Chess960) List(rookPos)
+      else List(rookPos, newKingPos).distinct
+    } map { move(_, b5, castle = castle) }) getOrElse Nil
 
   private def shortRange(dirs: Directions): List[Move] =
     dirs flatMap { _(pos) } flatMap { to =>

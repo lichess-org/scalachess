@@ -1,6 +1,7 @@
 package chess
 
-import format.Uci
+import chess.format.Uci
+import cats.syntax.option._
 
 case class Move(
     piece: Piece,

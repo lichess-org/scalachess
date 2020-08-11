@@ -2,7 +2,7 @@ package chess
 package format
 package pgn
 
-import scala._
+import cats.implicits._
 
 case class Pgn(
     tags: Tags,

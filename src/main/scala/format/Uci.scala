@@ -1,6 +1,9 @@
 package chess
 package format
 
+import cats.data.Validated
+import cats.implicits._
+
 sealed trait Uci {
 
   def uci: String
@@ -8,10 +11,10 @@ sealed trait Uci {
 
   def origDest: (Pos, Pos)
 
-  def apply(situation: Situation): Valid[MoveOrDrop]
+  def apply(situation: Situation): Validated[String, MoveOrDrop]
 }
 
-object Uci extends scalaz.std.OptionInstances with scalaz.syntax.ToTraverseOps {
+object Uci {
 
   case class Move(
       orig: Pos,

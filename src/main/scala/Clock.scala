@@ -1,8 +1,9 @@
 package chess
 
+import cats.syntax.option.none
 import java.text.DecimalFormat
 
-import Clock.Config
+import chess.Clock.Config
 
 // All unspecified durations are expressed in seconds
 case class Clock(
@@ -207,8 +208,8 @@ object Clock {
     str.split('+') match {
       case Array(initStr, incStr) =>
         for {
-          init <- parseIntOption(initStr)
-          inc  <- parseIntOption(incStr)
+          init <- initStr.toIntOption
+          inc  <- incStr.toIntOption
         } yield Config(init, inc)
       case _ => none
     }

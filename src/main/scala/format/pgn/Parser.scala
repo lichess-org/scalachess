@@ -1,14 +1,15 @@
 package chess
 package format.pgn
 
-import variant.Variant
+import chess.variant.Variant
 
 import scala.util.parsing.combinator._
-import scalaz.Validation.FlatMap._
-import scalaz.Validation.{ success => succezz }
+import cats.data.Validated
+import cats.data.Validated.{ invalid, valid }
+import cats.implicits._
 
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
-object Parser extends scalaz.syntax.ToTraverseOps {
+object Parser {
 
   case class StrMove(
       san: String,
@@ -17,7 +18,11 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       variations: List[List[StrMove]]
   )
 
-  def full(pgn: String): Valid[ParsedPgn] =
+  implicit private class RichValidated[E, A](validated: Validated[E, A]) {
+    def flatMap[EE >: E, B](f: A => Validated[EE, B]): Validated[EE, B] = validated.andThen(f)
+  }
+
+  def full(pgn: String): Validated[String, ParsedPgn] =
     try {
       val preprocessed = augmentString(pgn).linesIterator
         .map(_.trim)
@@ -48,17 +53,17 @@ object Parser extends scalaz.syntax.ToTraverseOps {
         sys error "### StackOverflowError ### in PGN parser"
     }
 
-  def moves(str: String, variant: Variant): Valid[Sans] =
+  def moves(str: String, variant: Variant): Validated[String, Sans] =
     moves(
       str.split(' ').toList,
       variant
     )
-  def moves(strMoves: Iterable[String], variant: Variant): Valid[Sans] =
+  def moves(strMoves: Iterable[String], variant: Variant): Validated[String, Sans] =
     objMoves(
       strMoves.map { StrMove(_, Glyphs.empty, Nil, Nil) }.to(List),
       variant
     )
-  def objMoves(strMoves: List[StrMove], variant: Variant): Valid[Sans] =
+  def objMoves(strMoves: List[StrMove], variant: Variant): Validated[String, Sans] =
     strMoves.map {
       case StrMove(san, glyphs, comments, variations) =>
         (
@@ -66,13 +71,13 @@ object Parser extends scalaz.syntax.ToTraverseOps {
             m withComments comments withVariations {
               variations
                 .map { v =>
-                  objMoves(v, variant) | Sans.empty
+                  objMoves(v, variant) getOrElse Sans.empty
                 }
                 .filter(_.value.nonEmpty)
             } mergeGlyphs glyphs
           }
-        ): Valid[San]
-    }.sequence map Sans.apply
+        ): Validated[String, San]
+    }.sequence map { Sans.apply(_) }
 
   trait Logging { self: Parsers =>
     protected val loggingEnabled = false
@@ -86,10 +91,10 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
     private def cleanComments(comments: List[String]) = comments.map(_.trim).filter(_.nonEmpty)
 
-    def apply(pgn: String): Valid[(InitialPosition, List[StrMove], Option[Tag])] =
+    def apply(pgn: String): Validated[String, (InitialPosition, List[StrMove], Option[Tag])] =
       parseAll(strMoves, pgn) match {
         case Success((init, moves, result), _) =>
-          succezz(
+          valid(
             (
               init,
               moves,
@@ -98,7 +103,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
               }
             )
           )
-        case err => "Cannot parse moves: %s\n%s".format(err.toString, pgn).failureNel
+        case err => invalid("Cannot parse moves: %s\n%s".format(err.toString, pgn))
       }
 
     def strMoves: Parser[(InitialPosition, List[StrMove], Option[String])] =
@@ -132,7 +137,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
       as("nagGlyphs") {
         rep(nag) ^^ { nags =>
           Glyphs fromList nags.flatMap { n =>
-            parseIntOption(n drop 1) flatMap Glyph.find
+            n.drop(1).toIntOption flatMap Glyph.find
           }
         }
       }
@@ -173,18 +178,18 @@ object Parser extends scalaz.syntax.ToTraverseOps {
     private val MoveR = """^(N|B|R|Q|K|)([a-h]?)([1-8]?)(x?)([a-h][0-9])(=?[NBRQ]?)(\+?)(\#?)$""".r
     private val DropR = """^(N|B|R|Q|P)@([a-h][1-8])(\+?)(\#?)$""".r
 
-    def apply(str: String, variant: Variant): Valid[San] = {
+    def apply(str: String, variant: Variant): Validated[String, San] = {
       if (str.size == 2) Pos.posAt(str).fold(slow(str)) { pos =>
-        succezz(Std(pos, Pawn))
+        valid(Std(pos, Pawn))
       }
       else
         str match {
-          case "O-O" | "o-o" | "0-0"       => succezz(Castle(KingSide))
-          case "O-O-O" | "o-o-o" | "0-0-0" => succezz(Castle(QueenSide))
+          case "O-O" | "o-o" | "0-0"       => valid(Castle(KingSide))
+          case "O-O-O" | "o-o-o" | "0-0-0" => valid(Castle(QueenSide))
           case MoveR(role, file, rank, capture, pos, prom, check, mate) =>
             role.headOption.fold[Option[Role]](Some(Pawn))(variant.rolesByPgn.get) flatMap { role =>
               Pos posAt pos map { dest =>
-                succezz(
+                valid(
                   Std(
                     dest = dest,
                     role = role,
@@ -206,7 +211,7 @@ object Parser extends scalaz.syntax.ToTraverseOps {
           case DropR(roleS, posS, check, mate) =>
             roleS.headOption flatMap variant.rolesByPgn.get flatMap { role =>
               Pos posAt posS map { pos =>
-                succezz(
+                valid(
                   Drop(
                     role = role,
                     pos = pos,
@@ -220,15 +225,15 @@ object Parser extends scalaz.syntax.ToTraverseOps {
                   )
                 )
               }
-            } getOrElse s"Cannot parse drop: $str".failureNel
+            } getOrElse invalid(s"Cannot parse drop: $str")
           case _ => slow(str)
         }
     }
 
-    private def slow(str: String): Valid[San] =
+    private def slow(str: String): Validated[String, San] =
       parseAll(move, str) match {
-        case Success(san, _) => succezz(san)
-        case err             => "Cannot parse move: %s\n%s".format(err.toString, str).failureNel
+        case Success(san, _) => valid(san)
+        case err             => invalid("Cannot parse move: %s\n%s".format(err.toString, str))
       }
 
     def move: Parser[San] = castle | standard
@@ -351,14 +356,14 @@ object Parser extends scalaz.syntax.ToTraverseOps {
 
   object TagParser extends RegexParsers with Logging {
 
-    def apply(pgn: String): Valid[Tags] =
+    def apply(pgn: String): Validated[String, Tags] =
       parseAll(all, pgn) match {
-        case f: Failure       => "Cannot parse tags: %s\n%s".format(f.toString, pgn).failureNel
-        case Success(tags, _) => succezz(Tags(tags))
-        case err              => "Cannot parse tags: %s\n%s".format(err.toString, pgn).failureNel
+        case f: Failure       => invalid("Cannot parse tags: %s\n%s".format(f.toString, pgn))
+        case Success(tags, _) => valid(Tags(tags))
+        case err              => invalid("Cannot parse tags: %s\n%s".format(err.toString, pgn))
       }
 
-    def fromFullPgn(pgn: String): Valid[Tags] =
+    def fromFullPgn(pgn: String): Validated[String, Tags] =
       splitTagAndMoves(pgn) flatMap {
         case (tags, _) => apply(tags)
       }
@@ -388,10 +393,10 @@ object Parser extends scalaz.syntax.ToTraverseOps {
   private def ensureTagsNewline(pgn: String): String =
     """"\]\s*(\d+\.)""".r.replaceAllIn(pgn, m => "\"]\n" + m.group(1))
 
-  private def splitTagAndMoves(pgn: String): Valid[(String, String)] =
+  private def splitTagAndMoves(pgn: String): Validated[String, (String, String)] =
     augmentString(ensureTagsNewline(pgn)).linesIterator.to(List).map(_.trim).filter(_.nonEmpty) span { line =>
       line lift 0 contains '['
     } match {
-      case (tagLines, moveLines) => succezz(tagLines.mkString("\n") -> moveLines.mkString("\n"))
+      case (tagLines, moveLines) => valid(tagLines.mkString("\n") -> moveLines.mkString("\n"))
     }
 }

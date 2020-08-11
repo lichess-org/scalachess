@@ -95,7 +95,7 @@ abstract class Variant private[variant] (
       _     <- actor.validIf(actor is situation.color, "Not my piece on " + from)
       m1    <- findMove(from, to) toValid "Piece on " + from + " cannot move to " + to
       m2    <- m1 withPromotion promotion toValid "Piece on " + from + " cannot promote to " + promotion
-      m3    <- m2 validIf (isValidPromotion(promotion), "Cannot promote to " + promotion + " in this game mode")
+      m3    <- m2.validIf(isValidPromotion(promotion), "Cannot promote to " + promotion + " in this game mode")
     } yield m3
   }
 

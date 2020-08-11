@@ -1,6 +1,8 @@
 package chess
 package opening
 
+import cats.syntax.option._
+
 final class Ecopening(
     val eco: Ecopening.ECO,
     val family: Ecopening.FamilyName,
@@ -52,7 +54,7 @@ object Ecopening {
     Replay
       .boards(
         moveStrs = pgnMoves take EcopeningDB.MAX_MOVES,
-        initialFen = none,
+        initialFen = None,
         variant = variant.Standard
       )
       .toOption flatMap matchChronoBoards

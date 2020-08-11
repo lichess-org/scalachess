@@ -1,6 +1,5 @@
 package chess
 
-import scalaz.Validation.FlatMap._
 import Pos._
 import variant.Standard
 
@@ -17,7 +16,7 @@ class AutodrawTest extends ChessTest {
       "opened" in {
         makeGame.playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5) map { g =>
           g.board.autoDraw
-        } must beSuccess(false)
+        } must beValid(false)
       }
       "two kings" in {
         """
@@ -72,11 +71,11 @@ K   bB""".autoDraw must_== false
       "opened" in {
         makeGame.playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5) map { g =>
           g.board.autoDraw
-        } must beSuccess(false)
+        } must beValid(false)
       }
       "tons of pointless moves" in {
         val moves = List.fill(30)(List(B1 -> C3, B8 -> C6, C3 -> B1, C6 -> B8))
-        makeGame.playMoves(moves.flatten: _*) must beSuccess.like {
+        makeGame.playMoves(moves.flatten: _*) must beValid.like {
           case g => g.board.autoDraw must_== true
         }
       }
@@ -182,7 +181,7 @@ K   bB""".autoDraw must_== false
           F2 -> G2,
           H6 -> G6
         )
-        makeGame.playMoves(moves: _*) must beSuccess.like {
+        makeGame.playMoves(moves: _*) must beValid.like {
           case g => g.board.history.threefoldRepetition must beTrue
         }
       }
@@ -280,13 +279,13 @@ K   bB""".autoDraw must_== false
           G2 -> F2,
           G6 -> H6
         )
-        makeGame.playMoves(moves: _*) must beSuccess.like {
+        makeGame.playMoves(moves: _*) must beValid.like {
           case g => g.board.history.threefoldRepetition must beFalse
         }
       }
       // "3fold on initial position - broken" in {
       //   val moves = List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten
-      //   makeGame.playMoves(moves: _*) must beSuccess.like {
+      //   makeGame.playMoves(moves: _*) must beValid.like {
       //     case g => g.board.history.threefoldRepetition must beTrue
       //   }
       // }
@@ -294,7 +293,7 @@ K   bB""".autoDraw must_== false
         val moves = List(E2 -> E4, E7 -> E5) ::: List
           .fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8))
           .flatten
-        makeGame.playMoves(moves: _*) must beSuccess.like {
+        makeGame.playMoves(moves: _*) must beValid.like {
           case g => g.board.history.threefoldRepetition must beTrue
         }
       }
@@ -386,12 +385,12 @@ K   bB""".autoDraw must_== false
         H6 -> H7
       )
       "from prod should be fivefold" in {
-        makeGame.playMoves(moves: _*) must beSuccess.like {
+        makeGame.playMoves(moves: _*) must beValid.like {
           case g => g.situation.autoDraw must beTrue
         }
       }
       "from prod should not be fivefold" in {
-        makeGame.playMoves(moves.dropRight(1): _*) must beSuccess.like {
+        makeGame.playMoves(moves.dropRight(1): _*) must beValid.like {
           case g => g.situation.autoDraw must beFalse
         }
       }
@@ -400,7 +399,7 @@ K   bB""".autoDraw must_== false
   "do not detect insufficient material" should {
     "on two knights" in {
       val position = "1n2k1n1/8/8/8/8/8/8/4K3 w - - 0 1"
-      fenToGame(position, Standard) must beSuccess.like {
+      fenToGame(position, Standard) must beValid.like {
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
@@ -414,7 +413,7 @@ K   bB""".autoDraw must_== false
         Pos.F7,
         Pos.F8
       ))
-      newGame must beSuccess.like {
+      newGame must beValid.like {
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
@@ -428,7 +427,7 @@ K   bB""".autoDraw must_== false
         Pos.B8,
         Pos.E5
       ))
-      newGame must beSuccess.like {
+      newGame must beValid.like {
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
@@ -442,7 +441,7 @@ K   bB""".autoDraw must_== false
         Pos.F6,
         Pos.E5
       ))
-      newGame must beSuccess.like {
+      newGame must beValid.like {
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
@@ -456,7 +455,7 @@ K   bB""".autoDraw must_== false
         Pos.F6,
         Pos.E5
       ))
-      newGame must beSuccess.like {
+      newGame must beValid.like {
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
@@ -470,7 +469,7 @@ K   bB""".autoDraw must_== false
         Pos.F6,
         Pos.E4
       ))
-      newGame must beSuccess.like {
+      newGame must beValid.like {
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
@@ -484,7 +483,7 @@ K   bB""".autoDraw must_== false
         Pos.E5,
         Pos.F7
       ))
-      newGame must beSuccess.like {
+      newGame must beValid.like {
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse
@@ -498,7 +497,7 @@ K   bB""".autoDraw must_== false
         Pos.A1,
         Pos.B2
       ))
-      newGame must beSuccess.like {
+      newGame must beValid.like {
         case game =>
           game.situation.autoDraw must beFalse
           game.situation.end must beFalse

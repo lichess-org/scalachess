@@ -17,7 +17,7 @@ class ParserPerfTest extends ChessTest {
 
   "playing a game" should {
     "many times" in {
-      runOne must beSuccess
+      runOne must beValid
       if (nb * iterations > 1) {
         println("warming up")
         run

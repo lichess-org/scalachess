@@ -1,11 +1,11 @@
 package chess
 package variant
 
+import cats.data.Validated
 import scala.annotation.nowarn
-import scalaz.Validation.failureNel
-import scalaz.Validation.FlatMap._
+import cats.syntax.option._
 
-import Pos.posAt
+import chess.Pos.posAt
 
 // Correctness depends on singletons for each variant ID
 abstract class Variant private[variant] (
@@ -85,22 +85,31 @@ abstract class Variant private[variant] (
       next == to || (!board.pieces.contains(next) && longRangeThreatens(board, next, dir, to))
     }
 
-  def move(situation: Situation, from: Pos, to: Pos, promotion: Option[PromotableRole]): Valid[Move] = {
+  def move(
+      situation: Situation,
+      from: Pos,
+      to: Pos,
+      promotion: Option[PromotableRole]
+  ): Validated[String, Move] = {
 
     // Find the move in the variant specific list of valid moves
     def findMove(from: Pos, to: Pos) = situation.moves get from flatMap (_.find(_.dest == to))
 
     for {
       actor <- situation.board.actors get from toValid "No piece on " + from
-      _     <- actor.validIf(actor is situation.color, "Not my piece on " + from)
-      m1    <- findMove(from, to) toValid "Piece on " + from + " cannot move to " + to
-      m2    <- m1 withPromotion promotion toValid "Piece on " + from + " cannot promote to " + promotion
-      m3    <- m2.validIf(isValidPromotion(promotion), "Cannot promote to " + promotion + " in this game mode")
+      _ <-
+        if (actor is situation.color) Validated.valid(actor)
+        else Validated.invalid("Not my piece on " + from)
+      m1 <- findMove(from, to) toValid "Piece on " + from + " cannot move to " + to
+      m2 <- m1 withPromotion promotion toValid "Piece on " + from + " cannot promote to " + promotion
+      m3 <-
+        if (isValidPromotion(promotion)) Validated.valid(m2)
+        else Validated.invalid("Cannot promote to " + promotion + " in this game mode")
     } yield m3
   }
 
-  def drop(situation: Situation, role: Role, pos: Pos): Valid[Drop] =
-    failureNel(s"$this variant cannot drop $situation $role $pos")
+  def drop(situation: Situation, role: Role, pos: Pos): Validated[String, Drop] =
+    Validated.invalid(s"$this variant cannot drop $situation $role $pos")
 
   def staleMate(situation: Situation): Boolean = !situation.check && situation.moves.isEmpty
 

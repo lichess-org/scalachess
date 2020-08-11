@@ -1,7 +1,8 @@
 package chess
 package format.pgn
 
-import scalaz.Validation.FlatMap._
+import cats.data.Validated
+import cats.syntax.option._
 
 case class ParsedPgn(
     initialPosition: InitialPosition,
@@ -18,7 +19,7 @@ object Sans {
 // Standard Algebraic Notation
 sealed trait San {
 
-  def apply(situation: Situation): Valid[MoveOrDrop]
+  def apply(situation: Situation): Validated[String, MoveOrDrop]
 
   def metas: Metas
 
@@ -56,7 +57,7 @@ case class Std(
 
   def withMetas(m: Metas) = copy(metas = m)
 
-  def move(situation: Situation): Valid[chess.Move] =
+  def move(situation: Situation): Validated[String, chess.Move] =
     situation.board.pieces.foldLeft(none[chess.Move]) {
       case (None, (pos, piece))
           if piece.color == situation.color && piece.role == role && compare(file, pos.x) && compare(
@@ -69,7 +70,7 @@ case class Std(
         }
       case (m, _) => m
     } match {
-      case None       => s"No move found: $this\n$situation".failureNel
+      case None       => Validated invalid s"No move found: $this\n$situation"
       case Some(move) => move withPromotion promotion toValid "Wrong promotion"
     }
 
@@ -86,7 +87,7 @@ case class Drop(
 
   def withMetas(m: Metas) = copy(metas = m)
 
-  def drop(situation: Situation): Valid[chess.Drop] =
+  def drop(situation: Situation): Validated[String, chess.Drop] =
     situation.drop(role, pos)
 }
 
@@ -129,7 +130,7 @@ case class Castle(
 
   def withMetas(m: Metas) = copy(metas = m)
 
-  def move(situation: Situation): Valid[chess.Move] =
+  def move(situation: Situation): Validated[String, chess.Move] =
     for {
       kingPos <- situation.board kingPosOf situation.color toValid "No king found"
       actor   <- situation.board actorAt kingPos toValid "No actor found"

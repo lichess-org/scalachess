@@ -77,7 +77,7 @@ object Replay {
       moves match {
         case (san, sanStr) :: rest =>
           san(g.situation).fold(
-            err => (Nil, err.head.some),
+            err => (Nil, err.some),
             moveOrDrop => {
               val newGame = moveOrDrop.fold(g.apply, g.applyDrop)
               val uci     = moveOrDrop.fold(_.toUci, _.toUci)
@@ -197,7 +197,7 @@ object Replay {
             san(sit) flatMap { moveOrDrop =>
               val after = moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter)
               val fen   = Forsyth >> Game(Situation(after, Color.fromPly(ply)), turns = ply)
-              if (compareFen(fen)) scalaz.Success(ply)
+              if (compareFen(fen)) Validated.valid(ply)
               else recursivePlyAtFen(Situation(after, !sit.color), rest, ply + 1)
             }
         }

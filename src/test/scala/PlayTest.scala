@@ -1,8 +1,7 @@
 package chess
 
-import scalaz.Validation.FlatMap._
-import format.Visual.addNewLines
-import Pos._
+import chess.format.Visual.addNewLines
+import chess.Pos._
 
 class PlayTest extends ChessTest {
 
@@ -11,7 +10,7 @@ class PlayTest extends ChessTest {
       val game =
         makeGame.playMoves(E2 -> E4, E7 -> E5, F1 -> C4, G8 -> F6, D2 -> D3, C7 -> C6, C1 -> G5, H7 -> H6)
       "current game" in {
-        game must beSuccess.like {
+        game must beValid.like {
           case g => addNewLines(g.board.visual) must_== """
 rnbqkb r
 pp p pp
@@ -25,7 +24,7 @@ RN QK NR
         }
       }
       "after recapture" in {
-        game flatMap { _.playMoves(G5 -> F6, D8 -> F6) } must beSuccess.like {
+        game flatMap { _.playMoves(G5 -> F6, D8 -> F6) } must beValid.like {
           case g => addNewLines(g.board.visual) must_== """
 rnb kb r
 pp p pp
@@ -61,7 +60,7 @@ RN QK NR
         C5 -> D4,
         C3 -> D4,
         F8 -> B4
-      ) must beSuccess.like {
+      ) must beValid.like {
         case g => addNewLines(g.board.visual) must_== """
 r   k  r
 pp   ppp
@@ -103,7 +102,7 @@ RN Q RK
         F3 -> C6,
         B7 -> C6,
         E2 -> A6
-      ) must beSuccess.like {
+      ) must beValid.like {
         case g => addNewLines(g.board.visual) must_== """
   kr  nr
 p  n ppp

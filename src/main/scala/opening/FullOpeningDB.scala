@@ -1,7 +1,9 @@
 package chess
 package opening
 
-import format.FEN
+import cats.syntax.option._
+
+import chess.format.FEN
 
 object FullOpeningDB {
 

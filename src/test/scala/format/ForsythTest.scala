@@ -20,34 +20,34 @@ class ForsythTest extends ChessTest {
           f exportBoard makeBoard must_== "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
         }
         "one move" in {
-          makeGame.playMoveList(moves take 1) must beSuccess.like {
+          makeGame.playMoveList(moves take 1) must beValid.like {
             case g => f >> g must_== "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"
           }
         }
         "2 moves" in {
-          makeGame.playMoveList(moves take 2) must beSuccess.like {
+          makeGame.playMoveList(moves take 2) must beValid.like {
             case g => f >> g must_== "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"
           }
         }
         "3 moves" in {
-          makeGame.playMoveList(moves take 3) must beSuccess.like {
+          makeGame.playMoveList(moves take 3) must beValid.like {
             case g => f >> g must_== "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"
           }
         }
         "4 moves" in {
-          makeGame.playMoveList(moves take 4) must beSuccess.like {
+          makeGame.playMoveList(moves take 4) must beValid.like {
             case g => f >> g must_== "rnbqkb1r/pp1ppppp/7n/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"
           }
         }
         "5 moves" in {
-          makeGame.playMoveList(moves take 5) must beSuccess.like {
+          makeGame.playMoveList(moves take 5) must beValid.like {
             case g => f >> g must_== "rnbqkb1r/pp1ppppp/7n/2p5/4P3/P4N2/1PPP1PPP/RNBQKB1R b KQkq - 0 3"
           }
         }
       }
 
       "completely legal en-passant" in {
-        makeGame.playMoves(A2 -> A4, G8 -> F6, A4 -> A5, B7 -> B5) must beSuccess.like {
+        makeGame.playMoves(A2 -> A4, G8 -> F6, A4 -> A5, B7 -> B5) must beValid.like {
           case g => f >> g must_== "rnbqkb1r/p1pppppp/5n2/Pp6/8/8/1PPPPPPP/RNBQKBNR w KQkq b6 0 3"
         }
       }
@@ -71,13 +71,13 @@ class ForsythTest extends ChessTest {
         )
 
         "inner rook" in {
-          makeGame.playMoveList(moves dropRight 2) must beSuccess.like {
+          makeGame.playMoveList(moves dropRight 2) must beValid.like {
             case g => f >> g must_== "rrbqkbn1/p1ppppp1/n7/1p5p/1P5P/N7/P1PPPPP1/RRBQKBN1 w Qq - 6 7"
           }
         }
 
         "inner rook removed" in {
-          makeGame.playMoveList(moves) must beSuccess.like {
+          makeGame.playMoveList(moves) must beValid.like {
             case g => f >> g must_== "r1bqkbn1/p1ppppp1/nr6/1p5p/1P5P/NR6/P1PPPPP1/R1BQKBN1 w Qq - 8 8"
           }
         }
@@ -86,7 +86,7 @@ class ForsythTest extends ChessTest {
     "import" in {
       val moves = List(E2 -> E4, C7 -> C5, G1 -> F3, G8 -> H6, A2 -> A3)
       def compare(ms: List[(Pos, Pos)], fen: String) =
-        makeGame.playMoveList(ms) must beSuccess.like {
+        makeGame.playMoveList(ms) must beValid.like {
           case g =>
             (f << fen) must beSome.like {
               case situation => situation.board.visual must_== g.situation.board.visual
@@ -369,13 +369,13 @@ class ForsythTest extends ChessTest {
     "write" in {
       "no checks" in {
         val moves = List(E2 -> E4, C7 -> C5, G1 -> F3, G8 -> H6, A2 -> A3)
-        Game(ThreeCheck).playMoveList(moves take 5) must beSuccess.like {
+        Game(ThreeCheck).playMoveList(moves take 5) must beValid.like {
           case g => f >> g must_== "rnbqkb1r/pp1ppppp/7n/2p5/4P3/P4N2/1PPP1PPP/RNBQKB1R b KQkq - 0 3 +0+0"
         }
       }
       "checks" in {
         val moves = List(E2 -> E4, E7 -> E5, F1 -> C4, G8 -> F6, B1 -> C3, F6 -> E4, C4 -> F7)
-        Game(ThreeCheck).playMoveList(moves) must beSuccess.like {
+        Game(ThreeCheck).playMoveList(moves) must beValid.like {
           case g => f >> g must_== "rnbqkb1r/pppp1Bpp/8/4p3/4n3/2N5/PPPP1PPP/R1BQK1NR b KQkq - 0 4 +1+0"
         }
       }

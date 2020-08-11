@@ -18,10 +18,6 @@ object Parser {
       variations: List[List[StrMove]]
   )
 
-  implicit private class RichValidated[E, A](validated: Validated[E, A]) {
-    def flatMap[EE >: E, B](f: A => Validated[EE, B]): Validated[EE, B] = validated.andThen(f)
-  }
-
   def full(pgn: String): Validated[String, ParsedPgn] =
     try {
       val preprocessed = augmentString(pgn).linesIterator

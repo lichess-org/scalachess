@@ -1,13 +1,15 @@
 package chess
 
+import cats.data.Validated
+import cats.syntax.option._
+import org.specs2.matcher.Matcher
+import org.specs2.matcher.ValidatedMatchers
+import org.specs2.mutable.Specification
+
 import chess.format.{ Forsyth, Visual }
 import chess.variant.Variant
-import org.specs2.matcher.{ Matcher, ValidationMatchers }
-import org.specs2.mutable.Specification
-import scalaz.{ Validation => V }
-import V.FlatMap._
 
-trait ChessTest extends Specification with ValidationMatchers {
+trait ChessTest extends Specification with ValidatedMatchers {
 
   implicit def stringToBoard(str: String): Board = Visual << str
 
@@ -44,10 +46,10 @@ trait ChessTest extends Specification with ValidationMatchers {
 
       def as(color: Color): Game = game.withPlayer(color)
 
-      def playMoves(moves: (Pos, Pos)*): Valid[Game] = playMoveList(moves)
+      def playMoves(moves: (Pos, Pos)*): Validated[String, Game] = playMoveList(moves)
 
-      def playMoveList(moves: Iterable[(Pos, Pos)]): Valid[Game] = {
-        val vg = moves.foldLeft(V.success(game): Valid[Game]) { (vg, move) =>
+      def playMoveList(moves: Iterable[(Pos, Pos)]): Validated[String, Game] = {
+        val vg = moves.foldLeft(Validated.valid(game): Validated[String, Game]) { (vg, move) =>
           // vg foreach { x =>
           // println(s"------------------------ ${x.turns} = $move")
           // }
@@ -67,7 +69,7 @@ trait ChessTest extends Specification with ValidationMatchers {
           orig: Pos,
           dest: Pos,
           promotion: Option[PromotableRole] = None
-      ): Valid[Game] =
+      ): Validated[String, Game] =
         game.apply(orig, dest, promotion) map (_._1)
 
       def withClock(c: Clock) = game.copy(clock = Some(c))
@@ -107,25 +109,25 @@ trait ChessTest extends Specification with ValidationMatchers {
       case p => Visual.addNewLines(Visual.>>|(board, Map(p -> 'x'))) must_== visual
     }
 
-  def beBoard(visual: String): Matcher[Valid[Board]] =
-    beSuccess.like {
+  def beBoard(visual: String): Matcher[Validated[String, Board]] =
+    beValid.like {
       case b => b.visual must_== (Visual << visual).visual
     }
 
-  def beSituation(visual: String): Matcher[Valid[Situation]] =
-    beSuccess.like {
+  def beSituation(visual: String): Matcher[Validated[String, Situation]] =
+    beValid.like {
       case s => s.board.visual must_== (Visual << visual).visual
     }
 
-  def beGame(visual: String): Matcher[Valid[Game]] =
-    beSuccess.like {
+  def beGame(visual: String): Matcher[Validated[String, Game]] =
+    beValid.like {
       case g => g.board.visual must_== (Visual << visual).visual
     }
 
   def sortPoss(poss: Seq[Pos]): Seq[Pos] = poss sortBy (_.toString)
 
   def pieceMoves(piece: Piece, pos: Pos): Option[List[Pos]] =
-    (makeEmptyBoard place piece at pos).toOption flatMap { b =>
+    (makeEmptyBoard place piece at pos) flatMap { b =>
       b actorAt pos map (_.destinations)
     }
 }

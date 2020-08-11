@@ -1,6 +1,8 @@
 package chess
 package format.pgn
 
+import cats.syntax.option._
+
 class RenderTest extends ChessTest {
 
   private def glyphs(id: Int) =

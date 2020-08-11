@@ -7,17 +7,17 @@ class UciDumpTest extends ChessTest {
 
   "only raw moves" should {
     "empty" in {
-      UciDump(Nil, None, variant.Standard) must beSuccess.like {
+      UciDump(Nil, None, variant.Standard) must beValid.like {
         case x => x must beEmpty
       }
     }
     "simple" in {
-      UciDump(simple.split(' ').toList, None, variant.Standard) must beSuccess.like {
+      UciDump(simple.split(' ').toList, None, variant.Standard) must beValid.like {
         case moves => moves must_== "e2e3 b8c6 d2d4 g8f6".split(" ").toList
       }
     }
     "complete" in {
-      UciDump(fromProd2.split(' ').toList, None, variant.Standard) must beSuccess.like {
+      UciDump(fromProd2.split(' ').toList, None, variant.Standard) must beValid.like {
         case moves =>
           moves must_== List(
             "e2e4",
@@ -142,7 +142,7 @@ class UciDumpTest extends ChessTest {
       }
     }
     // "960" in {
-    //   UciDump(complete960, None, Variant.Chess960) must beSuccess.like {
+    //   UciDump(complete960, None, Variant.Chess960) must beValid.like {
     //     case moves => moves must_== "e2e3 e8f6 f1g3 f8e6 e1f3 d7d5 f3d4 e6d4 e3d4 e7e6 d1e1 f6g4 e1e2 f7f6 c2c4 d5c4 b1e4 d8d4 e4f3 g4e5 g3e4 e5f3 g2f3 g8f7 e4f6 g7f6 c1d1 e6e5 h2h4 f7g6 g1h2 g6f5 e2e5 f6e5 h2e5 h8e5 h1f1 e5f4 d2d3 d4d3 d1e1 f4d2".split(" ").toList
     //   }
     // }

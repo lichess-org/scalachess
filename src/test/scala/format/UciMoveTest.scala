@@ -1,6 +1,8 @@
 package chess
 package format
 
+import cats.syntax.option._
+
 class UciMoveTest extends ChessTest {
 
   "piotr encoding" should {

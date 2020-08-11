@@ -25,7 +25,7 @@ class ReplayTest extends ChessTest {
         moves = List(Uci("e2e4"), Uci("e7e5"), Uci("e1e2")).flatten,
         initialFen = None,
         variant = variant.Standard
-      ) must beSuccess.like { situations =>
+      ) must beValid.like { situations =>
         situations.map(Forsyth.>>) must_== List(
           "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
           "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",

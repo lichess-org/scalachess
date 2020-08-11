@@ -1,6 +1,8 @@
 package chess
 
-import variant.Crazyhouse
+import cats.syntax.option._
+
+import chess.variant.Crazyhouse
 
 class CrazyhouseVariantTest extends ChessTest {
 
@@ -9,7 +11,7 @@ class CrazyhouseVariantTest extends ChessTest {
     "nothing to drop" in {
       val fenPosition = "3Nkb1r/1pQP1ppp/4p3/3N4/N5N1/6B1/PPPPBPPP/R1B2RK1 b - - 0 25"
       val game = {
-        fenToGame(fenPosition, Crazyhouse).toOption err "ooopses"
+        fenToGame(fenPosition, Crazyhouse).toOption.get
       }.updateBoard { b =>
         b.withCrazyData(
           Crazyhouse.Data(
@@ -28,7 +30,7 @@ class CrazyhouseVariantTest extends ChessTest {
     "pieces to drop, in vain" in {
       val fenPosition = "3Nkb1r/1pQP1ppp/4p3/3N4/N5N1/6B1/PPPPBPPP/R1B2RK1 b - - 0 25"
       val game = {
-        fenToGame(fenPosition, Crazyhouse).toOption err "ooopses"
+        fenToGame(fenPosition, Crazyhouse).toOption.get
       }.updateBoard { b =>
         b.withCrazyData(
           Crazyhouse.Data(
@@ -48,7 +50,7 @@ class CrazyhouseVariantTest extends ChessTest {
       import Pos._
       "tons of pointless moves but shouldn't apply 50-moves" in {
         val moves = List.fill(30)(List(B1 -> C3, B8 -> C6, C3 -> B1, C6 -> B8))
-        Game(Crazyhouse).playMoves(moves.flatten: _*) must beSuccess.like {
+        Game(Crazyhouse).playMoves(moves.flatten: _*) must beValid.like {
           case g =>
             g.board.variant.fiftyMoves(g.board.history) must beFalse
             g.board.autoDraw must beTrue // fivefold repetition
@@ -154,7 +156,7 @@ class CrazyhouseVariantTest extends ChessTest {
           F2 -> G2,
           H6 -> G6
         )
-        Game(Crazyhouse).playMoves(moves: _*) must beSuccess.like {
+        Game(Crazyhouse).playMoves(moves: _*) must beValid.like {
           case g => g.board.history.threefoldRepetition must beTrue
         }
       }
@@ -252,14 +254,14 @@ class CrazyhouseVariantTest extends ChessTest {
           G2 -> F2,
           G6 -> H6
         )
-        Game(Crazyhouse).playMoves(moves: _*) must beSuccess.like {
+        Game(Crazyhouse).playMoves(moves: _*) must beValid.like {
           case g => g.board.history.threefoldRepetition must beFalse
         }
       }
       "not draw when only kings left" in {
         val fenPosition = "k6K/8/8/8/8/8/8/8 w - - 0 25"
         val game = {
-          fenToGame(fenPosition, Crazyhouse).toOption err "error"
+          fenToGame(fenPosition, Crazyhouse).toOption.get
         }
         game.situation.autoDraw must beFalse
         game.situation.end must beFalse
@@ -325,9 +327,7 @@ class CrazyhouseVariantTest extends ChessTest {
         ),
         initialFen = None,
         variant = Crazyhouse
-      ) must beSuccess.like {
-        case _ => 1 must_== 1
-      }
+      ) must beValid
     }
   }
 }

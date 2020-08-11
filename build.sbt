@@ -8,7 +8,8 @@ scalaVersion := "2.13.3"
 
 libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
-  "org.specs2"             %% "specs2-core"              % "4.7.0" % "test",
+  "org.specs2"             %% "specs2-core"              % "4.10.0" % Test,
+  "org.specs2"             %% "specs2-cats"              % "4.10.0" % Test,
   "com.github.ornicar"     %% "scalalib"                 % "7.0.0",
   "joda-time"              % "joda-time"                 % "2.10.6",
   "org.typelevel" %% "cats-core" % "2.1.1"
@@ -55,7 +56,11 @@ scalacOptions ++= Seq(
     "-Wunused:privates",
     "-Wunused:implicits",
     "-Wunused:params",
-    "-Wvalue-discard"
+    "-Wvalue-discard",
+    "-Xmaxerrs",
+    "12",
+    "-Xmaxwarns",
+    "2"
 )
 
 publishTo := Some(Resolver.file("file", new File(sys.props.getOrElse("publishTo", ""))))

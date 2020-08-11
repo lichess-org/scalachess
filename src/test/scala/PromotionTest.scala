@@ -1,7 +1,8 @@
 package chess
 
-import scalaz.Validation.FlatMap._
-import Pos._
+import cats.syntax.option._
+
+import chess.Pos._
 import chess.variant.Standard
 
 class PromotionTest extends ChessTest {
@@ -66,7 +67,7 @@ K n    """)
 
       val failureGame = game flatMap (_.apply(Pos.B7, Pos.B8, Some(King))) map (_._1)
 
-      failureGame must beFailure
+      failureGame must beInvalid
     }
 
   }

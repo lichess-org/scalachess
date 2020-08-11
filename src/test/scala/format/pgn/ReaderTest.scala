@@ -9,78 +9,78 @@ class ReaderTest extends ChessTest {
   "only raw moves" should {
     "many games" in {
       forall(raws) { (c: String) =>
-        Reader.full(c) must beSuccess.like {
+        Reader.full(c) must beValid.like {
           case Complete(replay) => replay.moves must have size (c.split(' ').size)
         }
       }
     }
     "example from prod 1" in {
-      Reader.full(fromProd1) must beSuccess
+      Reader.full(fromProd1) must beValid
     }
     "example from prod 2" in {
-      Reader.full(fromProd2) must beSuccess
+      Reader.full(fromProd2) must beValid
     }
     "rook promotion" in {
-      Reader.full(promoteRook) must beSuccess
+      Reader.full(promoteRook) must beValid
     }
     "castle check O-O-O+" in {
-      Reader.full(castleCheck1) must beSuccess
+      Reader.full(castleCheck1) must beValid
     }
     "castle checkmate O-O#" in {
-      Reader.full(castleCheck2) must beSuccess
+      Reader.full(castleCheck2) must beValid
     }
     "and delimiters" in {
-      Reader.full(withDelimiters) must beSuccess.like {
+      Reader.full(withDelimiters) must beValid.like {
         case Complete(replay) => replay.moves must have size 33
       }
     }
     "and delimiters on new lines" in {
-      Reader.full(withDelimitersOnNewLines) must beSuccess.like {
+      Reader.full(withDelimitersOnNewLines) must beValid.like {
         case Complete(replay) => replay.moves must have size 33
       }
     }
   }
   "tags and moves" should {
     "chess960" in {
-      Reader.full(complete960) must beSuccess
+      Reader.full(complete960) must beValid
     }
     "with empty lines" in {
-      Reader.full("\n" + complete960 + "\n") must beSuccess
+      Reader.full("\n" + complete960 + "\n") must beValid
     }
     "example from wikipedia" in {
-      Reader.full(fromWikipedia) must beSuccess
+      Reader.full(fromWikipedia) must beValid
     }
     "with inline comments" in {
-      Reader.full(inlineComments) must beSuccess
+      Reader.full(inlineComments) must beValid
     }
     "example from chessgames.com" in {
-      Reader.full(fromChessgames) must beSuccess
+      Reader.full(fromChessgames) must beValid
     }
     "example from chessgames.com with escape chars" in {
-      Reader.full(fromChessgamesWithEscapeChar) must beSuccess
+      Reader.full(fromChessgamesWithEscapeChar) must beValid
     }
     "immortal with NAG" in {
-      Reader.full(withNag) must beSuccess
+      Reader.full(withNag) must beValid
     }
     "example from TCEC" in {
-      Reader.full(fromTcec) must beSuccess
+      Reader.full(fromTcec) must beValid
     }
     "from https://chessprogramming.wikispaces.com/Kasparov+versus+Deep+Blue+1996" in {
-      Reader.full(fromChessProgrammingWiki) must beSuccess
+      Reader.full(fromChessProgrammingWiki) must beValid
     }
     "comments and variations" in {
-      Reader.full(commentsAndVariations) must beSuccess
+      Reader.full(commentsAndVariations) must beValid
     }
     "comments and variations by smartchess" in {
-      Reader.full(bySmartChess) must beSuccess
+      Reader.full(bySmartChess) must beValid
     }
     "invalid variant" in {
-      Reader.full(invalidVariant) must beSuccess.like {
+      Reader.full(invalidVariant) must beValid.like {
         case Complete(replay) => replay.setup.board.variant must_== variant.Standard
       }
     }
     "promoting to a rook" in {
-      Reader.full(fromLichessBadPromotion) must beSuccess.like {
+      Reader.full(fromLichessBadPromotion) must beValid.like {
         case Complete(replay) =>
           replay.chronoMoves lift 10 must beSome.like {
             case move => move.fold(_.promotion, _ => None) must_== Some(Rook)
@@ -88,19 +88,19 @@ class ReaderTest extends ChessTest {
       }
     }
     "chessbase arrows" in {
-      Reader.full(chessbaseArrows) must beSuccess
+      Reader.full(chessbaseArrows) must beValid
     }
     "atomic regression" in {
-      Reader.full(atomicRegression) must beSuccess
+      Reader.full(atomicRegression) must beValid
     }
     "atomic promotion" in {
-      Reader.full(atomicPromotion) must beSuccess
+      Reader.full(atomicPromotion) must beValid
     }
     "lichobile export" in {
-      Reader.full(lichobile) must beSuccess
+      Reader.full(lichobile) must beValid
     }
     "crazyhouse 1" in {
-      Reader.full(crazyhouse1) must beSuccess.like {
+      Reader.full(crazyhouse1) must beValid.like {
         case Complete(replay) =>
           replay.chronoMoves lift 11 must beSome.like {
             case move => move.fold(_.toUci.uci, _.toUci.uci) must_== "P@c6"
@@ -108,32 +108,32 @@ class ReaderTest extends ChessTest {
       }
     }
     "crazyhouse 2" in {
-      Reader.full(crazyhouse2) must beSuccess.like {
+      Reader.full(crazyhouse2) must beValid.like {
         case Complete(replay) => replay.chronoMoves.size must_== 111
       }
     }
     "crazyhouse without variant tag" in {
-      Reader.full(crazyhouseNoVariantTag) must beSuccess.like {
+      Reader.full(crazyhouseNoVariantTag) must beValid.like {
         case Incomplete(replay, _) => replay.chronoMoves.size must_== 8
       }
     }
     "crazyhouse from chess.com" in {
-      Reader.full(chessComCrazyhouse) must beSuccess
+      Reader.full(chessComCrazyhouse) must beValid
     }
   }
   "from prod" in {
     "from position close chess" in {
-      Reader.full(fromPosProdCloseChess) must beSuccess.like {
+      Reader.full(fromPosProdCloseChess) must beValid.like {
         case Complete(replay) => replay.chronoMoves.size must_== 152
       }
     }
     "from position empty FEN" in {
-      Reader.full(fromPositionEmptyFen) must beSuccess.like {
+      Reader.full(fromPositionEmptyFen) must beValid.like {
         case Complete(replay) => replay.chronoMoves.size must_== 164
       }
     }
     "preserves initial ply" in {
-      Reader.full(caissa) must beSuccess.like {
+      Reader.full(caissa) must beValid.like {
         case Complete(replay) =>
           replay.setup.startedAtTurn must_== 43
           replay.state.startedAtTurn must_== 43
@@ -141,12 +141,12 @@ class ReaderTest extends ChessTest {
     }
   }
   "partial from broadcast" in {
-    Reader.full(festivalFigueira) must beSuccess.like {
+    Reader.full(festivalFigueira) must beValid.like {
       case Incomplete(replay, _) => replay.chronoMoves.size must_== 113
     }
   }
   "invisible char" in {
-    Reader.full(invisibleChar) must beSuccess.like {
+    Reader.full(invisibleChar) must beValid.like {
       case Complete(replay) => replay.chronoMoves.size must_== 19
     }
   }

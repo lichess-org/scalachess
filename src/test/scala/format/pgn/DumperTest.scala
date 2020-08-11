@@ -67,12 +67,12 @@ class DumperTest extends ChessTest {
   "standard game" should {
     "move list" in {
       "Gioachine Greco" in {
-        gioachineGreco map (_.pgnMoves) must beSuccess.like {
+        gioachineGreco map (_.pgnMoves) must beValid.like {
           case ms => ms must_== "d4 d5 c4 dxc4 e3 b5 a4 c6 axb5 cxb5 Qf3".split(' ').toList
         }
       }
       "Peruvian Immortal" in {
-        peruvianImmortal map (_.pgnMoves) must beSuccess.like {
+        peruvianImmortal map (_.pgnMoves) must beValid.like {
           case ms =>
             ms must_== "e4 d5 exd5 Qxd5 Nc3 Qa5 d4 c6 Nf3 Bg4 Bf4 e6 h3 Bxf3 Qxf3 Bb4 Be2 Nd7 a3 O-O-O axb4 Qxa1+ Kd2 Qxh1 Qxc6+ bxc6 Ba6#"
               .split(' ')
@@ -94,7 +94,7 @@ P    k
 PP   PPP
 KNBQ BNR
 """)
-      game.playMoves(A7 -> A8) map (_.pgnMoves) must beSuccess.like {
+      game.playMoves(A7 -> A8) map (_.pgnMoves) must beValid.like {
         case ms => ms must_== List("a8=Q")
       }
     }
@@ -109,7 +109,7 @@ P
 PP   PPP
 KNBQ BNR
 """)
-      game.playMoves(A7 -> A8) map (_.pgnMoves) must beSuccess.like {
+      game.playMoves(A7 -> A8) map (_.pgnMoves) must beValid.like {
         case ms => ms must_== List("a8=Q+")
       }
     }
@@ -124,7 +124,7 @@ P  ppp
 PP   PPP
 KNBQ BNR
 """)
-      game.playMoves(A7 -> A8) map (_.pgnMoves) must beSuccess.like {
+      game.playMoves(A7 -> A8) map (_.pgnMoves) must beValid.like {
         case ms => ms must_== List("a8=Q#")
       }
     }
@@ -132,7 +132,7 @@ KNBQ BNR
       Game("""
 PP   PPP
 R   K  R
-""").playMoves(E1 -> G1) map (_.pgnMoves) must beSuccess.like {
+""").playMoves(E1 -> G1) map (_.pgnMoves) must beValid.like {
         case ms => ms must_== List("O-O")
       }
     }
@@ -140,7 +140,7 @@ R   K  R
       Game("""
 PP   PPP
 R   K  R
-""").playMoves(E1 -> C1) map (_.pgnMoves) must beSuccess.like {
+""").playMoves(E1 -> C1) map (_.pgnMoves) must beValid.like {
         case ms => ms must_== List("O-O-O")
       }
     }
@@ -158,7 +158,7 @@ k
 P   K  P
 R      R
 """)
-      game.playMoves(H1 -> B1) map (_.pgnMoves) must beSuccess.like {
+      game.playMoves(H1 -> B1) map (_.pgnMoves) must beValid.like {
         case ms => ms must_== List("Rhb1")
       }
     }
@@ -173,7 +173,7 @@ k
     K  P
  N
 """)
-      game.playMoves(B5 -> C3) map (_.pgnMoves) must beSuccess.like {
+      game.playMoves(B5 -> C3) map (_.pgnMoves) must beValid.like {
         case ms => ms must_== List("N5c3")
       }
     }
@@ -188,7 +188,7 @@ k
     K
 k
 """)
-      game.playMoves(C6 -> D5) map (_.pgnMoves) must beSuccess.like {
+      game.playMoves(C6 -> D5) map (_.pgnMoves) must beValid.like {
         case ms => ms must_== List("Qc6d5")
       }
     }
@@ -203,7 +203,7 @@ k
 P      P
 R   K  R
 """)
-      game.playMoves(H1 -> F1) map (_.pgnMoves) must beSuccess.like {
+      game.playMoves(H1 -> F1) map (_.pgnMoves) must beValid.like {
         case ms => ms must_== List("Rf1")
       }
     }
@@ -218,7 +218,7 @@ k
 
 
 """)
-      game.playMoves(E4 -> E5) map (_.pgnMoves) must beSuccess.like {
+      game.playMoves(E4 -> E5) map (_.pgnMoves) must beValid.like {
         case ms => ms must_== List("Re5")
       }
     }
@@ -229,7 +229,7 @@ k
       Game(makeBoard("""
 PPPPPPPP
 NRK RQBB
-""", variant.Chess960)).playMoves(C1 -> B1) map (_.pgnMoves) must beSuccess.like {
+""", variant.Chess960)).playMoves(C1 -> B1) map (_.pgnMoves) must beValid.like {
         case ms => ms must_== List("O-O-O")
       }
     }
@@ -237,7 +237,7 @@ NRK RQBB
       Game(makeBoard("""
 PP PPPPP
 NRK R  B
-""", variant.Chess960)).playMoves(C1 -> E1) map (_.pgnMoves) must beSuccess.like {
+""", variant.Chess960)).playMoves(C1 -> E1) map (_.pgnMoves) must beValid.like {
         case ms => ms must_== List("O-O")
       }
     }
@@ -251,7 +251,7 @@ pppppppp
 
 PPPPPPPP
 NRK RQBB
-""", variant.Chess960)).withPlayer(Black).playMoves(C8 -> B8) map (_.pgnMoves) must beSuccess.like {
+""", variant.Chess960)).withPlayer(Black).playMoves(C8 -> B8) map (_.pgnMoves) must beValid.like {
         case ms => ms must_== List("O-O-O")
       }
     }
@@ -265,7 +265,7 @@ pppppppp
 
 PPPPPPPP
 NRK RQBB
-""", variant.Chess960)).withPlayer(Black).playMoves(C8 -> E8) map (_.pgnMoves) must beSuccess.like {
+""", variant.Chess960)).withPlayer(Black).playMoves(C8 -> E8) map (_.pgnMoves) must beValid.like {
         case ms => ms must_== List("O-O")
       }
     }
@@ -287,7 +287,7 @@ NRKNRQBB
         C3 -> B5,
         C8 -> B8,
         C1 -> B1
-      ) map (_.pgnMoves) must beSuccess.like {
+      ) map (_.pgnMoves) must beValid.like {
         case ms => ms must_== "f4 Nc6 Nc3 g6 Nb5 O-O-O O-O-O".split(' ').toList
       }
     }

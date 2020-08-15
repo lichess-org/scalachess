@@ -44,13 +44,15 @@ case class Move(
       else h2
     } fixCastles
 
+    // Update position hashes last, only after updating the board,
+    // castling rights and en-passant rights.
     board.variant.finalizeBoard(board, toUci, capture flatMap before.apply) updateHistory { h =>
-      // Update position hashes last, only after updating the board,
-      // castling rights and en-passant rights.
-      h.copy(positionHashes = Hash(Situation(board, !piece.color)) ++ {
-        if (board.variant.isIrreversible(this)) Array.empty: PositionHash
-        else h.positionHashes
-      })
+      lazy val positionHashesOfSituationBefore =
+        if (h.positionHashes.isEmpty) Hash(situationBefore) else h.positionHashes
+      val resetsPositionHashes = board.variant.isIrreversible(this)
+      val basePositionHashes =
+        if (resetsPositionHashes) Array.empty: PositionHash else positionHashesOfSituationBefore
+      h.copy(positionHashes = Hash(Situation(board, !piece.color)) ++ basePositionHashes)
     }
   }
 

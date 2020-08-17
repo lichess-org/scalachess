@@ -146,8 +146,8 @@ class ClockTest extends ChessTest {
       clock61.remainingTime(White).centis must_== 0
       clock61.outOfTime(White, withGrace = true) must beFalse
     }
-    "over quota stall" >> advance(fakeClock60, 6190).outOfTime(White, true)
-    "stall within quota" >> !advance(fakeClock600, 60190).outOfTime(White, true)
-    "max grace stall" >> advance(fakeClock600, 602 * 100).outOfTime(White, true)
+    "over quota stall" >> advance(fakeClock60, 6190).outOfTime(White, withGrace = true)
+    "stall within quota" >> !advance(fakeClock600, 60190).outOfTime(White, withGrace = true)
+    "max grace stall" >> advance(fakeClock600, 602 * 100).outOfTime(White, withGrace = true)
   }
 }

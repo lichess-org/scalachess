@@ -32,7 +32,7 @@ object StartingPosition {
           "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 1 1",
           "King's_Pawn_Game",
           "1. e4",
-          false
+          featurable = false
         ),
         StartingPosition(
           "B00",
@@ -40,7 +40,7 @@ object StartingPosition {
           "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
           "Open_Game",
           "1. e4 e5",
-          false
+          featurable = false
         ),
         StartingPosition(
           "B02",
@@ -580,7 +580,7 @@ object StartingPosition {
           "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPPKPPP/RNBQ1BNR b kq - 0 2",
           "Bong",
           "1. e4 e5 2. Ke2",
-          false
+          featurable = false
         )
       )
     ),
@@ -593,7 +593,7 @@ object StartingPosition {
           "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 1 1",
           "Queen's_Pawn_Game",
           "1. d4",
-          false
+          featurable = false
         ),
         StartingPosition(
           "A57",
@@ -930,7 +930,7 @@ object StartingPosition {
           "rnbqkb1r/pppp1ppp/5n2/4p3/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3",
           "Budapest_Gambit",
           "1.  d4 Nf6 2. c4 e5",
-          false
+          featurable = false
         ),
         StartingPosition(
           "D00",
@@ -938,7 +938,7 @@ object StartingPosition {
           "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2",
           "Closed_Game",
           "1. d4 d5",
-          false
+          featurable = false
         ),
         StartingPosition(
           "A45",
@@ -958,7 +958,7 @@ object StartingPosition {
           "rnbqkbnr/pppppppp/8/8/8/5N2/PPPPPPPP/RNBQKB1R b KQkq - 1 1",
           "Zukertort_Opening",
           "1. Nf3",
-          false
+          featurable = false
         ),
         StartingPosition(
           "A07",
@@ -985,7 +985,7 @@ object StartingPosition {
           "rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq c3 1 1",
           "English_Opening",
           "1. c4",
-          false
+          featurable = false
         ),
         StartingPosition(
           "A20",
@@ -1019,7 +1019,7 @@ object StartingPosition {
           "rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq - 1 1",
           "Larsen's_Opening",
           "1. b3",
-          false
+          featurable = false
         )
       )
     ),
@@ -1032,7 +1032,7 @@ object StartingPosition {
           "rnbqkbnr/pppppppp/8/8/1P6/8/P1PPPPPP/RNBQKBNR b KQkq - 1 1",
           "Sokolsky_Opening",
           "1. b4",
-          false
+          featurable = false
         )
       )
     ),
@@ -1064,7 +1064,7 @@ object StartingPosition {
           "rnbqkbnr/pppppppp/8/8/8/6P1/PPPPPP1P/RNBQKBNR b KQkq - 1 1",
           "King's_Fianchetto_Opening",
           "1. g3",
-          false
+          featurable = false
         )
       )
     )

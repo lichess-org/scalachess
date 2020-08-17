@@ -118,7 +118,7 @@ case class Metas(
 }
 
 object Metas {
-  val empty = Metas(false, false, Nil, Glyphs.empty, Nil)
+  val empty = Metas(check = false, checkmate = false, Nil, Glyphs.empty, Nil)
 }
 
 case class Castle(

@@ -21,7 +21,7 @@ case object Crazyhouse
 
   override def valid(board: Board, strict: Boolean) = {
     val pieces = board.pieces.values
-    (Color.all forall validSide(board, false) _) &&
+    (Color.all forall validSide(board, strict = false) _) &&
     (!strict || (pieces.count(_ is Pawn) <= 16 && pieces.size <= 32))
   }
 

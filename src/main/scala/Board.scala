@@ -154,10 +154,10 @@ case class Board(
             }
           }
         Castles(
-          whiteKingSide = castles.whiteKingSide && wkReady && rookReady(White, wkPos, false),
-          whiteQueenSide = castles.whiteQueenSide && wkReady && rookReady(White, wkPos, true),
-          blackKingSide = castles.blackKingSide && bkReady && rookReady(Black, bkPos, false),
-          blackQueenSide = castles.blackQueenSide && bkReady && rookReady(Black, bkPos, true)
+          whiteKingSide = castles.whiteKingSide && wkReady && rookReady(White, wkPos, left = false),
+          whiteQueenSide = castles.whiteQueenSide && wkReady && rookReady(White, wkPos, left = true),
+          blackKingSide = castles.blackKingSide && bkReady && rookReady(Black, bkPos, left = false),
+          blackQueenSide = castles.blackQueenSide && bkReady && rookReady(Black, bkPos, left = true)
         )
       } else Castles.none
     }

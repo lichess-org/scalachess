@@ -24,7 +24,7 @@ R  QK  R"""
       "chess960" in {
         val board960 = """
 PPPPPPPP
-RQK   R """.chess960 withHistory History.castle(White, true, true)
+RQK   R """.chess960 withHistory History.castle(White, kingSide = true, queenSide = true)
         "near bishop in the way" in {
           board960 place White.bishop at D1 flatMap (_ destsFrom C1) must bePoss()
         }
@@ -144,7 +144,7 @@ PPPPPPPP
   "impact history" in {
     val board = """
 PPPPPPPP
-R   K  R""" withHistory History.castle(White, true, true)
+R   K  R""" withHistory History.castle(White, kingSide = true, queenSide = true)
     val game  = Game(board, White)
     "if king castles kingside" in {
       val g2 = game.playMove(E1, G1)

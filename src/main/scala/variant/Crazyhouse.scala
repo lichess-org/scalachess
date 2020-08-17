@@ -22,7 +22,7 @@ case object Crazyhouse
   override def valid(board: Board, strict: Boolean) = {
     val pieces = board.pieces.values
     (Color.all forall validSide(board, false)) &&
-    (!strict || (pieces.count(_ is Pawn) <= 16 && pieces.size <= 32))
+    (!strict || (pieces.count(_ is Pawn) <= 16 && pieces.sizeIs <= 32))
   }
 
   private def canDropPawnOn(pos: Pos) = pos.y != 1 && pos.y != 8

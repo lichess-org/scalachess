@@ -60,7 +60,7 @@ case object Horde
     lazy val notKingBoard = board.kingPos.get(Color.black).flatMap(board.take).getOrElse(board)
     val hordePos          = board.occupation(Color.white) // may include promoted pieces
     val mateInOne =
-      hordePos.size == 1 && hordePos.forall(pos => pieceThreatened(board, Color.black, pos, (_ => true)))
+      hordePos.sizeIs == 1 && hordePos.forall(pos => pieceThreatened(board, Color.black, pos, (_ => true)))
     !mateInOne && notKingBoard.actors.values.forall(actor => actor.moves.isEmpty)
   }
 
@@ -86,33 +86,35 @@ case object Horde
       lazy val hordeBishopSquareColors = horde.filter(_._2.is(Bishop)).toList.map(_._1.color).distinct
       lazy val hordeRoles              = horde.map(_._2.role)
       lazy val army                    = board.piecesOf(Color.black)
-      lazy val armyPawnsOrRooks        = army.filter(p => p._2.is(Pawn) || p._2.is(Rook))
+      lazy val armyPawnsOrRooks        = army.count(p => p._2.is(Pawn) || p._2.is(Rook))
       lazy val armyPawnsOrBishops      = army.filter(p => p._2.is(Pawn) || p._2.is(Bishop))
-      lazy val armyPawnsOrKnights      = army.filter(p => p._2.is(Pawn) || p._2.is(Knight))
-      lazy val armyNonQueens           = army.filter(_._2.isNot(Queen))
-      lazy val armyNonQueensOrRooks    = army.filter(p => p._2.isNot(Queen) && p._2.isNot(Rook))
-      lazy val armyNonQueensOrBishops  = army.filter(p => p._2.isNot(Queen) && p._2.isNot(Bishop))
+      lazy val armyPawnsOrKnights      = army.count(p => p._2.is(Pawn) || p._2.is(Knight))
+      lazy val armyNonQueens           = army.count(_._2.isNot(Queen))
+      lazy val armyNonQueensOrRooks    = army.count(p => p._2.isNot(Queen) && p._2.isNot(Rook))
+      lazy val armyNonQueensOrBishops  = army.count(p => p._2.isNot(Queen) && p._2.isNot(Bishop))
       lazy val armyBishopSquareColors  = army.filter(_._2.is(Bishop)).toList.map(_._1.color).distinct
-      if (horde.size == 1) {
+      if (horde.sizeIs == 1) {
         hordeRoles match {
           case List(Knight) =>
-            army.size < 4 || armyNonQueensOrRooks.isEmpty || armyNonQueensOrBishops.isEmpty || (armyNonQueensOrBishops.size + armyBishopSquareColors.size) < 4
+            army.sizeIs < 4 || armyNonQueensOrRooks == 0 || armyNonQueensOrBishops == 0 || (armyNonQueensOrBishops + armyBishopSquareColors.size) < 4
           case List(Bishop) =>
             notKingPieces.count(p =>
               p._2.is(Pawn) || (p._2.is(Bishop) && p._1.color != horde.head._1.color)
             ) < 2
-          case List(Rook) => army.size < 3 || armyPawnsOrRooks.isEmpty || armyPawnsOrKnights.isEmpty
-          case _          => armyPawnsOrRooks.isEmpty
+          case List(Rook) => army.sizeIs < 3 || armyPawnsOrRooks == 0 || armyPawnsOrKnights == 0
+          case _          => armyPawnsOrRooks == 0
         }
       } else if (
         (hordeRoles.forall(
           _ == Bishop
-        ) && hordeBishopSquareColors.lengthCompare(1) == 0) && (armyPawnsOrKnights.size + armyPawnsOrBishops
-          .count(p => p._1.color != horde.head._1.color) < 2)
+        ) && hordeBishopSquareColors.lengthCompare(1) == 0) && {
+          armyPawnsOrKnights + armyPawnsOrBishops
+            .count(p => p._1.color != horde.head._1.color) < 2
+        }
       ) true
       else if (
-        horde.size == 2 && hordeRoles
-          .count(r => r == Queen || r == Rook || r == Pawn) < 2 && armyNonQueens.size <= 1
+        horde.sizeIs == 2 && hordeRoles
+          .count(r => r == Queen || r == Rook || r == Pawn) < 2 && armyNonQueens <= 1
       )
         true
       else fortress

@@ -279,6 +279,9 @@ object Forsyth {
     fen.toString
   }
 
+  def boardAndColor(situation: Situation): String =
+    boardAndColor(situation.board, situation.color)
+
   def boardAndColor(board: Board, turnColor: Color): String =
     s"${exportBoard(board)} ${turnColor.letter}"
 

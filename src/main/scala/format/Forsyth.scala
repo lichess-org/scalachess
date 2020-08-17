@@ -279,6 +279,9 @@ object Forsyth {
     fen.toString
   }
 
+  def boardAndColor(board: Board, turnColor: Color): String =
+    s"${exportBoard(board)} ${turnColor.letter}"
+
   def getFullMove(rawSource: String): Option[Int] =
     read(rawSource) {
       _.split(' ').lift(5).flatMap(_.toIntOption)

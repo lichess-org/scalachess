@@ -31,8 +31,10 @@ case class Drop(
       none
     )
 
-    board updateHistory {
-      _.copy(positionHashes = Hash(Situation(board, !piece.color)) ++ board.history.positionHashes)
+    board updateHistory { h =>
+      val basePositionHashes =
+        if (h.positionHashes.isEmpty) Hash(situationBefore) else board.history.positionHashes
+      h.copy(positionHashes = Hash(Situation(board, !piece.color)) ++ basePositionHashes)
     }
   }
 

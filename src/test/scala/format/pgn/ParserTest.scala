@@ -17,7 +17,7 @@ class ParserTest extends ChessTest {
       parser("b8=Q ") must beValid.like {
         case a =>
           a.sans.value.headOption must beSome.like {
-            case san: Std => san.promotion must_== Some(Queen)
+            case san: Std => san.promotion must_== Option(Queen)
           }
       }
     }
@@ -25,7 +25,7 @@ class ParserTest extends ChessTest {
       parser("b8=R ") must beValid.like {
         case a =>
           a.sans.value.headOption must beSome.like {
-            case san: Std => san.promotion must_== Some(Rook)
+            case san: Std => san.promotion must_== Option(Rook)
           }
       }
     }
@@ -34,22 +34,22 @@ class ParserTest extends ChessTest {
   "result" in {
     "no tag but inline result" in {
       parser(noTagButResult) must beValid.like {
-        case parsed => parsed.tags("Result") must_== Some("1-0")
+        case parsed => parsed.tags("Result") must_== Option("1-0")
       }
     }
     "in tags" in {
       parser(whiteResignsInTags) must beValid.like {
-        case parsed => parsed.tags("Result") must_== Some("0-1")
+        case parsed => parsed.tags("Result") must_== Option("0-1")
       }
     }
     "in moves" in {
       parser(whiteResignsInMoves) must beValid.like {
-        case parsed => parsed.tags("Result") must_== Some("0-1")
+        case parsed => parsed.tags("Result") must_== Option("0-1")
       }
     }
     "in tags and moves" in {
       parser(whiteResignsInTagsAndMoves) must beValid.like {
-        case parsed => parsed.tags("Result") must_== Some("0-1")
+        case parsed => parsed.tags("Result") must_== Option("0-1")
       }
     }
   }
@@ -84,8 +84,8 @@ class ParserTest extends ChessTest {
 
     parser("Ne7g6+! $13") must beValid.like {
       case ParsedPgn(_, _, Sans(List(san))) =>
-        san.metas.glyphs.move must_== Some(Glyph.MoveAssessment.good)
-        san.metas.glyphs.position must_== Some(Glyph.PositionAssessment.unclear)
+        san.metas.glyphs.move must_== Option(Glyph.MoveAssessment.good)
+        san.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
     }
   }
 
@@ -115,7 +115,7 @@ class ParserTest extends ChessTest {
   }
 
   raws foreach { sans =>
-    val size = sans.split(' ').size
+    val size = sans.split(' ').length
     "sans only size: " + size in {
       parser(sans) must beValid.like {
         case a => a.sans.value.size must_== size
@@ -124,7 +124,7 @@ class ParserTest extends ChessTest {
   }
 
   (shortCastles ++ longCastles ++ annotatedCastles) foreach { sans =>
-    val size = sans.split(' ').size
+    val size = sans.split(' ').length
     "sans only size: " + size in {
       parser(sans) must beValid.like {
         case a => a.sans.value.size must_== size
@@ -139,7 +139,7 @@ class ParserTest extends ChessTest {
   }
 
   List(fromProd1, fromProd2, castleCheck1, castleCheck2) foreach { sans =>
-    val size = sans.split(' ').size
+    val size = sans.split(' ').length
     "sans only from prod size: " + size in {
       parser(sans) must beValid.like {
         case a => a.sans.value.size must_== size
@@ -319,19 +319,19 @@ class ParserTest extends ChessTest {
   "year" in {
     "full date" in {
       parser(recentChessCom) must beValid.like {
-        case parsed => parsed.tags.year must_== Some(2016)
+        case parsed => parsed.tags.year must_== Option(2016)
       }
     }
     "only year" in {
       parser(explorerPartialDate) must beValid.like {
-        case parsed => parsed.tags.year must_== Some(1978)
+        case parsed => parsed.tags.year must_== Option(1978)
       }
     }
   }
 
   "weird variant names" in {
     parser(stLouisFischerandom) must beValid.like {
-      case parsed => parsed.tags.variant must_== Some(variant.Chess960)
+      case parsed => parsed.tags.variant must_== Option(variant.Chess960)
     }
   }
 

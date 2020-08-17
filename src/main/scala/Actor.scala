@@ -20,13 +20,13 @@ final case class Actor(
     val moves = piece.role match {
       case Pawn =>
         pawnDir(pos) map { next =>
-          val fwd = Some(next) filterNot board.pieces.contains
+          val fwd = Option(next) filterNot board.pieces.contains
           def capture(horizontal: Direction): Option[Move] = {
             for {
               p <- horizontal(next)
               if board.pieces.get(p).exists { _.color != color }
               b <- board.taking(pos, p)
-            } yield move(p, b, Some(p))
+            } yield move(p, b, Option(p))
           } flatMap maybePromote
           def enpassant(horizontal: Direction): Option[Move] =
             for {
@@ -39,16 +39,16 @@ final case class Actor(
                   case _                       => false
                 }
               }
-              b <- board.taking(pos, targetPos, Some(victimPos))
-            } yield move(targetPos, b, Some(victimPos), enpassant = true)
+              b <- board.taking(pos, targetPos, Option(victimPos))
+            } yield move(targetPos, b, Option(victimPos), enpassant = true)
           def forward(p: Pos): Option[Move] =
             board.move(pos, p) map { move(p, _) } flatMap maybePromote
           def maybePromote(m: Move): Option[Move] =
             if (m.dest.y == m.color.promotablePawnY)
               (m.after promote m.dest) map { b2 =>
-                m.copy(after = b2, promotion = Some(Queen))
+                m.copy(after = b2, promotion = Option(Queen))
               }
-            else Some(m)
+            else Option(m)
 
           List(
             fwd flatMap forward,
@@ -135,7 +135,7 @@ final case class Actor(
       b4 <- b3.place(color.rook, newRookPos)
       if !board.variant.kingThreatened(b4, !color, newKingPos)
       b5     = b4 updateHistory (_ withoutCastles color)
-      castle = Some((kingPos -> newKingPos, rookPos -> newRookPos))
+      castle = Option((kingPos -> newKingPos, rookPos -> newRookPos))
     } yield {
       if (board.variant == chess.variant.Chess960) List(rookPos)
       else List(rookPos, newKingPos).distinct
@@ -147,7 +147,7 @@ final case class Actor(
         case None => board.move(pos, to) map { move(to, _) }
         case Some(piece) =>
           if (piece is color) Nil
-          else board.taking(pos, to) map { move(to, _, Some(to)) }
+          else board.taking(pos, to) map { move(to, _, Option(to)) }
       }
     }
 

@@ -32,9 +32,9 @@ class UciCharPairTest extends ChessTest {
       allPairs.count(_ contains UciCharPair.implementation.voidChar) must_== 0
     }
     "promotions" in {
-      conv(Move(B7, B8, Some(Queen))) must_== "Td"
-      conv(Move(B7, C8, Some(Queen))) must_== "Te"
-      conv(Move(B7, C8, Some(Knight))) must_== "T}"
+      conv(Move(B7, B8, Option(Queen))) must_== "Td"
+      conv(Move(B7, C8, Option(Queen))) must_== "Te"
+      conv(Move(B7, C8, Option(Knight))) must_== "T}"
     }
     "drops" in {
       conv(Drop(Pawn, A1)).head must_== '#'

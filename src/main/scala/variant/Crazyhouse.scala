@@ -163,7 +163,7 @@ case object Crazyhouse
   case class Pocket(roles: List[Role]) {
 
     def take(role: Role) =
-      if (roles contains role) Some(copy(roles = roles diff List(role)))
+      if (roles contains role) Option(copy(roles = roles diff List(role)))
       else None
 
     def store(role: Role) =

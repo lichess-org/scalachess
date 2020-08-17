@@ -158,7 +158,7 @@ object Forsyth {
       y: Int
   ): Option[(List[(Pos, Piece)], Set[Pos])] =
     chars match {
-      case Nil                               => Some((Nil, Set.empty))
+      case Nil                               => Option((Nil, Set.empty))
       case '/' :: rest                       => makePiecesWithCrazyPromoted(rest, 1, y - 1)
       case c :: rest if '1' <= c && c <= '9' => makePiecesWithCrazyPromoted(rest, x + (c - '0').toInt, y)
       case c :: '~' :: rest =>

@@ -107,7 +107,7 @@ case object Horde
       } else if (
         (hordeRoles.forall(
           _ == Bishop
-        ) && hordeBishopSquareColors.size == 1) && (armyPawnsOrKnights.size + armyPawnsOrBishops
+        ) && hordeBishopSquareColors.lengthCompare(1) == 0) && (armyPawnsOrKnights.size + armyPawnsOrBishops
           .count(p => p._1.color != horde.head._1.color) < 2)
       ) true
       else if (

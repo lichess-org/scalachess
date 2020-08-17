@@ -10,7 +10,7 @@ class ReaderTest extends ChessTest {
     "many games" in {
       forall(raws) { (c: String) =>
         Reader.full(c) must beValid.like {
-          case Complete(replay) => replay.moves must have size (c.split(' ').size)
+          case Complete(replay) => replay.moves must have size c.split(' ').length
         }
       }
     }
@@ -83,7 +83,7 @@ class ReaderTest extends ChessTest {
       Reader.full(fromLichessBadPromotion) must beValid.like {
         case Complete(replay) =>
           replay.chronoMoves lift 10 must beSome.like {
-            case move => move.fold(_.promotion, _ => None) must_== Some(Rook)
+            case move => move.fold(_.promotion, _ => None) must_== Option(Rook)
           }
       }
     }

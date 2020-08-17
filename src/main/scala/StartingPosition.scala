@@ -1076,7 +1076,7 @@ object StartingPosition {
 
   def allWithInitial = initial +: all
 
-  lazy val featurable = new scala.util.Random(475591).shuffle(all.filter(_.featurable)).toIndexedSeq
+  lazy val featurable = new scala.util.Random(475591).shuffle(all.filter(_.featurable))
 
   def randomFeaturable = featurable(scala.util.Random.nextInt(featurable.size))
 

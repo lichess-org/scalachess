@@ -26,7 +26,7 @@ case object Antichess
     val allMoves       = super.validMoves(situation)
     val capturingMoves = allMoves.view mapValues (_.filter(_.captures)) filterNot (_._2.isEmpty)
 
-    (if (!capturingMoves.isEmpty) capturingMoves else allMoves).to(Map)
+    (if (capturingMoves.nonEmpty) capturingMoves else allMoves).to(Map)
   }
 
   override def valid(board: Board, strict: Boolean) =
@@ -34,7 +34,7 @@ case object Antichess
 
   // In antichess, there is no checkmate condition, and the winner is the current player if they have no legal moves
   override def winner(situation: Situation): Option[Color] =
-    if (specialEnd(situation)) Some(situation.color) else None
+    if (specialEnd(situation)) Option(situation.color) else None
 
   override def specialEnd(situation: Situation) = {
     // The game ends with a win when one player manages to lose all their pieces or is in stalemate
@@ -90,7 +90,7 @@ case object Antichess
   private def pawnNotAttackable(pawn: Actor, oppositeBishopColor: Color, board: Board) = {
     // The pawn cannot attack a bishop or be attacked by a bishop
     val cannotAttackBishop =
-      Actor.pawnAttacks(pawn.pos, pawn.piece.color).find(_.color == oppositeBishopColor).isEmpty
+      !Actor.pawnAttacks(pawn.pos, pawn.piece.color).exists(_.color == oppositeBishopColor)
 
     InsufficientMatingMaterial.pawnBlockedByPawn(pawn, board) && cannotAttackBishop
   }

@@ -14,7 +14,7 @@ object Side {
 
   def kingRookSide(kingPos: Pos, rookPos: Pos): Option[Side] =
     if (kingPos.y == rookPos.y)
-      Some(if (kingPos.x > rookPos.x) QueenSide else KingSide)
+      Option(if (kingPos.x > rookPos.x) QueenSide else KingSide)
     else None
 }
 

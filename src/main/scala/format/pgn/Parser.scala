@@ -22,8 +22,8 @@ object Parser {
     try {
       val preprocessed = augmentString(pgn).linesIterator
         .map(_.trim)
-        .filter {
-          _.headOption != Some('%')
+        .filterNot {
+          _.headOption.contains('%')
         }
         .mkString("\n")
         .replace("[pgn]", "")
@@ -172,10 +172,10 @@ object Parser {
     private val rankMap                       = rangeToMap('1' to '8')
 
     private val MoveR = """^(N|B|R|Q|K|)([a-h]?)([1-8]?)(x?)([a-h][0-9])(=?[NBRQ]?)(\+?)(\#?)$""".r
-    private val DropR = """^(N|B|R|Q|P)@([a-h][1-8])(\+?)(\#?)$""".r
+    private val DropR = """^([NBRQP])@([a-h][1-8])(\+?)(\#?)$""".r
 
     def apply(str: String, variant: Variant): Validated[String, San] = {
-      if (str.size == 2) Pos.posAt(str).fold(slow(str)) { pos =>
+      if (str.length == 2) Pos.posAt(str).fold(slow(str)) { pos =>
         valid(Std(pos, Pawn))
       }
       else
@@ -183,7 +183,7 @@ object Parser {
           case "O-O" | "o-o" | "0-0"       => valid(Castle(KingSide))
           case "O-O-O" | "o-o-o" | "0-0-0" => valid(Castle(QueenSide))
           case MoveR(role, file, rank, capture, pos, prom, check, mate) =>
-            role.headOption.fold[Option[Role]](Some(Pawn))(variant.rolesByPgn.get) flatMap { role =>
+            role.headOption.fold[Option[Role]](Option(Pawn))(variant.rolesByPgn.get) flatMap { role =>
               Pos posAt pos map { dest =>
                 valid(
                   Std(
@@ -317,7 +317,7 @@ object Parser {
     def glyph: Parser[Glyph] =
       as("glyph") {
         mapParser(
-          Glyph.MoveAssessment.all.sortBy(_.symbol.size).map { g =>
+          Glyph.MoveAssessment.all.sortBy(_.symbol.length).map { g =>
             g.symbol -> g
           },
           "glyph"

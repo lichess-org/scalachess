@@ -131,7 +131,7 @@ object Binary {
 
     def move(str: String): List[Byte] =
       (str match {
-        case pos if pos.size == 2  => simplePawn(pos)
+        case pos if pos.length == 2  => simplePawn(pos)
         case CastlingR(str, check) => castling(str, check)
         case SimplePieceR(piece, capture, pos, check) =>
           simplePiece(piece, pos, capture, check)
@@ -181,12 +181,12 @@ object Binary {
       )
 
     def disambTypeInt(orig: String): Int =
-      if (orig.size > 1) 2
+      if (orig.length > 1) 2
       else if (orig.head.toInt < 97) 1
       else 0
 
     def disambiguationInt(orig: String): Int =
-      if (orig.size > 1) posInt(orig)
+      if (orig.length > 1) posInt(orig)
       else if (orig.head.toInt < 97) rankInt(orig.head)
       else fileInt(orig.head)
 

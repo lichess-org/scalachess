@@ -40,7 +40,7 @@ object Uci {
     def apply(move: String): Option[Move] =
       for {
         orig <- Pos.posAt(move take 2)
-        dest <- Pos.posAt(move drop 2 take 2)
+        dest <- Pos.posAt(move.slice(2, 4))
         promotion = move lift 4 flatMap Role.promotable
       } yield Move(orig, dest, promotion)
 
@@ -88,7 +88,7 @@ object Uci {
   def apply(move: String): Option[Uci] =
     if (move lift 1 contains '@') for {
       role <- move.headOption flatMap Role.allByPgn.get
-      pos  <- Pos.posAt(move drop 2 take 2)
+      pos  <- Pos.posAt(move.slice(2, 4))
     } yield Uci.Drop(role, pos)
     else Uci.Move(move)
 

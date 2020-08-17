@@ -34,13 +34,9 @@ case object Rook extends PromotableRole {
   val dirs: Directions = List(_.up, _.down, _.left, _.right)
   def dir(from: Pos, to: Pos) =
     if (to ?| from)
-      Some(
-        if (to ?^ from) (_.up) else (_.down)
-      )
+      Option(if (to ?^ from) (_.up) else (_.down))
     else if (to ?- from)
-      Some(
-        if (to ?< from) (_.left) else (_.right)
-      )
+      Option(if (to ?< from) (_.left) else (_.right))
     else None
   val projection = true
 }
@@ -49,13 +45,11 @@ case object Bishop extends PromotableRole {
   val dirs: Directions = List(_.upLeft, _.upRight, _.downLeft, _.downRight)
   def dir(from: Pos, to: Pos) =
     if (to onSameDiagonal from)
-      Some(
-        if (to ?^ from) {
-          if (to ?< from) (_.upLeft) else (_.upRight)
-        } else {
-          if (to ?< from) (_.downLeft) else (_.downRight)
-        }
-      )
+      Option(if (to ?^ from) {
+        if (to ?< from) (_.upLeft) else (_.upRight)
+      } else {
+        if (to ?< from) (_.downLeft) else (_.downRight)
+      })
     else None
   val projection = true
 }
@@ -120,11 +114,11 @@ object Role {
 
   def valueOf(r: Role): Option[Int] =
     r match {
-      case Pawn   => Some(1)
-      case Knight => Some(3)
-      case Bishop => Some(3)
-      case Rook   => Some(5)
-      case Queen  => Some(9)
+      case Pawn   => Option(1)
+      case Knight => Option(3)
+      case Bishop => Option(3)
+      case Rook   => Option(5)
+      case Queen  => Option(9)
       case King   => None
     }
 }

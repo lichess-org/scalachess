@@ -72,7 +72,7 @@ trait ChessTest extends Specification with ValidatedMatchers {
       ): Validated[String, Game] =
         game.apply(orig, dest, promotion) map (_._1)
 
-      def withClock(c: Clock) = game.copy(clock = Some(c))
+      def withClock(c: Clock) = game.copy(clock = Option(c))
     }
 
   def fenToGame(positionString: String, variant: Variant) = {

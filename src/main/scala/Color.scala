@@ -86,13 +86,13 @@ object Color {
   def apply(b: Boolean): Color = if (b) White else Black
 
   def apply(n: String): Option[Color] =
-    if (n == "white") Some(White)
-    else if (n == "black") Some(Black)
+    if (n == "white") Option(White)
+    else if (n == "black") Option(Black)
     else None
 
   def apply(c: Char): Option[Color] =
-    if (c == 'w') Some(White)
-    else if (c == 'b') Some(Black)
+    if (c == 'w') Option(White)
+    else if (c == 'b') Option(Black)
     else None
 
   val white: Color = White
@@ -113,8 +113,8 @@ object Color {
 
   def fromResult(result: String): Option[Color] =
     result match {
-      case "1-0" => Some(chess.White)
-      case "0-1" => Some(chess.Black)
+      case "1-0" => Option(chess.White)
+      case "0-1" => Option(chess.Black)
       case _     => None
     }
 }

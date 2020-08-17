@@ -63,4 +63,4 @@ scalacOptions ++= Seq(
     "2"
 )
 
-publishTo := Some(Resolver.file("file", new File(sys.props.getOrElse("publishTo", ""))))
+publishTo := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", ""))))

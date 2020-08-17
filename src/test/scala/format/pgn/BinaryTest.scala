@@ -11,7 +11,7 @@ class BinaryTest extends ChessTest {
   def compareStrAndBin(pgn: String) = {
     val bin = (Binary writeMoves pgn.split(' ').toList).get.toList
     ((Binary readMoves bin).get mkString " ") must_== pgn
-    bin.size must be_<=(pgn.size)
+    bin.size must be_<=(pgn.length)
   }
 
   "binary encoding" should {
@@ -114,7 +114,7 @@ class BinaryTest extends ChessTest {
       "all games" in {
         forall(pgn200) { pgn =>
           val bin = (Binary writeMoves pgn.split(' ').toList).get
-          bin.size must be_<=(pgn.size)
+          bin.length must be_<=(pgn.length)
         }
       }
     }
@@ -208,7 +208,7 @@ class BinaryTest extends ChessTest {
     }
     "be isomorphic" in {
       "for one" in {
-        compareStrAndBin(pgn200(0))
+        compareStrAndBin(pgn200.head)
       }
       "for all" in {
         forall(pgn200)(compareStrAndBin)

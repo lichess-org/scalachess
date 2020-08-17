@@ -11,7 +11,7 @@ object InsufficientMatingMaterial {
   def nonKingPieces(board: Board) = board.pieces filter (_._2.role != King)
 
   def bishopsOnOppositeColors(board: Board) =
-    (board.pieces collect { case (pos, Piece(_, Bishop)) => pos.color } toList).distinct.size == 2
+    (board.pieces collect { case (pos, Piece(_, Bishop)) => pos.color } toList).distinct.lengthCompare(2) == 0
 
   /*
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
@@ -52,10 +52,10 @@ object InsufficientMatingMaterial {
     lazy val nonKingRolesOfColor  = board rolesOf color filter (King !=)
     lazy val rolesOfOpponentColor = board rolesOf !color
 
-    kingsAndMinorsOnlyOfColor && ((nonKingRolesOfColor toList).distinct match {
+    kingsAndMinorsOnlyOfColor && (nonKingRolesOfColor.distinct match {
       case Nil => true
       case List(Knight) =>
-        (nonKingRolesOfColor.size == 1) && (rolesOfOpponentColor filter (King !=) filter (Queen !=) isEmpty)
+        nonKingRolesOfColor.lengthCompare(1) == 0 && !(rolesOfOpponentColor filter (King !=) exists (Queen !=))
       case List(Bishop) =>
         !(rolesOfOpponentColor.exists(r => r == Knight || r == Pawn) || bishopsOnOppositeColors(board))
       case _ => false

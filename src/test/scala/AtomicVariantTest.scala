@@ -257,7 +257,7 @@ class AtomicVariantTest extends ChessTest {
           // Every piece surrounding the en-passant destination square that is not a pawn should be empty
           Atomic
             .surroundingPositions(Pos.E6)
-            .forall(pos => game.board(pos) == None || pos == Pos.E7 || pos == Pos.D7) must beTrue
+            .forall(pos => game.board(pos).isEmpty || pos == Pos.E7 || pos == Pos.D7) must beTrue
       }
     }
 

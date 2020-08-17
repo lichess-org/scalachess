@@ -24,7 +24,7 @@ case class Move(
   def finalizeAfter: Board = {
     val board = after updateHistory { h1 =>
       val h2 = h1.copy(
-        lastMove = Some(toUci),
+        lastMove = Option(toUci),
         unmovedRooks = before.unmovedRooks,
         halfMoveClock =
           if ((piece is Pawn) || captures || promotes) 0
@@ -75,7 +75,7 @@ case class Move(
       if ((after count color.queen) > (before count color.queen)) for {
         b2 <- after take dest
         b3 <- b2.place(color - p, dest)
-      } yield copy(after = b3, promotion = Some(p))
+      } yield copy(after = b3, promotion = Option(p))
       else this.some
     }
 

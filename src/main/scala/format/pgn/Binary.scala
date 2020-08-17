@@ -68,16 +68,14 @@ object Binary {
       if (bitAt(b2, 2)) drop(b1, b2)
       else
         pieceStrs(b2 >> 5) match {
-          case castle @ ("O-O" | "O-O-O") => {
+          case castle @ ("O-O" | "O-O-O") =>
             val check = checkStrs(cut(b2, 5, 3))
             s"$castle$check"
-          }
-          case piece => {
+          case piece =>
             val pos     = posString(right(b1, 6))
             val capture = if (bitAt(b2, 3)) "x" else ""
             val check   = checkStrs(cut(b2, 5, 3))
             s"$piece$capture$pos$check"
-          }
         }
     def drop(b1: Int, b2: Int): String = {
       val piece = dropPieceStrs(b2 >> 5)
@@ -212,7 +210,7 @@ object Binary {
     val promotionR   = "(?:\\=?([QRNBK]))?"
     val origR        = "([a-h]?[1-8]?)".r
     val SimplePieceR = s"^$pieceR$captureR$posR$checkR$$".r
-    val FullPawnR    = s"^${fileR}$posR$promotionR$checkR$$".r
+    val FullPawnR    = s"^$fileR$posR$promotionR$checkR$$".r
     val CastlingR    = s"^(O-O|O-O-O)$checkR$$".r
     val FullPieceR   = s"^$pieceR$origR$captureR$posR$checkR$$".r
     val DropR        = s"^([QRNBP])@$posR$checkR$$".r

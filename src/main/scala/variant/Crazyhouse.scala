@@ -21,7 +21,7 @@ case object Crazyhouse
 
   override def valid(board: Board, strict: Boolean) = {
     val pieces = board.pieces.values
-    (Color.all forall validSide(board, strict = false) _) &&
+    (Color.all forall validSide(board, false)) &&
     (!strict || (pieces.count(_ is Pawn) <= 16 && pieces.size <= 32))
   }
 
@@ -89,6 +89,7 @@ case object Crazyhouse
 
   private def blockades(situation: Situation, kingPos: Pos): List[Pos] = {
     def attacker(piece: Piece) = piece.role.projection && piece.color != situation.color
+    @scala.annotation.tailrec
     def forward(p: Pos, dir: Direction, squares: List[Pos]): List[Pos] =
       dir(p) match {
         case None                                                 => Nil

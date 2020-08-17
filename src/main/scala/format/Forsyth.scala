@@ -74,8 +74,8 @@ object Forsyth {
               val checkCount =
                 splitted
                   .lift(4)
-                  .flatMap(makeCheckCount(_))
-                  .orElse(splitted.lift(6).flatMap(makeCheckCount(_)))
+                  .flatMap(makeCheckCount)
+                  .orElse(splitted.lift(6).flatMap(makeCheckCount))
               checkCount.fold(history)(history.withCheckCount)
             }
           } fixCastles

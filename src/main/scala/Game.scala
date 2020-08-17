@@ -82,7 +82,7 @@ case class Game(
     */
   def fullMoveNumber: Int = 1 + turns / 2
 
-  def moveString = s"${fullMoveNumber}${player.fold(".", "...")}"
+  def moveString = s"$fullMoveNumber${player.fold(".", "...")}"
 
   def withBoard(b: Board) = copy(situation = situation.copy(board = b))
 

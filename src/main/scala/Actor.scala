@@ -96,7 +96,7 @@ final case class Actor(
    */
   def kingSafetyMoveFilter(ms: List[Move]): List[Move] = {
     val filter: Piece => Boolean =
-      if ((piece is King) || check) (_ => true) else (_.role.projection)
+      if ((piece is King) || check) _ => true else _.role.projection
     val stableKingPos = if (piece is King) None else board kingPosOf color
     ms filter { m =>
       board.variant.kingSafety(m, filter, stableKingPos orElse (m.after kingPosOf color))
@@ -160,10 +160,9 @@ final case class Actor(
         case None => ()
         case s @ Some(to) =>
           board.pieces.get(to) match {
-            case None => {
+            case None =>
               board.move(pos, to).foreach { buf += move(to, _) }
               addAll(to, dir)
-            }
             case Some(piece) =>
               if (piece.color != color) board.taking(pos, to) foreach {
                 buf += move(to, _, s)

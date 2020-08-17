@@ -16,5 +16,5 @@ trait Timestamper {
 }
 
 private[chess] object RealTimestamper extends Timestamper {
-  def now = new Timestamp(System.currentTimeMillis)
+  def now = Timestamp(System.currentTimeMillis)
 }

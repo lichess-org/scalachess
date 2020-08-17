@@ -17,7 +17,7 @@ object Dumper {
         (if (captures) s"${orig.file}x" else "") +
           promotion.fold(dest.key)(p => s"${dest.key}=${p.pgn}")
 
-      case (_, role) => {
+      case (_, role) =>
         // Check whether there is a need to disambiguate:
         //   - can a piece of same role move to/capture on the same square?
         //   - if so, disambiguate, in order or preference, by:
@@ -42,7 +42,6 @@ object Dumper {
         }
 
         s"${role.pgn}$disambiguation${if (captures) "x" else ""}${dest.key}"
-      }
     }) + {
       if (next.check) {
         if (next.checkMate) "#" else "+"

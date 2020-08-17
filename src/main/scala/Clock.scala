@@ -64,7 +64,7 @@ case class Clock(
         metrics.clientLag.fold(this) { l =>
           updatePlayer(color) { _.recordLag(l) }
         }
-      case Some(t) => {
+      case Some(t) =>
         val elapsed = toNow(t)
         val lag     = ~metrics.reportedLag(elapsed) nonNeg
 
@@ -82,7 +82,6 @@ case class Clock(
         }
 
         if (clockActive) newC else newC.hardStop
-      }
     }).switch
 
   // To do: safely add this to takeback to remove inc from player.

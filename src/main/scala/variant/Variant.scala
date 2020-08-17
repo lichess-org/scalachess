@@ -182,7 +182,7 @@ abstract class Variant private[variant] (
     !pawnsOnPromotionRank(board, color)
   }
 
-  def valid(board: Board, strict: Boolean) = Color.all forall validSide(board, strict) _
+  def valid(board: Board, strict: Boolean) = Color.all forall validSide(board, strict)
 
   val roles = List(Rook, Knight, King, Bishop, King, Queen, Pawn)
 

@@ -73,7 +73,7 @@ object Parser {
             } mergeGlyphs glyphs
           }
         ): Validated[String, San]
-    }.sequence map { Sans.apply(_) }
+    }.sequence map { Sans.apply }
 
   trait Logging { self: Parsers =>
     protected val loggingEnabled = false
@@ -253,9 +253,7 @@ object Parser {
     // e5
     def pawn: Parser[Std] =
       as("pawn") {
-        dest ^^ {
-          case de => Std(dest = de, role = Pawn)
-        }
+        dest ^^ (de => Std(dest = de, role = Pawn))
       }
 
     // Bg5
@@ -336,9 +334,9 @@ object Parser {
 
     val rank = mapParser(rankMap, "rank")
 
-    val promotion = ("=" ?) ~> mapParser(promotable, "promotion")
-
     val promotable = Role.allPromotableByPgn mapKeys (_.toUpper)
+
+    val promotion = ("=" ?) ~> mapParser(promotable, "promotion")
 
     val dest = mapParser(Pos.allKeys, "dest")
 

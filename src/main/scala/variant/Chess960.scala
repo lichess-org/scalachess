@@ -1,6 +1,8 @@
 package chess
 package variant
 
+import chess.format.FEN
+
 case object Chess960
     extends Variant(
       id = 2,
@@ -16,8 +18,20 @@ case object Chess960
       positions(scala.util.Random.nextInt(960)) flatMap Role.allByForsyth.get
     }
 
-  def positionNumber(fen: String): Option[Int] =
-    positionsMap.get(fen.takeWhile('/' !=))
+  def positionNumber(fen: FEN): Option[Int] =
+    fen.value split ' ' match {
+      case Array(board, "w", "KQkq" | "AHah", "-", "0", "1") =>
+        board split '/' match {
+          case Array(rank8, "pppppppp", "8", "8", "8", "8", "PPPPPPPP", rank1) =>
+            positionsMap get rank8 filter { _ =>
+              rank1 zip rank8 forall {
+                case (r1, r8) => r1 != r8 && r1.toLower == r8
+              }
+            }
+          case _ => None
+        }
+      case _ => None
+    }
 
   private val positions = Array(
     "bbqnnrkr",

@@ -11,7 +11,7 @@ object Dumper {
         if (orig ?> dest) "O-O-O" else "O-O"
 
       case _ if enpassant =>
-        orig.file + 'x' + dest.key
+        orig.file.toString + "x" + dest.key
 
       case (promotion, Pawn) =>
         (if (captures) s"${orig.file}x" else "") +
@@ -34,11 +34,11 @@ object Dumper {
         val disambiguation = if (candidates.isEmpty) {
           ""
         } else if (!candidates.exists(_ ?| orig)) {
-          orig.file
+          orig.file.toString
         } else if (!candidates.exists(_ ?- orig)) {
-          orig.rank
+          orig.rank.toString
         } else {
-          orig.file + orig.rank
+          orig.key
         }
 
         s"${role.pgn}$disambiguation${if (captures) "x" else ""}${dest.key}"

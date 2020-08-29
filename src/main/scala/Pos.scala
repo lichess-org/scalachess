@@ -42,9 +42,9 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
 
   def isLight: Boolean = (x + y) % 2 == 1
 
-  val file     = Pos xToString x
-  val rank     = y.toString
-  val key      = file + rank
+  @inline def file = File of this
+  @inline def rank = Rank of this
+  val key      = file.toString + rank.toString
   val piotrStr = piotr.toString
 
   override val toString = key
@@ -55,13 +55,13 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
 object Pos {
   val posCache = new Array[Pos](64)
 
+  def apply(file: File, rank: Rank): Pos = posCache(file.index + 8 * rank.index)
+
   def posAt(x: Int, y: Int): Option[Pos] =
     if (x < 1 || x > 8 || y < 1 || y > 8) None
     else posCache.lift(x + 8 * y - 9)
 
   def posAt(key: String): Option[Pos] = allKeys get key
-
-  def xToString(x: Int) = (96 + x).toChar.toString
 
   def piotr(c: Char): Option[Pos] = allPiotrs get c
 

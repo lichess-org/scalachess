@@ -34,16 +34,17 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
 
   def touches(other: Pos): Boolean = xDist(other) <= 1 && yDist(other) <= 1
 
-  def onSameDiagonal(other: Pos): Boolean = color == other.color && xDist(other) == yDist(other)
+  def onSameDiagonal(other: Pos): Boolean = x - y == other.x - other.y || x + y == other.x + other.y
   def onSameLine(other: Pos): Boolean     = ?-(other) || ?|(other)
 
   def xDist(other: Pos) = abs(x - other.x)
   def yDist(other: Pos) = abs(y - other.y)
 
+  def isLight: Boolean = (x + y) % 2 == 1
+
   val file     = Pos xToString x
   val rank     = y.toString
   val key      = file + rank
-  val color    = Color((x % 2 == 0) ^ (y % 2 == 0))
   val piotrStr = piotr.toString
 
   override val toString = key

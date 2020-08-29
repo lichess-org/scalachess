@@ -134,17 +134,17 @@ case object Atomic
     )
     val randomBishop = board.pieces.find { case (_, piece) => piece.is(Bishop) }
     val bishopsAbsentOrPawnitized = randomBishop match {
-      case Some((pos, piece)) => bishopPawnitized(board, piece.color, pos.color)
+      case Some((pos, piece)) => bishopPawnitized(board, piece.color, pos.isLight)
       case None               => true
     }
     closedStructure && bishopsAbsentOrPawnitized
   }
 
-  private def bishopPawnitized(board: Board, sideWithBishop: Color, bishopSquares: Color) = {
+  private def bishopPawnitized(board: Board, sideWithBishop: Color, bishopLight: Boolean) = {
     board.actors.values.forall(actor =>
       (actor.piece.is(Pawn) && actor.piece.is(sideWithBishop)) ||
-        (actor.piece.is(Pawn) && actor.piece.is(!sideWithBishop) && actor.pos.color == !bishopSquares) ||
-        (actor.piece.is(Bishop) && actor.piece.is(sideWithBishop) && actor.pos.color == bishopSquares) ||
+        (actor.piece.is(Pawn) && actor.piece.is(!sideWithBishop) && actor.pos.isLight == !bishopLight) ||
+        (actor.piece.is(Bishop) && actor.piece.is(sideWithBishop) && actor.pos.isLight == bishopLight) ||
         actor.piece.is(King)
     )
   }

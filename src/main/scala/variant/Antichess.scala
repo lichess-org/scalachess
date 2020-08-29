@@ -68,18 +68,18 @@ case object Antichess
 
         // We consider the case where a player has two bishops on the same diagonal after promoting.
         if (
-          whiteBishops.map(_.pos.color).to(Set).size != 1 ||
-          blackBishops.map(_.pos.color).to(Set).size != 1
+          whiteBishops.map(_.pos.isLight).to(Set).size != 1 ||
+          blackBishops.map(_.pos.isLight).to(Set).size != 1
         ) false
         else {
           for {
-            whiteSquareColor <- whiteBishops.headOption map (_.pos.color)
-            blackSquareColor <- blackBishops.headOption map (_.pos.color)
+            whiteBishopLight <- whiteBishops.headOption map (_.pos.isLight)
+            blackBishopLight <- blackBishops.headOption map (_.pos.isLight)
           } yield {
-            whiteSquareColor != blackSquareColor && whitePawns.forall(
-              pawnNotAttackable(_, blackSquareColor, board)
+            whiteBishopLight != blackBishopLight && whitePawns.forall(
+              pawnNotAttackable(_, blackBishopLight, board)
             ) &&
-            blackPawns.forall(pawnNotAttackable(_, whiteSquareColor, board))
+            blackPawns.forall(pawnNotAttackable(_, whiteBishopLight, board))
           }
         } getOrElse false
     }
@@ -87,10 +87,10 @@ case object Antichess
     bishopsAndPawns && drawnBishops
   }
 
-  private def pawnNotAttackable(pawn: Actor, oppositeBishopColor: Color, board: Board) = {
+  private def pawnNotAttackable(pawn: Actor, oppositeBishopLight: Boolean, board: Board) = {
     // The pawn cannot attack a bishop or be attacked by a bishop
     val cannotAttackBishop =
-      !Actor.pawnAttacks(pawn.pos, pawn.piece.color).exists(_.color == oppositeBishopColor)
+      !Actor.pawnAttacks(pawn.pos, pawn.piece.color).exists(_.isLight == oppositeBishopLight)
 
     InsufficientMatingMaterial.pawnBlockedByPawn(pawn, board) && cannotAttackBishop
   }

@@ -100,10 +100,6 @@ object Color {
 
   val all = List(White, Black)
 
-  val names = all map (_.name)
-
-  def exists(name: String) = all exists (_.name == name)
-
   def showResult(color: Option[Color]) =
     color match {
       case Some(chess.White) => "1-0"

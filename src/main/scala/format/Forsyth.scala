@@ -42,8 +42,8 @@ object Forsyth {
                 (for {
                   kingPos <- board.kingPosOf(color)
                   rookPos <- (ch.toLower match {
-                      case 'k'  => rooks.reverse.find(_.x > kingPos.x)
-                      case 'q'  => rooks.find(_.x < kingPos.x)
+                      case 'k'  => rooks.reverse.find(_ ?> kingPos)
+                      case 'q'  => rooks.find(_ ?< kingPos)
                       case file => rooks.find(_.file == file.toString)
                     })
                   side <- Side.kingRookSide(kingPos, rookPos)

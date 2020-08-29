@@ -148,7 +148,7 @@ case class Board(
         def rookReady(color: Color, kPos: Option[Pos], left: Boolean) =
           kPos.fold(false) { kp =>
             actorsOf(color) exists { a =>
-              a.piece.is(Rook) && a.pos.y == kp.y && (left ^ (a.pos.x > kp.x)) && history.unmovedRooks.pos(
+              a.piece.is(Rook) && a.pos ?- kp && (left ^ (a.pos ?> kp)) && history.unmovedRooks.pos(
                 a.pos
               )
             }

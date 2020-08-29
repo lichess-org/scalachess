@@ -13,8 +13,8 @@ object Side {
   val all = List(KingSide, QueenSide)
 
   def kingRookSide(kingPos: Pos, rookPos: Pos): Option[Side] =
-    if (kingPos.y == rookPos.y)
-      Option(if (kingPos.x > rookPos.x) QueenSide else KingSide)
+    if (kingPos ?- rookPos)
+      Option(if (kingPos ?> rookPos) QueenSide else KingSide)
     else None
 }
 

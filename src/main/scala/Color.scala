@@ -2,11 +2,11 @@ package chess
 
 sealed trait Color {
 
-  def -(role: Role) = Piece(this, role)
+  final def -(role: Role) = Piece(this, role)
 
-  def fold[A](w: => A, b: => A): A = if (white) w else b
+  final def fold[A](w: => A, b: => A): A = if (white) w else b
 
-  val unary_! : Color
+  def unary_! : Color
 
   val passablePawnY: Int
   val promotablePawnY: Int
@@ -15,15 +15,15 @@ sealed trait Color {
   val letter: Char
   val name: String
 
-  def pawn   = this - Pawn
-  def bishop = this - Bishop
-  def knight = this - Knight
-  def rook   = this - Rook
-  def queen  = this - Queen
-  def king   = this - King
+  final def pawn   = this - Pawn
+  final def bishop = this - Bishop
+  final def knight = this - Knight
+  final def rook   = this - Rook
+  final def queen  = this - Queen
+  final def king   = this - King
 
-  val white = this == Color.White
-  val black = this == Color.Black
+  final val white = this == Color.White
+  final val black = this == Color.Black
 }
 
 object Color {
@@ -55,7 +55,7 @@ object Color {
 
   case object White extends Color {
 
-    lazy val unary_! = Black
+    def unary_! = Black
 
     val passablePawnY   = 5
     val promotablePawnY = 8
@@ -69,7 +69,7 @@ object Color {
 
   case object Black extends Color {
 
-    val unary_! = White
+    def unary_! = White
 
     val passablePawnY   = 4
     val promotablePawnY = 1

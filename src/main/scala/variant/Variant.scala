@@ -5,7 +5,7 @@ import cats.data.Validated
 import scala.annotation.nowarn
 import cats.syntax.option._
 
-import chess.Pos.posAt
+import chess.Pos.posAt0
 
 // Correctness depends on singletons for each variant ID
 abstract class Variant private[variant] (
@@ -170,8 +170,8 @@ abstract class Variant private[variant] (
 
   protected def pawnsOnPromotionRank(board: Board, color: Color) = {
     board.pieces.exists {
-      case (pos, Piece(c, r)) if c == color && r == Pawn && pos.y == color.promotablePawnY => true
-      case _                                                                               => false
+      case (pos, Piece(c, r)) if c == color && r == Pawn && pos.y0 == color.promotablePawnY0 => true
+      case _                                                                                 => false
     }
   }
 
@@ -201,7 +201,7 @@ abstract class Variant private[variant] (
       }
       .to(Map)
 
-  def isUnmovedPawn(color: Color, pos: Pos) = pos.y == color.fold(2, 7)
+  def isUnmovedPawn(color: Color, pos: Pos) = pos.y0 == color.fold(1, 6)
 
   override def toString = s"Variant($name)"
 
@@ -259,15 +259,15 @@ object Variant {
   )
 
   private[variant] def symmetricRank(rank: IndexedSeq[Role]): Map[Pos, Piece] =
-    (for (y <- Seq(1, 2, 7, 8); x <- 1 to 8) yield {
-      posAt(x, y) map { pos =>
+    (for (y0 <- Seq(0, 1, 6, 7); x0 <- 0 to 7) yield {
+      posAt0(x0, y0) map { pos =>
         (
           pos,
-          y match {
-            case 1 => White - rank(x - 1)
-            case 2 => White.pawn
-            case 7 => Black.pawn
-            case 8 => Black - rank(x - 1)
+          y0 match {
+            case 0 => White - rank(x0)
+            case 1 => White.pawn
+            case 6 => Black.pawn
+            case 7 => Black - rank(x0)
           }
         )
       }

@@ -96,13 +96,13 @@ object Divider {
 
   private val mixednessRegions: List[List[Pos]] = {
     for {
-      y <- 1 to 7
-      x <- 1 to 7
+      y0 <- 0 to 6
+      x0 <- 0 to 6
     } yield {
       for {
         dy <- 0 to 1
         dx <- 0 to 1
-      } yield Pos.posAt(x + dx, y + dy)
+      } yield Pos.posAt0(x0 + dx, y0 + dy)
     }.toList.flatten
   }.toList
 
@@ -118,7 +118,7 @@ object Divider {
             else black = black + 1
           }
         }
-        mix + score(white, black, region.head.y)
+        mix + score(white, black, region.head.y0 + 1)
     }
   }
 }

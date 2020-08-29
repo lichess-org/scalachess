@@ -60,9 +60,9 @@ case class Std(
   def move(situation: Situation): Validated[String, chess.Move] =
     situation.board.pieces.foldLeft(none[chess.Move]) {
       case (None, (pos, piece))
-          if piece.color == situation.color && piece.role == role && compare(file, pos.x) && compare(
+          if piece.color == situation.color && piece.role == role && compare(file, pos.x0 + 1) && compare(
             rank,
-            pos.y
+            pos.y0 + 1
           ) && piece.eyesMovable(pos, dest) =>
         val a = Actor(piece, pos, situation.board)
         a trustedMoves false find { m =>

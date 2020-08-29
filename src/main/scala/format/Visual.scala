@@ -1,7 +1,7 @@
 package chess
 package format
 
-import Pos.posAt
+import Pos.posAt0
 
 /**
   * r bqkb r
@@ -24,11 +24,11 @@ object Visual {
     }
     Board(
       pieces = (for {
-        (l, y) <- (filtered zipWithIndex)
-        (c, x) <- (l zipWithIndex)
+        (l, y0) <- (filtered zipWithIndex)
+        (c, x0) <- (l zipWithIndex)
         role   <- Role forsyth c.toLower
       } yield {
-        posAt(x + 1, 8 - y) map { pos =>
+        posAt0(x0, 7 - y0) map { pos =>
           pos -> (Color(c isUpper) - role)
         }
       }) flatten,
@@ -45,9 +45,10 @@ object Visual {
           (pos, char)
         })
     }
-    for (y <- 8 to 1 by -1) yield {
-      for (x <- 1 to 8) yield {
-        posAt(x, y) flatMap markedPoss.get getOrElse board(x, y).fold(' ')(_ forsyth)
+    for (y0 <- 7 to 0 by -1) yield {
+      for (x0 <- 0 to 7) yield {
+        val pos = posAt0(x0, y0).get // XXX
+        markedPoss.get(pos) getOrElse board(pos).fold(' ')(_ forsyth)
       }
     } mkString
   } map { """\s*$""".r.replaceFirstIn(_, "") } mkString "\n"

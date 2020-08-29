@@ -82,7 +82,7 @@ object Hash {
       else hactors
 
     val hep = situation.enPassantSquare.fold(hcastling) { pos =>
-      hcastling ^ table.enPassantMasks(pos.x - 1)
+      hcastling ^ table.enPassantMasks(pos.x0)
     }
 
     // Hash in special three-check data.

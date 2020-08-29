@@ -1,6 +1,6 @@
 package chess
 
-import Pos.posAt
+import Pos.posAt0
 import variant.{ Crazyhouse, Variant }
 
 case class Board(
@@ -12,7 +12,7 @@ case class Board(
 
   def apply(at: Pos): Option[Piece] = pieces get at
 
-  def apply(x: Int, y: Int): Option[Piece] = posAt(x, y) flatMap pieces.get
+  def apply0(x: Int, y: Int): Option[Piece] = posAt0(x, y) flatMap pieces.get
 
   lazy val actors: Map[Pos, Actor] = pieces map {
     case (pos, piece) => (pos, Actor(piece, pos, this))
@@ -134,7 +134,7 @@ case class Board(
   def unmovedRooks =
     UnmovedRooks {
       history.unmovedRooks.pos.filter(pos =>
-        apply(pos).exists(piece => piece.is(Rook) && piece.color.backrankY == pos.y)
+        apply(pos).exists(piece => piece.is(Rook) && piece.color.backrankY0 == pos.y0)
       )
     }
 
@@ -143,12 +143,12 @@ case class Board(
       if (variant.allowsCastling) {
         val wkPos   = kingPosOf(White)
         val bkPos   = kingPosOf(Black)
-        val wkReady = wkPos.fold(false)(_.y == 1)
-        val bkReady = bkPos.fold(false)(_.y == 8)
+        val wkReady = wkPos.fold(false)(_.y0 == 0)
+        val bkReady = bkPos.fold(false)(_.y0 == 7)
         def rookReady(color: Color, kPos: Option[Pos], left: Boolean) =
           kPos.fold(false) { kp =>
             actorsOf(color) exists { a =>
-              a.piece.is(Rook) && a.pos.y == kp.y && (left ^ (a.pos.x > kp.x)) && history.unmovedRooks.pos(
+              a.piece.is(Rook) && a.pos ?- kp && (left ^ (a.pos ?> kp)) && history.unmovedRooks.pos(
                 a.pos
               )
             }

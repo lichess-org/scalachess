@@ -35,31 +35,31 @@ object Forsyth {
                 val rooks = board
                   .piecesOf(color)
                   .collect {
-                    case (pos, piece) if piece.is(Rook) && pos.y == color.backrankY => pos
+                    case (pos, piece) if piece.is(Rook) && pos.y0 == color.backrankY0 => pos
                   }
                   .toList
-                  .sortBy(_.x)
+                  .sortBy(_.x0)
                 (for {
                   kingPos <- board.kingPosOf(color)
                   rookPos <- (ch.toLower match {
-                      case 'k'  => rooks.reverse.find(_.x > kingPos.x)
-                      case 'q'  => rooks.find(_.x < kingPos.x)
+                      case 'k'  => rooks.reverse.find(_ ?> kingPos)
+                      case 'q'  => rooks.find(_ ?< kingPos)
                       case file => rooks.find(_.file == file.toString)
                     })
                   side <- Side.kingRookSide(kingPos, rookPos)
                 } yield (c.add(color, side), r + rookPos)).getOrElse((c, r))
             }
 
-            val fifthRank   = if (situation.color == White) 5 else 4
-            val sixthRank   = if (situation.color == White) 6 else 3
-            val seventhRank = if (situation.color == White) 7 else 2
+            val fifthRank   = if (situation.color == White) 4 else 3
+            val sixthRank   = if (situation.color == White) 5 else 2
+            val seventhRank = if (situation.color == White) 6 else 1
             val lastMove = for {
               pos <- splitted lift 3 flatMap Pos.posAt
-              if pos.y == sixthRank
-              orig <- Pos.posAt(pos.x, seventhRank)
-              dest <- Pos.posAt(pos.x, fifthRank) filter { d =>
+              if pos.y0 == sixthRank
+              orig <- Pos.posAt0(pos.x0, seventhRank)
+              dest <- Pos.posAt0(pos.x0, fifthRank) filter { d =>
                 situation.board(d).contains(Piece(!situation.color, Pawn)) &&
-                Pos.posAt(pos.x, sixthRank).flatMap(situation.board.apply).isEmpty &&
+                Pos.posAt0(pos.x0, sixthRank).flatMap(situation.board.apply).isEmpty &&
                 situation.board(orig).isEmpty
               }
             } yield Uci.Move(orig, dest)
@@ -132,7 +132,7 @@ object Forsyth {
           }
         case word => word -> None
       }
-      makePiecesWithCrazyPromoted(position.toList, 1, 8) map {
+      makePiecesWithCrazyPromoted0(position.toList, 0, 7) map {
         case (pieces, promoted) =>
           val board = Board(pieces, variant = variant)
           if (promoted.isEmpty) board else board.withCrazyData(_.copy(promoted = promoted))
@@ -152,26 +152,26 @@ object Forsyth {
       }
     }
 
-  private def makePiecesWithCrazyPromoted(
+  private def makePiecesWithCrazyPromoted0(
       chars: List[Char],
-      x: Int,
-      y: Int
+      x0: Int,
+      y0: Int
   ): Option[(List[(Pos, Piece)], Set[Pos])] =
     chars match {
       case Nil                               => Option((Nil, Set.empty))
-      case '/' :: rest                       => makePiecesWithCrazyPromoted(rest, 1, y - 1)
-      case c :: rest if '1' <= c && c <= '9' => makePiecesWithCrazyPromoted(rest, x + (c - '0').toInt, y)
+      case '/' :: rest                       => makePiecesWithCrazyPromoted0(rest, 0, y0 - 1)
+      case c :: rest if '1' <= c && c <= '9' => makePiecesWithCrazyPromoted0(rest, x0 + (c - '0').toInt, y0) // TODO: <= 9?
       case c :: '~' :: rest =>
         for {
-          pos                        <- Pos.posAt(x, y)
+          pos                        <- Pos.posAt0(x0, y0)
           piece                      <- Piece.fromChar(c)
-          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
+          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted0(rest, x0 + 1, y0)
         } yield (pos -> piece :: nextPieces, nextPromoted + pos)
       case c :: rest =>
         for {
-          pos                        <- Pos.posAt(x, y)
+          pos                        <- Pos.posAt0(x0, y0)
           piece                      <- Piece.fromChar(c)
-          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
+          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted0(rest, x0 + 1, y0)
         } yield (pos -> piece :: nextPieces, nextPromoted)
     }
 
@@ -218,19 +218,19 @@ object Forsyth {
       case _ => ""
     }
 
-  implicit private val posOrdering = Ordering.by[Pos, Int](_.x)
+  implicit private val posOrdering = Ordering.by[Pos, Int](_.x0)
 
   private[chess] def exportCastles(board: Board): String = {
 
     lazy val wr = board.pieces.collect {
-      case (pos, piece) if pos.y == White.backrankY && piece == White.rook => pos
+      case (pos, piece) if pos.y0 == White.backrankY0 && piece == White.rook => pos
     }
     lazy val br = board.pieces.collect {
-      case (pos, piece) if pos.y == Black.backrankY && piece == Black.rook => pos
+      case (pos, piece) if pos.y0 == Black.backrankY0 && piece == Black.rook => pos
     }
 
-    lazy val wur = board.unmovedRooks.pos.filter(_.y == White.backrankY)
-    lazy val bur = board.unmovedRooks.pos.filter(_.y == Black.backrankY)
+    lazy val wur = board.unmovedRooks.pos.filter(_.y0 == White.backrankY0)
+    lazy val bur = board.unmovedRooks.pos.filter(_.y0 == Black.backrankY0)
 
     {
       // castling rights with inner rooks are represented by their file name
@@ -255,10 +255,10 @@ object Forsyth {
   def exportBoard(board: Board): String = {
     val fen   = new scala.collection.mutable.StringBuilder(70)
     var empty = 0
-    for (y <- 8 to 1 by -1) {
+    for (y0 <- 7 to 0 by -1) {
       empty = 0
-      for (x <- 1 to 8) {
-        board(x, y) match {
+      for (x0 <- 0 to 7) {
+        board.apply0(x0, y0) match {
           case None => empty = empty + 1
           case Some(piece) =>
             if (empty == 0) fen append piece.forsyth.toString
@@ -268,13 +268,13 @@ object Forsyth {
             }
             if (
               piece.role != Pawn && board.crazyData.fold(false)(_.promoted.exists { p =>
-                p.x == x && p.y == y
+                p.x0 == x0 && p.y0 == y0
               })
             ) fen append '~'
         }
       }
       if (empty > 0) fen append empty
-      if (y > 1) fen append '/'
+      if (y0 > 0) fen append '/'
     }
     fen.toString
   }

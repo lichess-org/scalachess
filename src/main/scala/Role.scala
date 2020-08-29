@@ -1,6 +1,6 @@
 package chess
 
-import Pos.posAt
+import Pos.posAt0
 
 sealed trait Role {
   val forsyth: Char
@@ -56,14 +56,14 @@ case object Bishop extends PromotableRole {
 case object Knight extends PromotableRole {
   val forsyth = 'n'
   val dirs: Directions = List(
-    p => posAt(p.x - 1, p.y + 2),
-    p => posAt(p.x - 1, p.y - 2),
-    p => posAt(p.x + 1, p.y + 2),
-    p => posAt(p.x + 1, p.y - 2),
-    p => posAt(p.x - 2, p.y + 1),
-    p => posAt(p.x - 2, p.y - 1),
-    p => posAt(p.x + 2, p.y + 1),
-    p => posAt(p.x + 2, p.y - 1)
+    p => posAt0(p.x0 - 1, p.y0 + 2),
+    p => posAt0(p.x0 - 1, p.y0 - 2),
+    p => posAt0(p.x0 + 1, p.y0 + 2),
+    p => posAt0(p.x0 + 1, p.y0 - 2),
+    p => posAt0(p.x0 - 2, p.y0 + 1),
+    p => posAt0(p.x0 - 2, p.y0 - 1),
+    p => posAt0(p.x0 + 2, p.y0 + 1),
+    p => posAt0(p.x0 + 2, p.y0 - 1)
   )
   def dir(from: Pos, to: Pos) = None
   val projection              = false

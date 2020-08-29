@@ -33,9 +33,9 @@ case class Piece(color: Color, role: Role) {
   def eyesMovable(from: Pos, to: Pos): Boolean =
     if (role == Pawn) Piece.pawnEyes(color, from, to) || {
       (from ?| to) && {
-        val dy = to.y - from.y
-        if (color.white) (dy == 1 || (from.y <= 2 && dy == 2))
-        else (dy == -1 || (from.y >= 7 && dy == -2))
+        val dy = to.y0 - from.y0
+        if (color.white) (dy == 1 || (from.y0 <= 1 && dy == 2))
+        else (dy == -1 || (from.y0 >= 6 && dy == -2))
       }
     }
     else eyes(from, to)
@@ -51,7 +51,7 @@ object Piece {
     }
 
   private def pawnEyes(color: Color, from: Pos, to: Pos) =
-    (from xDist to) == 1 && (to.y - from.y) == {
+    (from xDist to) == 1 && (to.y0 - from.y0) == {
       if (color.white) 1 else -1
     }
 }

@@ -7,7 +7,7 @@ class PerftTest extends ChessTest {
   def perft(game: Game, depth: Int): Int = {
     if (depth > 0)
       game.situation.moves.values.flatten.foldLeft(0)((p, move) =>
-        if (move.piece.role == Pawn && (move.dest.y == 1 || move.dest.y == 8))
+        if (move.piece.role == Pawn && (move.dest.y0 == 0 || move.dest.y0 == 7))
           p + perft(game.apply(move.withPromotion(Option(Queen)).get), depth - 1)
             + perft(game.apply(move.withPromotion(Option(Rook)).get), depth - 1)
             + perft(game.apply(move.withPromotion(Option(Bishop)).get), depth - 1)

@@ -87,8 +87,8 @@ case class Situation(board: Board, color: Color) {
           move.dest.yDist(move.orig) == 2 &&
           board.actorAt(move.dest).exists(_.piece.is(Pawn)) &&
           List(
-            Pos.posAt(move.dest.x - 1, color.passablePawnY),
-            Pos.posAt(move.dest.x + 1, color.passablePawnY)
+            Pos.posAt0(move.dest.x0 - 1, color.passablePawnY0),
+            Pos.posAt0(move.dest.x0 + 1, color.passablePawnY0)
           ).flatten.flatMap(board.actorAt).exists(_.piece == color.pawn)
         )
           moves.values.flatten.find(_.enpassant).map(_.dest)

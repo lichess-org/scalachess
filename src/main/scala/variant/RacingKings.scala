@@ -43,7 +43,7 @@ case object RacingKings
   override def opponentHasInsufficientMaterial(situation: Situation) = false
 
   private def reachedGoal(board: Board, color: Color) =
-    board.kingPosOf(color) exists (_.y == 8)
+    board.kingPosOf(color) exists (_.y0 == 7)
 
   private def reachesGoal(move: Move) =
     reachedGoal(move.situationAfter.board, move.piece.color)

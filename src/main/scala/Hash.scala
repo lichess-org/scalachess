@@ -59,7 +59,8 @@ object Hash {
     def crazyPocketMask(role: Role, colorshift: Int, count: Int) = {
       // There should be no kings and at most 16 pieces of any given type
       // in a pocket.
-      if (0 < count && count <= 16 && roleIndex(role) < 5) Option(table.crazyPocketMasks(16 * roleIndex(role) + count + colorshift))
+      if (0 < count && count <= 16 && roleIndex(role) < 5)
+        Option(table.crazyPocketMasks(16 * roleIndex(role) + count + colorshift))
       else None
     }
 

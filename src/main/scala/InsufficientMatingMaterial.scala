@@ -55,7 +55,9 @@ object InsufficientMatingMaterial {
     kingsAndMinorsOnlyOfColor && (nonKingRolesOfColor.distinct match {
       case Nil => true
       case List(Knight) =>
-        nonKingRolesOfColor.lengthCompare(1) == 0 && !(rolesOfOpponentColor filter (King !=) exists (Queen !=))
+        nonKingRolesOfColor.lengthCompare(
+          1
+        ) == 0 && !(rolesOfOpponentColor filter (King !=) exists (Queen !=))
       case List(Bishop) =>
         !(rolesOfOpponentColor.exists(r => r == Knight || r == Pawn) || bishopsOnOppositeColors(board))
       case _ => false

@@ -129,8 +129,8 @@ object Binary {
 
     def move(str: String): List[Byte] =
       (str match {
-        case pos if pos.length == 2  => simplePawn(pos)
-        case CastlingR(str, check) => castling(str, check)
+        case pos if pos.length == 2 => simplePawn(pos)
+        case CastlingR(str, check)  => castling(str, check)
         case SimplePieceR(piece, capture, pos, check) =>
           simplePiece(piece, pos, capture, check)
         case FullPawnR(file, pos, promotion, check) =>

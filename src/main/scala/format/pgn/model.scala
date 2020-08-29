@@ -18,7 +18,7 @@ case class Pgn(
   }
   def updatePly(ply: Int, f: Move => Move) = {
     val fullMove = (ply + 1) / 2
-    val color    = Color(ply % 2 == 1)
+    val color    = Color.fromPly(ply - 1)
     updateTurn(fullMove, _.update(color, f))
   }
   def updateLastPly(f: Move => Move) = updatePly(nbPlies, f)

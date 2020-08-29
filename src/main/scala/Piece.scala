@@ -45,7 +45,7 @@ object Piece {
 
   def fromChar(c: Char): Option[Piece] =
     Role.allByPgn get c.toUpper map {
-      Piece(Color(c.isUpper), _)
+      Piece(Color.fromWhite(c.isUpper), _)
     }
 
   private def pawnEyes(color: Color, from: Pos, to: Pos) =

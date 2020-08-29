@@ -31,7 +31,7 @@ object Forsyth {
           .fold(situation) { strCastles =>
             val (castles, unmovedRooks) = strCastles.foldLeft(Castles.none -> Set.empty[Pos]) {
               case ((c, r), ch) =>
-                val color = Color(ch.isUpper)
+                val color = Color.fromWhite(ch.isUpper)
                 val rooks = board
                   .piecesOf(color)
                   .collect {

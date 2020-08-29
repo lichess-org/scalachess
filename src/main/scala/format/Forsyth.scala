@@ -160,7 +160,7 @@ object Forsyth {
     chars match {
       case Nil                               => Option((Nil, Set.empty))
       case '/' :: rest                       => makePiecesWithCrazyPromoted(rest, 1, y - 1)
-      case c :: rest if '1' <= c && c <= '9' => makePiecesWithCrazyPromoted(rest, x + (c - '0').toInt, y)
+      case c :: rest if '1' <= c && c <= '8' => makePiecesWithCrazyPromoted(rest, x + (c - '0').toInt, y)
       case c :: '~' :: rest =>
         for {
           pos                        <- Pos.posAt(x, y)

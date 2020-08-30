@@ -2,8 +2,9 @@ package chess
 
 import variant.{ Crazyhouse, Variant }
 
-case class Board(
+case class Board private (
     pieces: PieceMap,
+    occupied: PosSet,
     history: History,
     variant: Variant,
     crazyData: Option[Crazyhouse.Data] = None
@@ -55,17 +56,17 @@ case class Board(
 
   def place(piece: Piece, at: Pos): Option[Board] =
     if (pieces contains at) None
-    else Option(copy(pieces = pieces + ((at, piece))))
+    else Option(copy(pieces = pieces + ((at, piece)), occupied = occupied + at))
 
   def take(at: Pos): Option[Board] =
-    if (pieces contains at) Option(copy(pieces = pieces - at))
+    if (pieces contains at) Option(copy(pieces = pieces - at, occupied = occupied - at))
     else None
 
   def move(orig: Pos, dest: Pos): Option[Board] =
     if (pieces contains dest) None
     else
       pieces get orig map { piece =>
-        copy(pieces = pieces - orig + ((dest, piece)))
+        copy(pieces = pieces - orig + ((dest, piece)), occupied = occupied - orig + dest)
       }
 
   def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] =
@@ -73,12 +74,11 @@ case class Board(
       piece <- pieces get orig
       takenPos = taking getOrElse dest
       if pieces contains takenPos
-    } yield copy(pieces = pieces - takenPos - orig + (dest -> piece))
+    } yield copy(pieces = pieces - takenPos - orig + (dest -> piece), occupied = occupied - takenPos - orig + dest)
 
   lazy val occupation: Color.Map[PosSet] = Color.Map { color =>
     pieces.collect { case (pos, piece) if piece is color => pos }.to(PosSet)
   }
-  lazy val occupied: PosSet = pieces.keys.to(PosSet)
 
   def hasPiece(p: Piece) = pieces.values exists (p ==)
 
@@ -96,7 +96,7 @@ case class Board(
 
   def withCastles(c: Castles) = withHistory(history withCastles c)
 
-  def withPieces(newPieces: PieceMap) = copy(pieces = newPieces)
+  def withPieces(newPieces: PieceMap) = copy(pieces = newPieces, occupied = newPieces.keys.to(PosSet))
 
   def withVariant(v: Variant): Board = {
     if (v == Crazyhouse)
@@ -167,8 +167,10 @@ object Board {
   def apply(pieces: Iterable[(Pos, Piece)], variant: Variant): Board =
     Board(pieces.toMap, if (variant.allowsCastling) Castles.all else Castles.none, variant)
 
-  def apply(pieces: Iterable[(Pos, Piece)], castles: Castles, variant: Variant): Board =
-    Board(pieces.toMap, History(castles = castles), variant, variantCrazyData(variant))
+  def apply(pieces: Iterable[(Pos, Piece)], castles: Castles, variant: Variant): Board = {
+    val map = pieces.toMap
+    Board(map, map.keys.to(PosSet), History(castles = castles), variant, variantCrazyData(variant))
+  }
 
   def init(variant: Variant): Board = Board(variant.pieces, variant.castles, variant)
 

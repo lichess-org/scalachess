@@ -27,7 +27,7 @@ case class Piece(color: Color, role: Role) {
     }
     else eyes(from, to)
 
-  def attacks(from: Pos, occupied: => PosSet): PosSet =
+  def attacks(from: Pos, occupied: PosSet): PosSet =
     role match {
       case King   => PosSet.kingAttacks(from)
       case Queen  => PosSet.queenAttacks(from, occupied)

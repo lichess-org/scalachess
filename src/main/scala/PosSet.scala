@@ -147,28 +147,25 @@ object PosSet extends SpecificIterableFactory[Pos, PosSet] {
   }
   private val magicAttackTable: Array[PosSet] = {
     val table: Array[PosSet] = new Array(Magic.tableSize)
-    Pos.all.foreach { orig =>
-      val rookMagic = Magic.rook(orig.index)
-      PosSet(rookMagic.mask).subsets().foreach { subset =>
-        val idx    = ((rookMagic.factor * subset.bitboard) >>> (64 - 12)).toInt + rookMagic.offset
-        val attack = slidingAttacks(orig, subset, Rook.dirs)
-        assert(table(idx) == null || table(idx) == attack)
-        table(idx) = attack
-      }
-      val bishopMagic = Magic.bishop(orig.index)
-      PosSet(bishopMagic.mask).subsets().foreach { subset =>
-        val idx    = ((bishopMagic.factor * subset.bitboard) >>> (64 - 9)).toInt + bishopMagic.offset
-        val attack = slidingAttacks(orig, subset, Bishop.dirs)
-        assert(table(idx) == null || table(idx) == attack)
-        table(idx) = attack
+    def initMagics(magics: Array[Magic], shift: Int, dirs: Directions) = {
+      Pos.all.foreach { orig =>
+        val magic = magics(orig.index)
+        PosSet(magic.mask).subsets().foreach { subset =>
+          val idx    = ((magic.factor * subset.bitboard) >>> (64 - shift)).toInt + magic.offset
+          val attack = slidingAttacks(orig, subset, dirs)
+          assert(table(idx) == null || table(idx) == attack)
+          table(idx) = attack
+        }
       }
     }
+    initMagics(Magic.rook, 12, Rook.dirs)
+    initMagics(Magic.bishop, 9, Bishop.dirs)
     table
   }
 
-  def kingAttacks(orig: Pos): PosSet               = kingAttackTable(orig.index)
-  def knightAttacks(orig: Pos): PosSet             = knightAttackTable(orig.index)
-  def pawnAttacks(color: Color, orig: Pos): PosSet = pawnAttackTable(color)(orig.index)
+  @inline def kingAttacks(orig: Pos): PosSet               = kingAttackTable(orig.index)
+  @inline def knightAttacks(orig: Pos): PosSet             = knightAttackTable(orig.index)
+  @inline def pawnAttacks(color: Color, orig: Pos): PosSet = pawnAttackTable(color)(orig.index)
   def rookAttacks(orig: Pos, occupied: PosSet): PosSet = {
     val magic = Magic.rook(orig.index)
     val idx   = ((magic.factor * (occupied.bitboard & magic.mask)) >>> (64 - 12)).toInt + magic.offset

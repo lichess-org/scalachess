@@ -1,8 +1,6 @@
 package chess
 
 import format.Uci
-import scala.annotation.tailrec
-import scala.collection.mutable.ArrayBuffer
 
 final case class Actor(
     piece: Piece,

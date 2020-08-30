@@ -96,14 +96,16 @@ object Divider {
 
   private val mixednessRegions: List[List[Pos]] = {
     for {
-      y <- 1 to 7
-      x <- 1 to 7
+      y <- Rank.all.take(7)
+      x <- File.all.take(7)
     } yield {
       for {
-        dy <- 0 to 1
-        dx <- 0 to 1
-      } yield Pos.posAt(x + dx, y + dy)
-    }.toList.flatten
+        dy   <- 0 to 1
+        dx   <- 0 to 1
+        file <- x.offset(dx)
+        rank <- y.offset(dy)
+      } yield Pos(file, rank)
+    }.toList
   }.toList
 
   private def mixedness(board: Board): Int = {
@@ -118,7 +120,7 @@ object Divider {
             else black = black + 1
           }
         }
-        mix + score(white, black, region.head.y)
+        mix + score(white, black, region.head.rank.index + 1)
     }
   }
 }

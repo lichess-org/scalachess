@@ -1,7 +1,6 @@
 package chess
 
 import format.Uci
-import Pos.posAt
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
 
@@ -30,7 +29,7 @@ final case class Actor(
           } flatMap maybePromote
           def enpassant(horizontal: Direction): Option[Move] =
             for {
-              victimPos <- horizontal(pos).filter(_ => pos.y == color.passablePawnY)
+              victimPos <- horizontal(pos).filter(_ => pos.rank == color.passablePawnRank)
               _         <- board(victimPos).filter(v => v == !color - Pawn)
               targetPos <- horizontal(next)
               _ <- pawnDir(victimPos) flatMap pawnDir filter { vf =>
@@ -44,7 +43,7 @@ final case class Actor(
           def forward(p: Pos): Option[Move] =
             board.move(pos, p) map { move(p, _) } flatMap maybePromote
           def maybePromote(m: Move): Option[Move] =
-            if (m.dest.y == m.color.promotablePawnY)
+            if (m.dest.rank == m.color.promotablePawnRank)
               (m.after promote m.dest) map { b2 =>
                 m.copy(after = b2, promotion = Option(Queen))
               }
@@ -115,8 +114,8 @@ final case class Actor(
       if board(rookPos) contains color.rook
       if history.unmovedRooks.pos.contains(rookPos)
       // Check impeded castling.
-      newKingPos <- posAt(side.castledKingX, kingPos.y)
-      newRookPos <- posAt(side.castledRookX, rookPos.y)
+      newKingPos       = Pos(side.castledKingFile, kingPos.rank)
+      newRookPos       = Pos(side.castledRookFile, rookPos.rank)
       kingPath         = kingPos <-> newKingPos
       rookPath         = rookPos <-> newRookPos
       mustBeUnoccupied = (kingPath ++ rookPath).filter(_ != kingPos).filter(_ != rookPos)

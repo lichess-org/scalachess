@@ -2,8 +2,8 @@ package chess
 
 sealed trait Side {
 
-  def castledKingX: Int
-  def castledRookX: Int
+  def castledKingFile: File
+  def castledRookFile: File
 
   def tripToRook: (Pos, Board) => List[Pos]
 }
@@ -20,15 +20,15 @@ object Side {
 
 case object KingSide extends Side {
 
-  val castledKingX = 7
-  val castledRookX = 6
+  val castledKingFile = File.G
+  val castledRookFile = File.F
 
   val tripToRook: (Pos, Board) => List[Pos] = (pos, board) => pos >| board.pieces.contains
 }
 case object QueenSide extends Side {
 
-  val castledKingX = 3
-  val castledRookX = 4
+  val castledKingFile = File.C
+  val castledRookFile = File.D
 
   val tripToRook: (Pos, Board) => List[Pos] = (pos, board) => pos |< board.pieces.contains
 }

@@ -1,8 +1,6 @@
 package chess
 package variant
 
-import chess.Pos._
-
 case object Horde
     extends Variant(
       id = 8,
@@ -21,21 +19,16 @@ case object Horde
     val frontPawns = List(Pos.B5, Pos.C5, Pos.F5, Pos.G5).map { _ -> White.pawn }
 
     val whitePawnsHorde = frontPawns ++ (for {
-      x <- 1 to 8
-      y <- 1 to 4
-    } yield Pos.posAt(x, y) map (_ -> White.pawn)).flatten toMap
+      x <- File.all
+      y <- Rank.all.take(4)
+    } yield (Pos(x, y) -> White.pawn)) toMap
 
-    val blackPieces = (for (y <- 7 to 8; x <- 1 to 8) yield {
-      posAt(x, y) map { pos =>
-        (
-          pos,
-          y match {
-            case 8 => Black - backRank(x - 1)
-            case 7 => Black.pawn
-          }
-        )
-      }
-    }).flatten.toMap
+    val blackPieces = (for (y <- List(Rank.Seventh, Rank.Eighth); x <- File.all) yield {
+      Pos(x, y) -> (y match {
+        case Rank.Eighth  => Black - backRank(x.index)
+        case Rank.Seventh => Black.pawn
+      })
+    }).toMap
 
     blackPieces ++ whitePawnsHorde
   }
@@ -122,6 +115,6 @@ case object Horde
   }
 
   override def isUnmovedPawn(color: Color, pos: Pos) =
-    if (color.white) pos.y <= 2
-    else pos.y == 7
+    if (color.white) pos.rank <= Rank.Second
+    else pos.rank == Rank.Seventh
 }

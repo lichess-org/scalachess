@@ -135,6 +135,16 @@ object PosSet extends SpecificIterableFactory[Pos, PosSet] {
   private val knightAttackTable: Array[PosSet] = Pos.all.map { orig =>
     slidingAttacks(orig, full, Knight.dirs)
   }
+  private val pawnAttackTable: Color.Map[Array[PosSet]] = Color.Map { color =>
+    Pos.all.map { orig =>
+      slidingAttacks(
+        orig,
+        full,
+        if (color.white) List(_.upLeft, _.upRight)
+        else List(_.downLeft, _.downRight)
+      )
+    }
+  }
   private val magicAttackTable: Array[PosSet] = {
     val table: Array[PosSet] = new Array(Magic.tableSize)
     Pos.all.foreach { orig =>
@@ -156,8 +166,9 @@ object PosSet extends SpecificIterableFactory[Pos, PosSet] {
     table
   }
 
-  def kingAttacks(orig: Pos): PosSet   = kingAttackTable(orig.index)
-  def knightAttacks(orig: Pos): PosSet = knightAttackTable(orig.index)
+  def kingAttacks(orig: Pos): PosSet               = kingAttackTable(orig.index)
+  def knightAttacks(orig: Pos): PosSet             = knightAttackTable(orig.index)
+  def pawnAttacks(color: Color, orig: Pos): PosSet = pawnAttackTable(color)(orig.index)
   def rookAttacks(orig: Pos, occupied: PosSet): PosSet = {
     val magic = Magic.rook(orig.index)
     val idx   = ((magic.factor * (occupied.bitboard & magic.mask)) >>> (64 - 12)).toInt + magic.offset

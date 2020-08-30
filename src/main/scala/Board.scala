@@ -78,6 +78,7 @@ case class Board(
   lazy val occupation: Color.Map[PosSet] = Color.Map { color =>
     pieces.collect { case (pos, piece) if piece is color => pos }.to(PosSet)
   }
+  lazy val occupied: PosSet = pieces.keys.to(PosSet)
 
   def hasPiece(p: Piece) = pieces.values exists (p ==)
 

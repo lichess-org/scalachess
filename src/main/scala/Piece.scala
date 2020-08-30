@@ -14,15 +14,7 @@ case class Piece(color: Color, role: Role) {
   def forsyth: Char = if (color == White) role.forsythUpper else role.forsyth
 
   // attackable positions assuming empty board
-  def eyes(from: Pos, to: Pos): Boolean =
-    role match {
-      case King   => PosSet.kingAttacks(from).has(to)
-      case Queen  => PosSet.queenAttacks(from, PosSet.empty).has(to)
-      case Rook   => PosSet.rookAttacks(from, PosSet.empty).has(to)
-      case Bishop => PosSet.bishopAttacks(from, PosSet.empty).has(to)
-      case Knight => PosSet.knightAttacks(from).has(to)
-      case Pawn   => Piece.pawnEyes(color, from, to)
-    }
+  def eyes(from: Pos, to: Pos): Boolean = attacks(from, PosSet.empty).has(to)
 
   // movable positions assuming empty board
   def eyesMovable(from: Pos, to: Pos): Boolean =
@@ -34,6 +26,16 @@ case class Piece(color: Color, role: Role) {
       }
     }
     else eyes(from, to)
+
+  def attacks(from: Pos, occupied: PosSet): PosSet =
+    role match {
+      case King   => PosSet.kingAttacks(from)
+      case Queen  => PosSet.queenAttacks(from, occupied)
+      case Rook   => PosSet.rookAttacks(from, occupied)
+      case Bishop => PosSet.bishopAttacks(from, occupied)
+      case Knight => PosSet.knightAttacks(from)
+      case Pawn   => PosSet.pawnAttacks(color, from)
+    }
 
   override def toString = s"$color-$role".toLowerCase
 }

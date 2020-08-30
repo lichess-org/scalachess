@@ -175,7 +175,7 @@ object Parser {
     private val DropR = """^([NBRQP])@([a-h][1-8])(\+?)(\#?)$""".r
 
     def apply(str: String, variant: Variant): Validated[String, San] = {
-      if (str.length == 2) Pos.posAt(str).fold(slow(str)) { pos =>
+      if (str.length == 2) Pos.fromKey(str).fold(slow(str)) { pos =>
         valid(Std(pos, Pawn))
       }
       else
@@ -184,7 +184,7 @@ object Parser {
           case "O-O-O" | "o-o-o" | "0-0-0" => valid(Castle(QueenSide))
           case MoveR(role, file, rank, capture, pos, prom, check, mate) =>
             role.headOption.fold[Option[Role]](Option(Pawn))(variant.rolesByPgn.get) flatMap { role =>
-              Pos posAt pos map { dest =>
+              Pos fromKey pos map { dest =>
                 valid(
                   Std(
                     dest = dest,
@@ -206,7 +206,7 @@ object Parser {
             } getOrElse slow(str)
           case DropR(roleS, posS, check, mate) =>
             roleS.headOption flatMap variant.rolesByPgn.get flatMap { role =>
-              Pos posAt posS map { pos =>
+              Pos fromKey posS map { pos =>
                 valid(
                   Drop(
                     role = role,

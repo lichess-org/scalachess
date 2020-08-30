@@ -1,8 +1,6 @@
 package chess
 package format
 
-import Pos.posAt
-
 /**
   * r bqkb r
   * p ppp pp
@@ -28,7 +26,7 @@ object Visual {
         (c, x) <- (l zipWithIndex)
         role   <- Role forsyth c.toLower
       } yield {
-        posAt(x + 1, 8 - y) map { pos =>
+        Pos.at(x, 7 - y) map { pos =>
           pos -> (Color.fromWhite(c isUpper) - role)
         }
       }) flatten,

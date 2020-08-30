@@ -54,7 +54,7 @@ class BoardTest extends ChessTest {
     }
 
     "allow a piece to be placed" in {
-      board place White - Rook at E3 must beSome.like {
+      board.place(White - Rook, E3) must beSome.like {
         case b => b(E3) mustEqual Option(White - Rook)
       }
     }
@@ -66,17 +66,17 @@ class BoardTest extends ChessTest {
     }
 
     "allow a piece to move" in {
-      board move E2 to E4 must beSome.like {
+      board.move(E2, E4) must beSome.like {
         case b => b(E4) mustEqual Option(White - Pawn)
       }
     }
 
     "not allow an empty position to move" in {
-      board move E5 to E6 must beNone
+      board.move(E5, E6) must beNone
     }
 
     "not allow a piece to move to an occupied position" in {
-      board move A1 to A2 must beNone
+      board.move(A1, A2) must beNone
     }
 
     "allow a pawn to be promoted to a queen" in {
@@ -87,9 +87,9 @@ class BoardTest extends ChessTest {
 
     "allow chaining actions" in {
       makeEmptyBoard.seq(
-        _ place White - Pawn at A2,
-        _ place White - Pawn at A3,
-        _ move A2 to A4
+        _.place(White - Pawn, A2),
+        _.place(White - Pawn, A3),
+        _.move(A2, A4)
       ) must beSome.like {
         case b => b(A4) mustEqual Option(White - Pawn)
       }
@@ -97,9 +97,9 @@ class BoardTest extends ChessTest {
 
     "fail on bad actions chain" in {
       makeEmptyBoard.seq(
-        _ place White - Pawn at A2,
-        _ place White - Pawn at A3,
-        _ move B2 to B4
+        _.place(White - Pawn, A2),
+        _.place(White - Pawn, A3),
+        _.move(B2, B4)
       ) must beNone
     }
 

@@ -2,18 +2,16 @@ package chess
 
 import scala.math.{ abs, max, min }
 
-sealed case class Pos private (x: Int, y: Int, piotr: Char) {
+case class Pos private (index: Int) extends AnyVal {
 
-  import Pos.posAt
-
-  val down: Option[Pos]         = posAt(x, y - 1)
-  val left: Option[Pos]         = posAt(x - 1, y)
-  val downLeft: Option[Pos]     = posAt(x - 1, y - 1)
-  val downRight: Option[Pos]    = posAt(x + 1, y - 1)
-  lazy val up: Option[Pos]      = posAt(x, y + 1)
-  lazy val right: Option[Pos]   = posAt(x + 1, y)
-  lazy val upLeft: Option[Pos]  = posAt(x - 1, y + 1)
-  lazy val upRight: Option[Pos] = posAt(x + 1, y + 1)
+  def down: Option[Pos]      = Pos.at(file.index, rank.index - 1)
+  def left: Option[Pos]      = Pos.at(file.index - 1, rank.index)
+  def downLeft: Option[Pos]  = Pos.at(file.index - 1, rank.index - 1)
+  def downRight: Option[Pos] = Pos.at(file.index + 1, rank.index - 1)
+  def up: Option[Pos]        = Pos.at(file.index, rank.index + 1)
+  def right: Option[Pos]     = Pos.at(file.index + 1, rank.index)
+  def upLeft: Option[Pos]    = Pos.at(file.index - 1, rank.index + 1)
+  def upRight: Option[Pos]   = Pos.at(file.index + 1, rank.index + 1)
 
   def >|(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.right)
   def |<(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.left)
@@ -22,50 +20,58 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
       p :: (if (stop(p)) Nil else p.|<>|(stop, dir))
     } getOrElse Nil
 
-  def ?<(other: Pos): Boolean = x < other.x
-  def ?>(other: Pos): Boolean = x > other.x
-  def ?+(other: Pos): Boolean = y < other.y
-  def ?^(other: Pos): Boolean = y > other.y
-  def ?|(other: Pos): Boolean = x == other.x
-  def ?-(other: Pos): Boolean = y == other.y
+  def ?<(other: Pos): Boolean = file < other.file
+  def ?>(other: Pos): Boolean = file > other.file
+  def ?+(other: Pos): Boolean = rank < other.rank
+  def ?^(other: Pos): Boolean = rank > other.rank
+  def ?|(other: Pos): Boolean = file == other.file
+  def ?-(other: Pos): Boolean = rank == other.rank
 
   def <->(other: Pos): Iterable[Pos] =
-    min(x, other.x) to max(x, other.x) flatMap { posAt(_, y) }
+    min(file.index, other.file.index) to max(file.index, other.file.index) flatMap { Pos.at(_, rank.index) }
 
   def touches(other: Pos): Boolean = xDist(other) <= 1 && yDist(other) <= 1
 
-  def onSameDiagonal(other: Pos): Boolean = x - y == other.x - other.y || x + y == other.x + other.y
-  def onSameLine(other: Pos): Boolean     = ?-(other) || ?|(other)
+  def onSameDiagonal(other: Pos): Boolean =
+    file.index - rank.index == other.file.index - other.rank.index || file.index + rank.index == other.file.index + other.rank.index
+  def onSameLine(other: Pos): Boolean = ?-(other) || ?|(other)
 
-  def xDist(other: Pos) = abs(x - other.x)
-  def yDist(other: Pos) = abs(y - other.y)
+  def xDist(other: Pos) = abs(file - other.file)
+  def yDist(other: Pos) = abs(rank - other.rank)
 
-  def isLight: Boolean = (x + y) % 2 == 1
+  def isLight: Boolean = (file.index + rank.index) % 2 == 1
 
   @inline def file = File of this
   @inline def rank = Rank of this
-  val key          = file.toString + rank.toString
-  val piotrStr     = piotr.toString
 
-  override val toString = key
+  def piotr: Char =
+    if (index <= 25) (97 + index).toChar      // a ...
+    else if (index <= 51) (39 + index).toChar // A ...
+    else if (index <= 61) (index - 4).toChar  // 0 ...
+    else if (index == 62) '!'
+    else '?'
+  def piotrStr = piotr.toString
 
-  override val hashCode = 8 * (y - 1) + (x - 1)
+  def key               = file.toString + rank.toString
+  override def toString = key
 }
 
 object Pos {
-  val posCache = new Array[Pos](64)
+  def apply(index: Int): Option[Pos] =
+    if (0 <= index && index < 64) Some(new Pos(index))
+    else None
 
-  def apply(file: File, rank: Rank): Pos = posCache(file.index + 8 * rank.index)
+  def apply(file: File, rank: Rank): Pos = new Pos(file.index + 8 * rank.index)
 
-  def posAt(x: Int, y: Int): Option[Pos] =
-    if (x < 1 || x > 8 || y < 1 || y > 8) None
-    else posCache.lift(x + 8 * y - 9)
+  def at(x: Int, y: Int): Option[Pos] =
+    if (0 <= x && x < 8 && 0 <= y && y < 8) Some(new Pos(x + 8 * y))
+    else None
 
-  def posAt(key: String): Option[Pos] = allKeys get key
+  def fromKey(key: String): Option[Pos] = allKeys get key
 
   def piotr(c: Char): Option[Pos] = allPiotrs get c
 
-  def keyToPiotr(key: String) = posAt(key) map (_.piotr)
+  def keyToPiotr(key: String) = fromKey(key) map (_.piotr)
   def doubleKeyToPiotr(key: String) =
     for {
       a <- keyToPiotr(key take 2)
@@ -77,78 +83,72 @@ object Pos {
       b <- piotr(piotrs(1))
     } yield s"${a.key}${b.key}"
 
-  private[this] def createPos(x: Int, y: Int, piotr: Char): Pos = {
-    val pos = new Pos(x, y, piotr)
-    posCache(x + 8 * y - 9) = pos
-    pos
-  }
+  val A1 = new Pos(0)
+  val B1 = new Pos(1)
+  val C1 = new Pos(2)
+  val D1 = new Pos(3)
+  val E1 = new Pos(4)
+  val F1 = new Pos(5)
+  val G1 = new Pos(6)
+  val H1 = new Pos(7)
+  val A2 = new Pos(8)
+  val B2 = new Pos(9)
+  val C2 = new Pos(10)
+  val D2 = new Pos(11)
+  val E2 = new Pos(12)
+  val F2 = new Pos(13)
+  val G2 = new Pos(14)
+  val H2 = new Pos(15)
+  val A3 = new Pos(16)
+  val B3 = new Pos(17)
+  val C3 = new Pos(18)
+  val D3 = new Pos(19)
+  val E3 = new Pos(20)
+  val F3 = new Pos(21)
+  val G3 = new Pos(22)
+  val H3 = new Pos(23)
+  val A4 = new Pos(24)
+  val B4 = new Pos(25)
+  val C4 = new Pos(26)
+  val D4 = new Pos(27)
+  val E4 = new Pos(28)
+  val F4 = new Pos(29)
+  val G4 = new Pos(30)
+  val H4 = new Pos(31)
+  val A5 = new Pos(32)
+  val B5 = new Pos(33)
+  val C5 = new Pos(34)
+  val D5 = new Pos(35)
+  val E5 = new Pos(36)
+  val F5 = new Pos(37)
+  val G5 = new Pos(38)
+  val H5 = new Pos(39)
+  val A6 = new Pos(40)
+  val B6 = new Pos(41)
+  val C6 = new Pos(42)
+  val D6 = new Pos(43)
+  val E6 = new Pos(44)
+  val F6 = new Pos(45)
+  val G6 = new Pos(46)
+  val H6 = new Pos(47)
+  val A7 = new Pos(48)
+  val B7 = new Pos(49)
+  val C7 = new Pos(50)
+  val D7 = new Pos(51)
+  val E7 = new Pos(52)
+  val F7 = new Pos(53)
+  val G7 = new Pos(54)
+  val H7 = new Pos(55)
+  val A8 = new Pos(56)
+  val B8 = new Pos(57)
+  val C8 = new Pos(58)
+  val D8 = new Pos(59)
+  val E8 = new Pos(60)
+  val F8 = new Pos(61)
+  val G8 = new Pos(62)
+  val H8 = new Pos(63)
 
-  val A1 = createPos(1, 1, 'a')
-  val B1 = createPos(2, 1, 'b')
-  val C1 = createPos(3, 1, 'c')
-  val D1 = createPos(4, 1, 'd')
-  val E1 = createPos(5, 1, 'e')
-  val F1 = createPos(6, 1, 'f')
-  val G1 = createPos(7, 1, 'g')
-  val H1 = createPos(8, 1, 'h')
-  val A2 = createPos(1, 2, 'i')
-  val B2 = createPos(2, 2, 'j')
-  val C2 = createPos(3, 2, 'k')
-  val D2 = createPos(4, 2, 'l')
-  val E2 = createPos(5, 2, 'm')
-  val F2 = createPos(6, 2, 'n')
-  val G2 = createPos(7, 2, 'o')
-  val H2 = createPos(8, 2, 'p')
-  val A3 = createPos(1, 3, 'q')
-  val B3 = createPos(2, 3, 'r')
-  val C3 = createPos(3, 3, 's')
-  val D3 = createPos(4, 3, 't')
-  val E3 = createPos(5, 3, 'u')
-  val F3 = createPos(6, 3, 'v')
-  val G3 = createPos(7, 3, 'w')
-  val H3 = createPos(8, 3, 'x')
-  val A4 = createPos(1, 4, 'y')
-  val B4 = createPos(2, 4, 'z')
-  val C4 = createPos(3, 4, 'A')
-  val D4 = createPos(4, 4, 'B')
-  val E4 = createPos(5, 4, 'C')
-  val F4 = createPos(6, 4, 'D')
-  val G4 = createPos(7, 4, 'E')
-  val H4 = createPos(8, 4, 'F')
-  val A5 = createPos(1, 5, 'G')
-  val B5 = createPos(2, 5, 'H')
-  val C5 = createPos(3, 5, 'I')
-  val D5 = createPos(4, 5, 'J')
-  val E5 = createPos(5, 5, 'K')
-  val F5 = createPos(6, 5, 'L')
-  val G5 = createPos(7, 5, 'M')
-  val H5 = createPos(8, 5, 'N')
-  val A6 = createPos(1, 6, 'O')
-  val B6 = createPos(2, 6, 'P')
-  val C6 = createPos(3, 6, 'Q')
-  val D6 = createPos(4, 6, 'R')
-  val E6 = createPos(5, 6, 'S')
-  val F6 = createPos(6, 6, 'T')
-  val G6 = createPos(7, 6, 'U')
-  val H6 = createPos(8, 6, 'V')
-  val A7 = createPos(1, 7, 'W')
-  val B7 = createPos(2, 7, 'X')
-  val C7 = createPos(3, 7, 'Y')
-  val D7 = createPos(4, 7, 'Z')
-  val E7 = createPos(5, 7, '0')
-  val F7 = createPos(6, 7, '1')
-  val G7 = createPos(7, 7, '2')
-  val H7 = createPos(8, 7, '3')
-  val A8 = createPos(1, 8, '4')
-  val B8 = createPos(2, 8, '5')
-  val C8 = createPos(3, 8, '6')
-  val D8 = createPos(4, 8, '7')
-  val E8 = createPos(5, 8, '8')
-  val F8 = createPos(6, 8, '9')
-  val G8 = createPos(7, 8, '!')
-  val H8 = createPos(8, 8, '?')
-
-  val all = posCache.toList
+  val all: List[Pos] = (0 to 63).map(new Pos(_)).toList
 
   val whiteBackrank = (A1 <-> H1).toList
   val blackBackrank = (A8 <-> H8).toList

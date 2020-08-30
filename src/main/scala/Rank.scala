@@ -17,7 +17,7 @@ object Rank {
     if (0 <= index && index < 8) Some(new Rank(index))
     else None
 
-  @inline def of(pos: Pos): Rank = new Rank(pos.y - 1)
+  @inline def of(pos: Pos): Rank = new Rank(pos.index >> 3)
 
   def fromChar(ch: Char): Option[Rank] = apply(ch.toInt - 49)
 

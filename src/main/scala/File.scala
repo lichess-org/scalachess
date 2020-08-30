@@ -20,7 +20,7 @@ object File {
     if (0 <= index && index < 8) Some(new File(index))
     else None
 
-  @inline def of(pos: Pos): File = new File(pos.x - 1)
+  @inline def of(pos: Pos): File = new File(pos.index & 0x7)
 
   def fromChar(ch: Char): Option[File] = apply(ch.toInt - 97)
 

@@ -131,7 +131,7 @@ object Forsyth {
           }
         case word => word -> None
       }
-      makePiecesWithCrazyPromoted0(position.toList, 0, 7) map {
+      makePiecesWithCrazyPromoted(position.toList, 0, 7) map {
         case (pieces, promoted) =>
           val board = Board(pieces, variant = variant)
           if (promoted.isEmpty) board else board.withCrazyData(_.copy(promoted = promoted))
@@ -151,26 +151,26 @@ object Forsyth {
       }
     }
 
-  private def makePiecesWithCrazyPromoted0(
+  private def makePiecesWithCrazyPromoted(
       chars: List[Char],
-      x0: Int,
-      y0: Int
+      x: Int,
+      y: Int
   ): Option[(List[(Pos, Piece)], Set[Pos])] =
     chars match {
       case Nil                               => Option((Nil, Set.empty))
-      case '/' :: rest                       => makePiecesWithCrazyPromoted0(rest, 0, y0 - 1)
-      case c :: rest if '1' <= c && c <= '8' => makePiecesWithCrazyPromoted0(rest, x0 + (c - '0').toInt, y0)
+      case '/' :: rest                       => makePiecesWithCrazyPromoted(rest, 0, y - 1)
+      case c :: rest if '1' <= c && c <= '8' => makePiecesWithCrazyPromoted(rest, x + (c - '0').toInt, y)
       case c :: '~' :: rest =>
         for {
-          pos                        <- Pos.at(x0, y0)
+          pos                        <- Pos.at(x, y)
           piece                      <- Piece.fromChar(c)
-          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted0(rest, x0 + 1, y0)
+          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
         } yield (pos -> piece :: nextPieces, nextPromoted + pos)
       case c :: rest =>
         for {
-          pos                        <- Pos.at(x0, y0)
+          pos                        <- Pos.at(x, y)
           piece                      <- Piece.fromChar(c)
-          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted0(rest, x0 + 1, y0)
+          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
         } yield (pos -> piece :: nextPieces, nextPromoted)
     }
 

@@ -19,7 +19,7 @@ case class CheckCount(white: Int = 0, black: Int = 0) {
 case class UnmovedRooks(pos: PosSet) extends AnyVal
 
 object UnmovedRooks {
-  val default = UnmovedRooks((Pos.whiteBackrank ::: Pos.blackBackrank).to(PosSet))
+  val default = UnmovedRooks(PosSet.whiteBackRank ++ PosSet.blackBackRank)
 }
 
 case class History(

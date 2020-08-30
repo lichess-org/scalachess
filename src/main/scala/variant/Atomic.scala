@@ -84,7 +84,8 @@ case object Atomic
     * less surrounding positions than the usual eight.
     */
   private[chess] def surroundingPositions(pos: Pos): PosSet =
-    List(pos.up, pos.down, pos.left, pos.right, pos.upLeft, pos.upRight, pos.downLeft, pos.downRight).flatten.to(PosSet)
+    List(pos.up, pos.down, pos.left, pos.right, pos.upLeft, pos.upRight, pos.downLeft, pos.downRight).flatten
+      .to(PosSet)
 
   override def addVariantEffect(move: Move): Move = explodeSurroundingPieces(move)
 

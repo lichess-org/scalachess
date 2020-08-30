@@ -57,7 +57,7 @@ object Divider {
       if (p.role == Pawn || p.role == King) v else v + 1
     }
 
-  private val backranks = List(Pos.whiteBackrank -> Color.White, Pos.blackBackrank -> Color.Black)
+  private val backranks = List(PosSet.whiteBackRank -> Color.White, PosSet.blackBackRank -> Color.Black)
 
   // Sparse back-rank indicates that pieces have been developed
   private def backrankSparse(board: Board): Boolean =

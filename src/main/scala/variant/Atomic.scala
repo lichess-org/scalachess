@@ -41,16 +41,12 @@ case object Atomic
       filter: Piece => Boolean = _ => true
   ): Boolean = {
     board.pieces exists {
-      case (pos, piece)
-          if piece.color == color && filter(piece) && piece.eyes(pos, to) && !protectedByOtherKing(
+      case (pos, piece) =>
+          piece.color == color && filter(piece) && !protectedByOtherKing(
             board,
             to,
             color
-          ) =>
-        (!piece.role.projection) || piece.role.dir(pos, to).exists {
-          longRangeThreatens(board, pos, _, to)
-        }
-      case _ => false
+          ) && piece.attacks(pos, board.occupied).has(to)
     }
   }
 

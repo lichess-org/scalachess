@@ -201,9 +201,6 @@ final case class Actor(
 
 object Actor {
 
-  def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
-    board.variant.longRangeThreatens(board, p, dir, to)
-
   def pawnDirOf(color: Color): Direction = color.fold(_.up, _.down)
 
   /**

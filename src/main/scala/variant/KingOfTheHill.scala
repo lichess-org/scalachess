@@ -13,7 +13,7 @@ case object KingOfTheHill
 
   def pieces = Standard.pieces
 
-  private val center = Set(Pos.D4, Pos.D5, Pos.E4, Pos.E5)
+  private val center = PosSet(Pos.D4, Pos.D5, Pos.E4, Pos.E5)
 
   override def specialEnd(situation: Situation) =
     situation.board.kingPosOf(!situation.color) exists center.contains

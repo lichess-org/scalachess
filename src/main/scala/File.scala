@@ -1,7 +1,7 @@
 package chess
 
 case class File private (val index: Int) extends AnyVal with Ordered[File] {
-  @inline def -(that: File): Int = index - that.index
+  @inline def -(that: File): Int           = index - that.index
   @inline override def compare(that: File) = this - that
 
   def offset(delta: Int): Option[File] =
@@ -9,10 +9,10 @@ case class File private (val index: Int) extends AnyVal with Ordered[File] {
     else None
 
   @inline def char: Char = (97 + index).toChar
-  override def toString = char.toString
+  override def toString  = char.toString
 
   @inline def upperCaseChar: Char = (65 + index).toChar
-  def toUpperCaseString = upperCaseChar.toString
+  def toUpperCaseString           = upperCaseChar.toString
 }
 
 object File {

@@ -44,8 +44,8 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
 
   @inline def file = File of this
   @inline def rank = Rank of this
-  val key      = file.toString + rank.toString
-  val piotrStr = piotr.toString
+  val key          = file.toString + rank.toString
+  val piotrStr     = piotr.toString
 
   override val toString = key
 

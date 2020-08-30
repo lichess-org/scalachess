@@ -35,7 +35,7 @@ object Forsyth {
                 val rooks = board
                   .piecesOf(color)
                   .collect {
-                    case (pos, piece) if piece.is(Rook) && pos.y == color.backrankY => pos
+                    case (pos, piece) if piece.is(Rook) && pos.rank == color.backRank => pos
                   }
                   .toList
                   .sortBy(_.x)
@@ -50,18 +50,17 @@ object Forsyth {
                 } yield (c.add(color, side), r + rookPos)).getOrElse((c, r))
             }
 
-            val fifthRank   = if (situation.color == White) 5 else 4
-            val sixthRank   = if (situation.color == White) 6 else 3
-            val seventhRank = if (situation.color == White) 7 else 2
+            val fifthRank   = if (situation.color == White) Rank.Fifth else Rank.Fourth
+            val sixthRank   = if (situation.color == White) Rank.Sixth else Rank.Third
+            val seventhRank = if (situation.color == White) Rank.Seventh else Rank.Second
             val lastMove = for {
               pos <- splitted lift 3 flatMap Pos.posAt
-              if pos.y == sixthRank
-              orig <- Pos.posAt(pos.x, seventhRank)
-              dest <- Pos.posAt(pos.x, fifthRank) filter { d =>
-                situation.board(d).contains(Piece(!situation.color, Pawn)) &&
-                Pos.posAt(pos.x, sixthRank).flatMap(situation.board.apply).isEmpty &&
+              if pos.rank == sixthRank
+              orig = Pos(pos.file, seventhRank)
+              dest = Pos(pos.file, fifthRank)
+              if situation.board(dest).contains(Piece(!situation.color, Pawn)) &&
+                situation.board(pos.file, sixthRank).isEmpty &&
                 situation.board(orig).isEmpty
-              }
             } yield Uci.Move(orig, dest)
 
             situation withHistory {
@@ -218,19 +217,19 @@ object Forsyth {
       case _ => ""
     }
 
-  implicit private val posOrdering = Ordering.by[Pos, Int](_.x)
+  implicit private val posOrdering = Ordering.by[Pos, File](_.file)
 
   private[chess] def exportCastles(board: Board): String = {
 
     lazy val wr = board.pieces.collect {
-      case (pos, piece) if pos.y == White.backrankY && piece == White.rook => pos
+      case (pos, piece) if pos.rank == White.backRank && piece == White.rook => pos
     }
     lazy val br = board.pieces.collect {
-      case (pos, piece) if pos.y == Black.backrankY && piece == Black.rook => pos
+      case (pos, piece) if pos.rank == Black.backRank && piece == Black.rook => pos
     }
 
-    lazy val wur = board.unmovedRooks.pos.filter(_.y == White.backrankY)
-    lazy val bur = board.unmovedRooks.pos.filter(_.y == Black.backrankY)
+    lazy val wur = board.unmovedRooks.pos.filter(_.rank == White.backRank)
+    lazy val bur = board.unmovedRooks.pos.filter(_.rank == Black.backRank)
 
     {
       // castling rights with inner rooks are represented by their file name
@@ -255,9 +254,9 @@ object Forsyth {
   def exportBoard(board: Board): String = {
     val fen   = new scala.collection.mutable.StringBuilder(70)
     var empty = 0
-    for (y <- 8 to 1 by -1) {
+    for (y <- Rank.allReversed) {
       empty = 0
-      for (x <- 1 to 8) {
+      for (x <- File.all) {
         board(x, y) match {
           case None => empty = empty + 1
           case Some(piece) =>
@@ -266,15 +265,12 @@ object Forsyth {
               fen append (empty.toString + piece.forsyth)
               empty = 0
             }
-            if (
-              piece.role != Pawn && board.crazyData.fold(false)(_.promoted.exists { p =>
-                p.x == x && p.y == y
-              })
-            ) fen append '~'
+            if (piece.role != Pawn && board.crazyData.fold(false)(_.promoted.contains(Pos(x, y))))
+              fen append '~'
         }
       }
       if (empty > 0) fen append empty
-      if (y > 1) fen append '/'
+      if (y > Rank.First) fen append '/'
     }
     fen.toString
   }

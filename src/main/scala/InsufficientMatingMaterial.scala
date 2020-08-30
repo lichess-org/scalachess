@@ -11,7 +11,8 @@ object InsufficientMatingMaterial {
   def nonKingPieces(board: Board) = board.pieces filter (_._2.role != King)
 
   def bishopsOnOppositeColors(board: Board) =
-    (board.pieces collect { case (pos, Piece(_, Bishop)) => pos.isLight } toList).distinct.lengthCompare(2) == 0
+    (board.pieces collect { case (pos, Piece(_, Bishop)) => pos.isLight } toList).distinct
+    .lengthCompare(2) == 0
 
   /*
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn

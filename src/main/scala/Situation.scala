@@ -85,11 +85,11 @@ case class Situation(board: Board, color: Color) {
       case Some(move: Uci.Move) =>
         if (
           move.dest.yDist(move.orig) == 2 &&
-          board.actorAt(move.dest).exists(_.piece.is(Pawn)) &&
+          board(move.dest).exists(_.is(Pawn)) &&
           List(
-            Pos.posAt(move.dest.x - 1, color.passablePawnY),
-            Pos.posAt(move.dest.x + 1, color.passablePawnY)
-          ).flatten.flatMap(board.actorAt).exists(_.piece == color.pawn)
+            move.dest.file.offset(-1),
+            move.dest.file.offset(1)
+          ).flatten.flatMap(board(_, color.passablePawnRank)).exists(_ == color.pawn)
         )
           moves.values.flatten.find(_.enpassant).map(_.dest)
         else None

@@ -25,7 +25,7 @@ case object Crazyhouse
     (!strict || (pieces.count(_ is Pawn) <= 16 && pieces.sizeIs <= 32))
   }
 
-  private def canDropPawnOn(pos: Pos) = pos.y != 1 && pos.y != 8
+  private def canDropPawnOn(pos: Pos) = pos.rank != Rank.First && pos.rank != Rank.Eighth
 
   override def drop(situation: Situation, role: Role, pos: Pos): Validated[String, Drop] =
     for {

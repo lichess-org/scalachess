@@ -8,9 +8,9 @@ sealed trait Color {
 
   def unary_! : Color
 
-  val passablePawnY: Int
-  val promotablePawnY: Int
-  val backrankY: Int
+  val passablePawnRank: Rank
+  val promotablePawnRank: Rank
+  val backRank: Rank
 
   val letter: Char
   val name: String
@@ -57,9 +57,9 @@ object Color {
 
     def unary_! = Black
 
-    val passablePawnY   = 5
-    val promotablePawnY = 8
-    val backrankY       = 1
+    val passablePawnRank   = Rank.Fifth
+    val promotablePawnRank = Rank.Eighth
+    val backRank           = Rank.First
 
     val letter = 'w'
     val name   = "white"
@@ -71,9 +71,9 @@ object Color {
 
     def unary_! = White
 
-    val passablePawnY   = 4
-    val promotablePawnY = 1
-    val backrankY       = 8
+    val passablePawnRank   = Rank.Fourth
+    val promotablePawnRank = Rank.First
+    val backRank           = Rank.Eighth
 
     val letter = 'b'
     val name   = "black"

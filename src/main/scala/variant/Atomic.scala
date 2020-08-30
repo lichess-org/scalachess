@@ -83,7 +83,7 @@ case object Atomic
     * The positions surrounding a given position on the board. Any square at the edge of the board has
     * less surrounding positions than the usual eight.
     */
-  private[chess] def surroundingPositions(pos: Pos): PosSet = PosSet.kingAttack(pos)
+  private[chess] def surroundingPositions(pos: Pos): PosSet = PosSet.kingAttacks(pos)
 
   override def addVariantEffect(move: Move): Move = explodeSurroundingPieces(move)
 

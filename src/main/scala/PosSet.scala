@@ -112,17 +112,30 @@ object PosSet extends SpecificIterableFactory[Pos, PosSet] {
       override def result() = PosSet(bitboard)
     }
 
-  private val kingAttackTable: Array[PosSet] = Pos.all.map { a =>
-    full.filter(a.dist(_) == 1)
-  }
-  private val knightAttackTable: Array[PosSet] = Pos.all.map { a =>
-    full.filter { b =>
-      val dx = a.xDist(b)
-      val dy = a.yDist(b)
-      (dx == 1 && dy == 2) || (dx == 2 && dy == 1)
+  private def slidingAttacks(orig: Pos, occupied: PosSet, dirs: Directions): PosSet = {
+    val builder = newBuilder
+    dirs foreach { dir =>
+      var pos: Option[Pos] = Some(orig)
+      while (pos.isDefined) {
+        pos flatMap dir match {
+          case Some(p) =>
+            builder += p
+            if (occupied.has(p)) pos = None
+            else pos = Some(p)
+          case None => pos = None
+        }
+      }
     }
+    builder.result()
   }
 
-  def kingAttack(orig: Pos): PosSet = kingAttackTable(orig.index)
-  def knightAttack(orig: Pos): PosSet = knightAttackTable(orig.index)
+  private val kingAttackTable: Array[PosSet] = Pos.all.map { orig =>
+    slidingAttacks(orig, full, King.dirs)
+  }
+  private val knightAttackTable: Array[PosSet] = Pos.all.map { orig =>
+    slidingAttacks(orig, full, Knight.dirs)
+  }
+
+  def kingAttacks(orig: Pos): PosSet   = kingAttackTable(orig.index)
+  def knightAttacks(orig: Pos): PosSet = knightAttackTable(orig.index)
 }

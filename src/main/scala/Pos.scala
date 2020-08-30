@@ -30,7 +30,7 @@ case class Pos private (index: Int) extends AnyVal {
   def <->(other: Pos): Iterable[Pos] =
     min(file.index, other.file.index) to max(file.index, other.file.index) flatMap { Pos.at(_, rank.index) }
 
-  def touches(other: Pos): Boolean = this == other || PosSet.kingAttack(this).has(other)
+  def touches(other: Pos): Boolean = this == other || PosSet.kingAttacks(this).has(other)
 
   def onSameDiagonal(other: Pos): Boolean =
     file.index - rank.index == other.file.index - other.rank.index || file.index + rank.index == other.file.index + other.rank.index
@@ -38,7 +38,7 @@ case class Pos private (index: Int) extends AnyVal {
 
   def xDist(other: Pos) = abs(file - other.file)
   def yDist(other: Pos) = abs(rank - other.rank)
-  def dist(other: Pos) = max(xDist(other), yDist(other))
+  def dist(other: Pos)  = max(xDist(other), yDist(other))
 
   def isLight: Boolean = (file.index + rank.index) % 2 == 1
 

@@ -112,7 +112,7 @@ case object Crazyhouse
       // when captured and put in the pocket.
       // there we need to remember which pieces are issued from promotions.
       // we do that by tracking their positions on the board.
-      promoted: Set[Pos]
+      promoted: PosSet
   ) {
 
     def drop(piece: Piece): Option[Data] =
@@ -137,7 +137,7 @@ case object Crazyhouse
   }
 
   object Data {
-    val init = Data(Pockets(Pocket(Nil), Pocket(Nil)), Set.empty)
+    val init = Data(Pockets(Pocket(Nil), Pocket(Nil)), PosSet.empty)
   }
 
   case class Pockets(white: Pocket, black: Pocket) {

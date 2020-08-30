@@ -29,7 +29,7 @@ object Forsyth {
         splitted
           .lift(2)
           .fold(situation) { strCastles =>
-            val (castles, unmovedRooks) = strCastles.foldLeft(Castles.none -> Set.empty[Pos]) {
+            val (castles, unmovedRooks) = strCastles.foldLeft(Castles.none -> PosSet.empty) {
               case ((c, r), ch) =>
                 val color = Color.fromWhite(ch.isUpper)
                 val rooks = board
@@ -155,9 +155,9 @@ object Forsyth {
       chars: List[Char],
       x: Int,
       y: Int
-  ): Option[(List[(Pos, Piece)], Set[Pos])] =
+  ): Option[(List[(Pos, Piece)], PosSet)] =
     chars match {
-      case Nil                               => Option((Nil, Set.empty))
+      case Nil                               => Option((Nil, PosSet.empty))
       case '/' :: rest                       => makePiecesWithCrazyPromoted(rest, 0, y - 1)
       case c :: rest if '1' <= c && c <= '8' => makePiecesWithCrazyPromoted(rest, x + (c - '0').toInt, y)
       case c :: '~' :: rest =>

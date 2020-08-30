@@ -83,6 +83,14 @@ object Pos {
       b <- piotr(piotrs(1))
     } yield s"${a.key}${b.key}"
 
+  @inline private[chess] def lsb(bitboard: Long): Option[Pos] =
+    if (bitboard != 0) Some(new Pos(java.lang.Long.numberOfTrailingZeros(bitboard)))
+    else None
+
+  @inline private[chess] def msb(bitboard: Long): Option[Pos] =
+    if (bitboard != 0) Some(new Pos(63 - java.lang.Long.numberOfLeadingZeros(bitboard)))
+    else None
+
   val A1 = new Pos(0)
   val B1 = new Pos(1)
   val C1 = new Pos(2)

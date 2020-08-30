@@ -42,11 +42,11 @@ case object Atomic
   ): Boolean = {
     board.pieces exists {
       case (pos, piece) =>
-          piece.color == color && filter(piece) && !protectedByOtherKing(
-            board,
-            to,
-            color
-          ) && piece.attacks(pos, board.occupied).has(to)
+        piece.color == color && filter(piece) && !protectedByOtherKing(
+          board,
+          to,
+          color
+        ) && piece.attacks(pos, board.occupied).has(to)
     }
   }
 

@@ -74,7 +74,10 @@ case class Board private (
       piece <- pieces get orig
       takenPos = taking getOrElse dest
       if pieces contains takenPos
-    } yield copy(pieces = pieces - takenPos - orig + (dest -> piece), occupied = occupied - takenPos - orig + dest)
+    } yield copy(
+      pieces = pieces - takenPos - orig + (dest -> piece),
+      occupied = occupied - takenPos - orig + dest
+    )
 
   lazy val occupation: Color.Map[PosSet] = Color.Map { color =>
     pieces.collect { case (pos, piece) if piece is color => pos }.to(PosSet)

@@ -64,16 +64,8 @@ final case class Actor(
           ).flatten
         } getOrElse Nil
 
-      case Bishop => longRange(Bishop.dirs)
-
-      case Knight => shortRange(Knight.dirs)
-
-      case Rook => longRange(Rook.dirs)
-
-      case Queen => longRange(Queen.dirs)
-
-      case King if withCastle => shortRange(King.dirs) ::: castle
-      case King               => shortRange(King.dirs)
+      case King if withCastle => range(PosSet.kingAttacks(pos)) ::: castle
+      case _                  => range(piece.attacks(pos, board.occupied))
     }
 
     // We apply the current game variant's effects if there are any so that we can accurately decide if the king would
@@ -140,8 +132,8 @@ final case class Actor(
       else List(rookPos, newKingPos).distinct
     } map { move(_, b5, castle = castle) }) getOrElse Nil
 
-  private def shortRange(dirs: Directions): List[Move] =
-    dirs flatMap { _(pos) } flatMap { to =>
+  private def range(dests: PosSet): List[Move] =
+    dests.toList.flatMap { to =>
       board.pieces.get(to) match {
         case None => board.move(pos, to) map { move(to, _) }
         case Some(piece) =>
@@ -149,30 +141,6 @@ final case class Actor(
           else board.taking(pos, to) map { move(to, _, Option(to)) }
       }
     }
-
-  private def longRange(dirs: Directions): List[Move] = {
-    val buf = new ArrayBuffer[Move]
-
-    @tailrec
-    def addAll(p: Pos, dir: Direction): Unit = {
-      dir(p) match {
-        case None => ()
-        case s @ Some(to) =>
-          board.pieces.get(to) match {
-            case None =>
-              board.move(pos, to).foreach { buf += move(to, _) }
-              addAll(to, dir)
-            case Some(piece) =>
-              if (piece.color != color) board.taking(pos, to) foreach {
-                buf += move(to, _, s)
-              }
-          }
-      }
-    }
-
-    dirs foreach { addAll(pos, _) }
-    buf.toList
-  }
 
   private def pawnDir = pawnDirOf(color)
 

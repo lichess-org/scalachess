@@ -294,7 +294,7 @@ class CrazyhouseVariantTest extends ChessTest {
         )
         .situation
         .destinations must_== Map(
-        F2 -> List(E3, E1),
+        F2 -> List(E1, E3),
         G3 -> List(G2),
         F1 -> List(G2)
       )

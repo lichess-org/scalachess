@@ -135,7 +135,39 @@ object PosSet extends SpecificIterableFactory[Pos, PosSet] {
   private val knightAttackTable: Array[PosSet] = Pos.all.map { orig =>
     slidingAttacks(orig, full, Knight.dirs)
   }
+  private val magicAttackTable: Array[PosSet] = {
+    val table: Array[PosSet] = new Array(Magic.tableSize)
+    Pos.all.foreach { orig =>
+      val rookMagic = Magic.rook(orig.index)
+      PosSet(rookMagic.mask).subsets().foreach { subset =>
+        val idx    = ((rookMagic.factor * subset.bitboard) >>> (64 - 12)).toInt + rookMagic.offset
+        val attack = slidingAttacks(orig, subset, Rook.dirs)
+        assert(table(idx) == null || table(idx) == attack)
+        table(idx) = attack
+      }
+      val bishopMagic = Magic.bishop(orig.index)
+      PosSet(bishopMagic.mask).subsets().foreach { subset =>
+        val idx    = ((bishopMagic.factor * subset.bitboard) >>> (64 - 9)).toInt + bishopMagic.offset
+        val attack = slidingAttacks(orig, subset, Bishop.dirs)
+        assert(table(idx) == null || table(idx) == attack)
+        table(idx) = attack
+      }
+    }
+    table
+  }
 
   def kingAttacks(orig: Pos): PosSet   = kingAttackTable(orig.index)
   def knightAttacks(orig: Pos): PosSet = knightAttackTable(orig.index)
+  def rookAttacks(orig: Pos, occupied: PosSet): PosSet = {
+    val magic = Magic.rook(orig.index)
+    val idx   = ((magic.factor * (occupied.bitboard & magic.mask)) >>> (64 - 12)).toInt + magic.offset
+    magicAttackTable(idx)
+  }
+  def bishopAttacks(orig: Pos, occupied: PosSet): PosSet = {
+    val magic = Magic.bishop(orig.index)
+    val idx   = ((magic.factor * (occupied.bitboard & magic.mask)) >>> (64 - 9)).toInt + magic.offset
+    magicAttackTable(idx)
+  }
+  def queenAttacks(orig: Pos, occupied: PosSet): PosSet =
+    rookAttacks(orig, occupied) ^ bishopAttacks(orig, occupied)
 }

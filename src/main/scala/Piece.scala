@@ -17,9 +17,9 @@ case class Piece(color: Color, role: Role) {
   def eyes(from: Pos, to: Pos): Boolean =
     role match {
       case King   => PosSet.kingAttacks(from).has(to)
-      case Queen  => (from onSameLine to) || (from onSameDiagonal to)
-      case Rook   => from onSameLine to
-      case Bishop => from onSameDiagonal to
+      case Queen  => PosSet.queenAttacks(from, PosSet.empty).has(to)
+      case Rook   => PosSet.rookAttacks(from, PosSet.empty).has(to)
+      case Bishop => PosSet.bishopAttacks(from, PosSet.empty).has(to)
       case Knight => PosSet.knightAttacks(from).has(to)
       case Pawn   => Piece.pawnEyes(color, from, to)
     }

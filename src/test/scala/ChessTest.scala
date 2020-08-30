@@ -29,21 +29,19 @@ trait ChessTest extends Specification with ValidatedMatchers {
       def as(color: Color): Situation = Situation(Visual << str, color)
     }
 
-  implicit def richActor(actor: Actor) =
-    new {
-
-      def threatens(to: Pos): Boolean =
-        actor.piece.eyes(actor.pos, to) && {
-          (!actor.piece.role.projection) ||
-          actor.piece.role.dir(actor.pos, to).exists {
-            Actor.longRangeThreatens(actor.board, actor.pos, _, to)
-          }
+  case class RichActor(actor: Actor) {
+    def threatens(to: Pos): Boolean =
+      actor.piece.eyes(actor.pos, to) && {
+        (!actor.piece.role.projection) ||
+        actor.piece.role.dir(actor.pos, to).exists {
+          Actor.longRangeThreatens(actor.board, actor.pos, _, to)
         }
-    }
+      }
+  }
 
-  implicit def richGame(game: Game) =
-    new {
+  implicit def richActor(actor: Actor) = RichActor(actor)
 
+  case class RichGame(game: Game) {
       def as(color: Color): Game = game.withPlayer(color)
 
       def playMoves(moves: (Pos, Pos)*): Validated[String, Game] = playMoveList(moves)
@@ -74,6 +72,8 @@ trait ChessTest extends Specification with ValidatedMatchers {
 
       def withClock(c: Clock) = game.copy(clock = Option(c))
     }
+
+  implicit def richGame(game: Game) = RichGame(game)
 
   def fenToGame(positionString: String, variant: Variant) = {
     val situation = Forsyth << positionString
@@ -127,7 +127,7 @@ trait ChessTest extends Specification with ValidatedMatchers {
   def sortPoss(poss: Seq[Pos]): Seq[Pos] = poss sortBy (_.toString)
 
   def pieceMoves(piece: Piece, pos: Pos): Option[List[Pos]] =
-    (makeEmptyBoard place piece at pos) flatMap { b =>
+    (makeEmptyBoard place(piece, pos)) flatMap { b =>
       b actorAt pos map (_.destinations)
     }
 }

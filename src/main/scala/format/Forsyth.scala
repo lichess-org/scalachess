@@ -38,7 +38,7 @@ object Forsyth {
                     case (pos, piece) if piece.is(Rook) && pos.rank == color.backRank => pos
                   }
                   .toList
-                  .sortBy(_.x)
+                  .sortBy(_.file)
                 (for {
                   kingPos <- board.kingPosOf(color)
                   rookPos <- (ch.toLower match {
@@ -54,7 +54,7 @@ object Forsyth {
             val sixthRank   = if (situation.color == White) Rank.Sixth else Rank.Third
             val seventhRank = if (situation.color == White) Rank.Seventh else Rank.Second
             val lastMove = for {
-              pos <- splitted lift 3 flatMap Pos.posAt
+              pos <- splitted lift 3 flatMap Pos.fromKey
               if pos.rank == sixthRank
               orig = Pos(pos.file, seventhRank)
               dest = Pos(pos.file, fifthRank)
@@ -131,7 +131,7 @@ object Forsyth {
           }
         case word => word -> None
       }
-      makePiecesWithCrazyPromoted(position.toList, 1, 8) map {
+      makePiecesWithCrazyPromoted0(position.toList, 0, 7) map {
         case (pieces, promoted) =>
           val board = Board(pieces, variant = variant)
           if (promoted.isEmpty) board else board.withCrazyData(_.copy(promoted = promoted))
@@ -151,26 +151,26 @@ object Forsyth {
       }
     }
 
-  private def makePiecesWithCrazyPromoted(
+  private def makePiecesWithCrazyPromoted0(
       chars: List[Char],
-      x: Int,
-      y: Int
+      x0: Int,
+      y0: Int
   ): Option[(List[(Pos, Piece)], Set[Pos])] =
     chars match {
       case Nil                               => Option((Nil, Set.empty))
-      case '/' :: rest                       => makePiecesWithCrazyPromoted(rest, 1, y - 1)
-      case c :: rest if '1' <= c && c <= '8' => makePiecesWithCrazyPromoted(rest, x + (c - '0').toInt, y)
+      case '/' :: rest                       => makePiecesWithCrazyPromoted0(rest, 0, y0 - 1)
+      case c :: rest if '1' <= c && c <= '8' => makePiecesWithCrazyPromoted0(rest, x0 + (c - '0').toInt, y0)
       case c :: '~' :: rest =>
         for {
-          pos                        <- Pos.posAt(x, y)
+          pos                        <- Pos.at(x0, y0)
           piece                      <- Piece.fromChar(c)
-          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
+          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted0(rest, x0 + 1, y0)
         } yield (pos -> piece :: nextPieces, nextPromoted + pos)
       case c :: rest =>
         for {
-          pos                        <- Pos.posAt(x, y)
+          pos                        <- Pos.at(x0, y0)
           piece                      <- Piece.fromChar(c)
-          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
+          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted0(rest, x0 + 1, y0)
         } yield (pos -> piece :: nextPieces, nextPromoted)
     }
 

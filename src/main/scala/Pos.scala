@@ -2,18 +2,16 @@ package chess
 
 import scala.math.{ abs, max, min }
 
-sealed case class Pos private (x: Int, y: Int, piotr: Char) {
+case class Pos private (index: Int) extends AnyVal {
 
-  import Pos.posAt
-
-  val down: Option[Pos]         = posAt(x, y - 1)
-  val left: Option[Pos]         = posAt(x - 1, y)
-  val downLeft: Option[Pos]     = posAt(x - 1, y - 1)
-  val downRight: Option[Pos]    = posAt(x + 1, y - 1)
-  lazy val up: Option[Pos]      = posAt(x, y + 1)
-  lazy val right: Option[Pos]   = posAt(x + 1, y)
-  lazy val upLeft: Option[Pos]  = posAt(x - 1, y + 1)
-  lazy val upRight: Option[Pos] = posAt(x + 1, y + 1)
+  def down: Option[Pos]      = Pos.at(file.index, rank.index - 1)
+  def left: Option[Pos]      = Pos.at(file.index - 1, rank.index)
+  def downLeft: Option[Pos]  = Pos.at(file.index - 1, rank.index - 1)
+  def downRight: Option[Pos] = Pos.at(file.index + 1, rank.index - 1)
+  def up: Option[Pos]        = Pos.at(file.index, rank.index + 1)
+  def right: Option[Pos]     = Pos.at(file.index + 1, rank.index)
+  def upLeft: Option[Pos]    = Pos.at(file.index - 1, rank.index + 1)
+  def upRight: Option[Pos]   = Pos.at(file.index + 1, rank.index + 1)
 
   def >|(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.right)
   def |<(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.left)
@@ -22,50 +20,58 @@ sealed case class Pos private (x: Int, y: Int, piotr: Char) {
       p :: (if (stop(p)) Nil else p.|<>|(stop, dir))
     } getOrElse Nil
 
-  def ?<(other: Pos): Boolean = x < other.x
-  def ?>(other: Pos): Boolean = x > other.x
-  def ?+(other: Pos): Boolean = y < other.y
-  def ?^(other: Pos): Boolean = y > other.y
-  def ?|(other: Pos): Boolean = x == other.x
-  def ?-(other: Pos): Boolean = y == other.y
+  def ?<(other: Pos): Boolean = file < other.file
+  def ?>(other: Pos): Boolean = file > other.file
+  def ?+(other: Pos): Boolean = rank < other.rank
+  def ?^(other: Pos): Boolean = rank > other.rank
+  def ?|(other: Pos): Boolean = file == other.file
+  def ?-(other: Pos): Boolean = rank == other.rank
 
   def <->(other: Pos): Iterable[Pos] =
-    min(x, other.x) to max(x, other.x) flatMap { posAt(_, y) }
+    min(file.index, other.file.index) to max(file.index, other.file.index) flatMap { Pos.at(_, rank.index) }
 
   def touches(other: Pos): Boolean = xDist(other) <= 1 && yDist(other) <= 1
 
-  def onSameDiagonal(other: Pos): Boolean = x - y == other.x - other.y || x + y == other.x + other.y
-  def onSameLine(other: Pos): Boolean     = ?-(other) || ?|(other)
+  def onSameDiagonal(other: Pos): Boolean =
+    file.index - rank.index == other.file.index - other.rank.index || file.index + rank.index == other.file.index + other.rank.index
+  def onSameLine(other: Pos): Boolean = ?-(other) || ?|(other)
 
-  def xDist(other: Pos) = abs(x - other.x)
-  def yDist(other: Pos) = abs(y - other.y)
+  def xDist(other: Pos) = abs(file - other.file)
+  def yDist(other: Pos) = abs(rank - other.rank)
 
-  def isLight: Boolean = (x + y) % 2 == 1
+  def isLight: Boolean = (file.index + rank.index) % 2 == 1
 
   @inline def file = File of this
   @inline def rank = Rank of this
-  val key          = file.toString + rank.toString
-  val piotrStr     = piotr.toString
 
-  override val toString = key
+  def piotr: Char =
+    if (index <= 25) (97 + index).toChar      // a ...
+    else if (index <= 51) (39 + index).toChar // A ...
+    else if (index <= 61) (index - 4).toChar  // 0 ...
+    else if (index == 62) '!'
+    else '?'
+  def piotrStr = piotr.toString
 
-  override val hashCode = 8 * (y - 1) + (x - 1)
+  def key               = file.toString + rank.toString
+  override def toString = key
 }
 
 object Pos {
-  val posCache = new Array[Pos](64)
+  def apply(index: Int): Option[Pos] =
+    if (0 <= index && index < 64) Some(new Pos(index))
+    else None
 
-  def apply(file: File, rank: Rank): Pos = posCache(file.index + 8 * rank.index)
+  def apply(file: File, rank: Rank): Pos = new Pos(file.index + 8 * rank.index)
 
-  def posAt(x: Int, y: Int): Option[Pos] =
-    if (x < 1 || x > 8 || y < 1 || y > 8) None
-    else posCache.lift(x + 8 * y - 9)
+  def at(x: Int, y: Int): Option[Pos] =
+    if (0 <= x && x < 8 && 0 <= y && y < 8) Some(new Pos(x + 8 * y))
+    else None
 
-  def posAt(key: String): Option[Pos] = allKeys get key
+  def fromKey(key: String): Option[Pos] = allKeys get key
 
   def piotr(c: Char): Option[Pos] = allPiotrs get c
 
-  def keyToPiotr(key: String) = posAt(key) map (_.piotr)
+  def keyToPiotr(key: String) = fromKey(key) map (_.piotr)
   def doubleKeyToPiotr(key: String) =
     for {
       a <- keyToPiotr(key take 2)
@@ -78,8 +84,7 @@ object Pos {
     } yield s"${a.key}${b.key}"
 
   private[this] def createPos(x: Int, y: Int, piotr: Char): Pos = {
-    val pos = new Pos(x, y, piotr)
-    posCache(x + 8 * y - 9) = pos
+    val pos = new Pos((x - 1) + 8 * (y - 1))
     pos
   }
 
@@ -148,7 +153,7 @@ object Pos {
   val G8 = createPos(7, 8, '!')
   val H8 = createPos(8, 8, '?')
 
-  val all = posCache.toList
+  val all: List[Pos] = (0 to 63).map(new Pos(_)).toList
 
   val whiteBackrank = (A1 <-> H1).toList
   val blackBackrank = (A8 <-> H8).toList

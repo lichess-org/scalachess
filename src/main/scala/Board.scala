@@ -53,13 +53,6 @@ case class Board(
   def seq(actions: Board => Option[Board]*): Option[Board] =
     actions.foldLeft(Option(this): Option[Board])(_ flatMap _)
 
-  def place(piece: Piece) =
-    new {
-      def at(at: Pos): Option[Board] =
-        if (pieces contains at) None
-        else Option(copy(pieces = pieces + ((at, piece))))
-    }
-
   def place(piece: Piece, at: Pos): Option[Board] =
     if (pieces contains at) None
     else Option(copy(pieces = pieces + ((at, piece))))
@@ -81,17 +74,6 @@ case class Board(
       takenPos = taking getOrElse dest
       if pieces contains takenPos
     } yield copy(pieces = pieces - takenPos - orig + (dest -> piece))
-
-  def move(orig: Pos) =
-    new {
-      def to(dest: Pos): Option[Board] = {
-        if (pieces contains dest) None
-        else
-          pieces get orig map { piece =>
-            copy(pieces = pieces - orig + (dest -> piece))
-          }
-      }
-    }
 
   lazy val occupation: Color.Map[Set[Pos]] = Color.Map { color =>
     pieces.collect { case (pos, piece) if piece is color => pos }.to(Set)

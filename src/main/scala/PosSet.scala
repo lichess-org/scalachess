@@ -111,18 +111,4 @@ object PosSet extends SpecificIterableFactory[Pos, PosSet] {
       }
       override def result() = PosSet(bitboard)
     }
-
-  private val kingAttackTable: Array[PosSet] = Pos.all.map { a =>
-    full.filter(a.dist(_) == 1)
-  }
-  private val knightAttackTable: Array[PosSet] = Pos.all.map { a =>
-    full.filter { b =>
-      val dx = a.xDist(b)
-      val dy = a.yDist(b)
-      (dx == 1 && dy == 2) || (dx == 2 && dy == 1)
-    }
-  }
-
-  def kingAttack(orig: Pos): PosSet = kingAttackTable(orig.index)
-  def knightAttack(orig: Pos): PosSet = knightAttackTable(orig.index)
 }

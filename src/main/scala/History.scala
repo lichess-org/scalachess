@@ -16,10 +16,10 @@ case class CheckCount(white: Int = 0, black: Int = 0) {
   def apply(color: Color) = color.fold(white, black)
 }
 
-case class UnmovedRooks(pos: PosSet) extends AnyVal
+case class UnmovedRooks(pos: Set[Pos]) extends AnyVal
 
 object UnmovedRooks {
-  val default = UnmovedRooks(PosSet.whiteBackRank ++ PosSet.blackBackRank)
+  val default = UnmovedRooks((Pos.whiteBackrank ::: Pos.blackBackrank).toSet)
 }
 
 case class History(

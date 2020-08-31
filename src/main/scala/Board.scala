@@ -75,8 +75,8 @@ case class Board(
       if pieces contains takenPos
     } yield copy(pieces = pieces - takenPos - orig + (dest -> piece))
 
-  lazy val occupation: Color.Map[PosSet] = Color.Map { color =>
-    pieces.collect { case (pos, piece) if piece is color => pos }.to(PosSet)
+  lazy val occupation: Color.Map[Set[Pos]] = Color.Map { color =>
+    pieces.collect { case (pos, piece) if piece is color => pos }.to(Set)
   }
 
   def hasPiece(p: Piece) = pieces.values exists (p ==)

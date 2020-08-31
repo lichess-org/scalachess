@@ -19,7 +19,7 @@ class CrazyhouseVariantTest extends ChessTest {
               Crazyhouse.Pocket(Nil),
               Crazyhouse.Pocket(Nil)
             ),
-            promoted = PosSet.empty
+            promoted = Set.empty
           )
         )
       }
@@ -38,7 +38,7 @@ class CrazyhouseVariantTest extends ChessTest {
               Crazyhouse.Pocket(Queen :: Nil),
               Crazyhouse.Pocket(Rook :: Pawn :: Pawn :: Nil)
             ),
-            promoted = PosSet.empty
+            promoted = Set.empty
           )
         )
       }

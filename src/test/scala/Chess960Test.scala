@@ -20,6 +20,9 @@ class Chess960Test extends ChessTest {
 
       Chess960 positionNumber FEN("bbqnnrkr/pppppppp/8/8/8/8/PPPPPPPP/BBQNNRKR w KQkq - 0 1") must beSome(0)
       Chess960 positionNumber FEN("rkrnnqbb/pppppppp/8/8/8/8/PPPPPPPP/RKRNNQBB w KQkq - 0 1") must beSome(959)
+
+      Chess960 positionNumber FEN("rnqbbknr/pppppppp/8/8/8/8/PPPPPPPP/RNQBBKNR w AHa - 0 1") must beNone
+      Chess960 positionNumber FEN("bbqnnrkr/pppppppp/8/8/8/8/PPPPPPPP/BBQNNRKR w AHah - 0 1") must beNone
     }
   }
 }

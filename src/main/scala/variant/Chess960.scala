@@ -20,7 +20,7 @@ case object Chess960
 
   def positionNumber(fen: FEN): Option[Int] =
     fen.value split ' ' match {
-      case Array(board, "w", "KQkq" | "AHah", "-", "0", "1") =>
+      case Array(board, "w", "KQkq", "-", "0", "1") =>
         board split '/' match {
           case Array(rank8, "pppppppp", "8", "8", "8", "8", "PPPPPPPP", rank1) =>
             positionsMap get rank8 filter { _ =>

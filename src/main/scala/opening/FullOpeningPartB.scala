@@ -21,7 +21,7 @@ new FullOpening("B00", "Guatemala Defense", "rn1qkbnr/p1pppppp/bp6/8/3PP3/8/PPP2
 new FullOpening("B00", "Hippopotamus Defense", "rnbqkb1r/ppppp2p/5ppn/8/2PPP3/8/PP3PPP/RNBQKBNR w KQkq -"),
 new FullOpening("B00", "Hippopotamus Defense", "rnbqkb1r/pppppppp/7n/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -"),
 new FullOpening("B00", "King's Pawn Game: Nimzowitsch Defense", "r1bqkbnr/pppppppp/2n5/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq -"),
-new FullOpening("B00", "King's Pawn Game: Nimzowitsch Defense: Wheeler Gambit", "r1bqkbnr/pppppppp/2n5/8/3PP3/2P5/P4PPP/RNBQKBNR b KQkq -"),
+new FullOpening("B00", "King's Pawn Game: Nimzowitsch Defense, Wheeler Gambit", "r1bqkbnr/pppppppp/2n5/8/3PP3/2P5/P4PPP/RNBQKBNR b KQkq -"),
 new FullOpening("B00", "King's Pawn", "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq -"),
 new FullOpening("B00", "Lemming Defense", "r1bqkbnr/pppppppp/n7/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -"),
 new FullOpening("B00", "Lion Defense: Lion's Jaw", "rnbqkb1r/ppp1pppp/3p1n2/8/3PP3/5P2/PPP3PP/RNBQKBNR b KQkq -"),
@@ -727,6 +727,6 @@ new FullOpening("B98", "Sicilian Defense: Najdorf Variation, Browne Variation", 
 new FullOpening("B98", "Sicilian Defense: Najdorf Variation, Goteborg (Argentine)", "rnbqk2r/1p2bp2/p2ppn1p/6p1/3NPP1B/2N2Q2/PPP3PP/R3KB1R w KQkq -"),
 new FullOpening("B98", "Sicilian Defense: Najdorf Variation", "rnbqk2r/1p2bppp/p2ppn2/6B1/3NPP2/2N5/PPP3PP/R2QKB1R w KQkq -"),
 new FullOpening("B98", "Sicilian Defense: Najdorf Variation, Traditional Line", "rnb1k2r/1pq1bppp/p2ppn2/6B1/3NPP2/2N2Q2/PPP3PP/R3KB1R w KQkq -"),
-new FullOpening("B99", "Sicilian Defense: Najdorf Variation, Main Line", "r1b1k2r/1pqnbppp/p2ppn2/6B1/3NPP2/2N2Q2/PPP3PP/2KR1B1R w kq -")
+new FullOpening("B99", "Sicilian Defense: Najdorf Variation, Main Line", "r1b1k2r/1pqnbppp/p2ppn2/6B1/3NPP2/2N2Q2/PPP3PP/2KR1B1R w kq -"),
   )
 }

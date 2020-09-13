@@ -294,6 +294,6 @@ new FullOpening("E98", "King's Indian Defense: Orthodox Variation, Classical Sys
 new FullOpening("E98", "King's Indian Defense: Orthodox Variation, Classical System, Neo-Classical Line", "r1bq1rk1/pppnnpbp/3p2p1/3Pp3/2P1P3/2N1B3/PP2BPPP/R2QNRK1 b - -"),
 new FullOpening("E98", "King's Indian Defense: Orthodox Variation, Classical System", "r1bq1rk1/ppp1npbp/3p1np1/3Pp3/2P1P3/2N5/PP2BPPP/R1BQNRK1 b - -"),
 new FullOpening("E99", "King's Indian Defense: Orthodox Variation, Classical System, Benko Attack", "r1bq1rk1/pppnn1bp/3p2p1/3Ppp2/2P1P1P1/2N2P2/PP2B2P/R1BQNRK1 b - -"),
-new FullOpening("E99", "King's Indian Defense: Orthodox Variation, Classical System, Traditional Line", "r1bq1rk1/pppnn1bp/3p2p1/3Ppp2/2P1P3/2N2P2/PP2B1PP/R1BQNRK1 w - -")
+new FullOpening("E99", "King's Indian Defense: Orthodox Variation, Classical System, Traditional Line", "r1bq1rk1/pppnn1bp/3p2p1/3Ppp2/2P1P3/2N2P2/PP2B1PP/R1BQNRK1 w - -"),
   )
 }

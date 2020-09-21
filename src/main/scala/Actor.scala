@@ -136,8 +136,11 @@ final case class Actor(
       b5     = b4 updateHistory (_ withoutCastles color)
       castle = Option((kingPos -> newKingPos, rookPos -> newRookPos))
     } yield {
-      if (board.variant == chess.variant.Chess960) List(rookPos)
-      else List(rookPos, newKingPos).distinct
+      rookPos :: {
+        if (kingPos.file == File.E && List(File.A, File.H).contains(rookPos.file) && !board.variant.chess960)
+          newKingPos :: Nil
+        else Nil
+      }
     } map { move(_, b5, castle = castle) }) getOrElse Nil
 
   private def shortRange(dirs: Directions): List[Move] =

@@ -1,7 +1,6 @@
 package chess
 
 import cats.syntax.option._
-import org.specs2.matcher.ValidatedMatchers
 
 import chess.variant.Atomic
 

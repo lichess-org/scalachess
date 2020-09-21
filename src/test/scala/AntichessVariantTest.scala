@@ -1,6 +1,5 @@
 package chess
 
-import cats.data.Validated
 import cats.syntax.option._
 import org.specs2.matcher.ValidatedMatchers
 

@@ -504,5 +504,15 @@ K   bB""".autoDraw must_== false
           game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
+    "on same-color bishops on both sides" in {
+      val position = "5K2/8/8/1B6/8/k7/6b1/8 w - - 0 39"
+      val game     = fenToGame(position, Standard)
+      game must beValid.like {
+        case game =>
+          game.situation.autoDraw must beTrue
+          game.situation.end must beTrue
+          game.situation.opponentHasInsufficientMaterial must beTrue
+      }
+    }
   }
 }

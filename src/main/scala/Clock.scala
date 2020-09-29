@@ -30,8 +30,6 @@ case class Clock(
 
   def moretimeable(c: Color) = players(c).remaining.centis < 100 * 60 * 60 * 2
 
-  def isInit = players.forall(_.isInit)
-
   def isRunning = timer.isDefined
 
   def start = if (isRunning) this else copy(timer = Option(now))
@@ -132,8 +130,6 @@ case class ClockPlayer(
   }
 
   def recordLag(l: Centis) = copy(lag = lag.recordLag(l))
-
-  def isInit = elapsed.centis == 0
 
   def remaining = limit - elapsed
 

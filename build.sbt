@@ -2,7 +2,7 @@ name := "scalachess"
 
 organization := "org.lichess"
 
-version := "10.1.0"
+version := "10.1.1"
 
 scalaVersion := "2.13.3"
 
@@ -58,8 +58,6 @@ scalacOptions ++= Seq(
   "-Wunused:params",
   "-Wvalue-discard",
   "-Xmaxerrs",
-  "12",
-  "-Xmaxwarns",
   "12"
 )
 

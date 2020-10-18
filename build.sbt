@@ -2,7 +2,7 @@ name := "scalachess"
 
 organization := "org.lichess"
 
-version := "10.0.4"
+version := "10.1.0"
 
 scalaVersion := "2.13.3"
 
@@ -60,7 +60,7 @@ scalacOptions ++= Seq(
   "-Xmaxerrs",
   "12",
   "-Xmaxwarns",
-  "2"
+  "12"
 )
 
 publishTo := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", ""))))

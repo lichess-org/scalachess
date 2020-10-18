@@ -28,7 +28,7 @@ object Replay {
 
   def apply(
       moveStrs: Iterable[String],
-      initialFen: Option[String],
+      initialFen: Option[FEN],
       variant: chess.variant.Variant
   ): Validated[String, Reader.Result] =
     moveStrs.some.filter(_.nonEmpty) toValid "[replay] pgn is empty" andThen { nonEmptyMoves =>
@@ -37,7 +37,7 @@ object Replay {
         Tags(
           List(
             initialFen map { fen =>
-              Tag(_.FEN, fen)
+              Tag(_.FEN, fen.value)
             },
             variant.some.filterNot(_.standard) map { v =>
               Tag(_.Variant, v.name)

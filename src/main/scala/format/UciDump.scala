@@ -13,7 +13,7 @@ object UciDump {
 
   def apply(
       moves: Seq[String],
-      initialFen: Option[String],
+      initialFen: Option[FEN],
       variant: Variant
   ): Validated[String, List[String]] =
     if (moves.isEmpty) Validated.valid(Nil)

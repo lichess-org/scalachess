@@ -3,6 +3,7 @@ package chess
 import cats.syntax.option._
 import org.specs2.matcher.ValidatedMatchers
 
+import chess.format.FEN
 import chess.format.Forsyth
 import chess.format.pgn.Reader
 import chess.variant.Antichess
@@ -56,9 +57,9 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       val startingPosition = Game(Antichess)
       val afterFirstMove   = startingPosition.playMove(Pos.E2, Pos.E4, None)
 
-      afterFirstMove must beValid.like { case newGame =>
+      afterFirstMove must beValid.like { newGame =>
         val fen = Forsyth >> newGame
-        fen mustEqual "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b - - 0 1"
+        fen mustEqual FEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b - - 0 1")
       }
     }
 
@@ -146,8 +147,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Allow a pawn to be promoted to a king" in {
-      val positionString = "8/5P2/8/2b5/8/8/4B3/8 w - -"
-      val originalGame   = fenToGame(positionString, Antichess)
+      val position     = FEN("8/5P2/8/2b5/8/8/4B3/8 w - -")
+      val originalGame = fenToGame(position, Antichess)
 
       val newGame = originalGame flatMap (_.apply(Pos.F7, Pos.F8, Option(King))) map (_._1)
 
@@ -158,8 +159,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Be drawn when there are only opposite colour bishops remaining" in {
-      val positionString = "8/2b5/8/8/8/6Q1/4B3/8 b - -"
-      val originalGame   = fenToGame(positionString, Antichess)
+      val position     = FEN("8/2b5/8/8/8/6Q1/4B3/8 b - -")
+      val originalGame = fenToGame(position, Antichess)
 
       val newGame = originalGame flatMap (_.apply(Pos.C7, Pos.G3, None)) map (_._1)
 
@@ -174,8 +175,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Be drawn on multiple bishops on the opposite color" in {
-      val positionString = "8/6P1/8/8/1b6/8/8/5B2 w - -"
-      val originalGame   = fenToGame(positionString, Antichess)
+      val position     = FEN("8/6P1/8/8/1b6/8/8/5B2 w - -")
+      val originalGame = fenToGame(position, Antichess)
 
       val newGame = originalGame flatMap (_.apply(Pos.G7, Pos.G8, Bishop.some)) map (_._1)
 
@@ -191,7 +192,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Not be drawn when the black and white bishops are on the same coloured squares " in {
-      val position     = "7b/8/1p6/8/8/8/5B2/8 w - -"
+      val position     = FEN("7b/8/1p6/8/8/8/5B2/8 w - -")
       val originalGame = fenToGame(position, Antichess)
 
       val newGame = originalGame flatMap (_.apply(Pos.F2, Pos.B6, None)) map (_._1)
@@ -204,7 +205,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Be drawn when there are only opposite colour bishops and pawns which could not attack those bishops remaining" in {
-      val position     = "8/6p1/4B1P1/4p3/4P3/8/2p5/8 b - - 1 28"
+      val position     = FEN("8/6p1/4B1P1/4p3/4P3/8/2p5/8 b - - 1 28")
       val originalGame = fenToGame(position, Antichess)
 
       val newGame = originalGame flatMap (_.apply(Pos.C2, Pos.C1, Option(Bishop))) map (_._1)
@@ -219,7 +220,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Not be drawn on opposite color bishops but with pawns that could be forced to attack a bishop" in {
-      val position     = "8/6p1/1B4P1/4p3/4P3/8/3p4/8 b - -"
+      val position     = FEN("8/6p1/1B4P1/4p3/4P3/8/3p4/8 b - -")
       val originalGame = fenToGame(position, Antichess)
 
       val newGame = originalGame flatMap (_.apply(Pos.D2, Pos.D1, Option(Bishop))) map (_._1)
@@ -232,7 +233,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Not be drawn where a white bishop can attack a black pawn in an almost closed position" in {
-      val position     = "5b2/1P4p1/4B1P1/4p3/4P3/8/8/8 w - -"
+      val position     = FEN("5b2/1P4p1/4B1P1/4p3/4P3/8/8/8 w - -")
       val originalGame = fenToGame(position, Antichess)
 
       val newGame = originalGame flatMap (_.apply(Pos.B7, Pos.B8, Bishop.some)) map (_._1)
@@ -246,7 +247,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Not be drawn where a pawn is unattackable, but is blocked by a bishop, not a pawn" in {
-      val position     = "8/8/4BbP1/4p3/4P3/8/8/8 b - -"
+      val position     = FEN("8/8/4BbP1/4p3/4P3/8/8/8 b - -")
       val originalGame = fenToGame(position, Antichess)
 
       val newGame = originalGame flatMap (_.playMoves(Pos.F6 -> Pos.G7))
@@ -259,8 +260,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Not be drawn on insufficient mating material" in {
-      val positionString = "4K3/8/1b6/8/8/8/5B2/3k4 b - -"
-      val maybeGame      = fenToGame(positionString, Antichess)
+      val position  = FEN("4K3/8/1b6/8/8/8/5B2/3k4 b - -")
+      val maybeGame = fenToGame(position, Antichess)
 
       maybeGame must beValid.like { case game =>
         game.situation.end must beFalse
@@ -297,8 +298,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Win on a traditional stalemate where the player has no valid moves" in {
-      val positionString = "8/p7/8/P7/8/8/8/8 w - -"
-      val maybeGame      = fenToGame(positionString, Antichess)
+      val position  = FEN("8/p7/8/P7/8/8/8/8 w - -")
+      val maybeGame = fenToGame(position, Antichess)
 
       val drawnGame = maybeGame flatMap (_.playMoves((Pos.A5, Pos.A6)))
 
@@ -311,7 +312,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     }
 
     "Stalemate is a win - second test" in {
-      val fen       = "2Q5/8/p7/8/8/8/6PR/8 w - -"
+      val fen       = FEN("2Q5/8/p7/8/8/8/6PR/8 w - -")
       val maybeGame = fenToGame(fen, Antichess)
 
       val drawnGame = maybeGame flatMap (_.playMoves((Pos.C8, Pos.A6)))

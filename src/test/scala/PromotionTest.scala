@@ -2,6 +2,7 @@ package chess
 
 import cats.syntax.option._
 
+import chess.format.FEN
 import chess.Pos._
 import chess.variant.Standard
 
@@ -68,7 +69,7 @@ K n    """)
     }
 
     "Not allow promotion to a king in a standard game " in {
-      val fen  = "8/1P6/8/8/8/8/7k/1K6 w - -"
+      val fen  = FEN("8/1P6/8/8/8/8/7k/1K6 w - -")
       val game = fenToGame(fen, Standard)
 
       val failureGame = game flatMap (_.apply(Pos.B7, Pos.B8, Option(King))) map (_._1)

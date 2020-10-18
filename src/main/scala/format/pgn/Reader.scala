@@ -53,7 +53,7 @@ object Reader {
   private def makeGame(tags: Tags) = {
     val g = Game(
       variantOption = tags(_.Variant) flatMap chess.variant.Variant.byName,
-      fen = tags(_.FEN)
+      fen = tags.fen
     )
     g.copy(
       startedAtTurn = g.turns,

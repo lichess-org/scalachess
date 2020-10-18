@@ -6,7 +6,7 @@ class ForsythPerfTest extends ChessTest {
   args(skipAll = true)
 
   val initialBoard = Board.init(variant.Standard)
-  val emptyBoard   = (Forsyth << "8/8/8/8/8/8/8/8").get.board
+  val emptyBoard   = (Forsyth << FEN("8/8/8/8/8/8/8/8")).get.board
 
   // "export one position board" should {
   //   "many times" in {

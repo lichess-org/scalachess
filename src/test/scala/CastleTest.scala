@@ -13,10 +13,10 @@ R  QK  R"""
     "impossible" in {
       "standard chess" in {
         "near bishop in the way" in {
-          goodHist place(White.bishop, F1) flatMap (_ destsFrom E1) must bePoss()
+          goodHist place (White.bishop, F1) flatMap (_ destsFrom E1) must bePoss()
         }
         "distant knight in the way" in {
-          goodHist place(White.knight, G1) flatMap (_ destsFrom E1) must bePoss(F1)
+          goodHist place (White.knight, G1) flatMap (_ destsFrom E1) must bePoss(F1)
         }
         "not allowed by history" in {
           badHist destsFrom E1 must bePoss(F1)
@@ -27,10 +27,10 @@ R  QK  R"""
 PPPPPPPP
 RQK   R """.chess960 withHistory History.castle(White, kingSide = true, queenSide = true)
         "near bishop in the way" in {
-          board960 place(White.bishop, D1) flatMap (_ destsFrom C1) must bePoss()
+          board960 place (White.bishop, D1) flatMap (_ destsFrom C1) must bePoss()
         }
         "distant knight in the way" in {
-          board960 place(White.knight, F1) flatMap (_ destsFrom C1) must bePoss(D1)
+          board960 place (White.knight, F1) flatMap (_ destsFrom C1) must bePoss(D1)
         }
       }
     }
@@ -83,7 +83,8 @@ PPPPPPPP
         }
       }
       "chess960 close queenside as black" in {
-        val game = Game("""
+        val game = Game(
+          """
  b rkr q
 p pppppp
  p n
@@ -91,7 +92,9 @@ p pppppp
 
 
 
- K""".chess960, Black)
+ K""".chess960,
+          Black
+        )
         "viable moves" in {
           game.board destsFrom E8 must bePoss(D8, F8)
         }
@@ -108,14 +111,20 @@ p pppppp
         }
       }
       "from position with chess960 castling" in {
-        val game = Game(makeBoard("""rk  r
+        val game = Game(
+          makeBoard(
+            """rk  r
 pppbnppp
    p  n
 P  Pp
     P  q
 R     NP
  PP  PP
- KNQRB""", FromPosition), Black)
+ KNQRB""",
+            FromPosition
+          ),
+          Black
+        )
         "dests" in {
           game.board destsFrom B8 must bePoss(A8, C8, E8)
         }
@@ -130,13 +139,13 @@ R   KB R"""
     val badHist  = goodHist updateHistory (_ withoutCastles White)
     "impossible" in {
       "near queen in the way" in {
-        goodHist place(White.queen, D1) flatMap (_ destsFrom E1) must bePoss()
+        goodHist place (White.queen, D1) flatMap (_ destsFrom E1) must bePoss()
       }
       "bishop in the way" in {
-        goodHist place(White.bishop, C1) flatMap (_ destsFrom E1) must bePoss(D1)
+        goodHist place (White.bishop, C1) flatMap (_ destsFrom E1) must bePoss(D1)
       }
       "distant knight in the way" in {
-        goodHist place(White.knight, C1) flatMap (_ destsFrom E1) must bePoss(D1)
+        goodHist place (White.knight, C1) flatMap (_ destsFrom E1) must bePoss(D1)
       }
       "not allowed by history" in {
         badHist destsFrom E1 must bePoss(D1)
@@ -172,8 +181,8 @@ R    RK """)
       }
       "cannot castle kingside anymore even if the position looks good" in {
         g2.toOption flatMap (_.board.seq(
-          _ move(F1, H1),
-          _ move(G1, E1)
+          _ move (F1, H1),
+          _ move (G1, E1)
         )) flatMap (_ destsFrom E1) must bePoss(D1, F1)
       }
     }
@@ -189,8 +198,8 @@ PPPPPPPP
       }
       "cannot castle queenside anymore even if the position looks good" in {
         g2.toOption flatMap (_.board.seq(
-          _ move(D1, A1),
-          _ move(C1, E1)
+          _ move (D1, A1),
+          _ move (C1, E1)
         )) flatMap (_ destsFrom E1) must bePoss(D1, F1)
       }
     }
@@ -244,39 +253,39 @@ PPPPPPPP
   "threat on king prevents castling" in {
     val board: Board = """R   K  R"""
     "by a rook" in {
-      board place(Black.rook, E3) flatMap (_ destsFrom E1) must bePoss(D1, D2, F2, F1)
+      board place (Black.rook, E3) flatMap (_ destsFrom E1) must bePoss(D1, D2, F2, F1)
     }
     "by a knight" in {
-      board place(Black.knight, D3) flatMap (_ destsFrom E1) must bePoss(D1, D2, E2, F1)
+      board place (Black.knight, D3) flatMap (_ destsFrom E1) must bePoss(D1, D2, E2, F1)
     }
   }
   "threat on castle trip prevents castling" in {
     "king side" in {
       val board: Board = """R  QK  R"""
       "close" in {
-        board place(Black.rook, F3) flatMap (_ destsFrom E1) must bePoss(D2, E2)
+        board place (Black.rook, F3) flatMap (_ destsFrom E1) must bePoss(D2, E2)
       }
       "far" in {
-        board place(Black.rook, G3) flatMap (_ destsFrom E1) must bePoss(D2, E2, F2, F1)
+        board place (Black.rook, G3) flatMap (_ destsFrom E1) must bePoss(D2, E2, F2, F1)
       }
     }
     "queen side" in {
       val board: Board = """R   KB R"""
       "close" in {
-        board place(Black.rook, D3) flatMap (_ destsFrom E1) must bePoss(E2, F2)
+        board place (Black.rook, D3) flatMap (_ destsFrom E1) must bePoss(E2, F2)
       }
       "far" in {
-        board place(Black.rook, C3) flatMap (_ destsFrom E1) must bePoss(D1, D2, E2, F2)
+        board place (Black.rook, C3) flatMap (_ destsFrom E1) must bePoss(D1, D2, E2, F2)
       }
     }
     "chess 960" in {
       "far kingside" in {
         val board: Board = """BK     R"""
         "rook threat" in {
-          board place(Black.rook, F3) flatMap (_ destsFrom B1) must bePoss(A2, B2, C2, C1)
+          board place (Black.rook, F3) flatMap (_ destsFrom B1) must bePoss(A2, B2, C2, C1)
         }
         "enemy king threat" in {
-          board place(Black.king, E2) flatMap (_ destsFrom B1) must bePoss(A2, B2, C2, C1)
+          board place (Black.king, E2) flatMap (_ destsFrom B1) must bePoss(A2, B2, C2, C1)
         }
       }
     }
@@ -284,7 +293,7 @@ PPPPPPPP
   "threat on rook does not prevent castling" in {
     "king side" in {
       val board: Board = """R  QK  R"""
-      board place(Black.rook, H3) flatMap (_ destsFrom E1) must bePoss(
+      board place (Black.rook, H3) flatMap (_ destsFrom E1) must bePoss(
         D2,
         E2,
         F1,
@@ -295,7 +304,7 @@ PPPPPPPP
     }
     "queen side" in {
       val board: Board = """R   KB R"""
-      board place(Black.rook, A3) flatMap (_ destsFrom E1) must bePoss(
+      board place (Black.rook, A3) flatMap (_ destsFrom E1) must bePoss(
         A1,
         C1,
         D1,

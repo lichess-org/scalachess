@@ -46,8 +46,8 @@ object UciCharPair {
       Role.all
         .filterNot(King ==)
         .zipWithIndex
-        .map {
-          case (role, index) => role -> (charShift + pos2charMap.size + promotion2charMap.size + index).toChar
+        .map { case (role, index) =>
+          role -> (charShift + pos2charMap.size + promotion2charMap.size + index).toChar
         }
         .to(Map)
   }

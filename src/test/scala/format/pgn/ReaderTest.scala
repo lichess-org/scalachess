@@ -9,8 +9,8 @@ class ReaderTest extends ChessTest {
   "only raw moves" should {
     "many games" in {
       forall(raws) { (c: String) =>
-        Reader.full(c) must beValid.like {
-          case Complete(replay) => replay.moves must have size c.split(' ').length
+        Reader.full(c) must beValid.like { case Complete(replay) =>
+          replay.moves must have size c.split(' ').length
         }
       }
     }
@@ -30,13 +30,13 @@ class ReaderTest extends ChessTest {
       Reader.full(castleCheck2) must beValid
     }
     "and delimiters" in {
-      Reader.full(withDelimiters) must beValid.like {
-        case Complete(replay) => replay.moves must have size 33
+      Reader.full(withDelimiters) must beValid.like { case Complete(replay) =>
+        replay.moves must have size 33
       }
     }
     "and delimiters on new lines" in {
-      Reader.full(withDelimitersOnNewLines) must beValid.like {
-        case Complete(replay) => replay.moves must have size 33
+      Reader.full(withDelimitersOnNewLines) must beValid.like { case Complete(replay) =>
+        replay.moves must have size 33
       }
     }
   }
@@ -75,16 +75,15 @@ class ReaderTest extends ChessTest {
       Reader.full(bySmartChess) must beValid
     }
     "invalid variant" in {
-      Reader.full(invalidVariant) must beValid.like {
-        case Complete(replay) => replay.setup.board.variant must_== variant.Standard
+      Reader.full(invalidVariant) must beValid.like { case Complete(replay) =>
+        replay.setup.board.variant must_== variant.Standard
       }
     }
     "promoting to a rook" in {
-      Reader.full(fromLichessBadPromotion) must beValid.like {
-        case Complete(replay) =>
-          replay.chronoMoves lift 10 must beSome.like {
-            case move => move.fold(_.promotion, _ => None) must_== Option(Rook)
-          }
+      Reader.full(fromLichessBadPromotion) must beValid.like { case Complete(replay) =>
+        replay.chronoMoves lift 10 must beSome.like { case move =>
+          move.fold(_.promotion, _ => None) must_== Option(Rook)
+        }
       }
     }
     "chessbase arrows" in {
@@ -100,21 +99,20 @@ class ReaderTest extends ChessTest {
       Reader.full(lichobile) must beValid
     }
     "crazyhouse 1" in {
-      Reader.full(crazyhouse1) must beValid.like {
-        case Complete(replay) =>
-          replay.chronoMoves lift 11 must beSome.like {
-            case move => move.fold(_.toUci.uci, _.toUci.uci) must_== "P@c6"
-          }
+      Reader.full(crazyhouse1) must beValid.like { case Complete(replay) =>
+        replay.chronoMoves lift 11 must beSome.like { case move =>
+          move.fold(_.toUci.uci, _.toUci.uci) must_== "P@c6"
+        }
       }
     }
     "crazyhouse 2" in {
-      Reader.full(crazyhouse2) must beValid.like {
-        case Complete(replay) => replay.chronoMoves.size must_== 111
+      Reader.full(crazyhouse2) must beValid.like { case Complete(replay) =>
+        replay.chronoMoves.size must_== 111
       }
     }
     "crazyhouse without variant tag" in {
-      Reader.full(crazyhouseNoVariantTag) must beValid.like {
-        case Incomplete(replay, _) => replay.chronoMoves.size must_== 8
+      Reader.full(crazyhouseNoVariantTag) must beValid.like { case Incomplete(replay, _) =>
+        replay.chronoMoves.size must_== 8
       }
     }
     "crazyhouse from chess.com" in {
@@ -123,31 +121,30 @@ class ReaderTest extends ChessTest {
   }
   "from prod" in {
     "from position close chess" in {
-      Reader.full(fromPosProdCloseChess) must beValid.like {
-        case Complete(replay) => replay.chronoMoves.size must_== 152
+      Reader.full(fromPosProdCloseChess) must beValid.like { case Complete(replay) =>
+        replay.chronoMoves.size must_== 152
       }
     }
     "from position empty FEN" in {
-      Reader.full(fromPositionEmptyFen) must beValid.like {
-        case Complete(replay) => replay.chronoMoves.size must_== 164
+      Reader.full(fromPositionEmptyFen) must beValid.like { case Complete(replay) =>
+        replay.chronoMoves.size must_== 164
       }
     }
     "preserves initial ply" in {
-      Reader.full(caissa) must beValid.like {
-        case Complete(replay) =>
-          replay.setup.startedAtTurn must_== 43
-          replay.state.startedAtTurn must_== 43
+      Reader.full(caissa) must beValid.like { case Complete(replay) =>
+        replay.setup.startedAtTurn must_== 43
+        replay.state.startedAtTurn must_== 43
       }
     }
   }
   "partial from broadcast" in {
-    Reader.full(festivalFigueira) must beValid.like {
-      case Incomplete(replay, _) => replay.chronoMoves.size must_== 113
+    Reader.full(festivalFigueira) must beValid.like { case Incomplete(replay, _) =>
+      replay.chronoMoves.size must_== 113
     }
   }
   "invisible char" in {
-    Reader.full(invisibleChar) must beValid.like {
-      case Complete(replay) => replay.chronoMoves.size must_== 19
+    Reader.full(invisibleChar) must beValid.like { case Complete(replay) =>
+      replay.chronoMoves.size must_== 19
     }
   }
 }

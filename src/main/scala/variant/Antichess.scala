@@ -1,6 +1,8 @@
 package chess
 package variant
 
+import chess.format.FEN
+
 case object Antichess
     extends Variant(
       id = 6,
@@ -15,7 +17,7 @@ case object Antichess
 
   // In antichess, it is not permitted to castle
   override val castles    = Castles.none
-  override val initialFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1"
+  override val initialFen = FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1")
 
   // In antichess, the king can't be put into check so we always return false
   override def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) =
@@ -43,8 +45,8 @@ case object Antichess
 
   // In antichess, it is valuable for your opponent to have pieces.
   override def materialImbalance(board: Board): Int =
-    board.pieces.values.foldLeft(0) {
-      case (acc, Piece(color, _)) => acc + color.fold(-2, 2)
+    board.pieces.values.foldLeft(0) { case (acc, Piece(color, _)) =>
+      acc + color.fold(-2, 2)
     }
 
   // In antichess, there is no checkmate condition therefore a player may only draw either by agreement,

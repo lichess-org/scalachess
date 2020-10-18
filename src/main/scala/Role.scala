@@ -11,8 +11,7 @@ sealed trait Role {
 }
 sealed trait PromotableRole extends Role
 
-/**
-  * Promotable in antichess.
+/** Promotable in antichess.
   */
 case object King extends PromotableRole {
   val forsyth                 = 'k'

@@ -50,10 +50,9 @@ class CrazyhouseVariantTest extends ChessTest {
       import Pos._
       "tons of pointless moves but shouldn't apply 50-moves" in {
         val moves = List.fill(30)(List(B1 -> C3, B8 -> C6, C3 -> B1, C6 -> B8))
-        Game(Crazyhouse).playMoves(moves.flatten: _*) must beValid.like {
-          case g =>
-            g.board.variant.fiftyMoves(g.board.history) must beFalse
-            g.board.autoDraw must beTrue // fivefold repetition
+        Game(Crazyhouse).playMoves(moves.flatten: _*) must beValid.like { case g =>
+          g.board.variant.fiftyMoves(g.board.history) must beFalse
+          g.board.autoDraw must beTrue // fivefold repetition
         }
       }
       "from prod should 3fold" in {
@@ -156,8 +155,8 @@ class CrazyhouseVariantTest extends ChessTest {
           F2 -> G2,
           H6 -> G6
         )
-        Game(Crazyhouse).playMoves(moves: _*) must beValid.like {
-          case g => g.board.history.threefoldRepetition must beTrue
+        Game(Crazyhouse).playMoves(moves: _*) must beValid.like { case g =>
+          g.board.history.threefoldRepetition must beTrue
         }
       }
       "from prod should not 3fold" in {
@@ -254,8 +253,8 @@ class CrazyhouseVariantTest extends ChessTest {
           G2 -> F2,
           G6 -> H6
         )
-        Game(Crazyhouse).playMoves(moves: _*) must beValid.like {
-          case g => g.board.history.threefoldRepetition must beFalse
+        Game(Crazyhouse).playMoves(moves: _*) must beValid.like { case g =>
+          g.board.history.threefoldRepetition must beFalse
         }
       }
       "not draw when only kings left" in {

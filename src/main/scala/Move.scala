@@ -66,8 +66,8 @@ case class Move(
   def castles = castle.isDefined
 
   def normalizeCastle =
-    castle.fold(this) {
-      case (_, (rookOrig, _)) => copy(dest = rookOrig)
+    castle.fold(this) { case (_, (rookOrig, _)) =>
+      copy(dest = rookOrig)
     }
 
   def color = piece.color

@@ -1,6 +1,8 @@
 package chess
 package variant
 
+import chess.format.FEN
+
 case object Horde
     extends Variant(
       id = 8,
@@ -11,8 +13,7 @@ case object Horde
       standardInitialPosition = false
     ) {
 
-  /**
-    * In Horde chess white advances against black with a horde of pawns.
+  /** In Horde chess white advances against black with a horde of pawns.
     */
   lazy val pieces: Map[Pos, Piece] = {
 
@@ -35,7 +36,7 @@ case object Horde
 
   override val castles = Castles("kq")
 
-  override val initialFen = "rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1"
+  override val initialFen = FEN("rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1")
 
   override def valid(board: Board, strict: Boolean) =
     board.kingPosOf(White).isEmpty && validSide(board, strict)(Black) && !pawnsOnPromotionRank(board, White)
@@ -44,8 +45,7 @@ case object Horde
   override def specialEnd(situation: Situation) =
     situation.board.piecesOf(White).isEmpty
 
-  /**
-    * Any vs K + any where horde is stalemated and only king can move is a fortress draw
+  /** Any vs K + any where horde is stalemated and only king can move is a fortress draw
     * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
     * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
     */
@@ -57,14 +57,12 @@ case object Horde
     !mateInOne && notKingBoard.actors.values.forall(actor => actor.moves.isEmpty)
   }
 
-  /**
-    * In horde chess, black can win unless a fortress stalemate is unavoidable.
+  /** In horde chess, black can win unless a fortress stalemate is unavoidable.
     *  Auto-drawing the game should almost never happen, but it did in https://lichess.org/xQ2RsU8N#121
     */
   override def isInsufficientMaterial(board: Board) = hordeClosedPosition(board)
 
-  /**
-    * In horde chess, the horde cannot win on * V K or [BN]{2} v K or just one piece
+  /** In horde chess, the horde cannot win on * V K or [BN]{2} v K or just one piece
     * since they lack a king for checkmate support.
     * Technically there are some positions where stalemate is unavoidable which
     * this method does not detect; however, such are trivial to premove.

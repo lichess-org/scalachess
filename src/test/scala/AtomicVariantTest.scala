@@ -16,10 +16,9 @@ class AtomicVariantTest extends ChessTest {
 
       val explosionGame = maybeGame flatMap (_.playMoves((Pos.B2, Pos.H8)))
 
-      explosionGame must beValid.like {
-        case game =>
-          explodedSquares.forall(pos => game.situation.board(pos).isEmpty) must beTrue
-          intactPawns.forall(pos => game.situation.board(pos).isDefined) must beTrue
+      explosionGame must beValid.like { case game =>
+        explodedSquares.forall(pos => game.situation.board(pos).isEmpty) must beTrue
+        intactPawns.forall(pos => game.situation.board(pos).isDefined) must beTrue
       }
     }
 
@@ -30,9 +29,8 @@ class AtomicVariantTest extends ChessTest {
 
       val explosionGame = maybeGame flatMap (_.playMoves((Pos.H3, Pos.E6)))
 
-      explosionGame must beValid.like {
-        case game =>
-          explodedSquares.forall(pos => game.situation.board(pos).isEmpty) must beTrue
+      explosionGame must beValid.like { case game =>
+        explodedSquares.forall(pos => game.situation.board(pos).isEmpty) must beTrue
       }
     }
 
@@ -43,9 +41,8 @@ class AtomicVariantTest extends ChessTest {
 
       val explosionGame = maybeGame flatMap (_.playMoves((Pos.B3, Pos.E6)))
 
-      explosionGame must beValid.like {
-        case game =>
-          explodedSquares.forall(pos => game.situation.board(pos).isEmpty) must beTrue
+      explosionGame must beValid.like { case game =>
+        explodedSquares.forall(pos => game.situation.board(pos).isEmpty) must beTrue
       }
     }
 
@@ -64,13 +61,12 @@ class AtomicVariantTest extends ChessTest {
 
       val gameWin = maybeGame flatMap (_.playMoves((Pos.D5, Pos.D2)))
 
-      gameWin must beValid.like {
-        case winningGame =>
-          winningGame.situation.end must beTrue
-          winningGame.situation.variantEnd must beTrue
-          winningGame.situation.winner must beSome.like {
-            case winner => winner == Black
-          }
+      gameWin must beValid.like { case winningGame =>
+        winningGame.situation.end must beTrue
+        winningGame.situation.variantEnd must beTrue
+        winningGame.situation.winner must beSome.like { case winner =>
+          winner == Black
+        }
       }
     }
 
@@ -80,11 +76,10 @@ class AtomicVariantTest extends ChessTest {
 
       val gameWin = maybeGame flatMap (_.playMoves((Pos.H2, Pos.H1)))
 
-      gameWin must beValid.like {
-        case winningGame =>
-          winningGame.situation.end must beTrue
-          winningGame.situation.variantEnd must beFalse
-          winningGame.situation.winner must beSome.like { case color => color == Black }
+      gameWin must beValid.like { case winningGame =>
+        winningGame.situation.end must beTrue
+        winningGame.situation.variantEnd must beFalse
+        winningGame.situation.winner must beSome.like { case color => color == Black }
       }
     }
 
@@ -94,11 +89,10 @@ class AtomicVariantTest extends ChessTest {
 
       val gameWin = maybeGame flatMap (_.playMoves((Pos.B6, Pos.B7)))
 
-      gameWin must beValid.like {
-        case game =>
-          game.situation.moves
-          game.situation.end must beTrue
-          game.situation.staleMate must beTrue
+      gameWin must beValid.like { case game =>
+        game.situation.moves
+        game.situation.end must beTrue
+        game.situation.staleMate must beTrue
       }
     }
 
@@ -106,14 +100,13 @@ class AtomicVariantTest extends ChessTest {
       val positionFen = "4K3/8/2b5/8/8/8/5B2/3k4 b - -"
       val game        = fenToGame(positionFen, Atomic)
 
-      game must beValid.like {
-        case game =>
-          game.situation.end must beTrue
-          game.situation.autoDraw must beTrue
-          game.situation.winner must beNone
-          game.situation.status must beSome.like {
-            case status => status == Status.Draw
-          }
+      game must beValid.like { case game =>
+        game.situation.end must beTrue
+        game.situation.autoDraw must beTrue
+        game.situation.winner must beNone
+        game.situation.status must beSome.like { case status =>
+          status == Status.Draw
+        }
       }
     }
 
@@ -121,34 +114,31 @@ class AtomicVariantTest extends ChessTest {
       val positionFen    = "k1K5/pp5R/8/8/3Q4/P7/1P6/2r5 w - -"
       val threatenedGame = fenToGame(positionFen, Atomic)
 
-      threatenedGame must beValid.like {
-        case game =>
-          game.situation.check must beTrue
-          game.situation.end must beFalse
-          game.situation.winner must beNone
-          game.situation.moves must haveKeys(Pos.D4, Pos.H7, Pos.C8)
-          game.situation.moves.get(Pos.D4) must beSome.like {
-            case moves =>
-              // The queen can defend the king from check
-              moves.find(_.dest == Pos.A7) must beSome
+      threatenedGame must beValid.like { case game =>
+        game.situation.check must beTrue
+        game.situation.end must beFalse
+        game.situation.winner must beNone
+        game.situation.moves must haveKeys(Pos.D4, Pos.H7, Pos.C8)
+        game.situation.moves.get(Pos.D4) must beSome.like { case moves =>
+          // The queen can defend the king from check
+          moves.find(_.dest == Pos.A7) must beSome
 
-              // Or explode the opponent's king to win the game
-              moves.find(_.dest == Pos.C4) must beSome
-          }
+          // Or explode the opponent's king to win the game
+          moves.find(_.dest == Pos.C4) must beSome
+        }
 
-          // The king cannot capture a piece in the perimeter of the opponent king, exploding itself
-          game.situation.moves.get(Pos.C8) must beSome.like {
-            case mvs => mvs.forall(_.captures) must beFalse
-          }
+        // The king cannot capture a piece in the perimeter of the opponent king, exploding itself
+        game.situation.moves.get(Pos.C8) must beSome.like { case mvs =>
+          mvs.forall(_.captures) must beFalse
+        }
 
-          // The rook cannot capture, as that would result in our own king exploding
-          game.situation.moves.get(Pos.H7) must beSome.like {
-            case mvs =>
-              mvs.find(_.captures) must beNone
-              // It can, however, defend the king
-              mvs.find(_.dest == Pos.C7) must beSome
-              mvs.size must beEqualTo(1)
-          }
+        // The rook cannot capture, as that would result in our own king exploding
+        game.situation.moves.get(Pos.H7) must beSome.like { case mvs =>
+          mvs.find(_.captures) must beNone
+          // It can, however, defend the king
+          mvs.find(_.dest == Pos.C7) must beSome
+          mvs.size must beEqualTo(1)
+        }
       }
     }
 
@@ -158,12 +148,11 @@ class AtomicVariantTest extends ChessTest {
 
       val mateThreatedGame = game flatMap (_.playMoves((Pos.C8, Pos.C1)))
 
-      mateThreatedGame must beValid.like {
-        case game =>
-          game.situation.end must beFalse
-          game.situation.winner must beNone
-          game.situation.moves must haveKeys(Pos.D4, Pos.H7)
-          game.situation.moves.values.forall(_.forall(_.captures)) must beTrue
+      mateThreatedGame must beValid.like { case game =>
+        game.situation.end must beFalse
+        game.situation.winner must beNone
+        game.situation.moves must haveKeys(Pos.D4, Pos.H7)
+        game.situation.moves.values.forall(_.forall(_.captures)) must beTrue
       }
     }
 
@@ -173,10 +162,9 @@ class AtomicVariantTest extends ChessTest {
 
       val successGame = game flatMap (_.playMoves((Pos.D6, Pos.D7)))
 
-      successGame must beValid.like {
-        case game =>
-          game.situation.board(Pos.D7) must beSome
-          game.situation.check must beFalse
+      successGame must beValid.like { case game =>
+        game.situation.board(Pos.D7) must beSome
+        game.situation.check must beFalse
       }
     }
 
@@ -186,12 +174,11 @@ class AtomicVariantTest extends ChessTest {
 
       val successGame = game flatMap (_.playMoves((Pos.H1, Pos.E1)))
 
-      successGame must beValid.like {
-        case game =>
-          game.situation.end must beTrue
-          game.situation.status must beSome.like {
-            case status => status == Status.Draw
-          }
+      successGame must beValid.like { case game =>
+        game.situation.end must beTrue
+        game.situation.status must beSome.like { case status =>
+          status == Status.Draw
+        }
       }
     }
 
@@ -201,12 +188,11 @@ class AtomicVariantTest extends ChessTest {
 
       val successGame = game flatMap (_.playMoves((Pos.H1, Pos.E1)))
 
-      successGame must beValid.like {
-        case game =>
-          game.situation.end must beTrue
-          game.situation.status must beSome.like {
-            case status => status == Status.Draw
-          }
+      successGame must beValid.like { case game =>
+        game.situation.end must beTrue
+        game.situation.status must beSome.like { case status =>
+          status == Status.Draw
+        }
       }
     }
 
@@ -214,12 +200,11 @@ class AtomicVariantTest extends ChessTest {
       val position    = "8/8/8/8/8/8/N4r2/5k1K b - -"
       val game        = fenToGame(position, Atomic)
       val successGame = game flatMap (_.playMoves((Pos.F2, Pos.A2)))
-      successGame must beValid.like {
-        case game =>
-          game.situation.end must beTrue
-          game.situation.status must beSome.like {
-            case status => status == Status.Draw
-          }
+      successGame must beValid.like { case game =>
+        game.situation.end must beTrue
+        game.situation.status must beSome.like { case status =>
+          status == Status.Draw
+        }
       }
     }
 
@@ -228,12 +213,11 @@ class AtomicVariantTest extends ChessTest {
       val game        = fenToGame(position, Atomic)
       val successGame = game flatMap (_.playMoves((Pos.G1, Pos.G8)))
 
-      successGame must beValid.like {
-        case game =>
-          game.situation.end must beTrue
-          game.situation.status must beSome.like {
-            case status => status == Status.Draw
-          }
+      successGame must beValid.like { case game =>
+        game.situation.end must beTrue
+        game.situation.status must beSome.like { case status =>
+          status == Status.Draw
+        }
       }
     }
 
@@ -250,13 +234,12 @@ class AtomicVariantTest extends ChessTest {
       val game      = fenToGame(position, Atomic)
       val validGame = game flatMap (_.playMoves((Pos.E7, Pos.E5), (Pos.D5, Pos.E6)))
 
-      validGame must beValid.like {
-        case game =>
-          game.board(Pos.E6) must beNone // The pawn that captures during en-passant should explode
-          // Every piece surrounding the en-passant destination square that is not a pawn should be empty
-          Atomic
-            .surroundingPositions(Pos.E6)
-            .forall(pos => game.board(pos).isEmpty || pos == Pos.E7 || pos == Pos.D7) must beTrue
+      validGame must beValid.like { case game =>
+        game.board(Pos.E6) must beNone // The pawn that captures during en-passant should explode
+        // Every piece surrounding the en-passant destination square that is not a pawn should be empty
+        Atomic
+          .surroundingPositions(Pos.E6)
+          .forall(pos => game.board(pos).isEmpty || pos == Pos.E7 || pos == Pos.D7) must beTrue
       }
     }
 
@@ -284,9 +267,8 @@ class AtomicVariantTest extends ChessTest {
 
       val successGame = game flatMap (_.playMoves((Pos.F6, Pos.F5), (Pos.G4, Pos.H3)))
 
-      successGame must beValid.like {
-        case game =>
-          game.situation.check must beTrue
+      successGame must beValid.like { case game =>
+        game.situation.check must beTrue
       }
     }
 
@@ -296,12 +278,11 @@ class AtomicVariantTest extends ChessTest {
 
       val successGame = game flatMap (_.playMoves((Pos.D8, Pos.D2)))
 
-      successGame must beValid.like {
-        case game =>
-          game.situation.end must beTrue
-          game.situation.winner must beSome.like {
-            case color => color == Black
-          }
+      successGame must beValid.like { case game =>
+        game.situation.end must beTrue
+        game.situation.winner must beSome.like { case color =>
+          color == Black
+        }
       }
     }
 
@@ -311,9 +292,8 @@ class AtomicVariantTest extends ChessTest {
 
       val successGame = game flatMap (_.playMoves((Pos.B5, Pos.D7)))
 
-      successGame must beValid.like {
-        case game =>
-          game.situation.check must beFalse
+      successGame must beValid.like { case game =>
+        game.situation.check must beFalse
       }
     }
 
@@ -332,9 +312,8 @@ class AtomicVariantTest extends ChessTest {
 
       val successGame = game flatMap (_.playMoves((Pos.C7, Pos.D8)))
 
-      successGame must beValid.like {
-        case game =>
-          game.situation.end must beFalse
+      successGame must beValid.like { case game =>
+        game.situation.end must beFalse
       }
     }
 
@@ -346,14 +325,12 @@ class AtomicVariantTest extends ChessTest {
       val position    = "k1r5/pp5Q/8/8/8/8/PP6/2K5 w - -"
       val successGame = fenToGame(position, Atomic)
 
-      successGame must beValid.like {
-        case game =>
-          val moves = game.situation.moves.get(Pos.H7)
+      successGame must beValid.like { case game =>
+        val moves = game.situation.moves.get(Pos.H7)
 
-          moves must beSome.like {
-            case queenMoves =>
-              queenMoves.size must beEqualTo(queenMoves.toSet.size)
-          }
+        moves must beSome.like { case queenMoves =>
+          queenMoves.size must beEqualTo(queenMoves.toSet.size)
+        }
       }
 
     }
@@ -370,17 +347,15 @@ class AtomicVariantTest extends ChessTest {
           F1 -> B5,
           D8 -> D2
         ))
-        successGame must beValid.like {
-          case game =>
-            game.situation.variantEnd must beTrue
+        successGame must beValid.like { case game =>
+          game.situation.variantEnd must beTrue
         }
       }
       "from position" in {
         val game        = fenToGame("rnbqkbnr/ppp1pppp/8/1B6/8/8/PPPP1PPP/RNBQK2R b KQkq - 1 1", Atomic)
         val successGame = game flatMap (_.playMoves(D8 -> D2))
-        successGame must beValid.like {
-          case game =>
-            game.situation.variantEnd must beTrue
+        successGame must beValid.like { case game =>
+          game.situation.variantEnd must beTrue
         }
       }
 
@@ -401,16 +376,14 @@ class AtomicVariantTest extends ChessTest {
       val position = "8/8/8/8/7p/2k4q/2K3P1/8 w - - 19 54"
       val game     = fenToGame(position, Atomic)
 
-      game must beValid.like {
-        case game =>
-          game.situation.end must beFalse
+      game must beValid.like { case game =>
+        game.situation.end must beFalse
       }
 
       val drawGame = game flatMap (_.playMoves(Pos.G2 -> Pos.H3))
 
-      drawGame must beValid.like {
-        case game =>
-          game.situation.opponentHasInsufficientMaterial must beTrue
+      drawGame must beValid.like { case game =>
+        game.situation.opponentHasInsufficientMaterial must beTrue
       }
 
     }
@@ -421,10 +394,9 @@ class AtomicVariantTest extends ChessTest {
 
       val game = originalGame flatMap (_.playMoves(Pos.G4 -> Pos.G5))
 
-      game must beValid.like {
-        case game =>
-          game.situation.autoDraw must beTrue
-          game.situation.end must beTrue
+      game must beValid.like { case game =>
+        game.situation.autoDraw must beTrue
+        game.situation.end must beTrue
       }
 
     }
@@ -438,9 +410,8 @@ class AtomicVariantTest extends ChessTest {
         Bishop.some
       ))
 
-      newGame must beValid.like {
-        case game =>
-          game.situation.end must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.end must beFalse
       }
     }
 
@@ -453,9 +424,8 @@ class AtomicVariantTest extends ChessTest {
         Bishop.some
       ))
 
-      newGame must beValid.like {
-        case game =>
-          game.situation.end must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.end must beFalse
       }
     }
 
@@ -468,9 +438,8 @@ class AtomicVariantTest extends ChessTest {
         Knight.some
       ))
 
-      newGame must beValid.like {
-        case game =>
-          game.situation.end must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.end must beFalse
       }
     }
 
@@ -483,9 +452,8 @@ class AtomicVariantTest extends ChessTest {
         Bishop.some
       ))
 
-      newGame must beValid.like {
-        case game =>
-          game.situation.end must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.end must beFalse
       }
     }
 
@@ -498,9 +466,8 @@ class AtomicVariantTest extends ChessTest {
         Bishop.some
       ))
 
-      newGame must beValid.like {
-        case game =>
-          game.situation.end must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.end must beFalse
       }
     }
 
@@ -513,9 +480,8 @@ class AtomicVariantTest extends ChessTest {
         Bishop.some
       ))
 
-      newGame must beValid.like {
-        case game =>
-          game.situation.end must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.end must beFalse
       }
     }
 
@@ -528,9 +494,8 @@ class AtomicVariantTest extends ChessTest {
         Bishop.some
       ))
 
-      newGame must beValid.like {
-        case game =>
-          game.situation.end must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.end must beFalse
       }
     }
 
@@ -543,9 +508,8 @@ class AtomicVariantTest extends ChessTest {
         Bishop.some
       ))
 
-      newGame must beValid.like {
-        case game =>
-          game.situation.end must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.end must beFalse
       }
     }
 
@@ -558,9 +522,8 @@ class AtomicVariantTest extends ChessTest {
         Knight.some
       ))
 
-      newGame must beValid.like {
-        case game =>
-          game.situation.end must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.end must beFalse
       }
     }
 
@@ -573,9 +536,8 @@ class AtomicVariantTest extends ChessTest {
         Knight.some
       ))
 
-      newGame must beValid.like {
-        case game =>
-          game.situation.end must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.end must beFalse
       }
     }
 
@@ -588,9 +550,8 @@ class AtomicVariantTest extends ChessTest {
         Knight.some
       ))
 
-      newGame must beValid.like {
-        case game =>
-          game.situation.end must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.end must beFalse
       }
     }
 
@@ -599,10 +560,9 @@ class AtomicVariantTest extends ChessTest {
       val game     = fenToGame(position, Atomic)
       val newGame  = game flatMap (_.playMove(Pos.E1, Pos.C1))
 
-      newGame must beValid.like {
-        case game =>
-          game.board(Pos.C1) must beEqualTo(White.king.some)
-          game.board(Pos.D1) must beEqualTo(White.rook.some)
+      newGame must beValid.like { case game =>
+        game.board(Pos.C1) must beEqualTo(White.king.some)
+        game.board(Pos.D1) must beEqualTo(White.rook.some)
       }
     }
 
@@ -625,10 +585,9 @@ class AtomicVariantTest extends ChessTest {
       val game     = fenToGame(position, Atomic)
       val newGame  = game flatMap (_.playMove(Pos.E4, Pos.E5))
 
-      newGame must beValid.like {
-        case game =>
-          game.situation.autoDraw must beTrue
-          game.situation.end must beTrue
+      newGame must beValid.like { case game =>
+        game.situation.autoDraw must beTrue
+        game.situation.end must beTrue
       }
     }
 
@@ -637,10 +596,9 @@ class AtomicVariantTest extends ChessTest {
       val game     = fenToGame(position, Atomic)
       val newGame  = game flatMap (_.playMove(Pos.F3, Pos.F4))
 
-      newGame must beValid.like {
-        case game =>
-          game.situation.autoDraw must beFalse
-          game.situation.end must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.autoDraw must beFalse
+        game.situation.end must beFalse
       }
     }
 
@@ -649,10 +607,9 @@ class AtomicVariantTest extends ChessTest {
       val game     = fenToGame(position, Atomic)
       val newGame  = game flatMap (_.playMove(Pos.H5, Pos.H6))
 
-      newGame must beValid.like {
-        case game =>
-          game.situation.autoDraw must beFalse
-          game.situation.end must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.autoDraw must beFalse
+        game.situation.end must beFalse
       }
     }
 
@@ -661,10 +618,9 @@ class AtomicVariantTest extends ChessTest {
       val game     = fenToGame(position, Atomic)
       val newGame  = game flatMap (_.playMove(Pos.B3, Pos.B4))
 
-      newGame must beValid.like {
-        case game =>
-          game.situation.autoDraw must beFalse
-          game.situation.end must beTrue
+      newGame must beValid.like { case game =>
+        game.situation.autoDraw must beFalse
+        game.situation.end must beTrue
       }
     }
   }

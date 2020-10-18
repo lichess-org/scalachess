@@ -1,6 +1,8 @@
 package chess
 package variant
 
+import chess.format.FEN
+
 case object RacingKings
     extends Variant(
       id = 9,
@@ -37,7 +39,7 @@ case object RacingKings
 
   override val castles = Castles.none
 
-  override val initialFen = "8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1"
+  override val initialFen = FEN("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
 
   override def isInsufficientMaterial(board: Board)                  = false
   override def opponentHasInsufficientMaterial(situation: Situation) = false

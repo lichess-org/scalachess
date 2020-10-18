@@ -2,8 +2,10 @@ package chess
 package variant
 
 import cats.data.Validated
-import scala.annotation.nowarn
 import cats.syntax.option._
+import scala.annotation.nowarn
+
+import chess.format.FEN
 
 // Correctness depends on singletons for each variant ID
 abstract class Variant private[variant] (
@@ -36,7 +38,7 @@ abstract class Variant private[variant] (
 
   def castles: Castles = Castles.all
 
-  def initialFen = format.Forsyth.initial
+  def initialFen: FEN = format.Forsyth.initial
 
   def isValidPromotion(promotion: Option[PromotableRole]) =
     promotion match {
@@ -122,24 +124,20 @@ abstract class Variant private[variant] (
 
   @nowarn def specialDraw(situation: Situation) = false
 
-  /**
-    * Returns the material imbalance in pawns (overridden in Antichess)
+  /** Returns the material imbalance in pawns (overridden in Antichess)
     */
   def materialImbalance(board: Board): Int =
-    board.pieces.values.foldLeft(0) {
-      case (acc, Piece(color, role)) =>
-        Role.valueOf(role).fold(acc) { value =>
-          acc + value * color.fold(1, -1)
-        }
+    board.pieces.values.foldLeft(0) { case (acc, Piece(color, role)) =>
+      Role.valueOf(role).fold(acc) { value =>
+        acc + value * color.fold(1, -1)
+      }
     }
 
-  /**
-    * Returns true if neither player can win. The game should end immediately.
+  /** Returns true if neither player can win. The game should end immediately.
     */
   def isInsufficientMaterial(board: Board) = InsufficientMatingMaterial(board)
 
-  /**
-    * Returns true if the other player cannot win. This is relevant when the
+  /** Returns true if the other player cannot win. This is relevant when the
     * side to move times out or disconnects. Instead of losing on time,
     * the game should be drawn.
     */
@@ -150,8 +148,7 @@ abstract class Variant private[variant] (
   // pieces surrounding a capture explode
   def hasMoveEffects = false
 
-  /**
-    * Applies a variant specific effect to the move. This helps decide whether a king is endangered by a move, for
+  /** Applies a variant specific effect to the move. This helps decide whether a king is endangered by a move, for
     * example
     */
   def addVariantEffect(move: Move): Move = move
@@ -161,8 +158,7 @@ abstract class Variant private[variant] (
   def isIrreversible(move: Move): Boolean =
     (move.piece is Pawn) || move.captures || move.promotes || move.castles
 
-  /**
-    * Once a move has been decided upon from the available legal moves, the board is finalized
+  /** Once a move has been decided upon from the available legal moves, the board is finalized
     */
   @nowarn def finalizeBoard(board: Board, uci: format.Uci, captured: Option[Piece]): Board = board
 

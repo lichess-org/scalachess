@@ -209,14 +209,12 @@ object Actor {
 
   def pawnDirOf(color: Color): Direction = color.fold(_.up, _.down)
 
-  /**
-    * Determines the position one ahead of a pawn based on the color of the piece.
+  /** Determines the position one ahead of a pawn based on the color of the piece.
     * White pawns move up and black pawns move down.
     */
   def posAheadOfPawn(pos: Pos, color: Color): Option[Pos] = pawnDirOf(color)(pos)
 
-  /**
-    * Determines the squares that a pawn attacks based on the colour of the pawn.
+  /** Determines the squares that a pawn attacks based on the colour of the pawn.
     */
   def pawnAttacks(pos: Pos, color: Color): List[Pos] =
     color

@@ -1,8 +1,7 @@
 package chess
 package format
 
-/**
-  * r bqkb r
+/** r bqkb r
   * p ppp pp
   * pr
   *    P p
@@ -37,11 +36,10 @@ object Visual {
   def >>(board: Board): String = >>|(board, Map.empty)
 
   def >>|(board: Board, marks: Map[Iterable[Pos], Char]): String = {
-    val markedPoss: Map[Pos, Char] = marks.foldLeft(Map[Pos, Char]()) {
-      case (marks, (poss, char)) =>
-        marks ++ (poss.toList map { pos =>
-          (pos, char)
-        })
+    val markedPoss: Map[Pos, Char] = marks.foldLeft(Map[Pos, Char]()) { case (marks, (poss, char)) =>
+      marks ++ (poss.toList map { pos =>
+        (pos, char)
+      })
     }
     for (y <- Rank.allReversed) yield {
       for (x <- File.all) yield {

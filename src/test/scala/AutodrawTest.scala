@@ -75,8 +75,8 @@ K   bB""".autoDraw must_== false
       }
       "tons of pointless moves" in {
         val moves = List.fill(30)(List(B1 -> C3, B8 -> C6, C3 -> B1, C6 -> B8))
-        makeGame.playMoves(moves.flatten: _*) must beValid.like {
-          case g => g.board.autoDraw must_== true
+        makeGame.playMoves(moves.flatten: _*) must beValid.like { case g =>
+          g.board.autoDraw must_== true
         }
       }
     }
@@ -181,8 +181,8 @@ K   bB""".autoDraw must_== false
           F2 -> G2,
           H6 -> G6
         )
-        makeGame.playMoves(moves: _*) must beValid.like {
-          case g => g.board.history.threefoldRepetition must beTrue
+        makeGame.playMoves(moves: _*) must beValid.like { case g =>
+          g.board.history.threefoldRepetition must beTrue
         }
       }
       "from prod should not 3fold" in {
@@ -279,22 +279,22 @@ K   bB""".autoDraw must_== false
           G2 -> F2,
           G6 -> H6
         )
-        makeGame.playMoves(moves: _*) must beValid.like {
-          case g => g.board.history.threefoldRepetition must beFalse
+        makeGame.playMoves(moves: _*) must beValid.like { case g =>
+          g.board.history.threefoldRepetition must beFalse
         }
       }
       "3fold on initial position" in {
         val moves = List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten
-        makeGame.playMoves(moves: _*) must beValid.like {
-          case g => g.board.history.threefoldRepetition must beTrue
+        makeGame.playMoves(moves: _*) must beValid.like { case g =>
+          g.board.history.threefoldRepetition must beTrue
         }
       }
       "pawn move then minimalist 3fold" in {
         val moves = List(E2 -> E4, E7 -> E5) ::: List
           .fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8))
           .flatten
-        makeGame.playMoves(moves: _*) must beValid.like {
-          case g => g.board.history.threefoldRepetition must beTrue
+        makeGame.playMoves(moves: _*) must beValid.like { case g =>
+          g.board.history.threefoldRepetition must beTrue
         }
       }
     }
@@ -385,13 +385,13 @@ K   bB""".autoDraw must_== false
         H6 -> H7
       )
       "from prod should be fivefold" in {
-        makeGame.playMoves(moves: _*) must beValid.like {
-          case g => g.situation.autoDraw must beTrue
+        makeGame.playMoves(moves: _*) must beValid.like { case g =>
+          g.situation.autoDraw must beTrue
         }
       }
       "from prod should not be fivefold" in {
-        makeGame.playMoves(moves.dropRight(1): _*) must beValid.like {
-          case g => g.situation.autoDraw must beFalse
+        makeGame.playMoves(moves.dropRight(1): _*) must beValid.like { case g =>
+          g.situation.autoDraw must beFalse
         }
       }
     }
@@ -399,11 +399,10 @@ K   bB""".autoDraw must_== false
   "do not detect insufficient material" should {
     "on two knights" in {
       val position = "1n2k1n1/8/8/8/8/8/8/4K3 w - - 0 1"
-      fenToGame(position, Standard) must beValid.like {
-        case game =>
-          game.situation.autoDraw must beFalse
-          game.situation.end must beFalse
-          game.situation.opponentHasInsufficientMaterial must beFalse
+      fenToGame(position, Standard) must beValid.like { case game =>
+        game.situation.autoDraw must beFalse
+        game.situation.end must beFalse
+        game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
     "on knight versus pawn" in {
@@ -413,11 +412,10 @@ K   bB""".autoDraw must_== false
         Pos.F7,
         Pos.F8
       ))
-      newGame must beValid.like {
-        case game =>
-          game.situation.autoDraw must beFalse
-          game.situation.end must beFalse
-          game.situation.opponentHasInsufficientMaterial must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.autoDraw must beFalse
+        game.situation.end must beFalse
+        game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
     "on bishops versus pawn" in {
@@ -427,11 +425,10 @@ K   bB""".autoDraw must_== false
         Pos.B8,
         Pos.E5
       ))
-      newGame must beValid.like {
-        case game =>
-          game.situation.autoDraw must beFalse
-          game.situation.end must beFalse
-          game.situation.opponentHasInsufficientMaterial must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.autoDraw must beFalse
+        game.situation.end must beFalse
+        game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
     "on bishops versus queen" in {
@@ -441,11 +438,10 @@ K   bB""".autoDraw must_== false
         Pos.F6,
         Pos.E5
       ))
-      newGame must beValid.like {
-        case game =>
-          game.situation.autoDraw must beFalse
-          game.situation.end must beFalse
-          game.situation.opponentHasInsufficientMaterial must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.autoDraw must beFalse
+        game.situation.end must beFalse
+        game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
     "on bishops versus queen" in {
@@ -455,11 +451,10 @@ K   bB""".autoDraw must_== false
         Pos.F6,
         Pos.E5
       ))
-      newGame must beValid.like {
-        case game =>
-          game.situation.autoDraw must beFalse
-          game.situation.end must beFalse
-          game.situation.opponentHasInsufficientMaterial must beTrue
+      newGame must beValid.like { case game =>
+        game.situation.autoDraw must beFalse
+        game.situation.end must beFalse
+        game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
     "on knight versus pawns" in {
@@ -469,11 +464,10 @@ K   bB""".autoDraw must_== false
         Pos.F6,
         Pos.E4
       ))
-      newGame must beValid.like {
-        case game =>
-          game.situation.autoDraw must beFalse
-          game.situation.end must beFalse
-          game.situation.opponentHasInsufficientMaterial must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.autoDraw must beFalse
+        game.situation.end must beFalse
+        game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
     "on knight versus pieces" in {
@@ -483,11 +477,10 @@ K   bB""".autoDraw must_== false
         Pos.E5,
         Pos.F7
       ))
-      newGame must beValid.like {
-        case game =>
-          game.situation.autoDraw must beFalse
-          game.situation.end must beFalse
-          game.situation.opponentHasInsufficientMaterial must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.autoDraw must beFalse
+        game.situation.end must beFalse
+        game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
     "on opposite bishops with queen" in {
@@ -497,21 +490,19 @@ K   bB""".autoDraw must_== false
         Pos.A1,
         Pos.B2
       ))
-      newGame must beValid.like {
-        case game =>
-          game.situation.autoDraw must beFalse
-          game.situation.end must beFalse
-          game.situation.opponentHasInsufficientMaterial must beFalse
+      newGame must beValid.like { case game =>
+        game.situation.autoDraw must beFalse
+        game.situation.end must beFalse
+        game.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
     "on same-color bishops on both sides" in {
       val position = "5K2/8/8/1B6/8/k7/6b1/8 w - - 0 39"
       val game     = fenToGame(position, Standard)
-      game must beValid.like {
-        case game =>
-          game.situation.autoDraw must beTrue
-          game.situation.end must beTrue
-          game.situation.opponentHasInsufficientMaterial must beTrue
+      game must beValid.like { case game =>
+        game.situation.autoDraw must beTrue
+        game.situation.end must beTrue
+        game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
   }

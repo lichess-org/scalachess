@@ -1,6 +1,8 @@
 package chess
 package variant
 
+import chess.format.FEN
+
 case object ThreeCheck
     extends Variant(
       id = 5,
@@ -13,7 +15,7 @@ case object ThreeCheck
 
   def pieces = Standard.pieces
 
-  override val initialFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 +0+0"
+  override val initialFen = FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 +0+0")
 
   override def finalizeBoard(board: Board, uci: format.Uci, capture: Option[Piece]): Board =
     board updateHistory {
@@ -26,8 +28,7 @@ case object ThreeCheck
       situation.color.fold(checks.white, checks.black) >= 3
     }
 
-  /**
-    * It's not possible to check or checkmate the opponent with only a king
+  /** It's not possible to check or checkmate the opponent with only a king
     */
   override def opponentHasInsufficientMaterial(situation: Situation) =
     situation.board.rolesOf(!situation.color) == List(King)

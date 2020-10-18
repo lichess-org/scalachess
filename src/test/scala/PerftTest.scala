@@ -54,7 +54,8 @@ class PerftTest extends ChessTest {
       perft(game, 3) must be equalTo 8214
     }
     "gentest-5569" in {
-      val game = Game(Option(Chess960), Option("r3k1n1/p2p2p1/1p4N1/2r2pq1/2b2PPp/b1p5/P3PB1P/RQ1K1B1R b q -"))
+      val game =
+        Game(Option(Chess960), Option("r3k1n1/p2p2p1/1p4N1/2r2pq1/2b2PPp/b1p5/P3PB1P/RQ1K1B1R b q -"))
       perft(game, 3) must be equalTo 54944
     }
     "gentest-6195" in {

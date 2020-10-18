@@ -60,19 +60,18 @@ object Parser {
       variant
     )
   def objMoves(strMoves: List[StrMove], variant: Variant): Validated[String, Sans] =
-    strMoves.map {
-      case StrMove(san, glyphs, comments, variations) =>
-        (
-          MoveParser(san, variant) map { m =>
-            m withComments comments withVariations {
-              variations
-                .map { v =>
-                  objMoves(v, variant) getOrElse Sans.empty
-                }
-                .filter(_.value.nonEmpty)
-            } mergeGlyphs glyphs
-          }
-        ): Validated[String, San]
+    strMoves.map { case StrMove(san, glyphs, comments, variations) =>
+      (
+        MoveParser(san, variant) map { m =>
+          m withComments comments withVariations {
+            variations
+              .map { v =>
+                objMoves(v, variant) getOrElse Sans.empty
+              }
+              .filter(_.value.nonEmpty)
+          } mergeGlyphs glyphs
+        }
+      ): Validated[String, San]
     }.sequence map { Sans.apply }
 
   trait Logging { self: Parsers =>
@@ -104,8 +103,8 @@ object Parser {
 
     def strMoves: Parser[(InitialPosition, List[StrMove], Option[String])] =
       as("moves") {
-        (commentary *) ~ (strMove *) ~ (result ?) ~ (commentary *) ^^ {
-          case coms ~ sans ~ res ~ _ => (InitialPosition(cleanComments(coms)), sans, res)
+        (commentary *) ~ (strMove *) ~ (result ?) ~ (commentary *) ^^ { case coms ~ sans ~ res ~ _ =>
+          (InitialPosition(cleanComments(coms)), sans, res)
         }
       }
 
@@ -116,10 +115,9 @@ object Parser {
       as("move") {
         ((number | commentary) *) ~>
           (moveRegex ~ nagGlyphs ~ rep(commentary) ~ nagGlyphs ~ rep(variation)) <~
-          (moveExtras *) ^^ {
-          case san ~ glyphs ~ comments ~ glyphs2 ~ variations =>
+          (moveExtras *) ^^ { case san ~ glyphs ~ comments ~ glyphs2 ~ variations =>
             StrMove(san, glyphs merge glyphs2, cleanComments(comments), variations)
-        }
+          }
       }
 
     def number: Parser[String] = """[1-9]\d*[\s\.]*""".r
@@ -235,8 +233,8 @@ object Parser {
     def move: Parser[San] = castle | standard
 
     def castle =
-      (qCastle | kCastle) ~ suffixes ^^ {
-        case side ~ suf => Castle(side) withSuffixes suf
+      (qCastle | kCastle) ~ suffixes ^^ { case side ~ suf =>
+        Castle(side) withSuffixes suf
       }
 
     val qCastle: Parser[Side] = ("O-O-O" | "o-o-o" | "0-0-0") ^^^ QueenSide
@@ -245,8 +243,8 @@ object Parser {
 
     def standard: Parser[San] =
       as("standard") {
-        (disambiguatedPawn | pawn | disambiguated | ambiguous | drop) ~ suffixes ^^ {
-          case std ~ suf => std withSuffixes suf
+        (disambiguatedPawn | pawn | disambiguated | ambiguous | drop) ~ suffixes ^^ { case std ~ suf =>
+          std withSuffixes suf
         }
       }
 
@@ -259,52 +257,50 @@ object Parser {
     // Bg5
     def ambiguous: Parser[Std] =
       as("ambiguous") {
-        role ~ x ~ dest ^^ {
-          case ro ~ ca ~ de => Std(dest = de, role = ro, capture = ca)
+        role ~ x ~ dest ^^ { case ro ~ ca ~ de =>
+          Std(dest = de, role = ro, capture = ca)
         }
       }
 
     // B@g5
     def drop: Parser[Drop] =
       as("drop") {
-        role ~ "@" ~ dest ^^ {
-          case ro ~ _ ~ po => Drop(role = ro, pos = po)
+        role ~ "@" ~ dest ^^ { case ro ~ _ ~ po =>
+          Drop(role = ro, pos = po)
         }
       }
 
     // Bac3 Baxc3 B2c3 B2xc3 Ba2xc3
     def disambiguated: Parser[Std] =
       as("disambiguated") {
-        role ~ opt(file) ~ opt(rank) ~ x ~ dest ^^ {
-          case ro ~ fi ~ ra ~ ca ~ de =>
-            Std(
-              dest = de,
-              role = ro,
-              capture = ca,
-              file = fi,
-              rank = ra
-            )
+        role ~ opt(file) ~ opt(rank) ~ x ~ dest ^^ { case ro ~ fi ~ ra ~ ca ~ de =>
+          Std(
+            dest = de,
+            role = ro,
+            capture = ca,
+            file = fi,
+            rank = ra
+          )
         }
       }
 
     // d7d5
     def disambiguatedPawn: Parser[Std] =
       as("disambiguated") {
-        opt(file) ~ opt(rank) ~ x ~ dest ^^ {
-          case fi ~ ra ~ ca ~ de =>
-            Std(
-              dest = de,
-              role = Pawn,
-              capture = ca,
-              file = fi,
-              rank = ra
-            )
+        opt(file) ~ opt(rank) ~ x ~ dest ^^ { case fi ~ ra ~ ca ~ de =>
+          Std(
+            dest = de,
+            role = Pawn,
+            capture = ca,
+            file = fi,
+            rank = ra
+          )
         }
       }
 
     def suffixes: Parser[Suffixes] =
-      opt(promotion) ~ checkmate ~ check ~ glyphs ^^ {
-        case p ~ cm ~ c ~ g => Suffixes(c, cm, p, g)
+      opt(promotion) ~ checkmate ~ check ~ glyphs ^^ { case p ~ cm ~ c ~ g =>
+        Suffixes(c, cm, p, g)
       }
 
     def glyphs: Parser[Glyphs] =
@@ -343,8 +339,8 @@ object Parser {
     def exists(c: String): Parser[Boolean] = c ^^^ true | success(false)
 
     def mapParser[A, B](pairs: Iterable[(A, B)], name: String): Parser[B] =
-      pairs.foldLeft(failure(name + " not found"): Parser[B]) {
-        case (acc, (a, b)) => a.toString ^^^ b | acc
+      pairs.foldLeft(failure(name + " not found"): Parser[B]) { case (acc, (a, b)) =>
+        a.toString ^^^ b | acc
       }
   }
 
@@ -358,8 +354,8 @@ object Parser {
       }
 
     def fromFullPgn(pgn: String): Validated[String, Tags] =
-      splitTagAndMoves(pgn) flatMap {
-        case (tags, _) => apply(tags)
+      splitTagAndMoves(pgn) flatMap { case (tags, _) =>
+        apply(tags)
       }
 
     def all: Parser[List[Tag]] =
@@ -371,8 +367,8 @@ object Parser {
 
     def tag: Parser[Tag] =
       as("tag") {
-        tagName ~ tagValue ^^ {
-          case name ~ value => Tag(name, value)
+        tagName ~ tagValue ^^ { case name ~ value =>
+          Tag(name, value)
         }
       }
 

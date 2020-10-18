@@ -24,8 +24,8 @@ case object Chess960
         board split '/' match {
           case Array(rank8, "pppppppp", "8", "8", "8", "8", "PPPPPPPP", rank1) =>
             positionsMap get rank8 filter { _ =>
-              rank1 zip rank8 forall {
-                case (r1, r8) => r1 != r8 && r1.toLower == r8
+              rank1 zip rank8 forall { case (r1, r8) =>
+                r1 != r8 && r1.toLower == r8
               }
             }
           case _ => None

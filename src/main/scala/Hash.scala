@@ -76,8 +76,8 @@ object Hash {
     val hcastling =
       if (board.variant.allowsCastling)
         (situation.history.castles.toSeq.view zip table.castlingMasks)
-          .collect {
-            case (true, castlingMask) => castlingMask
+          .collect { case (true, castlingMask) =>
+            castlingMask
           }
           .fold(hactors)(_ ^ _)
       else hactors
@@ -106,8 +106,8 @@ object Hash {
       Color.all
         .flatMap { color =>
           val colorshift = color.fold(79, -1)
-          data.pockets(color).roles.groupBy(identity).flatMap {
-            case (role, list) => crazyPocketMask(role, colorshift, list.size)
+          data.pockets(color).roles.groupBy(identity).flatMap { case (role, list) =>
+            crazyPocketMask(role, colorshift, list.size)
           }
         }
         .fold(hcrazypromotions)(_ ^ _)

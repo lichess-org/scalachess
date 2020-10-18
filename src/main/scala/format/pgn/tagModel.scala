@@ -27,8 +27,8 @@ case class Tags(value: List[Tag]) extends AnyVal {
     value find (_.name == which(Tag)) map (_.value)
 
   def clockConfig: Option[Clock.Config] =
-    value.collectFirst {
-      case Tag(Tag.TimeControl, str) => str
+    value.collectFirst { case Tag(Tag.TimeControl, str) =>
+      str
     } flatMap Clock.readPgnConfig
 
   def variant: Option[chess.variant.Variant] =

@@ -12,8 +12,8 @@ case class Board(
   def apply(at: Pos): Option[Piece] = pieces get at
   def apply(file: File, rank: Rank) = pieces get Pos(file, rank)
 
-  lazy val actors: Map[Pos, Actor] = pieces map {
-    case (pos, piece) => (pos, Actor(piece, pos, this))
+  lazy val actors: Map[Pos, Actor] = pieces map { case (pos, piece) =>
+    (pos, Actor(piece, pos, this))
   }
 
   lazy val actorsOf: Color.Map[Seq[Actor]] = {
@@ -32,8 +32,8 @@ case class Board(
 
   def piecesOf(c: Color): Map[Pos, Piece] = pieces filter (_._2 is c)
 
-  lazy val kingPos: Map[Color, Pos] = pieces.collect {
-    case (pos, Piece(color, King)) => color -> pos
+  lazy val kingPos: Map[Color, Pos] = pieces.collect { case (pos, Piece(color, King)) =>
+    color -> pos
   }
 
   def kingPosOf(c: Color): Option[Pos] = kingPos get c

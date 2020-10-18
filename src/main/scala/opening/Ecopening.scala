@@ -43,11 +43,10 @@ object Ecopening {
 
   case class Family(name: FamilyName, ecos: List[FEN])
   def makeFamilies(ops: Iterable[Ecopening]): Map[FamilyName, Family] =
-    ops.foldLeft(Map.empty[FamilyName, Family]) {
-      case (fams, op) =>
-        fams + (op.family -> fams.get(op.family).fold(Family(op.family, List(op.eco))) { existing =>
-          existing.copy(ecos = op.eco :: existing.ecos)
-        })
+    ops.foldLeft(Map.empty[FamilyName, Family]) { case (fams, op) =>
+      fams + (op.family -> fams.get(op.family).fold(Family(op.family, List(op.eco))) { existing =>
+        existing.copy(ecos = op.eco :: existing.ecos)
+      })
     }
 
   def fromGame(pgnMoves: List[String]): Option[Ecopening] =
@@ -60,10 +59,9 @@ object Ecopening {
       .toOption flatMap matchChronoBoards
 
   private def matchChronoBoards(boards: List[Board]): Option[Ecopening] =
-    boards.reverse.foldLeft(none[Ecopening]) {
-      case (acc, board) =>
-        acc orElse {
-          EcopeningDB.allByFen get format.Forsyth.exportBoard(board)
-        }
+    boards.reverse.foldLeft(none[Ecopening]) { case (acc, board) =>
+      acc orElse {
+        EcopeningDB.allByFen get format.Forsyth.exportBoard(board)
+      }
     }
 }

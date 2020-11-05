@@ -1,6 +1,7 @@
 package chess
 package opening
 
+// Generated from https://github.com/niklasf/eco
 // format: off
 private[opening] object FullOpeningPartC {
 

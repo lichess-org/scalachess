@@ -11,7 +11,7 @@ new FullOpening("E00", "Catalan Opening", "rnbqkb1r/pppp1ppp/4pn2/8/2PP4/6P1/PP2
 new FullOpening("E00", "Indian Game: Devin Gambit", "rnbqkb1r/pppp1ppp/4pn2/8/2PP2P1/8/PP2PP1P/RNBQKBNR b KQkq -"),
 new FullOpening("E00", "Indian Game", "rnbqkb1r/pppp1ppp/4pn2/8/2PP4/1Q6/PP2PPPP/RNB1KBNR b KQkq -"),
 new FullOpening("E00", "Indian Game: Seirawan Attack", "rnbqkb1r/pppp1ppp/4pn2/6B1/2PP4/8/PP2PPPP/RN1QKBNR b KQkq -"),
-new FullOpening("E01", "Catalan Opening: Closed Variation", "rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/6P1/PP2PPBP/RNBQK1NR b KQkq -"),
+new FullOpening("E01", "Catalan Opening: Closed", "rnbqkb1r/ppp2ppp/4pn2/3p4/2PP4/6P1/PP2PPBP/RNBQK1NR b KQkq -"),
 new FullOpening("E01", "Catalan Opening: Open Defense, Tarrasch Defense", "r1bqkb1r/pp3ppp/2n1pn2/2pp4/2PP4/5NP1/PP2PPBP/RNBQK2R w KQkq -"),
 new FullOpening("E02", "Catalan Opening: Open Defense", "rnbqkb1r/ppp2ppp/4pn2/8/Q1pP4/6P1/PP2PPBP/RNB1K1NR b KQkq -"),
 new FullOpening("E03", "Catalan Opening: Open Defense, Alekhine Variation", "r1bqkb1r/1ppn1ppp/p3pn2/8/3P4/6P1/PPQ1PPBP/RNB1K1NR b KQkq -"),

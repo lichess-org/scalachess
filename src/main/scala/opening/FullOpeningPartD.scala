@@ -6,7 +6,7 @@ private[opening] object FullOpeningPartD {
 
   def db: Vector[FullOpening] = Vector(
 new FullOpening("D00", "Amazon Attack", "rnbqkbnr/ppp1pppp/8/3p4/3P4/3Q4/PPP1PPPP/RNB1KBNR b KQkq -"),
-new FullOpening("D00", "Blackmar-Diemer Gambit", "rnbqkbnr/ppp1pppp/8/3p4/3PP3/8/PPP2PPP/RNBQKBNR b KQkq -"),
+new FullOpening("D00", "Blackmar Gambit", "rnbqkbnr/ppp1pppp/8/3p4/3PP3/8/PPP2PPP/RNBQKBNR b KQkq -"),
 new FullOpening("D00", "Blackmar-Diemer Gambit", "rnbqkbnr/ppp1pppp/8/8/3Pp3/2N5/PPP2PPP/R1BQKBNR b KQkq -"),
 new FullOpening("D00", "Blackmar-Diemer Gambit", "rnbqkb1r/ppp1pppp/5n2/3p4/3PP3/2N5/PPP2PPP/R1BQKBNR b KQkq -"),
 new FullOpening("D00", "Blackmar-Diemer Gambit: Bogoljubov Defense, Mad Dog Attack", "rnbqk2r/ppp1ppbp/5np1/8/2BP3P/2N2N2/PPP3P1/R1BQK2R b KQkq -"),

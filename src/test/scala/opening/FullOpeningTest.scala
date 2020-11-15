@@ -32,12 +32,12 @@ class FullOpeningTest extends Specification {
     }
     "find Queen's Pawn" in {
       searchStr("d4") must beSome.like { case o =>
-        o.name == "Queen's Pawn"
+        o.name == "Queen's Pawn Game"
       }
     }
     "find Old Benoni Defense" in {
       searchStr("d4 c5 d5 e5") must beSome.like { case o =>
-        o.name == "Old Benoni Defense"
+        o.name == "Benoni Defense: Old Benoni"
       }
     }
   }

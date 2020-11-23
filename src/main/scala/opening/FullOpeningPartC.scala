@@ -640,6 +640,7 @@ new FullOpening("C42", "Russian Game: Moody Gambit", "r1bqkb1r/pppp1ppp/2n2n2/4p
 new FullOpening("C42", "Russian Game: Nimzowitsch Attack", "rnbqkb1r/ppp2ppp/3p4/8/4n3/2N2N2/PPPP1PPP/R1BQKB1R b KQkq -"),
 new FullOpening("C42", "Russian Game: Paulsen Attack", "rnbqkb1r/ppp2ppp/3p1n2/8/2N1P3/8/PPPP1PPP/RNBQKB1R b KQkq -"),
 new FullOpening("C42", "Russian Game: Stafford Gambit", "r1bqkb1r/pppp1ppp/2n2n2/4N3/4P3/8/PPPP1PPP/RNBQKB1R w KQkq -"),
+new FullOpening("C42", "Russian Game: Stafford Gambit", "r1bqkb1r/ppp2ppp/2p2n2/8/4P3/8/PPPP1PPP/RNBQKB1R w KQkq -"),
 new FullOpening("C42", "Russian Game: Three Knights Game", "rnbqkb1r/pppp1ppp/5n2/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R b KQkq -"),
 new FullOpening("C42", "Russian Game: Urusov Gambit", "rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq -"),
 new FullOpening("C43", "Bishop's Opening: Urusov Gambit, Keidansky Gambit", "rnbqkb1r/pppp1ppp/8/8/2BQn3/5N2/PPP2PPP/RNB1K2R b KQkq -"),

@@ -82,7 +82,7 @@ object Forsyth {
 
   case class SituationPlus(situation: Situation, fullMoveNumber: Int) {
 
-    def turns = fullMoveNumber * 2 - (if (situation.color.white) 2 else 1)
+    def turns = fullMoveNumber * 2 - situation.color.fold(2, 1)
   }
 
   def <<<@(variant: Variant, fen: FEN): Option[SituationPlus] =

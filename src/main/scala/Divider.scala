@@ -31,11 +31,11 @@ object Divider {
     val indexedBoards: List[(Board, Int)] = boards.zipWithIndex
 
     val midGame = indexedBoards.foldLeft(none[Int]) {
-      case (found: Some[_], _) => found
-      case (_, (board, index)) =>
+      case (None, (board, index)) =>
         (majorsAndMinors(board) <= 10 ||
           backrankSparse(board) ||
           mixedness(board) > 150) option index
+      case (found, _) => found
     }
 
     val endGame =
@@ -57,7 +57,8 @@ object Divider {
       if (p.role == Pawn || p.role == King) v else v + 1
     }
 
-  private val backranks = List(Pos.whiteBackrank -> Color.White, Pos.blackBackrank -> Color.Black)
+  private val backranks =
+    List(Pos.whiteBackrank -> Color.White, Pos.blackBackrank -> Color.Black)
 
   // Sparse back-rank indicates that pieces have been developed
   private def backrankSparse(board: Board): Boolean =
@@ -74,7 +75,8 @@ object Divider {
       case (1, 0) => 1 + (8 - y)
       case (2, 0) => if (y > 2) 2 + (y - 2) else 0
       case (3, 0) => if (y > 1) 3 + (y - 1) else 0
-      case (4, 0) => if (y > 1) 3 + (y - 1) else 0 // group of 4 on the homerow = 0
+      case (4, 0) =>
+        if (y > 1) 3 + (y - 1) else 0 // group of 4 on the homerow = 0
 
       case (0, 1) => 1 + y
       case (1, 1) => 5 + (3 - y).abs

@@ -502,7 +502,7 @@ object StartingPosition {
         StartingPosition(
           "B23",
           "Sicilian Defence: Grand Prix Attack",
-          FEN("nbqkbnr/pp1ppppp/8/2p5/4PP2/8/PPPP2PP/RNBQKBNR b KQkq - 0 2"),
+          FEN("rnbqkbnr/pp1ppppp/8/2p5/4PP2/8/PPPP2PP/RNBQKBNR b KQkq - 0 2"),
           "Sicilian_Defence#Grand_Prix_Attack",
           "1. e4 c5 2. f4"
         ),

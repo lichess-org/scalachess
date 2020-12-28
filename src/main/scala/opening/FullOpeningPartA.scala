@@ -22,6 +22,7 @@ new FullOpening("A00", "Clemenz Opening", "rnbqkbnr/pppppppp/8/8/8/7P/PPPPPPP1/R
 new FullOpening("A00", "Clemenz Opening: Spike Lee Gambit", "rnbqkbnr/ppppppp1/8/7p/6P1/7P/PPPPPP2/RNBQKBNR b KQkq -"),
 new FullOpening("A00", "Crab Opening", "rnbqkbnr/pppp1ppp/8/4p3/P6P/8/1PPPPPP1/RNBQKBNR b KQkq -"),
 new FullOpening("A00", "Creepy Crawly Formation: Classical Defense", "rnbqkbnr/ppp2ppp/8/3pp3/8/P6P/1PPPPPP1/RNBQKBNR w KQkq -"),
+new FullOpening("A00", "Englund Gambit: Kugelbuch Gambit", "rnbqk2r/ppp1nppp/3P4/2b5/8/5N2/PPP1PPPP/RNBQKB1R w KQkq -"),
 new FullOpening("A00", "Englund Gambit Declined: Reversed French", "rnbqkbnr/pppp1ppp/8/4p3/3P4/4P3/PPP2PPP/RNBQKBNR b KQkq -"),
 new FullOpening("A00", "Formation: Cabbage Attack", "r1bq1rk1/ppp2ppp/2nb1n2/3pp3/P7/1PP1P1P1/1B1P1P1P/RN1QKBNR b KQ -"),
 new FullOpening("A00", "Formation: Hippopotamus Attack", "r1bq1rk1/ppp2ppp/2nb1n2/3pp3/8/PPPPPPP1/7P/RNBQKBNR b KQ -"),

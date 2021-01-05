@@ -132,7 +132,7 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
 [TimeControl "300"]
 [ECO "A00e"]
 
-1. a4 { [%clk 0:04:58] } Nf6 { [%clk 0:04:59] } 2. d4 { [%clk 0:04:55] } d5 { [%clk 0:04:58] } 3. h4 { [%clk 0:04:52] } e6 { [%clk 0:04:57] } 4. Qd3! { An invention of true genius. } { [%clk 0:04:48] } 4... c5 { [%clk 0:04:56] } 5. dxc5 { [%clk 0:04:18] } Bxc5! { [%clk 0:04:55] }"""
+1. a4 { [%clk 0:04:58] } 1... Nf6 { [%clk 0:04:59] } 2. d4 { [%clk 0:04:55] } 2... d5 { [%clk 0:04:58] } 3. h4 { [%clk 0:04:52] } 3... e6 { [%clk 0:04:57] } 4. Qd3! { An invention of true genius. } { [%clk 0:04:48] } 4... c5 { [%clk 0:04:56] } 5. dxc5 { [%clk 0:04:18] } 5... Bxc5! { [%clk 0:04:55] }"""
     }
 
     "be correct with NAGs" in {
@@ -322,7 +322,7 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
 [TimeControl "300"]
 [ECO "A00e"]
 
-1. a4 { [%clk 0:04:58] } Nf6 { [%clk 0:04:59] } 2. d4 { [%clk 0:04:55] } d5 { [%clk 0:04:58] } 3. h4 { [%clk 0:04:52] } e6 { [%clk 0:04:57] } 4. Qd3! { An invention of true genius. } { [%clk 0:04:48] } 4... c5 { [%clk 0:04:56] } 5. dxc5 { [%clk 0:04:18] } Bxc5! { [%clk 0:04:55] }"""
+1. a4 { [%clk 0:04:58] } 1... Nf6 { [%clk 0:04:59] } 2. d4 { [%clk 0:04:55] } 2... d5 { [%clk 0:04:58] } 3. h4 { [%clk 0:04:52] } 3... e6 { [%clk 0:04:57] } 4. Qd3! { An invention of true genius. } { [%clk 0:04:48] } 4... c5 { [%clk 0:04:56] } 5. dxc5 { [%clk 0:04:18] } 5... Bxc5! { [%clk 0:04:55] }"""
     }
   }
 }

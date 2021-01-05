@@ -23,7 +23,7 @@ case class Game(
     }
 
   def apply(move: Move): Game = {
-    val newSituation = move situationAfter
+    val newSituation = move.situationAfter
 
     copy(
       situation = newSituation,

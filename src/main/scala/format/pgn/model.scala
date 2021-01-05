@@ -113,7 +113,7 @@ case class Move(
     secondsLeft: Option[Int] = None
 ) {
 
-  def isLong = comments.nonEmpty || variations.nonEmpty
+  def isLong = comments.nonEmpty || variations.nonEmpty || secondsLeft.isDefined
 
   private def clockString: Option[String] =
     secondsLeft.map(seconds => "[%clk " + Move.formatPgnSeconds(seconds) + "]")

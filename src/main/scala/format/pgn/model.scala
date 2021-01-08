@@ -40,8 +40,11 @@ case class Pgn(
       if (initial.comments.nonEmpty) initial.comments.mkString("{ ", " } { ", " }\n")
       else ""
     val turnStr = turns mkString " "
-    val endStr  = tags(_.Result) | ""
-    s"$tags\n\n$initStr$turnStr $endStr"
+    val resultStr = tags(_.Result) | ""
+    val endStr =
+      if (turnStr.nonEmpty) s" $resultStr"
+      else resultStr
+    s"$tags\n\n$initStr$turnStr$endStr"
   }.trim
 
   override def toString = render

@@ -262,7 +262,7 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
       )
       pgn.toString must_== """[Result "0-1"]
 
- 0-1"""
+0-1"""
     }
   }
 

@@ -45,7 +45,6 @@ object Parser {
       } yield ParsedPgn(init, tags, sans)
     } catch {
       case _: StackOverflowError =>
-        println(pgn)
         sys error "### StackOverflowError ### in PGN parser"
     }
 

@@ -44,7 +44,7 @@ object FullOpeningDB {
         }
       }
 
-  def searchInFens(fens: List[FEN]): Option[FullOpening] =
+  def searchInFens(fens: Vector[FEN]): Option[FullOpening] =
     fens.foldRight(none[FullOpening]) {
       case (fen, None) => findByFen(fen)
       case (_, found)  => found

@@ -39,7 +39,7 @@ case class Pgn(
     val initStr =
       if (initial.comments.nonEmpty) initial.comments.mkString("{ ", " } { ", " }\n")
       else ""
-    val turnStr = turns mkString " "
+    val turnStr   = turns mkString " "
     val resultStr = tags(_.Result) | ""
     val endStr =
       if (turnStr.nonEmpty) s" $resultStr"

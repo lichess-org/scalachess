@@ -7,6 +7,7 @@ import scala.util.parsing.combinator._
 import cats.data.Validated
 import cats.data.Validated.{ invalid, valid }
 import cats.implicits._
+import scala.util.matching.Regex
 
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 object Parser {
@@ -129,15 +130,20 @@ object Parser {
     def nagGlyphs: Parser[Glyphs] =
       as("nagGlyphs") {
         rep(nag) ^^ { nags =>
-          Glyphs fromList nags.flatMap { n =>
-            n.drop(1).toIntOption flatMap Glyph.find
-          }
+          Glyphs fromList nags.flatMap { Glyph.find _ }
         }
       }
 
     def nag: Parser[String] =
       as("nag") {
-        """\$\d+""".r
+        val glyphsRE = Glyph.PositionAssessment.all
+          .map(_.symbol)
+          .sortBy(-_.length)
+          .map(Regex.quote(_))
+          .mkString("|")
+          .r
+
+        """\$\d+""".r | glyphsRE
       }
 
     def variation: Parser[List[StrMove]] =

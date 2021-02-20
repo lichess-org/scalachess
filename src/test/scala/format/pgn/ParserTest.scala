@@ -83,6 +83,15 @@ class ParserTest extends ChessTest {
     }
   }
 
+  "non-nags" in {
+    parser(withGlyphAnnotations) must beValid
+
+    parser("Bxd3?? ∞") must beValid.like { case ParsedPgn(_, _, Sans(List(san))) =>
+      san.metas.glyphs.move must_== Option(Glyph.MoveAssessment.blunder)
+      san.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
+    }
+  }
+
   "comments" in {
     parser("Ne7g6+! {such a neat comment}") must beValid.like { case ParsedPgn(_, _, Sans(List(san))) =>
       san.metas.comments must_== List("such a neat comment")

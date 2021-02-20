@@ -1975,4 +1975,19 @@ val stackOverflow = """
 
 1. d3 g6 2. f4 d5 3. Nf3 Bg7 4. g3 c6 5. Bg2 Qb6 6. c3 Nf6 7. Qb3 Nbd7 8. Qxb6 axb6 9. h3 Nc5 10. Nbd2 O-O 11. O-O b5 12. a3 Ra4 13. Kh2 Ne8 14. d4 Ne4 15. Nxe4 dxe4 16. Nd2 f5 17. e3 Be6 18. Re1 Ra7 19. Bf1 Nd6 20. b3 b6 21. Bb2 c5 22. Be2 Rc8 23. Rec1 h5 24. Bd1 Kf7 25. Kg2 Bf6 26. h4 Ke8 27. Kf2 Kd7 28. Rab1 Rac7 29. Ra1 Ra8 30. Rab1 Rca7 31. Rc2 Rxa3 32. Bxa3 Rxa3 33. dxc5 bxc5 34. Be2 Kc6 35. b4 c4 36. Rbc1 Nc8 37. Nb1 Ra1 38. Nd2 Ra7 39. Nb1 Nb6 40. Bd1 Nd5 41. Be2 Ra1 42. Rd1 Bf7 43. Bf1 e5 44. fxe5 Bxe5 45. Bg2 Bc7 46. Re2 Be6 47. Rb2 Nf6 48. Bh3 Nd7 49. Bf1 Ne5 50. Be2 Nd3+ 51. Bxd3 cxd3 52. Rf1 Be5 53. Kg2 Kd6 54. Rff2 Bf6 55. Rf1 Bg7 56. Kf2 Be5 57. Kg2 Bf6 58. Rff2 g5 59. Rf1 gxh4 60. gxh4 Bxh4 61. Rh1 Bg5 62. Kf2 f4 63. exf4 Bxf4 64. Re1 Ke5 0-1
 """
+
+val withGlyphAnnotations = """
+1. e4 e5 2. Nf3 d5 3. exd5 e4 4. Nd4 Qxd5 5. c3 Bc5 6. Nb3 Nf6 7. d4 exd3 8.
+Bxd3?? ⩱ {BLUNDER (-4.28)} ({(+0.33) The best move was} 8. Nxc5 Qxc5 9. Bxd3 Bg4
+10. Qb3 Qe5+ 11. Be3 Qd5 12. Qxd5 Nxd5 13. Bd2 Nc6 14. Na3 Ne5 15. Bc2 O-O-O 16.
+f3 Be6 17. O-O-O a6) 8... Qxg2 9. Rf1 {INACCURACY (-4.62)} ({(-3.60) The best
+move was} 9. Qe2+ Kd8 10. Qf1 Bxf2+ 11. Kd1 Bh3 12. Kc2 Qxf1 13. Rxf1 Bxf1 14.
+Bxf1 a5 15. a4 Re8 16. Bg5 Nd7 17. Bg2 Re2+ 18. N1d2 Be3 19. Bxb7) 9... Bb6 10.
+Bf4? {MISTAKE (-7.01)} ({(-4.43) The best move was} 10. Qe2+ Kd8 11. Kd1 Re8 12.
+Qd2 Bg4+ 13. f3 Bxf3+ 14. Rxf3 Qxf3+ 15. Be2+ Qd5 16. Bf3 Qxd2+ 17. N1xd2 c6 18.
+Nc4 Nbd7 19. Bg5 h6 20. Bxf6+ Nxf6 21. Kc2 Kc7 22. Rd1 Rad8 23. Rxd8 Rxd8 24. h4
+Re8) (10. Bf4 O-O 11. Qd2 Bg4 12. f3 Re8+ 13. Kd1 Bxf3+ 14. Kc1 Nc6 15. Qxg2
+Bxg2 16. N1d2 Rad8 17. Kc2 Rxd3 18. Kxd3 Bxf1+ 19. Rxf1 Nd5 20. Bg3 Re3+ 21. Kc4
+Rxg3 22. hxg3 Ne3+ 23. Kb5 a6+ 24. Ka4 Nxf1) 1-0
+"""
 }

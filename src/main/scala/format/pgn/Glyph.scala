@@ -50,6 +50,9 @@ object Glyphs {
       position = glyphs.collectFirst { case g: Glyph.PositionAssessment => g },
       observations = glyphs.collect { case g: Glyph.Observation => g }
     )
+  val all = Glyph.MoveAssessment.all ++ Glyph.Observation.all ++ Glyph.PositionAssessment.all
+
+  val bySymbol: Map[String, Glyph] = all.map { g => g.symbol -> g }.toMap
 }
 
 object Glyph {
@@ -133,4 +136,10 @@ object Glyph {
     MoveAssessment.byId.get(id) orElse
       PositionAssessment.byId.get(id) orElse
       Observation.byId.get(id)
+
+  def find(s: String): Option[Glyph] =
+    if (s.startsWith("$"))
+      s.drop(1).toIntOption flatMap Glyph.find
+    else
+      Glyphs.bySymbol.get(s)
 }

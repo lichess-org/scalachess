@@ -2,16 +2,16 @@ name := "scalachess"
 
 organization := "org.lichess"
 
-version := "10.2.0"
+version := "10.2.1"
 
-scalaVersion := "2.13.4"
+scalaVersion := "2.13.5"
 
 libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
   "org.specs2"             %% "specs2-core"              % "4.10.0" % Test,
   "org.specs2"             %% "specs2-cats"              % "4.10.0" % Test,
   "com.github.ornicar"     %% "scalalib"                 % "7.0.2",
-  "joda-time"               % "joda-time"                % "2.10.8",
+  "joda-time"               % "joda-time"                % "2.10.10",
   "org.typelevel"          %% "cats-core"                % "2.2.0"
 )
 

@@ -125,24 +125,25 @@ object Forsyth {
         }
       case word => word -> None
     }
-    if (pockets.isDefined && !variant.crazyhouse) return None
-    makePiecesWithCrazyPromoted(position.toList, 0, 7) map { case (pieces, promoted) =>
-      val board = Board(pieces, variant = variant)
-      if (promoted.isEmpty) board else board.withCrazyData(_.copy(promoted = promoted))
-    } map { board =>
-      pockets.fold(board) { str =>
-        import chess.variant.Crazyhouse.{ Pocket, Pockets }
-        val (white, black) = str.toList.flatMap(Piece.fromChar).partition(_ is White)
-        board.withCrazyData(
-          _.copy(
-            pockets = Pockets(
-              white = Pocket(white.map(_.role)),
-              black = Pocket(black.map(_.role))
+    if (pockets.isDefined && !variant.crazyhouse) None
+    else
+      makePiecesWithCrazyPromoted(position.toList, 0, 7) map { case (pieces, promoted) =>
+        val board = Board(pieces, variant = variant)
+        if (promoted.isEmpty) board else board.withCrazyData(_.copy(promoted = promoted))
+      } map { board =>
+        pockets.fold(board) { str =>
+          import chess.variant.Crazyhouse.{ Pocket, Pockets }
+          val (white, black) = str.toList.flatMap(Piece.fromChar).partition(_ is White)
+          board.withCrazyData(
+            _.copy(
+              pockets = Pockets(
+                white = Pocket(white.map(_.role)),
+                black = Pocket(black.map(_.role))
+              )
             )
           )
-        )
+        }
       }
-    }
   }
 
   private def makePiecesWithCrazyPromoted(

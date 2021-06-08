@@ -125,6 +125,7 @@ object Forsyth {
         }
       case word => word -> None
     }
+    if (pockets.isDefined && !variant.crazyhouse) return None
     makePiecesWithCrazyPromoted(position.toList, 0, 7) map { case (pieces, promoted) =>
       val board = Board(pieces, variant = variant)
       if (promoted.isEmpty) board else board.withCrazyData(_.copy(promoted = promoted))

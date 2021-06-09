@@ -2,9 +2,9 @@ name := "scalachess"
 
 organization := "org.lichess"
 
-version := "10.2.1"
+version := "10.2.2"
 
-scalaVersion := "2.13.5"
+scalaVersion := "2.13.6"
 
 libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",

@@ -469,7 +469,6 @@ new FullOpening("A40", "Queen's Pawn Game", "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPP
 new FullOpening("A40", "Queen's Pawn Game: Anglo-Slav Opening", "rnbqkbnr/pp2pppp/2pp4/8/2PP4/8/PP2PPPP/RNBQKBNR w KQkq -"),
 new FullOpening("A40", "Queen's Pawn Game: Englund Gambit", "r1b1kb1r/ppppq1pp/2n2n2/3Q4/8/5N2/PPP1PPPP/RNB1KB1R w KQkq -"),
 new FullOpening("A40", "Queen's Pawn Game: London System, Pterodactyl Variation", "rnb1k1nr/pp1pppbp/6p1/q7/3P1B2/5N2/PP2PPPP/RN1QKB1R w KQkq -"),
-new FullOpening("A40", "Queen's Pawn Game: Veresov Attack, Fianchetto Defense", "rnbqk1nr/ppp1ppbp/6p1/3p4/3P4/2N2N2/PPP1PPPP/R1BQKB1R w KQkq -"),
 new FullOpening("A40", "Slav Indian: Kudischewitsch Gambit", "rnbqkb1r/p2ppppp/2p2n2/1p6/2PP4/5N2/PP2PPPP/RNBQKB1R w KQkq -"),
 new FullOpening("A40", "St. George Defense: Polish Variation", "rn1qkbnr/1bpp1ppp/p3p3/1p6/3PP3/3B1N2/PPP2PPP/RNBQK2R w KQkq -"),
 new FullOpening("A40", "Zaire Defense", "rnbqkbnr/pppppppp/8/3PP3/8/8/PPP2PPP/RNBQKBNR w KQkq -"),

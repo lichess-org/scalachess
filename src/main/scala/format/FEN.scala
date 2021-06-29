@@ -6,6 +6,7 @@ final case class FEN(value: String) extends AnyVal {
 
   override def toString = value
 
+  def halfMove: Option[Int] = value.split(' ').lift(4).flatMap(_.toIntOption)
   def fullMove: Option[Int] = value.split(' ').lift(5).flatMap(_.toIntOption)
 
   def color: Option[Color] =

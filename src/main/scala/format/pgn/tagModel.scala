@@ -97,6 +97,7 @@ object Tag {
     val format = DateTimeFormat forPattern "HH:mm:ss" withZone DateTimeZone.UTC
   }
   case object Round           extends TagType
+  case object Board           extends TagType
   case object White           extends TagType
   case object Black           extends TagType
   case object TimeControl     extends TagType
@@ -129,6 +130,7 @@ object Tag {
     UTCDate,
     UTCTime,
     Round,
+    Board,
     White,
     Black,
     TimeControl,

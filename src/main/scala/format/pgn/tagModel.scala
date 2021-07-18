@@ -10,7 +10,7 @@ case class Tag(name: TagType, value: String) {
   override def toString = s"""[$name "$value"]"""
 }
 
-sealed trait TagType {
+trait TagType {
   lazy val name      = toString
   lazy val lowercase = name.toLowerCase
   val isUnknown      = false

@@ -111,9 +111,15 @@ object Parser {
     val moveRegex =
       """(?:(?:0\-0(?:\-0|)[\+\#]?)|[PQKRBNOoa-h@][QKRBNa-h1-8xOo\-=\+\#\@]{1,6})[\?!□]{0,2}""".r
 
+    def forbidNullMove: Parser[Unit] =
+      as("forbidNullMove") {
+        val nullMove = "--" | "Z0" | "null" | "pass" | "@@@@"
+        guard(nullMove) ~> err("Lichess does not support null moves") | success(())
+      }
+
     def strMove: Parser[StrMove] =
       as("move") {
-        ((number | commentary) *) ~>
+        ((number | commentary) *) ~ forbidNullMove ~>
           (moveRegex ~ nagGlyphs ~ rep(commentary) ~ nagGlyphs ~ rep(variation)) <~
           (moveExtras *) ^^ { case san ~ glyphs ~ comments ~ glyphs2 ~ variations =>
             StrMove(san, glyphs merge glyphs2, cleanComments(comments), variations)

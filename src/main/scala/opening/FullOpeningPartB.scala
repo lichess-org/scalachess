@@ -447,7 +447,7 @@ new FullOpening("B27", "Modern Defense: Pterodactyl Variation", "rnb1k1nr/pp1ppp
 new FullOpening("B27", "Pterodactyl Defense: Sicilian, Anhanguera", "rnb1k1nr/pp1pppbp/6p1/q1p5/3PP3/2N1BN2/PPP2PPP/R2QKB1R b KQkq -"),
 new FullOpening("B27", "Pterodactyl Defense: Sicilian, Benoni Gambit", "rnb1k1nr/pp1pppbp/6p1/q1pP4/4P3/2N2N2/PPP2PPP/R1BQKB1R b KQkq -"),
 new FullOpening("B27", "Pterodactyl Defense: Sicilian, Pteranodon", "rnb1k1nr/pp1ppp1p/6p1/q1P5/4P3/2P2N2/P1P2PPP/R1BQKB1R b KQkq -"),
-new FullOpening("B27", "Pterodactyl Defense: Sicilian, Rhamporhynchus", "rnb1k1nr/pp1pppbp/6p1/q1P5/4P3/2N2N2/PPP2PPP/R1BQKB1R b KQkq -"),
+new FullOpening("B27", "Pterodactyl Defense: Sicilian, Rhamphorhynchus", "rnb1k1nr/pp1pppbp/6p1/q1P5/4P3/2N2N2/PPP2PPP/R1BQKB1R b KQkq -"),
 new FullOpening("B27", "Pterodactyl Defense: Sicilian, Unpin", "rnb1k1nr/pp1pppbp/6p1/q1p5/3PP3/2N2N2/PPPB1PPP/R2QKB1R b KQkq -"),
 new FullOpening("B27", "Pterodactyl Defense: Western, Pterodactyl", "rnb1k1nr/pp1pppbp/6p1/q1p5/3PP3/2P2N2/PP3PPP/RNBQKB1R w KQkq -"),
 new FullOpening("B27", "Pterodactyl Defense: Western, Rhamphorhynchus", "rnb1k1nr/pp1pppbp/6p1/q1P5/4P3/5N2/PPP2PPP/RNBQKB1R w KQkq -"),

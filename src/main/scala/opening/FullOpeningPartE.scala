@@ -37,7 +37,7 @@ new FullOpening("E10", "Blumenfeld Countergambit Accepted", "rnbqkb1r/p5pp/4pn2/
 new FullOpening("E10", "Blumenfeld Countergambit: Dus-Khotimirsky Variation", "rnbqkb1r/p2p1ppp/4pn2/1ppP2B1/2P5/5N2/PP2PPPP/RN1QKB1R b KQkq -"),
 new FullOpening("E10", "Blumenfeld Countergambit: Spielmann Variation", "rnbqkb1r/p2p1pp1/5n1p/1ppP2B1/8/5N2/PP2PPPP/RN1QKB1R w KQkq -"),
 new FullOpening("E10", "Indian Defense: Anti-Nimzo-Indian", "rnbqkb1r/pppp1ppp/4pn2/8/2PP4/5N2/PP2PPPP/RNBQKB1R b KQkq -"),
-new FullOpening("E10", "Indian Defense: Dzindzikhashvili Defense", "rnbqkb1r/1ppp1ppp/p3pn2/8/2PP4/5N2/PP2PPPP/RNBQKB1R w KQkq -"),
+new FullOpening("E10", "Indian Defense: Dzindzi-Indian Defense", "rnbqkb1r/1ppp1ppp/p3pn2/8/2PP4/5N2/PP2PPPP/RNBQKB1R w KQkq -"),
 new FullOpening("E10", "Indian Defense: Döry Indian", "rnbqkb1r/pppp1ppp/4p3/8/2PPn3/5N2/PP2PPPP/RNBQKB1R w KQkq -"),
 new FullOpening("E10", "Tarrasch Defense: Symmetrical Variation", "r1bqkb1r/pp3ppp/2n1pn2/2pp4/2PP4/2N1PN2/PP3PPP/R1BQKB1R w KQkq -"),
 new FullOpening("E11", "Bogo-Indian Defense", "rnbqk2r/pppp1ppp/4pn2/8/1bPP4/5N2/PP2PPPP/RNBQKB1R w KQkq -"),

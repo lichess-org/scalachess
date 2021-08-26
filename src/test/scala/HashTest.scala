@@ -148,7 +148,7 @@ class HashTest extends ChessTest {
 
       // 5 ... Bxf3
       val fenAfter       = FEN("r2qkb1r/ppp1pppp/2n2n2/3p2B1/3P4/4Pb2/PPP1BPPP/RN1QK2R/n w KQkq - 10 6")
-      val situationAfter = (format.Forsyth << fenAfter) get
+      val situationAfter = format.Forsyth.<<<@(Crazyhouse, fenAfter).get.situation
       val hashAfter      = hash(situationAfter)
 
       hashAfterMove mustEqual hashAfter

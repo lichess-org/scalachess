@@ -303,57 +303,70 @@ class ForsythTest extends ChessTest {
     import variant.Crazyhouse._
     "read" in {
       "nope" in {
-        f <<< FEN("2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6 w - f6 0 36") must beSome.like { s =>
-          s.situation.board.crazyData must beNone
-        }
+        f.<<<@(Crazyhouse, FEN("2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6 w - f6 0 36")) must beSome
+          .like { s =>
+            s.situation.board.crazyData must_== Some(Data(Pockets(Pocket(Nil), Pocket(Nil)), Set.empty))
+          }
       }
       "pockets are not confused as pieces" in {
-        f <<< FEN("2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6/pPP w - f6 0 36") must beSome.like { s =>
-          f exportBoard s.situation.board must_== "2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6"
-        }
+        f.<<<@(Crazyhouse, FEN("2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6/pPP w - f6 0 36")) must beSome
+          .like { s =>
+            f exportBoard s.situation.board must_== "2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6"
+          }
       }
       "pockets" in {
-        f <<< FEN("2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6/pPP w - f6 0 36") must beSome.like { s =>
+        f.<<<@(Crazyhouse, FEN("2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6/pPP w - f6 0 36")) must beSome
+          .like { s =>
+            s.situation.board.crazyData must beSome.like {
+              case Data(Pockets(Pocket(Pawn :: Pawn :: Nil), Pocket(Pawn :: Nil)), promoted) =>
+                promoted must beEmpty
+            }
+          }
+      }
+      "winboard pockets" in {
+        f.<<<@(
+          Crazyhouse,
+          FEN("r1bk3r/ppp2ppp/4p3/1B1pP3/1b1N4/2N2qPp/PPP2NbP/4R1KR[PNq] b - - 39 20")
+        ) must beSome.like { s =>
           s.situation.board.crazyData must beSome.like {
-            case Data(Pockets(Pocket(Pawn :: Pawn :: Nil), Pocket(Pawn :: Nil)), promoted) =>
+            case Data(Pockets(Pocket(Pawn :: Knight :: Nil), Pocket(Queen :: Nil)), promoted) =>
               promoted must beEmpty
           }
         }
       }
-      "winboard pockets" in {
-        f <<< FEN("r1bk3r/ppp2ppp/4p3/1B1pP3/1b1N4/2N2qPp/PPP2NbP/4R1KR[PNq] b - - 39 20") must beSome.like {
-          s =>
-            s.situation.board.crazyData must beSome.like {
-              case Data(Pockets(Pocket(Pawn :: Knight :: Nil), Pocket(Queen :: Nil)), promoted) =>
-                promoted must beEmpty
-            }
-        }
-      }
       "promoted none" in {
-        f <<< FEN("2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6/pPP w - f6 0 36") must beSome.like { s =>
+        f.<<<@(Crazyhouse, FEN("2b2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q6/pPP w - f6 0 36")) must beSome
+          .like { s =>
+            s.situation.board.crazyData must beSome.like { case Data(_, promoted) =>
+              promoted must beEmpty
+            }
+          }
+      }
+      "promoted some" in {
+        f.<<<@(
+          Crazyhouse,
+          FEN("Q~R~b~2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q4q~R~/pPP w - f6 0 36")
+        ) must beSome.like { s =>
           s.situation.board.crazyData must beSome.like { case Data(_, promoted) =>
-            promoted must beEmpty
+            promoted must_== Set(A8, B8, C8, G1, H1)
           }
         }
       }
-      "promoted some" in {
-        f <<< FEN("Q~R~b~2rk1/3p2pp/2pNp3/4PpN1/qp1P3P/4P1K1/6P1/1Q4q~R~/pPP w - f6 0 36") must beSome.like {
-          s =>
-            s.situation.board.crazyData must beSome.like { case Data(_, promoted) =>
-              promoted must_== Set(A8, B8, C8, G1, H1)
-            }
-        }
-      }
       "promoted on H8" in {
-        f << FEN("rnb1k2Q~/pp5p/2pp1p2/8/8/P1N2P2/P1PP1K1P/R1BQ1BNR/RPNBQPp b q - 21 11") must beSome.like {
-          s =>
-            s.board.crazyData must beSome.like { case Data(_, promoted) =>
-              promoted must_== Set(H8)
-            }
+        f.<<<@(
+          Crazyhouse,
+          FEN("rnb1k2Q~/pp5p/2pp1p2/8/8/P1N2P2/P1PP1K1P/R1BQ1BNR/RPNBQPp b q - 21 11")
+        ) must beSome.like { s =>
+          s.situation.board.crazyData must beSome.like { case Data(_, promoted) =>
+            promoted must_== Set(H8)
+          }
         }
       }
       "promoted on H2" in {
-        f << FEN("r2q1b1r/p2k1Ppp/2p2p2/4p3/P2nP2n/3P1PRP/1PPB1K1q~/RN1Q1B2/Npb w - - 40 21") must beSome
+        f.<<@(
+          Crazyhouse,
+          FEN("r2q1b1r/p2k1Ppp/2p2p2/4p3/P2nP2n/3P1PRP/1PPB1K1q~/RN1Q1B2/Npb w - - 40 21")
+        ) must beSome
           .like { s =>
             s.board.crazyData must beSome.like { case Data(_, promoted) =>
               promoted must_== Set(H2)

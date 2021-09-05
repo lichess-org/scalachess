@@ -565,7 +565,7 @@ new FullOpening("C41", "Philidor Defense", "rnbqkbnr/ppp2ppp/3p4/4p3/4P3/5N2/PPP
 new FullOpening("C41", "Philidor Defense", "rnbqkbnr/ppp2ppp/3p4/4p3/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq -"),
 new FullOpening("C41", "Philidor Defense", "rnbqkbnr/ppp2ppp/3p4/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq -"),
 new FullOpening("C41", "Philidor Defense", "rnbqk1nr/ppp1bppp/3p4/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq -"),
-new FullOpening("C41", "Philidor Defense: Alapin-Blackburne Gambit", "r2qkbnr/pppn1ppp/3p4/4P3/4P1b1/5N2/PPP2PPP/RNBQKB1R w KQkq -"),
+new FullOpening("C41", "Philidor Defense: Albin-Blackburne Gambit", "r2qkbnr/pppn1ppp/3p4/4P3/4P1b1/5N2/PPP2PPP/RNBQKB1R w KQkq -"),
 new FullOpening("C41", "Philidor Defense: Berger Variation", "r2q1rk1/pp2bppp/2npbn2/2p3B1/4P3/2N2N2/PPP1BPPP/R2QR1K1 b - -"),
 new FullOpening("C41", "Philidor Defense: Bird Gambit", "rnbqkbnr/ppp2ppp/3p4/8/3pP3/2P2N2/PP3PPP/RNBQKB1R b KQkq -"),
 new FullOpening("C41", "Philidor Defense: Boden Variation", "rn1qkbnr/pppb1ppp/3p4/8/3QP3/5N2/PPP2PPP/RNB1KB1R w KQkq -"),

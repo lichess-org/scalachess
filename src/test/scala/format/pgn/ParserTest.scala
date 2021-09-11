@@ -335,4 +335,8 @@ class ParserTest extends ChessTest {
   "example from chessgames.com with weird comments" in {
     parser(chessgamesWeirdComments) must beValid
   }
+
+  "exotic notation from clono.no" in {
+    parser(clonoNoExoticNotation) must beValid
+  }
 }

@@ -109,7 +109,7 @@ object Parser {
       }
 
     val moveRegex =
-      """(?:(?:0\-0(?:\-0|)[\+\#]?)|[PQKRBNOoa-h@][QKRBNa-h1-8xOo\-=\+\#\@]{1,6})[\?!□]{0,2}""".r
+      """(?:(?:0\-0(?:\-0|)[\+\#]?)|[PQKRBNOoa-h@][QKRBNa-h1-8xOo\-=\+\#\@]{1,7})[\?!□]{0,2}""".r
 
     def forbidNullMove: Parser[Unit] =
       as("forbidNullMove") {

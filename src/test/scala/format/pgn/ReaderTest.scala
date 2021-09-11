@@ -147,4 +147,11 @@ class ReaderTest extends ChessTest {
       replay.chronoMoves.size must_== 19
     }
   }
+  "exotic notation from clono.no" in {
+    Reader.full(clonoNoExoticNotation) must beValid.like { case Complete(replay) =>
+      replay.chronoMoves lift 42 must beSome.like { case Left(move) =>
+        move.toUci.uci must_== "e7f8q"
+      }
+    }
+  }
 }

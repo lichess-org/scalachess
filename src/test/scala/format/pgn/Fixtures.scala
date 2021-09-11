@@ -1990,4 +1990,9 @@ Re8) (10. Bf4 O-O 11. Qd2 Bg4 12. f3 Re8+ 13. Kd1 Bxf3+ 14. Kc1 Nc6 15. Qxg2
 Bxg2 16. N1d2 Rad8 17. Kc2 Rxd3 18. Kxd3 Bxf1+ 19. Rxf1 Nd5 20. Bg3 Re3+ 21. Kc4
 Rxg3 22. hxg3 Ne3+ 23. Kb5 a6+ 24. Ka4 Nxf1) 1-0
 """
+
+val clonoNoExoticNotation = """
+1. e2e4 e7e5 2. Ng1f3 Nb8c6 3. c2c3 Ng8f6 4. d2d4 e5xd4 5. e4e5 Nf6d5 6. Qd1b3 Nd5b6 7. c3xd4 d7d5 8. Bc1e3 Bc8f5 9. a2a3 Qd8d7 10. Nb1d2 Bf8e7 11. Bf1e2 a7a6 12. Ra1c1 O-O 13. O-O f7f6 14. Rf1d1 Kg8h8 15. Nd2b1 Nc6a5 16. Qb3c3 Na5c4 17. Be2c4 Nb6c4 18. Nb1d2 b7b5 19. Nd2b3 Bf5g4 20. e5xf6 Bg4f3 21. f6xe7 Qd7g4 22. e7xf8=Q+ {[%clk 00:26:01]} Ra8f8 {[%clk 00:27:09]} 0-1
+"""
+
 }

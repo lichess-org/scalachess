@@ -116,7 +116,8 @@ object Game {
             },
             color = parsed.situation.color
           ),
-          turns = parsed.turns
+          turns = parsed.turns,
+          startedAtTurn = parsed.turns
         )
       }
   }

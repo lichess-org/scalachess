@@ -101,8 +101,8 @@ object Divider {
       x <- File.all.take(7)
     } yield {
       for {
-        dy <- 0 to 1
-        dx <- 0 to 1
+        dy   <- 0 to 1
+        dx   <- 0 to 1
         file <- x.offset(dx)
         rank <- y.offset(dy)
       } yield Pos(file, rank)

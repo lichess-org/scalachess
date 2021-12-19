@@ -19,16 +19,17 @@ abstract class Variant private[variant] (
 
   def pieces: Map[Pos, Piece]
 
-  def standard      = this == Standard
-  def chess960      = this == Chess960
-  def fromPosition  = this == FromPosition
-  def kingOfTheHill = this == KingOfTheHill
-  def threeCheck    = this == ThreeCheck
-  def antichess     = this == Antichess
-  def atomic        = this == Atomic
-  def horde         = this == Horde
-  def racingKings   = this == RacingKings
-  def crazyhouse    = this == Crazyhouse
+  def standard              = this == Standard
+  def chess960              = this == Chess960
+  def fromPosition          = this == FromPosition
+  def kingOfTheHill         = this == KingOfTheHill
+  def threeCheck            = this == ThreeCheck
+  def antichess             = this == Antichess
+  def atomic                = this == Atomic
+  def horde                 = this == Horde
+  def racingKings           = this == RacingKings
+  def crazyhouse            = this == Crazyhouse
+  def riverDeepMountainHigh = this == RiverDeepMountainHigh
 
   def exotic = !standard
 
@@ -216,7 +217,8 @@ object Variant {
     Antichess,
     Atomic,
     Horde,
-    RacingKings
+    RacingKings,
+    RiverDeepMountainHigh
   )
   val byId = all map { v =>
     (v.id, v)

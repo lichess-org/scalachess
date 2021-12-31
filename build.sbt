@@ -12,6 +12,7 @@ ThisBuild / githubWorkflowBuild ++= Seq(
 
 libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
+  "org.typelevel"          %% "cats-parse"               % "0.3.6",
   "org.specs2"             %% "specs2-core"              % "4.10.0" % Test,
   "org.specs2"             %% "specs2-cats"              % "4.10.0" % Test,
   "com.github.ornicar"     %% "scalalib"                 % "7.0.2",

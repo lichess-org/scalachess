@@ -3,6 +3,7 @@ package format.pgn
 
 import chess.variant.Variant
 
+import cats.parse.{ Parser => P, Rfc5234 => R }
 import scala.util.parsing.combinator._
 import cats.data.Validated
 import cats.data.Validated.{ invalid, valid }
@@ -355,13 +356,26 @@ object Parser {
       }
   }
 
-  object TagParser extends RegexParsers with Logging {
+  object TagParser {
+
+    val whitespace: P[Unit]     = R.lf | R.wsp
+    val tagName: P[String]      = R.alpha.rep.string
+    val escapeDquote: P[String] = (P.char('\\') ~ R.dquote).as("\"")
+    val valueChar: P[String]    = escapeDquote | P.charWhere(_ != '"').string
+    val tagValue: P[String]     = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
+    val tagContent: P[Tag]      = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
+    val tag: P[Tag]             = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
+    val tags: P[Tags]           = tag.backtrack.rep.map(tags => Tags(tags.toList))
 
     def apply(pgn: String): Validated[String, Tags] =
-      parseAll(all, pgn) match {
-        case f: Failure       => invalid("Cannot parse tags: %s\n%s".format(f.toString, pgn))
-        case Success(tags, _) => valid(Tags(tags))
-        case err              => invalid("Cannot parse tags: %s\n%s".format(err.toString, pgn))
+      tags.parse(pgn) match {
+        case Left(err) =>
+          err match {
+            // TODO when error happen at the first charater return empty Tags, because it is feeded with empty string sometime.
+            case P.Error(0, _) => valid(Tags(List()))
+            case _             => invalid("Cannot parse tags: %s\n%s".format(err.toString, pgn))
+          }
+        case Right((_, tags)) => valid(tags)
       }
 
     def fromFullPgn(pgn: String): Validated[String, Tags] =
@@ -369,25 +383,6 @@ object Parser {
         apply(tags)
       }
 
-    def all: Parser[List[Tag]] =
-      as("all") {
-        tags <~ """(.|\n)*""".r
-      }
-
-    def tags: Parser[List[Tag]] = rep(tag)
-
-    def tag: Parser[Tag] =
-      as("tag") {
-        tagName ~ tagValue ^^ { case name ~ value =>
-          Tag(name, value)
-        }
-      }
-
-    val tagName: Parser[String] = "[" ~> """[a-zA-Z]+""".r
-
-    val tagValue: Parser[String] = """"(?:[^"\\]|\\.)*"""".r <~ "]" ^^ {
-      _.stripPrefix("\"").stripSuffix("\"").replace("\\\"", "\"")
-    }
   }
 
   // there must be a newline between the tags and the first move

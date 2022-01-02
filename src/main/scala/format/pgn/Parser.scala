@@ -3,7 +3,7 @@ package format.pgn
 
 import chess.variant.Variant
 
-import cats.parse.{ Parser => P, Rfc5234 => R }
+import cats.parse.{ Parser => P, Parser0 => P0, Rfc5234 => R }
 import scala.util.parsing.combinator._
 import cats.data.Validated
 import cats.data.Validated.{ invalid, valid }
@@ -236,124 +236,84 @@ object Parser {
         }
     }
 
-    private def slow(str: String): Validated[String, San] =
-      parseAll(move, str) match {
-        case Success(san, _) => valid(san)
-        case err             => invalid("Cannot parse move: %s\n%s".format(err.toString, str))
-      }
+    val qCastle: P[Side] = P.stringIn(List("O-O-O", "o-o-o", "0-0-0")).as(QueenSide)
+    val kCastle: P[Side] = P.stringIn(List("O-O", "o-o", "0-0")).as(KingSide)
 
-    def move: Parser[San] = castle | standard
+    val glyph: P[Glyph] =
+      mapParser(
+        Glyph.MoveAssessment.all.sortBy(_.symbol.length).map { g =>
+          g.symbol -> g
+        },
+        "glyph"
+      )
 
-    def castle =
-      (qCastle | kCastle) ~ suffixes ^^ { case side ~ suf =>
-        Castle(side) withSuffixes suf
-      }
+    val glyphs = glyph.rep0.map(gs => Glyphs.fromList(gs))
 
-    val qCastle: Parser[Side] = ("O-O-O" | "o-o-o" | "0-0-0") ^^^ QueenSide
-
-    val kCastle: Parser[Side] = ("O-O" | "o-o" | "0-0") ^^^ KingSide
-
-    def standard: Parser[San] =
-      as("standard") {
-        (disambiguatedPawn | pawn | disambiguated | ambiguous | drop) ~ suffixes ^^ { case std ~ suf =>
-          std withSuffixes suf
-        }
-      }
-
-    // e5
-    def pawn: Parser[Std] =
-      as("pawn") {
-        dest ^^ (de => Std(dest = de, role = Pawn))
-      }
-
-    // Bg5
-    def ambiguous: Parser[Std] =
-      as("ambiguous") {
-        role ~ x ~ dest ^^ { case ro ~ ca ~ de =>
-          Std(dest = de, role = ro, capture = ca)
-        }
-      }
-
-    // B@g5
-    def drop: Parser[Drop] =
-      as("drop") {
-        role ~ "@" ~ dest ^^ { case ro ~ _ ~ po =>
-          Drop(role = ro, pos = po)
-        }
-      }
-
-    // Bac3 Baxc3 B2c3 B2xc3 Ba2xc3
-    def disambiguated: Parser[Std] =
-      as("disambiguated") {
-        role ~ opt(file) ~ opt(rank) ~ x ~ dest ^^ { case ro ~ fi ~ ra ~ ca ~ de =>
-          Std(
-            dest = de,
-            role = ro,
-            capture = ca,
-            file = fi,
-            rank = ra
-          )
-        }
-      }
-
-    // d7d5
-    def disambiguatedPawn: Parser[Std] =
-      as("disambiguated") {
-        opt(file) ~ opt(rank) ~ x ~ dest ^^ { case fi ~ ra ~ ca ~ de =>
-          Std(
-            dest = de,
-            role = Pawn,
-            capture = ca,
-            file = fi,
-            rank = ra
-          )
-        }
-      }
-
-    def suffixes: Parser[Suffixes] =
-      opt(promotion) ~ checkmate ~ check ~ glyphs ^^ { case p ~ cm ~ c ~ g =>
-        Suffixes(c, cm, p, g)
-      }
-
-    def glyphs: Parser[Glyphs] =
-      as("glyphs") {
-        rep(glyph) ^^ Glyphs.fromList
-      }
-
-    def glyph: Parser[Glyph] =
-      as("glyph") {
-        mapParser(
-          Glyph.MoveAssessment.all.sortBy(_.symbol.length).map { g =>
-            g.symbol -> g
-          },
-          "glyph"
-        )
-      }
-
-    val x = exists("x")
-
-    val check = exists("+")
-
-    val checkmate = ("#" | "++") ^^^ true | success(false)
-
-    val role = mapParser(Role.allByPgn, "role") | success(Pawn)
+    val x         = P.char('x').?.map(_.isDefined)
+    val check     = P.char('+').?.map(_.isDefined)
+    val checkmate = (P.char('#') | P.string("++")).?.map(_.isDefined)
+    val role      = mapParser(Role.allByPgn, "role")
 
     val file = mapParser(fileMap, "file")
-
     val rank = mapParser(rankMap, "rank")
+
+    val dest: P[Pos] = mapParser(Pos.allKeys, "dest")
 
     val promotable = Role.allPromotableByPgn mapKeys (_.toUpper)
 
-    val promotion = ("=" ?) ~> mapParser(promotable, "promotion")
+    val promotion: P[PromotableRole] = P.char('=') *> mapParser(promotable, "promotion")
 
-    val dest = mapParser(Pos.allKeys, "dest")
+    // e5
+    val pawn: P[Std] = dest.map(Std(_, Pawn))
 
-    def exists(c: String): Parser[Boolean] = c ^^^ true | success(false)
+    // Bg5
+    val ambigous: P[Std] = (role ~ x ~ dest).map { case ((ro, ca), de) =>
+      Std(dest = de, role = ro, capture = ca)
+    }
 
-    def mapParser[A, B](pairs: Iterable[(A, B)], name: String): Parser[B] =
-      pairs.foldLeft(failure(name + " not found"): Parser[B]) { case (acc, (a, b)) =>
-        a.toString ^^^ b | acc
+    // B@g5
+    val drop: P[Drop] = ((role <* P.char('@')) ~ dest).map { case (role, pos) => Drop(role, pos) }
+
+    val pawnDrop: P[Drop] = (P.char('@') *> dest).map(Drop(Pawn, _))
+
+    // Bac3 Baxc3 B2c3 B2xc3 Ba2xc3
+    val disambiguated: P[Std] = (role ~ file.? ~ rank.? ~ x ~ dest).map { case ((((ro, fi), ra), ca), de) =>
+      Std(dest = de, role = ro, capture = ca, file = fi, rank = ra)
+    }
+
+    // d7d5
+    val disambiguatedPawn: P[Std] = (((file.? ~ rank.?) ~ x).with1 ~ dest).map { case (((fi, ra), ca), de) =>
+      Std(dest = de, role = Pawn, capture = ca, file = fi, rank = ra)
+    }
+
+    val suffixes: P0[Suffixes] = (promotion.? ~ checkmate ~ check ~ glyphs).map { case (((p, cm), c), g) =>
+      Suffixes(c, cm, p, g)
+    }
+
+    val castle: P[San] = ((qCastle | kCastle) ~ suffixes).map { case (side, suf) =>
+      Castle(side) withSuffixes suf
+    }
+
+    val standard: P[San] =
+      ((disambiguatedPawn.backtrack | pawn.backtrack | disambiguated.backtrack | ambigous.backtrack | drop.backtrack | pawnDrop.backtrack) ~ suffixes)
+        .map { case (std, suf) =>
+          std withSuffixes suf
+        }
+
+    val move = castle | standard
+    //val move = (pawn ~ suffixes).map { case (std, suf) => std withSuffixes suf }
+
+    def slow(str: String): Validated[String, San] =
+      move.parse(str) match {
+        case Right((_, san)) => valid(san)
+        case Left(err)       => invalid("Cannot parse move: %s\n%s".format(err.toString, str))
       }
+
+    def mapParser[A, B](pairs: Iterable[(A, B)], name: String): P[B] =
+      pairs.foldLeft(P.failWith(name + " not found"): P[B]) { case (acc, (a, b)) =>
+        P.string(a.toString).as(b) | acc
+      }
+
   }
 
   object TagParser {
@@ -396,3 +356,4 @@ object Parser {
       case (tagLines, moveLines) => valid(tagLines.mkString("\n") -> moveLines.mkString("\n"))
     }
 }
+

@@ -5,8 +5,8 @@ final case class LagTracker(
     quota: Centis,
     quotaMax: Centis,
     lagEstimator: DecayingRecorder,
-    uncompStats: Stats = EmptyStats,
-    lagStats: Stats = EmptyStats,
+    uncompStats: Stats = Stats.empty,
+    lagStats: Stats = Stats.empty,
     // We can remove compEst fields after tuning estimate.
     compEstSqErr: Int = 0,
     compEstOvers: Centis = Centis(0),

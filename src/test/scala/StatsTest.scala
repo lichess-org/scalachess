@@ -36,8 +36,7 @@ class StatsTest extends Specification {
       Stats.empty.samples must_== 0
     }
 
-    "convert to StatHolder" in {
-      Stats(5) must beLike(StatHolder(0, 0f, 0f).record(5))
+    "make Stats" in {
 
       "with good stats" in {
         Stats(5).samples must_== 1
@@ -59,13 +58,6 @@ class StatsTest extends Specification {
       statsN.mean must beApprox(realMean(data))
       statsN.variance.get must beApprox(realVar(data))
       statsN.samples must_== 400
-    }
-    "match concat" in {
-      statsN must_== (Stats.empty + statsN)
-      statsN must_== (statsN + Stats.empty)
-      statsN must beLike(Stats(data take 1) + Stats(data drop 1))
-      statsN must beLike(Stats(data take 100) + Stats(data drop 100))
-      statsN must beLike(Stats(data take 200) + Stats(data drop 200))
     }
   }
 }

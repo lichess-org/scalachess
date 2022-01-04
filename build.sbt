@@ -4,7 +4,11 @@ organization := "org.lichess"
 
 version := "10.3.0"
 
-scalaVersion := "2.13.6"
+ThisBuild / scalaVersion := "2.13.6"
+ThisBuild / githubWorkflowPublishTargetBranches := Seq() // Don't publish anywhere
+ThisBuild / githubWorkflowBuild ++= Seq(
+  WorkflowStep.Sbt(List("scalafmtCheckAll"), name = Some("Check Formatting"))
+)
 
 libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",

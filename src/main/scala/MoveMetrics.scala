@@ -7,5 +7,5 @@ case class MoveMetrics(
 
   // Calculate client reported lag given the server's duration for the move.
   def reportedLag(elapsed: Centis) =
-    clientMoveTime.orElse(clientLag).map(elapsed - _)
+    clientMoveTime.fold(clientLag)(mt => Option(elapsed - mt))
 }

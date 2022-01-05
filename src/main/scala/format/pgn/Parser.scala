@@ -2,8 +2,7 @@ package chess
 package format.pgn
 
 import chess.variant.Variant
-
-import cats.parse.{ Parser => P, Parser0 => P0, Rfc5234 => R, Numbers => N }
+import cats.parse.{ Numbers => N, Parser => P, Parser0 => P0, Rfc5234 => R }
 import cats.data.Validated
 import cats.data.Validated.{ invalid, valid }
 import cats.implicits._
@@ -12,11 +11,19 @@ import cats.implicits._
 object Parser {
 
   case class StrMove(
-      san: String,
+      san: San,
       glyphs: Glyphs,
       comments: List[String],
       variations: List[List[StrMove]]
-  )
+  ) {
+    def toSan: San = san withComments comments withVariations {
+      variations
+        .map { v =>
+          Sans(v.map(_.toSan))
+        }
+        .filter(_.value.nonEmpty)
+    } mergeGlyphs glyphs
+  }
 
   val whitespace  = R.lf | R.wsp
   val whitespaces = whitespace.rep0.?
@@ -41,10 +48,9 @@ object Parser {
         preTags     <- TagParser(tagStr)
         parsedMoves <- MovesParser(moveStr)
         init         = parsedMoves._1
-        strMoves     = parsedMoves._2
+        sans         = Sans(parsedMoves._2)
         resultOption = parsedMoves._3
         tags         = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + _)
-        sans <- objMoves(strMoves, tags.variant | Variant.default)
       } yield ParsedPgn(init, tags, sans)
     } catch {
       case _: StackOverflowError =>
@@ -52,43 +58,21 @@ object Parser {
     }
 
   def moves(str: String, variant: Variant): Validated[String, Sans] =
-    moves(
-      str.split(' ').toList,
-      variant
-    )
+    MovesParser.moves(str)
 
   def moves(strMoves: Iterable[String], variant: Variant): Validated[String, Sans] =
-    objMoves(
-      strMoves
-        .map {
-          StrMove(_, Glyphs.empty, Nil, Nil)
-        }
-        .to(List),
-      variant
-    )
+    strMoves.toList
+      .traverse(MovesParser.move)
+      .map(Sans(_))
 
-  def objMoves(strMoves: List[StrMove], variant: Variant): Validated[String, Sans] =
-    strMoves.map { case StrMove(san, glyphs, comments, variations) =>
-      (
-        MoveParser(san, variant) map { m =>
-          m withComments comments withVariations {
-            variations
-              .map { v =>
-                objMoves(v, variant) getOrElse Sans.empty
-              }
-              .filter(_.value.nonEmpty)
-          } mergeGlyphs glyphs
-        }
-      ): Validated[String, San]
-    }.sequence map {
-      Sans.apply
-    }
+  def objMoves(strMoves: List[StrMove], variant: Variant): Sans =
+    Sans(strMoves.map(_.toSan))
 
   object MovesParser {
 
     private def cleanComments(comments: List[String]) = comments.map(_.trim).filter(_.nonEmpty)
 
-    def apply(pgn: String): Validated[String, (InitialPosition, List[StrMove], Option[Tag])] =
+    def apply(pgn: String): Validated[String, (InitialPosition, List[San], Option[Tag])] =
       strMoves.parse(pgn) match {
         case Right((_, (init, moves, result))) =>
           valid(
@@ -106,6 +90,20 @@ object Parser {
             case P.Error(0, _) => valid((InitialPosition(List()), List(), None))
             case _             => invalid("Cannot parse moves: %s\n%s".format(err.toString, pgn))
           }
+      }
+
+    def moves(moves: String): Validated[String, Sans] =
+      strMove.rep.map(xs => Sans(xs.toList)).parse(moves) match {
+        case Right((_, str)) =>
+          valid(str)
+        case Left(err) => invalid("Cannot parse moves: %s\n%s".format(err.toString, moves))
+      }
+
+    def move(move: String): Validated[String, San] =
+      strMove.parse(move) match {
+        case Right((_, str)) =>
+          valid(str)
+        case Left(err) => invalid("Cannot parse move: %s\n%s".format(err.toString, move))
       }
 
     def whitespace: P[Unit] = R.lf | R.wsp
@@ -146,80 +144,27 @@ object Parser {
     def forbidNullMove =
       !P.stringIn(List("--", "Z0", "null", "pass", "@@@@")).withContext("Lichess does not support null moves")
 
-    def strMoves: P[(InitialPosition, List[StrMove], Option[String])] =
+    def strMoves: P[(InitialPosition, List[San], Option[String])] =
       ((commentary.rep0.with1 ~ strMove.rep) ~ result.? ~ commentary.rep0).map {
         case (((coms, sans), res), _) => (InitialPosition(cleanComments(coms)), sans.toList, res)
       }
 
-    def strMove: P[StrMove] = P.recursive[StrMove] { recuse =>
-      def variation: P[List[StrMove]] =
-        ((P.char('(') <* whitespaces) *> recuse.rep0 <* (P.char(')') ~ whitespaces)) <* whitespaces
+    def strMove: P[San] = P
+      .recursive[StrMove] { recuse =>
+        def variation: P[List[StrMove]] =
+          ((P.char('(') <* whitespaces) *> recuse.rep0 <* (P.char(')') ~ whitespaces)) <* whitespaces
 
-      ((number.backtrack | commentary <* whitespaces).rep0 ~ forbidNullMove).with1.soft *>
-        (((MoveParser.move.string ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0) <* whitespaces).backtrack
-          .map { case ((((san, glyphs), comments), glyphs2), variations) =>
-            StrMove(san, glyphs merge glyphs2, cleanComments(comments), variations)
-          }
-    }
+        ((number.backtrack | commentary <* whitespaces).rep0 ~ forbidNullMove).with1.soft *>
+          (((MoveParser.move ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0) <* whitespaces).backtrack
+            .map { case ((((san, glyphs), comments), glyphs2), variations) =>
+              StrMove(san, glyphs merge glyphs2, cleanComments(comments), variations)
+            }
+      }
+      .map(_.toSan)
 
   }
 
   object MoveParser {
-
-    val MoveR = """^(N|B|R|Q|K|)([a-h]?)([1-8]?)(x?)([a-h][0-9])(=?[NBRQ]?)(\+?)(\#?)$""".r
-    val DropR = """^([NBRQP])@([a-h][1-8])(\+?)(\#?)$""".r
-
-    def apply(str: String, variant: Variant): Validated[String, San] = {
-      if (str.length == 2) Pos.fromKey(str).fold(slow(str)) { pos =>
-        valid(Std(pos, Pawn))
-      }
-      else
-        str match {
-          case "O-O" | "o-o" | "0-0"       => valid(Castle(KingSide))
-          case "O-O-O" | "o-o-o" | "0-0-0" => valid(Castle(QueenSide))
-          case MoveR(role, file, rank, capture, pos, prom, check, mate) =>
-            role.headOption.fold[Option[Role]](Option(Pawn))(variant.rolesByPgn.get) flatMap { role =>
-              Pos fromKey pos map { dest =>
-                valid(
-                  Std(
-                    dest = dest,
-                    role = role,
-                    capture = capture != "",
-                    file = if (file == "") None else fileMap get file.head,
-                    rank = if (rank == "") None else rankMap get rank.head,
-                    promotion = if (prom == "") None else variant.rolesPromotableByPgn get prom.last,
-                    metas = Metas(
-                      check = check.nonEmpty,
-                      checkmate = mate.nonEmpty,
-                      comments = Nil,
-                      glyphs = Glyphs.empty,
-                      variations = Nil
-                    )
-                  )
-                )
-              }
-            } getOrElse slow(str)
-          case DropR(roleS, posS, check, mate) =>
-            roleS.headOption flatMap variant.rolesByPgn.get flatMap { role =>
-              Pos fromKey posS map { pos =>
-                valid(
-                  Drop(
-                    role = role,
-                    pos = pos,
-                    metas = Metas(
-                      check = check.nonEmpty,
-                      checkmate = mate.nonEmpty,
-                      comments = Nil,
-                      glyphs = Glyphs.empty,
-                      variations = Nil
-                    )
-                  )
-                )
-              }
-            } getOrElse invalid(s"Cannot parse drop: $str")
-          case _ => slow(str)
-        }
-    }
 
     def rangeToMap(r: Iterable[Char]) = r.zipWithIndex.to(Map).view.mapValues(_ + 1)
 
@@ -297,7 +242,7 @@ object Parser {
 
     def move = (castle | standard) <* whitespaces
 
-    def slow(str: String): Validated[String, San] =
+    def apply(str: String): Validated[String, San] =
       move.parse(str) match {
         case Right((_, san)) => valid(san)
         case Left(err)       => invalid("Cannot parse move: %s\n%s".format(err.toString, str))
@@ -349,4 +294,3 @@ object Parser {
       case (tagLines, moveLines) => valid(tagLines.mkString("\n") -> moveLines.mkString("\n"))
     }
 }
-

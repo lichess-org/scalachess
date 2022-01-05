@@ -137,13 +137,14 @@ object Parser {
     val positiveIntString: P[String] =
       (N.nonZeroDigit ~ N.digits0).string
 
+    // '. ' or '... ' or '. ... '
+    def numberSuffix = (P.char('.') | whitespace).rep0.void
+
     // 10. or 10... but not 0
     def number = (positiveIntString ~ numberSuffix).string
 
-    def numberSuffix = (P.char('.') | whitespace).rep0.void
-
-    // Lichess does not support null moves
-    def forbidNullMove = !P.stringIn(List("--", "Z0", "null", "pass", "@@@@"))
+    def forbidNullMove =
+      !P.stringIn(List("--", "Z0", "null", "pass", "@@@@")).withContext("Lichess does not support null moves")
 
     def strMoves: P[(InitialPosition, List[StrMove], Option[String])] =
       ((commentary.rep0.with1 ~ strMove.rep) ~ result.? ~ commentary.rep0).map {
@@ -155,9 +156,7 @@ object Parser {
         ((P.char('(') <* whitespaces) *> recuse.rep0 <* (P.char(')') ~ whitespaces)) <* whitespaces
 
       ((number.backtrack | commentary <* whitespaces).rep0 ~ forbidNullMove).with1.soft *>
-        (((MoveParser.move.string.withContext(
-          "move parser only"
-        ) ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0) <* whitespaces).backtrack
+        (((MoveParser.move.string ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0) <* whitespaces).backtrack
           .map { case ((((san, glyphs), comments), glyphs2), variations) =>
             StrMove(san, glyphs merge glyphs2, cleanComments(comments), variations)
           }
@@ -350,3 +349,4 @@ object Parser {
       case (tagLines, moveLines) => valid(tagLines.mkString("\n") -> moveLines.mkString("\n"))
     }
 }
+

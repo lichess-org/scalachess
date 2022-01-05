@@ -10,52 +10,33 @@ import cats.implicits._
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 object Parser {
 
-  case class StrMove(
-      san: San,
-      glyphs: Glyphs,
-      comments: List[String],
-      variations: List[List[StrMove]]
-  ) {
-    def toSan: San = san withComments comments withVariations {
-      variations
-        .map { v =>
-          Sans(v.map(_.toSan))
-        }
-        .filter(_.value.nonEmpty)
-    } mergeGlyphs glyphs
-  }
-
   val whitespace  = R.lf | R.wsp
   val whitespaces = whitespace.rep0.?
 
-  def full(pgn: String): Validated[String, ParsedPgn] =
-    try {
-      val preprocessed = augmentString(pgn).linesIterator
-        .map(_.trim)
-        .filterNot {
-          _.headOption.contains('%')
-        }
-        .mkString("\n")
-        .replace("[pgn]", "")
-        .replace("[/pgn]", "")
-        .replace("‑", "-")
-        .replace("–", "-")
-        .replace("e.p.", "") // silly en-passant notation
-      for {
-        splitted <- splitTagAndMoves(preprocessed)
-        tagStr  = splitted._1
-        moveStr = splitted._2
-        preTags     <- TagParser(tagStr)
-        parsedMoves <- MovesParser(moveStr)
-        init         = parsedMoves._1
-        sans         = Sans(parsedMoves._2)
-        resultOption = parsedMoves._3
-        tags         = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + _)
-      } yield ParsedPgn(init, tags, sans)
-    } catch {
-      case _: StackOverflowError =>
-        sys error "### StackOverflowError ### in PGN parser"
-    }
+  def full(pgn: String): Validated[String, ParsedPgn] = {
+    val preprocessed = augmentString(pgn).linesIterator
+      .map(_.trim)
+      .filterNot {
+        _.headOption.contains('%')
+      }
+      .mkString("\n")
+      .replace("[pgn]", "")
+      .replace("[/pgn]", "")
+      .replace("‑", "-")
+      .replace("–", "-")
+      .replace("e.p.", "") // silly en-passant notation
+    for {
+      splitted <- splitTagAndMoves(preprocessed)
+      tagStr  = splitted._1
+      moveStr = splitted._2
+      preTags     <- TagParser(tagStr)
+      parsedMoves <- MovesParser(moveStr)
+      init         = parsedMoves._1
+      sans         = Sans(parsedMoves._2)
+      resultOption = parsedMoves._3
+      tags         = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + _)
+    } yield ParsedPgn(init, tags, sans)
+  }
 
   def moves(str: String, variant: Variant): Validated[String, Sans] =
     MovesParser.moves(str)
@@ -64,9 +45,6 @@ object Parser {
     strMoves.toList
       .traverse(MovesParser.move)
       .map(Sans(_))
-
-  def objMoves(strMoves: List[StrMove], variant: Variant): Sans =
-    Sans(strMoves.map(_.toSan))
 
   object MovesParser {
 
@@ -86,7 +64,6 @@ object Parser {
           )
         case Left(err) =>
           err match {
-            // TODO when error happen at the first character return empty Tags, because it is fed with empty string sometime.
             case P.Error(0, _) => valid((InitialPosition(List()), List(), None))
             case _             => invalid("Cannot parse moves: %s\n%s".format(err.toString, pgn))
           }
@@ -105,8 +82,6 @@ object Parser {
           valid(str)
         case Left(err) => invalid("Cannot parse move: %s\n%s".format(err.toString, move))
       }
-
-    def whitespace: P[Unit] = R.lf | R.wsp
 
     def blockCommentary: P[String] = P.until0(P.char('}')).with1.between(P.char('{'), P.char('}'))
 
@@ -150,17 +125,17 @@ object Parser {
       }
 
     def strMove: P[San] = P
-      .recursive[StrMove] { recuse =>
-        def variation: P[List[StrMove]] =
-          ((P.char('(') <* whitespaces) *> recuse.rep0 <* (P.char(')') ~ whitespaces)) <* whitespaces
+      .recursive[San] { recuse =>
+        def variation: P[Sans] =
+          (((P.char('(') <* whitespaces) *> recuse.rep0 <* (P.char(')') ~ whitespaces)) <* whitespaces)
+            .map(Sans(_))
 
         ((number.backtrack | commentary <* whitespaces).rep0 ~ forbidNullMove).with1.soft *>
           (((MoveParser.move ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0) <* whitespaces).backtrack
             .map { case ((((san, glyphs), comments), glyphs2), variations) =>
-              StrMove(san, glyphs merge glyphs2, cleanComments(comments), variations)
+              san withComments comments withVariations variations mergeGlyphs (glyphs merge glyphs2)
             }
       }
-      .map(_.toSan)
 
   }
 
@@ -230,17 +205,15 @@ object Parser {
       Suffixes(c, cm, p, g)
     }
 
-    def castle: P[San] = ((qCastle | kCastle) ~ suffixes).map { case (side, suf) =>
-      Castle(side) withSuffixes suf
-    }
+    def castle: P[San] = (qCastle | kCastle).map(Castle(_))
 
     def standard: P[San] =
-      ((disambiguatedPawn.backtrack | pawn.backtrack | disambiguated.backtrack | ambigous.backtrack | drop.backtrack | pawnDrop.backtrack) ~ suffixes)
-        .map { case (std, suf) =>
-          std withSuffixes suf
-        }
+      disambiguatedPawn.backtrack | pawn.backtrack | disambiguated.backtrack | ambigous.backtrack | drop.backtrack | pawnDrop.backtrack
 
-    def move = (castle | standard) <* whitespaces
+    def move = ((castle | standard)  ~ suffixes <* whitespaces)
+      .map { case (std, suf) =>
+        std withSuffixes suf
+      }
 
     def apply(str: String): Validated[String, San] =
       move.parse(str) match {

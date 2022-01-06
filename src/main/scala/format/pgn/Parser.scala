@@ -51,8 +51,8 @@ object Parser {
     private def cleanComments(comments: List[String]) = comments.map(_.trim).filter(_.nonEmpty)
 
     def apply(pgn: String): Validated[String, (InitialPosition, List[San], Option[Tag])] =
-      strMoves.parse(pgn) match {
-        case Right((_, (init, moves, result))) =>
+      strMoves.parseAll(pgn) match {
+        case Right((init, moves, result)) =>
           valid(
             (
               init,

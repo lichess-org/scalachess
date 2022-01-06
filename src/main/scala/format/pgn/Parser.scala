@@ -66,7 +66,7 @@ object Parser {
         case Left(err) =>
           err match {
             case P.Error(0, _) => valid((InitialPosition(List()), List(), None))
-            case _ => invalid(showExpectations(pgn, err))
+            case _ => invalid(showExpectations("Cannot parse moves", pgn, err))
           }
       }
 
@@ -209,10 +209,10 @@ object Parser {
     val castle: P[San] = (qCastle | kCastle).map(Castle(_))
 
     val standard: P[San] =
-      disambiguatedPawn.backtrack | pawn.backtrack | disambiguated.backtrack | ambigous.backtrack | drop.backtrack | pawnDrop.backtrack
+      disambiguatedPawn.backtrack | pawn.backtrack | disambiguated.backtrack | ambigous.backtrack | drop.backtrack | pawnDrop.backtrack | P.failWith("Invalid chess move")
 
-    val move = (castle | standard).withContext("Invalid chess move")
-    val moveWithSuffix = (move ~ suffixes <* whitespaces)
+    val move: P[San] = (castle | standard).withContext("Invalid chess move")
+    val moveWithSuffix: P[San] = (move ~ suffixes <* whitespaces)
       .map { case (std, suf) =>
         std withSuffixes suf
       }
@@ -269,17 +269,25 @@ object Parser {
       case (tagLines, moveLines) => valid(tagLines.mkString("\n") -> moveLines.mkString("\n"))
     }
 
-  private def showExpectations(str: String, error: P.Error): String = {
+  private def showExpectations(context: String, str: String, error: P.Error): String = {
     val lm = LocationMap(str)
     val idx = error.failedAtOffset
-    s"failed at $idx because of \n" ++ error.expected.map(expToString).mkString_("\n") ++ "\n" ++ str
+    val caret = lm.toCaret(idx).getOrElse {
+      throw new RuntimeException("This is impossible")
+    }
+    val line = lm.getLine(caret.line).getOrElse("")
+    val errorLine = lm.getLine(caret.line).getOrElse("") ++ "\n" ++ " ".repeat(caret.col) ++ "^"
+    //    val errorMessage = error.expected.map(expToString).mkString_("\n")
+    val errorMessage = s"$context: [${caret.line + 1}.${caret.col + 1}]: ${expToString(error.expected.head)}"
+    //    s"failed at line ${caret.line}, column ${caret.col}, offset: ${caret.offset} because of \n" ++ error.expected.map(expToString).mkString_("\n") ++ "\n" ++ str
+    errorMessage ++ "\n" ++ errorLine ++ "\n" ++ str
   }
 
   private def expToString(expectation: Expectation): String =
     expectation match {
       case Expectation.OneOfStr(offset, strs) => strs match {
-        case one::Nil => s"expected: $one"
-        case _ => s"expected one of: $strs"
+        case one :: Nil => s"at $offset expected: $one"
+        case _ => s"at $offset expected one of: $strs"
       }
       case Expectation.InRange(offset, lower, upper) => s"expected char in range: [$lower, $upper]"
       case Expectation.StartOfString(offset) => "expected start of the file"
@@ -288,6 +296,6 @@ object Parser {
       case Expectation.ExpectedFailureAt(offset, matched) => s"expected failure but the parser matched: $matched"
       case Expectation.Fail(offset) => "Failed"
       case Expectation.FailWith(offset, message) => message
-      case Expectation.WithContext(contextStr, expect) => s"$contextStr + $expect"
+      case Expectation.WithContext(contextStr, expect) => contextStr
     }
 }

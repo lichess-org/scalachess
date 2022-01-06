@@ -2,15 +2,16 @@ package chess
 package format.pgn
 
 import chess.variant.Variant
-import cats.parse.{ Numbers => N, Parser => P, Parser0 => P0, Rfc5234 => R }
+import cats.parse.{LocationMap, Numbers => N, Parser => P, Parser0 => P0, Rfc5234 => R}
 import cats.data.Validated
-import cats.data.Validated.{ invalid, valid }
+import cats.data.Validated.{invalid, valid}
 import cats.implicits._
+import cats.parse.Parser.Expectation
 
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 object Parser {
 
-  val whitespace  = R.lf | R.wsp
+  val whitespace = R.lf | R.wsp
   val whitespaces = whitespace.rep0.?
 
   def full(pgn: String): Validated[String, ParsedPgn] = {
@@ -27,14 +28,14 @@ object Parser {
       .replace("e.p.", "") // silly en-passant notation
     for {
       splitted <- splitTagAndMoves(preprocessed)
-      tagStr  = splitted._1
+      tagStr = splitted._1
       moveStr = splitted._2
-      preTags     <- TagParser(tagStr)
+      preTags <- TagParser(tagStr)
       parsedMoves <- MovesParser(moveStr)
-      init         = parsedMoves._1
-      sans         = Sans(parsedMoves._2)
+      init = parsedMoves._1
+      sans = Sans(parsedMoves._2)
       resultOption = parsedMoves._3
-      tags         = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + _)
+      tags = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + _)
     } yield ParsedPgn(init, tags, sans)
   }
 
@@ -65,7 +66,7 @@ object Parser {
         case Left(err) =>
           err match {
             case P.Error(0, _) => valid((InitialPosition(List()), List(), None))
-            case _             => invalid("Cannot parse moves: %s\n%s".format(err.toString, pgn))
+            case _ => invalid(showExpectations(pgn, err))
           }
       }
 
@@ -113,11 +114,11 @@ object Parser {
     // '. ' or '... ' or '. ... '
     val numberSuffix = (P.char('.') | whitespace).rep0.void
 
-    // 10. or 10... but not 0
-    val number = (positiveIntString ~ numberSuffix).string
+    // 10. or 10... but not 0 or 1-0 or 1/2
+    val number = (positiveIntString <* !P.charIn('-', '/') ~ numberSuffix).string
 
     val forbidNullMove =
-      !P.stringIn(List("--", "Z0", "null", "pass", "@@@@")).withContext("Lichess does not support null moves")
+      P.stringIn(List("--", "Z0", "null", "pass", "@@@@")).?.flatMap(o => o.fold(P.unit)(_ => P.failWith("Lichess does not support null moves").void))
 
     val strMove: P[San] = P
       .recursive[San] { recuse =>
@@ -125,15 +126,15 @@ object Parser {
           (((P.char('(') <* whitespaces) *> recuse.rep0 <* (P.char(')') ~ whitespaces)) <* whitespaces)
             .map(Sans(_))
 
-        ((number.backtrack | commentary <* whitespaces).rep0 ~ forbidNullMove).with1.soft *>
-          (((MoveParser.move ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0) <* whitespaces).backtrack
+        ((number.backtrack | commentary <* whitespaces).rep0 ~ forbidNullMove).with1 *>
+          (((MoveParser.moveWithSuffix ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0) <* whitespaces).backtrack
             .map { case ((((san, glyphs), comments), glyphs2), variations) =>
               san withComments comments withVariations variations mergeGlyphs (glyphs merge glyphs2)
             }
       }
 
     val strMoves: P[(InitialPosition, List[San], Option[String])] =
-      ((commentary.rep0.with1 ~ strMove.rep) ~ result.? ~ commentary.rep0).map {
+      ((commentary.rep0.with1 ~ strMove.rep) ~ (result <* whitespaces).? ~ commentary.rep0).map {
         case (((coms, sans), res), _) => (InitialPosition(cleanComments(coms)), sans.toList, res)
       }
 
@@ -210,15 +211,16 @@ object Parser {
     val standard: P[San] =
       disambiguatedPawn.backtrack | pawn.backtrack | disambiguated.backtrack | ambigous.backtrack | drop.backtrack | pawnDrop.backtrack
 
-    val move = ((castle | standard)  ~ suffixes <* whitespaces)
+    val move = (castle | standard).withContext("Invalid chess move")
+    val moveWithSuffix = (move ~ suffixes <* whitespaces)
       .map { case (std, suf) =>
         std withSuffixes suf
       }
 
     def apply(str: String): Validated[String, San] =
-      move.parse(str) match {
+      moveWithSuffix.parse(str) match {
         case Right((_, san)) => valid(san)
-        case Left(err)       => invalid("Cannot parse move: %s\n%s".format(err.toString, str))
+        case Left(err) => invalid("Cannot parse move: %s\n%s".format(err.toString, str))
       }
 
     def mapParser[A, B](pairs: Iterable[(A, B)], name: String): P[B] =
@@ -230,13 +232,13 @@ object Parser {
 
   object TagParser {
 
-    val tagName: P[String]      = R.alpha.rep.string
+    val tagName: P[String] = R.alpha.rep.string
     val escapeDquote: P[String] = (P.char('\\') ~ R.dquote).as("\"")
-    val valueChar: P[String]    = escapeDquote | P.charWhere(_ != '"').string
-    val tagValue: P[String]     = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
-    val tagContent: P[Tag]      = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
-    val tag: P[Tag]             = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
-    val tags: P[Tags]           = tag.backtrack.rep.map(tags => Tags(tags.toList))
+    val valueChar: P[String] = escapeDquote | P.charWhere(_ != '"').string
+    val tagValue: P[String] = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
+    val tagContent: P[Tag] = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
+    val tag: P[Tag] = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
+    val tags: P[Tags] = tag.backtrack.rep.map(tags => Tags(tags.toList))
 
     def apply(pgn: String): Validated[String, Tags] =
       tags.parse(pgn) match {
@@ -244,7 +246,7 @@ object Parser {
           err match {
             // TODO when error happen at the first character return empty Tags, because it is fed with empty string sometime.
             case P.Error(0, _) => valid(Tags(List()))
-            case _             => invalid("Cannot parse tags: %s\n%s".format(err.toString, pgn))
+            case _ => invalid("Cannot parse tags: %s\n%s".format(err.toString, pgn))
           }
         case Right((_, tags)) => valid(tags)
       }
@@ -265,5 +267,27 @@ object Parser {
       line lift 0 contains '['
     } match {
       case (tagLines, moveLines) => valid(tagLines.mkString("\n") -> moveLines.mkString("\n"))
+    }
+
+  private def showExpectations(str: String, error: P.Error): String = {
+    val lm = LocationMap(str)
+    val idx = error.failedAtOffset
+    s"failed at $idx because of \n" ++ error.expected.map(expToString).mkString_("\n") ++ "\n" ++ str
+  }
+
+  private def expToString(expectation: Expectation): String =
+    expectation match {
+      case Expectation.OneOfStr(offset, strs) => strs match {
+        case one::Nil => s"expected: $one"
+        case _ => s"expected one of: $strs"
+      }
+      case Expectation.InRange(offset, lower, upper) => s"expected char in range: [$lower, $upper]"
+      case Expectation.StartOfString(offset) => "expected start of the file"
+      case Expectation.EndOfString(offset, length) => s"expected end of file but $length characters remaining"
+      case Expectation.Length(offset, expected, actual) => s"expected $expected more characters but only $actual remaining"
+      case Expectation.ExpectedFailureAt(offset, matched) => s"expected failure but the parser matched: $matched"
+      case Expectation.Fail(offset) => "Failed"
+      case Expectation.FailWith(offset, message) => message
+      case Expectation.WithContext(contextStr, expect) => s"$contextStr + $expect"
     }
 }

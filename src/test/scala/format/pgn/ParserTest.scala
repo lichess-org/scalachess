@@ -29,19 +29,6 @@ class ParserTest extends ChessTest {
     }
   }
 
-  "error message" should {
-    "yay" in {
-      val e = """[abc "def"]
-                |
-                |1. e5 { hello world } --
-                |2. c6
-                |""".stripMargin
-      val r = parser(e)
-      print(r)
-      r must beValid
-    }
-  }
-
   "result" in {
     "no tag but inline result" in {
       parser(noTagButResult) must beValid.like { case parsed =>

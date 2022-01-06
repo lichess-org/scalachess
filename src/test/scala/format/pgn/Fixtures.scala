@@ -2002,5 +2002,5 @@ val gamesForPerfTest = List(enpassantEP, enpassantEP2, recentChessCom, chessComC
   promoteRook, castleCheck1, castleCheck2, fromCrafty, withNag, fromTcec, fromLichessBadPromotion, fromTcecWithEngineOutput,
   fromPositionEmptyFen, chessbaseWeird, chessbaseArrows, commentsAndVariations, bySmartChess, android, chesskids, variations,
   caissa, handwritten, chessByPost, atomicRegression, atomicPromotion, weirdDashes, lichobile, overflow, overflow3,
-  crazyhouse1, crazyhouse2, crazyhouseNoVariantTag, stackOverflow, explorerPartialDate, withGlyphAnnotations) ++ prod500standard
+  crazyhouse1, crazyhouse2, crazyhouseNoVariantTag, stackOverflow, explorerPartialDate, withGlyphAnnotations)
 }

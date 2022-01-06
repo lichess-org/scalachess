@@ -289,15 +289,15 @@ object Parser {
           case one :: Nil => s"at $offset expected: $one"
           case _          => s"at $offset expected one of: $strs"
         }
-      case Expectation.InRange(offset, lower, upper) => s"expected char in range: [$lower, $upper]"
-      case Expectation.StartOfString(offset)         => "expected start of the file"
-      case Expectation.EndOfString(offset, length)   => s"expected end of file but $length characters remaining"
-      case Expectation.Length(offset, expected, actual) =>
+      case Expectation.InRange(_, lower, upper) => s"expected char in range: [$lower, $upper]"
+      case Expectation.StartOfString(_)         => "expected start of the file"
+      case Expectation.EndOfString(_, length)   => s"expected end of file but $length characters remaining"
+      case Expectation.Length(_, expected, actual) =>
         s"expected $expected more characters but only $actual remaining"
-      case Expectation.ExpectedFailureAt(offset, matched) =>
+      case Expectation.ExpectedFailureAt(_, matched) =>
         s"expected failure but the parser matched: $matched"
-      case Expectation.Fail(offset)                    => "Failed"
-      case Expectation.FailWith(offset, message)       => message
-      case Expectation.WithContext(contextStr, expect) => contextStr
+      case Expectation.Fail(_)                    => "Failed"
+      case Expectation.FailWith(_, message)       => message
+      case Expectation.WithContext(contextStr, _) => contextStr
     }
 }

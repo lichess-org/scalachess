@@ -18,18 +18,34 @@ case class Game(
       promotion: Option[PromotableRole] = None,
       metrics: MoveMetrics = MoveMetrics()
   ): Validated[String, (Game, Move)] =
-    situation.move(orig, dest, promotion).map(_.normalizeCastle withMetrics metrics) map { move =>
-      apply(move) -> move
+    moveWithCompensated(orig, dest, promotion, metrics).map { case (game, move) =>
+      (game.value, move)
     }
 
-  def apply(move: Move): Game = {
-    val newSituation = move.situationAfter
+  def moveWithCompensated(
+      orig: Pos,
+      dest: Pos,
+      promotion: Option[PromotableRole] = None,
+      metrics: MoveMetrics = MoveMetrics()
+  ): Validated[String, (Clock.WithCompensatedLag[Game], Move)] =
+    situation.move(orig, dest, promotion).map(_.normalizeCastle withMetrics metrics) map { move =>
+      applyWithCompensated(move) -> move
+    }
 
-    copy(
-      situation = newSituation,
-      turns = turns + 1,
-      pgnMoves = pgnMoves :+ pgn.Dumper(situation, move, newSituation),
-      clock = applyClock(move.metrics, newSituation.status.isEmpty)
+  def apply(move: Move): Game = applyWithCompensated(move).value
+
+  def applyWithCompensated(move: Move): Clock.WithCompensatedLag[Game] = {
+    val newSituation = move.situationAfter
+    val newClock     = applyClock(move.metrics, newSituation.status.isEmpty)
+
+    Clock.WithCompensatedLag(
+      copy(
+        situation = newSituation,
+        turns = turns + 1,
+        pgnMoves = pgnMoves :+ pgn.Dumper(situation, move, newSituation),
+        clock = newClock.map(_.value)
+      ),
+      newClock.flatMap(_.compensated)
     )
   }
 
@@ -49,15 +65,15 @@ case class Game(
       situation = newSituation,
       turns = turns + 1,
       pgnMoves = pgnMoves :+ pgn.Dumper(drop, newSituation),
-      clock = applyClock(drop.metrics, newSituation.status.isEmpty)
+      clock = applyClock(drop.metrics, newSituation.status.isEmpty).map(_.value)
     )
   }
 
-  private def applyClock(metrics: MoveMetrics, gameActive: Boolean) =
+  private def applyClock(metrics: MoveMetrics, gameActive: Boolean): Option[Clock.WithCompensatedLag[Clock]] =
     clock.map { c =>
       {
         val newC = c.step(metrics, gameActive)
-        if (turns - startedAtTurn == 1) newC.start else newC
+        if (turns - startedAtTurn == 1) newC.map(_.start) else newC
       }
     }
 

@@ -2,7 +2,7 @@ name := "scalachess"
 
 organization := "org.lichess"
 
-version := "10.3.0"
+version := "10.3.1"
 
 ThisBuild / scalaVersion := "2.13.7"
 ThisBuild / githubWorkflowPublishTargetBranches := Seq() // Don't publish anywhere
@@ -12,11 +12,11 @@ ThisBuild / githubWorkflowBuild ++= Seq(
 
 libraryDependencies ++= List(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.0",
-  "org.specs2"             %% "specs2-core"              % "4.10.0" % Test,
-  "org.specs2"             %% "specs2-cats"              % "4.10.0" % Test,
+  "org.specs2"             %% "specs2-core"              % "4.10.6" % Test,
+  "org.specs2"             %% "specs2-cats"              % "4.10.6" % Test,
   "com.github.ornicar"     %% "scalalib"                 % "7.0.2",
   "joda-time"               % "joda-time"                % "2.10.10",
-  "org.typelevel"          %% "cats-core"                % "2.2.0"
+  "org.typelevel"          %% "cats-core"                % "2.7.0"
 )
 
 resolvers ++= Seq(

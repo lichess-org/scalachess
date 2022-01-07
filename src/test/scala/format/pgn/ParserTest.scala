@@ -10,7 +10,7 @@ class ParserTest extends ChessTest {
   import Fixtures._
 
   val parser                 = Parser.full _
-  def parseMove(str: String) = Parser.MoveParser(str, Standard)
+  def parseMove(str: String) = Parser.MoveParser(str)
 
   "promotion check" should {
     "as a queen" in {

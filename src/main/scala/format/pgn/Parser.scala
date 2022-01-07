@@ -284,14 +284,19 @@ object Parser {
 
   private def expToString(expectation: Expectation): String =
     expectation match {
-      case Expectation.OneOfStr(offset, strs) =>
+      case Expectation.OneOfStr(_, strs) =>
         strs match {
-          case one :: Nil => s"at $offset expected: $one"
-          case _          => s"at $offset expected one of: $strs"
+          case one :: Nil => s"expected: $one"
+          case _          => s"expected one of: $strs"
         }
-      case Expectation.InRange(_, lower, upper) => s"expected char in range: [$lower, $upper]"
-      case Expectation.StartOfString(_)         => "expected start of the file"
-      case Expectation.EndOfString(_, length)   => s"expected end of file but $length characters remaining"
+      case Expectation.InRange(_, lower, upper) =>
+        if (lower == upper) {
+          s"expected: $lower"
+        } else {
+          s"expected char in range: [$lower, $upper]"
+        }
+      case Expectation.StartOfString(_)       => "expected start of the file"
+      case Expectation.EndOfString(_, length) => s"expected end of file but $length characters remaining"
       case Expectation.Length(_, expected, actual) =>
         s"expected $expected more characters but only $actual remaining"
       case Expectation.ExpectedFailureAt(_, matched) =>

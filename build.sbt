@@ -15,7 +15,7 @@ libraryDependencies ++= List(
   "org.specs2"             %% "specs2-core"              % "4.10.6" % Test,
   "org.specs2"             %% "specs2-cats"              % "4.10.6" % Test,
   "com.github.ornicar"     %% "scalalib"                 % "7.0.2",
-  "joda-time"               % "joda-time"                % "2.10.10",
+  "joda-time"               % "joda-time"                % "2.10.13",
   "org.typelevel"          %% "cats-core"                % "2.7.0"
 )
 

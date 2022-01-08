@@ -106,7 +106,7 @@ object Parser {
       }
     )
 
-    val moveExtras = commentary.as(())
+    val moveExtras = commentary.void
 
     val positiveIntString: P[String] =
       (N.nonZeroDigit ~ N.digits0).string
@@ -128,7 +128,7 @@ object Parser {
           (((P.char('(') <* whitespaces) *> recuse.rep0 <* (P.char(')') ~ whitespaces)) <* whitespaces)
             .map(Sans(_))
 
-        ((number.backtrack | commentary <* whitespaces).rep0 ~ forbidNullMove).with1 *>
+        ((number.backtrack | (commentary <* whitespaces)).rep0 ~ forbidNullMove).with1 *>
           (((MoveParser.moveWithSuffix ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0) <* whitespaces).backtrack
             .map { case ((((san, glyphs), comments), glyphs2), variations) =>
               san withComments comments withVariations variations mergeGlyphs (glyphs merge glyphs2)
@@ -136,10 +136,9 @@ object Parser {
       }
 
     val strMoves: P[(InitialPosition, List[San], Option[String])] =
-      ((commentary.rep0.with1 ~ strMove.rep) ~ (result <* whitespaces).? ~ commentary.rep0).map {
-        case (((coms, sans), res), _) => (InitialPosition(cleanComments(coms)), sans.toList, res)
+      ((commentary.rep0.with1 ~ strMove.rep) ~ (result <* whitespaces).? <* commentary.rep0).map {
+        case ((coms, sans), res) => (InitialPosition(cleanComments(coms)), sans.toList, res)
       }
-
   }
 
   object MoveParser {
@@ -169,17 +168,17 @@ object Parser {
 
     val checkmate = (P.char('#') | P.string("++")).?.map(_.isDefined)
 
-    val role = mapParser(Role.allByPgn, "role")
+    val role = mapParserChar(Role.allByPgn, "role")
 
-    val file = mapParser(fileMap, "file")
+    val file = mapParserChar(fileMap, "file")
 
-    val rank = mapParser(rankMap, "rank")
+    val rank = mapParserChar(rankMap, "rank")
 
     val dest: P[Pos] = mapParser(Pos.allKeys, "dest")
 
     val promotable = Role.allPromotableByPgn mapKeys (_.toUpper)
 
-    val promotion: P[PromotableRole] = P.char('=').?.with1 *> mapParser(promotable, "promotion")
+    val promotion: P[PromotableRole] = P.char('=').?.with1 *> mapParserChar(promotable, "promotion")
 
     // e5
     val pawn: P[Std] = dest.map(Std(_, Pawn))
@@ -210,8 +209,9 @@ object Parser {
 
     val castle: P[San] = (qCastle | kCastle).map(Castle(_))
 
-    val standard: P[San] =
-      disambiguatedPawn.backtrack | pawn.backtrack | disambiguated.backtrack | ambigous.backtrack | drop.backtrack | pawnDrop.backtrack
+    val standard: P[San] = P.oneOf(
+      (disambiguatedPawn :: pawn :: disambiguated :: ambigous :: drop :: pawnDrop :: Nil).map(_.backtrack)
+    )
 
     val move: P[San] = (castle | standard).withContext("Invalid chess move")
     val moveWithSuffix: P[San] = (move ~ suffixes <* whitespaces)
@@ -225,10 +225,15 @@ object Parser {
         case Left(err)       => invalid(showExpectations("Cannot parse move", str, err))
       }
 
-    def mapParser[A, B](pairs: Iterable[(A, B)], name: String): P[B] =
-      pairs.foldLeft(P.failWith(name + " not found"): P[B]) { case (acc, (a, b)) =>
-        P.string(a.toString).as(b) | acc
-      }
+    def mapParser[A](pairs: Iterable[(String, A)], name: String): P[A] = {
+      val pairMap = pairs.to(Map)
+      P.stringIn(pairMap.keySet).map(pairMap(_)) | P.failWith(name + " not found")
+    }
+
+    def mapParserChar[A](pairs: Iterable[(Char, A)], name: String): P[A] = {
+      val pairMap = pairs.to(Map)
+      P.charIn(pairMap.keySet).map(pairMap(_)) | P.failWith(name + " not found")
+    }
 
   }
 

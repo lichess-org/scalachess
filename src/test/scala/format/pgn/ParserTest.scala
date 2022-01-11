@@ -339,4 +339,9 @@ class ParserTest extends ChessTest {
   "exotic notation from clono.no" in {
     parser(clonoNoExoticNotation) must beValid
   }
+
+  "example with tags & comments without moves" in {
+    parser(tagsCommentsWithoutMoves) must beValid
+  }
+
 }

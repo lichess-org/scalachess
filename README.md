@@ -1,5 +1,4 @@
 [![Continuous Integration](https://github.com/ornicar/scalachess/actions/workflows/ci.yml/badge.svg)](https://github.com/ornicar/scalachess/actions/workflows/ci.yml)
-[![Clean](https://github.com/ornicar/scalachess/actions/workflows/clean.yml/badge.svg)](https://github.com/ornicar/scalachess/actions/workflows/clean.yml)
 
 Chess API written in scala for [lichess.org](https://lichess.org) 
 

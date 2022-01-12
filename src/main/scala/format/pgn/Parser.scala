@@ -52,8 +52,8 @@ object Parser {
     private def cleanComments(comments: List[String]) = comments.map(_.trim).filter(_.nonEmpty)
 
     def apply(pgn: String): Validated[String, (InitialPosition, List[San], Option[Tag])] =
-      strMoves.parseAll(pgn) match {
-        case Right((init, moves, result)) =>
+      strMoves.parse(pgn) match {
+        case Right((_, (init, moves, result))) =>
           valid(
             (
               init,
@@ -135,8 +135,8 @@ object Parser {
             }
       }
 
-    val strMoves: P[(InitialPosition, List[San], Option[String])] =
-      ((commentary.rep0.with1 ~ strMove.rep) ~ (result <* whitespaces).? <* commentary.rep0).map {
+    val strMoves: P0[(InitialPosition, List[San], Option[String])] =
+      ((commentary.rep0 ~ strMove.rep0) ~ (result <* whitespaces).? <* commentary.rep0).map {
         case ((coms, sans), res) => (InitialPosition(cleanComments(coms)), sans.toList, res)
       }
   }

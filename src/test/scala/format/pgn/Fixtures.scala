@@ -113,7 +113,7 @@ mit -0.10 minimal Schwarz vorne sieht, ist doch die Remisbreite sehr hoch.}
 """
 
   val fromPosProdCloseChess = """
-[FEN "8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1"]                                                                     [12/1807]
+[FEN "8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1"]
 1. d4 d5 2. Nf4 Nf5 3. g4 g5 4. gxf5 exf5
 5. Nbd3 gxf4 6. Nxf4 Bxf4 7. exf4 Nd6 8. Bh4 Qd8
 9. Bd3 Kd7 10. Kf1 Kc8 11. Rg2 Kb8 12. Qe1 Bh5
@@ -1520,7 +1520,7 @@ val bySmartChess = """
 [White "Andersson, U"]
 [Black "Robatsch"]
 [Result "1-0"]
-[Annotator  "Krush, I]
+[Annotator  "Krush, I"]
 
 {
 http://www.smartchess.com/SmartChessOnline/default.htm

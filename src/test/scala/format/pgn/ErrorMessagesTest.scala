@@ -8,7 +8,7 @@ class ErrorMessagesTest extends ChessTest {
   val parser = Parser.full _
 
   "Invalid move" should {
-    "yay" in {
+    "fail" in {
       val e =
         """[abc "def"]
           |
@@ -20,7 +20,7 @@ class ErrorMessagesTest extends ChessTest {
   }
 
   "Lichess does not support null moves" should {
-    "yay" in {
+    "fail" in {
       val e =
         """[abc "def"]
           |
@@ -32,7 +32,7 @@ class ErrorMessagesTest extends ChessTest {
   }
 
   "too many glyphs" should {
-    "failed" in {
+    "fail" in {
       val e =
         """[abc "def"]
           |
@@ -44,7 +44,7 @@ class ErrorMessagesTest extends ChessTest {
   }
 
   "invalid glyphs" should {
-    "failed" in {
+    "fail" in {
       val e =
         """[abc "def"]
           |
@@ -55,8 +55,8 @@ class ErrorMessagesTest extends ChessTest {
     }
   }
 
-  "Bad comment" should {
-    "failed" in {
+  "bad comment" should {
+    "fail" in {
       val e =
         """[abc "def"]
           |
@@ -67,15 +67,27 @@ class ErrorMessagesTest extends ChessTest {
     }
   }
 
-  "bad tags" should {
+  "invalid tags 1" should {
     "failed" in {
       val e =
-        """|[ab cdef"]
+        """|[ab "cdef]
            |
            |1. e4 { hello world }  c5??
            |2. c6
            |""".stripMargin
-      parser(e) must beInvalid
+      parser(e) must beValid
+    }
+  }
+
+  "invalid tags 2" should {
+    "failed" in {
+      val e =
+        """|[ab "cdef"]    [123]
+           |
+           |1. e4 { hello world }  c5??
+           |2. c6
+           |""".stripMargin
+      parser(e) must beValid
     }
   }
 

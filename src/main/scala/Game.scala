@@ -70,10 +70,11 @@ case class Game(
   }
 
   private def applyClock(metrics: MoveMetrics, gameActive: Boolean): Option[Clock.WithCompensatedLag[Clock]] =
-    clock.map { c =>
+    clock.map { prev =>
       {
-        val newC = c.step(metrics, gameActive)
-        if (turns - startedAtTurn == 1) newC.map(_.start) else newC
+        val c1 = metrics.frameLag.fold(prev)(prev.withFrameLag)
+        val c2 = c1.step(metrics, gameActive)
+        if (turns - startedAtTurn == 1) c2.map(_.start) else c2
       }
     }
 

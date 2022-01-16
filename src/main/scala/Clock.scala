@@ -53,6 +53,8 @@ case class Clock(
       timer = timer.map(_ => now)
     )
 
+  def withFrameLag(frameLag: Centis) = updatePlayer(color)(_ withFrameLag frameLag)
+
   def step(
       metrics: MoveMetrics = MoveMetrics(),
       gameActive: Boolean = true
@@ -148,6 +150,8 @@ case class ClockPlayer(
   def setRemaining(t: Centis) = copy(elapsed = limit - t)
 
   def increment = if (berserk) Centis(0) else config.increment
+
+  def withFrameLag(frameLag: Centis) = copy(lag = lag.withFrameLag(frameLag, config))
 }
 
 object ClockPlayer {

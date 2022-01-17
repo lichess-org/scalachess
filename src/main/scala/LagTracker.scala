@@ -66,7 +66,7 @@ final case class LagTracker(
 
 object LagTracker {
 
-  private val estimatedCpuLag = Centis(3)
+  private val estimatedCpuLag = Centis(5)
 
   def maxQuotaGainFor(config: Clock.Config) = Centis(config.estimateTotalSeconds match {
     case i if i >= 180 => 100

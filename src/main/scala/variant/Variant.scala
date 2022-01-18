@@ -164,8 +164,15 @@ abstract class Variant private[variant] (
 
   protected def pawnsOnPromotionRank(board: Board, color: Color) = {
     board.pieces.exists {
-      case (pos, Piece(c, r)) if c == color && r == Pawn && pos.rank == color.promotablePawnRank => true
-      case _                                                                                     => false
+      case (pos, Piece(c, Pawn)) if c == color && pos.rank == color.promotablePawnRank => true
+      case _                                                                           => false
+    }
+  }
+
+  protected def pawnsOnBackRank(board: Board, color: Color) = {
+    board.pieces.exists {
+      case (pos, Piece(c, Pawn)) if c == color && pos.rank == color.backRank => true
+      case _                                                                 => false
     }
   }
 
@@ -173,7 +180,8 @@ abstract class Variant private[variant] (
     val roles = board rolesOf color
     roles.count(_ == King) == 1 &&
     (!strict || { roles.count(_ == Pawn) <= 8 && roles.lengthCompare(16) <= 0 }) &&
-    !pawnsOnPromotionRank(board, color)
+    !pawnsOnPromotionRank(board, color) &&
+    !pawnsOnBackRank(board, color)
   }
 
   def valid(board: Board, strict: Boolean) = Color.all forall validSide(board, strict)

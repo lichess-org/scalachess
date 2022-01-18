@@ -69,7 +69,7 @@ case class Game(
     )
   }
 
-  private def applyClock(metrics: MoveMetrics, gameActive: Boolean): Option[Clock.WithCompensatedLag[Clock]] =
+  private def applyClock(metrics: MoveMetrics, gameActive: => Boolean): Option[Clock.WithCompensatedLag[Clock]] =
     clock.map { prev =>
       {
         val c1 = metrics.frameLag.fold(prev)(prev.withFrameLag)

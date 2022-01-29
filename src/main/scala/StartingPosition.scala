@@ -563,7 +563,7 @@ object StartingPosition {
           "1. e4 e5 2. Nc3 Nf6 3. Bc4 Nxe4"
         ),
         StartingPosition(
-          "C46",
+          "C47",
           "Four Knights Game: Halloween Gambit",
           FEN("r1bqkb1r/pppp1ppp/2n2n2/4N3/4P3/2N5/PPPP1PPP/R1BQKB1R b KQkq - 0 4"),
           "Halloween_Gambit",

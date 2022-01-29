@@ -1,7 +1,7 @@
 package chess
 package opening
 
-// Generated from https://github.com/niklasf/chess-openings
+// Generated from https://github.com/lichess-org/chess-openings
 // format: off
 private[opening] object FullOpeningPartC {
 
@@ -738,19 +738,19 @@ new FullOpening("C45", "Scotch Game: Schmidt Variation", "r1bqkb1r/pppp1ppp/2n2n
 new FullOpening("C45", "Scotch Game: Steinitz Variation", "r1b1kbnr/pppp1ppp/2n5/8/3NP2q/8/PPP2PPP/RNBQKB1R w KQkq -"),
 new FullOpening("C45", "Scotch Game: Steinitz Variation", "r1b1kbnr/pppp1ppp/2n5/8/3NP2q/2N5/PPP2PPP/R1BQKB1R b KQkq -"),
 new FullOpening("C45", "Scotch Game: Tartakower Variation", "r1bqkb1r/p1pp1ppp/2p2n2/8/4P3/8/PPPN1PPP/R1BQKB1R b KQkq -"),
-new FullOpening("C46", "Four Knights Game", "r1bqkb1r/pppp1ppp/2n2n2/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq -"),
-new FullOpening("C46", "Four Knights Game: Gunsberg Variation", "r1bqkb1r/pppp1ppp/2n2n2/4p3/4P3/P1N2N2/1PPP1PPP/R1BQKB1R b KQkq -"),
-new FullOpening("C46", "Four Knights Game: Halloween Gambit", "r1bqkb1r/pppp1ppp/2n2n2/4N3/4P3/2N5/PPPP1PPP/R1BQKB1R b KQkq -"),
-new FullOpening("C46", "Four Knights Game: Halloween Gambit, Oldtimer Variation", "r1bqk1nr/pppp2pp/6n1/4Pp2/1bBP4/2N2Q2/PPP2PPP/R1B1K2R w KQkq f6"),
-new FullOpening("C46", "Four Knights Game: Halloween Gambit, Plasma Variation", "1rb1kbnr/pp1p1ppp/3P1qn1/1N6/5P2/8/PPP3PP/R1BQKB1R w KQk -"),
-new FullOpening("C46", "Four Knights Game: Italian Variation", "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R b KQkq -"),
-new FullOpening("C46", "Four Knights Game: Italian Variation, Noa Gambit", "r1bqkb1r/pppp1Bpp/2n5/4p3/4n3/2N2N2/PPPP1PPP/R1BQK2R b KQkq -"),
 new FullOpening("C46", "Three Knights Opening", "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R b KQkq -"),
 new FullOpening("C46", "Three Knights Opening", "r1bqk1nr/pppp1ppp/2n5/4p3/1b2P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq -"),
 new FullOpening("C46", "Three Knights Opening: Schlechter Variation", "r1bqk2r/pppp1ppp/2n2n2/3Np3/1b2P3/5N2/PPPP1PPP/R1BQKB1R w KQkq -"),
 new FullOpening("C46", "Three Knights Opening: Steinitz Defense", "r1bqkbnr/pppp1p1p/2n3p1/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq -"),
 new FullOpening("C46", "Three Knights Opening: Steinitz-Rosenthal Variation", "r1bqkbnr/pppp1p1p/2n3p1/3N4/3pP3/5N2/PPP2PPP/R1BQKB1R b KQkq -"),
 new FullOpening("C46", "Three Knights Opening: Winawer Defense", "r1bqkbnr/pppp2pp/2n5/4pp2/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq -"),
+new FullOpening("C47", "Four Knights Game", "r1bqkb1r/pppp1ppp/2n2n2/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq -"),
+new FullOpening("C47", "Four Knights Game: Gunsberg Variation", "r1bqkb1r/pppp1ppp/2n2n2/4p3/4P3/P1N2N2/1PPP1PPP/R1BQKB1R b KQkq -"),
+new FullOpening("C47", "Four Knights Game: Halloween Gambit", "r1bqkb1r/pppp1ppp/2n2n2/4N3/4P3/2N5/PPPP1PPP/R1BQKB1R b KQkq -"),
+new FullOpening("C47", "Four Knights Game: Halloween Gambit, Oldtimer Variation", "r1bqk1nr/pppp2pp/6n1/4Pp2/1bBP4/2N2Q2/PPP2PPP/R1B1K2R w KQkq f6"),
+new FullOpening("C47", "Four Knights Game: Halloween Gambit, Plasma Variation", "1rb1kbnr/pp1p1ppp/3P1qn1/1N6/5P2/8/PPP3PP/R1BQKB1R w KQk -"),
+new FullOpening("C47", "Four Knights Game: Italian Variation", "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R b KQkq -"),
+new FullOpening("C47", "Four Knights Game: Italian Variation, Noa Gambit", "r1bqkb1r/pppp1Bpp/2n5/4p3/4n3/2N2N2/PPPP1PPP/R1BQK2R b KQkq -"),
 new FullOpening("C47", "Four Knights Game: Scotch Variation", "r1bqkb1r/pppp1ppp/2n2n2/4p3/3PP3/2N2N2/PPP2PPP/R1BQKB1R b KQkq -"),
 new FullOpening("C47", "Four Knights Game: Scotch Variation Accepted", "r1bqkb1r/pppp1ppp/2n2n2/8/3pP3/2N2N2/PPP2PPP/R1BQKB1R w KQkq -"),
 new FullOpening("C47", "Four Knights Game: Scotch Variation, Belgrade Gambit", "r1bqkb1r/pppp1ppp/2n2n2/3N4/3pP3/5N2/PPP2PPP/R1BQKB1R b KQkq -"),

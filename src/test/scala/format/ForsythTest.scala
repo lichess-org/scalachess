@@ -189,7 +189,7 @@ class ForsythTest extends ChessTest {
       "starting" in {
         f <<< FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") must beSome.like {
           case SituationPlus(
-                Situation(Board(_, History(_, _, Castles(true, true, true, true), _, _, _), _, _), _),
+                Situation(Board(_, History(_, _, Castles(true, true, true, true), _, _, _), _, _, _), _),
                 _
               ) =>
             ok
@@ -198,7 +198,7 @@ class ForsythTest extends ChessTest {
       "white to play" in {
         f <<< FEN("r2q1rk1/ppp2pp1/1bnpbn1p/4p3/4P3/1BNPBN1P/PPPQ1PP1/R3K2R w KQ - 7 10") must beSome.like {
           case SituationPlus(
-                Situation(Board(_, History(_, _, Castles(true, true, false, false), _, _, _), _, _), _),
+                Situation(Board(_, History(_, _, Castles(true, true, false, false), _, _, _), _, _, _), _),
                 _
               ) =>
             ok
@@ -207,7 +207,7 @@ class ForsythTest extends ChessTest {
       "black to play" in {
         f <<< FEN("r1q2rk1/ppp2ppp/3p1n2/8/2PNp3/P1PnP3/2QP1PPP/R1B2K1R b - - 3 12") must beSome.like {
           case SituationPlus(
-                Situation(Board(_, History(_, _, Castles(false, false, false, false), _, _, _), _, _), _),
+                Situation(Board(_, History(_, _, Castles(false, false, false, false), _, _, _), _, _, _), _),
                 _
               ) =>
             ok

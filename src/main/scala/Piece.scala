@@ -18,6 +18,7 @@ case class Piece(color: Color, role: Role) {
     role match {
       case King   => from touches to
       case Queen  => (from onSameLine to) || (from onSameDiagonal to)
+      case Doom  => ((from onSameLine to) || (from onSameDiagonal to)) && (from.xDist(to) <= 2 && from.yDist(to) <= 2)
       case Rook   => from onSameLine to
       case Bishop => from onSameDiagonal to
       case Knight =>

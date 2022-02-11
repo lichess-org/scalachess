@@ -115,7 +115,7 @@ object Hash {
     }
 
     // Hash in special newchess1 data.
-    val hnewchess1 = board.newChess1Data.fold(hchecks) { data =>
+    val hnewchess1 = board.newChess1Data.fold(hcrazy) { data =>
       Color.all
         .flatMap { color =>
           val colorshift = color.fold(79, -1)

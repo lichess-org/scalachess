@@ -122,7 +122,7 @@ object Hash {
           data.pockets(color).roles.groupBy(identity).flatMap { case (role, list) =>
             crazyPocketMask(role, colorshift, list.size)
           }
-        }.fold(0L)(_ ^ _)
+        }.fold(hcrazy)(_ ^ _)
     }
 
     hnewchess1

@@ -140,7 +140,7 @@ object Role {
       case Knight => Option(3)
       case Bishop => Option(3)
       case Rook   => Option(5)
-      case Doom  =>  Option(7)
+      case Doom  =>  Option(6)
       case Queen  => Option(9)
       case King   => None
     }

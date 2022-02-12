@@ -37,5 +37,5 @@ if you're going to contribute to this project.
 If you don't install it, please run `scalafmtAll` in the sbt console before committing.
 
 ## Demo
+![lichess org_](https://user-images.githubusercontent.com/95171638/153708930-1d59899d-f819-4749-8f51-b3653a8ff796.png)
 
-<img src="/scalachess/lichess.org_.png">

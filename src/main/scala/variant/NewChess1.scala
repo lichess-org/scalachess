@@ -15,6 +15,17 @@ case object NewChess1
       standardInitialPosition = true
     ) {
 
+  override def isValidPromotion(promotion: Option[PromotableRole]) =
+    promotion match {
+      case None                                 => true
+      case Some(Queen | Rook | Knight | Bishop| Doom) => true
+      case _                                    => false
+    }
+
+  override val roles = List(Rook, Knight, King, Bishop, King, Queen, Pawn, Doom)
+
+  override val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, Doom)
+
   def pieces = Standard.pieces
 
   override val initialFen = FEN(

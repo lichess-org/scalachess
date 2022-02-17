@@ -29,6 +29,7 @@ abstract class Variant private[variant] (
   def horde         = this == Horde
   def racingKings   = this == RacingKings
   def crazyhouse    = this == Crazyhouse
+  def newChess1    = this == NewChess1
 
   def exotic = !standard
 
@@ -224,7 +225,8 @@ object Variant {
     Antichess,
     Atomic,
     Horde,
-    RacingKings
+    RacingKings,
+    NewChess1
   )
   val byId = all map { v =>
     (v.id, v)
@@ -248,6 +250,7 @@ object Variant {
   val openingSensibleVariants: Set[Variant] = Set(
     chess.variant.Standard,
     chess.variant.Crazyhouse,
+    chess.variant.NewChess1,
     chess.variant.ThreeCheck,
     chess.variant.KingOfTheHill
   )

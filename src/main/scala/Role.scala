@@ -72,10 +72,35 @@ case object Pawn extends Role {
   val projection              = false
 }
 
+case object Duke extends PromotableRole {
+  val forsyth                 = 'd'
+  val dirs: Directions        = List(
+    p => Pos.at(p.file.index - 2, p.rank.index - 2),
+    p => Pos.at(p.file.index + 2, p.rank.index + 2),
+    p => Pos.at(p.file.index - 1, p.rank.index - 1),
+    p => Pos.at(p.file.index + 1, p.rank.index + 1),
+    p => Pos.at(p.file.index - 2, p.rank.index + 2),
+    p => Pos.at(p.file.index + 2, p.rank.index - 2),
+    p => Pos.at(p.file.index - 1, p.rank.index + 1),
+    p => Pos.at(p.file.index + 1, p.rank.index - 1),
+    p => Pos.at(p.file.index, p.rank.index - 2),
+    p => Pos.at(p.file.index, p.rank.index - 1),
+    p => Pos.at(p.file.index, p.rank.index + 1),
+    p => Pos.at(p.file.index, p.rank.index + 2),
+    p => Pos.at(p.file.index - 2, p.rank.index),
+    p => Pos.at(p.file.index - 1, p.rank.index),
+    p => Pos.at(p.file.index + 1, p.rank.index),
+    p => Pos.at(p.file.index + 2, p.rank.index),
+  )
+
+  def dir(from: Pos, to: Pos) = None
+  val projection              = false
+}
+
 object Role {
 
-  val all: List[Role]                     = List(King, Queen, Rook, Bishop, Knight, Pawn)
-  val allPromotable: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, King)
+  val all: List[Role]                     = List(King, Queen, Rook, Bishop, Knight, Pawn, Duke)
+  val allPromotable: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, King, Duke)
   val allByForsyth: Map[Char, Role] = all map { r =>
     (r.forsyth, r)
   } toMap
@@ -115,6 +140,7 @@ object Role {
       case Knight => Option(3)
       case Bishop => Option(3)
       case Rook   => Option(5)
+      case Duke  =>  Option(6)
       case Queen  => Option(9)
       case King   => None
     }

@@ -125,23 +125,38 @@ object Forsyth {
         }
       case word => word -> None
     }
-    if (pockets.isDefined && !variant.crazyhouse) None
+    if (pockets.isDefined && !(variant.crazyhouse || variant.newChess1)) None
     else
       makePiecesWithCrazyPromoted(position.toList, 0, 7) map { case (pieces, promoted) =>
         val board = Board(pieces, variant = variant)
         if (promoted.isEmpty) board else board.withCrazyData(_.copy(promoted = promoted))
       } map { board =>
-        pockets.fold(board) { str =>
-          import chess.variant.Crazyhouse.{ Pocket, Pockets }
-          val (white, black) = str.toList.flatMap(Piece.fromChar).partition(_ is White)
-          board.withCrazyData(
-            _.copy(
-              pockets = Pockets(
-                white = Pocket(white.map(_.role)),
-                black = Pocket(black.map(_.role))
+        if (variant.newChess1) {
+          pockets.fold(board) { str =>
+            import chess.variant.NewChess1.{ Pocket, Pockets }
+            val (white, black) = str.toList.flatMap(Piece.fromChar).partition(_ is White)
+            board.withNewChess1Data(
+              _.copy(
+                pockets = Pockets(
+                  white = Pocket(white.map(_.role)),
+                  black = Pocket(black.map(_.role))
+                )
               )
             )
-          )
+          }
+        } else {
+          pockets.fold(board) { str =>
+            import chess.variant.Crazyhouse.{ Pocket, Pockets }
+            val (white, black) = str.toList.flatMap(Piece.fromChar).partition(_ is White)
+            board.withCrazyData(
+              _.copy(
+                pockets = Pockets(
+                  white = Pocket(white.map(_.role)),
+                  black = Pocket(black.map(_.role))
+                )
+              )
+            )
+          }
         }
       }
   }
@@ -179,7 +194,7 @@ object Forsyth {
   def >>(game: Game): FEN = FEN {
     {
       List(
-        exportBoard(game.board) + exportCrazyPocket(game.board),
+        exportBoard(game.board) + exportCrazyPocket(game.board) + exportNewChess1Pocket(game.board),
         game.player.letter,
         exportCastles(game.board),
         game.situation.enPassantSquare.map(_.toString).getOrElse("-"),
@@ -208,6 +223,15 @@ object Forsyth {
   private def exportCrazyPocket(board: Board) =
     board.crazyData match {
       case Some(variant.Crazyhouse.Data(pockets, _)) =>
+        "/" +
+          pockets.white.roles.map(_.forsythUpper).mkString +
+          pockets.black.roles.map(_.forsyth).mkString
+      case _ => ""
+    }
+
+  private def exportNewChess1Pocket(board: Board) =
+    board.newChess1Data match {
+      case Some(variant.NewChess1.Data(pockets)) =>
         "/" +
           pockets.white.roles.map(_.forsythUpper).mkString +
           pockets.black.roles.map(_.forsyth).mkString

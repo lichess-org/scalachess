@@ -1,12 +1,13 @@
 package chess
 
-import variant.{ Crazyhouse, Variant }
+import variant.{Crazyhouse, NewChess1, Variant}
 
 case class Board(
     pieces: PieceMap,
     history: History,
     variant: Variant,
-    crazyData: Option[Crazyhouse.Data] = None
+    crazyData: Option[Crazyhouse.Data] = None,
+    newChess1Data: Option[NewChess1.Data] = None
 ) {
 
   def apply(at: Pos): Option[Piece] = pieces get at
@@ -111,6 +112,13 @@ case class Board(
 
   def ensureCrazyData = withCrazyData(crazyData | Crazyhouse.Data.init)
 
+  def withNewChess1Data(data: NewChess1.Data)         = copy(newChess1Data = Option(data))
+  def withNewChess1Data(data: Option[NewChess1.Data]) = copy(newChess1Data = data)
+  def withNewChess1Data(f: NewChess1.Data => NewChess1.Data): Board =
+    withNewChess1Data(f(newChess1Data | NewChess1.Data.init))
+
+  def ensureNewChess1Data = withNewChess1Data(newChess1Data | NewChess1.Data.init)
+
   def unmovedRooks =
     UnmovedRooks {
       history.unmovedRooks.pos.filter(pos =>
@@ -167,7 +175,7 @@ object Board {
     Board(pieces.toMap, if (variant.allowsCastling) Castles.all else Castles.none, variant)
 
   def apply(pieces: Iterable[(Pos, Piece)], castles: Castles, variant: Variant): Board =
-    Board(pieces.toMap, History(castles = castles), variant, variantCrazyData(variant))
+    Board(pieces.toMap, History(castles = castles), variant, variantCrazyData(variant), variantNewChess1Data(variant))
 
   def init(variant: Variant): Board = Board(variant.pieces, variant.castles, variant)
 
@@ -175,4 +183,7 @@ object Board {
 
   private def variantCrazyData(variant: Variant) =
     (variant == Crazyhouse) option Crazyhouse.Data.init
+
+  private def variantNewChess1Data(variant: Variant) =
+    (variant == NewChess1) option NewChess1.Data.init
 }

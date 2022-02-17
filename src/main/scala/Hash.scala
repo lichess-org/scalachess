@@ -45,7 +45,8 @@ object Hash {
       case Bishop => 2
       case Rook   => 3
       case Queen  => 4
-      case King   => 5
+      case Duke   => 5
+      case King   => 6
     }
 
   private def pieceIndex(piece: Piece) =
@@ -59,7 +60,7 @@ object Hash {
     def crazyPocketMask(role: Role, colorshift: Int, count: Int) = {
       // There should be no kings and at most 16 pieces of any given type
       // in a pocket.
-      if (0 < count && count <= 16 && roleIndex(role) < 5)
+      if (0 < count && count <= 16 && roleIndex(role) < 6)
         Option(table.crazyPocketMasks(16 * roleIndex(role) + count + colorshift))
       else None
     }
@@ -71,7 +72,7 @@ object Hash {
       .map {
         table.actorMasks compose actorIndex _
       }
-      .fold(hturn)(_ ^ _)
+    val a = hactors.fold(hturn)(_ ^ _)
 
     val hcastling =
       if (board.variant.allowsCastling)
@@ -79,8 +80,8 @@ object Hash {
           .collect { case (true, castlingMask) =>
             castlingMask
           }
-          .fold(hactors)(_ ^ _)
-      else hactors
+          .fold(a)(_ ^ _)
+      else a
 
     val hep = situation.enPassantSquare.fold(hcastling) { pos =>
       hcastling ^ table.enPassantMasks(pos.file.index)
@@ -113,7 +114,18 @@ object Hash {
         .fold(hcrazypromotions)(_ ^ _)
     }
 
-    hcrazy
+    // Hash in special newchess1 data.
+    val hnewchess1 = board.newChess1Data.fold(hcrazy) { data =>
+      Color.all
+        .flatMap { color =>
+          val colorshift = color.fold(79, -1)
+          data.pockets(color).roles.groupBy(identity).flatMap { case (role, list) =>
+            crazyPocketMask(role, colorshift, list.size)
+          }
+        }.fold(hcrazy)(_ ^ _)
+    }
+
+    hnewchess1
   }
 
   private val h = new Hash(size)
@@ -125,6 +137,7 @@ object Hash {
 }
 
 private object ZobristTables {
+  //preinited, should have size 64*(max roleIndex+1)
   val actorMasks = Array(
     "9d39247e33776d4152b375aa7c0d7bac",
     "2af7398005aaa5c7208d169a534f2cf5",
@@ -893,7 +906,135 @@ private object ZobristTables {
     "5fa7867caf35e149a893a8fa258f383e",
     "56986e2ef3ed091be78c30cc1179b849",
     "917f1dd5f8886c612e4432e6ce4996d9",
-    "d20d8c88c8ffe65f576ec7a84e0b932d"
+    "d20d8c88c8ffe65f576ec7a84e0b932d",
+    "b3035936d49572ca9b54cecc6b700a3a",
+    "2eb55070b8a1a5dcff30ffb24397b5fb",
+    "d96b6e5ba923df250a0ee6a7d1054d8f",
+    "172432aef8589279224895dcb1c75aef",
+    "e92dea13688a7f37a41c35d135c50560",
+    "0fdd1e60790f1cdeac03b0acebeae469",
+    "2a7c3a0547d3d4c55b748a7ef3560968",
+    "5fe5f5e8bf5ba1b78972525e87dcf311",
+    "3df5e64af52ca36d57f461fa80741642",
+    "091b4155bce172992e6bbc3a0b09415e",
+    "890a2675e0d2eae9833d6f1ccf5c2c56",
+    "d526d9fe16d7c5c2507b86a69b4087ea",
+    "2c96c387d88a676a071f8e3444960322",
+    "3d3e96a82e5a4d7e4469fbc37cc1a02e",
+    "2fc933955d64089d436094b727705591",
+    "c832af143e847f12bae774886720e749",
+    "f734dfe612622acacad205ac5bd77077",
+    "b2e2a06c806e1489aca179f3a401ee0c",
+    "8e8452d9c1ac8f6307db9e0f93a1f735",
+    "9c7b4c85bad9cc353e53063ee9518dca",
+    "f3396cb39d39c966dd8551c3336cc25f",
+    "00562434a8a516c3a37d39c38cef5d64",
+    "02335539a4d64de25ef27f33631f05a8",
+    "7264510871bfb8607ceef22d1ed68c46",
+    "aaa05504c7b5d29abf5ea611a9c25a5c",
+    "78205e8d487fb9c2f3afcc8871950d56",
+    "4b25994ef16c7f44aa516f9cfcd96912",
+    "8eaf9fa02fcd315d043925a2cba76ee4",
+    "5819a3315d9fa3de44d33f9875c9e417",
+    "eb1dfe950a91d0b61ada3c8488bc8fac",
+    "a54e958a74aa1faa83d7b959cdc94058",
+    "8efd4795f16b9f3b6d16c29668a3c8fd",
+    "0a22bab074f8589940faefaca3b1f02f",
+    "06ad812390a024d661ad1ec4154afd65",
+    "5331113c5e2ab94a813084adbcd8753f",
+    "07c886f6c4e8acfc3030bf0f3dfbc74e",
+    "3ca2f50186a65626c0bc607ad36f483a",
+    "391e14ef5df457fc1c8f5144df9d1b6d",
+    "66aa5c948f5dd4e06e279a55a4acf10a",
+    "cc1a75fd1601d9a7ad933f49a43a6551",
+    "cd2537035261f75dd69c20b899474bed",
+    "7b5d4404c455409c02cd6720ba307c76",
+    "5d8b7751e2f0876a4462d52f63ae13db",
+    "bdebdd5b91c90aa7defc586be9fdc538",
+    "6bce70548488777026d86d0ddac42448",
+    "94b8958ba4d265998170d44ef1d79285",
+    "8f624d274e01e4ca75baf811bd199995",
+    "a3fe73d52040ef45bc103c57ae8744f3",
+    "cccaab052f22003ed26e5457ed41ca68",
+    "43f5609f7fa877d923033fdfec4b3c24",
+    "b8d184e5a6805509ce79042283043746",
+    "f88a7279256f2148854326b7a1b4082f",
+    "616d1fcaec7bf22ea50c8bcf0b05af09",
+    "50b1056d087073a394c3c43601740770",
+    "d0318c93f3e095f84348dca67fa50ed9",
+    "b12eb313dbfbb7e677fe4c8ff7dad2c0",
+    "98f84ac9b491793288cd949bd4d9188d",
+    "797785ed9d1e1039dc870e838f2a5088",
+    "0af51c100ec25277dc16a359a88dfe1c",
+    "771a25148aaf67143a9449ce3bb3d08c",
+    "ed8bce4c8cf42d2978ab7d7ad189d358",
+    "c7cdb0f2f0af2bb8375418d610bf8c5e",
+    "77c836a65c19cf88c31e772e6ec648f8",
+    "1ad741c8874681146bc226ccfddce0f2",
+    "d016beaf1530071d02739f7d85dd8a3e",
+    "333345be5ccc7f5a0fdac1375da68713",
+    "83590bf00bc06ed136cb1ceeb3c845e9",
+    "c439ef0741ba9fdf27973dbc360a2e96",
+    "d9714b4a5d618296d78c097446f2df93",
+    "739baa5e3664544957a091eb99c76a82",
+    "b347849e6f4156d2a21c0bd7bdc9a217",
+    "9727a482ef3af7f64ff6d73bbd216da9",
+    "7b4642a8bab7b25bfaf16243c9bb3bda",
+    "4ded9ee669fc48371889f5b023e387c7",
+    "d2741fc81ce40f328f406487175a0266",
+    "fe14937638b8accf59820d899d8e70bb",
+    "6a80720c544a1eeb29a0d717fc82c422",
+    "e73235edde6f289a1bb39e272d420293",
+    "f42383d27a6f7e866b6cd6cd3d9f8892",
+    "22255b44a0d17e444f84e604a3f667a3",
+    "e1e11ada4b1857f958e4827296702be1",
+    "6835213f35444ee30e68de31f1d17cde",
+    "0a5996ea1d126d18c243952699b269a8",
+    "a3949e2a493a0b4a481aca54782eb1f0",
+    "051ca34b59c3df2053911750bb95f17b",
+    "e16021b521729673449e534dada937b1",
+    "1b0881fcc9660804b01eb7501b693f25",
+    "5594004cdadc0053664f96a277fd974b",
+    "c5322aee12edc673f32901d1268018f2",
+    "c4d8c334ff4cc16cb16654fcb186a320",
+    "4b4d86d6d2e090033638dbc12c97eacf",
+    "2a936d5ff20ec9a7c8439ebb0ec956bc",
+    "7c0a4d8482280d5f8ea693160c89fe29",
+    "711260ac83a917a60e75a3527982c544",
+    "221f3d36bce6ab13ada6c977b67cecbd",
+    "8f98284638125a8a6ecc94f81ab1c6d2",
+    "c577d0b3dbb5e2040f18d748995f1bca",
+    "bcfa85d2e9e92929159b8f414ba7a5c6",
+    "51a0bf6a1ad6f4520e28ab10dfd86c2e",
+    "34582d13ba8120b7a5bf543748ae0502",
+    "1c115e34a2535a649fae49ccafdca32a",
+    "25b3423c2b4c15fcfbdb7720d2db74af",
+    "140a8c83a8f2016f80fbe8c64cfd15b4",
+    "f3083bd06201733af356ff8623f1d1b5",
+    "eeacc6899f9a837e04e4c7e240cde242",
+    "5d4c610a054f2f47b42f82b7770ec9f8",
+    "a22206c65b906fe66cdd338c25e07323",
+    "7cc4bdc8cf09853c1259bc0be4c38b97",
+    "a847110bea52753ac94eef61fc92d942",
+    "bfb4f70dd674a199ff6e515b5724a891",
+    "431b9a2ed53da24616f24e0c7541a9fc",
+    "0f483bfe8733323e7bb4d66814d77bbb",
+    "d013ce8e1b93c9f97e689f5045b7c473",
+    "f4d5c3fbddc61004cb9fae0ac5d26d70",
+    "3a79f5d6aaa63b26393e60ba4529a674",
+    "3435ceddbfb546ab1c2f852563058153",
+    "4575f74b3993e0c016042337eb8d5583",
+    "1c80f3397e767abcdfc55733f357aa76",
+    "1c5b06a545b4edf6f899af25df32f7f3",
+    "5a7990969a1aa3507c57244a494c72b5",
+    "0b4a3ae6693248d2068e9a98656e1399",
+    "d75208023a1da4275f0a162c9db7ad55",
+    "2d28dc64b7fb318fbf656efc850e3b09",
+    "5840a724fc581267d9ffa12ada5ef462",
+    "363ee7d918224eea45e1f73f9c4d422b",
+    "ed25c8c4e49bc6fe1c40633477678b93",
+    "95db4961df9ee173832b19f328a466a9",
+    "ae22291a374a75dc1e6299bfedd2870f"
   )
 
   val whiteTurnMask = "f8d626aaaf2785093815e537b6222c85"
@@ -992,6 +1133,7 @@ private object ZobristTables {
     "7e3de4bfbef5566f06a79ac414c9632e"
   )
 
+  //16*6+16+54
   val crazyPocketMasks = Array(
     "b262e9f9d61233206e21a47d5b561a1d",
     "91533947cdaa8bec4263a757e414fe44",
@@ -1142,6 +1284,22 @@ private object ZobristTables {
     "2d78f39e1adbaa9d9992315a0c7adfe5",
     "1aada836dedb3ba7e12508294de8e35e",
     "f37991753c7df55849960c597d119ace",
-    "e80840e623a19d0857b7ccbb21f74d1c"
+    "e80840e623a19d0857b7ccbb21f74d1c",
+    "0fa62e0f7dbbd30ca190db18938504e9",
+    "2a6bbcc6aedd5a114ef6793c404eb26f",
+    "6a9f5281e7ae3cdccb6f3cb0045ebee0",
+    "564ea20d0471001cbcac583420ebc285",
+    "525c3075af08ee9d533c739200ee44f9",
+    "1c0f1044ed8cf6c2437d8f45495d3870",
+    "bce5b373839fdf9dc316a7c4558a0bf0",
+    "b58f7b671061e7235c3df571b81ddf48",
+    "3f07f807a08860a231d0ab64e942d31c",
+    "548d45e273b8751f36bdf82d741891ae",
+    "7f9965dea02eb951178dec5178f1f1f6",
+    "b9c1277d0edfaf768a240cd9a51ee585",
+    "67d07e741e6baaa7cfffabfd7f566b72",
+    "373019a0021ac6f021d21f399e11b325",
+    "57e3eacd271c40871b73dd251949034f",
+    "2d5653e1c41b97907c7696476940cc09"
   )
 }

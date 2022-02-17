@@ -4,12 +4,12 @@ import Pos._
 
 class DoomTest extends ChessTest {
 
-  "a doom" should {
+  "a duke" should {
 
-    val doom = White - Doom
+    val duke = White - Duke
 
     "move in any direction until range 2" in {
-      pieceMoves(doom, D4) must bePoss(
+      pieceMoves(duke, D4) must bePoss(
         D5,
         D6,
         D3,
@@ -30,7 +30,7 @@ class DoomTest extends ChessTest {
     }
 
     "move 1 position in any direction, even from the edges" in {
-      pieceMoves(doom, H8) must bePoss(
+      pieceMoves(duke, H8) must bePoss(
         F8,
         G8,
         F6,

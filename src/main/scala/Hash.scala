@@ -45,7 +45,7 @@ object Hash {
       case Bishop => 2
       case Rook   => 3
       case Queen  => 4
-      case Doom   => 5
+      case Duke   => 5
       case King   => 6
     }
 

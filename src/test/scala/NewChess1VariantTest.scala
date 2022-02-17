@@ -35,8 +35,8 @@ class NewChess1VariantTest extends ChessTest {
         b.withNewChess1Data(
           NewChess1.Data(
             pockets = NewChess1.Pockets(
-              NewChess1.Pocket(Doom :: Nil),
-              NewChess1.Pocket(Doom :: Nil)
+              NewChess1.Pocket(Duke :: Nil),
+              NewChess1.Pocket(Duke :: Nil)
             )
           )
         )

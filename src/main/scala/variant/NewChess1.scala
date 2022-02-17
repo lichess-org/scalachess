@@ -11,20 +11,20 @@ case object NewChess1
       key = "newchess1",
       name = "NewChess1",
       shortName = "NewChess1",
-      title = "A game with Doom piece started from the off board. It can be placed instead of moving a piece",
+      title = "A game with Duke piece started from the off board. It can be placed instead of moving a piece",
       standardInitialPosition = true
     ) {
 
   override def isValidPromotion(promotion: Option[PromotableRole]) =
     promotion match {
       case None                                 => true
-      case Some(Queen | Rook | Knight | Bishop| Doom) => true
+      case Some(Queen | Rook | Knight | Bishop| Duke) => true
       case _                                    => false
     }
 
-  override val roles = List(Rook, Knight, King, Bishop, King, Queen, Pawn, Doom)
+  override val roles = List(Rook, Knight, King, Bishop, King, Queen, Pawn, Duke)
 
-  override val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, Doom)
+  override val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, Duke)
 
   def pieces = Standard.pieces
 
@@ -45,7 +45,7 @@ case object NewChess1
     for {
       d1 <- situation.board.newChess1Data toValid "Board has no newchess1 data"
       _ <-
-        if (role != Doom || canDropDoomOn(pos, situation.color)) Validated.valid(d1)
+        if (role != Duke || canDropDoomOn(pos, situation.color)) Validated.valid(d1)
         else Validated.invalid(s"Can't drop $role on $pos")
       piece = Piece(situation.color, role)
       d2     <- d1.drop(piece) toValid s"No $piece to drop on $pos"
@@ -112,7 +112,7 @@ case object NewChess1
   }
 
   object Data {
-    val init = Data(Pockets(Pocket(List(Doom)), Pocket(List(Doom))))
+    val init = Data(Pockets(Pocket(List(Duke)), Pocket(List(Duke))))
   }
 
   case class Pockets(white: Pocket, black: Pocket) {
@@ -121,7 +121,7 @@ case object NewChess1
 
     def take(piece: Piece): Option[Pockets] =
       piece.role match {
-        case Doom =>
+        case Duke =>
           piece.color.fold(
             white take piece.role map { np =>
               copy(white = np)

@@ -35,3 +35,9 @@ Please [install it for your code editor](https://scalameta.org/scalafmt/docs/ins
 if you're going to contribute to this project.
 
 If you don't install it, please run `scalafmtAll` in the sbt console before committing.
+
+## Local deploy/build
+
+```
+sbt publishLocal
+```

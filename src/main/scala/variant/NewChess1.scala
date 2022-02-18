@@ -9,8 +9,8 @@ case object NewChess1
     extends Variant(
       id = 11,
       key = "newchess1",
-      name = "NewChess1",
-      shortName = "NewChess1",
+      name = "Duke",
+      shortName = "Duke",
       title = "A game with Duke piece started from the off board. It can be placed instead of moving a piece",
       standardInitialPosition = true
     ) {

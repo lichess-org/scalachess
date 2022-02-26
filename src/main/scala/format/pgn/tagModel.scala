@@ -7,7 +7,24 @@ import cats.syntax.option._
 
 case class Tag(name: TagType, value: String) {
 
-  override def toString = s"""[$name "$value"]"""
+  override def toString = s"""[$name "${escapeString(value)}"]"""
+
+  def escapeString(str: String): String =
+    str.flatMap(escapedChar)
+
+  def escapedChar(ch: Char): String = ch match {
+    case '\b' => "\\b"
+    case '\t' => "\\t"
+    case '\n' => "\\n"
+    case '\f' => "\\f"
+    case '\r' => "\\r"
+    case '"'  => "\\\""
+    case '\'' => "\\\'"
+    case '\\' => "\\\\"
+    case _ =>
+      if (ch.isControl) "\\0" + Integer.toOctalString(ch.toInt)
+      else String.valueOf(ch)
+  }
 }
 
 trait TagType {

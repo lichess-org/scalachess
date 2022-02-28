@@ -338,4 +338,31 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
 1. d4 (1. e4) 1... Nf6 (1... d5)"""
     }
   }
+
+  "tags" should {
+    "tag with \" in it" in {
+      val pgn = Pgn(
+        tags = Tags(
+          List(
+            Tag(_.TimeControl, "\"")
+          )
+        ),
+        turns = List()
+      )
+      pgn.toString must_== """[TimeControl "\""]"""
+    }
+
+    "tag with \\ in it" in {
+      val pgn = Pgn(
+        tags = Tags(
+          List(
+            Tag(_.TimeControl, "\\")
+          )
+        ),
+        turns = List()
+      )
+      pgn.toString must_== """[TimeControl "\\"]"""
+    }
+  }
+
 }

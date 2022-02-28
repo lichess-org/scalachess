@@ -240,8 +240,8 @@ object Parser {
   object TagParser {
 
     val tagName: P[String]      = R.alpha.rep.string.withContext("Tag name can only contains alphabet characters")
-    val escapeDquote: P[String] = (P.char('\\') ~ R.dquote).as("\"")
-    val valueChar: P[String]    = escapeDquote | P.charWhere(_ != '"').string
+    val escaped: P[String]      = P.char('\\') *> (R.dquote | P.char('\\')).string
+    val valueChar: P[String]    = escaped | P.charWhere(_ != '"').string
     val tagValue: P[String]     = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
     val tagContent: P[Tag]      = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
     val tag: P[Tag]             = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0

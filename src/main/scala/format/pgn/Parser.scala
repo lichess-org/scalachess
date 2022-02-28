@@ -239,13 +239,13 @@ object Parser {
 
   object TagParser {
 
-    val tagName: P[String]      = R.alpha.rep.string.withContext("Tag name can only contains alphabet characters")
-    val escaped: P[String]      = P.char('\\') *> (R.dquote | P.char('\\')).string
-    val valueChar: P[String]    = escaped | P.charWhere(_ != '"').string
-    val tagValue: P[String]     = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
-    val tagContent: P[Tag]      = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
-    val tag: P[Tag]             = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
-    val tags: P0[Tags]          = tag.rep0.map(tags => Tags(tags))
+    val tagName: P[String]   = R.alpha.rep.string.withContext("Tag name can only contains alphabet characters")
+    val escaped: P[String]   = P.char('\\') *> (R.dquote | P.char('\\')).string
+    val valueChar: P[String] = escaped | P.charWhere(_ != '"').string
+    val tagValue: P[String]  = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
+    val tagContent: P[Tag]   = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
+    val tag: P[Tag]          = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
+    val tags: P0[Tags]       = tag.rep0.map(tags => Tags(tags))
 
     def apply(pgn: String): Validated[String, Tags] =
       tags.parse(pgn) match {

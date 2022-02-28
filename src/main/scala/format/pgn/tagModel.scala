@@ -9,14 +9,8 @@ case class Tag(name: TagType, value: String) {
 
   override def toString = s"""[$name "${escapeString(value)}"]"""
 
-  def escapeString(str: String): String =
-    str.flatMap(escapedChar)
-
-  def escapedChar(ch: Char): String = ch match {
-    case '"'  => "\\\""
-    case '\\' => "\\\\"
-    case _    => String.valueOf(ch)
-  }
+  private def escapeString(str: String): String =
+    str.replace("\\", "\\\\").replace("\"", "\\\"")
 }
 
 trait TagType {

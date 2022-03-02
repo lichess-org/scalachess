@@ -390,6 +390,7 @@ new FullOpening("A28", "English Opening: King's English Variation, Four Knights 
 new FullOpening("A28", "English Opening: King's English Variation, Four Knights Variation, Quiet Line", "r1bqr1k1/pppp1ppp/2n2n2/3NpQ2/1bP5/4PN2/PP1P1PPP/R1B1KB1R b KQ -"),
 new FullOpening("A29", "English Opening: King's English Variation, Four Knights Variation, Fianchetto Line", "r1bqkb1r/pppp1ppp/2n2n2/4p3/2P5/2N2NP1/PP1PPP1P/R1BQKB1R b KQkq -"),
 new FullOpening("A30", "English Opening: Symmetrical Variation", "rnbqkbnr/pp1ppppp/8/2p5/2P5/8/PP1PPPPP/RNBQKBNR w KQkq -"),
+new FullOpening("A30", "English Opening: Symmetrical Variation", "rnbqkbnr/pp1ppppp/8/2p5/2P5/5N2/PP1PPPPP/RNBQKB1R b KQkq -"),
 new FullOpening("A30", "English Opening: Symmetrical Variation, Hedgehog Defense", "rn1qk2r/pb1pbppp/1p2pn2/2p5/2P5/2N2NP1/PP1PPPBP/R1BQ1RK1 w kq -"),
 new FullOpening("A30", "English Opening: Symmetrical Variation, Napolitano Gambit", "rnbqkb1r/pp1ppppp/5n2/2p5/1PP5/5N2/P2PPPPP/RNBQKB1R b KQkq -"),
 new FullOpening("A30", "English Opening: Symmetrical, Hedgehog, Flexible Formation", "r2qk2r/1b1nbppp/pp1ppn2/8/2PQ4/1PN2NP1/P3PPBP/R1BR2K1 w kq -"),

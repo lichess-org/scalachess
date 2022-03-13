@@ -35,7 +35,7 @@ object Parser {
       init         = parsedMoves._1
       sans         = Sans(parsedMoves._2)
       resultOption = parsedMoves._3
-      tags         = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + _)
+      tags         = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
     } yield ParsedPgn(init, tags, sans)
   }
 
@@ -51,18 +51,10 @@ object Parser {
 
     private def cleanComments(comments: List[String]) = comments.map(_.trim).filter(_.nonEmpty)
 
-    def apply(pgn: String): Validated[String, (InitialPosition, List[San], Option[Tag])] =
+    def apply(pgn: String): Validated[String, (InitialPosition, List[San], Option[String])] =
       strMoves.parse(pgn) match {
-        case Right((_, (init, moves, result))) =>
-          valid(
-            (
-              init,
-              moves,
-              result map { r =>
-                Tag(_.Result, r)
-              }
-            )
-          )
+        case Right((_, parsedResult)) =>
+          valid(parsedResult)
         case Left(err) =>
           err match {
             case P.Error(0, _) => valid((InitialPosition(List()), List(), None))

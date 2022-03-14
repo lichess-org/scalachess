@@ -217,7 +217,7 @@ new FullOpening("E67", "King's Indian Defense: Fianchetto Variation, Classical F
 new FullOpening("E67", "King's Indian Defense: Fianchetto Variation, Debrecen Defense", "r1bq1rk1/pppnppbp/3p1np1/8/2PP4/2N2NP1/PP2PPBP/R1BQK2R w KQ -"),
 new FullOpening("E67", "King's Indian Defense: Fianchetto Variation, Double Fianchetto Attack", "r1bq1rk1/pppn1pbp/3p1np1/4p3/2PP4/1PN2NP1/P3PPBP/R1BQ1RK1 b - -"),
 new FullOpening("E67", "King's Indian Defense: Fianchetto Variation, Hungarian Variation", "r1bq1rk1/1ppnppbp/p2p1np1/8/2PP4/2N2NP1/PP2PPBP/R1BQ1RK1 w - -"),
-new FullOpening("E68", "King's Indian Defense, Fianchetto Variation, Classical Variation", "r1bq1rk1/pppn1pbp/3p1np1/4p3/2PPP3/2N2NP1/PP3PBP/R1BQ1RK1 b - -"),
+new FullOpening("E68", "King's Indian Defense: Fianchetto Variation, Classical Variation", "r1bq1rk1/pppn1pbp/3p1np1/4p3/2PPP3/2N2NP1/PP3PBP/R1BQ1RK1 b - -"),
 new FullOpening("E68", "King's Indian Defense: Fianchetto Variation, Long Variation", "r1bqr1k1/1pp2pbp/3p1np1/p1n5/2PNP3/2N3PP/PP3PB1/R1BQR1K1 w - -"),
 new FullOpening("E69", "King's Indian Defense: Fianchetto Variation, Classical Main Line", "r1bq1rk1/pp1n1pbp/2pp1np1/4p3/2PPP3/2N2NPP/PP3PB1/R1BQ1RK1 b - -"),
 new FullOpening("E70", "King's Indian Defense: Accelerated Averbakh Variation", "rnbqk2r/ppp1ppbp/3p1np1/6B1/2PPP3/2N5/PP3PPP/R2QKBNR b KQkq -"),

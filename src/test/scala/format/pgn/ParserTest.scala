@@ -278,8 +278,8 @@ class ParserTest extends ChessTest {
     }
   }
   "overflow 3: tags" in {
-    Parser.TagParser.fromFullPgn(overflow3) must beValid.like { case tags =>
-      tags.value.size must_== 9
+    parser(overflow3) must beValid.like { case a =>
+      a.tags.value.size must_== 9
     }
   }
   "chessbase arrows" in {

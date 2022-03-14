@@ -249,11 +249,6 @@ object Parser {
         case Right((_, tags)) => valid(tags)
       }
 
-    def fromFullPgn(pgn: String): Validated[String, Tags] =
-      splitTagAndMoves(pgn) flatMap { case (tags, _) =>
-        apply(tags)
-      }
-
   }
 
   // there must be a newline between the tags and the first move

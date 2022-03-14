@@ -26,18 +26,32 @@ object Parser {
       .replace("‑", "-")
       .replace("–", "-")
       .replace("e.p.", "") // silly en-passant notation
-    for {
-      splitted <- splitTagAndMoves(preprocessed)
-      tagStr  = splitted._1
-      moveStr = splitted._2
-      preTags     <- TagParser(tagStr)
-      parsedMoves <- MovesParser(moveStr)
-      init         = parsedMoves._1
-      sans         = Sans(parsedMoves._2)
-      resultOption = parsedMoves._3
-      tags         = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
-    } yield ParsedPgn(init, tags, sans)
+    parse(preprocessed)
+  //for {
+      //splitted <- splitTagAndMoves(preprocessed)
+      //tagStr  = splitted._1
+      //moveStr = splitted._2
+      //preTags     <- TagParser(tagStr)
+      //parsedMoves <- MovesParser(moveStr)
+      //init         = parsedMoves._1
+      //sans         = Sans(parsedMoves._2)
+      //resultOption = parsedMoves._3
+      //tags         = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
+    //} yield ParsedPgn(init, tags, sans)
   }
+
+  val pgnParser = ((TagParser.tags <* whitespaces) ~ MovesParser.strMoves).map { case (preTags, (init, sans, resultOption)) => {
+      //val tags = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
+      ParsedPgn(init, preTags, Sans(sans))
+  }}
+
+  def parse(pgn: String): Validated[String, ParsedPgn] =
+    pgnParser.parse(pgn) match {
+      case Right((_, parsedResult)) =>
+        valid(parsedResult)
+      case Left(err) =>
+        invalid(showExpectations("Cannot parse moves", pgn, err))
+    }
 
   def moves(str: String, variant: Variant): Validated[String, Sans] =
     MovesParser.moves(str)
@@ -237,7 +251,7 @@ object Parser {
     val tagValue: P[String]  = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
     val tagContent: P[Tag]   = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
     val tag: P[Tag]          = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
-    val tags: P0[Tags]       = tag.rep0.map(tags => Tags(tags))
+    val tags: P0[Tags]       = tag.rep0.map(Tags(_))
 
     def apply(pgn: String): Validated[String, Tags] =
       tags.parse(pgn) match {

@@ -27,22 +27,11 @@ object Parser {
       .replace("–", "-")
       .replace("e.p.", "") // silly en-passant notation
     parse(preprocessed)
-  //for {
-      //splitted <- splitTagAndMoves(preprocessed)
-      //tagStr  = splitted._1
-      //moveStr = splitted._2
-      //preTags     <- TagParser(tagStr)
-      //parsedMoves <- MovesParser(moveStr)
-      //init         = parsedMoves._1
-      //sans         = Sans(parsedMoves._2)
-      //resultOption = parsedMoves._3
-      //tags         = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
-    //} yield ParsedPgn(init, tags, sans)
   }
 
-  val pgnParser = ((TagParser.tags <* whitespaces) ~ MovesParser.strMoves).map { case (preTags, (init, sans, resultOption)) => {
-      //val tags = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
-      ParsedPgn(init, preTags, Sans(sans))
+  lazy val pgnParser = ((TagParser.tags <* whitespaces) ~ MovesParser.strMoves).map { case (preTags, (init, sans, resultOption)) => {
+      val tags = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
+      ParsedPgn(init, tags, Sans(sans))
   }}
 
   def parse(pgn: String): Validated[String, ParsedPgn] =
@@ -64,17 +53,6 @@ object Parser {
   object MovesParser {
 
     private def cleanComments(comments: List[String]) = comments.map(_.trim).filter(_.nonEmpty)
-
-    def apply(pgn: String): Validated[String, (InitialPosition, List[San], Option[String])] =
-      strMoves.parse(pgn) match {
-        case Right((_, parsedResult)) =>
-          valid(parsedResult)
-        case Left(err) =>
-          err match {
-            case P.Error(0, _) => valid((InitialPosition(List()), List(), None))
-            case _             => invalid(showExpectations("Cannot parse moves", pgn, err))
-          }
-      }
 
     def moves(str: String): Validated[String, Sans] =
       strMove.rep.map(xs => Sans(xs.toList)).parse(str) match {

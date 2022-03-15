@@ -30,17 +30,20 @@ object Parser {
     parse(preprocessed)
   }
 
-  lazy val fullParser: P0[ParsedPgn] = ((whitespaces *> TagParser.tags.?) ~ MovesParser.strMoves.?).map { case (oTags, o) => {
+  lazy val fullParser: P0[ParsedPgn] = ((whitespaces *> TagParser.tags.?) ~ MovesParser.strMoves.?).map {
+    case (oTags, o) => {
       val preTags = Tags(oTags.map(_.toList).getOrElse(List()))
       o match {
         case None => ParsedPgn(InitialPosition(List()), preTags, Sans(List()))
         case Some((init, sans, resultOption)) => {
-          val tags = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
+          val tags =
+            resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
           ParsedPgn(init, tags, Sans(sans))
         }
       }
 
-  }}
+    }
+  }
 
   def parse(pgn: String): Validated[String, ParsedPgn] =
     fullParser.parse(pgn) match {
@@ -242,13 +245,13 @@ object Parser {
 
   object TagParser {
 
-    val tagName: P[String]   = R.alpha.rep.string.withContext("Tag name can only contains alphabet characters")
-    val escaped: P[String]   = P.char('\\') *> (R.dquote | P.char('\\')).string
-    val valueChar: P[String] = escaped | P.charWhere(_ != '"').string
-    val tagValue: P[String]  = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
-    val tagContent: P[Tag]   = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
-    val tag: P[Tag]          = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
-    val tags: P[NonEmptyList[Tag]]       = tag.rep
+    val tagName: P[String]         = R.alpha.rep.string.withContext("Tag name can only contains alphabet characters")
+    val escaped: P[String]         = P.char('\\') *> (R.dquote | P.char('\\')).string
+    val valueChar: P[String]       = escaped | P.charWhere(_ != '"').string
+    val tagValue: P[String]        = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
+    val tagContent: P[Tag]         = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
+    val tag: P[Tag]                = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
+    val tags: P[NonEmptyList[Tag]] = tag.rep
 
   }
 

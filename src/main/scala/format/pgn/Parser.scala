@@ -139,7 +139,7 @@ object Parser {
       }
 
     val strMoves: P0[(InitialPosition, List[San], Option[String])] =
-      ((commentary.rep0 ~ strMove.rep) ~ (result <* whitespaces).? <* commentary.rep0).map {
+      ((commentary.rep0 ~ strMove.rep0) ~ (result <* whitespaces).? <* commentary.rep0).map {
         case ((coms, sans), res) => (InitialPosition(cleanComments(coms)), sans.toList, res)
       }
   }

@@ -65,17 +65,6 @@ object Parser {
 
     private def cleanComments(comments: List[String]) = comments.map(_.trim).filter(_.nonEmpty)
 
-    def apply(pgn: String): Validated[String, (InitialPosition, List[San], Option[String])] =
-      strMoves.parse(pgn) match {
-        case Right((_, parsedResult)) =>
-          valid(parsedResult)
-        case Left(err) =>
-          err match {
-            case P.Error(0, _) => valid((InitialPosition(List()), List(), None))
-            case _             => invalid(showExpectations("Cannot parse moves", pgn, err))
-          }
-      }
-
     def moves(str: String): Validated[String, Sans] =
       strMove.rep.map(xs => Sans(xs.toList)).parse(str) match {
         case Right((_, str)) =>
@@ -223,12 +212,6 @@ object Parser {
     val moveWithSuffix: P[San] = (move ~ suffixes <* whitespaces)
       .map { case (std, suf) =>
         std withSuffixes suf
-      }
-
-    def apply(str: String): Validated[String, San] =
-      moveWithSuffix.parse(str) match {
-        case Right((_, san)) => valid(san)
-        case Left(err)       => invalid(showExpectations("Cannot parse move", str, err))
       }
 
     def mapParser[A](pairs: Iterable[(String, A)], name: String): P[A] = {

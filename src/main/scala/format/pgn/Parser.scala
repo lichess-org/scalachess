@@ -7,6 +7,7 @@ import cats.data.Validated
 import cats.data.Validated.{ invalid, valid }
 import cats.implicits._
 import cats.parse.Parser.Expectation
+import cats.data.NonEmptyList
 
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 object Parser {
@@ -29,17 +30,24 @@ object Parser {
     parse(preprocessed)
   }
 
-  lazy val pgnParser = ((TagParser.tags <* whitespaces) ~ MovesParser.strMoves).map { case (preTags, (init, sans, resultOption)) => {
-      val tags = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
-      ParsedPgn(init, tags, Sans(sans))
+  lazy val fullParser: P0[ParsedPgn] = ((whitespaces *> TagParser.tags.?) ~ MovesParser.strMoves.?).map { case (oTags, o) => {
+      val preTags = Tags(oTags.map(_.toList).getOrElse(List()))
+      o match {
+        case None => ParsedPgn(InitialPosition(List()), preTags, Sans(List()))
+        case Some((init, sans, resultOption)) => {
+          val tags = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
+          ParsedPgn(init, tags, Sans(sans))
+        }
+      }
+
   }}
 
   def parse(pgn: String): Validated[String, ParsedPgn] =
-    pgnParser.parse(pgn) match {
+    fullParser.parse(pgn) match {
       case Right((_, parsedResult)) =>
         valid(parsedResult)
       case Left(err) =>
-        invalid(showExpectations("Cannot parse moves", pgn, err))
+        invalid(showExpectations("Cannot parse pgn", pgn, err))
     }
 
   def moves(str: String, variant: Variant): Validated[String, Sans] =
@@ -53,6 +61,17 @@ object Parser {
   object MovesParser {
 
     private def cleanComments(comments: List[String]) = comments.map(_.trim).filter(_.nonEmpty)
+
+    def apply(pgn: String): Validated[String, (InitialPosition, List[San], Option[String])] =
+      strMoves.parse(pgn) match {
+        case Right((_, parsedResult)) =>
+          valid(parsedResult)
+        case Left(err) =>
+          err match {
+            case P.Error(0, _) => valid((InitialPosition(List()), List(), None))
+            case _             => invalid(showExpectations("Cannot parse moves", pgn, err))
+          }
+      }
 
     def moves(str: String): Validated[String, Sans] =
       strMove.rep.map(xs => Sans(xs.toList)).parse(str) match {
@@ -120,7 +139,7 @@ object Parser {
       }
 
     val strMoves: P0[(InitialPosition, List[San], Option[String])] =
-      ((commentary.rep0 ~ strMove.rep0) ~ (result <* whitespaces).? <* commentary.rep0).map {
+      ((commentary.rep0 ~ strMove.rep) ~ (result <* whitespaces).? <* commentary.rep0).map {
         case ((coms, sans), res) => (InitialPosition(cleanComments(coms)), sans.toList, res)
       }
   }
@@ -229,30 +248,9 @@ object Parser {
     val tagValue: P[String]  = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
     val tagContent: P[Tag]   = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
     val tag: P[Tag]          = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
-    val tags: P0[Tags]       = tag.rep0.map(Tags(_))
-
-    def apply(pgn: String): Validated[String, Tags] =
-      tags.parse(pgn) match {
-        case Left(err) =>
-          err match {
-            case P.Error(0, _) => valid(Tags(List()))
-            case _             => invalid(showExpectations("Cannot parse tags", pgn, err))
-          }
-        case Right((_, tags)) => valid(tags)
-      }
+    val tags: P[NonEmptyList[Tag]]       = tag.rep
 
   }
-
-  // there must be a newline between the tags and the first move
-  private def ensureTagsNewline(pgn: String): String =
-    """"\]\s*(\d+\.)""".r.replaceAllIn(pgn, m => "\"]\n" + m.group(1))
-
-  private def splitTagAndMoves(pgn: String): Validated[String, (String, String)] =
-    augmentString(ensureTagsNewline(pgn)).linesIterator.to(List).map(_.trim).filter(_.nonEmpty) span { line =>
-      line lift 0 contains '['
-    } match {
-      case (tagLines, moveLines) => valid(tagLines.mkString("\n") -> moveLines.mkString("\n"))
-    }
 
   private def showExpectations(context: String, str: String, error: P.Error): String = {
     val lm  = LocationMap(str)

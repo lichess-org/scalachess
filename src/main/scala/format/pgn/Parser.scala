@@ -21,11 +21,10 @@ object Parser {
         _.headOption.contains('%')
       }
       .mkString("\n")
-      .replace("[pgn]", "")
-      .replace("[/pgn]", "")
     parse(preprocessed)
   }
 
+  // todo simplify the mapping logic
   private lazy val fullParser: P0[ParsedPgn] =
     ((whitespaces *> TagParser.tags.?) ~ MovesParser.strMoves.?).map {
       case (oTags, o) => {
@@ -42,8 +41,11 @@ object Parser {
       }
     }
 
-  def parse(pgn: String): Validated[String, ParsedPgn] =
-    fullParser.parse(pgn) match {
+  private lazy val fullParserWithOptionalTag =
+    whitespaces *> P.string("[pgn]").? *> fullParser <* P.string("[/pgn]").? <* whitespaces
+
+  private def parse(pgn: String): Validated[String, ParsedPgn] =
+    fullParserWithOptionalTag.parse(pgn) match {
       case Right((_, parsedResult)) =>
         valid(parsedResult)
       case Left(err) =>

@@ -24,28 +24,8 @@ object Parser {
     parse(preprocessed)
   }
 
-  // todo simplify the mapping logic
-  private lazy val fullParser: P0[ParsedPgn] =
-    ((whitespaces *> TagParser.tags.?) ~ MovesParser.strMoves.?).map {
-      case (oTags, o) => {
-        val preTags = Tags(oTags.map(_.toList).getOrElse(List()))
-        o match {
-          case None => ParsedPgn(InitialPosition(List()), preTags, Sans(List()))
-          case Some((init, sans, resultOption)) => {
-            val tags =
-              resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
-            ParsedPgn(init, tags, Sans(sans))
-          }
-        }
-
-      }
-    }
-
-  private lazy val fullParserWithOptionalTag =
-    whitespaces *> P.string("[pgn]").? *> fullParser <* P.string("[/pgn]").? <* whitespaces
-
   private def parse(pgn: String): Validated[String, ParsedPgn] =
-    fullParserWithOptionalTag.parse(pgn) match {
+    pgnParser.parse(pgn) match {
       case Right((_, parsedResult)) =>
         valid(parsedResult)
       case Left(err) =>
@@ -101,7 +81,6 @@ object Parser {
       "1–0"
     )
 
-    // todo this also convert "½-½" => "1/2-1/2"
     def mapResult(result: String): String = result match {
       case "½-½"     => "1/2-1/2"
       case "1/2‑1/2" => "1/2-1/2"
@@ -274,6 +253,24 @@ object Parser {
     val tags: P[NonEmptyList[Tag]] = tag.rep
 
   }
+
+  private val tagsAndMovesParser: P0[ParsedPgn] =
+    ((whitespaces *> TagParser.tags.?) ~ MovesParser.strMoves.?).map {
+      case (optionalTags, optionalMoves) => {
+        val preTags = Tags(optionalTags.map(_.toList).getOrElse(List()))
+        optionalMoves match {
+          case None => ParsedPgn(InitialPosition(List()), preTags, Sans(List()))
+          case Some((init, sans, resultOption)) => {
+            val tags =
+              resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
+            ParsedPgn(init, tags, Sans(sans))
+          }
+        }
+      }
+    }
+
+  private val pgnParser: P0[ParsedPgn] =
+    whitespaces *> P.string("[pgn]").? *> tagsAndMovesParser <* P.string("[/pgn]").? <* whitespaces
 
   private def showExpectations(context: String, str: String, error: P.Error): String = {
     val lm  = LocationMap(str)

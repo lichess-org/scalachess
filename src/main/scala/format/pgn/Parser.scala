@@ -17,7 +17,6 @@ object Parser {
 
   def full(pgn: String): Validated[String, ParsedPgn] = {
     val preprocessed = augmentString(pgn).linesIterator
-      .map(_.trim)
       .filterNot {
         _.headOption.contains('%')
       }

@@ -30,20 +30,21 @@ object Parser {
     parse(preprocessed)
   }
 
-  lazy val fullParser: P0[ParsedPgn] = ((whitespaces *> TagParser.tags.?) ~ MovesParser.strMoves.?).map {
-    case (oTags, o) => {
-      val preTags = Tags(oTags.map(_.toList).getOrElse(List()))
-      o match {
-        case None => ParsedPgn(InitialPosition(List()), preTags, Sans(List()))
-        case Some((init, sans, resultOption)) => {
-          val tags =
-            resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
-          ParsedPgn(init, tags, Sans(sans))
+  private lazy val fullParser: P0[ParsedPgn] =
+    ((whitespaces *> TagParser.tags.?) ~ MovesParser.strMoves.?).map {
+      case (oTags, o) => {
+        val preTags = Tags(oTags.map(_.toList).getOrElse(List()))
+        o match {
+          case None => ParsedPgn(InitialPosition(List()), preTags, Sans(List()))
+          case Some((init, sans, resultOption)) => {
+            val tags =
+              resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
+            ParsedPgn(init, tags, Sans(sans))
+          }
         }
-      }
 
+      }
     }
-  }
 
   def parse(pgn: String): Validated[String, ParsedPgn] =
     fullParser.parse(pgn) match {
@@ -61,7 +62,9 @@ object Parser {
       .traverse(MovesParser.move)
       .map(Sans(_))
 
-  object MovesParser {
+  def move(str: String) = MovesParser.move(str)
+
+  private object MovesParser {
 
     private def cleanComments(comments: List[String]) = comments.map(_.trim).filter(_.nonEmpty)
 
@@ -136,7 +139,7 @@ object Parser {
       }
   }
 
-  object MoveParser {
+  private object MoveParser {
 
     def rangeToMap(r: Iterable[Char]) = r.zipWithIndex.to(Map).view.mapValues(_ + 1)
 
@@ -226,7 +229,7 @@ object Parser {
 
   }
 
-  object TagParser {
+  private object TagParser {
 
     val tagName: P[String]         = R.alpha.rep.string.withContext("Tag name can only contains alphabet characters")
     val escaped: P[String]         = P.char('\\') *> (R.dquote | P.char('\\')).string

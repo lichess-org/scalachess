@@ -24,8 +24,8 @@ object Parser {
       .mkString("\n")
       .replace("[pgn]", "")
       .replace("[/pgn]", "")
-      .replace("‑", "-")
-      .replace("–", "-")
+      //.replace("‑", "-")
+      //.replace("–", "-")
       .replace("e.p.", "") // silly en-passant notation
     parse(preprocessed)
   }
@@ -146,9 +146,16 @@ object Parser {
     val fileMap = rangeToMap('a' to 'h')
     val rankMap = rangeToMap('1' to '8')
 
-    val qCastle: P[Side] = P.stringIn(List("O-O-O", "o-o-o", "0-0-0")).as(QueenSide)
+    val castleQSide = List("O-O-O", "o-o-o", "0-0-0",
+      "O‑O‑O", "o‑o‑o", "0‑0‑0",
+      "O–O–O", "o–o–o", "0–0–0")
+    val qCastle: P[Side] = P.stringIn(castleQSide).as(QueenSide)
 
-    val kCastle: P[Side] = P.stringIn(List("O-O", "o-o", "0-0")).as(KingSide)
+    val castleKSide = List("O-O", "o-o", "0-0",
+      "O‑O", "o‑o", "0‑0",
+      "O–O", "o–o", "0–0")
+
+    val kCastle: P[Side] = P.stringIn(castleKSide).as(KingSide)
 
     val glyph: P[Glyph] =
       mapParser(

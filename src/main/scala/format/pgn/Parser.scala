@@ -24,9 +24,6 @@ object Parser {
       .mkString("\n")
       .replace("[pgn]", "")
       .replace("[/pgn]", "")
-      //.replace("‑", "-")
-      //.replace("–", "-")
-      .replace("e.p.", "") // silly en-passant notation
     parse(preprocessed)
   }
 
@@ -146,14 +143,10 @@ object Parser {
     val fileMap = rangeToMap('a' to 'h')
     val rankMap = rangeToMap('1' to '8')
 
-    val castleQSide = List("O-O-O", "o-o-o", "0-0-0",
-      "O‑O‑O", "o‑o‑o", "0‑0‑0",
-      "O–O–O", "o–o–o", "0–0–0")
+    val castleQSide      = List("O-O-O", "o-o-o", "0-0-0", "O‑O‑O", "o‑o‑o", "0‑0‑0", "O–O–O", "o–o–o", "0–0–0")
     val qCastle: P[Side] = P.stringIn(castleQSide).as(QueenSide)
 
-    val castleKSide = List("O-O", "o-o", "0-0",
-      "O‑O", "o‑o", "0‑0",
-      "O–O", "o–o", "0–0")
+    val castleKSide = List("O-O", "o-o", "0-0", "O‑O", "o‑o", "0‑0", "O–O", "o–o", "0–0")
 
     val kCastle: P[Side] = P.stringIn(castleKSide).as(KingSide)
 
@@ -186,7 +179,7 @@ object Parser {
     val promotion: P[PromotableRole] = P.char('=').?.with1 *> mapParserChar(promotable, "promotion")
 
     // e5
-    val pawn: P[Std] = dest.map(Std(_, Pawn))
+    val pawn: P[Std] = dest.map(Std(_, Pawn)) <* (R.wsp.rep0.soft ~ P.string("e.p.")).?
 
     // Bg5
     val ambigous: P[Std] = (role ~ x ~ dest).map { case ((ro, ca), de) =>

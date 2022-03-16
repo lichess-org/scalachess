@@ -101,6 +101,7 @@ object Parser {
       "1–0"
     )
 
+    // todo this also convert "½-½" => "1/2-1/2"
     def mapResult(result: String): String = result match {
       case "½-½"     => "1/2-1/2"
       case "1/2‑1/2" => "1/2-1/2"
@@ -207,8 +208,8 @@ object Parser {
 
     val promotion: P[PromotableRole] = P.char('=').?.with1 *> mapParserChar(promotable, "promotion")
 
-    // e5
-    val pawn: P[Std] = dest.map(Std(_, Pawn)) <* (R.wsp.rep0.soft ~ P.string("e.p.")).?
+    // e5 or e5
+    val pawn: P[Std] = dest.map(Std(_, Pawn))
 
     // Bg5
     val ambigous: P[Std] = (role ~ x ~ dest).map { case ((ro, ca), de) =>
@@ -225,9 +226,13 @@ object Parser {
       Std(dest = de, role = ro, capture = ca, file = fi, rank = ra)
     }
 
-    // d7d5
-    val disambiguatedPawn: P[Std] = (((file.? ~ rank.?) ~ x).with1 ~ dest).map { case (((fi, ra), ca), de) =>
-      Std(dest = de, role = Pawn, capture = ca, file = fi, rank = ra)
+    // optional e.p.
+    val optionalEnPassant = (R.wsp.rep0.soft ~ P.string("e.p.")).void.?
+
+    // d7d5 d7xd5
+    val disambiguatedPawn: P[Std] = (((file.? ~ rank.?) ~ x).with1 ~ dest <* optionalEnPassant).map {
+      case (((fi, ra), ca), de) =>
+        Std(dest = de, role = Pawn, capture = ca, file = fi, rank = ra)
     }
 
     val suffixes: P0[Suffixes] = (promotion.? ~ checkmate ~ check ~ glyphs).map { case (((p, cm), c), g) =>

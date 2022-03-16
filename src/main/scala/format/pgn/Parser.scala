@@ -83,8 +83,36 @@ object Parser {
     val inlineCommentary: P[String] = P.char(';') *> P.until(R.lf)
 
     val commentary = (blockCommentary | inlineCommentary).withContext("Invalid comment") <* whitespaces
+    val resultList = List(
+      "*",
+      "1/2-1/2",
+      "½-½",
+      "0-1",
+      "1-0",
+      "1/2‑1/2",
+      "½‑½",
+      "0‑1",
+      "1‑0",
+      "1/2–1/2",
+      "½–½",
+      "0–1",
+      "1–0"
+    )
 
-    val result: P[String] = P.stringIn(List("*", "1/2-1/2", "½-½", "0-1", "1-0"))
+    def mapResult(result: String): String = result match {
+      case "½-½"     => "1/2-1/2"
+      case "1/2‑1/2" => "1/2-1/2"
+      case "½‑½"     => "1/2-1/2"
+      case "1/2–1/2" => "1/2-1/2"
+      case "½–½"     => "1/2-1/2"
+      case "0‑1"     => "0-1"
+      case "0–1"     => "0-1"
+      case "1‑0"     => "1-0"
+      case "1–0"     => "1-0"
+      case x         => x
+    }
+
+    val result: P[String] = P.stringIn(resultList).map(mapResult)
 
     val nagGlyphsRE = P.stringIn(
       Glyph.PositionAssessment.all
@@ -109,7 +137,7 @@ object Parser {
     val numberSuffix = (P.char('.') | whitespace).rep0.void
 
     // 10. or 10... but not 0 or 1-0 or 1/2
-    val number = (positiveIntString <* !P.charIn('-', '/') ~ numberSuffix).string
+    val number = (positiveIntString <* !P.charIn('‑', '–', '-', '/') ~ numberSuffix).string
 
     val forbidNullMove =
       P.stringIn(List("--", "Z0", "null", "pass", "@@@@"))

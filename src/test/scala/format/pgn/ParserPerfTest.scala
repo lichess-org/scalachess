@@ -18,7 +18,7 @@ class ParserPerfTest extends ChessTest {
         run
       }
       println("running tests")
-      val durations = for (i <- 1 to iterations) yield {
+      val durations = for (_ <- 1 to iterations) yield {
         val start = System.currentTimeMillis
         run
         val duration = System.currentTimeMillis - start

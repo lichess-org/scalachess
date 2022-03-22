@@ -3,8 +3,6 @@ package format.pgn
 
 import cats.syntax.option._
 
-import chess.variant.Standard
-
 class ParserTest extends ChessTest {
 
   import Fixtures._

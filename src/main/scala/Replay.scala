@@ -62,7 +62,7 @@ object Replay {
       initialFen: Option[FEN],
       variant: chess.variant.Variant
   ): Validated[String, List[Game]] =
-    Parser.moves(moveStrs, variant) andThen { moves =>
+    Parser.moves(moveStrs) andThen { moves =>
       val game = makeGame(variant, initialFen)
       recursiveGames(game, moves.value) map { game :: _ }
     }
@@ -90,7 +90,7 @@ object Replay {
       }
     val init = makeGame(variant, initialFen.some)
     Parser
-      .moves(moveStrs, variant)
+      .moves(moveStrs)
       .fold(
         err => List.empty[(Game, Uci.WithSan)] -> err.some,
         moves => mk(init, moves.value zip moveStrs)
@@ -147,7 +147,7 @@ object Replay {
       variant: chess.variant.Variant
   ): Validated[String, List[Situation]] = {
     val sit = initialFenToSituation(initialFen, variant)
-    Parser.moves(moveStrs, sit.board.variant) andThen { moves =>
+    Parser.moves(moveStrs) andThen { moves =>
       recursiveSituations(sit, moves.value) map { sit :: _ }
     }
   }
@@ -204,7 +204,7 @@ object Replay {
         Forsyth.<<@(variant, _)
       } | Situation(variant)
 
-      Parser.moves(moveStrs, sit.board.variant) andThen { moves =>
+      Parser.moves(moveStrs) andThen { moves =>
         recursivePlyAtFen(sit, moves.value, 1)
       }
     }

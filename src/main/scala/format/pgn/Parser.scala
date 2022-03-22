@@ -1,7 +1,6 @@
 package chess
 package format.pgn
 
-import chess.variant.Variant
 import cats.parse.{ LocationMap, Numbers => N, Parser => P, Parser0 => P0, Rfc5234 => R }
 import cats.data.Validated
 import cats.data.Validated.{ invalid, valid }
@@ -32,10 +31,10 @@ object Parser {
         invalid(showExpectations("Cannot parse pgn", pgn, err))
     }
 
-  def moves(str: String, variant: Variant): Validated[String, Sans] =
+  def moves(str: String): Validated[String, Sans] =
     MovesParser.moves(str)
 
-  def moves(strMoves: Iterable[String], variant: Variant): Validated[String, Sans] =
+  def moves(strMoves: Iterable[String]): Validated[String, Sans] =
     strMoves.toList
       .traverse(MovesParser.move)
       .map(Sans(_))

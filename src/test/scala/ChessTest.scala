@@ -14,21 +14,19 @@ trait ChessTest extends Specification with ValidatedMatchers {
 
   implicit def stringToBoard(str: String): Board = Visual << str
 
-  implicit def stringToBoardBuilder(str: String) =
-    new {
+  implicit class StringToBoardBuilder(str: String) {
 
-      def chess960: Board = makeBoard(str, chess.variant.Chess960)
+    def chess960: Board = makeBoard(str, chess.variant.Chess960)
 
-      def kingOfTheHill: Board = makeBoard(str, chess.variant.KingOfTheHill)
+    def kingOfTheHill: Board = makeBoard(str, chess.variant.KingOfTheHill)
 
-      def threeCheck: Board = makeBoard(str, chess.variant.ThreeCheck)
-    }
+    def threeCheck: Board = makeBoard(str, chess.variant.ThreeCheck)
+  }
 
-  implicit def stringToSituationBuilder(str: String) =
-    new {
+  implicit class StringToSituationBuilder(str: String) {
 
-      def as(color: Color): Situation = Situation(Visual << str, color)
-    }
+    def as(color: Color): Situation = Situation(Visual << str, color)
+  }
 
   case class RichActor(actor: Actor) {
     def threatens(to: Pos): Boolean =
@@ -54,7 +52,7 @@ trait ChessTest extends Specification with ValidatedMatchers {
         // }
         // because possible moves are asked for player highlight
         // before the move is played (on initial situation)
-        vg foreach { _.situation.destinations }
+        val _ = vg map { _.situation.destinations }
         val ng = vg flatMap { g =>
           g(move._1, move._2) map (_._1)
         }

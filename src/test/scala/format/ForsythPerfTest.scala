@@ -42,15 +42,15 @@ class ForsythPerfTest extends ChessTest {
         // Forsyth.exportCastles(emptyBoard)
         Forsyth.exportCastles(initialBoard)
       }
-      def run: Unit = { for (i <- 1 to nb) runOne }
+      def run(): Unit = { for (_ <- 1 to nb) runOne }
       if (nb * iterations > 1) {
         println("warming up")
-        run
+        run()
       }
       println("running tests")
-      val durations = for (i <- 1 to iterations) yield {
+      val durations = for (_ <- 1 to iterations) yield {
         val start = System.currentTimeMillis
-        run
+        run()
         val duration = System.currentTimeMillis - start
         println(s"$nb positions in $duration ms")
         duration

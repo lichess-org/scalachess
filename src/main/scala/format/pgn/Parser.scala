@@ -7,6 +7,7 @@ import cats.data.Validated
 import cats.data.Validated.{ invalid, valid }
 import cats.implicits._
 import cats.parse.Parser.Expectation
+import cats.data.NonEmptyList
 
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 object Parser {
@@ -16,28 +17,20 @@ object Parser {
 
   def full(pgn: String): Validated[String, ParsedPgn] = {
     val preprocessed = augmentString(pgn).linesIterator
-      .map(_.trim)
       .filterNot {
         _.headOption.contains('%')
       }
       .mkString("\n")
-      .replace("[pgn]", "")
-      .replace("[/pgn]", "")
-      .replace("‑", "-")
-      .replace("–", "-")
-      .replace("e.p.", "") // silly en-passant notation
-    for {
-      splitted <- splitTagAndMoves(preprocessed)
-      tagStr  = splitted._1
-      moveStr = splitted._2
-      preTags     <- TagParser(tagStr)
-      parsedMoves <- MovesParser(moveStr)
-      init         = parsedMoves._1
-      sans         = Sans(parsedMoves._2)
-      resultOption = parsedMoves._3
-      tags         = resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
-    } yield ParsedPgn(init, tags, sans)
+    parse(preprocessed)
   }
+
+  private def parse(pgn: String): Validated[String, ParsedPgn] =
+    pgnParser.parse(pgn) match {
+      case Right((_, parsedResult)) =>
+        valid(parsedResult)
+      case Left(err) =>
+        invalid(showExpectations("Cannot parse pgn", pgn, err))
+    }
 
   def moves(str: String, variant: Variant): Validated[String, Sans] =
     MovesParser.moves(str)
@@ -47,20 +40,11 @@ object Parser {
       .traverse(MovesParser.move)
       .map(Sans(_))
 
-  object MovesParser {
+  def move(str: String) = MovesParser.move(str)
+
+  private object MovesParser {
 
     private def cleanComments(comments: List[String]) = comments.map(_.trim).filter(_.nonEmpty)
-
-    def apply(pgn: String): Validated[String, (InitialPosition, List[San], Option[String])] =
-      strMoves.parse(pgn) match {
-        case Right((_, parsedResult)) =>
-          valid(parsedResult)
-        case Left(err) =>
-          err match {
-            case P.Error(0, _) => valid((InitialPosition(List()), List(), None))
-            case _             => invalid(showExpectations("Cannot parse moves", pgn, err))
-          }
-      }
 
     def moves(str: String): Validated[String, Sans] =
       strMove.rep.map(xs => Sans(xs.toList)).parse(str) match {
@@ -81,8 +65,36 @@ object Parser {
     val inlineCommentary: P[String] = P.char(';') *> P.until(R.lf)
 
     val commentary = (blockCommentary | inlineCommentary).withContext("Invalid comment") <* whitespaces
+    val resultList = List(
+      "*",
+      "1/2-1/2",
+      "½-½",
+      "0-1",
+      "1-0",
+      "1/2‑1/2",
+      "½‑½",
+      "0‑1",
+      "1‑0",
+      "1/2–1/2",
+      "½–½",
+      "0–1",
+      "1–0"
+    )
 
-    val result: P[String] = P.stringIn(List("*", "1/2-1/2", "½-½", "0-1", "1-0"))
+    def mapResult(result: String): String = result match {
+      case "½-½"     => "1/2-1/2"
+      case "1/2‑1/2" => "1/2-1/2"
+      case "½‑½"     => "1/2-1/2"
+      case "1/2–1/2" => "1/2-1/2"
+      case "½–½"     => "1/2-1/2"
+      case "0‑1"     => "0-1"
+      case "0–1"     => "0-1"
+      case "1‑0"     => "1-0"
+      case "1–0"     => "1-0"
+      case x         => x
+    }
+
+    val result: P[String] = P.stringIn(resultList).map(mapResult)
 
     val nagGlyphsRE = P.stringIn(
       Glyph.PositionAssessment.all
@@ -107,7 +119,7 @@ object Parser {
     val numberSuffix = (P.char('.') | whitespace).rep0.void
 
     // 10. or 10... but not 0 or 1-0 or 1/2
-    val number = (positiveIntString <* !P.charIn('-', '/') ~ numberSuffix).string
+    val number = (positiveIntString <* !P.charIn('‑', '–', '-', '/') ~ numberSuffix).string
 
     val forbidNullMove =
       P.stringIn(List("--", "Z0", "null", "pass", "@@@@"))
@@ -133,16 +145,19 @@ object Parser {
       }
   }
 
-  object MoveParser {
+  private object MoveParser {
 
     def rangeToMap(r: Iterable[Char]) = r.zipWithIndex.to(Map).view.mapValues(_ + 1)
 
     val fileMap = rangeToMap('a' to 'h')
     val rankMap = rangeToMap('1' to '8')
 
-    val qCastle: P[Side] = P.stringIn(List("O-O-O", "o-o-o", "0-0-0")).as(QueenSide)
+    val castleQSide      = List("O-O-O", "o-o-o", "0-0-0", "O‑O‑O", "o‑o‑o", "0‑0‑0", "O–O–O", "o–o–o", "0–0–0")
+    val qCastle: P[Side] = P.stringIn(castleQSide).as(QueenSide)
 
-    val kCastle: P[Side] = P.stringIn(List("O-O", "o-o", "0-0")).as(KingSide)
+    val castleKSide = List("O-O", "o-o", "0-0", "O‑O", "o‑o", "0‑0", "O–O", "o–o", "0–0")
+
+    val kCastle: P[Side] = P.stringIn(castleKSide).as(KingSide)
 
     val glyph: P[Glyph] =
       mapParser(
@@ -172,7 +187,7 @@ object Parser {
 
     val promotion: P[PromotableRole] = P.char('=').?.with1 *> mapParserChar(promotable, "promotion")
 
-    // e5
+    // e5 or e5
     val pawn: P[Std] = dest.map(Std(_, Pawn))
 
     // Bg5
@@ -190,9 +205,13 @@ object Parser {
       Std(dest = de, role = ro, capture = ca, file = fi, rank = ra)
     }
 
-    // d7d5
-    val disambiguatedPawn: P[Std] = (((file.? ~ rank.?) ~ x).with1 ~ dest).map { case (((fi, ra), ca), de) =>
-      Std(dest = de, role = Pawn, capture = ca, file = fi, rank = ra)
+    // optional e.p.
+    val optionalEnPassant = (R.wsp.rep0.soft ~ P.string("e.p.")).void.?
+
+    // d7d5 d7xd5
+    val disambiguatedPawn: P[Std] = (((file.? ~ rank.?) ~ x).with1 ~ dest <* optionalEnPassant).map {
+      case (((fi, ra), ca), de) =>
+        Std(dest = de, role = Pawn, capture = ca, file = fi, rank = ra)
     }
 
     val suffixes: P0[Suffixes] = (promotion.? ~ checkmate ~ check ~ glyphs).map { case (((p, cm), c), g) =>
@@ -211,12 +230,6 @@ object Parser {
         std withSuffixes suf
       }
 
-    def apply(str: String): Validated[String, San] =
-      moveWithSuffix.parse(str) match {
-        case Right((_, san)) => valid(san)
-        case Left(err)       => invalid(showExpectations("Cannot parse move", str, err))
-      }
-
     def mapParser[A](pairs: Iterable[(String, A)], name: String): P[A] = {
       val pairMap = pairs.to(Map)
       P.stringIn(pairMap.keySet).map(pairMap(_)) | P.failWith(name + " not found")
@@ -229,43 +242,35 @@ object Parser {
 
   }
 
-  object TagParser {
+  private object TagParser {
 
-    val tagName: P[String]   = R.alpha.rep.string.withContext("Tag name can only contains alphabet characters")
-    val escaped: P[String]   = P.char('\\') *> (R.dquote | P.char('\\')).string
-    val valueChar: P[String] = escaped | P.charWhere(_ != '"').string
-    val tagValue: P[String]  = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
-    val tagContent: P[Tag]   = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
-    val tag: P[Tag]          = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
-    val tags: P0[Tags]       = tag.rep0.map(tags => Tags(tags))
-
-    def apply(pgn: String): Validated[String, Tags] =
-      tags.parse(pgn) match {
-        case Left(err) =>
-          err match {
-            case P.Error(0, _) => valid(Tags(List()))
-            case _             => invalid(showExpectations("Cannot parse tags", pgn, err))
-          }
-        case Right((_, tags)) => valid(tags)
-      }
-
-    def fromFullPgn(pgn: String): Validated[String, Tags] =
-      splitTagAndMoves(pgn) flatMap { case (tags, _) =>
-        apply(tags)
-      }
+    val tagName: P[String]         = R.alpha.rep.string.withContext("Tag name can only contains alphabet characters")
+    val escaped: P[String]         = P.char('\\') *> (R.dquote | P.char('\\')).string
+    val valueChar: P[String]       = escaped | P.charWhere(_ != '"').string
+    val tagValue: P[String]        = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
+    val tagContent: P[Tag]         = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
+    val tag: P[Tag]                = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
+    val tags: P[NonEmptyList[Tag]] = tag.rep
 
   }
 
-  // there must be a newline between the tags and the first move
-  private def ensureTagsNewline(pgn: String): String =
-    """"\]\s*(\d+\.)""".r.replaceAllIn(pgn, m => "\"]\n" + m.group(1))
-
-  private def splitTagAndMoves(pgn: String): Validated[String, (String, String)] =
-    augmentString(ensureTagsNewline(pgn)).linesIterator.to(List).map(_.trim).filter(_.nonEmpty) span { line =>
-      line lift 0 contains '['
-    } match {
-      case (tagLines, moveLines) => valid(tagLines.mkString("\n") -> moveLines.mkString("\n"))
+  private val tagsAndMovesParser: P0[ParsedPgn] =
+    ((whitespaces *> TagParser.tags.?) ~ MovesParser.strMoves.?).map {
+      case (optionalTags, optionalMoves) => {
+        val preTags = Tags(optionalTags.map(_.toList).getOrElse(List()))
+        optionalMoves match {
+          case None => ParsedPgn(InitialPosition(List()), preTags, Sans(List()))
+          case Some((init, sans, resultOption)) => {
+            val tags =
+              resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
+            ParsedPgn(init, tags, Sans(sans))
+          }
+        }
+      }
     }
+
+  private val pgnParser: P0[ParsedPgn] =
+    whitespaces *> P.string("[pgn]").? *> tagsAndMovesParser <* P.string("[/pgn]").? <* whitespaces
 
   private def showExpectations(context: String, str: String, error: P.Error): String = {
     val lm  = LocationMap(str)

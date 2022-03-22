@@ -3,14 +3,12 @@ package format.pgn
 
 import cats.syntax.option._
 
-import chess.variant.Standard
-
 class ParserTest extends ChessTest {
 
   import Fixtures._
 
-  val parser                 = Parser.full _
-  def parseMove(str: String) = Parser.MoveParser(str)
+  val parser    = Parser.full _
+  val parseMove = Parser.move _
 
   "promotion check" should {
     "as a queen" in {
@@ -278,8 +276,8 @@ class ParserTest extends ChessTest {
     }
   }
   "overflow 3: tags" in {
-    Parser.TagParser.fromFullPgn(overflow3) must beValid.like { case tags =>
-      tags.value.size must_== 9
+    parser(overflow3) must beValid.like { case a =>
+      a.tags.value.size must_== 9
     }
   }
   "chessbase arrows" in {

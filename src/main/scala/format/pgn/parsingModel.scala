@@ -137,7 +137,7 @@ case class Castle(
     for {
       kingPos <- situation.board kingPosOf situation.color toValid "No king found"
       actor   <- situation.board actorAt kingPos toValid "No actor found"
-      move    <- actor.castleOn(side).headOption toValid "Cannot castle / variant is " + situation.board.variant
+      move <- actor.castleOn(side).headOption toValid "Cannot castle / variant is " + situation.board.variant
     } yield move
 }
 

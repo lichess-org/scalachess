@@ -151,7 +151,7 @@ object Parser {
     val fileMap = rangeToMap('a' to 'h')
     val rankMap = rangeToMap('1' to '8')
 
-    val castleQSide      = List("O-O-O", "o-o-o", "0-0-0", "O‑O‑O", "o‑o‑o", "0‑0‑0", "O–O–O", "o–o–o", "0–0–0")
+    val castleQSide = List("O-O-O", "o-o-o", "0-0-0", "O‑O‑O", "o‑o‑o", "0‑0‑0", "O–O–O", "o–o–o", "0–0–0")
     val qCastle: P[Side] = P.stringIn(castleQSide).as(QueenSide)
 
     val castleKSide = List("O-O", "o-o", "0-0", "O‑O", "o‑o", "0‑0", "O–O", "o–o", "0–0")
@@ -243,8 +243,8 @@ object Parser {
 
   private object TagParser {
 
-    val tagName: P[String]         = R.alpha.rep.string.withContext("Tag name can only contains alphabet characters")
-    val escaped: P[String]         = P.char('\\') *> (R.dquote | P.char('\\')).string
+    val tagName: P[String] = R.alpha.rep.string.withContext("Tag name can only contains alphabet characters")
+    val escaped: P[String] = P.char('\\') *> (R.dquote | P.char('\\')).string
     val valueChar: P[String]       = escaped | P.charWhere(_ != '"').string
     val tagValue: P[String]        = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
     val tagContent: P[Tag]         = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))

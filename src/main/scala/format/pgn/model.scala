@@ -122,12 +122,10 @@ case class Move(
     secondsLeft.map(seconds => "[%clk " + Move.formatPgnSeconds(seconds) + "]")
 
   override def toString = {
-    val glyphStr = glyphs.toList
-      .map({
-        case glyph if glyph.id <= 6 => glyph.symbol
-        case glyph                  => s" $$${glyph.id}"
-      })
-      .mkString
+    val glyphStr = glyphs.toList.map {
+      case glyph if glyph.id <= 6 => glyph.symbol
+      case glyph                  => s" $$${glyph.id}"
+    }.mkString
     val commentsOrTime =
       if (comments.nonEmpty || secondsLeft.isDefined || opening.isDefined || result.isDefined)
         List(clockString, opening, result).flatten

@@ -12,18 +12,10 @@ import cats.data.NonEmptyList
 object Parser {
 
   val whitespace  = R.lf | R.wsp
-  val whitespaces = whitespace.rep0.?
+  val pgnComment  = P.caret.filter(_.col == 0) *> P.char('%') *> P.until(P.char('\n')).void
+  val whitespaces = pgnComment.? *> whitespace.rep0.?
 
-  def full(pgn: String): Validated[String, ParsedPgn] = {
-    val preprocessed = augmentString(pgn).linesIterator
-      .filterNot {
-        _.headOption.contains('%')
-      }
-      .mkString("\n")
-    parse(preprocessed)
-  }
-
-  private def parse(pgn: String): Validated[String, ParsedPgn] =
+  def full(pgn: String): Validated[String, ParsedPgn] =
     pgnParser.parse(pgn) match {
       case Right((_, parsedResult)) =>
         valid(parsedResult)
@@ -254,7 +246,7 @@ object Parser {
   }
 
   private val tagsAndMovesParser: P0[ParsedPgn] =
-    ((whitespaces *> TagParser.tags.?) ~ MovesParser.strMoves.?).map {
+    ((whitespaces *> TagParser.tags.? <* whitespaces) ~ MovesParser.strMoves.?).map {
       case (optionalTags, optionalMoves) => {
         val preTags = Tags(optionalTags.map(_.toList).getOrElse(List()))
         optionalMoves match {

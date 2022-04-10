@@ -10,6 +10,15 @@ class ParserTest extends ChessTest {
   val parser    = Parser.full _
   val parseMove = Parser.move _
 
+  "pgnComment" should {
+    "parse valid comment" in {
+      Parser.pgnComment.parse("% comment") must beRight
+    }
+    "parse invalid comment" in {
+      Parser.pgnComment.parse("  %comment") must beLeft
+    }
+  }
+
   "promotion check" should {
     "as a queen" in {
       parser("b8=Q ") must beValid.like { case a =>
@@ -344,6 +353,12 @@ class ParserTest extends ChessTest {
 
   "example with tags & comments without moves 2" in {
     parser(tagsCommentsWithoutMoves2) must beValid
+  }
+
+  "game with comments" in {
+    parser(gameWithComments) must beValid.like { case a =>
+      a.sans.value.size must_== 106
+    }
   }
 
 }

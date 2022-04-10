@@ -11,19 +11,12 @@ import cats.data.NonEmptyList
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 object Parser {
 
-  val whitespace  = R.lf | R.wsp
-  val whitespaces = whitespace.rep0.?
+  val whitespace = R.lf | R.wsp
+  val pgnComment = P.caret.filter(_.col == 0) *> P.char('%') *> P.until(P.char('\n')).void
+  // pgnComment with % or whitespaces
+  val escape = pgnComment.? *> whitespace.rep0.?
 
-  def full(pgn: String): Validated[String, ParsedPgn] = {
-    val preprocessed = augmentString(pgn).linesIterator
-      .filterNot {
-        _.headOption.contains('%')
-      }
-      .mkString("\n")
-    parse(preprocessed)
-  }
-
-  private def parse(pgn: String): Validated[String, ParsedPgn] =
+  def full(pgn: String): Validated[String, ParsedPgn] =
     pgnParser.parse(pgn) match {
       case Right((_, parsedResult)) =>
         valid(parsedResult)
@@ -63,7 +56,7 @@ object Parser {
 
     val inlineCommentary: P[String] = P.char(';') *> P.until(R.lf)
 
-    val commentary = (blockCommentary | inlineCommentary).withContext("Invalid comment") <* whitespaces
+    val commentary = (blockCommentary | inlineCommentary).withContext("Invalid comment") <* escape
     val resultList = List(
       "*",
       "1/2-1/2",
@@ -103,7 +96,7 @@ object Parser {
 
     val nag = (P.char('$') ~ R.digit.rep).string | nagGlyphsRE
 
-    val nagGlyphs: P0[Glyphs] = (nag <* whitespaces).rep0.map(nags =>
+    val nagGlyphs: P0[Glyphs] = (nag <* escape).rep0.map(nags =>
       Glyphs fromList nags.flatMap {
         Glyph.find
       }
@@ -128,18 +121,18 @@ object Parser {
     val strMove: P[San] = P
       .recursive[San] { recuse =>
         val variation: P[Sans] =
-          (((P.char('(') <* whitespaces) *> recuse.rep0 <* (P.char(')') ~ whitespaces)) <* whitespaces)
+          (((P.char('(') <* escape) *> recuse.rep0 <* (P.char(')') ~ escape)) <* escape)
             .map(Sans(_))
 
-        ((number.backtrack | (commentary <* whitespaces)).rep0 ~ forbidNullMove).with1 *>
-          (((MoveParser.moveWithSuffix ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0) <* whitespaces).backtrack
+        ((number.backtrack | (commentary <* escape)).rep0 ~ forbidNullMove).with1 *>
+          (((MoveParser.moveWithSuffix ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0) <* escape).backtrack
             .map { case ((((san, glyphs), comments), glyphs2), variations) =>
               san withComments comments withVariations variations mergeGlyphs (glyphs merge glyphs2)
             }
       }
 
     val strMoves: P0[(InitialPosition, List[San], Option[String])] =
-      ((commentary.rep0 ~ strMove.rep0) ~ (result <* whitespaces).? <* commentary.rep0).map {
+      ((commentary.rep0 ~ strMove.rep0) ~ (result <* escape).? <* commentary.rep0).map {
         case ((coms, sans), res) => (InitialPosition(cleanComments(coms)), sans.toList, res)
       }
   }
@@ -224,7 +217,7 @@ object Parser {
     )
 
     val move: P[San] = (castle | standard).withContext("Invalid chess move")
-    val moveWithSuffix: P[San] = (move ~ suffixes <* whitespaces)
+    val moveWithSuffix: P[San] = (move ~ suffixes <* escape)
       .map { case (std, suf) =>
         std withSuffixes suf
       }
@@ -254,7 +247,7 @@ object Parser {
   }
 
   private val tagsAndMovesParser: P0[ParsedPgn] =
-    ((whitespaces *> TagParser.tags.?) ~ MovesParser.strMoves.?).map {
+    ((escape *> TagParser.tags.? <* escape) ~ MovesParser.strMoves.?).map {
       case (optionalTags, optionalMoves) => {
         val preTags = Tags(optionalTags.map(_.toList).getOrElse(List()))
         optionalMoves match {
@@ -269,7 +262,7 @@ object Parser {
     }
 
   private val pgnParser: P0[ParsedPgn] =
-    whitespaces *> P.string("[pgn]").? *> tagsAndMovesParser <* P.string("[/pgn]").? <* whitespaces
+    escape *> P.string("[pgn]").? *> tagsAndMovesParser <* P.string("[/pgn]").? <* escape
 
   private def showExpectations(context: String, str: String, error: P.Error): String = {
     val lm  = LocationMap(str)

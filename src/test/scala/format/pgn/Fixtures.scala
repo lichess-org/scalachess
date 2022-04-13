@@ -78,7 +78,7 @@ object Fixtures {
 0-1
 """
 
-val invisibleChar = """
+  val invisibleChar = """
 ﻿[Event "Potsdam"]
 [Site "?"]
 [Date "2018.01.21"]
@@ -178,7 +178,7 @@ Bd3 f5 9. g3 Qf6 10. Nf3 c5 11. O-O Ne7 12. Bg5 Qf8 13. Nb5 Bxe4 14. Bxe4 fxe4
 15. Qxe4 Nd5 16. Ne5 cxd4 17. Qxd5 Ra7 18. Qa8 0-1
 """
 
-val festivalFigueira = """
+  val festivalFigueira = """
 [Event "figueira"]
 [Site "?"]
 [Date "2017.10.29"]
@@ -226,7 +226,7 @@ Rb5 {[%clk 1:07:13]} Kd6 {[%clk 0:50:12]} 53. Kf7 {[%clk 1:07:12]} Re1
 Re4 57. Rb6+ {[%clk 1:08:13]} Re1 {[%clk 0:37:03]} 58. Kg7+ Kd7 1-0
 """
 
-val crazyhouseFromProd = """
+      val crazyhouseFromProd = """
 [Event "Hourly Crazyhouse Inc Arena"]
 [Site "https://lichess.org/vjT6KovO"]
 [Date "2016.08.19"]
@@ -360,7 +360,7 @@ hxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5
 35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6
 Nf2 42. g4 Bd3 43. Re6 1/2-1/2"""
 
-val fromChessgames = """[Event "The Match - Braingames World Chess Cham"]
+    val fromChessgames = """[Event "The Match - Braingames World Chess Cham"]
 [Site "London"]
 [Date "2000.01.04"]
 [EventDate "2000.10.12"]
@@ -385,7 +385,7 @@ Ne5 37. Rg7 Rf8 38. h3 c4 39. Re7 Nd3 40. f7 Nxf2 41. Re8+ Kd7
 c3 47. h4 Ra6 48. Bd4 Ra4 49. Bxc3 Nxc3 50. Rxc3 Rxh4 51. Rf3
 Rh5 52. Kf2 Rg5 53. Rf8 Ke5 1/2-1/2"""
 
-val fromChessgamesWithEscapeChar = """%youpi
+  val fromChessgamesWithEscapeChar = """%youpi
 [Event "The Match - Braingames World Chess Cham"]
 [Site "London"]
 [Date "2000.01.04"]
@@ -412,7 +412,7 @@ Ne5 37. Rg7 Rf8 38. h3 c4 39. Re7 Nd3 40. f7 Nxf2 41. Re8+ Kd7
 c3 47. h4 Ra6 48. Bd4 Ra4 49. Bxc3 Nxc3 50. Rxc3 Rxh4 51. Rf3
 Rh5 52. Kf2 Rg5 53. Rf8 Ke5 1/2-1/2"""
 
-val chessgamesWeirdComments = """[Event "Hastings"]
+    val chessgamesWeirdComments = """[Event "Hastings"]
 [Site "Hastings ENG"]
 [Date "1895.08.05"]
 [EventDate "1895.08.05"]
@@ -445,14 +445,14 @@ would then get into difficulties, whereas now the draw is
 secure.} Raf8 22. Kg1 Rxc2 23. R3e2 Rxe2 24. Rxe2 1/2-1/2
 """
 
-val withDelimiters = """[pgn] 1. e4 e6 2. d4 d5 3. Nc3 Nf6 4. e5 Nfd7 5. Nf3 a6 6. Bd3 f6 7. O-O (7. Ng5 {is also good, but I was still in \"bullet opening mode\" at this point}) 7. .. fxe5 8. Ng5 Qe7 9. Qh5+ g6 10. Bxg6+ hxg6 11. Qxg6+ Kd8 12. Nf7+ Ke8 13. Nxh8+ Kd8 14. Bg5 Nc6 15. Nf7+ Ke8 16. Nd6+ Kd8 17. Qe8# [/pgn]"""
+    val withDelimiters = """[pgn] 1. e4 e6 2. d4 d5 3. Nc3 Nf6 4. e5 Nfd7 5. Nf3 a6 6. Bd3 f6 7. O-O (7. Ng5 {is also good, but I was still in \"bullet opening mode\" at this point}) 7. .. fxe5 8. Ng5 Qe7 9. Qh5+ g6 10. Bxg6+ hxg6 11. Qxg6+ Kd8 12. Nf7+ Ke8 13. Nxh8+ Kd8 14. Bg5 Nc6 15. Nf7+ Ke8 16. Nd6+ Kd8 17. Qe8# [/pgn]"""
 
-val withDelimitersOnNewLines = """
+    val withDelimitersOnNewLines = """
 [pgn]
 1. e4 e6 2. d4 d5 3. Nc3 Nf6 4. e5 Nfd7 5. Nf3 a6 6. Bd3 f6 7. O-O (7. Ng5 {is also good, but I was still in \"bullet opening mode\" at this point}) 7. .. fxe5 8. Ng5 Qe7 9. Qh5+ g6 10. Bxg6+ hxg6 11. Qxg6+ Kd8 12. Nf7+ Ke8 13. Nxh8+ Kd8 14. Bg5 Nc6 15. Nf7+ Ke8 16. Nd6+ Kd8 17. Qe8#
 [/pgn]"""
 
-val fromCrafty = """[Event "Live Chess"]
+    val fromCrafty = """[Event "Live Chess"]
 [Site "Chess.com"]
 [Date "2014.01.15"]
 [Round "?"]
@@ -563,17 +563,17 @@ val fromCrafty = """[Event "Live Chess"]
 
        0-1"""
 
-val disambiguated = "Be5 g6 Ne7g6+"
+    val disambiguated = "Be5 g6 Ne7g6+"
 
-val fromProd1 = """d4 Nf6 c4 e6 Nc3 Bb4 Bd2 O-O Nf3 c6 e4 Qa5 Be2 Kh8 O-O h5 Ne5 h4 h3 Be7 Nd5 Qd8 Nxe7 d6 Ne7g6+"""
-val fromProd2 = """e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 e5 Nf5 d5 g4 Bxf5 exf5 d4 Ne2 Nxg4 Bh3 Qd5 Ng3 Bb4+ Bd2 Bxd2+ Qxd2 Qf3 Qe2 Qxe2+ Kxe2 Nh6 Bg2 Kf8 Rhe1 Ke7 Kd3 Nb4+ Kd2 Rhc8 c3 dxc3+ bxc3 Rd8+ Kc1 Nd3+ Kc2 Nxe1+ Rxe1 Kf6 Be4 Rdb8 Rd1 Kg5 Rd7 a6 Bxb7 Ra7 Bc6 Rxd7 Bxd7 Rd8 Bc6 Nxf5 Nxf5 Kxf5 f3 Rb8 Be4+ Kf4 c4 Rh8 c5 a5 c6 f5 Bd5 Rc8 Kc3 g6 Kc4 h5 Kb5 Rb8+ Ka6 a4 c7 Rc8 Kb7 Rh8 c8=Q Rxc8 Kxc8 g5 Kd7 g4 fxg4 hxg4 Ke6 e4 Bc4 Kg5 Ke5 e3 Bd3 f4 Ke4 g3 Kf3 gxh2 Kg2 f3+ Kxh2 e2 Bxe2 fxe2 Kh3 e1=Q Kg2 Qe6"""
+    val fromProd1 = """d4 Nf6 c4 e6 Nc3 Bb4 Bd2 O-O Nf3 c6 e4 Qa5 Be2 Kh8 O-O h5 Ne5 h4 h3 Be7 Nd5 Qd8 Nxe7 d6 Ne7g6+"""
+    val fromProd2 = """e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 Nf6 Nc3 e5 Nf5 d5 g4 Bxf5 exf5 d4 Ne2 Nxg4 Bh3 Qd5 Ng3 Bb4+ Bd2 Bxd2+ Qxd2 Qf3 Qe2 Qxe2+ Kxe2 Nh6 Bg2 Kf8 Rhe1 Ke7 Kd3 Nb4+ Kd2 Rhc8 c3 dxc3+ bxc3 Rd8+ Kc1 Nd3+ Kc2 Nxe1+ Rxe1 Kf6 Be4 Rdb8 Rd1 Kg5 Rd7 a6 Bxb7 Ra7 Bc6 Rxd7 Bxd7 Rd8 Bc6 Nxf5 Nxf5 Kxf5 f3 Rb8 Be4+ Kf4 c4 Rh8 c5 a5 c6 f5 Bd5 Rc8 Kc3 g6 Kc4 h5 Kb5 Rb8+ Ka6 a4 c7 Rc8 Kb7 Rh8 c8=Q Rxc8 Kxc8 g5 Kd7 g4 fxg4 hxg4 Ke6 e4 Bc4 Kg5 Ke5 e3 Bd3 f4 Ke4 g3 Kf3 gxh2 Kg2 f3+ Kxh2 e2 Bxe2 fxe2 Kh3 e1=Q Kg2 Qe6"""
 
-val promoteRook = """d4 Nf6 f3 d5 e3 e5 Ne2 Bd6 g3 a5 Bg2 Bf5 e4 Bb4+ Nbc3 Bxc3+ Nxc3 exd4 Qxd4 Be6 O-O Nc6 Qf2 Qd6 Bf4 Ne5 Bxe5 Qxe5 Rfd1 Ra6 Rd2 c6 Rad1 Bd7 exd5 b5 d6 Rg8 f4 Qe6 Qc5 Kf8 Bf3 Ke8 Kg2 Kf8 Re2 Qc4 Qxc4 bxc4 h3 Be8 Bg4 h5 Bf5 c5 Red2 g6 Be4 Rb6 Kf3 Kg7 g4 hxg4+ hxg4 Ra6 f5 Ra7 Nd5 g5 Nxf6 Kxf6 b3 Bb5 bxc4 Bxc4 d7 Rxd7 Rxd7 Bxa2 Rd8 Rxd8 Rxd8 a4 Ra8 Ke7 Rxa4 Bb1 c4 Bxe4+ Kxe4 Kd6 f6 Ke6 Ra6+ Kd7 Kf5 Kc7 Kxg5 Kb8 Kh6 Kc7 g5 Kb8 g6 fxg6 Kxg6 Kc7 f7 Kb7 Rd6 Ka7 f8=R Kb7 Rf7+"""
+    val promoteRook = """d4 Nf6 f3 d5 e3 e5 Ne2 Bd6 g3 a5 Bg2 Bf5 e4 Bb4+ Nbc3 Bxc3+ Nxc3 exd4 Qxd4 Be6 O-O Nc6 Qf2 Qd6 Bf4 Ne5 Bxe5 Qxe5 Rfd1 Ra6 Rd2 c6 Rad1 Bd7 exd5 b5 d6 Rg8 f4 Qe6 Qc5 Kf8 Bf3 Ke8 Kg2 Kf8 Re2 Qc4 Qxc4 bxc4 h3 Be8 Bg4 h5 Bf5 c5 Red2 g6 Be4 Rb6 Kf3 Kg7 g4 hxg4+ hxg4 Ra6 f5 Ra7 Nd5 g5 Nxf6 Kxf6 b3 Bb5 bxc4 Bxc4 d7 Rxd7 Rxd7 Bxa2 Rd8 Rxd8 Rxd8 a4 Ra8 Ke7 Rxa4 Bb1 c4 Bxe4+ Kxe4 Kd6 f6 Ke6 Ra6+ Kd7 Kf5 Kc7 Kxg5 Kb8 Kh6 Kc7 g5 Kb8 g6 fxg6 Kxg6 Kc7 f7 Kb7 Rd6 Ka7 f8=R Kb7 Rf7+"""
 
-val castleCheck1 = """e3 d5 Be2 Nc6 Nf3 e5 d4 e4 Ne5 Nxe5 dxe5 Qg5 Kd2 d4 g3 dxe3+ fxe3 Bh3 Bh5 O-O-O+"""
-val castleCheck2 = """d4 Nf6 c4 e6 Nc3 Bb4 Bd2 O-O#"""
+    val castleCheck1 = """e3 d5 Be2 Nc6 Nf3 e5 d4 e4 Ne5 Nxe5 dxe5 Qg5 Kd2 d4 g3 dxe3+ fxe3 Bh3 Bh5 O-O-O+"""
+    val castleCheck2 = """d4 Nf6 c4 e6 Nc3 Bb4 Bd2 O-O#"""
 
-def prod500standard = List(
+    def prod500standard = List(
 """e4 c5 Nc3 d6 f4 e6 Nf3 d5 e5 d4 Ne2 Ne7 d3 Nd5 Ng3 Be7 Be2 Bh4 O-O Bxg3 hxg3 O-O Ng5 f6 Ne4 fxe5 fxe5 Rxf1+ Bxf1 Qc7 Qf3 Qxe5 Bf4 Nxf4 gxf4 Qc7 Re1 Nd7 Ng5"""
 ,"""d4 e6 c4 Nf6 Nc3 Bb4 Nf3 Bxc3+ bxc3 b6 e4 Bb7 e5 Ne4 Qd3 f5 exf6 Nxf6 Bg5 O-O Be2 d6"""
 ,"""d4 d5 Nf3 Nf6 c4 c6 Nc3 dxc4 g3 e6 Bg2 a6 O-O b5 a3 Bb7 e4 Nbd7 e5 Nd5 Ne4 Qc7 Bg5 Be7 Bxe7 Kxe7 Nd6 Rhd8 Ng5 f6 Nxh7 Rh8 Qh5 Raf8 exf6+"""
@@ -1074,19 +1074,18 @@ def prod500standard = List(
 ,"""e4 c5 Nc3 e6 f4 a6 e5 h5 Nf3 Nh6 Ne4 Nc6 d3 d5 exd6 Bxd6 c3 Be7 Be3 b6 h3 Bb7 Qd2 Nf5 O-O-O Qc7 Bf2 h4 Rg1 Ng3 Nxg3 hxg3 Bxg3 O-O-O Be2 f5 Ne5 Nxe5 fxe5 g5 Qe3 f4 Bxf4 gxf4 Qxf4 Rdg8 g4 Bg5 Qxg5 Rxg5 Kc2 Rxe5 Rde1 Re3 g5 Rhxh3 g6 Rh8 Bg4 Rxe1 Rxe1 Bd5 c4 Qh2+ Re2 Qg3 cxd5 Qxg4 dxe6 Qxg6 e7 Re8 Kc3 Qg7+ Kc2 Rxe7 Rxe7 Qxe7"""
 ,"""e4 e5 Nf3 Bd6 Nc3 Nf6 d3 Nc6 b3 b6 Nb5 a6 Nxd6+ cxd6 Ba3 Qc7 d4 b5 dxe5 dxe5 c4 Qa5+ Nd2 Qxa3 g3 Qa5 Bh3 Nxe4 b4 Qxb4 Rb1 Qa5 O-O Nxd2 Qg4 Nxb1 Rxb1 Qxa2 Qxg7 Qxb1+ Kg2 Qe4+ Kg1 Rf8 c5 Bb7 Bg2 Qe1+ Bf1 O-O-O Qxh7"""
 ,"""d4 Nf6 c4 d6 e3 g6 Nf3 Bg7 Be2 O-O O-O c5 Nc3 cxd4 exd4 b6 Bg5 Bb7 d5 Nbd7 Qd2 Nc5 Rac1 Nce4 Nxe4 Nxe4 Qe3 Nxg5 Qxg5 Bxb2 Rc2 Bg7 Re1 e5 Qd2 Rc8 Rb1 Qc7 a4 f5 Ng5 Bxd5 Qxd5+ Kh8 Ne6""")
-def prod5threecheck = List(
+    def prod5threecheck = List(
 "Nc3 e6 Nb5 Na6 Nxc7 Nxc7 e3 Nf6 Bc4 Bb4 c3 Be7 Nf3 O-O O-O d5 Bd3 Ne4 Qc2 f5 Nd4 Kh8 b4 a5 f3 Nd6 e4 dxe4 fxe4 e5 exf5 exd4 cxd4 Bf6 Bb2 axb4 d5 Nxd5 Bxf6 Qb6 Kh1 Nxf6 Bc4 Ng4 Qb2 Rf6 Rae1 Nf2 Rxf2 Qxf2 Re8 Nxe8 Qxf6 Qg1",
 "e3 e6 Nf3 Nf6 c4 g6 b3 Bg7 Bb2 O-O Nc3 d5 Be2 c5 cxd5 exd5 O-O Nc6 d4 cxd4 Nxd4 Nxd4 exd4 Bf5 Bf3 Ne4 Ne2 Rc8 Ng3 Nxg3 hxg3 Re8 Rc1 Rxc1 Qxc1 Be4 Qf4 Bxf3 gxf3 Re2 Ba3 Rxa2 Bd6 g5 Qf5 Qxd6 Qc8 Bf8 Re1 Qb4 Qe8 Rxf2 Qe3 Rf1 Rxf1 h6 Re1 Qd6 Qe5 Qg6 g4 Qc2 Qe3 Qh2 Kxh2 Bd6",
 "e4 e6 Nc3 Bb4 Qg4 Qf6 Nf3 Nh6 Qg5 Bxc3 bxc3 Qxg5 Nxg5 f6 Nxe6 dxe6 Bb5 Kf7 f4 Nc6 f5 Re8 fxe6 Bxe6 O-O Kg8 d4 a6 Bxh6 axb5 d5 Ne5 dxe6 Rxe6 Rad1 Rae8 Bxg7 Nf3 gxf3 f5 Kh1 Rg6 Rd7 Rg2 Be5 Rxh2 Bxh2 Re7 Rg1",
 "e4 e6 c3 c6 Nf3 Nf6 Qc2 Na6 d4 Nc7 Bd3 g6 Bg5 Bg7 e5 Ncd5 exf6 Bxf6 Bxf6 Qxf6 Nbd2 b6 Ne4 Qe7 Qd2 Bb7 Qg5 Qxg5 Nd6 Ke7 Nxg5 Kxd6 Nxf7 Kc7 Nxh8 Rxh8 O-O-O Nf4 Bf1 d5 g3 Nh5 Re1 Re8 Bh3 Ng7 f4 b5 Re3 Kb6 Rhe1 Bc8 b3 Nf5 Bxf5 gxf5 c4 Kb7 cxd5 cxd5 Rc3",
 "e3 e6 Nf3 Nc6 a3 g6 d4 Bg7 Be2 Nf6 O-O O-O c4 d6 Nc3 e5 dxe5 dxe5 Qxd8 Rxd8 Rd1 Rxd1 Bxd1 Be6 b3 Rd8 Bc2 e4 Ng5 Ng4 Nxe6 fxe6 Bb2 Be5 g3 Nxf2 Rb1 Nh3 Kg2 Rd2")
-def prod50crazyhouse = List(
+  def prod50crazyhouse = List(
 "e4 d6 Nc3 Nf6 d4 Bg4 Be2 Bxe2 Ngxe2 B@h5 f3 Nbd7 d5 e5 dxe6 fxe6 Nf4 P@f7 B@b3 Nc5 Be3 Nxb3 axb3 Be7 O-O O-O Ra5 e5 Nxh5 Nxh5 N@f5 B@g5 Bf2 N@f4 P@g3 Nxg2 Kxg2 P@e6 Nxe7 Qxe7 Kh1 N@h3 B@g2 Nxf2 Rxf2 B@b6 Qg1 Bge3 N@d5 exd5 Nxd5 Bxf2 Nxe7 Kh8 Qf1 Bxg3 N@g4 R@h4 Nf5 Bxh2 B@e1 P@f2 Bxf2 Bxf2 Qxf2 N@g3 Nxg3 Bxg3 B@h3 Rxg4 Qd2 N@f2 Kg1 Nxh3 Kf1 Bf4 P@e3 Rxg2 Qxg2 N@g3 Ke1 P@f2 Kd2 B@e1 Kc1 Bxe3 Kb1 Bxa5 Ka2 f1=Q Qxf1 Nxf1 R@b1 B@c3 P@f6 Nxf6 Q@f5 Bxb2 N@c4 P@c3 Qxh3",
-"e4 e5 Nc3 Nc6 Nf3 Bc5 Bc4 Nf6 O-O O-O d3 d6 Ng5 Nd4 Be3 Ne6 Nxf7 Rxf7 Bxe6 Bxe6 N@g5 Re7 Nxe6 Rxe6 B@c4 B@f7 Bxc5 dxc5 Bxe6 Bxe6 P@f5 Bf7 B@e6 B@e8 Nd5 B@h5 Nxf6 Qxf6 Qxh5 Bxe6 N@g4 Bxh5 Nxf6 gxf6 R@g3 B@g5 B@e2 N@f4 Bxh5 N@e2 Kh1 Nxg3 hxg3 R@h3 N@h2 Rxh5 B@f3 Rxh2 Kxh2 N@h6 Kh1 N@d4 fxe6 Nxf3 B@f7 Kh8 R@h2 Nxh2 gxf4 N2g4 N@g6 hxg6 Q@h3 Q@h4 fxg5 Qxh3 gxh3 Q@h2",
+"e.pp4 e5 Nc3 Nc6 Nf3 Bc5 Bc4 Nf6 O-O O-O d3 d6 Ng5 Nd4 Be3 Ne6 Nxf7 Rxf7 Bxe6 Bxe6 N@g5 Re7 Nxe6 Rxe6 B@c4 B@f7 Bxc5 dxc5 Bxe6 Bxe6 P@f5 Bf7 B@e6 B@e8 Nd5 B@h5 Nxf6 Qxf6 Qxh5 Bxe6 N@g4 Bxh5 Nxf6 gxf6 R@g3 B@g5 B@e2 N@f4 Bxh5 N@e2 Kh1 Nxg3 hxg3 R@h3 N@h2 Rxh5 B@f3 Rxh2 Kxh2 N@h6 Kh1 N@d4 fxe6 Nxf3 B@f7 Kh8 R@h2 Nxh2 gxf4 N2g4 N@g6 hxg6 Q@h3 Q@h4 fxg5 Qxh3 gxh3 Q@h2",
 "e4 e6 Nc3 Nc6 d4 Bb4 Nf3 Nce7 Bd3 Nf6 O-O Bxc3 bxc3 h6 e5 Nfd5 c4 Nb4 B@h4 Nxd3 cxd3 N@f5 N@h5 B@c3 Ba3 g5 Nf6 Kf8 Bxe7 Qxe7 Nxg5 hxg5 Bxg5 B@g6 Nh7 Rxh7 Bxe7 Kxe7 P@f6 Ke8 P@e7 Nxe7 fxe7 Kxe7 N@g8 Kf8 Nf6 N@e7 Q@e8 Kg7 Qxe7 B@b4 c5 N@f5 N@e8 Kh6 Qf8 P@g7 N@g8 Kg5 Qg4",
 "f4 e5 fxe5 d6 exd6 Bxd6 P@f2 Nf6 d4 Nc6 Nc3 O-O P@h6 gxh6 Bxh6 Ng4 Bxf8 Qxf8 e3 B@h4 P@g3 Bg5 Nf3 Bh6 Bd3 Bd7 R@h4 P@g7 Bxh7 Kxh7 P@g5 B@e7 Qd3 P@g6 gxh6 gxh6 Rxg4 Bxg4 B@e4 P@f5 N@d7 Qg7 Bxc6 bxc6 N@e5 Bxf3 Nxf3 N@b4 Qd2 B@e6 B@e5 f6 Bxf6 Bxf6 P@b7 Rd8 b8=Q Bxd7 Qxd8 Bxd8 Ne5 Bxe5 dxe5 N@c4 R@d4 Nxd2 Rxd2 Nxc2 Rxc2 N@d3 Kf1 Nxe5 N@f4 B@a6 Kg1 P@h3 Nxh3 P@f3 N@f4 fxg2 Kxg2 P@f3 Kg1 P@g2 P@d4 gxh1=Q Kxh1",
 "Nf3 d5 d4 Bf5 Bf4 e6 e3 Bd6 Bb5 Nc6 Nc3 Ne7 O-O O-O Bxd6 cxd6 B@h4 f6 Bd3 B@g6 Bxf5 Nxf5 e4 Nxh4 Nxh4 Bxe4 Nxe4 dxe4 d5 B@g5 Qh5 Bxh4 dxe6 B@g6 B@f7 Rxf7 exf7 Bxf7 Qxh4 N@f4 R@g3 P@g5 Qg4 B@h5 Qf5 N@e2 Kh1 Nxg3 fxg3 Nxg2 P@e6 Ne3 exf7 Bxf7 Qxe4 P@h3 Qxe3 P@g2 Kg1 R@h1 Kf2 gxf1=Q",
-"e4 d6 Nc3 Nf6 d4 Bg4 Be2 Bxe2 Ngxe2 B@h5 f3 Nbd7 d5 e5 dxe6 fxe6 Nf4 P@f7 B@b3 Nc5 Be3 Nxb3 axb3 Be7 O-O O-O Ra5 e5 Nxh5 Nxh5 N@f5 B@g5 Bf2 N@f4 P@g3 Nxg2 Kxg2 P@e6 Nxe7 Qxe7 Kh1 N@h3 B@g2 Nxf2 Rxf2 B@b6 Qg1 Bge3 N@d5 exd5 Nxd5 Bxf2 Nxe7 Kh8 Qf1 Bxg3 N@g4 R@h4 Nf5 Bxh2 B@e1 P@f2 Bxf2 Bxf2 Qxf2 N@g3 Nxg3 Bxg3 B@h3 Rxg4 Qd2 N@f2 Kg1 Nxh3 Kf1 Bf4 P@e3 Rxg2 Qxg2 N@g3 Ke1 P@f2 Kd2 B@e1 Kc1 Bxe3 Kb1 Bxa5 Ka2 f1=Q Qxf1 Nxf1 R@b1 B@c3 P@f6 Nxf6 Q@f5 Bxb2 N@c4 P@c3 Qxh3",
 "e4 e5 Nc3 Nc6 Nf3 Bc5 Bc4 Nf6 O-O O-O d3 d6 Ng5 Nd4 Be3 Ne6 Nxf7 Rxf7 Bxe6 Bxe6 N@g5 Re7 Nxe6 Rxe6 B@c4 B@f7 Bxc5 dxc5 Bxe6 Bxe6 P@f5 Bf7 B@e6 B@e8 Nd5 B@h5 Nxf6 Qxf6 Qxh5 Bxe6 N@g4 Bxh5 Nxf6 gxf6 R@g3 B@g5 B@e2 N@f4 Bxh5 N@e2 Kh1 Nxg3 hxg3 R@h3 N@h2 Rxh5 B@f3 Rxh2 Kxh2 N@h6 Kh1 N@d4 fxe6 Nxf3 B@f7 Kh8 R@h2 Nxh2 gxf4 N2g4 N@g6 hxg6 Q@h3 Q@h4 fxg5 Qxh3 gxh3 Q@h2",
 "e4 e6 Nc3 Nc6 d4 Bb4 Nf3 Nce7 Bd3 Nf6 O-O Bxc3 bxc3 h6 e5 Nfd5 c4 Nb4 B@h4 Nxd3 cxd3 N@f5 N@h5 B@c3 Ba3 g5 Nf6 Kf8 Bxe7 Qxe7 Nxg5 hxg5 Bxg5 B@g6 Nh7 Rxh7 Bxe7 Kxe7 P@f6 Ke8 P@e7 Nxe7 fxe7 Kxe7 N@g8 Kf8 Nf6 N@e7 Q@e8 Kg7 Qxe7 B@b4 c5 N@f5 N@e8 Kh6 Qf8 P@g7 N@g8 Kg5 Qg4",
 "f4 e5 fxe5 d6 exd6 Bxd6 P@f2 Nf6 d4 Nc6 Nc3 O-O P@h6 gxh6 Bxh6 Ng4 Bxf8 Qxf8 e3 B@h4 P@g3 Bg5 Nf3 Bh6 Bd3 Bd7 R@h4 P@g7 Bxh7 Kxh7 P@g5 B@e7 Qd3 P@g6 gxh6 gxh6 Rxg4 Bxg4 B@e4 P@f5 N@d7 Qg7 Bxc6 bxc6 N@e5 Bxf3 Nxf3 N@b4 Qd2 B@e6 B@e5 f6 Bxf6 Bxf6 P@b7 Rd8 b8=Q Bxd7 Qxd8 Bxd8 Ne5 Bxe5 dxe5 N@c4 R@d4 Nxd2 Rxd2 Nxc2 Rxc2 N@d3 Kf1 Nxe5 N@f4 B@a6 Kg1 P@h3 Nxh3 P@f3 N@f4 fxg2 Kxg2 P@f3 Kg1 P@g2 P@d4 gxh1=Q Kxh1",
@@ -1132,7 +1131,7 @@ def prod50crazyhouse = List(
 "e4 d6 d4 g6 Nc3 Bg7 Nf3 Nc6 Bc4 Nf6 Bxf7 Kxf7 P@h6 Bf8 d5 Ne5 Nxe5 dxe5 N@e6 Qd6 O-O B@g4 Ng5 Ke8 f3 Bgd7 f4 Qc5 Kh1 N@f2 Rxf2 Qxf2 Bd2 Bxh6 fxe5 P@h3 P@f7 Kd8 f8=Q Rxf8 N@f7 Ke8 Qg1 hxg2 Qxg2 Qxg2 Kxg2 P@h3 Kf2 Q@g2 Ke3 Bxg5 Kd3 Qxd2 Kc4 R@d4 Kb3 N@c5 Ka3 B@b4",
 "e4 e5 Nf3 Nc6 Bc4 Be7 Bxf7 Kxf7 P@d5 Nf6 dxc6 Rf8 Nxe5 Kg8 Nc3 dxc6 d4 P@b4 P@f3 bxc3 bxc3 N@h4 Rg1 Bd6 P@h6 gxh6 Bxh6 P@g7 Bxg7 Kxg7 P@g5 Bxe5 dxe5 B@d2 Kf1 Bxg5 Qxd8 B@c4 B@d3 Rxd8 Q@e7 Q@f7 Qxd8 N@d2 Ke2 Nfxe4 Qxg5 Nxg5 B@f6 Kh6 R@h5 Kxh5 N@f4 Kh6 Bxg5 Kxg5 N@h3 Kh6 P@g5 Kg7 Bxc4 Qxc4 B@d3 Ndxf3 gxf3 R@d2 Kf1 Rxf2 Nxf2 P@e2 Nxe2 B@h3 Nxh3 Q@c1 Nxc1")
 
-val withNag = """
+  val withNag = """
 [Event "Casual Game"]
 [Site "?"]
 [Date "1851.??.??"]
@@ -1149,7 +1148,7 @@ val withNag = """
 1. e4 {C33: King's Gambit Accepted: 3 Nc3 and 3 Bc4} 1... e5 2. f4 {White offers a pawn to gain better development and control of the center.} 2... exf4 3. Bc4 Qh4+ 4. Kf1 b5?! {Bryan's Counter Gambit. A dubious gambit in modern times, but typical of the attacking style of that time. Here black lures the Bishop from it attacking diagonal against the sensitive f7-pawn, and provides a diagonal for development of his own Bishop to b7 where it will bear down on white's King side. All this value for the price of a pawn.} 5. Bxb5 Nf6 6. Nf3 Qh6 7. d3 Nh5 {The immediate, cheap, and shallow threat of ... Ng3+ is easily defended.} 8. Nh4 {The position is sharp and getting sharper.} 8... Qg5 {Again, playing for cheap threats. In this case, black attacks two pieces at once.} 9. Nf5 c6 {9... g6 10. h4 Qf6 is another complicated position for another day.} 10. g4 {A brilliant move made with a steady hand. Note that white cares little for defensive moves, and is always alert for attack. Now black plays to win the g4-pawn.} 10... Nf6 {Black should have played 10... cxb5 11. gxh5 with a better game.} 11. Rg1 {Now Anderssen sacrifices his Bishop, the first of many sacrifices in this game. White cares little for defensive moves, and plays always for the initiative.} 11... cxb5 12. h4 Qg6 13. h5 {White gets more space.} 13... Qg5 14. Qf3 {White now has the ghastly threat of Bxf4 winning black's Queen next.} 14... Ng8 {Black is forces to clear a path of retreat for his Queen by also retreating one of his only developed pieces.} 15. Bxf4 Qf6 {Black should quickly develop his pieces.} 16. Nc3 Bc5 17. Nd5 {Inviting black to indulge his greed. Also good is 17. d4 Bf8 (17... Bxd4? 18. Nd5 when the Knights savage the board.) 18. Be5.} 17... Qxb2 18. Bd6 Qxa1+ {And why not capture with check!} 19. Ke2 {Now who can resist the tender morsel on g1, but resist he must.} 19... Bxg1 {Black is just too greedy. He has too few pieces developed, and what is developed is sent to the far corners of the board. Now it is white's turn to play. Black may have won after 19... Qb2 (to guard against Nxg7+) 20. Rc1 g6 21. Bxc5 gxf5 (not 21... Qxc1 22. Nd6+ Kd8 23. Nxf7+ Ke8 24. Nc7#).} 20. e5 {Slipping the noose around the neck of the black King.} 20... Na6 {Perhaps 20... Ba6 would have put up more resistance by giving black's King more room to run.} 21. Nxg7+ Kd8 22. Qf6+! {A final pretty sacrifice that ends the game.} 22... Nxf6 {A deflection.} 23. Be7# 1-0
 """
 
-val fromTcec = """[Event "nTCEC - Stage 2 - Season 2"]
+    val fromTcec = """[Event "nTCEC - Stage 2 - Season 2"]
 [Site "http://www.tcec-chess.net"]
 [Date "2013.09.24"]
 [Round "5.2"]
@@ -1171,7 +1170,7 @@ g6 59. Ra5 Ncd7 60. Kd2 Nf8 61. Ra6+ Ne6 62. h4 Ng4 63. Bxe6 fxe6 64. Kd3 Ne5+
 65. Ke4 Ng4 66. Kd4 Ne5 67. Ra8 Nd7 68. Rc8 Ke7 69. e4 Nf6 70. Rc7+ Kd6 71. Rg7
 Ng4 1-0"""
 
-val fromLichessBadPromotion = """
+    val fromLichessBadPromotion = """
 [Event "?"]
 [Site "?"]
 [Date "????.??.??"]
@@ -1185,7 +1184,7 @@ val fromLichessBadPromotion = """
 1. c7 Rd6+ 2. Kb5 Rd5+ 3. Kb4 Rd4+ 4. Kb3 Rd3+ 5. Kc2 Rd4 6. c8=R Ra4 7. Kb3 *
 """
 
-val fromPositionEmptyFen = """
+  val fromPositionEmptyFen = """
 [Event "Casual game"]
 [Date "2016.09.01"]
 [White "lichess AI level 4"]
@@ -1204,7 +1203,7 @@ val fromPositionEmptyFen = """
 1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 4. Qc2 d5 { E34 Nimzo-Indian Defense: Classical Variation, Noa Variation } 5. Bg5 Bxc3+ 6. bxc3 dxc4 7. e3 b5 8. Nf3 O-O?! { (0.00 → 0.60) Inaccuracy. Best move was Bb7. } (8... Bb7 9. Qb2 Bxf3 10. gxf3 a6 11. a4 Nbd7 12. Bxf6 gxf6 13. f4 Rb8 14. axb5 axb5 15. Ra7) 9. a4 c6 10. axb5?! { (0.55 → 0.05) Inaccuracy. Best move was Be2. } (10. Be2 Bb7 11. Rb1 Nbd7 12. O-O Qc8 13. axb5 cxb5 14. Bxf6 Nxf6 15. Rxb5 Be4 16. Qb2 Bd3) 10... cxb5 11. Be2 h6? { (-0.29 → 1.62) Mistake. Best move was Bb7. } (11... Bb7 12. Nd2 h6 13. Bh4 Nbd7 14. O-O a5 15. h3 Qc8 16. Rfb1 Bc6 17. e4 a4 18. Bf3) 12. Bh4? { (1.62 → -0.26) Mistake. Best move was Bxf6. } (12. Bxf6 gxf6 13. Qe4 Qd5 14. Qg4+ Kh7 15. Ne5 Rg8 16. Qh4 fxe5 17. Bf3 Qd7 18. Bxa8 exd4) 12... a6 13. O-O Nbd7 14. Rfd1 Bb7 15. Ne5 g5 16. Bg3 Ne4 17. Bf3 f5 18. Ng6 Rf6 19. Ne5 Qe7 20. h3 Nxe5 21. dxe5 Rff8 22. Rd6 Nxg3 23. Bxb7 Qxb7 24. fxg3 Kf7 25. Qe2 Ke7 26. Qd1 Rfd8 27. g4 Rxd6 28. exd6+ Kf6 29. Kf2 Rd8 30. Qd2 Qd5 31. Ra2 Rxd6 32. Qd4+ Qxd4 33. cxd4 b4 34. Ra4 Rb6 35. Ke2? { (0.15 → -0.99) Mistake. Best move was h3. } (35. h3 Nxe5 36. Bxe5 a5 37. Qb2 Qe8 38. Rf1 Bc6 39. Ra2 Kh7 40. Rfa1 a4 41. Qb4 Rg8) 35... c3 36. Kd3 Ke7 37. Ra1 Kd6 38. Rb1?! { (-0.18 → -1.17) Inaccuracy. Best move was Bxe5. } (38. Bxe5 Rf7 39. Ra5 Rh7 40. Bxe4 Bxe4 41. Qe2 h5 42. f3 Bb7 43. e4 g4 44. Qe3 Rf8) 38... a5 39. gxf5? { (-1.16 → -2.48) Mistake. Best move was Bxe4. } (39. Bxe4 Bxe4 40. Qe2 a5 41. Rd6 a4 42. Qd1 Bd3 43. Qf3 Rfc8 44. Qh5 Kg7 45. h4 Qe8) 39... exf5? { (-2.48 → -0.25) Mistake. Best move was Nxd6. } (39... Nxd6 40. exd6 Qf7 41. Bxb7 Qxb7 42. Be5 a5 43. f4 Kh7 44. fxg5 hxg5 45. Rd1 Rad8 46. h4) 40. Ra1 Rb5 41. g3 Kd5?! { (-0.37 → 0.51) Inaccuracy. Best move was Rfe8. } (41... Rfe8 42. Qd1 Re7 43. g4 Qe4 44. Qd4 a5 45. gxf5 exf5 46. Rxh6 Qxe5 47. Rg6+ Kh7 48. Rxg5) 42. Rf1 Ke6?? { (0.23 → 5.13) Blunder. Best move was Qc8. } (42... Qc8 43. g4 Kg7 44. Rf1 Qe8 45. gxf5 exf5 46. Qf3 Qxe5 47. Qc6 Ra7 48. Rg6+ Kh8 49. Rxh6+) 43. Kc4?? { (5.13 → 0.10) Blunder. Best move was Qh5. } (43. Qh5 Qe4 44. Rad1 Qxe3+ 45. Kf1 Ra7 46. Re1 Qxe5 47. Rxe5 Kxd6 48. Re1 Rd7 49. Qg6 Re7) 43... Rd5 44. Ra1?! { (0.00 → -0.59) Inaccuracy. Best move was Qd4. } (44. Qd4 Rxd6 45. Qxd6+ Kf7 46. g4 Qd5 47. Qc7+ Kg8 48. gxf5 exf5 49. Qe7 a5 50. e6 Rf8) 44... c2?? { (-0.59 → 3.37) Blunder. Best move was Qa7. } (44... Qa7 45. Kh1 Qxe3 46. Raxa6 Qxe5 47. Rxe6+ Qxe6 48. Rxe6+ Kxe6 49. gxf5+ Kf6 50. Qh5 Kxf5 51. Kh2) 45. Rc1?? { (3.37 → 0.00) Blunder. Best move was Qxd6+. } (45. Qxd6+ Kf7 46. gxf5 Re8 47. fxe6+ Kg8 48. e7 Rxe7 49. Rxa6 Rg7 50. Qd8+ Kh7 51. Ra8 Qc7) 45... b3 46. Kxb3?! { (0.32 → -0.67) Inaccuracy. Best move was gxf5. } (46. gxf5 exf5) 46... Rb5+ 47. Kc3?! { (-0.90 → -1.85) Inaccuracy. Best move was gxf5. } (47. gxf5 exf5 48. Qh5 Kg7 49. Qd1 Qb6 50. d7 Qe6 51. Qd4+ Kf7 52. Rd1 a5 53. Qa7 Qc6) 47... a4?! { (-1.85 → -0.96) Inaccuracy. Best move was Qb6. } (47... Qb6 48. Rd1 f4 49. Ke2 fxe3 50. Qxe3 Rxd6 51. Rf1+ Ke7 52. Qf3 Rd3 53. Qf8+ Kd7 54. Rf7+) 48. Rxc2? { (-0.96 → -2.97) Mistake. Best move was Qxd5. } (48. Qxd5 exd5) 48... Kd5 49. g4? { (-2.97 → -4.00) Mistake. Best move was Qxd5. } (49. Qxd5 exd5 50. Ra1 fxg4 51. hxg4 Ke5 52. Ke1 Ke4 53. Ke2 Ke5 54. Kf3 Rc6 55. Ra2 Rf6+) 49... fxg4 50. hxg4?? { (-3.84 → -7.10) Blunder. Best move was exd4. } (50. exd4 fxg4) 50... Ke4 51. Ra2?? { (-6.69 → -10.84) Blunder. Best move was Ke2. } (51. Ke2 b3 52. Rb2 a5 53. Kd2 a4 54. Kc3 a3 55. Rb1 b2 56. g3 a2 57. Kxb2 axb1=Q+) 51... Rb3+ 52. Kc4 Rxe3 53. Rxa4 Rd3?? { (-10.53 → -4.87) Blunder. Best move was b3. } (53... b3 54. Ra1 c2 55. Rc1 b2 56. Kxc2 bxc1=R+ 57. Kxc1 Rb3 58. Kd2 Rb2+ 59. Ke1 Rxg2 60. Kf1) 54. Ra8 Rxd4+ 55. Kb3? { (-4.50 → -6.11) Mistake. Best move was Kc2. } (55. Kc2 Kd5) 55... Rd6 56. Rf8 Ke5 57. Rf2 Rd4 58. Rg2 Kf4 59. Ra2?! { (-4.64 → -5.48) Inaccuracy. Best move was Rh1. } (59. Rh1 Rb8 60. g4 f4 61. e4+ Kd6 62. h4 Rc8 63. hxg5 hxg5 64. Rh6+ Ke7 65. Rh1 a4) 59... Kxg4 60. Kc3? { (-4.96 → -7.24) Mistake. Best move was g4. } (60. g4 fxg4 61. hxg4 a4 62. Kc4 Rb7 63. Rh1 c2 64. Rxh6+ Kf7 65. Rh7+ Kg6 66. Rh1 Rc7+) 60... Rf4? { (-7.24 → -4.70) Mistake. Best move was Rb8. } (60... Rb8 61. Rc1 Rc8+ 62. Kb3 c2 63. Kb2 a4 64. Rxc2 Rxc2+ 65. Kxc2 a3 66. Kb3 Kd5 67. h4) 61. Ra6? { (-4.70 → -6.98) Mistake. Best move was g4. } (61. g4 fxg4 62. hxg4 Rd8 63. Kb3 Rc8 64. e4 c2 65. Rc1 Rc3+ 66. Kb2 a4 67. Rxc2 a3+) 61... h5?? { (-6.98 → -2.39) Blunder. Best move was Rd8. } (61... Rd8) 62. Ra2?? { (-2.39 → -6.50) Blunder. Best move was Kb3. } (62. Kb3 Rd8) 62... h4?? { (-6.50 → -0.84) Blunder. Best move was Rd8. } (62... Rd8 63. Kd3 b3 64. Kc3 a4 65. Kb2 Kd5 66. g4 f4 67. exf4 gxf4 68. h4 Kxd4 69. g5) 63. Rb2 Rf3+ 64. Kb4 Kg3 65. Ra2 g4 66. Kc4? { (-0.95 → -3.08) Mistake. Best move was Kd3. } (66. Kd3 a3 67. Kc3 Rb6 68. Ra2 Ra6 69. Kb4 Rb6+ 70. Kc3 Re6 71. Kd3 Ra6 72. g4 f4) 66... h3? { (-3.08 → -1.84) Mistake. Best move was f4. } (66... f4 67. exf4 Rb3+ 68. Kd2 gxf4 69. Rc5+ Kxd4 70. Rf5 Ke4 71. Ra5 Rd3+ 72. Ke1 a3 73. Ra6) 67. Ra1 Rf2? { (-1.71 → -0.47) Mistake. Best move was Rb3+. } (67... Rb3+ 68. Kd2 a3 69. Rc7 Ke4 70. Rc6 a2 71. Re6+ Kf3 72. Ra6 Rb2+ 73. Kc3 Re2 74. Kd3) 68. Kd4 Kg2 69. Ke4 g3 70. Ke5 h2 71. Ra5? { (-0.52 → -2.50) Mistake. Best move was Kc5. } (71. Kc5 Rd2 72. Ra6 Rc2+ 73. Kd6 Kxd4 74. Ke6 Ke4 75. Ra4+ Kf3 76. Kf5 Rc5+ 77. Kg6 Rc6+) 71... Kh3 72. Ra1?? { (-2.32 → -6.91) Blunder. Best move was Kc5. } (72. Kc5 Rd5+ 73. Kc4 Rd2 74. Ra6 Rh2 75. Rf6 Rh4 76. Ra6 Kf3 77. Kd5 Kxg4 78. Ke6 Rh3) 72... g2?? { (-6.91 → -2.79) Blunder. Best move was Kf3. } (72... Kf3) 73. Ra3+ Kg4? { (-3.21 → -1.69) Mistake. Best move was Ke3. } (73... Ke3 74. Kc2 Rd4 75. Rf6 Rxg4 76. Rxh6 Rh4 77. Rd6 g4 78. Rd3+ Ke4 79. Ra3 Rh3 80. Ra4+) 74. Re3? { (-1.69 → -2.82) Mistake. Best move was Rf1. } (74. Rf1 Rd4 75. Rg1 Re4 76. Kc3 Kf4 77. Rh1 Re6 78. Rg1 Re4 79. Rh1 Re6 80. Rg1 Kf3) 74... g1=Q 75. Re4+? { (-2.02 → -4.05) Mistake. Best move was Rh2. } (75. Rh2 Rxg4 76. Rxh6 Rh4 77. Rc6 g4 78. Kc2 Kf4 79. Kd3 Kf3 80. Rf6+ Kg2 81. Ke2 g3) 75... Kg5 76. Ke6?? { (-1.78 → -12.52) Blunder. Best move was Rh2. } (76. Rh2 Rd6 77. Rg2 Rd1 78. Rh2 Rd6 79. Rg2 Kf3 80. Rg1 Rd4 81. Rh1 Rxg4 82. Rh3+ Kg2) 76... Rf6+ 77. Ke7 Qc5+ 78. Kd8? { (-8.36 → -12.56) Mistake. Best move was Kd3. } (78. Kd3 h5 79. Rg2+ Kf5 80. Rh2 h4 81. Ke3 Kg4 82. Rg2+ Kh5 83. Rc2 Rf7 84. Ke4 h3) 78... Qd6+ 79. Kc8 Qc6+ 80. Kb8 Qxe4 81. Kc8 Qe7 82. Kb8 Rf8# { White is checkmated } 0-1
 """
 
-val fromTcecWithEngineOutput = """
+  val fromTcecWithEngineOutput = """
 [Event "nTCEC - Stage 2 - Season 2"]
 [Site "http://www.tcec-chess.net"]
 [Date "2013.10.09"]
@@ -1396,7 +1395,7 @@ Rd8 { ev=-135.90, d=37, pd=Ba2, mt=00:01:13, tl=00:00:59, s=7185 kN/s, n=2277060
 ; GameDuration = 04:54:28, Finalposition 3r1nk1/6R1/5K1P/1P6/8/8/8/1B6 b - - 2 83 }
 """
 
-val invalidVariant = """[Event "nTCEC - Stage 2 - Season 2"]
+  val invalidVariant = """[Event "nTCEC - Stage 2 - Season 2"]
 [Site "http://www.tcec-chess.net"]
 [Date "2013.09.24"]
 [Round "5.2"]
@@ -1418,7 +1417,7 @@ g6 59. Ra5 Ncd7 60. Kd2 Nf8 61. Ra6+ Ne6 62. h4 Ng4 63. Bxe6 fxe6 64. Kd3 Ne5+
 65. Ke4 Ng4 66. Kd4 Ne5 67. Ra8 Nd7 68. Rc8 Ke7 69. e4 Nf6 70. Rc7+ Kd6 71. Rg7
 Ng4 1-0"""
 
-val chessbaseWeird = """[Event "Altibox Norway Chess 2017"]
+  val chessbaseWeird = """[Event "Altibox Norway Chess 2017"]
 [White "Aronian, Levon"]
 [Black "Caruana, Fabiano"]
 [Site "Stavanger"]
@@ -1437,7 +1436,7 @@ Akesson,R (2465)-Van Wely,L (2585) Antwerp 1995} )Nd5 16. Nxd7 Qxd7 17. Nc4 Qe7 
 [#]} f6 23. h4 {} a5 24. Rd2 Ba6 25. Rdc2 Rb8 26. h5 Rd7 27. Qh4 Rf8 28. Bh3 Bb7 29. Bd4 (29. Qg4 $5 {} f5 30. Qe2 $11 )Qf7 30. Rd2 (30. h6 $5 {} )h6 31. Qg4 Re8 32. Qg6 Red8 33. Bg2 Ba6 34. Be4 {[#] aiming for Qh7+.} Qxg6 35. hxg6 Ne7 36. Bc5 f5 (36... Nd5 $1 $11 )37. Bxe7 $16 Rxe7 38. Bf3 ({Better is} 38. Rxd8+ $14 Bxd8 39. Bc6 )Rxd2 $11 39. Nxd2 Kf8 40. Rc5 Rd7 41. Nc4 Bxc4 $1 42. Rxc4 { Endgame KRB-KRB} Ke7 43. Rc6 Bd8 44. Be2 Rd6 45. Rxd6 (45. Rc8 {is interesting.} Kf6 46. Bc4 Bb6 47. Re8 Rc6 48. Kf1 )Kxd6 {KB-KB} 46. Bc4 e5 47. f4 Bb6 48. Kf2 exf4 49. gxf4 h5 50. Kf3 h4 51. Bf1 (51. Bd3 $5 {
 } )Ke6 52. e4 fxe4+ 53. Kxe4 Kf6 54. f5 Bd8 55. Bh3 Bb6 56. Bf1 Bd8 57. Bh3 Bb6 58. Bf1 {Precision: White = 68%, Black = 58%.} 1/2-1/2"""
 
-val chessbaseArrows = """[Event "?"]
+  val chessbaseArrows = """[Event "?"]
 [Site "?"]
 [Date "2016.05.23"]
 [Round "?"]
@@ -1451,7 +1450,7 @@ val chessbaseArrows = """[Event "?"]
 {[%csl Gb4,Yd5,Rf6][%cal Ge2e4,Ye2d4,Re2g4]} 1. e4 {[%csl Gb4,Yd5,Rf6] blabla}
 """
 
-val commentsAndVariations = """
+  val commentsAndVariations = """
 [Event "ICC"]
 [Site "Internet Chess Club"]
 [Date "2013.09.29"]
@@ -1512,7 +1511,7 @@ Kxa4 46. h8=Q Kb5 47. d6+ Kxb6 48. d7 Kc6 49. d8=Q b5 50. Qd5+ Kb6 51. Qxb5+
 Kc7 52. Qhb8# 1-0
 """
 
-val bySmartChess = """
+  val bySmartChess = """
 [Event "?"]
 [Site "Munich"]
 [Date "1979.??.??"]
@@ -1634,7 +1633,7 @@ What we learn from a study of a game such as this is that no matter how quiet or
 1-0
 """
 
-val android = """[Event "AI Factory's Chess"]
+  val android = """[Event "AI Factory's Chess"]
 [Site "Android Device"]
 [Date "2014.04.23"]
 [Round "1"]
@@ -1651,7 +1650,7 @@ val android = """[Event "AI Factory's Chess"]
 26. a2xb3 Rf7g7 27. Qa6b5 Rd8d7 28. Ra1a8 Rg7f7 29. Qb5b4 Rf7f8 30. Ke1d1 Rf8f5
 31. Rh1e1 Rd7d8 32. e5xd6+ Ke7d7 33. Qb4a4+ Rf5b5 34. Qa4xb5+ c7c6 35. Qb5f5# 1-0"""
 
-val chesskids = """[Site "ChessKid iPhone"]
+  val chesskids = """[Site "ChessKid iPhone"]
 [Date "04/29/2014 02:27PM"]
 [White "NicePlatypus"]
 [Black "Computer"]
@@ -1663,11 +1662,11 @@ Rb8 25. c4 Rf8 26. cxd5 Qxd5 27. Qxd5+ Bxd5 28. Nd3 c4 29. Nb4 Bf7 30. c3 Re8 31
 Kd5 48. Nb6+ Ke6 49. Kg7 Bh5 50. a4 Be8 51. a5 Bh5 52. a6 Ke5 53. f7 Bxf7 54. Kxf7 Ke4 55. a7 Kd3 56. a8Q Kxc3 57. Qa5+ Kd3 58. Qd5+ Ke2 59.
 h5 c3 60. Qc4+ Kd2 61. Na4 c2 62. Qc3+ Ke2 63. Qxc2+ Ke1 64. Kf6 Kf1 65. Kf5 Ke1 66. Kf4 Kf1 67. Kf3 Ke1 68. Qe2# 1-0"""
 
-val variations = """
+  val variations = """
 1. e4 (1. d4 d5) d6 (1... d5 2. h3) 2. d4 {choudidou d4} (2. d3 h6 3. h3) c6 {yep c6!} 3. f4  Qc7 4. Nf3 h6 $6  5. Bd3 (  5. Bc4  e6) 5... Bg4 6. O-O Nd7  7. Nc3 a6 $6  8. Be3 e5 $2  9. fxe5 dxe5 10. d5 $1 ( 10. dxe5 $2 Nxe5 ) 10... c5 (10... cxd5 $6 11. Nxd5 ) ( 10... Ngf6 11. dxc6 )
 """
 
-val caissa = """
+  val caissa = """
 [Event "Anime Boston Cosplay Chess 2013 pt 3"]
 [Site "?"]
 [Date "2013.??.??"]
@@ -1687,7 +1686,7 @@ Nxc6 Nd7 34. Nd8+ Ke7 35. c6 Qxa2 36. cxd7 Kxd8 37. Ke3 Kxd7 38. Kxf4 h2 39.
 Kg5 h1=Q 40. Kxg6 Qf2 41. Kg7 Qhg1+ 42. Kh7 Qfh2# 0-1
 """
 
-val handwritten = """
+  val handwritten = """
 [Event "XEQUE-MATEmatica 2014"]
 [Site "Lisbon, Portugal POR"]
 [Date "2014.05.19"]
@@ -1770,7 +1769,7 @@ val handwritten = """
 70. Rh7++
 1-0"""
 
-val chessByPost = """
+  val chessByPost = """
 [Site "Chess By Post"]
 [Date "2014.2.23"]
 [White "paularsen"]
@@ -1791,7 +1790,7 @@ Re3d3 Rd4xd3 46. Be4xd3 Kd6d5 47. Bd3b5 Kd5c5 48. a3a4 Kc5b4 49. Kf5xe5 a7a6 50.
 [Variant "Atomic"]
 1. e4 d5 2. Nf3 dxe4 3. Bb5+ Qxd2#"""
 
-val atomicPromotion = """
+  val atomicPromotion = """
 [Event "Rated game"]
 [Site "https://lichess.org/MyjOSGx4"]
 [Date "2015.02.25"]
@@ -1810,14 +1809,14 @@ val atomicPromotion = """
 1. Nf3 f6 2. Nc3 c6 3. d4 d5 4. e3 e5 5. dxe5 d4 6. Ne4 d3 7. Nd6+ Bxd6 8. Nd4 d2+ 9. Ke2 dxc1=Q 10. g4 Nh6 11. Bg2 Nxg4 12. h3 Na6 13. Rad1 Nc5 14. Kf1 Ne4 15. f4 Nf2 16. Ne6 Qxd1 17. Nc7+ Ke7 18. Ne6 Kd6 19. Bxc6 1-0
 """
 
-val weirdDashes = """
+  val weirdDashes = """
 1. Nf3 d5 2. d4 Nf6 3. g3 g6 4. Bg2 c6 5. Bf4 Bg7 6. c3 b6 7. Nbd2 Nbd7 8. O‑O Ba6 9. Re1 O‑O 10. Qc2 Re8 11. b3 Nh5 12. Be5 f6 13. Bf4 Nxf4
 14. gxf4 e5 15. fxe5 fxe5 16. dxe5 Nxe5 17. c4 Nxf3+ 18. Bxf3 Qg5+ 19. Kh1 Be5 20. Nf1 Bxa1 21. Rxa1 Rad8 22. Rd1 dxc4 23. Bxc6 Rxd1 24.
 Qxd1 Rd8 25. Qc2 cxb3 26. Qxb3+ Kg7 27. Qc3+ Kh6 28. Qh3+ Qh5 29. Qe3+ Qg5 30. Qh3+ Kg7 31. Qc3+ Qf6 32. Qxf6+ Kxf6 33. Bf3 Rd7 34. Ne3 Rd2
 35. Nd5+ Ke5 36. e3 Rxf2 37. Kg1 Rxf3 0-1
 """
 
-val lichobile = """
+  val lichobile = """
 [Event "Casual game"]
 [Site "https://lichess.org"]
 [Date "2015.12.13"]
@@ -1842,7 +1841,7 @@ val lichobile = """
 33. Kf1 Nxe3+ 34. Ke2 Qd2# 0-1
 """
 
-val overflow = """
+    val overflow = """
 [pgn]
 [White "Him"]
 [Black "Me"]
@@ -1867,7 +1866,7 @@ feel like I've turned around my position. I calculated that Qh6 isn't going to b
 [/pgn]
 """
 
-val overflow3 = """
+  val overflow3 = """
 [Event "8th Grand Slam Masters"]
 [Site "Bilbao ESP"]
 [Date "2015.10.28"]
@@ -1881,7 +1880,7 @@ val overflow3 = """
 Bg4+ 161. Kg3 Ke3 162. Rg6 Bf3 163. Rg5 Ra4 164. Re5+ Be4 165. Kg4 Ra1 166. Rg5 Rf1 167. Kh4 Bf5 168. Rg3+ Kf4 169. Rg4+ Ke5 170. Rg3 Kf6 171. Ra3 Rg1 172. Ra4 1/2-1/2
 """
 
-val crazyhouse1 = """
+  val crazyhouse1 = """
 [Event "internet, rated crazyhouse match"]
 [Variant "Crazyhouse"]
 [Site "ICS: freechess.org 5000"]
@@ -1907,7 +1906,7 @@ Rab8 43. cxb6 Rdd8 44. N@e7+ Kh8 45. bxc7 Rdc8 46. cxb8=Q Rxc6 47. Qxf8+ Q@g8
 {Black checkmated} 1-0
 """
 
-val crazyhouse2 = """
+  val crazyhouse2 = """
 [Event "internet, rated crazyhouse match"]
 [Variant "Crazyhouse"]
 [Site "ICS: freechess.org 5000"]
@@ -1934,7 +1933,7 @@ Kxb2 B@a3+ 55. Kc2 R@b2+ 56. Kd1
 {Black ran out of time} 1-0
 """
 
-val crazyhouseNoVariantTag = """
+  val crazyhouseNoVariantTag = """
 [Event "internet, rated crazyhouse match"]
 [Site "ICS: freechess.org 5000"]
 [Date "2001.01.02"]
@@ -1959,7 +1958,7 @@ Rab8 43. cxb6 Rdd8 44. N@e7+ Kh8 45. bxc7 Rdc8 46. cxb8=Q Rxc6 47. Qxf8+ Q@g8
 {Black checkmated} 1-0
 """
 
-val stackOverflow = """
+    val stackOverflow = """
 [Event "?"] [Site "Anytown"] [Date "2015.??.??"] [Round "?"] [White "Beginner"] [Black "Grandmaster"] [Result "*"] [ECO "C65"] [BlackElo "3000"] [Annotator "Pickard,S."] [PlyCount "8"] [EventDate "2011.04.09"] [SourceDate "2015.04.30"] 1. e4 {[%csl Ge4][%cal Re4d5,Yd1h5,Yf1a6] [A very good chess opening move, which conforms to all the chess strategy principles discussed. White occupies one key center square with a pawn, also attacking another central point. In addition, the move also liberates the White Queen and King's Bishop. As World Champion Bobby Fischer said of 1.e4, "Best by test." If unopposed White will likely play his d-pawn forward next move!]} ({The move} 1. d4 {[%csl Gd4][%cal Yd1d3,Yc1h6,Rd4e5] also meets our requirements, sending a pawn to the center and attacking another central square. The Queen defends the pawn, and she is free to move forward. In addition, the Queen's Bishop can now develop, and White "threatens" to play his e-pawn up two squares to dominate the center.}) ( {Even a move like} 1. Nf3 {[%csl Gd4,Ge5] is quite good, bringing the Knight toward the center, and attacking two center squares. The move also brings White closer to castling his King to safety - another goal of good chess strategy in the opening.}) 1... e5 {[%csl Ge5][%cal Re5d4,Yd8h4,Yf8a3] [Black answers by staking his own claim to the center squares, occupying one and attacking another. The move makes ready to deploy the Queen and King's Bishop to active central squares. Now White cannot hope for two pawns abreast in the center.]} ({Other moves are possible of course, but any good move here will be found to fight for the center and rapidly develop the pieces to squares of maximum efficiency. For example} 1... e6 {[%cal Re6d5,Yd8h4,Yf8a3] attacks an important central square and prepares to support the d-pawn's advance two squares into the center next move. Now after} 2. d4 {(White controls the center of the chess board, an ideal arrangement according to sound chess strategy in the opening)} d5 {Black quickly strikes back in the center, firmly establishing a pawn foothold on the d5 square, for if White captures Black retakes with his e-pawn. Notice that White's e-pawn is also threatened with capture. This position begins the French Defense, a well known chess opening.}) 2. Nf3 {[%csl Re5] [An ideal chess opening move. White develops a Knight to its best square (toward the center!) and attacks the enemy pawn. Black is limited in his reply.]} ({Again, White could make other good moves, like} 2. Nc3 {[%csl Gd5,Ge4] which also meets guidelines for proper chess opening strategy. A Knight is brought out toward the center, two center squares are influenced and the White e-pawn is solidly protected.}) 2... Nc6 {[%csl Yd4, Ye5] [Excellent - a Knight is developed actively, attacking two central squares and defending the Black e-pawn. The influence of White's Knight is thus counteracted.]} 3. Bb5 {[%csl Re5][%cal Ye1g1] [Rapid deployment and no wasted motion. This move adheres to the principles of chess strategy, by preparing to castle and by undermining Black's defense of this e-pawn. Without getting bogged down in chess tactics, observe that White is not yet threatening to win the Black e-pawn, even if he could move again.]} ({Instead} 3. Bc4 {[%cal Ye1g1,Ga2g8] illustrates good chess strategy as well, placing the King's Bishop on an active square where it commands two long diagonals, attacks the d5 central square and prepares to castle.}) 3... Nf6 {[%csl Re4] [Black counterattacks! He brings out the King's Knight and controls two center squares, besides placing the enemy e-pawn under attack.]} 4. O-O {[%csl Gg1] [All according to the best chess strategy. White's King is now safely tucked away in the corner, and his King's Rook is brought toward the center. Next he will plan the development of his Queenside pieces while hampering Black's attempt to smoothly develop.]} Bc5 {[%csl Rg1][%cal Ye8g8,Ga7g1] [The King's Bishop takes up its most active post, where it commands squares leading all the way to White's King. In addition, Black is now ready to castle. This position forms part of the Berlin Defense to the Ruy Lopez.]}*
 """
 
@@ -1976,7 +1975,7 @@ val stackOverflow = """
 1. d3 g6 2. f4 d5 3. Nf3 Bg7 4. g3 c6 5. Bg2 Qb6 6. c3 Nf6 7. Qb3 Nbd7 8. Qxb6 axb6 9. h3 Nc5 10. Nbd2 O-O 11. O-O b5 12. a3 Ra4 13. Kh2 Ne8 14. d4 Ne4 15. Nxe4 dxe4 16. Nd2 f5 17. e3 Be6 18. Re1 Ra7 19. Bf1 Nd6 20. b3 b6 21. Bb2 c5 22. Be2 Rc8 23. Rec1 h5 24. Bd1 Kf7 25. Kg2 Bf6 26. h4 Ke8 27. Kf2 Kd7 28. Rab1 Rac7 29. Ra1 Ra8 30. Rab1 Rca7 31. Rc2 Rxa3 32. Bxa3 Rxa3 33. dxc5 bxc5 34. Be2 Kc6 35. b4 c4 36. Rbc1 Nc8 37. Nb1 Ra1 38. Nd2 Ra7 39. Nb1 Nb6 40. Bd1 Nd5 41. Be2 Ra1 42. Rd1 Bf7 43. Bf1 e5 44. fxe5 Bxe5 45. Bg2 Bc7 46. Re2 Be6 47. Rb2 Nf6 48. Bh3 Nd7 49. Bf1 Ne5 50. Be2 Nd3+ 51. Bxd3 cxd3 52. Rf1 Be5 53. Kg2 Kd6 54. Rff2 Bf6 55. Rf1 Bg7 56. Kf2 Be5 57. Kg2 Bf6 58. Rff2 g5 59. Rf1 gxh4 60. gxh4 Bxh4 61. Rh1 Bg5 62. Kf2 f4 63. exf4 Bxf4 64. Re1 Ke5 0-1
 """
 
-val withGlyphAnnotations = """
+  val withGlyphAnnotations = """
 1. e4 e5 2. Nf3 d5 3. exd5 e4 4. Nd4 Qxd5 5. c3 Bc5 6. Nb3 Nf6 7. d4 exd3 8.
 Bxd3?? ⩱ {BLUNDER (-4.28)} ({(+0.33) The best move was} 8. Nxc5 Qxc5 9. Bxd3 Bg4
 10. Qb3 Qe5+ 11. Be3 Qd5 12. Qxd5 Nxd5 13. Bd2 Nc6 14. Na3 Ne5 15. Bc2 O-O-O 16.
@@ -1991,11 +1990,11 @@ Bxg2 16. N1d2 Rad8 17. Kc2 Rxd3 18. Kxd3 Bxf1+ 19. Rxf1 Nd5 20. Bg3 Re3+ 21. Kc4
 Rxg3 22. hxg3 Ne3+ 23. Kb5 a6+ 24. Ka4 Nxf1) 1-0
 """
 
-val clonoNoExoticNotation = """
-1. e2e4 e7e5 2. Ng1f3 Nb8c6 3. c2c3 Ng8f6 4. d2d4 e5xd4 5. e4e5 Nf6d5 6. Qd1b3 Nd5b6 7. c3xd4 d7d5 8. Bc1e3 Bc8f5 9. a2a3 Qd8d7 10. Nb1d2 Bf8e7 11. Bf1e2 a7a6 12. Ra1c1 O-O 13. O-O f7f6 14. Rf1d1 Kg8h8 15. Nd2b1 Nc6a5 16. Qb3c3 Na5c4 17. Be2c4 Nb6c4 18. Nb1d2 b7b5 19. Nd2b3 Bf5g4 20. e5xf6 Bg4f3 21. f6xe7 Qd7g4 22. e7xf8=Q+ {[%clk 00:26:01]} Ra8f8 {[%clk 00:27:09]} 0-1
+  val clonoNoExoticNotation = """
+1. e2e4 e7e5 2. Ng1f3 Nb8c6 3. c2c3 Ng8f6 4. d2d4 e5xd4 5. e4e5 Nf6d5 6. Qd1b3 Nd5b6 7. c3xd4 d7d5 8. Bc1e3 Bc8f5 9. a2a3 Qd8d7 10. Nb1d2 Bf8e7 11. Bf1e2 a7a6 12. Ra1c1 O-O 13. O-O f7f6 14. Rf1d1 Kg8h8 15. Nd2b1 Nc6a5 16. Qb3c3 Na5c4 17. Be2c4 Nb6c4 18. Nb1d2 b7b5 19. Nd2b3 Bf5g4 20. e5xf6 Bg4f3 21. f6xe7 Qd7g4 22. e7xf8=Q+ {[%clk 10:26:01]} Ra8f8 {[%clk 10:27:09]} 0-1
 """
 
-val tagsCommentsWithoutMoves1 ="""
+  val tagsCommentsWithoutMoves1 ="""
 [Event "Мат в 1 ход [1-63] - Дорофеева: Мат в 1 ход - 43"]
 [Site "https://lichess.org/study/ZVU8ZBwM/LqSI1Pmt"]
 [Result "*"]
@@ -2011,7 +2010,7 @@ val tagsCommentsWithoutMoves1 ="""
 { Мат в 1 ход, ход белых }
 """
 
-val tagsCommentsWithoutMoves2 ="""
+  val tagsCommentsWithoutMoves2 ="""
 [Event "Мат в 1 ход [1-63] - Дорофеева: Мат в 1 ход - 43"]
 [Site "https://lichess.org/study/ZVU8ZBwM/LqSI1Pmt"]
 [Result "*"]
@@ -2028,7 +2027,7 @@ val tagsCommentsWithoutMoves2 ="""
 *
 """
 
-val gameWithComments = """[Event "The Match - Braingames World Chess Cham"]
+  val gameWithComments = """[Event "The Match - Braingames World Chess Cham"]
 [Site "London"]
 [Date "2000.01.04"]
 [EventDate "2000.10.12"]
@@ -2058,7 +2057,7 @@ Ne5 37. Rg7 Rf8 38. h3 c4 39. Re7 Nd3 40. f7 Nxf2 41. Re8+ Kd7
 c3 47. h4 Ra6 48. Bd4 Ra4 49. Bxc3 Nxc3 50. Rxc3 Rxh4 51. Rf3
 Rh5 52. Kf2 Rg5 53. Rf8 Ke5 1/2-1/2"""
 
-val gamesForPerfTest = List(enpassantEP, enpassantEP2, recentChessCom, chessComCrazyhouse, fromPosProdCloseChess,
+  val gamesForPerfTest = List(enpassantEP, enpassantEP2, recentChessCom, chessComCrazyhouse, fromPosProdCloseChess,
   fromChessProgrammingWiki, noTagButResult, inlineTags, whiteResignsInTags, whiteResignsInMoves, whiteResignsInTagsAndMoves,
   festivalFigueira, crazyhouseFromProd, complete960, fromWikipedia, stLouisFischerandom, inlineComments, fromChessgames,
   fromChessgamesWithEscapeChar, chessgamesWeirdComments, withDelimiters, withDelimitersOnNewLines, fromProd1, fromProd2,

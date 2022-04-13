@@ -65,9 +65,7 @@ class AtomicVariantTest extends ChessTest {
       gameWin must beValid.like { case winningGame =>
         winningGame.situation.end must beTrue
         winningGame.situation.variantEnd must beTrue
-        winningGame.situation.winner must beSome.like { case winner =>
-          winner == Black
-        }
+        winningGame.situation.winner must beSome(Black)
       }
     }
 
@@ -80,7 +78,7 @@ class AtomicVariantTest extends ChessTest {
       gameWin must beValid.like { case winningGame =>
         winningGame.situation.end must beTrue
         winningGame.situation.variantEnd must beFalse
-        winningGame.situation.winner must beSome.like { case color => color == Black }
+        winningGame.situation.winner must beSome(Black)
       }
     }
 
@@ -105,9 +103,7 @@ class AtomicVariantTest extends ChessTest {
         game.situation.end must beTrue
         game.situation.autoDraw must beTrue
         game.situation.winner must beNone
-        game.situation.status must beSome.like { case status =>
-          status == Status.Draw
-        }
+        game.situation.status must beSome(Status.Draw)
       }
     }
 
@@ -115,12 +111,12 @@ class AtomicVariantTest extends ChessTest {
       val positionFen    = FEN("k1K5/pp5R/8/8/3Q4/P7/1P6/2r5 w - -")
       val threatenedGame = fenToGame(positionFen, Atomic)
 
-      threatenedGame must beValid.like { case game =>
+      threatenedGame must beValid.like { case (game: Game) =>
         game.situation.check must beTrue
         game.situation.end must beFalse
         game.situation.winner must beNone
         game.situation.moves must haveKeys(Pos.D4, Pos.H7, Pos.C8)
-        game.situation.moves.get(Pos.D4) must beSome.like { case moves =>
+        game.situation.moves.get(Pos.D4) must beSome.like { (moves: List[Move]) =>
           // The queen can defend the king from check
           moves.find(_.dest == Pos.A7) must beSome
 
@@ -129,12 +125,12 @@ class AtomicVariantTest extends ChessTest {
         }
 
         // The king cannot capture a piece in the perimeter of the opponent king, exploding itself
-        game.situation.moves.get(Pos.C8) must beSome.like { case mvs =>
+        game.situation.moves.get(Pos.C8) must beSome.like { mvs =>
           mvs.forall(_.captures) must beFalse
         }
 
         // The rook cannot capture, as that would result in our own king exploding
-        game.situation.moves.get(Pos.H7) must beSome.like { case mvs =>
+        game.situation.moves.get(Pos.H7) must beSome.like { mvs =>
           mvs.find(_.captures) must beNone
           // It can, however, defend the king
           mvs.find(_.dest == Pos.C7) must beSome

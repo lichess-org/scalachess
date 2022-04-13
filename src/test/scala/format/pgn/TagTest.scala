@@ -39,4 +39,10 @@ class TagTest extends ChessTest {
       )
     }
   }
+
+  "test" should {
+    "beSome" in {
+      Option(3) must beSome((_: Int) == 3)
+    }
+  }
 }

@@ -97,14 +97,6 @@ case object Antichess
     InsufficientMatingMaterial.pawnBlockedByPawn(pawn, board) && cannotAttackBishop
   }
 
-  // In this game variant, a king is a valid promotion
-  override def isValidPromotion(promotion: Option[PromotableRole]) =
-    promotion match {
-      case None                                        => true
-      case Some(Queen | Rook | Knight | Bishop | King) => true
-      case _                                           => false
-    }
-
   override val roles = List(Rook, Knight, King, Bishop, Queen, Pawn)
 
   override val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, King)

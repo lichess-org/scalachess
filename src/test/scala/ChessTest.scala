@@ -28,7 +28,7 @@ trait ChessTest extends Specification with ValidatedMatchers {
     def as(color: Color): Situation = Situation(Visual << str, color)
   }
 
-  case class RichActor(actor: Actor) {
+  extension (actor: Actor)
     def threatens(to: Pos): Boolean =
       actor.piece.eyes(actor.pos, to) && {
         (!actor.piece.role.projection) ||
@@ -36,11 +36,8 @@ trait ChessTest extends Specification with ValidatedMatchers {
           Actor.longRangeThreatens(actor.board, actor.pos, _, to)
         }
       }
-  }
 
-  implicit def richActor(actor: Actor) = RichActor(actor)
-
-  case class RichGame(game: Game) {
+  extension (game: Game)
     def as(color: Color): Game = game.withPlayer(color)
 
     def playMoves(moves: (Pos, Pos)*): Validated[String, Game] = playMoveList(moves)
@@ -70,9 +67,6 @@ trait ChessTest extends Specification with ValidatedMatchers {
       game.apply(orig, dest, promotion) map (_._1)
 
     def withClock(c: Clock) = game.copy(clock = Option(c))
-  }
-
-  implicit def richGame(game: Game) = RichGame(game)
 
   def fenToGame(positionString: FEN, variant: Variant) = {
     val situation = Forsyth << positionString
@@ -95,15 +89,15 @@ trait ChessTest extends Specification with ValidatedMatchers {
 
   def makeEmptyBoard: Board = Board empty chess.variant.Standard
 
-  def bePoss(poss: Pos*): Matcher[Option[Iterable[Pos]]] =
-    beSome.like { case p =>
+  def bePoss(poss: Pos*) = // : Matcher[Option[Iterable[Pos]]] =
+    beSome.like { (p: Iterable[Pos]) =>
       sortPoss(p.toList) must_== sortPoss(poss.toList)
     }
 
   def makeGame: Game = Game(makeBoard, White)
 
-  def bePoss(board: Board, visual: String): Matcher[Option[Iterable[Pos]]] =
-    beSome.like { case p =>
+  def bePoss(board: Board, visual: String) = // : Matcher[Option[Iterable[Pos]]] =
+    beSome.like { (p: Iterable[Pos]) =>
       Visual.addNewLines(Visual.>>|(board, Map(p -> 'x'))) must_== visual
     }
 

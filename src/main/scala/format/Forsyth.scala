@@ -214,7 +214,7 @@ object Forsyth {
       case _ => ""
     }
 
-  implicit private val posOrdering: Ordering[Pos] = Ordering.by[Pos, File](_.file)
+  given Ordering[Pos] = Ordering.by[Pos, File](_.file)
 
   private[chess] def exportCastles(board: Board): String = {
 

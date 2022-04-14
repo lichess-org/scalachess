@@ -1,7 +1,7 @@
 lazy val scalachess = Project("scalachess", file("."))
 name                                            := "scalachess"
 organization                                    := "org.lichess"
-version                                         := "10.4.8"
+version                                         := "11.0.0"
 scalaVersion                                    := "3.1.1"
 ThisBuild / githubWorkflowPublishTargetBranches := Seq() // Don't publish anywhere
 ThisBuild / githubWorkflowBuild ++= Seq(

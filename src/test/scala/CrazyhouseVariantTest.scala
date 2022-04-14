@@ -269,14 +269,13 @@ class CrazyhouseVariantTest extends ChessTest {
       }
     }
     "prod 50 games accumulate hash" in {
-      val gameMoves = format.pgn.Fixtures.prod50crazyhouse.drop(1).take(1).map {
+      val gameMoves = format.pgn.Fixtures.prod50crazyhouse.map {
         _.split(' ').toList
       }
       def runOne(moves: List[String]) =
         Replay.gameMoveWhileValid(moves, format.Forsyth.initial, Crazyhouse)
       def hex(buf: Array[Byte]): String = buf.map("%02x" format _).mkString
       val g                             = gameMoves.map(runOne)
-      println(g.find(_._3.nonEmpty))
       g.exists(_._3.nonEmpty) must beFalse
       val m8  = java.security.MessageDigest getInstance "MD5"
       val m16 = java.security.MessageDigest getInstance "MD5"

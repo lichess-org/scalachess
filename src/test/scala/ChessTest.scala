@@ -90,14 +90,14 @@ trait ChessTest extends Specification with ValidatedMatchers {
   def makeEmptyBoard: Board = Board empty chess.variant.Standard
 
   def bePoss(poss: Pos*) = // : Matcher[Option[Iterable[Pos]]] =
-    beSome.like { (p: Iterable[Pos]) =>
+    beSome { (p: Iterable[Pos]) =>
       sortPoss(p.toList) must_== sortPoss(poss.toList)
     }
 
   def makeGame: Game = Game(makeBoard, White)
 
   def bePoss(board: Board, visual: String) = // : Matcher[Option[Iterable[Pos]]] =
-    beSome.like { (p: Iterable[Pos]) =>
+    beSome { (p: Iterable[Pos]) =>
       Visual.addNewLines(Visual.>>|(board, Map(p -> 'x'))) must_== visual
     }
 

@@ -152,8 +152,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.apply(Pos.F7, Pos.F8, Option(King))) map (_._1)
 
-      newGame must beValid.like { case gameWithPromotion =>
-        gameWithPromotion.board(Pos.F8).mustEqual(Option(White - King))
+      newGame must beValid {
+        (_: Game).board(Pos.F8).mustEqual(Option(White - King))
       }
 
     }
@@ -169,8 +169,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         drawnGame.situation.autoDraw must beTrue
         drawnGame.situation.winner must beNone
         drawnGame.situation.status must beSome(Status.Draw)
-        }
       }
+    }
 
     "Be drawn on multiple bishops on the opposite color" in {
       val position     = FEN("8/6P1/8/8/1b6/8/8/5B2 w - -")
@@ -265,7 +265,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     "Be drawn on a three move repetition" in {
       val game = Game(Antichess)
 
-      val moves         = List((Pos.G1, Pos.F3), (Pos.G8, Pos.F6), (Pos.F3, Pos.G1), (Pos.F6, Pos.G8))
+      val moves = List((Pos.G1, Pos.F3), (Pos.G8, Pos.F6), (Pos.F3, Pos.G1), (Pos.F6, Pos.G8))
       val repeatedMoves: List[(Pos, Pos)] = List.fill(3)(moves).flatten
 
       val drawnGame = game.playMoveList(repeatedMoves)

@@ -79,9 +79,7 @@ K  r
 """ as White
 
       game.checkMate must beTrue
-      game.winner must beSome.like { case color =>
-        color == Black
-      }
+      game.winner must beSome { (_: Color) == Black }
     }
 
     "Not give a winner if the game is still in progress" in {

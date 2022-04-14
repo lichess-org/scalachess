@@ -285,17 +285,16 @@ K   bB""".autoDraw must_== false
         }
       }
       "3fold on initial position" in {
-        val moves = List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten
+        val moves: List[(Pos, Pos)] = List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten
         makeGame.playMoves(moves: _*) must beValid.like { case g =>
           g.board.history.threefoldRepetition must beTrue
         }
       }
       "pawn move then minimalist 3fold" in {
-        val moves = List(E2 -> E4, E7 -> E5) ::: List
-          .fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8))
-          .flatten
-        makeGame.playMoves(moves: _*) must beValid.like { case g =>
-          g.board.history.threefoldRepetition must beTrue
+        val moves: List[(Pos, Pos)] = List(E2 -> E4, E7 -> E5) :::
+          (List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten: List[(Pos, Pos)])
+        makeGame.playMoves(moves: _*) must beValid {
+          (_: Game).board.history.threefoldRepetition must beTrue
         }
       }
     }

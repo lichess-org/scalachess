@@ -19,7 +19,7 @@ class ReplayPerfTest extends ChessTest {
 
   "playing a game" should {
     "many times" in {
-      runOne(gameMoves.head)._3 must beEmpty
+      runOne(gameMoves.head)._3 must beNone
       run()
       println("running tests")
       val durations = for (_ <- 1 to iterations) yield {

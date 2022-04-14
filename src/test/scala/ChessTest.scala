@@ -13,7 +13,8 @@ import chess.variant.Variant
 
 trait ChessTest extends Specification with ValidatedMatchers {
 
-  implicit def stringToBoard(str: String): Board = Visual << str
+  given Conversion[String, Board] with
+    def apply(str: String) = Visual << str
 
   extension (str: String)
     def chess960: Board             = makeBoard(str, chess.variant.Chess960)

@@ -1,21 +1,21 @@
 lazy val scalachess = Project("scalachess", file("."))
-name := "scalachess"
-organization := "org.lichess"
-version := "10.4.8"
-scalaVersion := "3.1.1"
+name                                            := "scalachess"
+organization                                    := "org.lichess"
+version                                         := "10.4.8"
+scalaVersion                                    := "3.1.1"
 ThisBuild / githubWorkflowPublishTargetBranches := Seq() // Don't publish anywhere
 ThisBuild / githubWorkflowBuild ++= Seq(
   WorkflowStep.Sbt(List("scalafmtCheckAll"), name = Some("Check Formatting"))
 )
 
 libraryDependencies ++= List(
-  "org.typelevel"      %% "cats-parse"  % "0.3.7",
-  "org.specs2"         %% "specs2-core" % "4.15.0" % Test,
-  "org.specs2"         %% "specs2-cats" % "4.15.0" % Test,
-  "com.github.ornicar" %% "scalalib"    % "8.0.2",
-  "joda-time"           % "joda-time"   % "2.10.14",
-  "org.typelevel"      %% "cats-core"   % "2.7.0",
-  "org.typelevel"      %% "alleycats-core"   % "2.7.0"
+  "org.typelevel"      %% "cats-parse"     % "0.3.7",
+  "org.specs2"         %% "specs2-core"    % "4.15.0" % Test,
+  "org.specs2"         %% "specs2-cats"    % "4.15.0" % Test,
+  "com.github.ornicar" %% "scalalib"       % "8.0.2",
+  "joda-time"           % "joda-time"      % "2.10.14",
+  "org.typelevel"      %% "cats-core"      % "2.7.0",
+  "org.typelevel"      %% "alleycats-core" % "2.7.0"
 )
 
 resolvers ++= Seq(
@@ -23,18 +23,17 @@ resolvers ++= Seq(
 )
 
 scalacOptions := Seq(
-    "-encoding",
-    "utf-8",
-    "-explaintypes",
-    "-feature",
-    "-language:higherKinds",
-    "-language:implicitConversions",
-    "-language:postfixOps",
-    // Warnings as errors!
-    // "-Xfatal-warnings",
-    // Linting options
-    "-unchecked",
-    // "-Wnumeric-widen",
+  "-encoding",
+  "utf-8",
+  "-explaintypes",
+  "-feature",
+  "-language:higherKinds",
+  "-language:postfixOps",
+  // Warnings as errors!
+  // "-Xfatal-warnings",
+  // Linting options
+  "-unchecked"
+  // "-Wnumeric-widen",
 )
 
 publishTo := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", ""))))

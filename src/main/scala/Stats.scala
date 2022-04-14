@@ -1,7 +1,6 @@
 package chess
 
 // Welford's numerically stable online variance.
-//
 final case class Stats(samples: Int, mean: Float, sn: Float) {
 
   def record(value: Float) = {
@@ -17,7 +16,7 @@ final case class Stats(samples: Int, mean: Float, sn: Float) {
     )
   }
 
-  def record[T](values: Iterable[T])(implicit n: Numeric[T]): Stats =
+  def record[T](values: Iterable[T])(using n: Numeric[T]): Stats =
     values.foldLeft(this) { (s, v) =>
       s record n.toFloat(v)
     }

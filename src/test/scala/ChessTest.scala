@@ -5,28 +5,21 @@ import cats.syntax.option._
 import org.specs2.matcher.Matcher
 import org.specs2.matcher.ValidatedMatchers
 import org.specs2.mutable.Specification
+import scala.language.implicitConversions
 
+import chess.format.FEN
 import chess.format.{ Forsyth, Visual }
 import chess.variant.Variant
-import chess.format.FEN
 
 trait ChessTest extends Specification with ValidatedMatchers {
 
   implicit def stringToBoard(str: String): Board = Visual << str
 
-  implicit class StringToBoardBuilder(str: String) {
-
-    def chess960: Board = makeBoard(str, chess.variant.Chess960)
-
-    def kingOfTheHill: Board = makeBoard(str, chess.variant.KingOfTheHill)
-
-    def threeCheck: Board = makeBoard(str, chess.variant.ThreeCheck)
-  }
-
-  implicit class StringToSituationBuilder(str: String) {
-
+  extension (str: String)
+    def chess960: Board             = makeBoard(str, chess.variant.Chess960)
+    def kingOfTheHill: Board        = makeBoard(str, chess.variant.KingOfTheHill)
+    def threeCheck: Board           = makeBoard(str, chess.variant.ThreeCheck)
     def as(color: Color): Situation = Situation(Visual << str, color)
-  }
 
   extension (actor: Actor)
     def threatens(to: Pos): Boolean =

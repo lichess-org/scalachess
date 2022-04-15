@@ -5,7 +5,6 @@ import cats.syntax.option.*
 import org.specs2.matcher.Matcher
 import org.specs2.matcher.ValidatedMatchers
 import org.specs2.mutable.Specification
-import scala.language.implicitConversions
 
 import chess.format.FEN
 import chess.format.{ Forsyth, Visual }

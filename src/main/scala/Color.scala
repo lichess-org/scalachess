@@ -1,6 +1,6 @@
 package chess
 
-sealed trait Color {
+sealed trait Color:
 
   final def -(role: Role) = Piece(this, role)
 
@@ -24,17 +24,15 @@ sealed trait Color {
 
   final val white = this == Color.White
   final val black = this == Color.Black
-}
 
-object Color {
+object Color:
 
-  case class Map[A](white: A, black: A) {
+  case class Map[A](white: A, black: A):
     def apply(color: Color) = if (color.white) white else black
 
-    def update(color: Color, f: A => A) = {
+    def update(color: Color, f: A => A) =
       if (color.white) copy(white = f(white))
       else copy(black = f(black))
-    }
 
     def map[B](fw: A => B, fb: A => B) = copy(white = fw(white), black = fb(black))
 
@@ -47,13 +45,11 @@ object Color {
     def forall(pred: A => Boolean) = pred(white) && pred(black)
 
     def exists(pred: A => Boolean) = pred(white) || pred(black)
-  }
 
-  object Map {
+  object Map:
     def apply[A](f: Color => A): Map[A] = Map(white = f(White), black = f(Black))
-  }
 
-  case object White extends Color {
+  case object White extends Color:
 
     def unary_! = Black
 
@@ -65,9 +61,8 @@ object Color {
     val name   = "white"
 
     override val hashCode = 1
-  }
 
-  case object Black extends Color {
+  case object Black extends Color:
 
     def unary_! = White
 
@@ -79,7 +74,6 @@ object Color {
     val name   = "black"
 
     override val hashCode = 2
-  }
 
   def fromPly(ply: Int) = fromWhite((ply & 1) == 0)
 
@@ -101,16 +95,13 @@ object Color {
   val all = List(White, Black)
 
   def showResult(color: Option[Color]) =
-    color match {
+    color match
       case Some(chess.White) => "1-0"
       case Some(chess.Black) => "0-1"
       case None              => "1/2-1/2"
-    }
 
   def fromResult(result: String): Option[Color] =
-    result match {
+    result match
       case "1-0" => Option(chess.White)
       case "0-1" => Option(chess.Black)
       case _     => None
-    }
-}

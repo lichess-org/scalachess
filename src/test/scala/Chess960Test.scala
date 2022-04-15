@@ -4,7 +4,7 @@ import variant.Chess960
 
 import chess.format.FEN
 
-class Chess960Test extends ChessTest {
+class Chess960Test extends ChessTest:
 
   "Chess960 chess" should {
 
@@ -25,4 +25,3 @@ class Chess960Test extends ChessTest {
       Chess960 positionNumber FEN("bbqnnrkr/pppppppp/8/8/8/8/PPPPPPPP/BBQNNRKR w AHah - 0 1") must beNone
     }
   }
-}

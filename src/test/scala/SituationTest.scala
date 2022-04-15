@@ -1,6 +1,6 @@
 package chess
 
-class SituationTest extends ChessTest {
+class SituationTest extends ChessTest:
 
   "a game" should {
     "detect check" should {
@@ -107,4 +107,3 @@ K  r
     }
 
   }
-}

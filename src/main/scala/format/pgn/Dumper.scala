@@ -1,10 +1,10 @@
 package chess
 package format.pgn
 
-object Dumper {
+object Dumper:
 
-  def apply(situation: Situation, data: chess.Move, next: Situation): String = {
-    import data._
+  def apply(situation: Situation, data: chess.Move, next: Situation): String =
+    import data.*
 
     ((promotion, piece.role) match {
       case _ if castles =>
@@ -43,21 +43,19 @@ object Dumper {
 
         s"${role.pgn}$disambiguation${if (captures) "x" else ""}${dest.key}"
     }) + {
-      if (next.check) {
+      if (next.check)
         if (next.checkMate) "#" else "+"
-      } else if (next.winner.isDefined) "#"
+      else if (next.winner.isDefined) "#"
       else ""
     }
-  }
 
-  def apply(data: chess.Drop, next: Situation): String = {
+  def apply(data: chess.Drop, next: Situation): String =
     data.toUci.uci + {
-      if (next.check) {
+      if (next.check)
         if (next.checkMate) "#" else "+"
-      } else if (next.winner.isDefined) "#"
+      else if (next.winner.isDefined) "#"
       else ""
     }
-  }
 
   def apply(data: chess.Move): String =
     apply(
@@ -71,4 +69,3 @@ object Dumper {
       data,
       data.finalizeAfter situationOf !data.color
     )
-}

@@ -1,6 +1,6 @@
 package chess
 
-case class Rank private (val index: Int) extends AnyVal with Ordered[Rank] {
+case class Rank private (val index: Int) extends AnyVal with Ordered[Rank]:
   @inline def -(that: Rank): Int           = index - that.index
   @inline override def compare(that: Rank) = this - that
 
@@ -10,9 +10,8 @@ case class Rank private (val index: Int) extends AnyVal with Ordered[Rank] {
 
   @inline def char: Char = (49 + index).toChar
   override def toString  = char.toString
-}
 
-object Rank {
+object Rank:
   def apply(index: Int): Option[Rank] =
     if (0 <= index && index < 8) Some(new Rank(index))
     else None
@@ -32,4 +31,3 @@ object Rank {
 
   val all                     = List(First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth)
   val allReversed: List[Rank] = all.reverse
-}

@@ -1,11 +1,11 @@
 package chess
 
-import cats.syntax.option._
+import cats.syntax.option.*
 
 import chess.variant.Atomic
 import chess.format.FEN
 
-class AtomicVariantTest extends ChessTest {
+class AtomicVariantTest extends ChessTest:
 
   "Atomic chess" should {
 
@@ -323,7 +323,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "End move regression" in {
-      import Pos._
+      import Pos.*
       "from init" in {
         val game = fenToGame(format.Forsyth.initial, Atomic)
         val successGame = game flatMap (_.playMoves(
@@ -611,4 +611,3 @@ class AtomicVariantTest extends ChessTest {
       }
     }
   }
-}

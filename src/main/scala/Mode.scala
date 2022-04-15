@@ -1,6 +1,6 @@
 package chess
 
-sealed abstract class Mode(val id: Int) {
+sealed abstract class Mode(val id: Int):
 
   lazy val name = toString.toLowerCase
 
@@ -8,9 +8,8 @@ sealed abstract class Mode(val id: Int) {
   def rated  = this == Mode.Rated
 
   def fold[A](c: => A, r: => A): A = if (this.casual) c else r
-}
 
-object Mode {
+object Mode:
 
   case object Casual extends Mode(0)
   case object Rated  extends Mode(1)
@@ -28,4 +27,3 @@ object Mode {
   val default: Mode = Casual
 
   def orDefault(id: Int): Mode = apply(id) | default
-}

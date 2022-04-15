@@ -3,7 +3,7 @@ package opening
 
 // Generated from https://github.com/lichess-org/chess-openings
 // format: off
-private[opening] object FullOpeningPartC {
+private[opening] object FullOpeningPartC:
 
   def db: Vector[FullOpening] = Vector(
 new FullOpening("C00", "French Defense", "rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -"),
@@ -1175,4 +1175,3 @@ new FullOpening("C98", "Ruy Lopez: Closed, Chigorin Defense", "r1b2rk1/2q1bppp/p
 new FullOpening("C98", "Ruy Lopez: Closed, Chigorin Defense", "r1b2rk1/2q1bppp/p1np1n2/1pP1p3/4P3/2P2N1P/PPBN1PP1/R1BQR1K1 b - -"),
 new FullOpening("C99", "Ruy Lopez: Morphy Defense, Chigorin Defense, Panov System", "r1b2rk1/2q1bppp/p2p1n2/np2p3/3PP3/5N1P/PPBN1PP1/R1BQR1K1 b - -"),
   )
-}

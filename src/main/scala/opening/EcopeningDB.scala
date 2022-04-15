@@ -2,9 +2,9 @@ package chess
 package opening
 
 // format: off
-object EcopeningDB {
+object EcopeningDB:
 
-  import Ecopening._
+  import Ecopening.*
 
   val MAX_MOVES = 25
 
@@ -516,4 +516,3 @@ object EcopeningDB {
 "E98" -> new Ecopening("E98", "King's Indian", "King's Indian, Orthodox, Taimanov, 9.Ne1", "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nc6 d5 Ne7 Ne1", "r1bq1rk1/ppp1npbp/3p1np1/3Pp3/2P1P3/2N5/PP2BPPP/R1BQNRK1", "f3e1"),
 "E99" -> new Ecopening("E99", "King's Indian", "King's Indian, Orthodox, Taimanov", "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nc6 d5 Ne7 Ne1 Nd7 f3 f5", "r1bq1rk1/pppnn1bp/3p2p1/3Ppp2/2P1P3/2N2P2/PP2B1PP/R1BQNRK1", "f7f5")
   )
-}

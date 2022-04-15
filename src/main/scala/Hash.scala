@@ -1,26 +1,23 @@
 package chess
 
-final class Hash(size: Int) {
+final class Hash(size: Int):
 
-  def apply(situation: Situation): PositionHash = {
+  def apply(situation: Situation): PositionHash =
     val l = Hash.get(situation, Hash.polyglotTable)
-    if (size <= 8) {
+    if (size <= 8)
       Array.tabulate(size)(i => (l >>> ((7 - i) * 8)).toByte)
-    } else {
+    else
       val m = Hash.get(situation, Hash.randomTable)
       Array.tabulate(size)(i =>
         if (i < 8) (l >>> ((7 - i) * 8)).toByte
         else (m >>> ((15 - i) * 8)).toByte
       )
-    }
-  }
-}
 
-object Hash {
+object Hash:
 
   val size = 3
 
-  private class ZobristConstants(start: Int) {
+  private class ZobristConstants(start: Int):
     def hexToLong(s: String): Long =
       (java.lang.Long.parseLong(s.substring(start, start + 8), 16) << 32) |
         java.lang.Long.parseLong(s.substring(start + 8, start + 16), 16)
@@ -31,7 +28,6 @@ object Hash {
     val threeCheckMasks     = ZobristTables.threeCheckMasks.map(hexToLong)
     val crazyPromotionMasks = ZobristTables.crazyPromotionMasks.map(hexToLong)
     val crazyPocketMasks    = ZobristTables.crazyPocketMasks.map(hexToLong)
-  }
 
   // The following masks are compatible with the Polyglot
   // opening book format.
@@ -39,14 +35,13 @@ object Hash {
   private lazy val randomTable = new ZobristConstants(16)
 
   private def roleIndex(role: Role) =
-    role match {
+    role match
       case Pawn   => 0
       case Knight => 1
       case Bishop => 2
       case Rook   => 3
       case Queen  => 4
       case King   => 5
-    }
 
   private def pieceIndex(piece: Piece) =
     roleIndex(piece.role) * 2 + piece.color.fold(1, 0)
@@ -54,22 +49,21 @@ object Hash {
   private def actorIndex(actor: Actor) =
     64 * pieceIndex(actor.piece) + actor.pos.hashCode
 
-  private def get(situation: Situation, table: ZobristConstants): Long = {
+  private def get(situation: Situation, table: ZobristConstants): Long =
 
-    def crazyPocketMask(role: Role, colorshift: Int, count: Int) = {
+    def crazyPocketMask(role: Role, colorshift: Int, count: Int) =
       // There should be no kings and at most 16 pieces of any given type
       // in a pocket.
       if (0 < count && count <= 16 && roleIndex(role) < 5)
         Option(table.crazyPocketMasks(16 * roleIndex(role) + count + colorshift))
       else None
-    }
 
     val board = situation.board
     val hturn = situation.color.fold(table.whiteTurnMask, 0L)
 
     val hactors = board.actors.values.view
       .map {
-        table.actorMasks compose actorIndex _
+        table.actorMasks compose actorIndex
       }
       .fold(hturn)(_ ^ _)
 
@@ -87,14 +81,13 @@ object Hash {
     }
 
     // Hash in special three-check data.
-    val hchecks = board.variant match {
+    val hchecks = board.variant match
       case variant.ThreeCheck =>
         val blackCount   = math.min(situation.history.checkCount.black, 3)
         val whiteCount   = math.min(situation.history.checkCount.white, 3)
         val hblackchecks = if (blackCount > 0) hep ^ table.threeCheckMasks(blackCount - 1) else hep
         if (whiteCount > 0) hblackchecks ^ table.threeCheckMasks(whiteCount + 2) else hblackchecks
       case _ => hep
-    }
 
     // Hash in special crazyhouse data.
     val hcrazy = board.crazyData.fold(hchecks) { data =>
@@ -114,7 +107,6 @@ object Hash {
     }
 
     hcrazy
-  }
 
   private val h = new Hash(size)
 
@@ -122,9 +114,8 @@ object Hash {
 
   def debug(hashes: PositionHash) = hashes.map(_.toInt).sum.toString
 
-}
 
-private object ZobristTables {
+private object ZobristTables:
   val actorMasks = Array(
     "9d39247e33776d4152b375aa7c0d7bac",
     "2af7398005aaa5c7208d169a534f2cf5",
@@ -1144,4 +1135,3 @@ private object ZobristTables {
     "f37991753c7df55849960c597d119ace",
     "e80840e623a19d0857b7ccbb21f74d1c"
   )
-}

@@ -2,20 +2,19 @@ package chess
 
 import org.specs2.mutable.Specification
 
-class DecayingStatsTest extends Specification {
+class DecayingStatsTest extends Specification:
 
-  import chess.{ DecayingStats => DS }
+  import chess.{ DecayingStats as DS }
 
   val random = new java.util.Random(2286825201242408115L)
 
   def realMean(elts: Seq[Float]): Float = elts.sum / elts.size
 
-  def realVar(elts: Seq[Float]): Float = {
+  def realVar(elts: Seq[Float]): Float =
     val mean = realMean(elts).toDouble
     (elts map { x =>
       Math.pow(x - mean, 2)
     } sum).toFloat / (elts.size - 1)
-  }
 
   def beApprox(comp: Float) =
     (f: Float) => {
@@ -74,4 +73,3 @@ class DecayingStatsTest extends Specification {
       stats.deviation must beCloseTo(.5f +/- 0.05f)
     }
   }
-}

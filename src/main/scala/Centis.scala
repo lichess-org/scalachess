@@ -1,12 +1,12 @@
 package chess
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import cats.Monoid
 import alleycats.Zero
 
 // maximum centis = Int.MaxValue / 100 / 60 / 60 / 24 = 248 days
-final case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
+final case class Centis(centis: Int) extends AnyVal with Ordered[Centis]:
 
   def roundTenths: Int =
     if (centis > 0) (centis + 5) / 10 else (centis - 4) / 10
@@ -32,9 +32,8 @@ final case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
   def atLeast(o: Centis) = Centis(Math.max(centis, o.centis))
 
   def nonNeg = Centis(Math.max(centis, 0))
-}
 
-object Centis {
+object Centis:
 
   given Zero[Centis] with
     def zero = Centis(0)
@@ -68,4 +67,3 @@ object Centis {
   def ofSeconds(s: Int) = Centis(100 * s)
   def ofMillis(i: Int)  = Centis((if (i > 0) i + 5 else i - 4) / 10)
   def ofMillis(l: Long) = Centis((if (l > 0) l + 5 else l - 4) / 10)
-}

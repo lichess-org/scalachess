@@ -1,11 +1,11 @@
 package chess
 
-import Pos._
+import Pos.*
 import format.Uci
 import variant.{ Antichess, Atomic, Crazyhouse, Standard, ThreeCheck }
 import chess.format.FEN
 
-class HashTest extends ChessTest {
+class HashTest extends ChessTest:
   def hexToBytes(str: String) =
     str.grouped(2).map(cc => Integer.parseInt(cc, 16).toByte).toArray
 
@@ -197,4 +197,3 @@ class HashTest extends ChessTest {
     }
   }
 
-}

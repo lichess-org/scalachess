@@ -2,7 +2,7 @@ package chess
 package format.pgn
 
 // format: off
-object Fixtures {
+object Fixtures:
 
   val simple = "e3 Nc6 d4 Nf6"
 
@@ -2066,4 +2066,3 @@ Rh5 52. Kf2 Rg5 53. Rf8 Ke5 1/2-1/2"""
   fromPositionEmptyFen, chessbaseWeird, chessbaseArrows, commentsAndVariations, bySmartChess, android, chesskids, variations,
   caissa, handwritten, chessByPost, atomicRegression, atomicPromotion, weirdDashes, lichobile, overflow, overflow3,
   crazyhouse1, crazyhouse2, crazyhouseNoVariantTag, stackOverflow, explorerPartialDate, withGlyphAnnotations)
-}

@@ -1,6 +1,6 @@
 package chess
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.specs2.matcher.ValidatedMatchers
 
 import chess.format.FEN
@@ -8,7 +8,7 @@ import chess.format.Forsyth
 import chess.format.pgn.Reader
 import chess.variant.Antichess
 
-class AntichessVariantTest extends ChessTest with ValidatedMatchers {
+class AntichessVariantTest extends ChessTest with ValidatedMatchers:
 
   // Random PGN taken from FICS
   val fullGame =
@@ -316,4 +316,3 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
   }
 
-}

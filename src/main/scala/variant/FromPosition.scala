@@ -9,7 +9,6 @@ case object FromPosition
       shortName = "FEN",
       title = "Custom starting position",
       standardInitialPosition = false
-    ) {
+    ):
 
   def pieces = Standard.pieces
-}

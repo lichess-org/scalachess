@@ -3,7 +3,7 @@ package opening
 
 // Generated from https://github.com/lichess-org/chess-openings
 // format: off
-private[opening] object FullOpeningPartE {
+private[opening] object FullOpeningPartE:
 
   def db: Vector[FullOpening] = Vector(
 new FullOpening("E00", "Catalan Opening", "rnbqkb1r/pppp1ppp/4pn2/8/2PP4/6P1/PP2PP1P/RNBQKBNR b KQkq -"),
@@ -297,4 +297,3 @@ new FullOpening("E98", "King's Indian Defense: Orthodox Variation, Classical Sys
 new FullOpening("E99", "King's Indian Defense: Orthodox Variation, Classical System, Benko Attack", "r1bq1rk1/pppnn1bp/3p2p1/3Ppp2/2P1P1P1/2N2P2/PP2B2P/R1BQNRK1 b - -"),
 new FullOpening("E99", "King's Indian Defense: Orthodox Variation, Classical System, Traditional Line", "r1bq1rk1/pppnn1bp/3p2p1/3Ppp2/2P1P3/2N2P2/PP2B1PP/R1BQNRK1 w - -"),
   )
-}

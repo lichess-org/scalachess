@@ -1,7 +1,7 @@
 package chess
 package opening
 
-import cats.syntax.option._
+import cats.syntax.option.*
 
 final class Ecopening(
     val eco: Ecopening.ECO,
@@ -10,7 +10,7 @@ final class Ecopening(
     private val moves: String,
     val fen: Ecopening.FEN,
     val lastMoveUci: String
-) extends Ordered[Ecopening] {
+) extends Ordered[Ecopening]:
 
   private lazy val moveList = moves.split(' ').toList
 
@@ -34,9 +34,8 @@ final class Ecopening(
   def compare(other: Ecopening) = eco compare other.eco
 
   override def toString = s"$ecoName ($moves)"
-}
 
-object Ecopening {
+object Ecopening:
   type FamilyName = String
   type ECO        = String
   type FEN        = String
@@ -64,4 +63,3 @@ object Ecopening {
         EcopeningDB.allByFen get format.Forsyth.exportBoard(board)
       }
     }
-}

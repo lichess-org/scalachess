@@ -4,7 +4,7 @@ import variant.RacingKings
 
 import chess.format.FEN
 
-class RacingKingsVariantTest extends ChessTest {
+class RacingKingsVariantTest extends ChessTest:
 
   "Racing Kings" should {
 
@@ -14,4 +14,3 @@ class RacingKingsVariantTest extends ChessTest {
       game.situation.destinations get Pos.D2 must beNone
     }
   }
-}

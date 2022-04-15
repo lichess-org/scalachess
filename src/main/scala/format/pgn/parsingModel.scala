@@ -2,7 +2,7 @@ package chess
 package format.pgn
 
 import cats.data.Validated
-import cats.syntax.option._
+import cats.syntax.option.*
 
 case class ParsedPgn(
     initialPosition: InitialPosition,
@@ -12,12 +12,11 @@ case class ParsedPgn(
 
 case class Sans(value: List[San]) extends AnyVal
 
-object Sans {
+object Sans:
   val empty = Sans(Nil)
-}
 
 // Standard Algebraic Notation
-sealed trait San {
+sealed trait San:
 
   def apply(situation: Situation): Validated[String, MoveOrDrop]
 
@@ -35,7 +34,6 @@ sealed trait San {
     withMetas(
       metas.withGlyphs(metas.glyphs merge glyphs)
     )
-}
 
 case class Std(
     dest: Pos,
@@ -45,7 +43,7 @@ case class Std(
     rank: Option[Int] = None,
     promotion: Option[PromotableRole] = None,
     metas: Metas = Metas.empty
-) extends San {
+) extends San:
 
   def apply(situation: Situation) = move(situation) map Left.apply
 
@@ -72,19 +70,17 @@ case class Std(
           m.dest == dest && a.board.variant.kingSafety(a, m)
         }
       case (m, _) => m
-    } match {
+    } match
       case None       => Validated invalid s"No move found: $this\n$situation"
       case Some(move) => move withPromotion promotion toValid "Wrong promotion"
-    }
 
   private def compare[A](a: Option[A], b: A) = a.fold(true)(b ==)
-}
 
 case class Drop(
     role: Role,
     pos: Pos,
     metas: Metas = Metas.empty
-) extends San {
+) extends San:
 
   def apply(situation: Situation) = drop(situation) map Right.apply
 
@@ -92,7 +88,6 @@ case class Drop(
 
   def drop(situation: Situation): Validated[String, chess.Drop] =
     situation.drop(role, pos)
-}
 
 case class InitialPosition(
     comments: List[String]
@@ -104,7 +99,7 @@ case class Metas(
     comments: List[String],
     glyphs: Glyphs,
     variations: List[Sans]
-) {
+):
 
   def withSuffixes(s: Suffixes) =
     copy(
@@ -118,16 +113,14 @@ case class Metas(
   def withComments(c: List[String]) = copy(comments = c)
 
   def withVariations(v: List[Sans]) = copy(variations = v)
-}
 
-object Metas {
+object Metas:
   val empty = Metas(check = false, checkmate = false, Nil, Glyphs.empty, Nil)
-}
 
 case class Castle(
     side: Side,
     metas: Metas = Metas.empty
-) extends San {
+) extends San:
 
   def apply(situation: Situation) = move(situation) map Left.apply
 
@@ -139,7 +132,6 @@ case class Castle(
       actor   <- situation.board actorAt kingPos toValid "No actor found"
       move <- actor.castleOn(side).headOption toValid "Cannot castle / variant is " + situation.board.variant
     } yield move
-}
 
 case class Suffixes(
     check: Boolean,

@@ -1,7 +1,7 @@
 package chess
 package format.pgn
 
-class TagTest extends ChessTest {
+class TagTest extends ChessTest:
 
   "Tags" should {
     // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm#c8.1.1
@@ -45,4 +45,3 @@ class TagTest extends ChessTest {
       Option(3) must beSome((_: Int) == 3)
     }
   }
-}

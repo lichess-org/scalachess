@@ -1,14 +1,14 @@
 package chess
 package format.pgn
 
-import cats.syntax.option._
+import cats.syntax.option.*
 
-class ParserTest extends ChessTest {
+class ParserTest extends ChessTest:
 
-  import Fixtures._
+  import Fixtures.*
 
-  val parser    = Parser.full _
-  val parseMove = Parser.move _
+  val parser    = Parser.full
+  val parseMove = Parser.move
 
   "pgnComment" should {
     "parse valid comment" in {
@@ -361,4 +361,3 @@ class ParserTest extends ChessTest {
     }
   }
 
-}

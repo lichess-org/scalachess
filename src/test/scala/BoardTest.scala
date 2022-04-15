@@ -1,8 +1,8 @@
 package chess
 
-import Pos._
+import Pos.*
 
-class BoardTest extends ChessTest {
+class BoardTest extends ChessTest:
 
   val board = makeBoard
 
@@ -139,4 +139,3 @@ R  BK  R"""
       }
     }
   }
-}

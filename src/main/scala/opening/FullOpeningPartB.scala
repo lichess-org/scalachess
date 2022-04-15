@@ -3,7 +3,7 @@ package opening
 
 // Generated from https://github.com/lichess-org/chess-openings
 // format: off
-private[opening] object FullOpeningPartB {
+private[opening] object FullOpeningPartB:
 
   def db: Vector[FullOpening] = Vector(
 new FullOpening("B00", "Barnes Defense", "rnbqkbnr/ppppp1pp/5p2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -"),
@@ -729,4 +729,3 @@ new FullOpening("B98", "Sicilian Defense: Najdorf Variation, Goteborg Variation"
 new FullOpening("B98", "Sicilian Defense: Najdorf Variation, Traditional Line", "rnb1k2r/1pq1bppp/p2ppn2/6B1/3NPP2/2N2Q2/PPP3PP/R3KB1R w KQkq -"),
 new FullOpening("B99", "Sicilian Defense: Najdorf Variation, Main Line", "r1b1k2r/1pqnbppp/p2ppn2/6B1/3NPP2/2N2Q2/PPP3PP/2KR1B1R w kq -"),
   )
-}

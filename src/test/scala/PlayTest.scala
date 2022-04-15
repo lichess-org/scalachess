@@ -1,9 +1,9 @@
 package chess
 
 import chess.format.Visual.addNewLines
-import chess.Pos._
+import chess.Pos.*
 
-class PlayTest extends ChessTest {
+class PlayTest extends ChessTest:
 
   "playing a game" should {
     "opening one" in {
@@ -116,4 +116,3 @@ B p p
       }
     }
   }
-}

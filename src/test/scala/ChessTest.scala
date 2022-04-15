@@ -1,7 +1,7 @@
 package chess
 
 import cats.data.Validated
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.specs2.matcher.Matcher
 import org.specs2.matcher.ValidatedMatchers
 import org.specs2.mutable.Specification
@@ -11,7 +11,7 @@ import chess.format.FEN
 import chess.format.{ Forsyth, Visual }
 import chess.variant.Variant
 
-trait ChessTest extends Specification with ValidatedMatchers {
+trait ChessTest extends Specification with ValidatedMatchers:
 
   given Conversion[String, Board] with
     def apply(str: String) = Visual << str
@@ -36,7 +36,7 @@ trait ChessTest extends Specification with ValidatedMatchers {
 
     def playMoves(moves: (Pos, Pos)*): Validated[String, Game] = playMoveList(moves)
 
-    def playMoveList(moves: Iterable[(Pos, Pos)]): Validated[String, Game] = {
+    def playMoveList(moves: Iterable[(Pos, Pos)]): Validated[String, Game] =
       val vg = moves.foldLeft(Validated.valid(game): Validated[String, Game]) { (vg, move) =>
         // vg foreach { x =>
         // println(s"------------------------ ${x.turns} = $move")
@@ -51,7 +51,6 @@ trait ChessTest extends Specification with ValidatedMatchers {
       }
       // vg foreach { x => println("========= PGN: " + x.pgnMoves) }
       vg
-    }
 
     def playMove(
         orig: Pos,
@@ -62,7 +61,7 @@ trait ChessTest extends Specification with ValidatedMatchers {
 
     def withClock(c: Clock) = game.copy(clock = Option(c))
 
-  def fenToGame(positionString: FEN, variant: Variant) = {
+  def fenToGame(positionString: FEN, variant: Variant) =
     val situation = Forsyth << positionString
     situation map { sit =>
       sit.color -> sit.withVariant(variant).board
@@ -71,7 +70,6 @@ trait ChessTest extends Specification with ValidatedMatchers {
         situation = Situation(board, color)
       )
     }
-  }
 
   def makeBoard(pieces: (Pos, Piece)*): Board =
     Board(pieces toMap, History(), chess.variant.Standard)
@@ -116,4 +114,3 @@ trait ChessTest extends Specification with ValidatedMatchers {
     (makeEmptyBoard place (piece, pos)) flatMap { b =>
       b actorAt pos map (_.destinations)
     }
-}

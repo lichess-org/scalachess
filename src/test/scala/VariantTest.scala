@@ -1,12 +1,12 @@
 package chess
 
-import cats.syntax.option._
+import cats.syntax.option.*
 
 import chess.format.FEN
-import chess.Pos._
-import chess.variant._
+import chess.Pos.*
+import chess.variant.*
 
-class VariantTest extends ChessTest {
+class VariantTest extends ChessTest:
 
   val board = makeBoard
 
@@ -332,4 +332,3 @@ K  r
       Board.init(Horde).history.castles must_== Castles("kq")
     }
   }
-}

@@ -8,15 +8,15 @@ final case class Actor(
     piece: Piece,
     pos: Pos,
     board: Board
-) {
+):
 
-  import Actor._
+  import Actor.*
 
   lazy val moves: List[Move] = kingSafetyMoveFilter(trustedMoves(board.variant.allowsCastling))
 
   /** The moves without taking defending the king into account */
-  def trustedMoves(withCastle: Boolean): List[Move] = {
-    val moves = piece.role match {
+  def trustedMoves(withCastle: Boolean): List[Move] =
+    val moves = piece.role match
       case Pawn =>
         pawnDir(pos) map { next =>
           val fwd = Option(next) filterNot board.pieces.contains
@@ -74,12 +74,10 @@ final case class Actor(
 
       case King if withCastle => shortRange(King.dirs) ::: castle
       case King               => shortRange(King.dirs)
-    }
 
     // We apply the current game variant's effects if there are any so that we can accurately decide if the king would
     // be in danger after the move was made.
     if (board.variant.hasMoveEffects) moves map (_.applyVariantEffect) else moves
-  }
 
   lazy val destinations: List[Pos] = moves map (_.dest)
 
@@ -93,14 +91,13 @@ final case class Actor(
    *
    *  critical function. optimize for performance.
    */
-  def kingSafetyMoveFilter(ms: List[Move]): List[Move] = {
+  def kingSafetyMoveFilter(ms: List[Move]): List[Move] =
     val filter: Piece => Boolean =
       if ((piece is King) || check) _ => true else _.role.projection
     val stableKingPos = if (piece is King) None else board kingPosOf color
     ms filter { m =>
       board.variant.kingSafety(m, filter, stableKingPos orElse (m.after kingPosOf color))
     }
-  }
 
   lazy val check: Boolean = board check color
 
@@ -145,23 +142,22 @@ final case class Actor(
 
   private def shortRange(dirs: Directions): List[Move] =
     dirs flatMap { _(pos) } flatMap { to =>
-      board.pieces.get(to) match {
+      board.pieces.get(to) match
         case None => board.move(pos, to) map { move(to, _) }
         case Some(piece) =>
           if (piece is color) Nil
           else board.taking(pos, to) map { move(to, _, Option(to)) }
-      }
     }
 
-  private def longRange(dirs: Directions): List[Move] = {
+  private def longRange(dirs: Directions): List[Move] =
     val buf = new ArrayBuffer[Move]
 
     @tailrec
-    def addAll(p: Pos, dir: Direction): Unit = {
-      dir(p) match {
+    def addAll(p: Pos, dir: Direction): Unit =
+      dir(p) match
         case None => ()
         case s @ Some(to) =>
-          board.pieces.get(to) match {
+          board.pieces.get(to) match
             case None =>
               board.move(pos, to).foreach { buf += move(to, _) }
               addAll(to, dir)
@@ -169,13 +165,9 @@ final case class Actor(
               if (piece.color != color) board.taking(pos, to) foreach {
                 buf += move(to, _, s)
               }
-          }
-      }
-    }
 
     dirs foreach { addAll(pos, _) }
     buf.toList
-  }
 
   private def pawnDir = pawnDirOf(color)
 
@@ -200,9 +192,8 @@ final case class Actor(
     )
 
   private def history = board.history
-}
 
-object Actor {
+object Actor:
 
   def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
     board.variant.longRangeThreatens(board, p, dir, to)
@@ -223,4 +214,3 @@ object Actor {
         List(pos.downLeft, pos.downRight)
       )
       .flatten
-}

@@ -1,10 +1,10 @@
 package chess
 package format.pgn
 
-class ReaderTest extends ChessTest {
+class ReaderTest extends ChessTest:
 
-  import Fixtures._
-  import Reader.Result._
+  import Fixtures.*
+  import Reader.Result.*
 
   "only raw moves" should {
     "many games" in {
@@ -154,4 +154,3 @@ class ReaderTest extends ChessTest {
       }
     }
   }
-}

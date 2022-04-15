@@ -3,7 +3,7 @@ package opening
 
 // Generated from https://github.com/lichess-org/chess-openings
 // format: off
-private[opening] object FullOpeningPartA {
+private[opening] object FullOpeningPartA:
 
   def db: Vector[FullOpening] = Vector(
 new FullOpening("A00", "Amar Gambit", "rn1qkbnr/ppp2ppp/8/3p4/5p2/6PB/PPPPP2P/RNBQK2R w KQkq -"),
@@ -727,4 +727,3 @@ new FullOpening("A97", "Dutch Defense: Classical Variation, Ilyin-Zhenevsky Vari
 new FullOpening("A98", "Dutch Defense: Classical Variation, Ilyin-Zhenevsky Variation, Alatortsev-Lisitsyn Line", "rnb1qrk1/ppp1b1pp/3ppn2/5p2/2PP4/2N2NP1/PPQ1PPBP/R1B2RK1 b - -"),
 new FullOpening("A99", "Dutch Defense: Classical Variation, Ilyin-Zhenevsky Variation, Modern Main Line", "rnb1qrk1/ppp1b1pp/3ppn2/5p2/2PP4/1PN2NP1/P3PPBP/R1BQ1RK1 b - -"),
   )
-}

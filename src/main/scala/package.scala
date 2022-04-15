@@ -1,6 +1,6 @@
 import ornicar.scalalib.ScalalibExtensions
 
-package object chess extends ScalalibExtensions {
+package object chess extends ScalalibExtensions:
 
   val White = Color.White
   val Black = Color.Black
@@ -13,4 +13,3 @@ package object chess extends ScalalibExtensions {
   type PositionHash = Array[Byte]
 
   type MoveOrDrop = Either[Move, Drop]
-}

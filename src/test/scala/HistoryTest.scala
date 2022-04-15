@@ -1,6 +1,6 @@
 package chess
 
-class HistoryTest extends ChessTest {
+class HistoryTest extends ChessTest:
 
   "threefold repetition" should {
     def toHash(a: Int) = Array(a.toByte, 0.toByte, 0.toByte)
@@ -33,4 +33,3 @@ class HistoryTest extends ChessTest {
       History().setHalfMoveClock(5).halfMoveClock must_== 5
     }
   }
-}

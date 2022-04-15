@@ -7,7 +7,7 @@ case class EndgamePosition(
     fen: FEN
 )
 
-object EndgamePosition {
+object EndgamePosition:
 
   val positions: List[EndgamePosition] = List(
     EndgamePosition("Mate Queen and Rook", FEN("8/8/8/3k4/8/8/8/5RQK w - - 0 1")),
@@ -186,4 +186,3 @@ object EndgamePosition {
     EndgamePosition("Queen vs Rook", FEN("8/8/4r3/3k4/8/8/3K1Q2/8 w - - 0 1"))
   )
 
-}

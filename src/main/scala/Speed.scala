@@ -6,12 +6,11 @@ sealed abstract class Speed(
     val range: Range,
     val name: String,
     val title: String
-) extends Ordered[Speed] {
+) extends Ordered[Speed]:
 
   def compare(other: Speed) = range.min compare other.range.min
-}
 
-object Speed {
+object Speed:
 
   case object UltraBullet
       extends Speed(0, "ultraBullet", 0 to 29, "UltraBullet", "Insanely fast games: less than 30 seconds")
@@ -45,4 +44,3 @@ object Speed {
   def byTime(seconds: Int): Speed = all.find(_.range contains seconds) | Correspondence
 
   def exists(id: Int): Boolean = byId contains id
-}

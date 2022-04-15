@@ -25,15 +25,14 @@ resolvers ++= Seq(
 scalacOptions := Seq(
   "-encoding",
   "utf-8",
+  "-rewrite",
+  "-source:future-migration",
+  "-indent",
   "-explaintypes",
   "-feature",
-  "-language:higherKinds",
-  "-language:postfixOps",
+  "-language:postfixOps"
   // Warnings as errors!
   // "-Xfatal-warnings",
-  // Linting options
-  "-unchecked"
-  // "-Wnumeric-widen",
 )
 
 publishTo := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", ""))))

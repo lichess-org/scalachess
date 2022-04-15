@@ -1,11 +1,11 @@
 package chess
 
-import cats.syntax.option._
+import cats.syntax.option.*
 
 import chess.format.FEN
 import chess.variant.Crazyhouse
 
-class CrazyhouseVariantTest extends ChessTest {
+class CrazyhouseVariantTest extends ChessTest:
 
   "Crazyhouse" should {
 
@@ -48,10 +48,10 @@ class CrazyhouseVariantTest extends ChessTest {
     }
 
     "autodraw" in {
-      import Pos._
+      import Pos.*
       "tons of pointless moves but shouldn't apply 50-moves" in {
         val moves = List.fill(30)(List(B1 -> C3, B8 -> C6, C3 -> B1, C6 -> B8))
-        Game(Crazyhouse).playMoves(moves.flatten: _*) must beValid.like { case g =>
+        Game(Crazyhouse).playMoves(moves.flatten *) must beValid.like { case g =>
           g.board.variant.fiftyMoves(g.board.history) must beFalse
           g.board.autoDraw must beTrue // fivefold repetition
         }
@@ -156,7 +156,7 @@ class CrazyhouseVariantTest extends ChessTest {
           F2 -> G2,
           H6 -> G6
         )
-        Game(Crazyhouse).playMoves(moves: _*) must beValid.like { case g =>
+        Game(Crazyhouse).playMoves(moves *) must beValid.like { case g =>
           g.board.history.threefoldRepetition must beTrue
         }
       }
@@ -254,15 +254,14 @@ class CrazyhouseVariantTest extends ChessTest {
           G2 -> F2,
           G6 -> H6
         )
-        Game(Crazyhouse).playMoves(moves: _*) must beValid.like { case g =>
+        Game(Crazyhouse).playMoves(moves *) must beValid.like { case g =>
           g.board.history.threefoldRepetition must beFalse
         }
       }
       "not draw when only kings left" in {
         val fenPosition = FEN("k6K/8/8/8/8/8/8/8 w - - 0 25")
-        val game = {
+        val game =
           fenToGame(fenPosition, Crazyhouse).toOption.get
-        }
         game.situation.autoDraw must beFalse
         game.situation.end must beFalse
         game.situation.opponentHasInsufficientMaterial must beFalse
@@ -292,7 +291,7 @@ class CrazyhouseVariantTest extends ChessTest {
     }
 
     "destinations prod bug on game VVXRgsQT" in {
-      import chess.Pos._
+      import chess.Pos.*
       chess
         .Game(
           Crazyhouse.some,
@@ -336,4 +335,3 @@ class CrazyhouseVariantTest extends ChessTest {
       ) must beValid
     }
   }
-}

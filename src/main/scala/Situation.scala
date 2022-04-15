@@ -1,11 +1,11 @@
 package chess
 
 import cats.data.Validated
-import cats.implicits._
+import cats.implicits.*
 
 import chess.format.Uci
 
-case class Situation(board: Board, color: Color) {
+case class Situation(board: Board, color: Color):
 
   lazy val actors = board actorsOf color
 
@@ -16,10 +16,9 @@ case class Situation(board: Board, color: Color) {
   lazy val destinations: Map[Pos, List[Pos]] = moves.view.mapValues { _ map (_.dest) }.to(Map)
 
   def drops: Option[List[Pos]] =
-    board.variant match {
+    board.variant match
       case v: variant.Crazyhouse.type => v possibleDrops this
       case _                          => None
-    }
 
   lazy val kingPos: Option[Pos] = board kingPosOf color
 
@@ -76,12 +75,12 @@ case class Situation(board: Board, color: Color) {
       board = board withVariant variant
     )
 
-  def canCastle = board.history.canCastle _
+  def canCastle = board.history.canCastle
 
-  def enPassantSquare: Option[Pos] = {
+  def enPassantSquare: Option[Pos] =
     // Before potentially expensive move generation, first ensure some basic
     // conditions are met.
-    history.lastMove match {
+    history.lastMove match
       case Some(move: Uci.Move) =>
         if (
           move.dest.yDist(move.orig) == 2 &&
@@ -94,13 +93,9 @@ case class Situation(board: Board, color: Color) {
           moves.values.flatten.find(_.enpassant).map(_.dest)
         else None
       case _ => None
-    }
-  }
 
   def unary_! = copy(color = !color)
-}
 
-object Situation {
+object Situation:
 
   def apply(variant: chess.variant.Variant): Situation = Situation(Board init variant, White)
-}

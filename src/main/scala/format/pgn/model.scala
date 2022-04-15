@@ -2,25 +2,23 @@ package chess
 package format
 package pgn
 
-import cats.implicits._
+import cats.implicits.*
 
 case class Pgn(
     tags: Tags,
     turns: List[Turn],
     initial: Initial = Initial.empty
-) {
+):
 
-  def updateTurn(fullMove: Int, f: Turn => Turn) = {
+  def updateTurn(fullMove: Int, f: Turn => Turn) =
     val index = fullMove - 1
     (turns lift index).fold(this) { turn =>
       copy(turns = turns.updated(index, f(turn)))
     }
-  }
-  def updatePly(ply: Int, f: Move => Move) = {
+  def updatePly(ply: Int, f: Move => Move) =
     val fullMove = (ply + 1) / 2
     val color    = Color.fromPly(ply - 1)
     updateTurn(fullMove, _.update(color, f))
-  }
   def updateLastPly(f: Move => Move) = updatePly(nbPlies, f)
 
   def nbPlies = turns.foldLeft(0)(_ + _.count)
@@ -48,19 +46,17 @@ case class Pgn(
   }.trim
 
   override def toString = render
-}
 
 case class Initial(comments: List[String] = Nil)
 
-object Initial {
+object Initial:
   val empty = Initial(Nil)
-}
 
 case class Turn(
     number: Int,
     white: Option[Move],
     black: Option[Move]
-) {
+):
 
   def update(color: Color, f: Move => Move) =
     color.fold(
@@ -79,19 +75,16 @@ case class Turn(
 
   def count = List(white, black) count (_.isDefined)
 
-  override def toString = {
-    val text = (white, black) match {
+  override def toString =
+    val text = (white, black) match
       case (Some(w), Some(b)) if w.isLong => s" $w $number... $b"
       case (Some(w), Some(b))             => s" $w $b"
       case (Some(w), None)                => s" $w"
       case (None, Some(b))                => s".. $b"
       case _                              => ""
-    }
     s"$number.$text"
-  }
-}
 
-object Turn {
+object Turn:
 
   def fromMoves(moves: List[Move], ply: Int): List[Turn] = {
     moves.foldLeft((List[Turn](), ply)) {
@@ -103,7 +96,6 @@ object Turn {
         (t.copy(black = move.some) :: tt) -> (p + 1)
     }
   }._1.reverse
-}
 
 case class Move(
     san: String,
@@ -114,14 +106,14 @@ case class Move(
     variations: List[List[Turn]] = Nil,
     // time left for the user who made the move, after he made it
     secondsLeft: Option[Int] = None
-) {
+):
 
   def isLong = comments.nonEmpty || variations.nonEmpty || secondsLeft.isDefined
 
   private def clockString: Option[String] =
     secondsLeft.map(seconds => "[%clk " + Move.formatPgnSeconds(seconds) + "]")
 
-  override def toString = {
+  override def toString =
     val glyphStr = glyphs.toList.map {
       case glyph if glyph.id <= 6 => glyph.symbol
       case glyph                  => s" $$${glyph.id}"
@@ -139,10 +131,8 @@ case class Move(
       if (variations.isEmpty) ""
       else variations.map(_.mkString(" (", " ", ")")).mkString(" ")
     s"$san$glyphStr$commentsOrTime$variationString"
-  }
-}
 
-object Move {
+object Move:
 
   private val noDoubleLineBreakRegex = "(\r?\n){2,}".r
 
@@ -164,4 +154,3 @@ object Move {
     .appendSeconds
     .toFormatter
 
-}

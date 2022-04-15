@@ -1,12 +1,12 @@
 package chess
 
-import cats.syntax.option._
+import cats.syntax.option.*
 
 import chess.format.FEN
-import chess.Pos._
+import chess.Pos.*
 import chess.variant.Standard
 
-class PromotionTest extends ChessTest {
+class PromotionTest extends ChessTest:
 
   "pawn promotion" should {
     val board = """
@@ -78,4 +78,3 @@ K n    """)
     }
 
   }
-}

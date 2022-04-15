@@ -1,6 +1,6 @@
 package chess
 
-class BoardReplayPerfTest extends ChessTest {
+class BoardReplayPerfTest extends ChessTest:
 
   args(skipAll = true)
 
@@ -16,18 +16,16 @@ class BoardReplayPerfTest extends ChessTest {
   "playing a game" should {
     "many times" in {
       runOne must beValid
-      if (nb * iterations > 1) {
+      if (nb * iterations > 1)
         println("warming up")
         run()
-      }
       println("running tests")
-      val durations = for (_ <- 1 to iterations) yield {
+      val durations = for (_ <- 1 to iterations) yield
         val start = System.currentTimeMillis
         run()
         val duration = System.currentTimeMillis - start
         println(s"$nb games in $duration ms")
         duration
-      }
       val nbGames    = iterations * nb
       val moveMicros = (1000 * durations.sum) / nbGames
       println(s"Average = $moveMicros microseconds per game")
@@ -35,4 +33,3 @@ class BoardReplayPerfTest extends ChessTest {
       true === true
     }
   }
-}

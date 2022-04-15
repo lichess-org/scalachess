@@ -1,6 +1,6 @@
 package chess
 
-sealed abstract class Status(val id: Int) extends Ordered[Status] {
+sealed abstract class Status(val id: Int) extends Ordered[Status]:
 
   val name = s"${toString.head.toLower}${toString.tail}"
 
@@ -9,9 +9,8 @@ sealed abstract class Status(val id: Int) extends Ordered[Status] {
   def is(s: Status): Boolean = this == s
 
   def is(f: Status.type => Status): Boolean = is(f(Status))
-}
 
-object Status {
+object Status:
 
   case object Created       extends Status(10)
   case object Started       extends Status(20)
@@ -54,4 +53,3 @@ object Status {
   } toMap
 
   def apply(id: Int): Option[Status] = byId get id
-}

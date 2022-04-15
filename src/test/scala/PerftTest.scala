@@ -3,9 +3,9 @@ package chess
 import chess.format.FEN
 import chess.variant.Chess960
 
-class PerftTest extends ChessTest {
+class PerftTest extends ChessTest:
 
-  def perft(game: Game, depth: Int): Int = {
+  def perft(game: Game, depth: Int): Int =
     if (depth > 0)
       (game.situation.moves.values.toList.flatten: List[Move]).foldLeft(0)((p, move) =>
         if (move.piece.role == Pawn && (move.dest.rank == Rank.First || move.dest.rank == Rank.Eighth))
@@ -17,7 +17,6 @@ class PerftTest extends ChessTest {
           p + perft(game.apply(move), depth - 1)
       )
     else 1
-  }
 
   "calculate standard chess perfts" should {
     // source: https://marcelk.net/rookie/nostalgia/v3/perft-random.epd
@@ -126,4 +125,3 @@ class PerftTest extends ChessTest {
       perft(game, 3) must be equalTo 71908
     }
   }
-}

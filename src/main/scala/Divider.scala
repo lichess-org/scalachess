@@ -2,7 +2,7 @@ package chess
 
 import cats.syntax.option.none
 
-case class Division(middle: Option[Int], end: Option[Int], plies: Int) {
+case class Division(middle: Option[Int], end: Option[Int], plies: Int):
 
   def openingSize: Int = middle | plies
   def middleSize: Option[Int] =
@@ -18,15 +18,13 @@ case class Division(middle: Option[Int], end: Option[Int], plies: Int) {
       e <- end
     } yield m -> e
   def endBounds = end.map(_ -> plies)
-}
 
-object Division {
+object Division:
   val empty = Division(None, None, 0)
-}
 
-object Divider {
+object Divider:
 
-  def apply(boards: List[Board]): Division = {
+  def apply(boards: List[Board]): Division =
 
     val indexedBoards: List[(Board, Int)] = boards.zipWithIndex
 
@@ -40,7 +38,7 @@ object Divider {
 
     val endGame =
       if (midGame.isDefined) indexedBoards.foldLeft(none[Int]) {
-        case (found: Some[_], _) => found
+        case (found: Some[?], _) => found
         case (_, (board, index)) => (majorsAndMinors(board) <= 6) option index
       }
       else None
@@ -50,7 +48,6 @@ object Divider {
       endGame,
       boards.size
     )
-  }
 
   private def majorsAndMinors(board: Board): Int =
     board.pieces.values.foldLeft(0) { (v, p) =>
@@ -69,7 +66,7 @@ object Divider {
     }
 
   private def score(white: Int, black: Int, y: Int): Int =
-    (white, black) match {
+    (white, black) match
       case (0, 0) => 0
 
       case (1, 0) => 1 + (8 - y)
@@ -93,7 +90,6 @@ object Divider {
       case (0, 4) => if (y < 7) 3 + (7 - y) else 0
 
       case _ => 0
-    }
 
   private val mixednessRegions: List[List[Pos]] = {
     for {
@@ -109,7 +105,7 @@ object Divider {
     }.toList
   }.toList
 
-  private def mixedness(board: Board): Int = {
+  private def mixedness(board: Board): Int =
     val boardValues = board.pieces.view.mapValues(_ is Color.white)
     mixednessRegions.foldLeft(0) { case (mix, region) =>
       var white = 0
@@ -122,5 +118,3 @@ object Divider {
       }
       mix + score(white, black, region.head.rank.index + 1)
     }
-  }
-}

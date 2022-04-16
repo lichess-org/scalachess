@@ -2,22 +2,22 @@ name := "scalachess"
 
 organization := "org.lichess"
 
-version := "10.4.8"
+version := "10.4.9"
 
-ThisBuild / scalaVersion := "2.13.8"
+ThisBuild / scalaVersion                        := "2.13.8"
 ThisBuild / githubWorkflowPublishTargetBranches := Seq() // Don't publish anywhere
 ThisBuild / githubWorkflowBuild ++= Seq(
   WorkflowStep.Sbt(List("scalafmtCheckAll"), name = Some("Check Formatting"))
 )
 
 libraryDependencies ++= List(
-  "org.typelevel"      %% "cats-parse"  % "0.3.7",
-  "org.specs2"         %% "specs2-core" % "4.15.0" % Test,
-  "org.specs2"         %% "specs2-cats" % "4.15.0" % Test,
-  "com.github.ornicar" %% "scalalib"    % "7.1.0",
-  "joda-time"           % "joda-time"   % "2.10.14",
-  "org.typelevel"      %% "cats-core"   % "2.7.0",
-  "org.typelevel"      %% "alleycats-core"   % "2.7.0"
+  "org.typelevel"      %% "cats-parse"     % "0.3.7",
+  "org.specs2"         %% "specs2-core"    % "4.15.0" % Test,
+  "org.specs2"         %% "specs2-cats"    % "4.15.0" % Test,
+  "com.github.ornicar" %% "scalalib"       % "7.1.0",
+  "joda-time"           % "joda-time"      % "2.10.14",
+  "org.typelevel"      %% "cats-core"      % "2.7.0",
+  "org.typelevel"      %% "alleycats-core" % "2.7.0"
 )
 
 resolvers ++= Seq(

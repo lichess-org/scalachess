@@ -17,7 +17,7 @@ object Parser {
   val escape = pgnComment.? *> whitespace.rep0.?
 
   def full(pgn: String): Validated[String, ParsedPgn] =
-    pgnParser.parse(pgn) match {
+    pgnParser.parse(pgn.replace("\r", "")) match {
       case Right((_, parsedResult)) =>
         valid(parsedResult)
       case Left(err) =>

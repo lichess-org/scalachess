@@ -36,6 +36,24 @@ class ParserTest extends ChessTest {
     }
   }
 
+  "carriage return" in {
+    "none" in {
+      parser("1. e4 c6\n2. d4 d5") must beValid.like { case parsed =>
+        parsed.sans.value.size must_== 4
+      }
+    }
+    "one" in {
+      parser("1. e4 c6\r\n2. d4 d5") must beValid.like { case parsed =>
+        parsed.sans.value.size must_== 4
+      }
+    }
+    "two" in {
+      parser("1. e4 c6\r\r\n2. d4 d5") must beValid.like { case parsed =>
+        parsed.sans.value.size must_== 4
+      }
+    }
+  }
+
   "result" in {
     "no tag but inline result" in {
       parser(noTagButResult) must beValid.like { case parsed =>

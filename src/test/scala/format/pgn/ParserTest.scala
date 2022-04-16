@@ -52,6 +52,13 @@ class ParserTest extends ChessTest {
         parsed.sans.value.size must_== 4
       }
     }
+    "between tags" in {
+      parser("""[White "carriage"]\r\n[Black "return"]\r\n\r\n1. a3 a6\r\n""") must beValid.like { case parsed =>
+        parsed.tags(_.White) must_== Some("carriage")
+        parsed.tags(_.Black) must_== Some("return")
+        parsed.sans.value.size must_== 2
+      }
+    }
   }
 
   "result" in {

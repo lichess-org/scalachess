@@ -11,7 +11,7 @@ import cats.data.NonEmptyList
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 object Parser:
 
-  val whitespace = R.lf | R.wsp
+  val whitespace = R.cr | R.lf | R.wsp
   val pgnComment = P.caret.filter(_.col == 0) *> P.char('%') *> P.until(P.char('\n')).void
   // pgnComment with % or whitespaces
   val escape = pgnComment.? *> whitespace.rep0.?

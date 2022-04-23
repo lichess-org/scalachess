@@ -5,7 +5,7 @@ import cats.implicits._
 import variant.{ Standard, Variant }
 
 /** Transform a game to standard Forsyth Edwards Notation
-  * http://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
+  * https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *
   * Crazyhouse & Threecheck extensions:
   * https://github.com/ddugovic/Stockfish/wiki/FEN-extensions

@@ -273,6 +273,7 @@ new FullOpening("B10", "Caro-Kann Defense: Accelerated Panov Attack, Modern Vari
 new FullOpening("B10", "Caro-Kann Defense: Accelerated Panov Attack, Open Variation", "rnbqkbnr/pp1p1ppp/2p5/4p3/2P1P3/8/PP1P1PPP/RNBQKBNR w KQkq -"),
 new FullOpening("B10", "Caro-Kann Defense: Accelerated Panov Attack, Pseudo-Scandinavian", "rnb1kbnr/pp2pppp/2p5/3q4/2P5/8/PP1P1PPP/RNBQKBNR w KQkq -"),
 new FullOpening("B10", "Caro-Kann Defense: Accelerated Panov Attack, Van Weersel Attack", "rnbqkbnr/pp2pppp/8/3p4/4P3/1Q6/PP1P1PPP/RNB1KBNR b KQkq -"),
+new FullOpening("B10", "Caro-Kann Defense: Apocalypse Attack", "rnbqkbnr/pp2pppp/8/3pN3/8/8/PPPP1PPP/RNBQKB1R b KQkq -"),
 new FullOpening("B10", "Caro-Kann Defense: Breyer Variation", "rnbqkbnr/pp1ppppp/2p5/8/4P3/3P4/PPP2PPP/RNBQKBNR b KQkq -"),
 new FullOpening("B10", "Caro-Kann Defense: Breyer Variation, Stein Attack", "rnbq1rk1/pp2npbp/2p3p1/3pp3/1P2P3/3P1NP1/P1PN1PBP/R1BQ1RK1 b - -"),
 new FullOpening("B10", "Caro-Kann Defense: Euwe Attack", "rnbqkbnr/pp1ppppp/2p5/8/4P3/1P6/P1PP1PPP/RNBQKBNR b KQkq -"),

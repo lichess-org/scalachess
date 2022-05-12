@@ -334,6 +334,7 @@ new FullOpening("B14", "Caro-Kann Defense: Panov Attack, Fianchetto Defense, Fia
 new FullOpening("B14", "Caro-Kann Defense: Panov Attack, Main Line", "rnbqk2r/pp3ppp/4pn2/3p4/1bPP4/2N2N2/PP3PPP/R1BQKB1R w KQkq -"),
 new FullOpening("B15", "Caro-Kann Defense", "rnbqkbnr/pp2pppp/2p5/3p4/3PP3/2N5/PPP2PPP/R1BQKBNR b KQkq -"),
 new FullOpening("B15", "Caro-Kann Defense: Alekhine Gambit", "rnbqkb1r/pp2pppp/2p2n2/8/3PN3/3B4/PPP2PPP/R1BQK1NR b KQkq -"),
+new FullOpening("B15", "Caro-Kann Defense: Campomanes Attack", "rnbqkb1r/pp2pppp/2p2n2/3p4/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq -"),
 new FullOpening("B15", "Caro-Kann Defense: Finnish Variation", "rnbqkbnr/pp2ppp1/2p4p/8/3PN3/8/PPP2PPP/R1BQKBNR w KQkq -"),
 new FullOpening("B15", "Caro-Kann Defense: Forgacs Variation", "rnbqkb1r/pp3ppp/2p2p2/8/2BP4/8/PPP2PPP/R1BQK1NR b KQkq -"),
 new FullOpening("B15", "Caro-Kann Defense: Gurgenidze Counterattack", "rnbqkbnr/p3pppp/2p5/1p1p4/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq -"),

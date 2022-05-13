@@ -30,7 +30,7 @@ class ReplayPerfTest extends ChessTest {
         duration
       }
       val nbGames    = iterations * nb
-      val moveMicros = (1000 * durations.sum) / nbGames
+      val moveMicros = 1000 * durations.sum / nbGames
       println(s"Average = $moveMicros microseconds per game")
       println(s"          ${1000000 / moveMicros} games per second")
       true === true

@@ -259,7 +259,7 @@ object Forsyth {
           case Some(piece) =>
             if (empty == 0) fen append piece.forsyth.toString
             else {
-              fen append (empty.toString + piece.forsyth)
+              fen append empty.toString + piece.forsyth
               empty = 0
             }
             if (piece.role != Pawn && board.crazyData.fold(false)(_.promoted.contains(Pos(x, y))))

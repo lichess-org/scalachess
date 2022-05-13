@@ -44,7 +44,7 @@ final case class Actor(
             board.move(pos, p) map { move(p, _) } flatMap maybePromote
           def maybePromote(m: Move): Option[Move] =
             if (m.dest.rank == m.color.promotablePawnRank)
-              (m.after promote m.dest) map { b2 =>
+              m.after promote m.dest map { b2 =>
                 m.copy(after = b2, promotion = Option(Queen))
               }
             else Option(m)

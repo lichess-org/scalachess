@@ -58,7 +58,7 @@ abstract class Variant private[variant] (
   def pieceThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean = {
     board.pieces exists {
       case (pos, piece) if piece.color == color && filter(piece) && piece.eyes(pos, to) =>
-        (!piece.role.projection) || piece.role.dir(pos, to).exists {
+        !piece.role.projection || piece.role.dir(pos, to).exists {
           longRangeThreatens(board, pos, _, to)
         }
       case _ => false
@@ -82,7 +82,7 @@ abstract class Variant private[variant] (
 
   def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
     dir(p) exists { next =>
-      next == to || (!board.pieces.contains(next) && longRangeThreatens(board, next, dir, to))
+      next == to || !board.pieces.contains(next) && longRangeThreatens(board, next, dir, to)
     }
 
   def move(

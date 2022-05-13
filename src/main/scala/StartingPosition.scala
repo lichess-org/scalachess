@@ -13,7 +13,7 @@ case class StartingPosition(
 
   def url = s"https://en.wikipedia.org/wiki/$wikiPath"
 
-  val shortName = name takeWhile (':' !=)
+  val shortName = name takeWhile ':' !=
 
   def fullName = s"$eco $name"
 

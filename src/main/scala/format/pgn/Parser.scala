@@ -18,7 +18,7 @@ object Parser {
 
   def full(pgn: String): Validated[String, ParsedPgn] =
     pgnParser.parse(pgn) match {
-      case Right((_, parsedResult)) =>
+      case Right(_, parsedResult) =>
         valid(parsedResult)
       case Left(err) =>
         invalid(showExpectations("Cannot parse pgn", pgn, err))
@@ -40,14 +40,14 @@ object Parser {
 
     def moves(str: String): Validated[String, Sans] =
       strMove.rep.map(xs => Sans(xs.toList)).parse(str) match {
-        case Right((_, str)) =>
+        case Right(_, str) =>
           valid(str)
         case Left(err) => invalid(showExpectations("Cannot parse moves", str, err))
       }
 
     def move(str: String): Validated[String, San] =
       strMove.parse(str) match {
-        case Right((_, str)) =>
+        case Right(_, str) =>
           valid(str)
         case Left(err) => invalid(showExpectations("Cannot parse move", str, err))
       }
@@ -121,18 +121,18 @@ object Parser {
     val strMove: P[San] = P
       .recursive[San] { recuse =>
         val variation: P[Sans] =
-          (((P.char('(') <* escape) *> recuse.rep0 <* (P.char(')') ~ escape)) <* escape)
+          ((P.char('(') <* escape) *> recuse.rep0 <* P.char(')') ~ escape <* escape)
             .map(Sans(_))
 
-        ((number.backtrack | (commentary <* escape)).rep0 ~ forbidNullMove).with1 *>
-          (((MoveParser.moveWithSuffix ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0) <* escape).backtrack
+        ((number.backtrack | commentary <* escape).rep0 ~ forbidNullMove).with1 *>
+          (MoveParser.moveWithSuffix ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0 <* moveExtras.rep0 <* escape).backtrack
             .map { case ((((san, glyphs), comments), glyphs2), variations) =>
               san withComments comments withVariations variations mergeGlyphs (glyphs merge glyphs2)
             }
       }
 
     val strMoves: P0[(InitialPosition, List[San], Option[String])] =
-      ((commentary.rep0 ~ strMove.rep0) ~ (result <* escape).? <* commentary.rep0).map {
+      (commentary.rep0 ~ strMove.rep0 ~ (result <* escape).? <* commentary.rep0).map {
         case ((coms, sans), res) => (InitialPosition(cleanComments(coms)), sans.toList, res)
       }
   }
@@ -201,7 +201,7 @@ object Parser {
     val optionalEnPassant = (R.wsp.rep0.soft ~ P.string("e.p.")).void.?
 
     // d7d5 d7xd5
-    val disambiguatedPawn: P[Std] = (((file.? ~ rank.?) ~ x).with1 ~ dest <* optionalEnPassant).map {
+    val disambiguatedPawn: P[Std] = ((file.? ~ rank.? ~ x).with1 ~ dest <* optionalEnPassant).map {
       case (((fi, ra), ca), de) =>
         Std(dest = de, role = Pawn, capture = ca, file = fi, rank = ra)
     }
@@ -252,7 +252,7 @@ object Parser {
         val preTags = Tags(optionalTags.map(_.toList).getOrElse(List()))
         optionalMoves match {
           case None => ParsedPgn(InitialPosition(List()), preTags, Sans(List()))
-          case Some((init, sans, resultOption)) => {
+          case Some(init, sans, resultOption) => {
             val tags =
               resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
             ParsedPgn(init, tags, Sans(sans))

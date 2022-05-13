@@ -142,7 +142,7 @@ class HashTest extends ChessTest {
     "be consistent in crazyhouse" in {
       // from https://lichess.org/j4r7XHTB/black
       val fen           = FEN("r2qkb1r/ppp1pppp/2n2n2/3p2B1/3P2b1/4PN2/PPP1BPPP/RN1QK2R/ b KQkq - 9 5")
-      val situation     = ((format.Forsyth << fen) get) withVariant Crazyhouse
+      val situation     = (format.Forsyth << fen) get withVariant Crazyhouse
       val move          = situation.move(Pos.G4, Pos.F3, None).toOption.get
       val hashAfterMove = hash(move.situationAfter)
 
@@ -156,13 +156,13 @@ class HashTest extends ChessTest {
 
     "be consistent when king is captured in antichess" in {
       val fen           = FEN("rnbqkb1r/ppp1pppp/3p1n2/1B6/8/4P3/PPPP1PPP/RNBQK1NR w KQkq - 2 3")
-      val situation     = ((format.Forsyth << fen) get) withVariant Antichess
+      val situation     = (format.Forsyth << fen) get withVariant Antichess
       val move          = situation.move(Pos.B5, Pos.E8, None).toOption.get
       val hashAfterMove = hash(move.situationAfter)
 
       // 3. BxK
       val fenAfter       = FEN("rnbqBb1r/ppp1pppp/3p1n2/8/8/4P3/PPPP1PPP/RNBQK1NR b KQkq - 0 3")
-      val situationAfter = ((format.Forsyth << fenAfter) get) withVariant Antichess
+      val situationAfter = (format.Forsyth << fenAfter) get withVariant Antichess
       val hashAfter      = hash(situationAfter)
 
       hashAfterMove mustEqual hashAfter

@@ -154,7 +154,7 @@ object Move {
       org.joda.time.Duration.standardSeconds(t).toPeriod
     )
 
-  private[this] val periodFormatter = new org.joda.time.format.PeriodFormatterBuilder().printZeroAlways
+  private[this] val periodFormatter = new org.joda.time.format.PeriodFormatterBuilder.printZeroAlways
     .minimumPrintedDigits(1)
     .appendHours
     .appendSeparator(":")

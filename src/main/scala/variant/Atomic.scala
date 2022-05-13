@@ -46,7 +46,7 @@ case object Atomic
             to,
             color
           ) =>
-        (!piece.role.projection) || piece.role.dir(pos, to).exists {
+        !piece.role.projection || piece.role.dir(pos, to).exists {
           longRangeThreatens(board, pos, _, to)
         }
       case _ => false
@@ -124,23 +124,23 @@ case object Atomic
     */
   private def atomicClosedPosition(board: Board) = {
     val closedStructure = board.actors.values.forall(actor =>
-      (actor.piece.is(Pawn) && actor.moves.isEmpty
-        && InsufficientMatingMaterial.pawnBlockedByPawn(actor, board))
+      actor.piece.is(Pawn) && actor.moves.isEmpty
+        && InsufficientMatingMaterial.pawnBlockedByPawn(actor, board)
         || actor.piece.is(King) || actor.piece.is(Bishop)
     )
     val randomBishop = board.pieces.find { case (_, piece) => piece.is(Bishop) }
     val bishopsAbsentOrPawnitized = randomBishop match {
-      case Some((pos, piece)) => bishopPawnitized(board, piece.color, pos.isLight)
-      case None               => true
+      case Some(pos, piece) => bishopPawnitized(board, piece.color, pos.isLight)
+      case None             => true
     }
     closedStructure && bishopsAbsentOrPawnitized
   }
 
   private def bishopPawnitized(board: Board, sideWithBishop: Color, bishopLight: Boolean) = {
     board.actors.values.forall(actor =>
-      (actor.piece.is(Pawn) && actor.piece.is(sideWithBishop)) ||
-        (actor.piece.is(Pawn) && actor.piece.is(!sideWithBishop) && actor.pos.isLight == !bishopLight) ||
-        (actor.piece.is(Bishop) && actor.piece.is(sideWithBishop) && actor.pos.isLight == bishopLight) ||
+      actor.piece.is(Pawn) && actor.piece.is(sideWithBishop) ||
+        actor.piece.is(Pawn) && actor.piece.is(!sideWithBishop) && actor.pos.isLight == !bishopLight ||
+        actor.piece.is(Bishop) && actor.piece.is(sideWithBishop) && actor.pos.isLight == bishopLight ||
         actor.piece.is(King)
     )
   }

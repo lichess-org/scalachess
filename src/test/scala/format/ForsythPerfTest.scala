@@ -56,7 +56,7 @@ class ForsythPerfTest extends ChessTest {
         duration
       }
       val nbPositions = iterations * nb
-      val moveNanos   = (1000000 * durations.sum) / nbPositions
+      val moveNanos   = 1000000 * durations.sum / nbPositions
       println(s"Average = $moveNanos nanoseconds per position")
       println(s"          ${1000000000 / moveNanos} positions per second")
       true === true

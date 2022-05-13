@@ -32,16 +32,16 @@ object Divider {
 
     val midGame = indexedBoards.foldLeft(none[Int]) {
       case (None, (board, index)) =>
-        (majorsAndMinors(board) <= 10 ||
-          backrankSparse(board) ||
-          mixedness(board) > 150) option index
+        majorsAndMinors(board) <= 10 ||
+        backrankSparse(board) ||
+        mixedness(board) > 150 option index
       case (found, _) => found
     }
 
     val endGame =
       if (midGame.isDefined) indexedBoards.foldLeft(none[Int]) {
         case (found: Some[_], _) => found
-        case (_, (board, index)) => (majorsAndMinors(board) <= 6) option index
+        case (_, (board, index)) => majorsAndMinors(board) <= 6 option index
       }
       else None
 

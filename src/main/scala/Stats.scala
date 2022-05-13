@@ -22,7 +22,7 @@ final case class Stats(samples: Int, mean: Float, sn: Float) {
       s record n.toFloat(v)
     }
 
-  def variance = (samples > 1) option sn / (samples - 1)
+  def variance = samples > 1 option sn / (samples - 1)
 
   def stdDev = variance.map { Math.sqrt(_).toFloat }
 

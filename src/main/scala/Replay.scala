@@ -19,7 +19,7 @@ case class Replay(setup: Game, moves: List[MoveOrDrop], state: Game) {
     )
 
   def moveAtPly(ply: Int): Option[MoveOrDrop] =
-    chronoMoves lift (ply - 1 - setup.startedAtTurn)
+    chronoMoves lift ply - 1 - setup.startedAtTurn
 }
 
 object Replay {
@@ -75,7 +75,7 @@ object Replay {
 
     def mk(g: Game, moves: List[(San, String)]): (List[(Game, Uci.WithSan)], Option[String]) =
       moves match {
-        case (san, sanStr) :: rest =>
+        case san, sanStr :: rest =>
           san(g.situation).fold(
             err => (Nil, err.some),
             moveOrDrop => {

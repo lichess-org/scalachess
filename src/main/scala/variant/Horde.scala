@@ -87,18 +87,18 @@ case object Horde
       if (horde.sizeIs == 1) {
         hordeRoles match {
           case List(Knight) =>
-            army.sizeIs < 4 || armyNonQueensOrRooks == 0 || armyNonQueensOrBishops == 0 || (armyNonQueensOrBishops + armyBishopSquareColors.size) < 4
+            army.sizeIs < 4 || armyNonQueensOrRooks == 0 || armyNonQueensOrBishops == 0 || armyNonQueensOrBishops + armyBishopSquareColors.size < 4
           case List(Bishop) =>
             notKingPieces.count(p =>
-              p._2.is(Pawn) || (p._2.is(Bishop) && p._1.isLight != horde.head._1.isLight)
+              p._2.is(Pawn) || p._2.is(Bishop) && p._1.isLight != horde.head._1.isLight
             ) < 2
           case List(Rook) => army.sizeIs < 3 || armyPawnsOrRooks == 0 || armyPawnsOrKnights == 0
           case _          => armyPawnsOrRooks == 0
         }
       } else if (
-        (hordeRoles.forall(
+        hordeRoles.forall(
           _ == Bishop
-        ) && hordeBishopSquareColors.lengthCompare(1) == 0) && {
+        ) && hordeBishopSquareColors.lengthCompare(1) == 0 && {
           armyPawnsOrKnights + armyPawnsOrBishops
             .count(p => p._1.isLight != horde.head._1.isLight) < 2
         }

@@ -24,7 +24,7 @@ final case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
   def /(div: Int)        = div != 0 option Centis(centis / div)
   def unary_-            = Centis(-centis)
 
-  def avg(other: Centis) = Centis((centis + other.centis) >> 1)
+  def avg(other: Centis) = Centis(centis + other.centis >> 1)
 
   def compare(other: Centis) = Integer.compare(centis, other.centis)
 

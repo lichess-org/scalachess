@@ -87,7 +87,7 @@ class ForsythTest extends ChessTest {
       val moves = List(E2 -> E4, C7 -> C5, G1 -> F3, G8 -> H6, A2 -> A3)
       def compare(ms: List[(Pos, Pos)], fen: String) =
         makeGame.playMoveList(ms) must beValid.like { g =>
-          (f << FEN(fen)) must beSome.like { situation =>
+          f << FEN(fen) must beSome.like { situation =>
             situation.board.visual must_== g.situation.board.visual
           }
         }

@@ -5,12 +5,12 @@ final class Hash(size: Int) {
   def apply(situation: Situation): PositionHash = {
     val l = Hash.get(situation, Hash.polyglotTable)
     if (size <= 8) {
-      Array.tabulate(size)(i => (l >>> ((7 - i) * 8)).toByte)
+      Array.tabulate(size)(i => (l >>> (7 - i) * 8).toByte)
     } else {
       val m = Hash.get(situation, Hash.randomTable)
       Array.tabulate(size)(i =>
-        if (i < 8) (l >>> ((7 - i) * 8)).toByte
-        else (m >>> ((15 - i) * 8)).toByte
+        if (i < 8) (l >>> (7 - i) * 8).toByte
+        else (m >>> (15 - i) * 8).toByte
       )
     }
   }
@@ -22,7 +22,7 @@ object Hash {
 
   private class ZobristConstants(start: Int) {
     def hexToLong(s: String): Long =
-      (java.lang.Long.parseLong(s.substring(start, start + 8), 16) << 32) |
+      java.lang.Long.parseLong(s.substring(start, start + 8), 16) << 32 |
         java.lang.Long.parseLong(s.substring(start + 8, start + 16), 16)
     val whiteTurnMask       = hexToLong(ZobristTables.whiteTurnMask)
     val actorMasks          = ZobristTables.actorMasks.map(hexToLong)

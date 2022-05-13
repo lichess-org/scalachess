@@ -17,7 +17,7 @@ object Visual {
     val filtered = lines.size match {
       case 8          => lines
       case n if n > 8 => lines.slice(1, 9)
-      case n          => (List.fill(8 - n)("")) ::: lines
+      case n          => List.fill(8 - n)("") ::: lines
     }
     Board(
       pieces = (for {

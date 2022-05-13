@@ -10,7 +10,7 @@ class BinaryTest extends ChessTest {
 
   def compareStrAndBin(pgn: String) = {
     val bin = (Binary writeMoves pgn.split(' ').toList).get.toList
-    ((Binary readMoves bin).get mkString " ") must_== pgn
+    (Binary readMoves bin).get mkString " " must_== pgn
     bin.size must be_<=(pgn.length)
   }
 

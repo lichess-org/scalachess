@@ -79,7 +79,7 @@ case class Board(
     pieces.collect { case (pos, piece) if piece is color => pos }.to(Set)
   }
 
-  def hasPiece(p: Piece) = pieces.values exists (p ==)
+  def hasPiece(p: Piece) = pieces.values exists p ==
 
   def promote(pos: Pos): Option[Board] =
     for {
@@ -128,7 +128,7 @@ case class Board(
         def rookReady(color: Color, kPos: Option[Pos], left: Boolean) =
           kPos.fold(false) { kp =>
             actorsOf(color) exists { a =>
-              a.piece.is(Rook) && a.pos ?- kp && (left ^ (a.pos ?> kp)) && history.unmovedRooks.pos(
+              a.piece.is(Rook) && a.pos ?- kp && (left ^ a.pos ?> kp) && history.unmovedRooks.pos(
                 a.pos
               )
             }
@@ -174,5 +174,5 @@ object Board {
   def empty(variant: Variant): Board = Board(Nil, variant)
 
   private def variantCrazyData(variant: Variant) =
-    (variant == Crazyhouse) option Crazyhouse.Data.init
+    variant == Crazyhouse option Crazyhouse.Data.init
 }

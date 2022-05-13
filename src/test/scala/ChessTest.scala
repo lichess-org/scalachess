@@ -31,7 +31,7 @@ trait ChessTest extends Specification with ValidatedMatchers {
   case class RichActor(actor: Actor) {
     def threatens(to: Pos): Boolean =
       actor.piece.eyes(actor.pos, to) && {
-        (!actor.piece.role.projection) ||
+        !actor.piece.role.projection ||
         actor.piece.role.dir(actor.pos, to).exists {
           Actor.longRangeThreatens(actor.board, actor.pos, _, to)
         }
@@ -125,7 +125,7 @@ trait ChessTest extends Specification with ValidatedMatchers {
   def sortPoss(poss: Seq[Pos]): Seq[Pos] = poss sortBy (_.toString)
 
   def pieceMoves(piece: Piece, pos: Pos): Option[List[Pos]] =
-    (makeEmptyBoard place (piece, pos)) flatMap { b =>
+    makeEmptyBoard place (piece, pos) flatMap { b =>
       b actorAt pos map (_.destinations)
     }
 }

@@ -1,8 +1,10 @@
 lazy val scalachess = Project("scalachess", file("."))
-name                                            := "scalachess"
-organization                                    := "org.lichess"
-version                                         := "11.0.2"
-ThisBuild / scalaVersion                        := "3.1.2"
+name                     := "scalachess"
+organization             := "org.lichess"
+version                  := "11.0.2"
+licenses += "AGPL-3.0"   -> url("https://opensource.org/licenses/AGPL-3.0")
+ThisBuild / scalaVersion := "3.1.2"
+ThisBuild / crossScalaVersions ++= Seq("2.13.8", "3.1.2")
 ThisBuild / githubWorkflowPublishTargetBranches := Seq() // Don't publish anywhere
 ThisBuild / githubWorkflowBuild ++= Seq(
   WorkflowStep.Sbt(List("scalafmtCheckAll"), name = Some("Check Formatting"))

@@ -254,6 +254,7 @@ new FullOpening("E81", "King's Indian Defense: Steiner Attack", "rnbq1rk1/ppp1pp
 new FullOpening("E81", "King's Indian Defense: Sämisch Variation, Bobotsov-Korchnoi-Petrosian Variation", "rnbq1rk1/ppp1ppbp/3p1np1/8/2PPP3/2N2P2/PP2N1PP/R1BQKB1R b KQ -"),
 new FullOpening("E81", "King's Indian Defense: Sämisch Variation, Byrne Defense", "rnbq1rk1/1p2ppbp/p1pp1np1/8/2PPP3/2NBBP2/PP4PP/R2QK1NR w KQ -"),
 new FullOpening("E81", "King's Indian Defense: Sämisch Variation, Normal Defense", "rnbq1rk1/ppp1ppbp/3p1np1/8/2PPP3/2N2P2/PP4PP/R1BQKBNR w KQ -"),
+new FullOpening("E81", "King's Indian Defense: Sämisch Variation, Sämisch Gambit", "rnbq1rk1/pp2ppbp/3p1np1/2p5/2PPP3/2N1BP2/PP4PP/R2QKBNR w KQ -"),
 new FullOpening("E82", "King's Indian Defense: Sämisch Variation, Double Fianchetto", "rnbq1rk1/p1p1ppbp/1p1p1np1/8/2PPP3/2N1BP2/PP4PP/R2QKBNR w KQ -"),
 new FullOpening("E83", "King's Indian Defense: Sämisch Variation, Panno Formation", "r1bq1rk1/1pp1ppbp/p1np1np1/8/2PPP3/2N1BP2/PP2N1PP/R2QKB1R w KQ -"),
 new FullOpening("E83", "King's Indian Defense: Sämisch Variation, Ruban Variation", "1rbq1rk1/ppp1ppbp/2np1np1/8/2PPP3/2N1BP2/PP2N1PP/R2QKB1R w KQ -"),

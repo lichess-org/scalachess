@@ -28,7 +28,7 @@ new FullOpening("B00", "Nimzowitsch Defense", "r1bqkbnr/pppppppp/2n5/8/4P3/8/PPP
 new FullOpening("B00", "Nimzowitsch Defense", "r1bqkbnr/pppppppp/2n5/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq -"),
 new FullOpening("B00", "Nimzowitsch Defense: Breyer Variation", "r1bqkb1r/pppp1ppp/2n2n2/4p3/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq -"),
 new FullOpening("B00", "Nimzowitsch Defense: Colorado Countergambit", "r1bqkbnr/ppppp1pp/2n5/5p2/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq -"),
-new FullOpening("B00", "Nimzowitsch Defense: Colorado Countergambit", "r1bqkbnr/ppppp1pp/2n5/5P2/8/5N2/PPPP1PPP/RNBQKB1R b KQkq -"),
+new FullOpening("B00", "Nimzowitsch Defense: Colorado Countergambit Accepted", "r1bqkbnr/ppppp1pp/2n5/5P2/8/5N2/PPPP1PPP/RNBQKB1R b KQkq -"),
 new FullOpening("B00", "Nimzowitsch Defense: Declined Variation", "r1bqkbnr/pppppppp/2n5/8/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -"),
 new FullOpening("B00", "Nimzowitsch Defense: El Columpio Defense", "r1bqkb1r/pppppppp/2n5/4P3/6n1/5N2/PPPP1PPP/RNBQKB1R w KQkq -"),
 new FullOpening("B00", "Nimzowitsch Defense: El Columpio Defense, El Columpio Gambit", "r1bqkb1r/ppp1pppp/2npP2n/8/3P4/5N1P/PPP2PP1/RNBQKB1R b KQkq -"),

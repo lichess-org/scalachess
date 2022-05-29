@@ -37,4 +37,15 @@ class ReplayTest extends ChessTest {
       }
     }
   }
+
+  "variant situations" in {
+    "racing kings" in {
+      Replay.situations(
+        moveStrs = "Be3 Ne4 Rg3 Nxe3 Rxe3" split " ",
+        initialFen = None,
+        variant = chess.variant.RacingKings
+      ) must beValid
+    }
+  }
+
 }

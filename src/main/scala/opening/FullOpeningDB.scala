@@ -13,6 +13,8 @@ object FullOpeningDB {
     o.fen -> o
   }.toMap
 
+  lazy val families: Set[OpeningFamily] = byFen.values.map(_.family).toSet
+
   def findByFen(fen: FEN): Option[FullOpening] =
     fen.value.split(' ').take(4) match {
       case Array(boardPocket, turn, castle, ep) =>
@@ -49,4 +51,6 @@ object FullOpeningDB {
       case (fen, None) => findByFen(fen)
       case (_, found)  => found
     }
+
+  def names = byFen.values.toList.map(o => o.name.takeWhile(':' !=)).distinct
 }

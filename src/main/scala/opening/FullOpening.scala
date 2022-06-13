@@ -8,9 +8,9 @@ final class FullOpening(
 ) {
 
   val (family: OpeningFamily, variation: Option[OpeningVariation]) = name.split(":", 2) match {
-    case Array(f, v) => OpeningFamily(f)    -> Some(OpeningVariation(v.takeWhile(',' !=)))
-    case Array(f)    => OpeningFamily(f)    -> None
-    case _           => OpeningFamily(name) -> None
+    case Array(f, v) => OpeningFamily(f.trim)    -> Some(OpeningVariation(v.takeWhile(',' !=).trim))
+    case Array(f)    => OpeningFamily(f.trim)    -> None
+    case _           => OpeningFamily(name.trim) -> None
   }
 
   def ecoName = s"$eco $name"
@@ -25,5 +25,5 @@ object FullOpening {
   case class AtPly(opening: FullOpening, ply: Int)
 }
 
-case class OpeningFamily(val name: String)
-case class OpeningVariation(val name: String)
+case class OpeningFamily(name: String)
+case class OpeningVariation(name: String)

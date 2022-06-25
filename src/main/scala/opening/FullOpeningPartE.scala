@@ -195,6 +195,7 @@ new FullOpening("E60", "King's Indian Defense: Semi-Classical Variation, Hollywo
 new FullOpening("E60", "Neo-Grünfeld Defense: Non- or Delayed Fianchetto", "rnbqkb1r/ppp1pp1p/5np1/3p4/2PP4/5N2/PP2PPPP/RNBQKB1R w KQkq -"),
 new FullOpening("E60", "Queen's Pawn, Mengarini Attack", "rnbqkb1r/pppppp1p/5np1/8/2PP4/8/PPQ1PPPP/RNB1KBNR b KQkq -"),
 new FullOpening("E61", "King's Indian Defense", "rnbqkb1r/pppppp1p/5np1/8/2PP4/2N5/PP2PPPP/R1BQKBNR b KQkq -"),
+new FullOpening("E61", "King's Indian Defense: Fianchetto Variation, Benjamin Defense", "rnb2rk1/pp2ppbp/1qpp1np1/8/2PP4/2N2NP1/PP2PPBP/R1BQ1RK1 w - -"),
 new FullOpening("E61", "King's Indian Defense: Semi-Classical Variation", "rnbq1rk1/ppp1ppbp/3p1np1/8/2PP4/2N1PN2/PP2BPPP/R1BQK2R b KQ -"),
 new FullOpening("E61", "King's Indian Defense: Semi-Classical Variation, Queenside Storm Line", "r1bq1rk1/pppn1pbp/3p1np1/4p3/1PPP4/2N1PN2/P3BPPP/R1BQ1RK1 b - -"),
 new FullOpening("E61", "King's Indian Defense: Smyslov Variation", "rnbqk2r/ppp1ppbp/3p1np1/6B1/2PP4/2N2N2/PP2PPPP/R2QKB1R b KQkq -"),

@@ -231,6 +231,7 @@ new FullOpening("B06", "Pterodactyl Defense: Western, Anhanguera", "rnb1k1nr/pp1
 new FullOpening("B06", "Pterodactyl Defense: Western, Siroccopteryx", "rnb1k1nr/pp1pppbp/6p1/q7/2BNP3/8/PPP2PPP/RNBQK2R w KQkq -"),
 new FullOpening("B06", "Rat Defense: Accelerated Gurgenidze", "rnbqkbnr/pp2pp1p/2pp2p1/8/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq -"),
 new FullOpening("B07", "Czech Defense", "rnbqkb1r/pp2pppp/2pp1n2/8/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq -"),
+new FullOpening("B07", "King's Pawn Game: Maróczy Defense", "rnbqkbnr/ppp2ppp/3p4/4p3/3PP3/8/PPP2PPP/RNBQKBNR w KQkq -"),
 new FullOpening("B07", "Lion Defense: Anti-Philidor", "r1bqkb1r/pppnpppp/3p1n2/8/3PPP2/2N5/PPP3PP/R1BQKBNR b KQkq -"),
 new FullOpening("B07", "Lion Defense: Anti-Philidor, Lion's Cave", "r1bqkb1r/pppn1ppp/3p1n2/4p3/3PPP2/2N5/PPP3PP/R1BQKBNR w KQkq -"),
 new FullOpening("B07", "Lion Defense: Anti-Philidor, Lion's Cave, Lion Claw Gambit", "r1bqkb1r/pp1n1ppp/2p2n2/3p4/2BQPP2/2N2N2/PPP3PP/R1B1K2R w KQkq -"),

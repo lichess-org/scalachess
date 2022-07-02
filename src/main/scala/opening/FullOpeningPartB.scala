@@ -238,7 +238,6 @@ new FullOpening("B07", "Lion Defense: Anti-Philidor, Lion's Cave, Lion Claw Gamb
 new FullOpening("B07", "Lion Defense: Bayonet Attack", "r1bqkb1r/pppnpppp/3p1n2/8/3PP1P1/2N5/PPP2P1P/R1BQKBNR b KQkq -"),
 new FullOpening("B07", "Modern Defense: Geller's System", "rnbqk1nr/ppp1ppbp/3p2p1/8/3PP3/2P2N2/PP3PPP/RNBQKB1R b KQkq -"),
 new FullOpening("B07", "Philidor Defense: Lion Variation, Lion's Claw", "r1bqk2r/pp1nbppp/2pp1n2/4p3/3PP3/2N2N2/PPP1BPPP/R1BQ1RK1 w kq -"),
-new FullOpening("B07", "Pirc Defense", "rnbqkb1r/ppp1pppp/3p1n2/8/3PP3/2N5/PPP2PPP/R1BQKBNR b KQkq -"),
 new FullOpening("B07", "Pirc Defense", "rnbqkb1r/ppp1pp1p/3p1np1/8/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq -"),
 new FullOpening("B07", "Pirc Defense: 150 Attack", "rnbqkb1r/pp2pp1p/2pp1np1/8/3PP3/2N1B3/PPPQ1PPP/R3KBNR b KQkq -"),
 new FullOpening("B07", "Pirc Defense: 150 Attack, Inner Doll Defense", "rn1qkb1r/pp2pp1p/2pp1np1/8/3PP1b1/2N1B3/PPPQ1PPP/R3KBNR w KQkq -"),

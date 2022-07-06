@@ -12,8 +12,8 @@ ThisBuild / githubWorkflowBuild ++= Seq(
 
 libraryDependencies ++= List(
   "org.typelevel"      %% "cats-parse"     % "0.3.7",
-  "org.specs2"         %% "specs2-core"    % "4.15.0" % Test,
-  "org.specs2"         %% "specs2-cats"    % "4.15.0" % Test,
+  "org.specs2"         %% "specs2-core"    % "4.16.1" % Test,
+  "org.specs2"         %% "specs2-cats"    % "4.16.1" % Test,
   "com.github.ornicar" %% "scalalib"       % "7.1.0",
   "joda-time"           % "joda-time"      % "2.10.14",
   "org.typelevel"      %% "cats-core"      % "2.7.0",

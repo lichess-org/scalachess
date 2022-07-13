@@ -4,7 +4,9 @@ package opening
 final class FullOpening(
     val eco: String,
     val name: String,
-    val fen: String
+    val fen: String,
+    val uci: String,
+    val pgn: String
 ) {
 
   val (family: OpeningFamily, variation: Option[OpeningVariation]) = name.split(":", 2) match {

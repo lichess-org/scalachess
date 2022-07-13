@@ -2,7 +2,7 @@ name := "scalachess"
 
 organization := "org.lichess"
 
-version := "10.4.13"
+version := "10.5.0"
 
 ThisBuild / scalaVersion                        := "2.13.8"
 ThisBuild / githubWorkflowPublishTargetBranches := Seq() // Don't publish anywhere

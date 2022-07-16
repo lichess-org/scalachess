@@ -129,6 +129,7 @@ new FullOpening("A00", "Van Geet Opening: Melleby Gambit", "rnbqkbnr/pp2pppp/8/2
 new FullOpening("A00", "Van Geet Opening: Myers Attack", "rnbqkbnr/pppppp1p/6p1/8/7P/2N5/PPPPPPP1/R1BQKBNR b KQkq -", "b1c3 g7g6 h2h4", "1. Nc3 g6 2. h4"),
 new FullOpening("A00", "Van Geet Opening: Napoleon Attack", "r1bqkbnr/pppp1ppp/2n5/4p3/3P4/2N2N2/PPP1PPPP/R1BQKB1R b KQkq -", "b1c3 e7e5 g1f3 b8c6 d2d4", "1. Nc3 e5 2. Nf3 Nc6 3. d4"),
 new FullOpening("A00", "Van Geet Opening: Novosibirsk Variation", "r1bqkbnr/pp1ppppp/2n5/8/7Q/2N5/PPP1PPPP/R1B1KBNR b KQkq -", "b1c3 c7c5 d2d4 c5d4 d1d4 b8c6 d4h4", "1. Nc3 c5 2. d4 cxd4 3. Qxd4 Nc6 4. Qh4"),
+new FullOpening("A00", "Van Geet Opening: Nowokunski Gambit", "rnbqkbnr/pppp1ppp/8/8/4Pp2/2N5/PPPP2PP/R1BQKBNR b KQkq e3", "b1c3 e7e5 f2f4 e5f4 e2e4", "1. Nc3 e5 2. f4 exf4 3. e4"),
 new FullOpening("A00", "Van Geet Opening: Pfeiffer Gambit", "rnbqkbnr/ppp2ppp/8/4p3/3pNP2/8/PPPPP1PP/R1BQKBNR w KQkq -", "b1c3 d7d5 f2f4 d5d4 c3e4 e7e5", "1. Nc3 d5 2. f4 d4 3. Ne4 e5"),
 new FullOpening("A00", "Van Geet Opening: Pfeiffer Gambit, Sleipnir Countergambit", "rnbqkbnr/ppp2ppp/8/4p3/3pNP2/5N2/PPPPP1PP/R1BQKB1R b KQkq -", "b1c3 d7d5 f2f4 d5d4 c3e4 e7e5 g1f3", "1. Nc3 d5 2. f4 d4 3. Ne4 e5 4. Nf3"),
 new FullOpening("A00", "Van Geet Opening: Reversed Nimzowitsch", "rnbqkbnr/pppp1ppp/8/4p3/8/2N5/PPPPPPPP/R1BQKBNR w KQkq -", "b1c3 e7e5", "1. Nc3 e5"),

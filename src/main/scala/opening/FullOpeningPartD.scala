@@ -63,7 +63,7 @@ new FullOpening("D00", "Queen's Pawn Game: Hübsch Gambit", "rnbqkb1r/ppp1pppp/8
 new FullOpening("D00", "Queen's Pawn Game: Levitsky Attack", "rnbqkbnr/ppp1pppp/8/3p2B1/3P4/8/PPP1PPPP/RN1QKBNR b KQkq -", "d2d4 d7d5 c1g5", "1. d4 d5 2. Bg5"),
 new FullOpening("D00", "Queen's Pawn Game: Levitsky Attack, Welling Variation", "rn1qkbnr/ppp1pppp/8/3p2B1/3P2b1/8/PPP1PPPP/RN1QKBNR w KQkq -", "d2d4 d7d5 c1g5 c8g4", "1. d4 d5 2. Bg5 Bg4"),
 new FullOpening("D00", "Queen's Pawn Game: Mason Attack", "rnbqkbnr/ppp1pppp/8/3p4/3P1P2/8/PPP1P1PP/RNBQKBNR b KQkq -", "d2d4 d7d5 f2f4", "1. d4 d5 2. f4"),
-new FullOpening("D00", "Queen's Pawn Game: Mason Variation", "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq -", "d2d4 d7d5 c1f4", "1. d4 d5 2. Bf4"),
+new FullOpening("D00", "Queen's Pawn Game: Accelerated London System", "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq -", "d2d4 d7d5 c1f4", "1. d4 d5 2. Bf4"),
 new FullOpening("D00", "Queen's Pawn Game: Morris Countergambit", "rnbqkbnr/pp2pppp/8/2pp4/3PPB2/8/PPP2PPP/RN1QKBNR b KQkq -", "d2d4 d7d5 c1f4 c7c5 e2e4", "1. d4 d5 2. Bf4 c5 3. e4"),
 new FullOpening("D00", "Queen's Pawn Game: Steinitz Countergambit", "rnbqkbnr/pp2pppp/8/2pp4/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq -", "d2d4 d7d5 c1f4 c7c5", "1. d4 d5 2. Bf4 c5"),
 new FullOpening("D00", "Queen's Pawn Game: Stonewall Attack", "rnbqkb1r/ppp1pppp/5n2/3p4/3P4/3BP3/PPP2PPP/RNBQK1NR b KQkq -", "d2d4 d7d5 e2e3 g8f6 f1d3", "1. d4 d5 2. e3 Nf6 3. Bd3"),

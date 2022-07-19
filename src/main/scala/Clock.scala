@@ -149,6 +149,8 @@ case class ClockPlayer(
 
   def setRemaining(t: Centis) = copy(elapsed = limit - t)
 
+  def emergSeconds = if (berserk) config.emergSeconds / 2 else config.emergSeconds
+
   def increment = if (berserk) Centis(0) else config.increment
 
   def withFrameLag(frameLag: Centis) = copy(lag = lag.withFrameLag(frameLag, config))

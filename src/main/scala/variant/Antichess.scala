@@ -53,8 +53,7 @@ case object Antichess
   // blockade or stalemate. Only one player can win if the only remaining pieces are two knights
   override def opponentHasInsufficientMaterial(situation: Situation) = {
     // Exit early if we are not in a situation with only knights
-    val knights = situation.board.pieces.values.forall(p => p.is(Knight)) && situation.board.pieces.values
-      .exists(_.is(Knight))
+    val knights = situation.board.pieces.values.forall(p => p.is(Knight)) 
 
     lazy val drawnKnights = situation.board.actors.values.partition(_.is(White)) match {
       case (whitePieces, blackPieces) =>

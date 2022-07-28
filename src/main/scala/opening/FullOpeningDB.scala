@@ -7,11 +7,15 @@ import chess.format.FEN
 
 object FullOpeningDB:
 
-  private lazy val byFen: collection.Map[String, FullOpening] = {
+  lazy val all: Vector[FullOpening] =
     FullOpeningPartA.db ++ FullOpeningPartB.db ++ FullOpeningPartC.db ++ FullOpeningPartD.db ++ FullOpeningPartE.db
-  }.view.map { o =>
-    o.fen -> o
-  }.toMap
+
+  private lazy val byFen: collection.Map[String, FullOpening] =
+    all.view.map { o =>
+      o.fen -> o
+    }.toMap
+
+  lazy val families: Set[OpeningFamily] = byFen.values.map(_.family).toSet
 
   def findByFen(fen: FEN): Option[FullOpening] =
     fen.value.split(' ').take(4) match
@@ -48,3 +52,5 @@ object FullOpeningDB:
       case (fen, None) => findByFen(fen)
       case (_, found)  => found
     }
+
+  def names = byFen.values.toList.map(o => o.name.takeWhile(':' !=)).distinct

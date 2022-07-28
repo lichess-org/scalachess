@@ -48,8 +48,23 @@ case object Antichess
     }
 
   // In antichess, there is no checkmate condition therefore a player may only draw either by agreement,
-  // blockade or stalemate. A player always has sufficient material to win otherwise.
-  override def opponentHasInsufficientMaterial(situation: Situation) = false
+  // blockade or stalemate. Only one player can win if the only remaining pieces are two knights
+  override def opponentHasInsufficientMaterial(situation: Situation) =
+    // Exit early if we are not in a situation with only knights
+    situation.board.pieces.values.forall(_.is(Knight)) && {
+
+      val whiteKnights = situation.board.actorsOf(White)
+      val blackKnights = situation.board.actorsOf(Black)
+
+      // We consider the case where a player has two knights
+      if (whiteKnights.size != 1 || blackKnights.size != 1) false
+      else {
+        for {
+          whiteKnight <- whiteKnights.headOption
+          blackKnight <- blackKnights.headOption
+        } yield whiteKnight.pos.isLight == blackKnight.pos.isLight
+      } getOrElse false
+    }
 
   // No player can win if the only remaining pieces are opposing bishops on different coloured
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color

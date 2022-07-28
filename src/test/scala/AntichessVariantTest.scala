@@ -253,6 +253,28 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       }
     }
 
+    "Opponent has insufficient material when there are only two remaining knights on same color squares" in {
+      val position     = FEN("8/8/3n2N1/8/8/8/8/8 w - -")
+      val originalGame = fenToGame(position, Antichess)
+
+      val newGame = originalGame flatMap (_.playMoves(Pos.G6 -> Pos.F4))
+
+      newGame must beValid.like {
+        _.situation.opponentHasInsufficientMaterial must beTrue
+      }
+    }
+
+    "Opponent has sufficient material when there are only two remaining knights on opposite color squares" in {
+      val position     = FEN("7n/8/8/8/8/8/8/N7 w - -")
+      val originalGame = fenToGame(position, Antichess)
+
+      val newGame = originalGame flatMap (_.playMoves(Pos.A1 -> Pos.B3))
+
+      newGame must beValid.like {
+        _.situation.opponentHasInsufficientMaterial must beFalse
+      }
+    }
+
     "Not be drawn on insufficient mating material" in {
       val position  = FEN("4K3/8/1b6/8/8/8/5B2/3k4 b - -")
       val maybeGame = fenToGame(position, Antichess)

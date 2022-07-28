@@ -124,7 +124,7 @@ object Replay:
         }
 
   private def initialFenToSituation(initialFen: Option[FEN], variant: chess.variant.Variant): Situation = {
-    initialFen.flatMap(Forsyth.<<) | Situation(chess.variant.Standard)
+    initialFen.flatMap(Forsyth.<<) | Situation(variant)
   } withVariant variant
 
   def boards(

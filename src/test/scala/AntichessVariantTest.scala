@@ -265,19 +265,19 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.playMoves(Pos.G6 -> Pos.F4))
 
-      newGame must beValid.like { case opponentHasInsufficientMaterialGame =>
-        opponentHasInsufficientMaterialGame.situation.opponentHasInsufficientMaterial must beTrue
+      newGame must beValid.like {
+        _.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
 
-    "Opponent does not have insufficient material when there are only two remaining knights on opposite color squares" in {
+    "Opponent has sufficient material when there are only two remaining knights on opposite color squares" in {
       val position     = FEN("7n/8/8/8/8/8/8/N7 w - -")
       val originalGame = fenToGame(position, Antichess)
 
       val newGame = originalGame flatMap (_.playMoves(Pos.A1 -> Pos.B3))
 
-      newGame must beValid.like { case opponentHasInsufficientMaterialGame =>
-        opponentHasInsufficientMaterialGame.situation.opponentHasInsufficientMaterial must beFalse
+      newGame must beValid.like {
+        _.situation.opponentHasInsufficientMaterial must beFalse
       }
     }
 

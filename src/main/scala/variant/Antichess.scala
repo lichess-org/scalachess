@@ -51,32 +51,22 @@ case object Antichess
 
   // In antichess, there is no checkmate condition therefore a player may only draw either by agreement,
   // blockade or stalemate. Only one player can win if the only remaining pieces are two knights
-  override def opponentHasInsufficientMaterial(situation: Situation) = {
+  override def opponentHasInsufficientMaterial(situation: Situation) =
     // Exit early if we are not in a situation with only knights
-    val knights = situation.board.pieces.values.forall(p => p.is(Knight))
+    situation.board.pieces.values.forall(_.is(Knight)) && {
 
-    lazy val drawnKnights = situation.board.actors.values.partition(_.is(White)) match {
-      case (whitePieces, blackPieces) =>
-        val whiteKnights = whitePieces.filter(_.is(Knight))
-        val blackKnights = blackPieces.filter(_.is(Knight))
+      val whiteKnights = situation.board.actorsOf(White)
+      val blackKnights = situation.board.actorsOf(Black)
 
-        // We consider the case where a player has two knights
-        if (
-          whiteKnights.to(Set).size != 1 ||
-          blackKnights.to(Set).size != 1
-        ) false
-        else {
-          for {
-            whiteKnightLight <- whiteKnights.headOption map (_.pos.isLight)
-            blackKnightLight <- blackKnights.headOption map (_.pos.isLight)
-          } yield {
-            whiteKnightLight == blackKnightLight
-          }
-        } getOrElse false
+      // We consider the case where a player has two knights
+      if (whiteKnights.size != 1 || blackKnights.size != 1) false
+      else {
+        for {
+          whiteKnight <- whiteKnights.headOption
+          blackKnight <- blackKnights.headOption
+        } yield whiteKnight.pos.isLight == blackKnight.pos.isLight
+      } getOrElse false
     }
-
-    knights && drawnKnights
-  }
 
   // No player can win if the only remaining pieces are opposing bishops on different coloured
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color

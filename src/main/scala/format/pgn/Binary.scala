@@ -35,7 +35,7 @@ object Binary:
     private val maxPlies = 600
 
     def moves(bs: List[Byte]): List[String]          = moves(bs, maxPlies)
-    def moves(bs: List[Byte], nb: Int): List[String] = intMoves(bs map toInt, nb)
+    def moves(bs: List[Byte], nb: Int): List[String] = intMoves(bs map (_ toInt), nb)
 
     def intMoves(bs: List[Int], pliesToGo: Int): List[String] =
       bs match

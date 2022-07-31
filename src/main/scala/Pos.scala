@@ -41,8 +41,8 @@ case class Pos private (index: Int) extends AnyVal:
 
   def isLight: Boolean = (file.index + rank.index) % 2 == 1
 
-  @inline def file = File of this
-  @inline def rank = Rank of this
+  inline def file = File of this
+  inline def rank = Rank of this
 
   def piotr: Char =
     if (index <= 25) (97 + index).toChar      // a ...

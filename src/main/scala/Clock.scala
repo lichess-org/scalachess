@@ -15,9 +15,9 @@ case class Clock(
 ):
   import timestamper.{ now, toNow }
 
-  @inline def timerFor(c: Color) = if (c == color) timer else None
+  inline def timerFor(c: Color) = if (c == color) timer else None
 
-  @inline def pending(c: Color) = timerFor(c).fold(Centis(0))(toNow)
+  inline def pending(c: Color) = timerFor(c).fold(Centis(0))(toNow)
 
   def remainingTime(c: Color) = (players(c).remaining - pending(c)) nonNeg
 

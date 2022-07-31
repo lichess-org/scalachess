@@ -1,15 +1,15 @@
 package chess
 
 case class Rank private (val index: Int) extends AnyVal with Ordered[Rank]:
-  @inline def -(that: Rank): Int           = index - that.index
+  inline def -(that: Rank): Int            = index - that.index
   @inline override def compare(that: Rank) = this - that
 
   def offset(delta: Int): Option[Rank] =
     if (-8 < delta && delta < 8) Rank(index + delta)
     else None
 
-  @inline def char: Char = (49 + index).toChar
-  override def toString  = char.toString
+  inline def char: Char = (49 + index).toChar
+  override def toString = char.toString
 
 object Rank:
   def apply(index: Int): Option[Rank] =

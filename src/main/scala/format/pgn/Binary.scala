@@ -205,5 +205,5 @@ object Binary:
     val FullPieceR   = s"^$pieceR$origR$captureR$posR$checkR$$".r
     val DropR        = s"^([QRNBP])@$posR$checkR$$".r
 
-  @inline private def toInt(b: Byte): Int = b & 0xff
-  private def showByte(b: Int): String    = "%08d" format (b.toBinaryString.toInt)
+  private inline def toInt(b: Byte): Int = b & 0xff
+  private def showByte(b: Int): String   = "%08d" format (b.toBinaryString.toInt)

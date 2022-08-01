@@ -16,22 +16,15 @@ case object Horde
   /** In Horde chess white advances against black with a horde of pawns.
     */
   lazy val pieces: Map[Pos, Piece] =
-
-    val frontPawns = List(Pos.B5, Pos.C5, Pos.F5, Pos.G5).map { _ -> White.pawn }
-
-    val whitePawnsHorde = frontPawns ++ (for {
+    val whitePawnsHorde = for {
       x <- File.all
       y <- Rank.all.take(4)
-    } yield (Pos(x, y) -> White.pawn)) toMap
+    } yield (Pos(x, y) -> White.pawn)
+    val frontPawns  = List(Pos.B5, Pos.C5, Pos.F5, Pos.G5).map { _ -> White.pawn }
+    val blackPawns  = File.all.map { Pos(_, Rank.Seventh) -> Black.pawn }
+    val blackPieces = File.all.map { x => Pos(x, Rank.Eighth) -> (Black - backRank(x.index)) }
+    whitePawnsHorde ++ frontPawns ++ blackPawns ++ blackPieces toMap
 
-    val blackPieces = (for (y <- List(Rank.Seventh, Rank.Eighth); x <- File.all) yield {
-      Pos(x, y) -> (y match {
-        case Rank.Eighth  => Black - backRank(x.index)
-        case Rank.Seventh => Black.pawn
-      })
-    }).toMap
-
-    blackPieces ++ whitePawnsHorde
 
   override val castles = Castles("kq")
 

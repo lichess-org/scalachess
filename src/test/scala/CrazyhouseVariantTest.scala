@@ -160,6 +160,60 @@ class CrazyhouseVariantTest extends ChessTest:
           g.board.history.threefoldRepetition must beTrue
         }
       }
+      "from prod with captures and drops should 3fold" in {
+        chess.Replay.boards(
+          moveStrs = Vector(
+            "e4",
+            "e5",
+            "Nf3",
+            "Nc6",
+            "Bc4",
+            "Bc5",
+            "d3",
+            "d6",
+            "Nc3",
+            "h6",
+            "O-O",
+            "Nf6",
+            "Be3",
+            "Bg4",
+            "Na4",
+            "b6",
+            "Nxc5",
+            "bxc5",
+            "B@b7",
+            "Nd4",
+            "Bxd4",
+            "cxd4",
+            "N@c6",
+            "O-O",
+            "Nxd8",
+            "Raxd8",
+            "Bbd5",
+            "B@h5",
+            "Bxf7+",
+            "Bxf7",
+            "P@e7",
+            "Bxc4",
+            "exf8=Q+",
+            "Rxf8",
+            "dxc4",
+            "B@f7",
+            "B@d5",
+            "B@h5",
+            "Bxf7+",
+            "Bxf7",
+            "B@f5",
+            "B@h5",
+            "Bxg4",
+            "Bxg4"
+          ),
+          initialFen = None,
+          variant = Crazyhouse
+        ) must beValid.like { boards =>
+          boards.last.history.threefoldRepetition must beTrue
+        }
+      }
       "from prod should not 3fold" in {
         val moves = List(
           E2 -> E4,

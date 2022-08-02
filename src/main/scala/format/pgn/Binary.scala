@@ -35,7 +35,7 @@ object Binary:
     private val maxPlies = 600
 
     def moves(bs: List[Byte]): List[String]          = moves(bs, maxPlies)
-    def moves(bs: List[Byte], nb: Int): List[String] = intMoves(bs map (_ toInt), nb)
+    def moves(bs: List[Byte], nb: Int): List[String] = intMoves(bs map (Binary.toInt(_)), nb)
 
     def intMoves(bs: List[Int], pliesToGo: Int): List[String] =
       bs match
@@ -118,7 +118,7 @@ object Binary:
     import Encoding.*
 
     def move(str: String): List[Byte] =
-      (str match {
+      (str match
         case pos if pos.length == 2 => simplePawn(pos)
         case CastlingR(str, check)  => castling(str, check)
         case SimplePieceR(piece, capture, pos, check) =>
@@ -128,7 +128,7 @@ object Binary:
         case FullPieceR(piece, orig, capture, pos, check) =>
           fullPiece(piece, orig, pos, capture, check)
         case DropR(role, pos, check) => drop(role, pos, check)
-      }) map (_.toByte)
+      ) map (_.toByte)
 
     def moves(strs: Iterable[String]): Array[Byte] = strs.flatMap(move).to(Array)
 

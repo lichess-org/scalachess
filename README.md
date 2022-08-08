@@ -1,6 +1,6 @@
 [![Continuous Integration](https://github.com/ornicar/scalachess/actions/workflows/ci.yml/badge.svg)](https://github.com/ornicar/scalachess/actions/workflows/ci.yml)
 
-Chess API written in scala for [lichess.org](https://lichess.org) 
+Xiangqi API written in scala forked from [scalachess](https://github.com/lichess-org/scalachess) 
 
 It is entirely functional, immutable, and free of side effects.
 
@@ -9,7 +9,7 @@ INSTALL
 
 Clone scalachess
 
-    git clone git://github.com/ornicar/scalachess
+    git clone git://github.com/ErdoganSeref/scalaxiangqi
 
 Get latest sbt on http://www.scala-sbt.org/download.html
 

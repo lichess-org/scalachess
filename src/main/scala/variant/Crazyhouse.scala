@@ -18,7 +18,7 @@ case object Crazyhouse
 
   def pieces = Standard.pieces
 
-  override val initialFen = FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1")
+  override val initialFen = FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ r KQkq - 0 1")
 
   override def valid(board: Board, strict: Boolean) = {
     val pieces = board.pieces.values
@@ -141,14 +141,14 @@ case object Crazyhouse
     val init = Data(Pockets(Pocket(Nil), Pocket(Nil)), Set.empty)
   }
 
-  case class Pockets(white: Pocket, black: Pocket) {
+  case class Pockets(red: Pocket, black: Pocket) {
 
-    def apply(color: Color) = color.fold(white, black)
+    def apply(color: Color) = color.fold(red, black)
 
     def take(piece: Piece): Option[Pockets] =
       piece.color.fold(
-        white take piece.role map { np =>
-          copy(white = np)
+        red take piece.role map { np =>
+          copy(red = np)
         },
         black take piece.role map { np =>
           copy(black = np)
@@ -158,7 +158,7 @@ case object Crazyhouse
     def store(piece: Piece) =
       piece.color.fold(
         copy(black = black store piece.role),
-        copy(white = white store piece.role)
+        copy(red = red store piece.role)
       )
   }
 

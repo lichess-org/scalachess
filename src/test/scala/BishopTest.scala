@@ -6,7 +6,7 @@ class BishopTest extends ChessTest {
 
   "a bishop" should {
 
-    val bishop = White - Bishop
+    val bishop = Red - Bishop
 
     "move in any of 8 positions, 2 and 1 squares away" in {
       pieceMoves(bishop, E4) must bePoss(F3, G2, H1, D5, C6, B7, A8, D3, C2, B1, F5, G6, H7)

@@ -6,7 +6,7 @@ class KnightTest extends ChessTest {
 
   "a knight" should {
 
-    val knight = White - Knight
+    val knight = Red - Knight
 
     "move in any of 8 positions, 2 and 1 squares away" in {
       pieceMoves(knight, E4) must bePoss(F6, G5, G3, F2, D2, C3, C5, D6)

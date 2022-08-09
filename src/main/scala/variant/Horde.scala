@@ -13,29 +13,29 @@ case object Horde
       standardInitialPosition = false
     ) {
 
-  /** In Horde chess white advances against black with a horde of pawns.
+  /** In Horde chess red advances against black with a horde of pawns.
     */
   lazy val pieces: Map[Pos, Piece] = {
-    val whitePawnsHorde = for {
+    val redPawnsHorde = for {
       x <- File.all
       y <- Rank.all.take(4)
-    } yield (Pos(x, y) -> White.pawn)
-    val frontPawns  = List(Pos.B5, Pos.C5, Pos.F5, Pos.G5).map { _ -> White.pawn }
+    } yield (Pos(x, y) -> Red.pawn)
+    val frontPawns  = List(Pos.B5, Pos.C5, Pos.F5, Pos.G5).map { _ -> Red.pawn }
     val blackPawns  = File.all.map { Pos(_, Rank.Seventh) -> Black.pawn }
     val blackPieces = File.all.map { x => Pos(x, Rank.Eighth) -> (Black - backRank(x.index)) }
-    whitePawnsHorde ++ frontPawns ++ blackPawns ++ blackPieces toMap
+    redPawnsHorde ++ frontPawns ++ blackPawns ++ blackPieces toMap
   }
 
   override val castles = Castles("kq")
 
-  override val initialFen = FEN("rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1")
+  override val initialFen = FEN("rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP r kq - 0 1")
 
   override def valid(board: Board, strict: Boolean) =
-    board.kingPosOf(White).isEmpty && validSide(board, strict)(Black) && !pawnsOnPromotionRank(board, White)
+    board.kingPosOf(Red).isEmpty && validSide(board, strict)(Black) && !pawnsOnPromotionRank(board, Red)
 
-  /** The game has a special end condition when black manages to capture all of white's pawns */
+  /** The game has a special end condition when black manages to capture all of red's pawns */
   override def specialEnd(situation: Situation) =
-    situation.board.piecesOf(White).isEmpty
+    situation.board.piecesOf(Red).isEmpty
 
   /** Any vs K + any where horde is stalemated and only king can move is a fortress draw
     * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
@@ -43,7 +43,7 @@ case object Horde
     */
   private def hordeClosedPosition(board: Board) = {
     lazy val notKingBoard = board.kingPos.get(Color.black).flatMap(board.take).getOrElse(board)
-    val hordePos          = board.occupation(Color.white) // may include promoted pieces
+    val hordePos          = board.occupation(Color.red) // may include promoted pieces
     val mateInOne =
       hordePos.sizeIs == 1 && hordePos.forall(pos => pieceThreatened(board, Color.black, pos, (_ => true)))
     !mateInOne && notKingBoard.actors.values.forall(actor => actor.moves.isEmpty)
@@ -63,9 +63,9 @@ case object Horde
     val board         = situation.board
     val opponentColor = !situation.color
     lazy val fortress = hordeClosedPosition(board) // costly function call
-    if (opponentColor == Color.white) {
+    if (opponentColor == Color.red) {
       lazy val notKingPieces           = InsufficientMatingMaterial.nonKingPieces(board) toList
-      val horde                        = board.piecesOf(Color.white)
+      val horde                        = board.piecesOf(Color.red)
       lazy val hordeBishopSquareColors = horde.filter(_._2.is(Bishop)).toList.map(_._1.isLight).distinct
       lazy val hordeRoles              = horde.map(_._2.role)
       lazy val army                    = board.piecesOf(Color.black)
@@ -105,6 +105,6 @@ case object Horde
   }
 
   override def isUnmovedPawn(color: Color, pos: Pos) =
-    if (color.white) pos.rank <= Rank.Second
+    if (color.red) pos.rank <= Rank.Second
     else pos.rank == Rank.Seventh
 }

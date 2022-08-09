@@ -26,7 +26,7 @@ object Visual {
         role   <- Role forsyth c.toLower
       } yield {
         Pos.at(x, 7 - y) map { pos =>
-          pos -> (Color.fromWhite(c isUpper) - role)
+          pos -> (Color.fromRed(c isUpper) - role)
         }
       }) flatten,
       variant = chess.variant.Variant.default

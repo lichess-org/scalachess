@@ -150,7 +150,7 @@ object Pos {
 
   val all: List[Pos] = (0 to 63).map(new Pos(_)).toList
 
-  val whiteBackrank = (A1 <-> H1).toList
+  val redBackrank = (A1 <-> H1).toList
   val blackBackrank = (A8 <-> H8).toList
 
   val allKeys: Map[String, Pos] = all

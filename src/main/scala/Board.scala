@@ -17,8 +17,8 @@ case class Board(
   }
 
   lazy val actorsOf: Color.Map[Seq[Actor]] = {
-    val (w, b) = actors.values.toSeq.partition { _.color.white }
-    Color.Map(w, b)
+    val (r, b) = actors.values.toSeq.partition { _.color.red }
+    Color.Map(r, b)
   }
 
   def rolesOf(c: Color): List[Role] =
@@ -38,9 +38,9 @@ case class Board(
 
   def kingPosOf(c: Color): Option[Pos] = kingPos get c
 
-  def check(c: Color): Boolean = c.fold(checkWhite, checkBlack)
+  def check(c: Color): Boolean = c.fold(checkRed, checkBlack)
 
-  lazy val checkWhite = checkOf(White)
+  lazy val checkRed = checkOf(Red)
   lazy val checkBlack = checkOf(Black)
 
   private def checkOf(c: Color): Boolean =
@@ -121,7 +121,7 @@ case class Board(
   def fixCastles: Board =
     withCastles {
       if (variant.allowsCastling) {
-        val wkPos   = kingPosOf(White)
+        val wkPos   = kingPosOf(Red)
         val bkPos   = kingPosOf(Black)
         val wkReady = wkPos.fold(false)(_.rank == Rank.First)
         val bkReady = bkPos.fold(false)(_.rank == Rank.Eighth)
@@ -134,8 +134,8 @@ case class Board(
             }
           }
         Castles(
-          whiteKingSide = castles.whiteKingSide && wkReady && rookReady(White, wkPos, left = false),
-          whiteQueenSide = castles.whiteQueenSide && wkReady && rookReady(White, wkPos, left = true),
+          redKingSide = castles.redKingSide && wkReady && rookReady(Red, wkPos, left = false),
+          redQueenSide = castles.redQueenSide && wkReady && rookReady(Red, wkPos, left = true),
           blackKingSide = castles.blackKingSide && bkReady && rookReady(Black, bkPos, left = false),
           blackQueenSide = castles.blackQueenSide && bkReady && rookReady(Black, bkPos, left = true)
         )

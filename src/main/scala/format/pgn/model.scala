@@ -27,7 +27,7 @@ case class Pgn(
 
   def moves =
     turns.flatMap { t =>
-      List(t.white, t.black).flatten
+      List(t.red, t.black).flatten
     }
 
   def withEvent(title: String) =
@@ -58,32 +58,32 @@ object Initial {
 
 case class Turn(
     number: Int,
-    white: Option[Move],
+    red: Option[Move],
     black: Option[Move]
 ) {
 
   def update(color: Color, f: Move => Move) =
     color.fold(
-      copy(white = white map f),
+      copy(red = red map f),
       copy(black = black map f)
     )
 
   def updateLast(f: Move => Move) = {
     black.map(m => copy(black = f(m).some)) orElse
-      white.map(m => copy(white = f(m).some))
+      red.map(m => copy(red = f(m).some))
   } | this
 
-  def isEmpty = white.isEmpty && black.isEmpty
+  def isEmpty = red.isEmpty && black.isEmpty
 
   def plyOf(color: Color) = number * 2 - color.fold(1, 0)
 
-  def count = List(white, black) count (_.isDefined)
+  def count = List(red, black) count (_.isDefined)
 
   override def toString = {
-    val text = (white, black) match {
-      case (Some(w), Some(b)) if w.isLong => s" $w $number... $b"
-      case (Some(w), Some(b))             => s" $w $b"
-      case (Some(w), None)                => s" $w"
+    val text = (red, black) match {
+      case (Some(r), Some(b)) if r.isLong => s" $r $number... $b"
+      case (Some(r), Some(b))             => s" $r $b"
+      case (Some(r), None)                => s" $r"
       case (None, Some(b))                => s".. $b"
       case _                              => ""
     }

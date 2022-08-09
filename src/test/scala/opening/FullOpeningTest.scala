@@ -44,8 +44,8 @@ class FullOpeningTest extends Specification {
 
   "by fen" should {
     "consider en passant" in {
-      FullOpeningDB findByFen FEN("rnbqkbnr/pp1p1ppp/8/2pPp3/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 3") must beNone
-      FullOpeningDB findByFen FEN("rnbqkbnr/pp1p1ppp/8/2pPp3/8/8/PPP1PPPP/RNBQKBNR w KQkq e6 0 3") must beSome
+      FullOpeningDB findByFen FEN("rnbqkbnr/pp1p1ppp/8/2pPp3/8/8/PPP1PPPP/RNBQKBNR r KQkq - 0 3") must beNone
+      FullOpeningDB findByFen FEN("rnbqkbnr/pp1p1ppp/8/2pPp3/8/8/PPP1PPPP/RNBQKBNR r KQkq e6 0 3") must beSome
     }
     "ignore empty crazyhouse pocket" in {
       FullOpeningDB findByFen FEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR/ b KQkq - 0 1") must beSome
@@ -59,12 +59,12 @@ class FullOpeningTest extends Specification {
     }
     "ignore crazyhouse pocket" in {
       FullOpeningDB findByFen FEN(
-        "rn2kb1r/ppp1pppp/5n2/q4b2/3P4/2N2N2/PPP2PPP/R1BQKB1R/Pp w KQkq - 3 6"
+        "rn2kb1r/ppp1pppp/5n2/q4b2/3P4/2N2N2/PPP2PPP/R1BQKB1R/Pp r KQkq - 3 6"
       ) must beSome.like { case o =>
         o.name == "Scandinavian Defense: Classical Variation"
       }
       FullOpeningDB findByFen FEN(
-        "rn2kb1r/ppp1pppp/5n2/q4b2/3P4/2N2N2/PPP2PPP/R1BQKB1R[Pp] w KQkq - 3 6"
+        "rn2kb1r/ppp1pppp/5n2/q4b2/3P4/2N2N2/PPP2PPP/R1BQKB1R[Pp] r KQkq - 3 6"
       ) must beSome.like { case o =>
         o.name == "Scandinavian Defense: Classical Variation"
       }

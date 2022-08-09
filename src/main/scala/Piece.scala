@@ -11,7 +11,7 @@ case class Piece(color: Color, role: Role) {
   def isMinor = oneOf(Set(Knight, Bishop))
   def isMajor = oneOf(Set(Queen, Rook))
 
-  def forsyth: Char = if (color == White) role.forsythUpper else role.forsyth
+  def forsyth: Char = if (color == Red) role.forsythUpper else role.forsyth
 
   // attackable positions assuming empty board
   def eyes(from: Pos, to: Pos): Boolean =
@@ -32,7 +32,7 @@ case class Piece(color: Color, role: Role) {
     if (role == Pawn) Piece.pawnEyes(color, from, to) || {
       (from ?| to) && {
         val dy = to.rank - from.rank
-        if (color.white) (dy == 1 || (from.rank <= Rank.Second && dy == 2))
+        if (color.red) (dy == 1 || (from.rank <= Rank.Second && dy == 2))
         else (dy == -1 || (from.rank >= Rank.Seventh && dy == -2))
       }
     }
@@ -45,11 +45,11 @@ object Piece {
 
   def fromChar(c: Char): Option[Piece] =
     Role.allByPgn get c.toUpper map {
-      Piece(Color.fromWhite(c.isUpper), _)
+      Piece(Color.fromRed(c.isUpper), _)
     }
 
   private def pawnEyes(color: Color, from: Pos, to: Pos) =
     (from xDist to) == 1 && (to.rank - from.rank) == {
-      if (color.white) 1 else -1
+      if (color.red) 1 else -1
     }
 }

@@ -6,7 +6,7 @@ class RookTest extends ChessTest {
 
   "a rook" should {
 
-    val rook = White - Rook
+    val rook = Red - Rook
 
     "move to any position along the same rank or file" in {
       pieceMoves(rook, E4) must bePoss(E5, E6, E7, E8, E3, E2, E1, F4, G4, H4, D4, C4, B4, A4)

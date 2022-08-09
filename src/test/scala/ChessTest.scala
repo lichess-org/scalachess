@@ -100,7 +100,7 @@ trait ChessTest extends Specification with ValidatedMatchers {
       sortPoss(p.toList) must_== sortPoss(poss.toList)
     }
 
-  def makeGame: Game = Game(makeBoard, White)
+  def makeGame: Game = Game(makeBoard, Red)
 
   def bePoss(board: Board, visual: String): Matcher[Option[Iterable[Pos]]] =
     beSome.like { case p =>

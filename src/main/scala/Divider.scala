@@ -58,7 +58,7 @@ object Divider {
     }
 
   private val backranks =
-    List(Pos.whiteBackrank -> Color.White, Pos.blackBackrank -> Color.Black)
+    List(Pos.redBackrank -> Color.Red, Pos.blackBackrank -> Color.Black)
 
   // Sparse back-rank indicates that pieces have been developed
   private def backrankSparse(board: Board): Boolean =
@@ -68,8 +68,8 @@ object Divider {
       } < 4
     }
 
-  private def score(white: Int, black: Int, y: Int): Int =
-    (white, black) match {
+  private def score(red: Int, black: Int, y: Int): Int =
+    (red, black) match {
       case (0, 0) => 0
 
       case (1, 0) => 1 + (8 - y)
@@ -110,17 +110,17 @@ object Divider {
   }.toList
 
   private def mixedness(board: Board): Int = {
-    val boardValues = board.pieces.view.mapValues(_ is Color.white)
+    val boardValues = board.pieces.view.mapValues(_ is Color.red)
     mixednessRegions.foldLeft(0) { case (mix, region) =>
-      var white = 0
+      var red = 0
       var black = 0
       region foreach { p =>
         boardValues get p foreach { v =>
-          if (v) white = white + 1
+          if (v) red = red + 1
           else black = black + 1
         }
       }
-      mix + score(white, black, region.head.rank.index + 1)
+      mix + score(red, black, region.head.rank.index + 1)
     }
   }
 }

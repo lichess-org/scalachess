@@ -80,7 +80,7 @@ object Tags {
     Tag.Site,
     Tag.Date,
     Tag.Round,
-    Tag.White,
+    Tag.Red,
     Tag.Black,
     Tag.Result
   )
@@ -102,18 +102,18 @@ object Tag {
   }
   case object Round           extends TagType
   case object Board           extends TagType
-  case object White           extends TagType
+  case object Red           extends TagType
   case object Black           extends TagType
   case object TimeControl     extends TagType
-  case object WhiteClock      extends TagType
+  case object RedClock      extends TagType
   case object BlackClock      extends TagType
-  case object WhiteElo        extends TagType
+  case object RedElo        extends TagType
   case object BlackElo        extends TagType
-  case object WhiteRatingDiff extends TagType
+  case object RedRatingDiff extends TagType
   case object BlackRatingDiff extends TagType
-  case object WhiteTitle      extends TagType
+  case object RedTitle      extends TagType
   case object BlackTitle      extends TagType
-  case object WhiteTeam       extends TagType
+  case object RedTeam       extends TagType
   case object BlackTeam       extends TagType
   case object Result          extends TagType
   case object FEN             extends TagType
@@ -135,18 +135,18 @@ object Tag {
     UTCTime,
     Round,
     Board,
-    White,
+    Red,
     Black,
     TimeControl,
-    WhiteClock,
+    RedClock,
     BlackClock,
-    WhiteElo,
+    RedElo,
     BlackElo,
-    WhiteRatingDiff,
+    RedRatingDiff,
     BlackRatingDiff,
-    WhiteTitle,
+    RedTitle,
     BlackTitle,
-    WhiteTeam,
+    RedTeam,
     BlackTeam,
     Result,
     FEN,

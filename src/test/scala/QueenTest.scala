@@ -6,7 +6,7 @@ class QueenTest extends ChessTest {
 
   "a queen" should {
 
-    val queen = White - Queen
+    val queen = Red - Queen
 
     "move in any direction until the edge of the board" in {
       pieceMoves(queen, D4) must bePoss(

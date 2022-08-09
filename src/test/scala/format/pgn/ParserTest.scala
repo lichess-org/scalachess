@@ -53,9 +53,9 @@ class ParserTest extends ChessTest {
       }
     }
     "between tags" in {
-      parser("[White \"carriage\"]\r\n[Black \"return\"]\r\n\r\n1. a3 a6\r\n") must beValid.like {
+      parser("[Red \"carriage\"]\r\n[Black \"return\"]\r\n\r\n1. a3 a6\r\n") must beValid.like {
         case parsed =>
-          parsed.tags(_.White) must_== Some("carriage")
+          parsed.tags(_.Red) must_== Some("carriage")
           parsed.tags(_.Black) must_== Some("return")
           parsed.sans.value.size must_== 2
       }
@@ -69,17 +69,17 @@ class ParserTest extends ChessTest {
       }
     }
     "in tags" in {
-      parser(whiteResignsInTags) must beValid.like { case parsed =>
+      parser(redResignsInTags) must beValid.like { case parsed =>
         parsed.tags("Result") must_== Option("0-1")
       }
     }
     "in moves" in {
-      parser(whiteResignsInMoves) must beValid.like { case parsed =>
+      parser(redResignsInMoves) must beValid.like { case parsed =>
         parsed.tags("Result") must_== Option("0-1")
       }
     }
     "in tags and moves" in {
-      parser(whiteResignsInTagsAndMoves) must beValid.like { case parsed =>
+      parser(redResignsInTagsAndMoves) must beValid.like { case parsed =>
         parsed.tags("Result") must_== Option("0-1")
       }
     }
@@ -190,7 +190,7 @@ class ParserTest extends ChessTest {
   "inline tags" in {
     parser(inlineTags) must beValid.like { case a =>
       a.tags.value must contain { (tag: Tag) =>
-        tag.name == Tag.White && tag.value == "Blazquez, Denis"
+        tag.name == Tag.Red && tag.value == "Blazquez, Denis"
       }
     }
   }

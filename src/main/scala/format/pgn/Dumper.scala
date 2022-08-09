@@ -23,7 +23,7 @@ object Dumper {
         //   - if so, disambiguate, in order or preference, by:
         //       - file
         //       - rank
-        //       - both (only happens w/ at least 3 pieces of the same role)
+        //       - both (only happens r/ at least 3 pieces of the same role)
         val candidates = situation.board.pieces collect {
           case (cpos, cpiece) if cpiece == piece && cpos != orig && cpiece.eyes(cpos, dest) => cpos
         } filter { cpos =>

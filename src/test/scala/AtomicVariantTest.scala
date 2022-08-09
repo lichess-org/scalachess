@@ -10,7 +10,7 @@ class AtomicVariantTest extends ChessTest {
   "Atomic chess" should {
 
     "Must explode surrounding non pawn pieces on capture" in {
-      val fenPosition     = FEN("rnbqkbnr/1ppppp1p/p5p1/8/8/1P6/PBPPPPPP/RN1QKBNR w KQkq -")
+      val fenPosition     = FEN("rnbqkbnr/1ppppp1p/p5p1/8/8/1P6/PBPPPPPP/RN1QKBNR r KQkq -")
       val maybeGame       = fenToGame(fenPosition, Atomic)
       val explodedSquares = List(Pos.H8, Pos.G8)
       val intactPawns     = List(Pos.F7, Pos.G6, Pos.H7)
@@ -24,7 +24,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "Must explode all surrounding non pawn pieces on capture (contrived situation)" in {
-      val fenPosition     = FEN("k7/3bbn2/3rqn2/3qr3/8/7B/8/1K6 w - -")
+      val fenPosition     = FEN("k7/3bbn2/3rqn2/3qr3/8/7B/8/1K6 r - -")
       val maybeGame       = fenToGame(fenPosition, Atomic)
       val explodedSquares = List(Pos.D5, Pos.E5, Pos.D6, Pos.E6, Pos.F6, Pos.D7, Pos.E7, Pos.F7)
 
@@ -36,7 +36,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "Must explode all surrounding non pawn pieces on capture (contrived situation with bottom right position)" in {
-      val fenPosition     = FEN("k7/3bbn2/3rqn2/4rq2/8/1B6/8/K7 w - -")
+      val fenPosition     = FEN("k7/3bbn2/3rqn2/4rq2/8/1B6/8/K7 r - -")
       val maybeGame       = fenToGame(fenPosition, Atomic)
       val explodedSquares = List(Pos.F5, Pos.E5, Pos.D6, Pos.E6, Pos.F6, Pos.D7, Pos.E7, Pos.F7)
 
@@ -48,7 +48,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "Not allow a king to capture a piece" in {
-      val fenPosition = FEN("8/8/8/1k6/8/8/8/1Kr5 w - -")
+      val fenPosition = FEN("8/8/8/1k6/8/8/8/1Kr5 r - -")
       val maybeGame   = fenToGame(fenPosition, Atomic)
 
       val errorGame = maybeGame flatMap (_.playMoves((Pos.B1, Pos.C1)))
@@ -85,7 +85,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "Must be a stalemate if a king could usually take a piece, but can't because it would explode" in {
-      val positionFen = FEN("k7/8/1R6/8/8/8/8/5K2 w - -")
+      val positionFen = FEN("k7/8/1R6/8/8/8/8/5K2 r - -")
       val maybeGame   = fenToGame(positionFen, Atomic)
 
       val gameWin = maybeGame flatMap (_.playMoves((Pos.B6, Pos.B7)))
@@ -112,7 +112,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "In atomic check, an opportunity at exploding the opponent's king takes priority over getting out of check" in {
-      val positionFen    = FEN("k1K5/pp5R/8/8/3Q4/P7/1P6/2r5 w - -")
+      val positionFen    = FEN("k1K5/pp5R/8/8/3Q4/P7/1P6/2r5 r - -")
       val threatenedGame = fenToGame(positionFen, Atomic)
 
       threatenedGame must beValid.like { case game =>
@@ -158,7 +158,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "In atomic chess a king may walk into a square that is in the perimeter of the opponent king since it can't capture" in {
-      val positionFen = FEN("3k4/8/3K4/8/8/8/7r/8 w - -")
+      val positionFen = FEN("3k4/8/3K4/8/8/8/7r/8 r - -")
       val game        = fenToGame(positionFen, Atomic)
 
       val successGame = game flatMap (_.playMoves((Pos.D6, Pos.D7)))
@@ -170,7 +170,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "Draw on knight and king vs king" in {
-      val position = FEN("8/1n6/8/8/8/8/k7/2K1b2R w - -")
+      val position = FEN("8/1n6/8/8/8/8/k7/2K1b2R r - -")
       val game     = fenToGame(position, Atomic)
 
       val successGame = game flatMap (_.playMoves((Pos.H1, Pos.E1)))
@@ -184,7 +184,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "Draw on bishop and king vs king" in {
-      val position = FEN("8/1b6/8/8/8/8/k7/2K1n2R w - -")
+      val position = FEN("8/1b6/8/8/8/8/k7/2K1n2R r - -")
       val game     = fenToGame(position, Atomic)
 
       val successGame = game flatMap (_.playMoves((Pos.H1, Pos.E1)))
@@ -210,7 +210,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "Draw on a king vs a king" in {
-      val position    = FEN("6r1/8/8/1k6/8/8/2K5/6R1 w - -")
+      val position    = FEN("6r1/8/8/1k6/8/8/2K5/6R1 r - -")
       val game        = fenToGame(position, Atomic)
       val successGame = game flatMap (_.playMoves((Pos.G1, Pos.G8)))
 
@@ -288,7 +288,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "It must be possible to remove yourself from check by exploding a piece next to the piece threatening the king" in {
-      val position = FEN("5k1r/p1ppq1pp/5p2/1B6/1b3P2/2P5/PP4PP/RNB1K2R w KQ - 0 12")
+      val position = FEN("5k1r/p1ppq1pp/5p2/1B6/1b3P2/2P5/PP4PP/RNB1K2R r KQ - 0 12")
       val game     = fenToGame(position, Atomic)
 
       val successGame = game flatMap (_.playMoves((Pos.B5, Pos.D7)))
@@ -299,7 +299,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "It should not be possible to explode a piece, exploding a piece next to it which would result in a check" in {
-      val position = FEN("r1b1k2r/pp1pBppp/2p1p2n/q3P3/B2P4/2N2Q2/PPn2PPP/R3K1NR w KQkq - 9 11")
+      val position = FEN("r1b1k2r/pp1pBppp/2p1p2n/q3P3/B2P4/2N2Q2/PPn2PPP/R3K1NR r KQkq - 9 11")
       val game     = fenToGame(position, Atomic)
 
       val failureGame = game flatMap (_.playMoves((Pos.A4, Pos.C2)))
@@ -323,7 +323,7 @@ class AtomicVariantTest extends ChessTest {
     "There are no repeated moves in the list of available moves for the situation" in {
 
       // Situation where the queen can capture a pawn to both win and remove itself from check
-      val position    = FEN("k1r5/pp5Q/8/8/8/8/PP6/2K5 w - -")
+      val position    = FEN("k1r5/pp5Q/8/8/8/8/PP6/2K5 r - -")
       val successGame = fenToGame(position, Atomic)
 
       successGame must beValid.like { case game =>
@@ -374,7 +374,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "Identify that a player does not have sufficient material to win when they only have a king" in {
-      val position = FEN("8/8/8/8/7p/2k4q/2K3P1/8 w - - 19 54")
+      val position = FEN("8/8/8/8/7p/2k4q/2K3P1/8 r - - 19 54")
       val game     = fenToGame(position, Atomic)
 
       game must beValid.like { case game =>
@@ -390,7 +390,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "An automatic draw in a closed position with only kings and pawns which cannot move" in {
-      val position     = FEN("8/8/6p1/3K4/6P1/2k5/8/8 w - -")
+      val position     = FEN("8/8/6p1/3K4/6P1/2k5/8/8 r - -")
       val originalGame = fenToGame(position, Atomic)
 
       val game = originalGame flatMap (_.playMoves(Pos.G4 -> Pos.G5))
@@ -403,7 +403,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "Not draw inappropriately on bishops vs bishops (where an explosion taking out the king is possible)" in {
-      val position = FEN("B2BBBB1/7P/8/8/8/8/3kb3/4K3 w - - 1 53")
+      val position = FEN("B2BBBB1/7P/8/8/8/8/3kb3/4K3 r - - 1 53")
       val game     = fenToGame(position, Atomic)
       val newGame = game flatMap (_.playMove(
         Pos.H7,
@@ -557,32 +557,32 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "Allow castling with touching kings and rook shielding final attack" in {
-      val position = FEN("8/8/8/8/8/8/4k3/R3K2r w Q - 0 1")
+      val position = FEN("8/8/8/8/8/8/4k3/R3K2r r Q - 0 1")
       val game     = fenToGame(position, Atomic)
       val newGame  = game flatMap (_.playMove(Pos.E1, Pos.C1))
 
       newGame must beValid.like { case game =>
-        game.board(Pos.C1) must beEqualTo(White.king.some)
-        game.board(Pos.D1) must beEqualTo(White.rook.some)
+        game.board(Pos.C1) must beEqualTo(Red.king.some)
+        game.board(Pos.D1) must beEqualTo(Red.rook.some)
       }
     }
 
     "Disallow castling through atomic check" in {
-      val position  = FEN("8/8/8/8/8/8/5k2/R3K2r w Q - 0 1")
+      val position  = FEN("8/8/8/8/8/8/5k2/R3K2r r Q - 0 1")
       val game      = fenToGame(position, Atomic)
       val errorGame = game flatMap (_.playMove(Pos.E1, Pos.C1))
       errorGame must beInvalid
     }
 
     "Disallow castling into atomic check" in {
-      val position  = FEN("4k3/8/8/8/8/8/8/rR2K3 w Q - 0 1")
+      val position  = FEN("4k3/8/8/8/8/8/8/rR2K3 r Q - 0 1")
       val game      = fenToGame(position, Atomic)
       val errorGame = game flatMap (_.playMove(Pos.E1, Pos.B1))
       errorGame must beInvalid
     }
 
     "An automatic draw in a closed position with kings, pawns and a pawnitized bishop" in {
-      val position = FEN("8/8/2k1p3/5p2/4PP2/1b6/4K3/8 w - - 0 1")
+      val position = FEN("8/8/2k1p3/5p2/4PP2/1b6/4K3/8 r - - 0 1")
       val game     = fenToGame(position, Atomic)
       val newGame  = game flatMap (_.playMove(Pos.E4, Pos.E5))
 
@@ -593,7 +593,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "Not draw inappropriately on blocked pawns with a non-pawnitized bishop" in {
-      val position = FEN("8/8/2k5/5p2/8/2b2P2/8/3K4 w - - 0 1")
+      val position = FEN("8/8/2k5/5p2/8/2b2P2/8/3K4 r - - 0 1")
       val game     = fenToGame(position, Atomic)
       val newGame  = game flatMap (_.playMove(Pos.F3, Pos.F4))
 
@@ -604,7 +604,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "Not draw inappropriately if both sides have a pawnitized bishop" in {
-      val position = FEN("6bk/4B2p/8/7P/4K3/8/8/8 w - - 0 1")
+      val position = FEN("6bk/4B2p/8/7P/4K3/8/8/8 r - - 0 1")
       val game     = fenToGame(position, Atomic)
       val newGame  = game flatMap (_.playMove(Pos.H5, Pos.H6))
 
@@ -615,7 +615,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "Checkmate overrides closed position" in {
-      val position = FEN("8/8/b1p5/kpP5/p3K3/PP6/8/8 w - - 0 1")
+      val position = FEN("8/8/b1p5/kpP5/p3K3/PP6/8/8 r - - 0 1")
       val game     = fenToGame(position, Atomic)
       val newGame  = game flatMap (_.playMove(Pos.B3, Pos.B4))
 

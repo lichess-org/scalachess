@@ -313,7 +313,7 @@ class CrazyhouseVariantTest extends ChessTest {
         }
       }
       "not draw when only kings left" in {
-        val fenPosition = FEN("k6K/8/8/8/8/8/8/8 w - - 0 25")
+        val fenPosition = FEN("k6K/8/8/8/8/8/8/8 r - - 0 25")
         val game = {
           fenToGame(fenPosition, Crazyhouse).toOption.get
         }
@@ -344,7 +344,7 @@ class CrazyhouseVariantTest extends ChessTest {
       chess
         .Game(
           Crazyhouse.some,
-          FEN("r2q1b1r/p2k1Ppp/2p2p2/4p3/P2nP2n/3P1PRP/1PPB1K1q~/RN1Q1B2/Npb w - - 40 21").some
+          FEN("r2q1b1r/p2k1Ppp/2p2p2/4p3/P2nP2n/3P1PRP/1PPB1K1q~/RN1Q1B2/Npb r - - 40 21").some
         )
         .situation
         .destinations must_== Map(

@@ -48,7 +48,7 @@ class StatsTest extends Specification {
   }
 
   "large values" should {
-    // Tight data w/ large mean. Shuffled for Stats.
+    // Tight data r/ large mean. Shuffled for Stats.
     val base         = (1 to 100) ++ (1 to 100) ++ (1 to 200)
     val data         = base map { _ + 1e5f }
     val shuffledData = base.sortWith(_ % 8 > _ % 8) map { _ + 1e5f }

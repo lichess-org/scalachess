@@ -15,17 +15,17 @@ case object ThreeCheck
 
   def pieces = Standard.pieces
 
-  override val initialFen = FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 +0+0")
+  override val initialFen = FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR r KQkq - 0 1 +0+0")
 
   override def finalizeBoard(board: Board, uci: format.Uci, capture: Option[Piece]): Board =
     board updateHistory {
-      _.withCheck(Color.White, board.checkWhite).withCheck(Color.Black, board.checkBlack)
+      _.withCheck(Color.Red, board.checkRed).withCheck(Color.Black, board.checkBlack)
     }
 
   override def specialEnd(situation: Situation) =
     situation.check && {
       val checks = situation.board.history.checkCount
-      situation.color.fold(checks.white, checks.black) >= 3
+      situation.color.fold(checks.red, checks.black) >= 3
     }
 
   /** It's not possible to check or checkmate the opponent with only a king

@@ -17,7 +17,7 @@ class HashTest extends ChessTest {
     // http://hardy.uhasselt.be/Toga/book_format.html
 
     "match on the starting position" in {
-      val fen  = FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+      val fen  = FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR r KQkq - 0 1")
       val game = fenToGame(fen, Standard).toOption.get
       hash(game.situation) mustEqual hexToBytes("463b96181691fc9c")
     }
@@ -29,7 +29,7 @@ class HashTest extends ChessTest {
     }
 
     "match after 1. e4 d5" in {
-      val fen  = FEN("rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
+      val fen  = FEN("rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR r KQkq - 0 2")
       val game = fenToGame(fen, Standard).toOption.get
       hash(game.situation) mustEqual hexToBytes("0756b94461c50fb0")
     }
@@ -42,7 +42,7 @@ class HashTest extends ChessTest {
 
     "match after 1. e4 d5 2. e5 f5" in {
       // note that en-passant matters
-      val fen  = FEN("rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3")
+      val fen  = FEN("rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR r KQkq f6 0 3")
       val game = fenToGame(fen, Standard).toOption.get
       hash(game.situation) mustEqual hexToBytes("22a48b5a8e47ff78")
     }
@@ -55,7 +55,7 @@ class HashTest extends ChessTest {
     }
 
     "match after 1. e4 d5 2. e5 f5 3. Ke2 Kf7" in {
-      val fen  = FEN("rnbq1bnr/ppp1pkpp/8/3pPp2/8/8/PPPPKPPP/RNBQ1BNR w - - 2 4")
+      val fen  = FEN("rnbq1bnr/ppp1pkpp/8/3pPp2/8/8/PPPPKPPP/RNBQ1BNR r - - 2 4")
       val game = fenToGame(fen, Standard).toOption.get
       hash(game.situation) mustEqual hexToBytes("00fdd303c946bdd9")
     }
@@ -147,7 +147,7 @@ class HashTest extends ChessTest {
       val hashAfterMove = hash(move.situationAfter)
 
       // 5 ... Bxf3
-      val fenAfter       = FEN("r2qkb1r/ppp1pppp/2n2n2/3p2B1/3P4/4Pb2/PPP1BPPP/RN1QK2R/n w KQkq - 10 6")
+      val fenAfter       = FEN("r2qkb1r/ppp1pppp/2n2n2/3p2B1/3P4/4Pb2/PPP1BPPP/RN1QK2R/n r KQkq - 10 6")
       val situationAfter = format.Forsyth.<<<@(Crazyhouse, fenAfter).get.situation
       val hashAfter      = hash(situationAfter)
 
@@ -155,7 +155,7 @@ class HashTest extends ChessTest {
     }
 
     "be consistent when king is captured in antichess" in {
-      val fen           = FEN("rnbqkb1r/ppp1pppp/3p1n2/1B6/8/4P3/PPPP1PPP/RNBQK1NR w KQkq - 2 3")
+      val fen           = FEN("rnbqkb1r/ppp1pppp/3p1n2/1B6/8/4P3/PPPP1PPP/RNBQK1NR r KQkq - 2 3")
       val situation     = ((format.Forsyth << fen) get) withVariant Antichess
       val move          = situation.move(Pos.B5, Pos.E8, None).toOption.get
       val hashAfterMove = hash(move.situationAfter)
@@ -169,7 +169,7 @@ class HashTest extends ChessTest {
     }
 
     "be consistent when rook is exploded in atomic" in {
-      val fen           = FEN("rnbqkb1r/ppppp1pp/5p1n/6N1/8/8/PPPPPPPP/RNBQKB1R w KQkq - 2 3")
+      val fen           = FEN("rnbqkb1r/ppppp1pp/5p1n/6N1/8/8/PPPPPPPP/RNBQKB1R r KQkq - 2 3")
       val situation     = format.Forsyth.<<@(Atomic, fen).get
       val move          = situation.move(Pos.G5, Pos.H7, None).toOption.get
       val hashAfterMove = hash(move.situationAfter)

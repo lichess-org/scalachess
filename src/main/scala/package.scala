@@ -2,7 +2,7 @@ import ornicar.scalalib
 
 package object chess extends scalalib.Common with scalalib.OrnicarOption with scalalib.OrnicarBoolean {
 
-  val White = Color.White
+  val Red = Color.Red
   val Black = Color.Black
 
   type Direction  = Pos => Option[Pos]

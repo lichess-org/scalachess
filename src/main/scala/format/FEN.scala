@@ -14,7 +14,7 @@ final case class FEN(value: String) extends AnyVal {
 
   def ply: Option[Int] =
     fullMove map { fm =>
-      fm * 2 - (if (color.exists(_.white)) 2 else 1)
+      fm * 2 - (if (color.exists(_.red)) 2 else 1)
     }
 
   def initial = value == Forsyth.initial.value

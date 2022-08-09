@@ -11,10 +11,10 @@ import cats.data.NonEmptyList
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 object Parser {
 
-  val whitespace = R.cr | R.lf | R.wsp
+  val redspace = R.cr | R.lf | R.wsp
   val pgnComment = P.caret.filter(_.col == 0) *> P.char('%') *> P.until(P.char('\n')).void
-  // pgnComment with % or whitespaces
-  val escape = pgnComment.? *> whitespace.rep0.?
+  // pgnComment with % or redspaces
+  val escape = pgnComment.? *> redspace.rep0.?
 
   def full(pgn: String): Validated[String, ParsedPgn] =
     pgnParser.parse(pgn) match {
@@ -108,7 +108,7 @@ object Parser {
       (N.nonZeroDigit ~ N.digits0).string
 
     // '. ' or '... ' or '. ... '
-    val numberSuffix = (P.char('.') | whitespace).rep0.void
+    val numberSuffix = (P.char('.') | redspace).rep0.void
 
     // 10. or 10... but not 0 or 1-0 or 1/2
     val number = (positiveIntString <* !P.charIn('‑', '–', '-', '/') ~ numberSuffix).string
@@ -241,7 +241,7 @@ object Parser {
     val valueChar: P[String]       = escaped | P.charWhere(_ != '"').string
     val tagValue: P[String]        = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
     val tagContent: P[Tag]         = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
-    val tag: P[Tag]                = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
+    val tag: P[Tag]                = tagContent.between(P.char('['), P.char(']')) <* redspace.rep0
     val tags: P[NonEmptyList[Tag]] = tag.rep
 
   }

@@ -14,22 +14,22 @@ class VariantTest extends ChessTest {
 
     "position pieces correctly" in {
       Standard.pieces must havePairs(
-        A1 -> (White - Rook),
-        B1 -> (White - Knight),
-        C1 -> (White - Bishop),
-        D1 -> (White - Queen),
-        E1 -> (White - King),
-        F1 -> (White - Bishop),
-        G1 -> (White - Knight),
-        H1 -> (White - Rook),
-        A2 -> (White - Pawn),
-        B2 -> (White - Pawn),
-        C2 -> (White - Pawn),
-        D2 -> (White - Pawn),
-        E2 -> (White - Pawn),
-        F2 -> (White - Pawn),
-        G2 -> (White - Pawn),
-        H2 -> (White - Pawn),
+        A1 -> (Red - Rook),
+        B1 -> (Red - Knight),
+        C1 -> (Red - Bishop),
+        D1 -> (Red - Queen),
+        E1 -> (Red - King),
+        F1 -> (Red - Bishop),
+        G1 -> (Red - Knight),
+        H1 -> (Red - Rook),
+        A2 -> (Red - Pawn),
+        B2 -> (Red - Pawn),
+        C2 -> (Red - Pawn),
+        D2 -> (Red - Pawn),
+        E2 -> (Red - Pawn),
+        F2 -> (Red - Pawn),
+        G2 -> (Red - Pawn),
+        H2 -> (Red - Pawn),
         A7 -> (Black - Pawn),
         B7 -> (Black - Pawn),
         C7 -> (Black - Pawn),
@@ -83,7 +83,7 @@ class VariantTest extends ChessTest {
   "chess960" should {
 
     "position pieces correctly" in {
-      Chess960.pieces must havePair(A2 -> (White - Pawn))
+      Chess960.pieces must havePair(A2 -> (Red - Pawn))
     }
 
     "initialize the board with castling rights" in {
@@ -99,7 +99,7 @@ class VariantTest extends ChessTest {
 PPk
 K
 """.kingOfTheHill,
-          White
+          Red
         ).situation.end must beFalse
       }
       "regular checkMate" in {
@@ -108,7 +108,7 @@ K
 PP
 K  r
 """.kingOfTheHill,
-          White
+          Red
         )
 
         game.situation.end must beTrue
@@ -124,7 +124,7 @@ K  r
 PP
    K
 """.kingOfTheHill,
-          White
+          Red
         ).situation
         sit.end must beTrue
         sit.winner must beSome.like { case color =>
@@ -147,7 +147,7 @@ PP
 PPk
 K
 """.threeCheck,
-          White
+          Red
         ).situation.end must beFalse
       }
       "regular checkMate" in {
@@ -156,7 +156,7 @@ K
 PP
 K  r
 """.threeCheck,
-          White
+          Red
         )
         game.situation.end must beTrue
         game.situation.winner must beSome.like { case color =>
@@ -251,7 +251,7 @@ K  r
     }
 
     "should not draw because of insufficient material" in {
-      val position = FEN("8/8/8/8/5K2/8/2k5/8 w - - 0 1")
+      val position = FEN("8/8/8/8/5K2/8/2k5/8 r - - 0 1")
       val game     = fenToGame(position, RacingKings)
 
       game must beValid.like { case game =>
@@ -261,20 +261,20 @@ K  r
     }
 
     "should recognize a king in the goal" in {
-      "white" in {
-        val position = FEN("2K5/8/6k1/8/8/8/8/Q6q w - - 0 1")
+      "red" in {
+        val position = FEN("2K5/8/6k1/8/8/8/8/Q6q r - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
         game must beValid.like { case game =>
           game.situation.end must beTrue
           game.situation.winner must beSome.like { case color =>
-            color == White
+            color == Red
           }
         }
       }
 
       "black" in {
-        val position = FEN("6k1/8/8/8/8/2r5/1KB5/2B5 w - - 0 1")
+        val position = FEN("6k1/8/8/8/8/2r5/1KB5/2B5 r - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
         game must beValid.like { case game =>
@@ -287,7 +287,7 @@ K  r
     }
 
     "should give black one more move" in {
-      "when white is in the goal" in {
+      "when red is in the goal" in {
         val position = FEN("2K5/5k2/8/8/8/8/8/8 b - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
@@ -303,14 +303,14 @@ K  r
         game must beValid.like { case game =>
           game.situation.end must beTrue
           game.situation.winner must beSome.like { case color =>
-            color == White
+            color == Red
           }
         }
       }
     }
 
     "should call it a draw with both kings in the goal" in {
-      val position = FEN("2K2k2/8/8/8/8/1b6/1b6/8 w - - 0 1")
+      val position = FEN("2K2k2/8/8/8/8/1b6/1b6/8 r - - 0 1")
       val game     = fenToGame(position, RacingKings)
 
       game must beValid.like { case game =>
@@ -330,7 +330,7 @@ K  r
     }
 
     "calculate material imbalance" in {
-      val position = FEN("8/p7/8/8/2B5/b7/PPPK2PP/RNB3NR w - - 1 16")
+      val position = FEN("8/p7/8/8/2B5/b7/PPPK2PP/RNB3NR r - - 1 16")
       val game     = fenToGame(position, Antichess)
 
       game must beValid.like { case game =>

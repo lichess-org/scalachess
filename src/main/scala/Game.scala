@@ -115,9 +115,9 @@ case class Game(
 
 object Game {
   def apply(variant: chess.variant.Variant): Game =
-    new Game(Situation(Board init variant, White))
+    new Game(Situation(Board init variant, Red))
 
-  def apply(board: Board): Game = apply(board, White)
+  def apply(board: Board): Game = apply(board, Red)
 
   def apply(board: Board, color: Color): Game = new Game(Situation(board, color))
 

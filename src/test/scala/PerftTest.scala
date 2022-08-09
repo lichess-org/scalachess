@@ -30,19 +30,19 @@ class PerftTest extends ChessTest {
       perft(game, 3) must be equalTo 4760
     }
     "gentest-2698" in {
-      val game = Game(Option(Chess960), Option(FEN("8/8/4R3/1k6/8/5n2/Kb6/8 w - -")))
+      val game = Game(Option(Chess960), Option(FEN("8/8/4R3/1k6/8/5n2/Kb6/8 r - -")))
       perft(game, 3) must be equalTo 5444
     }
     "gentest-3283" in {
       val game =
         Game(
           Option(Chess960),
-          Option(FEN("r1bqkb1r/p1pp1ppp/1p3n2/6B1/Pn1p2P1/7B/RPP1PP1P/1N1QK1NR w Kkq -"))
+          Option(FEN("r1bqkb1r/p1pp1ppp/1p3n2/6B1/Pn1p2P1/7B/RPP1PP1P/1N1QK1NR r Kkq -"))
         )
       perft(game, 3) must be equalTo 26302
     }
     "gentest-3523" in {
-      val game = Game(Option(Chess960), Option(FEN("1n1K4/3bB3/2k5/2p5/8/8/3p4/8 w - -")))
+      val game = Game(Option(Chess960), Option(FEN("1n1K4/3bB3/2k5/2p5/8/8/3p4/8 r - -")))
       perft(game, 3) must be equalTo 933
     }
     "gentest-4253" in {
@@ -55,7 +55,7 @@ class PerftTest extends ChessTest {
       perft(game, 3) must be equalTo 20587
     }
     "gentest-5008" in {
-      val game = Game(Option(Chess960), Option(FEN("5nk1/7p/r1p4b/p5PP/K4p2/3R4/5B2/8 w - -")))
+      val game = Game(Option(Chess960), Option(FEN("5nk1/7p/r1p4b/p5PP/K4p2/3R4/5B2/8 r - -")))
       perft(game, 3) must be equalTo 8214
     }
     "gentest-5569" in {
@@ -65,11 +65,11 @@ class PerftTest extends ChessTest {
     }
     "gentest-6195" in {
       val game =
-        Game(Option(Chess960), Option(FEN("Bnbqk2r/2pppp2/pp4p1/7p/P2b2Q1/2P1P3/1P1P1PPP/RNB2KNR w k -")))
+        Game(Option(Chess960), Option(FEN("Bnbqk2r/2pppp2/pp4p1/7p/P2b2Q1/2P1P3/1P1P1PPP/RNB2KNR r k -")))
       perft(game, 3) must be equalTo 41002
     }
     "gentest-6689" in {
-      val game = Game(Option(Chess960), Option(FEN("8/k5b1/7N/2b5/8/1K3N2/8/4R3 w - -")))
+      val game = Game(Option(Chess960), Option(FEN("8/k5b1/7N/2b5/8/1K3N2/8/4R3 r - -")))
       perft(game, 3) must be equalTo 17996
     }
   }
@@ -77,23 +77,23 @@ class PerftTest extends ChessTest {
   "calculate chess960 perfts" should {
     // source: http://www.talkchess.com/forum/viewtopic.php?t=55274
     "x-fen 00" in {
-      val game = Game(Option(Chess960), Option(FEN("r1k1r2q/p1ppp1pp/8/8/8/8/P1PPP1PP/R1K1R2Q w KQkq - 0 1")))
+      val game = Game(Option(Chess960), Option(FEN("r1k1r2q/p1ppp1pp/8/8/8/8/P1PPP1PP/R1K1R2Q r KQkq - 0 1")))
       perft(game, 3) must be equalTo 12333
     }
     "x-fen 01" in {
-      val game = Game(Option(Chess960), Option(FEN("r1k2r1q/p1ppp1pp/8/8/8/8/P1PPP1PP/R1K2R1Q w KQkq - 0 1")))
+      val game = Game(Option(Chess960), Option(FEN("r1k2r1q/p1ppp1pp/8/8/8/8/P1PPP1PP/R1K2R1Q r KQkq - 0 1")))
       perft(game, 3) must be equalTo 20218
     }
     "x-fen 02" in {
-      val game = Game(Option(Chess960), Option(FEN("8/8/8/4B2b/6nN/8/5P2/2R1K2k w Q - 0 1")))
+      val game = Game(Option(Chess960), Option(FEN("8/8/8/4B2b/6nN/8/5P2/2R1K2k r Q - 0 1")))
       perft(game, 4) must be equalTo 118388
     }
     "x-fen 03" in {
-      val game = Game(Option(Chess960), Option(FEN("2r5/8/8/8/8/8/6PP/k2KR3 w K - 0 1")))
+      val game = Game(Option(Chess960), Option(FEN("2r5/8/8/8/8/8/6PP/k2KR3 r K - 0 1")))
       perft(game, 4) must be equalTo 57700
     }
     "x-fen 04" in {
-      val game = Game(Option(Chess960), Option(FEN("4r3/3k4/8/8/8/8/6PP/qR1K1R2 w KQ - 0 1")))
+      val game = Game(Option(Chess960), Option(FEN("4r3/3k4/8/8/8/8/6PP/qR1K1R2 r KQ - 0 1")))
       perft(game, 3) must be equalTo 12858
     }
   }
@@ -104,7 +104,7 @@ class PerftTest extends ChessTest {
       val game =
         Game(
           Option(Chess960),
-          Option(FEN("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"))
+          Option(FEN("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R r KQkq - 0 1"))
         )
       perft(game, 3) must be equalTo 97862
     }
@@ -121,7 +121,7 @@ class PerftTest extends ChessTest {
       val game =
         Game(
           Option(Chess960),
-          Option(FEN("4rrk1/pbbp2p1/1ppnp3/3n1pqp/3N1PQP/1PPNP3/PBBP2P1/4RRK1 w Ff - 0 1"))
+          Option(FEN("4rrk1/pbbp2p1/1ppnp3/3n1pqp/3N1PQP/1PPNP3/PBBP2P1/4RRK1 r Ff - 0 1"))
         )
       perft(game, 3) must be equalTo 71908
     }

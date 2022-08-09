@@ -227,7 +227,7 @@ object Clock {
     val player = ClockPlayer.withConfig(config)
     Clock(
       config = config,
-      color = White,
+      color = Red,
       players = Color.Map(player, player),
       timer = None
     )

@@ -15,10 +15,10 @@ class RenderTest extends ChessTest {
 [Site "Bonn GER"]
 [Date "2008.10.14"]
 [Round "1"]
-[White "Kramnik,V"]
+[Red "Kramnik,V"]
 [Black "Anand,V"]
 [Result "1/2-1/2"]
-[WhiteElo "2772"]
+[RedElo "2772"]
 [BlackElo "2783"]
 [ECO "D14"]
 [Annotator "IM Malcolm Pein"]
@@ -41,7 +41,7 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
       val pgn = Pgn(
         tags = Tags(
           List(
-            Tag(_.White, "Kramnik,V"),
+            Tag(_.Red, "Kramnik,V"),
             Tag(_.Black, "Anand,V"),
             Tag(_.ECO, "D14")
           )
@@ -49,22 +49,22 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         turns = List(
           Turn(
             number = 1,
-            white = Move("d4").some,
+            red = Move("d4").some,
             black = Move("d5").some
           ),
           Turn(
             number = 2,
-            white = Move("c4", glyphs = glyphs(1)).some,
+            red = Move("c4", glyphs = glyphs(1)).some,
             black = Move("c6", glyphs = glyphs(2)).some
           ),
           Turn(
             number = 3,
-            white = Move("Nc3", glyphs = glyphs(3)).some,
+            red = Move("Nc3", glyphs = glyphs(3)).some,
             black = Move("Nf6").some
           ),
           Turn(
             number = 4,
-            white = Move(
+            red = Move(
               "cxd5",
               comments =
                 "The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one" :: Nil
@@ -73,12 +73,12 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
           ),
           Turn(
             number = 5,
-            white = Move("Bf4").some,
+            red = Move("Bf4").some,
             black = Move("Nc6").some
           )
         )
       )
-      pgn.toString must_== """[White "Kramnik,V"]
+      pgn.toString must_== """[Red "Kramnik,V"]
 [Black "Anand,V"]
 [ECO "D14"]
 
@@ -88,7 +88,7 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
       val pgn = Pgn(
         tags = Tags(
           List(
-            Tag(_.White, "tsinnema"),
+            Tag(_.Red, "tsinnema"),
             Tag(_.Black, "stockfish"),
             Tag(_.TimeControl, "300"),
             Tag(_.ECO, "A00e")
@@ -97,22 +97,22 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         turns = List(
           Turn(
             number = 1,
-            white = Move("a4", secondsLeft = 298.some).some,
+            red = Move("a4", secondsLeft = 298.some).some,
             black = Move("Nf6", secondsLeft = 299.some).some
           ),
           Turn(
             number = 2,
-            white = Move("d4", secondsLeft = 295.some).some,
+            red = Move("d4", secondsLeft = 295.some).some,
             black = Move("d5", secondsLeft = 298.some).some
           ),
           Turn(
             number = 3,
-            white = Move("h4", secondsLeft = 292.some).some,
+            red = Move("h4", secondsLeft = 292.some).some,
             black = Move("e6", secondsLeft = 297.some).some
           ),
           Turn(
             number = 4,
-            white = Move(
+            red = Move(
               "Qd3",
               glyphs = glyphs(1),
               secondsLeft = 288.some,
@@ -122,12 +122,12 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
           ),
           Turn(
             number = 5,
-            white = Move("dxc5", secondsLeft = 258.some).some,
+            red = Move("dxc5", secondsLeft = 258.some).some,
             black = Move("Bxc5", glyphs = glyphs(1), secondsLeft = 295.some).some
           )
         )
       )
-      pgn.toString must_== """[White "tsinnema"]
+      pgn.toString must_== """[Red "tsinnema"]
 [Black "stockfish"]
 [TimeControl "300"]
 [ECO "A00e"]
@@ -141,24 +141,24 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         turns = List(
           Turn(
             number = 1,
-            white = Move("d3", glyphs = glyphs(6)).some,
+            red = Move("d3", glyphs = glyphs(6)).some,
             black = Move("Nc6", glyphs = glyphs(10)).some
           ),
           Turn(
             number = 2,
-            white = Move("Qd2").some,
+            red = Move("Qd2").some,
             black = Move(
               "Nb4",
               glyphs = Glyphs(
                 Glyph.MoveAssessment.blunder.some,
-                Glyph.PositionAssessment.whiteMuchBetter.some,
+                Glyph.PositionAssessment.redMuchBetter.some,
                 List(Glyph.Observation.timeTrouble)
               )
             ).some
           ),
           Turn(
             number = 3,
-            white = Move("Qxb4", glyphs = glyphs(7)).some,
+            red = Move("Qxb4", glyphs = glyphs(7)).some,
             black = None
           )
         )
@@ -172,13 +172,13 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         turns = List(
           Turn(
             number = 1,
-            white = Move(
+            red = Move(
               "d4",
               variations = List(
                 List(
                   Turn(
                     number = 1,
-                    white = Move("e4").some,
+                    red = Move("e4").some,
                     black = None
                   )
                 )
@@ -190,7 +190,7 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
                 List(
                   Turn(
                     number = 1,
-                    white = None,
+                    red = None,
                     black = Move("d5").some
                   )
                 )
@@ -205,7 +205,7 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
       val pgn = Pgn(
         tags = Tags(
           List(
-            Tag(_.White, "tsinnema"),
+            Tag(_.Red, "tsinnema"),
             Tag(_.Black, "[=0040.34h5a4]"),
             Tag(_.TimeControl, "300"),
             Tag(_.ECO, "A00e")
@@ -214,22 +214,22 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         turns = List(
           Turn(
             number = 1,
-            white = Move("a4", secondsLeft = 298.some).some,
+            red = Move("a4", secondsLeft = 298.some).some,
             black = Move("Nf6", secondsLeft = 299.some).some
           ),
           Turn(
             number = 2,
-            white = Move("d4", secondsLeft = 295.some).some,
+            red = Move("d4", secondsLeft = 295.some).some,
             black = Move("d5", secondsLeft = 298.some).some
           ),
           Turn(
             number = 3,
-            white = Move("h4", secondsLeft = 292.some).some,
+            red = Move("h4", secondsLeft = 292.some).some,
             black = Move("e6", secondsLeft = 297.some).some
           ),
           Turn(
             number = 4,
-            white = Move(
+            red = Move(
               "Qd3",
               glyphs = glyphs(1),
               secondsLeft = 288.some,
@@ -239,12 +239,12 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
           ),
           Turn(
             number = 5,
-            white = Move("dxc5", secondsLeft = 258.some).some,
+            red = Move("dxc5", secondsLeft = 258.some).some,
             black = Move("Bxc5", glyphs = glyphs(1), secondsLeft = 295.some).some
           )
         )
       )
-      pgn.toString must_== """[White "tsinnema"]
+      pgn.toString must_== """[Red "tsinnema"]
 [Black "[=0040.34h5a4]"]
 [TimeControl "300"]
 [ECO "A00e"]
@@ -301,13 +301,13 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         turns = List(
           Turn(
             number = 1,
-            white = Move(
+            red = Move(
               "d4",
               variations = List(
                 List(
                   Turn(
                     number = 1,
-                    white = Move("e4").some,
+                    red = Move("e4").some,
                     black = None
                   )
                 )
@@ -319,7 +319,7 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
                 List(
                   Turn(
                     number = 1,
-                    white = None,
+                    red = None,
                     black = Move("d5").some
                   )
                 )

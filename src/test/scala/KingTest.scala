@@ -6,7 +6,7 @@ class KingTest extends ChessTest {
 
   "a king" should {
 
-    val king = White - King
+    val king = Red - King
 
     "move 1 position in any direction" in {
       pieceMoves(king, D4) must bePoss(D3, C3, C4, C5, D5, E5, E4, E3)

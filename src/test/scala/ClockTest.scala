@@ -24,7 +24,7 @@ class ClockTest extends ChessTest {
     val clock = Clock(5 * 60 * 1000, 0)
     val game  = makeGame withClock clock.start
     "new game" in {
-      game.clock map { _.color } must_== Option(White)
+      game.clock map { _.color } must_== Option(Red)
     }
     "one move played" in {
       game.playMoves(E2 -> E4) must beValid.like { case g: Game =>
@@ -55,12 +55,12 @@ class ClockTest extends ChessTest {
       } remainingTime Black).centis
     }
 
-    def clockStep60(w: Int, l: Int*)  = clockStep(fakeClock60, w, l: _*)
-    def clockStep600(w: Int, l: Int*) = clockStep(fakeClock600, w, l: _*)
+    def clockStep60(r: Int, l: Int*)  = clockStep(fakeClock60, r, l: _*)
+    def clockStep600(r: Int, l: Int*) = clockStep(fakeClock600, r, l: _*)
 
     def clockStart(lag: Int) = {
       val clock = fakeClock60.step()
-      ((clock.value step durOf(lag)).value remainingTime White).centis
+      ((clock.value step durOf(lag)).value remainingTime Red).centis
     }
 
     "start" in {
@@ -136,18 +136,18 @@ class ClockTest extends ChessTest {
     "60s stall" in {
       val clock60 = advance(fakeClock60, 60 * 100)
 
-      clock60.remainingTime(White).centis must_== 0
+      clock60.remainingTime(Red).centis must_== 0
       clock60.outOfTime(Black, withGrace = true) must beFalse
-      clock60.outOfTime(White, withGrace = true) must beFalse
-      clock60.outOfTime(White, withGrace = false) must beTrue
+      clock60.outOfTime(Red, withGrace = true) must beFalse
+      clock60.outOfTime(Red, withGrace = false) must beTrue
     }
     "61s stall" in {
       val clock61 = advance(fakeClock60, 61 * 100)
-      clock61.remainingTime(White).centis must_== 0
-      clock61.outOfTime(White, withGrace = true) must beFalse
+      clock61.remainingTime(Red).centis must_== 0
+      clock61.outOfTime(Red, withGrace = true) must beFalse
     }
-    "over quota stall" >> advance(fakeClock60, 6190).outOfTime(White, withGrace = true)
-    "stall within quota" >> !advance(fakeClock600, 60190).outOfTime(White, withGrace = true)
-    "max grace stall" >> advance(fakeClock600, 602 * 100).outOfTime(White, withGrace = true)
+    "over quota stall" >> advance(fakeClock60, 6190).outOfTime(Red, withGrace = true)
+    "stall within quota" >> !advance(fakeClock600, 60190).outOfTime(Red, withGrace = true)
+    "max grace stall" >> advance(fakeClock600, 602 * 100).outOfTime(Red, withGrace = true)
   }
 }

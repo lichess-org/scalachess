@@ -261,8 +261,8 @@ object Variant {
   )
 
   private[variant] def symmetricRank(rank: IndexedSeq[Role]): Map[Pos, Piece] =
-    File.all.zip(rank).map { case (x, role) => Pos(x, Rank.First) -> (White - role) } ++
-      File.all.map { Pos(_, Rank.Second) -> White.pawn } ++
+    File.all.zip(rank).map { case (x, role) => Pos(x, Rank.First) -> (Red - role) } ++
+      File.all.map { Pos(_, Rank.Second) -> Red.pawn } ++
       File.all.map { Pos(_, Rank.Seventh) -> Black.pawn } ++
       File.all.zip(rank).map { case (x, role) => Pos(x, Rank.Eighth) -> (Black - role) } toMap
 }

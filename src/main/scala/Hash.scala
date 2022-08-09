@@ -24,7 +24,7 @@ object Hash {
     def hexToLong(s: String): Long =
       (java.lang.Long.parseLong(s.substring(start, start + 8), 16) << 32) |
         java.lang.Long.parseLong(s.substring(start + 8, start + 16), 16)
-    val whiteTurnMask       = hexToLong(ZobristTables.whiteTurnMask)
+    val redTurnMask       = hexToLong(ZobristTables.redTurnMask)
     val actorMasks          = ZobristTables.actorMasks.map(hexToLong)
     val castlingMasks       = ZobristTables.castlingMasks.map(hexToLong)
     val enPassantMasks      = ZobristTables.enPassantMasks.map(hexToLong)
@@ -65,7 +65,7 @@ object Hash {
     }
 
     val board = situation.board
-    val hturn = situation.color.fold(table.whiteTurnMask, 0L)
+    val hturn = situation.color.fold(table.redTurnMask, 0L)
 
     val hactors = board.actors.values.view
       .map {
@@ -90,9 +90,9 @@ object Hash {
     val hchecks = board.variant match {
       case variant.ThreeCheck =>
         val blackCount   = math.min(situation.history.checkCount.black, 3)
-        val whiteCount   = math.min(situation.history.checkCount.white, 3)
+        val redCount   = math.min(situation.history.checkCount.red, 3)
         val hblackchecks = if (blackCount > 0) hep ^ table.threeCheckMasks(blackCount - 1) else hep
-        if (whiteCount > 0) hblackchecks ^ table.threeCheckMasks(whiteCount + 2) else hblackchecks
+        if (redCount > 0) hblackchecks ^ table.threeCheckMasks(redCount + 2) else hblackchecks
       case _ => hep
     }
 
@@ -896,7 +896,7 @@ private object ZobristTables {
     "d20d8c88c8ffe65f576ec7a84e0b932d"
   )
 
-  val whiteTurnMask = "f8d626aaaf2785093815e537b6222c85"
+  val redTurnMask = "f8d626aaaf2785093815e537b6222c85"
 
   val castlingMasks = Array(
     "31d71dce64b2c310ca3c7f8d050c44ba",

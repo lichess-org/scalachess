@@ -10,22 +10,22 @@ class BoardTest extends ChessTest {
 
     "position pieces correctly" in {
       board.pieces must havePairs(
-        A1 -> (White - Rook),
-        B1 -> (White - Knight),
-        C1 -> (White - Bishop),
-        D1 -> (White - Queen),
-        E1 -> (White - King),
-        F1 -> (White - Bishop),
-        G1 -> (White - Knight),
-        H1 -> (White - Rook),
-        A2 -> (White - Pawn),
-        B2 -> (White - Pawn),
-        C2 -> (White - Pawn),
-        D2 -> (White - Pawn),
-        E2 -> (White - Pawn),
-        F2 -> (White - Pawn),
-        G2 -> (White - Pawn),
-        H2 -> (White - Pawn),
+        A1 -> (Red - Rook),
+        B1 -> (Red - Knight),
+        C1 -> (Red - Bishop),
+        D1 -> (Red - Queen),
+        E1 -> (Red - King),
+        F1 -> (Red - Bishop),
+        G1 -> (Red - Knight),
+        H1 -> (Red - Rook),
+        A2 -> (Red - Pawn),
+        B2 -> (Red - Pawn),
+        C2 -> (Red - Pawn),
+        D2 -> (Red - Pawn),
+        E2 -> (Red - Pawn),
+        F2 -> (Red - Pawn),
+        G2 -> (Red - Pawn),
+        H2 -> (Red - Pawn),
         A7 -> (Black - Pawn),
         B7 -> (Black - Pawn),
         C7 -> (Black - Pawn),
@@ -54,8 +54,8 @@ class BoardTest extends ChessTest {
     }
 
     "allow a piece to be placed" in {
-      board.place(White - Rook, E3) must beSome.like { case b =>
-        b(E3) mustEqual Option(White - Rook)
+      board.place(Red - Rook, E3) must beSome.like { case b =>
+        b(E3) mustEqual Option(Red - Rook)
       }
     }
 
@@ -67,7 +67,7 @@ class BoardTest extends ChessTest {
 
     "allow a piece to move" in {
       board.move(E2, E4) must beSome.like { case b =>
-        b(E4) mustEqual Option(White - Pawn)
+        b(E4) mustEqual Option(Red - Pawn)
       }
     }
 
@@ -87,31 +87,31 @@ class BoardTest extends ChessTest {
 
     "allow chaining actions" in {
       makeEmptyBoard.seq(
-        _.place(White - Pawn, A2),
-        _.place(White - Pawn, A3),
+        _.place(Red - Pawn, A2),
+        _.place(Red - Pawn, A3),
         _.move(A2, A4)
       ) must beSome.like { case b =>
-        b(A4) mustEqual Option(White - Pawn)
+        b(A4) mustEqual Option(Red - Pawn)
       }
     }
 
     "fail on bad actions chain" in {
       makeEmptyBoard.seq(
-        _.place(White - Pawn, A2),
-        _.place(White - Pawn, A3),
+        _.place(Red - Pawn, A2),
+        _.place(Red - Pawn, A3),
         _.move(B2, B4)
       ) must beNone
     }
 
     "provide occupation map" in {
       makeBoard(
-        A2 -> (White - Pawn),
-        A3 -> (White - Pawn),
-        D1 -> (White - King),
+        A2 -> (Red - Pawn),
+        A3 -> (Red - Pawn),
+        D1 -> (Red - King),
         E8 -> (Black - King),
         H4 -> (Black - Queen)
       ).occupation must_== Color.Map(
-        white = Set(A2, A3, D1),
+        red = Set(A2, A3, D1),
         black = Set(E8, H4)
       )
     }

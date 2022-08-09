@@ -44,18 +44,18 @@ object Fixtures {
 [Site "Chess.com"]
 [Date "2016.05.10"]
 [Round "?"]
-[White "LyonBeast"]
+[Red "LyonBeast"]
 [Black "FabianoCaruana"]
 [Result "0-1"]
-[WhiteElo "2747"]
+[RedElo "2747"]
 [BlackElo "2699"]
 [ECO "A00"]
 [TimeControl "300+2"]
 [Termination "FabianoCaruana won by resignation"]
 [Annotator "Komodo 9.01 64-bit"]
-[CurrentPosition "3r2k1/p3n1p1/1p5p/2q1p3/2P1B1R1/2Q1P3/P5PP/3r1R1K w - - 6 28"]
+[CurrentPosition "3r2k1/p3n1p1/1p5p/2q1p3/2P1B1R1/2Q1P3/P5PP/3r1R1K r - - 6 28"]
 
-1.d4 Nf6 2.c4 e6 3.Nf3 d5 4.Nc3 Be7 5.Bg5 h6 6.Bh4 O-O 7.e3 Ne4 8.Bxe7 Qxe7 9.cxd5 Nxc3 10.bxc3 exd5 11.Qb3 Rd8 12.c4 Be6 13.Rc1 c5 14.dxc5 Qxc5 15.Nd4 Nc6 16.Nxe6 fxe6 17.Be2 d4 18.O-O dxe3 19.fxe3 Ne5 20.Kh1 b6 21.Qc3 Rd6 22.Rf4 Rad8 23.Re4 Nc6 24.Rf1 e5 25.Rg4 Rd2 26.Bf3 Ne7 27.Be4 Rd1 28.Kg1? ( 28.Rg1! { Forced, but Black is clearly much, much better. The silicon companion says Kh8 is now best. #shrug } ) 28...b5? ( 28...R8d3! { This classic interference tactic just ends the game. } 29.Bxd3 Qxe3+ 30.Kh1 Rxf1+ 31.Bxf1 Qxc3 ) 29.Bc2? ( 29.Rxd1 Rxd1+ 30.Kf2 { Black clearly still has a big plus, but is not yet winning. } ) 29...Rxf1+ 30.Kxf1 Nd5 31.Rxg7+ Kf8! { Black simply leaves White to deal with the hanging queen, e3 pawn, and rook. } ( 31...Kxg7? 32.Qxe5+ Kf8 33.Qh8+ Ke7 34.Qe5+ Kf7 35.cxd5 { Unclear. } ) ( 31...Kh8? 32.Rh7+ Kg8 33.Rh8+! )
+1.d4 Nf6 2.c4 e6 3.Nf3 d5 4.Nc3 Be7 5.Bg5 h6 6.Bh4 O-O 7.e3 Ne4 8.Bxe7 Qxe7 9.cxd5 Nxc3 10.bxc3 exd5 11.Qb3 Rd8 12.c4 Be6 13.Rc1 c5 14.dxc5 Qxc5 15.Nd4 Nc6 16.Nxe6 fxe6 17.Be2 d4 18.O-O dxe3 19.fxe3 Ne5 20.Kh1 b6 21.Qc3 Rd6 22.Rf4 Rad8 23.Re4 Nc6 24.Rf1 e5 25.Rg4 Rd2 26.Bf3 Ne7 27.Be4 Rd1 28.Kg1? ( 28.Rg1! { Forced, but Black is clearly much, much better. The silicon companion says Kh8 is now best. #shrug } ) 28...b5? ( 28...R8d3! { This classic interference tactic just ends the game. } 29.Bxd3 Qxe3+ 30.Kh1 Rxf1+ 31.Bxf1 Qxc3 ) 29.Bc2? ( 29.Rxd1 Rxd1+ 30.Kf2 { Black clearly still has a big plus, but is not yet winning. } ) 29...Rxf1+ 30.Kxf1 Nd5 31.Rxg7+ Kf8! { Black simply leaves Red to deal with the hanging queen, e3 pawn, and rook. } ( 31...Kxg7? 32.Qxe5+ Kf8 33.Qh8+ Ke7 34.Qe5+ Kf7 35.cxd5 { Unclear. } ) ( 31...Kh8? 32.Rh7+ Kg8 33.Rh8+! )
 0-1
 """
 
@@ -63,16 +63,16 @@ object Fixtures {
 [Event "Live Chess - Crazyhouse"]
 [Site "Chess.com"]
 [Date "2016.11.30"]
-[White "eekarf"]
+[Red "eekarf"]
 [Black "JannLeeCrazyhouse"]
 [Result "0-1"]
 [ECO "C46"]
-[WhiteElo "2071"]
+[RedElo "2071"]
 [BlackElo "2593"]
 [TimeControl "180"]
 [Termination "JannLeeCrazyhouse won by checkmate"]
 [Variant "Crazyhouse"]
-[CurrentPosition "r1bBk1r1/ppp2p1p/1b1p3p/3Pp3/6N1/2PPn2n/PP2B1pP/R2Q3K w q - 0 22 QNrp"]
+[CurrentPosition "r1bBk1r1/ppp2p1p/1b1p3p/3Pp3/6N1/2PPn2n/PP2B1pP/R2Q3K r q - 0 22 QNrp"]
 
 1.e4 e5 2.Nf3 Nc6 3.Nc3 Bc5 4.Be2 Nf6 5.O-O d6 6.d3 Nd4 7.Nxd4 Bxd4 8.Nd5 Nxd5 9.exd5 N@f6 10.c3 Bb6 11.Bg5 N@f4 12.N@e4 Rg8 13.N@h6 Nxe4 14.Bxd8 N@h3+ 15.gxh3 Nxh3+ 16.Kh1 Nexf2+ 17.Rxf2 Nxf2+ 18.Kg2 gxh6+ 19.N@g4 N@e3+ 20.Kg1 Nh3+ 21.Kh1 @g2#
 0-1
@@ -83,17 +83,17 @@ val invisibleChar = """
 [Site "?"]
 [Date "2018.01.21"]
 [Round "5.1"]
-[White "XXXXX, XXXXX"]
+[Red "XXXXX, XXXXX"]
 [Black "YYYYY, YYYYY"]
 [Result "1/2-1/2"]
 [ECO "A40"]
-[WhiteElo "1637"]
+[RedElo "1637"]
 [BlackElo "1859"]
 [Annotator "ZZZZZ"]
 [PlyCount "19"]
 [SourceDate "2017.09.30"]
 [SourceVersionDate "2017.09.30"]
-[WhiteTeam "XXXXX"]
+[RedTeam "XXXXX"]
 [BlackTeam "YYYYY"]
 
 {A40: Verschiedene (seltene) Antworten auf 1.d4} 1. e4 g6 2. d4 Bg7 3. c4 Nc6
@@ -113,7 +113,7 @@ mit -0.10 minimal Schwarz vorne sieht, ist doch die Remisbreite sehr hoch.}
 """
 
   val fromPosProdCloseChess = """
-[FEN "8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1"]
+[FEN "8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 r - - 0 1"]
 1. d4 d5 2. Nf4 Nf5 3. g4 g5 4. gxf5 exf5
 5. Nbd3 gxf4 6. Nxf4 Bxf4 7. exf4 Nd6 8. Bh4 Qd8
 9. Bd3 Kd7 10. Kf1 Kc8 11. Rg2 Kb8 12. Qe1 Bh5
@@ -147,31 +147,31 @@ Rc8 39.Bf6+ Kh7 40.c6 bxc6 41.Qc5 Kh6 42.Rb2 Qb7 43.Rb4 1–0"""
   val noTagButResult = "1.g4 e5 2.d4 e4 3.c4 Qh4 4.h3 Bb4+ 5.Nc3 Bxc3+ 6.bxc3 Qe7 7.Bf4 d6 8.e3 g5 9.Bg3 Be6 10.Rb1 Bc8 11.Be2 Nf6 12.h4 gxh4 13.Bxh4 Qe6 14.g5 Nfd7 15.Nh3 Rg8 16.Nf4 Qe7 17.Nd5 Qd8 18.g6 f6 19.gxh7 1-0"
 
   val inlineTags = """
-[Event "NII - Lille 2 / Tour Blanche Paris"] [Site "Lille"][Date "2015.03.14"][Round "8"] [White "Blazquez, Denis"] [Black "Soubirou, Oriane"] [Result "0-1"] [ECO "B00"] [WhiteElo "2083"] [BlackElo "2135"] [PlyCount "35"]
+[Event "NII - Lille 2 / Tour Blanche Paris"] [Site "Lille"][Date "2015.03.14"][Round "8"] [Red "Blazquez, Denis"] [Black "Soubirou, Oriane"] [Result "0-1"] [ECO "B00"] [RedElo "2083"] [BlackElo "2135"] [PlyCount "35"]
 
 1. d4 a6 2. e4 e6 3. c4 b5 4. cxb5 axb5 5. Bxb5 Bb7 6. Nc3 Bb4 7. Qe2 Qh4 8.
 Bd3 f5 9. g3 Qf6 10. Nf3 c5 11. O-O Ne7 12. Bg5 Qf8 13. Nb5 Bxe4 14. Bxe4 fxe4
 15. Qxe4 Nd5 16. Ne5 cxd4 17. Qxd5 Ra7 18. Qa8 0-1
 """
 
-  val whiteResignsInTags = """
-[Event "NII - Lille 2 / Tour Blanche Paris"] [Site "Lille"][Date "2015.03.14"][Round "8"] [White "Blazquez, Denis"] [Black "Soubirou, Oriane"] [Result "0-1"] [ECO "B00"] [WhiteElo "2083"] [BlackElo "2135"] [PlyCount "35"]
+  val redResignsInTags = """
+[Event "NII - Lille 2 / Tour Blanche Paris"] [Site "Lille"][Date "2015.03.14"][Round "8"] [Red "Blazquez, Denis"] [Black "Soubirou, Oriane"] [Result "0-1"] [ECO "B00"] [RedElo "2083"] [BlackElo "2135"] [PlyCount "35"]
 
 1. d4 a6 2. e4 e6 3. c4 b5 4. cxb5 axb5 5. Bxb5 Bb7 6. Nc3 Bb4 7. Qe2 Qh4 8.
 Bd3 f5 9. g3 Qf6 10. Nf3 c5 11. O-O Ne7 12. Bg5 Qf8 13. Nb5 Bxe4 14. Bxe4 fxe4
 15. Qxe4 Nd5 16. Ne5 cxd4 17. Qxd5 Ra7 18. Qa8
 """
 
-  val whiteResignsInMoves = """
-[Event "NII - Lille 2 / Tour Blanche Paris"] [Site "Lille"][Date "2015.03.14"][Round "8"] [White "Blazquez, Denis"] [Black "Soubirou, Oriane"] [ECO "B00"] [WhiteElo "2083"] [BlackElo "2135"] [PlyCount "35"]
+  val redResignsInMoves = """
+[Event "NII - Lille 2 / Tour Blanche Paris"] [Site "Lille"][Date "2015.03.14"][Round "8"] [Red "Blazquez, Denis"] [Black "Soubirou, Oriane"] [ECO "B00"] [RedElo "2083"] [BlackElo "2135"] [PlyCount "35"]
 
 1. d4 a6 2. e4 e6 3. c4 b5 4. cxb5 axb5 5. Bxb5 Bb7 6. Nc3 Bb4 7. Qe2 Qh4 8.
 Bd3 f5 9. g3 Qf6 10. Nf3 c5 11. O-O Ne7 12. Bg5 Qf8 13. Nb5 Bxe4 14. Bxe4 fxe4
 15. Qxe4 Nd5 16. Ne5 cxd4 17. Qxd5 Ra7 18. Qa8 0-1
 """
 
-  val whiteResignsInTagsAndMoves = """
-[Event "NII - Lille 2 / Tour Blanche Paris"] [Site "Lille"][Date "2015.03.14"][Round "8"] [White "Blazquez, Denis"] [Black "Soubirou, Oriane"] [Result "0-1"] [ECO "B00"] [WhiteElo "2083"] [BlackElo "2135"] [PlyCount "35"]
+  val redResignsInTagsAndMoves = """
+[Event "NII - Lille 2 / Tour Blanche Paris"] [Site "Lille"][Date "2015.03.14"][Round "8"] [Red "Blazquez, Denis"] [Black "Soubirou, Oriane"] [Result "0-1"] [ECO "B00"] [RedElo "2083"] [BlackElo "2135"] [PlyCount "35"]
 
 1. d4 a6 2. e4 e6 3. c4 b5 4. cxb5 axb5 5. Bxb5 Bb7 6. Nc3 Bb4 7. Qe2 Qh4 8.
 Bd3 f5 9. g3 Qf6 10. Nf3 c5 11. O-O Ne7 12. Bg5 Qf8 13. Nb5 Bxe4 14. Bxe4 fxe4
@@ -183,11 +183,11 @@ val festivalFigueira = """
 [Site "?"]
 [Date "2017.10.29"]
 [Round "1.21"]
-[White "Paiva, Henrique M A Albergaria"]
+[Red "Paiva, Henrique M A Albergaria"]
 [Black "Morais, Mario Martins Freitas"]
 [Result "1-0"]
 [BlackElo "1457"]
-[WhiteElo "2110"]
+[RedElo "2110"]
 [LiveChessVersion "1.4.8"]
 [ECO "B35"]
 
@@ -230,10 +230,10 @@ val crazyhouseFromProd = """
 [Event "Hourly Crazyhouse Inc Arena"]
 [Site "https://lichess.org/vjT6KovO"]
 [Date "2016.08.19"]
-[White "danieldima"]
+[Red "danieldima"]
 [Black "Hesar"]
 [Result "1-0"]
-[WhiteElo "2319"]
+[RedElo "2319"]
 [BlackElo "1943"]
 [PlyCount "49"]
 [Variant "Crazyhouse"]
@@ -251,11 +251,11 @@ val crazyhouseFromProd = """
 [Site "Lille"]
 [Date "2015.03.14"]
 [Round "8"]
-[White "Blazquez, Denis"]
+[Red "Blazquez, Denis"]
 [Black "Soubirou, Oriane"]
 [Result "1-0"]
 [ECO "B00"]
-[WhiteElo "2083"]
+[RedElo "2083"]
 [BlackElo "2135"]
 [PlyCount "35"]
 
@@ -267,14 +267,14 @@ Bd3 f5 9. g3 Qf6 10. Nf3 c5 11. O-O Ne7 12. Bg5 Qf8 13. Nb5 Bxe4 14. Bxe4 fxe4
   val complete960 = """[Event "Casual game"]
 [Site "http://lichess.org/analyse/---qxr00"]
 [Date "2010.10.30"]
-[White "Anonymous"]
+[Red "Anonymous"]
 [Black "Crafty level 1"]
-[WhiteElo "?"]
+[RedElo "?"]
 [BlackElo "?"]
 [Result "0-1"]
 [PlyCount "42"]
 [Variant "Chess960"]
-[FEN "rbkrnnbq/pppppppp/8/8/8/8/PPPPPPPP/RBKRNNBQ w KQkq - 0 1"]
+[FEN "rbkrnnbq/pppppppp/8/8/8/8/PPPPPPPP/RBKRNNBQ r KQkq - 0 1"]
 
 1. e3 Nf6 2. Ng3 Ne6 3. Nf3 d5 4. Nd4 Nxd4 5. exd4 e6 6. Re1 Ng4 7. Re2 f6 8. c4 dxc4 9. Be4 Rxd4 10. Bf3 Ne5 11. Ne4 Nxf3 12. gxf3 Bf7 13. Nxf6 gxf6 14. Kd1 e5 15. h4 Bg6 16. Bh2 Bf5 17. Rxe5 fxe5 18. Bxe5 Qxe5 19. Qf1 Qf4 20. d3 Rxd3+ 21. Ke1 Qd2# 0-1"""
 
@@ -282,7 +282,7 @@ Bd3 f5 9. g3 Qf6 10. Nf3 c5 11. O-O Ne7 12. Bg5 Qf8 13. Nb5 Bxe4 14. Bxe4 fxe4
 [Site "Belgrade, Serbia Yugoslavia|JUG"]
 [Date "1992.11.04"]
 [Round "29"]
-[White "Fischer, Robert J."]
+[Red "Fischer, Robert J."]
 [Black "Spassky, Boris V."]
 [Result "1/2-1/2"]
 
@@ -300,17 +300,17 @@ Nf2 42. g4 Bd3 43. Re6 1/2-1/2"""
 [Site "Saint Louis, United States"]
 [Date "2018.09.12"]
 [Round "6.1"]
-[White "Kasparov, Garry"]
+[Red "Kasparov, Garry"]
 [Black "Topalov, Veselin"]
 [Result "*"]
-[WhiteClock "00:04:08"]
+[RedClock "00:04:08"]
 [BlackClock "00:07:03"]
 [ReferenceTime "B/2018-09-12T15:26:56.191-05:00"]
-[FEN "rbnnqkbr/pppppppp/8/8/8/8/PPPPPPPP/RBNNQKBR w HAha - 0 1"]
+[FEN "rbnnqkbr/pppppppp/8/8/8/8/PPPPPPPP/RBNNQKBR r HAha - 0 1"]
 [Variant "Fischerandom"]
-[WhiteTitle "GM"]
+[RedTitle "GM"]
 [BlackTitle "GM"]
-[WhiteElo "2734"]
+[RedElo "2734"]
 [BlackElo "2722"]
 
 1. d4 {[%clk 00:30:00]} {[%emt 00:00:05]} d5 {[%clk 00:29:57]} {[%emt
@@ -347,7 +347,7 @@ Nd6 {[%clk 00:07:18]} {[%emt 00:00:10]} 26. Ke3 {[%clk 00:04:08]} {[%emt
 [Site "Belgrade, Serbia Yugoslavia|JUG"]
 [Date "1992.11.04"]
 [Round "29"]
-[White "Fischer, Robert J."]
+[Red "Fischer, Robert J."]
 [Black "Spassky, Boris V."]
 [Result "1/2-1/2"]
 
@@ -366,10 +366,10 @@ val fromChessgames = """[Event "The Match - Braingames World Chess Cham"]
 [EventDate "2000.10.12"]
 [Round "3"]
 [Result "1/2-1/2"]
-[White "Garry Kasparov"]
+[Red "Garry Kasparov"]
 [Black "Vladimir Kramnik"]
 [ECO "C67"]
-[WhiteElo "2849"]
+[RedElo "2849"]
 [BlackElo "2770"]
 [PlyCount "106"]
 
@@ -392,10 +392,10 @@ val fromChessgamesWithEscapeChar = """%youpi
 [EventDate "2000.10.12"]
 [Round "3"]
 [Result "1/2-1/2"]
-[White "Garry Kasparov"]
+[Red "Garry Kasparov"]
 [Black "Vladimir Kramnik"]
 [ECO "C67"]
-[WhiteElo "2849"]
+[RedElo "2849"]
 [BlackElo "2770"]
 [PlyCount "106"]
 
@@ -418,29 +418,29 @@ val chessgamesWeirdComments = """[Event "Hastings"]
 [EventDate "1895.08.05"]
 [Round "1"]
 [Result "1/2-1/2"]
-[White "Carl Schlechter"]
+[Red "Carl Schlechter"]
 [Black "William Henry Krause Pollock"]
 [ECO "C77"]
-[WhiteElo "?"]
+[RedElo "?"]
 [BlackElo "?"]
 [PlyCount "47"]
 
 1. e4 {Notes by E. Schiffers} e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4
 Nf6 5. Nc3 Bb4 {The 'Handbuch' considers that Black's best
-move here is Be7; White continues 6 O-O b5 7 Bb3 d6 8 a3 0r
+move here is Be7; Red continues 6 O-O b5 7 Bb3 d6 8 a3 0r
 a4.} 6. Nd5 Bc5 {After Be7 would follow 7 d3 h6 and an even
 game. It would not be good to play ...Nxd5 7 exd5 Ne7 8 c3 Ba5
 (?) 9 Nxe5.} 7. d3 {The 'Handbuch' gives the continuation 7 c3
-Nxe4 8 d4 exd4 9 cxd4 Bb4+ 10 Kf1 in White's favour.} h6
+Nxe4 8 d4 exd4 9 cxd4 Bb4+ 10 Kf1 in Red's favour.} h6
 8. Be3 Bxe3 {Also good would have been Nxe3.} 9. fxe3 d6
 10. O-O Be6 {...Bg4 is better.} 11. Nxf6+ {An enterprising
 move} Qxf6 12. Nd4 Qg5 13. Nxc6 {After 13 Nxe6 fxe6 (...Qxe3+
-14 Kh1 fxe6 15 Qh5+) 14 Bxc6+ bxc6 15 Qf3; White's game is
+14 Kh1 fxe6 15 Qh5+) 14 Bxc6+ bxc6 15 Qf3; Red's game is
 preferable.} Qxe3+ 14. Kh1 Bd7 15. Nxe5 {And other moves still
-do not give White the superiority, e.g. 15 Nb4 Bxa4 16 Nd5
+do not give Red the superiority, e.g. 15 Nb4 Bxa4 16 Nd5
 Qc5, etc.} Bxa4 16. Nxf7 O-O {!} $14 17. Qh5 Be8 18. Rf3 Bxf7
 19. Qxf7+ Rxf7 20. Rxe3 Rf2 21. Rae1 {21 Rc1 Raf8 followed by
-...Rd2 and the other rook to f2 would have been worse as White
+...Rd2 and the other rook to f2 would have been worse as Red
 would then get into difficulties, whereas now the draw is
 secure.} Raf8 22. Kg1 Rxc2 23. R3e2 Rxe2 24. Rxe2 1/2-1/2
 """
@@ -456,13 +456,13 @@ val fromCrafty = """[Event "Live Chess"]
 [Site "Chess.com"]
 [Date "2014.01.15"]
 [Round "?"]
-[White "amarkaur"]
-[WhiteElo "1116"]
+[Red "amarkaur"]
+[RedElo "1116"]
 [Black "ludocode"]
 [BlackElo "1220"]
 [Result "0-1"]
 [Annotator "Crafty v23.4"]
-{annotating both black and white moves.}
+{annotating both black and red moves.}
 {using a scoring margin of +0.50 pawns.}
 {search time limit is 1.00}
 
@@ -1137,23 +1137,23 @@ val withNag = """
 [Site "?"]
 [Date "1851.??.??"]
 [Round "?"]
-[White "Anderssen, Adolph"]
+[Red "Anderssen, Adolph"]
 [Black "Lionel, Kieseritsky"]
 [Result "1-0"]
 [ECO "C33"]
-[WhiteElo "unknown"]
+[RedElo "unknown"]
 [BlackElo "unknown"]
 [Annotator "Hayes, David"]
 [PlyCount "45"]
 
-1. e4 {C33: King's Gambit Accepted: 3 Nc3 and 3 Bc4} 1... e5 2. f4 {White offers a pawn to gain better development and control of the center.} 2... exf4 3. Bc4 Qh4+ 4. Kf1 b5?! {Bryan's Counter Gambit. A dubious gambit in modern times, but typical of the attacking style of that time. Here black lures the Bishop from it attacking diagonal against the sensitive f7-pawn, and provides a diagonal for development of his own Bishop to b7 where it will bear down on white's King side. All this value for the price of a pawn.} 5. Bxb5 Nf6 6. Nf3 Qh6 7. d3 Nh5 {The immediate, cheap, and shallow threat of ... Ng3+ is easily defended.} 8. Nh4 {The position is sharp and getting sharper.} 8... Qg5 {Again, playing for cheap threats. In this case, black attacks two pieces at once.} 9. Nf5 c6 {9... g6 10. h4 Qf6 is another complicated position for another day.} 10. g4 {A brilliant move made with a steady hand. Note that white cares little for defensive moves, and is always alert for attack. Now black plays to win the g4-pawn.} 10... Nf6 {Black should have played 10... cxb5 11. gxh5 with a better game.} 11. Rg1 {Now Anderssen sacrifices his Bishop, the first of many sacrifices in this game. White cares little for defensive moves, and plays always for the initiative.} 11... cxb5 12. h4 Qg6 13. h5 {White gets more space.} 13... Qg5 14. Qf3 {White now has the ghastly threat of Bxf4 winning black's Queen next.} 14... Ng8 {Black is forces to clear a path of retreat for his Queen by also retreating one of his only developed pieces.} 15. Bxf4 Qf6 {Black should quickly develop his pieces.} 16. Nc3 Bc5 17. Nd5 {Inviting black to indulge his greed. Also good is 17. d4 Bf8 (17... Bxd4? 18. Nd5 when the Knights savage the board.) 18. Be5.} 17... Qxb2 18. Bd6 Qxa1+ {And why not capture with check!} 19. Ke2 {Now who can resist the tender morsel on g1, but resist he must.} 19... Bxg1 {Black is just too greedy. He has too few pieces developed, and what is developed is sent to the far corners of the board. Now it is white's turn to play. Black may have won after 19... Qb2 (to guard against Nxg7+) 20. Rc1 g6 21. Bxc5 gxf5 (not 21... Qxc1 22. Nd6+ Kd8 23. Nxf7+ Ke8 24. Nc7#).} 20. e5 {Slipping the noose around the neck of the black King.} 20... Na6 {Perhaps 20... Ba6 would have put up more resistance by giving black's King more room to run.} 21. Nxg7+ Kd8 22. Qf6+! {A final pretty sacrifice that ends the game.} 22... Nxf6 {A deflection.} 23. Be7# 1-0
+1. e4 {C33: King's Gambit Accepted: 3 Nc3 and 3 Bc4} 1... e5 2. f4 {Red offers a pawn to gain better development and control of the center.} 2... exf4 3. Bc4 Qh4+ 4. Kf1 b5?! {Bryan's Counter Gambit. A dubious gambit in modern times, but typical of the attacking style of that time. Here black lures the Bishop from it attacking diagonal against the sensitive f7-pawn, and provides a diagonal for development of his own Bishop to b7 where it will bear down on red's King side. All this value for the price of a pawn.} 5. Bxb5 Nf6 6. Nf3 Qh6 7. d3 Nh5 {The immediate, cheap, and shallow threat of ... Ng3+ is easily defended.} 8. Nh4 {The position is sharp and getting sharper.} 8... Qg5 {Again, playing for cheap threats. In this case, black attacks two pieces at once.} 9. Nf5 c6 {9... g6 10. h4 Qf6 is another complicated position for another day.} 10. g4 {A brilliant move made with a steady hand. Note that red cares little for defensive moves, and is always alert for attack. Now black plays to win the g4-pawn.} 10... Nf6 {Black should have played 10... cxb5 11. gxh5 with a better game.} 11. Rg1 {Now Anderssen sacrifices his Bishop, the first of many sacrifices in this game. Red cares little for defensive moves, and plays always for the initiative.} 11... cxb5 12. h4 Qg6 13. h5 {Red gets more space.} 13... Qg5 14. Qf3 {Red now has the ghastly threat of Bxf4 winning black's Queen next.} 14... Ng8 {Black is forces to clear a path of retreat for his Queen by also retreating one of his only developed pieces.} 15. Bxf4 Qf6 {Black should quickly develop his pieces.} 16. Nc3 Bc5 17. Nd5 {Inviting black to indulge his greed. Also good is 17. d4 Bf8 (17... Bxd4? 18. Nd5 when the Knights savage the board.) 18. Be5.} 17... Qxb2 18. Bd6 Qxa1+ {And why not capture with check!} 19. Ke2 {Now who can resist the tender morsel on g1, but resist he must.} 19... Bxg1 {Black is just too greedy. He has too few pieces developed, and what is developed is sent to the far corners of the board. Now it is red's turn to play. Black may have won after 19... Qb2 (to guard against Nxg7+) 20. Rc1 g6 21. Bxc5 gxf5 (not 21... Qxc1 22. Nd6+ Kd8 23. Nxf7+ Ke8 24. Nc7#).} 20. e5 {Slipping the noose around the neck of the black King.} 20... Na6 {Perhaps 20... Ba6 would have put up more resistance by giving black's King more room to run.} 21. Nxg7+ Kd8 22. Qf6+! {A final pretty sacrifice that ends the game.} 22... Nxf6 {A deflection.} 23. Be7# 1-0
 """
 
 val fromTcec = """[Event "nTCEC - Stage 2 - Season 2"]
 [Site "http://www.tcec-chess.net"]
 [Date "2013.09.24"]
 [Round "5.2"]
-[White "Stockfish 160913"]
+[Red "Stockfish 160913"]
 [Black "Spike 1.4"]
 [Result "1-0"]
 [Variant "normal"]
@@ -1176,10 +1176,10 @@ val fromLichessBadPromotion = """
 [Site "?"]
 [Date "????.??.??"]
 [Round "?"]
-[White "?"]
+[Red "?"]
 [Black "?"]
 [Result "*"]
-[FEN "8/8/1KP5/3r4/8/8/8/k7 w - - 0 1"]
+[FEN "8/8/1KP5/3r4/8/8/8/k7 r - - 0 1"]
 [SetUp "1"]
 
 1. c7 Rd6+ 2. Kb5 Rd5+ 3. Kb4 Rd4+ 4. Kb3 Rd3+ 5. Kc2 Rd4 6. c8=R Ra4 7. Kb3 *
@@ -1188,10 +1188,10 @@ val fromLichessBadPromotion = """
 val fromPositionEmptyFen = """
 [Event "Casual game"]
 [Date "2016.09.01"]
-[White "lichess AI level 4"]
+[Red "lichess AI level 4"]
 [Black "victor946c"]
 [Result "0-1"]
-[WhiteElo "?"]
+[RedElo "?"]
 [BlackElo "1500"]
 [PlyCount "164"]
 [Variant "From Position"]
@@ -1201,7 +1201,7 @@ val fromPositionEmptyFen = """
 [Termination "Normal"]
 [SetUp "1"]
 [Annotator "lichess.org"]
-1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 4. Qc2 d5 { E34 Nimzo-Indian Defense: Classical Variation, Noa Variation } 5. Bg5 Bxc3+ 6. bxc3 dxc4 7. e3 b5 8. Nf3 O-O?! { (0.00 → 0.60) Inaccuracy. Best move was Bb7. } (8... Bb7 9. Qb2 Bxf3 10. gxf3 a6 11. a4 Nbd7 12. Bxf6 gxf6 13. f4 Rb8 14. axb5 axb5 15. Ra7) 9. a4 c6 10. axb5?! { (0.55 → 0.05) Inaccuracy. Best move was Be2. } (10. Be2 Bb7 11. Rb1 Nbd7 12. O-O Qc8 13. axb5 cxb5 14. Bxf6 Nxf6 15. Rxb5 Be4 16. Qb2 Bd3) 10... cxb5 11. Be2 h6? { (-0.29 → 1.62) Mistake. Best move was Bb7. } (11... Bb7 12. Nd2 h6 13. Bh4 Nbd7 14. O-O a5 15. h3 Qc8 16. Rfb1 Bc6 17. e4 a4 18. Bf3) 12. Bh4? { (1.62 → -0.26) Mistake. Best move was Bxf6. } (12. Bxf6 gxf6 13. Qe4 Qd5 14. Qg4+ Kh7 15. Ne5 Rg8 16. Qh4 fxe5 17. Bf3 Qd7 18. Bxa8 exd4) 12... a6 13. O-O Nbd7 14. Rfd1 Bb7 15. Ne5 g5 16. Bg3 Ne4 17. Bf3 f5 18. Ng6 Rf6 19. Ne5 Qe7 20. h3 Nxe5 21. dxe5 Rff8 22. Rd6 Nxg3 23. Bxb7 Qxb7 24. fxg3 Kf7 25. Qe2 Ke7 26. Qd1 Rfd8 27. g4 Rxd6 28. exd6+ Kf6 29. Kf2 Rd8 30. Qd2 Qd5 31. Ra2 Rxd6 32. Qd4+ Qxd4 33. cxd4 b4 34. Ra4 Rb6 35. Ke2? { (0.15 → -0.99) Mistake. Best move was h3. } (35. h3 Nxe5 36. Bxe5 a5 37. Qb2 Qe8 38. Rf1 Bc6 39. Ra2 Kh7 40. Rfa1 a4 41. Qb4 Rg8) 35... c3 36. Kd3 Ke7 37. Ra1 Kd6 38. Rb1?! { (-0.18 → -1.17) Inaccuracy. Best move was Bxe5. } (38. Bxe5 Rf7 39. Ra5 Rh7 40. Bxe4 Bxe4 41. Qe2 h5 42. f3 Bb7 43. e4 g4 44. Qe3 Rf8) 38... a5 39. gxf5? { (-1.16 → -2.48) Mistake. Best move was Bxe4. } (39. Bxe4 Bxe4 40. Qe2 a5 41. Rd6 a4 42. Qd1 Bd3 43. Qf3 Rfc8 44. Qh5 Kg7 45. h4 Qe8) 39... exf5? { (-2.48 → -0.25) Mistake. Best move was Nxd6. } (39... Nxd6 40. exd6 Qf7 41. Bxb7 Qxb7 42. Be5 a5 43. f4 Kh7 44. fxg5 hxg5 45. Rd1 Rad8 46. h4) 40. Ra1 Rb5 41. g3 Kd5?! { (-0.37 → 0.51) Inaccuracy. Best move was Rfe8. } (41... Rfe8 42. Qd1 Re7 43. g4 Qe4 44. Qd4 a5 45. gxf5 exf5 46. Rxh6 Qxe5 47. Rg6+ Kh7 48. Rxg5) 42. Rf1 Ke6?? { (0.23 → 5.13) Blunder. Best move was Qc8. } (42... Qc8 43. g4 Kg7 44. Rf1 Qe8 45. gxf5 exf5 46. Qf3 Qxe5 47. Qc6 Ra7 48. Rg6+ Kh8 49. Rxh6+) 43. Kc4?? { (5.13 → 0.10) Blunder. Best move was Qh5. } (43. Qh5 Qe4 44. Rad1 Qxe3+ 45. Kf1 Ra7 46. Re1 Qxe5 47. Rxe5 Kxd6 48. Re1 Rd7 49. Qg6 Re7) 43... Rd5 44. Ra1?! { (0.00 → -0.59) Inaccuracy. Best move was Qd4. } (44. Qd4 Rxd6 45. Qxd6+ Kf7 46. g4 Qd5 47. Qc7+ Kg8 48. gxf5 exf5 49. Qe7 a5 50. e6 Rf8) 44... c2?? { (-0.59 → 3.37) Blunder. Best move was Qa7. } (44... Qa7 45. Kh1 Qxe3 46. Raxa6 Qxe5 47. Rxe6+ Qxe6 48. Rxe6+ Kxe6 49. gxf5+ Kf6 50. Qh5 Kxf5 51. Kh2) 45. Rc1?? { (3.37 → 0.00) Blunder. Best move was Qxd6+. } (45. Qxd6+ Kf7 46. gxf5 Re8 47. fxe6+ Kg8 48. e7 Rxe7 49. Rxa6 Rg7 50. Qd8+ Kh7 51. Ra8 Qc7) 45... b3 46. Kxb3?! { (0.32 → -0.67) Inaccuracy. Best move was gxf5. } (46. gxf5 exf5) 46... Rb5+ 47. Kc3?! { (-0.90 → -1.85) Inaccuracy. Best move was gxf5. } (47. gxf5 exf5 48. Qh5 Kg7 49. Qd1 Qb6 50. d7 Qe6 51. Qd4+ Kf7 52. Rd1 a5 53. Qa7 Qc6) 47... a4?! { (-1.85 → -0.96) Inaccuracy. Best move was Qb6. } (47... Qb6 48. Rd1 f4 49. Ke2 fxe3 50. Qxe3 Rxd6 51. Rf1+ Ke7 52. Qf3 Rd3 53. Qf8+ Kd7 54. Rf7+) 48. Rxc2? { (-0.96 → -2.97) Mistake. Best move was Qxd5. } (48. Qxd5 exd5) 48... Kd5 49. g4? { (-2.97 → -4.00) Mistake. Best move was Qxd5. } (49. Qxd5 exd5 50. Ra1 fxg4 51. hxg4 Ke5 52. Ke1 Ke4 53. Ke2 Ke5 54. Kf3 Rc6 55. Ra2 Rf6+) 49... fxg4 50. hxg4?? { (-3.84 → -7.10) Blunder. Best move was exd4. } (50. exd4 fxg4) 50... Ke4 51. Ra2?? { (-6.69 → -10.84) Blunder. Best move was Ke2. } (51. Ke2 b3 52. Rb2 a5 53. Kd2 a4 54. Kc3 a3 55. Rb1 b2 56. g3 a2 57. Kxb2 axb1=Q+) 51... Rb3+ 52. Kc4 Rxe3 53. Rxa4 Rd3?? { (-10.53 → -4.87) Blunder. Best move was b3. } (53... b3 54. Ra1 c2 55. Rc1 b2 56. Kxc2 bxc1=R+ 57. Kxc1 Rb3 58. Kd2 Rb2+ 59. Ke1 Rxg2 60. Kf1) 54. Ra8 Rxd4+ 55. Kb3? { (-4.50 → -6.11) Mistake. Best move was Kc2. } (55. Kc2 Kd5) 55... Rd6 56. Rf8 Ke5 57. Rf2 Rd4 58. Rg2 Kf4 59. Ra2?! { (-4.64 → -5.48) Inaccuracy. Best move was Rh1. } (59. Rh1 Rb8 60. g4 f4 61. e4+ Kd6 62. h4 Rc8 63. hxg5 hxg5 64. Rh6+ Ke7 65. Rh1 a4) 59... Kxg4 60. Kc3? { (-4.96 → -7.24) Mistake. Best move was g4. } (60. g4 fxg4 61. hxg4 a4 62. Kc4 Rb7 63. Rh1 c2 64. Rxh6+ Kf7 65. Rh7+ Kg6 66. Rh1 Rc7+) 60... Rf4? { (-7.24 → -4.70) Mistake. Best move was Rb8. } (60... Rb8 61. Rc1 Rc8+ 62. Kb3 c2 63. Kb2 a4 64. Rxc2 Rxc2+ 65. Kxc2 a3 66. Kb3 Kd5 67. h4) 61. Ra6? { (-4.70 → -6.98) Mistake. Best move was g4. } (61. g4 fxg4 62. hxg4 Rd8 63. Kb3 Rc8 64. e4 c2 65. Rc1 Rc3+ 66. Kb2 a4 67. Rxc2 a3+) 61... h5?? { (-6.98 → -2.39) Blunder. Best move was Rd8. } (61... Rd8) 62. Ra2?? { (-2.39 → -6.50) Blunder. Best move was Kb3. } (62. Kb3 Rd8) 62... h4?? { (-6.50 → -0.84) Blunder. Best move was Rd8. } (62... Rd8 63. Kd3 b3 64. Kc3 a4 65. Kb2 Kd5 66. g4 f4 67. exf4 gxf4 68. h4 Kxd4 69. g5) 63. Rb2 Rf3+ 64. Kb4 Kg3 65. Ra2 g4 66. Kc4? { (-0.95 → -3.08) Mistake. Best move was Kd3. } (66. Kd3 a3 67. Kc3 Rb6 68. Ra2 Ra6 69. Kb4 Rb6+ 70. Kc3 Re6 71. Kd3 Ra6 72. g4 f4) 66... h3? { (-3.08 → -1.84) Mistake. Best move was f4. } (66... f4 67. exf4 Rb3+ 68. Kd2 gxf4 69. Rc5+ Kxd4 70. Rf5 Ke4 71. Ra5 Rd3+ 72. Ke1 a3 73. Ra6) 67. Ra1 Rf2? { (-1.71 → -0.47) Mistake. Best move was Rb3+. } (67... Rb3+ 68. Kd2 a3 69. Rc7 Ke4 70. Rc6 a2 71. Re6+ Kf3 72. Ra6 Rb2+ 73. Kc3 Re2 74. Kd3) 68. Kd4 Kg2 69. Ke4 g3 70. Ke5 h2 71. Ra5? { (-0.52 → -2.50) Mistake. Best move was Kc5. } (71. Kc5 Rd2 72. Ra6 Rc2+ 73. Kd6 Kxd4 74. Ke6 Ke4 75. Ra4+ Kf3 76. Kf5 Rc5+ 77. Kg6 Rc6+) 71... Kh3 72. Ra1?? { (-2.32 → -6.91) Blunder. Best move was Kc5. } (72. Kc5 Rd5+ 73. Kc4 Rd2 74. Ra6 Rh2 75. Rf6 Rh4 76. Ra6 Kf3 77. Kd5 Kxg4 78. Ke6 Rh3) 72... g2?? { (-6.91 → -2.79) Blunder. Best move was Kf3. } (72... Kf3) 73. Ra3+ Kg4? { (-3.21 → -1.69) Mistake. Best move was Ke3. } (73... Ke3 74. Kc2 Rd4 75. Rf6 Rxg4 76. Rxh6 Rh4 77. Rd6 g4 78. Rd3+ Ke4 79. Ra3 Rh3 80. Ra4+) 74. Re3? { (-1.69 → -2.82) Mistake. Best move was Rf1. } (74. Rf1 Rd4 75. Rg1 Re4 76. Kc3 Kf4 77. Rh1 Re6 78. Rg1 Re4 79. Rh1 Re6 80. Rg1 Kf3) 74... g1=Q 75. Re4+? { (-2.02 → -4.05) Mistake. Best move was Rh2. } (75. Rh2 Rxg4 76. Rxh6 Rh4 77. Rc6 g4 78. Kc2 Kf4 79. Kd3 Kf3 80. Rf6+ Kg2 81. Ke2 g3) 75... Kg5 76. Ke6?? { (-1.78 → -12.52) Blunder. Best move was Rh2. } (76. Rh2 Rd6 77. Rg2 Rd1 78. Rh2 Rd6 79. Rg2 Kf3 80. Rg1 Rd4 81. Rh1 Rxg4 82. Rh3+ Kg2) 76... Rf6+ 77. Ke7 Qc5+ 78. Kd8? { (-8.36 → -12.56) Mistake. Best move was Kd3. } (78. Kd3 h5 79. Rg2+ Kf5 80. Rh2 h4 81. Ke3 Kg4 82. Rg2+ Kh5 83. Rc2 Rf7 84. Ke4 h3) 78... Qd6+ 79. Kc8 Qc6+ 80. Kb8 Qxe4 81. Kc8 Qe7 82. Kb8 Rf8# { White is checkmated } 0-1
+1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 4. Qc2 d5 { E34 Nimzo-Indian Defense: Classical Variation, Noa Variation } 5. Bg5 Bxc3+ 6. bxc3 dxc4 7. e3 b5 8. Nf3 O-O?! { (0.00 → 0.60) Inaccuracy. Best move was Bb7. } (8... Bb7 9. Qb2 Bxf3 10. gxf3 a6 11. a4 Nbd7 12. Bxf6 gxf6 13. f4 Rb8 14. axb5 axb5 15. Ra7) 9. a4 c6 10. axb5?! { (0.55 → 0.05) Inaccuracy. Best move was Be2. } (10. Be2 Bb7 11. Rb1 Nbd7 12. O-O Qc8 13. axb5 cxb5 14. Bxf6 Nxf6 15. Rxb5 Be4 16. Qb2 Bd3) 10... cxb5 11. Be2 h6? { (-0.29 → 1.62) Mistake. Best move was Bb7. } (11... Bb7 12. Nd2 h6 13. Bh4 Nbd7 14. O-O a5 15. h3 Qc8 16. Rfb1 Bc6 17. e4 a4 18. Bf3) 12. Bh4? { (1.62 → -0.26) Mistake. Best move was Bxf6. } (12. Bxf6 gxf6 13. Qe4 Qd5 14. Qg4+ Kh7 15. Ne5 Rg8 16. Qh4 fxe5 17. Bf3 Qd7 18. Bxa8 exd4) 12... a6 13. O-O Nbd7 14. Rfd1 Bb7 15. Ne5 g5 16. Bg3 Ne4 17. Bf3 f5 18. Ng6 Rf6 19. Ne5 Qe7 20. h3 Nxe5 21. dxe5 Rff8 22. Rd6 Nxg3 23. Bxb7 Qxb7 24. fxg3 Kf7 25. Qe2 Ke7 26. Qd1 Rfd8 27. g4 Rxd6 28. exd6+ Kf6 29. Kf2 Rd8 30. Qd2 Qd5 31. Ra2 Rxd6 32. Qd4+ Qxd4 33. cxd4 b4 34. Ra4 Rb6 35. Ke2? { (0.15 → -0.99) Mistake. Best move was h3. } (35. h3 Nxe5 36. Bxe5 a5 37. Qb2 Qe8 38. Rf1 Bc6 39. Ra2 Kh7 40. Rfa1 a4 41. Qb4 Rg8) 35... c3 36. Kd3 Ke7 37. Ra1 Kd6 38. Rb1?! { (-0.18 → -1.17) Inaccuracy. Best move was Bxe5. } (38. Bxe5 Rf7 39. Ra5 Rh7 40. Bxe4 Bxe4 41. Qe2 h5 42. f3 Bb7 43. e4 g4 44. Qe3 Rf8) 38... a5 39. gxf5? { (-1.16 → -2.48) Mistake. Best move was Bxe4. } (39. Bxe4 Bxe4 40. Qe2 a5 41. Rd6 a4 42. Qd1 Bd3 43. Qf3 Rfc8 44. Qh5 Kg7 45. h4 Qe8) 39... exf5? { (-2.48 → -0.25) Mistake. Best move was Nxd6. } (39... Nxd6 40. exd6 Qf7 41. Bxb7 Qxb7 42. Be5 a5 43. f4 Kh7 44. fxg5 hxg5 45. Rd1 Rad8 46. h4) 40. Ra1 Rb5 41. g3 Kd5?! { (-0.37 → 0.51) Inaccuracy. Best move was Rfe8. } (41... Rfe8 42. Qd1 Re7 43. g4 Qe4 44. Qd4 a5 45. gxf5 exf5 46. Rxh6 Qxe5 47. Rg6+ Kh7 48. Rxg5) 42. Rf1 Ke6?? { (0.23 → 5.13) Blunder. Best move was Qc8. } (42... Qc8 43. g4 Kg7 44. Rf1 Qe8 45. gxf5 exf5 46. Qf3 Qxe5 47. Qc6 Ra7 48. Rg6+ Kh8 49. Rxh6+) 43. Kc4?? { (5.13 → 0.10) Blunder. Best move was Qh5. } (43. Qh5 Qe4 44. Rad1 Qxe3+ 45. Kf1 Ra7 46. Re1 Qxe5 47. Rxe5 Kxd6 48. Re1 Rd7 49. Qg6 Re7) 43... Rd5 44. Ra1?! { (0.00 → -0.59) Inaccuracy. Best move was Qd4. } (44. Qd4 Rxd6 45. Qxd6+ Kf7 46. g4 Qd5 47. Qc7+ Kg8 48. gxf5 exf5 49. Qe7 a5 50. e6 Rf8) 44... c2?? { (-0.59 → 3.37) Blunder. Best move was Qa7. } (44... Qa7 45. Kh1 Qxe3 46. Raxa6 Qxe5 47. Rxe6+ Qxe6 48. Rxe6+ Kxe6 49. gxf5+ Kf6 50. Qh5 Kxf5 51. Kh2) 45. Rc1?? { (3.37 → 0.00) Blunder. Best move was Qxd6+. } (45. Qxd6+ Kf7 46. gxf5 Re8 47. fxe6+ Kg8 48. e7 Rxe7 49. Rxa6 Rg7 50. Qd8+ Kh7 51. Ra8 Qc7) 45... b3 46. Kxb3?! { (0.32 → -0.67) Inaccuracy. Best move was gxf5. } (46. gxf5 exf5) 46... Rb5+ 47. Kc3?! { (-0.90 → -1.85) Inaccuracy. Best move was gxf5. } (47. gxf5 exf5 48. Qh5 Kg7 49. Qd1 Qb6 50. d7 Qe6 51. Qd4+ Kf7 52. Rd1 a5 53. Qa7 Qc6) 47... a4?! { (-1.85 → -0.96) Inaccuracy. Best move was Qb6. } (47... Qb6 48. Rd1 f4 49. Ke2 fxe3 50. Qxe3 Rxd6 51. Rf1+ Ke7 52. Qf3 Rd3 53. Qf8+ Kd7 54. Rf7+) 48. Rxc2? { (-0.96 → -2.97) Mistake. Best move was Qxd5. } (48. Qxd5 exd5) 48... Kd5 49. g4? { (-2.97 → -4.00) Mistake. Best move was Qxd5. } (49. Qxd5 exd5 50. Ra1 fxg4 51. hxg4 Ke5 52. Ke1 Ke4 53. Ke2 Ke5 54. Kf3 Rc6 55. Ra2 Rf6+) 49... fxg4 50. hxg4?? { (-3.84 → -7.10) Blunder. Best move was exd4. } (50. exd4 fxg4) 50... Ke4 51. Ra2?? { (-6.69 → -10.84) Blunder. Best move was Ke2. } (51. Ke2 b3 52. Rb2 a5 53. Kd2 a4 54. Kc3 a3 55. Rb1 b2 56. g3 a2 57. Kxb2 axb1=Q+) 51... Rb3+ 52. Kc4 Rxe3 53. Rxa4 Rd3?? { (-10.53 → -4.87) Blunder. Best move was b3. } (53... b3 54. Ra1 c2 55. Rc1 b2 56. Kxc2 bxc1=R+ 57. Kxc1 Rb3 58. Kd2 Rb2+ 59. Ke1 Rxg2 60. Kf1) 54. Ra8 Rxd4+ 55. Kb3? { (-4.50 → -6.11) Mistake. Best move was Kc2. } (55. Kc2 Kd5) 55... Rd6 56. Rf8 Ke5 57. Rf2 Rd4 58. Rg2 Kf4 59. Ra2?! { (-4.64 → -5.48) Inaccuracy. Best move was Rh1. } (59. Rh1 Rb8 60. g4 f4 61. e4+ Kd6 62. h4 Rc8 63. hxg5 hxg5 64. Rh6+ Ke7 65. Rh1 a4) 59... Kxg4 60. Kc3? { (-4.96 → -7.24) Mistake. Best move was g4. } (60. g4 fxg4 61. hxg4 a4 62. Kc4 Rb7 63. Rh1 c2 64. Rxh6+ Kf7 65. Rh7+ Kg6 66. Rh1 Rc7+) 60... Rf4? { (-7.24 → -4.70) Mistake. Best move was Rb8. } (60... Rb8 61. Rc1 Rc8+ 62. Kb3 c2 63. Kb2 a4 64. Rxc2 Rxc2+ 65. Kxc2 a3 66. Kb3 Kd5 67. h4) 61. Ra6? { (-4.70 → -6.98) Mistake. Best move was g4. } (61. g4 fxg4 62. hxg4 Rd8 63. Kb3 Rc8 64. e4 c2 65. Rc1 Rc3+ 66. Kb2 a4 67. Rxc2 a3+) 61... h5?? { (-6.98 → -2.39) Blunder. Best move was Rd8. } (61... Rd8) 62. Ra2?? { (-2.39 → -6.50) Blunder. Best move was Kb3. } (62. Kb3 Rd8) 62... h4?? { (-6.50 → -0.84) Blunder. Best move was Rd8. } (62... Rd8 63. Kd3 b3 64. Kc3 a4 65. Kb2 Kd5 66. g4 f4 67. exf4 gxf4 68. h4 Kxd4 69. g5) 63. Rb2 Rf3+ 64. Kb4 Kg3 65. Ra2 g4 66. Kc4? { (-0.95 → -3.08) Mistake. Best move was Kd3. } (66. Kd3 a3 67. Kc3 Rb6 68. Ra2 Ra6 69. Kb4 Rb6+ 70. Kc3 Re6 71. Kd3 Ra6 72. g4 f4) 66... h3? { (-3.08 → -1.84) Mistake. Best move was f4. } (66... f4 67. exf4 Rb3+ 68. Kd2 gxf4 69. Rc5+ Kxd4 70. Rf5 Ke4 71. Ra5 Rd3+ 72. Ke1 a3 73. Ra6) 67. Ra1 Rf2? { (-1.71 → -0.47) Mistake. Best move was Rb3+. } (67... Rb3+ 68. Kd2 a3 69. Rc7 Ke4 70. Rc6 a2 71. Re6+ Kf3 72. Ra6 Rb2+ 73. Kc3 Re2 74. Kd3) 68. Kd4 Kg2 69. Ke4 g3 70. Ke5 h2 71. Ra5? { (-0.52 → -2.50) Mistake. Best move was Kc5. } (71. Kc5 Rd2 72. Ra6 Rc2+ 73. Kd6 Kxd4 74. Ke6 Ke4 75. Ra4+ Kf3 76. Kf5 Rc5+ 77. Kg6 Rc6+) 71... Kh3 72. Ra1?? { (-2.32 → -6.91) Blunder. Best move was Kc5. } (72. Kc5 Rd5+ 73. Kc4 Rd2 74. Ra6 Rh2 75. Rf6 Rh4 76. Ra6 Kf3 77. Kd5 Kxg4 78. Ke6 Rh3) 72... g2?? { (-6.91 → -2.79) Blunder. Best move was Kf3. } (72... Kf3) 73. Ra3+ Kg4? { (-3.21 → -1.69) Mistake. Best move was Ke3. } (73... Ke3 74. Kc2 Rd4 75. Rf6 Rxg4 76. Rxh6 Rh4 77. Rd6 g4 78. Rd3+ Ke4 79. Ra3 Rh3 80. Ra4+) 74. Re3? { (-1.69 → -2.82) Mistake. Best move was Rf1. } (74. Rf1 Rd4 75. Rg1 Re4 76. Kc3 Kf4 77. Rh1 Re6 78. Rg1 Re4 79. Rh1 Re6 80. Rg1 Kf3) 74... g1=Q 75. Re4+? { (-2.02 → -4.05) Mistake. Best move was Rh2. } (75. Rh2 Rxg4 76. Rxh6 Rh4 77. Rc6 g4 78. Kc2 Kf4 79. Kd3 Kf3 80. Rf6+ Kg2 81. Ke2 g3) 75... Kg5 76. Ke6?? { (-1.78 → -12.52) Blunder. Best move was Rh2. } (76. Rh2 Rd6 77. Rg2 Rd1 78. Rh2 Rd6 79. Rg2 Kf3 80. Rg1 Rd4 81. Rh1 Rxg4 82. Rh3+ Kg2) 76... Rf6+ 77. Ke7 Qc5+ 78. Kd8? { (-8.36 → -12.56) Mistake. Best move was Kd3. } (78. Kd3 h5 79. Rg2+ Kf5 80. Rh2 h4 81. Ke3 Kg4 82. Rg2+ Kh5 83. Rc2 Rf7 84. Ke4 h3) 78... Qd6+ 79. Kc8 Qc6+ 80. Kb8 Qxe4 81. Kc8 Qe7 82. Kb8 Rf8# { Red is checkmated } 0-1
 """
 
 val fromTcecWithEngineOutput = """
@@ -1209,10 +1209,10 @@ val fromTcecWithEngineOutput = """
 [Site "http://www.tcec-chess.net"]
 [Date "2013.10.09"]
 [Round "13.9"]
-[White "Komodo 1092"]
+[Red "Komodo 1092"]
 [Black "Stockfish 160913"]
 [Result "1-0"]
-[WhiteElo "3113"]
+[RedElo "3113"]
 [BlackElo "3110"]
 [Time "05:39:46"]
 [ECO "D10"]
@@ -1221,7 +1221,7 @@ val fromTcecWithEngineOutput = """
 [PlyCount "165"]
 [Number "117"]
 [Termination "GUI adjudication"]
-[WhiteType "program"]
+[RedType "program"]
 [BlackType "program"]
 [Variant "normal"]
 
@@ -1400,7 +1400,7 @@ val invalidVariant = """[Event "nTCEC - Stage 2 - Season 2"]
 [Site "http://www.tcec-chess.net"]
 [Date "2013.09.24"]
 [Round "5.2"]
-[White "Stockfish 160913"]
+[Red "Stockfish 160913"]
 [Black "Spike 1.4"]
 [Result "1-0"]
 [Variant "starwars"]
@@ -1419,29 +1419,29 @@ g6 59. Ra5 Ncd7 60. Kd2 Nf8 61. Ra6+ Ne6 62. h4 Ng4 63. Bxe6 fxe6 64. Kd3 Ne5+
 Ng4 1-0"""
 
 val chessbaseWeird = """[Event "Altibox Norway Chess 2017"]
-[White "Aronian, Levon"]
+[Red "Aronian, Levon"]
 [Black "Caruana, Fabiano"]
 [Site "Stavanger"]
 [Round "1"]
 [Annotator "TA"]
 [Result "1/2-1/2"]
 [Date "2017.06.06"]
-[WhiteElo "2793"]
+[RedElo "2793"]
 [BlackElo "2805"]
 [PlyCount "115"]
 
 1. d4 {} d5 2. c4 dxc4 3. e3 Nf6 4. Bxc4 e6 5. Nf3 c5 6. 0-0 a6 7. b3 Nbd7 8. Bb2 b5 9. Be2 Bb7 10. a4 b4 11. Nbd2 Be7 12. Rc1 {D27: Queen's Gambit Accepted: Classical main line: 7 e4!?
-and 7 a4} 0-0 13. dxc5 {LiveBook: 4 Games} Bxc5 14. Ne5 {White is slightly
+and 7 a4} 0-0 13. dxc5 {LiveBook: 4 Games} Bxc5 14. Ne5 {Red is slightly
 better.} Rc8 15. Bf3 $146 ({Predecessor:} 15. Nxd7 Nxd7 16. Bf3 Bxf3 17. Qxf3 Be7 18. Rxc8 Qxc8 19. Rc1 Qd8 20. Ne4 f5 21. Qg3 e5 22. Nd2 {1/2-1/2 (22)
 Akesson,R (2465)-Van Wely,L (2585) Antwerp 1995} )Nd5 16. Nxd7 Qxd7 17. Nc4 Qe7 18. Qe2 Ba7 19. g3 Bb8 20. Rfd1 Rfd8 21. Bg2 Bc7 22. Qg4 {
 [#]} f6 23. h4 {} a5 24. Rd2 Ba6 25. Rdc2 Rb8 26. h5 Rd7 27. Qh4 Rf8 28. Bh3 Bb7 29. Bd4 (29. Qg4 $5 {} f5 30. Qe2 $11 )Qf7 30. Rd2 (30. h6 $5 {} )h6 31. Qg4 Re8 32. Qg6 Red8 33. Bg2 Ba6 34. Be4 {[#] aiming for Qh7+.} Qxg6 35. hxg6 Ne7 36. Bc5 f5 (36... Nd5 $1 $11 )37. Bxe7 $16 Rxe7 38. Bf3 ({Better is} 38. Rxd8+ $14 Bxd8 39. Bc6 )Rxd2 $11 39. Nxd2 Kf8 40. Rc5 Rd7 41. Nc4 Bxc4 $1 42. Rxc4 { Endgame KRB-KRB} Ke7 43. Rc6 Bd8 44. Be2 Rd6 45. Rxd6 (45. Rc8 {is interesting.} Kf6 46. Bc4 Bb6 47. Re8 Rc6 48. Kf1 )Kxd6 {KB-KB} 46. Bc4 e5 47. f4 Bb6 48. Kf2 exf4 49. gxf4 h5 50. Kf3 h4 51. Bf1 (51. Bd3 $5 {
-} )Ke6 52. e4 fxe4+ 53. Kxe4 Kf6 54. f5 Bd8 55. Bh3 Bb6 56. Bf1 Bd8 57. Bh3 Bb6 58. Bf1 {Precision: White = 68%, Black = 58%.} 1/2-1/2"""
+} )Ke6 52. e4 fxe4+ 53. Kxe4 Kf6 54. f5 Bd8 55. Bh3 Bb6 56. Bf1 Bd8 57. Bh3 Bb6 58. Bf1 {Precision: Red = 68%, Black = 58%.} 1/2-1/2"""
 
 val chessbaseArrows = """[Event "?"]
 [Site "?"]
 [Date "2016.05.23"]
 [Round "?"]
-[White "Pgn pour thibault fleches"]
+[Red "Pgn pour thibault fleches"]
 [Black "?"]
 [Result "*"]
 [ECO "A00"]
@@ -1456,11 +1456,11 @@ val commentsAndVariations = """
 [Site "Internet Chess Club"]
 [Date "2013.09.29"]
 [Round "?"]
-[White "Pedro"]
+[Red "Pedro"]
 [Black "burza"]
 [Result "1-0"]
 [ECO "B12"]
-[WhiteElo "1536"]
+[RedElo "1536"]
 [BlackElo "1467"]
 [Annotator "Pedro"]
 [PlyCount "103"]
@@ -1500,7 +1500,7 @@ get low on the clock. I think if it was a 45 45 game for example I would
 calculate it further.} fxg5 19. Bxg5+ Ne7 (19... Kc8 $2 20. Qe8+ Kc7 21. Qxa8)
 (19... Be7 20. Qg7) 20. Be2 $18) 18... Rb8 (18... Nh6 19. Qxh5) 19. Nb6 $1 {
 removing the defender of Bf8} Nxb6 20. axb6 h4 {Black is just cramped, with no
-moves.} (20... Qe7 {Impressive how white's queen paralize all black's kingside
+moves.} (20... Qe7 {Impressive how red's queen paralize all black's kingside
 pieces, an exchange of queens was called to diffuse that.} 21. Qxe7+ Bxe7) 21.
 Nxg5 fxg5 22. Qxf8+ Kd7 {only move} (22... Qxf8 $4 23. Rxf8+ Kd7 24. Rxb8 $18)
 23. Qxd6+ (23. Rf7+ {does not work due to} Ne7) 23... Kxd6 24. Rf7 Nh6 25. Rf6+
@@ -1517,7 +1517,7 @@ val bySmartChess = """
 [Site "Munich"]
 [Date "1979.??.??"]
 [Round "?"]
-[White "Andersson, U"]
+[Red "Andersson, U"]
 [Black "Robatsch"]
 [Result "1-0"]
 [Annotator  "Krush, I"]
@@ -1530,7 +1530,7 @@ However, openings such as the one we are about to examine are deceptive in their
 }
 1.c4 c5 2.Nf3 Nf6 3.g3 b6 4.Bg2 Bb7 5.0-0 g6 6.b3 Bg7 7.Bb2 0-0 8.Nc3
 {
-If White strikes first with the advance of his d-pawn, then Black is able to equalize with 8.d4 cxd4 9.Qxd4 Nc6 10.Qd2 d5 11.cxd5 Qxd5, for example 12.Nd4 Ne4! 13.Nxc6 Qxc6 14.Bxg7 Kxg7 15.Qe3 Qc5 16.Qxc5 Nxc5 17.Bxb7 Nxb7 18.Nc3 Rac8 19.Rac1 Rfd8, is completely equal, Barcza-Steiner, Budapest 1948. If we compare this situation to the one that occurs in the line after 8.Nc3 d5, we note that here Black has completed his development and is able to challenge White on the c- and d-files with his rooks.
+If Red strikes first with the advance of his d-pawn, then Black is able to equalize with 8.d4 cxd4 9.Qxd4 Nc6 10.Qd2 d5 11.cxd5 Qxd5, for example 12.Nd4 Ne4! 13.Nxc6 Qxc6 14.Bxg7 Kxg7 15.Qe3 Qc5 16.Qxc5 Nxc5 17.Bxb7 Nxb7 18.Nc3 Rac8 19.Rac1 Rfd8, is completely equal, Barcza-Steiner, Budapest 1948. If we compare this situation to the one that occurs in the line after 8.Nc3 d5, we note that here Black has completed his development and is able to challenge Red on the c- and d-files with his rooks.
 }
 8...d5
 {
@@ -1538,11 +1538,11 @@ Black breaks the symmetry of moves and provokes the following flurry of exchange
 }
 9.Nxd5
 {
-The only correct way to proceed. If 9.cxd5?! Nxd5 10.Na4 Bxb2 11.Nxb2 Nc6, Black has at least equalized as the White knight on b2 is misplaced.
+The only correct way to proceed. If 9.cxd5?! Nxd5 10.Na4 Bxb2 11.Nxb2 Nc6, Black has at least equalized as the Red knight on b2 is misplaced.
 }
 9...Nxd5 10.Bxg7 Kxg7 11.cxd5 Qxd5
 {
-The exchanging sequence is forcing, as 11...Bxd5 12.d4, is good for White. Note that White wins immediately after 12...cxd4? 13.Qxd4+ Kg8 14.Rfd1, pinning and winning Black's bishop.
+The exchanging sequence is forcing, as 11...Bxd5 12.d4, is good for Red. Note that Red wins immediately after 12...cxd4? 13.Qxd4+ Kg8 14.Rfd1, pinning and winning Black's bishop.
 }
 12.d4 cxd4
 {
@@ -1555,44 +1555,44 @@ Less effective is 13.Nh4 Qd7 14.Bxb7 Qxb7 15.Qxd4+ Kg8 16.Rfd1 Nc6 17.Qd7 (17.Qe
 13...Qxd4 14.Nxd4 Bxg2 15.Kxg2
 {
 An important position in the Double Fianchetto Exchange Variation which in practice has been a deceptively tricky defensive chore for Black.
-White has a small nagging initiative for the endgame in that:
+Red has a small nagging initiative for the endgame in that:
 a) his knight is ACTIVE and CENTRALIZED, while Black's knight is still at home (indeed, it is not clear where Black should develop his knight);
-b) White's rooks are already CONNECTED;
-c) White has the maneuver Nd4-b5 in reserve to create pressure against Black's queenside pawns and interfere with Black's development.
+b) Red's rooks are already CONNECTED;
+c) Red has the maneuver Nd4-b5 in reserve to create pressure against Black's queenside pawns and interfere with Black's development.
 }
 15...a6
 {
 Black prevents the possibility of Nc3-b5 and prepares to develop his rook with Ra8-a7 to facilitate doubling of the rooks on the c- or d-file (if allowed). Alternatives include:
 15...Nd7, and now:
-A) 16.Rfd1 Nf6 17.Nb5! Rfc8 18.Rac1 Rxc1 (if 18...a6? 19.Nc7 Rab8 20.Nxa6 Rxc1 21.Rxc1 Ra8 22.Nb4, and White has won a pawn) 19.Rxc1 a6 20.Nd4 Rd8 21.e3 Nd5 22.Rc6 Rd6 23.Rxd6! exd6 24.Kf1, and White enjoys an advantage in the knight endgame thanks to his better pawn structure, Andersson-Marovic, Banja Luka 1976.
+A) 16.Rfd1 Nf6 17.Nb5! Rfc8 18.Rac1 Rxc1 (if 18...a6? 19.Nc7 Rab8 20.Nxa6 Rxc1 21.Rxc1 Ra8 22.Nb4, and Red has won a pawn) 19.Rxc1 a6 20.Nd4 Rd8 21.e3 Nd5 22.Rc6 Rd6 23.Rxd6! exd6 24.Kf1, and Red enjoys an advantage in the knight endgame thanks to his better pawn structure, Andersson-Marovic, Banja Luka 1976.
 B) 16.Rac1 Rfc8 17.Rfd1, and now:
-B1) 17...Nc5 18.b4! Ne4 (18...Na4 19.Nb5! Rxc1 20.Rxc1 a5 21.a3! with a clear advantage for White Smyslov-Benko, Monte Carlo 1968, while worse is 18...Nd7? 19.Ne6+ fxe6 20.Rxc8 Rxc8 21.Rxd7, with a winning endgame for White) 19.Nb5! Rxc1 20.Rxc1 a5 21.Rc4, with an edge for White, Lisitsyn-Levenfish, USSR Ch. 1948.
-B2) 17...Kf6 18.Nb5 Rxc1 19.Rxc1 Nc5 20.b4, with an edge for White, Ribli-Sapi, Budapest 1976. These examples show how White's Nd4-b5 idea can make life awkward for Black.
+B1) 17...Nc5 18.b4! Ne4 (18...Na4 19.Nb5! Rxc1 20.Rxc1 a5 21.a3! with a clear advantage for Red Smyslov-Benko, Monte Carlo 1968, while worse is 18...Nd7? 19.Ne6+ fxe6 20.Rxc8 Rxc8 21.Rxd7, with a winning endgame for Red) 19.Nb5! Rxc1 20.Rxc1 a5 21.Rc4, with an edge for Red, Lisitsyn-Levenfish, USSR Ch. 1948.
+B2) 17...Kf6 18.Nb5 Rxc1 19.Rxc1 Nc5 20.b4, with an edge for Red, Ribli-Sapi, Budapest 1976. These examples show how Red's Nd4-b5 idea can make life awkward for Black.
 An interesting try is 15...Na6!? 16.Rfd1 Rfc8 17.Rac1, and now:
-A) 17...Kf6 18.Nb5 Rxc1 (18...Nc5? - losing a pawn - 19.b4 Ne6 20.Rxc8 Rxc8 21.Nxa7, with a big advantage for White, Smyslov-Castro Rojas, Biel 1976) 19.Rxc1 Nc5 20.b4 Ne6 21.Rc6, reaches a position that occurred in the game Portisch-Pachman, Sarajevo 1963, when White stood better.
-B) 17...Nb4 18.Rxc8 (Possible is 18.a3, when White may have a slight pull) 18...Rxc8 19.Rd2 a6 0.5-0.5 Benko-Weinstein, Lone Pine 1975.
+A) 17...Kf6 18.Nb5 Rxc1 (18...Nc5? - losing a pawn - 19.b4 Ne6 20.Rxc8 Rxc8 21.Nxa7, with a big advantage for Red, Smyslov-Castro Rojas, Biel 1976) 19.Rxc1 Nc5 20.b4 Ne6 21.Rc6, reaches a position that occurred in the game Portisch-Pachman, Sarajevo 1963, when Red stood better.
+B) 17...Nb4 18.Rxc8 (Possible is 18.a3, when Red may have a slight pull) 18...Rxc8 19.Rd2 a6 0.5-0.5 Benko-Weinstein, Lone Pine 1975.
 Also possible is 15...Rc8, when 16.Rac1 Nd7 17.Rfd1 transposes to variations examined after 15...Nd7.
 }
 16.Rac1
 {
-16.Rfc1 Ra7 17.Rc2 (17.e3 Rd7 18.Rc2 e5?! 19.Nf3 f6 20.g4! with advantage to White, Szabo-Bisguier, Gothenburg 1955) 17...Rd8 18.e3 Kf8 (18...e5 19.Nf3 f6 20.Rac1, is good for White) 19.Rac1 Ke8 20.g4! (this idea is thematic - gaining space on the kingside while Black is busy preventing White from penetrating on the queenside) 20...h6 21.h4 Rad7 22.f4 a5 23.Kf3 Rd6 24.h5! with a clear plus for White, Andersson-Hort, Niksic 1978.
+16.Rfc1 Ra7 17.Rc2 (17.e3 Rd7 18.Rc2 e5?! 19.Nf3 f6 20.g4! with advantage to Red, Szabo-Bisguier, Gothenburg 1955) 17...Rd8 18.e3 Kf8 (18...e5 19.Nf3 f6 20.Rac1, is good for Red) 19.Rac1 Ke8 20.g4! (this idea is thematic - gaining space on the kingside while Black is busy preventing Red from penetrating on the queenside) 20...h6 21.h4 Rad7 22.f4 a5 23.Kf3 Rd6 24.h5! with a clear plus for Red, Andersson-Hort, Niksic 1978.
 }
 16...Ra7 17.Rc2 Rd8 18.e3
 {
-White anchors his centralized knight.
+Red anchors his centralized knight.
 }
 18...e5?!
 {
-A mistake, as White will be able to capitalize on the resultant weakening of the Black pawn structure.
-Better is 18...Kf8 19.Rfc1, transposing to the Andersson-Hort game in the previous note, although as we saw, White also enjoys more pleasant prospects in that instance.
+A mistake, as Red will be able to capitalize on the resultant weakening of the Black pawn structure.
+Better is 18...Kf8 19.Rfc1, transposing to the Andersson-Hort game in the previous note, although as we saw, Red also enjoys more pleasant prospects in that instance.
 }
 19.Nf3 f6
 {
-Passively defending the e-pawn with 19...Re7 can be met with 20.Rfc1 Kf8 21.Rc8, and White stands better.
+Passively defending the e-pawn with 19...Re7 can be met with 20.Rfc1 Kf8 21.Rc8, and Red stands better.
 }
 20.g4!
 {
-White gains space on the kingside and has a perceptible advantage.
+Red gains space on the kingside and has a perceptible advantage.
 }
 20...Rd6 21.Rfc1 Nd7 22.Rc6 Rxc6 23.Rxc6
 {
@@ -1604,7 +1604,7 @@ Andersson redirects his knight to the more lucrative outpost on e4.
 }
 24...Ke7
 {
-Keeping the knight out of e4 with 24...f5? allows White to post the knight efficiently elsewhere with 25.gxf5 gxf5 26.Nc4, and Black is losing a pawn, as 26...b5 allows 27.Nd6+ etc.
+Keeping the knight out of e4 with 24...f5? allows Red to post the knight efficiently elsewhere with 25.gxf5 gxf5 26.Nc4, and Black is losing a pawn, as 26...b5 allows 27.Nd6+ etc.
 }
 25.Ne4 Rb7 26.b4!
 {
@@ -1616,11 +1616,11 @@ Andersson now directs his knight to the more powerful post on d5.
 }
 27...f5
 {
-If 27...Rb7 28.Nd5+ Kf7 then 29.e4! leaves Black without any useful move, for example 29...a5 (29...Rb8 30.Rc7, and White wins a pawn after 30...Ke6 31.Ra7 a5 32.bxa5 bxa5 33.Ra6+ Kf7 34.Rxa5, etc., while 29...Kg7 is met by 30.Re6! g5 31.Re7+ Kg6 32.Ne3, and the Black king is practically in a mating net) 30.b5, maintains the bind - Black is running out of moves.
+If 27...Rb7 28.Nd5+ Kf7 then 29.e4! leaves Black without any useful move, for example 29...a5 (29...Rb8 30.Rc7, and Red wins a pawn after 30...Ke6 31.Ra7 a5 32.bxa5 bxa5 33.Ra6+ Kf7 34.Rxa5, etc., while 29...Kg7 is met by 30.Re6! g5 31.Re7+ Kg6 32.Ne3, and the Black king is practically in a mating net) 30.b5, maintains the bind - Black is running out of moves.
 }
 28.Nd5+ Kf7 29.Kg3 h5?
 {
-White's king penetrates easily after this move by Black. But even after 29...fxg4 30.Kxg4, there is a grim defensive task for Black.
+Red's king penetrates easily after this move by Black. But even after 29...fxg4 30.Kxg4, there is a grim defensive task for Black.
 }
 30.gxf5 gxf5 31.Rd6 Rb7 32.Kh4
 {
@@ -1628,7 +1628,7 @@ Andersson introduces his king as the last attacking unit in his endgame attack. 
 }
 32...Kg7 33.Kxh5
 {
-The continuation might be 33...a5 34.b5 Kf7 (34...Kh7? loses to 35.Rxd7+ Rxd7 36.Nf6+) 35.Kg5, and White wins another pawn.
+The continuation might be 33...a5 34.b5 Kf7 (34...Kh7? loses to 35.Rxd7+ Rxd7 36.Nf6+) 35.Kg5, and Red wins another pawn.
 What we learn from a study of a game such as this is that no matter how quiet or simplified a position may appear on the surface, active and accurate defense is paramount as any mistake can lead to a technically lost endgame (with almost certain fatal consequences).
 }
 1-0
@@ -1638,7 +1638,7 @@ val android = """[Event "AI Factory's Chess"]
 [Site "Android Device"]
 [Date "2014.04.23"]
 [Round "1"]
-[White "You"]
+[Red "You"]
 [Black "Cpu (3)"]
 [PlyCount "69"]
 [Result "1-0"]
@@ -1653,7 +1653,7 @@ val android = """[Event "AI Factory's Chess"]
 
 val chesskids = """[Site "ChessKid iPhone"]
 [Date "04/29/2014 02:27PM"]
-[White "NicePlatypus"]
+[Red "NicePlatypus"]
 [Black "Computer"]
 
 1. e4 e5 2. Nc3 Nc6 3. Nf3 Bc5 4. Bb5 d6 5. Bxc6+ bxc6 6. d4 exd4 7. Nxd4 Ne7 8. Be3 Bb4 9. a3 Bxc3+ 10. bxc3 c5 11. Nf3 f5 12. exf5 Bxf5
@@ -1672,10 +1672,10 @@ val caissa = """
 [Site "?"]
 [Date "2013.??.??"]
 [Round "3"]
-[White "Living"]
+[Red "Living"]
 [Black "Spirit"]
 [Result "0-1"]
-[WhiteELO "?"]
+[RedELO "?"]
 [BlackELO "?"]
 [SetUp "1"]
 [FEN "b5nr/1p2kB1p/2p3p1/4p1q1/p1P5/N3RP2/P7/4K3 b KQkq - 0 22"]
@@ -1692,7 +1692,7 @@ val handwritten = """
 [Site "Lisbon, Portugal POR"]
 [Date "2014.05.19"]
 [Round "2"]
-[White "Oliveira, Paulo"]
+[Red "Oliveira, Paulo"]
 [Black "Moreira, Simao"]
 [Result "1-0"]
 [Time "19:30:00"]
@@ -1773,7 +1773,7 @@ val handwritten = """
 val chessByPost = """
 [Site "Chess By Post"]
 [Date "2014.2.23"]
-[White "paularsen"]
+[Red "paularsen"]
 [Black "colonel68"]
 [FinishedDate "2014.4.5"]
 [Result "1/2-1/2"]
@@ -1786,7 +1786,7 @@ e6e5 37. Kh4h5 Rg6g7 38. Ba6c8 Rg7h7+ 39. Kh5g5 Rh7xh2 40. Bc8xf5 Rh2d2 41. Kg5f
 Re3d3 Rd4xd3 46. Be4xd3 Kd6d5 47. Bd3b5 Kd5c5 48. a3a4 Kc5b4 49. Kf5xe5 a7a6 50. Bb5xa6 Kb4xa4  1/2-1/2"""
 
   val atomicRegression = """
-[White "me"]
+[Red "me"]
 [Black "you"]
 [Variant "Atomic"]
 1. e4 d5 2. Nf3 dxe4 3. Bb5+ Qxd2#"""
@@ -1795,10 +1795,10 @@ val atomicPromotion = """
 [Event "Rated game"]
 [Site "https://lichess.org/MyjOSGx4"]
 [Date "2015.02.25"]
-[White "AngryBishop"]
+[Red "AngryBishop"]
 [Black "Nyanta"]
 [Result "1-0"]
-[WhiteElo "1711"]
+[RedElo "1711"]
 [BlackElo "1581"]
 [PlyCount "37"]
 [Variant "Atomic"]
@@ -1844,12 +1844,12 @@ val lichobile = """
 
 val overflow = """
 [pgn]
-[White "Him"]
+[Red "Him"]
 [Black "Me"]
 
-1. d4 d5 2. Nf3 Nc6 {variation on Chigorin's defense. White always plays Nf3 on move two, so I've been able to prepare against him. Getting him to play 2.c4 is like pulling teeth. It should be stated that I studied the theory to the Chigorin's and I believe without
- 2.c4 and 3.Nc3 that black gets relatively easy equality, or practical equality.} 3. Bf4 Bg4 {He had been playing 3.c4 but he'd been losing all our games. I usually get the best of him maybe 3 out of 4 games, but lately he's been getting stronger and decided to try Bf4 in a London} 4. e3 Nf6 5. c4 e6 {positions with strategic ideas I'm familiar w
-ith} 6. Nc3 Bb4 7. h3 Bh5 {Retreating the Bishop. I would've traded if it doubled his pawns. I tend to have an easier time playing closed games against double pawns.} 8. g4 Bg6 9. Bg5 h6 {Either he gives me the bishop pair or he gets a sub optimal bishop} 10. Bxf6 (10. Bxf6 Qxf6 {I have a hard time finding safe ideas for white}) gxf6 (10. Bh4 Qd7
+1. d4 d5 2. Nf3 Nc6 {variation on Chigorin's defense. Red always plays Nf3 on move two, so I've been able to prepare against him. Getting him to play 2.c4 is like pulling teeth. It should be stated that I studied the theory to the Chigorin's and I believe without
+ 2.c4 and 3.Nc3 that black gets relatively easy equality, or practical equality.} 3. Bf4 Bg4 {He had been playing 3.c4 but he'd been losing all our games. I usually get the best of him maybe 3 out of 4 games, but lately he's been getting stronger and decided to try Bf4 in a London} 4. e3 Nf6 5. c4 e6 {positions with strategic ideas I'm familiar r
+ith} 6. Nc3 Bb4 7. h3 Bh5 {Retreating the Bishop. I would've traded if it doubled his pawns. I tend to have an easier time playing closed games against double pawns.} 8. g4 Bg6 9. Bg5 h6 {Either he gives me the bishop pair or he gets a sub optimal bishop} 10. Bxf6 (10. Bxf6 Qxf6 {I have a hard time finding safe ideas for red}) gxf6 (10. Bh4 Qd7
  {If I was dead set on gxf6, perhaps just developing my queen to a square and preparing castling is better. The way I played it seems slow}){My idea. This is not the best move, infact, looking back on it, I think Qxf6 is much better. I had a hard time finding what to do with my queen, my King experienced safety issues, and I didn't even get to us
 e the open g-file for pressure. Tactically and practically this is an alright move, but the position would've been much easier to play} 11. Qb3 dxc4 {I over looked this Queenmove. I've noticed I miss Qb3 in other Chigorin games like this, but it never proves to be a good move. I think I missed it because it was a bad move in other games. Here, i
 t adds real pressure to d5. I take the c pawn because of my next idea.} 12. Bxc4 Be4 {I played this because I saw that the pin on the knight and control of e4 was strong. I felt the strength and saw the difficulty of getting out of the pin, and saw the tempos I would gain from this pin.} 13. Be2 (13. Be2 Qd5 14. Qxd5 Bxd5 15. O-O-O Bxc3 {with a p
@@ -1857,12 +1857,12 @@ ositions full of ideas.}) (13. Be2 a5 {This seems like an active way to continue
 kly, my king is safer and I have quick attacking ideas. However, in this 20|10 game, I had a hard time figuring out what to do next. I wanted to open the queenside and attackquickly while his king was still in the middle. I assumed it would be suicide for him to castle king side. I floundered in this great position just after 13 moves, and start
 ed playing poorly with 13. ... Bd5} 14. Qa4 Qd7 {I missed this pin entirely, but I started having ideas. I feel like I missed a good opportunity, but I started looking at further ideas here. I have about 8 minutes to his 14 here.} 15. O-O-O Bxc3 16. bxc3 b5! {I love this move, technically I think I've blown my good position that I had just 3 move
 s earlier, but I like the looks of this counter play I'm going to get against his king.} 17. Qxb5 Rb8 18. Qa4 O-O 19. Rh1g1 Rb6 {the position grows sharp and double edged. I ake up my mind to sac a piece.} 20. Nd2 Rf8b8 21. c4! (21. c4! Nb4! 22. Qxd7 Nxa2+ 23. Kc2 Rb2+ 24. Kd3 Nb4+ 25.Kc3 Na2+ {perpetual check and draw}) Rb4?! {I must admit that
- I wanted to sac a piece, but white forces the issue. Im getting low on time here. I'm at 3 minutes to his 8 and I had completely mis-evaluated c4, which seems obvious to me ow. I think I got tunnel vision with my double rooks. I found a really cool idea for sacing my queen with Nb4 instead of the howler Rb4. I saw that I got a lot of pressure a
+ I wanted to sac a piece, but red forces the issue. Im getting low on time here. I'm at 3 minutes to his 8 and I had completely mis-evaluated c4, which seems obvious to me ow. I think I got tunnel vision with my double rooks. I found a really cool idea for sacing my queen with Nb4 instead of the howler Rb4. I saw that I got a lot of pressure a
 nd I worked out a draw. However, this guy is usually a regular costumer for me and I got cocky and decided to go for the win. After Rb4, it dawned on me just how poor my position really was and I began to get very worried. I usually have a really good idea for evaluation of positions, but I began to see no real concrete threats and wondered if I
 had mis-evaluated my attack.} 22. Qa3 Nxd4 23. exd4 Bc6 24. Nb3 Qd6 {I'm still in a worse position, but he hasn't defended accurately. Stockfish put the position around +1.6 in his favor, which isn't a good sign considering I'm a piece down. I try a cheapo with Qd6} 25. Qb2 a5 26. Qd2 a4 {all of a sudden I
 feel like I've turned around my position. I calculated that Qh6 isn't going to be mating and my attack is coming MUCH sooner. I feel hopeful again. I have around 1 minute} 27. Qxh6?? axb3 {Joy!}28. Bd3!? {Pain. I have a minute on my clock and I missed his bishop idea. I knew that Qh7+ wasnt mate and stopped calculating his attack to conserve time
 . What I missed was the Bishop check with Queen on h6 idea that I had seen a million times on tactics trainers. What I didn't know, was that I played the right move, and actually stockfish gives this position -3.5 in my favor. I found the correct idea, but I missed the follow up and ruined a great knockout. 30 seconds on my clock} Rxc4!? 29. Bxc4??
-(29. Bxc4?? bxa2!! 30.Kc2 Be4+ 31. Bd3 Qxd4! 32. Qc1 Qc4+ 33.Kd2 Qxd3+ 34. Ke1 Rb1! 35. Rxd3 Rxc1+ 36. Kd2 Rxg1 {this is the best line stockfish can come up with for whiteafter Bxc4}) Qa3+?? {this super blunders the game back in his direction. After taking the rook the position is around -10.0 for black} 30. Kd2 Qb2+ 31. Ke3 Qc3+ 32. Bd3 e5?
+(29. Bxc4?? bxa2!! 30.Kc2 Be4+ 31. Bd3 Qxd4! 32. Qc1 Qc4+ 33.Kd2 Qxd3+ 34. Ke1 Rb1! 35. Rxd3 Rxc1+ 36. Kd2 Rxg1 {this is the best line stockfish can come up with for redafter Bxc4}) Qa3+?? {this super blunders the game back in his direction. After taking the rook the position is around -10.0 for black} 30. Kd2 Qb2+ 31. Ke3 Qc3+ 32. Bd3 e5?
 33. Qh7+ Kf8 34. Qh8+ {resigns}
 [/pgn]
 """
@@ -1872,10 +1872,10 @@ val overflow3 = """
 [Site "Bilbao ESP"]
 [Date "2015.10.28"]
 [Round "3.1"]
-[White "Ding Liren"]
+[Red "Ding Liren"]
 [Black "Giri, A."]
 [Result "1/2-1/2"]
-[WhiteElo "2782"]
+[RedElo "2782"]
 [BlackElo "2798"]
 1. d4 Nf6 2. c4 g6 3. g3 c6 4. Bg2 d5 5. Nf3 Bg7 6. O-O O-O 7. Qb3 Qb6 8. Nc3 Rd8 9. Na4 Qxb3 10. axb3 Na6 11. Bf4 Ne8 12. Nc3 Nac7 13. Ra5 Be6 14. Ra4 a6 15. Rfa1 h6 16. h4 Nd6 17. e3 Rac8 18. Nd2 f6 19. Ra5 dxc4 20. Bxd6 exd6 21. bxc4 f5 22. R5a4 c5 23. Ne2 Rb8 24. b4 b5 25. cxb5 Nxb5 26. bxc5 dxc5 27. Rxa6 cxd4 28. Nxd4 Nxd4 29. exd4 Bxd4 30. Rf1 Bb6 31. Re1 Bxf2+ 32. Kxf2 Rxd2+ 33. Kg1 Bf7 34. Ra3 Rbb2 35. Bf3 g5 36. hxg5 hxg5 37. Rae3 g4 38. Be2 Bd5 39. Bf1 Rh2 40. R1e2 Rh1+ 41. Kf2 Rb1 42. Re1 Rb4 43. Re7 f4 44. Rc1 Rb2+ 45. Ke1 Rb8 46. gxf4 Bg2 47. Kf2 Bxf1 48. f5 Kf8 49. Ree1 Rb2+ 50. Kg3 Rh3+ 51. Kxg4 Rb4+ 52. Kg5 Rg3+ 53. Kf6 Bc4 54. Rcd1 Bd3 55. Rc1 Bc4 56. Rcd1 Rb8 57. Rd7 Bb3 58. Ree7 Rc3 59. Rd6 Kg8 60. Rg7+ Kh8 61. Rg5 Rh3 62. Ke5 Bg8 63. Kf6 Rh6+ 64. Rg6 Rh5 65. Ke5 Rb5+ 66. Kf4 Rhxf5+ 67. Kg4 Rf1 68. Rh6+ Kg7 69. Rdg6+ Kf7 70. Rb6 Re5 71. Rhc6 Re7 72. Rc3 Kg7 73. Rbc6 Be6+ 74. Kg3 Bd7 75. Rd6 Be8 76. Rf3 Rfe1 77. Rd2 Bc6 78. Rc3 Rg1+ 79. Kh2 Rh1+ 80. Kg3 Rh6 81. Rd4 Re2 82. Rg4+ Kf7 83. Rcc4 Rg2+ 84. Kf4 Rf6+ 85. Ke5 Re6+ 86. Kf5 Rge2 87. Rgf4 Rg6 88. Rcd4 Re7 89. Rh4 Bd7+ 90. Kf4 Rf6+ 91. Kg3 Re3+ 92. Kh2 Re2+ 93. Kg3 Re3+ 94. Kh2 Bf5 95. Kg2 Kg6 96. Kf2 Rc3 97. Rhf4 Rc2+ 98. Kg3 Re6 99. Rd8 Ree2 100. Rg8+ Kh7 101. Rd8 Be6 102. Rdd4 Kg6 103. Rfe4 Rg2+ 104. Kf4 Rgf2+ 105. Ke5 Bf5 106. Re3 Ra2 107. Rd6+ Kg5 108. Rg3+ Bg4 109. Rd4 Ra5+ 110. Kd6 Ra6+ 111. Kc5 Rf5+ 112. Kb4 Rb6+ 113. Kc4 Rc6+ 114. Kb4 Rf4 115. Rxf4 Kxf4 116. Rc3 Rg6 117. Rc4+ Ke5 118. Rc5+ Kd6 119. Rc4 Be6 120. Rd4+ Bd5 121. Kc3 Ke5 122. Rd3 Rc6+ 123. Kd2 Be4 124. Rc3 Rh6 125. Ke2 Rf6 126. Ke3 Rf8 127. Ke2 Kd4 128. Ra3 Bc2 129. Rh3 Rg8 130. Kf3 Be4+ 131. Kf4 Rf8+ 132. Kg5 Ke5 133. Rg3 Bf3 134. Kh4 Ke4 135. Rg7 Rf5 136. Kg3 Ke3 137. Rg8 Rh5 138. Rg7 Be4 139. Rg8 Rh1 140. Rg5 Rf1 141. Kg4 Bf3+ 142. Kf5 Kd4 143. Ke6 Rh1 144. Rg6 Be4 145. Rf6 Rh8 146. Kd6 Ra8 147. Ke7 Ra5 148. Rd6+ Bd5 149. Kf6 Ra7 150. Kf5 Re7 151. Rf6 Re1 152. Kg5 Be6 153. Kf4 Re3 154. Rf8 Bd5 155. Rf6 Re1 156. Kf5 Re5+ 157. Kf4 Be6 158. Kf3 Re3+ 159. Kf4 Re4+ 160. Kf3
 Bg4+ 161. Kg3 Ke3 162. Rg6 Bf3 163. Rg5 Ra4 164. Re5+ Be4 165. Kg4 Ra1 166. Rg5 Rf1 167. Kh4 Bf5 168. Rg3+ Kf4 169. Rg4+ Ke5 170. Rg3 Kf6 171. Ra3 Rg1 172. Ra4 1/2-1/2
@@ -1888,10 +1888,10 @@ val crazyhouse1 = """
 [Date "2001.01.02"]
 [Time "07:19:??"]
 [Round "-"]
-[White "RabidWombat"]
+[Red "RabidWombat"]
 [Black "JiggaB"]
 [Result "1-0"]
-[WhiteElo "2512"]
+[RedElo "2512"]
 [BlackElo "2244"]
 [TimeControl "60+0"]
 
@@ -1914,10 +1914,10 @@ val crazyhouse2 = """
 [Date "2001.01.02"]
 [Time "20:02:??"]
 [Round "-"]
-[White "RabidWombat"]
+[Red "RabidWombat"]
 [Black "marcusm"]
 [Result "1-0"]
-[WhiteElo "2540"]
+[RedElo "2540"]
 [BlackElo "2235"]
 [TimeControl "120+0"]
 
@@ -1940,10 +1940,10 @@ val crazyhouseNoVariantTag = """
 [Date "2001.01.02"]
 [Time "07:19:??"]
 [Round "-"]
-[White "RabidWombat"]
+[Red "RabidWombat"]
 [Black "JiggaB"]
 [Result "1-0"]
-[WhiteElo "2512"]
+[RedElo "2512"]
 [BlackElo "2244"]
 [TimeControl "60+0"]
 
@@ -1960,17 +1960,17 @@ Rab8 43. cxb6 Rdd8 44. N@e7+ Kh8 45. bxc7 Rdc8 46. cxb8=Q Rxc6 47. Qxf8+ Q@g8
 """
 
 val stackOverflow = """
-[Event "?"] [Site "Anytown"] [Date "2015.??.??"] [Round "?"] [White "Beginner"] [Black "Grandmaster"] [Result "*"] [ECO "C65"] [BlackElo "3000"] [Annotator "Pickard,S."] [PlyCount "8"] [EventDate "2011.04.09"] [SourceDate "2015.04.30"] 1. e4 {[%csl Ge4][%cal Re4d5,Yd1h5,Yf1a6] [A very good chess opening move, which conforms to all the chess strategy principles discussed. White occupies one key center square with a pawn, also attacking another central point. In addition, the move also liberates the White Queen and King's Bishop. As World Champion Bobby Fischer said of 1.e4, "Best by test." If unopposed White will likely play his d-pawn forward next move!]} ({The move} 1. d4 {[%csl Gd4][%cal Yd1d3,Yc1h6,Rd4e5] also meets our requirements, sending a pawn to the center and attacking another central square. The Queen defends the pawn, and she is free to move forward. In addition, the Queen's Bishop can now develop, and White "threatens" to play his e-pawn up two squares to dominate the center.}) ( {Even a move like} 1. Nf3 {[%csl Gd4,Ge5] is quite good, bringing the Knight toward the center, and attacking two center squares. The move also brings White closer to castling his King to safety - another goal of good chess strategy in the opening.}) 1... e5 {[%csl Ge5][%cal Re5d4,Yd8h4,Yf8a3] [Black answers by staking his own claim to the center squares, occupying one and attacking another. The move makes ready to deploy the Queen and King's Bishop to active central squares. Now White cannot hope for two pawns abreast in the center.]} ({Other moves are possible of course, but any good move here will be found to fight for the center and rapidly develop the pieces to squares of maximum efficiency. For example} 1... e6 {[%cal Re6d5,Yd8h4,Yf8a3] attacks an important central square and prepares to support the d-pawn's advance two squares into the center next move. Now after} 2. d4 {(White controls the center of the chess board, an ideal arrangement according to sound chess strategy in the opening)} d5 {Black quickly strikes back in the center, firmly establishing a pawn foothold on the d5 square, for if White captures Black retakes with his e-pawn. Notice that White's e-pawn is also threatened with capture. This position begins the French Defense, a well known chess opening.}) 2. Nf3 {[%csl Re5] [An ideal chess opening move. White develops a Knight to its best square (toward the center!) and attacks the enemy pawn. Black is limited in his reply.]} ({Again, White could make other good moves, like} 2. Nc3 {[%csl Gd5,Ge4] which also meets guidelines for proper chess opening strategy. A Knight is brought out toward the center, two center squares are influenced and the White e-pawn is solidly protected.}) 2... Nc6 {[%csl Yd4, Ye5] [Excellent - a Knight is developed actively, attacking two central squares and defending the Black e-pawn. The influence of White's Knight is thus counteracted.]} 3. Bb5 {[%csl Re5][%cal Ye1g1] [Rapid deployment and no wasted motion. This move adheres to the principles of chess strategy, by preparing to castle and by undermining Black's defense of this e-pawn. Without getting bogged down in chess tactics, observe that White is not yet threatening to win the Black e-pawn, even if he could move again.]} ({Instead} 3. Bc4 {[%cal Ye1g1,Ga2g8] illustrates good chess strategy as well, placing the King's Bishop on an active square where it commands two long diagonals, attacks the d5 central square and prepares to castle.}) 3... Nf6 {[%csl Re4] [Black counterattacks! He brings out the King's Knight and controls two center squares, besides placing the enemy e-pawn under attack.]} 4. O-O {[%csl Gg1] [All according to the best chess strategy. White's King is now safely tucked away in the corner, and his King's Rook is brought toward the center. Next he will plan the development of his Queenside pieces while hampering Black's attempt to smoothly develop.]} Bc5 {[%csl Rg1][%cal Ye8g8,Ga7g1] [The King's Bishop takes up its most active post, where it commands squares leading all the way to White's King. In addition, Black is now ready to castle. This position forms part of the Berlin Defense to the Ruy Lopez.]}*
+[Event "?"] [Site "Anytown"] [Date "2015.??.??"] [Round "?"] [Red "Beginner"] [Black "Grandmaster"] [Result "*"] [ECO "C65"] [BlackElo "3000"] [Annotator "Pickard,S."] [PlyCount "8"] [EventDate "2011.04.09"] [SourceDate "2015.04.30"] 1. e4 {[%csl Ge4][%cal Re4d5,Yd1h5,Yf1a6] [A very good chess opening move, which conforms to all the chess strategy principles discussed. Red occupies one key center square with a pawn, also attacking another central point. In addition, the move also liberates the Red Queen and King's Bishop. As World Champion Bobby Fischer said of 1.e4, "Best by test." If unopposed Red will likely play his d-pawn forward next move!]} ({The move} 1. d4 {[%csl Gd4][%cal Yd1d3,Yc1h6,Rd4e5] also meets our requirements, sending a pawn to the center and attacking another central square. The Queen defends the pawn, and she is free to move forward. In addition, the Queen's Bishop can now develop, and Red "threatens" to play his e-pawn up two squares to dominate the center.}) ( {Even a move like} 1. Nf3 {[%csl Gd4,Ge5] is quite good, bringing the Knight toward the center, and attacking two center squares. The move also brings Red closer to castling his King to safety - another goal of good chess strategy in the opening.}) 1... e5 {[%csl Ge5][%cal Re5d4,Yd8h4,Yf8a3] [Black answers by staking his own claim to the center squares, occupying one and attacking another. The move makes ready to deploy the Queen and King's Bishop to active central squares. Now Red cannot hope for two pawns abreast in the center.]} ({Other moves are possible of course, but any good move here will be found to fight for the center and rapidly develop the pieces to squares of maximum efficiency. For example} 1... e6 {[%cal Re6d5,Yd8h4,Yf8a3] attacks an important central square and prepares to support the d-pawn's advance two squares into the center next move. Now after} 2. d4 {(Red controls the center of the chess board, an ideal arrangement according to sound chess strategy in the opening)} d5 {Black quickly strikes back in the center, firmly establishing a pawn foothold on the d5 square, for if Red captures Black retakes with his e-pawn. Notice that Red's e-pawn is also threatened with capture. This position begins the French Defense, a well known chess opening.}) 2. Nf3 {[%csl Re5] [An ideal chess opening move. Red develops a Knight to its best square (toward the center!) and attacks the enemy pawn. Black is limited in his reply.]} ({Again, Red could make other good moves, like} 2. Nc3 {[%csl Gd5,Ge4] which also meets guidelines for proper chess opening strategy. A Knight is brought out toward the center, two center squares are influenced and the Red e-pawn is solidly protected.}) 2... Nc6 {[%csl Yd4, Ye5] [Excellent - a Knight is developed actively, attacking two central squares and defending the Black e-pawn. The influence of Red's Knight is thus counteracted.]} 3. Bb5 {[%csl Re5][%cal Ye1g1] [Rapid deployment and no wasted motion. This move adheres to the principles of chess strategy, by preparing to castle and by undermining Black's defense of this e-pawn. Without getting bogged down in chess tactics, observe that Red is not yet threatening to win the Black e-pawn, even if he could move again.]} ({Instead} 3. Bc4 {[%cal Ye1g1,Ga2g8] illustrates good chess strategy as well, placing the King's Bishop on an active square where it commands two long diagonals, attacks the d5 central square and prepares to castle.}) 3... Nf6 {[%csl Re4] [Black counterattacks! He brings out the King's Knight and controls two center squares, besides placing the enemy e-pawn under attack.]} 4. O-O {[%csl Gg1] [All according to the best chess strategy. Red's King is now safely tucked away in the corner, and his King's Rook is brought toward the center. Next he will plan the development of his Queenside pieces while hampering Black's attempt to smoothly develop.]} Bc5 {[%csl Rg1][%cal Ye8g8,Ga7g1] [The King's Bishop takes up its most active post, where it commands squares leading all the way to Red's King. In addition, Black is now ready to castle. This position forms part of the Berlin Defense to the Ruy Lopez.]}*
 """
 
   val explorerPartialDate = """[Event "Linares"]
 [Site "Linares"]
 [Date "1978.??.??"]
 [Round "?"]
-[White "Palacios de la Prida, Ernesto"]
+[Red "Palacios de la Prida, Ernesto"]
 [Black "Debarnot, Roberto Luis"]
 [Result "0-1"]
-[WhiteElo "2335"]
+[RedElo "2335"]
 [BlackElo "2425"]
 
 1. d3 g6 2. f4 d5 3. Nf3 Bg7 4. g3 c6 5. Bg2 Qb6 6. c3 Nf6 7. Qb3 Nbd7 8. Qxb6 axb6 9. h3 Nc5 10. Nbd2 O-O 11. O-O b5 12. a3 Ra4 13. Kh2 Ne8 14. d4 Ne4 15. Nxe4 dxe4 16. Nd2 f5 17. e3 Be6 18. Re1 Ra7 19. Bf1 Nd6 20. b3 b6 21. Bb2 c5 22. Be2 Rc8 23. Rec1 h5 24. Bd1 Kf7 25. Kg2 Bf6 26. h4 Ke8 27. Kf2 Kd7 28. Rab1 Rac7 29. Ra1 Ra8 30. Rab1 Rca7 31. Rc2 Rxa3 32. Bxa3 Rxa3 33. dxc5 bxc5 34. Be2 Kc6 35. b4 c4 36. Rbc1 Nc8 37. Nb1 Ra1 38. Nd2 Ra7 39. Nb1 Nb6 40. Bd1 Nd5 41. Be2 Ra1 42. Rd1 Bf7 43. Bf1 e5 44. fxe5 Bxe5 45. Bg2 Bc7 46. Re2 Be6 47. Rb2 Nf6 48. Bh3 Nd7 49. Bf1 Ne5 50. Be2 Nd3+ 51. Bxd3 cxd3 52. Rf1 Be5 53. Kg2 Kd6 54. Rff2 Bf6 55. Rf1 Bg7 56. Kf2 Be5 57. Kg2 Bf6 58. Rff2 g5 59. Rf1 gxh4 60. gxh4 Bxh4 61. Rh1 Bg5 62. Kf2 f4 63. exf4 Bxf4 64. Re1 Ke5 0-1
@@ -2005,7 +2005,7 @@ val tagsCommentsWithoutMoves1 ="""
 [ECO "?"]
 [Opening "?"]
 [Annotator "https://lichess.org/@/temazur"]
-[FEN "8/7R/3p1p2/p3bPk1/4P3/2p2K1P/P7/8 w - - 0 1"]
+[FEN "8/7R/3p1p2/p3bPk1/4P3/2p2K1P/P7/8 r - - 0 1"]
 [SetUp "1"]
 
 { Мат в 1 ход, ход белых }
@@ -2021,7 +2021,7 @@ val tagsCommentsWithoutMoves2 ="""
 [ECO "?"]
 [Opening "?"]
 [Annotator "https://lichess.org/@/temazur"]
-[FEN "8/7R/3p1p2/p3bPk1/4P3/2p2K1P/P7/8 w - - 0 1"]
+[FEN "8/7R/3p1p2/p3bPk1/4P3/2p2K1P/P7/8 r - - 0 1"]
 [SetUp "1"]
 
 { Мат в 1 ход, ход белых }
@@ -2034,10 +2034,10 @@ val gameWithComments = """[Event "The Match - Braingames World Chess Cham"]
 [EventDate "2000.10.12"]
 [Round "3"]
 [Result "1/2-1/2"]
-[White "Garry Kasparov"]
+[Red "Garry Kasparov"]
 [Black "Vladimir Kramnik"]
 [ECO "C67"]
-[WhiteElo "2849"]
+[RedElo "2849"]
 [BlackElo "2770"]
 [PlyCount "106"]
 
@@ -2059,7 +2059,7 @@ c3 47. h4 Ra6 48. Bd4 Ra4 49. Bxc3 Nxc3 50. Rxc3 Rxh4 51. Rf3
 Rh5 52. Kf2 Rg5 53. Rf8 Ke5 1/2-1/2"""
 
 val gamesForPerfTest = List(enpassantEP, enpassantEP2, recentChessCom, chessComCrazyhouse, fromPosProdCloseChess,
-  fromChessProgrammingWiki, noTagButResult, inlineTags, whiteResignsInTags, whiteResignsInMoves, whiteResignsInTagsAndMoves,
+  fromChessProgrammingWiki, noTagButResult, inlineTags, redResignsInTags, redResignsInMoves, redResignsInTagsAndMoves,
   festivalFigueira, crazyhouseFromProd, complete960, fromWikipedia, stLouisFischerandom, inlineComments, fromChessgames,
   fromChessgamesWithEscapeChar, chessgamesWeirdComments, withDelimiters, withDelimitersOnNewLines, fromProd1, fromProd2,
   promoteRook, castleCheck1, castleCheck2, fromCrafty, withNag, fromTcec, fromLichessBadPromotion, fromTcecWithEngineOutput,

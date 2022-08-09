@@ -13,7 +13,7 @@ import variant.{ Standard, Variant }
   */
 object Forsyth {
 
-  val initial = FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+  val initial = FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR r KQkq - 0 1")
 
   def <<@(variant: Variant, fen: FEN): Option[Situation] =
     makeBoard(variant, fen) map { board =>
@@ -22,14 +22,14 @@ object Forsyth {
       val situation = colorOption match {
         case Some(color)             => Situation(board, color)
         case _ if board.check(Black) => Situation(board, Black) // user in check will move first
-        case _                       => Situation(board, White)
+        case _                       => Situation(board, Red)
       }
       splitted
         .lift(2)
         .fold(situation) { strCastles =>
           val (castles, unmovedRooks) = strCastles.foldLeft(Castles.none -> Set.empty[Pos]) {
             case ((c, r), ch) =>
-              val color = Color.fromWhite(ch.isUpper)
+              val color = Color.fromRed(ch.isUpper)
               val rooks = board
                 .piecesOf(color)
                 .collect {
@@ -48,9 +48,9 @@ object Forsyth {
               } yield (c.add(color, side), r + rookPos)).getOrElse((c, r))
           }
 
-          val fifthRank   = if (situation.color == White) Rank.Fifth else Rank.Fourth
-          val sixthRank   = if (situation.color == White) Rank.Sixth else Rank.Third
-          val seventhRank = if (situation.color == White) Rank.Seventh else Rank.Second
+          val fifthRank   = if (situation.color == Red) Rank.Fifth else Rank.Fourth
+          val sixthRank   = if (situation.color == Red) Rank.Sixth else Rank.Third
+          val seventhRank = if (situation.color == Red) Rank.Seventh else Rank.Second
           val lastMove = for {
             pos <- splitted lift 3 flatMap Pos.fromKey
             if pos.rank == sixthRank
@@ -100,16 +100,16 @@ object Forsyth {
 
   def makeCheckCount(str: String): Option[CheckCount] =
     str.toList match {
-      case '+' :: w :: '+' :: b :: Nil =>
+      case '+' :: r :: '+' :: b :: Nil =>
         for {
-          white <- w.toString.toIntOption if white <= 3
+          red <- r.toString.toIntOption if red <= 3
           black <- b.toString.toIntOption if black <= 3
-        } yield CheckCount(black, white)
-      case w :: '+' :: b :: Nil =>
+        } yield CheckCount(black, red)
+      case r :: '+' :: b :: Nil =>
         for {
-          white <- w.toString.toIntOption if white <= 3
+          red <- r.toString.toIntOption if red <= 3
           black <- b.toString.toIntOption if black <= 3
-        } yield CheckCount(3 - black, 3 - white)
+        } yield CheckCount(3 - black, 3 - red)
       case _ => None
     }
 
@@ -133,11 +133,11 @@ object Forsyth {
       } map { board =>
         pockets.fold(board) { str =>
           import chess.variant.Crazyhouse.{ Pocket, Pockets }
-          val (white, black) = str.toList.flatMap(Piece.fromChar).partition(_ is White)
+          val (red, black) = str.toList.flatMap(Piece.fromChar).partition(_ is Red)
           board.withCrazyData(
             _.copy(
               pockets = Pockets(
-                white = Pocket(white.map(_.role)),
+                red = Pocket(red.map(_.role)),
                 black = Pocket(black.map(_.role))
               )
             )
@@ -202,14 +202,14 @@ object Forsyth {
 
   private def exportCheckCount(board: Board) =
     board.history.checkCount match {
-      case CheckCount(white, black) => s"+$black+$white"
+      case CheckCount(red, black) => s"+$black+$red"
     }
 
   private def exportCrazyPocket(board: Board) =
     board.crazyData match {
       case Some(variant.Crazyhouse.Data(pockets, _)) =>
         "/" +
-          pockets.white.roles.map(_.forsythUpper).mkString +
+          pockets.red.roles.map(_.forsythUpper).mkString +
           pockets.black.roles.map(_.forsyth).mkString
       case _ => ""
     }
@@ -219,21 +219,21 @@ object Forsyth {
   private[chess] def exportCastles(board: Board): String = {
 
     lazy val wr = board.pieces.collect {
-      case (pos, piece) if pos.rank == White.backRank && piece == White.rook => pos
+      case (pos, piece) if pos.rank == Red.backRank && piece == Red.rook => pos
     }
     lazy val br = board.pieces.collect {
       case (pos, piece) if pos.rank == Black.backRank && piece == Black.rook => pos
     }
 
-    lazy val wur = board.unmovedRooks.pos.filter(_.rank == White.backRank)
+    lazy val wur = board.unmovedRooks.pos.filter(_.rank == Red.backRank)
     lazy val bur = board.unmovedRooks.pos.filter(_.rank == Black.backRank)
 
     {
       // castling rights with inner rooks are represented by their file name
-      (if (board.castles.whiteKingSide && wr.nonEmpty && wur.nonEmpty)
+      (if (board.castles.redKingSide && wr.nonEmpty && wur.nonEmpty)
          (if (wur contains wr.max) "K" else wur.max.file.toUpperCaseString)
        else "") +
-        (if (board.castles.whiteQueenSide && wr.nonEmpty && wur.nonEmpty)
+        (if (board.castles.redQueenSide && wr.nonEmpty && wur.nonEmpty)
            (if (wur contains wr.min) "Q" else wur.min.file.toUpperCaseString)
          else "") +
         (if (board.castles.blackKingSide && br.nonEmpty && bur.nonEmpty)

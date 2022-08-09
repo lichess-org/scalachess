@@ -17,7 +17,7 @@ case object Antichess
 
   // In antichess, it is not permitted to castle
   override val castles    = Castles.none
-  override val initialFen = FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1")
+  override val initialFen = FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR r - - 0 1")
 
   // In antichess, the king can't be put into check so we always return false
   override def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) =
@@ -55,16 +55,16 @@ case object Antichess
     // Exit early if we are not in a situation with only knights
     situation.board.pieces.values.forall(_.is(Knight)) && {
 
-      val whiteKnights = situation.board.actorsOf(White)
+      val redKnights = situation.board.actorsOf(Red)
       val blackKnights = situation.board.actorsOf(Black)
 
       // We consider the case where a player has two knights
-      if (whiteKnights.size != 1 || blackKnights.size != 1) false
+      if (redKnights.size != 1 || blackKnights.size != 1) false
       else {
         for {
-          whiteKnight <- whiteKnights.headOption
+          redKnight <- redKnights.headOption
           blackKnight <- blackKnights.headOption
-        } yield whiteKnight.pos.isLight == blackKnight.pos.isLight
+        } yield redKnight.pos.isLight == blackKnight.pos.isLight
       } getOrElse false
     }
 
@@ -76,27 +76,27 @@ case object Antichess
     val bishopsAndPawns = board.pieces.values.forall(p => p.is(Bishop) || p.is(Pawn)) &&
       board.pieces.values.exists(_.is(Bishop))
 
-    lazy val drawnBishops = board.actors.values.partition(_.is(White)) match {
-      case (whitePieces, blackPieces) =>
-        val whiteBishops    = whitePieces.filter(_.is(Bishop))
+    lazy val drawnBishops = board.actors.values.partition(_.is(Red)) match {
+      case (redPieces, blackPieces) =>
+        val redBishops    = redPieces.filter(_.is(Bishop))
         val blackBishops    = blackPieces.filter(_.is(Bishop))
-        lazy val whitePawns = whitePieces.filter(_.is(Pawn))
+        lazy val redPawns = redPieces.filter(_.is(Pawn))
         lazy val blackPawns = blackPieces.filter(_.is(Pawn))
 
         // We consider the case where a player has two bishops on the same diagonal after promoting.
         if (
-          whiteBishops.map(_.pos.isLight).to(Set).size != 1 ||
+          redBishops.map(_.pos.isLight).to(Set).size != 1 ||
           blackBishops.map(_.pos.isLight).to(Set).size != 1
         ) false
         else {
           for {
-            whiteBishopLight <- whiteBishops.headOption map (_.pos.isLight)
+            redBishopLight <- redBishops.headOption map (_.pos.isLight)
             blackBishopLight <- blackBishops.headOption map (_.pos.isLight)
           } yield {
-            whiteBishopLight != blackBishopLight && whitePawns.forall(
+            redBishopLight != blackBishopLight && redPawns.forall(
               pawnNotAttackable(_, blackBishopLight, board)
             ) &&
-            blackPawns.forall(pawnNotAttackable(_, whiteBishopLight, board))
+            blackPawns.forall(pawnNotAttackable(_, redBishopLight, board))
           }
         } getOrElse false
     }

@@ -26,7 +26,7 @@ class HordeVariantTest extends ChessTest {
     }
 
     "Must not be insufficient winning material for king with only 1 pawn left" in {
-      val position = FEN("8/2k5/3q4/8/8/8/1P6/8 w - -")
+      val position = FEN("8/2k5/3q4/8/8/8/1P6/8 r - -")
       val game     = fenToGame(position, Horde)
 
       game must beValid.like { case game =>
@@ -55,7 +55,7 @@ class HordeVariantTest extends ChessTest {
     }
 
     "Must not be insufficient winning material for king with only 1 queen left" in {
-      val position = FEN("8/2k5/3q4/8/8/1Q6/8/8 w - -")
+      val position = FEN("8/2k5/3q4/8/8/1Q6/8/8 r - -")
       val game     = fenToGame(position, Horde)
 
       game must beValid.like { case game =>
@@ -73,7 +73,7 @@ class HordeVariantTest extends ChessTest {
     }
 
     "Must not be insufficient winning material for king with only 2 minor pieces left" in {
-      val position = FEN("8/2k5/3q4/8/8/1B2N3/8/8 w - -")
+      val position = FEN("8/2k5/3q4/8/8/1B2N3/8/8 r - -")
       val game     = fenToGame(position, Horde)
 
       game must beValid.like { case game =>

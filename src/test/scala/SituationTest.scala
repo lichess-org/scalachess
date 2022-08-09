@@ -7,13 +7,13 @@ class SituationTest extends ChessTest {
       "by rook" in {
         ("""
 K  r
-""" as White).check must beTrue
+""" as Red).check must beTrue
       }
       "by knight" in {
         ("""
   n
 K
-""" as White).check must beTrue
+""" as Red).check must beTrue
       }
       "by bishop" in {
         ("""
@@ -21,19 +21,19 @@ K
 
    
      K
-""" as White).check must beTrue
+""" as Red).check must beTrue
       }
       "by pawn" in {
         ("""
     p
      K
-""" as White).check must beTrue
+""" as Red).check must beTrue
       }
       "not" in {
         ("""
    n
 K
-""" as White).check must beFalse
+""" as Red).check must beFalse
       }
     }
     "detect check mate" in {
@@ -41,19 +41,19 @@ K
         ("""
 PP
 K  r
-""" as White).checkMate must beTrue
+""" as Red).checkMate must beTrue
       }
       "by knight" in {
         ("""
 PPn
 KR
-""" as White).checkMate must beTrue
+""" as Red).checkMate must beTrue
       }
       "not" in {
         ("""
   n
 K
-""" as White).checkMate must beFalse
+""" as Red).checkMate must beFalse
       }
     }
     "stale mate" in {
@@ -61,13 +61,13 @@ K
         ("""
 prr
 K
-""" as White).staleMate must beTrue
+""" as Red).staleMate must beTrue
       }
       "not" in {
         ("""
   b
 K
-""" as White).staleMate must beFalse
+""" as Red).staleMate must beFalse
       }
     }
 
@@ -76,7 +76,7 @@ K
         """
 PP
 K  r
-""" as White
+""" as Red
 
       game.checkMate must beTrue
       game.winner must beSome.like { case color =>
@@ -88,7 +88,7 @@ K  r
       val game = """
     p
      K
-    """ as White
+    """ as Red
 
       game.winner must beNone
 
@@ -102,7 +102,7 @@ K  r
       }
 
       "with other side in check" in {
-        val game = "k Q K" as White
+        val game = "k Q K" as Red
         game.playable(true) must beFalse
         game.playable(false) must beFalse
       }

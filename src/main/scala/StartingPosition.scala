@@ -39,7 +39,7 @@ object StartingPosition {
         StartingPosition(
           "B00",
           "Open Game",
-          FEN("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"),
+          FEN("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR r KQkq - 0 2"),
           "Open_Game",
           "1. e4 e5",
           featurable = false
@@ -47,7 +47,7 @@ object StartingPosition {
         StartingPosition(
           "B02",
           "Alekhine's Defence",
-          FEN("rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2"),
+          FEN("rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR r KQkq - 1 2"),
           "Alekhine's_Defence",
           "1. e4 Nf6"
         ),
@@ -68,7 +68,7 @@ object StartingPosition {
         StartingPosition(
           "B10",
           "Caro-Kann Defence",
-          FEN("rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"),
+          FEN("rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR r KQkq - 0 2"),
           "Caro–Kann_Defence",
           "1. e4 c6"
         ),
@@ -82,7 +82,7 @@ object StartingPosition {
         StartingPosition(
           "B18",
           "Caro-Kann Defence: Classical Variation",
-          FEN("rn1qkbnr/pp2pppp/2p5/5b2/3PN3/8/PPP2PPP/R1BQKBNR w KQkq - 1 5"),
+          FEN("rn1qkbnr/pp2pppp/2p5/5b2/3PN3/8/PPP2PPP/R1BQKBNR r KQkq - 1 5"),
           "Caro–Kann_Defence#Classical_Variation:_4...Bf5",
           "1. e4 c6 2. d4 d5 3. Nc3 dxe4 4. Nxe4 Bf5"
         ),
@@ -103,7 +103,7 @@ object StartingPosition {
         StartingPosition(
           "B17",
           "Caro-Kann Defence: Steinitz Variation",
-          FEN("r1bqkbnr/pp1npppp/2p5/8/3PN3/8/PPP2PPP/R1BQKBNR w KQkq - 1 5"),
+          FEN("r1bqkbnr/pp1npppp/2p5/8/3PN3/8/PPP2PPP/R1BQKBNR r KQkq - 1 5"),
           "Caro–Kann_Defence#Modern_Variation:_4...Nd7",
           "1. e4 c6 2. d4 d5 3. Nc3 dxe4 4. Nxe4 Nd7"
         ),
@@ -117,7 +117,7 @@ object StartingPosition {
         StartingPosition(
           "C46",
           "Four Knights Game",
-          FEN("r1bqkb1r/pppp1ppp/2n2n2/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq - 4 4"),
+          FEN("r1bqkb1r/pppp1ppp/2n2n2/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R r KQkq - 4 4"),
           "Four_Knights_Game",
           "1. e4 e5 2. Nf3 Nc6 3. Nc3 Nf6"
         ),
@@ -138,7 +138,7 @@ object StartingPosition {
         StartingPosition(
           "C00",
           "French Defence",
-          FEN("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"),
+          FEN("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR r KQkq - 0 2"),
           "French_Defence",
           "1. e4 e6"
         ),
@@ -159,7 +159,7 @@ object StartingPosition {
         StartingPosition(
           "C11",
           "French Defence: Classical Variation",
-          FEN("rnbqkb1r/ppp2ppp/4pn2/3p4/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 2 4"),
+          FEN("rnbqkb1r/ppp2ppp/4pn2/3p4/3PP3/2N5/PPP2PPP/R1BQKBNR r KQkq - 2 4"),
           "French_Defence#Classical_Variation:_3...Nf6",
           "1. e4 e6 2. d4 d5 3. Nc3 Nf6"
         ),
@@ -173,7 +173,7 @@ object StartingPosition {
         StartingPosition(
           "C10",
           "French Defence: Rubinstein Variation",
-          FEN("rnbqkbnr/ppp2ppp/4p3/8/3Pp3/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 4"),
+          FEN("rnbqkbnr/ppp2ppp/4p3/8/3Pp3/2N5/PPP2PPP/R1BQKBNR r KQkq - 0 4"),
           "French_Defence#Rubinstein_Variation:_3...dxe4",
           "1. e4 e6 2. d4 d5 3. Nc3 dxe4"
         ),
@@ -187,14 +187,14 @@ object StartingPosition {
         StartingPosition(
           "C15",
           "French Defence: Winawer Variation",
-          FEN("rnbqk1nr/ppp2ppp/4p3/3p4/1b1PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 2 4"),
+          FEN("rnbqk1nr/ppp2ppp/4p3/3p4/1b1PP3/2N5/PPP2PPP/R1BQKBNR r KQkq - 2 4"),
           "French_Defence#Winawer_Variation:_3...Bb4",
           "1. e4 e6 2. d4 d5 3. Nc3 Bb4"
         ),
         StartingPosition(
           "C50",
           "Giuoco Piano",
-          FEN("r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4"),
+          FEN("r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R r KQkq - 4 4"),
           "Giuoco_Piano",
           "1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5"
         ),
@@ -215,14 +215,14 @@ object StartingPosition {
         StartingPosition(
           "C50",
           "Italian Game: Hungarian Defence",
-          FEN("r1bqk1nr/ppppbppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4"),
+          FEN("r1bqk1nr/ppppbppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R r KQkq - 4 4"),
           "Hungarian_Defense",
           "1. e4 e5 2. Nf3 Nc6 3. Bc4 Be7"
         ),
         StartingPosition(
           "C55",
           "Italian Game: Two Knights Defence",
-          FEN("r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4"),
+          FEN("r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R r KQkq - 4 4"),
           "Two_Knights_Defense",
           "1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6"
         ),
@@ -236,7 +236,7 @@ object StartingPosition {
         StartingPosition(
           "C33",
           "King's Gambit Accepted",
-          FEN("rnbqkbnr/pppp1ppp/8/8/4Pp2/8/PPPP2PP/RNBQKBNR w KQkq - 0 3"),
+          FEN("rnbqkbnr/pppp1ppp/8/8/4Pp2/8/PPPP2PP/RNBQKBNR r KQkq - 0 3"),
           "King's_Gambit#King.27s_Gambit_Accepted:_2...exf4",
           "1. e4 e5 2. f4 exf4"
         ),
@@ -250,35 +250,35 @@ object StartingPosition {
         StartingPosition(
           "C36",
           "King's Gambit Accepted: Modern Defence",
-          FEN("rnbqkbnr/ppp2ppp/8/3p4/4Pp2/5N2/PPPP2PP/RNBQKB1R w KQkq d6 0 4"),
+          FEN("rnbqkbnr/ppp2ppp/8/3p4/4Pp2/5N2/PPPP2PP/RNBQKB1R r KQkq d6 0 4"),
           "King's_Gambit#Modern_Defence:_3...d5",
           "1. e4 e5 2. f4 exf4 3. Nf3 d5"
         ),
         StartingPosition(
           "C30",
           "King's Gambit Accepted: Classical Variation",
-          FEN("rnbqkbnr/pppp1p1p/8/6p1/4Pp2/5N2/PPPP2PP/RNBQKB1R w KQkq - 0 4"),
+          FEN("rnbqkbnr/pppp1p1p/8/6p1/4Pp2/5N2/PPPP2PP/RNBQKB1R r KQkq - 0 4"),
           "King's_Gambit#Classical_Variation:_3...g5",
           "1. e4 e5 2. f4 exf4 3. Nf3 g5"
         ),
         StartingPosition(
           "C30",
           "King's Gambit Declined: Classical Variation",
-          FEN("rnbqk1nr/pppp1ppp/8/2b1p3/4PP2/8/PPPP2PP/RNBQKBNR w KQkq - 1 3"),
+          FEN("rnbqk1nr/pppp1ppp/8/2b1p3/4PP2/8/PPPP2PP/RNBQKBNR r KQkq - 1 3"),
           "King's_Gambit#Classical_Defence:_2...Bc5",
           "1. e4 e5 2. f4 Bc5"
         ),
         StartingPosition(
           "C31",
           "King's Gambit: Falkbeer Countergambit",
-          FEN("rnbqkbnr/ppp2ppp/8/3pp3/4PP2/8/PPPP2PP/RNBQKBNR w KQkq - 0 3"),
+          FEN("rnbqkbnr/ppp2ppp/8/3pp3/4PP2/8/PPPP2PP/RNBQKBNR r KQkq - 0 3"),
           "King%27s_Gambit,_Falkbeer_Countergambit",
           "1. e4 e5 2. f4 d5"
         ),
         StartingPosition(
           "B06",
           "Modern Defence",
-          FEN("rnbqkbnr/pppppp1p/6p1/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"),
+          FEN("rnbqkbnr/pppppp1p/6p1/8/4P3/8/PPPP1PPP/RNBQKBNR r KQkq - 0 2"),
           "Modern_Defense",
           "1. e4 g6"
         ),
@@ -292,28 +292,28 @@ object StartingPosition {
         StartingPosition(
           "C41",
           "Philidor Defence",
-          FEN("rnbqkbnr/ppp2ppp/3p4/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3"),
+          FEN("rnbqkbnr/ppp2ppp/3p4/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R r KQkq - 0 3"),
           "Philidor_Defence",
           "1. e4 e5 2. Nf3 d6"
         ),
         StartingPosition(
           "C41",
           "Philidor Defence: Lion Variation",
-          FEN("r1bqkb1r/pppn1ppp/3p1n2/4p3/3PP3/2N2N2/PPP2PPP/R1BQKB1R w KQkq - 2 5"),
+          FEN("r1bqkb1r/pppn1ppp/3p1n2/4p3/3PP3/2N2N2/PPP2PPP/R1BQKB1R r KQkq - 2 5"),
           "Philidor_Defence",
           "1. e4 d6 2. d4 Nf6 3. Nc3 e5 4. Nf3 Nbd7"
         ),
         StartingPosition(
           "B07",
           "Lion Variation: Anti-Philidor",
-          FEN("r1bqkb1r/pppn1ppp/3p1n2/4p3/3PPP2/2N5/PPP3PP/R1BQKBNR w KQkq - 0 5"),
+          FEN("r1bqkb1r/pppn1ppp/3p1n2/4p3/3PPP2/2N5/PPP3PP/R1BQKBNR r KQkq - 0 5"),
           "Philidor_Defence",
           "1. e4 d6 2. d4 Nf6 3. Nc3 Nbd7 4. f4 e5"
         ),
         StartingPosition(
           "B07",
           "Pirc Defence",
-          FEN("rnbqkb1r/ppp1pppp/3p1n2/8/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 2 3"),
+          FEN("rnbqkb1r/ppp1pppp/3p1n2/8/3PP3/8/PPP2PPP/RNBQKBNR r KQkq - 2 3"),
           "Pirc_Defence",
           "1. e4 d6 2. d4 Nf6 3. Nc3"
         ),
@@ -334,14 +334,14 @@ object StartingPosition {
         StartingPosition(
           "B07",
           "Pirc Defence: Lion Variation",
-          FEN("r1bqkb1r/pppnpppp/3p1n2/8/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 3 4"),
+          FEN("r1bqkb1r/pppnpppp/3p1n2/8/3PP3/2N5/PPP2PPP/R1BQKBNR r KQkq - 3 4"),
           "Pirc_Defence#Classical_.28Two_Knights.29_System",
           "1. e4 d6 2. d4 Nf6 3. Nc3 Nbd7"
         ),
         StartingPosition(
           "C42",
           "Petrov's Defence",
-          FEN("rnbqkb1r/pppp1ppp/5n2/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"),
+          FEN("rnbqkb1r/pppp1ppp/5n2/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R r KQkq - 2 3"),
           "Petrov's_Defence",
           "1. e4 e5 2. Nf3 Nf6"
         ),
@@ -376,14 +376,14 @@ object StartingPosition {
         StartingPosition(
           "C65",
           "Ruy Lopez: Berlin Defence",
-          FEN("r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4"),
+          FEN("r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R r KQkq - 4 4"),
           "Ruy_Lopez#Berlin_Defence:_3...Nf6",
           "1. e4 e5 2. Nf3 Nc6 3. Bb5 Nf6"
         ),
         StartingPosition(
           "C64",
           "Ruy Lopez: Classical Variation",
-          FEN("r1bqk1nr/pppp1ppp/2n5/1Bb1p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4"),
+          FEN("r1bqk1nr/pppp1ppp/2n5/1Bb1p3/4P3/5N2/PPPP1PPP/RNBQK2R r KQkq - 4 4"),
           "Ruy_Lopez#Classical_Defence:_3...Bc5",
           "1. e4 e5 2. Nf3 Nc6 3. Bb5 Bc5"
         ),
@@ -404,21 +404,21 @@ object StartingPosition {
         StartingPosition(
           "C89",
           "Ruy Lopez: Marshall Attack",
-          FEN("r1bq1rk1/2p1bppp/p1n2n2/1p1pp3/4P3/1BP2N2/PP1P1PPP/RNBQR1K1 w - - 0 9"),
+          FEN("r1bq1rk1/2p1bppp/p1n2n2/1p1pp3/4P3/1BP2N2/PP1P1PPP/RNBQR1K1 r - - 0 9"),
           "Ruy_Lopez#Marshall_Attack",
           "1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 O-O 8. c3 d5"
         ),
         StartingPosition(
           "C63",
           "Ruy Lopez: Schliemann Defence",
-          FEN("r1bqkbnr/pppp2pp/2n5/1B2pp2/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4"),
+          FEN("r1bqkbnr/pppp2pp/2n5/1B2pp2/4P3/5N2/PPPP1PPP/RNBQK2R r KQkq - 0 4"),
           "Ruy_Lopez#Schliemann_Defence:_3...f5",
           "1. e4 e5 2. Nf3 Nc6 3. Bb5 f5"
         ),
         StartingPosition(
           "B01",
           "Scandinavian Defence",
-          FEN("rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"),
+          FEN("rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR r KQkq - 0 2"),
           "Scandinavian_Defense",
           "1. e4 d5"
         ),
@@ -432,7 +432,7 @@ object StartingPosition {
         StartingPosition(
           "B01",
           "Scandinavian Defence: Icelandic-Palme Gambit",
-          FEN("rnbqkb1r/ppp2ppp/4pn2/3P4/2P5/8/PP1P1PPP/RNBQKBNR w KQkq - 0 4"),
+          FEN("rnbqkb1r/ppp2ppp/4pn2/3P4/2P5/8/PP1P1PPP/RNBQKBNR r KQkq - 0 4"),
           "Scandinavian_Defense#2...Nf6",
           "1. e4 d5 2. exd5 Nf6 3. c4 e6"
         ),
@@ -446,7 +446,7 @@ object StartingPosition {
         StartingPosition(
           "C45",
           "Scotch Game: Classical Variation",
-          FEN("r1bqk1nr/pppp1ppp/2n5/2b5/3NP3/8/PPP2PPP/RNBQKB1R w KQkq - 1 5"),
+          FEN("r1bqk1nr/pppp1ppp/2n5/2b5/3NP3/8/PPP2PPP/RNBQKB1R r KQkq - 1 5"),
           "Scotch_Game,_Classical_Variation",
           "1. e4 e5 2. Nf3 Nc6 3. d4 exd4 4. Nxd4 Bc5"
         ),
@@ -460,21 +460,21 @@ object StartingPosition {
         StartingPosition(
           "C45",
           "Scotch Game: Steinitz Variation",
-          FEN("r1b1kbnr/pppp1ppp/2n5/8/3NP2q/8/PPP2PPP/RNBQKB1R w KQkq - 1 5"),
+          FEN("r1b1kbnr/pppp1ppp/2n5/8/3NP2q/8/PPP2PPP/RNBQKB1R r KQkq - 1 5"),
           "Scotch_Game#Steinitz_Variation:_4...Qh4.21.3F",
           "1. e4 e5 2. Nf3 Nc6 3. d4 exd4 4. Nxd4 Qh4"
         ),
         StartingPosition(
           "B20",
           "Sicilian Defence",
-          FEN("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"),
+          FEN("rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR r KQkq - 0 2"),
           "Sicilian_Defence",
           "1. e4 c5"
         ),
         StartingPosition(
           "B36",
           "Sicilian Defence: Accelerated Dragon",
-          FEN("r1bqkbnr/pp1ppp1p/2n3p1/8/3NP3/8/PPP2PPP/RNBQKB1R w KQkq - 0 5"),
+          FEN("r1bqkbnr/pp1ppp1p/2n3p1/8/3NP3/8/PPP2PPP/RNBQKB1R r KQkq - 0 5"),
           "Sicilian_Defence,_Accelerated_Dragon",
           "1. e4 c5 2. Nf3 Nc6 3. d4 cxd4 4. Nxd4 g6"
         ),
@@ -495,7 +495,7 @@ object StartingPosition {
         StartingPosition(
           "B70",
           "Sicilian Defence: Dragon Variation",
-          FEN("rnbqkb1r/pp2pp1p/3p1np1/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 0 6"),
+          FEN("rnbqkb1r/pp2pp1p/3p1np1/8/3NP3/2N5/PPP2PPP/R1BQKB1R r KQkq - 0 6"),
           "Sicilian_Defence,_Dragon_Variation",
           "1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 g6"
         ),
@@ -509,21 +509,21 @@ object StartingPosition {
         StartingPosition(
           "B27",
           "Sicilian Defence: Hyper-Accelerated Dragon",
-          FEN("rnbqkbnr/pp1ppp1p/6p1/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3"),
+          FEN("rnbqkbnr/pp1ppp1p/6p1/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R r KQkq - 0 3"),
           "Sicilian_Defence#2...g6:_Hungarian_Variation",
           "1. e4 c5 2. Nf3 g6"
         ),
         StartingPosition(
           "B41",
           "Sicilian Defence: Kan Variation",
-          FEN("rnbqkbnr/1p1p1ppp/p3p3/8/3NP3/8/PPP2PPP/RNBQKB1R w KQkq - 0 5"),
+          FEN("rnbqkbnr/1p1p1ppp/p3p3/8/3NP3/8/PPP2PPP/RNBQKB1R r KQkq - 0 5"),
           "Sicilian_Defence#Kan_.28Paulsen.29_Variation:_4...a6",
           "1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 a6"
         ),
         StartingPosition(
           "B90",
           "Sicilian Defence: Najdorf Variation",
-          FEN("rnbqkb1r/1p2pppp/p2p1n2/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 0 6"),
+          FEN("rnbqkb1r/1p2pppp/p2p1n2/8/3NP3/2N5/PPP2PPP/R1BQKB1R r KQkq - 0 6"),
           "Sicilian_Defence,_Najdorf_Variation",
           "1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6"
         ),
@@ -537,7 +537,7 @@ object StartingPosition {
         StartingPosition(
           "B80",
           "Sicilian Defence: Scheveningen Variation",
-          FEN("rnbqkb1r/pp3ppp/3ppn2/8/3NP3/2N5/PPP2PPP/R1BQKB1R w KQkq - 0 6"),
+          FEN("rnbqkb1r/pp3ppp/3ppn2/8/3NP3/2N5/PPP2PPP/R1BQKB1R r KQkq - 0 6"),
           "Sicilian_Defence,_Scheveningen_Variation",
           "1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 e6"
         ),
@@ -558,7 +558,7 @@ object StartingPosition {
         StartingPosition(
           "C27",
           "Vienna Game: Frankenstein-Dracula Variation",
-          FEN("rnbqkb1r/pppp1ppp/8/4p3/2B1n3/2N5/PPPP1PPP/R1BQK1NR w KQkq - 0 4"),
+          FEN("rnbqkb1r/pppp1ppp/8/4p3/2B1n3/2N5/PPPP1PPP/R1BQK1NR r KQkq - 0 4"),
           "Frankenstein-Dracula_Variation",
           "1. e4 e5 2. Nc3 Nf6 3. Bc4 Nxe4"
         ),
@@ -600,21 +600,21 @@ object StartingPosition {
         StartingPosition(
           "A57",
           "Benko Gambit",
-          FEN("rnbqkb1r/p2ppppp/5n2/1ppP4/2P5/8/PP2PPPP/RNBQKBNR w KQkq - 0 4"),
+          FEN("rnbqkb1r/p2ppppp/5n2/1ppP4/2P5/8/PP2PPPP/RNBQKBNR r KQkq - 0 4"),
           "Benko_Gambit",
           "1. d4 Nf6 2. c4 c5 3. d5 b5"
         ),
         StartingPosition(
           "A61",
           "Benoni Defence: Modern Benoni",
-          FEN("rnbqkb1r/pp1p1ppp/4pn2/2pP4/2P5/8/PP2PPPP/RNBQKBNR w KQkq - 0 4"),
+          FEN("rnbqkb1r/pp1p1ppp/4pn2/2pP4/2P5/8/PP2PPPP/RNBQKBNR r KQkq - 0 4"),
           "Modern_Benoni",
           "1. d4 Nf6 2. c4 c5 3. d5 e6"
         ),
         StartingPosition(
           "A43",
           "Benoni Defence: Czech Benoni",
-          FEN("rnbqkb1r/pp1p1ppp/5n2/2pPp3/2P5/8/PP2PPPP/RNBQKBNR w KQkq e6 0 4"),
+          FEN("rnbqkb1r/pp1p1ppp/5n2/2pPp3/2P5/8/PP2PPPP/RNBQKBNR r KQkq e6 0 4"),
           "Benoni_Defense#Czech_Benoni:_1.d4_Nf6_2.c4_c5_3.d5_e5",
           "1. d4 Nf6 2. c4 c5 3. d5 e5"
         ),
@@ -628,7 +628,7 @@ object StartingPosition {
         StartingPosition(
           "E11",
           "Bogo-Indian Defence",
-          FEN("rnbqk2r/pppp1ppp/4pn2/8/1bPP4/5N2/PP2PPPP/RNBQKB1R w KQkq - 2 4"),
+          FEN("rnbqk2r/pppp1ppp/4pn2/8/1bPP4/5N2/PP2PPPP/RNBQKB1R r KQkq - 2 4"),
           "Bogo-Indian_Defence",
           "1. d4 Nf6 2. c4 e6 3. Nf3 Bb4+"
         ),
@@ -649,14 +649,14 @@ object StartingPosition {
         StartingPosition(
           "A80",
           "Dutch Defence",
-          FEN("rnbqkbnr/ppppp1pp/8/5p2/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2"),
+          FEN("rnbqkbnr/ppppp1pp/8/5p2/3P4/8/PPP1PPPP/RNBQKBNR r KQkq - 0 2"),
           "Dutch_Defence",
           "1. d4 f5"
         ),
         StartingPosition(
           "A96",
           "Dutch Defence: Classical Variation",
-          FEN("rnbq1rk1/ppp1b1pp/3ppn2/5p2/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w - - 0 7"),
+          FEN("rnbq1rk1/ppp1b1pp/3ppn2/5p2/2PP4/5NP1/PP2PPBP/RNBQ1RK1 r - - 0 7"),
           "Dutch_Defence",
           "1. d4 f5 2. c4 Nf6 3. g3 e6 4. Bg2 Be7 5. Nf3 O-O 6. O-O d6"
         ),
@@ -677,14 +677,14 @@ object StartingPosition {
         StartingPosition(
           "A92",
           "Dutch Defence: Stonewall Variation",
-          FEN("rnbq1rk1/ppp1b1pp/4pn2/3p1p2/2PP4/5NP1/PP2PPBP/RNBQ1RK1 w - - 0 7"),
+          FEN("rnbq1rk1/ppp1b1pp/4pn2/3p1p2/2PP4/5NP1/PP2PPBP/RNBQ1RK1 r - - 0 7"),
           "Dutch_Defence",
           "1. d4 f5 2. c4 Nf6 3. g3 e6 4. Bg2 Be7 5. Nf3 O-O 6. O-O d5"
         ),
         StartingPosition(
           "D80",
           "Grünfeld Defence",
-          FEN("rnbqkb1r/ppp1pp1p/5np1/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq - 0 4"),
+          FEN("rnbqkb1r/ppp1pp1p/5np1/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR r KQkq - 0 4"),
           "Grünfeld_Defence",
           "1. d4 Nf6 2. c4 g6 3. Nc3 d5"
         ),
@@ -698,7 +698,7 @@ object StartingPosition {
         StartingPosition(
           "D85",
           "Grünfeld Defence: Exchange Variation",
-          FEN("rnbqkb1r/ppp1pp1p/6p1/3n4/3P4/2N5/PP2PPPP/R1BQKBNR w KQkq - 0 5"),
+          FEN("rnbqkb1r/ppp1pp1p/6p1/3n4/3P4/2N5/PP2PPPP/R1BQKBNR r KQkq - 0 5"),
           "Grünfeld_Defence#Exchange_Variation:_4.cxd5_Nxd5_5.e4",
           "1. d4 Nf6 2. c4 g6 3. Nc3 d5 4. cxd5 Nxd5"
         ),
@@ -719,14 +719,14 @@ object StartingPosition {
         StartingPosition(
           "E61",
           "King's Indian Defence",
-          FEN("rnbqkb1r/pppppp1p/5np1/8/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3"),
+          FEN("rnbqkb1r/pppppp1p/5np1/8/2PP4/8/PP2PPPP/RNBQKBNR r KQkq - 0 3"),
           "King's_Indian_Defence",
           "1. d4 Nf6 2. c4 g6"
         ),
         StartingPosition(
           "E77",
           "King's Indian Defence: 4.e4",
-          FEN("rnbqk2r/ppp1ppbp/3p1np1/8/2PPP3/2N5/PP3PPP/R1BQKBNR w KQkq - 0 5"),
+          FEN("rnbqk2r/ppp1ppbp/3p1np1/8/2PPP3/2N5/PP3PPP/R1BQKBNR r KQkq - 0 5"),
           "King's_Indian_Defence",
           "1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 d6"
         ),
@@ -768,14 +768,14 @@ object StartingPosition {
         StartingPosition(
           "A41",
           "Queens's Pawn Game: Modern Defence",
-          FEN("rnbqk1nr/ppp1ppbp/3p2p1/8/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq - 2 4"),
+          FEN("rnbqk1nr/ppp1ppbp/3p2p1/8/2PP4/2N5/PP2PPPP/R1BQKBNR r KQkq - 2 4"),
           "Queen's_Pawn_Game#1...g6",
           "1. d4 g6 2. c4 d6 3. Nc3 Bg7"
         ),
         StartingPosition(
           "E20",
           "Nimzo-Indian Defence",
-          FEN("rnbqk2r/pppp1ppp/4pn2/8/1bPP4/2N5/PP2PPPP/R1BQKBNR w KQkq - 2 4"),
+          FEN("rnbqk2r/pppp1ppp/4pn2/8/1bPP4/2N5/PP2PPPP/R1BQKBNR r KQkq - 2 4"),
           "Nimzo-Indian_Defence",
           "1. d4 Nf6 2. c4 e6 3. Nc3 Bb4"
         ),
@@ -789,14 +789,14 @@ object StartingPosition {
         StartingPosition(
           "E43",
           "Nimzo-Indian Defence: Fischer Variation",
-          FEN("rnbqk2r/p1pp1ppp/1p2pn2/8/1bPP4/2N1P3/PP3PPP/R1BQKBNR w KQkq - 0 5"),
+          FEN("rnbqk2r/p1pp1ppp/1p2pn2/8/1bPP4/2N1P3/PP3PPP/R1BQKBNR r KQkq - 0 5"),
           "Nimzo-Indian_Defence#4...b6",
           "1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 4. e3 b6"
         ),
         StartingPosition(
           "E41",
           "Nimzo-Indian Defence: Hübner Variation",
-          FEN("r1bqk2r/pp3ppp/2nppn2/2p5/2PP4/2PBPN2/P4PPP/R1BQK2R w KQkq - 0 8"),
+          FEN("r1bqk2r/pp3ppp/2nppn2/2p5/2PP4/2PBPN2/P4PPP/R1BQK2R r KQkq - 0 8"),
           "Nimzo-Indian_Defence#4...c5",
           "1. d4 Nf6 2. c4 e6 3. Nc3 Bb4 4. e3 c5 5. Bd3 Nc6 6. Nf3 Bxc3+ 7. bxc3 d6"
         ),
@@ -824,7 +824,7 @@ object StartingPosition {
         StartingPosition(
           "A53",
           "Old Indian Defence",
-          FEN("rnbqkb1r/ppp1pppp/3p1n2/8/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3"),
+          FEN("rnbqkb1r/ppp1pppp/3p1n2/8/2PP4/8/PP2PPPP/RNBQKBNR r KQkq - 0 3"),
           "Old_Indian_Defense",
           "1. d4 Nf6 2. c4 d6"
         ),
@@ -838,56 +838,56 @@ object StartingPosition {
         StartingPosition(
           "D20",
           "Queen's Gambit Accepted",
-          FEN("rnbqkbnr/ppp1pppp/8/8/2pP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3"),
+          FEN("rnbqkbnr/ppp1pppp/8/8/2pP4/8/PP2PPPP/RNBQKBNR r KQkq - 0 3"),
           "Queen%27s_Gambit_Accepted",
           "1. d4 d5 2. c4 dxc4"
         ),
         StartingPosition(
           "D43",
           "Queen's Gambit Declined: Semi-Slav Defence",
-          FEN("rnbqkb1r/pp3ppp/2p1pn2/3p4/2PP4/2N2N2/PP2PPPP/R1BQKB1R w KQkq - 0 5"),
+          FEN("rnbqkb1r/pp3ppp/2p1pn2/3p4/2PP4/2N2N2/PP2PPPP/R1BQKB1R r KQkq - 0 5"),
           "Semi-Slav_Defense",
           "1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Nf3 c6"
         ),
         StartingPosition(
           "D10",
           "Queen's Gambit Declined: Slav Defence",
-          FEN("rnbqkbnr/pp2pppp/2p5/3p4/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3"),
+          FEN("rnbqkbnr/pp2pppp/2p5/3p4/2PP4/8/PP2PPPP/RNBQKBNR r KQkq - 0 3"),
           "Slav_Defense",
           "1. d4 d5 2. c4 c6"
         ),
         StartingPosition(
           "D40",
           "Queen's Gambit Declined: Semi-Tarrasch Defence",
-          FEN("rnbqkb1r/pp3ppp/4pn2/2pp4/2PP4/2N2N2/PP2PPPP/R1BQKB1R w KQkq - 0 5"),
+          FEN("rnbqkb1r/pp3ppp/4pn2/2pp4/2PP4/2N2N2/PP2PPPP/R1BQKB1R r KQkq - 0 5"),
           "Tarrasch_Defense#Semi-Tarrasch_Defense",
           "1. d4 d5 2. c4 e6 3. Nc3 Nf6 4. Nf3 c5"
         ),
         StartingPosition(
           "D32",
           "Queen's Gambit Declined: Tarrasch Defence",
-          FEN("rnbqkbnr/pp3ppp/4p3/2pp4/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq - 0 4"),
+          FEN("rnbqkbnr/pp3ppp/4p3/2pp4/2PP4/2N5/PP2PPPP/R1BQKBNR r KQkq - 0 4"),
           "Tarrasch_Defense",
           "1. d4 d5 2. c4 e6 3. Nc3 c5"
         ),
         StartingPosition(
           "D08",
           "Queen's Gambit: Albin Countergambit",
-          FEN("rnbqkbnr/ppp2ppp/8/3pp3/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3"),
+          FEN("rnbqkbnr/ppp2ppp/8/3pp3/2PP4/8/PP2PPPP/RNBQKBNR r KQkq - 0 3"),
           "Albin_Countergambit",
           "1. d4 d5 2. c4 e5"
         ),
         StartingPosition(
           "D07",
           "Queen's Gambit: Chigorin Defence",
-          FEN("r1bqkbnr/ppp1pppp/2n5/3p4/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 1 3"),
+          FEN("r1bqkbnr/ppp1pppp/2n5/3p4/2PP4/8/PP2PPPP/RNBQKBNR r KQkq - 1 3"),
           "Chigorin_Defense",
           "1. d4 d5 2. c4 Nc6"
         ),
         StartingPosition(
           "E12",
           "Queen's Indian Defence",
-          FEN("rnbqkb1r/p1pp1ppp/1p2pn2/8/2PP4/5N2/PP2PPPP/RNBQKB1R w KQkq - 0 4"),
+          FEN("rnbqkb1r/p1pp1ppp/1p2pn2/8/2PP4/5N2/PP2PPPP/RNBQKB1R r KQkq - 0 4"),
           "Queen's_Indian_Defense",
           "1. d4 Nf6 2. c4 e6 3. Nf3 b6"
         ),
@@ -929,7 +929,7 @@ object StartingPosition {
         StartingPosition(
           "A52",
           "Budapest Defence",
-          FEN("rnbqkb1r/pppp1ppp/5n2/4p3/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3"),
+          FEN("rnbqkb1r/pppp1ppp/5n2/4p3/2PP4/8/PP2PPPP/RNBQKBNR r KQkq - 0 3"),
           "Budapest_Gambit",
           "1. d4 Nf6 2. c4 e5",
           featurable = false
@@ -937,7 +937,7 @@ object StartingPosition {
         StartingPosition(
           "D00",
           "Closed Game",
-          FEN("rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2"),
+          FEN("rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR r KQkq - 0 2"),
           "Closed_Game",
           "1. d4 d5",
           featurable = false
@@ -992,21 +992,21 @@ object StartingPosition {
         StartingPosition(
           "A20",
           "English Opening: Reversed Sicilian",
-          FEN("rnbqkbnr/pppp1ppp/8/4p3/2P5/8/PP1PPPPP/RNBQKBNR w KQkq - 0 2"),
+          FEN("rnbqkbnr/pppp1ppp/8/4p3/2P5/8/PP1PPPPP/RNBQKBNR r KQkq - 0 2"),
           "English_Opening",
           "1. c4 e5"
         ),
         StartingPosition(
           "A30",
           "English Opening: Symmetrical Variation",
-          FEN("rnbqkbnr/pp1ppppp/8/2p5/2P5/8/PP1PPPPP/RNBQKBNR w KQkq - 0 2"),
+          FEN("rnbqkbnr/pp1ppppp/8/2p5/2P5/8/PP1PPPPP/RNBQKBNR r KQkq - 0 2"),
           "English_Opening",
           "1. c4 c5"
         ),
         StartingPosition(
           "A26",
           "English Opening: Closed System",
-          FEN("r1bqk1nr/ppp2pbp/2np2p1/4p3/2P5/2NP2P1/PP2PPBP/R1BQK1NR w KQkq - 0 6"),
+          FEN("r1bqk1nr/ppp2pbp/2np2p1/4p3/2P5/2NP2P1/PP2PPBP/R1BQK1NR r KQkq - 0 6"),
           "English_Opening",
           "1. c4 e5 2. Nc3 Nc6 3. g3 g6 4. Bg2 Bg7 5. d3 d6"
         )
@@ -1051,7 +1051,7 @@ object StartingPosition {
         StartingPosition(
           "A02",
           "Bird's Opening: Dutch Variation",
-          FEN("rnbqkbnr/ppp1pppp/8/3p4/5P2/8/PPPPP1PP/RNBQKBNR w KQkq - 0 2"),
+          FEN("rnbqkbnr/ppp1pppp/8/3p4/5P2/8/PPPPP1PP/RNBQKBNR r KQkq - 0 2"),
           "Bird's_Opening",
           "1. f4 d5"
         )
@@ -1093,7 +1093,7 @@ object StartingPosition {
     val frankenstein = StartingPosition(
       "C27",
       "Frankenstein-Dracula Variation",
-      FEN("rnbqkb1r/pppp1ppp/8/4p3/2B1n3/2N5/PPPP1PPP/R1BQK1NR w KQkq - 0 4"),
+      FEN("rnbqkb1r/pppp1ppp/8/4p3/2B1n3/2N5/PPPP1PPP/R1BQK1NR r KQkq - 0 4"),
       "Frankenstein-Dracula_Variation",
       "1. e4 e5 2. Nc3 Nf6 3. Bc4 Nxe4"
     )

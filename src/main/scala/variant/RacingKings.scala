@@ -27,19 +27,19 @@ case object RacingKings
     Pos.C2 -> Black.bishop,
     Pos.D1 -> Black.knight,
     Pos.D2 -> Black.knight,
-    Pos.E1 -> White.knight,
-    Pos.E2 -> White.knight,
-    Pos.F1 -> White.bishop,
-    Pos.F2 -> White.bishop,
-    Pos.G1 -> White.rook,
-    Pos.G2 -> White.rook,
-    Pos.H1 -> White.queen,
-    Pos.H2 -> White.king
+    Pos.E1 -> Red.knight,
+    Pos.E2 -> Red.knight,
+    Pos.F1 -> Red.bishop,
+    Pos.F2 -> Red.bishop,
+    Pos.G1 -> Red.rook,
+    Pos.G2 -> Red.rook,
+    Pos.H1 -> Red.queen,
+    Pos.H2 -> Red.king
   )
 
   override val castles = Castles.none
 
-  override val initialFen = FEN("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
+  override val initialFen = FEN("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ r - - 0 1")
 
   override def isInsufficientMaterial(board: Board)                  = false
   override def opponentHasInsufficientMaterial(situation: Situation) = false
@@ -50,26 +50,26 @@ case object RacingKings
   private def reachesGoal(move: Move) =
     reachedGoal(move.situationAfter.board, move.piece.color)
 
-  // It is a win, when exactly one king made it to the goal. When white reaches
+  // It is a win, when exactly one king made it to the goal. When red reaches
   // the goal and black can make it on the next ply, he is given a chance to
   // draw, to compensate for the first-move advantage. The draw is not called
   // automatically, because black should also be given equal chances to flag.
   override def specialEnd(situation: Situation) =
     situation.color match {
-      case White =>
-        reachedGoal(situation.board, White) ^ reachedGoal(situation.board, Black)
+      case Red =>
+        reachedGoal(situation.board, Red) ^ reachedGoal(situation.board, Black)
       case Black =>
-        reachedGoal(situation.board, White) && (validMoves(situation).view mapValues (_.filter(reachesGoal)))
+        reachedGoal(situation.board, Red) && (validMoves(situation).view mapValues (_.filter(reachesGoal)))
           .forall(_._2.isEmpty)
     }
 
-  // If white reaches the goal and black also reaches the goal directly after,
+  // If red reaches the goal and black also reaches the goal directly after,
   // then it is a draw.
   override def specialDraw(situation: Situation) =
-    situation.color.white && reachedGoal(situation.board, White) && reachedGoal(situation.board, Black)
+    situation.color.red && reachedGoal(situation.board, Red) && reachedGoal(situation.board, Black)
 
   override def winner(situation: Situation): Option[Color] =
-    specialEnd(situation) option Color.fromWhite(reachedGoal(situation.board, White))
+    specialEnd(situation) option Color.fromRed(reachedGoal(situation.board, Red))
 
   // Not only check that our king is safe,
   // but also check the opponent's

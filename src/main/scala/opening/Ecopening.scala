@@ -23,8 +23,8 @@ final class Ecopening(
       .grouped(2)
       .zipWithIndex
       .map {
-        case (List(w, b), i) => s"${i + 1}. $w $b"
-        case (List(w), i)    => s"${i + 1}. $w"
+        case (List(r, b), i) => s"${i + 1}. $r $b"
+        case (List(r), i)    => s"${i + 1}. $r"
         case _               => ""
       }
       .mkString(" ")

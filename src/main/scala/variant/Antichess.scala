@@ -60,12 +60,13 @@ case object Antichess
 
       // We consider the case where a player has two knights
       if (whiteKnights.size != 1 || blackKnights.size != 1) false
-      else {
-        for {
-          whiteKnight <- whiteKnights.headOption
-          blackKnight <- blackKnights.headOption
-        } yield whiteKnight.pos.isLight == blackKnight.pos.isLight
-      } getOrElse false
+      else
+        {
+          for {
+            whiteKnight <- whiteKnights.headOption
+            blackKnight <- blackKnights.headOption
+          } yield whiteKnight.pos.isLight == blackKnight.pos.isLight
+        } getOrElse false
     }
 
   // No player can win if the only remaining pieces are opposing bishops on different coloured
@@ -88,17 +89,18 @@ case object Antichess
           whiteBishops.map(_.pos.isLight).to(Set).size != 1 ||
           blackBishops.map(_.pos.isLight).to(Set).size != 1
         ) false
-        else {
-          for {
-            whiteBishopLight <- whiteBishops.headOption map (_.pos.isLight)
-            blackBishopLight <- blackBishops.headOption map (_.pos.isLight)
-          } yield {
-            whiteBishopLight != blackBishopLight && whitePawns.forall(
-              pawnNotAttackable(_, blackBishopLight, board)
-            ) &&
-            blackPawns.forall(pawnNotAttackable(_, whiteBishopLight, board))
-          }
-        } getOrElse false
+        else
+          {
+            for {
+              whiteBishopLight <- whiteBishops.headOption map (_.pos.isLight)
+              blackBishopLight <- blackBishops.headOption map (_.pos.isLight)
+            } yield {
+              whiteBishopLight != blackBishopLight && whitePawns.forall(
+                pawnNotAttackable(_, blackBishopLight, board)
+              ) &&
+              blackPawns.forall(pawnNotAttackable(_, whiteBishopLight, board))
+            }
+          } getOrElse false
     }
 
     bishopsAndPawns && drawnBishops

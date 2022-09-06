@@ -214,7 +214,7 @@ abstract class Variant private[variant] (
 
 object Variant {
 
-  val all = List(
+  val all: List[Variant] = List(
     Standard,
     Crazyhouse,
     Chess960,
@@ -233,7 +233,7 @@ object Variant {
     (v.key, v)
   } toMap
 
-  val default = Standard
+  val default: Variant = Standard
 
   def apply(id: Int): Option[Variant]     = byId get id
   def apply(key: String): Option[Variant] = byKey get key

@@ -98,5 +98,5 @@ object Color {
   val white: Color = White
   val black: Color = Black
 
-  val all = List(White, Black)
+  val all = List[Color](White, Black)
 }

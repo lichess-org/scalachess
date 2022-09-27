@@ -15,9 +15,11 @@ final class FullOpening(
     case _           => OpeningFamily(name.trim) -> None
   }
 
-  def ecoName = s"$eco $name"
+  lazy val nbMoves = uci.count(' ' ==) + 1
+  lazy val lastUci = uci.split(' ').lastOption
+  lazy val key     = FullOpening nameToKey name
 
-  override def toString = ecoName
+  override def toString = name
 
   def atPly(ply: Int) = FullOpening.AtPly(this, ply)
 }
@@ -25,7 +27,27 @@ final class FullOpening(
 object FullOpening {
 
   case class AtPly(opening: FullOpening, ply: Int)
+
+  object nameToKey {
+    private val splitAccentRegex = "[\u0300-\u036f]".r
+    private val multiSpaceRegex  = """\s+""".r
+    private val badChars         = """[^\w\-]+""".r
+    def apply(name: String) =
+      badChars.replaceAllIn(
+        multiSpaceRegex.replaceAllIn(
+          splitAccentRegex.replaceAllIn(
+            // split an accented letter in the base letter and the accent
+            java.text.Normalizer.normalize(name, java.text.Normalizer.Form.NFD),
+            ""
+          ),
+          "_"
+        ),
+        ""
+      )
+  }
 }
 
-case class OpeningFamily(name: String)
+case class OpeningFamily(name: String) {
+  lazy val key = FullOpening nameToKey name
+}
 case class OpeningVariation(name: String)

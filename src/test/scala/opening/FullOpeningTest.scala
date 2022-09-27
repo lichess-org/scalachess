@@ -70,4 +70,17 @@ class FullOpeningTest extends Specification {
       }
     }
   }
+
+  "nameToKey" in {
+    "opening name" in {
+      import FullOpening.nameToKey
+      nameToKey("Grünfeld Defense") must_== "Grunfeld_Defense"
+      nameToKey("King's Pawn Game") must_== "Kings_Pawn_Game"
+      nameToKey("Neo-Grünfeld Defense") must_== "Neo-Grunfeld_Defense"
+      nameToKey(
+        "Bishop's Opening: McDonnell Gambit, La Bourdonnais-Denker Gambit"
+      ) must_== "Bishops_Opening_McDonnell_Gambit_La_Bourdonnais-Denker_Gambit"
+    }
+  }
+
 }

@@ -39,14 +39,25 @@ object FullOpeningDB {
         variant.Standard
       )
       .toOption
-      .flatMap {
-        _.zipWithIndex.drop(1).foldRight(none[FullOpening.AtPly]) {
-          case ((situation, ply), None) =>
-            val fen = format.Forsyth.exportStandardPositionTurnCastlingEp(situation)
-            byFen get fen map (_ atPly ply)
-          case (_, found) => found
+      .flatMap(searchInSituations)
+
+  def search(replay: Replay): Option[FullOpening.AtPly] =
+    searchInSituations {
+      replay.chronoMoves.view
+        .takeWhile {
+          case Left(_) => true
+          case _       => false
         }
-      }
+        .map(_.fold(_.situationAfter, _.situationAfter))
+    }
+
+  private def searchInSituations(situations: Iterable[Situation]): Option[FullOpening.AtPly] =
+    situations.zipWithIndex.drop(1).foldRight(none[FullOpening.AtPly]) {
+      case ((situation, ply), None) =>
+        val fen = format.Forsyth.exportStandardPositionTurnCastlingEp(situation)
+        byFen get fen map (_ atPly ply)
+      case (_, found) => found
+    }
 
   def searchInFens(fens: Vector[FEN]): Option[FullOpening] =
     fens.foldRight(none[FullOpening]) {

@@ -26,13 +26,15 @@ final class FullOpening(
 
 object FullOpening {
 
+  type Key = String
+
   case class AtPly(opening: FullOpening, ply: Int)
 
   object nameToKey {
     private val splitAccentRegex = "[\u0300-\u036f]".r
     private val multiSpaceRegex  = """\s+""".r
     private val badChars         = """[^\w\-]+""".r
-    def apply(name: String) =
+    def apply(name: String): Key =
       badChars.replaceAllIn(
         multiSpaceRegex.replaceAllIn(
           splitAccentRegex.replaceAllIn(

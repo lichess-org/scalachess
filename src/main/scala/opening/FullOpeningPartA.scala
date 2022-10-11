@@ -678,7 +678,6 @@ new FullOpening("A82", "Dutch Defense: Staunton Gambit", "rnbqkbnr/ppppp1pp/8/5p
 new FullOpening("A82", "Dutch Defense: Staunton Gambit Accepted", "rnbqkbnr/ppppp1pp/8/8/3Pp3/8/PPP2PPP/RNBQKBNR w KQkq -", "d2d4 f7f5 e2e4 f5e4", "1. d4 f5 2. e4 fxe4"),
 new FullOpening("A82", "Dutch Defense: Staunton Gambit, American Attack", "rnbqkbnr/ppppp1pp/8/8/3Pp3/8/PPPN1PPP/R1BQKBNR b KQkq -", "d2d4 f7f5 e2e4 f5e4 b1d2", "1. d4 f5 2. e4 fxe4 3. Nd2"),
 new FullOpening("A82", "Dutch Defense: Staunton Gambit, Tartakower Variation", "rnbqkb1r/ppppp1pp/5n2/8/3Pp1P1/2N5/PPP2P1P/R1BQKBNR b KQkq -", "d2d4 f7f5 e2e4 f5e4 b1c3 g8f6 g2g4", "1. d4 f5 2. e4 fxe4 3. Nc3 Nf6 4. g4"),
-new FullOpening("A82", "French Defense: Franco-Hiva Gambit", "rnbqkbnr/pppp2pp/4p3/5p2/3PP3/8/PPP2PPP/RNBQKBNR w KQkq -", "d2d4 f7f5 e2e4 e7e6", "1. d4 f5 2. e4 e6"),
 new FullOpening("A82", "Rat Defense: Balogh Defense", "rnbqkbnr/ppp1p1pp/3p4/5p2/3PP3/8/PPP2PPP/RNBQKBNR w KQkq -", "e2e4 d7d6 d2d4 f7f5", "1. e4 d6 2. d4 f5"),
 new FullOpening("A83", "Dutch Defense: Staunton Gambit", "rnbqkb1r/ppppp1pp/5n2/6B1/3Pp3/2N5/PPP2PPP/R2QKBNR b KQkq -", "d2d4 f7f5 e2e4 f5e4 b1c3 g8f6 c1g5", "1. d4 f5 2. e4 fxe4 3. Nc3 Nf6 4. Bg5"),
 new FullOpening("A83", "Dutch Defense: Staunton Gambit, Alekhine Variation", "rnbqkb1r/ppppp2p/5np1/6B1/3Pp2P/2N5/PPP2PP1/R2QKBNR b KQkq -", "d2d4 f7f5 e2e4 f5e4 b1c3 g8f6 c1g5 g7g6 h2h4", "1. d4 f5 2. e4 fxe4 3. Nc3 Nf6 4. Bg5 g6 5. h4"),

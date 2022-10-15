@@ -178,24 +178,24 @@ object Forsyth {
 
   def >>(game: Game): FEN = FEN {
     {
-      List(
+      List[String](
         exportBoard(game.board) + exportCrazyPocket(game.board),
-        game.player.letter,
+        game.player.letter.toString,
         exportCastles(game.board),
         game.situation.enPassantSquare.map(_.toString).getOrElse("-"),
-        game.halfMoveClock,
-        game.fullMoveNumber
+        game.halfMoveClock.toString,
+        game.fullMoveNumber.toString
       ) ::: {
         if (game.board.variant == variant.ThreeCheck) List(exportCheckCount(game.board))
-        else List()
+        else Nil
       }
     } mkString " "
   }
 
   def exportStandardPositionTurnCastlingEp(situation: Situation): String =
-    List(
+    List[String](
       exportBoard(situation.board),
-      situation.color.letter,
+      situation.color.letter.toString,
       exportCastles(situation.board),
       situation.enPassantSquare.map(_.toString).getOrElse("-")
     ) mkString " "

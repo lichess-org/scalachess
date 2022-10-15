@@ -4,7 +4,7 @@ organization := "org.lichess"
 
 version := "10.6.3"
 
-ThisBuild / scalaVersion                        := "2.13.8"
+ThisBuild / scalaVersion                        := "2.13.10"
 ThisBuild / githubWorkflowPublishTargetBranches := Seq() // Don't publish anywhere
 ThisBuild / githubWorkflowBuild ++= Seq(
   WorkflowStep.Sbt(List("scalafmtCheckAll"), name = Some("Check Formatting"))

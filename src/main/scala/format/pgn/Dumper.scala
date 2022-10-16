@@ -43,18 +43,16 @@ object Dumper {
 
         s"${role.pgn}$disambiguation${if (captures) "x" else ""}${dest.key}"
     }) + {
-      if (next.check) {
-        if (next.checkMate) "#" else "+"
-      } else if (next.winner.isDefined) "#"
+      if (next.winner.isDefined) "#"
+      else if (next.check) "+"
       else ""
     }
   }
 
   def apply(data: chess.Drop, next: Situation): String = {
     data.toUci.uci + {
-      if (next.check) {
-        if (next.checkMate) "#" else "+"
-      } else if (next.winner.isDefined) "#"
+      if (next.winner.isDefined) "#"
+      else if (next.check) "+"
       else ""
     }
   }

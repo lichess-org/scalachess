@@ -5,6 +5,7 @@ import format.Forsyth
 import Pos._
 
 import chess.format.FEN
+import chess.variant.ThreeCheck
 
 class DumperTest extends ChessTest {
 
@@ -66,6 +67,18 @@ class DumperTest extends ChessTest {
     E2 -> A6
   )
 
+  val threeCheck = Game(Board init ThreeCheck).playMoves(
+    E2 -> E4,
+    C7 -> C5,
+    F1 -> C4,
+    B8 -> C6,
+    C4 -> F7,
+    E8 -> F7,
+    D1 -> H5,
+    G7 -> G6,
+    H5 -> G6
+  )
+
   "standard game" should {
     "move list" in {
       "Gioachine Greco" in {
@@ -79,6 +92,16 @@ class DumperTest extends ChessTest {
             .split(' ')
             .toList
         }
+      }
+    }
+  }
+
+  "three check variant" should {
+    "move list" in {
+      threeCheck map (_.pgnMoves) must beValid.like { case ms =>
+        ms must_== "e4 c5 Bc4 Nc6 Bxf7+ Kxf7 Qh5+ g6 Qxg6#"
+          .split(' ')
+          .toList
       }
     }
   }

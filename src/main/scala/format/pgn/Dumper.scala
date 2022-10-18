@@ -6,7 +6,7 @@ object Dumper {
   def apply(situation: Situation, data: chess.Move, next: Situation): String = {
     import data._
 
-    ((promotion, piece.role) match {
+    val base = (promotion, piece.role) match {
       case _ if castles =>
         if (orig ?> dest) "O-O-O" else "O-O"
 
@@ -40,22 +40,19 @@ object Dumper {
         } else {
           orig.key
         }
-
         s"${role.pgn}$disambiguation${if (captures) "x" else ""}${dest.key}"
-    }) + {
-      if (next.winner.isDefined) "#"
-      else if (next.check) "+"
-      else ""
     }
+
+    s"$base${checkOrWinnerSymbol(next)}"
   }
 
-  def apply(data: chess.Drop, next: Situation): String = {
-    data.toUci.uci + {
-      if (next.winner.isDefined) "#"
-      else if (next.check) "+"
-      else ""
-    }
-  }
+  def apply(data: chess.Drop, next: Situation): String =
+    s"${data.toUci.uci}${checkOrWinnerSymbol(next)}"
+
+  private def checkOrWinnerSymbol(next: Situation): String =
+    if (next.winner.isDefined) "#"
+    else if (next.check) "+"
+    else ""
 
   def apply(data: chess.Move): String =
     apply(

@@ -24,6 +24,8 @@ final class FullOpening(
 
 object FullOpening:
 
+  type Key = String
+
   case class AtPly(opening: FullOpening, ply: Int)
 
   object nameToKey:
@@ -42,7 +44,6 @@ object FullOpening:
         ),
         ""
       )
-  }
 
 case class OpeningFamily(name: String):
   lazy val key = FullOpening nameToKey name

@@ -6,7 +6,7 @@ object Dumper:
   def apply(situation: Situation, data: chess.Move, next: Situation): String =
     import data.*
 
-    val base = (promotion, piece.role) match {
+    val base = (promotion, piece.role) match
       case _ if castles =>
         if (orig ?> dest) "O-O-O" else "O-O"
 
@@ -31,21 +31,18 @@ object Dumper:
           situation.move(cpos, dest, None).isValid
         }
 
-        val disambiguation = if (candidates.isEmpty) {
+        val disambiguation = if (candidates.isEmpty)
           ""
-        } else if (!candidates.exists(_ ?| orig)) {
+        else if (!candidates.exists(_ ?| orig))
           orig.file.toString
-        } else if (!candidates.exists(_ ?- orig)) {
+        else if (!candidates.exists(_ ?- orig))
           orig.rank.toString
-        } else {
+        else
           orig.key
-        }
 
         s"${role.pgn}$disambiguation${if (captures) "x" else ""}${dest.key}"
-    }
 
     s"$base${checkOrWinnerSymbol(next)}"
-  }
 
   def apply(data: chess.Drop, next: Situation): String =
     s"${data.toUci.uci}${checkOrWinnerSymbol(next)}"

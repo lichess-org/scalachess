@@ -48,8 +48,8 @@ class FullOpeningTest extends Specification:
         None,
         variant.Standard
       ).toOption.get.valid.toOption.get
-      FullOpeningDB.search(replay) must beSome.like { case o =>
-        o.opening.name == "King's Gambit Accepted: Muzio Gambit, Holloway Defense"
+      FullOpeningDB.search(replay) must beSome {
+        (_: FullOpening.AtPly).opening.name == "King's Gambit Accepted: Muzio Gambit, Holloway Defense"
       }
     }
   }
@@ -94,5 +94,3 @@ class FullOpeningTest extends Specification:
       ) must_== "Bishops_Opening_McDonnell_Gambit_La_Bourdonnais-Denker_Gambit"
     }
   }
-
-}

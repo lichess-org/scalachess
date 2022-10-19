@@ -93,4 +93,3 @@ object Color:
   val black: Color = Black
 
   val all = List[Color](White, Black)
-}

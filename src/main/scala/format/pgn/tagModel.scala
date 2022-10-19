@@ -51,8 +51,8 @@ case class Tags(value: List[Tag]) extends AnyVal:
   def exists(which: Tag.type => TagType): Boolean =
     value.exists(_.name == which(Tag))
 
-  def resultColor: Option[Option[Color]] =
-    apply(_.Result).filter("*" !=) map Color.fromResult
+  def outcome: Option[Outcome] =
+    apply(_.Result) flatMap Outcome.fromResult
 
   def ++(tags: Tags) = tags.value.foldLeft(this)(_ + _)
 

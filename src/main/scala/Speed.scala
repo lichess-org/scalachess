@@ -28,8 +28,8 @@ object Speed:
         "Correspondence games: one or several days per move"
       )
 
-  val all     = List(UltraBullet, Bullet, Blitz, Rapid, Classical, Correspondence)
-  val limited = List(Bullet, Blitz, Rapid, Classical)
+  val all     = List[Speed](UltraBullet, Bullet, Blitz, Rapid, Classical, Correspondence)
+  val limited = List[Speed](Bullet, Blitz, Rapid, Classical)
 
   val byId = all map { v =>
     (v.id, v)

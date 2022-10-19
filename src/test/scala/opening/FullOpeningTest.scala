@@ -40,6 +40,18 @@ class FullOpeningTest extends Specification:
         (_: FullOpening).name == "Benoni Defense: Old Benoni"
       }
     }
+    "find by replay" in {
+      val replay = Replay(
+        "e4 e5 f4 exf4 Nf3 g5 Bc4 g4 O-O gxf3 Qxf3 Nc6 Qxf4 f6 Nc3 d6 Nd5 Ne5 Bb3 Ng6 Nxf6+ Qxf6 Qxf6 Nxf6 Rxf6 Bd7 Bf7+ Ke7 Rf2 Be8 Bb3 Bg7 c3 Rf8 Rxf8 Kxf8 d4 Bf7 Bxf7 Kxf7 Bg5 c5 Rf1+ Kg8 d5 Re8 Re1 Rf8 Be3"
+          .split(' ')
+          .toList,
+        None,
+        variant.Standard
+      ).toOption.get.valid.toOption.get
+      FullOpeningDB.search(replay) must beSome.like { case o =>
+        o.opening.name == "King's Gambit Accepted: Muzio Gambit, Holloway Defense"
+      }
+    }
   }
 
   "by fen" should {
@@ -70,3 +82,17 @@ class FullOpeningTest extends Specification:
       }
     }
   }
+
+  "nameToKey" in {
+    "opening name" in {
+      import FullOpening.nameToKey
+      nameToKey("Grünfeld Defense") must_== "Grunfeld_Defense"
+      nameToKey("King's Pawn Game") must_== "Kings_Pawn_Game"
+      nameToKey("Neo-Grünfeld Defense") must_== "Neo-Grunfeld_Defense"
+      nameToKey(
+        "Bishop's Opening: McDonnell Gambit, La Bourdonnais-Denker Gambit"
+      ) must_== "Bishops_Opening_McDonnell_Gambit_La_Bourdonnais-Denker_Gambit"
+    }
+  }
+
+}

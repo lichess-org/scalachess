@@ -7,6 +7,8 @@ import chess.format.FEN
 
 object FullOpeningDB:
 
+  import FullOpening.Key
+
   lazy val all: Vector[FullOpening] =
     FullOpeningPartA.db ++ FullOpeningPartB.db ++ FullOpeningPartC.db ++ FullOpeningPartD.db ++ FullOpeningPartE.db
 
@@ -16,6 +18,17 @@ object FullOpeningDB:
     }.toMap
 
   lazy val families: Set[OpeningFamily] = byFen.values.map(_.family).toSet
+
+  // Keep only one opening per unique key: the shortest one
+  lazy val shortestLines: Map[Key, FullOpening] = FullOpeningDB.all
+    .foldLeft(Map.empty[Key, FullOpening]) { case (acc, op) =>
+      acc.updatedWith(op.key) {
+        case Some(prev) if prev.uci.size < op.uci.size => prev.some
+        case _                                         => op.some
+      }
+    }
+
+  def isShortest(op: FullOpening) = shortestLines get op.key contains op
 
   def findByFen(fen: FEN): Option[FullOpening] =
     fen.value.split(' ').take(4) match
@@ -38,14 +51,25 @@ object FullOpeningDB:
         variant.Standard
       )
       .toOption
-      .flatMap {
-        _.zipWithIndex.drop(1).foldRight(none[FullOpening.AtPly]) {
-          case ((situation, ply), None) =>
-            val fen = format.Forsyth.exportStandardPositionTurnCastlingEp(situation)
-            byFen get fen map (_ atPly ply)
-          case (_, found) => found
+      .flatMap(searchInSituations)
+
+  def search(replay: Replay): Option[FullOpening.AtPly] =
+    searchInSituations {
+      replay.chronoMoves.view
+        .takeWhile {
+          case Left(_) => true
+          case _       => false
         }
-      }
+        .map(_.fold(_.situationAfter, _.situationAfter))
+    }
+
+  private def searchInSituations(situations: Iterable[Situation]): Option[FullOpening.AtPly] =
+    situations.zipWithIndex.drop(1).foldRight(none[FullOpening.AtPly]) {
+      case ((situation, ply), None) =>
+        val fen = format.Forsyth.exportStandardPositionTurnCastlingEp(situation)
+        byFen get fen map (_ atPly ply)
+      case (_, found) => found
+    }
 
   def searchInFens(fens: Vector[FEN]): Option[FullOpening] =
     fens.foldRight(none[FullOpening]) {

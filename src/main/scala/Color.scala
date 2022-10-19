@@ -92,16 +92,5 @@ object Color:
   val white: Color = White
   val black: Color = Black
 
-  val all = List(White, Black)
-
-  def showResult(color: Option[Color]) =
-    color match
-      case Some(chess.White) => "1-0"
-      case Some(chess.Black) => "0-1"
-      case None              => "1/2-1/2"
-
-  def fromResult(result: String): Option[Color] =
-    result match
-      case "1-0" => Option(chess.White)
-      case "0-1" => Option(chess.Black)
-      case _     => None
+  val all = List[Color](White, Black)
+}

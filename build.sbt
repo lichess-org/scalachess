@@ -1,10 +1,10 @@
 lazy val scalachess = Project("scalachess", file("."))
 name                     := "scalachess"
 organization             := "org.lichess"
-version                  := "11.0.2"
+version                  := "11.0.3"
 licenses += "AGPL-3.0"   -> url("https://opensource.org/licenses/AGPL-3.0")
-ThisBuild / scalaVersion := "3.1.2"
-ThisBuild / crossScalaVersions ++= Seq("2.13.8", "3.1.2")
+ThisBuild / scalaVersion := "3.1.3"
+ThisBuild / crossScalaVersions ++= Seq("2.13.10", "3.1.3")
 ThisBuild / githubWorkflowPublishTargetBranches := Seq() // Don't publish anywhere
 ThisBuild / githubWorkflowBuild ++= Seq(
   WorkflowStep.Sbt(List("scalafmtCheckAll"), name = Some("Check Formatting"))
@@ -12,10 +12,10 @@ ThisBuild / githubWorkflowBuild ++= Seq(
 
 libraryDependencies ++= List(
   "org.typelevel"      %% "cats-parse"     % "0.3.8",
-  "org.specs2"         %% "specs2-core"    % "4.16.1" % Test,
-  "org.specs2"         %% "specs2-cats"    % "4.16.1" % Test,
+  "org.specs2"         %% "specs2-core"    % "4.17.0" % Test,
+  "org.specs2"         %% "specs2-cats"    % "4.17.0" % Test,
   "com.github.ornicar" %% "scalalib"       % "8.0.2",
-  "joda-time"           % "joda-time"      % "2.10.14",
+  "joda-time"           % "joda-time"      % "2.12.0",
   "org.typelevel"      %% "cats-core"      % "2.8.0",
   "org.typelevel"      %% "alleycats-core" % "2.8.0"
 )

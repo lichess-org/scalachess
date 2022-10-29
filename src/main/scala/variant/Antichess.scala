@@ -7,6 +7,7 @@ case object Antichess
     extends Variant(
       id = 6,
       key = "antichess",
+      uciKey = "antichess",
       name = "Antichess",
       shortName = "Anti",
       title = "Lose all your pieces (or get stalemated) to win the game.",

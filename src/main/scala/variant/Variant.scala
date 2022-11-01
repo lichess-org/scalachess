@@ -11,6 +11,7 @@ import chess.format.FEN
 abstract class Variant private[variant] (
     val id: Int,
     val key: String,
+    val uciKey: String,
     val name: String,
     val shortName: String,
     val title: String,

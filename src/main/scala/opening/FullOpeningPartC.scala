@@ -799,6 +799,7 @@ new FullOpening("C50", "Italian Game: Giuoco Piano", "r1bqk1nr/pppp1ppp/2n5/2b1p
 new FullOpening("C50", "Italian Game: Hungarian Defense", "r1bqk1nr/ppppbppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq -", "e2e4 e7e5 g1f3 b8c6 f1c4 f8e7", "1. e4 e5 2. Nf3 Nc6 3. Bc4 Be7"),
 new FullOpening("C50", "Italian Game: Hungarian Defense, Tartakower Variation", "r1bqk2r/ppppbppp/2n5/4P3/2Bpn3/2P2N2/PP3PPP/RNBQK2R w KQkq -", "e2e4 e7e5 g1f3 b8c6 f1c4 f8e7 d2d4 e5d4 c2c3 g8f6 e4e5 f6e4", "1. e4 e5 2. Nf3 Nc6 3. Bc4 Be7 4. d4 exd4 5. c3 Nf6 6. e5 Ne4"),
 new FullOpening("C50", "Italian Game: Jerome Gambit", "r1bqk1nr/pppp1Bpp/2n5/2b1p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq -", "e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 c4f7", "1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. Bxf7+"),
+new FullOpening("C50", "Italian Game: Paris Defense", "r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq -", "e2e4 e7e5 g1f3 b8c6 f1c4 d7d6", "1. e4 e5 2. Nf3 Nc6 3. Bc4 d6"),
 new FullOpening("C50", "Italian Game: Rosentreter Gambit", "r1bqk1nr/pppp1ppp/2n5/2b1p3/2BPP3/5N2/PPP2PPP/RNBQK2R b KQkq -", "e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 d2d4", "1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. d4"),
 new FullOpening("C50", "Italian Game: Rousseau Gambit", "r1bqkbnr/pppp2pp/2n5/4pp2/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq -", "e2e4 e7e5 g1f3 b8c6 f1c4 f7f5", "1. e4 e5 2. Nf3 Nc6 3. Bc4 f5"),
 new FullOpening("C51", "Italian Game: Evans Gambit", "r1bqk1nr/pppp1ppp/2n5/2b1p3/1PB1P3/5N2/P1PP1PPP/RNBQK2R b KQkq -", "e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 b2b4", "1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. b4"),

@@ -5,6 +5,7 @@ case object KingOfTheHill
     extends Variant(
       id = 4,
       key = "kingOfTheHill",
+      uciKey = "kingofthehill",
       name = "King of the Hill",
       shortName = "KotH",
       title = "Bring your King to the center to win the game.",

@@ -7,6 +7,7 @@ case object ThreeCheck
     extends Variant(
       id = 5,
       key = "threeCheck",
+      uciKey = "3check",
       name = "Three-check",
       shortName = "3check",
       title = "Check your opponent 3 times to win the game.",

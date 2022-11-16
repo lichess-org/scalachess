@@ -2,6 +2,8 @@ import ornicar.scalalib.ScalalibExtensions
 
 package object chess extends ScalalibExtensions:
 
+  export ornicar.scalalib.OrnicarBooleanWrapper
+
   val White = Color.White
   val Black = Color.Black
 

@@ -1,5 +1,6 @@
 package chess
 
+import scala.language.implicitConversions
 import chess.Pos.*
 import chess.variant.FromPosition
 

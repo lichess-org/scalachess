@@ -1,5 +1,6 @@
 package chess
 
+import scala.language.implicitConversions
 import Pos.*
 
 class KnightTest extends ChessTest:

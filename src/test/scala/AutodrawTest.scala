@@ -1,5 +1,6 @@
 package chess
 
+import scala.language.implicitConversions
 import Pos.*
 import variant.Standard
 import chess.format.FEN
@@ -76,7 +77,7 @@ K   bB""".autoDraw must_== false
       }
       "tons of pointless moves" in {
         val moves = List.fill(30)(List(B1 -> C3, B8 -> C6, C3 -> B1, C6 -> B8))
-        makeGame.playMoves(moves.flatten *) must beValid.like { case g =>
+        makeGame.playMoves(moves.flatten*) must beValid.like { case g =>
           g.board.autoDraw must_== true
         }
       }
@@ -182,7 +183,7 @@ K   bB""".autoDraw must_== false
           F2 -> G2,
           H6 -> G6
         )
-        makeGame.playMoves(moves *) must beValid.like { case g =>
+        makeGame.playMoves(moves*) must beValid.like { case g =>
           g.board.history.threefoldRepetition must beTrue
         }
       }
@@ -280,20 +281,20 @@ K   bB""".autoDraw must_== false
           G2 -> F2,
           G6 -> H6
         )
-        makeGame.playMoves(moves *) must beValid.like { case g =>
+        makeGame.playMoves(moves*) must beValid.like { case g =>
           g.board.history.threefoldRepetition must beFalse
         }
       }
       "3fold on initial position" in {
         val moves: List[(Pos, Pos)] = List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten
-        makeGame.playMoves(moves *) must beValid.like { case g =>
+        makeGame.playMoves(moves*) must beValid.like { case g =>
           g.board.history.threefoldRepetition must beTrue
         }
       }
       "pawn move then minimalist 3fold" in {
         val moves: List[(Pos, Pos)] = List(E2 -> E4, E7 -> E5) :::
           (List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten: List[(Pos, Pos)])
-        makeGame.playMoves(moves *) must beValid {
+        makeGame.playMoves(moves*) must beValid {
           (_: Game).board.history.threefoldRepetition must beTrue
         }
       }
@@ -385,12 +386,12 @@ K   bB""".autoDraw must_== false
         H6 -> H7
       )
       "from prod should be fivefold" in {
-        makeGame.playMoves(moves *) must beValid.like { case g =>
+        makeGame.playMoves(moves*) must beValid.like { case g =>
           g.situation.autoDraw must beTrue
         }
       }
       "from prod should not be fivefold" in {
-        makeGame.playMoves(moves.dropRight(1) *) must beValid.like { case g =>
+        makeGame.playMoves(moves.dropRight(1)*) must beValid.like { case g =>
           g.situation.autoDraw must beFalse
         }
       }

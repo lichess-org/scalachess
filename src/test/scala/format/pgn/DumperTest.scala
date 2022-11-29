@@ -1,6 +1,7 @@
 package chess
 package format.pgn
 
+import scala.language.implicitConversions
 import format.Forsyth
 import Pos.*
 

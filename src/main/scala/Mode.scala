@@ -1,18 +1,13 @@
 package chess
 
-sealed abstract class Mode(val id: Int):
+enum Mode(val id: Int, val rated: Boolean):
+  case Casual extends Mode(0, false)
+  case Rated  extends Mode(1, true)
+  val name = toString.toLowerCase
 
-  lazy val name = toString.toLowerCase
-
-  def casual = this == Mode.Casual
-  def rated  = this == Mode.Rated
-
-  def fold[A](c: => A, r: => A): A = if (this.casual) c else r
+  def casual = !rated
 
 object Mode:
-
-  case object Casual extends Mode(0)
-  case object Rated  extends Mode(1)
 
   val all = List(Casual, Rated)
 

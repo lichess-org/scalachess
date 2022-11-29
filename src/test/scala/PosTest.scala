@@ -14,18 +14,20 @@ class PosTest extends ChessTest:
     }
 
     "be a string" in {
-      "D5" in { D5.toString must_== "d5" }
+      A1.key.pp
+      H8.key.pp
+      "D5" in { D5.key must_== "d5" }
     }
 
     "piotr" in {
-      A1.piotr must_== 'a'
-      B4.piotr must_== 'z'
-      C4.piotr must_== 'A'
-      D7.piotr must_== 'Z'
-      E7.piotr must_== '0'
-      F7.piotr must_== '1'
-      F8.piotr must_== '9'
-      G8.piotr must_== '!'
-      H8.piotr must_== '?'
+      A1.toChar must_== 'a'
+      B4.toChar must_== 'z'
+      C4.toChar must_== 'A'
+      D7.toChar must_== 'Z'
+      E7.toChar must_== '0'
+      F7.toChar must_== '1'
+      F8.toChar must_== '9'
+      G8.toChar must_== '!'
+      H8.toChar must_== '?'
     }
   }

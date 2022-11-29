@@ -15,6 +15,15 @@ trait ChessTest extends Specification with ValidatedMatchers:
   given Conversion[String, Board] with
     def apply(str: String) = Visual << str
 
+  extension (color: Color)
+    def -(role: Role) = Piece(color, role)
+    def pawn          = color - Pawn
+    def bishop        = color - Bishop
+    def knight        = color - Knight
+    def rook          = color - Rook
+    def queen         = color - Queen
+    def king          = color - King
+
   extension (str: String)
     def chess960: Board             = makeBoard(str, chess.variant.Chess960)
     def kingOfTheHill: Board        = makeBoard(str, chess.variant.KingOfTheHill)

@@ -7,7 +7,7 @@ import cats.implicits.*
 sealed trait Uci:
 
   def uci: String
-  def piotr: String
+  def chars: String
 
   def origDest: (Pos, Pos)
 
@@ -21,11 +21,11 @@ object Uci:
       promotion: Option[PromotableRole] = None
   ) extends Uci:
 
-    def keys = orig.key + dest.key
-    def uci  = keys + promotionString
+    def keys = s"${orig.key}${dest.key}"
+    def uci  = s"$keys$promotionString"
 
-    def keysPiotr = orig.piotrStr + dest.piotrStr
-    def piotr     = keysPiotr + promotionString
+    def charKeys = s"${orig.toChar}${dest.toChar}"
+    def chars    = s"$charKeys$promotionString"
 
     def promotionString = promotion.fold("")(_.forsyth.toString)
 
@@ -42,10 +42,10 @@ object Uci:
         promotion = move lift 4 flatMap Role.promotable
       } yield Move(orig, dest, promotion)
 
-    def piotr(move: String) =
+    def toChar(move: String) =
       for {
-        orig <- move.headOption flatMap Pos.piotr
-        dest <- move lift 1 flatMap Pos.piotr
+        orig <- move.headOption flatMap Pos.fromChar
+        dest <- move lift 1 flatMap Pos.fromChar
         promotion = move lift 2 flatMap Role.promotable
       } yield Move(orig, dest, promotion)
 
@@ -60,7 +60,7 @@ object Uci:
 
     def uci = s"${role.pgn}@${pos.key}"
 
-    def piotr = s"${role.pgn}@${pos.piotrStr}"
+    def chars = s"${role.pgn}@${pos.toChar}"
 
     def origDest = pos -> pos
 
@@ -90,9 +90,9 @@ object Uci:
   def piotr(move: String): Option[Uci] =
     if (move lift 1 contains '@') for {
       role <- move.headOption flatMap Role.allByPgn.get
-      pos  <- move lift 2 flatMap Pos.piotr
+      pos  <- move lift 2 flatMap Pos.fromChar
     } yield Uci.Drop(role, pos)
-    else Uci.Move.piotr(move)
+    else Uci.Move.toChar(move)
 
   def readList(moves: String): Option[List[Uci]] =
     moves.split(' ').toList.map(apply).sequence
@@ -104,4 +104,4 @@ object Uci:
     moves.split(' ').toList.map(piotr).sequence
 
   def writeListPiotr(moves: List[Uci]): String =
-    moves.map(_.piotr) mkString " "
+    moves.map(_.chars) mkString " "

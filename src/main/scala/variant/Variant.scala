@@ -93,15 +93,15 @@ abstract class Variant private[variant] (
     def findMove(from: Pos, to: Pos) = situation.moves get from flatMap (_.find(_.dest == to))
 
     for {
-      actor <- situation.board.actors get from toValid "No piece on " + from
+      actor <- situation.board.actors get from toValid s"No piece on ${from.key}"
       _ <-
         if (actor is situation.color) Validated.valid(actor)
-        else Validated.invalid("Not my piece on " + from)
-      m1 <- findMove(from, to) toValid "Piece on " + from + " cannot move to " + to
-      m2 <- m1 withPromotion promotion toValid "Piece on " + from + " cannot promote to " + promotion
+        else Validated.invalid(s"Not my piece on ${from.key}")
+      m1 <- findMove(from, to) toValid s"Piece on ${from.key} cannot move to ${to.key}"
+      m2 <- m1 withPromotion promotion toValid s"Piece on ${from.key} cannot promote to $promotion"
       m3 <-
         if (isValidPromotion(promotion)) Validated.valid(m2)
-        else Validated.invalid("Cannot promote to " + promotion + " in this game mode")
+        else Validated.invalid(s"Cannot promote to $promotion in this game mode")
     } yield m3
 
   def drop(situation: Situation, role: Role, pos: Pos): Validated[String, Drop] =

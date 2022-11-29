@@ -46,7 +46,7 @@ case class Tags(value: List[Tag]) extends AnyVal:
       case _                       => None
     }
 
-  def fen: Option[format.FEN] = apply(_.FEN) map format.FEN.apply
+  def fen: Option[format.FEN] = format.FEN from apply(_.FEN)
 
   def exists(which: Tag.type => TagType): Boolean =
     value.exists(_.name == which(Tag))

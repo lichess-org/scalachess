@@ -10,11 +10,10 @@ object Dumper:
       case _ if castles =>
         if (orig ?> dest) "O-O-O" else "O-O"
 
-      case _ if enpassant =>
-        orig.file.toString + "x" + dest.key
+      case _ if enpassant => s"${orig.file.char}x${dest.key}"
 
       case (promotion, Pawn) =>
-        (if (captures) s"${orig.file}x" else "") +
+        (if (captures) s"${orig.file.char}x" else "") +
           promotion.fold(dest.key)(p => s"${dest.key}=${p.pgn}")
 
       case (_, role) =>
@@ -31,14 +30,15 @@ object Dumper:
           situation.move(cpos, dest, None).isValid
         }
 
-        val disambiguation = if (candidates.isEmpty)
-          ""
-        else if (!candidates.exists(_ ?| orig))
-          orig.file.toString
-        else if (!candidates.exists(_ ?- orig))
-          orig.rank.toString
-        else
-          orig.key
+        val disambiguation: String =
+          if (candidates.isEmpty)
+            ""
+          else if (!candidates.exists(_ ?| orig))
+            orig.file.char.toString
+          else if (!candidates.exists(_ ?- orig))
+            orig.rank.char.toString
+          else
+            orig.key
 
         s"${role.pgn}$disambiguation${if (captures) "x" else ""}${dest.key}"
 

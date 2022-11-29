@@ -29,13 +29,13 @@ object Forsyth:
           val (castles, unmovedRooks) = strCastles.foldLeft(Castles.none -> Set.empty[Pos]) {
             case ((c, r), ch) =>
               val color = Color.fromWhite(ch.isUpper)
-              val rooks = board
+              val rooks: List[Pos] = board
                 .piecesOf(color)
                 .collect {
                   case (pos, piece) if piece.is(Rook) && pos.rank == color.backRank => pos
                 }
                 .toList
-                .sortBy(_.file)
+                .sortBy(_.file.value)
               (for {
                 kingPos <- board.kingPosOf(color)
                 rookPos <- (ch.toLower match {
@@ -204,7 +204,9 @@ object Forsyth:
           pockets.black.roles.map(_.forsyth).mkString
       case _ => ""
 
-  given Ordering[Pos] = Ordering.by[Pos, File](_.file)
+  // private given Ordering[Rank] = intOrdering[Rank]
+  private given Ordering[File] = intOrdering[File]
+  given Ordering[Pos]          = Ordering.by[Pos, File](_.file)
 
   private[chess] def exportCastles(board: Board): String =
 

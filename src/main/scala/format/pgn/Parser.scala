@@ -170,7 +170,7 @@ object Parser:
 
     val dest: P[Pos] = mapParser(Pos.allKeys, "dest")
 
-    val promotable = Role.allPromotableByPgn mapKeys (_.toUpper)
+    val promotable = Role.allPromotableByPgn.mapKeys(_.toUpper)
 
     val promotion: P[PromotableRole] = P.char('=').?.with1 *> mapParserChar(promotable, "promotion")
 
@@ -225,7 +225,6 @@ object Parser:
       val pairMap = pairs.to(Map)
       P.charIn(pairMap.keySet).map(pairMap(_)) | P.failWith(name + " not found")
 
-
   private object TagParser:
 
     val tagName: P[String] = R.alpha.rep.string.withContext("Tag name can only contains alphabet characters")
@@ -235,7 +234,6 @@ object Parser:
     val tagContent: P[Tag]         = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
     val tag: P[Tag]                = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
     val tags: P[NonEmptyList[Tag]] = tag.rep
-
 
   private val tagsAndMovesParser: P0[ParsedPgn] =
     ((escape *> TagParser.tags.? <* escape) ~ MovesParser.strMoves.?).map {

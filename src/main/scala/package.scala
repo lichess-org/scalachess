@@ -1,9 +1,11 @@
 package chess
 
-import cats.data.Validated
+object Chess extends ornicar.scalalib.NewTypes with ornicar.scalalib.Zeros
 
-export ornicar.scalalib.ScalalibExtensions.*
+export Chess.{ *, given }
+
 export ornicar.scalalib.OrnicarBooleanWrapper
+export ornicar.scalalib.ScalalibExtensions.*
 
 export Color.{ Black, White }
 

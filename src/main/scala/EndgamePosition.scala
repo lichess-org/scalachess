@@ -185,4 +185,3 @@ object EndgamePosition:
     EndgamePosition("Pawns Ending XXX", FEN("8/8/3k4/1p2p3/1P2K3/8/7P/8 w - - 0 1")),
     EndgamePosition("Queen vs Rook", FEN("8/8/4r3/3k4/8/8/3K1Q2/8 w - - 0 1"))
   )
-

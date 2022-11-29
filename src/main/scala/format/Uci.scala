@@ -42,7 +42,7 @@ object Uci:
         promotion = move lift 4 flatMap Role.promotable
       } yield Move(orig, dest, promotion)
 
-    def toChar(move: String) =
+    def fromChars(move: String) =
       for {
         orig <- move.headOption flatMap { Pos.fromChar(_) }
         dest <- move lift 1 flatMap { Pos.fromChar(_) }
@@ -68,6 +68,11 @@ object Uci:
 
   object Drop:
 
+    def fromChars(move: String) = for {
+      role <- move.headOption flatMap Role.allByPgn.get
+      pos  <- move lift 2 flatMap { Pos.fromChar(_) }
+    } yield Uci.Drop(role, pos)
+
     def fromStrings(roleS: String, posS: String) =
       for {
         role <- Role.allByName get roleS
@@ -87,12 +92,9 @@ object Uci:
     } yield Uci.Drop(role, pos)
     else Uci.Move(move)
 
-  def piotr(move: String): Option[Uci] =
-    if (move lift 1 contains '@') for {
-      role <- move.headOption flatMap Role.allByPgn.get
-      pos  <- move lift 2 flatMap { Pos.fromChar(_) }
-    } yield Uci.Drop(role, pos)
-    else Uci.Move.toChar(move)
+  def fromChars(move: String): Option[Uci] =
+    if (move lift 1 contains '@') Uci.Drop.fromChars(move)
+    else Uci.Move.fromChars(move)
 
   def readList(moves: String): Option[List[Uci]] =
     moves.split(' ').toList.map(apply).sequence
@@ -100,8 +102,8 @@ object Uci:
   def writeList(moves: List[Uci]): String =
     moves.map(_.uci) mkString " "
 
-  def readListPiotr(moves: String): Option[List[Uci]] =
-    moves.split(' ').toList.map(piotr).sequence
+  def readListChars(moves: String): Option[List[Uci]] =
+    moves.split(' ').toList.map(fromChars).sequence
 
-  def writeListPiotr(moves: List[Uci]): String =
+  def writeListChars(moves: List[Uci]): String =
     moves.map(_.chars) mkString " "

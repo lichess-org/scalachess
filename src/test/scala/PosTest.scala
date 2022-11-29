@@ -19,7 +19,7 @@ class PosTest extends ChessTest:
       "D5" in { D5.key must_== "d5" }
     }
 
-    "piotr" in {
+    "chars" in {
       A1.toChar must_== 'a'
       B4.toChar must_== 'z'
       C4.toChar must_== 'A'

@@ -4,22 +4,22 @@ opaque type Rank = Int
 object Rank extends OpaqueInt[Rank]:
   extension (a: Rank)
 
-    inline def index = a.value
+    inline def index: Int = a
 
-    def offset(delta: Int): Option[Rank] =
-      if (-8 < delta && delta < 8) atIndex(a.value + delta)
+    inline def offset(delta: Int): Option[Rank] =
+      if (-8 < delta && delta < 8) atIndex(a + delta)
       else None
 
-    inline def char: Char = (49 + a.value).toChar
+    inline def char: Char = (49 + a).toChar
   end extension
 
-  def atIndex(index: Int): Option[Rank] =
+  inline def atIndex(index: Int): Option[Rank] =
     if (0 <= index && index < 8) Some(index)
     else None
 
-  inline def of(pos: Pos): Rank = pos.value >> 3
+  inline def of(inline pos: Pos): Rank = pos.value >> 3
 
-  def fromChar(ch: Char): Option[Rank] = atIndex(ch.toInt - 49)
+  inline def fromChar(inline ch: Char): Option[Rank] = atIndex(ch.toInt - 49)
 
   val First   = Rank(0)
   val Second  = Rank(1)

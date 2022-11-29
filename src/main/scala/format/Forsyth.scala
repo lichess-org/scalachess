@@ -51,7 +51,7 @@ object Forsyth:
           val sixthRank   = if (situation.color == White) Rank.Sixth else Rank.Third
           val seventhRank = if (situation.color == White) Rank.Seventh else Rank.Second
           val lastMove = for {
-            pos <- splitted lift 3 flatMap Pos.fromKey
+            pos <- splitted lift 3 flatMap { Pos.fromKey(_) }
             if pos.rank == sixthRank
             orig = Pos(pos.file, seventhRank)
             dest = Pos(pos.file, fifthRank)

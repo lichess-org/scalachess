@@ -44,9 +44,9 @@ object Uci:
 
     def toChar(move: String) =
       for {
-        orig <- move.headOption flatMap Pos.fromChar
-        dest <- move lift 1 flatMap Pos.fromChar
-        promotion = move lift 2 flatMap Role.promotable
+        orig <- move.headOption flatMap { Pos.fromChar(_) }
+        dest <- move lift 1 flatMap { Pos.fromChar(_) }
+        promotion = move lift 2 flatMap { Role.promotable(_) }
       } yield Move(orig, dest, promotion)
 
     def fromStrings(origS: String, destS: String, promS: Option[String]) =
@@ -90,7 +90,7 @@ object Uci:
   def piotr(move: String): Option[Uci] =
     if (move lift 1 contains '@') for {
       role <- move.headOption flatMap Role.allByPgn.get
-      pos  <- move lift 2 flatMap Pos.fromChar
+      pos  <- move lift 2 flatMap { Pos.fromChar(_) }
     } yield Uci.Drop(role, pos)
     else Uci.Move.toChar(move)
 

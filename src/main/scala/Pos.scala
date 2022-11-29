@@ -21,26 +21,26 @@ object Pos extends OpaqueInt[Pos]:
         p :: (if (stop(p)) Nil else p.|<>|(stop, dir))
       } getOrElse Nil
 
-    def ?<(other: Pos): Boolean = file < other.file
-    def ?>(other: Pos): Boolean = file > other.file
-    def ?+(other: Pos): Boolean = rank < other.rank
-    def ?^(other: Pos): Boolean = rank > other.rank
-    def ?|(other: Pos): Boolean = file == other.file
-    def ?-(other: Pos): Boolean = rank == other.rank
+    inline def ?<(inline other: Pos): Boolean = file < other.file
+    inline def ?>(inline other: Pos): Boolean = file > other.file
+    inline def ?+(inline other: Pos): Boolean = rank < other.rank
+    inline def ?^(inline other: Pos): Boolean = rank > other.rank
+    inline def ?|(inline other: Pos): Boolean = file == other.file
+    inline def ?-(inline other: Pos): Boolean = rank == other.rank
 
     def <->(other: Pos): Iterable[Pos] =
       min(file.value, other.file.value) to max(file.value, other.file.value) flatMap { Pos.at(_, rank.value) }
 
-    def touches(other: Pos): Boolean = xDist(other) <= 1 && yDist(other) <= 1
+    inline def touches(other: Pos): Boolean = xDist(other) <= 1 && yDist(other) <= 1
 
-    def onSameDiagonal(other: Pos): Boolean =
+    inline def onSameDiagonal(other: Pos): Boolean =
       file.value - rank.value == other.file.value - other.rank.value || file.value + rank.value == other.file.value + other.rank.value
-    def onSameLine(other: Pos): Boolean = ?-(other) || ?|(other)
+    inline def onSameLine(other: Pos): Boolean = ?-(other) || ?|(other)
 
-    def xDist(other: Pos) = abs(p.file.value - other.file.value)
-    def yDist(other: Pos) = abs(p.rank.value - other.rank.value)
+    inline def xDist(inline other: Pos) = abs(p.file.value - other.file.value)
+    inline def yDist(inline other: Pos) = abs(p.rank.value - other.rank.value)
 
-    def isLight: Boolean = (file.value + rank.value) % 2 == 1
+    inline def isLight: Boolean = (file.value + rank.value) % 2 == 1
 
     inline def file: File = File of p
     inline def rank: Rank = Rank of p
@@ -52,29 +52,29 @@ object Pos extends OpaqueInt[Pos]:
       else if (p == 62) '!'
       else '?'
 
-    def key = s"${p.file.char}${p.rank.char}"
+    inline def key = s"${p.file.char}${p.rank.char}"
   end extension
 
-  def apply(file: File, rank: Rank): Pos = file.value + 8 * rank.value
+  inline def apply(inline file: File, inline rank: Rank): Pos = file.value + 8 * rank.value
 
-  inline def at(inline x: Int, inline y: Int): Option[Pos] =
+  inline def at(x: Int, y: Int): Option[Pos] =
     if (0 <= x && x < 8 && 0 <= y && y < 8) Some(x + 8 * y)
     else None
 
-  def at(index: Int): Option[Pos] =
+  inline def at(index: Int): Option[Pos] =
     if (0 <= index && index < 64) Some(index)
     else None
 
-  def fromKey(key: String): Option[Pos] = allKeys get key
+  inline def fromKey(key: String): Option[Pos] = allKeys get key
 
-  def fromChar(c: Char): Option[Pos] = charMap get c
+  inline def fromChar(c: Char): Option[Pos] = charMap get c
 
-  def keyToChar(key: String) = fromKey(key).map(_.toChar)
-  def doubleKeyToChars(key: String) = for
+  inline def keyToChar(inline key: String) = fromKey(key).map(_.toChar)
+  inline def doubleKeyToChars(key: String) = for
     a <- keyToChar(key take 2)
     b <- keyToChar(key drop 2)
   yield s"$a$b"
-  def doubleCharToKey(chars: String) = for
+  inline def doubleCharToKey(chars: String) = for
     a <- fromChar(chars.head)
     b <- fromChar(chars(1))
   yield s"${a.key}${b.key}"

@@ -1,17 +1,20 @@
-import ornicar.scalalib.ScalalibExtensions
+package chess
 
-package object chess extends ScalalibExtensions:
+import cats.data.Validated
 
-  export ornicar.scalalib.OrnicarBooleanWrapper
+export ornicar.scalalib.ScalalibExtensions.*
+export ornicar.scalalib.OrnicarBooleanWrapper
 
-  val White = Color.White
-  val Black = Color.Black
+extension [E, A](validated: Validated[E, A])
+  def flatMap[EE >: E, B](f: A => Validated[EE, B]): Validated[EE, B] = validated.andThen(f)
 
-  type Direction  = Pos => Option[Pos]
-  type Directions = List[Direction]
+export Color.{ Black, White }
 
-  type PieceMap = Map[Pos, Piece]
+type Direction  = Pos => Option[Pos]
+type Directions = List[Direction]
 
-  type PositionHash = Array[Byte]
+type PieceMap = Map[Pos, Piece]
 
-  type MoveOrDrop = Either[Move, Drop]
+type PositionHash = Array[Byte]
+
+type MoveOrDrop = Either[Move, Drop]

@@ -50,7 +50,7 @@ object Replay:
     sans match
       case Nil => valid(Nil)
       case san :: rest =>
-        san(game.situation) flatMap { moveOrDrop =>
+        san(game.situation) andThen { moveOrDrop =>
           val newGame = moveOrDrop.fold(game.apply, game.applyDrop)
           recursiveGames(newGame, rest) map { newGame :: _ }
         }
@@ -98,7 +98,7 @@ object Replay:
     sans match
       case Nil => valid(Nil)
       case san :: rest =>
-        san(sit) flatMap { moveOrDrop =>
+        san(sit) andThen { moveOrDrop =>
           val after = Situation(moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter), !sit.color)
           recursiveSituations(after, rest) map { after :: _ }
         }
@@ -182,7 +182,7 @@ object Replay:
         sans match
           case Nil => invalid(s"Can't find $atFenTruncated, reached ply $ply")
           case san :: rest =>
-            san(sit) flatMap { moveOrDrop =>
+            san(sit) andThen { moveOrDrop =>
               val after = moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter)
               val fen   = Forsyth >> Game(Situation(after, Color.fromPly(ply)), turns = ply)
               if (compareFen(fen)) Validated.valid(ply)

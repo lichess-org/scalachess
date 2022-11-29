@@ -24,11 +24,11 @@ case class Clock(
   def outOfTime(c: Color, withGrace: Boolean) =
     players(c).remaining <=
       timerFor(c).fold(Centis(0)) { t =>
-        if (withGrace) (toNow(t) - (players(c).lag.quota atMost Centis(200))) nonNeg
+        if (withGrace) (toNow(t) - (players(c).lag.quota atMost Centis(200))).nonNeg
         else toNow(t)
       }
 
-  def moretimeable(c: Color) = players(c).remaining.centis < 100 * 60 * 60 * 2
+  def moretimeable(c: Color) = players(c).remaining < 100 * 60 * 60 * 2
 
   def isRunning = timer.isDefined
 

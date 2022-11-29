@@ -6,64 +6,56 @@ import cats.Monoid
 import alleycats.Zero
 
 // maximum centis = Int.MaxValue / 100 / 60 / 60 / 24 = 248 days
-final case class Centis(centis: Int) extends AnyVal with Ordered[Centis]:
+opaque type Centis = Int
+object Centis extends OpaqueInt[Centis]:
 
-  def roundTenths: Int =
-    if (centis > 0) (centis + 5) / 10 else (centis - 4) / 10
-  def roundSeconds: Int = Math.round(centis * 0.01f)
+  extension (centis: Centis)
 
-  def toSeconds: BigDecimal = java.math.BigDecimal.valueOf(centis, 2)
-  def millis: Long          = centis * 10L
-  def toDuration            = FiniteDuration(millis, MILLISECONDS)
+    inline def centis: Int = centis
 
-  def +(other: Centis)   = Centis(centis + other.centis)
-  def -(other: Centis)   = Centis(centis - other.centis)
-  def *(scalar: Int)     = Centis(scalar * centis)
-  def *~(scalar: Float)  = Centis(scalar * centis)
-  def *~(scalar: Double) = Centis(scalar * centis)
-  def /(div: Int)        = div != 0 option Centis(centis / div)
-  def unary_-            = Centis(-centis)
+    inline def *(inline o: Int): Centis = centis * o
 
-  def avg(other: Centis) = Centis((centis + other.centis) >> 1)
+    def roundTenths: Int  = if (centis > 0) (centis + 5) / 10 else (centis - 4) / 10
+    def roundSeconds: Int = Math.round(centis * 0.01f)
 
-  def compare(other: Centis) = Integer.compare(centis, other.centis)
+    // def toSeconds: BigDecimal = java.math.BigDecimal.valueOf(centis, 2)
+    inline def millis: Long  = centis * 10L
+    def toDuration: Duration = FiniteDuration(millis, MILLISECONDS)
 
-  def atMost(o: Centis)  = Centis(Math.min(centis, o.centis))
-  def atLeast(o: Centis) = Centis(Math.max(centis, o.centis))
+    def *~(scalar: Float): Centis = ofFloat(scalar * centis)
+    // def *~(scalar: Double): Centis  = Centis(scalar * centis)
+    def /(div: Int): Option[Centis] = div != 0 option (centis / div)
 
-  def nonNeg = Centis(Math.max(centis, 0))
+    def avg(other: Centis): Centis = (centis + other.value) >> 1
 
-object Centis:
+    inline def nonNeg: Centis = Math.max(centis, 0)
 
-  given Zero[Centis] with
-    def zero = Centis(0)
+  end extension
+
+  given Zero[Centis] = Zero(0)
 
   given Monoid[Centis] with
     def combine(c1: Centis, c2: Centis) = c1 + c2
-    final val empty                     = Centis(0)
+    val empty                           = 0
 
-  extension (scalar: Int) def *(o: Centis) = o * scalar
+  // extension (scalar: Int) def *(o: Centis) = o * scalar
+  // extension (scalar: Float) def *~(o: Centis) = o *~ scalar
+  // extension (scalar: Double) def *~(o: Centis) = o *~ scalar
 
-  extension (scalar: Float) def *~(o: Centis) = o *~ scalar
-
-  extension (scalar: Double) def *~(o: Centis) = o *~ scalar
-
-  def apply(l: Long): Centis =
-    Centis {
-      if (l.toInt == l) l.toInt
-      else if (l > 0) Integer.MAX_VALUE
-      else Integer.MIN_VALUE
-    }
+  def ofLong(l: Long): Centis =
+    if (l.toInt == l) l.toInt
+    else if (l > 0) Integer.MAX_VALUE
+    else Integer.MIN_VALUE
 
   def apply(d: FiniteDuration): Centis =
-    Centis.ofMillis {
+    ofMillis {
       if (d.unit eq MILLISECONDS) d.length
       else d.toMillis
     }
 
-  def apply(f: Float): Centis  = Centis(Math.round(f))
-  def apply(d: Double): Centis = Centis(Math.round(d))
+  inline def ofFloat(f: Float): Centis = Math.round(f)
+  // def ofDouble(d: Double): Centis = Math.round(d)
 
-  def ofSeconds(s: Int) = Centis(100 * s)
-  def ofMillis(i: Int)  = Centis((if (i > 0) i + 5 else i - 4) / 10)
-  def ofMillis(l: Long) = Centis((if (l > 0) l + 5 else l - 4) / 10)
+  inline def ofSeconds(s: Int): Centis = 100 * s
+  // def ofMillis(i: Int): Centis  = (if (i > 0) i + 5 else i - 4) / 10
+  inline def ofMillis(l: Long): Centis = ofLong(if (l > 0) l + 5 else l - 4) / 10

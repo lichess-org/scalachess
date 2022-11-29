@@ -11,7 +11,7 @@ case class Game(
     clock: Option[Clock] = None,
     turns: Int = 0, // plies
     startedAtTurn: Int = 0
-) {
+):
   def apply(
       orig: Pos,
       dest: Pos,
@@ -34,7 +34,7 @@ case class Game(
 
   def apply(move: Move): Game = applyWithCompensated(move).value
 
-  def applyWithCompensated(move: Move): Clock.WithCompensatedLag[Game] = {
+  def applyWithCompensated(move: Move): Clock.WithCompensatedLag[Game] =
     val newSituation = move.situationAfter
     val newClock     = applyClock(move.metrics, newSituation.status.isEmpty)
 
@@ -47,7 +47,6 @@ case class Game(
       ),
       newClock.flatMap(_.compensated)
     )
-  }
 
   def drop(
       role: Role,
@@ -58,7 +57,7 @@ case class Game(
       applyDrop(drop) -> drop
     }
 
-  def applyDrop(drop: Drop): Game = {
+  def applyDrop(drop: Drop): Game =
     val newSituation = drop situationAfter
 
     copy(
@@ -67,7 +66,6 @@ case class Game(
       pgnMoves = pgnMoves :+ pgn.Dumper(drop, newSituation),
       clock = applyClock(drop.metrics, newSituation.status.isEmpty).map(_.value)
     )
-  }
 
   private def applyClock(
       metrics: MoveMetrics,
@@ -84,10 +82,9 @@ case class Game(
   def apply(uci: Uci.Move): Validated[String, (Game, Move)] = apply(uci.orig, uci.dest, uci.promotion)
   def apply(uci: Uci.Drop): Validated[String, (Game, Drop)] = drop(uci.role, uci.pos)
   def apply(uci: Uci): Validated[String, (Game, MoveOrDrop)] =
-    uci match {
+    uci match
       case u: Uci.Move => apply(u) map { case (g, m) => g -> Left(m) }
       case u: Uci.Drop => apply(u) map { case (g, d) => g -> Right(d) }
-    }
 
   def player = situation.color
 
@@ -111,9 +108,8 @@ case class Game(
   def withPlayer(c: Color) = copy(situation = situation.copy(color = c))
 
   def withTurns(t: Int) = copy(turns = t)
-}
 
-object Game {
+object Game:
   def apply(variant: chess.variant.Variant): Game =
     new Game(Situation(Board init variant, White))
 
@@ -121,7 +117,7 @@ object Game {
 
   def apply(board: Board, color: Color): Game = new Game(Situation(board, color))
 
-  def apply(variantOption: Option[chess.variant.Variant], fen: Option[FEN]): Game = {
+  def apply(variantOption: Option[chess.variant.Variant], fen: Option[FEN]): Game =
     val variant = variantOption | chess.variant.Standard
     val g       = apply(variant)
     fen
@@ -140,5 +136,3 @@ object Game {
           startedAtTurn = parsed.turns
         )
       }
-  }
-}

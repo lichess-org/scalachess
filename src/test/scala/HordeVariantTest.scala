@@ -3,7 +3,7 @@ package chess
 import variant.Horde
 import chess.format.FEN
 
-class HordeVariantTest extends ChessTest {
+class HordeVariantTest extends ChessTest:
 
   "Horde chess" should {
 
@@ -120,4 +120,3 @@ class HordeVariantTest extends ChessTest {
       }
     }
   }
-}

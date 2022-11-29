@@ -9,7 +9,7 @@ case class StartingPosition(
     wikiPath: String,
     moves: String,
     featurable: Boolean = true
-) {
+):
 
   def url = s"https://en.wikipedia.org/wiki/$wikiPath"
 
@@ -18,9 +18,8 @@ case class StartingPosition(
   def fullName = s"$eco $name"
 
   def initial = fen == format.Forsyth.initial
-}
 
-object StartingPosition {
+object StartingPosition:
 
   case class Category(name: String, positions: List[StartingPosition])
 
@@ -1082,7 +1081,7 @@ object StartingPosition {
 
   def randomFeaturable = featurable(scala.util.Random.nextInt(featurable.size))
 
-  object presets {
+  object presets:
     val halloween = StartingPosition(
       "C47",
       "Halloween Gambit",
@@ -1097,5 +1096,3 @@ object StartingPosition {
       "Frankenstein-Dracula_Variation",
       "1. e4 e5 2. Nc3 Nf6 3. Bc4 Nxe4"
     )
-  }
-}

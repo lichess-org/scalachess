@@ -5,12 +5,12 @@ final case class Castles(
     whiteQueenSide: Boolean,
     blackKingSide: Boolean,
     blackQueenSide: Boolean
-) {
+):
 
   def can(color: Color) = new Castles.Can(this, color)
 
   def without(color: Color) =
-    color match {
+    color match
       case White =>
         copy(
           whiteKingSide = false,
@@ -21,40 +21,35 @@ final case class Castles(
           blackKingSide = false,
           blackQueenSide = false
         )
-    }
 
   def without(color: Color, side: Side) =
-    (color, side) match {
+    (color, side) match
       case (White, KingSide)  => copy(whiteKingSide = false)
       case (White, QueenSide) => copy(whiteQueenSide = false)
       case (Black, KingSide)  => copy(blackKingSide = false)
       case (Black, QueenSide) => copy(blackQueenSide = false)
-    }
 
   def add(color: Color, side: Side) =
-    (color, side) match {
+    (color, side) match
       case (White, KingSide)  => copy(whiteKingSide = true)
       case (White, QueenSide) => copy(whiteQueenSide = true)
       case (Black, KingSide)  => copy(blackKingSide = true)
       case (Black, QueenSide) => copy(blackQueenSide = true)
-    }
 
-  override lazy val toString: String = {
+  override lazy val toString: String =
     (if (whiteKingSide) "K" else "") +
       (if (whiteQueenSide) "Q" else "") +
       (if (blackKingSide) "k" else "") +
       (if (blackQueenSide) "q" else "")
-  } match {
+  match
     case "" => "-"
     case n  => n
-  }
 
   def toSeq = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
 
   def isEmpty = !(whiteKingSide || whiteQueenSide || blackKingSide || blackQueenSide)
-}
 
-object Castles {
+object Castles:
 
   def apply(
       castles: (Boolean, Boolean, Boolean, Boolean)
@@ -78,14 +73,11 @@ object Castles {
   val none = new Castles(false, false, false, false)
   def init = all
 
-  final class Can(castles: Castles, color: Color) {
+  final class Can(castles: Castles, color: Color):
     def on(side: Side): Boolean =
-      (color, side) match {
+      (color, side) match
         case (White, KingSide)  => castles.whiteKingSide
         case (White, QueenSide) => castles.whiteQueenSide
         case (Black, KingSide)  => castles.blackKingSide
         case (Black, QueenSide) => castles.blackQueenSide
-      }
     def any = on(KingSide) || on(QueenSide)
-  }
-}

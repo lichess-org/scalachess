@@ -10,7 +10,6 @@ case object Standard
       shortName = "Std",
       title = "Standard rules of chess (FIDE)",
       standardInitialPosition = true
-    ) {
+    ):
 
   val pieces: Map[Pos, Piece] = Variant.symmetricRank(backRank)
-}

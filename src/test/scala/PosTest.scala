@@ -1,8 +1,8 @@
 package chess
 
-import Pos._
+import Pos.*
 
-class PosTest extends ChessTest {
+class PosTest extends ChessTest:
 
   "A position" should {
 
@@ -29,4 +29,3 @@ class PosTest extends ChessTest {
       H8.piotr must_== '?'
     }
   }
-}

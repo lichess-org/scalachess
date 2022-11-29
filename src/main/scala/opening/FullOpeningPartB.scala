@@ -3,7 +3,7 @@ package opening
 
 // Generated from https://github.com/lichess-org/chess-openings
 // format: off
-private[opening] object FullOpeningPartB {
+private[opening] object FullOpeningPartB:
 
   def db: Vector[FullOpening] = Vector(
 new FullOpening("B00", "Barnes Defense", "rnbqkbnr/ppppp1pp/5p2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -", "e2e4 f7f6", "1. e4 f6"),
@@ -722,4 +722,3 @@ new FullOpening("B98", "Sicilian Defense: Najdorf Variation, Goteborg Variation"
 new FullOpening("B98", "Sicilian Defense: Najdorf Variation, Traditional Line", "rnb1k2r/1pq1bppp/p2ppn2/6B1/3NPP2/2N2Q2/PPP3PP/R3KB1R w KQkq -", "e2e4 c7c5 g1f3 d7d6 d2d4 c5d4 f3d4 g8f6 b1c3 a7a6 c1g5 e7e6 f2f4 f8e7 d1f3 d8c7", "1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Bg5 e6 7. f4 Be7 8. Qf3 Qc7"),
 new FullOpening("B99", "Sicilian Defense: Najdorf Variation, Main Line", "r1b1k2r/1pqnbppp/p2ppn2/6B1/3NPP2/2N2Q2/PPP3PP/2KR1B1R w kq -", "e2e4 c7c5 g1f3 d7d6 d2d4 c5d4 f3d4 g8f6 b1c3 a7a6 c1g5 e7e6 f2f4 f8e7 d1f3 d8c7 e1c1 b8d7", "1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Bg5 e6 7. f4 Be7 8. Qf3 Qc7 9. O-O-O Nbd7"),
   )
-}

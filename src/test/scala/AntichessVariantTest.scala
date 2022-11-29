@@ -1,6 +1,6 @@
 package chess
 
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.specs2.matcher.ValidatedMatchers
 
 import chess.format.FEN
@@ -8,7 +8,7 @@ import chess.format.Forsyth
 import chess.format.pgn.Reader
 import chess.variant.Antichess
 
-class AntichessVariantTest extends ChessTest with ValidatedMatchers {
+class AntichessVariantTest extends ChessTest with ValidatedMatchers:
 
   // Random PGN taken from FICS
   val fullGame =
@@ -152,8 +152,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.apply(Pos.F7, Pos.F8, Option(King))) map (_._1)
 
-      newGame must beValid.like { case gameWithPromotion =>
-        gameWithPromotion.board(Pos.F8).mustEqual(Option(White - King))
+      newGame must beValid {
+        (_: Game).board(Pos.F8).mustEqual(Option(White - King))
       }
 
     }
@@ -164,13 +164,11 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.apply(Pos.C7, Pos.G3, None)) map (_._1)
 
-      newGame must beValid.like { case drawnGame =>
+      newGame must beValid.like { case (drawnGame: Game) =>
         drawnGame.situation.end must beTrue
         drawnGame.situation.autoDraw must beTrue
         drawnGame.situation.winner must beNone
-        drawnGame.situation.status must beSome.like { case status =>
-          status == Status.Draw
-        }
+        drawnGame.situation.status must beSome(Status.Draw)
       }
     }
 
@@ -180,13 +178,11 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.apply(Pos.G7, Pos.G8, Bishop.some)) map (_._1)
 
-      newGame must beValid.like { case drawnGame =>
+      newGame must beValid.like { case (drawnGame: Game) =>
         drawnGame.situation.end must beTrue
         drawnGame.situation.autoDraw must beTrue
         drawnGame.situation.winner must beNone
-        drawnGame.situation.status must beSome.like { case status =>
-          status == Status.Draw
-        }
+        drawnGame.situation.status must beSome(Status.Draw)
       }
 
     }
@@ -210,12 +206,10 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.apply(Pos.C2, Pos.C1, Option(Bishop))) map (_._1)
 
-      newGame must beValid.like { case drawnGame =>
+      newGame must beValid.like { case (drawnGame: Game) =>
         drawnGame.situation.end must beTrue
         drawnGame.situation.autoDraw must beTrue
-        drawnGame.situation.status must beSome.like { case status =>
-          status == Status.Draw
-        }
+        drawnGame.situation.status must beSome(Status.Draw)
       }
     }
 
@@ -293,8 +287,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     "Be drawn on a three move repetition" in {
       val game = Game(Antichess)
 
-      val moves         = List((Pos.G1, Pos.F3), (Pos.G8, Pos.F6), (Pos.F3, Pos.G1), (Pos.F6, Pos.G8))
-      val repeatedMoves = List.fill(3)(moves).flatten
+      val moves = List((Pos.G1, Pos.F3), (Pos.G8, Pos.F6), (Pos.F3, Pos.G1), (Pos.F6, Pos.G8))
+      val repeatedMoves: List[(Pos, Pos)] = List.fill(3)(moves).flatten
 
       val drawnGame = game.playMoveList(repeatedMoves)
 
@@ -313,9 +307,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         game.situation.end must beTrue
 
         // In antichess, the player who has just lost all their pieces is the winner
-        game.situation.winner must beSome.like { case color =>
-          color == Black;
-        }
+        game.situation.winner must beSome(Black)
       }
     }
 
@@ -327,9 +319,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       drawnGame must beValid.like { case game =>
         game.situation.end must beTrue
-        game.situation.winner must beSome.like { case color =>
-          color == Black;
-        }
+        game.situation.winner must beSome(Black)
       }
     }
 
@@ -341,16 +331,10 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       drawnGame must beValid.like { case game =>
         game.situation.end must beTrue
-        game.situation.status must beSome.like { case state =>
-          state == Status.VariantEnd
-
-        }
-        game.situation.winner must beSome.like { case color =>
-          color == Black;
-        }
+        game.situation.status must beSome(Status.VariantEnd)
+        game.situation.winner must beSome(Black)
       }
     }
 
   }
 
-}

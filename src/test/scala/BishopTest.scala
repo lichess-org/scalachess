@@ -1,8 +1,8 @@
 package chess
 
-import Pos._
+import Pos.*
 
-class BishopTest extends ChessTest {
+class BishopTest extends ChessTest:
 
   "a bishop" should {
 
@@ -95,4 +95,3 @@ PPPPPPPP
       }
     }
   }
-}

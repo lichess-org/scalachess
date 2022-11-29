@@ -3,7 +3,7 @@ package format.pgn
 
 import scala.util.Try
 
-object Binary {
+object Binary:
 
   def writeMove(m: String)             = Try(Writer move m)
   def writeMoves(ms: Iterable[String]) = Try(Writer moves ms)
@@ -11,14 +11,13 @@ object Binary {
   def readMoves(bs: List[Byte])          = Try(Reader moves bs)
   def readMoves(bs: List[Byte], nb: Int) = Try(Reader.moves(bs, nb))
 
-  private object MoveType {
+  private object MoveType:
     val SimplePawn  = 0
     val SimplePiece = 1
     val FullPawn    = 2
     val FullPiece   = 3
-  }
 
-  private object Encoding {
+  private object Encoding:
     val pieceInts: Map[String, Int] =
       Map("K" -> 1, "Q" -> 2, "R" -> 3, "N" -> 4, "B" -> 5, "O-O" -> 6, "O-O-O" -> 7)
     val pieceStrs: Map[Int, String]     = pieceInts map { case (k, v) => v -> k }
@@ -28,19 +27,18 @@ object Binary {
     val promotionStrs: Map[Int, String] = promotionInts map { case (k, v) => v -> k }
     val checkInts: Map[String, Int]     = Map("" -> 0, "+" -> 1, "#" -> 2)
     val checkStrs: Map[Int, String]     = checkInts map { case (k, v) => v -> k }
-  }
 
-  private object Reader {
+  private object Reader:
 
-    import Encoding._
+    import Encoding.*
 
     private val maxPlies = 600
 
     def moves(bs: List[Byte]): List[String]          = moves(bs, maxPlies)
-    def moves(bs: List[Byte], nb: Int): List[String] = intMoves(bs map toInt, nb)
+    def moves(bs: List[Byte], nb: Int): List[String] = intMoves(bs map (Binary.toInt(_)), nb)
 
     def intMoves(bs: List[Int], pliesToGo: Int): List[String] =
-      bs match {
+      bs match
         case _ if pliesToGo <= 0 => Nil
         case Nil                 => Nil
         case b1 :: rest if moveType(b1) == MoveType.SimplePawn =>
@@ -52,7 +50,6 @@ object Binary {
         case b1 :: b2 :: b3 :: rest if moveType(b1) == MoveType.FullPiece =>
           fullPiece(b1, b2, b3) :: intMoves(rest, pliesToGo - 1)
         case x => !!(x map showByte mkString ",")
-      }
 
     def simplePawn(i: Int): String = posString(right(i, 6))
 
@@ -67,7 +64,7 @@ object Binary {
     def simplePiece(b1: Int, b2: Int): String =
       if (bitAt(b2, 2)) drop(b1, b2)
       else
-        pieceStrs(b2 >> 5) match {
+        pieceStrs(b2 >> 5) match
           case castle @ ("O-O" | "O-O-O") =>
             val check = checkStrs(cut(b2, 5, 3))
             s"$castle$check"
@@ -76,39 +73,33 @@ object Binary {
             val capture = if (bitAt(b2, 3)) "x" else ""
             val check   = checkStrs(cut(b2, 5, 3))
             s"$piece$capture$pos$check"
-        }
-    def drop(b1: Int, b2: Int): String = {
+    def drop(b1: Int, b2: Int): String =
       val piece = dropPieceStrs(b2 >> 5)
       val pos   = posString(right(b1, 6))
       val check = checkStrs(cut(b2, 5, 3))
       s"$piece@$pos$check"
-    }
 
-    def fullPawn(b1: Int, b2: Int): String = {
+    def fullPawn(b1: Int, b2: Int): String =
       val pos = posString(right(b1, 6))
-      val fileCapture = (b2 >> 6) match {
+      val fileCapture = (b2 >> 6) match
         case 1 => s"${(pos(0) - 1).toChar}x"
         case 2 => s"${(pos(0) + 1).toChar}x"
         case _ => ""
-      }
       val check     = checkStrs(cut(b2, 6, 4))
       val prom      = promotionStrs(cut(b2, 4, 1))
       val promotion = if (prom.isEmpty) "" else s"=$prom"
       s"$fileCapture$pos$promotion$check"
-    }
 
-    def fullPiece(b1: Int, b2: Int, b3: Int): String = {
+    def fullPiece(b1: Int, b2: Int, b3: Int): String =
       val pos     = posString(right(b1, 6))
       val piece   = pieceStrs(b2 >> 5)
       val capture = if (bitAt(b2, 3)) "x" else ""
       val check   = checkStrs(cut(b2, 5, 3))
-      val disamb = (b3 >> 6) match {
+      val disamb = (b3 >> 6) match
         case 0 => fileChar(right(b3, 3)).toString
         case 1 => rankChar(right(b3, 3)).toString
         case _ => posString(right(b3, 6))
-      }
       s"$piece$disamb$capture$pos$check"
-    }
 
     private def moveType(i: Int)  = i >> 6
     private def posString(i: Int) = fileChar(i >> 3).toString + rankChar(right(i, 3))
@@ -121,14 +112,13 @@ object Binary {
     private val lengthMasks =
       Map(1 -> 0x01, 2 -> 0x03, 3 -> 0x07, 4 -> 0x0f, 5 -> 0x1f, 6 -> 0x3f, 7 -> 0x7f, 8 -> 0xff)
     private def !!(msg: String) = throw new Exception("Binary reader failed: " + msg)
-  }
 
-  private object Writer {
+  private object Writer:
 
-    import Encoding._
+    import Encoding.*
 
     def move(str: String): List[Byte] =
-      (str match {
+      (str match
         case pos if pos.length == 2 => simplePawn(pos)
         case CastlingR(str, check)  => castling(str, check)
         case SimplePieceR(piece, capture, pos, check) =>
@@ -138,7 +128,7 @@ object Binary {
         case FullPieceR(piece, orig, capture, pos, check) =>
           fullPiece(piece, orig, pos, capture, check)
         case DropR(role, pos, check) => drop(role, pos, check)
-      }) map (_.toByte)
+      ) map (_.toByte)
 
     def moves(strs: Iterable[String]): Array[Byte] = strs.flatMap(move).to(Array)
 
@@ -214,8 +204,6 @@ object Binary {
     val CastlingR    = s"^(O-O|O-O-O)$checkR$$".r
     val FullPieceR   = s"^$pieceR$origR$captureR$posR$checkR$$".r
     val DropR        = s"^([QRNBP])@$posR$checkR$$".r
-  }
 
-  @inline private def toInt(b: Byte): Int = b & 0xff
-  private def showByte(b: Int): String    = "%08d" format (b.toBinaryString.toInt)
-}
+  private inline def toInt(b: Byte): Int = b & 0xff
+  private def showByte(b: Int): String   = "%08d" format (b.toBinaryString.toInt)

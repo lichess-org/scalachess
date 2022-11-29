@@ -1,14 +1,14 @@
 package chess
 package format.pgn
 
-import cats.syntax.option._
+import cats.syntax.option.*
 
-class ParserTest extends ChessTest {
+class ParserTest extends ChessTest:
 
-  import Fixtures._
+  import Fixtures.*
 
-  val parser    = Parser.full _
-  val parseMove = Parser.move _
+  val parser    = Parser.full
+  val parseMove = Parser.move
 
   "pgnComment" should {
     "parse valid comment" in {
@@ -21,16 +21,16 @@ class ParserTest extends ChessTest {
 
   "promotion check" should {
     "as a queen" in {
-      parser("b8=Q ") must beValid.like { case a =>
-        a.sans.value.headOption must beSome.like { case san: Std =>
-          san.promotion must_== Option(Queen)
+      parser("b8=Q ") must beValid { (parsed: ParsedPgn) =>
+        parsed.sans.value.headOption must beSome { (san: San) =>
+          san.asInstanceOf[Std].promotion == Option(Queen)
         }
       }
     }
     "as a rook" in {
-      parser("b8=R ") must beValid.like { case a =>
-        a.sans.value.headOption must beSome.like { case san: Std =>
-          san.promotion must_== Option(Rook)
+      parser("b8=R ") must beValid {
+        (_: ParsedPgn).sans.value.headOption must beSome { (san: San) =>
+          san.asInstanceOf[Std].promotion must_== Option(Rook)
         }
       }
     }
@@ -134,16 +134,16 @@ class ParserTest extends ChessTest {
   "variations" in {
     parser("Ne7g6+! {such a neat comment} (e4 Ng6)") must beValid.like {
       case ParsedPgn(_, _, Sans(List(san))) =>
-        san.metas.variations.headOption must beSome.like { case variation =>
-          variation.value must haveSize(2)
+        san.metas.variations.headOption must beSome {
+          (_: Sans).value must haveSize(2)
         }
     }
   }
 
   "first move variation" in {
     parser("1. e4 (1. d4)") must beValid.like { case ParsedPgn(_, _, Sans(List(san))) =>
-      san.metas.variations.headOption must beSome.like { case variation =>
-        variation.value must haveSize(1)
+      san.metas.variations.headOption must beSome {
+        (_: Sans).value must haveSize(1)
       }
     }
   }
@@ -387,4 +387,3 @@ class ParserTest extends ChessTest {
     }
   }
 
-}

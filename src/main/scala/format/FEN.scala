@@ -2,7 +2,7 @@ package chess.format
 
 import chess.Color
 
-final case class FEN(value: String) extends AnyVal {
+final case class FEN(value: String) extends AnyVal:
 
   override def toString = value
 
@@ -18,9 +18,7 @@ final case class FEN(value: String) extends AnyVal {
     }
 
   def initial = value == Forsyth.initial.value
-}
 
-object FEN {
+object FEN:
 
   def clean(source: String): FEN = FEN(source.replace("_", " ").trim)
-}

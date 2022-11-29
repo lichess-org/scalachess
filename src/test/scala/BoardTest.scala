@@ -1,8 +1,8 @@
 package chess
 
-import Pos._
+import Pos.*
 
-class BoardTest extends ChessTest {
+class BoardTest extends ChessTest:
 
   val board = makeBoard
 
@@ -54,20 +54,20 @@ class BoardTest extends ChessTest {
     }
 
     "allow a piece to be placed" in {
-      board.place(White - Rook, E3) must beSome.like { case b =>
-        b(E3) mustEqual Option(White - Rook)
+      board.place(White - Rook, E3) must beSome {
+        (_: Board)(E3) mustEqual Option(White - Rook)
       }
     }
 
     "allow a piece to be taken" in {
-      board take A1 must beSome.like { case b =>
-        b(A1) must beNone
+      board take A1 must beSome {
+        (_: Board)(A1) must beNone
       }
     }
 
     "allow a piece to move" in {
-      board.move(E2, E4) must beSome.like { case b =>
-        b(E4) mustEqual Option(White - Pawn)
+      board.move(E2, E4) must beSome {
+        (_: Board)(E4) mustEqual Option(White - Pawn)
       }
     }
 
@@ -80,8 +80,8 @@ class BoardTest extends ChessTest {
     }
 
     "allow a pawn to be promoted to a queen" in {
-      makeEmptyBoard.place(Black.pawn, A8) flatMap (_ promote A8) must beSome.like { case b =>
-        b(A8) must beSome(Black.queen)
+      makeEmptyBoard.place(Black.pawn, A8) flatMap (_ promote A8) must beSome {
+        (_: Board)(A8) must beSome(Black.queen)
       }
     }
 
@@ -90,8 +90,8 @@ class BoardTest extends ChessTest {
         _.place(White - Pawn, A2),
         _.place(White - Pawn, A3),
         _.move(A2, A4)
-      ) must beSome.like { case b =>
-        b(A4) mustEqual Option(White - Pawn)
+      ) must beSome {
+        (_: Board)(A4) mustEqual Option(White - Pawn)
       }
     }
 
@@ -139,4 +139,3 @@ R  BK  R"""
       }
     }
   }
-}

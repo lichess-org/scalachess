@@ -3,7 +3,7 @@ package opening
 
 // Generated from https://github.com/lichess-org/chess-openings
 // format: off
-private[opening] object FullOpeningPartA {
+private[opening] object FullOpeningPartA:
 
   def db: Vector[FullOpening] = Vector(
 new FullOpening("A00", "Amar Gambit", "rn1qkbnr/ppp2ppp/8/3p4/5p2/6PB/PPPPP2P/RNBQK2R w KQkq -", "g1h3 d7d5 g2g3 e7e5 f2f4 c8h3 f1h3 e5f4", "1. Nh3 d5 2. g3 e5 3. f4 Bxh3 4. Bxh3 exf4"),
@@ -711,4 +711,3 @@ new FullOpening("A97", "Dutch Defense: Classical Variation, Ilyin-Zhenevsky Vari
 new FullOpening("A98", "Dutch Defense: Classical Variation, Ilyin-Zhenevsky Variation, Alatortsev-Lisitsyn Line", "rnb1qrk1/ppp1b1pp/3ppn2/5p2/2PP4/2N2NP1/PPQ1PPBP/R1B2RK1 b - -", "d2d4 f7f5 g1f3 g8f6 g2g3 e7e6 f1g2 f8e7 e1g1 e8g8 c2c4 d7d6 b1c3 d8e8 d1c2", "1. d4 f5 2. Nf3 Nf6 3. g3 e6 4. Bg2 Be7 5. O-O O-O 6. c4 d6 7. Nc3 Qe8 8. Qc2"),
 new FullOpening("A99", "Dutch Defense: Classical Variation, Ilyin-Zhenevsky Variation, Modern Main Line", "rnb1qrk1/ppp1b1pp/3ppn2/5p2/2PP4/1PN2NP1/P3PPBP/R1BQ1RK1 b - -", "d2d4 e7e6 c2c4 f7f5 g2g3 g8f6 f1g2 f8e7 g1f3 e8g8 e1g1 d7d6 b1c3 d8e8 b2b3", "1. d4 e6 2. c4 f5 3. g3 Nf6 4. Bg2 Be7 5. Nf3 O-O 6. O-O d6 7. Nc3 Qe8 8. b3"),
   )
-}

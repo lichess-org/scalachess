@@ -1,11 +1,11 @@
 package chess
 package opening
 
-import cats.syntax.option._
+import cats.syntax.option.*
 
 import chess.format.FEN
 
-object FullOpeningDB {
+object FullOpeningDB:
 
   import FullOpening.Key
 
@@ -31,7 +31,7 @@ object FullOpeningDB {
   def isShortest(op: FullOpening) = shortestLines get op.key contains op
 
   def findByFen(fen: FEN): Option[FullOpening] =
-    fen.value.split(' ').take(4) match {
+    fen.value.split(' ').take(4) match
       case Array(boardPocket, turn, castle, ep) =>
         val board =
           if (boardPocket.contains('[')) boardPocket.takeWhile('[' !=)
@@ -39,7 +39,6 @@ object FullOpeningDB {
           else boardPocket
         byFen get List(board, turn, castle, ep).mkString(" ")
       case _ => None
-    }
 
   val SEARCH_MAX_PLIES = 40
 
@@ -79,4 +78,3 @@ object FullOpeningDB {
     }
 
   def names = byFen.values.toList.map(o => o.name.takeWhile(':' !=)).distinct
-}

@@ -10,7 +10,7 @@ case object KingOfTheHill
       shortName = "KotH",
       title = "Bring your King to the center to win the game.",
       standardInitialPosition = true
-    ) {
+    ):
 
   def pieces = Standard.pieces
 
@@ -23,4 +23,3 @@ case object KingOfTheHill
     */
   override def opponentHasInsufficientMaterial(situation: Situation) = false
   override def isInsufficientMaterial(board: Board)                  = false
-}

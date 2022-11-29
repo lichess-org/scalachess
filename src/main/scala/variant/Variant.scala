@@ -2,7 +2,7 @@ package chess
 package variant
 
 import cats.data.Validated
-import cats.syntax.option._
+import cats.syntax.option.*
 import scala.annotation.nowarn
 
 import chess.format.FEN
@@ -16,7 +16,7 @@ abstract class Variant private[variant] (
     val shortName: String,
     val title: String,
     val standardInitialPosition: Boolean
-) {
+):
 
   def pieces: Map[Pos, Piece]
 
@@ -42,11 +42,10 @@ abstract class Variant private[variant] (
   def initialFen: FEN = format.Forsyth.initial
 
   def isValidPromotion(promotion: Option[PromotableRole]) =
-    promotion match {
+    promotion match
       case None                                 => true
       case Some(Queen | Rook | Knight | Bishop) => true
       case _                                    => false
-    }
 
   def validMoves(situation: Situation): Map[Pos, List[Move]] =
     situation.actors
@@ -56,7 +55,7 @@ abstract class Variant private[variant] (
       .to(Map)
 
   // Optimised for performance
-  def pieceThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean = {
+  def pieceThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean =
     board.pieces exists {
       case (pos, piece) if piece.color == color && filter(piece) && piece.eyes(pos, to) =>
         (!piece.role.projection) || piece.role.dir(pos, to).exists {
@@ -64,15 +63,12 @@ abstract class Variant private[variant] (
         }
       case _ => false
     }
-  }
 
   def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) =
     pieceThreatened(board, color, to, filter)
 
   def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean =
-    ! {
-      kingPos exists { kingThreatened(m.after, !m.color, _, filter) }
-    }
+    !kingPos.exists { kingThreatened(m.after, !m.color, _, filter) }
 
   def kingSafety(a: Actor, m: Move): Boolean =
     kingSafety(
@@ -91,7 +87,7 @@ abstract class Variant private[variant] (
       from: Pos,
       to: Pos,
       promotion: Option[PromotableRole]
-  ): Validated[String, Move] = {
+  ): Validated[String, Move] =
 
     // Find the move in the variant specific list of valid moves
     def findMove(from: Pos, to: Pos) = situation.moves get from flatMap (_.find(_.dest == to))
@@ -107,7 +103,6 @@ abstract class Variant private[variant] (
         if (isValidPromotion(promotion)) Validated.valid(m2)
         else Validated.invalid("Cannot promote to " + promotion + " in this game mode")
     } yield m3
-  }
 
   def drop(situation: Situation, role: Role, pos: Pos): Validated[String, Drop] =
     Validated.invalid(s"$this variant cannot drop $situation $role $pos")
@@ -163,27 +158,24 @@ abstract class Variant private[variant] (
     */
   @nowarn def finalizeBoard(board: Board, uci: format.Uci, captured: Option[Piece]): Board = board
 
-  protected def pawnsOnPromotionRank(board: Board, color: Color) = {
+  protected def pawnsOnPromotionRank(board: Board, color: Color) =
     board.pieces.exists {
       case (pos, Piece(c, Pawn)) if c == color && pos.rank == color.promotablePawnRank => true
       case _                                                                           => false
     }
-  }
 
-  protected def pawnsOnBackRank(board: Board, color: Color) = {
+  protected def pawnsOnBackRank(board: Board, color: Color) =
     board.pieces.exists {
       case (pos, Piece(c, Pawn)) if c == color && pos.rank == color.backRank => true
       case _                                                                 => false
     }
-  }
 
-  protected def validSide(board: Board, strict: Boolean)(color: Color) = {
+  protected def validSide(board: Board, strict: Boolean)(color: Color) =
     val roles = board rolesOf color
     roles.count(_ == King) == 1 &&
     (!strict || { roles.count(_ == Pawn) <= 8 && roles.lengthCompare(16) <= 0 }) &&
     !pawnsOnPromotionRank(board, color) &&
     !pawnsOnBackRank(board, color)
-  }
 
   def valid(board: Board, strict: Boolean) = Color.all forall validSide(board, strict)
 
@@ -211,9 +203,8 @@ abstract class Variant private[variant] (
   override def equals(that: Any): Boolean = this eq that.asInstanceOf[AnyRef]
 
   override def hashCode: Int = id
-}
 
-object Variant {
+object Variant:
 
   val all: List[Variant] = List(
     Standard,
@@ -266,4 +257,3 @@ object Variant {
       File.all.map { Pos(_, Rank.Second) -> White.pawn } ++
       File.all.map { Pos(_, Rank.Seventh) -> Black.pawn } ++
       File.all.zip(rank).map { case (x, role) => Pos(x, Rank.Eighth) -> (Black - role) } toMap
-}

@@ -12,12 +12,12 @@ case class Clock(
     players: Color.Map[ClockPlayer],
     timer: Option[Timestamp] = None,
     timestamper: Timestamper = RealTimestamper
-) {
+):
   import timestamper.{ now, toNow }
 
-  @inline def timerFor(c: Color) = if (c == color) timer else None
+  inline def timerFor(c: Color) = if (c == color) timer else None
 
-  @inline def pending(c: Color) = timerFor(c).fold(Centis(0))(toNow)
+  inline def pending(c: Color) = timerFor(c).fold(Centis(0))(toNow)
 
   def remainingTime(c: Color) = (players(c).remaining - pending(c)) nonNeg
 
@@ -59,7 +59,7 @@ case class Clock(
       metrics: MoveMetrics = MoveMetrics(),
       gameActive: Boolean = true
   ): Clock.WithCompensatedLag[Clock] =
-    timer match {
+    timer match
       case None =>
         Clock.WithCompensatedLag(
           metrics.clientLag
@@ -90,7 +90,6 @@ case class Clock(
           (if (clockActive) newC else newC.hardStop).switch,
           Some(lagComp)
         )
-    }
 
   // To do: safely add this to takeback to remove inc from player.
   // def deinc = updatePlayer(color, _.giveTime(-incrementOf(color)))
@@ -126,18 +125,16 @@ case class Clock(
   def limit                = config.limit
   def limitInMinutes       = config.limitInMinutes
   def limitSeconds         = config.limitSeconds
-}
 
 case class ClockPlayer(
     config: Clock.Config,
     lag: LagTracker,
     elapsed: Centis = Centis(0),
     berserk: Boolean = false
-) {
-  def limit = {
+):
+  def limit =
     if (berserk) config.initTime - config.berserkPenalty
     else config.initTime
-  }
 
   def recordLag(l: Centis) = copy(lag = lag.recordLag(l))
 
@@ -152,21 +149,19 @@ case class ClockPlayer(
   def increment = if (berserk) Centis(0) else config.increment
 
   def withFrameLag(frameLag: Centis) = copy(lag = lag.withFrameLag(frameLag, config))
-}
 
-object ClockPlayer {
+object ClockPlayer:
   def withConfig(config: Clock.Config) =
     ClockPlayer(
       config,
       LagTracker.init(config)
     )
-}
 
-object Clock {
+object Clock:
   private val limitFormatter = new DecimalFormat("#.##")
 
   // All unspecified durations are expressed in seconds
-  case class Config(limitSeconds: Int, incrementSeconds: Int) {
+  case class Config(limitSeconds: Int, incrementSeconds: Int):
 
     def berserkable = incrementSeconds == 0 || limitSeconds > 0
 
@@ -187,14 +182,13 @@ object Clock {
     def toClock = Clock(this)
 
     def limitString: String =
-      limitSeconds match {
+      limitSeconds match
         case l if l % 60 == 0 => (l / 60).toString
         case 15 => "¼"
         case 30 => "½"
         case 45 => "¾"
         case 90 => "1.5"
         case _  => limitFormatter.format(limitSeconds / 60d)
-      }
 
     def show = toString
 
@@ -204,26 +198,23 @@ object Clock {
       if (limitSeconds < 40 * incrementSeconds) Centis(0)
       else Centis(limitSeconds * (100 / 2))
 
-    def initTime = {
+    def initTime =
       if (limitSeconds == 0) increment atLeast Centis(300)
       else limit
-    }
-  }
 
   // [TimeControl "600+2"] -> 10+2
   def readPgnConfig(str: String): Option[Config] =
-    str.split('+') match {
+    str.split('+') match
       case Array(initStr, incStr) =>
         for {
           init <- initStr.toIntOption
           inc  <- incStr.toIntOption
         } yield Config(init, inc)
       case _ => none
-    }
 
   def apply(limit: Int, increment: Int): Clock = apply(Config(limit, increment))
 
-  def apply(config: Config): Clock = {
+  def apply(config: Config): Clock =
     val player = ClockPlayer.withConfig(config)
     Clock(
       config = config,
@@ -231,9 +222,6 @@ object Clock {
       players = Color.Map(player, player),
       timer = None
     )
-  }
 
-  case class WithCompensatedLag[A](value: A, compensated: Option[Centis]) {
+  case class WithCompensatedLag[A](value: A, compensated: Option[Centis]):
     def map[B](f: A => B) = copy(value = f(value))
-  }
-}

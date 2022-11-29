@@ -1,12 +1,12 @@
 package chess
 
-import cats.syntax.option._
+import cats.syntax.option.*
 
 import chess.format.FEN
-import chess.Pos._
-import chess.variant._
+import chess.Pos.*
+import chess.variant.*
 
-class VariantTest extends ChessTest {
+class VariantTest extends ChessTest:
 
   val board = makeBoard
 
@@ -112,9 +112,7 @@ K  r
         )
 
         game.situation.end must beTrue
-        game.situation.winner must beSome.like { case color =>
-          color == Black
-        }
+        game.situation.winner must beSome { (_: Color) == Black }
       }
       "centered black king" in {
         val sit = Game(
@@ -127,9 +125,7 @@ PP
           White
         ).situation
         sit.end must beTrue
-        sit.winner must beSome.like { case color =>
-          color == Black
-        }
+        sit.winner must beSome { (_: Color) == Black }
 
       }
     }
@@ -159,9 +155,7 @@ K  r
           White
         )
         game.situation.end must beTrue
-        game.situation.winner must beSome.like { case color =>
-          color == Black
-        }
+        game.situation.winner must beSome { (_: Color) == Black }
       }
       "1 check" in {
         val game = Game(Board init ThreeCheck)
@@ -207,9 +201,7 @@ K  r
           .get
         game.situation.end must beTrue
 
-        game.situation.winner must beSome.like { case color =>
-          color == Black
-        }
+        game.situation.winner must beSome { (_: Color) == Black }
       }
     }
 
@@ -265,11 +257,9 @@ K  r
         val position = FEN("2K5/8/6k1/8/8/8/8/Q6q w - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
-        game must beValid.like { case game =>
+        game must beValid { (game: Game) =>
           game.situation.end must beTrue
-          game.situation.winner must beSome.like { case color =>
-            color == White
-          }
+          game.situation.winner must beSome { (_: Color) == White }
         }
       }
 
@@ -277,11 +267,9 @@ K  r
         val position = FEN("6k1/8/8/8/8/2r5/1KB5/2B5 w - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
-        game must beValid.like { case game =>
+        game must beValid { (game: Game) =>
           game.situation.end must beTrue
-          game.situation.winner must beSome.like { case color =>
-            color == Black
-          }
+          game.situation.winner must beSome { (_: Color) == Black }
         }
       }
     }
@@ -300,10 +288,10 @@ K  r
         val position = FEN("2K5/8/2n1nk2/8/8/8/8/4r3 b - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
-        game must beValid.like { case game =>
+        game must beValid { (game: Game) =>
           game.situation.end must beTrue
-          game.situation.winner must beSome.like { case color =>
-            color == White
+          game.situation.winner must beSome {
+            (_: Color) == White
           }
         }
       }
@@ -344,4 +332,3 @@ K  r
       Board.init(Horde).history.castles must_== Castles("kq")
     }
   }
-}

@@ -1,12 +1,14 @@
 package chess
 
-class DividerTest extends ChessTest {
+// import org.specs2.matcher.MustExpectations.akaMust
+import org.specs2.matcher.MustMatchers.akaMust
+
+class DividerTest extends ChessTest:
 
   def makeReplay(moves: String) =
-    format.pgn.Reader.full(moves).toOption.get match {
+    format.pgn.Reader.full(moves).toOption.get match
       case format.pgn.Reader.Result.Complete(replay) => replay.chronoMoves.map(_.fold(_.before, _.before))
       case x                                         => sys error s"Unexpected incomplete replay $x"
-    }
 
   "the divider finds middlegame and endgame" should {
     "game1" in {
@@ -16,12 +18,8 @@ class DividerTest extends ChessTest {
       )
       val divided = Divider(replay)
       println("Game 1 => " + divided)
-      divided.middle must beSome.like { case x =>
-        x must beBetween(18, 40)
-      }
-      divided.end must beSome.like { case x =>
-        x must beBetween(50, 65)
-      }
+      divided.middle must beSome { (_: Int) must beBetween(18, 40) }
+      divided.end must beSome { (_: Int) must beBetween(50, 65) }
     }
     "game2" in {
       // http://l.org/gk3gNFN7/black
@@ -30,12 +28,8 @@ class DividerTest extends ChessTest {
       )
       val divided = Divider(replay)
       println("Game 2 => " + divided)
-      divided.middle must beSome.like { case x =>
-        x must beBetween(17, 30)
-      }
-      divided.end must beSome.like { case x =>
-        x must beBetween(65, 80)
-      }
+      divided.middle must beSome { (_: Int) must beBetween(17, 30) }
+      divided.end must beSome { (_: Int) must beBetween(65, 80) }
     }
     "game3" in {
       // http://l.org/v9drYYoa
@@ -44,12 +38,8 @@ class DividerTest extends ChessTest {
       )
       val divided = Divider(replay)
       println("Game 3 => " + divided)
-      divided.middle must beSome.like { case x =>
-        x must beBetween(20, 28)
-      }
-      divided.end must beSome.like { case x =>
-        x must beBetween(50, 65)
-      }
+      divided.middle must beSome { (_: Int) must beBetween(20, 28) }
+      divided.end must beSome { (_: Int) must beBetween(50, 65) }
     }
     "game4" in {
       // http://l.org/v9drYYoa
@@ -58,12 +48,8 @@ class DividerTest extends ChessTest {
       )
       val divided = Divider(replay)
       println("Game 4 => " + divided)
-      divided.middle must beSome.like { case x =>
-        x must beBetween(16, 34)
-      }
-      divided.end must beSome.like { case x =>
-        x must beBetween(40, 47)
-      }
+      divided.middle must beSome { (_: Int) must beBetween(16, 34) }
+      divided.end must beSome { (_: Int) must beBetween(40, 47) }
     }
     "game5" in {
       // http://l.org/PaaBKHRO
@@ -72,12 +58,8 @@ class DividerTest extends ChessTest {
       )
       val divided = Divider(replay)
       println("Game 5 => " + divided)
-      divided.middle must beSome.like { case x =>
-        x must beBetween(19, 26)
-      }
-      divided.end must beSome.like { case x =>
-        x must beBetween(36, 48)
-      }
+      divided.middle must beSome { (_: Int) must beBetween(19, 26) }
+      divided.end must beSome { (_: Int) must beBetween(36, 48) }
     }
     "game6" in {
       // http://l.org/PaaBKHRO
@@ -86,12 +68,8 @@ class DividerTest extends ChessTest {
       )
       val divided = Divider(replay)
       println("Game 6 => " + divided)
-      divided.middle must beSome.like { case x =>
-        x must beBetween(19, 26)
-      }
-      divided.end must beSome.like { case x =>
-        x must beBetween(36, 48)
-      }
+      divided.middle must beSome { (_: Int) must beBetween(19, 26) }
+      divided.end must beSome { (_: Int) must beBetween(36, 48) }
     }
     "game7" in {
       // http://l.org/W2RS81OY
@@ -100,10 +78,7 @@ class DividerTest extends ChessTest {
       )
       val divided = Divider(replay)
       println("Game 7 => " + divided)
-      divided.middle must beSome.like { case x =>
-        x must beBetween(19, 25)
-      }
+      divided.middle must beSome { (_: Int) must beBetween(19, 25) }
       divided.end must beNone
     }
   }
-}

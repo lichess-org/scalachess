@@ -1,9 +1,9 @@
 package chess
 package format.pgn
 
-import cats.syntax.option._
+import cats.syntax.option.*
 
-class RenderTest extends ChessTest {
+class RenderTest extends ChessTest:
 
   private def glyphs(id: Int) =
     Glyph.find(id).fold(Glyphs.empty) { g =>
@@ -365,4 +365,3 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
     }
   }
 
-}

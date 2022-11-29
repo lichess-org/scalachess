@@ -1,12 +1,12 @@
 package chess
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import cats.Monoid
 import alleycats.Zero
 
 // maximum centis = Int.MaxValue / 100 / 60 / 60 / 24 = 248 days
-final case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
+final case class Centis(centis: Int) extends AnyVal with Ordered[Centis]:
 
   def roundTenths: Int =
     if (centis > 0) (centis + 5) / 10 else (centis - 4) / 10
@@ -32,28 +32,21 @@ final case class Centis(centis: Int) extends AnyVal with Ordered[Centis] {
   def atLeast(o: Centis) = Centis(Math.max(centis, o.centis))
 
   def nonNeg = Centis(Math.max(centis, 0))
-}
 
-object Centis {
+object Centis:
 
-  implicit final val zeroInstance = Zero(Centis(0))
+  given Zero[Centis] with
+    def zero = Centis(0)
 
-  implicit val CentisMonoid = new Monoid[Centis] {
+  given Monoid[Centis] with
     def combine(c1: Centis, c2: Centis) = c1 + c2
     final val empty                     = Centis(0)
-  }
 
-  implicit final class CentisScalar(val scalar: Int) extends AnyVal {
-    def *(o: Centis) = o * scalar
-  }
+  extension (scalar: Int) def *(o: Centis) = o * scalar
 
-  implicit final class CentisScalarF(val scalar: Float) extends AnyVal {
-    def *~(o: Centis) = o *~ scalar
-  }
+  extension (scalar: Float) def *~(o: Centis) = o *~ scalar
 
-  implicit final class CentisScalarD(val scalar: Double) extends AnyVal {
-    def *~(o: Centis) = o *~ scalar
-  }
+  extension (scalar: Double) def *~(o: Centis) = o *~ scalar
 
   def apply(l: Long): Centis =
     Centis {
@@ -74,4 +67,3 @@ object Centis {
   def ofSeconds(s: Int) = Centis(100 * s)
   def ofMillis(i: Int)  = Centis((if (i > 0) i + 5 else i - 4) / 10)
   def ofMillis(l: Long) = Centis((if (l > 0) l + 5 else l - 4) / 10)
-}

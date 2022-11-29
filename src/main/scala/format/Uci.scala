@@ -2,9 +2,9 @@ package chess
 package format
 
 import cats.data.Validated
-import cats.implicits._
+import cats.implicits.*
 
-sealed trait Uci {
+sealed trait Uci:
 
   def uci: String
   def piotr: String
@@ -12,15 +12,14 @@ sealed trait Uci {
   def origDest: (Pos, Pos)
 
   def apply(situation: Situation): Validated[String, MoveOrDrop]
-}
 
-object Uci {
+object Uci:
 
   case class Move(
       orig: Pos,
       dest: Pos,
       promotion: Option[PromotableRole] = None
-  ) extends Uci {
+  ) extends Uci:
 
     def keys = orig.key + dest.key
     def uci  = keys + promotionString
@@ -33,9 +32,8 @@ object Uci {
     def origDest = orig -> dest
 
     def apply(situation: Situation) = situation.move(orig, dest, promotion) map Left.apply
-  }
 
-  object Move {
+  object Move:
 
     def apply(move: String): Option[Move] =
       for {
@@ -57,9 +55,8 @@ object Uci {
         dest <- Pos.fromKey(destS)
         promotion = Role promotable promS
       } yield Move(orig, dest, promotion)
-  }
 
-  case class Drop(role: Role, pos: Pos) extends Uci {
+  case class Drop(role: Role, pos: Pos) extends Uci:
 
     def uci = s"${role.pgn}@${pos.key}"
 
@@ -68,16 +65,14 @@ object Uci {
     def origDest = pos -> pos
 
     def apply(situation: Situation) = situation.drop(role, pos) map Right.apply
-  }
 
-  object Drop {
+  object Drop:
 
     def fromStrings(roleS: String, posS: String) =
       for {
         role <- Role.allByName get roleS
         pos  <- Pos.fromKey(posS)
       } yield Drop(role, pos)
-  }
 
   case class WithSan(uci: Uci, san: String)
 
@@ -110,4 +105,3 @@ object Uci {
 
   def writeListPiotr(moves: List[Uci]): String =
     moves.map(_.piotr) mkString " "
-}

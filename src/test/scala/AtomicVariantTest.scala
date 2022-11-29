@@ -1,11 +1,11 @@
 package chess
 
-import cats.syntax.option._
+import cats.syntax.option.*
 
 import chess.variant.Atomic
 import chess.format.FEN
 
-class AtomicVariantTest extends ChessTest {
+class AtomicVariantTest extends ChessTest:
 
   "Atomic chess" should {
 
@@ -65,9 +65,7 @@ class AtomicVariantTest extends ChessTest {
       gameWin must beValid.like { case winningGame =>
         winningGame.situation.end must beTrue
         winningGame.situation.variantEnd must beTrue
-        winningGame.situation.winner must beSome.like { case winner =>
-          winner == Black
-        }
+        winningGame.situation.winner must beSome(Black)
       }
     }
 
@@ -80,7 +78,7 @@ class AtomicVariantTest extends ChessTest {
       gameWin must beValid.like { case winningGame =>
         winningGame.situation.end must beTrue
         winningGame.situation.variantEnd must beFalse
-        winningGame.situation.winner must beSome.like { case color => color == Black }
+        winningGame.situation.winner must beSome(Black)
       }
     }
 
@@ -105,9 +103,7 @@ class AtomicVariantTest extends ChessTest {
         game.situation.end must beTrue
         game.situation.autoDraw must beTrue
         game.situation.winner must beNone
-        game.situation.status must beSome.like { case status =>
-          status == Status.Draw
-        }
+        game.situation.status must beSome(Status.Draw)
       }
     }
 
@@ -115,12 +111,12 @@ class AtomicVariantTest extends ChessTest {
       val positionFen    = FEN("k1K5/pp5R/8/8/3Q4/P7/1P6/2r5 w - -")
       val threatenedGame = fenToGame(positionFen, Atomic)
 
-      threatenedGame must beValid.like { case game =>
+      threatenedGame must beValid.like { case (game: Game) =>
         game.situation.check must beTrue
         game.situation.end must beFalse
         game.situation.winner must beNone
         game.situation.moves must haveKeys(Pos.D4, Pos.H7, Pos.C8)
-        game.situation.moves.get(Pos.D4) must beSome.like { case moves =>
+        game.situation.moves.get(Pos.D4) must beSome { (moves: List[Move]) =>
           // The queen can defend the king from check
           moves.find(_.dest == Pos.A7) must beSome
 
@@ -129,12 +125,12 @@ class AtomicVariantTest extends ChessTest {
         }
 
         // The king cannot capture a piece in the perimeter of the opponent king, exploding itself
-        game.situation.moves.get(Pos.C8) must beSome.like { case mvs =>
-          mvs.forall(_.captures) must beFalse
+        game.situation.moves.get(Pos.C8) must beSome {
+          (_: List[Move]).forall(_.captures) must beFalse
         }
 
         // The rook cannot capture, as that would result in our own king exploding
-        game.situation.moves.get(Pos.H7) must beSome.like { case mvs =>
+        game.situation.moves.get(Pos.H7) must beSome { (mvs: List[Move]) =>
           mvs.find(_.captures) must beNone
           // It can, however, defend the king
           mvs.find(_.dest == Pos.C7) must beSome
@@ -175,11 +171,9 @@ class AtomicVariantTest extends ChessTest {
 
       val successGame = game flatMap (_.playMoves((Pos.H1, Pos.E1)))
 
-      successGame must beValid.like { case game =>
+      successGame must beValid { (game: Game) =>
         game.situation.end must beTrue
-        game.situation.status must beSome.like { case status =>
-          status == Status.Draw
-        }
+        game.situation.status must beSome { (_: Status) == Status.Draw }
       }
     }
 
@@ -191,9 +185,7 @@ class AtomicVariantTest extends ChessTest {
 
       successGame must beValid.like { case game =>
         game.situation.end must beTrue
-        game.situation.status must beSome.like { case status =>
-          status == Status.Draw
-        }
+        game.situation.status must beSome { (_: Status) == Status.Draw }
       }
     }
 
@@ -203,9 +195,7 @@ class AtomicVariantTest extends ChessTest {
       val successGame = game flatMap (_.playMoves((Pos.F2, Pos.A2)))
       successGame must beValid.like { case game =>
         game.situation.end must beTrue
-        game.situation.status must beSome.like { case status =>
-          status == Status.Draw
-        }
+        game.situation.status must beSome { (_: Status) == Status.Draw }
       }
     }
 
@@ -216,9 +206,7 @@ class AtomicVariantTest extends ChessTest {
 
       successGame must beValid.like { case game =>
         game.situation.end must beTrue
-        game.situation.status must beSome.like { case status =>
-          status == Status.Draw
-        }
+        game.situation.status must beSome { (_: Status) == Status.Draw }
       }
     }
 
@@ -281,9 +269,7 @@ class AtomicVariantTest extends ChessTest {
 
       successGame must beValid.like { case game =>
         game.situation.end must beTrue
-        game.situation.winner must beSome.like { case color =>
-          color == Black
-        }
+        game.situation.winner must beSome { (_: Color) == Black }
       }
     }
 
@@ -326,10 +312,10 @@ class AtomicVariantTest extends ChessTest {
       val position    = FEN("k1r5/pp5Q/8/8/8/8/PP6/2K5 w - -")
       val successGame = fenToGame(position, Atomic)
 
-      successGame must beValid.like { case game =>
+      successGame must beValid { (game: Game) =>
         val moves = game.situation.moves.get(Pos.H7)
 
-        moves must beSome.like { case queenMoves =>
+        moves must beSome { (queenMoves: List[Move]) =>
           queenMoves.size must beEqualTo(queenMoves.toSet.size)
         }
       }
@@ -337,7 +323,7 @@ class AtomicVariantTest extends ChessTest {
     }
 
     "End move regression" in {
-      import Pos._
+      import Pos.*
       "from init" in {
         val game = fenToGame(format.Forsyth.initial, Atomic)
         val successGame = game flatMap (_.playMoves(
@@ -625,4 +611,3 @@ class AtomicVariantTest extends ChessTest {
       }
     }
   }
-}

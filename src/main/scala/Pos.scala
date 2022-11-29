@@ -2,7 +2,7 @@ package chess
 
 import scala.math.{ abs, max, min }
 
-case class Pos private (index: Int) extends AnyVal {
+case class Pos private (index: Int) extends AnyVal:
 
   def down: Option[Pos]      = Pos.at(file.index, rank.index - 1)
   def left: Option[Pos]      = Pos.at(file.index - 1, rank.index)
@@ -41,8 +41,8 @@ case class Pos private (index: Int) extends AnyVal {
 
   def isLight: Boolean = (file.index + rank.index) % 2 == 1
 
-  @inline def file = File of this
-  @inline def rank = Rank of this
+  inline def file = File of this
+  inline def rank = Rank of this
 
   def piotr: Char =
     if (index <= 25) (97 + index).toChar      // a ...
@@ -54,9 +54,8 @@ case class Pos private (index: Int) extends AnyVal {
 
   def key               = file.toString + rank.toString
   override def toString = key
-}
 
-object Pos {
+object Pos:
   def apply(index: Int): Option[Pos] =
     if (0 <= index && index < 64) Some(new Pos(index))
     else None
@@ -164,4 +163,3 @@ object Pos {
       pos.piotr -> pos
     }
     .to(Map)
-}

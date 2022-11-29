@@ -7,13 +7,12 @@ final class FullOpening(
     val fen: String,
     val uci: String,
     val pgn: String
-) {
+):
 
-  val (family: OpeningFamily, variation: Option[OpeningVariation]) = name.split(":", 2) match {
+  val (family: OpeningFamily, variation: Option[OpeningVariation]) = name.split(":", 2) match
     case Array(f, v) => OpeningFamily(f.trim)    -> Some(OpeningVariation(v.takeWhile(',' !=).trim))
     case Array(f)    => OpeningFamily(f.trim)    -> None
     case _           => OpeningFamily(name.trim) -> None
-  }
 
   lazy val nbMoves = uci.count(' ' ==) + 1
   lazy val lastUci = uci.split(' ').lastOption
@@ -22,15 +21,14 @@ final class FullOpening(
   override def toString = name
 
   def atPly(ply: Int) = FullOpening.AtPly(this, ply)
-}
 
-object FullOpening {
+object FullOpening:
 
   type Key = String
 
   case class AtPly(opening: FullOpening, ply: Int)
 
-  object nameToKey {
+  object nameToKey:
     private val splitAccentRegex = "[\u0300-\u036f]".r
     private val multiSpaceRegex  = """\s+""".r
     private val badChars         = """[^\w\-]+""".r
@@ -46,10 +44,7 @@ object FullOpening {
         ),
         ""
       )
-  }
-}
 
-case class OpeningFamily(name: String) {
+case class OpeningFamily(name: String):
   lazy val key = FullOpening nameToKey name
-}
 case class OpeningVariation(name: String)

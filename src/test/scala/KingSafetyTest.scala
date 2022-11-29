@@ -1,8 +1,8 @@
 package chess
 
-import Pos._
+import Pos.*
 
-class KingSafetyTest extends ChessTest {
+class KingSafetyTest extends ChessTest:
 
   "in order to save the king" should {
     "the king" in {
@@ -97,4 +97,3 @@ RNB    R""" destsFrom D3 must bePoss()
       }
     }
   }
-}

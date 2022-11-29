@@ -10,7 +10,7 @@ case class Drop(
     situationBefore: Situation,
     after: Board,
     metrics: MoveMetrics = MoveMetrics()
-) {
+):
 
   def before = situationBefore.board
 
@@ -18,7 +18,7 @@ case class Drop(
 
   def withHistory(h: History) = copy(after = after withHistory h)
 
-  def finalizeAfter: Board = {
+  def finalizeAfter: Board =
     val board = after.variant.finalizeBoard(
       after updateHistory { h =>
         h.copy(
@@ -36,7 +36,6 @@ case class Drop(
         if (h.positionHashes.isEmpty) Hash(situationBefore) else h.positionHashes
       h.copy(positionHashes = Hash(Situation(board, !piece.color)) ++ basePositionHashes)
     }
-  }
 
   def afterWithLastMove =
     after.variant.finalizeBoard(
@@ -54,4 +53,3 @@ case class Drop(
   def toUci = Uci.Drop(piece.role, pos)
 
   override def toString = toUci.uci
-}

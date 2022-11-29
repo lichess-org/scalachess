@@ -1,6 +1,5 @@
 package chess
 
-object Setup {
+object Setup:
 
   def apply(variant: chess.variant.Variant) = Game(variant)
-}

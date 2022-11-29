@@ -1,6 +1,8 @@
-import ornicar.scalalib
+import ornicar.scalalib.ScalalibExtensions
 
-package object chess extends scalalib.Common with scalalib.OrnicarOption with scalalib.OrnicarBoolean {
+package object chess extends ScalalibExtensions:
+
+  export ornicar.scalalib.OrnicarBooleanWrapper
 
   val White = Color.White
   val Black = Color.Black
@@ -13,4 +15,3 @@ package object chess extends scalalib.Common with scalalib.OrnicarOption with sc
   type PositionHash = Array[Byte]
 
   type MoveOrDrop = Either[Move, Drop]
-}

@@ -4,7 +4,7 @@ import format.{ Forsyth, Uci }
 
 import chess.format.FEN
 
-class ReplayTest extends ChessTest {
+class ReplayTest extends ChessTest:
 
   "from prod" in {
     "replay from position close chess" in {
@@ -47,5 +47,3 @@ class ReplayTest extends ChessTest {
       ) must beValid
     }
   }
-
-}

@@ -1,8 +1,8 @@
 package chess
 
-import Pos._
+import Pos.*
 
-class KingTest extends ChessTest {
+class KingTest extends ChessTest:
 
   "a king" should {
 
@@ -94,4 +94,3 @@ PP   PPP
 """ destsFrom B1 must bePoss(A1, A2, B2)
     }
   }
-}

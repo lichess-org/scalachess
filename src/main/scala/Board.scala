@@ -7,7 +7,7 @@ case class Board(
     history: History,
     variant: Variant,
     crazyData: Option[Crazyhouse.Data] = None
-) {
+):
 
   def apply(at: Pos): Option[Piece] = pieces get at
   def apply(file: File, rank: Rank) = pieces get Pos(file, rank)
@@ -16,10 +16,9 @@ case class Board(
     (pos, Actor(piece, pos, this))
   }
 
-  lazy val actorsOf: Color.Map[Seq[Actor]] = {
+  lazy val actorsOf: Color.Map[Seq[Actor]] =
     val (w, b) = actors.values.toSeq.partition { _.color.white }
     Color.Map(w, b)
-  }
 
   def rolesOf(c: Color): List[Role] =
     pieces.values
@@ -97,12 +96,11 @@ case class Board(
 
   def withPieces(newPieces: PieceMap) = copy(pieces = newPieces)
 
-  def withVariant(v: Variant): Board = {
+  def withVariant(v: Variant): Board =
     if (v == Crazyhouse)
       copy(variant = v).ensureCrazyData
     else
       copy(variant = v)
-  }
 
   def withCrazyData(data: Crazyhouse.Data)         = copy(crazyData = Option(data))
   def withCrazyData(data: Option[Crazyhouse.Data]) = copy(crazyData = data)
@@ -120,7 +118,7 @@ case class Board(
 
   def fixCastles: Board =
     withCastles {
-      if (variant.allowsCastling) {
+      if (variant.allowsCastling)
         val wkPos   = kingPosOf(White)
         val bkPos   = kingPosOf(Black)
         val wkReady = wkPos.fold(false)(_.rank == Rank.First)
@@ -139,7 +137,7 @@ case class Board(
           blackKingSide = castles.blackKingSide && bkReady && rookReady(Black, bkPos, left = false),
           blackQueenSide = castles.blackQueenSide && bkReady && rookReady(Black, bkPos, left = true)
         )
-      } else Castles.none
+      else Castles.none
     }
 
   def updateHistory(f: History => History) = copy(history = f(history))
@@ -159,9 +157,8 @@ case class Board(
   def materialImbalance: Int = variant.materialImbalance(this)
 
   override def toString = s"$variant Position after ${history.lastMove}\n$visual"
-}
 
-object Board {
+object Board:
 
   def apply(pieces: Iterable[(Pos, Piece)], variant: Variant): Board =
     Board(pieces.toMap, if (variant.allowsCastling) Castles.all else Castles.none, variant)
@@ -175,4 +172,3 @@ object Board {
 
   private def variantCrazyData(variant: Variant) =
     (variant == Crazyhouse) option Crazyhouse.Data.init
-}

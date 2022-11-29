@@ -10,7 +10,7 @@ case object Atomic
       shortName = "Atom",
       title = "Nuke your opponent's king to win.",
       standardInitialPosition = true
-    ) {
+    ):
 
   def pieces = Standard.pieces
 
@@ -23,9 +23,8 @@ case object Atomic
     }
 
   /** Move threatens to illegally explode our own king */
-  private def explodesOwnKing(situation: Situation)(move: Move): Boolean = {
+  private def explodesOwnKing(situation: Situation)(move: Move): Boolean =
     move.captures && (situation.kingPos exists move.dest.touches)
-  }
 
   private def protectedByOtherKing(board: Board, to: Pos, color: Color): Boolean =
     board.kingPosOf(color) exists to.touches
@@ -39,7 +38,7 @@ case object Atomic
       color: Color,
       to: Pos,
       filter: Piece => Boolean = _ => true
-  ): Boolean = {
+  ): Boolean =
     board.pieces exists {
       case (pos, piece)
           if piece.color == color && filter(piece) && piece.eyes(pos, to) && !protectedByOtherKing(
@@ -52,7 +51,6 @@ case object Atomic
         }
       case _ => false
     }
-  }
 
   // moves exploding opponent king are always playable
   override def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean = {
@@ -61,8 +59,8 @@ case object Atomic
   } && !explodesOwnKing(m.situationBefore)(m)
 
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
-  private def explodeSurroundingPieces(move: Move): Move = {
-    if (move.captures) {
+  private def explodeSurroundingPieces(move: Move): Move =
+    if (move.captures)
       val affectedPos = surroundingPositions(move.dest)
       val afterBoard  = move.after
       val destination = move.dest
@@ -76,8 +74,7 @@ case object Atomic
 
       val newBoard = afterBoard withPieces afterExplosions
       move withAfter newBoard
-    } else move
-  }
+    else move
 
   /** The positions surrounding a given position on the board. Any square at the edge of the board has
     * less surrounding positions than the usual eight.
@@ -90,7 +87,7 @@ case object Atomic
   /** Since kings cannot confine each other, if either player has only a king
     * then either a queen or multiple pieces are required for checkmate.
     */
-  private def insufficientAtomicWinningMaterial(board: Board) = {
+  private def insufficientAtomicWinningMaterial(board: Board) =
     val kingsAndBishopsOnly = board.pieces forall { p =>
       (p._2 is King) || (p._2 is Bishop)
     }
@@ -110,41 +107,36 @@ case object Atomic
     // Queen, rook + any, bishop + any (same piece color), or 3 knights can mate
     else if (kingsAndKnightsOnly) board.pieces.size <= 4
     else kingsRooksAndMinorsOnly && !bishopsOnOppositeColors && board.pieces.size <= 3
-  }
 
   /*
    * Bishops on opposite coloured squares can never capture each other to cause a king to explode and a traditional
    * mate would be not be very likely. Additionally, a player can only mate another player with sufficient material.
    * We also look out for closed positions (pawns that cannot move and kings which cannot capture them.)
    */
-  override def isInsufficientMaterial(board: Board) = {
+  override def isInsufficientMaterial(board: Board) =
     insufficientAtomicWinningMaterial(board) || atomicClosedPosition(board)
-  }
 
   /** Since a king cannot capture, K + P vs K + P where none of the pawns can move is an automatic draw
     */
-  private def atomicClosedPosition(board: Board) = {
+  private def atomicClosedPosition(board: Board) =
     val closedStructure = board.actors.values.forall(actor =>
       (actor.piece.is(Pawn) && actor.moves.isEmpty
         && InsufficientMatingMaterial.pawnBlockedByPawn(actor, board))
         || actor.piece.is(King) || actor.piece.is(Bishop)
     )
     val randomBishop = board.pieces.find { case (_, piece) => piece.is(Bishop) }
-    val bishopsAbsentOrPawnitized = randomBishop match {
+    val bishopsAbsentOrPawnitized = randomBishop match
       case Some((pos, piece)) => bishopPawnitized(board, piece.color, pos.isLight)
       case None               => true
-    }
     closedStructure && bishopsAbsentOrPawnitized
-  }
 
-  private def bishopPawnitized(board: Board, sideWithBishop: Color, bishopLight: Boolean) = {
+  private def bishopPawnitized(board: Board, sideWithBishop: Color, bishopLight: Boolean) =
     board.actors.values.forall(actor =>
       (actor.piece.is(Pawn) && actor.piece.is(sideWithBishop)) ||
         (actor.piece.is(Pawn) && actor.piece.is(!sideWithBishop) && actor.pos.isLight == !bishopLight) ||
         (actor.piece.is(Bishop) && actor.piece.is(sideWithBishop) && actor.pos.isLight == bishopLight) ||
         actor.piece.is(King)
     )
-  }
 
   /** In atomic chess, it is possible to win with a single knight, bishop, etc, by exploding
     * a piece in the opponent's king's proximity. On the other hand, a king alone or a king with
@@ -155,4 +147,3 @@ case object Atomic
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
   override def specialEnd(situation: Situation) = situation.board.kingPos.size != 2
-}

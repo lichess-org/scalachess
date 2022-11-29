@@ -1,7 +1,7 @@
 package chess
 
 import chess.format.Uci
-import cats.syntax.option._
+import cats.syntax.option.*
 
 case class Move(
     piece: Piece,
@@ -14,14 +14,14 @@ case class Move(
     castle: Option[((Pos, Pos), (Pos, Pos))],
     enpassant: Boolean,
     metrics: MoveMetrics = MoveMetrics()
-) {
+):
   def before = situationBefore.board
 
   def situationAfter = Situation(finalizeAfter, !piece.color)
 
   def withHistory(h: History) = copy(after = after withHistory h)
 
-  def finalizeAfter: Board = {
+  def finalizeAfter: Board =
     val board = after.variant.finalizeBoard(
       after updateHistory { h1 =>
         val h2 = h1.copy(
@@ -58,7 +58,6 @@ case class Move(
         if (resetsPositionHashes) Array.empty: PositionHash else positionHashesOfSituationBefore
       h.copy(positionHashes = Hash(Situation(board, !piece.color)) ++ basePositionHashes)
     }
-  }
 
   def applyVariantEffect: Move = before.variant addVariantEffect this
 
@@ -92,4 +91,3 @@ case class Move(
   def toUci = Uci.Move(orig, dest, promotion)
 
   override def toString = s"$piece ${toUci.uci}"
-}

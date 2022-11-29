@@ -1,7 +1,7 @@
 package chess
 package format
 
-import cats.implicits._
+import cats.implicits.*
 import variant.{ Standard, Variant }
 
 /** Transform a game to standard Forsyth Edwards Notation
@@ -11,7 +11,7 @@ import variant.{ Standard, Variant }
   * https://github.com/ddugovic/Stockfish/wiki/FEN-extensions
   * http://scidb.sourceforge.net/help/en/FEN.html#ThreeCheck
   */
-object Forsyth {
+object Forsyth:
 
   val initial = FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 
@@ -19,11 +19,10 @@ object Forsyth {
     makeBoard(variant, fen) map { board =>
       val splitted    = fen.value split ' '
       val colorOption = splitted lift 1 flatMap (_ lift 0) flatMap Color.apply
-      val situation = colorOption match {
+      val situation = colorOption match
         case Some(color)             => Situation(board, color)
         case _ if board.check(Black) => Situation(board, Black) // user in check will move first
         case _                       => Situation(board, White)
-      }
       splitted
         .lift(2)
         .fold(situation) { strCastles =>
@@ -80,10 +79,9 @@ object Forsyth {
 
   def <<(fen: FEN): Option[Situation] = <<@(Standard, fen)
 
-  case class SituationPlus(situation: Situation, fullMoveNumber: Int) {
+  case class SituationPlus(situation: Situation, fullMoveNumber: Int):
 
     def turns = fullMoveNumber * 2 - situation.color.fold(2, 1)
-  }
 
   def <<<@(variant: Variant, fen: FEN): Option[SituationPlus] =
     <<@(variant, fen) map { sit =>
@@ -99,7 +97,7 @@ object Forsyth {
   def <<<(fen: FEN): Option[SituationPlus] = <<<@(Standard, fen)
 
   def makeCheckCount(str: String): Option[CheckCount] =
-    str.toList match {
+    str.toList match
       case '+' :: w :: '+' :: b :: Nil =>
         for {
           white <- w.toString.toIntOption if white <= 3
@@ -111,20 +109,17 @@ object Forsyth {
           black <- b.toString.toIntOption if black <= 3
         } yield CheckCount(3 - black, 3 - white)
       case _ => None
-    }
 
   // only cares about pieces positions on the board (first part of FEN string)
-  def makeBoard(variant: Variant, fen: FEN): Option[Board] = {
-    val (position, pockets) = fen.value.takeWhile(' ' !=) match {
+  def makeBoard(variant: Variant, fen: FEN): Option[Board] =
+    val (position, pockets) = fen.value.takeWhile(' ' !=) match
       case word if word.count('/' ==) == 8 =>
         val splitted = word.split('/')
         splitted.take(8).mkString("/") -> splitted.lift(8)
       case word if word.contains('[') && word.endsWith("]") =>
-        word.span('[' !=) match {
+        word.span('[' !=) match
           case (position, pockets) => position -> pockets.stripPrefix("[").stripSuffix("]").some
-        }
       case word => word -> None
-    }
     if (pockets.isDefined && !variant.crazyhouse) None
     else
       makePiecesWithCrazyPromoted(position.toList, 0, 7) map { case (pieces, promoted) =>
@@ -144,14 +139,13 @@ object Forsyth {
           )
         }
       }
-  }
 
   private def makePiecesWithCrazyPromoted(
       chars: List[Char],
       x: Int,
       y: Int
   ): Option[(List[(Pos, Piece)], Set[Pos])] =
-    chars match {
+    chars match
       case Nil                               => Option((Nil, Set.empty))
       case '/' :: rest                       => makePiecesWithCrazyPromoted(rest, 0, y - 1)
       case c :: rest if '1' <= c && c <= '8' => makePiecesWithCrazyPromoted(rest, x + (c - '0').toInt, y)
@@ -167,14 +161,12 @@ object Forsyth {
           piece                      <- Piece.fromChar(c)
           (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
         } yield (pos -> piece :: nextPieces, nextPromoted)
-    }
 
   def >>(situation: Situation): FEN = >>(SituationPlus(situation, 1))
 
   def >>(parsed: SituationPlus): FEN =
-    parsed match {
+    parsed match
       case SituationPlus(situation, _) => >>(Game(situation, turns = parsed.turns))
-    }
 
   def >>(game: Game): FEN = FEN {
     {
@@ -201,22 +193,20 @@ object Forsyth {
     ) mkString " "
 
   private def exportCheckCount(board: Board) =
-    board.history.checkCount match {
+    board.history.checkCount match
       case CheckCount(white, black) => s"+$black+$white"
-    }
 
   private def exportCrazyPocket(board: Board) =
-    board.crazyData match {
+    board.crazyData match
       case Some(variant.Crazyhouse.Data(pockets, _)) =>
         "/" +
           pockets.white.roles.map(_.forsythUpper).mkString +
           pockets.black.roles.map(_.forsyth).mkString
       case _ => ""
-    }
 
-  implicit private val posOrdering = Ordering.by[Pos, File](_.file)
+  given Ordering[Pos] = Ordering.by[Pos, File](_.file)
 
-  private[chess] def exportCastles(board: Board): String = {
+  private[chess] def exportCastles(board: Board): String =
 
     lazy val wr = board.pieces.collect {
       case (pos, piece) if pos.rank == White.backRank && piece == White.rook => pos
@@ -242,39 +232,31 @@ object Forsyth {
         (if (board.castles.blackQueenSide && br.nonEmpty && bur.nonEmpty)
            (if (bur contains br.min) "q" else bur.min.file)
          else "")
-    } match {
+    } match
       case "" => "-"
       case n  => n
-    }
-  }
 
-  def exportBoard(board: Board): String = {
+  def exportBoard(board: Board): String =
     val fen   = new scala.collection.mutable.StringBuilder(70)
     var empty = 0
-    for (y <- Rank.allReversed) {
+    for (y <- Rank.allReversed)
       empty = 0
-      for (x <- File.all) {
-        board(x, y) match {
+      for (x <- File.all)
+        board(x, y) match
           case None => empty = empty + 1
           case Some(piece) =>
             if (empty == 0) fen append piece.forsyth.toString
-            else {
+            else
               fen append (empty.toString + piece.forsyth)
               empty = 0
-            }
             if (piece.role != Pawn && board.crazyData.fold(false)(_.promoted.contains(Pos(x, y))))
               fen append '~'
-        }
-      }
       if (empty > 0) fen append empty
       if (y > Rank.First) fen append '/'
-    }
     fen.toString
-  }
 
   def boardAndColor(situation: Situation): String =
     boardAndColor(situation.board, situation.color)
 
   def boardAndColor(board: Board, turnColor: Color): String =
     s"${exportBoard(board)} ${turnColor.letter}"
-}

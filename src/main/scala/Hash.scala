@@ -1,17 +1,25 @@
 package chess
 
+import cats.kernel.Monoid
+
+opaque type PositionHash = Array[Byte]
+object PositionHash extends TotalWrapper[PositionHash, Array[Byte]]:
+  given Monoid[PositionHash] with
+    def combine(p1: PositionHash, p2: PositionHash) = p1 ++ p2
+    val empty                                       = Array.empty
+
 final class Hash(size: Int):
 
-  def apply(situation: Situation): PositionHash =
+  def apply(situation: Situation): PositionHash = PositionHash {
     val l = Hash.get(situation, Hash.polyglotTable)
-    if (size <= 8)
-      Array.tabulate(size)(i => (l >>> ((7 - i) * 8)).toByte)
+    if (size <= 8) Array.tabulate(size)(i => (l >>> ((7 - i) * 8)).toByte)
     else
       val m = Hash.get(situation, Hash.randomTable)
       Array.tabulate(size)(i =>
         if (i < 8) (l >>> ((7 - i) * 8)).toByte
         else (m >>> ((15 - i) * 8)).toByte
       )
+  }
 
 object Hash:
 
@@ -112,8 +120,7 @@ object Hash:
 
   def apply(situation: Situation): PositionHash = h.apply(situation)
 
-  def debug(hashes: PositionHash) = hashes.map(_.toInt).sum.toString
-
+  def debug(hashes: PositionHash) = hashes.value.map(_.toInt).sum.toString
 
 private object ZobristTables:
   val actorMasks = Array(

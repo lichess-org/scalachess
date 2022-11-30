@@ -1,10 +1,11 @@
 package chess
 
 enum Mode(val id: Int, val rated: Boolean):
+
   case Casual extends Mode(0, false)
   case Rated  extends Mode(1, true)
-  val name = toString.toLowerCase
 
+  val name   = toString.toLowerCase
   def casual = !rated
 
 object Mode:

@@ -3,6 +3,7 @@ package format
 
 import cats.implicits.*
 import variant.{ Standard, Variant }
+import cats.kernel.Monoid
 
 /** Transform a game to standard Forsyth Edwards Notation
   * https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
@@ -63,7 +64,7 @@ object Forsyth:
           situation withHistory {
             val history = History(
               lastMove = lastMove,
-              positionHashes = Array.empty,
+              positionHashes = Monoid[PositionHash].empty,
               castles = castles,
               unmovedRooks = UnmovedRooks(unmovedRooks)
             )
@@ -217,8 +218,8 @@ object Forsyth:
       case (pos, piece) if pos.rank == Black.backRank && piece == Black.rook => pos
     }
 
-    lazy val wur = board.unmovedRooks.pos.filter(_.rank == White.backRank)
-    lazy val bur = board.unmovedRooks.pos.filter(_.rank == Black.backRank)
+    lazy val wur = board.unmovedRooks.value.filter(_.rank == White.backRank)
+    lazy val bur = board.unmovedRooks.value.filter(_.rank == Black.backRank)
 
     {
       // castling rights with inner rooks are represented by their file name

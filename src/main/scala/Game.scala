@@ -86,28 +86,28 @@ case class Game(
       case u: Uci.Move => apply(u) map { case (g, m) => g -> Left(m) }
       case u: Uci.Drop => apply(u) map { case (g, d) => g -> Right(d) }
 
-  def player = situation.color
+  inline def player = situation.color
 
-  def board = situation.board
+  inline def board = situation.board
 
-  def isStandardInit = board.pieces == chess.variant.Standard.pieces
+  inline def isStandardInit = board.pieces == chess.variant.Standard.pieces
 
-  def halfMoveClock: Int = board.history.halfMoveClock
+  inline def halfMoveClock: Int = board.history.halfMoveClock
 
   /** Fullmove number: The number of the full move.
     * It starts at 1, and is incremented after Black's move.
     */
-  def fullMoveNumber: Int = 1 + turns / 2
+  inline def fullMoveNumber: Int = 1 + turns / 2
 
   def moveString = s"$fullMoveNumber${player.fold(".", "...")}"
 
-  def withBoard(b: Board) = copy(situation = situation.copy(board = b))
+  inline def withBoard(inline b: Board) = copy(situation = situation.copy(board = b))
 
-  def updateBoard(f: Board => Board) = withBoard(f(board))
+  inline def updateBoard(inline f: Board => Board) = withBoard(f(board))
 
-  def withPlayer(c: Color) = copy(situation = situation.copy(color = c))
+  inline def withPlayer(c: Color) = copy(situation = situation.copy(color = c))
 
-  def withTurns(t: Int) = copy(turns = t)
+  inline def withTurns(t: Int) = copy(turns = t)
 
 object Game:
   def apply(variant: chess.variant.Variant): Game =

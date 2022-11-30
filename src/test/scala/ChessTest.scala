@@ -35,7 +35,7 @@ trait ChessTest extends Specification with ValidatedMatchers:
       actor.piece.eyes(actor.pos, to) && {
         (!actor.piece.role.projection) ||
         actor.piece.role.dir(actor.pos, to).exists {
-          Actor.longRangeThreatens(actor.board, actor.pos, _, to)
+          actor.board.variant.longRangeThreatens(actor.board, p, _, to)
         }
       }
 

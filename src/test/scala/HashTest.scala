@@ -192,8 +192,7 @@ class HashTest extends ChessTest:
       g.exists(_._3.nonEmpty) must beFalse
       val m16 = java.security.MessageDigest getInstance "MD5"
       val h   = new Hash(16)
-      g.foreach(_._2.foreach(x => m16.update(h(x._1.situation))))
+      g.foreach(_._2.foreach(x => m16.update(PositionHash value h(x._1.situation))))
       hex(m16.digest) must beEqualTo("21281304d25ccf9c1dfd640775800087")
     }
   }
-

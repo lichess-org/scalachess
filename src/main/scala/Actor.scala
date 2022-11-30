@@ -4,7 +4,7 @@ import format.Uci
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
 
-final case class Actor(
+case class Actor(
     piece: Piece,
     pos: Pos,
     board: Board
@@ -81,10 +81,10 @@ final case class Actor(
 
   lazy val destinations: List[Pos] = moves.map(_.dest)
 
-  def color        = piece.color
-  def is(c: Color) = c == piece.color
-  def is(r: Role)  = r == piece.role
-  def is(p: Piece) = p == piece
+  inline def color               = piece.color
+  inline def is(inline c: Color) = c == piece.color
+  inline def is(inline r: Role)  = r == piece.role
+  inline def is(inline p: Piece) = p == piece
 
   /*
    *  Filters out moves that would put the king in check.
@@ -109,7 +109,7 @@ final case class Actor(
       kingPos <- board kingPosOf color filter (_ => history canCastle color on side)
       rookPos <- side.tripToRook(kingPos, board).lastOption
       if board(rookPos) contains color.rook
-      if history.unmovedRooks.pos.contains(rookPos)
+      if history.unmovedRooks.value.contains(rookPos)
       // Check impeded castling.
       newKingPos       = Pos(side.castledKingFile, kingPos.rank)
       newRookPos       = Pos(side.castledRookFile, rookPos.rank)
@@ -194,9 +194,6 @@ final case class Actor(
   private def history = board.history
 
 object Actor:
-
-  def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
-    board.variant.longRangeThreatens(board, p, dir, to)
 
   inline def pawnDirOf(inline color: Color): Direction = color.fold(_.up, _.down)
 

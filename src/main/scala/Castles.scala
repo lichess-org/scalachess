@@ -1,13 +1,13 @@
 package chess
 
-final case class Castles(
+case class Castles(
     whiteKingSide: Boolean,
     whiteQueenSide: Boolean,
     blackKingSide: Boolean,
     blackQueenSide: Boolean
 ):
 
-  def can(color: Color) = new Castles.Can(this, color)
+  inline def can(inline color: Color) = Castles.Can(this, color)
 
   def without(color: Color) =
     color match
@@ -36,12 +36,12 @@ final case class Castles(
       case (Black, KingSide)  => copy(blackKingSide = true)
       case (Black, QueenSide) => copy(blackQueenSide = true)
 
-  override lazy val toString: String =
+  override lazy val toString: String = {
     (if (whiteKingSide) "K" else "") +
       (if (whiteQueenSide) "Q" else "") +
       (if (blackKingSide) "k" else "") +
       (if (blackQueenSide) "q" else "")
-  match
+  } match
     case "" => "-"
     case n  => n
 

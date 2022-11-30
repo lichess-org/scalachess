@@ -3,7 +3,7 @@ package chess
 trait DecayingRecorder:
   def record(value: Float): DecayingStats
 
-final case class DecayingStats(
+case class DecayingStats(
     mean: Float,
     deviation: Float,
     decay: Float
@@ -20,7 +20,7 @@ final case class DecayingStats(
       s record n.toFloat(v)
     }
 
-final case class EmptyDecayingStats(deviation: Float, decay: Float) extends DecayingRecorder:
+final class EmptyDecayingStats(deviation: Float, decay: Float) extends DecayingRecorder:
   def record(value: Float) =
     DecayingStats(
       mean = value,

@@ -19,7 +19,7 @@ object InsufficientMatingMaterial:
   def pawnBlockedByPawn(pawn: Actor, board: Board) =
     pawn.moves.isEmpty && {
       val blockingPosition = Actor.posAheadOfPawn(pawn.pos, pawn.piece.color)
-      blockingPosition.flatMap(board.apply).exists(_.is(Pawn))
+      blockingPosition.flatMap(board(_)).exists(_.is(Pawn))
     }
 
   /*

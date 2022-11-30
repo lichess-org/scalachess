@@ -22,6 +22,7 @@ case object KingSide extends Side:
   val castledRookFile = File.F
 
   val tripToRook: (Pos, Board) => List[Pos] = (pos, board) => pos >| board.pieces.contains
+
 case object QueenSide extends Side:
 
   val castledKingFile = File.C

@@ -26,23 +26,23 @@ case class Situation(board: Board, color: Color):
 
   def checkSquare = if (check) kingPos else None
 
-  def history = board.history
+  inline def history = board.history
 
-  def checkMate: Boolean = board.variant checkmate this
+  inline def checkMate: Boolean = board.variant checkmate this
 
-  def staleMate: Boolean = board.variant staleMate this
+  inline def staleMate: Boolean = board.variant staleMate this
 
-  def autoDraw: Boolean = board.autoDraw || board.variant.specialDraw(this)
+  inline def autoDraw: Boolean = board.autoDraw || board.variant.specialDraw(this)
 
-  def opponentHasInsufficientMaterial: Boolean = board.variant.opponentHasInsufficientMaterial(this)
+  inline def opponentHasInsufficientMaterial: Boolean = board.variant.opponentHasInsufficientMaterial(this)
 
   lazy val threefoldRepetition: Boolean = board.history.threefoldRepetition
 
-  def variantEnd = board.variant specialEnd this
+  inline def variantEnd = board.variant specialEnd this
 
-  def end: Boolean = checkMate || staleMate || autoDraw || variantEnd
+  inline def end: Boolean = checkMate || staleMate || autoDraw || variantEnd
 
-  def winner: Option[Color] = board.variant.winner(this)
+  inline def winner: Option[Color] = board.variant.winner(this)
 
   def playable(strict: Boolean): Boolean =
     (board valid strict) && !end && !copy(color = !color).check
@@ -75,7 +75,7 @@ case class Situation(board: Board, color: Color):
       board = board withVariant variant
     )
 
-  def canCastle = board.history.canCastle
+  export board.history.canCastle
 
   def enPassantSquare: Option[Pos] =
     // Before potentially expensive move generation, first ensure some basic

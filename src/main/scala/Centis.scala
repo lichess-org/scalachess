@@ -2,7 +2,7 @@ package chess
 
 import scala.concurrent.duration.*
 
-import cats.Monoid
+import cats.kernel.Monoid
 import alleycats.Zero
 
 // maximum centis = Int.MaxValue / 100 / 60 / 60 / 24 = 248 days

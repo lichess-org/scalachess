@@ -8,10 +8,10 @@ sealed trait Role:
   val projection: Boolean
   val dirs: Directions
   def dir(from: Pos, to: Pos): Option[Direction]
+
 sealed trait PromotableRole extends Role
 
-/** Promotable in antichess.
-  */
+/** Promotable in antichess. */
 case object King extends PromotableRole:
   val forsyth                 = 'k'
   val dirs: Directions        = Queen.dirs
@@ -23,6 +23,7 @@ case object Queen extends PromotableRole:
   val dirs: Directions        = Rook.dirs ::: Bishop.dirs
   def dir(from: Pos, to: Pos) = Rook.dir(from, to) orElse Bishop.dir(from, to)
   val projection              = true
+
 case object Rook extends PromotableRole:
   val forsyth          = 'r'
   val dirs: Directions = List(_.up, _.down, _.left, _.right)
@@ -33,6 +34,7 @@ case object Rook extends PromotableRole:
       Option(if (to ?< from) (_.left) else (_.right))
     else None
   val projection = true
+
 case object Bishop extends PromotableRole:
   val forsyth          = 'b'
   val dirs: Directions = List(_.upLeft, _.upRight, _.downLeft, _.downRight)
@@ -45,6 +47,7 @@ case object Bishop extends PromotableRole:
       })
     else None
   val projection = true
+
 case object Knight extends PromotableRole:
   val forsyth = 'n'
   val dirs: Directions = List(
@@ -59,6 +62,7 @@ case object Knight extends PromotableRole:
   )
   def dir(from: Pos, to: Pos) = None
   val projection              = false
+
 case object Pawn extends Role:
   val forsyth                 = 'p'
   val dirs: Directions        = Nil

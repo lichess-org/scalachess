@@ -9,8 +9,8 @@ case class Board(
     crazyData: Option[Crazyhouse.Data] = None
 ):
 
-  def apply(at: Pos): Option[Piece] = pieces get at
-  def apply(file: File, rank: Rank) = pieces get Pos(file, rank)
+  inline def apply(inline at: Pos): Option[Piece]        = pieces get at
+  inline def apply(inline file: File, inline rank: Rank) = pieces get Pos(file, rank)
 
   lazy val actors: Map[Pos, Actor] = pieces map { case (pos, piece) =>
     (pos, Actor(piece, pos, this))
@@ -27,7 +27,7 @@ case class Board(
       }
       .to(List)
 
-  def actorAt(at: Pos): Option[Actor] = actors get at
+  inline def actorAt(inline at: Pos): Option[Actor] = actors get at
 
   def piecesOf(c: Color): Map[Pos, Piece] = pieces filter (_._2 is c)
 
@@ -47,7 +47,7 @@ case class Board(
       variant.kingThreatened(this, !c, kingPos)
     }
 
-  def destsFrom(from: Pos): Option[List[Pos]] = actorAt(from) map (_.destinations)
+  def destsFrom(from: Pos): Option[List[Pos]] = actorAt(from).map(_.destinations)
 
   def seq(actions: Board => Option[Board]*): Option[Board] =
     actions.foldLeft(Option(this): Option[Board])(_ flatMap _)
@@ -78,7 +78,7 @@ case class Board(
     pieces.collect { case (pos, piece) if piece is color => pos }.to(Set)
   }
 
-  def hasPiece(p: Piece) = pieces.values exists (p ==)
+  inline def hasPiece(inline p: Piece) = pieces.values.exists(p ==)
 
   def promote(pos: Pos): Option[Board] =
     for {
@@ -111,7 +111,7 @@ case class Board(
 
   def unmovedRooks =
     UnmovedRooks {
-      history.unmovedRooks.pos.filter(pos =>
+      history.unmovedRooks.value.filter(pos =>
         apply(pos).exists(piece => piece.is(Rook) && piece.color.backRank == pos.rank)
       )
     }
@@ -126,9 +126,7 @@ case class Board(
         def rookReady(color: Color, kPos: Option[Pos], left: Boolean) =
           kPos.fold(false) { kp =>
             actorsOf(color) exists { a =>
-              a.piece.is(Rook) && a.pos ?- kp && (left ^ (a.pos ?> kp)) && history.unmovedRooks.pos(
-                a.pos
-              )
+              a.piece.is(Rook) && a.pos ?- kp && (left ^ (a.pos ?> kp)) && history.unmovedRooks.value(a.pos)
             }
           }
         Castles(
@@ -140,19 +138,19 @@ case class Board(
       else Castles.none
     }
 
-  def updateHistory(f: History => History) = copy(history = f(history))
+  inline def updateHistory(inline f: History => History) = copy(history = f(history))
 
-  def count(p: Piece): Int = pieces.values count (_ == p)
-  def count(c: Color): Int = pieces.values count (_.color == c)
+  def count(p: Piece): Int = pieces.values.count(_ == p)
+  def count(c: Color): Int = pieces.values.count(_.color == c)
 
   def autoDraw: Boolean =
     variant.fiftyMoves(history) || variant.isInsufficientMaterial(this) || history.fivefoldRepetition
 
-  def situationOf(color: Color) = Situation(this, color)
+  inline def situationOf(inline color: Color) = Situation(this, color)
 
   def visual = format.Visual >> this
 
-  def valid(strict: Boolean) = variant.valid(this, strict)
+  inline def valid(inline strict: Boolean) = variant.valid(this, strict)
 
   def materialImbalance: Int = variant.materialImbalance(this)
 

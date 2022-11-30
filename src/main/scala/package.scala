@@ -11,6 +11,4 @@ type Directions = List[Direction]
 
 type PieceMap = Map[Pos, Piece]
 
-type PositionHash = Array[Byte]
-
 type MoveOrDrop = Either[Move, Drop]

@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import chess.format.FEN
+import chess.format.Fen
 
 case object RacingKings
     extends Variant(
@@ -14,7 +14,7 @@ case object RacingKings
       standardInitialPosition = false
     ):
 
-  override def allowsCastling = false
+  override val allowsCastling = false
 
   // Both sides start on the first two ranks:
   // krbnNBRK
@@ -40,7 +40,7 @@ case object RacingKings
 
   override val castles = Castles.none
 
-  override val initialFen = FEN("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
+  override val initialFen = Fen("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
 
   override def isInsufficientMaterial(board: Board)                  = false
   override def opponentHasInsufficientMaterial(situation: Situation) = false

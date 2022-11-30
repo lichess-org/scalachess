@@ -5,7 +5,7 @@ import cats.data.Validated
 import cats.syntax.option.*
 import scala.annotation.nowarn
 
-import chess.format.FEN
+import chess.format.Fen
 
 // Correctness depends on singletons for each variant ID
 abstract class Variant private[variant] (
@@ -20,18 +20,18 @@ abstract class Variant private[variant] (
 
   def pieces: Map[Pos, Piece]
 
-  def standard      = this == Standard
-  def chess960      = this == Chess960
-  def fromPosition  = this == FromPosition
-  def kingOfTheHill = this == KingOfTheHill
-  def threeCheck    = this == ThreeCheck
-  def antichess     = this == Antichess
-  def atomic        = this == Atomic
-  def horde         = this == Horde
-  def racingKings   = this == RacingKings
-  def crazyhouse    = this == Crazyhouse
+  inline def standard      = this == Standard
+  inline def chess960      = this == Chess960
+  inline def fromPosition  = this == FromPosition
+  inline def kingOfTheHill = this == KingOfTheHill
+  inline def threeCheck    = this == ThreeCheck
+  inline def antichess     = this == Antichess
+  inline def atomic        = this == Atomic
+  inline def horde         = this == Horde
+  inline def racingKings   = this == RacingKings
+  inline def crazyhouse    = this == Crazyhouse
 
-  def exotic = !standard
+  inline def exotic = !standard
 
   def allowsCastling = !castles.isEmpty
 
@@ -39,7 +39,7 @@ abstract class Variant private[variant] (
 
   def castles: Castles = Castles.all
 
-  def initialFen: FEN = format.Forsyth.initial
+  val initialFen: Fen = format.Forsyth.initial
 
   def isValidPromotion(promotion: Option[PromotableRole]) =
     promotion match

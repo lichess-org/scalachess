@@ -2,7 +2,7 @@ package chess
 
 import cats.syntax.option.*
 
-import chess.format.FEN
+import chess.format.Fen
 import chess.Pos.*
 import chess.variant.*
 
@@ -50,7 +50,7 @@ class VariantTest extends ChessTest:
     }
 
     "Identify insufficient mating material when called (bishop)." in {
-      val position = FEN("krq5/bqqq4/qqr5/1qq5/8/8/8/3qB2K b - -")
+      val position = Fen("krq5/bqqq4/qqr5/1qq5/8/8/8/3qB2K b - -")
       val game     = fenToGame(position, Standard)
 
       game should beValid.like { case game =>
@@ -60,7 +60,7 @@ class VariantTest extends ChessTest:
     }
 
     "Identify sufficient mating material when called (bishop)." in {
-      val position = FEN("8/7B/K7/2b5/1k6/8/8/8 b - -")
+      val position = Fen("8/7B/K7/2b5/1k6/8/8/8 b - -")
       val game     = fenToGame(position, Standard)
 
       game should beValid.like { case game =>
@@ -70,7 +70,7 @@ class VariantTest extends ChessTest:
     }
 
     "Identify insufficient mating material when called (knight)." in {
-      val position = FEN("8/3k4/2q5/8/8/K1N5/8/8 b - -")
+      val position = Fen("8/3k4/2q5/8/8/K1N5/8/8 b - -")
       val game     = fenToGame(position, Standard)
 
       game should beValid.like { case game =>
@@ -206,7 +206,7 @@ K  r
     }
 
     "Not force a draw when there is insufficient mating material" in {
-      val position = FEN("8/6K1/8/8/8/8/k6p/8 b - - 1 39")
+      val position = Fen("8/6K1/8/8/8/8/k6p/8 b - - 1 39")
       val game     = fenToGame(position, ThreeCheck)
 
       val successGame = game flatMap (_.playMove(Pos.H2, Pos.H1, Knight.some))
@@ -217,7 +217,7 @@ K  r
     }
 
     "Force a draw when there are only kings remaining" in {
-      val position = FEN("8/6K1/8/8/8/8/k7/8 b - -")
+      val position = Fen("8/6K1/8/8/8/8/k7/8 b - -")
       val game     = fenToGame(position, ThreeCheck)
 
       game must beValid.like { case game =>
@@ -233,7 +233,7 @@ K  r
 
   "racingKings" should {
     "call it stalemate when there is no legal move" in {
-      val position = FEN("8/8/8/8/3K4/8/1k6/b7 b - - 5 3")
+      val position = Fen("8/8/8/8/3K4/8/1k6/b7 b - - 5 3")
       val game     = fenToGame(position, RacingKings)
 
       game must beValid.like { case game =>
@@ -243,7 +243,7 @@ K  r
     }
 
     "should not draw because of insufficient material" in {
-      val position = FEN("8/8/8/8/5K2/8/2k5/8 w - - 0 1")
+      val position = Fen("8/8/8/8/5K2/8/2k5/8 w - - 0 1")
       val game     = fenToGame(position, RacingKings)
 
       game must beValid.like { case game =>
@@ -254,7 +254,7 @@ K  r
 
     "should recognize a king in the goal" in {
       "white" in {
-        val position = FEN("2K5/8/6k1/8/8/8/8/Q6q w - - 0 1")
+        val position = Fen("2K5/8/6k1/8/8/8/8/Q6q w - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
         game must beValid { (game: Game) =>
@@ -264,7 +264,7 @@ K  r
       }
 
       "black" in {
-        val position = FEN("6k1/8/8/8/8/2r5/1KB5/2B5 w - - 0 1")
+        val position = Fen("6k1/8/8/8/8/2r5/1KB5/2B5 w - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
         game must beValid { (game: Game) =>
@@ -276,7 +276,7 @@ K  r
 
     "should give black one more move" in {
       "when white is in the goal" in {
-        val position = FEN("2K5/5k2/8/8/8/8/8/8 b - - 0 1")
+        val position = Fen("2K5/5k2/8/8/8/8/8/8 b - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
         game must beValid.like { case game =>
@@ -285,7 +285,7 @@ K  r
       }
 
       "but not if it does not matter anyway" in {
-        val position = FEN("2K5/8/2n1nk2/8/8/8/8/4r3 b - - 0 1")
+        val position = Fen("2K5/8/2n1nk2/8/8/8/8/4r3 b - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
         game must beValid { (game: Game) =>
@@ -298,7 +298,7 @@ K  r
     }
 
     "should call it a draw with both kings in the goal" in {
-      val position = FEN("2K2k2/8/8/8/8/1b6/1b6/8 w - - 0 1")
+      val position = Fen("2K2k2/8/8/8/8/1b6/1b6/8 w - - 0 1")
       val game     = fenToGame(position, RacingKings)
 
       game must beValid.like { case game =>
@@ -318,7 +318,7 @@ K  r
     }
 
     "calculate material imbalance" in {
-      val position = FEN("8/p7/8/8/2B5/b7/PPPK2PP/RNB3NR w - - 1 16")
+      val position = Fen("8/p7/8/8/2B5/b7/PPPK2PP/RNB3NR w - - 1 16")
       val game     = fenToGame(position, Antichess)
 
       game must beValid.like { case game =>

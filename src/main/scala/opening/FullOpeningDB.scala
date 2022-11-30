@@ -3,7 +3,7 @@ package opening
 
 import cats.syntax.option.*
 
-import chess.format.FEN
+import chess.format.Fen
 
 object FullOpeningDB:
 
@@ -30,7 +30,7 @@ object FullOpeningDB:
 
   def isShortest(op: FullOpening) = shortestLines get op.key contains op
 
-  def findByFen(fen: FEN): Option[FullOpening] =
+  def findByFen(fen: Fen): Option[FullOpening] =
     fen.value.split(' ').take(4) match
       case Array(boardPocket, turn, castle, ep) =>
         val board =
@@ -42,7 +42,7 @@ object FullOpeningDB:
 
   val SEARCH_MAX_PLIES = 40
 
-  // assumes standard initial FEN and variant
+  // assumes standard initial Fen and variant
   def search(moveStrs: Iterable[String]): Option[FullOpening.AtPly] =
     chess.Replay
       .situations(
@@ -71,7 +71,7 @@ object FullOpeningDB:
       case (_, found) => found
     }
 
-  def searchInFens(fens: Vector[FEN]): Option[FullOpening] =
+  def searchInFens(fens: Vector[Fen]): Option[FullOpening] =
     fens.foldRight(none[FullOpening]) {
       case (fen, None) => findByFen(fen)
       case (_, found)  => found

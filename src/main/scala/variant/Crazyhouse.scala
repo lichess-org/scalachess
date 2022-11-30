@@ -4,7 +4,7 @@ package variant
 import chess.format.Uci
 import cats.syntax.option.*
 import cats.data.Validated
-import chess.format.FEN
+import chess.format.Fen
 
 case object Crazyhouse
     extends Variant(
@@ -19,7 +19,7 @@ case object Crazyhouse
 
   def pieces = Standard.pieces
 
-  override val initialFen = FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1")
+  override val initialFen = Fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1")
 
   override def valid(board: Board, strict: Boolean) =
     val pieces = board.pieces.values

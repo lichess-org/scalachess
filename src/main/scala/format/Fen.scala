@@ -3,9 +3,9 @@ package format
 
 import chess.Color
 
-opaque type FEN = String
-object FEN extends OpaqueString[FEN]:
-  extension (a: FEN)
+opaque type Fen = String
+object Fen extends OpaqueString[Fen]:
+  extension (a: Fen)
     def halfMove: Option[Int] = a.value.split(' ').lift(4).flatMap(_.toIntOption)
     def fullMove: Option[Int] = a.value.split(' ').lift(5).flatMap(_.toIntOption)
 
@@ -17,4 +17,4 @@ object FEN extends OpaqueString[FEN]:
 
     def initial = a.value == Forsyth.initial.value
 
-  def clean(source: String): FEN = FEN(source.replace("_", " ").trim)
+  def clean(source: String): Fen = Fen(source.replace("_", " ").trim)

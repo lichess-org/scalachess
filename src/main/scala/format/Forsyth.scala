@@ -14,9 +14,9 @@ import cats.kernel.Monoid
   */
 object Forsyth:
 
-  val initial = FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+  val initial = Fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 
-  def <<@(variant: Variant, fen: FEN): Option[Situation] =
+  def <<@(variant: Variant, fen: Fen): Option[Situation] =
     makeBoard(variant, fen) map { board =>
       val splitted    = fen.value split ' '
       val colorOption = splitted lift 1 flatMap (_ lift 0) flatMap Color.apply
@@ -78,13 +78,13 @@ object Forsyth:
         } fixCastles
     }
 
-  def <<(fen: FEN): Option[Situation] = <<@(Standard, fen)
+  def <<(fen: Fen): Option[Situation] = <<@(Standard, fen)
 
   case class SituationPlus(situation: Situation, fullMoveNumber: Int):
 
     def turns = fullMoveNumber * 2 - situation.color.fold(2, 1)
 
-  def <<<@(variant: Variant, fen: FEN): Option[SituationPlus] =
+  def <<<@(variant: Variant, fen: Fen): Option[SituationPlus] =
     <<@(variant, fen) map { sit =>
       val splitted       = fen.value.split(' ').drop(4).dropWhile(_.contains('+'))
       val fullMoveNumber = splitted lift 1 flatMap (_.toIntOption) map (_ max 1 min 500)
@@ -95,7 +95,7 @@ object Forsyth:
       )
     }
 
-  def <<<(fen: FEN): Option[SituationPlus] = <<<@(Standard, fen)
+  def <<<(fen: Fen): Option[SituationPlus] = <<<@(Standard, fen)
 
   def makeCheckCount(str: String): Option[CheckCount] =
     str.toList match
@@ -112,7 +112,7 @@ object Forsyth:
       case _ => None
 
   // only cares about pieces positions on the board (first part of FEN string)
-  def makeBoard(variant: Variant, fen: FEN): Option[Board] =
+  def makeBoard(variant: Variant, fen: Fen): Option[Board] =
     val (position, pockets) = fen.value.takeWhile(' ' !=) match
       case word if word.count('/' ==) == 8 =>
         val splitted = word.split('/')
@@ -163,13 +163,13 @@ object Forsyth:
           (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
         } yield (pos -> piece :: nextPieces, nextPromoted)
 
-  def >>(situation: Situation): FEN = >>(SituationPlus(situation, 1))
+  def >>(situation: Situation): Fen = >>(SituationPlus(situation, 1))
 
-  def >>(parsed: SituationPlus): FEN =
+  def >>(parsed: SituationPlus): Fen =
     parsed match
       case SituationPlus(situation, _) => >>(Game(situation, turns = parsed.turns))
 
-  def >>(game: Game): FEN = FEN {
+  def >>(game: Game): Fen = Fen {
     {
       List[String](
         exportBoard(game.board) + exportCrazyPocket(game.board),

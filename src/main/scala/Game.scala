@@ -2,7 +2,7 @@ package chess
 
 import cats.data.Validated
 
-import chess.format.FEN
+import chess.format.Fen
 import chess.format.{ pgn, Uci }
 
 case class Game(
@@ -117,7 +117,7 @@ object Game:
 
   def apply(board: Board, color: Color): Game = new Game(Situation(board, color))
 
-  def apply(variantOption: Option[chess.variant.Variant], fen: Option[FEN]): Game =
+  def apply(variantOption: Option[chess.variant.Variant], fen: Option[Fen]): Game =
     val variant = variantOption | chess.variant.Standard
     val g       = apply(variant)
     fen

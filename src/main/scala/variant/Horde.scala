@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import chess.format.FEN
+import chess.format.Fen
 
 case object Horde
     extends Variant(
@@ -29,7 +29,7 @@ case object Horde
 
   override val castles = Castles("kq")
 
-  override val initialFen = FEN("rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1")
+  override val initialFen = Fen("rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1")
 
   override def valid(board: Board, strict: Boolean) =
     board.kingPosOf(White).isEmpty && validSide(board, strict)(Black) && !pawnsOnPromotionRank(board, White)

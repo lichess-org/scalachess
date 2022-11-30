@@ -3,16 +3,14 @@ package opening
 
 import cats.syntax.option.*
 
-import chess.format.Fen
+import chess.format.{ Fen, OpeningFen }
 
 object FullOpeningDB:
-
-  import FullOpening.Key
 
   lazy val all: Vector[FullOpening] =
     FullOpeningPartA.db ++ FullOpeningPartB.db ++ FullOpeningPartC.db ++ FullOpeningPartD.db ++ FullOpeningPartE.db
 
-  private lazy val byFen: collection.Map[Fen, FullOpening] =
+  private lazy val byFen: collection.Map[OpeningFen, FullOpening] =
     all.view.map { o =>
       o.fen -> o
     }.toMap
@@ -20,25 +18,19 @@ object FullOpeningDB:
   lazy val families: Set[OpeningFamily] = byFen.values.map(_.family).toSet
 
   // Keep only one opening per unique key: the shortest one
-  lazy val shortestLines: Map[Key, FullOpening] = FullOpeningDB.all
-    .foldLeft(Map.empty[Key, FullOpening]) { case (acc, op) =>
+  lazy val shortestLines: Map[OpeningKey, FullOpening] = FullOpeningDB.all
+    .foldLeft(Map.empty[OpeningKey, FullOpening]) { case (acc, op) =>
       acc.updatedWith(op.key) {
-        case Some(prev) if prev.uci.size < op.uci.size => prev.some
-        case _                                         => op.some
+        case Some(prev) if prev.uci.value.size < op.uci.value.size => prev.some
+        case _                                                     => op.some
       }
     }
 
   def isShortest(op: FullOpening) = shortestLines get op.key contains op
 
-  def findByFen(fen: Fen): Option[FullOpening] =
-    fen.value.split(' ').take(4) match
-      case Array(boardPocket, turn, castle, ep) =>
-        val board =
-          if (boardPocket.contains('[')) boardPocket.takeWhile('[' !=)
-          else if (boardPocket.count('/' ==) == 8) boardPocket.split('/').take(8).mkString("/")
-          else boardPocket
-        byFen get Fen(s"$board $turn $castle $ep")
-      case _ => None
+  def findByFullFen(fen: Fen): Option[FullOpening] = findByFen(OpeningFen fromFen fen)
+
+  def findByFen(fen: OpeningFen): Option[FullOpening] = byFen get fen
 
   val SEARCH_MAX_PLIES = 40
 
@@ -66,15 +58,12 @@ object FullOpeningDB:
   private def searchInSituations(situations: Iterable[Situation]): Option[FullOpening.AtPly] =
     situations.zipWithIndex.drop(1).foldRight(none[FullOpening.AtPly]) {
       case ((situation, ply), None) =>
-        val fen = Fen(format.Forsyth.exportStandardPositionTurnCastlingEp(situation))
-        byFen get fen map (_ atPly ply)
+        byFen get format.Forsyth.openingFen(situation) map (_ atPly ply)
       case (_, found) => found
     }
 
-  def searchInFens(fens: Vector[Fen]): Option[FullOpening] =
+  def searchInFens(fens: Iterator[OpeningFen]): Option[FullOpening] =
     fens.foldRight(none[FullOpening]) {
       case (fen, None) => findByFen(fen)
       case (_, found)  => found
     }
-
-  def names = byFen.values.toList.map(o => o.name.takeWhile(':' !=)).distinct

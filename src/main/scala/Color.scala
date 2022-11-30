@@ -22,8 +22,8 @@ sealed trait Color:
   inline def queen  = this - Queen
   inline def king   = this - King
 
-  final val white = this == Color.White
-  final val black = this == Color.Black
+  val white = this == Color.White
+  val black = this == Color.Black
 
 object Color:
 
@@ -57,8 +57,8 @@ object Color:
     val promotablePawnRank = Rank.Eighth
     val backRank           = Rank.First
 
-    val letter = 'w'
-    val name   = "white"
+    inline val letter = 'w'
+    inline val name   = "white"
 
     override val hashCode = 1
 
@@ -70,8 +70,8 @@ object Color:
     val promotablePawnRank = Rank.First
     val backRank           = Rank.Eighth
 
-    val letter = 'b'
-    val name   = "black"
+    inline val letter = 'b'
+    inline val name   = "black"
 
     override val hashCode = 2
 

@@ -172,10 +172,10 @@ object Forsyth:
   def >>(game: Game): Fen = Fen {
     {
       List[String](
-        exportBoard(game.board) + exportCrazyPocket(game.board),
+        s"${exportBoard(game.board)}${exportCrazyPocket(game.board)}",
         game.player.letter.toString,
         exportCastles(game.board),
-        game.situation.enPassantSquare.map(_.key).getOrElse("-"),
+        game.situation.enPassantSquare.fold("-")(_.key),
         game.halfMoveClock.toString,
         game.fullMoveNumber.toString
       ) ::: {
@@ -185,13 +185,10 @@ object Forsyth:
     } mkString " "
   }
 
-  def exportStandardPositionTurnCastlingEp(situation: Situation): String =
-    List[String](
-      exportBoard(situation.board),
-      situation.color.letter.toString,
-      exportCastles(situation.board),
-      situation.enPassantSquare.map(_.key).getOrElse("-")
-    ) mkString " "
+  def openingFen(situation: Situation): OpeningFen = OpeningFen {
+    s"${exportBoard(situation.board)} ${situation.color.letter} ${exportCastles(situation.board)} ${situation.enPassantSquare
+        .fold("-")(_.key)}"
+  }
 
   private def exportCheckCount(board: Board) =
     board.history.checkCount match
@@ -239,7 +236,7 @@ object Forsyth:
       case "" => "-"
       case n  => n
 
-  def exportBoard(board: Board): String =
+  def exportBoard(board: Board): BoardFen =
     val fen   = new scala.collection.mutable.StringBuilder(70)
     var empty = 0
     for (y <- Rank.allReversed)
@@ -250,16 +247,16 @@ object Forsyth:
           case Some(piece) =>
             if (empty == 0) fen append piece.forsyth.toString
             else
-              fen append (empty.toString + piece.forsyth)
+              fen append "$empty${piece.forsyth}"
               empty = 0
             if (piece.role != Pawn && board.crazyData.fold(false)(_.promoted.contains(Pos(x, y))))
               fen append '~'
       if (empty > 0) fen append empty
       if (y > Rank.First) fen append '/'
-    fen.toString
+    BoardFen(fen.toString)
 
-  def boardAndColor(situation: Situation): String =
+  def boardAndColor(situation: Situation): BoardAndColorFen =
     boardAndColor(situation.board, situation.color)
 
-  def boardAndColor(board: Board, turnColor: Color): String =
-    s"${exportBoard(board)} ${turnColor.letter}"
+  def boardAndColor(board: Board, turnColor: Color): BoardAndColorFen =
+    exportBoard(board).andColor(turnColor)

@@ -20,10 +20,11 @@ case class DecayingStats(
       s record n.toFloat(v)
     }
 
-final class EmptyDecayingStats(deviation: Float, decay: Float) extends DecayingRecorder:
-  def record(value: Float) =
-    DecayingStats(
-      mean = value,
-      deviation = deviation,
-      decay = decay
-    )
+object DecayingStats:
+  val empty = new DecayingRecorder:
+    def record(value: Float) =
+      DecayingStats(
+        mean = value,
+        deviation = 4f,
+        decay = 0.85f
+      )

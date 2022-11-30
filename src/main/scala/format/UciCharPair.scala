@@ -30,7 +30,7 @@ object UciCharPair:
       }
       .to(Map)
 
-    def toChar(pos: Pos) = pos2charMap.getOrElse(pos, voidChar)
+    inline def toChar(inline pos: Pos) = pos2charMap.getOrElse(pos, voidChar)
 
     val promotion2charMap: Map[(File, PromotableRole), Char] = for {
       (role, index) <- Role.allPromotable.zipWithIndex.to(Map)

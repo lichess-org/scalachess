@@ -12,7 +12,7 @@ object FullOpeningDB:
   lazy val all: Vector[FullOpening] =
     FullOpeningPartA.db ++ FullOpeningPartB.db ++ FullOpeningPartC.db ++ FullOpeningPartD.db ++ FullOpeningPartE.db
 
-  private lazy val byFen: collection.Map[String, FullOpening] =
+  private lazy val byFen: collection.Map[Fen, FullOpening] =
     all.view.map { o =>
       o.fen -> o
     }.toMap
@@ -37,7 +37,7 @@ object FullOpeningDB:
           if (boardPocket.contains('[')) boardPocket.takeWhile('[' !=)
           else if (boardPocket.count('/' ==) == 8) boardPocket.split('/').take(8).mkString("/")
           else boardPocket
-        byFen get List(board, turn, castle, ep).mkString(" ")
+        byFen get Fen(s"$board $turn $castle $ep")
       case _ => None
 
   val SEARCH_MAX_PLIES = 40
@@ -66,7 +66,7 @@ object FullOpeningDB:
   private def searchInSituations(situations: Iterable[Situation]): Option[FullOpening.AtPly] =
     situations.zipWithIndex.drop(1).foldRight(none[FullOpening.AtPly]) {
       case ((situation, ply), None) =>
-        val fen = format.Forsyth.exportStandardPositionTurnCastlingEp(situation)
+        val fen = Fen(format.Forsyth.exportStandardPositionTurnCastlingEp(situation))
         byFen get fen map (_ atPly ply)
       case (_, found) => found
     }

@@ -1,10 +1,12 @@
 package chess
 package opening
 
+import chess.format.Fen
+
 final class FullOpening(
     val eco: String,
     val name: String,
-    val fen: String,
+    val fen: Fen,
     val uci: String,
     val pgn: String
 ):

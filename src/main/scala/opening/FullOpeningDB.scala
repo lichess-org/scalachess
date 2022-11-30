@@ -62,7 +62,7 @@ object FullOpeningDB:
       case (_, found) => found
     }
 
-  def searchInFens(fens: Iterator[OpeningFen]): Option[FullOpening] =
+  def searchInFens(fens: Iterable[OpeningFen]): Option[FullOpening] =
     fens.foldRight(none[FullOpening]) {
       case (fen, None) => findByFen(fen)
       case (_, found)  => found

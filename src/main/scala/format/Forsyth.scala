@@ -247,7 +247,7 @@ object Forsyth:
           case Some(piece) =>
             if (empty == 0) fen append piece.forsyth.toString
             else
-              fen append "$empty${piece.forsyth}"
+              fen append s"$empty${piece.forsyth}"
               empty = 0
             if (piece.role != Pawn && board.crazyData.fold(false)(_.promoted.contains(Pos(x, y))))
               fen append '~'

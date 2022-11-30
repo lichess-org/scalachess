@@ -4,9 +4,13 @@ enum Status(val id: Int):
 
   val name = s"${toString.head.toLower}${toString.tail}"
 
-  def is(s: Status): Boolean = this == s
+  inline def is(inline s: Status): Boolean                = this == s
+  inline def is(inline f: Status.type => Status): Boolean = is(f(Status))
 
-  def is(f: Status.type => Status): Boolean = is(f(Status))
+  inline infix def >=(inline s: Status): Boolean = id >= s.id
+  inline infix def >(inline s: Status): Boolean  = id > s.id
+  inline infix def <=(inline s: Status): Boolean = id <= s.id
+  inline infix def <(inline s: Status): Boolean  = id < s.id
 
   case Created       extends Status(10)
   case Started       extends Status(20)

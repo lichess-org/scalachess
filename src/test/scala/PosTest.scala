@@ -20,14 +20,14 @@ class PosTest extends ChessTest:
     }
 
     "chars" in {
-      A1.toChar must_== 'a'
-      B4.toChar must_== 'z'
-      C4.toChar must_== 'A'
-      D7.toChar must_== 'Z'
-      E7.toChar must_== '0'
-      F7.toChar must_== '1'
-      F8.toChar must_== '9'
-      G8.toChar must_== '!'
-      H8.toChar must_== '?'
+      A1.asChar must_== 'a'
+      B4.asChar must_== 'z'
+      C4.asChar must_== 'A'
+      D7.asChar must_== 'Z'
+      E7.asChar must_== '0'
+      F7.asChar must_== '1'
+      F8.asChar must_== '9'
+      G8.asChar must_== '!'
+      H8.asChar must_== '?'
     }
   }

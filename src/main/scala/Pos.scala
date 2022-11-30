@@ -45,7 +45,7 @@ object Pos extends OpaqueInt[Pos]:
     inline def file: File = File of p
     inline def rank: Rank = Rank of p
 
-    def toChar: Char =
+    def asChar: Char =
       if (p <= 25) (97 + p).toChar      // a ...
       else if (p <= 51) (39 + p).toChar // A ...
       else if (p <= 61) (p - 4).toChar  // 0 ...
@@ -69,7 +69,7 @@ object Pos extends OpaqueInt[Pos]:
 
   inline def fromChar(c: Char): Option[Pos] = charMap get c
 
-  inline def keyToChar(inline key: String) = fromKey(key).map(_.toChar)
+  inline def keyToChar(inline key: String) = fromKey(key).map(_.asChar)
   inline def doubleKeyToChars(key: String) = for
     a <- keyToChar(key take 2)
     b <- keyToChar(key drop 2)
@@ -157,6 +157,6 @@ object Pos extends OpaqueInt[Pos]:
 
   val charMap: Map[Char, Pos] = all
     .map { pos =>
-      pos.toChar -> pos
+      Pos(pos).asChar -> pos
     }
     .to(Map)

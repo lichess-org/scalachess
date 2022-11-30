@@ -24,7 +24,7 @@ object Uci:
     def keys = s"${orig.key}${dest.key}"
     def uci  = s"$keys$promotionString"
 
-    def charKeys = s"${orig.toChar}${dest.toChar}"
+    def charKeys = s"${orig.asChar}${dest.asChar}"
     def chars    = s"$charKeys$promotionString"
 
     def promotionString = promotion.fold("")(_.forsyth.toString)
@@ -60,7 +60,7 @@ object Uci:
 
     def uci = s"${role.pgn}@${pos.key}"
 
-    def chars = s"${role.pgn}@${pos.toChar}"
+    def chars = s"${role.pgn}@${pos.asChar}"
 
     def origDest = pos -> pos
 

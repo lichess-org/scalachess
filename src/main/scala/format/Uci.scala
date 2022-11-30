@@ -33,6 +33,8 @@ object Uci:
 
     def apply(situation: Situation) = situation.move(orig, dest, promotion) map Left.apply
 
+    override def toString = s"Move(${orig.key}${dest.key}${promotion.fold("")(_.forsyth)})"
+
   object Move:
 
     def apply(move: String): Option[Move] =

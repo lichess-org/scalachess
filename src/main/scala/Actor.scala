@@ -79,7 +79,7 @@ final case class Actor(
     // be in danger after the move was made.
     if (board.variant.hasMoveEffects) moves map (_.applyVariantEffect) else moves
 
-  lazy val destinations: List[Pos] = moves map (_.dest)
+  lazy val destinations: List[Pos] = moves.map(_.dest)
 
   def color        = piece.color
   def is(c: Color) = c == piece.color
@@ -169,7 +169,7 @@ final case class Actor(
     dirs foreach { addAll(pos, _) }
     buf.toList
 
-  private def pawnDir = pawnDirOf(color)
+  private inline def pawnDir = pawnDirOf(color)
 
   private def move(
       dest: Pos,
@@ -198,7 +198,7 @@ object Actor:
   def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
     board.variant.longRangeThreatens(board, p, dir, to)
 
-  def pawnDirOf(color: Color): Direction = color.fold(_.up, _.down)
+  inline def pawnDirOf(inline color: Color): Direction = color.fold(_.up, _.down)
 
   /** Determines the position one ahead of a pawn based on the color of the piece.
     * White pawns move up and black pawns move down.

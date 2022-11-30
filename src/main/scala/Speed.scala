@@ -31,7 +31,7 @@ enum Speed(
 
 object Speed:
 
-  val all = Speed.values.toList
+  val all = values.toList
 
   given Ordering[Speed] = Ordering.by(_.range.min)
 

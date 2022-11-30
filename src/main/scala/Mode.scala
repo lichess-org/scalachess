@@ -10,7 +10,7 @@ enum Mode(val id: Int, val rated: Boolean):
 
 object Mode:
 
-  val all = List(Casual, Rated)
+  val all = values.toList
 
   val byId = all map { v =>
     (v.id, v)

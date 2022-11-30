@@ -8,6 +8,11 @@ enum Speed(
     val title: String
 ):
 
+  inline infix def >=(inline s: Speed): Boolean = range.min >= s.range.min
+  inline infix def >(inline s: Speed): Boolean  = range.min > s.range.min
+  inline infix def <=(inline s: Speed): Boolean = range.min <= s.range.min
+  inline infix def <(inline s: Speed): Boolean  = range.min < s.range.min
+
   case UltraBullet
       extends Speed(0, "ultraBullet", 0 to 29, "UltraBullet", "Insanely fast games: less than 30 seconds")
   case Bullet extends Speed(1, "bullet", 30 to 179, "Bullet", "Very fast games: less than 3 minutes")

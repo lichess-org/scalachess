@@ -174,7 +174,7 @@ object Forsyth:
         exportBoard(game.board) + exportCrazyPocket(game.board),
         game.player.letter.toString,
         exportCastles(game.board),
-        game.situation.enPassantSquare.map(_.toString).getOrElse("-"),
+        game.situation.enPassantSquare.map(_.key).getOrElse("-"),
         game.halfMoveClock.toString,
         game.fullMoveNumber.toString
       ) ::: {
@@ -189,7 +189,7 @@ object Forsyth:
       exportBoard(situation.board),
       situation.color.letter.toString,
       exportCastles(situation.board),
-      situation.enPassantSquare.map(_.toString).getOrElse("-")
+      situation.enPassantSquare.map(_.key).getOrElse("-")
     ) mkString " "
 
   private def exportCheckCount(board: Board) =

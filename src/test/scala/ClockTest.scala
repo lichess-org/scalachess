@@ -54,8 +54,8 @@ class ClockTest extends ChessTest:
         advance(clk.step().value, wait + lag) step durOf(lag) value
       } remainingTime Black).centis
 
-    def clockStep60(w: Int, l: Int*)  = clockStep(fakeClock60, w, l *)
-    def clockStep600(w: Int, l: Int*) = clockStep(fakeClock600, w, l *)
+    def clockStep60(w: Int, l: Int*)  = clockStep(fakeClock60, w, l*)
+    def clockStep600(w: Int, l: Int*) = clockStep(fakeClock600, w, l*)
 
     def clockStart(lag: Int) =
       val clock = fakeClock60.step()

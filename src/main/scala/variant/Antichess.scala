@@ -91,10 +91,9 @@ case object Antichess
           for {
             whiteBishopLight <- whiteBishops.headOption map (_.pos.isLight)
             blackBishopLight <- blackBishops.headOption map (_.pos.isLight)
-          } yield
-            whiteBishopLight != blackBishopLight && whitePawns.forall(
-              pawnNotAttackable(_, blackBishopLight, board)
-            ) &&
+          } yield whiteBishopLight != blackBishopLight && whitePawns.forall(
+            pawnNotAttackable(_, blackBishopLight, board)
+          ) &&
             blackPawns.forall(pawnNotAttackable(_, whiteBishopLight, board))
         } getOrElse false
 

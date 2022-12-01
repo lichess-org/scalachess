@@ -4,7 +4,7 @@ import org.specs2.mutable.Specification
 
 class DecayingStatsTest extends Specification:
 
-  import chess.{ DecayingStats as DS }
+  import chess.DecayingStats as DS
 
   val random = new java.util.Random(2286825201242408115L)
 

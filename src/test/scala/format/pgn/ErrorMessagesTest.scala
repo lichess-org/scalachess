@@ -102,4 +102,3 @@ class ErrorMessagesTest extends ChessTest:
       parser(e) must beValid
     }
   }
-

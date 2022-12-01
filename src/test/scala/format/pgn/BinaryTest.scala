@@ -215,7 +215,6 @@ class BinaryTest extends ChessTest:
     }
   }
 
-
 object BinaryTestUtils:
 
   def showByte(b: Byte): String =

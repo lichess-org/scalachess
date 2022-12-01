@@ -1,14 +1,9 @@
 lazy val scalachess = Project("scalachess", file("."))
-name                     := "scalachess"
-organization             := "org.lichess"
-version                  := "12.2.10"
-licenses += "AGPL-3.0"   -> url("https://opensource.org/licenses/AGPL-3.0")
-ThisBuild / scalaVersion := "3.2.1"
-// ThisBuild / crossScalaVersions ++= Seq("2.13.10", "3.1.3")
-ThisBuild / githubWorkflowPublishTargetBranches := Seq() // Don't publish anywhere
-ThisBuild / githubWorkflowBuild ++= Seq(
-  WorkflowStep.Sbt(List("scalafmtCheckAll"), name = Some("Check Formatting"))
-)
+name                   := "scalachess"
+organization           := "org.lichess"
+version                := "12.2.10"
+scalaVersion           := "3.2.1"
+licenses += "AGPL-3.0" -> url("https://opensource.org/licenses/AGPL-3.0")
 
 libraryDependencies ++= List(
   "org.specs2"         %% "specs2-core"    % "4.17.0" % Test,
@@ -20,9 +15,7 @@ libraryDependencies ++= List(
   "org.typelevel"      %% "cats-parse"     % "0.3.8"
 )
 
-resolvers ++= Seq(
-  "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-maven/master"
-)
+resolvers += "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-maven/master"
 
 scalacOptions := Seq(
   "-encoding",

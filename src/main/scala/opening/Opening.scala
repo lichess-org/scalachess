@@ -4,7 +4,7 @@ package opening
 import chess.format.OpeningFen
 import chess.format.Uci
 
-final class FullOpening(
+final class Opening(
     val eco: Eco,
     val name: OpeningName,
     val fen: OpeningFen,
@@ -19,18 +19,18 @@ final class FullOpening(
 
   lazy val nbMoves = uci.value.count(' ' ==) + 1
   lazy val lastUci = uci.value.split(' ').lastOption.flatMap(Uci.Move.apply)
-  lazy val key     = FullOpening nameToKey name
+  lazy val key     = Opening nameToKey name
 
   override def toString = name.value
 
-  def atPly(ply: Int) = FullOpening.AtPly(this, ply)
+  def atPly(ply: Int) = Opening.AtPly(this, ply)
 
-object FullOpening:
+object Opening:
 
-  private[opening] def apply(eco: String, name: String, fen: String, uci: String, pgn: String): FullOpening =
-    new FullOpening(Eco(eco), OpeningName(name), OpeningFen(fen), UcisStr(uci), SansStr(pgn))
+  private[opening] def apply(eco: String, name: String, fen: String, uci: String, pgn: String): Opening =
+    new Opening(Eco(eco), OpeningName(name), OpeningFen(fen), UcisStr(uci), SansStr(pgn))
 
-  case class AtPly(opening: FullOpening, ply: Int)
+  case class AtPly(opening: Opening, ply: Int)
 
   object nameToKey:
     private val splitAccentRegex = "[\u0300-\u036f]".r

@@ -5,12 +5,12 @@ import cats.syntax.option.*
 
 import chess.format.{ Fen, OpeningFen }
 
-object FullOpeningDB:
+object OpeningDb:
 
-  lazy val all: Vector[FullOpening] =
-    FullOpeningPartA.db ++ FullOpeningPartB.db ++ FullOpeningPartC.db ++ FullOpeningPartD.db ++ FullOpeningPartE.db
+  lazy val all: Vector[Opening] =
+    openingDbPartA ++ openingDbPartB ++ openingDbPartC ++ openingDbPartD ++ openingDbPartE
 
-  private lazy val byFen: collection.Map[OpeningFen, FullOpening] =
+  private lazy val byFen: collection.Map[OpeningFen, Opening] =
     all.view.map { o =>
       o.fen -> o
     }.toMap
@@ -18,24 +18,24 @@ object FullOpeningDB:
   lazy val families: Set[OpeningFamily] = byFen.values.map(_.family).toSet
 
   // Keep only one opening per unique key: the shortest one
-  lazy val shortestLines: Map[OpeningKey, FullOpening] = FullOpeningDB.all
-    .foldLeft(Map.empty[OpeningKey, FullOpening]) { case (acc, op) =>
+  lazy val shortestLines: Map[OpeningKey, Opening] = OpeningDb.all
+    .foldLeft(Map.empty[OpeningKey, Opening]) { case (acc, op) =>
       acc.updatedWith(op.key) {
         case Some(prev) if prev.uci.value.size < op.uci.value.size => prev.some
         case _                                                     => op.some
       }
     }
 
-  def isShortest(op: FullOpening) = shortestLines get op.key contains op
+  def isShortest(op: Opening) = shortestLines get op.key contains op
 
-  def findByFullFen(fen: Fen): Option[FullOpening] = findByFen(OpeningFen fromFen fen)
+  def findByFullFen(fen: Fen): Option[Opening] = findByFen(OpeningFen fromFen fen)
 
-  def findByFen(fen: OpeningFen): Option[FullOpening] = byFen get fen
+  def findByFen(fen: OpeningFen): Option[Opening] = byFen get fen
 
   val SEARCH_MAX_PLIES = 40
 
   // assumes standard initial Fen and variant
-  def search(moveStrs: Iterable[String]): Option[FullOpening.AtPly] =
+  def search(moveStrs: Iterable[String]): Option[Opening.AtPly] =
     chess.Replay
       .situations(
         moveStrs.take(SEARCH_MAX_PLIES).takeWhile(san => !san.contains('@')),
@@ -45,7 +45,7 @@ object FullOpeningDB:
       .toOption
       .flatMap(searchInSituations)
 
-  def search(replay: Replay): Option[FullOpening.AtPly] =
+  def search(replay: Replay): Option[Opening.AtPly] =
     searchInSituations {
       replay.chronoMoves.view
         .takeWhile {
@@ -55,15 +55,15 @@ object FullOpeningDB:
         .map(_.fold(_.situationAfter, _.situationAfter))
     }
 
-  private def searchInSituations(situations: Iterable[Situation]): Option[FullOpening.AtPly] =
-    situations.zipWithIndex.drop(1).foldRight(none[FullOpening.AtPly]) {
+  private def searchInSituations(situations: Iterable[Situation]): Option[Opening.AtPly] =
+    situations.zipWithIndex.drop(1).foldRight(none[Opening.AtPly]) {
       case ((situation, ply), None) =>
         byFen get format.Forsyth.openingFen(situation) map (_ atPly ply)
       case (_, found) => found
     }
 
-  def searchInFens(fens: Iterable[OpeningFen]): Option[FullOpening] =
-    fens.foldRight(none[FullOpening]) {
+  def searchInFens(fens: Iterable[OpeningFen]): Option[Opening] =
+    fens.foldRight(none[Opening]) {
       case (fen, None) => findByFen(fen)
       case (_, found)  => found
     }

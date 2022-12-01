@@ -15,10 +15,10 @@ object UcisStr extends OpaqueString[UcisStr]
 
 opaque type OpeningKey = String
 object OpeningKey extends OpaqueString[OpeningKey]:
-  export FullOpening.nameToKey as fromName
+  export Opening.nameToKey as fromName
 
 case class OpeningFamily(name: OpeningName):
-  lazy val key = FullOpening nameToKey name
+  lazy val key = Opening nameToKey name
 
 opaque type OpeningVariation = String
 object OpeningVariation extends OpaqueString[OpeningVariation]

@@ -5,18 +5,15 @@ import cats.implicits.*
 import variant.{ Standard, Variant }
 import cats.kernel.Monoid
 
-/** Transform a game to standard Forsyth Edwards Notation
-  * https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
+/** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *
   * Crazyhouse & Threecheck extensions:
   * https://github.com/ddugovic/Stockfish/wiki/FEN-extensions
   * http://scidb.sourceforge.net/help/en/FEN.html#ThreeCheck
   */
-object Forsyth:
+trait FenReader:
 
-  val initial = Fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-
-  def <<@(variant: Variant, fen: Fen): Option[Situation] =
+  def read(variant: Variant, fen: Fen): Option[Situation] =
     makeBoard(variant, fen) map { board =>
       val splitted    = fen.value split ' '
       val colorOption = splitted lift 1 flatMap (_ lift 0) flatMap Color.apply
@@ -71,33 +68,30 @@ object Forsyth:
             val checkCount =
               splitted
                 .lift(4)
-                .flatMap(makeCheckCount)
-                .orElse(splitted.lift(6).flatMap(makeCheckCount))
+                .flatMap(readCheckCount)
+                .orElse(splitted.lift(6).flatMap(readCheckCount))
             checkCount.fold(history)(history.withCheckCount)
           }
         } fixCastles
     }
 
-  def <<(fen: Fen): Option[Situation] = <<@(Standard, fen)
+  def read(fen: Fen): Option[Situation] = read(Standard, fen)
 
-  case class SituationPlus(situation: Situation, fullMoveNumber: Int):
-
-    def turns = fullMoveNumber * 2 - situation.color.fold(2, 1)
-
-  def <<<@(variant: Variant, fen: Fen): Option[SituationPlus] =
-    <<@(variant, fen) map { sit =>
+  def readWithMoveNumber(variant: Variant, fen: Fen): Option[Situation.AndFullMoveNumber] =
+    read(variant, fen) map { sit =>
       val splitted       = fen.value.split(' ').drop(4).dropWhile(_.contains('+'))
       val fullMoveNumber = splitted lift 1 flatMap (_.toIntOption) map (_ max 1 min 500)
       val halfMoveClock  = splitted lift 0 flatMap (_.toIntOption) map (_ max 0 min 100)
-      SituationPlus(
+      Situation.AndFullMoveNumber(
         halfMoveClock.map(sit.history.setHalfMoveClock).fold(sit)(sit.withHistory),
         fullMoveNumber | 1
       )
     }
 
-  def <<<(fen: Fen): Option[SituationPlus] = <<<@(Standard, fen)
+  def readWithMoveNumber(fen: Fen): Option[Situation.AndFullMoveNumber] =
+    readWithMoveNumber(Standard, fen)
 
-  def makeCheckCount(str: String): Option[CheckCount] =
+  private def readCheckCount(str: String): Option[CheckCount] =
     str.toList match
       case '+' :: w :: '+' :: b :: Nil =>
         for {
@@ -162,101 +156,3 @@ object Forsyth:
           piece                      <- Piece.fromChar(c)
           (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
         } yield (pos -> piece :: nextPieces, nextPromoted)
-
-  def >>(situation: Situation): Fen = >>(SituationPlus(situation, 1))
-
-  def >>(parsed: SituationPlus): Fen =
-    parsed match
-      case SituationPlus(situation, _) => >>(Game(situation, turns = parsed.turns))
-
-  def >>(game: Game): Fen = Fen {
-    {
-      List[String](
-        s"${exportBoard(game.board)}${exportCrazyPocket(game.board)}",
-        game.player.letter.toString,
-        exportCastles(game.board),
-        game.situation.enPassantSquare.fold("-")(_.key),
-        game.halfMoveClock.toString,
-        game.fullMoveNumber.toString
-      ) ::: {
-        if (game.board.variant == variant.ThreeCheck) List(exportCheckCount(game.board))
-        else Nil
-      }
-    } mkString " "
-  }
-
-  def openingFen(situation: Situation): OpeningFen = OpeningFen {
-    s"${exportBoard(situation.board)} ${situation.color.letter} ${exportCastles(situation.board)} ${situation.enPassantSquare
-        .fold("-")(_.key)}"
-  }
-
-  private def exportCheckCount(board: Board) =
-    board.history.checkCount match
-      case CheckCount(white, black) => s"+$black+$white"
-
-  private def exportCrazyPocket(board: Board) =
-    board.crazyData match
-      case Some(variant.Crazyhouse.Data(pockets, _)) =>
-        "/" +
-          pockets.white.roles.map(_.forsythUpper).mkString +
-          pockets.black.roles.map(_.forsyth).mkString
-      case _ => ""
-
-  // private given Ordering[Rank] = intOrdering[Rank]
-  private given Ordering[File] = intOrdering[File]
-  given Ordering[Pos]          = Ordering.by[Pos, File](_.file)
-
-  private[chess] def exportCastles(board: Board): String =
-
-    lazy val wr = board.pieces.collect {
-      case (pos, piece) if pos.rank == White.backRank && piece == White.rook => pos
-    }
-    lazy val br = board.pieces.collect {
-      case (pos, piece) if pos.rank == Black.backRank && piece == Black.rook => pos
-    }
-
-    lazy val wur = board.unmovedRooks.value.filter(_.rank == White.backRank)
-    lazy val bur = board.unmovedRooks.value.filter(_.rank == Black.backRank)
-
-    {
-      // castling rights with inner rooks are represented by their file name
-      (if (board.castles.whiteKingSide && wr.nonEmpty && wur.nonEmpty)
-         (if (wur contains wr.max) "K" else wur.max.file.toUpperCaseString)
-       else "") +
-        (if (board.castles.whiteQueenSide && wr.nonEmpty && wur.nonEmpty)
-           (if (wur contains wr.min) "Q" else wur.min.file.toUpperCaseString)
-         else "") +
-        (if (board.castles.blackKingSide && br.nonEmpty && bur.nonEmpty)
-           (if (bur contains br.max) "k" else bur.max.file)
-         else "") +
-        (if (board.castles.blackQueenSide && br.nonEmpty && bur.nonEmpty)
-           (if (bur contains br.min) "q" else bur.min.file)
-         else "")
-    } match
-      case "" => "-"
-      case n  => n
-
-  def exportBoard(board: Board): BoardFen =
-    val fen   = new scala.collection.mutable.StringBuilder(70)
-    var empty = 0
-    for (y <- Rank.allReversed)
-      empty = 0
-      for (x <- File.all)
-        board(x, y) match
-          case None => empty = empty + 1
-          case Some(piece) =>
-            if (empty == 0) fen append piece.forsyth.toString
-            else
-              fen append s"$empty${piece.forsyth}"
-              empty = 0
-            if (piece.role != Pawn && board.crazyData.fold(false)(_.promoted.contains(Pos(x, y))))
-              fen append '~'
-      if (empty > 0) fen append empty
-      if (y > Rank.First) fen append '/'
-    BoardFen(fen.toString)
-
-  def boardAndColor(situation: Situation): BoardAndColorFen =
-    boardAndColor(situation.board, situation.color)
-
-  def boardAndColor(board: Board, turnColor: Color): BoardAndColorFen =
-    exportBoard(board).andColor(turnColor)

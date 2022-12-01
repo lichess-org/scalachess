@@ -1,8 +1,6 @@
 package chess
 
-import format.{ Forsyth, Uci }
-
-import chess.format.Fen
+import format.{ Fen, Uci }
 
 class ReplayTest extends ChessTest:
 
@@ -28,7 +26,7 @@ class ReplayTest extends ChessTest:
         initialFen = None,
         variant = variant.Standard
       ) must beValid.like { situations =>
-        situations.map(Forsyth.>>) must_== List(
+        situations.map(Fen.write) must_== List(
           Fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"),
           Fen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"),
           Fen("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"),

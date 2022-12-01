@@ -326,7 +326,7 @@ class CrazyhouseVariantTest extends ChessTest:
         _.split(' ').toList
       }
       def runOne(moves: List[String]) =
-        Replay.gameMoveWhileValid(moves, format.Forsyth.initial, Crazyhouse)
+        Replay.gameMoveWhileValid(moves, format.Fen.initial, Crazyhouse)
       def hex(buf: Array[Byte]): String = buf.map("%02x" format _).mkString
       val g                             = gameMoves.map(runOne)
       g.exists(_._3.nonEmpty) must beFalse

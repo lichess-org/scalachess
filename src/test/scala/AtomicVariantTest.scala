@@ -325,7 +325,7 @@ class AtomicVariantTest extends ChessTest:
     "End move regression" in {
       import Pos.*
       "from init" in {
-        val game = fenToGame(format.Forsyth.initial, Atomic)
+        val game = fenToGame(format.Fen.initial, Atomic)
         val successGame = game flatMap (_.playMoves(
           E2 -> E4,
           D7 -> D5,

@@ -6,7 +6,7 @@ import cats.implicits.*
 
 import chess.format.pgn.San
 import chess.format.pgn.{ Parser, Reader, Tag, Tags }
-import chess.format.{ Fen, Forsyth, Uci }
+import chess.format.{ Fen, Uci }
 
 case class Replay(setup: Game, moves: List[MoveOrDrop], state: Game):
 
@@ -124,7 +124,7 @@ object Replay:
         }
 
   private def initialFenToSituation(initialFen: Option[Fen], variant: chess.variant.Variant): Situation = {
-    initialFen.flatMap(Forsyth.<<) | Situation(variant)
+    initialFen.flatMap(Fen.read) | Situation(variant)
   } withVariant variant
 
   def boards(
@@ -170,7 +170,7 @@ object Replay:
       variant: chess.variant.Variant,
       atFen: Fen
   ): Validated[String, Int] =
-    if (Forsyth.<<@(variant, atFen).isEmpty) invalid(s"Invalid Fen $atFen")
+    if (Fen.read(variant, atFen).isEmpty) invalid(s"Invalid Fen $atFen")
     else
 
       // we don't want to compare the full move number, to match transpositions
@@ -184,13 +184,13 @@ object Replay:
           case san :: rest =>
             san(sit) andThen { moveOrDrop =>
               val after = moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter)
-              val fen   = Forsyth >> Game(Situation(after, Color.fromPly(ply)), turns = ply)
+              val fen   = Fen write Game(Situation(after, Color.fromPly(ply)), turns = ply)
               if (compareFen(fen)) Validated.valid(ply)
               else recursivePlyAtFen(Situation(after, !sit.color), rest, ply + 1)
             }
 
       val sit = initialFen.flatMap {
-        Forsyth.<<@(variant, _)
+        Fen.read(variant, _)
       } | Situation(variant)
 
       Parser.moves(moveStrs) andThen { moves =>

@@ -3,7 +3,7 @@ package format
 
 // r3k2r/p3n1pp/2q2p2/4n1B1/5Q2/5P2/PP3P1P/R4RK1 b kq - 6 20
 opaque type Fen = String
-object Fen extends OpaqueString[Fen]:
+object Fen extends OpaqueString[Fen] with FenReader with FenWriter:
   extension (a: Fen)
     def halfMove: Option[Int] = a.value.split(' ').lift(4).flatMap(_.toIntOption)
     def fullMove: Option[Int] = a.value.split(' ').lift(5).flatMap(_.toIntOption)
@@ -14,11 +14,12 @@ object Fen extends OpaqueString[Fen]:
     def ply: Option[Int] =
       fullMove map { _ * 2 - (if (color.exists(_.white)) 2 else 1) }
 
-    def initial = a == Forsyth.initial
+    def isInitial: Boolean = a == initial
 
     def board: BoardFen     = a.takeWhile(_ != ' ')
     def opening: OpeningFen = OpeningFen fromFen a
 
+  val initial: Fen               = Fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
   def clean(source: String): Fen = Fen(source.replace("_", " ").trim)
 
 // r3k2r/p3n1pp/2q2p2/4n1B1/5Q2/5P2/PP3P1P/R4RK1 b kq -

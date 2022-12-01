@@ -4,7 +4,6 @@ import cats.syntax.option.*
 import org.specs2.matcher.ValidatedMatchers
 
 import chess.format.Fen
-import chess.format.Forsyth
 import chess.format.pgn.Reader
 import chess.variant.Antichess
 
@@ -58,7 +57,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       val afterFirstMove   = startingPosition.playMove(Pos.E2, Pos.E4, None)
 
       afterFirstMove must beValid.like { newGame =>
-        val fen = Forsyth >> newGame
+        val fen = Fen write newGame
         fen mustEqual Fen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b - - 0 1")
       }
     }

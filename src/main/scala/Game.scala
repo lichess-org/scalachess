@@ -122,7 +122,7 @@ object Game:
     val g       = apply(variant)
     fen
       .flatMap {
-        format.Forsyth.<<<@(variant, _)
+        format.Fen.readWithMoveNumber(variant, _)
       }
       .fold(g) { parsed =>
         g.copy(

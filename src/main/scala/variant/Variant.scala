@@ -39,7 +39,7 @@ abstract class Variant private[variant] (
 
   def castles: Castles = Castles.all
 
-  val initialFen: Fen = format.Forsyth.initial
+  val initialFen: Fen = format.Fen.initial
 
   def isValidPromotion(promotion: Option[PromotableRole]) =
     promotion match

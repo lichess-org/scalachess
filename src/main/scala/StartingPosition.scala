@@ -17,7 +17,7 @@ case class StartingPosition(
 
   def fullName = s"$eco $name"
 
-  def initial = fen == format.Forsyth.initial
+  def initial = fen.isInitial
 
 object StartingPosition:
 
@@ -1073,7 +1073,7 @@ object StartingPosition:
 
   val all: IndexedSeq[StartingPosition] = categories.flatMap(_.positions).toIndexedSeq
 
-  val initial = StartingPosition("---", "Initial position", format.Forsyth.initial, "Chess", "")
+  val initial = StartingPosition("---", "Initial position", format.Fen.initial, "Chess", "")
 
   def allWithInitial = initial +: all
 

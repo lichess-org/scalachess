@@ -9,7 +9,7 @@ final class Opening(
     val name: OpeningName,
     val fen: OpeningFen,
     val uci: UcisStr,
-    val pgn: SansStr // wrong, there are move numbers in there as well. Remove them?
+    val pgn: PgnMovesStr
 ):
 
   val (family: OpeningFamily, variation: Option[OpeningVariation]) = name.value.split(":", 2) match
@@ -17,9 +17,9 @@ final class Opening(
     case Array(f)    => OpeningFamily(OpeningName(f)) -> None
     case _           => OpeningFamily(name)           -> None
 
-  lazy val nbMoves = uci.value.count(' ' ==) + 1
-  lazy val lastUci = uci.value.split(' ').lastOption.flatMap(Uci.Move.apply)
-  lazy val key     = Opening nameToKey name
+  lazy val nbMoves: Int              = uci.value.count(' ' ==) + 1
+  lazy val lastUci: Option[Uci.Move] = uci.value.split(' ').lastOption.flatMap(Uci.Move.apply)
+  lazy val key: OpeningKey           = Opening nameToKey name
 
   override def toString = name.value
 
@@ -28,7 +28,7 @@ final class Opening(
 object Opening:
 
   private[opening] def apply(eco: String, name: String, fen: String, uci: String, pgn: String): Opening =
-    new Opening(Eco(eco), OpeningName(name), OpeningFen(fen), UcisStr(uci), SansStr(pgn))
+    new Opening(Eco(eco), OpeningName(name), OpeningFen(fen), UcisStr(uci), PgnMovesStr(pgn))
 
   case class AtPly(opening: Opening, ply: Int)
 

@@ -7,9 +7,11 @@ object Eco extends OpaqueString[Eco]
 opaque type OpeningName = String
 object OpeningName extends OpaqueString[OpeningName]
 
-opaque type SansStr = String
-object SansStr extends OpaqueString[SansStr]
+// 1. d4 Nf6 2. c4 e6 3. g3
+opaque type PgnMovesStr = String
+object PgnMovesStr extends OpaqueString[PgnMovesStr]
 
+// d2d4 g8f6 c2c4 e7e6 g2g3
 opaque type UcisStr = String
 object UcisStr extends OpaqueString[UcisStr]
 

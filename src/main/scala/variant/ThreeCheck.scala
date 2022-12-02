@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import chess.format.Fen
+import chess.format.EpdFen
 
 case object ThreeCheck
     extends Variant(
@@ -16,7 +16,7 @@ case object ThreeCheck
 
   def pieces = Standard.pieces
 
-  override val initialFen = Fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 +0+0")
+  override val initialFen = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 +0+0")
 
   override def finalizeBoard(board: Board, uci: format.Uci, capture: Option[Piece]): Board =
     board updateHistory {

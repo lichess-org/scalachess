@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import chess.format.Fen
+import chess.format.EpdFen
 
 case object Chess960
     extends Variant(
@@ -19,7 +19,7 @@ case object Chess960
       positions(scala.util.Random.nextInt(960)) flatMap Role.allByForsyth.get
     }
 
-  def positionNumber(fen: Fen): Option[Int] =
+  def positionNumber(fen: EpdFen): Option[Int] =
     fen.value split ' ' match
       case Array(board, "w", "KQkq", "-", "0", "1") =>
         board split '/' match

@@ -27,7 +27,7 @@ object Replay:
 
   def apply(
       moveStrs: Iterable[String],
-      initialFen: Option[Fen],
+      initialFen: Option[Fen.Epd],
       variant: chess.variant.Variant
   ): Validated[String, Reader.Result] =
     moveStrs.some.filter(_.nonEmpty) toValid "[replay] pgn is empty" andThen { nonEmptyMoves =>
@@ -57,7 +57,7 @@ object Replay:
 
   def games(
       moveStrs: Iterable[String],
-      initialFen: Option[Fen],
+      initialFen: Option[Fen.Epd],
       variant: chess.variant.Variant
   ): Validated[String, List[Game]] =
     Parser.moves(moveStrs) andThen { moves =>
@@ -67,7 +67,7 @@ object Replay:
 
   def gameMoveWhileValid(
       moveStrs: Seq[String],
-      initialFen: Fen,
+      initialFen: Fen.Epd,
       variant: chess.variant.Variant
   ): (Game, List[(Game, Uci.WithSan)], Option[String]) =
 
@@ -123,19 +123,19 @@ object Replay:
           recursiveReplayFromUci(replay addMove moveOrDrop, rest)
         }
 
-  private def initialFenToSituation(initialFen: Option[Fen], variant: chess.variant.Variant): Situation = {
+  private def initialFenToSituation(initialFen: Option[Fen.Epd], variant: chess.variant.Variant): Situation = {
     initialFen.flatMap(Fen.read) | Situation(variant)
   } withVariant variant
 
   def boards(
       moveStrs: Iterable[String],
-      initialFen: Option[Fen],
+      initialFen: Option[Fen.Epd],
       variant: chess.variant.Variant
   ): Validated[String, List[Board]] = situations(moveStrs, initialFen, variant) map (_ map (_.board))
 
   def situations(
       moveStrs: Iterable[String],
-      initialFen: Option[Fen],
+      initialFen: Option[Fen.Epd],
       variant: chess.variant.Variant
   ): Validated[String, List[Situation]] =
     val sit = initialFenToSituation(initialFen, variant)
@@ -145,13 +145,13 @@ object Replay:
 
   def boardsFromUci(
       moves: List[Uci],
-      initialFen: Option[Fen],
+      initialFen: Option[Fen.Epd],
       variant: chess.variant.Variant
   ): Validated[String, List[Board]] = situationsFromUci(moves, initialFen, variant) map (_ map (_.board))
 
   def situationsFromUci(
       moves: List[Uci],
-      initialFen: Option[Fen],
+      initialFen: Option[Fen.Epd],
       variant: chess.variant.Variant
   ): Validated[String, List[Situation]] =
     val sit = initialFenToSituation(initialFen, variant)
@@ -159,24 +159,24 @@ object Replay:
 
   def apply(
       moves: List[Uci],
-      initialFen: Option[Fen],
+      initialFen: Option[Fen.Epd],
       variant: chess.variant.Variant
   ): Validated[String, Replay] =
     recursiveReplayFromUci(Replay(makeGame(variant, initialFen)), moves)
 
   def plyAtFen(
       moveStrs: Iterable[String],
-      initialFen: Option[Fen],
+      initialFen: Option[Fen.Epd],
       variant: chess.variant.Variant,
-      atFen: Fen
+      atFen: Fen.Epd
   ): Validated[String, Int] =
     if (Fen.read(variant, atFen).isEmpty) invalid(s"Invalid Fen $atFen")
     else
 
       // we don't want to compare the full move number, to match transpositions
-      def truncateFen(fen: Fen) = fen.value.split(' ').take(4) mkString " "
+      def truncateFen(fen: Fen.Epd) = fen.value.split(' ').take(4) mkString " "
       val atFenTruncated        = truncateFen(atFen)
-      def compareFen(fen: Fen)  = truncateFen(fen) == atFenTruncated
+      def compareFen(fen: Fen.Epd)  = truncateFen(fen) == atFenTruncated
 
       def recursivePlyAtFen(sit: Situation, sans: List[San], ply: Int): Validated[String, Int] =
         sans match
@@ -197,6 +197,6 @@ object Replay:
         recursivePlyAtFen(sit, moves.value, 1)
       }
 
-  private def makeGame(variant: chess.variant.Variant, initialFen: Option[Fen]): Game =
+  private def makeGame(variant: chess.variant.Variant, initialFen: Option[Fen.Epd]): Game =
     val g = Game(variant.some, initialFen)
     g.copy(startedAtTurn = g.turns)

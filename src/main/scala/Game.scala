@@ -117,7 +117,7 @@ object Game:
 
   def apply(board: Board, color: Color): Game = new Game(Situation(board, color))
 
-  def apply(variantOption: Option[chess.variant.Variant], fen: Option[Fen]): Game =
+  def apply(variantOption: Option[chess.variant.Variant], fen: Option[Fen.Epd]): Game =
     val variant = variantOption | chess.variant.Standard
     val g       = apply(variant)
     fen

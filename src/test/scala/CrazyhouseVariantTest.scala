@@ -2,7 +2,7 @@ package chess
 
 import cats.syntax.option.*
 
-import chess.format.Fen
+import chess.format.EpdFen
 import chess.variant.Crazyhouse
 
 class CrazyhouseVariantTest extends ChessTest:
@@ -10,7 +10,7 @@ class CrazyhouseVariantTest extends ChessTest:
   "Crazyhouse" should {
 
     "nothing to drop" in {
-      val fenPosition = Fen("3Nkb1r/1pQP1ppp/4p3/3N4/N5N1/6B1/PPPPBPPP/R1B2RK1 b - - 0 25")
+      val fenPosition = EpdFen("3Nkb1r/1pQP1ppp/4p3/3N4/N5N1/6B1/PPPPBPPP/R1B2RK1 b - - 0 25")
       val game = {
         fenToGame(fenPosition, Crazyhouse).toOption.get
       }.updateBoard { b =>
@@ -29,7 +29,7 @@ class CrazyhouseVariantTest extends ChessTest:
     }
 
     "pieces to drop, in vain" in {
-      val fenPosition = Fen("3Nkb1r/1pQP1ppp/4p3/3N4/N5N1/6B1/PPPPBPPP/R1B2RK1 b - - 0 25")
+      val fenPosition = EpdFen("3Nkb1r/1pQP1ppp/4p3/3N4/N5N1/6B1/PPPPBPPP/R1B2RK1 b - - 0 25")
       val game = {
         fenToGame(fenPosition, Crazyhouse).toOption.get
       }.updateBoard { b =>
@@ -313,7 +313,7 @@ class CrazyhouseVariantTest extends ChessTest:
         }
       }
       "not draw when only kings left" in {
-        val fenPosition = Fen("k6K/8/8/8/8/8/8/8 w - - 0 25")
+        val fenPosition = EpdFen("k6K/8/8/8/8/8/8/8 w - - 0 25")
         val game =
           fenToGame(fenPosition, Crazyhouse).toOption.get
         game.situation.autoDraw must beFalse
@@ -349,7 +349,7 @@ class CrazyhouseVariantTest extends ChessTest:
       chess
         .Game(
           Crazyhouse.some,
-          Fen("r2q1b1r/p2k1Ppp/2p2p2/4p3/P2nP2n/3P1PRP/1PPB1K1q~/RN1Q1B2/Npb w - - 40 21").some
+          EpdFen("r2q1b1r/p2k1Ppp/2p2p2/4p3/P2nP2n/3P1PRP/1PPB1K1q~/RN1Q1B2/Npb w - - 40 21").some
         )
         .situation
         .destinations must_== Map(

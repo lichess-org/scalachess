@@ -6,8 +6,7 @@ import org.specs2.matcher.Matcher
 import org.specs2.matcher.ValidatedMatchers
 import org.specs2.mutable.Specification
 
-import chess.format.Fen
-import chess.format.{ Fen, Visual }
+import chess.format.{ EpdFen, Fen, Visual }
 import chess.variant.Variant
 
 trait ChessTest extends Specification with ValidatedMatchers:
@@ -69,8 +68,8 @@ trait ChessTest extends Specification with ValidatedMatchers:
 
     def withClock(c: Clock) = game.copy(clock = Option(c))
 
-  def fenToGame(positionString: Fen, variant: Variant) =
-    val situation = Fen read positionString
+  def fenToGame(positionString: EpdFen, variant: Variant) =
+    val situation = Fen.read(variant, positionString)
     situation map { sit =>
       sit.color -> sit.withVariant(variant).board
     } toValid "Could not construct situation from Fen" map { case (color, board) =>

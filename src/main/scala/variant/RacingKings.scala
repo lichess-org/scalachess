@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import chess.format.Fen
+import chess.format.EpdFen
 
 case object RacingKings
     extends Variant(
@@ -40,7 +40,7 @@ case object RacingKings
 
   override val castles = Castles.none
 
-  override val initialFen = Fen("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
+  override val initialFen = EpdFen("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
 
   override def isInsufficientMaterial(board: Board)                  = false
   override def opponentHasInsufficientMaterial(situation: Situation) = false

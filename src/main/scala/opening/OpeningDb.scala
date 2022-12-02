@@ -3,7 +3,7 @@ package opening
 
 import cats.syntax.option.*
 
-import chess.format.{ Fen, OpeningFen }
+import chess.format.{ EpdFen, OpeningFen }
 
 object OpeningDb:
 
@@ -28,9 +28,9 @@ object OpeningDb:
 
   def isShortest(op: Opening) = shortestLines get op.key contains op
 
-  def findByFullFen(fen: Fen): Option[Opening] = findByFen(OpeningFen fromFen fen)
+  def findByEpdFen(fen: EpdFen): Option[Opening] = findByOpeningFen(fen.opening)
 
-  def findByFen(fen: OpeningFen): Option[Opening] = byFen get fen
+  def findByOpeningFen(fen: OpeningFen): Option[Opening] = byFen get fen
 
   val SEARCH_MAX_PLIES = 40
 
@@ -64,6 +64,6 @@ object OpeningDb:
 
   def searchInFens(fens: Iterable[OpeningFen]): Option[Opening] =
     fens.foldRight(none[Opening]) {
-      case (fen, None) => findByFen(fen)
+      case (fen, None) => findByOpeningFen(fen)
       case (_, found)  => found
     }

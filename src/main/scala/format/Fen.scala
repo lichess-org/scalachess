@@ -1,32 +1,53 @@
 package chess
 package format
 
+object Fen extends FenReader with FenWriter:
+  export format.{ BoardFen as Board, EpdFen as Epd, OpeningFen as Opening, SimpleFen as Simple }
+  export EpdFen.initial
+
+// https://www.chessprogramming.org/Extended_Position_Description
 // r3k2r/p3n1pp/2q2p2/4n1B1/5Q2/5P2/PP3P1P/R4RK1 b kq - 6 20
-opaque type Fen = String
-object Fen extends OpaqueString[Fen] with FenReader with FenWriter:
-  extension (a: Fen)
-    def halfMove: Option[Int] = a.value.split(' ').lift(4).flatMap(_.toIntOption)
-    def fullMove: Option[Int] = a.value.split(' ').lift(5).flatMap(_.toIntOption)
+// rnbqkbnr/ppp1pppp/8/1B1p4/4P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2 +1+0 (3check)
+// r1bqkbnr/pppp1Qpp/2n5/4p3/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 2+3 0 3 (winboards 3check)
+opaque type EpdFen = String
+object EpdFen extends OpaqueString[EpdFen]:
+  extension (a: EpdFen)
+    def color: Color           = SimpleFen color a
+    def castling: String       = SimpleFen castling a
+    def enpassant: Option[Pos] = SimpleFen enpassant a
 
-    def color: Option[Color] =
-      a.value.split(' ').lift(1) flatMap (_.headOption) flatMap Color.apply
-
-    def ply: Option[Int] =
-      fullMove map { _ * 2 - (if (color.exists(_.white)) 2 else 1) }
+    // def ply: Option[Int] = fullMove map { _ * 2 - (if (color.white) 2 else 1) }
 
     def isInitial: Boolean = a == initial
 
-    def board: BoardFen     = a.takeWhile(_ != ' ')
-    def opening: OpeningFen = OpeningFen fromFen a
+    def simple: SimpleFen   = SimpleFen fromEpd a
+    def opening: OpeningFen = SimpleFen opening a
+    def board: BoardFen     = SimpleFen board a
 
-  val initial: Fen               = Fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-  def clean(source: String): Fen = Fen(source.replace("_", " ").trim)
+  val initial: EpdFen               = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+  def clean(source: String): EpdFen = EpdFen(source.replace("_", " ").trim)
 
+// a.k.a. just FEN.
 // r3k2r/p3n1pp/2q2p2/4n1B1/5Q2/5P2/PP3P1P/R4RK1 b kq -
+opaque type SimpleFen = String
+object SimpleFen extends OpaqueString[SimpleFen]:
+  extension (a: SimpleFen)
+    def color: Color           = a.split(' ').lift(1).flatMap(_.headOption).flatMap(Color.apply) | Color.white
+    def castling: String       = a.split(' ').lift(2) | "-"
+    def enpassant: Option[Pos] = a.split(' ').lift(3).flatMap(Pos.fromKey(_))
+    def opening: OpeningFen    = OpeningFen.fromSimple(a)
+    def board: BoardFen        = a.takeWhile(_ != ' ')
+  def fromEpd(fen: EpdFen): OpeningFen =
+    fen.value.split(' ').take(4) match
+      case Array(board, turn, castle, ep) => SimpleFen(s"$board $turn $castle $ep")
+      case _                              => fen into SimpleFen
+
+// Like SimpleFen, but for standard chess, without ZH pockets
 opaque type OpeningFen = String
 object OpeningFen extends OpaqueString[OpeningFen]:
   extension (a: OpeningFen) def board: BoardFen = a.value.takeWhile(_ != ' ')
-  def fromFen(fen: Fen): OpeningFen =
+  def fromEpd(fen: EpdFen): OpeningFen          = fromSimple(EpdFen simple fen)
+  def fromSimple(fen: SimpleFen): OpeningFen =
     fen.value.split(' ').take(4) match
       case Array(board, turn, castle, ep) =>
         OpeningFen(s"${BoardFen(board).removePockets} $turn $castle $ep")

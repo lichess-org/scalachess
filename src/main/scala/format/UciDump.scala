@@ -13,7 +13,7 @@ object UciDump:
 
   def apply(
       moves: Seq[String],
-      initialFen: Option[Fen],
+      initialFen: Option[EpdFen],
       variant: Variant,
       force960Notation: Boolean = false
   ): Validated[String, List[String]] =

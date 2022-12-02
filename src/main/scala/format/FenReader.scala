@@ -4,6 +4,7 @@ package format
 import cats.implicits.*
 import variant.{ Standard, Variant }
 import cats.kernel.Monoid
+import ornicar.scalalib.zeros.given_Zero_Option
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *
@@ -13,16 +14,11 @@ import cats.kernel.Monoid
   */
 trait FenReader:
 
-  def read(variant: Variant, fen: Fen): Option[Situation] =
+  def read(variant: Variant, fen: EpdFen): Option[Situation] =
     makeBoard(variant, fen) map { board =>
-      val splitted    = fen.value split ' '
-      val colorOption = splitted lift 1 flatMap (_ lift 0) flatMap Color.apply
-      val situation = colorOption match
-        case Some(color)             => Situation(board, color)
-        case _ if board.check(Black) => Situation(board, Black) // user in check will move first
-        case _                       => Situation(board, White)
-      splitted
-        .lift(2)
+      val situation = Situation(board, if variant.atomic then fen.color else board.checkColor | fen.color)
+      fen.castling.some
+        .filterNot(_ == "-")
         .fold(situation) { strCastles =>
           val (castles, unmovedRooks) = strCastles.foldLeft(Castles.none -> Set.empty[Pos]) {
             case ((c, r), ch) =>
@@ -45,11 +41,11 @@ trait FenReader:
               } yield (c.add(color, side), r + rookPos)).getOrElse((c, r))
           }
 
-          val fifthRank   = if (situation.color == White) Rank.Fifth else Rank.Fourth
-          val sixthRank   = if (situation.color == White) Rank.Sixth else Rank.Third
-          val seventhRank = if (situation.color == White) Rank.Seventh else Rank.Second
-          val lastMove = for {
-            pos <- splitted lift 3 flatMap { Pos.fromKey(_) }
+          val fifthRank   = if (situation.color.white) Rank.Fifth else Rank.Fourth
+          val sixthRank   = if (situation.color.white) Rank.Sixth else Rank.Third
+          val seventhRank = if (situation.color.white) Rank.Seventh else Rank.Second
+          val enpassantMove = for {
+            pos <- fen.enpassant
             if pos.rank == sixthRank
             orig = Pos(pos.file, seventhRank)
             dest = Pos(pos.file, fifthRank)
@@ -60,35 +56,37 @@ trait FenReader:
 
           situation withHistory {
             val history = History(
-              lastMove = lastMove,
+              lastMove = enpassantMove,
               positionHashes = Monoid[PositionHash].empty,
               castles = castles,
               unmovedRooks = UnmovedRooks(unmovedRooks)
             )
-            val checkCount =
+            val checkCount = variant.threeCheck.?? {
+              val splitted = fen.value split ' '
               splitted
                 .lift(4)
                 .flatMap(readCheckCount)
                 .orElse(splitted.lift(6).flatMap(readCheckCount))
-            checkCount.fold(history)(history.withCheckCount)
+            }
+            checkCount.foldLeft(history)(_ withCheckCount _)
           }
         } fixCastles
     }
 
-  def read(fen: Fen): Option[Situation] = read(Standard, fen)
+  def read(fen: EpdFen): Option[Situation] = read(Standard, fen)
 
-  def readWithMoveNumber(variant: Variant, fen: Fen): Option[Situation.AndFullMoveNumber] =
+  def readWithMoveNumber(variant: Variant, fen: EpdFen): Option[Situation.AndFullMoveNumber] =
     read(variant, fen) map { sit =>
-      val splitted       = fen.value.split(' ').drop(4).dropWhile(_.contains('+'))
-      val fullMoveNumber = splitted lift 1 flatMap (_.toIntOption) map (_ max 1 min 500)
-      val halfMoveClock  = splitted lift 0 flatMap (_.toIntOption) map (_ max 0 min 100)
+      val splitted = fen.value.split(' ').drop(4).dropWhile(_.contains('+')) // skip winboards 3check notation
+      val halfMoveClock  = splitted.lift(0).flatMap(_.toIntOption).map(_ max 0 min 100)
+      val fullMoveNumber = splitted.lift(1).flatMap(_.toIntOption).map(_ max 1 min 500)
       Situation.AndFullMoveNumber(
         halfMoveClock.map(sit.history.setHalfMoveClock).fold(sit)(sit.withHistory),
         fullMoveNumber | 1
       )
     }
 
-  def readWithMoveNumber(fen: Fen): Option[Situation.AndFullMoveNumber] =
+  def readWithMoveNumber(fen: EpdFen): Option[Situation.AndFullMoveNumber] =
     readWithMoveNumber(Standard, fen)
 
   private def readCheckCount(str: String): Option[CheckCount] =
@@ -106,7 +104,7 @@ trait FenReader:
       case _ => None
 
   // only cares about pieces positions on the board (first part of FEN string)
-  def makeBoard(variant: Variant, fen: Fen): Option[Board] =
+  def makeBoard(variant: Variant, fen: EpdFen): Option[Board] =
     val (position, pockets) = fen.value.takeWhile(' ' !=) match
       case word if word.count('/' ==) == 8 =>
         val splitted = word.split('/')

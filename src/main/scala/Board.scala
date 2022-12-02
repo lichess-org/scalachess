@@ -39,6 +39,8 @@ case class Board(
 
   def check(c: Color): Boolean = c.fold(checkWhite, checkBlack)
 
+  def checkColor: Option[Color] = checkWhite.option(White) orElse checkBlack.option(Black)
+
   lazy val checkWhite = checkOf(White)
   lazy val checkBlack = checkOf(Black)
 

@@ -27,28 +27,6 @@ sealed trait Color:
 
 object Color:
 
-  case class Map[A](white: A, black: A):
-    def apply(color: Color) = if (color.white) white else black
-
-    def update(color: Color, f: A => A) =
-      if (color.white) copy(white = f(white))
-      else copy(black = f(black))
-
-    def map[B](fw: A => B, fb: A => B) = copy(white = fw(white), black = fb(black))
-
-    def map[B](f: A => B): Map[B] = map(f, f)
-
-    def all: Seq[A] = Seq(white, black)
-
-    def reduce[B](f: (A, A) => B) = f(white, black)
-
-    def forall(pred: A => Boolean) = pred(white) && pred(black)
-
-    def exists(pred: A => Boolean) = pred(white) || pred(black)
-
-  object Map:
-    def apply[A](f: Color => A): Map[A] = Map(white = f(White), black = f(Black))
-
   case object White extends Color:
 
     inline def unary_! = Black
@@ -74,6 +52,28 @@ object Color:
     inline val name   = "black"
 
     override val hashCode = 2
+
+  case class Map[A](white: A, black: A):
+    def apply(color: Color) = if (color.white) white else black
+
+    def update(color: Color, f: A => A) =
+      if (color.white) copy(white = f(white))
+      else copy(black = f(black))
+
+    def map[B](fw: A => B, fb: A => B) = copy(white = fw(white), black = fb(black))
+
+    def map[B](f: A => B): Map[B] = map(f, f)
+
+    def all: Seq[A] = Seq(white, black)
+
+    def reduce[B](f: (A, A) => B) = f(white, black)
+
+    def forall(pred: A => Boolean) = pred(white) && pred(black)
+
+    def exists(pred: A => Boolean) = pred(white) || pred(black)
+
+  object Map:
+    def apply[A](f: Color => A): Map[A] = Map(white = f(White), black = f(Black))
 
   inline def fromPly(inline ply: Int) = fromWhite((ply & 1) == 0)
 

@@ -5,7 +5,7 @@ import cats.data.Validated
 import cats.syntax.option.*
 import scala.annotation.nowarn
 
-import chess.format.Fen
+import chess.format.EpdFen
 
 // Correctness depends on singletons for each variant ID
 abstract class Variant private[variant] (
@@ -39,7 +39,7 @@ abstract class Variant private[variant] (
 
   def castles: Castles = Castles.all
 
-  val initialFen: Fen = format.Fen.initial
+  val initialFen: EpdFen = EpdFen.initial
 
   def isValidPromotion(promotion: Option[PromotableRole]) =
     promotion match

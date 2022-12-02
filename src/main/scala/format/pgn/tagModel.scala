@@ -5,6 +5,8 @@ import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
 import cats.syntax.option.*
 
+import chess.format.EpdFen
+
 case class Tag(name: TagType, value: String):
 
   override def toString = s"""[$name "${escapeString(value)}"]"""
@@ -46,7 +48,7 @@ case class Tags(value: List[Tag]) extends AnyVal:
       case _                       => None
     }
 
-  def fen: Option[format.Fen] = format.Fen from apply(_.FEN)
+  def fen: Option[EpdFen] = EpdFen from apply(_.FEN)
 
   def exists(which: Tag.type => TagType): Boolean =
     value.exists(_.name == which(Tag))

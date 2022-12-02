@@ -1,7 +1,7 @@
 package chess
 package opening
 
-import format.Fen
+import format.EpdFen
 import org.specs2.mutable.Specification
 
 class OpeningTest extends Specification:
@@ -58,34 +58,34 @@ class OpeningTest extends Specification:
 
   "by fen" should {
     "consider en passant" in {
-      OpeningDb findByFen Fen(
+      OpeningDb findByEpdFen EpdFen(
         "rnbqkbnr/pp1p1ppp/8/2pPp3/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 3"
-      ).opening must beNone
-      OpeningDb findByFen Fen(
+      ) must beNone
+      OpeningDb findByEpdFen EpdFen(
         "rnbqkbnr/pp1p1ppp/8/2pPp3/8/8/PPP1PPPP/RNBQKBNR w KQkq e6 0 3"
-      ).opening must beSome
+      ) must beSome
     }
     "ignore empty crazyhouse pocket" in {
-      OpeningDb findByFen Fen(
+      OpeningDb findByEpdFen EpdFen(
         "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR/ b KQkq - 0 1"
-      ).opening must beSome {
+      ) must beSome {
         (_: Opening).name == OpeningName("King's Pawn")
       }
-      OpeningDb findByFen Fen(
+      OpeningDb findByEpdFen EpdFen(
         "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR[] b KQkq - 0 1"
-      ).opening must beSome {
+      ) must beSome {
         (_: Opening).name == OpeningName("King's Pawn")
       }
     }
     "ignore crazyhouse pocket" in {
-      OpeningDb findByFen Fen(
+      OpeningDb findByEpdFen EpdFen(
         "rn2kb1r/ppp1pppp/5n2/q4b2/3P4/2N2N2/PPP2PPP/R1BQKB1R/Pp w KQkq - 3 6"
-      ).opening must beSome {
+      ) must beSome {
         (_: Opening).name == OpeningName("Scandinavian Defense: Classical Variation")
       }
-      OpeningDb findByFen Fen(
+      OpeningDb findByEpdFen EpdFen(
         "rn2kb1r/ppp1pppp/5n2/q4b2/3P4/2N2N2/PPP2PPP/R1BQKB1R[Pp] w KQkq - 3 6"
-      ).opening must beSome {
+      ) must beSome {
         (_: Opening).name == OpeningName("Scandinavian Defense: Classical Variation")
       }
     }

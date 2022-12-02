@@ -3,7 +3,7 @@ package chess
 import scala.language.implicitConversions
 import Pos.*
 import variant.Standard
-import chess.format.Fen
+import chess.format.EpdFen
 
 class AutodrawTest extends ChessTest:
 
@@ -399,7 +399,7 @@ K   bB""".autoDraw must_== false
   }
   "do not detect insufficient material" should {
     "on two knights" in {
-      val position = Fen("1n2k1n1/8/8/8/8/8/8/4K3 w - - 0 1")
+      val position = EpdFen("1n2k1n1/8/8/8/8/8/8/4K3 w - - 0 1")
       fenToGame(position, Standard) must beValid.like { case game =>
         game.situation.autoDraw must beFalse
         game.situation.end must beFalse
@@ -407,7 +407,7 @@ K   bB""".autoDraw must_== false
       }
     }
     "on knight versus pawn" in {
-      val position = Fen("7K/5k2/7P/6n1/8/8/8/8 b - - 0 40")
+      val position = EpdFen("7K/5k2/7P/6n1/8/8/8/8 b - - 0 40")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
         Pos.F7,
@@ -420,7 +420,7 @@ K   bB""".autoDraw must_== false
       }
     }
     "on bishops versus pawn" in {
-      val position = Fen("1b1b3K/8/5k1P/8/8/8/8/8 b - - 0 40")
+      val position = EpdFen("1b1b3K/8/5k1P/8/8/8/8/8 b - - 0 40")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
         Pos.B8,
@@ -433,7 +433,7 @@ K   bB""".autoDraw must_== false
       }
     }
     "on bishops versus queen" in {
-      val position = Fen("b2b3K/8/5k1Q/8/8/8/8/8 b - -")
+      val position = EpdFen("b2b3K/8/5k1Q/8/8/8/8/8 b - -")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
         Pos.F6,
@@ -446,7 +446,7 @@ K   bB""".autoDraw must_== false
       }
     }
     "on bishops versus queen" in {
-      val position = Fen("1b1b3K/8/5k1Q/8/8/8/8/8 b - -")
+      val position = EpdFen("1b1b3K/8/5k1Q/8/8/8/8/8 b - -")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
         Pos.F6,
@@ -459,7 +459,7 @@ K   bB""".autoDraw must_== false
       }
     }
     "on knight versus pawns" in {
-      val position = Fen("8/8/5N2/8/6p1/8/5K1p/7k w - - 0 37")
+      val position = EpdFen("8/8/5N2/8/6p1/8/5K1p/7k w - - 0 37")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
         Pos.F6,
@@ -472,7 +472,7 @@ K   bB""".autoDraw must_== false
       }
     }
     "on knight versus pieces" in {
-      val position = Fen("8/8/8/4N3/4k1p1/6K1/8/3b4 w - - 5 59")
+      val position = EpdFen("8/8/8/4N3/4k1p1/6K1/8/3b4 w - - 5 59")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
         Pos.E5,
@@ -485,7 +485,7 @@ K   bB""".autoDraw must_== false
       }
     }
     "on opposite bishops with queen" in {
-      val position = Fen("8/8/3Q4/2bK4/B7/8/8/k7 b - - 0 67")
+      val position = EpdFen("8/8/3Q4/2bK4/B7/8/8/k7 b - - 0 67")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
         Pos.A1,
@@ -498,7 +498,7 @@ K   bB""".autoDraw must_== false
       }
     }
     "on same-color bishops on both sides" in {
-      val position = Fen("5K2/8/8/1B6/8/k7/6b1/8 w - - 0 39")
+      val position = EpdFen("5K2/8/8/1B6/8/k7/6b1/8 w - - 0 39")
       val game     = fenToGame(position, Standard)
       game must beValid.like { case game =>
         game.situation.autoDraw must beTrue

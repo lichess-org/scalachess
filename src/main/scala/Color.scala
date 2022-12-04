@@ -10,9 +10,9 @@ enum Color:
   @targetName("negate")
   def unary_! = fold(Black, White)
 
-  lazy val passablePawnRank: Rank = fold(Rank.Fifth, Rank.Fourth)
+  lazy val passablePawnRank: Rank   = fold(Rank.Fifth, Rank.Fourth)
   lazy val promotablePawnRank: Rank = fold(Rank.Eighth, Rank.First)
-  lazy val backRank: Rank = fold(Rank.First, Rank.Eighth)
+  lazy val backRank: Rank           = fold(Rank.First, Rank.Eighth)
 
   lazy val letter: Char = fold('w', 'b')
   lazy val name: String = fold("white", "black")

@@ -9,7 +9,7 @@ class ColorTest extends ChessTest:
     }
 
     "passablePawnRank" in {
-      "white" in {White.passablePawnRank == Rank.Fifth}
-      "black" in {Black.passablePawnRank == Rank.Fourth}
+      "white" in { White.passablePawnRank == Rank.Fifth }
+      "black" in { Black.passablePawnRank == Rank.Fourth }
     }
   }

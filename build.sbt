@@ -20,6 +20,7 @@ resolvers += "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-mav
 scalacOptions := Seq(
   "-encoding",
   "utf-8",
+  "-explain",
   // "-rewrite",
   "-source:future-migration",
   "-indent",

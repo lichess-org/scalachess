@@ -3,19 +3,19 @@ package chess
 import scala.annotation.targetName
 
 enum Color:
-  case Black, White
+  case White, Black
 
-  inline def fold[A](w: => A, b: => A): A = if (white) w else b
+  def fold[A](w: => A, b: => A): A = if (white) w else b
 
   @targetName("negate")
   def unary_! = fold(Black, White)
 
-  val passablePawnRank: Rank = fold(Rank.Fifth, Rank.Fourth)
-  val promotablePawnRank: Rank = fold(Rank.Eighth, Rank.First)
-  val backRank: Rank = fold(Rank.First, Rank.Eighth)
+  lazy val passablePawnRank: Rank = fold(Rank.Fifth, Rank.Fourth)
+  lazy val promotablePawnRank: Rank = fold(Rank.Eighth, Rank.First)
+  lazy val backRank: Rank = fold(Rank.First, Rank.Eighth)
 
-  val letter: Char = fold('w', 'b')
-  val name: String = fold("white", "black")
+  lazy val letter: Char = fold('w', 'b')
+  lazy val name: String = fold("white", "black")
 
   inline def -(inline role: Role) = Piece(this, role)
 
@@ -26,8 +26,10 @@ enum Color:
   inline def queen  = this - Queen
   inline def king   = this - King
 
-  val white = this == Color.White
-  val black = this == Color.Black
+  lazy val white = this == Color.White
+  lazy val black = this == Color.Black
+
+  override def hashCode = fold(1, 2)
 
 object Color:
 

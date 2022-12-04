@@ -1,17 +1,21 @@
 package chess
 
-sealed trait Color:
+import scala.annotation.targetName
+
+enum Color:
+  case Black, White
 
   inline def fold[A](w: => A, b: => A): A = if (white) w else b
 
-  def unary_! : Color
+  @targetName("negate")
+  def unary_! = fold(Black, White)
 
-  val passablePawnRank: Rank
-  val promotablePawnRank: Rank
-  val backRank: Rank
+  val passablePawnRank: Rank = fold(Rank.Fifth, Rank.Fourth)
+  val promotablePawnRank: Rank = fold(Rank.Eighth, Rank.First)
+  val backRank: Rank = fold(Rank.First, Rank.Eighth)
 
-  val letter: Char
-  val name: String
+  val letter: Char = fold('w', 'b')
+  val name: String = fold("white", "black")
 
   inline def -(inline role: Role) = Piece(this, role)
 
@@ -26,32 +30,6 @@ sealed trait Color:
   val black = this == Color.Black
 
 object Color:
-
-  case object White extends Color:
-
-    inline def unary_! = Black
-
-    val passablePawnRank   = Rank.Fifth
-    val promotablePawnRank = Rank.Eighth
-    val backRank           = Rank.First
-
-    inline val letter = 'w'
-    inline val name   = "white"
-
-    override val hashCode = 1
-
-  case object Black extends Color:
-
-    inline def unary_! = White
-
-    val passablePawnRank   = Rank.Fourth
-    val promotablePawnRank = Rank.First
-    val backRank           = Rank.Eighth
-
-    inline val letter = 'b'
-    inline val name   = "black"
-
-    override val hashCode = 2
 
   case class Map[A](white: A, black: A):
     def apply(color: Color) = if (color.white) white else black

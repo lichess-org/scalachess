@@ -123,7 +123,10 @@ object Replay:
           recursiveReplayFromUci(replay addMove moveOrDrop, rest)
         }
 
-  private def initialFenToSituation(initialFen: Option[Fen.Epd], variant: chess.variant.Variant): Situation = {
+  private def initialFenToSituation(
+      initialFen: Option[Fen.Epd],
+      variant: chess.variant.Variant
+  ): Situation = {
     initialFen.flatMap(Fen.read) | Situation(variant)
   } withVariant variant
 
@@ -175,7 +178,7 @@ object Replay:
 
       // we don't want to compare the full move number, to match transpositions
       def truncateFen(fen: Fen.Epd) = fen.value.split(' ').take(4) mkString " "
-      val atFenTruncated        = truncateFen(atFen)
+      val atFenTruncated            = truncateFen(atFen)
       def compareFen(fen: Fen.Epd)  = truncateFen(fen) == atFenTruncated
 
       def recursivePlyAtFen(sit: Situation, sans: List[San], ply: Int): Validated[String, Int] =

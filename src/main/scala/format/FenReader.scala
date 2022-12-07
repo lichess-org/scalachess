@@ -77,9 +77,7 @@ trait FenReader:
 
   def readWithMoveNumber(variant: Variant, fen: EpdFen): Option[Situation.AndFullMoveNumber] =
     read(variant, fen) map { sit =>
-      val splitted = fen.value.split(' ').drop(4).dropWhile(_.contains('+')) // skip winboards 3check notation
-      val halfMoveClock  = splitted.lift(0).flatMap(_.toIntOption).map(_ max 0 min 100)
-      val fullMoveNumber = splitted.lift(1).flatMap(_.toIntOption).map(_ max 1 min 500)
+      val (halfMoveClock, fullMoveNumber) = readHalfMoveClockAndFullMoveNumber(fen)
       Situation.AndFullMoveNumber(
         halfMoveClock.map(sit.history.setHalfMoveClock).fold(sit)(sit.withHistory),
         fullMoveNumber | 1
@@ -88,6 +86,18 @@ trait FenReader:
 
   def readWithMoveNumber(fen: EpdFen): Option[Situation.AndFullMoveNumber] =
     readWithMoveNumber(Standard, fen)
+
+  def readHalfMoveClockAndFullMoveNumber(fen: EpdFen): (Option[Int], Option[Int]) =
+    val splitted = fen.value.split(' ').drop(4).dropWhile(_.contains('+')) // skip winboards 3check notation
+    val halfMoveClock  = splitted.lift(0).flatMap(_.toIntOption).map(_ max 0 min 100)
+    val fullMoveNumber = splitted.lift(1).flatMap(_.toIntOption).map(_ max 1 min 500)
+    (halfMoveClock, fullMoveNumber)
+
+  def readPly(fen: EpdFen): Option[Int] =
+    val (_, fullMoveNumber) = readHalfMoveClockAndFullMoveNumber(fen)
+    fullMoveNumber map {
+      _ * 2 - (if fen.color.white then 2 else 1)
+    }
 
   private def readCheckCount(str: String): Option[CheckCount] =
     str.toList match

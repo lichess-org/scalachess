@@ -1,21 +1,16 @@
 package chess
 
-sealed abstract class Mode(val id: Int) {
+enum Mode(val id: Int, val rated: Boolean):
 
-  lazy val name = toString.toLowerCase
+  case Casual extends Mode(0, false)
+  case Rated  extends Mode(1, true)
 
-  def casual = this == Mode.Casual
-  def rated  = this == Mode.Rated
+  val name   = toString.toLowerCase
+  def casual = !rated
 
-  def fold[A](c: => A, r: => A): A = if (this.casual) c else r
-}
+object Mode:
 
-object Mode {
-
-  case object Casual extends Mode(0)
-  case object Rated  extends Mode(1)
-
-  val all = List(Casual, Rated)
+  val all = values.toList
 
   val byId = all map { v =>
     (v.id, v)
@@ -28,4 +23,3 @@ object Mode {
   val default: Mode = Casual
 
   def orDefault(id: Int): Mode = apply(id) | default
-}

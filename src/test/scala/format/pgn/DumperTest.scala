@@ -1,23 +1,18 @@
 package chess
 package format.pgn
 
-import format.Forsyth
-import Pos._
+import scala.language.implicitConversions
+import chess.format.{ EpdFen, Fen }
+import Pos.*
 
-import chess.format.FEN
 import chess.variant.ThreeCheck
 
-class DumperTest extends ChessTest {
+class DumperTest extends ChessTest:
 
   "Check with pawn" should {
     "not be checkmate if pawn can be taken en passant" in {
-      val game = Forsyth.<<<(FEN("8/3b4/6R1/1P2kp2/6pp/2N1P3/4KPPP/8 w - -")).get match {
-        case Forsyth.SituationPlus(sit, turns) =>
-          Game(
-            sit,
-            turns = turns
-          )
-      }
+      val game = Fen.readWithMoveNumber(EpdFen("8/3b4/6R1/1P2kp2/6pp/2N1P3/4KPPP/8 w - -")).get match
+        case Situation.AndFullMoveNumber(sit, turns) => Game(sit, turns = turns)
       val move = game(Pos.F2, Pos.F4).toOption.get._2
       Dumper(move) must_== "f4+"
     }
@@ -341,8 +336,8 @@ NRKNRQBB
       }
     }
     "tricky rook disambiguation" in {
-      val fen           = FEN("r5k1/1b5p/N3p1p1/Q4p2/4r3/2P1q3/1PK2RP1/5R2 w - - 1 38")
-      val sit           = chess.format.Forsyth.<<(fen).get
+      val fen           = EpdFen("r5k1/1b5p/N3p1p1/Q4p2/4r3/2P1q3/1PK2RP1/5R2 w - - 1 38")
+      val sit           = Fen.read(fen).get
       val game1         = Game(sit.board, sit.color)
       val (game2, move) = game1(Pos.F2, Pos.F3).toOption.get
       Dumper(game1.situation, move, game2.situation) must_== "Rf3"
@@ -380,4 +375,3 @@ comment""")
 comment }"""
     }
   }
-}

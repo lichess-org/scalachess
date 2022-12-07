@@ -1,11 +1,11 @@
 package chess
 package format.pgn
 
-class ErrorMessagesTest extends ChessTest {
+class ErrorMessagesTest extends ChessTest:
 
   args(skipAll = true)
 
-  val parser = Parser.full _
+  val parser = Parser.full
 
   "Invalid move" should {
     "fail" in {
@@ -102,5 +102,3 @@ class ErrorMessagesTest extends ChessTest {
       parser(e) must beValid
     }
   }
-
-}

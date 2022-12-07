@@ -1,18 +1,17 @@
 package chess
 package format.pgn
 
-import scala._
+import scala.*
 
-class BinaryTest extends ChessTest {
+class BinaryTest extends ChessTest:
 
-  import BinaryTestData._
-  import BinaryTestUtils._
+  import BinaryTestData.*
+  import BinaryTestUtils.*
 
-  def compareStrAndBin(pgn: String) = {
+  def compareStrAndBin(pgn: String) =
     val bin = (Binary writeMoves pgn.split(' ').toList).get.toList
     ((Binary readMoves bin).get mkString " ") must_== pgn
     bin.size must be_<=(pgn.length)
-  }
 
   "binary encoding" should {
     "util test" in {
@@ -216,9 +215,7 @@ class BinaryTest extends ChessTest {
     }
   }
 
-}
-
-object BinaryTestUtils {
+object BinaryTestUtils:
 
   def showByte(b: Byte): String =
     "%08d" format {
@@ -234,24 +231,20 @@ object BinaryTestUtils {
   def readMoves(m: String): List[String] =
     (Binary readMoves m.split(',').toList.map(parseBinary)).get
 
-  def parseBinary(s: String): Byte = {
+  def parseBinary(s: String): Byte =
     var i    = s.length - 1
     var sum  = 0
     var mult = 1
-    while (i >= 0) {
-      s.charAt(i) match {
+    while (i >= 0)
+      s.charAt(i) match
         case '1' => sum += mult
         case '0' =>
         case x   => sys error s"invalid binary literal: $x in $s"
-      }
       mult *= 2
       i -= 1
-    }
     sum.toByte
-  }
-}
 
-object BinaryTestData {
+object BinaryTestData:
 
   val pgn200: List[String] = augmentString(
     """
@@ -459,4 +452,3 @@ e3 e5 Qf3 Nf6 Qe2 Nc6 d3 d5 f4 Bd6 fxe5 Nxe5 Nf3 O-O Nxe5 Bxe5 Nc3 Bg4 Qd2 c5 h3
 Re1 Bxe1 Kxe1 Qg3+ Kd1 Rxe3 Kc1 Re1+ Nd1 d4 a3 Nd5 Kb1 Nc3+ Bxc3 dxc3 Qc1 Qxg2 Ka2 Rxd3 Rb1 Rdxd1 Qxd1 Rxd1 a4 Qxc2+ Ka3 Rxb1
 """
   ).linesIterator.filter(_.nonEmpty).toList
-}

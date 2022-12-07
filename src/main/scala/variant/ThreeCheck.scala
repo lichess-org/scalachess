@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import chess.format.FEN
+import chess.format.EpdFen
 
 case object ThreeCheck
     extends Variant(
@@ -12,11 +12,11 @@ case object ThreeCheck
       shortName = "3check",
       title = "Check your opponent 3 times to win the game.",
       standardInitialPosition = true
-    ) {
+    ):
 
   def pieces = Standard.pieces
 
-  override val initialFen = FEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 +0+0")
+  override val initialFen = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 +0+0")
 
   override def finalizeBoard(board: Board, uci: format.Uci, capture: Option[Piece]): Board =
     board updateHistory {
@@ -37,4 +37,3 @@ case object ThreeCheck
   // When there is insufficient mating material, there is still potential to win by checking the opponent 3 times
   // by the variant ending. However, no players can check if there are only kings remaining
   override def isInsufficientMaterial(board: Board) = board.pieces.values.forall(_ is King)
-}

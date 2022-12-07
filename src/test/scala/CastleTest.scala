@@ -1,9 +1,10 @@
 package chess
 
-import chess.Pos._
+import scala.language.implicitConversions
+import chess.Pos.*
 import chess.variant.FromPosition
 
-class CastleTest extends ChessTest {
+class CastleTest extends ChessTest:
 
   "king side" should {
     val goodHist = """
@@ -314,4 +315,3 @@ PPPPPPPP
       )
     }
   }
-}

@@ -1,8 +1,9 @@
 package chess
 
-import Pos._
+import scala.language.implicitConversions
+import Pos.*
 
-class BishopTest extends ChessTest {
+class BishopTest extends ChessTest:
 
   "a bishop" should {
 
@@ -95,4 +96,3 @@ PPPPPPPP
       }
     }
   }
-}

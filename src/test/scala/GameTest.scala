@@ -1,8 +1,9 @@
 package chess
 
-import Pos._
+import scala.language.implicitConversions
+import Pos.*
 
-class GameTest extends ChessTest {
+class GameTest extends ChessTest:
 
   "prevent castle by capturing a rook" should {
     val game = Game(
@@ -41,4 +42,3 @@ R   K""",
       }
     }
   }
-}

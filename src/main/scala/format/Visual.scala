@@ -10,15 +10,14 @@ package format
   * P    PPP
   * RN  K  R
   */
-object Visual {
+object Visual:
 
-  def <<(source: String): Board = {
+  def <<(source: String): Board =
     val lines = augmentString(source).linesIterator.to(List)
-    val filtered = lines.size match {
+    val filtered = lines.size match
       case 8          => lines
       case n if n > 8 => lines.slice(1, 9)
       case n          => (List.fill(8 - n)("")) ::: lines
-    }
     Board(
       pieces = (for {
         (l, y) <- (filtered zipWithIndex)
@@ -31,7 +30,6 @@ object Visual {
       }) flatten,
       variant = chess.variant.Variant.default
     )
-  }
 
   def >>(board: Board): String = >>|(board, Map.empty)
 
@@ -42,12 +40,10 @@ object Visual {
       })
     }
     for (y <- Rank.allReversed) yield {
-      for (x <- File.all) yield {
+      for (x <- File.all) yield
         val pos = Pos(x, y)
         markedPoss.get(pos) getOrElse board(pos).fold(' ')(_ forsyth)
-      }
     } mkString
   } map { """\s*$""".r.replaceFirstIn(_, "") } mkString "\n"
 
   def addNewLines(str: String) = "\n" + str + "\n"
-}

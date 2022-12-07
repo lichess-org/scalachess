@@ -1,6 +1,6 @@
 package chess
 
-class PieceTest extends ChessTest {
+class PieceTest extends ChessTest:
 
   "Piece" should {
     "compare" in {
@@ -13,4 +13,3 @@ class PieceTest extends ChessTest {
       }
     }
   }
-}

@@ -2,40 +2,40 @@ package chess
 package format
 
 import cats.data.Validated
-import cats.implicits._
+import cats.implicits.*
 
-sealed trait Uci {
+sealed trait Uci:
 
   def uci: String
-  def piotr: String
+  def chars: String
 
   def origDest: (Pos, Pos)
 
   def apply(situation: Situation): Validated[String, MoveOrDrop]
-}
 
-object Uci {
+object Uci:
 
   case class Move(
       orig: Pos,
       dest: Pos,
       promotion: Option[PromotableRole] = None
-  ) extends Uci {
+  ) extends Uci:
 
-    def keys = orig.key + dest.key
-    def uci  = keys + promotionString
+    def keys = s"${orig.key}${dest.key}"
+    def uci  = s"$keys$promotionString"
 
-    def keysPiotr = orig.piotrStr + dest.piotrStr
-    def piotr     = keysPiotr + promotionString
+    def charKeys = s"${orig.asChar}${dest.asChar}"
+    def chars    = s"$charKeys$promotionString"
 
     def promotionString = promotion.fold("")(_.forsyth.toString)
 
     def origDest = orig -> dest
 
     def apply(situation: Situation) = situation.move(orig, dest, promotion) map Left.apply
-  }
 
-  object Move {
+    override def toString = s"Move(${orig.key}${dest.key}${promotion.fold("")(_.forsyth)})"
+
+  object Move:
 
     def apply(move: String): Option[Move] =
       for {
@@ -44,11 +44,11 @@ object Uci {
         promotion = move lift 4 flatMap Role.promotable
       } yield Move(orig, dest, promotion)
 
-    def piotr(move: String) =
+    def fromChars(move: String) =
       for {
-        orig <- move.headOption flatMap Pos.piotr
-        dest <- move lift 1 flatMap Pos.piotr
-        promotion = move lift 2 flatMap Role.promotable
+        orig <- move.headOption flatMap { Pos.fromChar(_) }
+        dest <- move lift 1 flatMap { Pos.fromChar(_) }
+        promotion = move lift 2 flatMap { Role.promotable(_) }
       } yield Move(orig, dest, promotion)
 
     def fromStrings(origS: String, destS: String, promS: Option[String]) =
@@ -57,27 +57,29 @@ object Uci {
         dest <- Pos.fromKey(destS)
         promotion = Role promotable promS
       } yield Move(orig, dest, promotion)
-  }
 
-  case class Drop(role: Role, pos: Pos) extends Uci {
+  case class Drop(role: Role, pos: Pos) extends Uci:
 
     def uci = s"${role.pgn}@${pos.key}"
 
-    def piotr = s"${role.pgn}@${pos.piotrStr}"
+    def chars = s"${role.pgn}@${pos.asChar}"
 
     def origDest = pos -> pos
 
     def apply(situation: Situation) = situation.drop(role, pos) map Right.apply
-  }
 
-  object Drop {
+  object Drop:
+
+    def fromChars(move: String) = for {
+      role <- move.headOption flatMap Role.allByPgn.get
+      pos  <- move lift 2 flatMap { Pos.fromChar(_) }
+    } yield Uci.Drop(role, pos)
 
     def fromStrings(roleS: String, posS: String) =
       for {
         role <- Role.allByName get roleS
         pos  <- Pos.fromKey(posS)
       } yield Drop(role, pos)
-  }
 
   case class WithSan(uci: Uci, san: String)
 
@@ -92,12 +94,9 @@ object Uci {
     } yield Uci.Drop(role, pos)
     else Uci.Move(move)
 
-  def piotr(move: String): Option[Uci] =
-    if (move lift 1 contains '@') for {
-      role <- move.headOption flatMap Role.allByPgn.get
-      pos  <- move lift 2 flatMap Pos.piotr
-    } yield Uci.Drop(role, pos)
-    else Uci.Move.piotr(move)
+  def fromChars(move: String): Option[Uci] =
+    if (move lift 1 contains '@') Uci.Drop.fromChars(move)
+    else Uci.Move.fromChars(move)
 
   def readList(moves: String): Option[List[Uci]] =
     moves.split(' ').toList.map(apply).sequence
@@ -105,9 +104,8 @@ object Uci {
   def writeList(moves: List[Uci]): String =
     moves.map(_.uci) mkString " "
 
-  def readListPiotr(moves: String): Option[List[Uci]] =
-    moves.split(' ').toList.map(piotr).sequence
+  def readListChars(moves: String): Option[List[Uci]] =
+    moves.split(' ').toList.map(fromChars).sequence
 
-  def writeListPiotr(moves: List[Uci]): String =
-    moves.map(_.piotr) mkString " "
-}
+  def writeListChars(moves: List[Uci]): String =
+    moves.map(_.chars) mkString " "

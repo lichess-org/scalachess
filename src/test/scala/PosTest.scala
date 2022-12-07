@@ -1,8 +1,8 @@
 package chess
 
-import Pos._
+import Pos.*
 
-class PosTest extends ChessTest {
+class PosTest extends ChessTest:
 
   "A position" should {
 
@@ -14,19 +14,20 @@ class PosTest extends ChessTest {
     }
 
     "be a string" in {
-      "D5" in { D5.toString must_== "d5" }
+      A1.key.pp
+      H8.key.pp
+      "D5" in { D5.key must_== "d5" }
     }
 
-    "piotr" in {
-      A1.piotr must_== 'a'
-      B4.piotr must_== 'z'
-      C4.piotr must_== 'A'
-      D7.piotr must_== 'Z'
-      E7.piotr must_== '0'
-      F7.piotr must_== '1'
-      F8.piotr must_== '9'
-      G8.piotr must_== '!'
-      H8.piotr must_== '?'
+    "chars" in {
+      A1.asChar must_== 'a'
+      B4.asChar must_== 'z'
+      C4.asChar must_== 'A'
+      D7.asChar must_== 'Z'
+      E7.asChar must_== '0'
+      F7.asChar must_== '1'
+      F8.asChar must_== '9'
+      G8.asChar must_== '!'
+      H8.asChar must_== '?'
     }
   }
-}

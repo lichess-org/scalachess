@@ -1,12 +1,14 @@
 package chess
 
-class HistoryTest extends ChessTest {
+import cats.kernel.Monoid
+
+class HistoryTest extends ChessTest:
 
   "threefold repetition" should {
-    def toHash(a: Int) = Array(a.toByte, 0.toByte, 0.toByte)
+    def toHash(a: Int) = PositionHash(Array(a.toByte, 0.toByte, 0.toByte))
     def makeHistory(positions: List[Int]) =
-      (positions map toHash).foldLeft(History()) { case (history, hash) =>
-        history.copy(positionHashes = hash ++ history.positionHashes)
+      (positions map toHash).foldLeft(History()) { (history, hash) =>
+        history.copy(positionHashes = Monoid[PositionHash].combine(hash, history.positionHashes))
       }
     "empty history" in {
       History().threefoldRepetition must_== false
@@ -33,4 +35,3 @@ class HistoryTest extends ChessTest {
       History().setHalfMoveClock(5).halfMoveClock must_== 5
     }
   }
-}

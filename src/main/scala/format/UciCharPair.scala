@@ -1,17 +1,16 @@
 package chess
 package format
 
-case class UciCharPair(a: Char, b: Char) {
+case class UciCharPair(a: Char, b: Char):
 
   override def toString = s"$a$b"
-}
 
-object UciCharPair {
+object UciCharPair:
 
-  import implementation._
+  import implementation.*
 
   def apply(uci: Uci): UciCharPair =
-    uci match {
+    uci match
       case Uci.Move(orig, dest, None)       => UciCharPair(toChar(orig), toChar(dest))
       case Uci.Move(orig, dest, Some(role)) => UciCharPair(toChar(orig), toChar(dest.file, role))
       case Uci.Drop(role, pos) =>
@@ -19,9 +18,8 @@ object UciCharPair {
           toChar(pos),
           dropRole2charMap.getOrElse(role, voidChar)
         )
-    }
 
-  private[format] object implementation {
+  private[format] object implementation:
 
     val charShift = 35        // Start at Char(35) == '#'
     val voidChar  = 33.toChar // '!'. We skipped Char(34) == '"'.
@@ -32,7 +30,7 @@ object UciCharPair {
       }
       .to(Map)
 
-    def toChar(pos: Pos) = pos2charMap.getOrElse(pos, voidChar)
+    inline def toChar(inline pos: Pos) = pos2charMap.getOrElse(pos, voidChar)
 
     val promotion2charMap: Map[(File, PromotableRole), Char] = for {
       (role, index) <- Role.allPromotable.zipWithIndex.to(Map)
@@ -50,5 +48,3 @@ object UciCharPair {
           role -> (charShift + pos2charMap.size + promotion2charMap.size + index).toChar
         }
         .to(Map)
-  }
-}

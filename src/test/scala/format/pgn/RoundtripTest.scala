@@ -1,7 +1,7 @@
 package chess
 package format.pgn
 
-class RoundtripTest extends ChessTest {
+class RoundtripTest extends ChessTest:
 
   "tags" should {
     "roundtrip with special chars" in {
@@ -12,4 +12,3 @@ class RoundtripTest extends ChessTest {
       }
     }
   }
-}

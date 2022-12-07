@@ -1,9 +1,9 @@
 package chess
 
-import Pos._
+import Pos.*
 import format.Uci
 
-class PawnTest extends ChessTest {
+class PawnTest extends ChessTest:
 
   "a white pawn" should {
 
@@ -206,4 +206,3 @@ class PawnTest extends ChessTest {
       }
     }
   }
-}

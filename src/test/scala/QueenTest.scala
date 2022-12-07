@@ -1,8 +1,9 @@
 package chess
 
-import Pos._
+import scala.language.implicitConversions
+import Pos.*
 
-class QueenTest extends ChessTest {
+class QueenTest extends ChessTest:
 
   "a queen" should {
 
@@ -148,4 +149,3 @@ PPPPPPPP
       }
     }
   }
-}

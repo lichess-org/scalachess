@@ -1,6 +1,6 @@
 package chess
 
-class BerserkTest extends ChessTest {
+class BerserkTest extends ChessTest:
 
   def whiteBerserk(minutes: Int, seconds: Int) =
     Clock(minutes * 60, seconds).goBerserk(White).remainingTime(White).centis * .01
@@ -67,4 +67,3 @@ class BerserkTest extends ChessTest {
       whiteBerserk(1, 5) must_== 1 * 60
     }
   }
-}

@@ -1,23 +1,22 @@
 package chess
 package format.pgn
 
-case class Glyph(id: Int, symbol: String, name: String) {
+case class Glyph(id: Int, symbol: String, name: String):
 
   override def toString = s"$symbol ($$$id $name)"
-}
 
 case class Glyphs(
     move: Option[Glyph.MoveAssessment],
     position: Option[Glyph.PositionAssessment],
     observations: List[Glyph.Observation]
-) {
+):
 
   def isEmpty = this == Glyphs.empty
 
   def nonEmpty: Option[Glyphs] = if (isEmpty) None else Option(this)
 
   def toggle(glyph: Glyph) =
-    glyph match {
+    glyph match
       case g: Glyph.MoveAssessment     => copy(move = !move.contains(g) option g)
       case g: Glyph.PositionAssessment => copy(position = !position.contains(g) option g)
       case g: Glyph.Observation =>
@@ -26,7 +25,6 @@ case class Glyphs(
           else g :: observations
         )
       case _ => this
-    }
 
   def merge(g: Glyphs) =
     if (isEmpty) g
@@ -39,9 +37,8 @@ case class Glyphs(
       )
 
   def toList: List[Glyph] = move.toList ::: position.toList ::: observations
-}
 
-object Glyphs {
+object Glyphs:
   val empty = Glyphs(None, None, Nil)
 
   def fromList(glyphs: List[Glyph]) =
@@ -53,13 +50,12 @@ object Glyphs {
   val all = Glyph.MoveAssessment.all ++ Glyph.Observation.all ++ Glyph.PositionAssessment.all
 
   val bySymbol: Map[String, Glyph] = all.map { g => g.symbol -> g }.toMap
-}
 
-object Glyph {
+object Glyph:
 
   sealed trait MoveAssessment extends Glyph
 
-  object MoveAssessment {
+  object MoveAssessment:
     val good        = new Glyph(1, "!", "Good move") with MoveAssessment
     val mistake     = new Glyph(2, "?", "Mistake") with MoveAssessment
     val brillant    = new Glyph(3, "!!", "Brillant move") with MoveAssessment
@@ -77,11 +73,10 @@ object Glyph {
       .to(Map)
 
     def display = all
-  }
 
   sealed trait PositionAssessment extends Glyph
 
-  object PositionAssessment {
+  object PositionAssessment:
     val equal               = new Glyph(10, "=", "Equal position") with PositionAssessment
     val unclear             = new Glyph(13, "∞", "Unclear position") with PositionAssessment
     val whiteSlightlyBetter = new Glyph(14, "⩲", "White is slightly better") with PositionAssessment
@@ -108,11 +103,10 @@ object Glyph {
       .to(Map)
 
     def display = all
-  }
 
   sealed trait Observation extends Glyph
 
-  object Observation {
+  object Observation:
     val novelty      = new Glyph(146, "N", "Novelty") with Observation
     val development  = new Glyph(32, "↑↑", "Development") with Observation
     val initiative   = new Glyph(36, "↑", "Initiative") with Observation
@@ -130,7 +124,6 @@ object Glyph {
       .to(Map)
 
     def display = all
-  }
 
   def find(id: Int): Option[Glyph] =
     MoveAssessment.byId.get(id) orElse
@@ -142,4 +135,3 @@ object Glyph {
       s.drop(1).toIntOption flatMap Glyph.find
     else
       Glyphs.bySymbol.get(s)
-}

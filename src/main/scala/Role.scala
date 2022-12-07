@@ -1,6 +1,6 @@
 package chess
 
-sealed trait Role {
+sealed trait Role:
   val forsyth: Char
   lazy val forsythUpper: Char = forsyth.toUpper
   lazy val pgn: Char          = forsythUpper
@@ -8,25 +8,23 @@ sealed trait Role {
   val projection: Boolean
   val dirs: Directions
   def dir(from: Pos, to: Pos): Option[Direction]
-}
+
 sealed trait PromotableRole extends Role
 
-/** Promotable in antichess.
-  */
-case object King extends PromotableRole {
+/** Promotable in antichess. */
+case object King extends PromotableRole:
   val forsyth                 = 'k'
   val dirs: Directions        = Queen.dirs
   def dir(from: Pos, to: Pos) = None
   val projection              = false
-}
 
-case object Queen extends PromotableRole {
+case object Queen extends PromotableRole:
   val forsyth                 = 'q'
   val dirs: Directions        = Rook.dirs ::: Bishop.dirs
   def dir(from: Pos, to: Pos) = Rook.dir(from, to) orElse Bishop.dir(from, to)
   val projection              = true
-}
-case object Rook extends PromotableRole {
+
+case object Rook extends PromotableRole:
   val forsyth          = 'r'
   val dirs: Directions = List(_.up, _.down, _.left, _.right)
   def dir(from: Pos, to: Pos) =
@@ -36,8 +34,8 @@ case object Rook extends PromotableRole {
       Option(if (to ?< from) (_.left) else (_.right))
     else None
   val projection = true
-}
-case object Bishop extends PromotableRole {
+
+case object Bishop extends PromotableRole:
   val forsyth          = 'b'
   val dirs: Directions = List(_.upLeft, _.upRight, _.downLeft, _.downRight)
   def dir(from: Pos, to: Pos) =
@@ -49,8 +47,8 @@ case object Bishop extends PromotableRole {
       })
     else None
   val projection = true
-}
-case object Knight extends PromotableRole {
+
+case object Knight extends PromotableRole:
   val forsyth = 'n'
   val dirs: Directions = List(
     p => Pos.at(p.file.index - 1, p.rank.index + 2),
@@ -64,15 +62,14 @@ case object Knight extends PromotableRole {
   )
   def dir(from: Pos, to: Pos) = None
   val projection              = false
-}
-case object Pawn extends Role {
+
+case object Pawn extends Role:
   val forsyth                 = 'p'
   val dirs: Directions        = Nil
   def dir(from: Pos, to: Pos) = None
   val projection              = false
-}
 
-object Role {
+object Role:
 
   val all: List[Role]                     = List(King, Queen, Rook, Bishop, Knight, Pawn)
   val allPromotable: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, King)
@@ -110,12 +107,10 @@ object Role {
     name flatMap promotable
 
   def valueOf(r: Role): Option[Int] =
-    r match {
+    r match
       case Pawn   => Option(1)
       case Knight => Option(3)
       case Bishop => Option(3)
       case Rook   => Option(5)
       case Queen  => Option(9)
       case King   => None
-    }
-}

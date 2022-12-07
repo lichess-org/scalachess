@@ -1,8 +1,9 @@
 package chess
 
-import Pos._
+import scala.language.implicitConversions
+import Pos.*
 
-class RookTest extends ChessTest {
+class RookTest extends ChessTest:
 
   "a rook" should {
 
@@ -72,4 +73,3 @@ PPPPPPPP
       }
     }
   }
-}

@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import chess.format.FEN
+import chess.format.EpdFen
 
 case object RacingKings
     extends Variant(
@@ -12,9 +12,9 @@ case object RacingKings
       shortName = "Racing",
       title = "Race your King to the eighth rank to win.",
       standardInitialPosition = false
-    ) {
+    ):
 
-  override def allowsCastling = false
+  override val allowsCastling = false
 
   // Both sides start on the first two ranks:
   // krbnNBRK
@@ -40,7 +40,7 @@ case object RacingKings
 
   override val castles = Castles.none
 
-  override val initialFen = FEN("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
+  override val initialFen = EpdFen("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
 
   override def isInsufficientMaterial(board: Board)                  = false
   override def opponentHasInsufficientMaterial(situation: Situation) = false
@@ -56,13 +56,12 @@ case object RacingKings
   // draw, to compensate for the first-move advantage. The draw is not called
   // automatically, because black should also be given equal chances to flag.
   override def specialEnd(situation: Situation) =
-    situation.color match {
+    situation.color match
       case White =>
         reachedGoal(situation.board, White) ^ reachedGoal(situation.board, Black)
       case Black =>
         reachedGoal(situation.board, White) && (validMoves(situation).view mapValues (_.filter(reachesGoal)))
           .forall(_._2.isEmpty)
-    }
 
   // If white reaches the goal and black also reaches the goal directly after,
   // then it is a draw.
@@ -75,13 +74,11 @@ case object RacingKings
   // Not only check that our king is safe,
   // but also check the opponent's
   override def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean =
-    super.kingSafety(m, filter, kingPos) && ! {
-      m.after.kingPos get !m.color exists { theirKingPos =>
+    super.kingSafety(m, filter, kingPos) &&
+      !m.after.kingPos.get(!m.color).exists { theirKingPos =>
         kingThreatened(m.after, m.color, theirKingPos, (_ => true))
       }
-    }
 
   // When considering stalemate, take into account that checks are not allowed.
   override def staleMate(situation: Situation): Boolean =
     !situation.check && !specialEnd(situation) && !validMoves(situation).exists(_._2.nonEmpty)
-}

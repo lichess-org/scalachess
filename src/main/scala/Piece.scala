@@ -1,6 +1,6 @@
 package chess
 
-case class Piece(color: Color, role: Role) {
+case class Piece(color: Color, role: Role):
 
   def is(c: Color)   = c == color
   def is(r: Role)    = r == role
@@ -15,7 +15,7 @@ case class Piece(color: Color, role: Role) {
 
   // attackable positions assuming empty board
   def eyes(from: Pos, to: Pos): Boolean =
-    role match {
+    role match
       case King   => from touches to
       case Queen  => (from onSameLine to) || (from onSameDiagonal to)
       case Rook   => from onSameLine to
@@ -25,13 +25,12 @@ case class Piece(color: Color, role: Role) {
         val yd = from yDist to
         (xd == 1 && yd == 2) || (xd == 2 && yd == 1)
       case Pawn => Piece.pawnEyes(color, from, to)
-    }
 
   // movable positions assuming empty board
   def eyesMovable(from: Pos, to: Pos): Boolean =
     if (role == Pawn) Piece.pawnEyes(color, from, to) || {
       (from ?| to) && {
-        val dy = to.rank - from.rank
+        val dy = to.rank.value - from.rank.value
         if (color.white) (dy == 1 || (from.rank <= Rank.Second && dy == 2))
         else (dy == -1 || (from.rank >= Rank.Seventh && dy == -2))
       }
@@ -39,9 +38,8 @@ case class Piece(color: Color, role: Role) {
     else eyes(from, to)
 
   override def toString = s"$color-$role".toLowerCase
-}
 
-object Piece {
+object Piece:
 
   def fromChar(c: Char): Option[Piece] =
     Role.allByPgn get c.toUpper map {
@@ -49,7 +47,6 @@ object Piece {
     }
 
   private def pawnEyes(color: Color, from: Pos, to: Pos) =
-    (from xDist to) == 1 && (to.rank - from.rank) == {
+    (from xDist to) == 1 && (to.rank.value - from.rank.value) == {
       if (color.white) 1 else -1
     }
-}

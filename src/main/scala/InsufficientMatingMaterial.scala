@@ -5,7 +5,7 @@ package chess
   *
   * See http://www.e4ec.org/immr.html
   */
-object InsufficientMatingMaterial {
+object InsufficientMatingMaterial:
 
   def nonKingPieces(board: Board) = board.pieces filter (_._2.role != King)
 
@@ -19,14 +19,14 @@ object InsufficientMatingMaterial {
   def pawnBlockedByPawn(pawn: Actor, board: Board) =
     pawn.moves.isEmpty && {
       val blockingPosition = Actor.posAheadOfPawn(pawn.pos, pawn.piece.color)
-      blockingPosition.flatMap(board.apply).exists(_.is(Pawn))
+      blockingPosition.flatMap(board(_)).exists(_.is(Pawn))
     }
 
   /*
    * Determines whether a board position is an automatic draw due to neither player
    * being able to mate the other as informed by the traditional chess rules.
    */
-  def apply(board: Board) = {
+  def apply(board: Board) =
     lazy val kingsAndBishopsOnly = board.pieces forall { p =>
       (p._2 is King) || (p._2 is Bishop)
     }
@@ -35,7 +35,6 @@ object InsufficientMatingMaterial {
     }
 
     kingsAndMinorsOnly && (board.pieces.size <= 3 || (kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
-  }
 
   /*
    * Determines whether a color does not have mating material. In general:
@@ -44,7 +43,7 @@ object InsufficientMatingMaterial {
    * King + bishop mates against king + any(bishop, knight, pawn)
    * King + bishop(s) versus king + bishop(s) depends upon bishop square colors
    */
-  def apply(board: Board, color: Color) = {
+  def apply(board: Board, color: Color) =
 
     val kingsAndMinorsOnlyOfColor = board.piecesOf(color) forall { p =>
       (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight)
@@ -62,5 +61,3 @@ object InsufficientMatingMaterial {
         !(rolesOfOpponentColor.exists(r => r == Knight || r == Pawn) || bishopsOnOppositeColors(board))
       case _ => false
     })
-  }
-}

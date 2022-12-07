@@ -3,6 +3,7 @@ package chess
 import cats.syntax.option.none
 
 import chess.format.Uci
+import cats.kernel.Monoid
 
 case class Drop(
     piece: Piece,
@@ -10,15 +11,15 @@ case class Drop(
     situationBefore: Situation,
     after: Board,
     metrics: MoveMetrics = MoveMetrics()
-) {
+):
 
-  def before = situationBefore.board
+  inline def before = situationBefore.board
 
-  def situationAfter = Situation(finalizeAfter, !piece.color)
+  inline def situationAfter = Situation(finalizeAfter, !piece.color)
 
-  def withHistory(h: History) = copy(after = after withHistory h)
+  inline def withHistory(inline h: History) = copy(after = after withHistory h)
 
-  def finalizeAfter: Board = {
+  def finalizeAfter: Board =
     val board = after.variant.finalizeBoard(
       after updateHistory { h =>
         h.copy(
@@ -33,10 +34,11 @@ case class Drop(
 
     board updateHistory { h =>
       val basePositionHashes =
-        if (h.positionHashes.isEmpty) Hash(situationBefore) else h.positionHashes
-      h.copy(positionHashes = Hash(Situation(board, !piece.color)) ++ basePositionHashes)
+        if (h.positionHashes.value.isEmpty) Hash(situationBefore) else h.positionHashes
+      h.copy(positionHashes =
+        Monoid[PositionHash].combine(Hash(Situation(board, !piece.color)), basePositionHashes)
+      )
     }
-  }
 
   def afterWithLastMove =
     after.variant.finalizeBoard(
@@ -45,13 +47,12 @@ case class Drop(
       none
     )
 
-  def color = piece.color
+  inline def color = piece.color
 
-  def withAfter(newBoard: Board) = copy(after = newBoard)
+  inline def withAfter(newBoard: Board) = copy(after = newBoard)
 
-  def withMetrics(m: MoveMetrics) = copy(metrics = m)
+  inline def withMetrics(m: MoveMetrics) = copy(metrics = m)
 
-  def toUci = Uci.Drop(piece.role, pos)
+  inline def toUci = Uci.Drop(piece.role, pos)
 
   override def toString = toUci.uci
-}

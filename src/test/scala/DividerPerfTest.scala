@@ -1,6 +1,6 @@
 package chess
 
-class DividerPerfTest extends ChessTest {
+class DividerPerfTest extends ChessTest:
 
   args(skipAll = true)
 
@@ -19,18 +19,16 @@ class DividerPerfTest extends ChessTest {
       // runOne.end must beSome.like {
       //   case x => x must beBetween(65, 80)
       // }
-      if (nb * iterations > 1) {
+      if (nb * iterations > 1)
         println("warming up")
         run()
-      }
       println("running tests")
-      val durations = for (_ <- 1 to iterations) yield {
+      val durations = for (_ <- 1 to iterations) yield
         val start = System.currentTimeMillis
         run()
         val duration = System.currentTimeMillis - start
         println(s"$nb games in $duration ms")
         duration
-      }
       val nbGames    = iterations * nb
       val moveMicros = (1000 * durations.sum) / nbGames
       println(s"Average = $moveMicros microseconds per game")
@@ -38,4 +36,3 @@ class DividerPerfTest extends ChessTest {
       true === true
     }
   }
-}

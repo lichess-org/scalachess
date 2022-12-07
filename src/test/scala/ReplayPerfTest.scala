@@ -1,6 +1,6 @@
 package chess
 
-class ReplayPerfTest extends ChessTest {
+class ReplayPerfTest extends ChessTest:
 
   args(skipAll = true)
 
@@ -13,22 +13,21 @@ class ReplayPerfTest extends ChessTest {
   // val iterations = 1
 
   def runOne(moves: List[String]) =
-    Replay.gameMoveWhileValid(moves, format.Forsyth.initial, chess.variant.Standard)
+    Replay.gameMoveWhileValid(moves, format.Fen.initial, chess.variant.Standard)
 
   def run(): Unit = { gameMoves foreach runOne }
 
   "playing a game" should {
     "many times" in {
-      runOne(gameMoves.head)._3 must beEmpty
+      runOne(gameMoves.head)._3 must beNone
       run()
       println("running tests")
-      val durations = for (_ <- 1 to iterations) yield {
+      val durations = for (_ <- 1 to iterations) yield
         val start = System.currentTimeMillis
         run()
         val duration = System.currentTimeMillis - start
         println(s"$nb games in $duration ms")
         duration
-      }
       val nbGames    = iterations * nb
       val moveMicros = (1000 * durations.sum) / nbGames
       println(s"Average = $moveMicros microseconds per game")
@@ -36,4 +35,3 @@ class ReplayPerfTest extends ChessTest {
       true === true
     }
   }
-}

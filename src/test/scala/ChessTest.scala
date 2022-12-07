@@ -1,51 +1,49 @@
 package chess
 
 import cats.data.Validated
-import cats.syntax.option._
+import cats.syntax.option.*
 import org.specs2.matcher.Matcher
 import org.specs2.matcher.ValidatedMatchers
 import org.specs2.mutable.Specification
 
-import chess.format.{ Forsyth, Visual }
+import chess.format.{ EpdFen, Fen, Visual }
 import chess.variant.Variant
-import chess.format.FEN
 
-trait ChessTest extends Specification with ValidatedMatchers {
+trait ChessTest extends Specification with ValidatedMatchers:
 
-  implicit def stringToBoard(str: String): Board = Visual << str
+  given Conversion[String, Board] with
+    def apply(str: String) = Visual << str
 
-  implicit class StringToBoardBuilder(str: String) {
+  extension (color: Color)
+    def -(role: Role) = Piece(color, role)
+    def pawn          = color - Pawn
+    def bishop        = color - Bishop
+    def knight        = color - Knight
+    def rook          = color - Rook
+    def queen         = color - Queen
+    def king          = color - King
 
-    def chess960: Board = makeBoard(str, chess.variant.Chess960)
-
-    def kingOfTheHill: Board = makeBoard(str, chess.variant.KingOfTheHill)
-
-    def threeCheck: Board = makeBoard(str, chess.variant.ThreeCheck)
-  }
-
-  implicit class StringToSituationBuilder(str: String) {
-
+  extension (str: String)
+    def chess960: Board             = makeBoard(str, chess.variant.Chess960)
+    def kingOfTheHill: Board        = makeBoard(str, chess.variant.KingOfTheHill)
+    def threeCheck: Board           = makeBoard(str, chess.variant.ThreeCheck)
     def as(color: Color): Situation = Situation(Visual << str, color)
-  }
 
-  case class RichActor(actor: Actor) {
+  extension (actor: Actor)
     def threatens(to: Pos): Boolean =
       actor.piece.eyes(actor.pos, to) && {
         (!actor.piece.role.projection) ||
         actor.piece.role.dir(actor.pos, to).exists {
-          Actor.longRangeThreatens(actor.board, actor.pos, _, to)
+          actor.board.variant.longRangeThreatens(actor.board, actor.pos, _, to)
         }
       }
-  }
 
-  implicit def richActor(actor: Actor) = RichActor(actor)
-
-  case class RichGame(game: Game) {
+  extension (game: Game)
     def as(color: Color): Game = game.withPlayer(color)
 
     def playMoves(moves: (Pos, Pos)*): Validated[String, Game] = playMoveList(moves)
 
-    def playMoveList(moves: Iterable[(Pos, Pos)]): Validated[String, Game] = {
+    def playMoveList(moves: Iterable[(Pos, Pos)]): Validated[String, Game] =
       val vg = moves.foldLeft(Validated.valid(game): Validated[String, Game]) { (vg, move) =>
         // vg foreach { x =>
         // println(s"------------------------ ${x.turns} = $move")
@@ -60,7 +58,6 @@ trait ChessTest extends Specification with ValidatedMatchers {
       }
       // vg foreach { x => println("========= PGN: " + x.pgnMoves) }
       vg
-    }
 
     def playMove(
         orig: Pos,
@@ -70,20 +67,16 @@ trait ChessTest extends Specification with ValidatedMatchers {
       game.apply(orig, dest, promotion) map (_._1)
 
     def withClock(c: Clock) = game.copy(clock = Option(c))
-  }
 
-  implicit def richGame(game: Game) = RichGame(game)
-
-  def fenToGame(positionString: FEN, variant: Variant) = {
-    val situation = Forsyth << positionString
+  def fenToGame(positionString: EpdFen, variant: Variant) =
+    val situation = Fen.read(variant, positionString)
     situation map { sit =>
       sit.color -> sit.withVariant(variant).board
-    } toValid "Could not construct situation from FEN" map { case (color, board) =>
+    } toValid "Could not construct situation from Fen" map { case (color, board) =>
       Game(variant).copy(
         situation = Situation(board, color)
       )
     }
-  }
 
   def makeBoard(pieces: (Pos, Piece)*): Board =
     Board(pieces toMap, History(), chess.variant.Standard)
@@ -95,15 +88,15 @@ trait ChessTest extends Specification with ValidatedMatchers {
 
   def makeEmptyBoard: Board = Board empty chess.variant.Standard
 
-  def bePoss(poss: Pos*): Matcher[Option[Iterable[Pos]]] =
-    beSome.like { case p =>
+  def bePoss(poss: Pos*) = // : Matcher[Option[Iterable[Pos]]] =
+    beSome { (p: Iterable[Pos]) =>
       sortPoss(p.toList) must_== sortPoss(poss.toList)
     }
 
   def makeGame: Game = Game(makeBoard, White)
 
-  def bePoss(board: Board, visual: String): Matcher[Option[Iterable[Pos]]] =
-    beSome.like { case p =>
+  def bePoss(board: Board, visual: String) = // : Matcher[Option[Iterable[Pos]]] =
+    beSome { (p: Iterable[Pos]) =>
       Visual.addNewLines(Visual.>>|(board, Map(p -> 'x'))) must_== visual
     }
 
@@ -128,4 +121,3 @@ trait ChessTest extends Specification with ValidatedMatchers {
     (makeEmptyBoard place (piece, pos)) flatMap { b =>
       b actorAt pos map (_.destinations)
     }
-}

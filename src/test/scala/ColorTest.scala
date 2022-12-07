@@ -1,6 +1,6 @@
 package chess
 
-class ColorTest extends ChessTest {
+class ColorTest extends ChessTest:
 
   "Color" should {
     "unary !" in {
@@ -8,4 +8,3 @@ class ColorTest extends ChessTest {
       "black" in { !Black must_== White }
     }
   }
-}

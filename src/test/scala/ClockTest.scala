@@ -1,8 +1,8 @@
 package chess
 
-import Pos._
+import Pos.*
 
-class ClockTest extends ChessTest {
+class ClockTest extends ChessTest:
   val fakeClock60 = Clock(60, 0)
     .copy(timestamper = new Timestamper {
       val now = Timestamp(0)
@@ -49,19 +49,17 @@ class ClockTest extends ChessTest {
   "lag compensation" should {
     def durOf(lag: Int) = MoveMetrics(clientLag = Option(Centis(lag)))
 
-    def clockStep(clock: Clock, wait: Int, lags: Int*) = {
+    def clockStep(clock: Clock, wait: Int, lags: Int*) =
       (lags.foldLeft(clock) { (clk, lag) =>
         advance(clk.step().value, wait + lag) step durOf(lag) value
       } remainingTime Black).centis
-    }
 
-    def clockStep60(w: Int, l: Int*)  = clockStep(fakeClock60, w, l: _*)
-    def clockStep600(w: Int, l: Int*) = clockStep(fakeClock600, w, l: _*)
+    def clockStep60(w: Int, l: Int*)  = clockStep(fakeClock60, w, l*)
+    def clockStep600(w: Int, l: Int*) = clockStep(fakeClock600, w, l*)
 
-    def clockStart(lag: Int) = {
+    def clockStart(lag: Int) =
       val clock = fakeClock60.step()
       ((clock.value step durOf(lag)).value remainingTime White).centis
-    }
 
     "start" in {
       "no lag" in {
@@ -150,4 +148,3 @@ class ClockTest extends ChessTest {
     "stall within quota" >> !advance(fakeClock600, 60190).outOfTime(White, withGrace = true)
     "max grace stall" >> advance(fakeClock600, 602 * 100).outOfTime(White, withGrace = true)
   }
-}

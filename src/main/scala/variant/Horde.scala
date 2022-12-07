@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import chess.format.FEN
+import chess.format.EpdFen
 
 case object Horde
     extends Variant(
@@ -12,11 +12,11 @@ case object Horde
       shortName = "Horde",
       title = "Destroy the horde to win!",
       standardInitialPosition = false
-    ) {
+    ):
 
   /** In Horde chess white advances against black with a horde of pawns.
     */
-  lazy val pieces: Map[Pos, Piece] = {
+  lazy val pieces: Map[Pos, Piece] =
     val whitePawnsHorde = for {
       x <- File.all
       y <- Rank.all.take(4)
@@ -25,11 +25,12 @@ case object Horde
     val blackPawns  = File.all.map { Pos(_, Rank.Seventh) -> Black.pawn }
     val blackPieces = File.all.map { x => Pos(x, Rank.Eighth) -> (Black - backRank(x.index)) }
     whitePawnsHorde ++ frontPawns ++ blackPawns ++ blackPieces toMap
-  }
 
   override val castles = Castles("kq")
 
-  override val initialFen = FEN("rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1")
+  override val initialFen = EpdFen(
+    "rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1"
+  )
 
   override def valid(board: Board, strict: Boolean) =
     board.kingPosOf(White).isEmpty && validSide(board, strict)(Black) && !pawnsOnPromotionRank(board, White)
@@ -42,13 +43,12 @@ case object Horde
     * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
     * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
     */
-  private def hordeClosedPosition(board: Board) = {
+  private def hordeClosedPosition(board: Board) =
     lazy val notKingBoard = board.kingPos.get(Color.black).flatMap(board.take).getOrElse(board)
     val hordePos          = board.occupation(Color.white) // may include promoted pieces
     val mateInOne =
       hordePos.sizeIs == 1 && hordePos.forall(pos => pieceThreatened(board, Color.black, pos, (_ => true)))
     !mateInOne && notKingBoard.actors.values.forall(actor => actor.moves.isEmpty)
-  }
 
   /** In horde chess, black can win unless a fortress stalemate is unavoidable.
     *  Auto-drawing the game should almost never happen, but it did in https://lichess.org/xQ2RsU8N#121
@@ -60,11 +60,11 @@ case object Horde
     * Technically there are some positions where stalemate is unavoidable which
     * this method does not detect; however, such are trivial to premove.
     */
-  override def opponentHasInsufficientMaterial(situation: Situation): Boolean = {
+  override def opponentHasInsufficientMaterial(situation: Situation): Boolean =
     val board         = situation.board
     val opponentColor = !situation.color
     lazy val fortress = hordeClosedPosition(board) // costly function call
-    if (opponentColor == Color.white) {
+    if (opponentColor == Color.white)
       lazy val notKingPieces           = InsufficientMatingMaterial.nonKingPieces(board) toList
       val horde                        = board.piecesOf(Color.white)
       lazy val hordeBishopSquareColors = horde.filter(_._2.is(Bishop)).toList.map(_._1.isLight).distinct
@@ -77,8 +77,8 @@ case object Horde
       lazy val armyNonQueensOrRooks    = army.count(p => p._2.isNot(Queen) && p._2.isNot(Rook))
       lazy val armyNonQueensOrBishops  = army.count(p => p._2.isNot(Queen) && p._2.isNot(Bishop))
       lazy val armyBishopSquareColors  = army.filter(_._2.is(Bishop)).toList.map(_._1.isLight).distinct
-      if (horde.sizeIs == 1) {
-        hordeRoles match {
+      if (horde.sizeIs == 1)
+        hordeRoles match
           case List(Knight) =>
             army.sizeIs < 4 || armyNonQueensOrRooks == 0 || armyNonQueensOrBishops == 0 || (armyNonQueensOrBishops + armyBishopSquareColors.size) < 4
           case List(Bishop) =>
@@ -87,8 +87,7 @@ case object Horde
             ) < 2
           case List(Rook) => army.sizeIs < 3 || armyPawnsOrRooks == 0 || armyPawnsOrKnights == 0
           case _          => armyPawnsOrRooks == 0
-        }
-      } else if (
+      else if (
         (hordeRoles.forall(
           _ == Bishop
         ) && hordeBishopSquareColors.lengthCompare(1) == 0) && {
@@ -102,10 +101,8 @@ case object Horde
       )
         true
       else fortress
-    } else fortress
-  }
+    else fortress
 
   override def isUnmovedPawn(color: Color, pos: Pos) =
     if (color.white) pos.rank <= Rank.Second
     else pos.rank == Rank.Seventh
-}

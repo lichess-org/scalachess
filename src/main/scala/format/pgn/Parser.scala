@@ -1,15 +1,15 @@
 package chess
 package format.pgn
 
-import cats.parse.{ LocationMap, Numbers => N, Parser => P, Parser0 => P0, Rfc5234 => R }
+import cats.parse.{ LocationMap, Numbers as N, Parser as P, Parser0 as P0, Rfc5234 as R }
 import cats.data.Validated
 import cats.data.Validated.{ invalid, valid }
-import cats.implicits._
+import cats.implicits.*
 import cats.parse.Parser.Expectation
 import cats.data.NonEmptyList
 
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
-object Parser {
+object Parser:
 
   val whitespace = R.cr | R.lf | R.wsp
   val pgnComment = P.caret.filter(_.col == 0) *> P.char('%') *> P.until(P.char('\n')).void
@@ -17,12 +17,11 @@ object Parser {
   val escape = pgnComment.? *> whitespace.rep0.?
 
   def full(pgn: String): Validated[String, ParsedPgn] =
-    pgnParser.parse(pgn) match {
+    pgnParser.parse(pgn) match
       case Right((_, parsedResult)) =>
         valid(parsedResult)
       case Left(err) =>
         invalid(showExpectations("Cannot parse pgn", pgn, err))
-    }
 
   def moves(str: String): Validated[String, Sans] =
     MovesParser.moves(str)
@@ -34,23 +33,21 @@ object Parser {
 
   def move(str: String) = MovesParser.move(str)
 
-  private object MovesParser {
+  private object MovesParser:
 
     private def cleanComments(comments: List[String]) = comments.map(_.trim).filter(_.nonEmpty)
 
     def moves(str: String): Validated[String, Sans] =
-      strMove.rep.map(xs => Sans(xs.toList)).parse(str) match {
+      strMove.rep.map(xs => Sans(xs.toList)).parse(str) match
         case Right((_, str)) =>
           valid(str)
         case Left(err) => invalid(showExpectations("Cannot parse moves", str, err))
-      }
 
     def move(str: String): Validated[String, San] =
-      strMove.parse(str) match {
+      strMove.parse(str) match
         case Right((_, str)) =>
           valid(str)
         case Left(err) => invalid(showExpectations("Cannot parse move", str, err))
-      }
 
     val blockCommentary: P[String] = P.until0(P.char('}')).with1.between(P.char('{'), P.char('}'))
 
@@ -73,7 +70,7 @@ object Parser {
       "1–0"
     )
 
-    def mapResult(result: String): String = result match {
+    def mapResult(result: String): String = result match
       case "½-½"     => "1/2-1/2"
       case "1/2‑1/2" => "1/2-1/2"
       case "½‑½"     => "1/2-1/2"
@@ -84,7 +81,6 @@ object Parser {
       case "1‑0"     => "1-0"
       case "1–0"     => "1-0"
       case x         => x
-    }
 
     val result: P[String] = P.stringIn(resultList).map(mapResult)
 
@@ -135,9 +131,8 @@ object Parser {
       ((commentary.rep0 ~ strMove.rep0) ~ (result <* escape).? <* commentary.rep0).map {
         case ((coms, sans), res) => (InitialPosition(cleanComments(coms)), sans.toList, res)
       }
-  }
 
-  private object MoveParser {
+  private object MoveParser:
 
     def rangeToMap(r: Iterable[Char]) = r.zipWithIndex.to(Map).view.mapValues(_ + 1)
 
@@ -175,7 +170,7 @@ object Parser {
 
     val dest: P[Pos] = mapParser(Pos.allKeys, "dest")
 
-    val promotable = Role.allPromotableByPgn mapKeys (_.toUpper)
+    val promotable = Role.allPromotableByPgn.mapKeys(_.toUpper)
 
     val promotion: P[PromotableRole] = P.char('=').?.with1 *> mapParserChar(promotable, "promotion")
 
@@ -222,19 +217,15 @@ object Parser {
         std withSuffixes suf
       }
 
-    def mapParser[A](pairs: Iterable[(String, A)], name: String): P[A] = {
+    def mapParser[A](pairs: Iterable[(String, A)], name: String): P[A] =
       val pairMap = pairs.to(Map)
       P.stringIn(pairMap.keySet).map(pairMap(_)) | P.failWith(name + " not found")
-    }
 
-    def mapParserChar[A](pairs: Iterable[(Char, A)], name: String): P[A] = {
+    def mapParserChar[A](pairs: Iterable[(Char, A)], name: String): P[A] =
       val pairMap = pairs.to(Map)
       P.charIn(pairMap.keySet).map(pairMap(_)) | P.failWith(name + " not found")
-    }
 
-  }
-
-  private object TagParser {
+  private object TagParser:
 
     val tagName: P[String] = R.alpha.rep.string.withContext("Tag name can only contains alphabet characters")
     val escaped: P[String] = P.char('\\') *> (R.dquote | P.char('\\')).string
@@ -244,27 +235,24 @@ object Parser {
     val tag: P[Tag]                = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
     val tags: P[NonEmptyList[Tag]] = tag.rep
 
-  }
-
   private val tagsAndMovesParser: P0[ParsedPgn] =
     ((escape *> TagParser.tags.? <* escape) ~ MovesParser.strMoves.?).map {
       case (optionalTags, optionalMoves) => {
         val preTags = Tags(optionalTags.map(_.toList).getOrElse(List()))
-        optionalMoves match {
+        optionalMoves match
           case None => ParsedPgn(InitialPosition(List()), preTags, Sans(List()))
           case Some((init, sans, resultOption)) => {
             val tags =
               resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
             ParsedPgn(init, tags, Sans(sans))
           }
-        }
       }
     }
 
   private val pgnParser: P0[ParsedPgn] =
     escape *> P.string("[pgn]").? *> tagsAndMovesParser <* P.string("[/pgn]").? <* escape
 
-  private def showExpectations(context: String, str: String, error: P.Error): String = {
+  private def showExpectations(context: String, str: String, error: P.Error): String =
     val lm  = LocationMap(str)
     val idx = error.failedAtOffset
     val caret = lm.toCaret(idx).getOrElse {
@@ -274,21 +262,18 @@ object Parser {
     val errorLine    = line ++ "\n" ++ " ".repeat(caret.col) ++ "^"
     val errorMessage = s"$context: [${caret.line + 1}.${caret.col + 1}]: ${expToString(error.expected.head)}"
     errorMessage ++ "\n\n" ++ errorLine ++ "\n" ++ str
-  }
 
   private def expToString(expectation: Expectation): String =
-    expectation match {
+    expectation match
       case Expectation.OneOfStr(_, strs) =>
-        strs match {
+        strs match
           case one :: Nil => s"expected: $one"
           case _          => s"expected one of: $strs"
-        }
       case Expectation.InRange(_, lower, upper) =>
-        if (lower == upper) {
+        if (lower == upper)
           s"expected: $lower"
-        } else {
+        else
           s"expected char in range: [$lower, $upper]"
-        }
       case Expectation.StartOfString(_)       => "expected start of the file"
       case Expectation.EndOfString(_, length) => s"expected end of file but $length characters remaining"
       case Expectation.Length(_, expected, actual) =>
@@ -298,5 +283,3 @@ object Parser {
       case Expectation.Fail(_)                    => "Failed"
       case Expectation.FailWith(_, message)       => message
       case Expectation.WithContext(contextStr, _) => contextStr
-    }
-}

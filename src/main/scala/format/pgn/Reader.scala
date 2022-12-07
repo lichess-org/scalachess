@@ -3,20 +3,16 @@ package format.pgn
 
 import cats.data.Validated
 
-object Reader {
+object Reader:
 
-  sealed trait Result {
+  sealed trait Result:
     def valid: Validated[String, Replay]
-  }
 
-  object Result {
-    case class Complete(replay: Replay) extends Result {
+  object Result:
+    case class Complete(replay: Replay) extends Result:
       def valid = Validated.valid(replay)
-    }
-    case class Incomplete(replay: Replay, failure: String) extends Result {
+    case class Incomplete(replay: Replay, failure: String) extends Result:
       def valid = Validated.invalid(failure)
-    }
-  }
 
   def full(pgn: String, tags: Tags = Tags.empty): Validated[String, Result] =
     fullWithSans(pgn, identity, tags)
@@ -50,7 +46,7 @@ object Reader {
       case (r: Result.Incomplete, _) => r
     }
 
-  private def makeGame(tags: Tags) = {
+  private def makeGame(tags: Tags) =
     val g = Game(
       variantOption = tags(_.Variant) flatMap chess.variant.Variant.byName,
       fen = tags.fen
@@ -59,5 +55,3 @@ object Reader {
       startedAtTurn = g.turns,
       clock = tags.clockConfig map Clock.apply
     )
-  }
-}

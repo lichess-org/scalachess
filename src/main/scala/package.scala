@@ -1,16 +1,14 @@
-import ornicar.scalalib
+package chess
 
-package object chess extends scalalib.Common with scalalib.OrnicarOption with scalalib.OrnicarBoolean {
+export ornicar.scalalib.newtypes.*
+export ornicar.scalalib.zeros.*
+export ornicar.scalalib.extensions.*
 
-  val White = Color.White
-  val Black = Color.Black
+export Color.{ Black, White }
 
-  type Direction  = Pos => Option[Pos]
-  type Directions = List[Direction]
+type Direction  = Pos => Option[Pos]
+type Directions = List[Direction]
 
-  type PieceMap = Map[Pos, Piece]
+type PieceMap = Map[Pos, Piece]
 
-  type PositionHash = Array[Byte]
-
-  type MoveOrDrop = Either[Move, Drop]
-}
+type MoveOrDrop = Either[Move, Drop]

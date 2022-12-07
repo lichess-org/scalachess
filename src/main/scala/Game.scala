@@ -2,7 +2,7 @@ package chess
 
 import cats.data.Validated
 
-import chess.format.FEN
+import chess.format.Fen
 import chess.format.{ pgn, Uci }
 
 case class Game(
@@ -11,7 +11,7 @@ case class Game(
     clock: Option[Clock] = None,
     turns: Int = 0, // plies
     startedAtTurn: Int = 0
-) {
+):
   def apply(
       orig: Pos,
       dest: Pos,
@@ -34,7 +34,7 @@ case class Game(
 
   def apply(move: Move): Game = applyWithCompensated(move).value
 
-  def applyWithCompensated(move: Move): Clock.WithCompensatedLag[Game] = {
+  def applyWithCompensated(move: Move): Clock.WithCompensatedLag[Game] =
     val newSituation = move.situationAfter
     val newClock     = applyClock(move.metrics, newSituation.status.isEmpty)
 
@@ -47,7 +47,6 @@ case class Game(
       ),
       newClock.flatMap(_.compensated)
     )
-  }
 
   def drop(
       role: Role,
@@ -58,7 +57,7 @@ case class Game(
       applyDrop(drop) -> drop
     }
 
-  def applyDrop(drop: Drop): Game = {
+  def applyDrop(drop: Drop): Game =
     val newSituation = drop situationAfter
 
     copy(
@@ -67,7 +66,6 @@ case class Game(
       pgnMoves = pgnMoves :+ pgn.Dumper(drop, newSituation),
       clock = applyClock(drop.metrics, newSituation.status.isEmpty).map(_.value)
     )
-  }
 
   private def applyClock(
       metrics: MoveMetrics,
@@ -84,36 +82,34 @@ case class Game(
   def apply(uci: Uci.Move): Validated[String, (Game, Move)] = apply(uci.orig, uci.dest, uci.promotion)
   def apply(uci: Uci.Drop): Validated[String, (Game, Drop)] = drop(uci.role, uci.pos)
   def apply(uci: Uci): Validated[String, (Game, MoveOrDrop)] =
-    uci match {
+    uci match
       case u: Uci.Move => apply(u) map { case (g, m) => g -> Left(m) }
       case u: Uci.Drop => apply(u) map { case (g, d) => g -> Right(d) }
-    }
 
-  def player = situation.color
+  inline def player = situation.color
 
-  def board = situation.board
+  inline def board = situation.board
 
-  def isStandardInit = board.pieces == chess.variant.Standard.pieces
+  inline def isStandardInit = board.pieces == chess.variant.Standard.pieces
 
-  def halfMoveClock: Int = board.history.halfMoveClock
+  inline def halfMoveClock: Int = board.history.halfMoveClock
 
   /** Fullmove number: The number of the full move.
     * It starts at 1, and is incremented after Black's move.
     */
-  def fullMoveNumber: Int = 1 + turns / 2
+  inline def fullMoveNumber: Int = 1 + turns / 2
 
   def moveString = s"$fullMoveNumber${player.fold(".", "...")}"
 
-  def withBoard(b: Board) = copy(situation = situation.copy(board = b))
+  inline def withBoard(inline b: Board) = copy(situation = situation.copy(board = b))
 
-  def updateBoard(f: Board => Board) = withBoard(f(board))
+  inline def updateBoard(inline f: Board => Board) = withBoard(f(board))
 
-  def withPlayer(c: Color) = copy(situation = situation.copy(color = c))
+  inline def withPlayer(c: Color) = copy(situation = situation.copy(color = c))
 
-  def withTurns(t: Int) = copy(turns = t)
-}
+  inline def withTurns(t: Int) = copy(turns = t)
 
-object Game {
+object Game:
   def apply(variant: chess.variant.Variant): Game =
     new Game(Situation(Board init variant, White))
 
@@ -121,12 +117,12 @@ object Game {
 
   def apply(board: Board, color: Color): Game = new Game(Situation(board, color))
 
-  def apply(variantOption: Option[chess.variant.Variant], fen: Option[FEN]): Game = {
+  def apply(variantOption: Option[chess.variant.Variant], fen: Option[Fen.Epd]): Game =
     val variant = variantOption | chess.variant.Standard
     val g       = apply(variant)
     fen
       .flatMap {
-        format.Forsyth.<<<@(variant, _)
+        format.Fen.readWithMoveNumber(variant, _)
       }
       .fold(g) { parsed =>
         g.copy(
@@ -140,5 +136,3 @@ object Game {
           startedAtTurn = parsed.turns
         )
       }
-  }
-}

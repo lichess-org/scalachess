@@ -3,28 +3,27 @@ package format.pgn
 
 import org.joda.time.DateTimeZone
 import org.joda.time.format.DateTimeFormat
-import cats.syntax.option._
+import cats.syntax.option.*
 
-case class Tag(name: TagType, value: String) {
+import chess.format.EpdFen
+
+case class Tag(name: TagType, value: String):
 
   override def toString = s"""[$name "${escapeString(value)}"]"""
 
   private def escapeString(str: String): String =
     str.replace("\\", "\\\\").replace("\"", "\\\"")
-}
 
-trait TagType {
+trait TagType:
   lazy val name      = toString
   lazy val lowercase = name.toLowerCase
   val isUnknown      = false
-}
 
-case class Tags(value: List[Tag]) extends AnyVal {
+case class Tags(value: List[Tag]) extends AnyVal:
 
-  def apply(name: String): Option[String] = {
+  def apply(name: String): Option[String] =
     val tagType = Tag tagType name
     value.find(_.name == tagType).map(_.value)
-  }
 
   def apply(which: Tag.type => TagType): Option[String] =
     value find (_.name == which(Tag)) map (_.value)
@@ -49,7 +48,7 @@ case class Tags(value: List[Tag]) extends AnyVal {
       case _                       => None
     }
 
-  def fen: Option[format.FEN] = apply(_.FEN) map format.FEN.apply
+  def fen: Option[EpdFen] = EpdFen from apply(_.FEN)
 
   def exists(which: Tag.type => TagType): Boolean =
     value.exists(_.name == which(Tag))
@@ -69,9 +68,8 @@ case class Tags(value: List[Tag]) extends AnyVal {
     )
 
   override def toString = sorted.value mkString "\n"
-}
 
-object Tags {
+object Tags:
   val empty = Tags(Nil)
 
   // according to http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm#c8.1.1
@@ -87,19 +85,16 @@ object Tags {
   val tagIndex: Map[TagType, Int] = sevenTagRoster.zipWithIndex.toMap
 
   private val DateRegex = """(\d{4}|\?{4})\.(\d\d|\?\?)\.(\d\d|\?\?)""".r
-}
 
-object Tag {
+object Tag:
 
   case object Event extends TagType
   case object Site  extends TagType
   case object Date  extends TagType
-  case object UTCDate extends TagType {
+  case object UTCDate extends TagType:
     val format = DateTimeFormat forPattern "yyyy.MM.dd" withZone DateTimeZone.UTC
-  }
-  case object UTCTime extends TagType {
+  case object UTCTime extends TagType:
     val format = DateTimeFormat forPattern "HH:mm:ss" withZone DateTimeZone.UTC
-  }
   case object Round           extends TagType
   case object Board           extends TagType
   case object White           extends TagType
@@ -122,10 +117,9 @@ object Tag {
   case object Opening         extends TagType
   case object Termination     extends TagType
   case object Annotator       extends TagType
-  case class Unknown(n: String) extends TagType {
+  case class Unknown(n: String) extends TagType:
     override def toString  = n
     override val isUnknown = true
-  }
 
   val tagTypes = List(
     Event,
@@ -185,4 +179,3 @@ object Tag {
         s"${c.limit.roundSeconds}+${c.increment.roundSeconds}"
       }
     )
-}

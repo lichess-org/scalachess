@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import chess.format.FEN
+import chess.format.EpdFen
 
 case object Chess960
     extends Variant(
@@ -12,17 +12,17 @@ case object Chess960
       shortName = "960",
       title = "Starting position of the home rank pieces is randomized.",
       standardInitialPosition = false
-    ) {
+    ):
 
   def pieces =
     Variant.symmetricRank {
       positions(scala.util.Random.nextInt(960)) flatMap Role.allByForsyth.get
     }
 
-  def positionNumber(fen: FEN): Option[Int] =
-    fen.value split ' ' match {
+  def positionNumber(fen: EpdFen): Option[Int] =
+    fen.value split ' ' match
       case Array(board, "w", "KQkq", "-", "0", "1") =>
-        board split '/' match {
+        board split '/' match
           case Array(rank8, "pppppppp", "8", "8", "8", "8", "PPPPPPPP", rank1) =>
             positionsMap get rank8 filter { _ =>
               rank1 zip rank8 forall { case (r1, r8) =>
@@ -30,9 +30,7 @@ case object Chess960
               }
             }
           case _ => None
-        }
       case _ => None
-    }
 
   private val positions = Array(
     "bbqnnrkr",
@@ -998,4 +996,3 @@ case object Chess960
   )
 
   private val positionsMap: Map[String, Int] = positions.zipWithIndex.toMap
-}

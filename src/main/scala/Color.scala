@@ -1,10 +1,8 @@
 package chess
 
-sealed trait Color {
+sealed trait Color:
 
-  final def -(role: Role) = Piece(this, role)
-
-  final def fold[A](w: => A, b: => A): A = if (white) w else b
+  inline def fold[A](w: => A, b: => A): A = if (white) w else b
 
   def unary_! : Color
 
@@ -15,26 +13,52 @@ sealed trait Color {
   val letter: Char
   val name: String
 
-  final def pawn   = this - Pawn
-  final def bishop = this - Bishop
-  final def knight = this - Knight
-  final def rook   = this - Rook
-  final def queen  = this - Queen
-  final def king   = this - King
+  inline def -(inline role: Role) = Piece(this, role)
 
-  final val white = this == Color.White
-  final val black = this == Color.Black
-}
+  inline def pawn   = this - Pawn
+  inline def bishop = this - Bishop
+  inline def knight = this - Knight
+  inline def rook   = this - Rook
+  inline def queen  = this - Queen
+  inline def king   = this - King
 
-object Color {
+  val white = this == Color.White
+  val black = this == Color.Black
 
-  case class Map[A](white: A, black: A) {
+object Color:
+
+  case object White extends Color:
+
+    inline def unary_! = Black
+
+    val passablePawnRank   = Rank.Fifth
+    val promotablePawnRank = Rank.Eighth
+    val backRank           = Rank.First
+
+    inline val letter = 'w'
+    inline val name   = "white"
+
+    override val hashCode = 1
+
+  case object Black extends Color:
+
+    inline def unary_! = White
+
+    val passablePawnRank   = Rank.Fourth
+    val promotablePawnRank = Rank.First
+    val backRank           = Rank.Eighth
+
+    inline val letter = 'b'
+    inline val name   = "black"
+
+    override val hashCode = 2
+
+  case class Map[A](white: A, black: A):
     def apply(color: Color) = if (color.white) white else black
 
-    def update(color: Color, f: A => A) = {
+    def update(color: Color, f: A => A) =
       if (color.white) copy(white = f(white))
       else copy(black = f(black))
-    }
 
     def map[B](fw: A => B, fb: A => B) = copy(white = fw(white), black = fb(black))
 
@@ -47,43 +71,13 @@ object Color {
     def forall(pred: A => Boolean) = pred(white) && pred(black)
 
     def exists(pred: A => Boolean) = pred(white) || pred(black)
-  }
 
-  object Map {
+  object Map:
     def apply[A](f: Color => A): Map[A] = Map(white = f(White), black = f(Black))
-  }
 
-  case object White extends Color {
+  inline def fromPly(inline ply: Int) = fromWhite((ply & 1) == 0)
 
-    def unary_! = Black
-
-    val passablePawnRank   = Rank.Fifth
-    val promotablePawnRank = Rank.Eighth
-    val backRank           = Rank.First
-
-    val letter = 'w'
-    val name   = "white"
-
-    override val hashCode = 1
-  }
-
-  case object Black extends Color {
-
-    def unary_! = White
-
-    val passablePawnRank   = Rank.Fourth
-    val promotablePawnRank = Rank.First
-    val backRank           = Rank.Eighth
-
-    val letter = 'b'
-    val name   = "black"
-
-    override val hashCode = 2
-  }
-
-  def fromPly(ply: Int) = fromWhite((ply & 1) == 0)
-
-  def fromWhite(white: Boolean): Color = if (white) White else Black
+  inline def fromWhite(inline white: Boolean): Color = if (white) White else Black
 
   def fromName(n: String): Option[Color] =
     if (n == "white") Option(White)
@@ -99,4 +93,3 @@ object Color {
   val black: Color = Black
 
   val all = List[Color](White, Black)
-}

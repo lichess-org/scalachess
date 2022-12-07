@@ -1,69 +1,33 @@
-name := "scalachess"
-
-organization := "org.lichess"
-
-version := "10.6.4"
-
-ThisBuild / scalaVersion                        := "2.13.10"
-ThisBuild / githubWorkflowPublishTargetBranches := Seq() // Don't publish anywhere
-ThisBuild / githubWorkflowBuild ++= Seq(
-  WorkflowStep.Sbt(List("scalafmtCheckAll"), name = Some("Check Formatting"))
-)
+lazy val scalachess = Project("scalachess", file("."))
+name                   := "scalachess"
+organization           := "org.lichess"
+version                := "13.1.0"
+scalaVersion           := "3.2.1"
+licenses += "AGPL-3.0" -> url("https://opensource.org/licenses/AGPL-3.0")
 
 libraryDependencies ++= List(
-  "org.typelevel"      %% "cats-parse"     % "0.3.8",
-  "org.specs2"         %% "specs2-core"    % "4.18.0" % Test,
-  "org.specs2"         %% "specs2-cats"    % "4.18.0" % Test,
-  "com.github.ornicar" %% "scalalib"       % "7.1.0",
+  "org.specs2"         %% "specs2-core"    % "4.17.0" % Test,
+  "org.specs2"         %% "specs2-cats"    % "4.17.0" % Test,
+  "com.github.ornicar" %% "scalalib"       % "9.0.1",
   "joda-time"           % "joda-time"      % "2.12.1",
-  "org.typelevel"      %% "cats-core"      % "2.8.0",
-  "org.typelevel"      %% "alleycats-core" % "2.8.0"
+  "org.typelevel"      %% "cats-core"      % "2.9.0",
+  "org.typelevel"      %% "alleycats-core" % "2.9.0",
+  "org.typelevel"      %% "cats-parse"     % "0.3.8"
 )
 
-resolvers ++= Seq(
-  "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-maven/master"
-)
+resolvers += "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-maven/master"
 
-scalacOptions ++= Seq(
+scalacOptions := Seq(
   "-encoding",
   "utf-8",
+  // "-rewrite",
+  "-source:future-migration",
+  "-indent",
   "-explaintypes",
   "-feature",
-  "-language:higherKinds",
-  "-language:implicitConversions",
-  "-language:postfixOps",
-  "-Ymacro-annotations",
+  "-language:postfixOps"
   // Warnings as errors!
-  // "-Xfatal-warnings",
-  // Linting options
-  "-unchecked",
-  "-Xcheckinit",
-  "-Xlint:adapted-args",
-  "-Xlint:constant",
-  "-Xlint:delayedinit-select",
-  "-Xlint:deprecation",
-  "-Xlint:inaccessible",
-  "-Xlint:infer-any",
-  "-Xlint:missing-interpolator",
-  "-Xlint:nullary-unit",
-  "-Xlint:option-implicit",
-  "-Xlint:package-object-classes",
-  "-Xlint:poly-implicit-overload",
-  "-Xlint:private-shadow",
-  "-Xlint:stars-align",
-  "-Xlint:type-parameter-shadow",
-  "-Wdead-code",
-  "-Wextra-implicit",
-  // "-Wnumeric-widen",
-  "-Wunused:imports",
-  "-Wunused:locals",
-  "-Wunused:patvars",
-  "-Wunused:privates",
-  "-Wunused:implicits",
-  "-Wunused:params",
-  "-Wvalue-discard",
-  "-Xmaxerrs",
-  "12"
+  /* "-Xfatal-warnings" */
 )
 
 publishTo := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", ""))))

@@ -6,7 +6,7 @@ scalaVersion           := "3.2.1"
 licenses += "AGPL-3.0" -> url("https://opensource.org/licenses/AGPL-3.0")
 
 libraryDependencies ++= List(
-  "org.specs2"         %% "specs2-core"    % "4.19.0" % Test,
+  "org.specs2"         %% "specs2-core"    % "5.2.0"  % Test,
   "org.specs2"         %% "specs2-cats"    % "4.19.0" % Test,
   "com.github.ornicar" %% "scalalib"       % "9.0.1",
   "joda-time"           % "joda-time"      % "2.12.2",

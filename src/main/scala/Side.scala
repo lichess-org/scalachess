@@ -3,7 +3,7 @@ package chess
 enum Side:
   case KingSide, QueenSide
 
-  inline def fold[A](k: => A, q: => A): A = if isKingSide then k else q
+  inline def fold[A](inline k: A, inline q: A): A = if isKingSide then k else q
 
   lazy val castledKingFile: File = fold(File.G, File.C)
   lazy val castledRookFile: File = fold(File.F, File.D)

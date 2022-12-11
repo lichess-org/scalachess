@@ -10,7 +10,7 @@ enum Color(val name: String, val letter: Char):
   lazy val white = this == Color.White
   lazy val black = this == Color.Black
 
-  def fold[A](w: => A, b: => A): A = if white then w else b
+  inline def fold[A](inline w: A, inline b: A): A = if white then w else b
 
   @targetName("negate")
   def unary_! = fold(Black, White)

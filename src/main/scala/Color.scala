@@ -2,10 +2,15 @@ package chess
 
 import scala.annotation.targetName
 
-enum Color:
-  case White, Black
+enum Color(val name: String, val letter: Char):
 
-  def fold[A](w: => A, b: => A): A = if (white) w else b
+  case White extends Color("white", 'w')
+  case Black extends Color("black", 'b')
+
+  lazy val white = this == Color.White
+  lazy val black = this == Color.Black
+
+  def fold[A](w: => A, b: => A): A = if white then w else b
 
   @targetName("negate")
   def unary_! = fold(Black, White)
@@ -13,9 +18,6 @@ enum Color:
   lazy val passablePawnRank: Rank   = fold(Rank.Fifth, Rank.Fourth)
   lazy val promotablePawnRank: Rank = fold(Rank.Eighth, Rank.First)
   lazy val backRank: Rank           = fold(Rank.First, Rank.Eighth)
-
-  lazy val letter: Char = fold('w', 'b')
-  lazy val name: String = fold("white", "black")
 
   inline def -(inline role: Role) = Piece(this, role)
 
@@ -25,9 +27,6 @@ enum Color:
   inline def rook   = this - Rook
   inline def queen  = this - Queen
   inline def king   = this - King
-
-  lazy val white = this == Color.White
-  lazy val black = this == Color.Black
 
   override def hashCode = fold(1, 2)
 

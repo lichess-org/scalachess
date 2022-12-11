@@ -14,8 +14,6 @@ class PosTest extends ChessTest:
     }
 
     "be a string" in {
-      A1.key.pp
-      H8.key.pp
       "D5" in { D5.key must_== "d5" }
     }
 

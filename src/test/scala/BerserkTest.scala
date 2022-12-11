@@ -1,9 +1,14 @@
 package chess
 
+import scala.language.implicitConversions
+
 class BerserkTest extends ChessTest:
 
   def whiteBerserk(minutes: Int, seconds: Int) =
     Clock(minutes * 60, seconds).goBerserk(White).remainingTime(White).centis * .01
+
+  given Conversion[Int, Clock.LimitSeconds]     = Clock.LimitSeconds(_)
+  given Conversion[Int, Clock.IncrementSeconds] = Clock.IncrementSeconds(_)
 
   "berserkable" should {
     "yep" in {

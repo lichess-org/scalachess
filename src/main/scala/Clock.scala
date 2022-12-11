@@ -160,8 +160,14 @@ object ClockPlayer:
 object Clock:
   private val limitFormatter = new DecimalFormat("#.##")
 
+  opaque type LimitSeconds = Int
+  object LimitSeconds extends OpaqueInt[LimitSeconds]
+
+  opaque type IncrementSeconds = Int
+  object IncrementSeconds extends OpaqueInt[IncrementSeconds]
+
   // All unspecified durations are expressed in seconds
-  case class Config(limitSeconds: Int, incrementSeconds: Int):
+  case class Config(limitSeconds: LimitSeconds, incrementSeconds: IncrementSeconds):
 
     def berserkable = incrementSeconds == 0 || limitSeconds > 0
 
@@ -194,11 +200,11 @@ object Clock:
 
     override def toString = s"$limitString+$incrementSeconds"
 
-    def berserkPenalty =
+    def berserkPenalty: Centis =
       if (limitSeconds < 40 * incrementSeconds) Centis(0)
       else Centis(limitSeconds * (100 / 2))
 
-    def initTime =
+    def initTime: Centis =
       if (limitSeconds == 0) increment atLeast Centis(300)
       else limit
 
@@ -212,7 +218,7 @@ object Clock:
         } yield Config(init, inc)
       case _ => none
 
-  def apply(limit: Int, increment: Int): Clock = apply(Config(limit, increment))
+  def apply(limit: LimitSeconds, increment: IncrementSeconds): Clock = apply(Config(limit, increment))
 
   def apply(config: Config): Clock =
     val player = ClockPlayer.withConfig(config)

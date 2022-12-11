@@ -1,15 +1,15 @@
 lazy val scalachess = Project("scalachess", file("."))
 name                   := "scalachess"
 organization           := "org.lichess"
-version                := "13.1.0"
+version                := "13.1.1"
 scalaVersion           := "3.2.1"
 licenses += "AGPL-3.0" -> url("https://opensource.org/licenses/AGPL-3.0")
 
 libraryDependencies ++= List(
-  "org.specs2"         %% "specs2-core"    % "4.17.0" % Test,
-  "org.specs2"         %% "specs2-cats"    % "4.17.0" % Test,
+  "org.specs2"         %% "specs2-core"    % "4.19.0" % Test,
+  "org.specs2"         %% "specs2-cats"    % "4.19.0" % Test,
   "com.github.ornicar" %% "scalalib"       % "9.0.1",
-  "joda-time"           % "joda-time"      % "2.12.1",
+  "joda-time"           % "joda-time"      % "2.12.2",
   "org.typelevel"      %% "cats-core"      % "2.9.0",
   "org.typelevel"      %% "alleycats-core" % "2.9.0",
   "org.typelevel"      %% "cats-parse"     % "0.3.8"

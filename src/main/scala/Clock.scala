@@ -15,6 +15,16 @@ case class Clock(
 ):
   import timestamper.{ now, toNow }
 
+  export config.{
+    estimateTotalSeconds,
+    estimateTotalTime,
+    increment,
+    incrementSeconds,
+    limit,
+    limitInMinutes,
+    limitSeconds
+  }
+
   inline def timerFor(c: Color) = if (c == color) timer else None
 
   inline def pending(c: Color) = timerFor(c).fold(Centis(0))(toNow)
@@ -118,14 +128,6 @@ case class Clock(
   // Lowball estimate of next move's lag comp for UI butter.
   def lagCompEstimate(c: Color) = players(c).lag.compEstimate
 
-  def estimateTotalSeconds = config.estimateTotalSeconds
-  def estimateTotalTime    = config.estimateTotalTime
-  def increment            = config.increment
-  def incrementSeconds     = config.incrementSeconds
-  def limit                = config.limit
-  def limitInMinutes       = config.limitInMinutes
-  def limitSeconds         = config.limitSeconds
-
 case class ClockPlayer(
     config: Clock.Config,
     lag: LagTracker,
@@ -162,6 +164,9 @@ object Clock:
 
   opaque type LimitSeconds = Int
   object LimitSeconds extends OpaqueInt[LimitSeconds]
+
+  opaque type LimitMinutes = Int
+  object LimitMinutes extends OpaqueInt[LimitMinutes]
 
   opaque type IncrementSeconds = Int
   object IncrementSeconds extends OpaqueInt[IncrementSeconds]

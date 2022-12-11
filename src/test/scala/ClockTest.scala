@@ -1,8 +1,13 @@
 package chess
 
+import scala.language.implicitConversions
 import Pos.*
 
 class ClockTest extends ChessTest:
+
+  given Conversion[Int, Clock.LimitSeconds]     = Clock.LimitSeconds(_)
+  given Conversion[Int, Clock.IncrementSeconds] = Clock.IncrementSeconds(_)
+
   val fakeClock60 = Clock(60, 0)
     .copy(timestamper = new Timestamper {
       val now = Timestamp(0)

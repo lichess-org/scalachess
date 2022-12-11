@@ -1,11 +1,19 @@
 package chess
 
-sealed trait Side:
+enum Side:
+  case KingSide, QueenSide
 
-  def castledKingFile: File
-  def castledRookFile: File
+  inline def fold[A](k: => A, q: => A): A = if isKingSide then k else q
 
-  def tripToRook: (Pos, Board) => List[Pos]
+  lazy val castledKingFile: File = fold(File.G, File.C)
+  lazy val castledRookFile: File = fold(File.F, File.D)
+
+  lazy val tripToRook: (Pos, Board) => List[Pos] = fold(
+    (pos, board) => pos >| board.pieces.contains,
+    (pos, board) => pos |< board.pieces.contains
+  )
+
+  private lazy val isKingSide = this == Side.KingSide
 
 object Side:
 
@@ -15,17 +23,3 @@ object Side:
     if (kingPos ?- rookPos)
       Option(if (kingPos ?> rookPos) QueenSide else KingSide)
     else None
-
-case object KingSide extends Side:
-
-  val castledKingFile = File.G
-  val castledRookFile = File.F
-
-  val tripToRook: (Pos, Board) => List[Pos] = (pos, board) => pos >| board.pieces.contains
-
-case object QueenSide extends Side:
-
-  val castledKingFile = File.C
-  val castledRookFile = File.D
-
-  val tripToRook: (Pos, Board) => List[Pos] = (pos, board) => pos |< board.pieces.contains

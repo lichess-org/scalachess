@@ -46,14 +46,20 @@ object Replay:
       )
     }
 
-  private def recursiveGames(game: Game, sans: List[San]): Validated[String, List[Game]] =
+  @scala.annotation.tailrec
+  private def recursiveGames(
+      game: Game,
+      sans: List[San],
+      acc: List[Game] = Nil
+  ): Validated[String, List[Game]] =
     sans match
-      case Nil => valid(Nil)
+      case Nil => valid(acc)
       case san :: rest =>
-        san(game.situation) andThen { moveOrDrop =>
-          val newGame = moveOrDrop.fold(game.apply, game.applyDrop)
-          recursiveGames(newGame, rest) map { newGame :: _ }
-        }
+        san(game.situation) match
+          case n: Validated.Invalid[?] => n
+          case Validated.Valid(moveOrDrop) =>
+            val newGame = moveOrDrop.fold(game.apply, game.applyDrop)
+            recursiveGames(newGame, rest, acc)
 
   def games(
       moveStrs: Iterable[String],

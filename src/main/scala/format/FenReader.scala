@@ -17,60 +17,56 @@ trait FenReader:
   def read(variant: Variant, fen: EpdFen): Option[Situation] =
     makeBoard(variant, fen) map { board =>
       val situation = Situation(board, if variant.atomic then fen.color else board.checkColor | fen.color)
-      fen.castling.some
-        .filterNot(_ == "-")
-        .fold(situation) { strCastles =>
-          val (castles, unmovedRooks) = strCastles.foldLeft(Castles.none -> Set.empty[Pos]) {
-            case ((c, r), ch) =>
-              val color = Color.fromWhite(ch.isUpper)
-              val rooks: List[Pos] = board
-                .piecesOf(color)
-                .collect {
-                  case (pos, piece) if piece.is(Rook) && pos.rank == color.backRank => pos
-                }
-                .toList
-                .sortBy(_.file.value)
-              (for {
-                kingPos <- board.kingPosOf(color)
-                rookPos <- (ch.toLower match {
-                  case 'k'  => rooks.reverse.find(_ ?> kingPos)
-                  case 'q'  => rooks.find(_ ?< kingPos)
-                  case file => rooks.find(_.file.char == file)
-                })
-                side <- Side.kingRookSide(kingPos, rookPos)
-              } yield (c.add(color, side), r + rookPos)).getOrElse((c, r))
-          }
-
-          val fifthRank   = if (situation.color.white) Rank.Fifth else Rank.Fourth
-          val sixthRank   = if (situation.color.white) Rank.Sixth else Rank.Third
-          val seventhRank = if (situation.color.white) Rank.Seventh else Rank.Second
-          val enpassantMove = for {
-            pos <- fen.enpassant
-            if pos.rank == sixthRank
-            orig = Pos(pos.file, seventhRank)
-            dest = Pos(pos.file, fifthRank)
-            if situation.board(dest).contains(Piece(!situation.color, Pawn)) &&
-              situation.board(pos.file, sixthRank).isEmpty &&
-              situation.board(orig).isEmpty
-          } yield Uci.Move(orig, dest)
-
-          situation withHistory {
-            val history = History(
-              lastMove = enpassantMove,
-              positionHashes = Monoid[PositionHash].empty,
-              castles = castles,
-              unmovedRooks = UnmovedRooks(unmovedRooks)
-            )
-            val checkCount = variant.threeCheck.?? {
-              val splitted = fen.value split ' '
-              splitted
-                .lift(4)
-                .flatMap(readCheckCount)
-                .orElse(splitted.lift(6).flatMap(readCheckCount))
+      val (castles, unmovedRooks) = fen.castling.foldLeft(Castles.none -> Set.empty[Pos]) {
+        case ((c, r), ch) =>
+          val color = Color.fromWhite(ch.isUpper)
+          val rooks: List[Pos] = board
+            .piecesOf(color)
+            .collect {
+              case (pos, piece) if piece.is(Rook) && pos.rank == color.backRank => pos
             }
-            checkCount.foldLeft(history)(_ withCheckCount _)
-          }
-        } fixCastles
+            .toList
+            .sortBy(_.file.value)
+          (for {
+            kingPos <- board.kingPosOf(color)
+            rookPos <- (ch.toLower match {
+              case 'k'  => rooks.reverse.find(_ ?> kingPos)
+              case 'q'  => rooks.find(_ ?< kingPos)
+              case file => rooks.find(_.file.char == file)
+            })
+            side <- Side.kingRookSide(kingPos, rookPos)
+          } yield (c.add(color, side), r + rookPos)).getOrElse((c, r))
+      }
+
+      val fifthRank   = if (situation.color.white) Rank.Fifth else Rank.Fourth
+      val sixthRank   = if (situation.color.white) Rank.Sixth else Rank.Third
+      val seventhRank = if (situation.color.white) Rank.Seventh else Rank.Second
+      val enpassantMove = for {
+        pos <- fen.enpassant
+        if pos.rank == sixthRank
+        orig = Pos(pos.file, seventhRank)
+        dest = Pos(pos.file, fifthRank)
+        if situation.board(dest).contains(Piece(!situation.color, Pawn)) &&
+          situation.board(pos.file, sixthRank).isEmpty &&
+          situation.board(orig).isEmpty
+      } yield Uci.Move(orig, dest)
+
+      situation withHistory {
+        val history = History(
+          lastMove = enpassantMove,
+          positionHashes = Monoid[PositionHash].empty,
+          castles = castles,
+          unmovedRooks = UnmovedRooks(unmovedRooks)
+        )
+        val checkCount = variant.threeCheck.?? {
+          val splitted = fen.value split ' '
+          splitted
+            .lift(4)
+            .flatMap(readCheckCount)
+            .orElse(splitted.lift(6).flatMap(readCheckCount))
+        }
+        checkCount.foldLeft(history)(_ withCheckCount _)
+      } fixCastles
     }
 
   def read(fen: EpdFen): Option[Situation] = read(Standard, fen)

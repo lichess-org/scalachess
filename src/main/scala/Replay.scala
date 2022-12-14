@@ -4,9 +4,9 @@ import cats.data.Validated
 import cats.data.Validated.{ invalid, valid }
 import cats.implicits.*
 
-import chess.format.pgn.San
-import chess.format.pgn.{ Parser, Reader, Tag, Tags }
+import chess.format.pgn.{ Parser, Reader, San, Tag, Tags }
 import chess.format.{ Fen, Uci }
+import chess.variant.Variant
 
 case class Replay(setup: Game, moves: List[MoveOrDrop], state: Game):
 
@@ -28,7 +28,7 @@ object Replay:
   def apply(
       moveStrs: Iterable[String],
       initialFen: Option[Fen.Epd],
-      variant: chess.variant.Variant
+      variant: Variant
   ): Validated[String, Reader.Result] =
     moveStrs.some.filter(_.nonEmpty) toValid "[replay] pgn is empty" andThen { nonEmptyMoves =>
       Reader.moves(
@@ -46,35 +46,31 @@ object Replay:
       )
     }
 
-  @scala.annotation.tailrec
-  private def recursiveGames(
-      game: Game,
-      sans: List[San],
-      acc: List[Game] = Nil
-  ): Validated[String, List[Game]] =
-    sans match
-      case Nil => valid(acc)
-      case san :: rest =>
-        san(game.situation) match
-          case n: Validated.Invalid[?] => n
-          case Validated.Valid(moveOrDrop) =>
-            val newGame = moveOrDrop.fold(game.apply, game.applyDrop)
-            recursiveGames(newGame, rest, acc)
+  private def computeGames(game: Game, sans: List[San]): Validated[String, List[Game]] =
+    sans
+      .foldLeft(valid[String, List[Game]](List(game))) { (acc, move) =>
+        acc andThen { games =>
+          val current = games.head
+          move(current.situation) map { moveOrDrop =>
+            moveOrDrop.fold(game.apply, game.applyDrop) :: games
+          }
+        }
+      }
+      .map(_.reverse)
 
   def games(
       moveStrs: Iterable[String],
       initialFen: Option[Fen.Epd],
-      variant: chess.variant.Variant
+      variant: Variant
   ): Validated[String, List[Game]] =
     Parser.moves(moveStrs) andThen { moves =>
-      val game = makeGame(variant, initialFen)
-      recursiveGames(game, moves.value) map { game :: _ }
+      computeGames(makeGame(variant, initialFen), moves.value)
     }
 
   def gameMoveWhileValid(
       moveStrs: Seq[String],
       initialFen: Fen.Epd,
-      variant: chess.variant.Variant
+      variant: Variant
   ): (Game, List[(Game, Uci.WithSan)], Option[String]) =
 
     def mk(g: Game, moves: List[(San, String)]): (List[(Game, Uci.WithSan)], Option[String]) =
@@ -100,16 +96,23 @@ object Replay:
       ) match
       case (games, err) => (init, games, err)
 
-  private def recursiveSituations(sit: Situation, sans: List[San]): Validated[String, List[Situation]] =
-    sans match
-      case Nil => valid(Nil)
-      case san :: rest =>
-        san(sit) andThen { moveOrDrop =>
-          val after = Situation(moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter), !sit.color)
-          recursiveSituations(after, rest) map { after :: _ }
+  private def computeSituations[M](
+      sit: Situation,
+      moves: List[M],
+      play: M => Situation => Validated[String, MoveOrDrop]
+  ): Validated[String, List[Situation]] =
+    moves
+      .foldLeft(valid[String, List[Situation]](List(sit))) { (acc, move) =>
+        acc andThen { sits =>
+          val current = sits.head
+          play(move)(current) map { moveOrDrop =>
+            Situation(moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter), !current.color) :: sits
+          }
         }
+      }
+      .map(_.reverse)
 
-  private def recursiveSituationsFromUci(
+  private def computeSituationsFromUci(
       sit: Situation,
       ucis: List[Uci]
   ): Validated[String, List[Situation]] =
@@ -118,20 +121,22 @@ object Replay:
       case uci :: rest =>
         uci(sit) andThen { moveOrDrop =>
           val after = Situation(moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter), !sit.color)
-          recursiveSituationsFromUci(after, rest) map { after :: _ }
+          computeSituationsFromUci(after, rest) map { after :: _ }
         }
 
-  private def recursiveReplayFromUci(replay: Replay, ucis: List[Uci]): Validated[String, Replay] =
+  @scala.annotation.tailrec
+  private def computeReplay(replay: Replay, ucis: List[Uci]): Validated[String, Replay] =
     ucis match
       case Nil => valid(replay)
       case uci :: rest =>
-        uci(replay.state.situation) andThen { moveOrDrop =>
-          recursiveReplayFromUci(replay addMove moveOrDrop, rest)
-        }
+        uci(replay.state.situation) match
+          case fail: Validated.Invalid[?] => fail
+          case Validated.Valid(moveOrDrop) =>
+            computeReplay(replay addMove moveOrDrop, rest)
 
   private def initialFenToSituation(
       initialFen: Option[Fen.Epd],
-      variant: chess.variant.Variant
+      variant: Variant
   ): Situation = {
     initialFen.flatMap(Fen.read) | Situation(variant)
   } withVariant variant
@@ -139,44 +144,43 @@ object Replay:
   def boards(
       moveStrs: Iterable[String],
       initialFen: Option[Fen.Epd],
-      variant: chess.variant.Variant
+      variant: Variant
   ): Validated[String, List[Board]] = situations(moveStrs, initialFen, variant) map (_ map (_.board))
 
   def situations(
       moveStrs: Iterable[String],
       initialFen: Option[Fen.Epd],
-      variant: chess.variant.Variant
+      variant: Variant
   ): Validated[String, List[Situation]] =
     val sit = initialFenToSituation(initialFen, variant)
     Parser.moves(moveStrs) andThen { moves =>
-      recursiveSituations(sit, moves.value) map { sit :: _ }
+      computeSituations[San](sit, moves.value, _.apply)
     }
 
   def boardsFromUci(
       moves: List[Uci],
       initialFen: Option[Fen.Epd],
-      variant: chess.variant.Variant
+      variant: Variant
   ): Validated[String, List[Board]] = situationsFromUci(moves, initialFen, variant) map (_ map (_.board))
 
   def situationsFromUci(
       moves: List[Uci],
       initialFen: Option[Fen.Epd],
-      variant: chess.variant.Variant
+      variant: Variant
   ): Validated[String, List[Situation]] =
-    val sit = initialFenToSituation(initialFen, variant)
-    recursiveSituationsFromUci(sit, moves) map { sit :: _ }
+    computeSituations[Uci](initialFenToSituation(initialFen, variant), moves, _.apply)
 
   def apply(
       moves: List[Uci],
       initialFen: Option[Fen.Epd],
-      variant: chess.variant.Variant
+      variant: Variant
   ): Validated[String, Replay] =
-    recursiveReplayFromUci(Replay(makeGame(variant, initialFen)), moves)
+    computeReplay(Replay(makeGame(variant, initialFen)), moves)
 
   def plyAtFen(
       moveStrs: Iterable[String],
       initialFen: Option[Fen.Epd],
-      variant: chess.variant.Variant,
+      variant: Variant,
       atFen: Fen.Epd
   ): Validated[String, Int] =
     if (Fen.read(variant, atFen).isEmpty) invalid(s"Invalid Fen $atFen")
@@ -206,6 +210,6 @@ object Replay:
         recursivePlyAtFen(sit, moves.value, 1)
       }
 
-  private def makeGame(variant: chess.variant.Variant, initialFen: Option[Fen.Epd]): Game =
+  private def makeGame(variant: Variant, initialFen: Option[Fen.Epd]): Game =
     val g = Game(variant.some, initialFen)
     g.copy(startedAtTurn = g.turns)

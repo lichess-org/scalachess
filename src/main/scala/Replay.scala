@@ -112,18 +112,6 @@ object Replay:
       }
       .map(_.reverse)
 
-  private def computeSituationsFromUci(
-      sit: Situation,
-      ucis: List[Uci]
-  ): Validated[String, List[Situation]] =
-    ucis match
-      case Nil => valid(Nil)
-      case uci :: rest =>
-        uci(sit) andThen { moveOrDrop =>
-          val after = Situation(moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter), !sit.color)
-          computeSituationsFromUci(after, rest) map { after :: _ }
-        }
-
   @scala.annotation.tailrec
   private def computeReplay(replay: Replay, ucis: List[Uci]): Validated[String, Replay] =
     ucis match

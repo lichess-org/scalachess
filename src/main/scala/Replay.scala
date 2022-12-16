@@ -179,16 +179,18 @@ object Replay:
       val atFenTruncated            = truncateFen(atFen)
       def compareFen(fen: Fen.Epd)  = truncateFen(fen) == atFenTruncated
 
+      @scala.annotation.tailrec
       def recursivePlyAtFen(sit: Situation, sans: List[San], ply: Int): Validated[String, Int] =
         sans match
           case Nil => invalid(s"Can't find $atFenTruncated, reached ply $ply")
           case san :: rest =>
-            san(sit) andThen { moveOrDrop =>
-              val after = moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter)
-              val fen   = Fen write Game(Situation(after, Color.fromPly(ply)), turns = ply)
-              if (compareFen(fen)) Validated.valid(ply)
-              else recursivePlyAtFen(Situation(after, !sit.color), rest, ply + 1)
-            }
+            san(sit) match
+              case fail: Validated.Invalid[?] => fail
+              case Validated.Valid(moveOrDrop) =>
+                val after = moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter)
+                val fen   = Fen write Game(Situation(after, Color.fromPly(ply)), turns = ply)
+                if (compareFen(fen)) Validated.valid(ply)
+                else recursivePlyAtFen(Situation(after, !sit.color), rest, ply + 1)
 
       val sit = initialFen.flatMap {
         Fen.read(variant, _)

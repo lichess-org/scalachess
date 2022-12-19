@@ -9,6 +9,8 @@ import chess.variant.ThreeCheck
 
 class DumperTest extends ChessTest:
 
+  given Conversion[String, SanStr] = SanStr(_)
+
   "Check with pawn" should {
     "not be checkmate if pawn can be taken en passant" in {
       val game = Fen.readWithMoveNumber(EpdFen("8/3b4/6R1/1P2kp2/6pp/2N1P3/4KPPP/8 w - -")).get match

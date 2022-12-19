@@ -4,8 +4,13 @@ package pgn
 
 import cats.implicits.*
 
+// Nf6
 opaque type SanStr = String
 object SanStr extends OpaqueString[SanStr]
+
+// 1. d4 Nf6 2. c4 e6 3. g3
+opaque type PgnMovesStr = String
+object PgnMovesStr extends OpaqueString[PgnMovesStr]
 
 case class Pgn(tags: Tags, turns: List[Turn], initial: Initial = Initial.empty):
 
@@ -97,7 +102,7 @@ object Turn:
   }._1.reverse
 
 case class Move(
-    san: String,
+    san: SanStr,
     comments: List[String] = Nil,
     glyphs: Glyphs = Glyphs.empty,
     opening: Option[String] = None,

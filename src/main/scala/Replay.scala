@@ -4,7 +4,7 @@ import cats.data.Validated
 import cats.data.Validated.{ invalid, valid }
 import cats.implicits.*
 
-import chess.format.pgn.{ Parser, Reader, San, Tag, Tags }
+import chess.format.pgn.{ Parser, Reader, San, SanStr, Tag, Tags }
 import chess.format.{ Fen, Uci }
 import chess.variant.Variant
 
@@ -26,11 +26,11 @@ object Replay:
   def apply(game: Game) = new Replay(game, Nil, game)
 
   def apply(
-      moveStrs: Iterable[String],
+      sans: Iterable[SanStr],
       initialFen: Option[Fen.Epd],
       variant: Variant
   ): Validated[String, Reader.Result] =
-    moveStrs.some.filter(_.nonEmpty) toValid "[replay] pgn is empty" andThen { nonEmptyMoves =>
+    sans.some.filter(_.nonEmpty) toValid "[replay] pgn is empty" andThen { nonEmptyMoves =>
       Reader.moves(
         nonEmptyMoves,
         Tags(
@@ -59,21 +59,21 @@ object Replay:
       .map(_.reverse)
 
   def games(
-      moveStrs: Iterable[String],
+      sans: Iterable[SanStr],
       initialFen: Option[Fen.Epd],
       variant: Variant
   ): Validated[String, List[Game]] =
-    Parser.moves(moveStrs) andThen { moves =>
+    Parser.moves(sans) andThen { moves =>
       computeGames(makeGame(variant, initialFen), moves.value)
     }
 
   def gameMoveWhileValid(
-      moveStrs: Seq[String],
+      sans: Seq[SanStr],
       initialFen: Fen.Epd,
       variant: Variant
   ): (Game, List[(Game, Uci.WithSan)], Option[String]) =
 
-    def mk(g: Game, moves: List[(San, String)]): (List[(Game, Uci.WithSan)], Option[String]) =
+    def mk(g: Game, moves: List[(San, SanStr)]): (List[(Game, Uci.WithSan)], Option[String]) =
       moves match
         case (san, sanStr) :: rest =>
           san(g.situation).fold(
@@ -89,10 +89,10 @@ object Replay:
         case _ => (Nil, None)
     val init = makeGame(variant, initialFen.some)
     Parser
-      .moves(moveStrs)
+      .moves(sans)
       .fold(
         err => List.empty[(Game, Uci.WithSan)] -> err.some,
-        moves => mk(init, moves.value zip moveStrs)
+        moves => mk(init, moves.value zip sans)
       ) match
       case (games, err) => (init, games, err)
 
@@ -130,18 +130,18 @@ object Replay:
   } withVariant variant
 
   def boards(
-      moveStrs: Iterable[String],
+      sans: Iterable[SanStr],
       initialFen: Option[Fen.Epd],
       variant: Variant
-  ): Validated[String, List[Board]] = situations(moveStrs, initialFen, variant) map (_ map (_.board))
+  ): Validated[String, List[Board]] = situations(sans, initialFen, variant) map (_ map (_.board))
 
   def situations(
-      moveStrs: Iterable[String],
+      sans: Iterable[SanStr],
       initialFen: Option[Fen.Epd],
       variant: Variant
   ): Validated[String, List[Situation]] =
     val sit = initialFenToSituation(initialFen, variant)
-    Parser.moves(moveStrs) andThen { moves =>
+    Parser.moves(sans) andThen { moves =>
       computeSituations[San](sit, moves.value, _.apply)
     }
 
@@ -166,7 +166,7 @@ object Replay:
     computeReplay(Replay(makeGame(variant, initialFen)), moves)
 
   def plyAtFen(
-      moveStrs: Iterable[String],
+      sans: Iterable[SanStr],
       initialFen: Option[Fen.Epd],
       variant: Variant,
       atFen: Fen.Epd
@@ -192,11 +192,9 @@ object Replay:
                 if (compareFen(fen)) Validated.valid(ply)
                 else recursivePlyAtFen(Situation(after, !sit.color), rest, ply + 1)
 
-      val sit = initialFen.flatMap {
-        Fen.read(variant, _)
-      } | Situation(variant)
+      val sit = initialFen.flatMap { Fen.read(variant, _) } | Situation(variant)
 
-      Parser.moves(moveStrs) andThen { moves =>
+      Parser.moves(sans) andThen { moves =>
         recursivePlyAtFen(sit, moves.value, 1)
       }
 

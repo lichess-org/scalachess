@@ -23,31 +23,29 @@ object Parser:
       case Left(err) =>
         invalid(showExpectations("Cannot parse pgn", pgn, err))
 
-  def moves(str: String): Validated[String, Sans] =
+  def moves(str: PgnMovesStr): Validated[String, Sans] =
     MovesParser.moves(str)
 
-  def moves(strMoves: Iterable[String]): Validated[String, Sans] =
+  def moves(strMoves: Iterable[SanStr]): Validated[String, Sans] =
     strMoves.toList
       .traverse(MovesParser.move)
       .map(Sans(_))
 
-  def move(str: String) = MovesParser.move(str)
+  def move(str: SanStr) = MovesParser.move(str)
 
   private object MovesParser:
 
     private def cleanComments(comments: List[String]) = comments.map(_.trim).filter(_.nonEmpty)
 
-    def moves(str: String): Validated[String, Sans] =
-      strMove.rep.map(xs => Sans(xs.toList)).parse(str) match
-        case Right((_, str)) =>
-          valid(str)
-        case Left(err) => invalid(showExpectations("Cannot parse moves", str, err))
+    def moves(str: PgnMovesStr): Validated[String, Sans] =
+      strMove.rep.map(xs => Sans(xs.toList)).parse(str.value) match
+        case Right((_, sans)) => valid(sans)
+        case Left(err)        => invalid(showExpectations("Cannot parse moves", str.value, err))
 
-    def move(str: String): Validated[String, San] =
-      strMove.parse(str) match
-        case Right((_, str)) =>
-          valid(str)
-        case Left(err) => invalid(showExpectations("Cannot parse move", str, err))
+    def move(str: SanStr): Validated[String, San] =
+      strMove.parse(str.value) match
+        case Right((_, san)) => valid(san)
+        case Left(err)       => invalid(showExpectations("Cannot parse move", str.value, err))
 
     val blockCommentary: P[String] = P.until0(P.char('}')).with1.between(P.char('{'), P.char('}'))
 

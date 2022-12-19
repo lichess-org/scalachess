@@ -81,7 +81,7 @@ object Uci:
         pos  <- Pos.fromKey(posS)
       } yield Drop(role, pos)
 
-  case class WithSan(uci: Uci, san: String)
+  case class WithSan(uci: Uci, san: pgn.SanStr)
 
   def apply(move: chess.Move) = Uci.Move(move.orig, move.dest, move.promotion)
 

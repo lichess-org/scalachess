@@ -12,7 +12,7 @@ object UciDump:
     replay.chronoMoves map move(replay.setup.board.variant, force960Notation)
 
   def apply(
-      moves: Seq[String],
+      moves: Seq[pgn.SanStr],
       initialFen: Option[EpdFen],
       variant: Variant,
       force960Notation: Boolean = false

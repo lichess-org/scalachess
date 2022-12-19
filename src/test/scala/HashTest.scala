@@ -3,6 +3,7 @@ package chess
 import Pos.*
 import variant.{ Antichess, Atomic, Crazyhouse, Standard, ThreeCheck }
 import chess.format.{ EpdFen, Fen, Uci }
+import chess.format.pgn.SanStr
 
 class HashTest extends ChessTest:
   def hexToBytes(str: String) =
@@ -181,10 +182,10 @@ class HashTest extends ChessTest:
       hashAfterMove mustEqual hashAfter
     }
     "prod 5 Three-Check games accumulate hash" in {
-      val gameMoves = format.pgn.Fixtures.prod5threecheck.map {
-        _.split(' ').toList
+      val gameMoves = format.pgn.Fixtures.prod5threecheck.map { g =>
+        SanStr from g.split(' ').toList
       }
-      def runOne(moves: List[String]) =
+      def runOne(moves: List[SanStr]) =
         Replay.gameMoveWhileValid(moves, Fen.initial, chess.variant.ThreeCheck)
       def hex(buf: Array[Byte]): String = buf.map("%02x" format _).mkString
       val g                             = gameMoves.map(runOne)

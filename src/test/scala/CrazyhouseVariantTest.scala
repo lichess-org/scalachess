@@ -4,6 +4,7 @@ import cats.syntax.option.*
 
 import chess.format.EpdFen
 import chess.variant.Crazyhouse
+import chess.format.pgn.SanStr
 
 class CrazyhouseVariantTest extends ChessTest:
 
@@ -162,51 +163,10 @@ class CrazyhouseVariantTest extends ChessTest:
       }
       "from prod with captures and drops should 3fold" in {
         chess.Replay.boards(
-          moveStrs = Vector(
-            "e4",
-            "e5",
-            "Nf3",
-            "Nc6",
-            "Bc4",
-            "Bc5",
-            "d3",
-            "d6",
-            "Nc3",
-            "h6",
-            "O-O",
-            "Nf6",
-            "Be3",
-            "Bg4",
-            "Na4",
-            "b6",
-            "Nxc5",
-            "bxc5",
-            "B@b7",
-            "Nd4",
-            "Bxd4",
-            "cxd4",
-            "N@c6",
-            "O-O",
-            "Nxd8",
-            "Raxd8",
-            "Bbd5",
-            "B@h5",
-            "Bxf7+",
-            "Bxf7",
-            "P@e7",
-            "Bxc4",
-            "exf8=Q+",
-            "Rxf8",
-            "dxc4",
-            "B@f7",
-            "B@d5",
-            "B@h5",
-            "Bxf7+",
-            "Bxf7",
-            "B@f5",
-            "B@h5",
-            "Bxg4",
-            "Bxg4"
+          sans = SanStr.from(
+            "e4 e5 Nf3 Nc6 Bc4 Bc5 d3 d6 Nc3 h6 O-O Nf6 Be3 Bg4 Na4 b6 Nxc5 bxc5 B@b7 Nd4 Bxd4 cxd4 N@c6 O-O Nxd8 Raxd8 Bbd5 B@h5 Bxf7+ Bxf7 P@e7 Bxc4 exf8=Q+ Rxf8 dxc4 B@f7 B@d5 B@h5 Bxf7+ Bxf7 B@f5 B@h5 Bxg4 Bxg4"
+              .split(' ')
+              .toVector
           ),
           initialFen = None,
           variant = Crazyhouse
@@ -322,10 +282,10 @@ class CrazyhouseVariantTest extends ChessTest:
       }
     }
     "prod 50 games accumulate hash" in {
-      val gameMoves = format.pgn.Fixtures.prod50crazyhouse.map {
-        _.split(' ').toList
+      val gameMoves = format.pgn.Fixtures.prod50crazyhouse.map { g =>
+        SanStr from g.split(' ').toList
       }
-      def runOne(moves: List[String]) =
+      def runOne(moves: List[SanStr]) =
         Replay.gameMoveWhileValid(moves, format.Fen.initial, Crazyhouse)
       def hex(buf: Array[Byte]): String = buf.map("%02x" format _).mkString
       val g                             = gameMoves.map(runOne)
@@ -361,29 +321,10 @@ class CrazyhouseVariantTest extends ChessTest:
 
     "replay ZH" in {
       chess.Replay.boards(
-        moveStrs = Vector(
-          "e4",
-          "c5",
-          "Na3",
-          "d6",
-          "Nf3",
-          "Bg4",
-          "Bc4",
-          "Bxf3",
-          "Qxf3",
-          "N@b4",
-          "Bxf7+",
-          "Kd7",
-          "P@d5",
-          "Nf6",
-          "O-O",
-          "Nxc2",
-          "Nb5",
-          "P@c4",
-          "Be6+",
-          "Ke8",
-          "B@f7#"
-        ),
+        sans =
+          SanStr from "e4 c5 Na3 d6 Nf3 Bg4 Bc4 Bxf3 Qxf3 N@b4 Bxf7+ Kd7 P@d5 Nf6 O-O Nxc2 Nb5 P@c4 Be6+ Ke8 B@f7#"
+            .split(' ')
+            .toVector,
         initialFen = None,
         variant = Crazyhouse
       ) must beValid

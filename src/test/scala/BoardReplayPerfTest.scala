@@ -1,5 +1,7 @@
 package chess
 
+import chess.format.pgn.SanStr
+
 class BoardReplayPerfTest extends ChessTest:
 
   args(skipAll = true)
@@ -9,7 +11,7 @@ class BoardReplayPerfTest extends ChessTest:
   // val nb = 1
   // val iterations = 1
 
-  val moves       = format.pgn.Fixtures.fromProd2.split(' ').toList
+  val moves       = SanStr from format.pgn.Fixtures.fromProd2.split(' ').toList
   def runOne      = Replay.boards(moves, None, variant.Standard)
   def run(): Unit = { for (_ <- 1 to nb) runOne }
 

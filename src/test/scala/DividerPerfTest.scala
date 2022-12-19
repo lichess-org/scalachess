@@ -1,5 +1,7 @@
 package chess
 
+import chess.format.pgn.SanStr
+
 class DividerPerfTest extends ChessTest:
 
   args(skipAll = true)
@@ -10,7 +12,7 @@ class DividerPerfTest extends ChessTest:
   // val iterations = 1
 
   val moves       = format.pgn.Fixtures.fromProd2
-  val gameReplay  = Replay.boards(moves.split(' ').toList, None, variant.Standard).toOption.get
+  val gameReplay  = Replay.boards(SanStr from moves.split(' ').toList, None, variant.Standard).toOption.get
   def runOne      = Divider(gameReplay)
   def run(): Unit = { for (_ <- 1 to nb) runOne }
 

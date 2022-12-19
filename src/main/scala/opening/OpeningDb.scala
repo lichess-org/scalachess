@@ -4,6 +4,7 @@ package opening
 import cats.syntax.option.*
 
 import chess.format.{ EpdFen, OpeningFen }
+import chess.format.pgn.SanStr
 
 object OpeningDb:
 
@@ -35,10 +36,10 @@ object OpeningDb:
   val SEARCH_MAX_PLIES = 40
 
   // assumes standard initial Fen and variant
-  def search(moveStrs: Iterable[String]): Option[Opening.AtPly] =
+  def search(sans: Iterable[SanStr]): Option[Opening.AtPly] =
     chess.Replay
       .situations(
-        moveStrs.take(SEARCH_MAX_PLIES).takeWhile(san => !san.contains('@')),
+        sans.take(SEARCH_MAX_PLIES).takeWhile(san => !san.value.contains('@')),
         None,
         variant.Standard
       )

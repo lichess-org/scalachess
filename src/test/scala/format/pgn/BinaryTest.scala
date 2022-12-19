@@ -1,15 +1,17 @@
 package chess
 package format.pgn
 
-import scala.*
+import chess.format.pgn.SanStr
+import scala.language.implicitConversions
 
 class BinaryTest extends ChessTest:
 
   import BinaryTestData.*
   import BinaryTestUtils.*
+  given Conversion[String, SanStr] = SanStr(_)
 
   def compareStrAndBin(pgn: String) =
-    val bin = (Binary writeMoves pgn.split(' ').toList).get.toList
+    val bin = (Binary writeMoves SanStr.from(pgn.split(' ').toList)).get.toList
     ((Binary readMoves bin).get mkString " ") must_== pgn
     bin.size must be_<=(pgn.length)
 
@@ -112,7 +114,7 @@ class BinaryTest extends ChessTest:
     "write many moves" in {
       "all games" in {
         forall(pgn200) { pgn =>
-          val bin = (Binary writeMoves pgn.split(' ').toList).get
+          val bin = (Binary writeMoves SanStr.from(pgn.split(' ').toList)).get
           bin.length must be_<=(pgn.length)
         }
       }
@@ -222,13 +224,13 @@ object BinaryTestUtils:
       b & 0xff
     }.toBinaryString.toInt
 
-  def writeMove(m: String): String =
+  def writeMove(m: SanStr): String =
     (Binary writeMove m).get map showByte mkString ","
 
-  def readMove(m: String): String =
+  def readMove(m: String): SanStr =
     readMoves(m).head
 
-  def readMoves(m: String): List[String] =
+  def readMoves(m: String): List[SanStr] =
     (Binary readMoves m.split(',').toList.map(parseBinary)).get
 
   def parseBinary(s: String): Byte =

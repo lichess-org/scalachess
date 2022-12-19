@@ -17,8 +17,8 @@ object Reader:
   def full(pgn: String, tags: Tags = Tags.empty): Validated[String, Result] =
     fullWithSans(pgn, identity, tags)
 
-  def moves(moveStrs: Iterable[String], tags: Tags): Validated[String, Result] =
-    movesWithSans(moveStrs, identity, tags)
+  def moves(sans: Iterable[SanStr], tags: Tags): Validated[String, Result] =
+    movesWithSans(sans, identity, tags)
 
   def fullWithSans(pgn: String, op: Sans => Sans, tags: Tags = Tags.empty): Validated[String, Result] =
     Parser.full(cleanUserInput(pgn)) map { parsed =>
@@ -28,8 +28,8 @@ object Reader:
   def fullWithSans(parsed: ParsedPgn, op: Sans => Sans): Result =
     makeReplay(makeGame(parsed.tags), op(parsed.sans))
 
-  def movesWithSans(moveStrs: Iterable[String], op: Sans => Sans, tags: Tags): Validated[String, Result] =
-    Parser.moves(moveStrs) map { moves =>
+  def movesWithSans(sans: Iterable[SanStr], op: Sans => Sans, tags: Tags): Validated[String, Result] =
+    Parser.moves(sans) map { moves =>
       makeReplay(makeGame(tags), op(moves))
     }
 

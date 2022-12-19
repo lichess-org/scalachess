@@ -5,8 +5,8 @@ import scala.util.Try
 
 object Binary:
 
-  def writeMove(m: String)             = Try(Writer move m)
-  def writeMoves(ms: Iterable[String]) = Try(Writer moves ms)
+  def writeMove(m: SanStr)             = Try(Writer move m)
+  def writeMoves(ms: Iterable[SanStr]) = Try(Writer moves ms)
 
   def readMoves(bs: List[Byte])          = Try(Reader moves bs)
   def readMoves(bs: List[Byte], nb: Int) = Try(Reader.moves(bs, nb))
@@ -34,8 +34,8 @@ object Binary:
 
     private val maxPlies = 600
 
-    def moves(bs: List[Byte]): List[String]          = moves(bs, maxPlies)
-    def moves(bs: List[Byte], nb: Int): List[String] = intMoves(bs map (Binary.toInt(_)), nb)
+    def moves(bs: List[Byte]): List[SanStr]          = moves(bs, maxPlies)
+    def moves(bs: List[Byte], nb: Int): List[SanStr] = SanStr from intMoves(bs.map(Binary.toInt(_)), nb)
 
     def intMoves(bs: List[Int], pliesToGo: Int): List[String] =
       bs match
@@ -117,8 +117,8 @@ object Binary:
 
     import Encoding.*
 
-    def move(str: String): List[Byte] =
-      (str match
+    def move(str: SanStr): List[Byte] =
+      (str.value match
         case pos if pos.length == 2 => simplePawn(pos)
         case CastlingR(str, check)  => castling(str, check)
         case SimplePieceR(piece, capture, pos, check) =>
@@ -130,7 +130,7 @@ object Binary:
         case DropR(role, pos, check) => drop(role, pos, check)
       ) map (_.toByte)
 
-    def moves(strs: Iterable[String]): Array[Byte] = strs.flatMap(move).to(Array)
+    def moves(strs: Iterable[SanStr]): Array[Byte] = strs.flatMap(move).to(Array)
 
     def simplePawn(pos: String) =
       List(

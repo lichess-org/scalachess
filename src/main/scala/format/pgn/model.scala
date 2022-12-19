@@ -14,16 +14,17 @@ object PgnMovesStr extends OpaqueString[PgnMovesStr]
 
 case class Pgn(tags: Tags, turns: List[Turn], initial: Initial = Initial.empty):
 
-  def updateTurn(fullMove: Int, f: Turn => Turn) =
-    val index = fullMove - 1
+  // index is NOT a full move turn!
+  private def updateTurnAt(index: Int, f: Turn => Turn) =
+    // val index = fullMove.value - 1
     (turns lift index).fold(this) { turn =>
       copy(turns = turns.updated(index, f(turn)))
     }
-  def updatePly(ply: Int, f: Move => Move) =
-    val fullMove = (ply + 1) / 2
-    val color    = Color.fromPly(ply - 1)
-    updateTurn(fullMove, _.update(color, f))
-  def updateLastPly(f: Move => Move) = updatePly(nbPlies, f)
+
+  def updatePly(ply: Ply, f: Move => Move) =
+    updateTurnAt((ply + 1).value / 2 - 1, _.update(!ply.color, f))
+
+  def updateLastPly(f: Move => Move) = updatePly(Ply(nbPlies), f)
 
   def nbPlies = turns.foldLeft(0)(_ + _.count)
 
@@ -90,12 +91,12 @@ case class Turn(
 
 object Turn:
 
-  def fromMoves(moves: List[Move], ply: Int): List[Turn] = {
+  def fromMoves(moves: List[Move], ply: Ply): List[Turn] = {
     moves.foldLeft((List[Turn](), ply)) {
-      case ((turns, p), move) if p % 2 == 1 =>
-        (Turn((p + 1) / 2, move.some, none) :: turns) -> (p + 1)
+      case ((turns, p), move) if (p.value & 1) == 1 =>
+        (Turn((p.value + 1) / 2, move.some, none) :: turns) -> (p + 1)
       case ((Nil, p), move) =>
-        (Turn((p + 1) / 2, none, move.some) :: Nil) -> (p + 1)
+        (Turn((p.value + 1) / 2, none, move.some) :: Nil) -> (p + 1)
       case ((t :: tt, p), move) =>
         (t.copy(black = move.some) :: tt) -> (p + 1)
     }

@@ -2,14 +2,14 @@ package chess
 
 import cats.syntax.option.none
 
-case class Division(middle: Option[Int], end: Option[Int], plies: Int):
+case class Division(middle: Option[Ply], end: Option[Ply], plies: Ply):
 
-  def openingSize: Int = middle | plies
-  def middleSize: Option[Int] =
+  def openingSize: Ply = middle | plies
+  def middleSize: Option[Ply] =
     middle.map { m =>
       (end | plies) - m
     }
-  def endSize = end.map(plies -)
+  def endSize = end.map(plies - _)
 
   def openingBounds = middle.map(0 -> _)
   def middleBounds =
@@ -20,7 +20,7 @@ case class Division(middle: Option[Int], end: Option[Int], plies: Int):
   def endBounds = end.map(_ -> plies)
 
 object Division:
-  val empty = Division(None, None, 0)
+  val empty = Division(None, None, Ply(0))
 
 object Divider:
 
@@ -44,9 +44,9 @@ object Divider:
       else None
 
     Division(
-      midGame.filter(m => endGame.fold(true)(m <)),
-      endGame,
-      boards.size
+      Ply from midGame.filter(m => endGame.fold(true)(m < _)),
+      Ply from endGame,
+      Ply(boards.size)
     )
 
   private def majorsAndMinors(board: Board): Int =

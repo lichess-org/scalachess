@@ -100,5 +100,5 @@ object Situation:
 
   def apply(variant: chess.variant.Variant): Situation = Situation(Board init variant, White)
 
-  case class AndFullMoveNumber(situation: Situation, fullMoveNumber: Int):
-    def turns = fullMoveNumber * 2 - situation.color.fold(2, 1)
+  case class AndFullMoveNumber(situation: Situation, fullMoveNumber: FullMoveNumber):
+    def ply = fullMoveNumber.ply(situation.color)

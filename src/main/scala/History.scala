@@ -26,9 +26,9 @@ case class History(
     castles: Castles = Castles.all,
     checkCount: CheckCount = CheckCount(0, 0),
     unmovedRooks: UnmovedRooks = UnmovedRooks.default,
-    halfMoveClock: Int = 0
+    halfMoveClock: HalfMoveClock = HalfMoveClock(0)
 ):
-  def setHalfMoveClock(v: Int) = copy(halfMoveClock = v)
+  def setHalfMoveClock(v: HalfMoveClock) = copy(halfMoveClock = v)
 
   private def isRepetition(times: Int) =
     positionHashes.value.length > (times - 1) * 4 * Hash.size && {

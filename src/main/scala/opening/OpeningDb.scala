@@ -59,7 +59,7 @@ object OpeningDb:
   private def searchInSituations(situations: Iterable[Situation]): Option[Opening.AtPly] =
     situations.zipWithIndex.drop(1).foldRight(none[Opening.AtPly]) {
       case ((situation, ply), None) =>
-        byFen get format.Fen.writeOpening(situation) map (_ atPly ply)
+        byFen.get(format.Fen.writeOpening(situation)).map(_ atPly Ply(ply))
       case (_, found) => found
     }
 

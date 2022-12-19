@@ -10,9 +10,13 @@ case class Game(
     situation: Situation,
     sans: Vector[SanStr] = Vector(),
     clock: Option[Clock] = None,
-    turns: Int = 0, // plies
-    startedAtTurn: Int = 0
+    turns: Ply = Ply(0), // plies
+    startedAtTurn: Ply = Ply(0)
 ):
+
+  export situation.{ board, color as player }
+  export situation.board.history.halfMoveClock
+
   def apply(
       orig: Pos,
       dest: Pos,
@@ -76,7 +80,7 @@ case class Game(
       {
         val c1 = metrics.frameLag.fold(prev)(prev.withFrameLag)
         val c2 = c1.step(metrics, gameActive)
-        if (turns - startedAtTurn == 1) c2.map(_.start) else c2
+        if (turns - startedAtTurn == Ply(1)) c2.map(_.start) else c2
       }
     }
 
@@ -87,18 +91,9 @@ case class Game(
       case u: Uci.Move => apply(u) map { case (g, m) => g -> Left(m) }
       case u: Uci.Drop => apply(u) map { case (g, d) => g -> Right(d) }
 
-  inline def player = situation.color
-
-  inline def board = situation.board
-
   inline def isStandardInit = board.pieces == chess.variant.Standard.pieces
 
-  inline def halfMoveClock: Int = board.history.halfMoveClock
-
-  /** Fullmove number: The number of the full move.
-    * It starts at 1, and is incremented after Black's move.
-    */
-  inline def fullMoveNumber: Int = 1 + turns / 2
+  inline def fullMoveNumber: FullMoveNumber = turns.fullMoveNumber
 
   def moveString = s"$fullMoveNumber${player.fold(".", "...")}"
 
@@ -108,11 +103,12 @@ case class Game(
 
   inline def withPlayer(c: Color) = copy(situation = situation.copy(color = c))
 
-  inline def withTurns(t: Int) = copy(turns = t)
+  inline def withTurns(t: Ply) = copy(turns = t)
 
 object Game:
+
   def apply(variant: chess.variant.Variant): Game =
-    new Game(Situation(Board init variant, White))
+    Game(Situation(Board init variant, White))
 
   def apply(board: Board): Game = apply(board, White)
 
@@ -133,7 +129,7 @@ object Game:
             },
             color = parsed.situation.color
           ),
-          turns = parsed.turns,
-          startedAtTurn = parsed.turns
+          turns = parsed.ply,
+          startedAtTurn = parsed.ply
         )
       }

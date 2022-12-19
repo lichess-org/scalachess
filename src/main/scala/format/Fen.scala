@@ -16,8 +16,6 @@ object EpdFen extends OpaqueString[EpdFen]:
     def castling: String       = SimpleFen castling a
     def enpassant: Option[Pos] = SimpleFen enpassant a
 
-    // def ply: Option[Int] = fullMove map { _ * 2 - (if (color.white) 2 else 1) }
-
     def isInitial: Boolean = a == initial
 
     def simple: SimpleFen   = SimpleFen fromEpd a

@@ -54,9 +54,7 @@ object Color:
   object Map:
     def apply[A](f: Color => A): Map[A] = Map(white = f(White), black = f(Black))
 
-  inline def fromPly(inline ply: Int) = fromWhite((ply & 1) == 0)
-
-  inline def fromWhite(inline white: Boolean): Color = if (white) White else Black
+  inline def fromWhite(inline white: Boolean): Color = if white then White else Black
 
   def fromName(n: String): Option[Color] =
     if (n == "white") Option(White)

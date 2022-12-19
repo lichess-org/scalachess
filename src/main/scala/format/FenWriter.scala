@@ -16,10 +16,10 @@ trait FenWriter:
   private given Ordering[File] = intOrdering[File]
   given Ordering[Pos]          = Ordering.by[Pos, File](_.file)
 
-  def write(situation: Situation): EpdFen = write(Situation.AndFullMoveNumber(situation, 1))
+  def write(situation: Situation): EpdFen = write(Situation.AndFullMoveNumber(situation, FullMoveNumber(1)))
 
   def write(parsed: Situation.AndFullMoveNumber): EpdFen =
-    write(Game(parsed.situation, turns = parsed.turns))
+    write(Game(parsed.situation, turns = parsed.ply))
 
   def write(game: Game): EpdFen = EpdFen {
     {

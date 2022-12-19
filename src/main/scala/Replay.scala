@@ -18,8 +18,8 @@ case class Replay(setup: Game, moves: List[MoveOrDrop], state: Game):
       state = moveOrDrop.fold(state.apply, state.applyDrop)
     )
 
-  def moveAtPly(ply: Int): Option[MoveOrDrop] =
-    chronoMoves lift (ply - 1 - setup.startedAtTurn)
+  def moveAtPly(ply: Ply): Option[MoveOrDrop] =
+    chronoMoves.lift(ply.value - 1 - setup.startedAtTurn.value)
 
 object Replay:
 
@@ -170,7 +170,7 @@ object Replay:
       initialFen: Option[Fen.Epd],
       variant: Variant,
       atFen: Fen.Epd
-  ): Validated[String, Int] =
+  ): Validated[String, Ply] =
     if (Fen.read(variant, atFen).isEmpty) invalid(s"Invalid Fen $atFen")
     else
 
@@ -180,7 +180,7 @@ object Replay:
       def compareFen(fen: Fen.Epd)  = truncateFen(fen) == atFenTruncated
 
       @scala.annotation.tailrec
-      def recursivePlyAtFen(sit: Situation, sans: List[San], ply: Int): Validated[String, Int] =
+      def recursivePlyAtFen(sit: Situation, sans: List[San], ply: Ply): Validated[String, Ply] =
         sans match
           case Nil => invalid(s"Can't find $atFenTruncated, reached ply $ply")
           case san :: rest =>
@@ -188,14 +188,14 @@ object Replay:
               case fail: Validated.Invalid[?] => fail
               case Validated.Valid(moveOrDrop) =>
                 val after = moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter)
-                val fen   = Fen write Game(Situation(after, Color.fromPly(ply)), turns = ply)
+                val fen   = Fen write Game(Situation(after, ply.color), turns = ply)
                 if (compareFen(fen)) Validated.valid(ply)
                 else recursivePlyAtFen(Situation(after, !sit.color), rest, ply + 1)
 
       val sit = initialFen.flatMap { Fen.read(variant, _) } | Situation(variant)
 
       Parser.moves(sans) andThen { moves =>
-        recursivePlyAtFen(sit, moves.value, 1)
+        recursivePlyAtFen(sit, moves.value, Ply(1))
       }
 
   private def makeGame(variant: Variant, initialFen: Option[Fen.Epd]): Game =

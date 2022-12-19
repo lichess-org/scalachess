@@ -3,7 +3,7 @@ package format.pgn
 
 object Dumper:
 
-  def apply(situation: Situation, data: chess.Move, next: Situation): String =
+  def apply(situation: Situation, data: chess.Move, next: Situation): SanStr =
     import data.*
 
     val base = (promotion, piece.role) match
@@ -42,25 +42,18 @@ object Dumper:
 
         s"${role.pgn}$disambiguation${if (captures) "x" else ""}${dest.key}"
 
-    s"$base${checkOrWinnerSymbol(next)}"
+    SanStr(s"$base${checkOrWinnerSymbol(next)}")
 
-  def apply(data: chess.Drop, next: Situation): String =
-    s"${data.toUci.uci}${checkOrWinnerSymbol(next)}"
+  def apply(data: chess.Drop, next: Situation): SanStr =
+    SanStr(s"${data.toUci.uci}${checkOrWinnerSymbol(next)}")
+
+  def apply(data: chess.Move): SanStr =
+    apply(data.situationBefore, data, data.finalizeAfter situationOf !data.color)
+
+  def apply(data: chess.Drop): SanStr =
+    apply(data, data.finalizeAfter situationOf !data.color)
 
   private def checkOrWinnerSymbol(next: Situation): String =
     if (next.winner.isDefined) "#"
     else if (next.check) "+"
     else ""
-
-  def apply(data: chess.Move): String =
-    apply(
-      data.situationBefore,
-      data,
-      data.finalizeAfter situationOf !data.color
-    )
-
-  def apply(data: chess.Drop): String =
-    apply(
-      data,
-      data.finalizeAfter situationOf !data.color
-    )

@@ -4,11 +4,10 @@ package pgn
 
 import cats.implicits.*
 
-case class Pgn(
-    tags: Tags,
-    turns: List[Turn],
-    initial: Initial = Initial.empty
-):
+opaque type SanStr = String
+object SanStr extends OpaqueString[SanStr]
+
+case class Pgn(tags: Tags, turns: List[Turn], initial: Initial = Initial.empty):
 
   def updateTurn(fullMove: Int, f: Turn => Turn) =
     val index = fullMove - 1

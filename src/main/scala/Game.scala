@@ -4,10 +4,11 @@ import cats.data.Validated
 
 import chess.format.Fen
 import chess.format.{ pgn, Uci }
+import chess.format.pgn.SanStr
 
 case class Game(
     situation: Situation,
-    pgnMoves: Vector[String] = Vector(),
+    sans: Vector[SanStr] = Vector(),
     clock: Option[Clock] = None,
     turns: Int = 0, // plies
     startedAtTurn: Int = 0
@@ -42,7 +43,7 @@ case class Game(
       copy(
         situation = newSituation,
         turns = turns + 1,
-        pgnMoves = pgnMoves :+ pgn.Dumper(situation, move, newSituation),
+        sans = sans :+ pgn.Dumper(situation, move, newSituation),
         clock = newClock.map(_.value)
       ),
       newClock.flatMap(_.compensated)
@@ -63,7 +64,7 @@ case class Game(
     copy(
       situation = newSituation,
       turns = turns + 1,
-      pgnMoves = pgnMoves :+ pgn.Dumper(drop, newSituation),
+      sans = sans :+ pgn.Dumper(drop, newSituation),
       clock = applyClock(drop.metrics, newSituation.status.isEmpty).map(_.value)
     )
 

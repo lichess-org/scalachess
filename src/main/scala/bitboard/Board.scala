@@ -129,7 +129,7 @@ case class Board(
     case Rook if role == Rook     => rooks ^ mask
     case Queen if role == Queen   => queens ^ mask
     case King if role == King     => kings ^ mask
-    case _                                  => roles(role)
+    case _                        => roles(role)
 
   def roles: Role => Bitboard =
     case Pawn   => pawns

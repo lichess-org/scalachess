@@ -89,10 +89,13 @@ object Bitboard:
       _ =
         if slidingAttacks(a, 0, ROOK_DELTAS).contains(b) then
           BETWEEN(a)(b) = slidingAttacks(a, 1L << b, ROOK_DELTAS) & slidingAttacks(b, 1L << a, ROOK_DELTAS)
-          RAYS(a)(b) = (1L << a) | (1L << b) | slidingAttacks(a, 0, ROOK_DELTAS) & slidingAttacks(b, 0, ROOK_DELTAS)
+          RAYS(a)(b) =
+            (1L << a) | (1L << b) | slidingAttacks(a, 0, ROOK_DELTAS) & slidingAttacks(b, 0, ROOK_DELTAS)
         else if slidingAttacks(a, 0, BISHOP_DELTAS).contains(b) then
-          BETWEEN(a)(b) = slidingAttacks(a, 1L << b, BISHOP_DELTAS) & slidingAttacks(b, 1L << a, BISHOP_DELTAS)
-          RAYS(a)(b) = (1L << a) | (1L << b) | slidingAttacks(a, 0, BISHOP_DELTAS) & slidingAttacks(b, 0, BISHOP_DELTAS)
+          BETWEEN(a)(b) =
+            slidingAttacks(a, 1L << b, BISHOP_DELTAS) & slidingAttacks(b, 1L << a, BISHOP_DELTAS)
+          RAYS(a)(b) =
+            (1L << a) | (1L << b) | slidingAttacks(a, 0, BISHOP_DELTAS) & slidingAttacks(b, 0, BISHOP_DELTAS)
     yield ()
 
   initialize()

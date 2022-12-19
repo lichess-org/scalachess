@@ -1,9 +1,12 @@
 package chess
 package bitboard
 
+import scala.language.implicitConversions
+import bitboard.Bitboard.*
 import scala.collection.mutable.ListBuffer
-
 import cats.syntax.all.*
+
+given Conversion[Rank, Int] = _.value
 
 case class Fen(board: Board, state: State):
   def us: Bitboard   = board.byColor(state.turn)
@@ -38,7 +41,7 @@ case class Fen(board: Board, state: State):
 
   def playState(move: Move): State =
     val halfMoves = if move.isHalfMove then state.halfMoves + 1 else 0
-    val fullMoves = if state.turn.isBlack then state.fullMoves + 1 else state.fullMoves
+    val fullMoves = if state.turn.black then state.fullMoves + 1 else state.fullMoves
     val turn      = !state.turn
     val halfCastlingRights =
       if move.isCapture then state.castlingRights & ~move.to.bitboard
@@ -52,17 +55,17 @@ case class Fen(board: Board, state: State):
     )
 
     move match
-      case Move.Normal(from, to, Role.Pawn, _) =>
+      case Move.Normal(from, to, Pawn, _) =>
         val epSquare: Option[Pos] =
           if Math.abs(from - to) == 16 then
             // TODO calculate their pawns attacks
-            Pos(from + (if isWhiteTurn then 8 else -8))
+            Some(Pos(from + (if isWhiteTurn then 8 else -8)))
           else None
         haftState.copy(epSquare = epSquare)
-      case Move.Normal(from, _, Role.Rook, _) =>
+      case Move.Normal(from, _, Rook, _) =>
         val castlingRights = halfCastlingRights & ~from.bitboard
         haftState.copy(castlingRights = castlingRights)
-      case Move.Normal(_, _, Role.King, _) | Move.Castle(_, _) =>
+      case Move.Normal(_, _, King, _) | Move.Castle(_, _) =>
         val castlingRights = halfCastlingRights & Bitboard.RANKS(state.turn.lastRank)
         haftState.copy(castlingRights = castlingRights)
       case _ => haftState
@@ -111,13 +114,19 @@ object Fen:
           .map(_.foldRight(0L)((s, b) => s.bitboard | b))
           .toRight(ParseFenError.InvalidCastling)
 
+  // TODO naming is hard
+  def fromString(s: String): Option[Pos] =
+    s.toList match
+      case x :: y :: Nil => Pos.at(x, y)
+      case _             => None
+
   def parseEpPassantSquare(s: String): Either[ParseFenError, Option[Pos]] =
     val epSquares = for
       f <- 'a' to 'h'
       r <- List('3', '6')
     yield s"$f$r"
     s match
-      case ep if epSquares contains ep => Right(Pos.fromString(ep))
+      case ep if epSquares contains ep => Right(fromString(ep))
       case "-"                         => Right(None)
       case _                           => Left(ParseFenError.InvalidEpSquare)
 
@@ -147,7 +156,7 @@ object Fen:
         }
         case ch => {
           // println(s"do $ch $file $rank")
-          (Piece.fromChar(ch), File(file), Rank(rank))
+          (Piece.fromChar(ch), File.atIndex(file), Rank.atIndex(rank))
             .mapN((p, f, r) => (Pos(f, r), p))
             .match
               case Some(p) => pieces.addOne(p)

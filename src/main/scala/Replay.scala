@@ -19,7 +19,7 @@ case class Replay(setup: Game, moves: List[MoveOrDrop], state: Game):
     )
 
   def moveAtPly(ply: Ply): Option[MoveOrDrop] =
-    chronoMoves.lift(ply.value - 1 - setup.startedAtTurn.value)
+    chronoMoves.lift(ply.value - 1 - setup.startedAtPly.value)
 
 object Replay:
 
@@ -73,6 +73,7 @@ object Replay:
       variant: Variant
   ): (Game, List[(Game, Uci.WithSan)], Option[String]) =
 
+    // @scala.annotation.tailrec
     def mk(g: Game, moves: List[(San, SanStr)]): (List[(Game, Uci.WithSan)], Option[String]) =
       moves match
         case (san, sanStr) :: rest =>
@@ -188,7 +189,7 @@ object Replay:
               case fail: Validated.Invalid[?] => fail
               case Validated.Valid(moveOrDrop) =>
                 val after = moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter)
-                val fen   = Fen write Game(Situation(after, ply.color), turns = ply)
+                val fen   = Fen write Game(Situation(after, ply.color), ply = ply)
                 if (compareFen(fen)) Validated.valid(ply)
                 else recursivePlyAtFen(Situation(after, !sit.color), rest, ply + 1)
 
@@ -200,4 +201,4 @@ object Replay:
 
   private def makeGame(variant: Variant, initialFen: Option[Fen.Epd]): Game =
     val g = Game(variant.some, initialFen)
-    g.copy(startedAtTurn = g.turns)
+    g.copy(startedAtPly = g.ply)

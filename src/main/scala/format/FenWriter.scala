@@ -19,7 +19,7 @@ trait FenWriter:
   def write(situation: Situation): EpdFen = write(Situation.AndFullMoveNumber(situation, FullMoveNumber(1)))
 
   def write(parsed: Situation.AndFullMoveNumber): EpdFen =
-    write(Game(parsed.situation, turns = parsed.ply))
+    write(Game(parsed.situation, ply = parsed.ply))
 
   def write(game: Game): EpdFen = EpdFen {
     {

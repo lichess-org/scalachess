@@ -10,8 +10,8 @@ case class Game(
     situation: Situation,
     sans: Vector[SanStr] = Vector(),
     clock: Option[Clock] = None,
-    turns: Ply = Ply(0), // plies
-    startedAtTurn: Ply = Ply(0)
+    ply: Ply = Ply(0), // plies
+    startedAtPly: Ply = Ply(0)
 ):
 
   export situation.{ board, color as player }
@@ -46,7 +46,7 @@ case class Game(
     Clock.WithCompensatedLag(
       copy(
         situation = newSituation,
-        turns = turns + 1,
+        ply = ply + 1,
         sans = sans :+ pgn.Dumper(situation, move, newSituation),
         clock = newClock.map(_.value)
       ),
@@ -67,7 +67,7 @@ case class Game(
 
     copy(
       situation = newSituation,
-      turns = turns + 1,
+      ply = ply + 1,
       sans = sans :+ pgn.Dumper(drop, newSituation),
       clock = applyClock(drop.metrics, newSituation.status.isEmpty).map(_.value)
     )
@@ -80,7 +80,7 @@ case class Game(
       {
         val c1 = metrics.frameLag.fold(prev)(prev.withFrameLag)
         val c2 = c1.step(metrics, gameActive)
-        if (turns - startedAtTurn == Ply(1)) c2.map(_.start) else c2
+        if (ply - startedAtPly == Ply(1)) c2.map(_.start) else c2
       }
     }
 
@@ -93,7 +93,7 @@ case class Game(
 
   inline def isStandardInit = board.pieces == chess.variant.Standard.pieces
 
-  inline def fullMoveNumber: FullMoveNumber = turns.fullMoveNumber
+  inline def fullMoveNumber: FullMoveNumber = ply.fullMoveNumber
 
   def moveString = s"$fullMoveNumber${player.fold(".", "...")}"
 
@@ -103,7 +103,7 @@ case class Game(
 
   inline def withPlayer(c: Color) = copy(situation = situation.copy(color = c))
 
-  inline def withTurns(t: Ply) = copy(turns = t)
+  inline def withTurns(t: Ply) = copy(ply = t)
 
 object Game:
 
@@ -129,7 +129,7 @@ object Game:
             },
             color = parsed.situation.color
           ),
-          turns = parsed.ply,
-          startedAtTurn = parsed.ply
+          ply = parsed.ply,
+          startedAtPly = parsed.ply
         )
       }

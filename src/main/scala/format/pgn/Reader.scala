@@ -52,6 +52,6 @@ object Reader:
       fen = tags.fen
     )
     g.copy(
-      startedAtTurn = g.turns,
+      startedAtPly = g.ply,
       clock = tags.clockConfig map Clock.apply
     )

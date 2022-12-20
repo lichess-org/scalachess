@@ -42,9 +42,9 @@ object UciCharPair:
 
     val dropRole2charMap: Map[Role, Char] =
       Role.all
-        .filterNot(King ==)
+        .filterNot(King == _)
         .zipWithIndex
-        .map { case (role, index) =>
+        .map { (role, index) =>
           role -> (charShift + pos2charMap.size + promotion2charMap.size + index).toChar
         }
         .to(Map)

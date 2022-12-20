@@ -29,7 +29,7 @@ case class Clock(
 
   inline def pending(c: Color) = timerFor(c).fold(Centis(0))(toNow)
 
-  def remainingTime(c: Color) = (players(c).remaining - pending(c)) nonNeg
+  def remainingTime(c: Color) = (players(c).remaining - pending(c)).nonNeg
 
   def outOfTime(c: Color, withGrace: Boolean) =
     players(c).remaining <=

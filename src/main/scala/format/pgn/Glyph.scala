@@ -49,7 +49,7 @@ object Glyphs:
     )
   val all = Glyph.MoveAssessment.all ++ Glyph.Observation.all ++ Glyph.PositionAssessment.all
 
-  val bySymbol: Map[String, Glyph] = all.map { g => g.symbol -> g }.toMap
+  val bySymbol: Map[String, Glyph] = all.mapBy(_.symbol)
 
 object Glyph:
 
@@ -65,12 +65,8 @@ object Glyph:
     val only        = new Glyph(7, "□", "Only move") with MoveAssessment
     val zugzwang    = new Glyph(22, "⨀", "Zugzwang") with MoveAssessment
 
-    val all = List(good, mistake, brillant, blunder, interesting, dubious, only, zugzwang)
-    val byId: Map[Int, Glyph] = all
-      .map { g =>
-        g.id -> g
-      }
-      .to(Map)
+    val all                   = List(good, mistake, brillant, blunder, interesting, dubious, only, zugzwang)
+    val byId: Map[Int, Glyph] = all.mapBy(_.id)
 
     def display = all
 
@@ -96,11 +92,7 @@ object Glyph:
       whiteMuchBetter,
       blackMuchBetter
     )
-    val byId: Map[Int, Glyph] = all
-      .map { g =>
-        g.id -> g
-      }
-      .to(Map)
+    val byId: Map[Int, Glyph] = all.mapBy(_.id)
 
     def display = all
 
@@ -117,11 +109,7 @@ object Glyph:
     val withIdea     = new Glyph(140, "∆", "With the idea") with Observation
 
     val all = List(novelty, development, initiative, attack, counterplay, timeTrouble, compensation, withIdea)
-    val byId: Map[Int, Glyph] = all
-      .map { g =>
-        g.id -> g
-      }
-      .to(Map)
+    val byId: Map[Int, Glyph] = all.mapBy(_.id)
 
     def display = all
 

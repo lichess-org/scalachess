@@ -150,12 +150,7 @@ object Tag:
     Termination,
     Annotator
   )
-  val tagTypesByLowercase: Map[String, TagType] =
-    tagTypes
-      .map { t =>
-        t.lowercase -> t
-      }
-      .to(Map)
+  val tagTypesByLowercase: Map[String, TagType] = tagTypes.mapBy(_.lowercase)
 
   def apply(name: String, value: Any): Tag =
     new Tag(

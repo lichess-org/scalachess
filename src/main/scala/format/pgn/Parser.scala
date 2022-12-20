@@ -132,7 +132,7 @@ object Parser:
 
   private object MoveParser:
 
-    def rangeToMap(r: Iterable[Char]) = r.zipWithIndex.to(Map).view.mapValues(_ + 1)
+    def rangeToMap(r: Iterable[Char]) = r.zipWithIndex.toMap.view.mapValues(_ + 1).toMap
 
     val fileMap = rangeToMap('a' to 'h')
     val rankMap = rangeToMap('1' to '8')
@@ -146,9 +146,12 @@ object Parser:
 
     val glyph: P[Glyph] =
       mapParser(
-        Glyph.MoveAssessment.all.sortBy(_.symbol.length).map { g =>
-          g.symbol -> g
-        },
+        Glyph.MoveAssessment.all
+          .sortBy(_.symbol.length)
+          .map { g =>
+            g.symbol -> g
+          }
+          .toMap,
         "glyph"
       )
 
@@ -215,13 +218,11 @@ object Parser:
         std withSuffixes suf
       }
 
-    def mapParser[A](pairs: Iterable[(String, A)], name: String): P[A] =
-      val pairMap = pairs.to(Map)
-      P.stringIn(pairMap.keySet).map(pairMap(_)) | P.failWith(name + " not found")
+    def mapParser[A](pairMap: Map[String, A], name: String): P[A] =
+      P.stringIn(pairMap.keySet).map(pairMap.apply) | P.failWith(name + " not found")
 
-    def mapParserChar[A](pairs: Iterable[(Char, A)], name: String): P[A] =
-      val pairMap = pairs.to(Map)
-      P.charIn(pairMap.keySet).map(pairMap(_)) | P.failWith(name + " not found")
+    def mapParserChar[A](pairMap: Map[Char, A], name: String): P[A] =
+      P.charIn(pairMap.keySet).map(pairMap.apply) | P.failWith(name + " not found")
 
   private object TagParser:
 

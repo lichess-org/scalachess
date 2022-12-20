@@ -71,29 +71,14 @@ case object Pawn extends Role:
 
 object Role:
 
-  val all: List[Role]                     = List(King, Queen, Rook, Bishop, Knight, Pawn)
-  val allPromotable: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, King)
-  val allByForsyth: Map[Char, Role] = all map { r =>
-    (r.forsyth, r)
-  } toMap
-  val allByPgn: Map[Char, Role] = all map { r =>
-    (r.pgn, r)
-  } toMap
-  val allByName: Map[String, Role] = all map { r =>
-    (r.name, r)
-  } toMap
-  val allPromotableByName: Map[String, PromotableRole] =
-    allPromotable map { r =>
-      (r.toString, r)
-    } toMap
-  val allPromotableByForsyth: Map[Char, PromotableRole] =
-    allPromotable map { r =>
-      (r.forsyth, r)
-    } toMap
-  val allPromotableByPgn: Map[Char, PromotableRole] =
-    allPromotable map { r =>
-      (r.pgn, r)
-    } toMap
+  val all: List[Role]                                   = List(King, Queen, Rook, Bishop, Knight, Pawn)
+  val allPromotable: List[PromotableRole]               = List(Queen, Rook, Bishop, Knight, King)
+  val allByForsyth: Map[Char, Role]                     = all.mapBy(_.forsyth)
+  val allByPgn: Map[Char, Role]                         = all.mapBy(_.pgn)
+  val allByName: Map[String, Role]                      = all.mapBy(_.name)
+  val allPromotableByName: Map[String, PromotableRole]  = allPromotable.mapBy(_.toString)
+  val allPromotableByForsyth: Map[Char, PromotableRole] = allPromotable.mapBy(_.forsyth)
+  val allPromotableByPgn: Map[Char, PromotableRole]     = allPromotable.mapBy(_.pgn)
 
   def forsyth(c: Char): Option[Role] = allByForsyth get c
 

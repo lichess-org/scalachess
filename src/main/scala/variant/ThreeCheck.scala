@@ -5,8 +5,8 @@ import chess.format.EpdFen
 
 case object ThreeCheck
     extends Variant(
-      id = 5,
-      key = "threeCheck",
+      id = Variant.Id(5),
+      key = Variant.Key("threeCheck"),
       uciKey = "3check",
       name = "Three-check",
       shortName = "3check",

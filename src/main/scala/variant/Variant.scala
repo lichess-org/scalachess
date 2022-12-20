@@ -9,8 +9,8 @@ import chess.format.EpdFen
 
 // Correctness depends on singletons for each variant ID
 abstract class Variant private[variant] (
-    val id: Int,
-    val key: String,
+    val id: Variant.Id,
+    val key: Variant.Key,
     val uciKey: String,
     val name: String,
     val shortName: String,
@@ -48,11 +48,9 @@ abstract class Variant private[variant] (
       case _                                    => false
 
   def validMoves(situation: Situation): Map[Pos, List[Move]] =
-    situation.actors
-      .collect {
-        case actor if actor.moves.nonEmpty => actor.pos -> actor.moves
-      }
-      .to(Map)
+    situation.actors.collect {
+      case actor if actor.moves.nonEmpty => actor.pos -> actor.moves
+    }.toMap
 
   // Optimised for performance
   def pieceThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean =
@@ -183,18 +181,9 @@ abstract class Variant private[variant] (
 
   val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
 
-  lazy val rolesByPgn: Map[Char, Role] = roles
-    .map { r =>
-      (r.pgn, r)
-    }
-    .to(Map)
+  lazy val rolesByPgn: Map[Char, Role] = roles.mapBy(_.pgn)
 
-  lazy val rolesPromotableByPgn: Map[Char, PromotableRole] =
-    promotableRoles
-      .map { r =>
-        (r.pgn, r)
-      }
-      .to(Map)
+  lazy val rolesPromotableByPgn: Map[Char, PromotableRole] = promotableRoles.mapBy(_.pgn)
 
   def isUnmovedPawn(color: Color, pos: Pos) = pos.rank == color.fold(Rank.Second, Rank.Seventh)
 
@@ -202,9 +191,15 @@ abstract class Variant private[variant] (
 
   override def equals(that: Any): Boolean = this eq that.asInstanceOf[AnyRef]
 
-  override def hashCode: Int = id
+  override def hashCode: Int = id.value
 
 object Variant:
+
+  opaque type Id = Int
+  object Id extends OpaqueInt[Id]
+
+  opaque type Key = String
+  object Key extends OpaqueString[Key]
 
   val all: List[Variant] = List(
     Standard,
@@ -218,24 +213,20 @@ object Variant:
     Horde,
     RacingKings
   )
-  val byId = all map { v =>
-    (v.id, v)
-  } toMap
-  val byKey = all map { v =>
-    (v.key, v)
-  } toMap
+  val byId  = all.mapBy(_.id)
+  val byKey = all.mapBy(_.key)
 
   val default: Variant = Standard
 
-  def apply(id: Int): Option[Variant]     = byId get id
-  def apply(key: String): Option[Variant] = byKey get key
-  def orDefault(id: Int): Variant         = apply(id) | default
-  def orDefault(key: String): Variant     = apply(key) | default
+  def apply(id: Id): Option[Variant]   = byId get id
+  def apply(key: Key): Option[Variant] = byKey get key
+  def orDefault(id: Id): Variant       = apply(id) | default
+  def orDefault(key: Key): Variant     = apply(key) | default
 
   def byName(name: String): Option[Variant] =
-    all find (_.name.toLowerCase == name.toLowerCase)
+    all.find(_.name.toLowerCase == name.toLowerCase)
 
-  def exists(id: Int): Boolean = byId contains id
+  def exists(id: Id): Boolean = byId contains id
 
   val openingSensibleVariants: Set[Variant] = Set(
     chess.variant.Standard,
@@ -253,7 +244,7 @@ object Variant:
   )
 
   private[variant] def symmetricRank(rank: IndexedSeq[Role]): Map[Pos, Piece] =
-    File.all.zip(rank).map { case (x, role) => Pos(x, Rank.First) -> (White - role) } ++
+    File.all.zip(rank).map { (x, role) => Pos(x, Rank.First) -> (White - role) } ++
       File.all.map { Pos(_, Rank.Second) -> White.pawn } ++
       File.all.map { Pos(_, Rank.Seventh) -> Black.pawn } ++
-      File.all.zip(rank).map { case (x, role) => Pos(x, Rank.Eighth) -> (Black - role) } toMap
+      File.all.zip(rank).map { (x, role) => Pos(x, Rank.Eighth) -> (Black - role) } toMap

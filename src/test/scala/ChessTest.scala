@@ -81,7 +81,7 @@ trait ChessTest extends Specification with ValidatedMatchers:
     }
 
   def makeBoard(pieces: (Pos, Piece)*): Board =
-    Board(pieces toMap, History(), chess.variant.Standard)
+    Board(pieces.toMap, History(), chess.variant.Standard)
 
   def makeBoard(str: String, variant: Variant) =
     Visual << str withVariant variant

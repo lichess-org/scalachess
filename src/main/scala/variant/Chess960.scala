@@ -5,8 +5,8 @@ import chess.format.EpdFen
 
 case object Chess960
     extends Variant(
-      id = 2,
-      key = "chess960",
+      id = Variant.Id(2),
+      key = Variant.Key("chess960"),
       uciKey = "chess",
       name = "Chess960",
       shortName = "960",

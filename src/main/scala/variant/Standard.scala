@@ -3,8 +3,8 @@ package variant
 
 case object Standard
     extends Variant(
-      id = 1,
-      key = "standard",
+      id = Variant.Id(1),
+      key = Variant.Key("standard"),
       uciKey = "chess",
       name = "Standard",
       shortName = "Std",

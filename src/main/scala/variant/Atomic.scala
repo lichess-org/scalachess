@@ -3,8 +3,8 @@ package variant
 
 case object Atomic
     extends Variant(
-      id = 7,
-      key = "atomic",
+      id = Variant.Id(7),
+      key = Variant.Key("atomic"),
       uciKey = "atomic",
       name = "Atomic",
       shortName = "Atom",

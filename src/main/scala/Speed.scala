@@ -37,9 +37,7 @@ object Speed:
 
   val limited = List[Speed](Bullet, Blitz, Rapid, Classical)
 
-  val byId = all map { v =>
-    (v.id, v)
-  } toMap
+  val byId = all.mapBy(_.id)
 
   export byId.{ contains as exists, get as apply }
 

@@ -12,9 +12,7 @@ object Mode:
 
   val all = values.toList
 
-  val byId = all map { v =>
-    (v.id, v)
-  } toMap
+  val byId = all.mapBy(_.id)
 
   def apply(id: Int): Option[Mode] = byId get id
 

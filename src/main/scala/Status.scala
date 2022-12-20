@@ -38,8 +38,6 @@ object Status:
 
   val finishedWithWinner = List(Mate, Resign, Timeout, Outoftime, Cheat, NoStart, VariantEnd)
 
-  val byId = all map { v =>
-    (v.id, v)
-  } toMap
+  val byId = all.mapBy(_.id)
 
   def apply(id: Int): Option[Status] = byId get id

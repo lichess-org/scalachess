@@ -149,14 +149,5 @@ object Pos extends OpaqueInt[Pos]:
   val whiteBackrank = (A1 <-> H1).toList
   val blackBackrank = (A8 <-> H8).toList
 
-  val allKeys: Map[String, Pos] = all
-    .map { pos =>
-      pos.key -> pos
-    }
-    .to(Map)
-
-  val charMap: Map[Char, Pos] = all
-    .map { pos =>
-      Pos(pos).asChar -> pos
-    }
-    .to(Map)
+  val allKeys: Map[String, Pos] = all.mapBy(_.key)
+  val charMap: Map[Char, Pos]   = all.mapBy(pos => Pos(pos).asChar)

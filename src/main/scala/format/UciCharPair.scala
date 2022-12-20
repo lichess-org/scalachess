@@ -24,16 +24,14 @@ object UciCharPair:
     val charShift = 35        // Start at Char(35) == '#'
     val voidChar  = 33.toChar // '!'. We skipped Char(34) == '"'.
 
-    val pos2charMap: Map[Pos, Char] = Pos.all
-      .map { pos =>
-        pos -> (pos.hashCode + charShift).toChar
-      }
-      .to(Map)
+    val pos2charMap: Map[Pos, Char] = Pos.all.map { pos =>
+      pos -> (pos.hashCode + charShift).toChar
+    }.toMap
 
     inline def toChar(inline pos: Pos) = pos2charMap.getOrElse(pos, voidChar)
 
     val promotion2charMap: Map[(File, PromotableRole), Char] = for {
-      (role, index) <- Role.allPromotable.zipWithIndex.to(Map)
+      (role, index) <- Role.allPromotable.zipWithIndex.toMap
       file          <- File.all
     } yield (file, role) -> (charShift + pos2charMap.size + index * 8 + file.index).toChar
 
@@ -47,4 +45,4 @@ object UciCharPair:
         .map { (role, index) =>
           role -> (charShift + pos2charMap.size + promotion2charMap.size + index).toChar
         }
-        .to(Map)
+        .toMap

@@ -8,8 +8,8 @@ import chess.format.EpdFen
 
 case object Crazyhouse
     extends Variant(
-      id = 10,
-      key = "crazyhouse",
+      id = Variant.Id(10),
+      key = Variant.Key("crazyhouse"),
       uciKey = "crazyhouse",
       name = "Crazyhouse",
       shortName = "Crazy",

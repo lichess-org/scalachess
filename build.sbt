@@ -8,7 +8,7 @@ licenses += "AGPL-3.0" -> url("https://opensource.org/licenses/AGPL-3.0")
 libraryDependencies ++= List(
   "org.specs2"         %% "specs2-core"    % "4.19.0" % Test,
   "org.specs2"         %% "specs2-cats"    % "4.19.0" % Test,
-  "com.github.ornicar" %% "scalalib"       % "9.0.1",
+  "com.github.ornicar" %% "scalalib"       % "9.0.2",
   "joda-time"           % "joda-time"      % "2.12.2",
   "org.typelevel"      %% "cats-core"      % "2.9.0",
   "org.typelevel"      %% "alleycats-core" % "2.9.0",

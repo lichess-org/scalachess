@@ -5,8 +5,8 @@ import chess.format.EpdFen
 
 case object Horde
     extends Variant(
-      id = 8,
-      key = "horde",
+      id = Variant.Id(8),
+      key = Variant.Key("horde"),
       uciKey = "horde",
       name = "Horde",
       shortName = "Horde",

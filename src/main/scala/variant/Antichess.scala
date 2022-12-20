@@ -5,8 +5,8 @@ import chess.format.EpdFen
 
 case object Antichess
     extends Variant(
-      id = 6,
-      key = "antichess",
+      id = Variant.Id(60),
+      key = Variant.Key("antichess"),
       uciKey = "antichess",
       name = "Antichess",
       shortName = "Anti",
@@ -29,7 +29,7 @@ case object Antichess
     val allMoves       = super.validMoves(situation)
     val capturingMoves = allMoves.view mapValues (_.filter(_.captures)) filterNot (_._2.isEmpty)
 
-    (if (capturingMoves.nonEmpty) capturingMoves else allMoves).to(Map)
+    (if (capturingMoves.nonEmpty) capturingMoves else allMoves).toMap
 
   override def valid(board: Board, strict: Boolean) =
     board.pieces.size >= 2 && board.pieces.size <= 32

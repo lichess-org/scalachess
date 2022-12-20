@@ -11,10 +11,7 @@ object OpeningDb:
   lazy val all: Vector[Opening] =
     openingDbPartA ++ openingDbPartB ++ openingDbPartC ++ openingDbPartD ++ openingDbPartE
 
-  private lazy val byFen: collection.Map[OpeningFen, Opening] =
-    all.view.map { o =>
-      o.fen -> o
-    }.toMap
+  private lazy val byFen: collection.Map[OpeningFen, Opening] = all.mapBy(_.fen)
 
   lazy val families: Set[OpeningFamily] = byFen.values.map(_.family).toSet
 

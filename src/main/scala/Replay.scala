@@ -72,30 +72,28 @@ object Replay:
       initialFen: Fen.Epd,
       variant: Variant
   ): (Game, List[(Game, Uci.WithSan)], Option[String]) =
-
-    // @scala.annotation.tailrec
-    def mk(g: Game, moves: List[(San, SanStr)]): (List[(Game, Uci.WithSan)], Option[String]) =
-      moves match
-        case (san, sanStr) :: rest =>
-          san(g.situation).fold(
-            err => (Nil, err.some),
-            moveOrDrop => {
-              val newGame = moveOrDrop.fold(g.apply, g.applyDrop)
-              val uci     = moveOrDrop.fold(_.toUci, _.toUci)
-              mk(newGame, rest) match {
-                case (next, msg) => ((newGame, Uci.WithSan(uci, sanStr)) :: next, msg)
-              }
-            }
-          )
-        case _ => (Nil, None)
-    val init = makeGame(variant, initialFen.some)
+    val init       = makeGame(variant, initialFen.some)
+    val emptyGames = List.empty[(Game, Uci.WithSan)]
     Parser
       .moves(sans)
       .fold(
-        err => List.empty[(Game, Uci.WithSan)] -> err.some,
-        moves => mk(init, moves.value zip sans)
+        err => emptyGames -> err.some,
+        moves =>
+          moves.value.zip(sans).foldLeft((emptyGames, none[String])) {
+            case ((games, None), (san, sanStr)) =>
+              val game = games.headOption.fold(init)(_._1)
+              san(game.situation).fold(
+                err => (games, err.some),
+                moveOrDrop => {
+                  val newGame = moveOrDrop.fold(game.apply, game.applyDrop)
+                  val uci     = moveOrDrop.fold(_.toUci, _.toUci)
+                  ((newGame, Uci.WithSan(uci, sanStr)) :: games, None)
+                }
+              )
+            case (end, _) => end
+          }
       ) match
-      case (games, err) => (init, games, err)
+      case (games, err) => (init, games.reverse, err)
 
   private def computeSituations[M](
       sit: Situation,

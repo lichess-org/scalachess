@@ -38,6 +38,8 @@ trait ChessTest extends Specification with ValidatedMatchers:
         }
       }
 
+  extension (board: Board) def visual = Visual >> board
+
   extension (game: Game)
     def as(color: Color): Game = game.withPlayer(color)
 

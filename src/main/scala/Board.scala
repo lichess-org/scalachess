@@ -150,13 +150,11 @@ case class Board(
 
   inline def situationOf(inline color: Color) = Situation(this, color)
 
-  def visual = format.Visual >> this
-
   inline def valid(inline strict: Boolean) = variant.valid(this, strict)
 
   def materialImbalance: Int = variant.materialImbalance(this)
 
-  override def toString = s"$variant Position after ${history.lastMove}\n$visual"
+  override def toString = s"$variant ${history.lastMove}\n"
 
 object Board:
 

@@ -1,12 +1,9 @@
 package chess
 package bitboard
 
-import scala.language.implicitConversions
 import bitboard.Bitboard.*
 import scala.collection.mutable.ListBuffer
 import cats.syntax.all.*
-
-given Conversion[Rank, Int] = _.value
 
 case class Fen(board: Board, state: State):
   def us: Bitboard   = board.byColor(state.turn)
@@ -22,7 +19,7 @@ case class Fen(board: Board, state: State):
   def isSafe(king: Pos, move: Move, blockers: Bitboard): Boolean =
     move match
       case Move.Normal(from, to, _, _) =>
-        val result = !(us & blockers).contains(from) || Bitboard.aligned(from, to, king)
+        val result = !(us & blockers).contains(from.value) || Bitboard.aligned(from, to, king)
         result
       case Move.EnPassant(from, to) =>
         val newOccupied = (occupied ^ from.bitboard ^ to.combine(from).bitboard) | to.bitboard
@@ -57,16 +54,16 @@ case class Fen(board: Board, state: State):
     move match
       case Move.Normal(from, to, Pawn, _) =>
         val epSquare: Option[Pos] =
-          if Math.abs(from - to) == 16 then
+          if Math.abs((from - to).value) == 16 then
             // TODO calculate their pawns attacks
-            Some(Pos(from + (if isWhiteTurn then 8 else -8)))
+            Some(Pos(from.value + (if isWhiteTurn then 8 else -8)))
           else None
         haftState.copy(epSquare = epSquare)
       case Move.Normal(from, _, Rook, _) =>
         val castlingRights = halfCastlingRights & ~from.bitboard
         haftState.copy(castlingRights = castlingRights)
       case Move.Normal(_, _, King, _) | Move.Castle(_, _) =>
-        val castlingRights = halfCastlingRights & Bitboard.RANKS(state.turn.lastRank)
+        val castlingRights = halfCastlingRights & Bitboard.RANKS(state.turn.lastRank.value)
         haftState.copy(castlingRights = castlingRights)
       case _ => haftState
 

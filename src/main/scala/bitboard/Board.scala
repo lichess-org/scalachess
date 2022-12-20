@@ -6,8 +6,6 @@ import cats.syntax.all.*
 
 import Bitboard.*
 
-given Conversion[Pos, Int] = _.value
-
 case class Board(
     pawns: Bitboard,
     knights: Bitboard,
@@ -19,7 +17,7 @@ case class Board(
     black: Bitboard,
     occupied: Bitboard
 ):
-  def isOccupied(s: Pos): Boolean = occupied.contains(s)
+  def isOccupied(s: Pos): Boolean = occupied.contains(s.value)
 
   def sliders = bishops ^ rooks ^ queens
 
@@ -28,17 +26,17 @@ case class Board(
     case Color.Black => black
 
   def roleAt(s: Pos): Option[Role] =
-    if (pawns.contains(s)) then Some(Pawn)
-    else if (knights.contains(s)) then Some(Knight)
-    else if (bishops.contains(s)) then Some(Bishop)
-    else if (rooks.contains(s)) then Some(Rook)
-    else if (queens.contains(s)) then Some(Queen)
-    else if (kings.contains(s)) then Some(King)
+    if (pawns.contains(s.value)) then Some(Pawn)
+    else if (knights.contains(s.value)) then Some(Knight)
+    else if (bishops.contains(s.value)) then Some(Bishop)
+    else if (rooks.contains(s.value)) then Some(Rook)
+    else if (queens.contains(s.value)) then Some(Queen)
+    else if (kings.contains(s.value)) then Some(King)
     else None
 
   def colorAt(s: Pos): Option[Color] =
-    if (white.contains(s)) then Some(Color.White)
-    else if (black.contains(s)) then Some(Color.Black)
+    if (white.contains(s.value)) then Some(Color.White)
+    else if (black.contains(s.value)) then Some(Color.Black)
     else None
 
   def pieceAt(s: Pos): Option[Piece] =

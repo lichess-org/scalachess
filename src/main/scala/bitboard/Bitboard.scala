@@ -1,7 +1,6 @@
 package chess
 package bitboard
 
-import scala.language.implicitConversions
 import scala.collection.mutable.ListBuffer
 
 // TODO opaque
@@ -100,21 +99,19 @@ object Bitboard:
 
   initialize()
 
-  given Conversion[Pos, Int] = _.value
-
   def aligned(a: Pos, b: Pos, c: Pos): Boolean =
-    RAYS(a)(b).contains(c)
+    RAYS(a.value)(b.value).contains(c.value)
 
   def between(a: Pos, b: Pos): Bitboard =
-    BETWEEN(a)(b)
+    BETWEEN(a.value)(b.value)
 
   extension (s: Pos)
     def bishopAttacks(occupied: Bitboard): Bitboard =
-      val magic = Magic.BISHOP(s)
+      val magic = Magic.BISHOP(s.value)
       ATTACKS(((magic.factor * (occupied & magic.mask) >>> (64 - 9)).toInt + magic.offset))
 
     def rookAttacks(occupied: Bitboard): Bitboard =
-      val magic = Magic.ROOK(s)
+      val magic = Magic.ROOK(s.value)
       ATTACKS(((magic.factor * (occupied & magic.mask) >>> (64 - 12)).toInt + magic.offset))
 
     def queenAttacks(occupied: Bitboard): Bitboard =
@@ -122,17 +119,17 @@ object Bitboard:
 
     def pawnAttacks(color: Color): Bitboard =
       color match
-        case Color.White => WHITE_PAWN_ATTACKS(s)
-        case Color.Black => BLACK_PAWN_ATTACKS(s)
+        case Color.White => WHITE_PAWN_ATTACKS(s.value)
+        case Color.Black => BLACK_PAWN_ATTACKS(s.value)
 
     def kingAttacks: Bitboard =
-      KING_ATTACKS(s)
+      KING_ATTACKS(s.value)
 
     def knightAttacks: Bitboard =
-      KNIGHT_ATTACKS(s)
+      KNIGHT_ATTACKS(s.value)
 
     def bitboard: Bitboard =
-      1L << s
+      1L << s.value
 
   extension (b: Bitboard)
     def contains(s: Int): Boolean =

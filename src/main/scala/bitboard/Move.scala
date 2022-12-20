@@ -1,8 +1,6 @@
 package chess
 package bitboard
 
-import scala.language.implicitConversions
-
 // TODO should capture be only Boolean? what is the benefit of Role?
 // case Capture(from: Pos, to: Pos, role: Role, capture: Role)???
 enum Move(val from: Pos, val to: Pos, val role: Role):

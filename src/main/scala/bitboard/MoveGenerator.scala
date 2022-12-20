@@ -1,7 +1,6 @@
 package chess
 package bitboard
 
-import scala.language.implicitConversions
 import Bitboard.*
 
 import scala.collection.mutable.ListBuffer
@@ -45,24 +44,26 @@ object StandardMovesGenerator:
 
     def genCastling(king: Pos): List[Move] =
       val firstRank = f.state.turn.firstRank
-      val rooks     = f.state.castlingRights & Bitboard.RANKS(firstRank)
+      val rooks     = f.state.castlingRights & Bitboard.RANKS(firstRank.value)
       for
         rook <- rooks.occupiedSquares
         path = Bitboard.between(king, rook)
         if (path & f.occupied) == 0
         toRank   = if rook < king then Pos.C1 else Pos.G1
         kingTo   = toRank.combine(king)
-        kingPath = Bitboard.between(king, kingTo) | (1L << kingTo) | (1L << king)
+        kingPath = Bitboard.between(king, kingTo) | (1L << kingTo.value) | (1L << king.value)
         safe = kingPath.occupiedSquares
-          .map(f.board.attacksTo(_, !f.state.turn, f.occupied ^ (1L << king)) == 0)
+          .map(f.board.attacksTo(_, !f.state.turn, f.occupied ^ (1L << king.value)) == 0)
           .forall(identity)
         if safe
       yield Move.Castle(king, rook)
 
     def genEvasions(king: Pos, checkers: Bitboard): List[Move] =
       // Checks by these sliding pieces can maybe be blocked.
-      val sliders  = checkers & (f.board.sliders)
-      val attacked = sliders.occupiedSquares.foldRight(0L)((s, a) => a | (Bitboard.RAYS(king)(s) ^ (1L << s)))
+      val sliders = checkers & (f.board.sliders)
+      val attacked = sliders.occupiedSquares.foldRight(0L)((s, a) =>
+        a | (Bitboard.RAYS(king.value)(s.value) ^ (1L << s.value))
+      )
       val safeKings = genSafeKing(king, ~f.us & ~attacked)
       val blockers =
         if !checkers.moreThanOne then
@@ -133,12 +134,12 @@ object StandardMovesGenerator:
 
       val s2: List[List[Move]] = for
         to <- singleMoves.occupiedSquares
-        from = Pos.at(to + (if f.isWhiteTurn then -8 else 8)).get
+        from = Pos.at(to.value + (if f.isWhiteTurn then -8 else 8)).get
       yield genPawnMoves(from, to, false)
 
       val s3: List[Move] = for
         to <- doubleMoves.occupiedSquares
-        from = Pos.at(to + (if f.isWhiteTurn then -16 else 16)).get
+        from = Pos.at(to.value + (if f.isWhiteTurn then -16 else 16)).get
       yield Move.Normal(from, to, Pawn, false)
 
       s1.flatten ++ s2.flatten ++ s3

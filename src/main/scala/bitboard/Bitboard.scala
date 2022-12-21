@@ -4,9 +4,8 @@ package bitboard
 import scala.collection.mutable.ListBuffer
 
 // TODO opaque
-type Bitboard = Long
-
-object Bitboard:
+opaque type Bitboard <: Long = Long
+object Bitboard extends OpaqueLong[Bitboard]:
 
   val ALL     = -1L
   val corners = 0x8100000000000081L

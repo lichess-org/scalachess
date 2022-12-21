@@ -201,47 +201,47 @@ object Variant:
   opaque type Key = String
   object Key extends OpaqueString[Key]
 
-  lazy val all: List[Variant] = List(
-    Standard,
-    Crazyhouse,
-    Chess960,
-    FromPosition,
-    KingOfTheHill,
-    ThreeCheck,
-    Antichess,
-    Atomic,
-    Horde,
-    RacingKings
-  )
-  lazy val byId  = all.mapBy(_.id)
-  lazy val byKey = all.mapBy(_.key)
+  object list:
+    val all: List[Variant] = List(
+      Standard,
+      Crazyhouse,
+      Chess960,
+      FromPosition,
+      KingOfTheHill,
+      ThreeCheck,
+      Antichess,
+      Atomic,
+      Horde,
+      RacingKings
+    )
+    val byId  = all.mapBy(_.id)
+    val byKey = all.mapBy(_.key)
 
-  lazy val default: Variant = Standard
+    val openingSensibleVariants: Set[Variant] = Set(
+      chess.variant.Standard,
+      chess.variant.Crazyhouse,
+      chess.variant.ThreeCheck,
+      chess.variant.KingOfTheHill
+    )
+    val divisionSensibleVariants: Set[Variant] = Set(
+      chess.variant.Standard,
+      chess.variant.Chess960,
+      chess.variant.ThreeCheck,
+      chess.variant.KingOfTheHill,
+      chess.variant.FromPosition
+    )
 
-  def apply(id: Id): Option[Variant]   = byId get id
-  def apply(key: Key): Option[Variant] = byKey get key
-  def orDefault(id: Id): Variant       = apply(id) | default
-  def orDefault(key: Key): Variant     = apply(key) | default
+  val default: Variant = Standard
+
+  inline def apply(inline id: Id): Option[Variant]   = list.byId get id
+  inline def apply(inline key: Key): Option[Variant] = list.byKey get key
+  def orDefault(id: Id): Variant                     = apply(id) | default
+  def orDefault(key: Key): Variant                   = apply(key) | default
 
   def byName(name: String): Option[Variant] =
-    all.find(_.name.toLowerCase == name.toLowerCase)
+    list.all.find(_.name.toLowerCase == name.toLowerCase)
 
-  def exists(id: Id): Boolean = byId contains id
-
-  lazy val openingSensibleVariants: Set[Variant] = Set(
-    chess.variant.Standard,
-    chess.variant.Crazyhouse,
-    chess.variant.ThreeCheck,
-    chess.variant.KingOfTheHill
-  )
-
-  lazy val divisionSensibleVariants: Set[Variant] = Set(
-    chess.variant.Standard,
-    chess.variant.Chess960,
-    chess.variant.ThreeCheck,
-    chess.variant.KingOfTheHill,
-    chess.variant.FromPosition
-  )
+  def exists(id: Id): Boolean = list.byId contains id
 
   private[variant] def symmetricRank(rank: IndexedSeq[Role]): Map[Pos, Piece] =
     File.all.zip(rank).map { (x, role) => Pos(x, Rank.First) -> (White - role) } ++

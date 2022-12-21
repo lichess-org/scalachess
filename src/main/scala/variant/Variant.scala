@@ -201,7 +201,7 @@ object Variant:
   opaque type Key = String
   object Key extends OpaqueString[Key]
 
-  val all: List[Variant] = List(
+  lazy val all: List[Variant] = List(
     Standard,
     Crazyhouse,
     Chess960,
@@ -213,10 +213,10 @@ object Variant:
     Horde,
     RacingKings
   )
-  val byId  = all.mapBy(_.id)
-  val byKey = all.mapBy(_.key)
+  lazy val byId  = all.mapBy(_.id)
+  lazy val byKey = all.mapBy(_.key)
 
-  val default: Variant = Standard
+  lazy val default: Variant = Standard
 
   def apply(id: Id): Option[Variant]   = byId get id
   def apply(key: Key): Option[Variant] = byKey get key
@@ -228,14 +228,14 @@ object Variant:
 
   def exists(id: Id): Boolean = byId contains id
 
-  val openingSensibleVariants: Set[Variant] = Set(
+  lazy val openingSensibleVariants: Set[Variant] = Set(
     chess.variant.Standard,
     chess.variant.Crazyhouse,
     chess.variant.ThreeCheck,
     chess.variant.KingOfTheHill
   )
 
-  val divisionSensibleVariants: Set[Variant] = Set(
+  lazy val divisionSensibleVariants: Set[Variant] = Set(
     chess.variant.Standard,
     chess.variant.Chess960,
     chess.variant.ThreeCheck,

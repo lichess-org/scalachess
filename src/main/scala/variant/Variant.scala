@@ -240,6 +240,8 @@ object Variant:
   inline def apply(inline key: LilaKey): Option[Variant] = list.byKey get key
   def orDefault(id: Id): Variant                         = apply(id) | default
   def orDefault(key: LilaKey): Variant                   = apply(key) | default
+  def idOrDefault(id: Option[Id]): Variant               = id.flatMap(apply(_)) | default
+  def orDefault(key: Option[LilaKey]): Variant           = key.flatMap(apply(_)) | default
 
   def byName(name: String): Option[Variant] =
     list.all.find(_.name.toLowerCase == name.toLowerCase)

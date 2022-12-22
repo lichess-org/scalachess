@@ -4,8 +4,8 @@ package variant
 case object KingOfTheHill
     extends Variant(
       id = Variant.Id(4),
-      key = Variant.Key("kingOfTheHill"),
-      uciKey = "kingofthehill",
+      key = Variant.LilaKey("kingOfTheHill"),
+      uciKey = Variant.UciKey("kingofthehill"),
       name = "King of the Hill",
       shortName = "KotH",
       title = "Bring your King to the center to win the game.",

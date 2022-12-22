@@ -6,8 +6,8 @@ import chess.format.EpdFen
 case object Antichess
     extends Variant(
       id = Variant.Id(60),
-      key = Variant.Key("antichess"),
-      uciKey = "antichess",
+      key = Variant.LilaKey("antichess"),
+      uciKey = Variant.UciKey("antichess"),
       name = "Antichess",
       shortName = "Anti",
       title = "Lose all your pieces (or get stalemated) to win the game.",

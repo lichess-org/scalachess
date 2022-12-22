@@ -6,8 +6,8 @@ import chess.format.EpdFen
 case object Chess960
     extends Variant(
       id = Variant.Id(2),
-      key = Variant.Key("chess960"),
-      uciKey = "chess",
+      key = Variant.LilaKey("chess960"),
+      uciKey = Variant.UciKey("chess"),
       name = "Chess960",
       shortName = "960",
       title = "Starting position of the home rank pieces is randomized.",

@@ -10,8 +10,8 @@ import chess.format.EpdFen
 // Correctness depends on singletons for each variant ID
 abstract class Variant private[variant] (
     val id: Variant.Id,
-    val key: Variant.Key,
-    val uciKey: String,
+    val key: Variant.LilaKey,
+    val uciKey: Variant.UciKey,
     val name: String,
     val shortName: String,
     val title: String,
@@ -198,8 +198,11 @@ object Variant:
   opaque type Id = Int
   object Id extends OpaqueInt[Id]
 
-  opaque type Key = String
-  object Key extends OpaqueString[Key]
+  opaque type LilaKey = String
+  object LilaKey extends OpaqueString[LilaKey]
+
+  opaque type UciKey = String
+  object UciKey extends OpaqueString[UciKey]
 
   object list:
     val all: List[Variant] = List(
@@ -233,10 +236,10 @@ object Variant:
 
   inline def default: Variant = Standard
 
-  inline def apply(inline id: Id): Option[Variant]   = list.byId get id
-  inline def apply(inline key: Key): Option[Variant] = list.byKey get key
-  def orDefault(id: Id): Variant                     = apply(id) | default
-  def orDefault(key: Key): Variant                   = apply(key) | default
+  inline def apply(inline id: Id): Option[Variant]       = list.byId get id
+  inline def apply(inline key: LilaKey): Option[Variant] = list.byKey get key
+  def orDefault(id: Id): Variant                         = apply(id) | default
+  def orDefault(key: LilaKey): Variant                   = apply(key) | default
 
   def byName(name: String): Option[Variant] =
     list.all.find(_.name.toLowerCase == name.toLowerCase)

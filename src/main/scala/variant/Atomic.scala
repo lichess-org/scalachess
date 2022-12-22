@@ -4,8 +4,8 @@ package variant
 case object Atomic
     extends Variant(
       id = Variant.Id(7),
-      key = Variant.Key("atomic"),
-      uciKey = "atomic",
+      key = Variant.LilaKey("atomic"),
+      uciKey = Variant.UciKey("atomic"),
       name = "Atomic",
       shortName = "Atom",
       title = "Nuke your opponent's king to win.",

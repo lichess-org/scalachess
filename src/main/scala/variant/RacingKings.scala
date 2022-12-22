@@ -6,8 +6,8 @@ import chess.format.EpdFen
 case object RacingKings
     extends Variant(
       id = Variant.Id(9),
-      key = Variant.Key("racingKings"),
-      uciKey = "racingkings",
+      key = Variant.LilaKey("racingKings"),
+      uciKey = Variant.UciKey("racingkings"),
       name = "Racing Kings",
       shortName = "Racing",
       title = "Race your King to the eighth rank to win.",

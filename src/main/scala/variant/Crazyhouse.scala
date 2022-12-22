@@ -9,8 +9,8 @@ import chess.format.EpdFen
 case object Crazyhouse
     extends Variant(
       id = Variant.Id(10),
-      key = Variant.Key("crazyhouse"),
-      uciKey = "crazyhouse",
+      key = Variant.LilaKey("crazyhouse"),
+      uciKey = Variant.UciKey("crazyhouse"),
       name = "Crazyhouse",
       shortName = "Crazy",
       title = "Captured pieces can be dropped back on the board instead of moving a piece.",

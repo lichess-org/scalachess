@@ -11,7 +11,7 @@ class HashTest extends ChessTest:
 
   "Polyglot hasher" should {
 
-    val hash = new Hash(8)
+    val hash = Hash(8)
 
     // Reference values available at:
     // http://hardy.uhasselt.be/Toga/book_format.html
@@ -77,7 +77,7 @@ class HashTest extends ChessTest:
 
   "Hasher" should {
 
-    val hash = new Hash(3)
+    val hash = Hash(3)
 
     "account for checks in three-check" in {
       // 2 ... Bb4+
@@ -191,7 +191,7 @@ class HashTest extends ChessTest:
       val g                             = gameMoves.map(runOne)
       g.exists(_._3.nonEmpty) must beFalse
       val m16 = java.security.MessageDigest getInstance "MD5"
-      val h   = new Hash(16)
+      val h   = Hash(16)
       g.foreach(_._2.foreach(x => m16.update(PositionHash value h(x._1.situation))))
       hex(m16.digest) must beEqualTo("21281304d25ccf9c1dfd640775800087")
     }

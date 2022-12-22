@@ -292,7 +292,7 @@ class CrazyhouseVariantTest extends ChessTest:
       g.exists(_._3.nonEmpty) must beFalse
       val m8  = java.security.MessageDigest getInstance "MD5"
       val m16 = java.security.MessageDigest getInstance "MD5"
-      val h   = new Hash(16)
+      val h   = Hash(16)
       g.foreach {
         _._2.foreach { x =>
           val ph = h(x._1.situation)

@@ -231,7 +231,7 @@ object Variant:
       chess.variant.FromPosition
     )
 
-  val default: Variant = Standard
+  inline def default: Variant = Standard
 
   inline def apply(inline id: Id): Option[Variant]   = list.byId get id
   inline def apply(inline key: Key): Option[Variant] = list.byKey get key

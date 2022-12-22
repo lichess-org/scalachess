@@ -39,8 +39,8 @@ case class Std(
     dest: Pos,
     role: Role,
     capture: Boolean = false,
-    file: Option[Int] = None,
-    rank: Option[Int] = None,
+    file: Option[File] = None,
+    rank: Option[Rank] = None,
     promotion: Option[PromotableRole] = None,
     metas: Metas = Metas.empty
 ) extends San:

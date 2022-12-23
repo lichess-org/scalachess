@@ -5,7 +5,7 @@ import chess.format.EpdFen
 
 case object Antichess
     extends Variant(
-      id = Variant.Id(60),
+      id = Variant.Id(6),
       key = Variant.LilaKey("antichess"),
       uciKey = Variant.UciKey("antichess"),
       name = "Antichess",

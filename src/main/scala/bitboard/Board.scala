@@ -1,7 +1,6 @@
 package chess
 package bitboard
 
-import scala.language.implicitConversions
 import cats.syntax.all.*
 
 import Bitboard.*
@@ -65,8 +64,10 @@ case class Board(
         s.pawnAttacks(!attacker) & pawns
     )
 
+  // return true if the king with color is in check
+  // return false in case of no king
   def isCheck(color: Color): Boolean =
-    king(color).fold(false)(k => attacksTo(k, !color) != 0)
+    king(color).fold(false)(k => attacksTo(k, !color) != empty)
 
   /** Find all blockers between the king and attacking sliders First we find all snipers (all potential sliders which
     * can attack the king) Then we loop over those snipers if there is only one blockers between the king and the sniper
@@ -77,11 +78,11 @@ case class Board(
   def sliderBlockers(us: Color): Bitboard =
     val ourKing = king(us) match
       case Some(s) => s
-      case None    => return 0L
+      case None    => return Bitboard.empty
 
     val snipers = byColor(!us) & (
-      ourKing.rookAttacks(0L) & (rooks ^ queens) |
-        ourKing.bishopAttacks(0L) & (bishops ^ queens)
+      ourKing.rookAttacks(Bitboard.empty) & (rooks ^ queens) |
+        ourKing.bishopAttacks(Bitboard.empty) & (bishops ^ queens)
     )
 
     val bs = for
@@ -90,7 +91,7 @@ case class Board(
       if !between.moreThanOne
     yield between
 
-    bs.fold(0L)((a, b) => a | b)
+    bs.fold(0L.bb)((a, b) => a | b)
 
   // TODO move: Board => Board
   // We can implement as PieceMap => PieceMap
@@ -172,38 +173,38 @@ case class Board(
 
 object Board:
   val empty = Board(
-    pawns = 0L,
-    knights = 0L,
-    bishops = 0L,
-    rooks = 0L,
-    queens = 0L,
-    kings = 0L,
-    white = 0L,
-    black = 0L,
-    occupied = 0L
+    pawns = Bitboard.empty,
+    knights = Bitboard.empty,
+    bishops = Bitboard.empty,
+    rooks = Bitboard.empty,
+    queens = Bitboard.empty,
+    kings = Bitboard.empty,
+    white = Bitboard.empty,
+    black = Bitboard.empty,
+    occupied = Bitboard.empty,
   )
   val standard = Board(
-    pawns = 0xff00000000ff00L,
-    knights = 0x4200000000000042L,
-    bishops = 0x2400000000000024L,
-    rooks = 0x8100000000000081L,
-    queens = 0x800000000000008L,
-    kings = 0x1000000000000010L,
-    white = 0xffffL,
-    black = 0xffff000000000000L,
-    occupied = 0xffff00000000ffffL
+    pawns = Bitboard(0xff00000000ff00L),
+    knights = Bitboard(0x4200000000000042L),
+    bishops = Bitboard(0x2400000000000024L),
+    rooks = Bitboard(0x8100000000000081L),
+    queens = Bitboard(0x800000000000008L),
+    kings = Bitboard(0x1000000000000010L),
+    white = Bitboard(0xffffL),
+    black = Bitboard(0xffff000000000000L),
+    occupied = Bitboard(0xffff00000000ffffL)
   )
 
   def fromMap(pieces: Map[Pos, Piece]): Board =
-    var pawns    = 0L
-    var knights  = 0L
-    var bishops  = 0L
-    var rooks    = 0L
-    var queens   = 0L
-    var kings    = 0L
-    var white    = 0L
-    var black    = 0L
-    var occupied = 0L
+    var pawns    = Bitboard.empty
+    var knights  = Bitboard.empty
+    var bishops  = Bitboard.empty
+    var rooks    = Bitboard.empty
+    var queens   = Bitboard.empty
+    var kings    = Bitboard.empty
+    var white    = Bitboard.empty
+    var black    = Bitboard.empty
+    var occupied = Bitboard.empty
 
     pieces.foreach { (s, p) =>
       val position = s.bitboard

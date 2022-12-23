@@ -11,6 +11,7 @@ class BitboardTest extends ScalaCheckSuite:
 
   import scala.language.implicitConversions
   given Conversion[Pos, Int] = _.value
+  given Conversion[Bitboard, Long] = _.value
   import Bitboard.*
 
   val allDeltas =
@@ -19,12 +20,12 @@ class BitboardTest extends ScalaCheckSuite:
   def as(array: Array[Int]) = array.map(i => s"$i, ").mkString
 
   test("single cases") {
-    val occupied = 20292374
+    val occupied = 20292374.bb
     val deltas   = KING_DELTAS
     val s        = Pos.at(43).get
     val result   = Bitboard.slidingAttacks(s, occupied, deltas)
     val expected = CBB.slidingAttacks(s, occupied, deltas)
-    assertEquals(result, expected)
+    assertEquals(result, expected.bb)
   }
 
   test("slidingAttack with all occupied") {
@@ -35,16 +36,16 @@ class BitboardTest extends ScalaCheckSuite:
       s        = Pos.at(i).get
       result   = Bitboard.slidingAttacks(s, occupied, deltas)
       expected = CBB.slidingAttacks(s, occupied, deltas)
-    yield assertEquals(result, expected)
+    yield assertEquals(result, expected.bb)
   }
 
   property("slidingAttack check") {
-    Prop.forAll { (occupied: Long, s: Pos) =>
+    Prop.forAll { (occupied: Bitboard, s: Pos) =>
       val result = for
         deltas <- allDeltas
         result   = Bitboard.slidingAttacks(s, occupied, deltas)
         expected = CBB.slidingAttacks(s, occupied, deltas)
-      yield result == expected
+      yield result == expected.bb
       result.forall(identity)
     }
   }
@@ -61,26 +62,26 @@ class BitboardTest extends ScalaCheckSuite:
   }
 
   property("bitshop attacks") {
-    Prop.forAll { (occupied: Long, s: Pos) =>
-      s.bishopAttacks(occupied) == CBB.bishopAttacks(s, occupied)
+    Prop.forAll { (occupied: Bitboard, s: Pos) =>
+      s.bishopAttacks(occupied) == CBB.bishopAttacks(s, occupied).bb
     }
   }
 
   property("rook attacks") {
-    Prop.forAll { (occupied: Long, s: Pos) =>
-      s.rookAttacks(occupied) == CBB.rookAttacks(s, occupied)
+    Prop.forAll { (occupied: Bitboard, s: Pos) =>
+      s.rookAttacks(occupied) == CBB.rookAttacks(s, occupied).bb
     }
   }
 
   property("queen attacks") {
-    Prop.forAll { (occupied: Long, s: Pos) =>
-      s.queenAttacks(occupied) == CBB.queenAttacks(s, occupied)
+    Prop.forAll { (occupied: Bitboard, s: Pos) =>
+      s.queenAttacks(occupied) == CBB.queenAttacks(s, occupied).bb
     }
   }
 
   property("pawn attacks") {
     Prop.forAll { (s: Pos) =>
-      s.pawnAttacks(Color.White) == CBB.pawnAttacks(true, s)
-      s.pawnAttacks(Color.Black) == CBB.pawnAttacks(false, s)
+      s.pawnAttacks(Color.White) == CBB.pawnAttacks(true, s).bb
+      s.pawnAttacks(Color.Black) == CBB.pawnAttacks(false, s).bb
     }
   }

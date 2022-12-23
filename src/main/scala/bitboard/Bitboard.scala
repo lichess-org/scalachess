@@ -3,12 +3,12 @@ package bitboard
 
 import scala.collection.mutable.ListBuffer
 
-// TODO opaque
-opaque type Bitboard <: Long = Long
-object Bitboard extends OpaqueLong[Bitboard]:
+opaque type Bitboard = Long
+object Bitboard extends TotalWrapper[Bitboard, Long]:
 
-  val ALL     = -1L
-  val corners = 0x8100000000000081L
+  val ALL     = Bitboard(-1L)
+  val empty   = Bitboard(0L)
+  val corners = Bitboard(0x8100000000000081L)
 
   val RANKS = Array.fill(8)(0L)
   val FILES = Array.fill(8)(0L)
@@ -130,23 +130,55 @@ object Bitboard extends OpaqueLong[Bitboard]:
     def bitboard: Bitboard =
       1L << s.value
 
-  extension (b: Bitboard)
+  type LongRuntime[A] = SameRuntime[A, Long]
+  extension (a: Bitboard)
+    inline def unary_-                                                       = apply(-raw(a))
+    inline def unary_~                                                       = apply(~raw(a))
+    inline infix def >(inline o: Long): Boolean                              = raw(a) > o
+    inline infix def <(inline o: Long): Boolean                              = raw(a) < o
+    inline infix def >=(inline o: Long): Boolean                             = raw(a) >= o
+    inline infix def <=(inline o: Long): Boolean                             = raw(a) <= o
+    inline infix def +(inline o: Long): Bitboard                             = apply(raw(a) + o)
+    inline infix def -(inline o: Long): Bitboard                             = apply(raw(a) - o)
+    inline infix def &(inline o: Long): Bitboard                             = apply(raw(a) & o)
+    inline infix def ^(inline o: Long): Bitboard                             = apply(raw(a) ^ o)
+    inline infix def |(inline o: Long): Bitboard                             = apply(raw(a) | o)
+    inline infix def <<(inline o: Long): Bitboard                            = apply(raw(a) << o)
+    inline infix def >>>(inline o: Long): Bitboard                           = apply(raw(a) >>> o)
+    inline def atLeast(inline bot: Long): Bitboard                           = apply(math.max(raw(a), bot))
+    inline def atMost(inline top: Long): Bitboard                            = apply(math.min(raw(a), top))
+    inline infix def >[B](inline o: B)(using sr: LongRuntime[B]): Boolean    = >(sr(o))
+    inline infix def <[B](inline o: B)(using sr: LongRuntime[B]): Boolean    = <(sr(o))
+    inline infix def >=[B](inline o: B)(using sr: LongRuntime[B]): Boolean   = >=(sr(o))
+    inline infix def <=[B](inline o: B)(using sr: LongRuntime[B]): Boolean   = <=(sr(o))
+    inline infix def +[B](inline o: B)(using sr: LongRuntime[B]): Bitboard   = a + sr(o)
+    inline infix def -[B](inline o: B)(using sr: LongRuntime[B]): Bitboard   = a - sr(o)
+    inline infix def &[B](inline o: B)(using sr: LongRuntime[B]): Bitboard   = a & sr(o)
+    inline infix def ^[B](inline o: B)(using sr: LongRuntime[B]): Bitboard   = a ^ sr(o)
+    inline infix def |[B](inline o: B)(using sr: LongRuntime[B]): Bitboard   = a | sr(o)
+    inline infix def <<[B](inline o: B)(using sr: LongRuntime[B]): Bitboard  = a << sr(o)
+    inline infix def >>>[B](inline o: B)(using sr: LongRuntime[B]): Bitboard = a >>> sr(o)
+    inline def atLeast[B](inline bot: B)(using sr: LongRuntime[B]): Bitboard = atLeast(sr(bot))
+    inline def atMost[B](inline top: B)(using sr: LongRuntime[B]): Bitboard  = atMost(sr(top))
+
     def contains(s: Int): Boolean =
-      (b & (1L << s)) != 0
+      (a & (1L << s)) != 0
 
     def moreThanOne: Boolean =
-      (b & (b - 1L)) != 0
+      (a & (a - 1L)) != 0
 
-    def lsb: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(b))
+    def lsb: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(a))
 
     def occupiedSquares: List[Pos] =
-      var bb = b
+      var bb = a
       val sx = ListBuffer[Pos]()
       while bb != 0
       do
         sx.addOne(bb.lsb.get)
         bb &= (bb - 1L)
       sx.toList
+
+    def isEmpty: Boolean = a == empty
 
   // TODO move to color
   extension (c: Color)
@@ -177,3 +209,5 @@ object Bitboard extends OpaqueLong[Bitboard]:
   extension (a: Int)
     private def file = a & 7
     private def rank = a >>> 3
+
+  extension (a: Long) def bb = Bitboard(a)

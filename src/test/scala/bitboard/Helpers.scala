@@ -7,6 +7,12 @@ import org.lichess.compression.game.{ Board as CBoard, Move as CMove, MoveList, 
 
 object Helpers:
 
+  import scala.language.implicitConversions
+
+  import Bitboard.*
+  given Conversion[Bitboard, Long] = _.value
+  given Conversion[Long, Bitboard] = _.bb
+
   extension (cb: CBoard)
     def fen(halfMoves: Int, fullMoves: Int) =
       val b = Board(

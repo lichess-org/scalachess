@@ -9,7 +9,9 @@ class BoardTest extends FunSuite:
 
   import scala.language.implicitConversions
   given Conversion[Pos, Int] = _.value
+
   import Helpers.*
+  import Bitboard.*
 
   test("sliderBlockers") {
     FenFixtures.fens.foreach { str =>
@@ -17,7 +19,7 @@ class BoardTest extends FunSuite:
       val result   = fen.board.sliderBlockers(fen.state.turn)
       val king     = fen.ourKing.get
       val expected = fen.cBoard.sliderBlockers(king)
-      assertEquals(result, expected)
+      assertEquals(result, expected.bb)
     }
   }
 
@@ -31,7 +33,7 @@ class BoardTest extends FunSuite:
       color <- List(Color.White, Color.Black)
       result   = fen.board.attacksTo(sq, color)
       expected = fen.cBoard.attacksTo(sq, color.white)
-    yield assertEquals(result, expected)
+    yield assertEquals(result, expected.bb)
   }
 
   test("discard with standard board") {

@@ -17,13 +17,13 @@ object StandardMovesGenerator:
       val king           = f.ourKing.get
       val enPassantMoves = f.state.epSquare.fold(List())(genEnPassant)
       val checkers       = f.checkers.get
-      val moves = if checkers == 0 then
+      val moves = if checkers == Bitboard.empty then
         val targets = ~f.us
         genNonKing(targets) ++ genSafeKing(king, targets) ++ genCastling(king)
       else genEvasions(king, checkers)
 
       val blockers = f.sliderBlockers
-      if blockers != 0 || !f.state.epSquare.isDefined then moves.filter(m => f.isSafe(king, m, blockers))
+      if blockers != Bitboard.empty || !f.state.epSquare.isDefined then moves.filter(m => f.isSafe(king, m, blockers))
       else moves
 
     def genEnPassant(ep: Pos): List[Move] =
@@ -39,7 +39,7 @@ object StandardMovesGenerator:
       val targets = king.kingAttacks & mask
       for
         to <- targets.occupiedSquares
-        if f.board.attacksTo(to, !f.state.turn) == 0
+        if f.board.attacksTo(to, !f.state.turn).isEmpty
       yield Move.Normal(king, to, King, f.isOccupied(to))
 
     def genCastling(king: Pos): List[Move] =
@@ -48,12 +48,12 @@ object StandardMovesGenerator:
       for
         rook <- rooks.occupiedSquares
         path = Bitboard.between(king, rook)
-        if (path & f.occupied) == 0
+        if (path & f.occupied).isEmpty
         toRank   = if rook < king then Pos.C1 else Pos.G1
         kingTo   = toRank.combine(king)
         kingPath = Bitboard.between(king, kingTo) | (1L << kingTo.value) | (1L << king.value)
         safe = kingPath.occupiedSquares
-          .map(f.board.attacksTo(_, !f.state.turn, f.occupied ^ (1L << king.value)) == 0)
+          .map(f.board.attacksTo(_, !f.state.turn, f.occupied ^ (1L << king.value)).isEmpty)
           .forall(identity)
         if safe
       yield Move.Castle(king, rook)

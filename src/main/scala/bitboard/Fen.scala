@@ -1,7 +1,7 @@
 package chess
 package bitboard
 
-import bitboard.Bitboard.*
+import Bitboard.*
 import scala.collection.mutable.ListBuffer
 import cats.syntax.all.*
 
@@ -23,8 +23,8 @@ case class Fen(board: Board, state: State):
         result
       case Move.EnPassant(from, to) =>
         val newOccupied = (occupied ^ from.bitboard ^ to.combine(from).bitboard) | to.bitboard
-        (king.rookAttacks(newOccupied) & them & (board.rooks ^ board.queens)) == 0L &&
-        (king.bishopAttacks(newOccupied) & them & (board.bishops ^ board.queens)) == 0L
+        (king.rookAttacks(newOccupied) & them & (board.rooks ^ board.queens)) == Bitboard.empty &&
+        (king.bishopAttacks(newOccupied) & them & (board.bishops ^ board.queens)) == Bitboard.empty
       case _ => true
 
   // TODO now it works with valid move only
@@ -104,11 +104,11 @@ object Fen:
 
   def parseCastlingRights(s: String): Either[ParseFenError, Bitboard] =
     s match
-      case "-" => Right(0L)
+      case "-" => Right(Bitboard.empty)
       case _ =>
         s.toList
           .traverse(charToSquare)
-          .map(_.foldRight(0L)((s, b) => s.bitboard | b))
+          .map(_.foldRight(Bitboard.empty)((s, b) => s.bitboard | b))
           .toRight(ParseFenError.InvalidCastling)
 
   // TODO naming is hard

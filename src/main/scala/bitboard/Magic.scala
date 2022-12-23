@@ -1,7 +1,8 @@
 package chess
 package bitboard
 
-case class Magic(mask: Bitboard, factor: Long, offset: Int)
+// TODO move to bitboard
+case class Magic(mask: Long, factor: Long, offset: Int)
 
 object Magic:
   val ROOK = Array[Magic](

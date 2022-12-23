@@ -4,7 +4,6 @@ package bitboard
 import cats.syntax.all.*
 import munit.FunSuite
 
-
 class BoardTest extends FunSuite:
 
   import scala.language.implicitConversions
@@ -60,10 +59,10 @@ class BoardTest extends FunSuite:
 
   test("put with test fixtures") {
     FenFixtures.fens.foreach { str =>
-      val fen                           = Fen.parse(str).getOrElse(throw RuntimeException("boooo"))
-      val ss                            = List.range(0, 64).map(Pos.at(_).get)
+      val fen                        = Fen.parse(str).getOrElse(throw RuntimeException("boooo"))
+      val ss                         = List.range(0, 64).map(Pos.at(_).get)
       val pieces: List[(Pos, Piece)] = ss.mapFilter(s => fen.board.pieceAt(s).map((s, _)))
-      val result                        = pieces.foldRight(Board.empty)((s, b) => b.put(s._1, s._2))
+      val result                     = pieces.foldRight(Board.empty)((s, b) => b.put(s._1, s._2))
       assertEquals(result, fen.board)
     }
   }
@@ -85,7 +84,9 @@ class BoardTest extends FunSuite:
 
   test("case 1") {
     val fen =
-      Fen.parse("rnbqkbnr/1ppppppp/8/8/p7/PPP5/3PPPPP/RNBQKBNR w KQkq - 0 4").getOrElse(throw RuntimeException("booo"))
+      Fen
+        .parse("rnbqkbnr/1ppppppp/8/8/p7/PPP5/3PPPPP/RNBQKBNR w KQkq - 0 4")
+        .getOrElse(throw RuntimeException("booo"))
     val result      = fen.play(Move.Normal(Pos.B3, Pos.A4, Pawn, true))
     val expectedMap = (fen.board.pieceMap - Pos.B3) + (Pos.A4 -> Piece(White, Pawn))
     assertEquals(result.board.pieceMap, expectedMap)

@@ -10,12 +10,20 @@ import Arbitraries.given
 class BitboardTest extends ScalaCheckSuite:
 
   import scala.language.implicitConversions
-  given Conversion[Pos, Int] = _.value
+  given Conversion[Pos, Int]       = _.value
   given Conversion[Bitboard, Long] = _.value
   import Bitboard.*
 
   val allDeltas =
-    List(KING_DELTAS, KNIGHT_DELTAS, BISHOP_DELTAS, ROOK_DELTAS, KING_DELTAS, WHITE_PAWN_DELTAS, BLACK_PAWN_DELTAS)
+    List(
+      KING_DELTAS,
+      KNIGHT_DELTAS,
+      BISHOP_DELTAS,
+      ROOK_DELTAS,
+      KING_DELTAS,
+      WHITE_PAWN_DELTAS,
+      BLACK_PAWN_DELTAS
+    )
 
   def as(array: Array[Int]) = array.map(i => s"$i, ").mkString
 

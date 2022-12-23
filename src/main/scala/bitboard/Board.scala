@@ -181,7 +181,7 @@ object Board:
     kings = Bitboard.empty,
     white = Bitboard.empty,
     black = Bitboard.empty,
-    occupied = Bitboard.empty,
+    occupied = Bitboard.empty
   )
   val standard = Board(
     pawns = Bitboard(0xff00000000ff00L),

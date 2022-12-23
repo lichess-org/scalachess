@@ -23,7 +23,8 @@ object StandardMovesGenerator:
       else genEvasions(king, checkers)
 
       val blockers = f.sliderBlockers
-      if blockers != Bitboard.empty || !f.state.epSquare.isDefined then moves.filter(m => f.isSafe(king, m, blockers))
+      if blockers != Bitboard.empty || !f.state.epSquare.isDefined then
+        moves.filter(m => f.isSafe(king, m, blockers))
       else moves
 
     def genEnPassant(ep: Pos): List[Move] =

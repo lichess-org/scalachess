@@ -65,7 +65,7 @@ case class Board(
   // return true if the king with color is in check
   // return false in case of no king
   def isCheck(color: Color): Boolean =
-    king(color).exists(k => attacksTo(k, !color) != empty)
+    king(color).exists(k => attacksTo(k, !color) != Bitboard.empty)
 
   /** Find all blockers between the king and attacking sliders First we find all snipers (all potential sliders which
     * can attack the king) Then we loop over those snipers if there is only one blockers between the king and the sniper
@@ -85,7 +85,7 @@ case class Board(
         if !between.moreThanOne
       yield between
 
-      bs.fold(0L.bb)((a, b) => a | b)
+      bs.fold(Bitboard.empty)((a, b) => a | b)
     }
 
   // TODO move: Board => Board
@@ -136,11 +136,7 @@ case class Board(
   def updateColor(mask: Bitboard, color: Color): Color => Bitboard =
     case Color.White if color == Color.White => white ^ mask
     case Color.Black if color == Color.Black => black ^ mask
-    case _                                   => colors(color)
-
-  def colors: Color => Bitboard =
-    case Color.White => white
-    case Color.Black => black
+    case _                                   => byColor(color)
 
   def put(s: Pos, role: Role, color: Color): Board =
     val b = discard(s)

@@ -33,7 +33,7 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
 
   /** Slow attack set generation. Used only to bootstrap the attack tables.
     */
-  def slidingAttacks(square: Int, occupied: Bitboard, deltas: Array[Int]): Bitboard =
+  private[bitboard] def slidingAttacks(square: Int, occupied: Bitboard, deltas: Array[Int]): Bitboard =
     var attacks = 0L
     deltas.foreach { delta =>
       var sq: Int = square
@@ -50,7 +50,7 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
     }
     attacks
 
-  def initMagics(square: Int, magic: Magic, shift: Int, deltas: Array[Int]) =
+  private def initMagics(square: Int, magic: Magic, shift: Int, deltas: Array[Int]) =
     var subset = 0L
     while
       val attack = slidingAttacks(square, subset, deltas)
@@ -63,7 +63,7 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
       subset != 0
     do ()
 
-  def initialize() =
+  private def initialize() =
     (0 until 8).foreach { i =>
       RANKS(i) = 0xffL << (i * 8)
       FILES(i) = 0x0101010101010101L << i

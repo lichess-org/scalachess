@@ -20,9 +20,7 @@ case class Board(
 
   def sliders = bishops ^ rooks ^ queens
 
-  def byColor: Color => Bitboard =
-    case Color.White => white
-    case Color.Black => black
+  val byColor = Color.Map(white, black)
 
   def roleAt(s: Pos): Option[Role] =
     if (pawns.contains(s.value)) then Some(Pawn)

@@ -132,21 +132,21 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
 
   type LongRuntime[A] = SameRuntime[A, Long]
   extension (a: Bitboard)
-    inline def unary_-                                                       = apply(-raw(a))
-    inline def unary_~                                                       = apply(~raw(a))
-    inline infix def >(inline o: Long): Boolean                              = raw(a) > o
-    inline infix def <(inline o: Long): Boolean                              = raw(a) < o
-    inline infix def >=(inline o: Long): Boolean                             = raw(a) >= o
-    inline infix def <=(inline o: Long): Boolean                             = raw(a) <= o
-    inline infix def +(inline o: Long): Bitboard                             = apply(raw(a) + o)
-    inline infix def -(inline o: Long): Bitboard                             = apply(raw(a) - o)
-    inline infix def &(inline o: Long): Bitboard                             = apply(raw(a) & o)
-    inline infix def ^(inline o: Long): Bitboard                             = apply(raw(a) ^ o)
-    inline infix def |(inline o: Long): Bitboard                             = apply(raw(a) | o)
-    inline infix def <<(inline o: Long): Bitboard                            = apply(raw(a) << o)
-    inline infix def >>>(inline o: Long): Bitboard                           = apply(raw(a) >>> o)
-    inline def atLeast(inline bot: Long): Bitboard                           = apply(math.max(raw(a), bot))
-    inline def atMost(inline top: Long): Bitboard                            = apply(math.min(raw(a), top))
+    inline def unary_- : Bitboard                                            = -a
+    inline def unary_~ : Bitboard                                            = ~a
+    inline infix def >(inline o: Long): Boolean                              = a > o
+    inline infix def <(inline o: Long): Boolean                              = a < o
+    inline infix def >=(inline o: Long): Boolean                             = a >= o
+    inline infix def <=(inline o: Long): Boolean                             = a <= o
+    inline infix def +(inline o: Long): Bitboard                             = a + o
+    inline infix def -(inline o: Long): Bitboard                             = a - o
+    inline infix def &(inline o: Long): Bitboard                             = a & o
+    inline infix def ^(inline o: Long): Bitboard                             = a ^ o
+    inline infix def |(inline o: Long): Bitboard                             = a | o
+    inline infix def <<(inline o: Long): Bitboard                            = a << o
+    inline infix def >>>(inline o: Long): Bitboard                           = a >>> o
+    inline def atLeast(inline bot: Long): Bitboard                           = math.max(a, bot)
+    inline def atMost(inline top: Long): Bitboard                            = math.min(a, top)
     inline infix def >[B](inline o: B)(using sr: LongRuntime[B]): Boolean    = >(sr(o))
     inline infix def <[B](inline o: B)(using sr: LongRuntime[B]): Boolean    = <(sr(o))
     inline infix def >=[B](inline o: B)(using sr: LongRuntime[B]): Boolean   = >=(sr(o))

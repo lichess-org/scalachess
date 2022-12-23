@@ -190,7 +190,7 @@ object Parser:
 
     // Bac3 Baxc3 B2c3 B2xc3 Ba2xc3
     val disambiguated: P[Std] = (role ~ file.? ~ rank.? ~ x ~ dest).map { case ((((ro, fi), ra), ca), de) =>
-      Std(dest = de, role = ro, capture = ca, file = fi, rank = ra)
+      Std(dest = de, role = ro, capture = ca, file = File from fi, rank = Rank from ra)
     }
 
     // optional e.p.
@@ -199,7 +199,7 @@ object Parser:
     // d7d5 d7xd5
     val disambiguatedPawn: P[Std] = (((file.? ~ rank.?) ~ x).with1 ~ dest <* optionalEnPassant).map {
       case (((fi, ra), ca), de) =>
-        Std(dest = de, role = Pawn, capture = ca, file = fi, rank = ra)
+        Std(dest = de, role = Pawn, capture = ca, file = File from fi, rank = Rank from ra)
     }
 
     val suffixes: P0[Suffixes] = (promotion.? ~ checkmate ~ check ~ glyphs).map { case (((p, cm), c), g) =>

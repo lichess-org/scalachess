@@ -23,17 +23,17 @@ case class Board(
   val byColor = Color.Map(white, black)
 
   def roleAt(s: Pos): Option[Role] =
-    if (pawns.contains(s.value)) then Some(Pawn)
-    else if (knights.contains(s.value)) then Some(Knight)
-    else if (bishops.contains(s.value)) then Some(Bishop)
-    else if (rooks.contains(s.value)) then Some(Rook)
-    else if (queens.contains(s.value)) then Some(Queen)
-    else if (kings.contains(s.value)) then Some(King)
+    if pawns.contains(s.value) then Some(Pawn)
+    else if knights.contains(s.value) then Some(Knight)
+    else if bishops.contains(s.value) then Some(Bishop)
+    else if rooks.contains(s.value) then Some(Rook)
+    else if queens.contains(s.value) then Some(Queen)
+    else if kings.contains(s.value) then Some(King)
     else None
 
   def colorAt(s: Pos): Option[Color] =
-    if (white.contains(s.value)) then Some(Color.White)
-    else if (black.contains(s.value)) then Some(Color.Black)
+    if white.contains(s.value) then Some(Color.White)
+    else if black.contains(s.value) then Some(Color.Black)
     else None
 
   def pieceAt(s: Pos): Option[Piece] =

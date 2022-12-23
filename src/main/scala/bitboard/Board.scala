@@ -74,22 +74,19 @@ case class Board(
     * This is being used when checking a move is safe for the king or not
     */
   def sliderBlockers(us: Color): Bitboard =
-    val ourKing = king(us) match
-      case Some(s) => s
-      case None    => return Bitboard.empty
+    king(us).fold(Bitboard.empty) { ourKing =>
+      val snipers = byColor(!us) & (
+        ourKing.rookAttacks(Bitboard.empty) & (rooks ^ queens) |
+          ourKing.bishopAttacks(Bitboard.empty) & (bishops ^ queens)
+      )
+      val bs = for
+        sniper <- snipers.occupiedSquares
+        between = Bitboard.between(ourKing, sniper) & occupied
+        if !between.moreThanOne
+      yield between
 
-    val snipers = byColor(!us) & (
-      ourKing.rookAttacks(Bitboard.empty) & (rooks ^ queens) |
-        ourKing.bishopAttacks(Bitboard.empty) & (bishops ^ queens)
-    )
-
-    val bs = for
-      sniper <- snipers.occupiedSquares
-      between = Bitboard.between(ourKing, sniper) & occupied
-      if !between.moreThanOne
-    yield between
-
-    bs.fold(0L.bb)((a, b) => a | b)
+      bs.fold(0L.bb)((a, b) => a | b)
+    }
 
   // TODO move: Board => Board
   // We can implement as PieceMap => PieceMap

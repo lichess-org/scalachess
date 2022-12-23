@@ -44,7 +44,7 @@ object StandardMovesGenerator:
       yield Move.Normal(king, to, King, f.isOccupied(to))
 
     def genCastling(king: Pos): List[Move] =
-      val firstRank = f.state.turn.firstRank
+      val firstRank = f.state.turn.backRank
       val rooks     = f.state.castlingRights & Bitboard.RANKS(firstRank.value)
       for
         rook <- rooks.occupiedSquares

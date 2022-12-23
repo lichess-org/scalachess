@@ -183,11 +183,6 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
   // TODO move to color
   extension (c: Color)
 
-    def firstRank: Rank =
-      c match
-        case Color.White => Rank.First
-        case Color.Black => Rank.Eighth
-
     def secondRank: Rank =
       c match
         case Color.White => Rank.Second
@@ -197,11 +192,6 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
       c match
         case Color.White => Rank.Seventh
         case Color.Black => Rank.Second
-
-    def lastRank: Rank =
-      c match
-        case Color.White => Rank.Eighth
-        case Color.Black => Rank.First
 
   private def distance(a: Int, b: Int): Int =
     Math.max(Math.abs(a.file - b.file), Math.abs(a.rank - b.rank))

@@ -16,9 +16,9 @@ enum Color(val name: String, val letter: Char):
   def unary_! = fold(Black, White)
 
   lazy val passablePawnRank: Rank   = fold(Rank.Fifth, Rank.Fourth)
-  lazy val promotablePawnRank: Rank = fold(Rank.Eighth, Rank.First)
   lazy val backRank: Rank           = fold(Rank.First, Rank.Eighth)
   lazy val lastRank: Rank           = fold(Rank.Eighth, Rank.First)
+  lazy val promotablePawnRank: Rank = lastRank
 
   inline def -(inline role: Role) = Piece(this, role)
 

@@ -14,7 +14,7 @@ object Helpers:
   given Conversion[Long, Bitboard] = _.bb
 
   extension (cb: CBoard)
-    def fen(halfMoves: Int, fullMoves: Int) =
+    def fen(halfMoves: HalfMoveClock, fullMoves: FullMoveNumber) =
       val b = Board(
         pawns = cb.pawns,
         knights = cb.knights,

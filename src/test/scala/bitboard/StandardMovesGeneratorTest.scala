@@ -18,7 +18,7 @@ class StandardMovesGeneratorTest extends FunSuite:
   test("genEnPassant 1") {
     val b     = Board.empty.copy(pawns = 0x7000000000L.bb, white = 0x5000000000L.bb, black = 0x2000000000L.bb)
     val ep    = Pos(File.F, Rank.Sixth)
-    val fen   = Fen(b, State(White, Some(ep), Bitboard.corners, 5, 10))
+    val fen   = Fen(b, State(White, Some(ep), Bitboard.corners, HalfMoveClock(5), FullMoveNumber(10)))
     val moves = fen.genEnPassant(ep)
     val expected = Set(Move.EnPassant(Pos.at(36).get, ep), Move.EnPassant(Pos.at(38).get, ep))
     assertEquals(moves.toSet, expected.toSet)

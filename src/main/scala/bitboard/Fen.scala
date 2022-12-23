@@ -37,7 +37,7 @@ case class Fen(board: Board, state: State):
     board.play(state.turn)
 
   def playState(move: Move): State =
-    val halfMoves = if move.isHalfMove then state.halfMoves + 1 else 0
+    val halfMoves = if move.isHalfMove then state.halfMoves + 1 else HalfMoveClock(0)
     val fullMoves = if state.turn.black then state.fullMoves + 1 else state.fullMoves
     val turn      = !state.turn
     val halfCastlingRights =
@@ -92,9 +92,9 @@ object Fen:
         turn           <- parseColor(parts(1))
         castlingRights <- parseCastlingRights(parts(2))
         epSquare       <- parseEpPassantSquare(parts(3))
-        halftMoves     <- parts(4).toIntOption.toRight(ParseFenError.InvalidHalfMoveClock)
-        fullMoves      <- parts(5).toIntOption.toRight(ParseFenError.InvalidHalfMoveClock)
-      yield Fen(board, State(turn, epSquare, castlingRights, halftMoves, fullMoves))
+        halfMoves      <- HalfMoveClock from parts(4).toIntOption.toRight(ParseFenError.InvalidHalfMoveClock)
+        fullMoves      <- FullMoveNumber from parts(5).toIntOption.toRight(ParseFenError.InvalidHalfMoveClock)
+      yield Fen(board, State(turn, epSquare, castlingRights, halfMoves, fullMoves))
 
   def parseColor(s: String): Either[ParseFenError, Color] =
     s match

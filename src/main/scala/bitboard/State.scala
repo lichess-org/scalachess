@@ -18,11 +18,11 @@ case class State(
     // The halfmove clock specifies a decimal number of half moves with respect
     // to the 50/75 move draw rule. It is reset to zero after a capture or a pawn
     // move and incremented otherwise.
-    halfMoves: Int,
+    halfMoves: HalfMoveClock,
     // The number of the full moves in a game. It starts at 1,
     // and is incremented after each Black's move.
-    fullMoves: Int
+    fullMoves: FullMoveNumber
 )
 
 object State:
-  val start = State(Color.White, None, Bitboard.corners, 0, 1)
+  val start = State(Color.White, None, Bitboard.corners, HalfMoveClock(0), FullMoveNumber(1))

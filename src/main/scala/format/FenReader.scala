@@ -119,7 +119,7 @@ trait FenReader:
       case word => word -> None
     if (pockets.isDefined && !variant.crazyhouse) None
     else
-      makePiecesWithCrazyPromoted(position.toList, 0, 7) map { case (pieces, promoted) =>
+      makePiecesWithCrazyPromoted(position.toList, 0, 7) map { (pieces, promoted) =>
         val board = Board(pieces, variant = variant)
         if (promoted.isEmpty) board else board.withCrazyData(_.copy(promoted = promoted))
       } map { board =>

@@ -6,7 +6,7 @@ object SpeedId extends OpaqueInt[SpeedId]
 opaque type SpeedKey = String
 object SpeedKey extends OpaqueString[SpeedKey]
 
-sealed class Speed(
+sealed abstract class Speed(
     val id: SpeedId,
     val key: SpeedKey,
     val range: Range,

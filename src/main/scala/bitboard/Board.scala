@@ -186,17 +186,19 @@ case class Board(
       newBoard <- discard(orig).discard(takenPos).put(piece, dest)
     } yield newBoard
 
+  // TODO test
   lazy val occupation: Color.Map[Set[Pos]] = Color.Map { c =>
     color(c).occupiedSquares.toSet
   }
 
+  // TODO test
   inline def hasPiece(inline p: Piece) =
     piece(p).isNotEmpty
 
   // TODO remove unsafe get
   // we believe in the integrity of bitboard
   // tests pieceMap . fromMap = identity
-  def pieceMap: Map[Pos, Piece] =
+  lazy val pieceMap: Map[Pos, Piece] =
     occupied.occupiedSquares.map(s => (s, pieceAt(s).get)).toMap
 
   def pieces: List[Piece] =

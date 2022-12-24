@@ -9,8 +9,9 @@ enum Side:
   lazy val castledRookFile: File = fold(File.F, File.D)
 
   lazy val tripToRook: (Pos, Board) => List[Pos] = fold(
-    (pos, board) => pos >| board.pieces.contains,
-    (pos, board) => pos |< board.pieces.contains
+    // todo board.occupied contains
+    (pos, board) => pos >| board.pieceMap.contains,
+    (pos, board) => pos |< board.pieceMap.contains
   )
 
   private lazy val isKingSide = this == Side.KingSide

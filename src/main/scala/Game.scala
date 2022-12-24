@@ -91,7 +91,7 @@ case class Game(
       case u: Uci.Move => apply(u) map { case (g, m) => g -> Left(m) }
       case u: Uci.Drop => apply(u) map { case (g, d) => g -> Right(d) }
 
-  inline def isStandardInit = board.pieces == chess.variant.Standard.pieces
+  inline def isStandardInit = board.pieceMap == chess.variant.Standard.pieces
 
   inline def fullMoveNumber: FullMoveNumber = ply.fullMoveNumber
 

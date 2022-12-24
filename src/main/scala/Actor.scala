@@ -23,7 +23,7 @@ case class Actor(
     val moves = piece.role match
       case Pawn =>
         pawnDir(pos) map { next =>
-          val fwd = Option(next) filterNot board.pieces.contains
+          val fwd = Option(next) filterNot board.pieceMap.contains
           def capture(horizontal: Direction): Option[Move] = {
             for {
               p <- horizontal(next)
@@ -58,7 +58,7 @@ case class Actor(
             for {
               p  <- fwd.filter(_ => board.variant.isUnmovedPawn(color, pos))
               p2 <- pawnDir(p)
-              if !(board.pieces contains p2)
+              if !(board.pieceMap contains p2)
               b <- board.move(pos, p2)
             } yield move(p2, b),
             capture(_.left),
@@ -120,7 +120,7 @@ case class Actor(
       kingPath         = kingPos <-> newKingPos
       rookPath         = rookPos <-> newRookPos
       mustBeUnoccupied = (kingPath ++ rookPath).filter(_ != kingPos).filter(_ != rookPos)
-      if !mustBeUnoccupied.exists(board.pieces.contains)
+      if !mustBeUnoccupied.exists(board.pieceMap.contains)
       // Check the king is not currently attacked, and none of the squares it
       // passes *through* are attacked. We do this after removing the old king,
       // to ensure the old king does not shield attacks. This is important in

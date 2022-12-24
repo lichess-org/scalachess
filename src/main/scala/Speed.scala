@@ -1,37 +1,61 @@
 package chess
 
-enum Speed(
-    val id: Int,
-    val key: String,
+opaque type SpeedId = Int
+object SpeedId extends OpaqueInt[SpeedId]
+
+opaque type SpeedKey = String
+object SpeedKey extends OpaqueString[SpeedKey]
+
+sealed class Speed(
+    val id: SpeedId,
+    val key: SpeedKey,
     val range: Range,
     val name: String,
     val title: String
-):
+) extends Ordered[Speed]:
 
-  inline infix def >=(inline s: Speed): Boolean = range.min >= s.range.min
-  inline infix def >(inline s: Speed): Boolean  = range.min > s.range.min
-  inline infix def <=(inline s: Speed): Boolean = range.min <= s.range.min
-  inline infix def <(inline s: Speed): Boolean  = range.min < s.range.min
+  def compare(that: Speed) = range.min compare that.range.min
 
-  case UltraBullet
-      extends Speed(0, "ultraBullet", 0 to 29, "UltraBullet", "Insanely fast games: less than 30 seconds")
-  case Bullet extends Speed(1, "bullet", 30 to 179, "Bullet", "Very fast games: less than 3 minutes")
-  case Blitz  extends Speed(2, "blitz", 180 to 479, "Blitz", "Fast games: 3 to 8 minutes")
-  case Rapid  extends Speed(5, "rapid", 480 to 1499, "Rapid", "Rapid games: 8 to 25 minutes")
-  case Classical
-      extends Speed(3, "classical", 1500 to 21599, "Classical", "Classical games: 25 minutes and more")
-  case Correspondence
+object Speed:
+
+  case object UltraBullet
       extends Speed(
-        4,
-        "correspondence",
+        SpeedId(0),
+        SpeedKey("ultraBullet"),
+        0 to 29,
+        "UltraBullet",
+        "Insanely fast games: less than 30 seconds"
+      )
+  case object Bullet
+      extends Speed(
+        SpeedId(1),
+        SpeedKey("bullet"),
+        30 to 179,
+        "Bullet",
+        "Very fast games: less than 3 minutes"
+      )
+  case object Blitz
+      extends Speed(SpeedId(2), SpeedKey("blitz"), 180 to 479, "Blitz", "Fast games: 3 to 8 minutes")
+  case object Rapid
+      extends Speed(SpeedId(5), SpeedKey("rapid"), 480 to 1499, "Rapid", "Rapid games: 8 to 25 minutes")
+  case object Classical
+      extends Speed(
+        SpeedId(3),
+        SpeedKey("classical"),
+        1500 to 21599,
+        "Classical",
+        "Classical games: 25 minutes and more"
+      )
+  case object Correspondence
+      extends Speed(
+        SpeedId(4),
+        SpeedKey("correspondence"),
         21600 to Int.MaxValue,
         "Correspondence",
         "Correspondence games: one or several days per move"
       )
 
-object Speed:
-
-  val all = values.toList
+  val all = List(UltraBullet, Bullet, Blitz, Rapid, Classical, Correspondence)
 
   given Ordering[Speed] = Ordering.by(_.range.min)
 

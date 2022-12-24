@@ -3,7 +3,6 @@ package chess
 import variant.{ Crazyhouse, Variant }
 import bitboard.Board as BBoard
 
-// PieceMap => Board
 case class Board(
     board: BBoard,
     history: History,
@@ -28,25 +27,17 @@ case class Board(
     val (w, b) = actors.values.toSeq.partition { _.color.white }
     Color.Map(w, b)
 
-  // TODO fix
   def rolesOf(c: Color): List[Role] =
-    board.pieceMap.values
-      .collect {
-        case piece if piece.color == c => piece.role
-      }
-      .to(List)
+    pieces.filter(_.color == c).map(_.role)
 
   // todo fix
   inline def actorAt(inline at: Pos): Option[Actor] = actors get at
 
   def piecesOf(c: Color): Map[Pos, Piece] = board.piecesOf(c)
 
-  // todo fix
-  lazy val kingPos: Map[Color, Pos] = pieceMap.collect { case (pos, Piece(color, King)) =>
-    color -> pos
-  }
+  lazy val kingPos: Map[Color, Pos] = board.kingPos
 
-  def kingPosOf(c: Color): Option[Pos] = kingPos get c
+  def kingPosOf(c: Color): Option[Pos] = board.king(c)
 
   def check(c: Color): Boolean = c.fold(checkWhite, checkBlack)
 

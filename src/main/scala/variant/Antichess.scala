@@ -44,7 +44,7 @@ case object Antichess
 
   // In antichess, it is valuable for your opponent to have pieces.
   override def materialImbalance(board: Board): Int =
-    board.pieces.values.foldLeft(0) { case (acc, Piece(color, _)) =>
+    board.pieces.foldLeft(0) { case (acc, Piece(color, _)) =>
       acc + color.fold(-2, 2)
     }
 
@@ -52,7 +52,7 @@ case object Antichess
   // blockade or stalemate. Only one player can win if the only remaining pieces are two knights
   override def opponentHasInsufficientMaterial(situation: Situation) =
     // Exit early if we are not in a situation with only knights
-    situation.board.pieces.values.forall(_.is(Knight)) && {
+    situation.board.pieces.forall(_.is(Knight)) && {
 
       val whiteKnights = situation.board.actorsOf(White)
       val blackKnights = situation.board.actorsOf(Black)
@@ -72,8 +72,8 @@ case object Antichess
   // of square to allow the player to force their opponent to capture their bishop, also resulting in a draw
   override def isInsufficientMaterial(board: Board) =
     // Exit early if we are not in a situation with only bishops and pawns
-    val bishopsAndPawns = board.pieces.values.forall(p => p.is(Bishop) || p.is(Pawn)) &&
-      board.pieces.values.exists(_.is(Bishop))
+    val bishopsAndPawns = board.pieces.forall(p => p.is(Bishop) || p.is(Pawn)) &&
+      board.pieces.exists(_.is(Bishop))
 
     lazy val drawnBishops = board.actors.values.partition(_.is(White)) match
       case (whitePieces, blackPieces) =>

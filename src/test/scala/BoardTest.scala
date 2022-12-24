@@ -10,7 +10,7 @@ class BoardTest extends ChessTest:
   "a board" should {
 
     "position pieces correctly" in {
-      board.pieces must havePairs(
+      board.pieceMap must havePairs(
         A1 -> (White - Rook),
         B1 -> (White - Knight),
         C1 -> (White - Bishop),

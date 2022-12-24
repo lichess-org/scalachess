@@ -7,10 +7,10 @@ package chess
   */
 object InsufficientMatingMaterial:
 
-  def nonKingPieces(board: Board) = board.pieces filter (_._2.role != King)
+  def nonKingPieces(board: Board): PieceMap = board.pieceMap filter (_._2.role != King)
 
   def bishopsOnOppositeColors(board: Board) =
-    (board.pieces collect { case (pos, Piece(_, Bishop)) => pos.isLight } toList).distinct
+    (board.pieceMap collect { case (pos, Piece(_, Bishop)) => pos.isLight } toList).distinct
     .lengthCompare(2) == 0
 
   /*
@@ -28,10 +28,10 @@ object InsufficientMatingMaterial:
    */
   def apply(board: Board) =
     lazy val kingsAndBishopsOnly = board.pieces forall { p =>
-      (p._2 is King) || (p._2 is Bishop)
+      (p is King) || (p is Bishop)
     }
     val kingsAndMinorsOnly = board.pieces forall { p =>
-      (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight)
+      (p is King) || (p is Bishop) || (p is Knight)
     }
 
     kingsAndMinorsOnly && (board.pieces.size <= 3 || (kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))

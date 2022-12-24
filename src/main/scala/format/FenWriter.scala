@@ -81,10 +81,10 @@ trait FenWriter:
 
   private[chess] def writeCastles(board: Board): String =
 
-    lazy val wr = board.pieces.collect {
+    lazy val wr = board.pieceMap.collect {
       case (pos, piece) if pos.rank == White.backRank && piece == White.rook => pos
     }
-    lazy val br = board.pieces.collect {
+    lazy val br = board.pieceMap.collect {
       case (pos, piece) if pos.rank == Black.backRank && piece == Black.rook => pos
     }
 

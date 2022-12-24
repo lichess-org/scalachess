@@ -1,18 +1,26 @@
 package chess
 
 import variant.{ Crazyhouse, Variant }
+import bitboard.Board as BBoard
 
+// PieceMap => Board
 case class Board(
-    pieces: PieceMap,
+    board: BBoard,
     history: History,
     variant: Variant,
     crazyData: Option[Crazyhouse.Data] = None
 ):
 
-  inline def apply(inline at: Pos): Option[Piece]        = pieces get at
-  inline def apply(inline file: File, inline rank: Rank) = pieces get Pos(file, rank)
+  inline def apply(inline at: Pos): Option[Piece]        = board.pieceAt(at)
+  inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Pos(file, rank))
 
-  lazy val actors: Map[Pos, Actor] = pieces map { case (pos, piece) =>
+  // todo remove
+  lazy val pieceMap = board.pieceMap
+  // todo maybe remove?
+  lazy val pieces = board.pieces
+
+  // TODO fix
+  lazy val actors: Map[Pos, Actor] = pieceMap map { case (pos, piece) =>
     (pos, Actor(piece, pos, this))
   }
 
@@ -20,8 +28,10 @@ case class Board(
     val (w, b) = actors.values.toSeq.partition { _.color.white }
     Color.Map(w, b)
 
+
+  // TODO fix
   def rolesOf(c: Color): List[Role] =
-    pieces.values
+    board.pieceMap.values
       .collect {
         case piece if piece.color == c => piece.role
       }
@@ -29,9 +39,10 @@ case class Board(
 
   inline def actorAt(inline at: Pos): Option[Actor] = actors get at
 
-  def piecesOf(c: Color): Map[Pos, Piece] = pieces filter (_._2 is c)
+  def piecesOf(c: Color): Map[Pos, Piece] = board.piecesOf(c)
 
-  lazy val kingPos: Map[Color, Pos] = pieces.collect { case (pos, Piece(color, King)) =>
+  // todo fix
+  lazy val kingPos: Map[Color, Pos] = board.pieceMap.collect { case (pos, Piece(color, King)) =>
     color -> pos
   }
 
@@ -44,43 +55,35 @@ case class Board(
   lazy val checkWhite: Boolean = checkOf(White)
   lazy val checkBlack: Boolean = checkOf(Black)
 
+  // todo fix
   private def checkOf(c: Color): Boolean =
     kingPosOf(c) exists { kingPos =>
       variant.kingThreatened(this, !c, kingPos)
     }
 
+  // todo fix
   def destsFrom(from: Pos): Option[List[Pos]] = actorAt(from).map(_.destinations)
 
   def seq(actions: Board => Option[Board]*): Option[Board] =
     actions.foldLeft(Option(this): Option[Board])(_ flatMap _)
 
+  def withBoard(b: BBoard): Board = copy(board = b)
+
   def place(piece: Piece, at: Pos): Option[Board] =
-    if (pieces contains at) None
-    else Option(copy(pieces = pieces + ((at, piece))))
+    board.put(piece, at).map(withBoard)
 
   def take(at: Pos): Option[Board] =
-    if (pieces contains at) Option(copy(pieces = pieces - at))
-    else None
+    board.take(at).map(withBoard)
 
   def move(orig: Pos, dest: Pos): Option[Board] =
-    if (pieces contains dest) None
-    else
-      pieces get orig map { piece =>
-        copy(pieces = pieces - orig + ((dest, piece)))
-      }
+    board.move(orig, dest).map(withBoard)
 
   def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] =
-    for {
-      piece <- pieces get orig
-      takenPos = taking getOrElse dest
-      if pieces contains takenPos
-    } yield copy(pieces = pieces - takenPos - orig + (dest -> piece))
+    board.taking(orig, dest, taking).map(withBoard)
 
-  lazy val occupation: Color.Map[Set[Pos]] = Color.Map { color =>
-    pieces.collect { case (pos, piece) if piece is color => pos }.to(Set)
-  }
+  lazy val occupation: Color.Map[Set[Pos]] = board.occupation
 
-  inline def hasPiece(inline p: Piece) = pieces.values.exists(p ==)
+  inline def hasPiece(inline p: Piece) = board.hasPiece(p)
 
   def promote(pos: Pos): Option[Board] =
     for {
@@ -96,7 +99,7 @@ case class Board(
 
   def withCastles(c: Castles) = withHistory(history withCastles c)
 
-  def withPieces(newPieces: PieceMap) = copy(pieces = newPieces)
+  def withPieces(newPieces: PieceMap) = copy(board = BBoard.fromMap(newPieces))
 
   def withVariant(v: Variant): Board =
     if (v == Crazyhouse)
@@ -142,8 +145,8 @@ case class Board(
 
   inline def updateHistory(inline f: History => History) = copy(history = f(history))
 
-  def count(p: Piece): Int = pieces.values.count(_ == p)
-  def count(c: Color): Int = pieces.values.count(_.color == c)
+  def count(p: Piece): Int = board.piece(p).count
+  def count(c: Color): Int = board.color(c).count
 
   def autoDraw: Boolean =
     variant.fiftyMoves(history) || variant.isInsufficientMaterial(this) || history.fivefoldRepetition
@@ -162,7 +165,7 @@ object Board:
     Board(pieces.toMap, if (variant.allowsCastling) Castles.all else Castles.none, variant)
 
   def apply(pieces: Iterable[(Pos, Piece)], castles: Castles, variant: Variant): Board =
-    Board(pieces.toMap, History(castles = castles), variant, variantCrazyData(variant))
+    Board(BBoard.fromMap(pieces.toMap), History(castles = castles), variant, variantCrazyData(variant))
 
   def init(variant: Variant): Board = Board(variant.pieces, variant.castles, variant)
 

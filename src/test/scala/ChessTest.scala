@@ -8,6 +8,7 @@ import org.specs2.mutable.Specification
 
 import chess.format.{ EpdFen, Fen, Visual }
 import chess.variant.Variant
+import bitboard.Board as BBoard
 
 trait ChessTest extends Specification with ValidatedMatchers:
 
@@ -81,7 +82,7 @@ trait ChessTest extends Specification with ValidatedMatchers:
     }
 
   def makeBoard(pieces: (Pos, Piece)*): Board =
-    Board(pieces.toMap, History(), chess.variant.Standard)
+    Board(BBoard.fromMap(pieces.toMap), History(), chess.variant.Standard)
 
   def makeBoard(str: String, variant: Variant) =
     Visual << str withVariant variant

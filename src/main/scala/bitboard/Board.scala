@@ -199,7 +199,11 @@ case class Board(
   def pieceMap: Map[Pos, Piece] =
     occupied.occupiedSquares.map(s => (s, pieceAt(s).get)).toMap
 
+  def pieces: List[Piece] =
+    occupied.occupiedSquares.map(pieceAt(_).get)
+
   def color(c: Color): Bitboard = c.fold(white, black)
+
   def role(r: Role): Bitboard =
     r match
       case Pawn   => pawns

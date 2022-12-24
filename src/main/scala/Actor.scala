@@ -27,7 +27,7 @@ case class Actor(
           def capture(horizontal: Direction): Option[Move] = {
             for {
               p <- horizontal(next)
-              if board.pieces.get(p).exists { _.color != color }
+              if board.pieceMap.get(p).exists { _.color != color }
               b <- board.taking(pos, p)
             } yield move(p, b, Option(p))
           } flatMap maybePromote
@@ -146,7 +146,7 @@ case class Actor(
 
   private def shortRange(dirs: Directions): List[Move] =
     dirs flatMap { _(pos) } flatMap { to =>
-      board.pieces.get(to) match
+      board.pieceMap.get(to) match
         case None => board.move(pos, to) map { move(to, _) }
         case Some(piece) =>
           if (piece is color) Nil
@@ -161,7 +161,7 @@ case class Actor(
       dir(p) match
         case None => ()
         case s @ Some(to) =>
-          board.pieces.get(to) match
+          board.pieceMap.get(to) match
             case None =>
               board.move(pos, to).foreach { buf += move(to, _) }
               addAll(to, dir)

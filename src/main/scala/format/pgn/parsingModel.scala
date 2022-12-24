@@ -56,7 +56,7 @@ case class Std(
   def withMetas(m: Metas) = copy(metas = m)
 
   def move(situation: Situation): Validated[String, chess.Move] =
-    situation.board.pieces.foldLeft(none[chess.Move]) {
+    situation.board.pieceMap.foldLeft(none[chess.Move]) {
       case (None, (pos, piece))
           if piece.color == situation.color && piece.role == role && compare(
             file,

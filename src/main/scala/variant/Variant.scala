@@ -54,7 +54,8 @@ abstract class Variant private[variant] (
 
   // Optimised for performance
   def pieceThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean =
-    board.pieces exists {
+    // todo remove pieceMap
+    board.pieceMap exists {
       case (pos, piece) if piece.color == color && filter(piece) && piece.eyes(pos, to) =>
         (!piece.role.projection) || piece.role.dir(pos, to).exists {
           longRangeThreatens(board, pos, _, to)
@@ -77,7 +78,7 @@ abstract class Variant private[variant] (
 
   def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
     dir(p) exists { next =>
-      next == to || (!board.pieces.contains(next) && longRangeThreatens(board, next, dir, to))
+      next == to || (!board.pieceMap.contains(next) && longRangeThreatens(board, next, dir, to))
     }
 
   def move(
@@ -121,7 +122,7 @@ abstract class Variant private[variant] (
   /** Returns the material imbalance in pawns (overridden in Antichess)
     */
   def materialImbalance(board: Board): Int =
-    board.pieces.values.foldLeft(0) { case (acc, Piece(color, role)) =>
+    board.pieces.foldLeft(0) { case (acc, Piece(color, role)) =>
       Role.valueOf(role).fold(acc) { value =>
         acc + value * color.fold(1, -1)
       }
@@ -157,13 +158,13 @@ abstract class Variant private[variant] (
   @nowarn def finalizeBoard(board: Board, uci: format.Uci, captured: Option[Piece]): Board = board
 
   protected def pawnsOnPromotionRank(board: Board, color: Color) =
-    board.pieces.exists {
+    board.pieceMap.exists {
       case (pos, Piece(c, Pawn)) if c == color && pos.rank == color.promotablePawnRank => true
       case _                                                                           => false
     }
 
   protected def pawnsOnBackRank(board: Board, color: Color) =
-    board.pieces.exists {
+    board.pieceMap.exists {
       case (pos, Piece(c, Pawn)) if c == color && pos.rank == color.backRank => true
       case _                                                                 => false
     }

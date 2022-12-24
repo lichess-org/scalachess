@@ -52,17 +52,17 @@ class BoardTest extends FunSuite:
   }
 
   test("put a piece into a not empty pos should return none") {
-    val board  = Board.standard
+    val board    = Board.standard
     val posToPut = List.range(0, 16) ++ List.range(48, 64)
-    val piece = Piece(White, King)
-    val result = posToPut.map(Pos.at(_).get).map(board.put(piece, _))
+    val piece    = Piece(White, King)
+    val result   = posToPut.map(Pos.at(_).get).map(board.put(piece, _))
     result.foreach(assertEquals(_, None))
   }
 
   test("put a piece into an empty pos should return new board") {
-    val board  = Board.standard
-    val posToPut = List.range(17, 47).map(Pos.at(_).get)
-    val piece = Piece(White, King)
+    val board                       = Board.standard
+    val posToPut                    = List.range(17, 47).map(Pos.at(_).get)
+    val piece                       = Piece(White, King)
     val result: List[Option[Board]] = posToPut.map(board.put(piece, _))
     result.foreach(x => assertEquals(x.isDefined, true))
   }
@@ -101,7 +101,7 @@ class BoardTest extends FunSuite:
 
   test("pieceMap . fromMap === identity") {
     FenFixtures.fens.foreach { str =>
-      val board    = Fen.parse(str).getOrElse(throw RuntimeException("boooo")).board
+      val board  = Fen.parse(str).getOrElse(throw RuntimeException("boooo")).board
       val result = Board.fromMap(board.pieceMap)
       assertEquals(result, board)
     }

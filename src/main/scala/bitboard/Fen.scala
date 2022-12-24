@@ -4,16 +4,19 @@ package bitboard
 import Bitboard.*
 import scala.collection.mutable.ListBuffer
 import cats.syntax.all.*
+import chess.variant.Variant
+import chess.variant.Crazyhouse
 
+// similar to chess.Situation
 case class Fen(board: Board, state: State):
-  def us: Bitboard   = board.byColor(state.turn)
-  def them: Bitboard = board.byColor(!state.turn)
-  def ourKing        = board.king(state.turn)
-  def checkers       = ourKing.map(board.attacksTo(_, !state.turn))
-  def sliderBlockers = board.sliderBlockers(state.turn)
-  def isWhiteTurn    = state.turn.white
-  def occupied       = board.occupied
-  def isOccupied     = board.isOccupied
+  def us: Bitboard               = board.byColor(state.turn)
+  def them: Bitboard             = board.byColor(!state.turn)
+  def ourKing: Option[Pos]       = board.king(state.turn)
+  def checkers: Option[Bitboard] = ourKing.map(board.attacksTo(_, !state.turn))
+  def sliderBlockers: Bitboard   = board.sliderBlockers(state.turn)
+  def isWhiteTurn: Boolean       = state.turn.white
+  def occupied: Bitboard         = board.occupied
+  def isOccupied: Pos => Boolean = board.isOccupied
 
   // Used for filtering candidate moves that would leave put the king in check.
   def isSafe(king: Pos, move: Move, blockers: Bitboard): Boolean =
@@ -66,6 +69,79 @@ case class Fen(board: Board, state: State):
         val castlingRights = halfCastlingRights & Bitboard.RANKS(state.turn.lastRank.value)
         haftState.copy(castlingRights = castlingRights)
       case _ => haftState
+
+  /**
+   * chess.Board api
+   * */
+  inline def apply(inline at: Pos): Option[Piece]        = board.pieceAt(at)
+  inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Pos(file, rank))
+  lazy val actors: Map[Pos, Actor]                       = ??? // NO
+  lazy val actorsOf: Color.Map[Seq[Actor]]               = ??? // NO
+  inline def actorAt(inline at: Pos): Option[Actor]      = ??? // NO
+  def piecesOf(c: Color): Map[Pos, Piece]                = board.piecesOf(c)
+  def kingPosOf(c: Color): Option[Pos]                   = board.king(c)
+  def check(c: Color): Boolean                           = c.fold(checkWhite, checkBlack)
+  def checkColor: Option[Color]               = checkWhite.option(White) orElse checkBlack.option(Black)
+  lazy val checkWhite: Boolean                = checkOf(White)
+  lazy val checkBlack: Boolean                = checkOf(Black)
+  private def checkOf(c: Color): Boolean      = ??? // TODO actor
+  def destsFrom(from: Pos): Option[List[Pos]] = ??? // TODO actor
+  def seq(actions: Fen => Option[Fen]*): Option[Fen] =
+    actions.foldLeft(Option(this): Option[Fen])(_ flatMap _)
+  // place a pice at a pos
+  // return None if the pos is already occupied
+  def place(piece: Piece, at: Pos): Option[Fen] = board.put(piece, at).map(newBoard => copy(board = newBoard))
+  // take piece fromt he board at pos
+  // return None if the pos is empty
+  def take(at: Pos): Option[Fen] = board.take(at).map(newBoard => copy(board = newBoard))
+  // move a pice from orig to des
+  // return None if des is occupied or orgin is empty
+  def move(orig: Pos, dest: Pos): Option[Fen] = board.move(orig, dest).map(newBoard => copy(board = newBoard))
+  def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Fen] = ??? // TODO not important
+  lazy val occupation: Color.Map[Set[Pos]]                                  = board.occupation
+  inline def hasPiece(inline p: Piece)                                      = board.hasPiece(p)
+  def promote(pos: Pos): Option[Fen] =
+    for {
+      pawn <- apply(pos)
+      if pawn is Pawn
+      b2 <- take(pos)
+      b3 <- b2.place(pawn.color.queen, pos)
+    } yield b3
+
+  def castles: chess.Castles = state.castles
+
+  def withHistory(h: History): Fen = ??? // NO => withState
+  def withState(s: State): Fen     = copy(state = s)
+  def withCastles(c: chess.Castles) =
+    val whiteKing  = if (c.whiteKingSide) Pos.H1.bitboard else Bitboard.empty
+    val whiteQueen = if (c.whiteQueenSide) Pos.H1.bitboard else Bitboard.empty
+    val blackKing  = if (c.blackKingSide) Pos.H1.bitboard else Bitboard.empty
+    val blackQueen = if (c.blackQueenSide) Pos.H1.bitboard else Bitboard.empty
+    val newCastles = whiteKing & whiteQueen & blackKing & blackQueen
+    withState(state.copy(castlingRights = newCastles))
+
+  def withPieces(newPieces: PieceMap)                           = ???
+  def withVariant(v: Variant): Fen                              = ???
+  def withCrazyData(data: Crazyhouse.Data): Fen                 = ???
+  def withCrazyData(data: Option[Crazyhouse.Data]): Fen         = ???
+  def withCrazyData(f: Crazyhouse.Data => Crazyhouse.Data): Fen = ???
+  def ensureCrazyData: Fen                                      = ???
+
+  // do we need this? not sure
+  def unmovedRooks: UnmovedRooks = ???
+
+  // do we need this? not sure
+  def fixCastles: Fen = ???
+
+  inline def updateHistory(inline f: History => History) = ??? // No
+  def count(p: Piece): Int                               = board.piece(p).count
+  def count(c: Color): Int                               = board.color(c).count
+  def autoDraw: Boolean                                  = ??? // not now
+  inline def situationOf(inline color: Color): Situation = ??? // No. Fen is Situation
+  inline def valid(inline strict: Boolean): Boolean      = ??? // variant
+  def materialImbalance: Int                             = ??? // variant
+
+  // override def toString = s"$variant ${history.lastMove}\n"
 
 enum ParseFenError:
   case InvalidFenFormat

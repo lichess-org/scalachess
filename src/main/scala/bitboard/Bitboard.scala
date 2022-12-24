@@ -170,15 +170,23 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
     def lsb: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(a))
 
     def occupiedSquares: List[Pos] =
-      var bb = a
-      val sx = ListBuffer[Pos]()
+      fold(List[Pos]())((xs, pos) => xs :+ pos)
+
+    // total not empty position
+    def count: Int =
+      fold(0)((count, _) => count + 1)
+
+    def fold[A](init: A)(f: (A, Pos) => A): A =
+      var bb     = a
+      var result = init
       while bb != 0
       do
-        sx.addOne(bb.lsb.get)
+        result = f(result, bb.lsb.get)
         bb &= (bb - 1L)
-      sx.toList
+      result
 
-    def isEmpty: Boolean = a == empty
+    def isEmpty: Boolean    = a == empty
+    def isNotEmpty: Boolean = !isEmpty
 
   // TODO move to color
   extension (c: Color)

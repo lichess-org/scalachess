@@ -5,6 +5,8 @@ import cats.syntax.all.*
 
 import Bitboard.*
 
+// chess.PieceMap
+// Pieces position on the board
 case class Board(
     pawns: Bitboard,
     knights: Bitboard,
@@ -91,13 +93,13 @@ case class Board(
   // TODO move: Board => Board
   // We can implement as PieceMap => PieceMap
   def play(color: Color): Move => Board =
-    case Move.Normal(from, to, role, _)    => discard(from).put(to, role, color)
-    case Move.Promotion(from, to, role, _) => discard(from).put(to, role, color)
-    case Move.EnPassant(from, to)          => discard(from).discard(to.combine(from)).put(to, Pawn, color)
+    case Move.Normal(from, to, role, _)    => discard(from).putOrReplace(to, role, color)
+    case Move.Promotion(from, to, role, _) => discard(from).putOrReplace(to, role, color)
+    case Move.EnPassant(from, to) => discard(from).discard(to.combine(from)).putOrReplace(to, Pawn, color)
     case Move.Castle(from, to) =>
       val rookTo = (if to < from then Pos.D1 else Pos.F1).combine(to)
       val kingTo = (if to < from then Pos.C1 else Pos.G1).combine(to)
-      discard(from).discard(to).put(rookTo, Rook, color).put(kingTo, King, color)
+      discard(from).discard(to).putOrReplace(rookTo, Rook, color).putOrReplace(kingTo, King, color)
 
   // todo more efficient
   def discard(s: Pos): Board =
@@ -138,7 +140,18 @@ case class Board(
     case Color.Black if color == Color.Black => black ^ mask
     case _                                   => byColor(color)
 
-  def put(s: Pos, role: Role, color: Color): Board =
+  def hasPiece(at: Pos): Boolean =
+    colorAt(at).isDefined
+
+  def take(at: Pos): Option[Board] =
+    if hasPiece(at) then discard(at).some
+    else None
+
+  def put(piece: Piece, at: Pos): Option[Board] =
+    if hasPiece(at) then None
+    else putOrReplace(at, piece).some // todo no need to discard
+
+  def putOrReplace(s: Pos, role: Role, color: Color): Board =
     val b = discard(s)
     val m = s.bitboard
     b.copy(
@@ -153,14 +166,53 @@ case class Board(
       occupied = b.occupied ^ m
     )
 
-  def put(s: Pos, p: Piece): Board =
-    put(s, p.role, p.color)
+  // put a piece into the board
+  // remove the existing piece at that pos if needed
+  def putOrReplace(s: Pos, p: Piece): Board =
+    putOrReplace(s, p.role, p.color)
+
+  // move without capture
+  // TODO test
+  def move(orig: Pos, dest: Pos): Option[Board] =
+    if hasPiece(dest) then None
+    else pieceAt(orig).flatMap(p => discard(orig).put(p, dest))
+
+  // TODO test
+  def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] =
+    for {
+      piece <- pieceAt(orig)
+      takenPos = taking getOrElse dest
+      if hasPiece(takenPos)
+      newBoard <- discard(orig).discard(takenPos).put(piece, dest)
+    } yield newBoard
+
+  lazy val occupation: Color.Map[Set[Pos]] = Color.Map { c =>
+    color(c).occupiedSquares.toSet
+  }
+
+  inline def hasPiece(inline p: Piece) =
+    piece(p).isNotEmpty
 
   // TODO remove unsafe get
   // we believe in the integrity of bitboard
   // tests pieceMap . fromMap = identity
   def pieceMap: Map[Pos, Piece] =
     occupied.occupiedSquares.map(s => (s, pieceAt(s).get)).toMap
+
+  def color(c: Color): Bitboard = c.fold(white, black)
+  def role(r: Role): Bitboard =
+    r match
+      case Pawn   => pawns
+      case Knight => knights
+      case Bishop => bishops
+      case Rook   => rooks
+      case Queen  => queens
+      case King   => kings
+
+  def piece(p: Piece): Bitboard = color(p.color) & role(p.role)
+
+  def piecesOf(c: Color): Map[Pos, Piece] =
+    color(c).occupiedSquares.map(s => (s, pieceAt(s).get)).toMap
 
 object Board:
   val empty = Board(
@@ -186,7 +238,7 @@ object Board:
     occupied = Bitboard(0xffff00000000ffffL)
   )
 
-  def fromMap(pieces: Map[Pos, Piece]): Board =
+  def fromMap(pieces: PieceMap): Board =
     var pawns    = Bitboard.empty
     var knights  = Bitboard.empty
     var bishops  = Bitboard.empty

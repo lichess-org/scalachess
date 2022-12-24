@@ -49,27 +49,42 @@ class BoardTest extends FunSuite:
     }
   }
 
-  test("put with standard board") {
-    val ss     = List.range(0, 64).map(Pos.at(_).get)
+  test("put a piece into a not empty pos should return none") {
+    val board    = Board.standard
+    val posToPut = List.range(0, 16) ++ List.range(48, 64)
+    val piece    = Piece(White, King)
+    val result   = posToPut.map(Pos.at(_).get).map(board.put(piece, _))
+    result.foreach(assertEquals(_, None))
+  }
+
+  test("put a piece into an empty pos should return new board") {
+    val board                       = Board.standard
+    val posToPut                    = List.range(17, 47).map(Pos.at(_).get)
+    val piece                       = Piece(White, King)
+    val result: List[Option[Board]] = posToPut.map(board.put(piece, _))
+    result.foreach(x => assertEquals(x.isDefined, true))
+  }
+
+  test("putOrReplace with standard board") {
     val board  = Board.standard
-    val pieces = ss.mapFilter(s => board.pieceAt(s).map((s, _)))
-    val result = pieces.foldRight(Board.empty)((s, b) => b.put(s._1, s._2))
+    val pieces = board.pieceMap
+    val result = pieces.foldRight(Board.empty)((s, b) => b.putOrReplace(s._1, s._2))
     assertEquals(result, board)
   }
 
-  test("put with test fixtures") {
+  test("putOrReplace with test fixtures") {
     FenFixtures.fens.foreach { str =>
       val fen                        = Fen.parse(str).getOrElse(throw RuntimeException("boooo"))
       val ss                         = List.range(0, 64).map(Pos.at(_).get)
       val pieces: List[(Pos, Piece)] = ss.mapFilter(s => fen.board.pieceAt(s).map((s, _)))
-      val result                     = pieces.foldRight(Board.empty)((s, b) => b.put(s._1, s._2))
+      val result                     = pieces.foldRight(Board.empty)((s, b) => b.putOrReplace(s._1, s._2))
       assertEquals(result, fen.board)
     }
   }
 
-  test("put case 1") {
+  test("putOrReplace case 1") {
     val fen         = Fen.parse("8/8/8/8/p7/1P6/8/8 w - - 0 1").getOrElse(throw RuntimeException("booo"))
-    val result      = fen.board.put(Pos.A4, Piece(White, Pawn))
+    val result      = fen.board.putOrReplace(Pos.A4, Piece(White, Pawn))
     val expectedMap = fen.board.pieceMap + (Pos.A4 -> Piece(White, Pawn))
     assertEquals(result.pieceMap, expectedMap)
   }

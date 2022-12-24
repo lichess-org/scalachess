@@ -8,6 +8,7 @@ import scala.collection.mutable.ListBuffer
 /** The idea is each variant can have its own movs generator.
   * Now I just want to finish standard variant first
   */
+// chess.Actor
 object StandardMovesGenerator:
   extension (f: Fen)
     // todo this function should return Either[InvalidPosition, List[Move]]

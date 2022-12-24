@@ -41,8 +41,8 @@ case class Board(
 
   def checkColor: Option[Color] = checkWhite.option(White) orElse checkBlack.option(Black)
 
-  lazy val checkWhite = checkOf(White)
-  lazy val checkBlack = checkOf(Black)
+  lazy val checkWhite: Boolean = checkOf(White)
+  lazy val checkBlack: Boolean = checkOf(Black)
 
   private def checkOf(c: Color): Boolean =
     kingPosOf(c) exists { kingPos =>
@@ -109,7 +109,7 @@ case class Board(
   def withCrazyData(f: Crazyhouse.Data => Crazyhouse.Data): Board =
     withCrazyData(f(crazyData | Crazyhouse.Data.init))
 
-  def ensureCrazyData = withCrazyData(crazyData | Crazyhouse.Data.init)
+  def ensureCrazyData: Board = withCrazyData(crazyData | Crazyhouse.Data.init)
 
   def unmovedRooks =
     UnmovedRooks {
@@ -150,7 +150,7 @@ case class Board(
 
   inline def situationOf(inline color: Color) = Situation(this, color)
 
-  inline def valid(inline strict: Boolean) = variant.valid(this, strict)
+  inline def valid(inline strict: Boolean): Boolean = variant.valid(this, strict)
 
   def materialImbalance: Int = variant.materialImbalance(this)
 

@@ -4,6 +4,10 @@ import format.Uci
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
 
+trait IActor:
+  lazy val moves: List[Move]
+  def trustedMoves(withCastle: Boolean): List[Move]
+
 case class Actor(
     piece: Piece,
     pos: Pos,

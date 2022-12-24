@@ -23,11 +23,11 @@ case class Actor(
     val moves = piece.role match
       case Pawn =>
         pawnDir(pos) map { next =>
-          val fwd = Option(next) filterNot board.pieceMap.contains
+          val fwd = Option(next) filterNot board.contains
           def capture(horizontal: Direction): Option[Move] = {
             for {
               p <- horizontal(next)
-              if board.pieceMap.get(p).exists { _.color != color }
+              if board(p).exists { _.color != color }
               b <- board.taking(pos, p)
             } yield move(p, b, Option(p))
           } flatMap maybePromote
@@ -58,7 +58,7 @@ case class Actor(
             for {
               p  <- fwd.filter(_ => board.variant.isUnmovedPawn(color, pos))
               p2 <- pawnDir(p)
-              if !(board.pieceMap contains p2)
+              if !(board.contains(p2))
               b <- board.move(pos, p2)
             } yield move(p2, b),
             capture(_.left),
@@ -120,7 +120,7 @@ case class Actor(
       kingPath         = kingPos <-> newKingPos
       rookPath         = rookPos <-> newRookPos
       mustBeUnoccupied = (kingPath ++ rookPath).filter(_ != kingPos).filter(_ != rookPos)
-      if !mustBeUnoccupied.exists(board.pieceMap.contains)
+      if !mustBeUnoccupied.exists(board.contains)
       // Check the king is not currently attacked, and none of the squares it
       // passes *through* are attacked. We do this after removing the old king,
       // to ensure the old king does not shield attacks. This is important in
@@ -146,7 +146,7 @@ case class Actor(
 
   private def shortRange(dirs: Directions): List[Move] =
     dirs flatMap { _(pos) } flatMap { to =>
-      board.pieceMap.get(to) match
+      board(to) match
         case None => board.move(pos, to) map { move(to, _) }
         case Some(piece) =>
           if (piece is color) Nil
@@ -161,7 +161,7 @@ case class Actor(
       dir(p) match
         case None => ()
         case s @ Some(to) =>
-          board.pieceMap.get(to) match
+          board(to) match
             case None =>
               board.move(pos, to).foreach { buf += move(to, _) }
               addAll(to, dir)

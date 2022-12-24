@@ -18,6 +18,8 @@ case class Board(
   // todo maybe remove?
   lazy val pieces = board.pieces
 
+  def contains = board.contains
+
   // TODO fix
   lazy val actors: Map[Pos, Actor] = pieceMap map { case (pos, piece) =>
     (pos, Actor(piece, pos, this))

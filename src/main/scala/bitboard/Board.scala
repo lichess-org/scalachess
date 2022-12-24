@@ -5,7 +5,6 @@ import cats.syntax.all.*
 
 import Bitboard.*
 
-// chess.PieceMap
 // Pieces position on the board
 case class Board(
     pawns: Bitboard,
@@ -23,6 +22,8 @@ case class Board(
   def sliders = bishops ^ rooks ^ queens
 
   lazy val byColor = Color.Map(white, black)
+
+  def contains(p: Pos) = occupied.contains(p.value)
 
   def roleAt(s: Pos): Option[Role] =
     if pawns.contains(s.value) then Some(Pawn)

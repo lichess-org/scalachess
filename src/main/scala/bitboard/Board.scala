@@ -145,12 +145,10 @@ case class Board(
     colorAt(at).isDefined
 
   def take(at: Pos): Option[Board] =
-    if hasPiece(at) then discard(at).some
-    else None
+    hasPiece(at) option discard(at)
 
   def put(piece: Piece, at: Pos): Option[Board] =
-    if hasPiece(at) then None
-    else putOrReplace(at, piece).some // todo no need to discard
+    !hasPiece(at) option putOrReplace(at, piece) // todo no need to discard
 
   def putOrReplace(s: Pos, role: Role, color: Color): Board =
     val b = discard(s)
@@ -180,12 +178,12 @@ case class Board(
 
   // TODO test
   def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] =
-    for {
+    for
       piece <- pieceAt(orig)
       takenPos = taking getOrElse dest
       if hasPiece(takenPos)
       newBoard <- discard(orig).discard(takenPos).put(piece, dest)
-    } yield newBoard
+    yield newBoard
 
   // TODO test
   lazy val occupation: Color.Map[Set[Pos]] = Color.Map { c =>

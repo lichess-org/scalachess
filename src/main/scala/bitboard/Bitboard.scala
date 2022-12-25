@@ -6,9 +6,9 @@ import scala.collection.mutable.ListBuffer
 opaque type Bitboard = Long
 object Bitboard extends TotalWrapper[Bitboard, Long]:
 
-  val ALL     = Bitboard(-1L)
-  val empty   = Bitboard(0L)
-  val corners = Bitboard(0x8100000000000081L)
+  val ALL: Bitboard     = Bitboard(-1L)
+  val empty: Bitboard   = Bitboard(0L)
+  val corners: Bitboard = Bitboard(0x8100000000000081L)
 
   val RANKS = Array.fill(8)(0L)
   val FILES = Array.fill(8)(0L)
@@ -185,8 +185,8 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
         bb &= (bb - 1L)
       result
 
-    def isEmpty: Boolean    = a == empty
-    def isNotEmpty: Boolean = !isEmpty
+    inline def isEmpty: Boolean    = a == empty
+    inline def isNotEmpty: Boolean = !isEmpty
 
   // TODO move to color
   extension (c: Color)

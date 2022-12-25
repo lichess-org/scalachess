@@ -30,7 +30,7 @@ case class Board(
     Color.Map(w, b)
 
   def rolesOf(c: Color): List[Role] =
-    allPieces.filter(_.color == c).map(_.role)
+    allPieces.collect { case p if p.color == c => p.role }
 
   // todo fix
   inline def actorAt(inline at: Pos): Option[Actor] = actors get at

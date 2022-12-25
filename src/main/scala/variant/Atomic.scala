@@ -146,4 +146,4 @@ case object Atomic
     situation.board.rolesOf(!situation.color) == List(King)
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
-  override def specialEnd(situation: Situation) = situation.board.kingPos.size != 2
+  override def specialEnd(situation: Situation) = situation.board.board.kings.count < 2

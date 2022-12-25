@@ -75,8 +75,8 @@ case object RacingKings
   // but also check the opponent's
   override def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean =
     super.kingSafety(m, filter, kingPos) &&
-      !m.after.kingPos.get(!m.color).exists { theirKingPos =>
-        kingThreatened(m.after, m.color, theirKingPos, (_ => true))
+      !m.after.board.king(!m.color).exists { theirKingPos =>
+        kingThreatened(m.after, m.color, theirKingPos, _ => true)
       }
 
   // When considering stalemate, take into account that checks are not allowed.

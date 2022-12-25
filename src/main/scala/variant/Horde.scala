@@ -44,8 +44,8 @@ case object Horde
     * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
     */
   private def hordeClosedPosition(board: Board) =
-    lazy val notKingBoard = board.kingPos.get(Color.black).flatMap(board.take).getOrElse(board)
-    val hordePos          = board.occupation(Color.white) // may include promoted pieces
+    def notKingBoard = board.board.king(Color.black).flatMap(board.take) | board
+    val hordePos     = board.occupation(Color.white) // may include promoted pieces
     val mateInOne =
       hordePos.sizeIs == 1 && hordePos.forall(pos => pieceThreatened(board, Color.black, pos, (_ => true)))
     !mateInOne && notKingBoard.actors.values.forall(actor => actor.moves.isEmpty)

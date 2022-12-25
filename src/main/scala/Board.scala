@@ -37,8 +37,6 @@ case class Board(
 
   def piecesOf(c: Color): Map[Pos, Piece] = board.piecesOf(c)
 
-  lazy val kingPos: Map[Color, Pos] = board.kingPos
-
   def kingPosOf(c: Color): Option[Pos] = board.king(c)
 
   def check(c: Color): Boolean = c.fold(checkWhite, checkBlack)

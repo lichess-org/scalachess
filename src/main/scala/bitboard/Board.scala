@@ -53,10 +53,6 @@ case class Board(
   def king(color: Color): Option[Pos] =
     (kings & byColor(color)).lsb
 
-  // TODO this is so ugly
-  def kingPos: Map[Color, Pos] =
-    Map(White -> king(White), Black -> king(Black)).mapFilter(identity)
-
   def attacksTo(s: Pos, attacker: Color): Bitboard =
     attacksTo(s, attacker, occupied)
 

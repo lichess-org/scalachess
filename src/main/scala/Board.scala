@@ -2,6 +2,7 @@ package chess
 
 import variant.{ Crazyhouse, Variant }
 import bitboard.Board as BBoard
+import bitboard.Bitboard
 import Castles.*
 
 case class Board(
@@ -10,6 +11,16 @@ case class Board(
     variant: Variant,
     crazyData: Option[Crazyhouse.Data] = None
 ):
+
+  val white: Bitboard            = board.white
+  val black: Bitboard            = board.black
+  val pawns: Bitboard            = board.pawns
+  val knights: Bitboard          = board.knights
+  val bishops: Bitboard          = board.bishops
+  val rooks: Bitboard            = board.rooks
+  val queens: Bitboard           = board.queens
+  val kings: Bitboard            = board.kings
+  def occupied: Bitboard         = board.occupied
 
   inline def apply(inline at: Pos): Option[Piece]        = board.pieceAt(at)
   inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Pos(file, rank))

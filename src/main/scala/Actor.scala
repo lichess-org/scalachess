@@ -175,7 +175,7 @@ case class Actor(
 
   private inline def pawnDir = pawnDirOf(color)
 
-  private def move(
+  def move(
       dest: Pos,
       after: Board,
       capture: Option[Pos] = None,

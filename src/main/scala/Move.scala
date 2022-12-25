@@ -24,6 +24,8 @@ case class Move(
 
   inline def withHistory(inline h: History) = copy(after = after withHistory h)
 
+  val isWhiteTurn: Boolean = piece.color.white
+
   def finalizeAfter: Board =
     val board = after.variant.finalizeBoard(
       after updateHistory { h1 =>
@@ -40,11 +42,19 @@ case class Move(
           else h1.castles
 
         val castleRights: Bitboard =
-          if piece.is(Rook) then (halfCastlingRights & ~orig.bitboard)
+          if piece is Rook then (halfCastlingRights & ~orig.bitboard)
           else if piece.is(King) then (halfCastlingRights & Bitboard.RANKS(piece.color.lastRank.value))
           else halfCastlingRights
 
-        h2.withCastles(Castles(castleRights))
+        val epSquare: Option[Pos] =
+          if piece is Pawn then
+            if Math.abs((orig - dest).value) == 16 then
+              // TODO calculate their pawns attacks
+              Some(Pos(orig.value + (if isWhiteTurn then 8 else -8)))
+            else None
+          else None
+
+        h2.withCastles(Castles(castleRights)).copy(epSquare = epSquare)
       },
       toUci,
       capture flatMap { before(_) }

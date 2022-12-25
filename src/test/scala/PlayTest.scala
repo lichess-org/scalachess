@@ -115,4 +115,32 @@ B p p
 """
       }
     }
+
+    "A game with enpassant" in {
+      makeGame.playMoves(
+        E2 -> E4
+      ) must beValid.like { case game =>
+        game.board.history.epSquare must_== Option(E3)
+      }
+    }
+
+    "A game with more enpassant" in {
+      makeGame.playMoves(
+        E2 -> E4,
+        A7 -> A5
+      ) must beValid.like { case game =>
+        game.board.history.epSquare must_== Option(A6)
+      }
+    }
+
+    "A game with no enpassant" in {
+      makeGame.playMoves(
+        E2 -> E4,
+        A7 -> A5,
+        B2 -> B3
+      ) must beValid.like { case game =>
+        game.board.history.epSquare must_== None
+      }
+    }
+
   }

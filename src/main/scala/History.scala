@@ -27,7 +27,7 @@ case class History(
     castles: Castles = Castles.all, // => castlingRight
     checkCount: CheckCount = CheckCount(0, 0),
     unmovedRooks: UnmovedRooks = UnmovedRooks.default,
-    halfMoveClock: HalfMoveClock = HalfMoveClock(0),
+    halfMoveClock: HalfMoveClock = HalfMoveClock(0)
     // fullMoves: FullMoveNumber = FullMoveNumber(0),
     // possible en-passant square
     // epSquare: Option[Pos] = None

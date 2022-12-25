@@ -1,10 +1,8 @@
 package chess
 
-
 import bitboard.Bitboard
 import bitboard.Bitboard.*
 import Pos.*
-
 
 type Castles = Bitboard
 object Castles:
@@ -34,14 +32,14 @@ object Castles:
 
     def add(color: Color, side: Side): Castles =
       (color, side) match
-        case (White, KingSide)  => c & H1.bitboard
-        case (White, QueenSide) => c & A1.bitboard
-        case (Black, KingSide)  => c & H8.bitboard
-        case (Black, QueenSide) => c & A8.bitboard
+        case (White, KingSide)  => c | H1.bitboard
+        case (White, QueenSide) => c | A1.bitboard
+        case (Black, KingSide)  => c | H8.bitboard
+        case (Black, QueenSide) => c | A8.bitboard
 
     def update(color: Color, kingSide: Boolean, queenSide: Boolean): Castles = color match
-        case White => c.without(color) | kingSide.whiteKing | queenSide.whiteQueen
-        case Black => c.without(color) | kingSide.blackKing | queenSide.blackQueen
+      case White => c.without(color) | kingSide.whiteKing | queenSide.whiteQueen
+      case Black => c.without(color) | kingSide.blackKing | queenSide.blackQueen
 
     def toFenString: String = {
       (if (whiteKingSide) "K" else "") +
@@ -65,16 +63,17 @@ object Castles:
   def apply(
       castles: (Boolean, Boolean, Boolean, Boolean)
   ): Castles =
-      val whiteKing  = castles._1.whiteKing
-      val whiteQueen = castles._2.whiteQueen
-      val blackKing  = castles._3.blackKing
-      val blackQueen = castles._4.blackQueen
-      whiteKing | whiteQueen | blackKing | blackQueen
+    val whiteKing  = castles._1.whiteKing
+    val whiteQueen = castles._2.whiteQueen
+    val blackKing  = castles._3.blackKing
+    val blackQueen = castles._4.blackQueen
+    whiteKing | whiteQueen | blackKing | blackQueen
 
   def apply(str: String): Castles = str match
     case "-" => Bitboard.empty
     case _ =>
-      str.toList.traverse(charToSquare)
+      str.toList
+        .traverse(charToSquare)
         .map(_.foldRight(Bitboard.empty)((s, b) => s.bitboard | b))
         .getOrElse(Bitboard.empty)
 

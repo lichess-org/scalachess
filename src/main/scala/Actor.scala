@@ -11,7 +11,7 @@ trait IActor:
 case class Actor(
     piece: Piece,
     pos: Pos,
-    board: Board,
+    board: Board
 ):
 
   import Actor.*

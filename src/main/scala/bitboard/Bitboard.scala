@@ -185,8 +185,8 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
         bb &= (bb - 1L)
       result
 
-    inline def isEmpty: Boolean    = a == empty
-    inline def isNotEmpty: Boolean = !isEmpty
+    inline def isEmpty: Boolean  = a == empty
+    inline def nonEmpty: Boolean = !isEmpty
 
   // TODO move to color
   extension (c: Color)

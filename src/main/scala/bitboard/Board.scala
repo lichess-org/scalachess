@@ -40,7 +40,10 @@ case class Board(
     else None
 
   def pieceAt(s: Pos): Option[Piece] =
-    (colorAt(s), roleAt(s)).mapN(Piece.apply)
+    for
+      color <- colorAt(s)
+      role  <- roleAt(s)
+    yield Piece(color, role)
 
   // TODO returns Option[Boolean]
   // None in case of no king
@@ -198,10 +201,13 @@ case class Board(
   // we believe in the integrity of bitboard
   // tests pieceMap . fromMap = identity
   lazy val pieceMap: Map[Pos, Piece] =
-    occupied.occupiedSquares.map(s => (s, pieceAt(s).get)).toMap
+    occupied.occupiedSquares.view.map(s => (s, pieceAt(s).get)).toMap
+
+  def piecesOf(c: Color): Map[Pos, Piece] =
+    color(c).occupiedSquares.view.map(s => (s, pieceAt(s).get)).toMap
 
   def pieces: List[Piece] =
-    occupied.occupiedSquares.map(pieceAt(_).get)
+    occupied.occupiedSquares.flatMap(pieceAt)
 
   def color(c: Color): Bitboard = c.fold(white, black)
 
@@ -215,9 +221,6 @@ case class Board(
       case King   => kings
 
   def piece(p: Piece): Bitboard = color(p.color) & role(p.role)
-
-  def piecesOf(c: Color): Map[Pos, Piece] =
-    color(c).occupiedSquares.map(s => (s, pieceAt(s).get)).toMap
 
 object Board:
   val empty = Board(

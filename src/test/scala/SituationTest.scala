@@ -19,7 +19,7 @@ K
         ("""
   b
 
-   
+
      K
 """ as White).check must beTrue
       }

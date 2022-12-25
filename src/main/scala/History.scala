@@ -22,9 +22,9 @@ object UnmovedRooks extends TotalWrapper[UnmovedRooks, Set[Pos]]:
   val default: UnmovedRooks = (Pos.whiteBackrank ::: Pos.blackBackrank).toSet
 
 // color
-// turn: Color,
 case class History(
     lastMove: Option[Uci] = None,
+    // turn: Color,
     positionHashes: PositionHash = Monoid[PositionHash].empty,
     castles: Castles = Castles.all, // => castlingRight
     checkCount: CheckCount = CheckCount(0, 0),

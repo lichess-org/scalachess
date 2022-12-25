@@ -27,7 +27,7 @@ trait FenWriter:
         s"${writeBoard(game.board)}${writeCrazyPocket(game.board)}",
         game.player.letter.toString,
         writeCastles(game.board),
-        game.situation.enPassantSquare.fold("-")(_.key),
+        game.situation.board.history.epSquare.fold("-")(_.key),
         game.halfMoveClock.toString,
         game.fullMoveNumber.toString
       ) ::: {
@@ -38,7 +38,7 @@ trait FenWriter:
   }
 
   def writeOpening(situation: Situation): OpeningFen = OpeningFen {
-    s"${writeBoard(situation.board)} ${situation.color.letter} ${writeCastles(situation.board)} ${situation.enPassantSquare
+    s"${writeBoard(situation.board)} ${situation.color.letter} ${writeCastles(situation.board)} ${situation.enPassantSquareForHash
         .fold("-")(_.key)}"
   }
 
@@ -79,6 +79,7 @@ trait FenWriter:
           pockets.black.roles.map(_.forsyth).mkString
       case _ => ""
 
+  // todo we can do better with bitboard
   private[chess] def writeCastles(board: Board): String =
 
     import Castles.*

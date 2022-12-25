@@ -16,72 +16,12 @@ case class Actor(
 
   import Actor.*
 
-  lazy val moves: List[Move] = kingSafetyMoveFilter(trustedMoves(board.variant.allowsCastling))
+  lazy val situation = Situation(board, piece.color)
 
-  /** The moves without taking defending the king into account */
-  def trustedMoves(withCastle: Boolean): List[Move] =
-    val moves = piece.role match
-      case Pawn =>
-        pawnDir(pos) map { next =>
-          val fwd = Option(next) filterNot board.contains
-          def capture(horizontal: Direction): Option[Move] = {
-            for {
-              p <- horizontal(next)
-              if board(p).exists { _.color != color }
-              b <- board.taking(pos, p)
-            } yield move(p, b, Option(p))
-          } flatMap maybePromote
-          def enpassant(horizontal: Direction): Option[Move] =
-            for {
-              victimPos <- horizontal(pos).filter(_ => pos.rank == color.passablePawnRank)
-              _         <- board(victimPos).filter(v => v == !color - Pawn)
-              targetPos <- horizontal(next)
-              _ <- pawnDir(victimPos) flatMap pawnDir filter { vf =>
-                history.lastMove.exists {
-                  case Uci.Move(orig, dest, _) => orig == vf && dest == victimPos
-                  case _                       => false
-                }
-              }
-              b <- board.taking(pos, targetPos, Option(victimPos))
-            } yield move(targetPos, b, Option(victimPos), enpassant = true)
-          def forward(p: Pos): Option[Move] =
-            board.move(pos, p) map { move(p, _) } flatMap maybePromote
-          def maybePromote(m: Move): Option[Move] =
-            if (m.dest.rank == m.color.promotablePawnRank)
-              (m.after promote m.dest) map { b2 =>
-                m.copy(after = b2, promotion = Option(Queen))
-              }
-            else Option(m)
+  // lazy val moves: List[Move] = kingSafetyMoveFilter(trustedMoves(board.variant.allowsCastling))
 
-          List(
-            fwd flatMap forward,
-            for {
-              p  <- fwd.filter(_ => board.variant.isUnmovedPawn(color, pos))
-              p2 <- pawnDir(p)
-              if !(board.contains(p2))
-              b <- board.move(pos, p2)
-            } yield move(p2, b),
-            capture(_.left),
-            capture(_.right),
-            enpassant(_.left),
-            enpassant(_.right)
-          ).flatten
-        } getOrElse Nil
-
-      case Bishop => longRange(Bishop.dirs)
-
-      case Knight => shortRange(Knight.dirs)
-
-      case Rook => longRange(Rook.dirs)
-
-      case Queen => longRange(Queen.dirs)
-
-      case King if withCastle => shortRange(King.dirs) ::: castle
-      case King               => shortRange(King.dirs)
-
-    // We apply the current game variant's effects if there are any so that we can accurately decide if the king would
-    // be in danger after the move was made.
-    if (board.variant.hasMoveEffects) moves map (_.applyVariantEffect) else moves
+  lazy val moves: List[Move] = situation.generate(board.variant.allowsCastling)
+  def trustedMoves(withCastle: Boolean): List[Move] = situation.trustedMoves(withCastle)
 
   lazy val destinations: List[Pos] = moves.map(_.dest)
 

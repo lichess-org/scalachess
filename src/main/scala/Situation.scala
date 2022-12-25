@@ -121,13 +121,26 @@ object Situation:
   import scala.collection.mutable.ListBuffer
 
   extension (f: Situation)
-    def generate: List[Move] =
+
+    /** The moves without taking defending the king into account */
+    def trustedMoves(withCastle: Boolean): List[Move] =
+      val king           = f.ourKing.get
+      val enPassantMoves = f.board.history.epSquare.fold(List())(genEnPassant)
+      val checkers       = f.checkers.get
+      val targets = ~f.us
+      val withoutCastles = genNonKing(targets) ++ genSafeKing(king, targets)
+      if(withCastle) withoutCastles ++ genCastling(king)
+      else withoutCastles
+
+    def generate(withCastle: Boolean): List[Move] =
       val king           = f.ourKing.get
       val enPassantMoves = f.board.history.epSquare.fold(List())(genEnPassant)
       val checkers       = f.checkers.get
       val moves = if checkers == Bitboard.empty then
         val targets = ~f.us
-        genNonKing(targets) ++ genSafeKing(king, targets) ++ genCastling(king)
+        val withoutCastles = genNonKing(targets) ++ genSafeKing(king, targets)
+        if(withCastle) withoutCastles ++ genCastling(king)
+        else withoutCastles
       else genEvasions(king, checkers)
 
       val blockers = f.sliderBlockers
@@ -135,12 +148,12 @@ object Situation:
         moves.filter(m => f.isSafe(king, m, blockers))
       else moves
 
-    def genEnPassant(ep: Pos): List[Move] =
+    private def genEnPassant(ep: Pos): List[Move] =
       val pawns                                   = f.us & f.board.board.pawns & ep.pawnAttacks(!f.color)
       val ff: Bitboard => Option[(Pos, Bitboard)] = bb => bb.lsb.map((_, bb & (bb - 1L)))
       List.unfold(pawns)(ff).map(enpassant(_, ep))
 
-    def genNonKing(mask: Bitboard): List[Move] =
+    private def genNonKing(mask: Bitboard): List[Move] =
       genPawn(mask) ++ genKnight(mask) ++ genBishop(mask) ++ genRook(mask) ++ genQueen(mask)
 
     /** Generate all pawn moves except en passant
@@ -154,7 +167,7 @@ object Situation:
       *   TODO @mask includes enemy King now, which should not be because
       *   enemy King cannot be captured by law
       */
-    def genPawn(mask: Bitboard): List[Move] =
+    private def genPawn(mask: Bitboard): List[Move] =
       val moves = ListBuffer[Move]()
 
       // pawn captures
@@ -186,7 +199,7 @@ object Situation:
 
       s1.flatten ++ s2.flatten ++ s3
 
-    def genKnight(mask: Bitboard): List[Move] =
+    private def genKnight(mask: Bitboard): List[Move] =
       val knights = f.us & f.board.knights
       for
         from <- knights.occupiedSquares
@@ -194,7 +207,7 @@ object Situation:
         to <- targets.occupiedSquares
       yield normalMove(from, to, Knight, f.isOccupied(to))
 
-    def genBishop(mask: Bitboard): List[Move] =
+    private def genBishop(mask: Bitboard): List[Move] =
       val bishops = f.us & f.board.bishops
       for
         from <- bishops.occupiedSquares
@@ -202,7 +215,7 @@ object Situation:
         to <- targets.occupiedSquares
       yield normalMove(from, to, Bishop, f.isOccupied(to))
 
-    def genRook(mask: Bitboard): List[Move] =
+    private def genRook(mask: Bitboard): List[Move] =
       val rooks = f.us & f.board.rooks
       for
         from <- rooks.occupiedSquares
@@ -210,7 +223,7 @@ object Situation:
         to <- targets.occupiedSquares
       yield normalMove(from, to, Rook, f.isOccupied(to))
 
-    def genQueen(mask: Bitboard): List[Move] =
+    private def genQueen(mask: Bitboard): List[Move] =
       val queens = f.us & f.board.queens
       for
         from <- queens.occupiedSquares
@@ -218,7 +231,7 @@ object Situation:
         to <- targets.occupiedSquares
       yield normalMove(from, to, Queen, f.isOccupied(to))
 
-    def genEvasions(king: Pos, checkers: Bitboard): List[Move] =
+    private def genEvasions(king: Pos, checkers: Bitboard): List[Move] =
       // Checks by these sliding pieces can maybe be blocked.
       val sliders = checkers & (f.board.sliders)
       val attacked = sliders.occupiedSquares.foldRight(0L)((s, a) =>
@@ -232,7 +245,7 @@ object Situation:
       safeKings ++ blockers
 
     // this can still generate unsafe king moves
-    def genSafeKing(king: Pos, mask: Bitboard): List[Move] =
+    private def genSafeKing(king: Pos, mask: Bitboard): List[Move] =
       val targets = king.kingAttacks & mask
       for
         to <- targets.occupiedSquares
@@ -240,7 +253,7 @@ object Situation:
       yield normalMove(king, to, King, f.isOccupied(to))
 
     // todo works with starndard only
-    def genCastling(king: Pos): List[Move] =
+    private def genCastling(king: Pos): List[Move] =
       val firstRank = f.color.backRank
       val rooks     = f.board.history.castles & Bitboard.RANKS(firstRank.value)
       for

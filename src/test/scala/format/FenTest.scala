@@ -31,6 +31,6 @@ class FenTest extends ChessTest:
       Fen
         .read(Fen.Epd("1brr2k1/1pq3p1/p6p/P1p1Pp2/2P5/3PRB2/2Q2PPP/R5K1 w - f6 0 28"))
         .get
-        .enPassantSquareForHash === Some(Pos.F6)
+        .enPassantSquare === Some(Pos.F6)
     }
   }

@@ -77,7 +77,7 @@ case class Situation(board: Board, color: Color):
 
   export board.history.canCastle
 
-  def enPassantSquareForHash: Option[Pos] =
+  def enPassantSquare: Option[Pos] =
     // Before potentially expensive move generation, first ensure some basic
     // conditions are met.
     // todo we can do better with bitboard

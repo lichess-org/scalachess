@@ -58,7 +58,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       afterFirstMove must beValid.like { newGame =>
         val fen = Fen write newGame
-        fen mustEqual EpdFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b - e3 0 1")
+        fen mustEqual EpdFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b - - 0 1")
       }
     }
 

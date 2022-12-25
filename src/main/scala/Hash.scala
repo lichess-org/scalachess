@@ -84,7 +84,7 @@ object Hash extends OpaqueInt[Hash]:
           .fold(hactors)(_ ^ _)
       else hactors
 
-    val hep = situation.enPassantSquareForHash.fold(hcastling) { pos =>
+    val hep = situation.enPassantSquare.fold(hcastling) { pos =>
       hcastling ^ table.enPassantMasks(pos.file.index)
     }
 

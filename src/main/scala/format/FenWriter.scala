@@ -81,6 +81,7 @@ trait FenWriter:
 
   private[chess] def writeCastles(board: Board): String =
 
+    import Castles.*
     lazy val wr = board.pieces.collect {
       case (pos, piece) if pos.rank == White.backRank && piece == White.rook => pos
     }

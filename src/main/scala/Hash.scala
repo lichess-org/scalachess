@@ -1,6 +1,7 @@
 package chess
 
 import cats.kernel.Monoid
+import Castles.*
 
 opaque type PositionHash = Array[Byte]
 object PositionHash extends TotalWrapper[PositionHash, Array[Byte]]:

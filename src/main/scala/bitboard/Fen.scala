@@ -112,13 +112,6 @@ case class Fen(board: Board, state: State):
 
   def withHistory(h: History): Fen = ??? // NO => withState
   def withState(s: State): Fen     = copy(state = s)
-  def withCastles(c: chess.Castles) =
-    val whiteKing  = if (c.whiteKingSide) Pos.H1.bitboard else Bitboard.empty
-    val whiteQueen = if (c.whiteQueenSide) Pos.H1.bitboard else Bitboard.empty
-    val blackKing  = if (c.blackKingSide) Pos.H1.bitboard else Bitboard.empty
-    val blackQueen = if (c.blackQueenSide) Pos.H1.bitboard else Bitboard.empty
-    val newCastles = whiteKing & whiteQueen & blackKing & blackQueen
-    withState(state.copy(castlingRights = newCastles))
 
   def withPieces(newPieces: PieceMap)                           = ???
   def withVariant(v: Variant): Fen                              = ???

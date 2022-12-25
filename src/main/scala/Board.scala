@@ -2,6 +2,7 @@ package chess
 
 import variant.{ Crazyhouse, Variant }
 import bitboard.Board as BBoard
+import Castles.*
 
 case class Board(
     board: BBoard,
@@ -126,10 +127,10 @@ case class Board(
             }
           }
         Castles(
-          whiteKingSide = castles.whiteKingSide && wkReady && rookReady(White, wkPos, left = false),
-          whiteQueenSide = castles.whiteQueenSide && wkReady && rookReady(White, wkPos, left = true),
-          blackKingSide = castles.blackKingSide && bkReady && rookReady(Black, bkPos, left = false),
-          blackQueenSide = castles.blackQueenSide && bkReady && rookReady(Black, bkPos, left = true)
+          castles.whiteKingSide && wkReady && rookReady(White, wkPos, left = false),
+          castles.whiteQueenSide && wkReady && rookReady(White, wkPos, left = true),
+          castles.blackKingSide && bkReady && rookReady(Black, bkPos, left = false),
+          castles.blackQueenSide && bkReady && rookReady(Black, bkPos, left = true)
         )
       else Castles.none
     }

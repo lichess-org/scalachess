@@ -6,6 +6,67 @@ import chess.variant.FromPosition
 
 class CastleTest extends ChessTest:
 
+  // todo more sophisicated tests
+  "castle object" should {
+    import Castles.*
+
+    "init" in {
+      val castles = Castles.init
+      castles.whiteKingSide mustEqual true
+      castles.whiteQueenSide mustEqual true
+      castles.blackKingSide mustEqual true
+      castles.blackQueenSide mustEqual true
+    }
+
+    "without White" in {
+      val castles = Castles.init.without(White)
+      castles.whiteKingSide mustEqual false
+      castles.whiteQueenSide mustEqual false
+      castles.blackKingSide mustEqual true
+      castles.blackQueenSide mustEqual true
+    }
+
+    "without Black" in {
+      val castles = Castles.init.without(Black)
+      castles.whiteKingSide mustEqual true
+      castles.whiteQueenSide mustEqual true
+      castles.blackKingSide mustEqual false
+      castles.blackQueenSide mustEqual false
+    }
+
+    "without Black" in {
+      val castles = Castles.init.without(Black)
+      castles.whiteKingSide mustEqual true
+      castles.whiteQueenSide mustEqual true
+      castles.blackKingSide mustEqual false
+      castles.blackQueenSide mustEqual false
+    }
+
+    "without White Kingside" in {
+      val castles = Castles.init.without(White, KingSide)
+      castles.whiteKingSide mustEqual false
+      castles.whiteQueenSide mustEqual true
+      castles.blackKingSide mustEqual true
+      castles.blackQueenSide mustEqual true
+    }
+
+    "without White QueenSide" in {
+      val castles = Castles.init.without(White, QueenSide)
+      castles.whiteKingSide mustEqual true
+      castles.whiteQueenSide mustEqual false
+      castles.blackKingSide mustEqual true
+      castles.blackQueenSide mustEqual true
+    }
+
+    "update" in {
+      val castles = Castles.init.update(White, false, true)
+      castles.whiteKingSide mustEqual false
+      castles.whiteQueenSide mustEqual true
+      castles.blackKingSide mustEqual true
+      castles.blackQueenSide mustEqual true
+    }
+  }
+
   "king side" should {
     val goodHist = """
 PPPPPPPP

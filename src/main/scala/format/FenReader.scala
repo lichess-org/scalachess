@@ -13,7 +13,7 @@ import ornicar.scalalib.zeros.given_Zero_Option
   * http://scidb.sourceforge.net/help/en/FEN.html#ThreeCheck
   */
 trait FenReader:
-
+  import Castles.*
   def read(variant: Variant, fen: EpdFen): Option[Situation] =
     makeBoard(variant, fen) map { board =>
       val situation = Situation(board, if variant.atomic then fen.color else board.checkColor | fen.color)

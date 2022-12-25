@@ -47,6 +47,7 @@ abstract class Variant private[variant] (
       case Some(Queen | Rook | Knight | Bishop) => true
       case _                                    => false
 
+  // TODO this is the one
   def validMoves(situation: Situation): Map[Pos, List[Move]] =
     situation.actors.collect {
       case actor if actor.moves.nonEmpty => actor.pos -> actor.moves
@@ -78,7 +79,7 @@ abstract class Variant private[variant] (
 
   def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
     dir(p) exists { next =>
-      next == to || (!board.pieces.contains(next) && longRangeThreatens(board, next, dir, to))
+      next == to || (!board.contains(next) && longRangeThreatens(board, next, dir, to))
     }
 
   def move(

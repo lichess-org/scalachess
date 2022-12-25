@@ -9,6 +9,7 @@ case class Situation(board: Board, color: Color):
 
   lazy val actors = board actorsOf color
 
+  // TODO this is the one
   lazy val moves: Map[Pos, List[Move]] = board.variant.validMoves(this)
 
   lazy val playerCanCapture: Boolean = moves exists (_._2 exists (_.captures))
@@ -96,9 +97,19 @@ case class Situation(board: Board, color: Color):
 
   def unary_! = copy(color = !color)
 
+  // =======================================bitboard========================
+
+  val ourKing = board.board.king(color)
+
 object Situation:
 
   def apply(variant: chess.variant.Variant): Situation = Situation(Board init variant, White)
 
   case class AndFullMoveNumber(situation: Situation, fullMoveNumber: FullMoveNumber):
     def ply = fullMoveNumber.ply(situation.color)
+
+  extension (s: Situation)
+    def generate: List[Move] = ???
+    // val king = s.ourKing
+
+    // def genEnPassant(ep: Pos)

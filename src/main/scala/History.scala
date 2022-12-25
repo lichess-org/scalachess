@@ -2,6 +2,7 @@ package chess
 
 import format.Uci
 import cats.kernel.Monoid
+import Castles.*
 
 // Checks received by the respective side.
 case class CheckCount(white: Int = 0, black: Int = 0):
@@ -23,11 +24,15 @@ object UnmovedRooks extends TotalWrapper[UnmovedRooks, Set[Pos]]:
 case class History(
     lastMove: Option[Uci] = None,
     positionHashes: PositionHash = Monoid[PositionHash].empty,
-    castles: Castles = Castles.all,
+    castles: Castles = Castles.all, // => castlingRight
     checkCount: CheckCount = CheckCount(0, 0),
     unmovedRooks: UnmovedRooks = UnmovedRooks.default,
-    halfMoveClock: HalfMoveClock = HalfMoveClock(0)
+    halfMoveClock: HalfMoveClock = HalfMoveClock(0),
+    // fullMoves: FullMoveNumber = FullMoveNumber(0),
+    // possible en-passant square
+    // epSquare: Option[Pos] = None
 ):
+
   def setHalfMoveClock(v: HalfMoveClock) = copy(halfMoveClock = v)
 
   private def isRepetition(times: Int) =
@@ -81,19 +86,6 @@ object History:
     )
 
   def castle(color: Color, kingSide: Boolean, queenSide: Boolean) =
-    History(
-      castles = color match {
-        case White =>
-          Castles.init.copy(
-            whiteKingSide = kingSide,
-            whiteQueenSide = queenSide
-          )
-        case Black =>
-          Castles.init.copy(
-            blackKingSide = kingSide,
-            blackQueenSide = queenSide
-          )
-      }
-    )
+    History(castles = Castles.init.update(color, kingSide, queenSide))
 
   def noCastle = History(castles = Castles.none)

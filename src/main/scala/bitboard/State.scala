@@ -42,18 +42,3 @@ case class State(
 
 object State:
   val start = State(Color.White, None, Bitboard.corners, HalfMoveClock(0), FullMoveNumber(1))
-
-type Castles = Bitboard
-object Castles:
-  def fromChessCastle(c: chess.Castles): Castles =
-    val whiteKing  = if (c.whiteKingSide) Pos.H1.bitboard else Bitboard.empty
-    val whiteQueen = if (c.whiteQueenSide) Pos.H1.bitboard else Bitboard.empty
-    val blackKing  = if (c.blackKingSide) Pos.H1.bitboard else Bitboard.empty
-    val blackQueen = if (c.blackQueenSide) Pos.H1.bitboard else Bitboard.empty
-    whiteKing & whiteQueen & blackKing & blackQueen
-
-  extension (c: Castles)
-    def whiteKingSide  = (c & Pos.H1.bitboard).nonEmpty
-    def whiteQueenSide = (c & Pos.A1.bitboard).nonEmpty
-    def blackKingSide  = (c & Pos.H8.bitboard).nonEmpty
-    def blackQueenSide = (c & Pos.A8.bitboard).nonEmpty

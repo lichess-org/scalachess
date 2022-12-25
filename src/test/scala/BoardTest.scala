@@ -10,7 +10,7 @@ class BoardTest extends ChessTest:
   "a board" should {
 
     "position pieces correctly" in {
-      board.pieceMap must havePairs(
+      board.pieces must havePairs(
         A1 -> (White - Rook),
         B1 -> (White - Knight),
         C1 -> (White - Bishop),
@@ -47,7 +47,7 @@ class BoardTest extends ChessTest:
     }
 
     "have pieces by default" in {
-      board.pieces must not beEmpty
+      board.allPieces must not beEmpty
     }
 
     "have castling rights by default" in {
@@ -121,22 +121,22 @@ class BoardTest extends ChessTest:
       "right to end" in {
         val board: Board = """
 R   K  R"""
-        E1 >| (p => board.pieceMap contains p) must_== List(F1, G1, H1)
+        E1 >| (p => board.pieces contains p) must_== List(F1, G1, H1)
       }
       "right to next" in {
         val board: Board = """
 R   KB R"""
-        E1 >| (p => board.pieceMap contains p) must_== List(F1)
+        E1 >| (p => board.pieces contains p) must_== List(F1)
       }
       "left to end" in {
         val board: Board = """
 R   K  R"""
-        E1 |< (p => board.pieceMap contains p) must_== List(D1, C1, B1, A1)
+        E1 |< (p => board.pieces contains p) must_== List(D1, C1, B1, A1)
       }
       "right to next" in {
         val board: Board = """
 R  BK  R"""
-        E1 |< (p => board.pieceMap contains p) must_== List(D1)
+        E1 |< (p => board.pieces contains p) must_== List(D1)
       }
     }
   }

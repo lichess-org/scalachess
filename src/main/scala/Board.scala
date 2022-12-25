@@ -14,14 +14,14 @@ case class Board(
   inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Pos(file, rank))
 
   // todo remove
-  lazy val pieceMap = board.pieceMap
+  lazy val pieces = board.pieceMap
   // todo maybe remove?
-  lazy val pieces = board.pieces
+  lazy val allPieces = board.pieces
 
   def contains = board.contains
 
   // TODO fix
-  lazy val actors: Map[Pos, Actor] = pieceMap map { case (pos, piece) =>
+  lazy val actors: Map[Pos, Actor] = pieces map { case (pos, piece) =>
     (pos, Actor(piece, pos, this))
   }
 
@@ -30,7 +30,7 @@ case class Board(
     Color.Map(w, b)
 
   def rolesOf(c: Color): List[Role] =
-    pieces.filter(_.color == c).map(_.role)
+    allPieces.filter(_.color == c).map(_.role)
 
   // todo fix
   inline def actorAt(inline at: Pos): Option[Actor] = actors get at

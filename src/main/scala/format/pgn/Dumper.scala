@@ -23,7 +23,7 @@ object Dumper:
         //       - file
         //       - rank
         //       - both (only happens w/ at least 3 pieces of the same role)
-        val candidates = situation.board.pieceMap collect {
+        val candidates = situation.board.pieces collect {
           case (cpos, cpiece) if cpiece == piece && cpos != orig && cpiece.eyes(cpos, dest) => cpos
         } filter { cpos =>
           // We know Role ≠ Pawn, so it is fine to always pass None as promotion target

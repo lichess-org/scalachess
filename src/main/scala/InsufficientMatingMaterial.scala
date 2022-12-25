@@ -7,10 +7,10 @@ package chess
   */
 object InsufficientMatingMaterial:
 
-  def nonKingPieces(board: Board): PieceMap = board.pieceMap filter (_._2.role != King)
+  def nonKingPieces(board: Board): PieceMap = board.pieces filter (_._2.role != King)
 
   def bishopsOnOppositeColors(board: Board) =
-    (board.pieceMap collect { case (pos, Piece(_, Bishop)) => pos.isLight } toList).distinct
+    (board.pieces collect { case (pos, Piece(_, Bishop)) => pos.isLight } toList).distinct
     .lengthCompare(2) == 0
 
   /*
@@ -27,14 +27,16 @@ object InsufficientMatingMaterial:
    * being able to mate the other as informed by the traditional chess rules.
    */
   def apply(board: Board) =
-    lazy val kingsAndBishopsOnly = board.pieces forall { p =>
+    lazy val kingsAndBishopsOnly = board.allPieces forall { p =>
       (p is King) || (p is Bishop)
     }
-    val kingsAndMinorsOnly = board.pieces forall { p =>
+    val kingsAndMinorsOnly = board.allPieces forall { p =>
       (p is King) || (p is Bishop) || (p is Knight)
     }
 
-    kingsAndMinorsOnly && (board.pieces.size <= 3 || (kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
+    kingsAndMinorsOnly && (board.allPieces.size <= 3 || (kingsAndBishopsOnly && !bishopsOnOppositeColors(
+      board
+    )))
 
   /*
    * Determines whether a color does not have mating material. In general:

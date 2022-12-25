@@ -39,7 +39,7 @@ case object Atomic
       to: Pos,
       filter: Piece => Boolean = _ => true
   ): Boolean =
-    board.pieceMap exists {
+    board.pieces exists {
       case (pos, piece)
           if piece.color == color && filter(piece) && piece.eyes(pos, to) && !protectedByOtherKing(
             board,
@@ -65,7 +65,7 @@ case object Atomic
       val afterBoard  = move.after
       val destination = move.dest
 
-      val boardPieces = afterBoard.pieceMap
+      val boardPieces = afterBoard.pieces
 
       // Pawns are immune (for some reason), but all pieces surrounding the captured piece and the capturing piece
       // itself explode
@@ -88,25 +88,25 @@ case object Atomic
     * then either a queen or multiple pieces are required for checkmate.
     */
   private def insufficientAtomicWinningMaterial(board: Board) =
-    val kingsAndBishopsOnly = board.pieces forall { p =>
+    val kingsAndBishopsOnly = board.allPieces forall { p =>
       (p is King) || (p is Bishop)
     }
     lazy val bishopsOnOppositeColors = InsufficientMatingMaterial.bishopsOnOppositeColors(board)
-    lazy val kingsAndKnightsOnly = board.pieces forall { p =>
+    lazy val kingsAndKnightsOnly = board.allPieces forall { p =>
       (p is King) || (p is Knight)
     }
-    lazy val kingsRooksAndMinorsOnly = board.pieces forall { p =>
+    lazy val kingsRooksAndMinorsOnly = board.allPieces forall { p =>
       (p is King) || (p is Rook) || (p is Bishop) || (p is Knight)
     }
 
     // Bishops of opposite color (no other pieces) endgames are dead drawn
     // except if either player has multiple bishops so a helpmate is possible
     if (board.count(White) >= 2 && board.count(Black) >= 2)
-      kingsAndBishopsOnly && board.pieces.size <= 4 && bishopsOnOppositeColors
+      kingsAndBishopsOnly && board.allPieces.size <= 4 && bishopsOnOppositeColors
 
     // Queen, rook + any, bishop + any (same piece color), or 3 knights can mate
-    else if (kingsAndKnightsOnly) board.pieceMap.size <= 4
-    else kingsRooksAndMinorsOnly && !bishopsOnOppositeColors && board.pieces.size <= 3
+    else if (kingsAndKnightsOnly) board.pieces.size <= 4
+    else kingsRooksAndMinorsOnly && !bishopsOnOppositeColors && board.allPieces.size <= 3
 
   /*
    * Bishops on opposite coloured squares can never capture each other to cause a king to explode and a traditional
@@ -124,7 +124,7 @@ case object Atomic
         && InsufficientMatingMaterial.pawnBlockedByPawn(actor, board))
         || actor.piece.is(King) || actor.piece.is(Bishop)
     )
-    val randomBishop = board.pieceMap.find { case (_, piece) => piece.is(Bishop) }
+    val randomBishop = board.pieces.find { case (_, piece) => piece.is(Bishop) }
     val bishopsAbsentOrPawnitized = randomBishop match
       case Some((pos, piece)) => bishopPawnitized(board, piece.color, pos.isLight)
       case None               => true

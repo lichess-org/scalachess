@@ -121,13 +121,27 @@ object Situation:
   import scala.collection.mutable.ListBuffer
 
   extension (f: Situation)
-    def generate: List[Move] = ???
-    // val king = s.ourKing
+    def generate: List[Move] =
+      val king           = f.ourKing.get
+      val enPassantMoves = f.board.history.epSquare.fold(List())(genEnPassant)
+      val checkers       = f.checkers.get
+      val moves = if checkers == Bitboard.empty then
+        val targets = ~f.us
+        genNonKing(targets) ++ genSafeKing(king, targets) ++ genCastling(king)
+      else genEvasions(king, checkers)
+
+      val blockers = f.sliderBlockers
+      if blockers != Bitboard.empty || !f.board.history.epSquare.isDefined then
+        moves.filter(m => f.isSafe(king, m, blockers))
+      else moves
 
     def genEnPassant(ep: Pos): List[Move] =
       val pawns                                   = f.us & f.board.board.pawns & ep.pawnAttacks(!f.color)
       val ff: Bitboard => Option[(Pos, Bitboard)] = bb => bb.lsb.map((_, bb & (bb - 1L)))
       List.unfold(pawns)(ff).map(enpassant(_, ep))
+
+    def genNonKing(mask: Bitboard): List[Move] =
+      genPawn(mask) ++ genKnight(mask) ++ genBishop(mask) ++ genRook(mask) ++ genQueen(mask)
 
     /** Generate all pawn moves except en passant
      *  This includes
@@ -172,6 +186,78 @@ object Situation:
 
       s1.flatten ++ s2.flatten ++ s3
 
+    def genKnight(mask: Bitboard): List[Move] =
+      val knights = f.us & f.board.knights
+      for
+        from <- knights.occupiedSquares
+        targets = Bitboard.knightAttacks(from) & mask
+        to <- targets.occupiedSquares
+      yield normalMove(from, to, Knight, f.isOccupied(to))
+
+    def genBishop(mask: Bitboard): List[Move] =
+      val bishops = f.us & f.board.bishops
+      for
+        from <- bishops.occupiedSquares
+        targets = from.bishopAttacks(f.board.occupied) & mask
+        to <- targets.occupiedSquares
+      yield normalMove(from, to, Bishop, f.isOccupied(to))
+
+    def genRook(mask: Bitboard): List[Move] =
+      val rooks = f.us & f.board.rooks
+      for
+        from <- rooks.occupiedSquares
+        targets = from.rookAttacks(f.board.occupied) & mask
+        to <- targets.occupiedSquares
+      yield normalMove(from, to, Rook, f.isOccupied(to))
+
+    def genQueen(mask: Bitboard): List[Move] =
+      val queens = f.us & f.board.queens
+      for
+        from <- queens.occupiedSquares
+        targets = from.queenAttacks(f.board.occupied) & mask
+        to <- targets.occupiedSquares
+      yield normalMove(from, to, Queen, f.isOccupied(to))
+
+    def genEvasions(king: Pos, checkers: Bitboard): List[Move] =
+      // Checks by these sliding pieces can maybe be blocked.
+      val sliders = checkers & (f.board.sliders)
+      val attacked = sliders.occupiedSquares.foldRight(0L)((s, a) =>
+        a | (Bitboard.RAYS(king.value)(s.value) ^ (1L << s.value))
+      )
+      val safeKings = genSafeKing(king, ~f.us & ~attacked)
+      val blockers =
+        if !checkers.moreThanOne then
+          checkers.lsb.map(c => genNonKing(Bitboard.between(king, c) | checkers)).getOrElse(List())
+        else List()
+      safeKings ++ blockers
+
+    // this can still generate unsafe king moves
+    def genSafeKing(king: Pos, mask: Bitboard): List[Move] =
+      val targets = king.kingAttacks & mask
+      for
+        to <- targets.occupiedSquares
+        if f.board.board.attacksTo(to, !f.color).isEmpty
+      yield normalMove(king, to, King, f.isOccupied(to))
+
+    // todo works with starndard only
+    def genCastling(king: Pos): List[Move] =
+      val firstRank = f.color.backRank
+      val rooks     = f.board.history.castles & Bitboard.RANKS(firstRank.value)
+      for
+        rook <- rooks.occupiedSquares
+        path = Bitboard.between(king, rook)
+        if (path & f.board.occupied).isEmpty
+        toKingRank = if rook < king then Pos.C1 else Pos.G1
+        toRookRank = if rook < king then Pos.D1 else Pos.F1
+        kingTo     = toKingRank.combine(king)
+        rookTo     = toRookRank.combine(rook)
+        kingPath   = Bitboard.between(king, kingTo) | (1L << kingTo.value) | (1L << king.value)
+        safe = kingPath.occupiedSquares
+          .map(f.board.board.attacksTo(_, !f.color, f.board.occupied ^ (1L << king.value)).isEmpty)
+          .forall(identity)
+        if safe
+      yield castle(king, kingTo, rook, rookTo)
+
     private def genPawnMoves(from: Pos, to: Pos, capture: Boolean): List[Move] =
       if from.rank == f.color.seventhRank then
         List(Queen, Knight, Rook, Bishop).map(promotion(from, to, _, capture))
@@ -194,8 +280,9 @@ object Situation:
 
     private def normalMove(orig: Pos, dest: Pos, role: Role, capture: Boolean) =
       val taken = if capture then Option(dest) else None
-      val after = if(capture) then f.board.taking(orig, dest, taken).get // todo no get pls
-                  else f.board.move(orig, dest).get
+      val after =
+        if (capture) then f.board.taking(orig, dest, taken).get // todo no get pls
+        else f.board.move(orig, dest).get
       Move(
         piece = Piece(f.color, role),
         orig = orig,
@@ -210,8 +297,9 @@ object Situation:
 
     private def promotion(orig: Pos, dest: Pos, promotion: PromotableRole, capture: Boolean) =
       val taken = if capture then Option(dest) else None
-      val after = if(capture) then f.board.taking(orig, dest, taken).get // todo no get pls
-                  else f.board.move(orig, dest).get
+      val after =
+        if (capture) then f.board.taking(orig, dest, taken).get // todo no get pls
+        else f.board.move(orig, dest).get
       Move(
         piece = f.color.pawn,
         orig = orig,
@@ -221,5 +309,25 @@ object Situation:
         capture = taken,
         castle = None,
         promotion = Some(promotion),
+        enpassant = false
+      )
+
+    private def castle(king: Pos, kingTo: Pos, rook: Pos, rookTo: Pos): Move =
+      val after =
+        for
+          b1 <- f.board.take(king)
+          b2 <- b1.take(rook)
+          b3 <- b2.place(f.color.king, kingTo)
+          b4 <- b3.place(f.color.rook, rookTo)
+        yield b4
+      Move(
+        piece = f.color.king,
+        orig = king,
+        dest = kingTo,
+        situationBefore = f,
+        after = after.get,
+        capture = None,
+        castle = Option((king, kingTo), (rook, rookTo)),
+        promotion = None,
         enpassant = false
       )

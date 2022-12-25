@@ -123,9 +123,6 @@ case class Fen(board: Board, state: State):
   // do we need this? not sure
   def unmovedRooks: UnmovedRooks = ???
 
-  // do we need this? not sure
-  def fixCastles: Fen = ???
-
   inline def updateHistory(inline f: History => History) = ??? // No
   def count(p: Piece): Int                               = board.piece(p).count
   def count(c: Color): Int                               = board.color(c).count

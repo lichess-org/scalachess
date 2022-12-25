@@ -16,6 +16,7 @@ trait FenReader:
   import Castles.*
   def read(variant: Variant, fen: EpdFen): Option[Situation] =
     makeBoard(variant, fen) map { board =>
+      // why it is different when the variant is Atomic?
       val situation = Situation(board, if variant.atomic then fen.color else board.checkColor | fen.color)
       val (castles, unmovedRooks) = fen.castling.foldLeft(Castles.none -> Set.empty[Pos]) {
         case ((c, r), ch) =>
@@ -41,8 +42,10 @@ trait FenReader:
       val fifthRank   = if (situation.color.white) Rank.Fifth else Rank.Fourth
       val sixthRank   = if (situation.color.white) Rank.Sixth else Rank.Third
       val seventhRank = if (situation.color.white) Rank.Seventh else Rank.Second
+
+      val enpassantPos = fen.enpassant
       val enpassantMove = for {
-        pos <- fen.enpassant
+        pos <- enpassantPos
         if pos.rank == sixthRank
         orig = Pos(pos.file, seventhRank)
         dest = Pos(pos.file, fifthRank)
@@ -56,7 +59,8 @@ trait FenReader:
           lastMove = enpassantMove,
           positionHashes = Monoid[PositionHash].empty,
           castles = castles,
-          unmovedRooks = UnmovedRooks(unmovedRooks)
+          unmovedRooks = UnmovedRooks(unmovedRooks),
+          epSquare = enpassantPos
         )
         val checkCount = variant.threeCheck.?? {
           val splitted = fen.value split ' '
@@ -66,7 +70,7 @@ trait FenReader:
             .orElse(splitted.lift(6).flatMap(readCheckCount))
         }
         checkCount.foldLeft(history)(_ withCheckCount _)
-      } fixCastles
+      }
     }
 
   def read(fen: EpdFen): Option[Situation] = read(Standard, fen)

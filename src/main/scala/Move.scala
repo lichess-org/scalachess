@@ -1,8 +1,10 @@
 package chess
 
 import chess.format.Uci
+import bitboard.Bitboard.*
 import cats.syntax.option.*
 import cats.kernel.Monoid
+import chess.bitboard.Bitboard
 
 case class Move(
     piece: Piece,
@@ -33,18 +35,17 @@ case class Move(
             else h1.halfMoveClock + 1
         )
 
-        // my broken castles
-        if ((piece is King) && h2.canCastle(color).any)
-          h2 withoutCastles color
-        else if (piece is Rook) (for {
-          kingPos <- after kingPosOf color
-          side <- Side.kingRookSide(kingPos, orig).filter { s =>
-            (h2 canCastle color on s) &&
-            h1.unmovedRooks.value(orig)
-          }
-        } yield h2.withoutCastle(color, side)) | h2
-        else h2
-      } fixCastles,
+        val halfCastlingRights: Bitboard =
+          if captures then h1.castles & ~dest.bitboard
+          else h1.castles
+
+        val castleRights: Bitboard =
+          if piece.is(Rook) then (halfCastlingRights & ~orig.bitboard)
+          else if piece.is(King) then (halfCastlingRights & Bitboard.RANKS(piece.color.lastRank.value))
+          else halfCastlingRights
+
+        h2.withCastles(Castles(castleRights))
+      },
       toUci,
       capture flatMap { before(_) }
     )

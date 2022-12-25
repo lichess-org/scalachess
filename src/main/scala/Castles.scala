@@ -60,6 +60,8 @@ object Castles:
     def blackKing: Castles  = if (b) H8.bitboard else Bitboard.empty
     def blackQueen: Castles = if (b) A8.bitboard else Bitboard.empty
 
+  def apply(b: Bitboard): Castles = b
+
   def apply(
       castles: (Boolean, Boolean, Boolean, Boolean)
   ): Castles =

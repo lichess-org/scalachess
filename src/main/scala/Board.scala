@@ -113,28 +113,6 @@ case class Board(
       )
     }
 
-  def fixCastles: Board =
-    withCastles {
-      if (variant.allowsCastling)
-        val wkPos   = kingPosOf(White)
-        val bkPos   = kingPosOf(Black)
-        val wkReady = wkPos.fold(false)(_.rank == Rank.First)
-        val bkReady = bkPos.fold(false)(_.rank == Rank.Eighth)
-        def rookReady(color: Color, kPos: Option[Pos], left: Boolean) =
-          kPos.fold(false) { kp =>
-            actorsOf(color) exists { a =>
-              a.piece.is(Rook) && a.pos ?- kp && (left ^ (a.pos ?> kp)) && history.unmovedRooks.value(a.pos)
-            }
-          }
-        Castles(
-          castles.whiteKingSide && wkReady && rookReady(White, wkPos, left = false),
-          castles.whiteQueenSide && wkReady && rookReady(White, wkPos, left = true),
-          castles.blackKingSide && bkReady && rookReady(Black, bkPos, left = false),
-          castles.blackQueenSide && bkReady && rookReady(Black, bkPos, left = true)
-        )
-      else Castles.none
-    }
-
   inline def updateHistory(inline f: History => History) = copy(history = f(history))
 
   def count(p: Piece): Int = board.piece(p).count

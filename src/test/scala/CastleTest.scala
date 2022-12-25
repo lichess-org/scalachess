@@ -6,6 +6,7 @@ import chess.variant.FromPosition
 
 class CastleTest extends ChessTest:
 
+  // todo add a test case for Atomic when a rook is exploded
   // todo more sophisicated tests
   "castle object" should {
     import Castles.*

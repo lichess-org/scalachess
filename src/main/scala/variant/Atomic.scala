@@ -1,6 +1,8 @@
 package chess
 package variant
 
+import bitboard.Bitboard.*
+
 case object Atomic
     extends Variant(
       id = Variant.Id(7),
@@ -69,10 +71,15 @@ case object Atomic
 
       // Pawns are immune (for some reason), but all pieces surrounding the captured piece and the capturing piece
       // itself explode
-      val piecesToExplode = affectedPos.filter(boardPieces.get(_).fold(false)(_.isNot(Pawn))) + destination
+      // todo use bitboard
+      val piecesToExplode: Set[Pos] =
+        affectedPos.filter(boardPieces.get(_).fold(false)(_.isNot(Pawn))) + destination
       val afterExplosions = boardPieces -- piecesToExplode
 
-      val newBoard = afterBoard withPieces afterExplosions
+      val rooksToExploded = affectedPos.filter(boardPieces.get(_).fold(false)(_.is(Rook)))
+
+      val castles  = rooksToExploded.foldLeft(afterBoard.history.castles)((c, pos) => c & ~pos.bitboard)
+      val newBoard = (afterBoard withPieces afterExplosions).withCastles(Castles(castles))
       move withAfter newBoard
     else move
 

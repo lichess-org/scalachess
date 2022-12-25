@@ -21,16 +21,18 @@ opaque type UnmovedRooks = Set[Pos]
 object UnmovedRooks extends TotalWrapper[UnmovedRooks, Set[Pos]]:
   val default: UnmovedRooks = (Pos.whiteBackrank ::: Pos.blackBackrank).toSet
 
+// color
+// turn: Color,
 case class History(
     lastMove: Option[Uci] = None,
     positionHashes: PositionHash = Monoid[PositionHash].empty,
     castles: Castles = Castles.all, // => castlingRight
     checkCount: CheckCount = CheckCount(0, 0),
     unmovedRooks: UnmovedRooks = UnmovedRooks.default,
-    halfMoveClock: HalfMoveClock = HalfMoveClock(0)
-    // fullMoves: FullMoveNumber = FullMoveNumber(0),
+    halfMoveClock: HalfMoveClock = HalfMoveClock(0),
+    // fullMoves: FullMoveNumber = FullMoveNumber(0), // do we need it nows? => no
     // possible en-passant square
-    // epSquare: Option[Pos] = None
+    epSquare: Option[Pos] = None
 ):
 
   def setHalfMoveClock(v: HalfMoveClock) = copy(halfMoveClock = v)

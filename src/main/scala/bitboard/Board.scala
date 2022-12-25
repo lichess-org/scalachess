@@ -194,7 +194,7 @@ case class Board(
 
   // TODO test
   inline def hasPiece(inline p: Piece) =
-    piece(p).isNotEmpty
+    piece(p).nonEmpty
 
   // TODO remove unsafe get
   // we believe in the integrity of bitboard

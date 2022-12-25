@@ -53,7 +53,7 @@ object Castles:
     whiteKing & whiteQueen & blackKing & blackQueen
 
   extension (c: Castles)
-    def whiteKingSide  = (c & Pos.H1.bitboard).isNotEmpty
-    def whiteQueenSide = (c & Pos.A1.bitboard).isNotEmpty
-    def blackKingSide  = (c & Pos.H8.bitboard).isNotEmpty
-    def blackQueenSide = (c & Pos.A8.bitboard).isNotEmpty
+    def whiteKingSide  = (c & Pos.H1.bitboard).nonEmpty
+    def whiteQueenSide = (c & Pos.A1.bitboard).nonEmpty
+    def blackKingSide  = (c & Pos.H8.bitboard).nonEmpty
+    def blackQueenSide = (c & Pos.A8.bitboard).nonEmpty

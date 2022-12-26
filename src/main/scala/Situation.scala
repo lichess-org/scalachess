@@ -141,7 +141,6 @@ object Situation:
       moves ++ enPassantMoves
 
     def generateMoves: List[Move] =
-      val withCastle     = f.board.variant.allowsCastling
       val enPassantMoves = f.board.history.epSquare.fold(Nil)(genEnPassant)
       // println(s"passant $enPassantMoves")
       val checkers = f.checkers.getOrElse(Bitboard.empty)
@@ -149,7 +148,7 @@ object Situation:
       val movesWithoutEnpassant = if checkers == Bitboard.empty then
         val targets        = ~f.us
         val withoutCastles = genNonKing(targets) ++ genSafeKing(targets)
-        if (withCastle) withoutCastles ++ genCastling()
+        if f.board.variant.allowsCastling then withoutCastles ++ genCastling()
         else withoutCastles
       else genEvasions(checkers)
       val moves = movesWithoutEnpassant ++ enPassantMoves
@@ -285,7 +284,7 @@ object Situation:
         yield normalMove(king, to, King, f.isOccupied(to))
       )
 
-    // todo works with starndard only
+    // todo works with standard only
     private def genCastling(): List[Move] =
       f.ourKing.fold(Nil) { king =>
         val firstRank = f.color.backRank
@@ -303,7 +302,8 @@ object Situation:
             .map(f.board.board.attacksTo(_, !f.color, f.board.occupied ^ (1L << king.value)).isEmpty)
             .forall(identity)
           if safe
-        yield castle(king, kingTo, rook, rookTo)
+          moves <- castle(king, kingTo, rook, rookTo)
+        yield moves
       }
 
     private def genPawnMoves(from: Pos, to: Pos, capture: Boolean): List[Move] =
@@ -362,21 +362,24 @@ object Situation:
         enpassant = false
       )
 
-    private def castle(king: Pos, kingTo: Pos, rook: Pos, rookTo: Pos): Move =
+    private def castle(king: Pos, kingTo: Pos, rook: Pos, rookTo: Pos): List[Move] =
       // println(s"castle $king $kingTo $rook $rookTo")
-      val after =
-        for
-          b1 <- f.board.take(king)
-          b2 <- b1.take(rook)
-          b3 <- b2.place(f.color.king, kingTo)
-          b4 <- b3.place(f.color.rook, rookTo)
-        yield b4
-      Move(
+      val after = for
+        b1    <- f.board.take(king)
+        b2    <- b1.take(rook)
+        b3    <- b2.place(f.color.king, kingTo)
+        after <- b3.place(f.color.rook, rookTo)
+      yield after
+      // for BC, we add a move where the king goes to the rook position
+      for
+        a            <- after.toList
+        inputKingPos <- List(kingTo, rook).distinct
+      yield Move(
         piece = f.color.king,
         orig = king,
-        dest = kingTo,
+        dest = inputKingPos,
         situationBefore = f,
-        after = after.get,
+        after = a,
         capture = None,
         castle = Option((king, kingTo), (rook, rookTo)),
         promotion = None,

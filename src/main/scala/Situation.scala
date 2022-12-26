@@ -293,10 +293,10 @@ object Situation:
           rook <- rooks.occupiedSquares
           path = Bitboard.between(king, rook)
           if (path & f.board.occupied).isEmpty
-          toKingRank = if rook < king then Pos.C1 else Pos.G1
-          toRookRank = if rook < king then Pos.D1 else Pos.F1
-          kingTo     = toKingRank.combine(king)
-          rookTo     = toRookRank.combine(rook)
+          toKingFile = if rook < king then File.C else File.G
+          toRookFile = if rook < king then File.D else File.F
+          kingTo     = Pos(toKingFile, king.rank)
+          rookTo     = Pos(toRookFile, rook.rank)
           kingPath   = Bitboard.between(king, kingTo) | (1L << kingTo.value) | (1L << king.value)
           safe = kingPath.occupiedSquares
             .map(f.board.board.attacksTo(_, !f.color, f.board.occupied ^ (1L << king.value)).isEmpty)
@@ -363,7 +363,6 @@ object Situation:
       )
 
     private def castle(king: Pos, kingTo: Pos, rook: Pos, rookTo: Pos): List[Move] =
-      // println(s"castle $king $kingTo $rook $rookTo")
       val after = for
         b1    <- f.board.take(king)
         b2    <- b1.take(rook)

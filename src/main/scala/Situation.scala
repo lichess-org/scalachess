@@ -12,7 +12,7 @@ case class Situation(board: Board, color: Color):
   lazy val actors = board actorsOf color
 
   lazy val moves: Map[Pos, List[Move]] =
-    this.generate(board.variant.allowsCastling).groupBy(_.orig)
+    this.generateMoves.groupBy(_.orig)
 
   lazy val playerCanCapture: Boolean = moves.exists(_._2.exists(_.captures))
 
@@ -140,7 +140,8 @@ object Situation:
         else withoutCastles
       moves ++ enPassantMoves
 
-    def generate(withCastle: Boolean): List[Move] =
+    def generateMoves: List[Move] =
+      val withCastle     = f.board.variant.allowsCastling
       val enPassantMoves = f.board.history.epSquare.fold(Nil)(genEnPassant)
       // println(s"passant $enPassantMoves")
       val checkers = f.checkers.getOrElse(Bitboard.empty)

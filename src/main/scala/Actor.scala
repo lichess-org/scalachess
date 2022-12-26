@@ -16,12 +16,10 @@ case class Actor(
 
   // lazy val moves: List[Move] = kingSafetyMoveFilter(trustedMoves(board.variant.allowsCastling))
 
-  lazy val moves: List[Move] = situation
-    .generate(board.variant.allowsCastling)
-    .filter(m => m.orig == pos)
+  lazy val moves: List[Move] = situation.generateMoves.filter(_.orig == pos)
   def trustedMoves(withCastle: Boolean): List[Move] = situation
     .trustedMoves(withCastle)
-    .filter(m => m.orig == pos)
+    .filter(_.orig == pos)
 
   lazy val destinations: List[Pos] =
     // println(situation)

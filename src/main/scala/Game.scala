@@ -33,7 +33,9 @@ case class Game(
       promotion: Option[PromotableRole] = None,
       metrics: MoveMetrics = MoveMetrics()
   ): Validated[String, (Clock.WithCompensatedLag[Game], Move)] =
+    // println(s"moveWithCompensated $promotion")
     situation.move(orig, dest, promotion).map(_.normalizeCastle withMetrics metrics) map { move =>
+      // println(s"situation.move ${move.after}")
       applyWithCompensated(move) -> move
     }
 
@@ -41,6 +43,7 @@ case class Game(
 
   def applyWithCompensated(move: Move): Clock.WithCompensatedLag[Game] =
     val newSituation = move.situationAfter
+    // println(s"applyWithCompensated after: $newSituation")
     val newClock     = applyClock(move.metrics, newSituation.status.isEmpty)
 
     Clock.WithCompensatedLag(

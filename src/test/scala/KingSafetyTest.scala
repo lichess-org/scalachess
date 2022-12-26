@@ -56,6 +56,13 @@ RNBQ  NR""" destsFrom D2 must bePoss(D3)
 PPPP   P
 RNBQ  NR""" destsFrom D2 must bePoss(D4)
         }
+        "pawn double square h2" in {
+          """
+  K    r
+
+PPPP   P
+RNBQ  NR""" destsFrom H2 must bePoss()
+        }
       }
       "eat to defend" in {
         "queen" in {

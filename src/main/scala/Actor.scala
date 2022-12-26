@@ -4,10 +4,6 @@ import format.Uci
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
 
-trait IActor:
-  lazy val moves: List[Move]
-  def trustedMoves(withCastle: Boolean): List[Move]
-
 case class Actor(
     piece: Piece,
     pos: Pos,
@@ -21,9 +17,14 @@ case class Actor(
   // lazy val moves: List[Move] = kingSafetyMoveFilter(trustedMoves(board.variant.allowsCastling))
 
   lazy val moves: List[Move] = situation.generate(board.variant.allowsCastling)
+    .filter(m => m.orig == pos)
   def trustedMoves(withCastle: Boolean): List[Move] = situation.trustedMoves(withCastle)
+    .filter(m => m.orig == pos)
 
-  lazy val destinations: List[Pos] = moves.map(_.dest)
+  lazy val destinations: List[Pos] =
+    // println(situation)
+    // println(moves)
+    moves.map(_.dest)
 
   inline def color               = piece.color
   inline def is(inline c: Color) = c == piece.color

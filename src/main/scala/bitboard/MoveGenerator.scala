@@ -129,18 +129,18 @@ object StandardMovesGenerator:
 
       // normal pawn moves
       val singleMoves = ~f.board.occupied & (if f.isWhiteTurn then ((f.board.white & f.board.pawns) << 8)
-                                             else ((f.board.black & f.board.pawns) >>> 8)) & mask
+                                             else ((f.board.black & f.board.pawns) >>> 8))
       val doubleMoves =
         ~f.board.occupied & (if f.isWhiteTurn then (singleMoves << 8) else (singleMoves >>> 8))
-          & Bitboard.RANKS(if f.isWhiteTurn then 3 else 4) & mask
+          & Bitboard.RANKS(if f.isWhiteTurn then 3 else 4)
 
       val s2: List[List[Move]] = for
-        to <- singleMoves.occupiedSquares
+        to <- (singleMoves & mask).occupiedSquares
         from = Pos.at(to.value + (if f.isWhiteTurn then -8 else 8)).get
       yield genPawnMoves(from, to, false)
 
       val s3: List[Move] = for
-        to <- doubleMoves.occupiedSquares
+        to <- (doubleMoves & mask).occupiedSquares
         from = Pos.at(to.value + (if f.isWhiteTurn then -16 else 16)).get
       yield Move.Normal(from, to, Pawn, false)
 

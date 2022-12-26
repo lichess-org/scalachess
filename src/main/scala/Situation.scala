@@ -3,6 +3,7 @@ package chess
 import cats.data.Validated
 import cats.implicits.*
 import bitboard.Bitboard
+import bitboard.Bitboard.*
 
 import chess.format.Uci
 
@@ -10,8 +11,7 @@ case class Situation(board: Board, color: Color):
 
   lazy val actors = board actorsOf color
 
-  // TODO this is the one
-  lazy val moves: Map[Pos, List[Move]] = board.variant.validMoves(this)
+  lazy val moves: Map[Pos, List[Move]] = this.generate(board.variant.allowsCastling).groupMap(_.orig)(identity)
 
   lazy val playerCanCapture: Boolean = moves exists (_._2 exists (_.captures))
 
@@ -107,7 +107,14 @@ case class Situation(board: Board, color: Color):
   def isWhiteTurn: Boolean       = color.white
   def isOccupied: Pos => Boolean = board.board.isOccupied
 
-  def isSafe(king: Pos, move: Move, blockers: Bitboard): Boolean = ???
+  def isSafe(king: Pos, move: Move, blockers: Bitboard): Boolean =
+    if move.enpassant then
+      val newOccupied =
+        (board.occupied ^ move.orig.bitboard ^ move.dest.combine(move.orig).bitboard) | move.dest.bitboard
+      (king.rookAttacks(newOccupied) & them & (board.rooks ^ board.queens)) == Bitboard.empty &&
+      (king.bishopAttacks(newOccupied) & them & (board.bishops ^ board.queens)) == Bitboard.empty
+    else if move.capture.isDefined then true
+    else !(us & blockers).contains(move.orig.value) || Bitboard.aligned(move.orig, move.dest, king)
 
 object Situation:
 
@@ -116,44 +123,51 @@ object Situation:
   case class AndFullMoveNumber(situation: Situation, fullMoveNumber: FullMoveNumber):
     def ply = fullMoveNumber.ply(situation.color)
 
-  import bitboard.Bitboard.*
-
   import scala.collection.mutable.ListBuffer
 
   extension (f: Situation)
 
     /** The moves without taking defending the king into account */
     def trustedMoves(withCastle: Boolean): List[Move] =
-      val king           = f.ourKing.get
       val enPassantMoves = f.board.history.epSquare.fold(List())(genEnPassant)
-      val checkers       = f.checkers.get
-      val targets = ~f.us
-      val withoutCastles = genNonKing(targets) ++ genSafeKing(king, targets)
-      if(withCastle) withoutCastles ++ genCastling(king)
-      else withoutCastles
+      // println(s"passant $enPassantMoves")
+      val checkers       = f.checkers.getOrElse(Bitboard.empty)
+      val targets        = ~f.us
+      val withoutCastles = genNonKing(targets) ++ genSafeKing(targets)
+      val moves =
+        if (withCastle) withoutCastles ++ genCastling()
+        else withoutCastles
+      moves ++ enPassantMoves
 
     def generate(withCastle: Boolean): List[Move] =
-      val king           = f.ourKing.get
-      val enPassantMoves = f.board.history.epSquare.fold(List())(genEnPassant)
-      val checkers       = f.checkers.get
-      val moves = if checkers == Bitboard.empty then
-        val targets = ~f.us
-        val withoutCastles = genNonKing(targets) ++ genSafeKing(king, targets)
-        if(withCastle) withoutCastles ++ genCastling(king)
+      val enPassantMoves = f.board.history.epSquare.fold(Nil)(genEnPassant)
+      // println(s"passant $enPassantMoves")
+      val checkers = f.checkers.getOrElse(Bitboard.empty)
+      // println(checkers)
+      val movesWithoutEnpassant = if checkers == Bitboard.empty then
+        val targets        = ~f.us
+        val withoutCastles = genNonKing(targets) ++ genSafeKing(targets)
+        if (withCastle) withoutCastles ++ genCastling()
         else withoutCastles
-      else genEvasions(king, checkers)
+      else genEvasions(checkers)
+      val moves = movesWithoutEnpassant ++ enPassantMoves
+      // println(moves)
 
-      val blockers = f.sliderBlockers
-      if blockers != Bitboard.empty || !f.board.history.epSquare.isDefined then
-        moves.filter(m => f.isSafe(king, m, blockers))
-      else moves
+      f.ourKing.fold(moves)(king =>
+        val blockers = f.sliderBlockers
+        if blockers != Bitboard.empty || !f.board.history.epSquare.isDefined then
+          moves.filter(m => f.isSafe(king, m, blockers))
+        else moves
+      )
 
     private def genEnPassant(ep: Pos): List[Move] =
-      val pawns                                   = f.us & f.board.board.pawns & ep.pawnAttacks(!f.color)
+      val pawns = f.us & f.board.board.pawns & ep.pawnAttacks(!f.color)
+      // println(s"pawns $pawns")
       val ff: Bitboard => Option[(Pos, Bitboard)] = bb => bb.lsb.map((_, bb & (bb - 1L)))
       List.unfold(pawns)(ff).map(enpassant(_, ep))
 
     private def genNonKing(mask: Bitboard): List[Move] =
+      // println(s"mask $mask")
       genPawn(mask) ++ genKnight(mask) ++ genBishop(mask) ++ genRook(mask) ++ genQueen(mask)
 
     /** Generate all pawn moves except en passant
@@ -170,33 +184,40 @@ object Situation:
     private def genPawn(mask: Bitboard): List[Move] =
       val moves = ListBuffer[Move]()
 
-      // pawn captures
+      // println(s"turns ${f.color}")
+      // our pawns or captures
       val capturers = f.us & f.board.board.pawns
+      // println(s"capturers $capturers")
 
       val s1: List[List[Move]] = for
         from <- capturers.occupiedSquares
         targets = from.pawnAttacks(f.color) & f.them & mask
         to <- targets.occupiedSquares
       yield genPawnMoves(from, to, true)
+      // println(s"s1 $s1")
 
       // normal pawn moves
       val singleMoves = ~f.board.occupied & (if f.isWhiteTurn then ((f.board.white & f.board.pawns) << 8)
-                                             else ((f.board.black & f.board.pawns) >>> 8)) & mask
+                                             else ((f.board.black & f.board.pawns) >>> 8))
 
+      // println(s"singleMoves $singleMoves")
       val doubleMoves =
         ~f.board.occupied & (if f.isWhiteTurn then (singleMoves << 8) else (singleMoves >>> 8))
-          & Bitboard.RANKS(if f.isWhiteTurn then 3 else 4) & mask
+          & Bitboard.RANKS(if f.isWhiteTurn then 3 else 4)
+      // println(s"doubleMoves $doubleMoves")
 
       val s2: List[List[Move]] = for
-        to <- singleMoves.occupiedSquares
+        to <- (singleMoves & mask).occupiedSquares
         from = Pos.at(to.value + (if f.isWhiteTurn then -8 else 8)).get
       yield genPawnMoves(from, to, false)
+      // println(s"s2 $s2")
 
       val s3: List[Move] = for
-        to <- doubleMoves.occupiedSquares
+        to <- (doubleMoves & mask).occupiedSquares
         from = Pos.at(to.value + (if f.isWhiteTurn then -16 else 16)).get
       yield normalMove(from, to, Pawn, false)
 
+      // println(s"s3 $s3")
       s1.flatten ++ s2.flatten ++ s3
 
     private def genKnight(mask: Bitboard): List[Move] =
@@ -231,45 +252,54 @@ object Situation:
         to <- targets.occupiedSquares
       yield normalMove(from, to, Queen, f.isOccupied(to))
 
-    private def genEvasions(king: Pos, checkers: Bitboard): List[Move] =
-      // Checks by these sliding pieces can maybe be blocked.
-      val sliders = checkers & (f.board.sliders)
-      val attacked = sliders.occupiedSquares.foldRight(0L)((s, a) =>
-        a | (Bitboard.RAYS(king.value)(s.value) ^ (1L << s.value))
+    private def genEvasions(checkers: Bitboard): List[Move] =
+      f.ourKing.fold(Nil)(king =>
+        // Checks by these sliding pieces can maybe be blocked.
+        val sliders = checkers & (f.board.sliders)
+        // println(s"sliders: $sliders")
+        val attacked = sliders.occupiedSquares.foldRight(0L)((s, a) =>
+          a | (Bitboard.RAYS(king.value)(s.value) ^ (1L << s.value))
+        )
+        val safeKings = genSafeKing(~f.us & ~attacked)
+        // println(s"safeKings $safeKings")
+        val blockers =
+          if !checkers.moreThanOne then
+            checkers.lsb.map(c => genNonKing(Bitboard.between(king, c) | checkers)).getOrElse(List())
+          else List()
+        // println(s"blockers $blockers")
+        safeKings ++ blockers
       )
-      val safeKings = genSafeKing(king, ~f.us & ~attacked)
-      val blockers =
-        if !checkers.moreThanOne then
-          checkers.lsb.map(c => genNonKing(Bitboard.between(king, c) | checkers)).getOrElse(List())
-        else List()
-      safeKings ++ blockers
 
     // this can still generate unsafe king moves
-    private def genSafeKing(king: Pos, mask: Bitboard): List[Move] =
-      val targets = king.kingAttacks & mask
-      for
-        to <- targets.occupiedSquares
-        if f.board.board.attacksTo(to, !f.color).isEmpty
-      yield normalMove(king, to, King, f.isOccupied(to))
+    private def genSafeKing(mask: Bitboard): List[Move] =
+      f.ourKing.fold(Nil)(king =>
+        val targets = king.kingAttacks & mask
+        for
+          to <- targets.occupiedSquares
+          if f.board.board.attacksTo(to, !f.color).isEmpty
+        yield normalMove(king, to, King, f.isOccupied(to))
+      )
 
     // todo works with starndard only
-    private def genCastling(king: Pos): List[Move] =
-      val firstRank = f.color.backRank
-      val rooks     = f.board.history.castles & Bitboard.RANKS(firstRank.value)
-      for
-        rook <- rooks.occupiedSquares
-        path = Bitboard.between(king, rook)
-        if (path & f.board.occupied).isEmpty
-        toKingRank = if rook < king then Pos.C1 else Pos.G1
-        toRookRank = if rook < king then Pos.D1 else Pos.F1
-        kingTo     = toKingRank.combine(king)
-        rookTo     = toRookRank.combine(rook)
-        kingPath   = Bitboard.between(king, kingTo) | (1L << kingTo.value) | (1L << king.value)
-        safe = kingPath.occupiedSquares
-          .map(f.board.board.attacksTo(_, !f.color, f.board.occupied ^ (1L << king.value)).isEmpty)
-          .forall(identity)
-        if safe
-      yield castle(king, kingTo, rook, rookTo)
+    private def genCastling(): List[Move] =
+      f.ourKing.fold(Nil)(king =>
+        val firstRank = f.color.backRank
+        val rooks     = f.board.history.castles & Bitboard.RANKS(firstRank.value) & f.board.rooks
+        for
+          rook <- rooks.occupiedSquares
+          path = Bitboard.between(king, rook)
+          if (path & f.board.occupied).isEmpty
+          toKingRank = if rook < king then Pos.C1 else Pos.G1
+          toRookRank = if rook < king then Pos.D1 else Pos.F1
+          kingTo     = toKingRank.combine(king)
+          rookTo     = toRookRank.combine(rook)
+          kingPath   = Bitboard.between(king, kingTo) | (1L << kingTo.value) | (1L << king.value)
+          safe = kingPath.occupiedSquares
+            .map(f.board.board.attacksTo(_, !f.color, f.board.occupied ^ (1L << king.value)).isEmpty)
+            .forall(identity)
+          if safe
+        yield castle(king, kingTo, rook, rookTo)
+      )
 
     private def genPawnMoves(from: Pos, to: Pos, capture: Boolean): List[Move] =
       if from.rank == f.color.seventhRank then
@@ -313,12 +343,14 @@ object Situation:
       val after =
         if (capture) then f.board.taking(orig, dest, taken).get // todo no get pls
         else f.board.move(orig, dest).get
+      // todo yo lol
+      val yo = after.putOrReplace(Piece(f.color, promotion), dest)
       Move(
         piece = f.color.pawn,
         orig = orig,
         dest = dest,
         situationBefore = f,
-        after = after,
+        after = yo,
         capture = taken,
         castle = None,
         promotion = Some(promotion),
@@ -326,6 +358,7 @@ object Situation:
       )
 
     private def castle(king: Pos, kingTo: Pos, rook: Pos, rookTo: Pos): Move =
+      // println(s"castle $king $kingTo $rook $rookTo")
       val after =
         for
           b1 <- f.board.take(king)

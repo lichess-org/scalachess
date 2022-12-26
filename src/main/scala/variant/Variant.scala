@@ -90,7 +90,8 @@ abstract class Variant private[variant] (
   ): Validated[String, Move] =
 
     // Find the move in the variant specific list of valid moves
-    def findMove(from: Pos, to: Pos) = situation.moves get from flatMap (_.find(_.dest == to))
+    def findMove(from: Pos, to: Pos) =
+      situation.moves get from flatMap (_.find(_.dest == to))
 
     for {
       actor <- situation.board.actors get from toValid s"No piece on ${from.key}"

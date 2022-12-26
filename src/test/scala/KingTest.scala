@@ -29,7 +29,7 @@ R  QK NR""" destsFrom E1 must bePoss(F1)
 NPKP   P
 
 PPPPPPPP
- NBQKBNR
+ NBQQBNN
 """
       board destsFrom C4 must bePoss(
         board,
@@ -41,7 +41,7 @@ PPPPPPPP
 NPKP   P
  xxx
 PPPPPPPP
- NBQKBNR
+ NBQQBNN
 """
       )
     }

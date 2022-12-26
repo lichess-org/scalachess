@@ -132,15 +132,20 @@ object Situation:
 
   extension (f: Situation)
 
+    private def addCastlingMoves(prevMoves: List[Move], castlingMoves: List[Move]) =
+      prevMoves ::: castlingMoves.filterNot { cm =>
+        prevMoves.exists(m => m.orig == cm.orig && m.dest == cm.dest)
+      }
+
     /** The moves without taking defending the king into account */
-    def trustedMoves(withCastle: Boolean): List[Move] =
+    def trustedMoves: List[Move] =
       val enPassantMoves = f.board.history.epSquare.fold(Nil)(genEnPassant)
       // println(s"passant $enPassantMoves")
       val checkers       = f.checkers.getOrElse(Bitboard.empty)
       val targets        = ~f.us
       val withoutCastles = genNonKing(targets) ++ genSafeKing(targets)
       val moves =
-        if (withCastle) withoutCastles ++ genCastling()
+        if f.board.variant.allowsCastling then addCastlingMoves(withoutCastles, genCastling())
         else withoutCastles
       moves ++ enPassantMoves
 
@@ -152,7 +157,7 @@ object Situation:
       val movesWithoutEnpassant = if checkers == Bitboard.empty then
         val targets        = ~f.us
         val withoutCastles = genNonKing(targets) ++ genSafeKing(targets)
-        if f.board.variant.allowsCastling then withoutCastles ++ genCastling()
+        if f.board.variant.allowsCastling then addCastlingMoves(withoutCastles, genCastling())
         else withoutCastles
       else genEvasions(checkers)
       val moves = movesWithoutEnpassant ++ enPassantMoves
@@ -291,8 +296,7 @@ object Situation:
     // todo works with standard only
     private def genCastling(): List[Move] =
       f.ourKing.fold(Nil) { king =>
-        val firstRank = f.color.backRank
-        val rooks     = f.board.history.castles & Bitboard.rank(firstRank) & f.board.rooks
+        val rooks = f.board.history.castles & Bitboard.rank(f.color.backRank) & f.board.rooks
         for
           rook <- rooks.occupiedSquares
           path = Bitboard.between(king, rook)
@@ -376,7 +380,7 @@ object Situation:
       // for BC, we add a move where the king goes to the rook position
       for
         a            <- after.toList
-        inputKingPos <- List(kingTo, rook).distinct
+        inputKingPos <- List(kingTo, rook).distinct.filter(_ != king)
       yield Move(
         piece = f.color.king,
         orig = king,

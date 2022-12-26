@@ -16,7 +16,7 @@ object StandardMovesGenerator:
       // todo fix
       // if no king returns Left
       val king           = f.ourKing.get
-      val enPassantMoves = f.state.epSquare.fold(List())(genEnPassant)
+      val enPassantMoves = f.state.epSquare.fold(Nil)(genEnPassant)
       val checkers       = f.checkers.get
       val moves = if checkers == Bitboard.empty then
         val targets = ~f.us
@@ -69,8 +69,8 @@ object StandardMovesGenerator:
       val safeKings = genSafeKing(king, ~f.us & ~attacked)
       val blockers =
         if !checkers.moreThanOne then
-          checkers.lsb.map(c => genNonKing(Bitboard.between(king, c) | checkers)).getOrElse(List())
-        else List()
+          checkers.lsb.map(c => genNonKing(Bitboard.between(king, c) | checkers)).getOrElse(Nil)
+        else Nil
       safeKings ++ blockers
 
     def genKnight(mask: Bitboard): List[Move] =

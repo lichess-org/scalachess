@@ -14,7 +14,7 @@ case class Situation(board: Board, color: Color):
   lazy val moves: Map[Pos, List[Move]] =
     this.generate(board.variant.allowsCastling).groupBy(_.orig)
 
-  lazy val playerCanCapture: Boolean = moves exists (_._2 exists (_.captures))
+  lazy val playerCanCapture: Boolean = moves.exists(_._2.exists(_.captures))
 
   lazy val destinations: Map[Pos, List[Pos]] = moves.view.mapValues { _.map(_.dest) }.to(Map)
 
@@ -130,7 +130,7 @@ object Situation:
 
     /** The moves without taking defending the king into account */
     def trustedMoves(withCastle: Boolean): List[Move] =
-      val enPassantMoves = f.board.history.epSquare.fold(List())(genEnPassant)
+      val enPassantMoves = f.board.history.epSquare.fold(Nil)(genEnPassant)
       // println(s"passant $enPassantMoves")
       val checkers       = f.checkers.getOrElse(Bitboard.empty)
       val targets        = ~f.us
@@ -198,13 +198,16 @@ object Situation:
       // println(s"s1 $s1")
 
       // normal pawn moves
-      val singleMoves = ~f.board.occupied & (if f.isWhiteTurn then ((f.board.white & f.board.pawns) << 8)
-                                             else ((f.board.black & f.board.pawns) >>> 8))
+      val singleMoves = ~f.board.occupied & {
+        if f.isWhiteTurn then (f.board.white & f.board.pawns) << 8
+        else (f.board.black & f.board.pawns) >>> 8
+      }
 
       // println(s"singleMoves $singleMoves")
       val doubleMoves =
-        ~f.board.occupied & (if f.isWhiteTurn then (singleMoves << 8) else (singleMoves >>> 8))
-          & Bitboard.RANKS(if f.isWhiteTurn then 3 else 4)
+        ~f.board.occupied &
+          (if f.isWhiteTurn then singleMoves << 8 else singleMoves >>> 8) &
+          Bitboard.RANKS(if f.isWhiteTurn then 3 else 4)
       // println(s"doubleMoves $doubleMoves")
 
       val s2: List[List[Move]] = for
@@ -265,8 +268,8 @@ object Situation:
         // println(s"safeKings $safeKings")
         val blockers =
           if !checkers.moreThanOne then
-            checkers.lsb.map(c => genNonKing(Bitboard.between(king, c) | checkers)).getOrElse(List())
-          else List()
+            checkers.lsb.map(c => genNonKing(Bitboard.between(king, c) | checkers)).getOrElse(Nil)
+          else Nil
         // println(s"blockers $blockers")
         safeKings ++ blockers
       )
@@ -283,7 +286,7 @@ object Situation:
 
     // todo works with starndard only
     private def genCastling(): List[Move] =
-      f.ourKing.fold(Nil)(king =>
+      f.ourKing.fold(Nil) { king =>
         val firstRank = f.color.backRank
         val rooks     = f.board.history.castles & Bitboard.RANKS(firstRank.value) & f.board.rooks
         for
@@ -300,7 +303,7 @@ object Situation:
             .forall(identity)
           if safe
         yield castle(king, kingTo, rook, rookTo)
-      )
+      }
 
     private def genPawnMoves(from: Pos, to: Pos, capture: Boolean): List[Move] =
       if from.rank == f.color.seventhRank then

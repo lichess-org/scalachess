@@ -237,9 +237,9 @@ object Parser:
   private val tagsAndMovesParser: P0[ParsedPgn] =
     ((escape *> TagParser.tags.? <* escape) ~ MovesParser.strMoves.?).map {
       case (optionalTags, optionalMoves) => {
-        val preTags = Tags(optionalTags.map(_.toList).getOrElse(List()))
+        val preTags = Tags(optionalTags.map(_.toList).getOrElse(Nil))
         optionalMoves match
-          case None => ParsedPgn(InitialPosition(List()), preTags, Sans(List()))
+          case None => ParsedPgn(InitialPosition(Nil), preTags, Sans(Nil))
           case Some((init, sans, resultOption)) => {
             val tags =
               resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))

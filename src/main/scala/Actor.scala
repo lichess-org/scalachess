@@ -50,8 +50,8 @@ case class Actor(
 
   private def castle: List[Move] = castleOn(KingSide) ::: castleOn(QueenSide)
 
-  def castleOn(side: Side): List[Move] =
-    (for {
+  def castleOn(side: Side): List[Move] = {
+    for {
       // Check castling rights.
       kingPos <- board kingPosOf color filter (_ => history canCastle color on side)
       rookPos <- side.tripToRook(kingPos, board).lastOption
@@ -85,7 +85,8 @@ case class Actor(
           newKingPos :: Nil
         else Nil
       }
-    } map { move(_, b5, castle = castle) }) getOrElse Nil
+    } map { move(_, b5, castle = castle) }
+  } getOrElse Nil
 
   private def shortRange(dirs: Directions): List[Move] =
     dirs flatMap { _(pos) } flatMap { to =>

@@ -86,7 +86,7 @@ object Castles:
     case 'Q' => Some(A1)
     case _   => None
 
-  val all: Castles  = Bitboard.corners
+  val all: Castles  = Bitboard.corners // yep that's not chess960 friendly
   val none: Castles = Bitboard.empty
   def init: Castles = all
 

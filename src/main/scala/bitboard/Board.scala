@@ -222,6 +222,12 @@ case class Board(
 
   def piece(p: Piece): Bitboard = color(p.color) & role(p.role)
 
+  // use to guess unmovedRooks from board
+  def defaultUnmovedRooks =
+    val wr = rooks & white & Bitboard.rank(White.backRank)
+    val br = rooks & black & Bitboard.rank(Black.backRank)
+    wr | br
+
 object Board:
   val empty = Board(
     pawns = Bitboard.empty,

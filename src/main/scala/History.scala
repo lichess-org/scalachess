@@ -3,6 +3,7 @@ package chess
 import format.Uci
 import cats.kernel.Monoid
 import Castles.*
+import bitboard.Bitboard
 
 // Checks received by the respective side.
 case class CheckCount(white: Int = 0, black: Int = 0):
@@ -17,9 +18,9 @@ case class CheckCount(white: Int = 0, black: Int = 0):
 
   def apply(color: Color) = color.fold(white, black)
 
-opaque type UnmovedRooks = Set[Pos]
-object UnmovedRooks extends TotalWrapper[UnmovedRooks, Set[Pos]]:
-  val default: UnmovedRooks = (Pos.whiteBackrank ::: Pos.blackBackrank).toSet
+// opaque type UnmovedRooks = Map[(Color, Side), Pos]
+// object UnmovedRooks extends TotalWrapper[UnmovedRooks, Map[(Color, Side), Pos]]:
+//   val default: UnmovedRooks = (Pos.whiteBackrank ::: Pos.blackBackrank).toSet
 
 // color
 case class History(
@@ -28,7 +29,7 @@ case class History(
     positionHashes: PositionHash = Monoid[PositionHash].empty,
     castles: Castles = Castles.all, // => castlingRight
     checkCount: CheckCount = CheckCount(0, 0),
-    unmovedRooks: UnmovedRooks = UnmovedRooks.default,
+    unmovedRooks: Castles = Bitboard.corners,
     halfMoveClock: HalfMoveClock = HalfMoveClock(0),
     // fullMoves: FullMoveNumber = FullMoveNumber(0), // do we need it nows? => no
     // possible en-passant square

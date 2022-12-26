@@ -46,6 +46,15 @@ case class Move(
           else if piece.is(King) then halfCastlingRights & Bitboard.rank(piece.color.lastRank)
           else halfCastlingRights
 
+        val unmovedRooks1: Bitboard =
+          if captures then h2.unmovedRooks & ~dest.bitboard
+          else h2.unmovedRooks
+
+        val unmovedRooks2: Bitboard =
+          if piece is Rook then unmovedRooks1 & ~orig.bitboard
+          else if piece.is(King) then unmovedRooks1 & Bitboard.rank(piece.color.lastRank)
+          else unmovedRooks1
+
         val epSquare: Option[Pos] =
           if piece is Pawn then
             if Math.abs((orig - dest).value) == 16 then

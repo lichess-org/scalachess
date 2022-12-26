@@ -81,32 +81,13 @@ trait FenWriter:
 
   // todo we can do better with bitboard
   private[chess] def writeCastles(board: Board): String =
-
     import Castles.*
-    lazy val wr = board.pieces.collect {
-      case (pos, piece) if pos.rank == White.backRank && piece == White.rook => pos
-    }
-    lazy val br = board.pieces.collect {
-      case (pos, piece) if pos.rank == Black.backRank && piece == Black.rook => pos
-    }
-
-    lazy val wur = board.unmovedRooks.value.filter(_.rank == White.backRank)
-    lazy val bur = board.unmovedRooks.value.filter(_.rank == Black.backRank)
-
     {
       // castling rights with inner rooks are represented by their file name
-      (if (board.castles.whiteKingSide && wr.nonEmpty && wur.nonEmpty)
-         (if (wur contains wr.max) "K" else wur.max.file.toUpperCaseString)
-       else "") +
-        (if (board.castles.whiteQueenSide && wr.nonEmpty && wur.nonEmpty)
-           (if (wur contains wr.min) "Q" else wur.min.file.toUpperCaseString)
-         else "") +
-        (if (board.castles.blackKingSide && br.nonEmpty && bur.nonEmpty)
-           (if (bur contains br.max) "k" else bur.max.file)
-         else "") +
-        (if (board.castles.blackQueenSide && br.nonEmpty && bur.nonEmpty)
-           (if (bur contains br.min) "q" else bur.min.file)
-         else "")
+      (if (board.castles.whiteKingSide) "K" else "") +
+        (if (board.castles.whiteQueenSide) "Q" else "") +
+        (if (board.castles.blackKingSide) "k" else "") +
+        (if (board.castles.blackQueenSide) "q" else "")
     } match
       case "" => "-"
       case n  => n

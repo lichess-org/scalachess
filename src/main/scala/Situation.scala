@@ -6,6 +6,7 @@ import bitboard.Bitboard
 import bitboard.Bitboard.*
 
 import chess.format.Uci
+import chess.variant.Chess960
 
 case class Situation(board: Board, color: Color):
 
@@ -294,24 +295,33 @@ object Situation:
       )
 
     // todo works with standard only
+    // check king position
     private def genCastling(): List[Move] =
+      import Castles.*
       f.ourKing.fold(Nil) { king =>
-        val rooks = f.board.history.castles & Bitboard.rank(f.color.backRank) & f.board.rooks
-        for
-          rook <- rooks.occupiedSquares
-          path = Bitboard.between(king, rook)
-          if (path & f.board.occupied).isEmpty
-          toKingFile = if rook < king then File.C else File.G
-          toRookFile = if rook < king then File.D else File.F
-          kingTo     = Pos(toKingFile, king.rank)
-          rookTo     = Pos(toRookFile, rook.rank)
-          kingPath   = Bitboard.between(king, kingTo) | (1L << kingTo.value) | (1L << king.value)
-          safe = kingPath.occupiedSquares
-            .map(f.board.board.attacksTo(_, !f.color, f.board.occupied ^ (1L << king.value)).isEmpty)
-            .forall(identity)
-          if safe
-          moves <- castle(king, kingTo, rook, rookTo)
-        yield moves
+        // can castle but which side?
+        if !f.board.history.castles.can(f.color).any || king.rank != f.color.backRank then Nil
+        else
+          val rooks = f.board.history.unmovedRooks & Bitboard.rank(f.color.backRank) & f.board.rooks
+          for
+            rook <- rooks.occupiedSquares
+            toKingFile = if rook < king then File.C else File.G
+            toRookFile = if rook < king then File.D else File.F
+            kingTo     = Pos(toKingFile, king.rank)
+            rookTo     = Pos(toRookFile, rook.rank)
+            // calulate different path for standard vs chess960
+            path =
+              if f.board.variant.chess960 || f.board.variant.fromPosition
+              then (Bitboard.between(king, rook) | Bitboard.between(king, kingTo))
+              else Bitboard.between(king, rook)
+            if (path & (f.board.occupied & ~rook.bitboard)).isEmpty
+            kingPath = Bitboard.between(king, kingTo) | (1L << kingTo.value) | (1L << king.value)
+            safe = kingPath.occupiedSquares
+              .map(f.board.board.attacksTo(_, !f.color, f.board.occupied ^ (1L << king.value)).isEmpty)
+              .forall(identity)
+            if safe
+            moves <- castle(king, kingTo, rook, rookTo)
+          yield moves
       }
 
     private def genPawnMoves(from: Pos, to: Pos, capture: Boolean): List[Move] =
@@ -378,17 +388,21 @@ object Situation:
         after <- b3.place(f.color.rook, rookTo)
       yield after
       // for BC, we add a move where the king goes to the rook position
-      for
-        a            <- after.toList
-        inputKingPos <- List(kingTo, rook).distinct.filter(_ != king)
-      yield Move(
-        piece = f.color.king,
-        orig = king,
-        dest = inputKingPos,
-        situationBefore = f,
-        after = a,
-        capture = None,
-        castle = Option((king, kingTo), (rook, rookTo)),
-        promotion = None,
-        enpassant = false
-      )
+      val moves =
+        for
+          a            <- after.toList
+          inputKingPos <- List(kingTo, rook).distinct.filter(_ != king)
+        yield Move(
+          piece = f.color.king,
+          orig = king,
+          dest = inputKingPos,
+          situationBefore = f,
+          after = a,
+          capture = None,
+          castle = Option((king, kingTo), (rook, rookTo)),
+          promotion = None,
+          enpassant = false
+        )
+      // in chess960 we only allow king move to the rook position
+      if f.board.variant.chess960 || f.board.variant.fromPosition then moves.filter(m => m.dest != kingTo)
+      else moves

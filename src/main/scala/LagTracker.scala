@@ -65,13 +65,9 @@ object LagTracker:
 
   private val estimatedCpuLag = Centis(4)
 
+  // https://github.com/lichess-org/lila/issues/12097
   private def maxQuotaGainFor(config: Clock.Config) =
-    Centis(config.estimateTotalSeconds match {
-      case i if i >= 180 => 100
-      case i if i <= 15  => 20
-      case i if i <= 30  => 35
-      case i             => i / 4 + 30
-    })
+    Centis(math.min(100, config.estimateTotalSeconds * 2 / 5 + 15))
 
   def init(config: Clock.Config) =
     val quotaGain = maxQuotaGainFor(config)

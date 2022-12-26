@@ -208,7 +208,7 @@ object Situation:
       val doubleMoves =
         ~f.board.occupied &
           (if f.isWhiteTurn then singleMoves << 8 else singleMoves >>> 8) &
-          Bitboard.RANKS(if f.isWhiteTurn then 3 else 4)
+          Bitboard.rank(f.color.fourthRank)
       // println(s"doubleMoves $doubleMoves")
 
       val s2: List[List[Move]] = for
@@ -289,7 +289,7 @@ object Situation:
     private def genCastling(): List[Move] =
       f.ourKing.fold(Nil) { king =>
         val firstRank = f.color.backRank
-        val rooks     = f.board.history.castles & Bitboard.RANKS(firstRank.value) & f.board.rooks
+        val rooks     = f.board.history.castles & Bitboard.rank(firstRank) & f.board.rooks
         for
           rook <- rooks.occupiedSquares
           path = Bitboard.between(king, rook)

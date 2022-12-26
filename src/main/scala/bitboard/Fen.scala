@@ -66,7 +66,7 @@ case class Fen(board: Board, state: State):
         val castlingRights = halfCastlingRights & ~from.bitboard
         haftState.copy(castlingRights = castlingRights)
       case Move.Normal(_, _, King, _) | Move.Castle(_, _) =>
-        val castlingRights = halfCastlingRights & Bitboard.RANKS(state.turn.lastRank.value)
+        val castlingRights = halfCastlingRights & Bitboard.rank(state.turn.lastRank)
         haftState.copy(castlingRights = castlingRights)
       case _ => haftState
 

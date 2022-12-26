@@ -10,8 +10,8 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
   val empty: Bitboard   = Bitboard(0L)
   val corners: Bitboard = Bitboard(0x8100000000000081L)
 
-  val RANKS = Array.fill(8)(0L)
-  val FILES = Array.fill(8)(0L)
+  private val RANKS = Array.fill(8)(0L)
+  private val FILES = Array.fill(8)(0L)
 
   val KNIGHT_DELTAS     = Array[Int](17, 15, 10, 6, -17, -15, -10, -6)
   val BISHOP_DELTAS     = Array[Int](7, -7, 9, -9)
@@ -30,6 +30,9 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
 
   // Large overlapping attack table indexed using magic multiplication.
   val ATTACKS = Array.fill(88772)(0L)
+
+  inline def rank(r: Rank) = RANKS(r.value)
+  inline def file(f: File) = FILES(f.value)
 
   /** Slow attack set generation. Used only to bootstrap the attack tables.
     */

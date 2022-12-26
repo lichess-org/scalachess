@@ -46,7 +46,7 @@ object StandardMovesGenerator:
 
     def genCastling(king: Pos): List[Move] =
       val firstRank = f.state.turn.backRank
-      val rooks     = f.state.castlingRights & Bitboard.RANKS(firstRank.value)
+      val rooks     = f.state.castlingRights & Bitboard.rank(firstRank)
       for
         rook <- rooks.occupiedSquares
         path = Bitboard.between(king, rook)
@@ -131,8 +131,9 @@ object StandardMovesGenerator:
       val singleMoves = ~f.board.occupied & (if f.isWhiteTurn then ((f.board.white & f.board.pawns) << 8)
                                              else ((f.board.black & f.board.pawns) >>> 8))
       val doubleMoves =
-        ~f.board.occupied & (if f.isWhiteTurn then (singleMoves << 8) else (singleMoves >>> 8))
-          & Bitboard.RANKS(if f.isWhiteTurn then 3 else 4)
+        ~f.board.occupied &
+          (if f.isWhiteTurn then singleMoves << 8 else singleMoves >>> 8) &
+          Bitboard.rank(f.state.turn.fourthRank)
 
       val s2: List[List[Move]] = for
         to <- (singleMoves & mask).occupiedSquares

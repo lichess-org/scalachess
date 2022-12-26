@@ -33,7 +33,7 @@ case class Move(
           lastMove = Option(toUci),
           unmovedRooks = before.unmovedRooks,
           halfMoveClock =
-            if ((piece is Pawn) || captures || promotes) HalfMoveClock(0)
+            if (piece.is(Pawn) || captures || promotes) HalfMoveClock(0)
             else h1.halfMoveClock + 1
         )
 
@@ -42,8 +42,8 @@ case class Move(
           else h1.castles
 
         val castleRights: Bitboard =
-          if piece is Rook then (halfCastlingRights & ~orig.bitboard)
-          else if piece.is(King) then (halfCastlingRights & Bitboard.RANKS(piece.color.lastRank.value))
+          if piece is Rook then halfCastlingRights & ~orig.bitboard
+          else if piece.is(King) then halfCastlingRights & Bitboard.rank(piece.color.lastRank)
           else halfCastlingRights
 
         val epSquare: Option[Pos] =

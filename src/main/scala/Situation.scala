@@ -110,12 +110,16 @@ case class Situation(board: Board, color: Color):
 
   def isSafe(king: Pos, move: Move, blockers: Bitboard): Boolean =
     if move.enpassant then
-      val newOccupied =
-        (board.occupied ^ move.orig.bitboard ^ move.dest.combine(move.orig).bitboard) | move.dest.bitboard
-      (king.rookAttacks(newOccupied) & them & (board.rooks ^ board.queens)) == Bitboard.empty &&
-      (king.bishopAttacks(newOccupied) & them & (board.bishops ^ board.queens)) == Bitboard.empty
-    else if move.capture.isDefined then true
-    else !(us & blockers).contains(move.orig.value) || Bitboard.aligned(move.orig, move.dest, king)
+      val newOccupied = {
+        board.occupied ^
+          move.orig.bitboard ^ move.dest.withRankOf(move.orig).bitboard
+      } | move.dest.bitboard
+      (king.rookAttacks(newOccupied) & them & (board.rooks ^ board.queens)).isEmpty &&
+      (king.bishopAttacks(newOccupied) & them & (board.bishops ^ board.queens)).isEmpty
+    else
+      move.capture.isDefined || {
+        !(us & blockers).contains(move.orig.value) || Bitboard.aligned(move.orig, move.dest, king)
+      }
 
 object Situation:
 
@@ -311,16 +315,16 @@ object Situation:
         List(Queen, Knight, Rook, Bishop).map(promotion(from, to, _, capture))
       else List(normalMove(from, to, Pawn, capture))
 
-    private def enpassant(orig: Pos, dest: Pos) =
-      val capture = Option(dest.combine(orig))
-      val after   = f.board.taking(orig, dest, capture).get // todo we know that we have value
+    private def enpassant(orig: Pos, dest: Pos): Move =
+      val capture = Pos(dest.file, orig.rank)
+      val after   = f.board.taking(orig, dest, capture.some).get // todo we know that we have value
       Move(
         piece = f.color.pawn,
         orig = orig,
         dest = dest,
         situationBefore = f,
         after = after,
-        capture = capture,
+        capture = capture.some,
         castle = None,
         promotion = None,
         enpassant = true

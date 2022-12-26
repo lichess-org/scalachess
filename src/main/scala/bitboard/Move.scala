@@ -32,7 +32,7 @@ enum Move(val from: Pos, val to: Pos, val role: Role):
     this match
       case Promotion(from, to, role, _) => s"${from.uci}${to.uci}${role.forsyth}"
       case Castle(from, to) => {
-        val k = (if to < from then Pos.C1 else Pos.G1).combine(from)
+        val k = from.withFile(if to < from then File.C else File.G)
         s"${from.uci}${k.uci}"
       }
       case _ => s"${from.uci}${to.uci}"

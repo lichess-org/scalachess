@@ -25,9 +25,9 @@ case class Fen(board: Board, state: State):
         val result = !(us & blockers).contains(from.value) || Bitboard.aligned(from, to, king)
         result
       case Move.EnPassant(from, to) =>
-        val newOccupied = (occupied ^ from.bitboard ^ to.combine(from).bitboard) | to.bitboard
-        (king.rookAttacks(newOccupied) & them & (board.rooks ^ board.queens)) == Bitboard.empty &&
-        (king.bishopAttacks(newOccupied) & them & (board.bishops ^ board.queens)) == Bitboard.empty
+        val newOccupied = (occupied ^ from.bitboard ^ to.withRankOf(from).bitboard) | to.bitboard
+        (king.rookAttacks(newOccupied) & them & (board.rooks ^ board.queens)).isEmpty &&
+        (king.bishopAttacks(newOccupied) & them & (board.bishops ^ board.queens)).isEmpty
       case _ => true
 
   // TODO now it works with valid move only

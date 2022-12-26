@@ -51,8 +51,8 @@ object StandardMovesGenerator:
         rook <- rooks.occupiedSquares
         path = Bitboard.between(king, rook)
         if (path & f.occupied).isEmpty
-        toRank   = if rook < king then Pos.C1 else Pos.G1
-        kingTo   = toRank.combine(king)
+        toFile   = if rook < king then File.C else File.G
+        kingTo   = king.withFile(toFile)
         kingPath = Bitboard.between(king, kingTo) | (1L << kingTo.value) | (1L << king.value)
         safe = kingPath.occupiedSquares
           .map(f.board.attacksTo(_, !f.state.turn, f.occupied ^ (1L << king.value)).isEmpty)

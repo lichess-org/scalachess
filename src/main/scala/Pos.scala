@@ -54,8 +54,11 @@ object Pos extends OpaqueInt[Pos]:
 
     inline def key = s"${p.file.char}${p.rank.char}"
 
-    def combine(o: Pos): Pos =
-      Pos(p.file, o.rank)
+    inline def withRank(inline r: Rank): Pos = Pos(p.file, r)
+    inline def withFile(inline f: File): Pos = Pos(f, p.rank)
+
+    inline def withRankOf(inline o: Pos): Pos = withRank(o.rank)
+    inline def withFileOf(inline o: Pos): Pos = withFile(o.file)
 
   end extension
 

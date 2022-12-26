@@ -99,10 +99,10 @@ case class Board(
   def play(color: Color): Move => Board =
     case Move.Normal(from, to, role, _)    => discard(from).putOrReplace(to, role, color)
     case Move.Promotion(from, to, role, _) => discard(from).putOrReplace(to, role, color)
-    case Move.EnPassant(from, to) => discard(from).discard(to.combine(from)).putOrReplace(to, Pawn, color)
+    case Move.EnPassant(from, to) => discard(from).discard(to.withRankOf(from)).putOrReplace(to, Pawn, color)
     case Move.Castle(from, to) =>
-      val rookTo = (if to < from then Pos.D1 else Pos.F1).combine(to)
-      val kingTo = (if to < from then Pos.C1 else Pos.G1).combine(to)
+      val rookTo = to.withFile(if to < from then File.D else File.F)
+      val kingTo = to.withFile(if to < from then File.C else File.G)
       discard(from).discard(to).putOrReplace(rookTo, Rook, color).putOrReplace(kingTo, King, color)
 
   // todo more efficient

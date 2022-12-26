@@ -127,10 +127,10 @@ class ClockTest extends ChessTest:
         clockStep60(0, 0, 0) must_== 60 * 100
       }
       "no -> medium lag" in {
-        clockStep60(0, 0, 300) must_== 5880
+        clockStep60(0, 0, 300) must_== 5856
       }
       "no x4 -> big lag" in {
-        clockStep60(0, 0, 0, 0, 0, 700) must_== 5615
+        clockStep60(0, 0, 0, 0, 0, 700) must_== 5573
       }
     }
   }

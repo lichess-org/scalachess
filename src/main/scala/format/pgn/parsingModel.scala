@@ -55,7 +55,10 @@ case class Std(
 
   def withMetas(m: Metas) = copy(metas = m)
 
+  // TODO fix fix fix => bibibi
   def move(situation: Situation): Validated[String, chess.Move] =
+    // println(s"move $dest $role")
+    // println(situation.moves)
     situation.board.pieces.foldLeft(none[chess.Move]) {
       case (None, (pos, piece))
           if piece.color == situation.color && piece.role == role && compare(
@@ -66,6 +69,7 @@ case class Std(
             pos.rank.index + 1
           ) && piece.eyesMovable(pos, dest) =>
         val a = Actor(piece, pos, situation.board)
+        // println(s"Actor trustedMoves: ${a.trustedMoves(false)}")
         a trustedMoves false find { m =>
           m.dest == dest && a.board.variant.kingSafety(a, m)
         }

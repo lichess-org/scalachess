@@ -13,7 +13,9 @@ case class Situation(board: Board, color: Color):
   lazy val actors = board actorsOf color
 
   lazy val moves: Map[Pos, List[Move]] =
-    this.generateMoves.filter(board.variant.isValid).groupBy(_.orig)
+    board.variant.validMoves(this)
+
+  lazy val allMoves: List[Move] = this.trustedMoves
 
   lazy val playerCanCapture: Boolean = moves.exists(_._2.exists(_.captures))
 
@@ -142,9 +144,8 @@ object Situation:
     def trustedMoves: List[Move] =
       val enPassantMoves = f.board.history.epSquare.fold(Nil)(genEnPassant)
       // println(s"passant $enPassantMoves")
-      val checkers       = f.checkers.getOrElse(Bitboard.empty)
       val targets        = ~f.us
-      val withoutCastles = genNonKing(targets) ++ genSafeKing(targets)
+      val withoutCastles = genNonKing(targets) ++ genUnsafeKing(targets)
       val moves =
         if f.board.variant.allowsCastling then addCastlingMoves(withoutCastles, genCastling())
         else withoutCastles
@@ -164,11 +165,14 @@ object Situation:
       val moves = movesWithoutEnpassant ++ enPassantMoves
       // println(moves)
 
-      f.ourKing.fold(moves)(king =>
-        val blockers = f.sliderBlockers
-        if blockers != Bitboard.empty || !f.board.history.epSquare.isDefined then
-          moves.filter(m => f.isSafe(king, m, blockers))
-        else moves
+      if f.board.variant.antichess then
+        moves
+      else
+        f.ourKing.fold(moves)(king =>
+          val blockers = f.sliderBlockers
+          if blockers != Bitboard.empty || !f.board.history.epSquare.isDefined then
+            moves.filter(m => f.isSafe(king, m, blockers))
+          else moves
       )
 
     private def genEnPassant(ep: Pos): List[Move] =
@@ -282,6 +286,12 @@ object Situation:
           else Nil
         // println(s"blockers $blockers")
         safeKings ++ blockers
+      )
+
+    private def genUnsafeKing(mask: Bitboard): List[Move] =
+      f.ourKing.fold(Nil)(king =>
+        val targets = king.kingAttacks & mask
+        targets.occupiedSquares.map(to => normalMove(king, to, King, f.isOccupied(to)))
       )
 
     // this can still generate unsafe king moves

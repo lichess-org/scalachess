@@ -73,8 +73,13 @@ case object RacingKings
 
   // Not only check that our king is safe,
   // but also check the opponent's
+  override def validMoves(situation: Situation): Map[Pos, List[Move]] =
+    situation.allMoves
+    .filter(isValid)
+      .groupBy(_.orig)
+
   override def isValid(move: Move): Boolean =
-    !move.after.board.isCheck(!move.color)
+    super.isValid(move) && !move.after.board.isCheck(!move.color)
 
   override def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean =
     super.kingSafety(m, filter, kingPos) && m.after.board.isCheck(!m.color)

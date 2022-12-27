@@ -1,6 +1,12 @@
 package chess
 
 
+import cats.syntax.option.*
+import org.specs2.matcher.ValidatedMatchers
+import chess.format.{ EpdFen, Fen }
+import chess.format.pgn.Reader
+import chess.variant.Antichess
+
 import chess.format.EpdFen
 import chess.Pos.*
 import chess.variant.*
@@ -8,14 +14,19 @@ import chess.variant.*
 class DT extends ChessTest:
 
   "racingKings" should {
-    "call it stalemate when there is no legal move" in {
-      val position = EpdFen("8/8/8/8/3K4/8/1k6/b7 b - - 5 3")
-      val game     = fenToGame(position, RacingKings)
-      println(game)
-      game must beValid.like { case game =>
-        game.situation.end must beTrue
-        game.situation.staleMate must beTrue
+
+    "Not allow a king to be check mated" in {
+      val game = Game(Antichess).playMoves(
+        Pos.F2 -> Pos.F3,
+        Pos.E7 -> Pos.E6,
+        Pos.G2 -> Pos.G4,
+        Pos.D8 -> Pos.H4
+      )
+
+      game must beValid.like { case newGame =>
+        println(s" game valid ${newGame.situation.moves.values}")
+        newGame.situation.checkMate must beFalse
       }
     }
-  }
 
+  }

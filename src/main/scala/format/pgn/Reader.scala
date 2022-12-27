@@ -40,6 +40,7 @@ object Reader:
     println(s"makeReplay $game $sans")
     sans.value.foldLeft[Result](Result.Complete(Replay(game))) {
       case (Result.Complete(replay), san) =>
+        // println(s"replay ${replay.moves.size}")
         san(replay.state.situation).fold(
           err => Result.Incomplete(replay, err),
           move => Result.Complete(replay addMove move)

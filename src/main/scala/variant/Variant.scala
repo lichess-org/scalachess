@@ -48,7 +48,11 @@ abstract class Variant private[variant] (
       case _                                    => false
 
   def validMoves(situation: Situation): Map[Pos, List[Move]] =
-    situation.moves
+    // println(s"allMoves ${situation.allMoves}")
+    situation.allMoves.filter(isValid).groupBy(_.orig)
+
+  def isValid(move: Move): Boolean =
+    !move.after.board.isCheck(move.color)
 
   // Optimised for performance
   def pieceThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean =
@@ -64,16 +68,12 @@ abstract class Variant private[variant] (
   def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) =
     pieceThreatened(board, color, to, filter)
 
-  def isValid(move: Move): Boolean = true
+  // def isValid(move: Move): Boolean = true
   def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean =
-    m.after.board.isCheck(m.color)
+    !m.after.board.isCheck(m.color)
 
   def kingSafety(a: Actor, m: Move): Boolean =
-    kingSafety(
-      m,
-      if ((a.piece is King) || a.check) (_ => true) else (_.role.projection),
-      if (a.piece.role == King) None else a.board kingPosOf a.color
-    )
+    !m.after.board.isCheck(m.color)
 
   def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
     dir(p) exists { next =>

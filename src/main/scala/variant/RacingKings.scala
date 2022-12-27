@@ -75,7 +75,7 @@ case object RacingKings
   // but also check the opponent's
   override def validMoves(situation: Situation): Map[Pos, List[Move]] =
     situation.allMoves
-    .filter(isValid)
+      .filter(isValid)
       .groupBy(_.orig)
 
   override def isValid(move: Move): Boolean =

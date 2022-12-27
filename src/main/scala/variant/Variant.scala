@@ -47,11 +47,8 @@ abstract class Variant private[variant] (
       case Some(Queen | Rook | Knight | Bishop) => true
       case _                                    => false
 
-  // TODO this is the one
   def validMoves(situation: Situation): Map[Pos, List[Move]] =
-    situation.actors.collect {
-      case actor if actor.moves.nonEmpty => actor.pos -> actor.moves
-    }.toMap
+    situation.moves
 
   // Optimised for performance
   def pieceThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean =
@@ -67,8 +64,9 @@ abstract class Variant private[variant] (
   def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) =
     pieceThreatened(board, color, to, filter)
 
+  def isValid(move: Move): Boolean = true
   def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean =
-    !kingPos.exists { kingThreatened(m.after, !m.color, _, filter) }
+    m.after.board.isCheck(m.color)
 
   def kingSafety(a: Actor, m: Move): Boolean =
     kingSafety(

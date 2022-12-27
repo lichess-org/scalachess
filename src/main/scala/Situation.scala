@@ -13,7 +13,7 @@ case class Situation(board: Board, color: Color):
   lazy val actors = board actorsOf color
 
   lazy val moves: Map[Pos, List[Move]] =
-    this.generateMoves.groupBy(_.orig)
+    this.generateMoves.filter(board.variant.isValid).groupBy(_.orig)
 
   lazy val playerCanCapture: Boolean = moves.exists(_._2.exists(_.captures))
 

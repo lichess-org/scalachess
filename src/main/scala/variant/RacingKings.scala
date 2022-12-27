@@ -73,11 +73,11 @@ case object RacingKings
 
   // Not only check that our king is safe,
   // but also check the opponent's
+  override def isValid(move: Move): Boolean =
+    !move.after.board.isCheck(!move.color)
+
   override def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean =
-    super.kingSafety(m, filter, kingPos) &&
-      !m.after.board.king(!m.color).exists { theirKingPos =>
-        kingThreatened(m.after, m.color, theirKingPos, _ => true)
-      }
+    super.kingSafety(m, filter, kingPos) && m.after.board.isCheck(!m.color)
 
   // When considering stalemate, take into account that checks are not allowed.
   override def staleMate(situation: Situation): Boolean =

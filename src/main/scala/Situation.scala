@@ -175,9 +175,9 @@ object Situation:
           else moves
       )
 
+    // TODO we depend on the correctness of epSQuare here
     private def genEnPassant(ep: Pos): List[Move] =
       val pawns = f.us & f.board.board.pawns & ep.pawnAttacks(!f.color)
-      // println(s"pawns $pawns")
       val ff: Bitboard => Option[(Pos, Bitboard)] = bb => bb.lsb.map((_, bb & (bb - 1L)))
       List.unfold(pawns)(ff).map(enpassant(_, ep))
 

@@ -165,21 +165,20 @@ object Situation:
       val moves = movesWithoutEnpassant ++ enPassantMoves
       // println(moves)
 
-      if f.board.variant.antichess then
-        moves
+      if f.board.variant.antichess then moves
       else
         f.ourKing.fold(moves)(king =>
           val blockers = f.sliderBlockers
           if blockers != Bitboard.empty || !f.board.history.epSquare.isDefined then
             moves.filter(m => f.isSafe(king, m, blockers))
           else moves
-      )
+        )
 
     // TODO we depend on the correctness of epSQuare here
     private def genEnPassant(ep: Pos): List[Move] =
-      val pawns = f.us & f.board.board.pawns & ep.pawnAttacks(!f.color)
+      val pawns                                   = f.us & f.board.board.pawns & ep.pawnAttacks(!f.color)
       val ff: Bitboard => Option[(Pos, Bitboard)] = bb => bb.lsb.map((_, bb & (bb - 1L)))
-      List.unfold(pawns)(ff).map(enpassant(_, ep))
+      List.unfold(pawns)(ff).mapFilter(enpassant(_, ep))
 
     private def genNonKing(mask: Bitboard): List[Move] =
       // println(s"mask $mask")
@@ -230,45 +229,45 @@ object Situation:
       yield genPawnMoves(from, to, false)
       // println(s"s2 $s2")
 
-      val s3: List[Move] = for
+      val s3: List[Move] = (for
         to <- (doubleMoves & mask).occupiedSquares
         from = Pos.at(to.value + (if f.isWhiteTurn then -16 else 16)).get
-      yield normalMove(from, to, Pawn, false)
+      yield normalMove(from, to, Pawn, false)).flatten
 
       // println(s"s3 $s3")
       s1.flatten ++ s2.flatten ++ s3
 
     private def genKnight(mask: Bitboard): List[Move] =
       val knights = f.us & f.board.knights
-      for
+      (for
         from <- knights.occupiedSquares
         targets = Bitboard.knightAttacks(from) & mask
         to <- targets.occupiedSquares
-      yield normalMove(from, to, Knight, f.isOccupied(to))
+      yield normalMove(from, to, Knight, f.isOccupied(to))).flatten
 
     private def genBishop(mask: Bitboard): List[Move] =
       val bishops = f.us & f.board.bishops
-      for
+      (for
         from <- bishops.occupiedSquares
         targets = from.bishopAttacks(f.board.occupied) & mask
         to <- targets.occupiedSquares
-      yield normalMove(from, to, Bishop, f.isOccupied(to))
+      yield normalMove(from, to, Bishop, f.isOccupied(to))).flatten
 
     private def genRook(mask: Bitboard): List[Move] =
       val rooks = f.us & f.board.rooks
-      for
+      (for
         from <- rooks.occupiedSquares
         targets = from.rookAttacks(f.board.occupied) & mask
         to <- targets.occupiedSquares
-      yield normalMove(from, to, Rook, f.isOccupied(to))
+      yield normalMove(from, to, Rook, f.isOccupied(to))).flatten
 
     private def genQueen(mask: Bitboard): List[Move] =
       val queens = f.us & f.board.queens
-      for
+      (for
         from <- queens.occupiedSquares
         targets = from.queenAttacks(f.board.occupied) & mask
         to <- targets.occupiedSquares
-      yield normalMove(from, to, Queen, f.isOccupied(to))
+      yield normalMove(from, to, Queen, f.isOccupied(to))).flatten
 
     private def genEvasions(checkers: Bitboard): List[Move] =
       f.ourKing.fold(Nil)(king =>
@@ -291,17 +290,17 @@ object Situation:
     private def genUnsafeKing(mask: Bitboard): List[Move] =
       f.ourKing.fold(Nil)(king =>
         val targets = king.kingAttacks & mask
-        targets.occupiedSquares.map(to => normalMove(king, to, King, f.isOccupied(to)))
+        targets.occupiedSquares.flatMap(to => normalMove(king, to, King, f.isOccupied(to)))
       )
 
     // this can still generate unsafe king moves
     private def genSafeKing(mask: Bitboard): List[Move] =
       f.ourKing.fold(Nil)(king =>
         val targets = king.kingAttacks & mask
-        for
+        (for
           to <- targets.occupiedSquares
           if f.board.board.attacksTo(to, !f.color).isEmpty
-        yield normalMove(king, to, King, f.isOccupied(to))
+        yield normalMove(king, to, King, f.isOccupied(to))).flatten
       )
 
     // todo works with standard only
@@ -336,59 +335,66 @@ object Situation:
 
     private def genPawnMoves(from: Pos, to: Pos, capture: Boolean): List[Move] =
       if from.rank == f.color.seventhRank then
-        List(Queen, Knight, Rook, Bishop).map(promotion(from, to, _, capture))
-      else List(normalMove(from, to, Pawn, capture))
+        List(Queen, Knight, Rook, Bishop).map(promotion(from, to, _, capture)).flatten
+      else normalMove(from, to, Pawn, capture).toList
 
-    private def enpassant(orig: Pos, dest: Pos): Move =
+    private def enpassant(orig: Pos, dest: Pos): Option[Move] =
       val capture = Pos(dest.file, orig.rank)
-      val after   = f.board.taking(orig, dest, capture.some).get // todo we know that we have value
-      Move(
-        piece = f.color.pawn,
-        orig = orig,
-        dest = dest,
-        situationBefore = f,
-        after = after,
-        capture = capture.some,
-        castle = None,
-        promotion = None,
-        enpassant = true
-      )
+      f.board
+        .taking(orig, dest, capture.some)
+        .map(after =>
+          Move(
+            piece = f.color.pawn,
+            orig = orig,
+            dest = dest,
+            situationBefore = f,
+            after = after,
+            capture = capture.some,
+            castle = None,
+            promotion = None,
+            enpassant = true
+          )
+        )
 
-    private def normalMove(orig: Pos, dest: Pos, role: Role, capture: Boolean) =
+    private def normalMove(orig: Pos, dest: Pos, role: Role, capture: Boolean): Option[Move] =
       val taken = if capture then Option(dest) else None
       val after =
-        if (capture) then f.board.taking(orig, dest, taken).get // todo no get pls
-        else f.board.move(orig, dest).get
-      Move(
-        piece = Piece(f.color, role),
-        orig = orig,
-        dest = dest,
-        situationBefore = f,
-        after = after,
-        capture = taken,
-        castle = None,
-        promotion = None,
-        enpassant = false
+        if (capture) then f.board.taking(orig, dest, taken)
+        else f.board.move(orig, dest)
+      after.map(board =>
+        Move(
+          piece = Piece(f.color, role),
+          orig = orig,
+          dest = dest,
+          situationBefore = f,
+          after = board,
+          capture = taken,
+          castle = None,
+          promotion = None,
+          enpassant = false
+        )
       )
 
-    private def promotion(orig: Pos, dest: Pos, promotion: PromotableRole, capture: Boolean) =
+    private def promotion(orig: Pos, dest: Pos, promotion: PromotableRole, capture: Boolean): Option[Move] =
       val taken = if capture then Option(dest) else None
-      val after =
-        if (capture) then f.board.taking(orig, dest, taken).get // todo no get pls
-        else f.board.move(orig, dest).get
-      // todo yo lol
-      val yo = after.putOrReplace(Piece(f.color, promotion), dest)
-      Move(
-        piece = f.color.pawn,
-        orig = orig,
-        dest = dest,
-        situationBefore = f,
-        after = yo,
-        capture = taken,
-        castle = None,
-        promotion = Some(promotion),
-        enpassant = false
-      )
+      val after: Option[Board] =
+        if (capture) then f.board.taking(orig, dest, taken)
+        else f.board.move(orig, dest)
+      after
+        .map(_.putOrReplace(Piece(f.color, promotion), dest))
+        .map(board =>
+          Move(
+            piece = f.color.pawn,
+            orig = orig,
+            dest = dest,
+            situationBefore = f,
+            after = board,
+            capture = taken,
+            castle = None,
+            promotion = Some(promotion),
+            enpassant = false
+          )
+        )
 
     private def castle(king: Pos, kingTo: Pos, rook: Pos, rookTo: Pos): List[Move] =
       val after = for

@@ -285,8 +285,8 @@ object Situation:
         // Checks by these sliding pieces can maybe be blocked.
         val sliders = checkers & (f.board.sliders)
         // println(s"sliders: $sliders")
-        val attacked = sliders.occupiedSquares.foldRight(0L)((s, a) =>
-          a | (Bitboard.RAYS(king.value)(s.value) ^ (1L << s.value))
+        val attacked = sliders.occupiedSquares.foldRight(Bitboard.empty)((s, a) =>
+          a | (s.bitboard ^ Bitboard.RAYS(king.value)(s.value))
         )
         val safeKings = genSafeKing(~f.us & ~attacked)
         // println(s"safeKings $safeKings")
@@ -320,8 +320,8 @@ object Situation:
       import Castles.*
       f.ourKing.fold(Nil) { king =>
         def checkSafeSquare(pos: Pos, rookTo: Pos): Boolean =
-          if f.board.variant.atomic then !f.board.board.atomicKingAttack(pos, f.color, (f.board.occupied ^ (1L << king.value) | rookTo.bitboard))
-          else f.board.board.attacksTo(pos, !f.color, f.board.occupied ^ (1L << king.value)).isEmpty
+          if f.board.variant.atomic then !f.board.board.atomicKingAttack(pos, f.color, (f.board.occupied ^ king.bitboard | rookTo.bitboard))
+          else f.board.board.attacksTo(pos, !f.color, f.board.occupied ^ king.bitboard).isEmpty
 
         // can castle but which side?
         if !f.board.history.castles.can(f.color).any || king.rank != f.color.backRank then Nil
@@ -339,7 +339,7 @@ object Situation:
               then (Bitboard.between(king, rook) | Bitboard.between(king, kingTo))
               else Bitboard.between(king, rook)
             if (path & (f.board.occupied & ~rook.bitboard)).isEmpty
-            kingPath = Bitboard.between(king, kingTo) | (1L << kingTo.value) | (1L << king.value)
+            kingPath = Bitboard.between(king, kingTo) | kingTo.bitboard | king.bitboard
             safe = kingPath.occupiedSquares
               .map(checkSafeSquare(_, rookTo))
               .forall(identity)

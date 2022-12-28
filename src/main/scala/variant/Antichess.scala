@@ -34,7 +34,6 @@ case object Antichess
   override def validMoves(situation: Situation) =
     val allMoves       = situation.allMoves.groupBy(_.orig)
     val capturingMoves = allMoves.view mapValues (_.filter(_.captures)) filterNot (_._2.isEmpty)
-    println(s"anti capturingMoves: ${capturingMoves.size}")
     (if (capturingMoves.nonEmpty) capturingMoves else allMoves).toMap
 
 

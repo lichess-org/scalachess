@@ -1,5 +1,8 @@
 package benchmarks
+
 import org.openjdk.jmh.annotations._
+
+import chess.PerftTestCase
 
 import java.util.concurrent.TimeUnit
 
@@ -13,6 +16,6 @@ class Bench {
 
   @Benchmark
   def justBench(): Int =
-    List.range(1,10000).sum
+    PerftTestCase.chess960.flatMap(_.calculate()).map(_.result).sum
 
 }

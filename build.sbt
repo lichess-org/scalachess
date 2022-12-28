@@ -35,4 +35,4 @@ publishTo := Option(Resolver.file("file", new File(sys.props.getOrElse("publishT
 lazy val bench = project
   .enablePlugins(JmhPlugin)
   .settings(name := "bench")
-  .dependsOn(scalachess)
+  .dependsOn(scalachess, scalachess % "compile->test")

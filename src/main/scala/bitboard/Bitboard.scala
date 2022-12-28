@@ -202,10 +202,8 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
         case Color.Black => Rank.Second
 
   private def distance(a: Int, b: Int): Int =
-    Math.max(Math.abs(a.file - b.file), Math.abs(a.rank - b.rank))
-
-  extension (a: Int)
-    private def file = a & 7
-    private def rank = a >>> 3
+    inline def file(p: Int) = p & 7
+    inline def rank(p: Int) = p >>> 3
+    Math.max(Math.abs(file(a) - file(b)), Math.abs(rank(a) - rank(b)))
 
   extension (a: Long) def bb = Bitboard(a)

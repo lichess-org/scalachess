@@ -12,14 +12,27 @@ class DT extends ChessTest:
 
   "Crazyhouse" should {
 
-    "Not allow a king to capture a piece" in {
-      val fenPosition = EpdFen("8/8/8/1k6/8/8/8/1Kr5 w - -")
-      val maybeGame   = fenToGame(fenPosition, Atomic)
+    "In atomic chess a king may walk into a square that is in the perimeter of the opponent king since it can't capture" in {
+      val positionFen = EpdFen("3k4/8/3K4/8/8/8/7r/8 w - -")
+      val game        = fenToGame(positionFen, Atomic)
 
-      val errorGame = maybeGame flatMap (_.playMoves((Pos.B1, Pos.C1)))
+      game.map(g => println(s"${g.situation.moves}"))
+      val successGame = game flatMap (_.playMoves((Pos.D6, Pos.D7)))
 
-      errorGame must beInvalid("Piece on b1 cannot move to c1")
+      successGame must beValid.like { case game =>
+        game.situation.board(Pos.D7) must beSome
+        game.situation.check must beFalse
+      }
     }
+
+    // "Not allow a king to capture a piece" in {
+    //   val fenPosition = EpdFen("8/8/8/1k6/8/8/8/1Kr5 w - -")
+    //   val maybeGame   = fenToGame(fenPosition, Atomic)
+    //
+    //   val errorGame = maybeGame flatMap (_.playMoves((Pos.B1, Pos.C1)))
+    //
+    //   errorGame must beInvalid("Piece on b1 cannot move to c1")
+    // }
 
     // "The game must end with the correct winner when a king explodes in the perimeter of a captured piece" in {
     //   val fenPosition = EpdFen("rnb1kbnr/ppp1pppp/8/3q4/8/7P/PPPP1PP1/RNBQKBNR b KQkq -")

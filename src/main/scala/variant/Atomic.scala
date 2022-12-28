@@ -55,9 +55,9 @@ case object Atomic
     }
 
   override def isValid(move: Move): Boolean =
-    (!move.after.board.isCheck(move.color) ||
-    explodesOpponentKing(move.situationBefore)(move))
-    && !explodesOwnKing(move.situationBefore)(move)
+    (!move.after.board.isCheckWithoutKing(move.color) ||
+      explodesOpponentKing(move.situationBefore)(move))
+      && !explodesOwnKing(move.situationBefore)(move)
 
   // moves exploding opponent king are always playable
   override def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean = {

@@ -68,6 +68,18 @@ case class Board(
         s.pawnAttacks(!attacker) & pawns
     )
 
+  // temporary function for Atomic
+  def attacksToWithoutKing(s: Pos, attacker: Color, occupied: Bitboard): Bitboard =
+    byColor(attacker) & (
+      s.rookAttacks(occupied) & (rooks ^ queens) |
+        s.bishopAttacks(occupied) & (bishops ^ queens) |
+        s.knightAttacks & knights |
+        s.pawnAttacks(!attacker) & pawns
+    )
+  def isCheckWithoutKing(color: Color): Boolean =
+    king(color).exists(k => attacksToWithoutKing(k, !color, occupied) != Bitboard.empty)
+
+
   // return true if the king with color is in check
   // return false in case of no king
   def isCheck(color: Color): Boolean =

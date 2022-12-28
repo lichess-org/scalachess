@@ -7,13 +7,13 @@ import org.specs2.specification.core.Fragments
 class PerftTest extends ChessTest:
 
   private def genTests(name: String, tests: List[PerftTestCase]): Fragments =
-    name should {
+    name >> {
       Fragments.foreach(tests) { pts =>
-        pts.id should {
+        pts.id >> {
           val result = pts.calculate()
           Fragments.foreach(result) { r =>
             s"${r.depth}" in {
-              r.result must be equalTo r.expected
+              r.result === r.expected
             }
           }
         }

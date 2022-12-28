@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit
 class Bench {
 
   @Benchmark
-  def justBench(): Int =
+  def chess960(): Int =
     PerftTestCase.chess960.flatMap(_.calculate()).map(_.result).sum
 
 }

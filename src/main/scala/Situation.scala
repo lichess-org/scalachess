@@ -122,7 +122,7 @@ case class Situation(board: Board, color: Color):
       (king.bishopAttacks(newOccupied) & them & (board.bishops ^ board.queens)).isEmpty
     else
       move.capture.isDefined || {
-        !(us & blockers).contains(move.orig.value) || Bitboard.aligned(move.orig, move.dest, king)
+        !(us & blockers).contains(move.orig) || Bitboard.aligned(move.orig, move.dest, king)
       }
 
 object Situation:

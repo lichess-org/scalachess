@@ -49,7 +49,7 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
         if (!con)
           attacks |= 1L << sq
 
-        !(occupied.contains(sq) || con)
+        !(occupied.contains(Pos(sq)) || con)
       do ()
     }
     attacks
@@ -89,11 +89,11 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
       a <- squareRange
       b <- squareRange
       _ =
-        if slidingAttacks(a, 0, ROOK_DELTAS).contains(b) then
+        if slidingAttacks(a, 0, ROOK_DELTAS).contains(Pos(b)) then
           BETWEEN(a)(b) = slidingAttacks(a, 1L << b, ROOK_DELTAS) & slidingAttacks(b, 1L << a, ROOK_DELTAS)
           RAYS(a)(b) =
             (1L << a) | (1L << b) | slidingAttacks(a, 0, ROOK_DELTAS) & slidingAttacks(b, 0, ROOK_DELTAS)
-        else if slidingAttacks(a, 0, BISHOP_DELTAS).contains(b) then
+        else if slidingAttacks(a, 0, BISHOP_DELTAS).contains(Pos(b)) then
           BETWEEN(a)(b) =
             slidingAttacks(a, 1L << b, BISHOP_DELTAS) & slidingAttacks(b, 1L << a, BISHOP_DELTAS)
           RAYS(a)(b) =
@@ -103,7 +103,7 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
   initialize()
 
   def aligned(a: Pos, b: Pos, c: Pos): Boolean =
-    ray(a, b).contains(c.value)
+    ray(a, b).contains(c)
 
   def between(a: Pos, b: Pos): Bitboard =
     BETWEEN(a.value)(b.value)
@@ -165,11 +165,11 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
     inline def atLeast[B](inline bot: B)(using sr: LongRuntime[B]): Bitboard = atLeast(sr(bot))
     inline def atMost[B](inline top: B)(using sr: LongRuntime[B]): Bitboard  = atMost(sr(top))
 
-    def contains(s: Int): Boolean =
-      (a & (1L << s)) != 0
+    def contains(pos: Pos): Boolean =
+      (a & (1L << pos.value)).nonEmpty
 
     def moreThanOne: Boolean =
-      (a & (a - 1L)) != 0
+      (a & (a - 1L)).nonEmpty
 
     def lsb: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(a))
 

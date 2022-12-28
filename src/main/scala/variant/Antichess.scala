@@ -28,12 +28,17 @@ case object Antichess
   override def kingSafety(a: Actor, m: Move): Boolean =
     true
 
-  // In this variant, a player must capture if a capturing move is available
+  override def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) =
+    false
+
   override def validMoves(situation: Situation) =
     val allMoves       = situation.allMoves.groupBy(_.orig)
     val capturingMoves = allMoves.view mapValues (_.filter(_.captures)) filterNot (_._2.isEmpty)
     println(s"anti capturingMoves: ${capturingMoves.size}")
     (if (capturingMoves.nonEmpty) capturingMoves else allMoves).toMap
+
+
+  // override def isValid(move: Move): Boolean = true
 
   override def valid(board: Board, strict: Boolean) =
     board.allPieces.size >= 2 && board.allPieces.size <= 32

@@ -87,7 +87,6 @@ abstract class Variant private[variant] (
       to: Pos,
       promotion: Option[PromotableRole]
   ): Validated[String, Move] =
-    // println(s"variant move $situation $from $to")
     // Find the move in the variant specific list of valid moves
     def findMove(from: Pos, to: Pos) =
       situation.moves get from flatMap (_.find(_.dest == to))

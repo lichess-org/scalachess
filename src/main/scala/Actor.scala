@@ -31,7 +31,7 @@ case class Actor(
 
   private inline def pawnDir = pawnDirOf(color)
 
-  def castleOn(side: Side): List[Move] = moves.filter(m => m.castle.fold(false)(_.sideCastles == side))
+  def castleOn(side: Side): List[Move] = moves.filter(_.castle.exists(_.sideCastles == side))
 
   // another ugly function
   extension (c: ((Pos, Pos), (Pos, Pos)))

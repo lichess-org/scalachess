@@ -61,7 +61,7 @@ object Divider:
   private def backrankSparse(board: Board): Boolean =
     backranks.exists { case (backrank, color) =>
       backrank.count { pos =>
-        board(pos).fold(false)(_ is color)
+        board(pos).exists(_ is color)
       } < 4
     }
 

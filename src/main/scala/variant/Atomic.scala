@@ -78,10 +78,10 @@ case object Atomic
       // itself explode
       // todo use bitboard
       val piecesToExplode: Set[Pos] =
-        affectedPos.filter(boardPieces.get(_).fold(false)(_.isNot(Pawn))) + destination
+        affectedPos.filter(boardPieces.get(_).exists(_.isNot(Pawn))) + destination
       val afterExplosions = boardPieces -- piecesToExplode
 
-      val rooksToExploded = affectedPos.filter(boardPieces.get(_).fold(false)(_.is(Rook)))
+      val rooksToExploded = affectedPos.filter(boardPieces.get(_).exists(_.is(Rook)))
 
       val castles  = rooksToExploded.foldLeft(afterBoard.history.castles)((c, pos) => c & ~pos.bitboard)
       val newBoard = (afterBoard withPieces afterExplosions).withCastles(Castles(castles))

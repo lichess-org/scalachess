@@ -55,7 +55,7 @@ trait FenWriter:
             else
               fen append s"$empty${piece.forsyth}"
               empty = 0
-            if (piece.role != Pawn && board.crazyData.fold(false)(_.promoted.contains(Pos(x, y))))
+            if (piece.role != Pawn && board.crazyData.exists(_.promoted.contains(Pos(x, y))))
               fen append '~'
       if (empty > 0) fen append empty
       if (y > Rank.First) fen append '/'

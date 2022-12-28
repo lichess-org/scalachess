@@ -119,3 +119,24 @@ object PerftTestCase:
       Chess960
     )
   )
+
+  val tricky: List[PerftTestCase] = List(
+    PerftTestCase(
+      "kiwipete",
+      EpdFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"),
+      List(TestCase(3, 97862)),
+      Chess960
+    ),
+    PerftTestCase(
+      "position 4 mirrored",
+      EpdFen("r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1"),
+      List(TestCase(3, 9467)),
+      Chess960
+    ),
+    PerftTestCase(
+      "h-side rook blocks a-side castling",
+      EpdFen("4rrk1/pbbp2p1/1ppnp3/3n1pqp/3N1PQP/1PPNP3/PBBP2P1/4RRK1 w Ff - 0 1"),
+      List(TestCase(3, 71908)),
+      Chess960
+    )
+  )

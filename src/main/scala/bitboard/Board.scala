@@ -77,16 +77,15 @@ case class Board(
         s.pawnAttacks(!attacker) & pawns
     )
 
-
   def atomicCheck(color: Color): Boolean =
     val their = byColor(!color)
-    king(color).exists(k => (their & (k.kingAttacks & kings)).isEmpty && attacksToWithoutKing(k, !color, occupied).nonEmpty)
+    king(color).exists(k =>
+      (their & (k.kingAttacks & kings)).isEmpty && attacksToWithoutKing(k, !color, occupied).nonEmpty
+    )
 
   def atomicKingAttack(king: Pos, color: Color, occupied: Bitboard): Boolean =
     val their = byColor(!color)
     (their & (king.kingAttacks & kings)).isEmpty && attacksToWithoutKing(king, !color, occupied).nonEmpty
-
-
 
   // return true if the king with color is in check
   // return false in case of no king

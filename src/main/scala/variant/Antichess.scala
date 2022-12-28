@@ -36,7 +36,6 @@ case object Antichess
     val capturingMoves = allMoves.view mapValues (_.filter(_.captures)) filterNot (_._2.isEmpty)
     (if (capturingMoves.nonEmpty) capturingMoves else allMoves).toMap
 
-
   // override def isValid(move: Move): Boolean = true
 
   override def valid(board: Board, strict: Boolean) =

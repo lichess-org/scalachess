@@ -80,13 +80,14 @@ abstract class Variant private[variant] (
       next == to || (!board.contains(next) && longRangeThreatens(board, next, dir, to))
     }
 
+  // todo simplify this, we don't need actor anymore
   def move(
       situation: Situation,
       from: Pos,
       to: Pos,
       promotion: Option[PromotableRole]
   ): Validated[String, Move] =
-
+    // println(s"variant move $situation $from $to")
     // Find the move in the variant specific list of valid moves
     def findMove(from: Pos, to: Pos) =
       situation.moves get from flatMap (_.find(_.dest == to))

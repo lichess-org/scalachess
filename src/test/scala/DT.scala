@@ -11,28 +11,44 @@ import chess.format.pgn.SanStr
 class DT extends ChessTest:
 
   "Crazyhouse" should {
-    "prod 50 games accumulate hash" in {
-      val gameMoves: List[List[SanStr]] = format.pgn.Fixtures.prod50crazyhouse.map { g =>
-        SanStr from g.split(' ').toList
-      }
-      def runOne(moves: List[SanStr]) =
-        Replay.gameMoveWhileValid(moves, format.Fen.initial, Crazyhouse)
-      def hex(buf: Array[Byte]): String = buf.map("%02x" format _).mkString
-      val g                             = gameMoves.map(runOne)
-      g.exists(_._3.nonEmpty) must beFalse
-      val m8  = java.security.MessageDigest getInstance "MD5"
-      val m16 = java.security.MessageDigest getInstance "MD5"
-      val h   = Hash(16)
-      g.foreach {
-        _._2.foreach { x =>
-          val ph = h(x._1.situation)
-          m8.update(PositionHash.value(ph).slice(0, 8))
-          m16.update(PositionHash value ph)
-        }
-      }
-      hex(m8.digest) must beEqualTo("fcf5867ad3324c4be6d28108ff27212c")
-      hex(m16.digest) must beEqualTo("80c4edf5fbd41eff78d3d563777beb61")
+
+    "Not allow a king to capture a piece" in {
+      val fenPosition = EpdFen("8/8/8/1k6/8/8/8/1Kr5 w - -")
+      val maybeGame   = fenToGame(fenPosition, Atomic)
+
+      val errorGame = maybeGame flatMap (_.playMoves((Pos.B1, Pos.C1)))
+
+      errorGame must beInvalid("Piece on b1 cannot move to c1")
     }
+
+    // "The game must end with the correct winner when a king explodes in the perimeter of a captured piece" in {
+    //   val fenPosition = EpdFen("rnb1kbnr/ppp1pppp/8/3q4/8/7P/PPPP1PP1/RNBQKBNR b KQkq -")
+    //   val maybeGame   = fenToGame(fenPosition, Atomic)
+    //
+    //   val gameWin = maybeGame flatMap (_.playMoves((Pos.D5, Pos.D2)))
+    //
+    //   gameWin must beValid.like { case winningGame =>
+    //     winningGame.situation.end must beTrue
+    //     winningGame.situation.variantEnd must beTrue
+    //     winningGame.situation.winner must beSome(Black)
+    //   }
+    // }
+    //
+    // "Must explode surrounding non pawn pieces on capture" in {
+    //   val fenPosition     = EpdFen("rnbqkbnr/1ppppp1p/p5p1/8/8/1P6/PBPPPPPP/RN1QKBNR w KQkq -")
+    //   val maybeGame       = fenToGame(fenPosition, Atomic)
+    //   val explodedSquares = List(Pos.H8, Pos.G8)
+    //   val intactPawns     = List(Pos.F7, Pos.G6, Pos.H7)
+    //
+    //   val explosionGame = maybeGame flatMap (_.playMoves((Pos.B2, Pos.H8)))
+    //   println(s"explosionGame $explosionGame")
+    //
+    //   explosionGame must beValid.like { case game =>
+    //     println(s"game $game")
+    //     explodedSquares.forall(pos => game.situation.board(pos).isEmpty) must beTrue
+    //     intactPawns.forall(pos => game.situation.board(pos).isDefined) must beTrue
+    //   }
+    // }
 
     // "destinations prod bug on game VVXRgsQT" in {
     //   import chess.Pos.*

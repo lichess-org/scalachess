@@ -11,17 +11,17 @@ case class PerftTestCase(id: String, epd: EpdFen, cases: List[TestCase], variant
     cases.map(c => Result(c.depth, PerftTestCase.perft(game, c.depth), c.result))
 
 case class TestCase(depth: Int, result: Int)
-case class Result(val depth: Int, val result: Int, val expected: Int)
+case class Result(depth: Int, result: Int, expected: Int)
 
 object PerftTestCase:
   private def perft(game: Game, depth: Int): Int =
     if (depth > 0)
       (game.situation.moves.values.toList.flatten: List[Move]).foldLeft(0)((p, move) =>
         if (move.piece.role == Pawn && (move.dest.rank == Rank.First || move.dest.rank == Rank.Eighth))
-          p + perft(game.apply(move.withPromotion(Option(Queen)).get), depth - 1)
-            + perft(game.apply(move.withPromotion(Option(Rook)).get), depth - 1)
-            + perft(game.apply(move.withPromotion(Option(Bishop)).get), depth - 1)
-            + perft(game.apply(move.withPromotion(Option(Knight)).get), depth - 1)
+          p + List(Queen, Rook, Bishop, Knight, King)
+            .flatMap(move.withPromotion)
+            .map(move => perft(game(move), depth - 1))
+            .sum
         else
           p + perft(game.apply(move), depth - 1)
       )

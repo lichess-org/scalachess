@@ -26,8 +26,12 @@ To run the tests (with coverage):
     clean coverage test
     coverageReport
 
+To run benchmarks:
+
+    sbt "bench / Jmh / run"
+
 Code formatting
-###
+---------------
 
 This repository uses [scalafmt](https://scalameta.org/scalafmt/).
 

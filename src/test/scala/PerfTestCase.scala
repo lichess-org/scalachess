@@ -18,7 +18,7 @@ object PerftTestCase:
     if (depth > 0)
       (game.situation.moves.values.toList.flatten: List[Move]).foldLeft(0)((p, move) =>
         if (move.piece.role == Pawn && (move.dest.rank == Rank.First || move.dest.rank == Rank.Eighth))
-          p + List(Queen, Rook, Bishop, Knight, King)
+          p + List(Queen, Rook, Bishop, Knight)
             .flatMap(move.withPromotion)
             .map(move => perft(game(move), depth - 1))
             .sum

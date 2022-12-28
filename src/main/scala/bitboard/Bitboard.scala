@@ -138,17 +138,17 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
   extension (a: Bitboard)
     inline def unary_- : Bitboard                                            = -a
     inline def unary_~ : Bitboard                                            = ~a
-    inline infix def >(inline o: Bitboard): Boolean                          = a > o
-    inline infix def <(inline o: Bitboard): Boolean                          = a < o
-    inline infix def >=(inline o: Bitboard): Boolean                         = a >= o
-    inline infix def <=(inline o: Bitboard): Boolean                         = a <= o
-    inline infix def +(inline o: Bitboard): Bitboard                         = a + o
-    inline infix def -(inline o: Bitboard): Bitboard                         = a - o
-    inline infix def &(inline o: Bitboard): Bitboard                         = a & o
-    inline infix def ^(inline o: Bitboard): Bitboard                         = a ^ o
-    inline infix def |(inline o: Bitboard): Bitboard                         = a | o
-    inline infix def <<(inline o: Bitboard): Bitboard                        = a << o
-    inline infix def >>>(inline o: Bitboard): Bitboard                       = a >>> o
+    inline infix def >(inline o: Long): Boolean                              = a > o
+    inline infix def <(inline o: Long): Boolean                              = a < o
+    inline infix def >=(inline o: Long): Boolean                             = a >= o
+    inline infix def <=(inline o: Long): Boolean                             = a <= o
+    inline infix def +(inline o: Long): Bitboard                             = a + o
+    inline infix def -(inline o: Long): Bitboard                             = a - o
+    inline infix def &(inline o: Long): Bitboard                             = a & o
+    inline infix def ^(inline o: Long): Bitboard                             = a ^ o
+    inline infix def |(inline o: Long): Bitboard                             = a | o
+    inline infix def <<(inline o: Long): Bitboard                            = a << o
+    inline infix def >>>(inline o: Long): Bitboard                           = a >>> o
     inline infix def >[B](inline o: B)(using sr: LongRuntime[B]): Boolean    = >(sr(o))
     inline infix def <[B](inline o: B)(using sr: LongRuntime[B]): Boolean    = <(sr(o))
     inline infix def >=[B](inline o: B)(using sr: LongRuntime[B]): Boolean   = >=(sr(o))

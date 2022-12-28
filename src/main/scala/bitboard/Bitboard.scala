@@ -13,27 +13,27 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
   private val RANKS = Array.fill(8)(0L)
   private val FILES = Array.fill(8)(0L)
 
-  val KNIGHT_DELTAS     = Array[Int](17, 15, 10, 6, -17, -15, -10, -6)
-  val BISHOP_DELTAS     = Array[Int](7, -7, 9, -9)
-  val ROOK_DELTAS       = Array[Int](1, -1, 8, -8)
-  val KING_DELTAS       = Array[Int](1, 7, 8, 9, -1, -7, -8, -9)
-  val WHITE_PAWN_DELTAS = Array[Int](7, 9)
-  val BLACK_PAWN_DELTAS = Array[Int](-7, -9)
+  private[bitboard] val KNIGHT_DELTAS     = Array[Int](17, 15, 10, 6, -17, -15, -10, -6)
+  private[bitboard] val BISHOP_DELTAS     = Array[Int](7, -7, 9, -9)
+  private[bitboard] val ROOK_DELTAS       = Array[Int](1, -1, 8, -8)
+  private[bitboard] val KING_DELTAS       = Array[Int](1, 7, 8, 9, -1, -7, -8, -9)
+  private[bitboard] val WHITE_PAWN_DELTAS = Array[Int](7, 9)
+  private[bitboard] val BLACK_PAWN_DELTAS = Array[Int](-7, -9)
 
-  val KNIGHT_ATTACKS     = Array.fill(64)(0L)
-  val KING_ATTACKS       = Array.fill(64)(0L)
-  val WHITE_PAWN_ATTACKS = Array.fill(64)(0L)
-  val BLACK_PAWN_ATTACKS = Array.fill(64)(0L)
+  private[bitboard] val KNIGHT_ATTACKS     = Array.fill(64)(0L)
+  private[bitboard] val KING_ATTACKS       = Array.fill(64)(0L)
+  private[bitboard] val WHITE_PAWN_ATTACKS = Array.fill(64)(0L)
+  private[bitboard] val BLACK_PAWN_ATTACKS = Array.fill(64)(0L)
 
-  val BETWEEN                = Array.ofDim[Long](64, 64)
-  private[bitboard] val RAYS = Array.ofDim[Long](64, 64)
+  private[bitboard] val BETWEEN = Array.ofDim[Long](64, 64)
+  private[bitboard] val RAYS    = Array.ofDim[Long](64, 64)
 
   // Large overlapping attack table indexed using magic multiplication.
-  val ATTACKS = Array.fill(88772)(0L)
+  private[bitboard] val ATTACKS = Array.fill(88772)(0L)
 
-  inline def rank(r: Rank): Bitboard           = RANKS(r.value)
-  inline def file(f: File): Bitboard           = FILES(f.value)
-  inline def ray(from: Pos, to: Pos): Bitboard = RAYS(from.value)(to.value)
+  inline def rank(inline r: Rank): Bitboard                  = RANKS(r.value)
+  inline def file(inline f: File): Bitboard                  = FILES(f.value)
+  inline def ray(inline from: Pos, inline to: Pos): Bitboard = RAYS(from.value)(to.value)
 
   /** Slow attack set generation. Used only to bootstrap the attack tables.
     */
@@ -103,7 +103,7 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
   initialize()
 
   def aligned(a: Pos, b: Pos, c: Pos): Boolean =
-    RAYS(a.value)(b.value).contains(c.value)
+    ray(a, b).contains(c.value)
 
   def between(a: Pos, b: Pos): Bitboard =
     BETWEEN(a.value)(b.value)

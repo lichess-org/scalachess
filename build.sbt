@@ -22,8 +22,9 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
     /* "-Xfatal-warnings" */
   )
 )
+
 ThisBuild / organization           := "org.lichess"
-ThisBuild / version                := "13.2.4"
+ThisBuild / version                := "13.2.5"
 ThisBuild / scalaVersion           := "3.2.1"
 ThisBuild / licenses += "AGPL-3.0" -> url("https://opensource.org/licenses/AGPL-3.0")
 

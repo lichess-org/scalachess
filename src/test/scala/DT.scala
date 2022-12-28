@@ -3,6 +3,7 @@ package chess
 import chess.format.EpdFen
 import chess.Pos.*
 import chess.variant.*
+import cats.syntax.option.*
 
 import chess.format.EpdFen
 import chess.variant.Crazyhouse
@@ -15,6 +16,7 @@ class DT extends ChessTest:
     "Allow castling with touching kings and rook shielding final attack" in {
       val position = EpdFen("8/8/8/8/8/8/4k3/R3K2r w Q - 0 1")
       val game     = fenToGame(position, Atomic)
+      game.map(g => println(g.situation.moves))
       val newGame  = game flatMap (_.playMove(Pos.E1, Pos.C1))
 
       newGame must beValid.like { case game =>

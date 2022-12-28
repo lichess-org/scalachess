@@ -319,6 +319,10 @@ object Situation:
     private def genCastling(): List[Move] =
       import Castles.*
       f.ourKing.fold(Nil) { king =>
+        def checkSafeSquare(pos: Pos, rookTo: Pos): Boolean =
+          if f.board.variant.atomic then !f.board.board.atomicKingAttack(pos, f.color, (f.board.occupied ^ (1L << king.value) | rookTo.bitboard))
+          else f.board.board.attacksTo(pos, !f.color, f.board.occupied ^ (1L << king.value)).isEmpty
+
         // can castle but which side?
         if !f.board.history.castles.can(f.color).any || king.rank != f.color.backRank then Nil
         else
@@ -337,7 +341,7 @@ object Situation:
             if (path & (f.board.occupied & ~rook.bitboard)).isEmpty
             kingPath = Bitboard.between(king, kingTo) | (1L << kingTo.value) | (1L << king.value)
             safe = kingPath.occupiedSquares
-              .map(f.board.board.attacksTo(_, !f.color, f.board.occupied ^ (1L << king.value)).isEmpty)
+              .map(checkSafeSquare(_, rookTo))
               .forall(identity)
             if safe
             moves <- castle(king, kingTo, rook, rookTo)

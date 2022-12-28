@@ -55,8 +55,7 @@ object StandardMovesGenerator:
         kingTo   = king.withFile(toFile)
         kingPath = Bitboard.between(king, kingTo) | (1L << kingTo.value) | (1L << king.value)
         safe = kingPath.occupiedSquares
-          .map(f.board.attacksTo(_, !f.state.turn, f.occupied ^ (1L << king.value)).isEmpty)
-          .forall(identity)
+          .forall(f.board.attacksTo(_, !f.state.turn, f.occupied ^ (1L << king.value)).isEmpty)
         if safe
       yield Move.Castle(king, rook)
 

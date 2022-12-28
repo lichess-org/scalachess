@@ -345,9 +345,7 @@ object Situation:
               else Bitboard.between(king, rook)
             if (path & (f.board.occupied & ~rook.bitboard)).isEmpty
             kingPath = Bitboard.between(king, kingTo) | kingTo.bitboard | king.bitboard
-            safe = kingPath.occupiedSquares
-              .map(checkSafeSquare(_, rookTo))
-              .forall(identity)
+            safe     = kingPath.occupiedSquares.forall(checkSafeSquare(_, rookTo))
             if safe
             moves <- castle(king, kingTo, rook, rookTo)
           yield moves

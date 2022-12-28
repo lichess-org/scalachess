@@ -55,7 +55,7 @@ case object Atomic
     }
 
   override def isValid(move: Move): Boolean =
-    (!move.after.board.isCheckWithoutKing(move.color) ||
+    (!move.after.board.atomicCheck(move.color) ||
       explodesOpponentKing(move.situationBefore)(move))
       && !explodesOwnKing(move.situationBefore)(move)
 

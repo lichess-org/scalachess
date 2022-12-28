@@ -76,14 +76,17 @@ case class Board(
         s.knightAttacks & knights |
         s.pawnAttacks(!attacker) & pawns
     )
-  def isCheckWithoutKing(color: Color): Boolean =
-    king(color).exists(k => attacksToWithoutKing(k, !color, occupied) != Bitboard.empty)
+
+
+  def atomicCheck(color: Color): Boolean =
+    val their = byColor(!color)
+    king(color).exists(k => (their & (k.kingAttacks & kings)).isEmpty && attacksToWithoutKing(k, !color, occupied).nonEmpty)
 
 
   // return true if the king with color is in check
   // return false in case of no king
   def isCheck(color: Color): Boolean =
-    king(color).exists(k => attacksTo(k, !color) != Bitboard.empty)
+    king(color).exists(k => attacksTo(k, !color).nonEmpty)
 
   /** Find all blockers between the king and attacking sliders First we find all snipers (all potential sliders which
     * can attack the king) Then we loop over those snipers if there is only one blockers between the king and the sniper

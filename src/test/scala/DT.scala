@@ -12,18 +12,38 @@ class DT extends ChessTest:
 
   "Crazyhouse" should {
 
-    "In atomic chess a king may walk into a square that is in the perimeter of the opponent king since it can't capture" in {
-      val positionFen = EpdFen("3k4/8/3K4/8/8/8/7r/8 w - -")
-      val game        = fenToGame(positionFen, Atomic)
+    "Allow castling with touching kings and rook shielding final attack" in {
+      val position = EpdFen("8/8/8/8/8/8/4k3/R3K2r w Q - 0 1")
+      val game     = fenToGame(position, Atomic)
+      val newGame  = game flatMap (_.playMove(Pos.E1, Pos.C1))
 
-      game.map(g => println(s"${g.situation.moves}"))
-      val successGame = game flatMap (_.playMoves((Pos.D6, Pos.D7)))
-
-      successGame must beValid.like { case game =>
-        game.situation.board(Pos.D7) must beSome
-        game.situation.check must beFalse
+      newGame must beValid.like { case game =>
+        game.board(Pos.C1) must beEqualTo(White.king.some)
+        game.board(Pos.D1) must beEqualTo(White.rook.some)
       }
     }
+
+    // "Must be a stalemate if a king could usually take a piece, but can't because it would explode" in {
+    //   val positionFen = EpdFen("k7/8/1R6/8/8/8/8/5K2 w - -")
+    //   val maybeGame   = fenToGame(positionFen, Atomic)
+    //
+    //   val gameWin = maybeGame flatMap (_.playMoves((Pos.B6, Pos.B7)))
+    //
+    //   gameWin must beValid.like { case game =>
+    //     println(game.situation.moves)
+    //     game.situation.end must beTrue
+    //     game.situation.staleMate must beTrue
+    //   }
+    // }
+
+    // "Verify that a king can move into what would traditionally be check when touching the opponent king" in {
+    //   val position = EpdFen("r1bq1bnr/pppp1ppp/5k2/4p3/4P1K1/8/PPPP1PPP/RNBQ1B1R b - - 5 6")
+    //   val game     = fenToGame(position, Atomic)
+    //
+    //   val successGame = game flatMap (_.playMoves((Pos.F6, Pos.F5)))
+    //
+    //   successGame must beValid
+    // }
 
     // "Not allow a king to capture a piece" in {
     //   val fenPosition = EpdFen("8/8/8/1k6/8/8/8/1Kr5 w - -")

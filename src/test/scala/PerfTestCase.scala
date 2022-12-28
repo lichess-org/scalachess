@@ -27,6 +27,7 @@ object PerftTestCase:
       )
     else 1
 
+  // source: https://marcelk.net/rookie/nostalgia/v3/perft-random.epd
   val chess960 = List(
     PerftTestCase(
       "gentest-1364",
@@ -88,6 +89,7 @@ object PerftTestCase:
       List(TestCase(3, 17996)),
       Chess960
     ),
+    // source: http://www.talkchess.com/forum/viewtopic.php?t=55274
     PerftTestCase(
       "x-fen 00",
       EpdFen("r1k1r2q/p1ppp1pp/8/8/8/8/P1PPP1PP/R1K1R2Q w KQkq - 0 1"),
@@ -121,6 +123,7 @@ object PerftTestCase:
   )
 
   val tricky: List[PerftTestCase] = List(
+    // source: https://chessprogramming.wikispaces.com/Perft+Results
     PerftTestCase(
       "kiwipete",
       EpdFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"),
@@ -133,6 +136,7 @@ object PerftTestCase:
       List(TestCase(3, 9467)),
       Chess960
     ),
+    // https://github.com/ornicar/lila/issues/4625
     PerftTestCase(
       "h-side rook blocks a-side castling",
       EpdFen("4rrk1/pbbp2p1/1ppnp3/3n1pqp/3N1PQP/1PPNP3/PBBP2P1/4RRK1 w Ff - 0 1"),

@@ -62,9 +62,8 @@ object StandardMovesGenerator:
     def genEvasions(king: Pos, checkers: Bitboard): List[Move] =
       // Checks by these sliding pieces can maybe be blocked.
       val sliders = checkers & (f.board.sliders)
-      val attacked = sliders.occupiedSquares.foldRight(0L)((s, a) =>
-        a | (Bitboard.RAYS(king.value)(s.value) ^ (1L << s.value))
-      )
+      val attacked =
+        sliders.occupiedSquares.foldRight(Bitboard.empty)((s, a) => a | (Bitboard.ray(king, s) ^ s.bitboard))
       val safeKings = genSafeKing(king, ~f.us & ~attacked)
       val blockers =
         if !checkers.moreThanOne then

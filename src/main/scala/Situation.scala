@@ -292,7 +292,7 @@ object Situation:
         val sliders = checkers & (f.board.sliders)
         // println(s"sliders: $sliders")
         val attacked = sliders.occupiedSquares.foldRight(Bitboard.empty)((s, a) =>
-          a | (s.bitboard ^ Bitboard.RAYS(king.value)(s.value))
+          a | (s.bitboard ^ Bitboard.ray(king, s))
         )
         val safeKings = genSafeKing(~f.us & ~attacked)
         // println(s"safeKings $safeKings")

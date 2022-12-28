@@ -25,14 +25,15 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
   val WHITE_PAWN_ATTACKS = Array.fill(64)(0L)
   val BLACK_PAWN_ATTACKS = Array.fill(64)(0L)
 
-  val BETWEEN = Array.ofDim[Long](64, 64)
-  val RAYS    = Array.ofDim[Long](64, 64)
+  val BETWEEN                = Array.ofDim[Long](64, 64)
+  private[bitboard] val RAYS = Array.ofDim[Long](64, 64)
 
   // Large overlapping attack table indexed using magic multiplication.
   val ATTACKS = Array.fill(88772)(0L)
 
-  inline def rank(r: Rank) = RANKS(r.value)
-  inline def file(f: File) = FILES(f.value)
+  inline def rank(r: Rank): Bitboard           = RANKS(r.value)
+  inline def file(f: File): Bitboard           = FILES(f.value)
+  inline def ray(from: Pos, to: Pos): Bitboard = RAYS(from.value)(to.value)
 
   /** Slow attack set generation. Used only to bootstrap the attack tables.
     */

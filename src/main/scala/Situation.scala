@@ -214,11 +214,12 @@ object Situation:
       val capturers = f.us & f.board.board.pawns
       // println(s"capturers $capturers")
 
-      val s1: List[List[Move]] = for
+      val s1: List[Move] = for
         from <- capturers.occupiedSquares
         targets = from.pawnAttacks(f.color) & f.them & mask
-        to <- targets.occupiedSquares
-      yield genPawnMoves(from, to, true)
+        to   <- targets.occupiedSquares
+        move <- genPawnMoves(from, to, true)
+      yield move
       // println(s"s1 $s1")
 
       // normal pawn moves
@@ -234,51 +235,56 @@ object Situation:
           Bitboard.rank(f.color.fourthRank)
       // println(s"doubleMoves $doubleMoves")
 
-      val s2: List[List[Move]] = for
-        to <- (singleMoves & mask).occupiedSquares
-        from = Pos.at(to.value + (if f.isWhiteTurn then -8 else 8)).get
-      yield genPawnMoves(from, to, false)
+      val s2: List[Move] = for
+        to   <- (singleMoves & mask).occupiedSquares
+        from <- Pos.at(to.value + (if f.isWhiteTurn then -8 else 8)).toList
+        move <- genPawnMoves(from, to, false)
+      yield move
       // println(s"s2 $s2")
 
-      val s3: List[Move] = (for
-        to <- (doubleMoves & mask).occupiedSquares
-        from = Pos.at(to.value + (if f.isWhiteTurn then -16 else 16)).get
-      yield normalMove(from, to, Pawn, false)).flatten
+      val s3: List[Move] = for
+        to   <- (doubleMoves & mask).occupiedSquares
+        from <- Pos.at(to.value + (if f.isWhiteTurn then -16 else 16))
+        move <- normalMove(from, to, Pawn, false)
+      yield move
 
-      // println(s"s3 $s3")
-      s1.flatten ++ s2.flatten ++ s3
+      s1 ++ s2 ++ s3
 
     private def genKnight(mask: Bitboard): List[Move] =
       val knights = f.us & f.board.knights
-      (for
+      for
         from <- knights.occupiedSquares
         targets = Bitboard.knightAttacks(from) & mask
-        to <- targets.occupiedSquares
-      yield normalMove(from, to, Knight, f.isOccupied(to))).flatten
+        to   <- targets.occupiedSquares
+        move <- normalMove(from, to, Knight, f.isOccupied(to))
+      yield move
 
     private def genBishop(mask: Bitboard): List[Move] =
       val bishops = f.us & f.board.bishops
-      (for
+      for
         from <- bishops.occupiedSquares
         targets = from.bishopAttacks(f.board.occupied) & mask
-        to <- targets.occupiedSquares
-      yield normalMove(from, to, Bishop, f.isOccupied(to))).flatten
+        to   <- targets.occupiedSquares
+        move <- normalMove(from, to, Bishop, f.isOccupied(to))
+      yield move
 
     private def genRook(mask: Bitboard): List[Move] =
       val rooks = f.us & f.board.rooks
-      (for
+      for
         from <- rooks.occupiedSquares
         targets = from.rookAttacks(f.board.occupied) & mask
-        to <- targets.occupiedSquares
-      yield normalMove(from, to, Rook, f.isOccupied(to))).flatten
+        to   <- targets.occupiedSquares
+        move <- normalMove(from, to, Rook, f.isOccupied(to))
+      yield move
 
     private def genQueen(mask: Bitboard): List[Move] =
       val queens = f.us & f.board.queens
-      (for
+      for
         from <- queens.occupiedSquares
         targets = from.queenAttacks(f.board.occupied) & mask
-        to <- targets.occupiedSquares
-      yield normalMove(from, to, Queen, f.isOccupied(to))).flatten
+        to   <- targets.occupiedSquares
+        move <- normalMove(from, to, Queen, f.isOccupied(to))
+      yield move
 
     private def genEvasions(checkers: Bitboard): List[Move] =
       f.ourKing.fold(Nil)(king =>
@@ -308,10 +314,11 @@ object Situation:
     private def genSafeKing(mask: Bitboard): List[Move] =
       f.ourKing.fold(Nil)(king =>
         val targets = king.kingAttacks & mask
-        (for
+        for
           to <- targets.occupiedSquares
           if f.board.board.attacksTo(to, !f.color).isEmpty
-        yield normalMove(king, to, King, f.isOccupied(to))).flatten
+          move <- normalMove(king, to, King, f.isOccupied(to))
+        yield move
       )
 
     // todo works with standard only
@@ -353,7 +360,7 @@ object Situation:
 
     private def genPawnMoves(from: Pos, to: Pos, capture: Boolean): List[Move] =
       if from.rank == f.color.seventhRank then
-        List(Queen, Knight, Rook, Bishop).map(promotion(from, to, _, capture)).flatten
+        List(Queen, Knight, Rook, Bishop).flatMap(promotion(from, to, _, capture))
       else normalMove(from, to, Pawn, capture).toList
 
     private def enpassant(orig: Pos, dest: Pos): Option[Move] =

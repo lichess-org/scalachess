@@ -23,7 +23,7 @@ object UciDump:
   def move(variant: Variant, force960Notation: Boolean = false)(mod: MoveOrDrop): String =
     mod match
       case Left(m) =>
-        m.castle.fold(m.toUci.uci) {
+        Move.Castle.raw(m.castle).fold(m.toUci.uci) {
           case ((kf, kt), (rf, _))
               if force960Notation || kf == kt || variant.chess960 || variant.fromPosition =>
             kf.key + rf.key

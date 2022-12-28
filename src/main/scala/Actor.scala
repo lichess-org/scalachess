@@ -31,19 +31,13 @@ case class Actor(
 
   private inline def pawnDir = pawnDirOf(color)
 
-  def castleOn(side: Side): List[Move] = moves.filter(_.castle.exists(_.sideCastles == side))
-
-  // another ugly function
-  extension (c: ((Pos, Pos), (Pos, Pos)))
-    def sideCastles: Side =
-      if (c._1._1.file > c._2._1.file) QueenSide
-      else KingSide
+  def castleOn(side: Side): List[Move] = moves.filter(_.castle.exists(_.side == side))
 
   def move(
       dest: Pos,
       after: Board,
       capture: Option[Pos] = None,
-      castle: Option[((Pos, Pos), (Pos, Pos))] = None,
+      castle: Option[Move.Castle] = None,
       promotion: Option[PromotableRole] = None,
       enpassant: Boolean = false
   ) =

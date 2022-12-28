@@ -14,7 +14,7 @@ case class Move(
     after: Board,
     capture: Option[Pos],
     promotion: Option[PromotableRole],
-    castle: Option[((Pos, Pos), (Pos, Pos))],
+    castle: Option[Move.Castle],
     enpassant: Boolean,
     metrics: MoveMetrics = MoveMetrics()
 ):
@@ -92,7 +92,7 @@ case class Move(
   inline def castles = castle.isDefined
 
   inline def normalizeCastle =
-    castle.fold(this) { case (_, (rookOrig, _)) =>
+    Move.Castle.raw(castle).fold(this) { case (_, (rookOrig, _)) =>
       copy(dest = rookOrig)
     }
 
@@ -114,3 +114,10 @@ case class Move(
   inline def toUci = Uci.Move(orig, dest, promotion)
 
   override def toString = s"$piece ${toUci.uci}"
+end Move
+
+object Move:
+
+  opaque type Castle = ((Pos, Pos), (Pos, Pos))
+  object Castle extends TotalWrapper[Castle, ((Pos, Pos), (Pos, Pos))]:
+    extension (e: Castle) def side: Side = if e._1._1.file > e._2._1.file then QueenSide else KingSide

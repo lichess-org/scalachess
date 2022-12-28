@@ -320,7 +320,12 @@ object Situation:
       import Castles.*
       f.ourKing.fold(Nil) { king =>
         def checkSafeSquare(pos: Pos, rookTo: Pos): Boolean =
-          if f.board.variant.atomic then !f.board.board.atomicKingAttack(pos, f.color, (f.board.occupied ^ king.bitboard | rookTo.bitboard))
+          if f.board.variant.atomic then
+            !f.board.board.atomicKingAttack(
+              pos,
+              f.color,
+              (f.board.occupied ^ king.bitboard | rookTo.bitboard)
+            )
           else f.board.board.attacksTo(pos, !f.color, f.board.occupied ^ king.bitboard).isEmpty
 
         // can castle but which side?
@@ -430,7 +435,7 @@ object Situation:
           situationBefore = f,
           after = a,
           capture = None,
-          castle = Option((king, kingTo), (rook, rookTo)),
+          castle = Move.Castle((king, kingTo), (rook, rookTo)).some,
           promotion = None,
           enpassant = false
         )

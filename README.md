@@ -26,15 +26,13 @@ To run the tests (with coverage):
     clean coverage test
     coverageReport
 
-To run benchmarks:
+To run benchmarks (takes 10-20 minutes to finish):
 
     sbt "bench / Jmh / run"
 
-Benchmarks takes about 10-20 minutes to finish.
-So, if you want too see a quick (but may not correct) results:
+To run quick benchmarks (results may be incorrect):
 
     sbt "bench / Jmh / run -i 1 -wi 1 -f1 -t1"
-    Which runs the benchmarks with "1 iterations" "1 warmup iterations" "1 fork" "1 thread"
 
 Code formatting
 ---------------

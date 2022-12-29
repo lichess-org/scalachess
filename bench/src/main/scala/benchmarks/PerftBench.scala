@@ -12,10 +12,14 @@ import java.util.concurrent.TimeUnit
 @Measurement(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
 @Warmup(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
 @Threads(value = 1)
-class Bench {
+class PerftBench {
 
   @Benchmark
   def chess960(): Int =
     PerftTestCase.chess960.flatMap(_.calculate()).map(_.result).sum
+
+  @Benchmark
+  def tricky(): Int =
+    PerftTestCase.tricky.flatMap(_.calculate()).map(_.result).sum
 
 }

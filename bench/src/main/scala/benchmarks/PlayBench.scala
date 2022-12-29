@@ -15,12 +15,13 @@ import chess.{Mode => _ , *}
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
 @OutputTimeUnit(TimeUnit.SECONDS)
-@Measurement(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
-@Warmup(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
-@Threads(value = 1)
+@Measurement(iterations = 10, timeUnit = TimeUnit.SECONDS, time = 3)
+@Warmup(iterations = 3, timeUnit = TimeUnit.SECONDS, time = 3)
+@Fork(2)
 class PlayBench:
 
   val standard = Game(Board init chess.variant.Standard, White)
+
   @Benchmark
   def divider() =
     val moves       = Fixtures.fromProd2

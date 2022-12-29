@@ -19,7 +19,7 @@ object PerftTestCase:
     else
       val moves = game.situation.moves.values.toList.flatten
       if (depth == 1) then moves.size
-      else moves.map(move => perft(game.apply(move), depth -1)).sum
+      else moves.map(move => perft(game.apply(move), depth - 1)).sum
 
   // source: https://marcelk.net/rookie/nostalgia/v3/perft-random.epd
   val chess960 = List(
@@ -102,7 +102,6 @@ object PerftTestCase:
       List(TestCase(4, 118388)),
       Chess960
     ),
-
     PerftTestCase(
       "x-fen 03",
       EpdFen("2r5/8/8/8/8/8/6PP/k2KR3 w K - 0 1"),

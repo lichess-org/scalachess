@@ -445,5 +445,5 @@ object Situation:
           enpassant = false
         )
       // in chess960 we only allow king move to the rook position
-      if f.board.variant.chess960 || f.board.variant.fromPosition then moves.filter(m => m.dest != kingTo)
+      if f.board.variant.chess960 || f.board.variant.fromPosition then moves.filter(m => m.dest == rook)
       else moves

@@ -20,18 +20,19 @@ import chess.{Mode => _ , *}
 @Fork(2)
 class PlayBench:
 
-  val standard = Game(Board init chess.variant.Standard, White)
+  var standard = Game(Board init chess.variant.Standard, White)
 
   @Benchmark
   def divider() =
-    val moves       = Fixtures.fromProd2
+    var moves       = Fixtures.fromProd2
     val gameReplay  = Replay.boards(SanStr from moves.split(' ').toList, None, Standard).toOption.get
     Divider(gameReplay)
 
   @Benchmark
   def replay() =
-    val nb = 500
-    val gameMoves = (Fixtures.prod500standard take nb).map { g =>
+    var nb = 500
+    var games = Fixtures.prod500standard
+    var gameMoves = (games take nb).map { g =>
       SanStr from g.split(' ').toList
     }
     gameMoves foreach { moves =>

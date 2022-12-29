@@ -18,8 +18,9 @@ import chess.format.pgn.Parser
 @Fork(2)
 class ParserBench {
 
+  var games = Fixtures.gamesForPerfTest
   @Benchmark
   def PgnParser(): Boolean =
-    Fixtures.gamesForPerfTest.traverse(Parser.full).isValid
+    games.traverse(Parser.full).isValid
 
 }

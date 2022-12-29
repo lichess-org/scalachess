@@ -14,12 +14,14 @@ import java.util.concurrent.TimeUnit
 @Fork(2)
 class PerftBench {
 
+  var chess960Games = PerftTestCase.chess960
   @Benchmark
-  def chess960(): Int =
-    PerftTestCase.chess960.flatMap(_.calculate()).map(_.result).sum
+  def chess960() =
+    chess960Games.map(_.calculate())
 
+  var trickyGames = PerftTestCase.tricky
   @Benchmark
-  def tricky(): Int =
-    PerftTestCase.tricky.flatMap(_.calculate()).map(_.result).sum
+  def tricky() =
+    trickyGames.map(_.calculate())
 
 }

@@ -188,7 +188,7 @@ object Situation:
     // TODO we depend on the correctness of epSQuare here
     private def genEnPassant(ep: Pos): List[Move] =
       val pawns                                   = f.us & f.board.board.pawns & ep.pawnAttacks(!f.color)
-      val ff: Bitboard => Option[(Pos, Bitboard)] = bb => bb.lsb.map((_, bb & (bb - 1L)))
+      val ff: Bitboard => Option[(Pos, Bitboard)] = bb => bb.lsb.map((_, bb & (bb - 1L.bb)))
       List.unfold(pawns)(ff).mapFilter(enpassant(_, ep))
 
     private def genNonKing(mask: Bitboard): List[Move] =

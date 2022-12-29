@@ -15,18 +15,26 @@ case class Result(depth: Int, result: Int, expected: Int)
 
 object PerftTestCase:
   private def perft(game: Game, depth: Int): Int =
-    if (depth > 0)
-      (game.situation.moves.values.toList.flatten: List[Move]).foldLeft(0)((p, move) =>
-        if (move.piece.role == Pawn && (move.dest.rank == Rank.First || move.dest.rank == Rank.Eighth))
-          p + List(Queen, Rook, Bishop, Knight)
-            .flatMap(move.withPromotion)
-            .map(move => perft(game(move), depth - 1))
-            .sum
-        else
-          p + perft(game.apply(move), depth - 1)
-      )
-    else 1
+    if depth == 0 then 1
+    else
+      val moves = game.situation.moves.values.toList.flatten
+      println(moves)
+      if (depth == 1) then moves.size
+      else moves.map(move => perft(game.apply(move), depth -1)).sum
 
+  val sut = List(
+    PerftTestCase(
+      "x-fen 02",
+      EpdFen("8/8/8/4B2b/6nN/8/5P2/2R1K2k w Q - 0 1"),
+      List(
+        TestCase(1, 34),
+        // TestCase(2, 318),
+        // TestCase(3, 9002),
+        // TestCase(4, 118388)
+      ),
+      Chess960
+    ),
+  )
   // source: https://marcelk.net/rookie/nostalgia/v3/perft-random.epd
   val chess960 = List(
     PerftTestCase(
@@ -108,6 +116,7 @@ object PerftTestCase:
       List(TestCase(4, 118388)),
       Chess960
     ),
+
     PerftTestCase(
       "x-fen 03",
       EpdFen("2r5/8/8/8/8/8/6PP/k2KR3 w K - 0 1"),

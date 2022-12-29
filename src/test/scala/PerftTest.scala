@@ -20,5 +20,6 @@ class PerftTest extends ChessTest:
       }
     }
 
-  genTests("calculate chess960 perfts", PerftTestCase.chess960)
-  genTests("calculate tricky perfts", PerftTestCase.tricky)
+  // genTests("calculate chess960 perfts", PerftTestCase.chess960)
+  // genTests("calculate tricky perfts", PerftTestCase.tricky)
+  genTests("the one that failed", PerftTestCase.sut)

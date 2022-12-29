@@ -1,6 +1,6 @@
 [![Continuous Integration](https://github.com/ornicar/scalachess/actions/workflows/ci.yml/badge.svg)](https://github.com/ornicar/scalachess/actions/workflows/ci.yml)
 
-Chess API written in scala for [lichess.org](https://lichess.org) 
+Chess API written in scala for [lichess.org](https://lichess.org)
 
 It is entirely functional, immutable, and free of side effects.
 
@@ -29,6 +29,12 @@ To run the tests (with coverage):
 To run benchmarks:
 
     sbt "bench / Jmh / run"
+
+Benchmarks takes about 10-20 minutes to finish.
+So, if you want too see a quick (but may not correct) results:
+
+    sbt "bench / Jmh / run -i 1 -wi 1 -f1 -t1"
+    Which runs the benchmarks with "1 iterations" "1 warmup iterations" "1 fork" "1 thread"
 
 Code formatting
 ---------------

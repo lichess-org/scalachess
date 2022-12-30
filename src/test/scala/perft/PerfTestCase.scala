@@ -1,4 +1,5 @@
 package chess
+package perft
 
 import chess.format.EpdFen
 import chess.variant.Chess960

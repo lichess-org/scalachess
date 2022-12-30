@@ -1,17 +1,18 @@
 package chess
 package perft
 
-import chess.format.EpdFen
-import chess.variant.Chess960
 import org.specs2.specification.core.Fragments
+
+import chess.format.EpdFen
+import chess.variant.*
 
 class PerftTest extends ChessTest:
 
-  private def genTests(name: String, tests: List[Perft]): Fragments =
+  private def genTests(name: String, tests: List[Perft], variant: Variant): Fragments =
     name >> {
       Fragments.foreach(tests) { pts =>
         pts.id >> {
-          val result = pts.calculate()
+          val result = pts.calculate(variant)
           Fragments.foreach(result) { r =>
             s"${r.depth}" in {
               r.result === r.expected
@@ -21,5 +22,11 @@ class PerftTest extends ChessTest:
       }
     }
 
-  // genTests("calculate chess960 perfts", Perft.chess960)
-  genTests("calculate tricky perfts", Perft.tricky)
+  genTests("calculate ThreeCheck perfts", Perft.read("3check.perft"), ThreeCheck)
+  genTests("calculate Antichess perfts", Perft.read("antichess.perft"), Antichess)
+  genTests("calculate Atomic perfts", Perft.read("atomic.perft"), Atomic)
+  genTests("calculate Crazyhouse perfts", Perft.read("crazyhouse.perft"), Crazyhouse)
+  genTests("calculate Horde perfts", Perft.read("horde.perft"), Horde)
+  genTests("calculate RacingKings perfts", Perft.read("racingKings.perft"), RacingKings)
+  genTests("calculate chess960 perfts", Perft.read("random.perft"), Chess960)
+  genTests("calculate tricky perfts", Perft.read("tricky.perft"), Chess960)

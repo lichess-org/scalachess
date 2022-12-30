@@ -19,15 +19,7 @@ import chess.format.EpdFen
   *
   */
 object Parser:
-  def parse: String => Either[P.Error, (String, List[Perft1])] = {
-    // println(id.parse("id aligng\n"))
-    println(((ignored.rep0 *> id) ~ epd).parse("""#
-# id align-ep
-id align-ep
-epd 8/8/8/1k6/3Pp3/8/8/4KQ2 b - d3
-"""))
-    perfts.parse
-  }
+  def parse: String => Either[P.Error, List[Perft]] = perfts.parseAll
 
   private val whitespace = R.cr | R.lf | R.wsp
   private val blank = P.until(!whitespace)
@@ -41,7 +33,7 @@ epd 8/8/8/1k6/3Pp3/8/8/4KQ2 b - d3
   private val testCase: P[TestCase] = ((nonNegative.map(_.toInt) <* P.char(' ')) ~ nonNegative.map(_.toLong)).map(TestCase.apply)
   private val oneTestCase: P[TestCase] = P.string("perft ") *> testCase <* R.lf.?
   private val cases: P[List[TestCase]] = oneTestCase.rep.map(_.toList) <* (ignored.rep | R.lf.rep0)
-  private val perft: P[Perft1] = (id, epd, cases).mapN(Perft1.apply) <* R.lf.?
+  private val perft: P[Perft] = (id, epd, cases).mapN(Perft.apply) <* R.lf.?
   // private val perfts = perft.rep.map(_.toList)
   private val perfts = ignored.rep0 *> perft.rep.map(_.toList)
 

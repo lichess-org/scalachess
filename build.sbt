@@ -1,14 +1,18 @@
 lazy val scalachess = Project("scalachess", file(".")).settings(
   name := "scalachess",
   libraryDependencies ++= List(
-    "org.specs2"         %% "specs2-core"    % "4.19.0" % Test,
-    "org.specs2"         %% "specs2-cats"    % "4.19.0" % Test,
-    "com.github.ornicar" %% "scalalib"       % "9.0.2",
-    "joda-time"           % "joda-time"      % "2.12.2",
-    "org.typelevel"      %% "cats-core"      % "2.9.0",
-    "org.typelevel"      %% "alleycats-core" % "2.9.0",
-    "org.typelevel"      %% "cats-parse"     % "0.3.8"
+    "org.specs2"          %% "specs2-core"       % "4.19.0" % Test,
+    "org.specs2"          %% "specs2-cats"       % "4.19.0" % Test,
+    "org.typelevel"       %% "cats-effect"       % "3.4.3"  % Test,
+    "com.disneystreaming" %% "weaver-cats"       % "0.8.1"  % Test,
+    "com.disneystreaming" %% "weaver-scalacheck" % "0.8.1"  % Test,
+    "com.github.ornicar"  %% "scalalib"          % "9.0.2",
+    "joda-time"            % "joda-time"         % "2.12.2",
+    "org.typelevel"       %% "cats-core"         % "2.9.0",
+    "org.typelevel"       %% "alleycats-core"    % "2.9.0",
+    "org.typelevel"       %% "cats-parse"        % "0.3.8"
   ),
+  testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
   scalacOptions := Seq(
     "-encoding",
     "utf-8",

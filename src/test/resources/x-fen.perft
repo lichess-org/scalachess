@@ -1,0 +1,21 @@
+# source: http://www.talkchess.com/forum/viewtopic.php?t=55274
+
+id x-fen 00
+epd r1k1r2q/p1ppp1pp/8/8/8/8/P1PPP1PP/R1K1R2Q w KQkq - 0 1
+perft 7 4557457200
+
+id x-fen 01
+epd r1k2r1q/p1ppp1pp/8/8/8/8/P1PPP1PP/R1K2R1Q w KQkq - 0 1
+perft 7 12094237108
+
+id x-fen 02
+epd 8/8/8/4B2b/6nN/8/5P2/2R1K2k w Q - 0 1
+perft 7 1205627532
+
+id x-fen 03
+epd 2r5/8/8/8/8/8/6PP/k2KR3 w K - 0 1
+perft 8 3914405614
+
+id x-fen 03
+epd 4r3/3k4/8/8/8/8/6PP/qR1K1R2 w KQ - 0 1
+perft 7 6447669114

@@ -7,7 +7,7 @@ import org.specs2.specification.core.Fragments
 
 class PerftTest extends ChessTest:
 
-  private def genTests(name: String, tests: List[PerftTestCase]): Fragments =
+  private def genTests(name: String, tests: List[Perft]): Fragments =
     name >> {
       Fragments.foreach(tests) { pts =>
         pts.id >> {
@@ -21,5 +21,5 @@ class PerftTest extends ChessTest:
       }
     }
 
-  genTests("calculate chess960 perfts", PerftTestCase.chess960)
-  genTests("calculate tricky perfts", PerftTestCase.tricky)
+  // genTests("calculate chess960 perfts", Perft.chess960)
+  genTests("calculate tricky perfts", Perft.tricky)

@@ -30,4 +30,3 @@ class PerftTest extends ChessTest:
   genTests("calculate RacingKings perfts", Perft.read("racingkings.perft"), RacingKings, 1_000_000L)
   genTests("calculate random perfts", Perft.read("random.perft"), Chess960, 10_000L)
   genTests("calculate tricky perfts", Perft.read("tricky.perft"), Chess960, 100_000L)
-  genTests("calculate chess960 perfts", Perft.read("x-fen.perft"), Chess960, 10_000L)

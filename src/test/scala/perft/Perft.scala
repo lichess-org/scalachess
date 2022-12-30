@@ -11,6 +11,9 @@ case class Perft(id: String, epd: EpdFen, cases: List[TestCase]):
     val game = Game(Option(variant), Option(epd))
     cases.map(c => Result(c.depth, Perft.perft(game, c.depth), c.result))
 
+  def withLimit(limit: Long): Perft =
+    copy(cases = cases.filter(_.result < limit))
+
 case class TestCase(depth: Int, result: Long)
 case class Result(depth: Int, result: Long, expected: Long)
 

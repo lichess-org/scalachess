@@ -19,7 +19,16 @@ case class Result(depth: Int, result: Long, expected: Long)
 
 object Perft:
 
-  def read(file: String): List[Perft] =
+  lazy val threeCheckPerfts  = Perft.read("3check.perft")
+  lazy val antichessPerfts   = Perft.read("antichess.perft")
+  lazy val atomicPerfts       = Perft.read("atomic.perft")
+  lazy val crazyhousePerfts  = Perft.read("crazyhouse.perft")
+  lazy val hordePerfts       = Perft.read("horde.perft")
+  lazy val racingkingsPerfts = Perft.read("racingkings.perft")
+  lazy val randomPerfts      = Perft.read("random.perft")
+  lazy val trickyPerfts      = Perft.read("tricky.perft")
+
+  private def read(file: String): List[Perft] =
     val str = io.Source.fromResource(file).mkString
     Parser.parse(str).getOrElse(throw RuntimeException(s"Parse perft file failed: $file"))
 

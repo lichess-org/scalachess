@@ -18,7 +18,7 @@ object FullRandomPerftTest extends SimpleIOSuite:
 
   // Tests all perft scenario on random.perft with node limitation is 10_000
   test("random.perft") {
-    Perft.read("random.perft")
+    Perft.randomPerfts
       .parFoldMapA(perft => IO(genTests(perft, Chess960, 10_000L)))
       .map(assert(_))
   }

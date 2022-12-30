@@ -4,8 +4,6 @@ import org.openjdk.jmh.annotations._
 
 import cats.syntax.all.*
 
-import chess.PerftTestCase
-
 import java.util.concurrent.TimeUnit
 import chess.format.pgn.Fixtures
 import chess.format.pgn.Parser

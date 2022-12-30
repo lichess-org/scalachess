@@ -1,0 +1,51 @@
+id atomic-start
+epd rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -
+perft 1 20
+perft 2 400
+perft 3 8902
+perft 4 197326
+
+id programfox-1
+epd rn2kb1r/1pp1p2p/p2q1pp1/3P4/2P3b1/4PN2/PP3PPP/R2QKB1R b KQkq -
+perft 1 40
+perft 2 1238
+perft 3 45237
+perft 4 1434825
+
+id programfox-2
+epd rn1qkb1r/p5pp/2p5/3p4/N3P3/5P2/PPP4P/R1BQK3 w Qkq -
+perft 1 28
+perft 2 833
+perft 3 23353
+perft 4 714499
+
+id atomic960-castle-1
+epd 8/8/8/8/8/8/2k5/rR4KR w KQ -
+perft 1 18
+perft 2 180
+perft 3 4364
+perft 4 61401
+perft 5 1603055
+
+id atomic960-castle-2
+epd r3k1rR/5K2/8/8/8/8/8/8 b kq -
+perft 1 25
+perft 2 282
+perft 3 6753
+perft 4 98729
+perft 5 2587730
+
+id atomic960-castle-3
+epd Rr2k1rR/3K4/3p4/8/8/8/7P/8 w kq -
+perft 1 21
+perft 2 465
+perft 3 10631
+perft 4 241478
+perft 5 5800275
+
+id shakmaty-bench
+epd rn2kb1r/1pp1p2p/p2q1pp1/3P4/2P3b1/4PN2/PP3PPP/R2QKB1R b KQkq -
+perft 1 40
+perft 2 1238
+perft 3 45237
+perft 4 1434825

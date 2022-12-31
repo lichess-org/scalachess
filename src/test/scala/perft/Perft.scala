@@ -35,6 +35,11 @@ object Perft:
   private def perft(game: Game, depth: Int): Long =
     if depth == 0 then 1L
     else
-      val moves = game.situation.allTrustedMoves
+      val allMoves = game.situation.allTrustedMoves
+      // if variant is not chess960 we need to deduplicated castlings moves
+      val moves =
+        if !game.situation.board.variant.chess960 then
+          allMoves.filterNot(m => m.castles && (m.dest == File.A || m.dest == File.H))
+        else allMoves
       if (depth == 1) then moves.size.toLong
       else moves.map(move => perft(game.apply(move), depth - 1)).sum

@@ -51,11 +51,12 @@ object Hash extends OpaqueInt[Hash]:
       case Queen  => 4
       case King   => 5
 
-  private def pieceIndex(piece: Piece) =
+  private def pieceIndex(piece: Piece): Int =
     roleIndex(piece.role) * 2 + piece.color.fold(1, 0)
 
-  private def actorIndex(actor: Actor) =
-    64 * pieceIndex(actor.piece) + actor.pos.hashCode
+  // todo rename
+  private def actorIndex(pos: Pos, piece: Piece): Int =
+    64 * pieceIndex(piece) + pos.hashCode
 
   private def get(situation: Situation, table: ZobristConstants): Long =
 
@@ -69,10 +70,8 @@ object Hash extends OpaqueInt[Hash]:
     val board = situation.board
     val hturn = situation.color.fold(table.whiteTurnMask, 0L)
 
-    val hactors = board.actors.values.view
-      .map {
-        table.actorMasks compose actorIndex
-      }
+    val hactors = board.pieces
+      .map((pos, piece) => table.actorMasks(actorIndex(pos, piece)))
       .fold(hturn)(_ ^ _)
 
     val hcastling =

@@ -233,7 +233,7 @@ object Situation:
       val doubleMoves =
         ~f.board.occupied &
           (if f.isWhiteTurn then singleMoves << 8 else singleMoves >>> 8) &
-          Bitboard.rank(f.color.fourthRank)
+          (if f.board.variant.horde then Bitboard.rank(f.color.fourthRank) | Bitboard.rank(f.color.thirdRank) else Bitboard.rank(f.color.fourthRank))
       // println(s"doubleMoves $doubleMoves")
 
       val s2: List[Move] = for

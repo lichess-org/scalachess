@@ -59,10 +59,10 @@ abstract class Variant private[variant] (
     board.board.isAttacksTo(to, color)
 
   def kingThreatened(board: Board, color: Color) =
-    board.checkOf(color)
+    board.board.isCheck(color)
 
   def kingSafety(m: Move): Boolean =
-    !m.after.board.isCheck(m.color)
+    !kingThreatened(m.after, m.color)
 
   def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
     dir(p) exists { next =>
@@ -81,9 +81,9 @@ abstract class Variant private[variant] (
       situation.moves get from flatMap (_.find(_.dest == to))
 
     for {
-      actor <- situation.board.actors get from toValid s"No piece on ${from.key}"
+      piece <- situation.board(from) toValid s"No piece on ${from.key}"
       _ <-
-        if (actor is situation.color) Validated.valid(actor)
+        if (piece.color == situation.color) Validated.valid(piece)
         else Validated.invalid(s"Not my piece on ${from.key}")
       m1 <- findMove(from, to) toValid s"Piece on ${from.key} cannot move to ${to.key}"
       m2 <- m1 withPromotion promotion toValid s"Piece on ${from.key} cannot promote to $promotion"

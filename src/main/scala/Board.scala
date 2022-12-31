@@ -52,7 +52,7 @@ case class Board(
 
   def kingPosOf(c: Color): Option[Pos] = board.king(c)
 
-  def check(c: Color): Boolean = c.fold(checkWhite, checkBlack)
+  def check(c: Color): Boolean = variant.kingThreatened(this, c)
 
   def checkColor: Option[Color] = checkWhite.option(White) orElse checkBlack.option(Black)
 
@@ -60,10 +60,7 @@ case class Board(
   lazy val checkBlack: Boolean = checkOf(Black)
 
   def checkOf(c: Color): Boolean =
-    if(variant.atomic) then
-      board.atomicCheck(c)
-    else
-      board.isCheck(c)
+    variant.kingThreatened(this, c)
 
   // todo fix
   def destsFrom(from: Pos): Option[List[Pos]] = actorAt(from).map(_.destinations)

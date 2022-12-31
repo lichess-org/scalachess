@@ -32,12 +32,8 @@ case object Atomic
     * to capture it, their own king would explode. This effectively makes a king invincible while connected with another
     * king.
     */
-  override def kingThreatened(
-      board: Board,
-      color: Color
-  ): Boolean =
+  override def kingThreatened(board: Board, color: Color): Boolean =
     board.board.atomicCheck(color)
-
 
   private def protectedByOtherKing(board: Board, to: Pos, color: Color): Boolean =
     board.kingPosOf(color) exists { to.touches(_) }

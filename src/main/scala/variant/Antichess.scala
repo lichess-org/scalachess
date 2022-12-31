@@ -31,8 +31,6 @@ case object Antichess
     val capturingMoves = situation.allMoves.filter(_.captures)
     if (capturingMoves.nonEmpty) capturingMoves else situation.allMoves
 
-  // override def isValid(move: Move): Boolean = true
-
   override def valid(board: Board, strict: Boolean) =
     board.allPieces.size >= 2 && board.allPieces.size <= 32
 

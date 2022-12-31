@@ -50,6 +50,7 @@ abstract class Variant private[variant] (
   def validMoves(situation: Situation): List[Move] =
     situation.allMoves.filter(isValid)
 
+  // todo maybe just use kingThreatened???
   def isValid(move: Move): Boolean =
     !move.after.board.isCheck(move.color)
 

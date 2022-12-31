@@ -60,7 +60,10 @@ case class Board(
   lazy val checkBlack: Boolean = checkOf(Black)
 
   def checkOf(c: Color): Boolean =
-    board.isCheck(c)
+    if(variant.atomic) then
+      board.atomicCheck(c)
+    else
+      board.isCheck(c)
 
   // todo fix
   def destsFrom(from: Pos): Option[List[Pos]] = actorAt(from).map(_.destinations)

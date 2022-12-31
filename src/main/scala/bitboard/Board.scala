@@ -83,7 +83,7 @@ case class Board(
   def atomicCheck(color: Color): Boolean =
     val their = byColor(!color)
     king(color).exists(k =>
-      (their & (k.kingAttacks & kings)).isEmpty && attacksToWithoutKing(k, !color, occupied).nonEmpty
+      (their & k.kingAttacks & kings).isEmpty && attacksToWithoutKing(k, !color, occupied).nonEmpty
     )
 
   def atomicKingAttack(king: Pos, color: Color, occupied: Bitboard): Boolean =

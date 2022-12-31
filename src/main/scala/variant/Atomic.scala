@@ -38,16 +38,11 @@ case object Atomic
   private def protectedByOtherKing(board: Board, to: Pos, color: Color): Boolean =
     board.kingPosOf(color) exists { to.touches(_) }
 
-  override def isValid(move: Move): Boolean =
-    (!move.after.board.atomicCheck(move.color) ||
-      explodesOpponentKing(move.situationBefore)(move))
-      && !explodesOwnKing(move.situationBefore)(move)
-
   // moves exploding opponent king are always playable
-  override def kingSafety(m: Move): Boolean = {
-    !kingThreatened(m.after, !m.color) ||
-    explodesOpponentKing(m.situationBefore)(m)
-  } && !explodesOwnKing(m.situationBefore)(m)
+  override def kingSafety(m: Move): Boolean =
+    (!kingThreatened(m.after, m.color) ||
+      explodesOpponentKing(m.situationBefore)(m))
+      && !explodesOwnKing(m.situationBefore)(m)
 
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
   private def explodeSurroundingPieces(move: Move): Move =

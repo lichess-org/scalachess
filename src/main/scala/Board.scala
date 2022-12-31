@@ -52,8 +52,6 @@ case class Board(
 
   def kingPosOf(c: Color): Option[Pos] = board.king(c)
 
-  def check(c: Color): Boolean = variant.kingThreatened(this, c)
-
   def checkColor: Option[Color] = checkWhite.option(White) orElse checkBlack.option(Black)
 
   lazy val checkWhite: Boolean = checkOf(White)

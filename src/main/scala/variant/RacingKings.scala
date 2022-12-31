@@ -72,9 +72,6 @@ case object RacingKings
 
   // Not only check that our king is safe,
   // but also check the opponent's
-  override def isValid(move: Move): Boolean =
-    super.isValid(move) && !move.after.board.isCheck(!move.color)
-
   override def kingSafety(m: Move): Boolean =
     super.kingSafety(m) && !m.after.board.isCheck(!m.color)
 

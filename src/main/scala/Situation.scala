@@ -29,7 +29,7 @@ case class Situation(board: Board, color: Color):
 
   lazy val kingPos: Option[Pos] = board kingPosOf color
 
-  lazy val check: Boolean = board check color
+  lazy val check: Boolean = board checkOf color
 
   def checkSquare = if (check) kingPos else None
 

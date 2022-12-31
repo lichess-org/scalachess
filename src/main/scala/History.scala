@@ -18,10 +18,6 @@ case class CheckCount(white: Int = 0, black: Int = 0):
 
   def apply(color: Color) = color.fold(white, black)
 
-// opaque type UnmovedRooks = Map[(Color, Side), Pos]
-// object UnmovedRooks extends TotalWrapper[UnmovedRooks, Map[(Color, Side), Pos]]:
-//   val default: UnmovedRooks = (Pos.whiteBackrank ::: Pos.blackBackrank).toSet
-
 // color
 case class History(
     lastMove: Option[Uci] = None,

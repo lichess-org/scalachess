@@ -41,18 +41,7 @@ case object Atomic
       to: Pos,
       filter: Piece => Boolean = _ => true
   ): Boolean =
-    board.pieces exists {
-      case (pos, piece)
-          if piece.color == color && filter(piece) && piece.eyes(pos, to) && !protectedByOtherKing(
-            board,
-            to,
-            color
-          ) =>
-        (!piece.role.projection) || piece.role.dir(pos, to).exists {
-          longRangeThreatens(board, pos, _, to)
-        }
-      case _ => false
-    }
+    board.board.isCheck(color)
 
   override def isValid(move: Move): Boolean =
     (!move.after.board.atomicCheck(move.color) ||
@@ -60,8 +49,8 @@ case object Atomic
       && !explodesOwnKing(move.situationBefore)(move)
 
   // moves exploding opponent king are always playable
-  override def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean = {
-    !kingPos.exists(kingThreatened(m.after, !m.color, _, filter)) ||
+  override def kingSafety(m: Move): Boolean = {
+    m.after.board.isCheck(m.color) ||
     explodesOpponentKing(m.situationBefore)(m)
   } && !explodesOwnKing(m.situationBefore)(m)
 

@@ -48,7 +48,6 @@ abstract class Variant private[variant] (
       case _                                    => false
 
   def validMoves(situation: Situation): List[Move] =
-    // println(s"allMoves ${situation.allMoves}")
     situation.allMoves.filter(isValid)
 
   def isValid(move: Move): Boolean =
@@ -68,11 +67,7 @@ abstract class Variant private[variant] (
   def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) =
     pieceThreatened(board, color, to, filter)
 
-  // def isValid(move: Move): Boolean = true
-  def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean =
-    !m.after.board.isCheck(m.color)
-
-  def kingSafety(a: Actor, m: Move): Boolean =
+  def kingSafety(m: Move): Boolean =
     !m.after.board.isCheck(m.color)
 
   def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =

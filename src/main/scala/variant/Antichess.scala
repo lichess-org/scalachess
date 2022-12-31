@@ -21,11 +21,7 @@ case object Antichess
   override val initialFen = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1")
 
   // In antichess, the king can't be put into check so we always return false
-  override def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean =
-    true
-
-  // In antichess, the king can't be put into check so we always return false
-  override def kingSafety(a: Actor, m: Move): Boolean =
+  override def kingSafety(m: Move): Boolean =
     true
 
   override def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) =

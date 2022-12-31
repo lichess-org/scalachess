@@ -71,7 +71,7 @@ case class Std(
         val a = Actor(piece, pos, situation.board)
         // println(s"Actor trustedMoves: ${a.trustedMoves(false)}")
         a trustedMoves false find { m =>
-          m.dest == dest && a.board.variant.kingSafety(a, m)
+          m.dest == dest && a.board.variant.kingSafety(m)
         }
       case (m, _) => m
     } match

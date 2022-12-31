@@ -47,9 +47,9 @@ abstract class Variant private[variant] (
       case Some(Queen | Rook | Knight | Bishop) => true
       case _                                    => false
 
-  def validMoves(situation: Situation): Map[Pos, List[Move]] =
+  def validMoves(situation: Situation): List[Move] =
     // println(s"allMoves ${situation.allMoves}")
-    situation.allMoves.filter(isValid).groupBy(_.orig)
+    situation.allMoves.filter(isValid)
 
   def isValid(move: Move): Boolean =
     !move.after.board.isCheck(move.color)

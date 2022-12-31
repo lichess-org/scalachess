@@ -60,8 +60,7 @@ case object RacingKings
       case White =>
         reachedGoal(situation.board, White) ^ reachedGoal(situation.board, Black)
       case Black =>
-        reachedGoal(situation.board, White) && (validMoves(situation).view mapValues (_.filter(reachesGoal)))
-          .forall(_._2.isEmpty)
+        reachedGoal(situation.board, White) && situation.allTrustedMoves.filter(reachesGoal).isEmpty
 
   // If white reaches the goal and black also reaches the goal directly after,
   // then it is a draw.
@@ -73,10 +72,8 @@ case object RacingKings
 
   // Not only check that our king is safe,
   // but also check the opponent's
-  override def validMoves(situation: Situation): Map[Pos, List[Move]] =
-    situation.allMoves
-      .filter(isValid)
-      .groupBy(_.orig)
+  override def validMoves(situation: Situation) =
+    situation.allMoves.filter(isValid)
 
   override def isValid(move: Move): Boolean =
     super.isValid(move) && !move.after.board.isCheck(!move.color)
@@ -86,4 +83,4 @@ case object RacingKings
 
   // When considering stalemate, take into account that checks are not allowed.
   override def staleMate(situation: Situation): Boolean =
-    !situation.check && !specialEnd(situation) && !validMoves(situation).exists(_._2.nonEmpty)
+    !situation.check && !specialEnd(situation) && situation.allTrustedMoves.isEmpty

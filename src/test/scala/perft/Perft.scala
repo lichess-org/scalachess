@@ -35,6 +35,6 @@ object Perft:
   private def perft(game: Game, depth: Int): Long =
     if depth == 0 then 1L
     else
-      val moves = game.situation.moves.values.toList.flatten
+      val moves = game.situation.allTrustedMoves
       if (depth == 1) then moves.size.toLong
       else moves.map(move => perft(game.apply(move), depth - 1)).sum

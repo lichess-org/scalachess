@@ -1,0 +1,162 @@
+#
+# Source: https://chessprogramming.wikispaces.com/Perft+Results
+#
+
+# Position 2: Kiwipete by Peter McKenzie.
+id pos-2
+epd r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -
+perft 1 48
+perft 2 2039
+perft 3 97862
+
+# Position 3.
+id pos-3
+epd 8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -
+perft 1 14
+perft 2 191
+perft 3 2812
+perft 4 43238
+
+# Position 4 (mirrored).
+id pos-4
+epd r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ -
+perft 1 6
+perft 2 264
+perft 3 9467
+
+# Position 5: http://www.talkchess.com/forum/viewtopic.php?t=42463
+id pos-5
+epd rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ -
+perft 1 44
+perft 2 1486
+perft 3 62379
+
+# Position 6 by Steven Edwards.
+id pos-6
+epd r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - -
+perft 1 46
+perft 2 2079
+perft 3 89890
+
+
+#
+# Source: http://www.talkchess.com/forum/viewtopic.php?t=55274
+#
+
+id xfen-00
+epd r1k1r2q/p1ppp1pp/8/8/8/8/P1PPP1PP/R1K1R2Q w KQkq -
+perft 1 23
+perft 2 522
+perft 3 12333
+perft 4 285754
+perft 5 7096972
+perft 6 172843489
+perft 7 4557457200
+
+id xfen-01
+epd r1k2r1q/p1ppp1pp/8/8/8/8/P1PPP1PP/R1K2R1Q w KQkq -
+perft 1 28
+perft 2 738
+perft 3 20218
+perft 4 541480
+perft 5 15194841
+perft 6 418430598
+perft 7 12094237108
+
+id xfen-02
+epd 8/8/8/4B2b/6nN/8/5P2/2R1K2k w Q -
+perft 1 34
+perft 2 318
+perft 3 9002
+perft 4 118388
+perft 5 3223406
+perft 6 44554839
+perft 7 1205627532
+perft 5 985298
+perft 6 14751778
+perft 6 259604208
+perft 8 3914405614
+
+id xfen-03
+epd 2r5/8/8/8/8/8/6PP/k2KR3 w K -
+perft 1 17
+perft 2 242
+perft 3 3931
+perft 4 57700
+perft 5 8992652
+perft 6 281330710
+perft 7 6447669114
+
+id xfen-04
+epd 4r3/3k4/8/8/8/8/6PP/qR1K1R2 w KQ -
+perft 1 19
+perft 2 628
+perft 3 12858
+perft 4 405636
+
+#
+# Regression tests
+#
+
+id ep-evasion
+epd 8/8/8/5k2/3p4/8/4P3/4K3 w - -
+perft 1 6
+perft 2 54
+perft 3 343
+perft 4 2810
+perft 5 19228
+
+id prison
+epd 2b5/kpPp4/1p1P4/1P6/6p1/4p1P1/4PpPK/5B2 w - -
+perft 1 1
+perft 2 1
+perft 32 1
+
+id king-walk
+epd 8/8/8/B2p3Q/2qPp1P1/b7/2P2PkP/4K2R b K -
+perft 1 26
+perft 2 611
+perft 3 14583
+perft 4 366807
+
+#
+# https://github.com/ornicar/lila/issues/4625
+#
+
+id hside-rook-blocks-aside-castling
+epd 4rrk1/pbbp2p1/1ppnp3/3n1pqp/3N1PQP/1PPNP3/PBBP2P1/4RRK1 w Ff -
+perft 1 42
+perft 2 1743
+perft 3 71908
+
+#
+# Impossible checker alignment.
+#
+
+id align-diag-1
+epd 3R4/8/q4k2/2B5/1NK5/3b4/8/8 w - -
+perft 1 4
+perft 2 125
+perft 3 2854
+
+id align-diag-2
+epd 2Nq4/2K5/1b6/8/7R/3k4/7P/8 w - -
+perft 1 3
+perft 2 81
+perft 3 1217
+
+id align-horizontal
+epd 5R2/2P5/8/4k3/8/3rK2r/8/8 w - -
+perft 1 2
+perft 2 56
+perft 3 1030
+
+id align-ep
+epd 8/8/8/1k6/3Pp3/8/8/4KQ2 b - d3
+perft 1 6
+perft 2 121
+perft 3 711
+perft 4 405636
+perft 5 8992652
+perft 6 281330710
+perft 7 6447669114

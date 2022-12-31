@@ -7,12 +7,15 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
     "org.scalacheck"     %% "scalacheck"       % "1.16.0" % Test,
     "org.scalameta"      %% "munit-scalacheck" % "1.0.0-M7" % Test,
     "com.github.lenguyenthanh" % "compression"      % "aacf55bea2" % Test, // a fork of lichess compression which public everything so we can use it for testing.
+    "com.disneystreaming" %% "weaver-cats"       % "0.8.1"  % Test,
+    "com.disneystreaming" %% "weaver-scalacheck" % "0.8.1"  % Test,
     "com.github.ornicar" %% "scalalib"       % "9.0.2",
     "joda-time"           % "joda-time"      % "2.12.2",
     "org.typelevel"      %% "cats-core"      % "2.9.0",
     "org.typelevel"      %% "alleycats-core" % "2.9.0",
     "org.typelevel"      %% "cats-parse"     % "0.3.8"
   ),
+  testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
   scalacOptions := Seq(
     "-encoding",
     "utf-8",

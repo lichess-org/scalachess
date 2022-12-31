@@ -446,5 +446,8 @@ object Situation:
           enpassant = false
         )
       // in chess960 we only allow king move to the rook position
+      // TODO we have atomic chess960, how do we determine we are in that varaint?
+      // We can't guess from just rooks & kings position because there is 960 position that king and rooks are in the same as theirs in standard position
+      // So, the question is how do we filter out castling moves
       if f.board.variant.chess960 || f.board.variant.fromPosition then moves.filter(m => m.dest == rook)
       else moves

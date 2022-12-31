@@ -76,8 +76,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       val gameAfterOpening = game.playMoves((Pos.E2, Pos.E4), (Pos.F7, Pos.F5))
 
       gameAfterOpening must beValid.like { case newGame =>
-        newGame.situation.moves.size must beEqualTo(1)
-        newGame.situation.moves.values.find(_.exists(_.captures == false)) must beNone
+        newGame.situation.allTrustedMoves.size must beEqualTo(1)
+        newGame.situation.allTrustedMoves.exists(_.captures == false) must beEqualTo(false)
       }
 
     }

@@ -106,9 +106,9 @@ abstract class Variant private[variant] (
   def drop(situation: Situation, role: Role, pos: Pos): Validated[String, Drop] =
     Validated.invalid(s"$this variant cannot drop $situation $role $pos")
 
-  def staleMate(situation: Situation): Boolean = !situation.check && situation.moves.isEmpty
+  def staleMate(situation: Situation): Boolean = !situation.check && situation.allTrustedMoves.isEmpty
 
-  def checkmate(situation: Situation) = situation.check && situation.moves.isEmpty
+  def checkmate(situation: Situation) = situation.check && situation.allTrustedMoves.isEmpty
 
   // In most variants, the winner is the last player to have played and there is a possibility of either a traditional
   // checkmate or a variant end condition

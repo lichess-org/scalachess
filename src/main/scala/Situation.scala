@@ -18,7 +18,7 @@ case class Situation(board: Board, color: Color):
 
   lazy val allMoves: List[Move] = this.trustedMoves
 
-  lazy val playerCanCapture: Boolean = moves.exists(_._2.exists(_.captures))
+  lazy val playerCanCapture: Boolean = allTrustedMoves.exists(_.captures)
 
   lazy val destinations: Map[Pos, List[Pos]] = moves.view.mapValues { _.map(_.dest) }.to(Map)
 
@@ -96,7 +96,7 @@ case class Situation(board: Board, color: Color):
             move.dest.file.offset(1)
           ).flatten.flatMap(board(_, color.passablePawnRank)).exists(_ == color.pawn)
         )
-          moves.values.flatten.find(_.enpassant).map(_.dest)
+          allTrustedMoves.find(_.enpassant).map(_.dest)
         else None
       case _ => None
 

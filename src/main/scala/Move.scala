@@ -57,7 +57,8 @@ case class Move(
 
         val epSquare: Option[Pos] =
           if piece is Pawn then
-            if Math.abs((orig - dest).value) == 16 then
+            // todo pawns need to be in the second rank
+            if Math.abs((orig - dest).value) == 16 && orig.rank != piece.color.backRank then
               // TODO calculate their pawns attacks
               Some(Pos(orig.value + (if isWhiteTurn then 8 else -8)))
             else None

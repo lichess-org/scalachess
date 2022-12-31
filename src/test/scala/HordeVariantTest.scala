@@ -119,4 +119,13 @@ class HordeVariantTest extends ChessTest:
         game.situation.opponentHasInsufficientMaterial must beTrue
       }
     }
+
+    "Hord pawn on first rank should able to move two squares" in {
+      val position = EpdFen("8/pp1k2q1/3P2p1/8/P3PP2/PPP2r2/PPP5/PPPP4 w - - 1 2")
+      val game     = fenToGame(position, Horde)
+      game must beValid.like {case game =>
+        game.situation.allTrustedMoves.exists(m => m.orig == Pos.D1 && m.dest == Pos.D3)
+      }
+    }
+
   }

@@ -27,33 +27,7 @@ case class Actor(
   inline def is(inline r: Role)  = r == piece.role
   inline def is(inline p: Piece) = p == piece
 
-  lazy val check: Boolean = board check color
-
-  private inline def pawnDir = pawnDirOf(color)
-
   def castleOn(side: Side): List[Move] = moves.filter(_.castle.exists(_.side == side))
-
-  def move(
-      dest: Pos,
-      after: Board,
-      capture: Option[Pos] = None,
-      castle: Option[Move.Castle] = None,
-      promotion: Option[PromotableRole] = None,
-      enpassant: Boolean = false
-  ) =
-    Move(
-      piece = piece,
-      orig = pos,
-      dest = dest,
-      situationBefore = Situation(board, piece.color),
-      after = after,
-      capture = capture,
-      castle = castle,
-      promotion = promotion,
-      enpassant = enpassant
-    )
-
-  private def history = board.history
 
 object Actor:
 

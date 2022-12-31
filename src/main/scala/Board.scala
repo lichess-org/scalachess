@@ -59,11 +59,8 @@ case class Board(
   lazy val checkWhite: Boolean = checkOf(White)
   lazy val checkBlack: Boolean = checkOf(Black)
 
-  // todo fix
-  private def checkOf(c: Color): Boolean =
-    kingPosOf(c) exists { kingPos =>
-      variant.kingThreatened(this, !c, kingPos)
-    }
+  def checkOf(c: Color): Boolean =
+    board.isCheck(c)
 
   // todo fix
   def destsFrom(from: Pos): Option[List[Pos]] = actorAt(from).map(_.destinations)

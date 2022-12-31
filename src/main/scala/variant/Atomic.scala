@@ -38,8 +38,6 @@ case object Atomic
   override def kingThreatened(
       board: Board,
       color: Color,
-      to: Pos,
-      filter: Piece => Boolean = _ => true
   ): Boolean =
     board.board.isCheck(color)
 

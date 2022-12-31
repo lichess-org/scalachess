@@ -24,7 +24,7 @@ case object Antichess
   override def kingSafety(m: Move): Boolean =
     true
 
-  override def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) =
+  override def kingThreatened(board: Board, color: Color) =
     false
 
   override def validMoves(situation: Situation) =

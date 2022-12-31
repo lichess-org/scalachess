@@ -47,7 +47,7 @@ case object Horde
     def notKingBoard = board.board.king(Color.black).flatMap(board.take) | board
     val hordePos     = board.occupation(Color.white) // may include promoted pieces
     val mateInOne =
-      hordePos.sizeIs == 1 && hordePos.forall(pos => pieceThreatened(board, Color.black, pos, (_ => true)))
+      hordePos.sizeIs == 1 && hordePos.forall(pos => pieceThreatened(board, Color.black, pos))
     !mateInOne && notKingBoard.actors.values.forall(actor => actor.moves.isEmpty)
 
   /** In horde chess, black can win unless a fortress stalemate is unavoidable.

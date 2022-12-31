@@ -54,18 +54,11 @@ abstract class Variant private[variant] (
     !move.after.board.isCheck(move.color)
 
   // Optimised for performance
-  def pieceThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true): Boolean =
-    // todo remove pieceMap
-    board.pieces exists {
-      case (pos, piece) if piece.color == color && filter(piece) && piece.eyes(pos, to) =>
-        (!piece.role.projection) || piece.role.dir(pos, to).exists {
-          longRangeThreatens(board, pos, _, to)
-        }
-      case _ => false
-    }
+  def pieceThreatened(board: Board, color: Color, to: Pos): Boolean =
+    board.board.isAttacksTo(to, color)
 
-  def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) =
-    pieceThreatened(board, color, to, filter)
+  def kingThreatened(board: Board, color: Color) =
+    board.checkOf(color)
 
   def kingSafety(m: Move): Boolean =
     !m.after.board.isCheck(m.color)

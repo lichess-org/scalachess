@@ -55,26 +55,11 @@ case class Std(
 
   def withMetas(m: Metas) = copy(metas = m)
 
-  // TODO fix fix fix => bibibi
+  def isMove(m: chess.Move): Boolean =
+    !m.castles && m.dest == dest && m.piece.role == role && compare(file, m.orig.file + 1) && compare(rank, m.orig.rank + 1)
+
   def move(situation: Situation): Validated[String, chess.Move] =
-    // println(s"move $dest $role")
-    // println(situation.moves)
-    situation.board.pieces.foldLeft(none[chess.Move]) {
-      case (None, (pos, piece))
-          if piece.color == situation.color && piece.role == role && compare(
-            file,
-            pos.file.index + 1
-          ) && compare(
-            rank,
-            pos.rank.index + 1
-          ) && piece.eyesMovable(pos, dest) =>
-        val a = Actor(piece, pos, situation.board)
-        // println(s"Actor trustedMoves: ${a.trustedMoves(false)}")
-        a trustedMoves false find { m =>
-          m.dest == dest && a.board.variant.kingSafety(m)
-        }
-      case (m, _) => m
-    } match
+    situation.allTrustedMoves.find(isMove) match
       case None       => Validated invalid s"No move found: $this\n$situation"
       case Some(move) => move withPromotion promotion toValid "Wrong promotion"
 

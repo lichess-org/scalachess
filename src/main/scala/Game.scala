@@ -41,7 +41,7 @@ case class Game(
 
   def applyWithCompensated(move: Move): Clock.WithCompensatedLag[Game] =
     val newSituation = move.situationAfter
-    val newClock = applyClock(move.metrics, newSituation.status.isEmpty)
+    val newClock     = applyClock(move.metrics, newSituation.status.isEmpty)
 
     Clock.WithCompensatedLag(
       copy(

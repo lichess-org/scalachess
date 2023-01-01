@@ -131,7 +131,7 @@ class HordeVariantTest extends ChessTest:
     "Cannot en passant a pawn from fist rank" in {
       val position = EpdFen("k7/5p2/4p2P/3p2P1/2p2P2/1p2P2P/p2P2P1/2P2P2 w - - 0 1")
       val game     = fenToGame(position, Horde)
-      val newGame = game.flatMap(_.apply(Pos.C1, Pos.C3))
+      val newGame  = game.flatMap(_.apply(Pos.C1, Pos.C3))
       newGame must beValid.like { case game =>
         game._1.situation.allTrustedMoves.exists(m => m.orig == Pos.B3 && m.dest == Pos.C2) must beFalse
       }

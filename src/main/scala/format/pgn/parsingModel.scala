@@ -56,7 +56,10 @@ case class Std(
   def withMetas(m: Metas) = copy(metas = m)
 
   def isMove(m: chess.Move): Boolean =
-    !m.castles && m.dest == dest && m.piece.role == role && compare(file, m.orig.file + 1) && compare(rank, m.orig.rank + 1)
+    !m.castles && m.dest == dest && m.piece.role == role && compare(file, m.orig.file + 1) && compare(
+      rank,
+      m.orig.rank + 1
+    )
 
   def move(situation: Situation): Validated[String, chess.Move] =
     situation.allTrustedMoves.find(isMove) match
@@ -118,7 +121,9 @@ case class Castle(
   def withMetas(m: Metas) = copy(metas = m)
 
   def move(situation: Situation): Validated[String, chess.Move] =
-    situation.allTrustedMoves.find(_.castle.exists(_.side == side)) toValid "Cannot castle / variant is " + situation.board.variant
+    situation.allTrustedMoves.find(
+      _.castle.exists(_.side == side)
+    ) toValid "Cannot castle / variant is " + situation.board.variant
 
 case class Suffixes(
     check: Boolean,

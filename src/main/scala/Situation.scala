@@ -363,7 +363,7 @@ object Situation:
 
     private def genPawnMoves(from: Pos, to: Pos, capture: Boolean): List[Move] =
       if from.rank == f.color.seventhRank then
-        List(Queen, Knight, Rook, Bishop).flatMap(promotion(from, to, _, capture))
+        f.board.variant.promotableRoles.flatMap(promotion(from, to, _, capture))
       else normalMove(from, to, Pawn, capture).toList
 
     private def enpassant(orig: Pos, dest: Pos): Option[Move] =

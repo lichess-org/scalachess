@@ -233,7 +233,8 @@ object Situation:
       val doubleMoves =
         ~f.board.occupied &
           (if f.isWhiteTurn then singleMoves << 8 else singleMoves >>> 8) &
-          (if f.board.variant.horde then Bitboard.rank(f.color.fourthRank) | Bitboard.rank(f.color.thirdRank) else Bitboard.rank(f.color.fourthRank))
+          (if f.board.variant.horde then Bitboard.rank(f.color.fourthRank) | Bitboard.rank(f.color.thirdRank)
+           else Bitboard.rank(f.color.fourthRank))
       // println(s"doubleMoves $doubleMoves")
 
       val s2: List[Move] = for
@@ -422,6 +423,14 @@ object Situation:
           )
         )
 
+    // for BC, we add a move where the king goes to the rook position
+    // Here is the rules:
+    // if the variant is Standard => 2 moves
+    // if the variant is Chess960 => 1 move
+    // if the variatn is not either of those two then
+    //     if King and Rook are in standard position  => 2 moves
+    //     else => 1 move
+    // check logic in isChess960 function
     private def castle(king: Pos, kingTo: Pos, rook: Pos, rookTo: Pos): List[Move] =
       val after = for
         b1    <- f.board.take(king)
@@ -429,25 +438,25 @@ object Situation:
         b3    <- b2.place(f.color.king, kingTo)
         after <- b3.place(f.color.rook, rookTo)
       yield after
-      // for BC, we add a move where the king goes to the rook position
-      val moves =
-        for
-          a            <- after.toList
-          inputKingPos <- List(kingTo, rook).distinct.filter(_ != king)
-        yield Move(
-          piece = f.color.king,
-          orig = king,
-          dest = inputKingPos,
-          situationBefore = f,
-          after = a,
-          capture = None,
-          castle = Move.Castle((king, kingTo), (rook, rookTo)).some,
-          promotion = None,
-          enpassant = false
-        )
-      // in chess960 we only allow king move to the rook position
-      // TODO we have atomic chess960, how do we determine we are in that varaint?
-      // We can't guess from just rooks & kings position because there is 960 position that king and rooks are in the same as theirs in standard position
-      // So, the question is how do we filter out castling moves
-      if f.board.variant.chess960 || f.board.variant.fromPosition then moves.filter(m => m.dest == rook)
-      else moves
+
+      val isChess960 =
+        if f.board.variant.standard then false
+        else if f.board.variant.chess960 then true
+        else king.file != File.E || !(rook.file == File.A || rook.file == File.H)
+
+      val destInput = if (!isChess960) then List(kingTo, rook) else List(rook)
+
+      for
+        a            <- after.toList
+        inputKingPos <- destInput // .filter(_ != king)
+      yield Move(
+        piece = f.color.king,
+        orig = king,
+        dest = inputKingPos,
+        situationBefore = f,
+        after = a,
+        capture = None,
+        castle = Move.Castle((king, kingTo), (rook, rookTo)).some,
+        promotion = None,
+        enpassant = false
+      )

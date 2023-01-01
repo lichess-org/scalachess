@@ -123,4 +123,10 @@ object Move:
   // ((king, kingTo), (rook, rookTo))
   opaque type Castle = ((Pos, Pos), (Pos, Pos))
   object Castle extends TotalWrapper[Castle, ((Pos, Pos), (Pos, Pos))]:
-    extension (e: Castle) def side: Side = if e._1._1.file > e._2._1.file then QueenSide else KingSide
+    extension (e: Castle)
+      inline def king         = e._1._1
+      inline def kingTo       = e._1._2
+      inline def rook         = e._2._1
+      inline def rookTo       = e._2._2
+      def side: Side          = if king.file > kingTo.file then QueenSide else KingSide
+      def isStandard: Boolean = king.file == File.E && (rook.file == File.A || rook.file == File.H)

@@ -36,23 +36,19 @@ object Perft:
     import chess.Move.Castle.*
     import Perft.*
 
-    // if game.situation.end && game.situation.allTrustedMoves.nonEmpty then
-    //   println(s"wtf: ${game.situation}")
-
     if depth == 0 then 1L
+    else if game.situation.perftEnd then 0L
     else
-      if game.situation.perftEnd then 0L
-      else
-        val allMoves = game.situation.allTrustedMoves
-        // if variant is not chess960 we need to deduplicated castlings moves
-        val moves =
-          if game.situation.board.variant.chess960 then allMoves
-          // We filter out castling move that is Standard and king's dest is not in the rook position
-          else allMoves.filterNot(m => m.castle.exists(c => c.isStandard && m.dest != c.rook))
+      val allMoves = game.situation.allTrustedMoves
+      // if variant is not chess960 we need to deduplicated castlings moves
+      val moves =
+        if game.situation.board.variant.chess960 then allMoves
+        // We filter out castling move that is Standard and king's dest is not in the rook position
+        else allMoves.filterNot(m => m.castle.exists(c => c.isStandard && m.dest != c.rook))
 
-        if (depth == 1) then moves.size.toLong
-        else moves.map(move => perft(game.apply(move), depth - 1)).sum
+      if (depth == 1) then moves.size.toLong
+      else moves.map(move => perft(game.apply(move), depth - 1)).sum
 
   extension (s: Situation)
     // when calculate perft we don't do autoDraw
-    def perftEnd = s.checkMate || s.staleMate || s.variantEnd
+    def perftEnd = s.checkMate || s.staleMate || s.variantEnd || s.board.variant.specialDraw(s)

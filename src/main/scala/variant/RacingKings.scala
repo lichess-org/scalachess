@@ -45,6 +45,7 @@ case object RacingKings
   override def isInsufficientMaterial(board: Board)                  = false
   override def opponentHasInsufficientMaterial(situation: Situation) = false
 
+  // todo bitboard => kings & byColor & Rank.Eight
   private def reachedGoal(board: Board, color: Color) =
     board.kingPosOf(color) exists (_.rank == Rank.Eighth)
 

@@ -65,7 +65,6 @@ abstract class Variant private[variant] (
       next == to || (!board.contains(next) && longRangeThreatens(board, next, dir, to))
     }
 
-  // todo simplify this, we don't need actor anymore
   def move(
       situation: Situation,
       from: Pos,
@@ -74,7 +73,7 @@ abstract class Variant private[variant] (
   ): Validated[String, Move] =
     // Find the move in the variant specific list of valid moves
     def findMove(from: Pos, to: Pos) =
-      situation.moves get from flatMap (_.find(_.dest == to))
+      situation.allTrustedMoves.find(m => m.orig == from && m.dest == to)
 
     for {
       piece <- situation.board(from) toValid s"No piece on ${from.key}"
@@ -84,7 +83,7 @@ abstract class Variant private[variant] (
       m1 <- findMove(from, to) toValid s"Piece on ${from.key} cannot move to ${to.key}"
       m2 <- m1 withPromotion promotion toValid s"Piece on ${from.key} cannot promote to $promotion"
       m3 <-
-        if (isValidPromotion(promotion)) Validated.valid(m2)
+        if isValidPromotion(promotion) then Validated.valid(m2)
         else Validated.invalid(s"Cannot promote to $promotion in this game mode")
     } yield m3
 

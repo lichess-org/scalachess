@@ -219,7 +219,7 @@ case class Board(
   inline def hasPiece(inline p: Piece) =
     piece(p).nonEmpty
 
-  lazy val onlyKingsLeft = kings == occupied
+  lazy val onlyKingsLeft           = kings == occupied
   def isOnlyKingLeft(color: Color) = (kings & byColor(color)) == byColor(color)
 
   // TODO remove unsafe get

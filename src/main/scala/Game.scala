@@ -33,7 +33,6 @@ case class Game(
       promotion: Option[PromotableRole] = None,
       metrics: MoveMetrics = MoveMetrics()
   ): Validated[String, (Clock.WithCompensatedLag[Game], Move)] =
-    // println(s"moveWithCompensated $promotion")
     situation.move(orig, dest, promotion).map(_.normalizeCastle withMetrics metrics) map { move =>
       applyWithCompensated(move) -> move
     }

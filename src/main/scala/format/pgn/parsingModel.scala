@@ -118,11 +118,7 @@ case class Castle(
   def withMetas(m: Metas) = copy(metas = m)
 
   def move(situation: Situation): Validated[String, chess.Move] =
-    for {
-      kingPos <- situation.board kingPosOf situation.color toValid "No king found"
-      actor   <- situation.board actorAt kingPos toValid "No actor found"
-      move <- actor.castleOn(side).headOption toValid "Cannot castle / variant is " + situation.board.variant
-    } yield move
+    situation.allTrustedMoves.find(_.castle.exists(_.side == side)) toValid "Cannot castle / variant is " + situation.board.variant
 
 case class Suffixes(
     check: Boolean,

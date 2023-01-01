@@ -26,6 +26,8 @@ case class Move(
 
   val isWhiteTurn: Boolean = piece.color.white
 
+  // TODO rethink about how handle castling
+  // it's quite messy and error prone now
   def finalizeAfter: Board =
     val board = after.variant.finalizeBoard(
       after updateHistory { h1 =>
@@ -42,19 +44,22 @@ case class Move(
           else h1.castles
 
         val castleRights: Bitboard =
-          if piece is Rook then halfCastlingRights & ~orig.bitboard
+          if (piece is Rook) && (orig.bitboard & h2.unmovedRooks).nonEmpty then halfCastlingRights & ~orig.bitboard
           else if piece.is(King) then halfCastlingRights & Bitboard.rank(piece.color.lastRank)
           else halfCastlingRights
 
-        val unmovedRooks1: Bitboard =
-          if captures then h2.unmovedRooks & ~dest.bitboard
+        var unmovedRooks: Bitboard =
+          if captures then
+            h2.unmovedRooks & ~dest.bitboard
           else h2.unmovedRooks
 
-        val unmovedRooks2: Bitboard =
-          if piece is Rook then unmovedRooks1 & ~orig.bitboard
-          else if piece.is(King) then unmovedRooks1 & Bitboard.rank(piece.color.lastRank)
-          else unmovedRooks1
+        // if orig == Pos.H1 then println(s"unmovedRooks1 $unmovedRooks1")
+        unmovedRooks =
+          if piece is Rook then unmovedRooks & ~orig.bitboard
+          else if piece is King then unmovedRooks & Bitboard.rank(piece.color.lastRank)
+          else unmovedRooks
 
+        // var castles = h1.castles
         val epSquare: Option[Pos] =
           if piece is Pawn then
             // todo pawns need to be in the second rank
@@ -64,7 +69,7 @@ case class Move(
             else None
           else None
 
-        h2.withCastles(Castles(castleRights)).copy(epSquare = epSquare)
+        h2.withCastles(Castles(castleRights)).copy(epSquare = epSquare, unmovedRooks = unmovedRooks)
       },
       toUci,
       capture flatMap { before(_) }

@@ -172,7 +172,7 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
     def occupiedSquares: List[Pos] =
       fold(List[Pos]())((xs, pos) => xs :+ pos)
 
-    // total not empty position
+    // total non empty position
     def count: Int =
       fold(0)((count, _) => count + 1)
 

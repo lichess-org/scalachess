@@ -93,3 +93,11 @@ class BitboardTest extends ScalaCheckSuite:
       s.pawnAttacks(Color.Black) == CBB.pawnAttacks(false, s).bb
     }
   }
+
+  test("count") {
+    assertEquals(1024L.bb.count, 1)
+    assertEquals(4264L.bb.count, 4)
+    assertEquals((1L.bb & Pos.A1.bitboard).nonEmpty, true)
+    import Castles.*
+    assertEquals(Castles(1L.bb).can(White).any, true)
+  }

@@ -25,7 +25,7 @@ class PerftTest extends ChessTest:
   genTests("calculate ThreeCheck perfts", Perft.threeCheckPerfts, ThreeCheck, 1_000_000L)
   genTests("calculate Antichess perfts", Perft.antichessPerfts, Antichess, 1_000_000L)
   genTests("calculate Atomic perfts", Perft.atomicPerfts, Atomic, 1_000_000L)
-  // scalachess doesn't generate drops now
+  // TODO scalachess doesn't generate drops now
   // genTests("calculate Crazyhouse perfts", Perft.crazyhousePerfts, Crazyhouse, 1_000_000L)
   genTests("calculate Horde perfts", Perft.hordePerfts, Horde, 1_000_000L)
   genTests("calculate RacingKings perfts", Perft.racingkingsPerfts, RacingKings, 1_000_000L)

@@ -3,7 +3,7 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
   libraryDependencies ++= List(
     "org.specs2"          %% "specs2-core"       % "4.19.0" % Test,
     "org.specs2"          %% "specs2-cats"       % "4.19.0" % Test,
-    "org.typelevel"       %% "cats-effect"       % "3.4.3"  % Test,
+    "org.typelevel"       %% "cats-effect"       % "3.4.4"  % Test,
     "com.disneystreaming" %% "weaver-cats"       % "0.8.1"  % Test,
     "com.disneystreaming" %% "weaver-scalacheck" % "0.8.1"  % Test,
     "com.github.ornicar"  %% "scalalib"          % "9.0.2",

@@ -13,6 +13,7 @@ case class Situation(board: Board, color: Color):
   lazy val actors = board actorsOf color
 
   lazy val allTrustedMoves = board.variant.validMoves(this)
+
   lazy val moves: Map[Pos, List[Move]] =
     allTrustedMoves.groupBy(_.orig)
 

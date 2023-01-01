@@ -16,56 +16,56 @@ class RacingKingsVariantTest extends ChessTest:
 
     "game end to black" in {
       val fenPosition = EpdFen("4krn1/K2b4/8/8/8/8/8/8 w - - 4 3")
-      val game = fenToGame(fenPosition, RacingKings).toOption.get
+      val game        = fenToGame(fenPosition, RacingKings).toOption.get
       game.situation.end must beTrue
       game.situation.winner mustEqual Option(Black)
     }
 
     "game end to black 2" in {
       val fenPosition = EpdFen("4brk1/8/5n2/K7/8/8/8/8 w - - 6 4")
-      val game = fenToGame(fenPosition, RacingKings).toOption.get
+      val game        = fenToGame(fenPosition, RacingKings).toOption.get
       game.situation.end must beTrue
       game.situation.winner mustEqual Option(Black)
     }
 
     "game end to black 3" in {
       val fenPosition = EpdFen("3kbrn1/8/8/K7/8/8/8/8 w - - 4 3")
-      val game = fenToGame(fenPosition, RacingKings).toOption.get
+      val game        = fenToGame(fenPosition, RacingKings).toOption.get
       game.situation.end must beTrue
       game.situation.winner mustEqual Option(Black)
     }
 
     "game end to black 4" in {
       val fenPosition = EpdFen("4brk1/4n3/8/K7/8/8/8/8 w - - 4 3")
-      val game = fenToGame(fenPosition, RacingKings).toOption.get
+      val game        = fenToGame(fenPosition, RacingKings).toOption.get
       game.situation.end must beTrue
       game.situation.winner mustEqual Option(Black)
     }
 
     "game end to white" in {
       val fenPosition = EpdFen("K3br2/5k2/8/8/6n1/8/8/8 w - - 4 3")
-      val game = fenToGame(fenPosition, RacingKings).toOption.get
+      val game        = fenToGame(fenPosition, RacingKings).toOption.get
       game.situation.end must beTrue
       game.situation.winner mustEqual Option(White)
     }
 
     "game end to white 2" in {
       val fenPosition = EpdFen("K3b2r/5k2/5n2/8/8/8/8/8 w - - 4 3")
-      val game = fenToGame(fenPosition, RacingKings).toOption.get
+      val game        = fenToGame(fenPosition, RacingKings).toOption.get
       game.situation.end must beTrue
       game.situation.winner mustEqual Option(White)
     }
 
     "game is draw if both kings are in 8th rank" in {
       val fenPosition = EpdFen("K3brk1/8/5n2/8/8/8/8/8 w - - 4 3")
-      val game = fenToGame(fenPosition, RacingKings).toOption.get
+      val game        = fenToGame(fenPosition, RacingKings).toOption.get
       game.situation.end must beTrue
       game.situation.winner mustEqual None
     }
 
     "game is not end when Black's King can go to the 8th rank" in {
       val fenPosition = EpdFen("1K2br2/5k2/5n2/8/8/8/8/8 b - - 3 2")
-      val game = fenToGame(fenPosition, RacingKings).toOption.get
+      val game        = fenToGame(fenPosition, RacingKings).toOption.get
       game.situation.end must beFalse
     }
 

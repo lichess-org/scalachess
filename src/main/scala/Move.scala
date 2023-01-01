@@ -44,13 +44,13 @@ case class Move(
           else h1.castles
 
         val castleRights: Bitboard =
-          if (piece is Rook) && (orig.bitboard & h2.unmovedRooks).nonEmpty then halfCastlingRights & ~orig.bitboard
+          if (piece is Rook) && (orig.bitboard & h2.unmovedRooks).nonEmpty then
+            halfCastlingRights & ~orig.bitboard
           else if piece.is(King) then halfCastlingRights & Bitboard.rank(piece.color.lastRank)
           else halfCastlingRights
 
         var unmovedRooks: Bitboard =
-          if captures then
-            h2.unmovedRooks & ~dest.bitboard
+          if captures then h2.unmovedRooks & ~dest.bitboard
           else h2.unmovedRooks
 
         // if orig == Pos.H1 then println(s"unmovedRooks1 $unmovedRooks1")

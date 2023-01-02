@@ -62,7 +62,7 @@ case class Std(
     )
 
   def move(situation: Situation): Validated[String, chess.Move] =
-    situation.allTrustedMoves.find(isMove) match
+    situation.legalMoves.find(isMove) match
       case None       => Validated invalid s"No move found: $this\n$situation"
       case Some(move) => move withPromotion promotion toValid "Wrong promotion"
 
@@ -121,7 +121,7 @@ case class Castle(
   def withMetas(m: Metas) = copy(metas = m)
 
   def move(situation: Situation): Validated[String, chess.Move] =
-    situation.allTrustedMoves.find(
+    situation.legalMoves.find(
       _.castle.exists(_.side == side)
     ) toValid "Cannot castle / variant is " + situation.board.variant
 

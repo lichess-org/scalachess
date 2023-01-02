@@ -39,7 +39,7 @@ object Perft:
     if depth == 0 then 1L
     else if game.situation.perftEnd then 0L
     else
-      val allMoves = game.situation.allTrustedMoves
+      val allMoves = game.situation.legalMoves
       // if variant is not chess960 we need to deduplicated castlings moves
       val moves =
         if game.situation.board.variant.chess960 then allMoves

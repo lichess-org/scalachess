@@ -14,13 +14,9 @@ case class Actor(
 
   lazy val situation = Situation(board, piece.color)
 
-  lazy val moves: List[Move]                        = situation.generateMoves.filter(_.orig == pos)
-  def trustedMoves(withCastle: Boolean): List[Move] = situation.trustedMoves.filter(_.orig == pos)
+  lazy val moves: List[Move] = situation.generateMoves.filter(_.orig == pos)
 
-  lazy val destinations: List[Pos] =
-    // println(situation)
-    // println(moves)
-    moves.map(_.dest)
+  lazy val destinations: List[Pos] = moves.map(_.dest)
 
   inline def color               = piece.color
   inline def is(inline c: Color) = c == piece.color

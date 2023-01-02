@@ -148,7 +148,7 @@ class AtomicVariantTest extends ChessTest:
         game.situation.end must beFalse
         game.situation.winner must beNone
         game.situation.moves must haveKeys(Pos.D4, Pos.H7)
-        game.situation.allTrustedMoves.forall(_.captures) must beTrue
+        game.situation.legalMoves.forall(_.captures) must beTrue
       }
     }
 

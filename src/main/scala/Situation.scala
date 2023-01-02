@@ -14,14 +14,12 @@ case class Situation(board: Board, color: Color):
 
   lazy val actors = board actorsOf color
 
-  lazy val allTrustedMoves = board.variant.validMoves(this)
+  lazy val legalMoves = board.variant.validMoves(this)
 
   lazy val moves: Map[Pos, List[Move]] =
-    allTrustedMoves.groupBy(_.orig)
+    legalMoves.groupBy(_.orig)
 
-  lazy val allMoves: List[Move] = this.trustedMoves
-
-  lazy val playerCanCapture: Boolean = allTrustedMoves.exists(_.captures)
+  lazy val playerCanCapture: Boolean = legalMoves.exists(_.captures)
 
   lazy val destinations: Map[Pos, List[Pos]] = moves.view.mapValues { _.map(_.dest) }.to(Map)
 
@@ -30,11 +28,9 @@ case class Situation(board: Board, color: Color):
       case v: variant.Crazyhouse.type => v possibleDrops this
       case _                          => None
 
-  lazy val kingPos: Option[Pos] = board kingPosOf color
-
   lazy val check: Boolean = board checkOf color
 
-  def checkSquare = if (check) kingPos else None
+  def checkSquare = if (check) ourKing else None
 
   inline def history = board.history
 
@@ -99,7 +95,7 @@ case class Situation(board: Board, color: Color):
             move.dest.file.offset(1)
           ).flatten.flatMap(board(_, color.passablePawnRank)).exists(_ == color.pawn)
         )
-          allTrustedMoves.find(_.enpassant).map(_.dest)
+          legalMoves.find(_.enpassant).map(_.dest)
         else None
       case _ => None
 
@@ -107,14 +103,14 @@ case class Situation(board: Board, color: Color):
 
   // =======================================bitboard========================
 
-  val ourKing                    = board.board.king(color)
-  val theirKing                  = board.board.king(!color)
+  val ourKing: Option[Pos]       = board.board.king(color)
+  val theirKing: Option[Pos]     = board.board.king(!color)
   val us: Bitboard               = board.board.byColor(color)
-  def them: Bitboard             = board.board.byColor(!color)
-  def checkers: Option[Bitboard] = ourKing.map(board.board.attacksTo(_, !color))
-  def sliderBlockers: Bitboard   = board.board.sliderBlockers(color)
-  def isWhiteTurn: Boolean       = color.white
-  def isOccupied: Pos => Boolean = board.board.isOccupied
+  private def them: Bitboard             = board.board.byColor(!color)
+  private def checkers: Option[Bitboard] = ourKing.map(board.board.attacksTo(_, !color))
+  private def sliderBlockers: Bitboard   = board.board.sliderBlockers(color)
+  private def isWhiteTurn: Boolean       = color.white
+  private def isOccupied: Pos => Boolean = board.board.isOccupied
 
   def isSafe(king: Pos, move: Move, blockers: Bitboard): Boolean =
     if move.enpassant then
@@ -129,13 +125,8 @@ case class Situation(board: Board, color: Color):
         !(us & blockers).contains(move.orig) || Bitboard.aligned(move.orig, move.dest, king)
       }
 
-  // private def addCastlingMoves(prevMoves: List[Move], castlingMoves: List[Move]) =
-  //   prevMoves ::: castlingMoves.filterNot { cm =>
-  //     prevMoves.exists(m => m.orig == cm.orig && m.dest == cm.dest)
-  //   }
-
   /** The moves without taking defending the king into account */
-  lazy val trustedMoves: List[Move] =
+  lazy val allMoves: List[Move] =
     val enPassantMoves = board.history.epSquare.fold(Nil)(genEnPassant)
     val targets        = ~us
     val withoutCastles = genNonKing(targets) ++ genUnsafeKing(targets)
@@ -149,6 +140,8 @@ case class Situation(board: Board, color: Color):
     if board.variant.hasMoveEffects then moves.map(board.variant.addVariantEffect(_))
     else moves
 
+  // It works now but we have two versions of move generator: generateMoves and allMoves
+  // we should somehow reconcile them
   lazy val generateMoves: List[Move] =
     val enPassantMoves = board.history.epSquare.fold(Nil)(genEnPassant)
     val mask           = checkers.getOrElse(Bitboard.empty)
@@ -182,7 +175,6 @@ case class Situation(board: Board, color: Color):
     List.unfold(pawns)(ff).mapFilter(enpassant(_, ep))
 
   private def genNonKing(mask: Bitboard): List[Move] =
-    // println(s"mask $mask")
     genPawn(mask) ++ genKnight(mask) ++ genBishop(mask) ++ genRook(mask) ++ genQueen(mask)
 
   /** Generate all pawn moves except en passant
@@ -199,10 +191,8 @@ case class Situation(board: Board, color: Color):
   private def genPawn(mask: Bitboard): List[Move] =
     val moves = ListBuffer[Move]()
 
-    // println(s"turns ${color}")
-    // our pawns or captures
+    // our pawns which are called captures
     val capturers = us & board.board.pawns
-    // println(s"capturers $capturers")
 
     val s1: List[Move] = for
       from <- capturers.occupiedSquares
@@ -210,7 +200,6 @@ case class Situation(board: Board, color: Color):
       to   <- targets.occupiedSquares
       move <- genPawnMoves(from, to, true)
     yield move
-    // println(s"s1 $s1")
 
     // normal pawn moves
     val singleMoves = ~board.occupied & {
@@ -218,20 +207,17 @@ case class Situation(board: Board, color: Color):
       else (board.black & board.pawns) >>> 8
     }
 
-    // println(s"singleMoves $singleMoves")
     val doubleMoves =
       ~board.occupied &
         (if isWhiteTurn then singleMoves << 8 else singleMoves >>> 8) &
         (if board.variant.horde then Bitboard.rank(color.fourthRank) | Bitboard.rank(color.thirdRank)
          else Bitboard.rank(color.fourthRank))
-    // println(s"doubleMoves $doubleMoves")
 
     val s2: List[Move] = for
       to   <- (singleMoves & mask).occupiedSquares
       from <- Pos.at(to.value + (if isWhiteTurn then -8 else 8)).toList
       move <- genPawnMoves(from, to, false)
     yield move
-    // println(s"s2 $s2")
 
     val s3: List[Move] = for
       to   <- (doubleMoves & mask).occupiedSquares
@@ -281,16 +267,13 @@ case class Situation(board: Board, color: Color):
     ourKing.fold(Nil)(king =>
       // Checks by these sliding pieces can maybe be blocked.
       val sliders = checkers & (board.sliders)
-      // println(s"sliders: $sliders")
       val attacked =
         sliders.occupiedSquares.foldRight(Bitboard.empty)((s, a) => a | (s.bitboard ^ Bitboard.ray(king, s)))
       val safeKings = genSafeKing(~us & ~attacked)
-      // println(s"safeKings $safeKings")
       val blockers =
         if !checkers.moreThanOne then
           checkers.lsb.map(c => genNonKing(Bitboard.between(king, c) | checkers)).getOrElse(Nil)
         else Nil
-      // println(s"blockers $blockers")
       safeKings ++ blockers
     )
 

@@ -75,7 +75,6 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
 
     val squareRange = 0 until 64
     squareRange.foreach { sq =>
-      // println(s"$sq")
       KNIGHT_ATTACKS(sq) = slidingAttacks(sq, Bitboard.ALL, KNIGHT_DELTAS)
       KING_ATTACKS(sq) = slidingAttacks(sq, Bitboard.ALL, KING_DELTAS)
       WHITE_PAWN_ATTACKS(sq) = slidingAttacks(sq, Bitboard.ALL, WHITE_PAWN_DELTAS)

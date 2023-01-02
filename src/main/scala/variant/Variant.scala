@@ -54,7 +54,7 @@ abstract class Variant private[variant] (
   def pieceThreatened(board: Board, color: Color, to: Pos): Boolean =
     board.board.isAttacksTo(to, color)
 
-  def kingThreatened(board: Board, color: Color) =
+  def kingThreatened(board: Board, color: Color): Boolean =
     board.board.isCheck(color)
 
   def kingSafety(m: Move): Boolean =
@@ -73,7 +73,7 @@ abstract class Variant private[variant] (
   ): Validated[String, Move] =
     // Find the move in the variant specific list of valid moves
     def findMove(from: Pos, to: Pos) =
-      situation.allTrustedMoves.find(m => m.orig == from && m.dest == to)
+      situation.legalMoves.find(m => m.orig == from && m.dest == to)
 
     for {
       piece <- situation.board(from) toValid s"No piece on ${from.key}"
@@ -90,9 +90,9 @@ abstract class Variant private[variant] (
   def drop(situation: Situation, role: Role, pos: Pos): Validated[String, Drop] =
     Validated.invalid(s"$this variant cannot drop $situation $role $pos")
 
-  def staleMate(situation: Situation): Boolean = !situation.check && situation.allTrustedMoves.isEmpty
+  def staleMate(situation: Situation): Boolean = !situation.check && situation.legalMoves.isEmpty
 
-  def checkmate(situation: Situation) = situation.check && situation.allTrustedMoves.isEmpty
+  def checkmate(situation: Situation) = situation.check && situation.legalMoves.isEmpty
 
   // In most variants, the winner is the last player to have played and there is a possibility of either a traditional
   // checkmate or a variant end condition

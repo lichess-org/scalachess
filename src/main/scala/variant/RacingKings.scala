@@ -61,7 +61,7 @@ case object RacingKings
       case White =>
         reachedGoal(situation.board, White) ^ reachedGoal(situation.board, Black)
       case Black =>
-        reachedGoal(situation.board, White) && situation.allTrustedMoves.filter(reachesGoal).isEmpty
+        reachedGoal(situation.board, White) && situation.legalMoves.filter(reachesGoal).isEmpty
 
   // If white reaches the goal and black also reaches the goal directly after,
   // then it is a draw.
@@ -78,4 +78,4 @@ case object RacingKings
 
   // When considering stalemate, take into account that checks are not allowed.
   override def staleMate(situation: Situation): Boolean =
-    !situation.check && !specialEnd(situation) && situation.allTrustedMoves.isEmpty
+    !situation.check && !specialEnd(situation) && situation.legalMoves.isEmpty

@@ -156,7 +156,6 @@ object Fen:
           if file > 8 then return Left(ParseFenError.InvalidBoard)
         }
         case ch => {
-          // println(s"do $ch $file $rank")
           (Piece.fromChar(ch), File.atIndex(file), Rank.atIndex(rank))
             .mapN((p, f, r) => (Pos(f, r), p))
             .match

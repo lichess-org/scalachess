@@ -53,7 +53,6 @@ case class Move(
           if captures then h2.unmovedRooks & ~dest.bitboard
           else h2.unmovedRooks
 
-        // if orig == Pos.H1 then println(s"unmovedRooks1 $unmovedRooks1")
         unmovedRooks =
           if piece is Rook then unmovedRooks & ~orig.bitboard
           else if piece is King then unmovedRooks & Bitboard.rank(piece.color.lastRank)

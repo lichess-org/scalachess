@@ -124,7 +124,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("8/pp1k2q1/3P2p1/8/P3PP2/PPP2r2/PPP5/PPPP4 w - - 1 2")
       val game     = fenToGame(position, Horde)
       game must beValid.like { case game =>
-        game.situation.allTrustedMoves.exists(m => m.orig == Pos.D1 && m.dest == Pos.D3) must beTrue
+        game.situation.legalMoves.exists(m => m.orig == Pos.D1 && m.dest == Pos.D3) must beTrue
       }
     }
 
@@ -133,7 +133,7 @@ class HordeVariantTest extends ChessTest:
       val game     = fenToGame(position, Horde)
       val newGame  = game.flatMap(_.apply(Pos.C1, Pos.C3))
       newGame must beValid.like { case game =>
-        game._1.situation.allTrustedMoves.exists(m => m.orig == Pos.B3 && m.dest == Pos.C2) must beFalse
+        game._1.situation.legalMoves.exists(m => m.orig == Pos.B3 && m.dest == Pos.C2) must beFalse
       }
     }
 

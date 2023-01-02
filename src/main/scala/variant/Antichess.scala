@@ -40,7 +40,7 @@ case object Antichess
 
   override def specialEnd(situation: Situation) =
     // The game ends with a win when one player manages to lose all their pieces or is in stalemate
-    situation.board.piecesOf(situation.color).isEmpty || situation.allTrustedMoves.isEmpty
+    situation.board.piecesOf(situation.color).isEmpty || situation.legalMoves.isEmpty
 
   // In antichess, it is valuable for your opponent to have pieces.
   override def materialImbalance(board: Board): Int =

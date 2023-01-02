@@ -322,8 +322,8 @@ PPPPPPPP
       println(
         s"game: ${game.situation} - ${game.board.history} - ${game.board.history.castles} - ${game.board.history.unmovedRooks}"
       )
-      println(game.situation.allTrustedMoves)
-      game.situation.allTrustedMoves.exists(_.castles) must beTrue
+      println(game.situation.legalMoves)
+      game.situation.legalMoves.exists(_.castles) must beTrue
     }
 
   }

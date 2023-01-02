@@ -26,7 +26,7 @@ case object Atomic
 
   /** Move threatens to illegally explode our own king */
   private def explodesOwnKing(situation: Situation)(move: Move): Boolean =
-    move.captures && situation.kingPos.exists { move.dest.touches(_) }
+    move.captures && situation.ourKing.exists { move.dest.touches(_) }
 
   /** In atomic chess, a king cannot be threatened while it is in the perimeter of the other king as were the other player
     * to capture it, their own king would explode. This effectively makes a king invincible while connected with another

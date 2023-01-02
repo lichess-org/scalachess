@@ -36,6 +36,7 @@ case class Fen(board: Board, state: State):
 
   // TODO should we validate the move here?
   // Either[InvalidMove, Board]
+  import Fen.*
   def playBoard: Move => Board =
     board.play(state.turn)
 
@@ -164,3 +165,15 @@ object Fen:
           file += 1
         }
     Right(Board.fromMap(pieces.toMap))
+
+  // TODO move: Board => Board
+  extension (b: Board)
+    def play(color: Color): Move => Board =
+      case Move.Normal(from, to, role, _)    => b.discard(from).putOrReplace(to, role, color)
+      case Move.Promotion(from, to, role, _) => b.discard(from).putOrReplace(to, role, color)
+      case Move.EnPassant(from, to) =>
+        b.discard(from).discard(to.withRankOf(from)).putOrReplace(to, Pawn, color)
+      case Move.Castle(from, to) =>
+        val rookTo = to.withFile(if to < from then File.D else File.F)
+        val kingTo = to.withFile(if to < from then File.C else File.G)
+        b.discard(from).discard(to).putOrReplace(rookTo, Rook, color).putOrReplace(kingTo, King, color)

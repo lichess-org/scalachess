@@ -13,6 +13,7 @@ class BoardTest extends FunSuite:
 
   import Helpers.*
   import Bitboard.*
+  import Fen.*
 
   test("sliderBlockers") {
     FenFixtures.fens.foreach { str =>

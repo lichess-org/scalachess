@@ -103,9 +103,9 @@ case class Situation(board: Board, color: Color):
 
   // =======================================bitboard========================
 
-  val ourKing: Option[Pos]       = board.board.king(color)
-  val theirKing: Option[Pos]     = board.board.king(!color)
-  val us: Bitboard               = board.board.byColor(color)
+  val ourKing: Option[Pos]               = board.board.king(color)
+  val theirKing: Option[Pos]             = board.board.king(!color)
+  val us: Bitboard                       = board.board.byColor(color)
   private def them: Bitboard             = board.board.byColor(!color)
   private def checkers: Option[Bitboard] = ourKing.map(board.board.attacksTo(_, !color))
   private def sliderBlockers: Bitboard   = board.board.sliderBlockers(color)

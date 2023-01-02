@@ -188,19 +188,6 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
     inline def isEmpty: Boolean  = a == empty
     inline def nonEmpty: Boolean = !isEmpty
 
-  // TODO move to color
-  extension (c: Color)
-
-    def secondRank: Rank =
-      c match
-        case Color.White => Rank.Second
-        case Color.Black => Rank.Seventh
-
-    def seventhRank: Rank =
-      c match
-        case Color.White => Rank.Seventh
-        case Color.Black => Rank.Second
-
   private def distance(a: Int, b: Int): Int =
     inline def file(p: Int) = p & 7
     inline def rank(p: Int) = p >>> 3

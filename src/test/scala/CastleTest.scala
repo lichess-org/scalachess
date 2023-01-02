@@ -3,6 +3,8 @@ package chess
 import scala.language.implicitConversions
 import chess.Pos.*
 import chess.variant.FromPosition
+import chess.variant.Chess960
+import chess.format.EpdFen
 
 class CastleTest extends ChessTest:
 
@@ -312,6 +314,18 @@ PPPPPPPP
         }
       }
     }
+
+    "chess960" in {
+      val fenPosition = EpdFen("r3k2r/8/8/8/8/8/8/1R2K2R b KQk - 1 1")
+      val init        = fenToGame(fenPosition, Chess960).toOption.get
+      val game        = init.playMoves((A8, A1), (H1, H2), (A1, A7)).toOption.get
+      println(
+        s"game: ${game.situation} - ${game.board.history} - ${game.board.history.castles} - ${game.board.history.unmovedRooks}"
+      )
+      println(game.situation.allTrustedMoves)
+      game.situation.allTrustedMoves.exists(_.castles) must beTrue
+    }
+
   }
   "threat on king prevents castling" in {
     val board: Board = """R   K  R"""
@@ -376,4 +390,5 @@ PPPPPPPP
         F2
       )
     }
+
   }

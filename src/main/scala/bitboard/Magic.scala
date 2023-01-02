@@ -1,7 +1,6 @@
 package chess
 package bitboard
 
-// TODO move to bitboard
 case class Magic(mask: Long, factor: Long, offset: Int)
 
 object Magic:

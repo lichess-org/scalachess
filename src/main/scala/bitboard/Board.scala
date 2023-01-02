@@ -45,8 +45,6 @@ case class Board(
       role  <- roleAt(s)
     yield Piece(color, role)
 
-  // TODO returns Option[Boolean]
-  // None in case of no king
   def whiteAt(s: Pos): Boolean =
     colorAt(s).contains(Color.White)
 

@@ -117,11 +117,6 @@ case class Board(
   def ensureCrazyData: Board = withCrazyData(crazyData | Crazyhouse.Data.init)
 
   def unmovedRooks = history.unmovedRooks
-  // UnmovedRooks {
-  //   history.unmovedRooks.value.filter(pos =>
-  //     apply(pos).exists(piece => piece.is(Rook) && piece.color.backRank == pos.rank)
-  //   )
-  // }
 
   inline def updateHistory(inline f: History => History) = copy(history = f(history))
 

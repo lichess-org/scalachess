@@ -18,8 +18,7 @@ enum Color(val name: String, val letter: Char):
   lazy val backRank: Rank           = fold(Rank.First, Rank.Eighth)
   lazy val thirdRank: Rank          = fold(Rank.Third, Rank.Sixth)
   lazy val fourthRank: Rank         = fold(Rank.Fourth, Rank.Fifth)
-  lazy val seventhRank: Rank = fold(Rank.Seventh, Rank.Second)
-
+  lazy val seventhRank: Rank        = fold(Rank.Seventh, Rank.Second)
   lazy val passablePawnRank: Rank   = fold(Rank.Fifth, Rank.Fourth)
   lazy val lastRank: Rank           = fold(Rank.Eighth, Rank.First)
   lazy val promotablePawnRank: Rank = lastRank

@@ -1,7 +1,6 @@
 package chess
 package bitboard
 
-// TODO should capture be only Boolean? what is the benefit of Role?
 // case Capture(from: Pos, to: Pos, role: Role, capture: Role)???
 // case Drop/Put(role: Role, to: Pos)
 enum Move(val from: Pos, val to: Pos, val role: Role):

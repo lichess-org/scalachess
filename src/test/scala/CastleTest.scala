@@ -319,10 +319,6 @@ PPPPPPPP
       val fenPosition = EpdFen("r3k2r/8/8/8/8/8/8/1R2K2R b KQk - 1 1")
       val init        = fenToGame(fenPosition, Chess960).toOption.get
       val game        = init.playMoves((A8, A1), (H1, H2), (A1, A7)).toOption.get
-      println(
-        s"game: ${game.situation} - ${game.board.history} - ${game.board.history.castles} - ${game.board.history.unmovedRooks}"
-      )
-      println(game.situation.legalMoves)
       game.situation.legalMoves.exists(_.castles) must beTrue
     }
 

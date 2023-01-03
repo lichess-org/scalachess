@@ -87,7 +87,7 @@ object Castles extends OpaqueBitboard[Castles]:
     case 'Q' => Some(A1)
     case _   => None
 
-  val full: Castles  = corners
+  val full: Castles = corners
   val none: Castles = empty
   def init: Castles = all
 

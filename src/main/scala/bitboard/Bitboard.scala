@@ -6,7 +6,7 @@ import OpaqueBitboard.*
 opaque type Bitboard = Long
 object Bitboard extends OpaqueBitboard[Bitboard]:
 
-  val ALL: Bitboard     = Bitboard(-1L)
+  val ALL: Bitboard = Bitboard(-1L)
   // val empty: Bitboard   = Bitboard(0L)
   // val corners: Bitboard = Bitboard(0x8100000000000081L)
 

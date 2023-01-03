@@ -11,9 +11,8 @@ object OpaqueBitboard:
     def corners: A = 0x8100000000000081L.bb
 
     extension (l: Long)
-      def bb: A = l.asInstanceOf[A]
+      def bb: A            = l.asInstanceOf[A]
       def lsb: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(l))
-
 
     extension (s: Pos) inline def bitboard: A = (1L << s.value).bb
 

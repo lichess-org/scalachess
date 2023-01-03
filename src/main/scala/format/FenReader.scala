@@ -15,13 +15,12 @@ import bitboard.Bitboard.bitboard
   * http://scidb.sourceforge.net/help/en/FEN.html#ThreeCheck
   */
 trait FenReader:
-  import Castles.*
   def read(variant: Variant, fen: EpdFen): Option[Situation] =
     makeBoard(variant, fen) map { board =>
       // why it is different when the variant is Atomic?
       val situation = Situation(board, if variant.atomic then fen.color else board.checkColor | fen.color)
       // todo verify unmovedRooks vs board.rooks
-      val (castles, unmovedRooks) = fen.castling.foldLeft(Castles.none -> Bitboard.empty) {
+      val (castles, unmovedRooks) = fen.castling.foldLeft(Castles.none -> UnmovedRooks.empty) {
         case ((c, r), ch) =>
           val color = Color.fromWhite(ch.isUpper)
           // todo (board.rooks & board.us).occupiedSquares or fold

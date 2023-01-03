@@ -39,17 +39,17 @@ case class Move(
             else h1.halfMoveClock + 1
         )
 
-        val halfCastlingRights: Bitboard =
-          if captures then h1.castles.value & ~dest.bitboard
-          else h1.castles.value
+        val halfCastlingRights: Castles =
+          if captures then h1.castles & ~dest.bitboard
+          else h1.castles
 
-        val castleRights: Bitboard =
+        val castleRights: Castles =
           if (piece is Rook) && (orig.bitboard & h2.unmovedRooks).nonEmpty then
             halfCastlingRights & ~orig.bitboard
           else if piece.is(King) then halfCastlingRights & Bitboard.rank(piece.color.lastRank)
           else halfCastlingRights
 
-        var unmovedRooks: Bitboard =
+        var unmovedRooks: UnmovedRooks =
           if captures then h2.unmovedRooks & ~dest.bitboard
           else h2.unmovedRooks
 
@@ -68,7 +68,7 @@ case class Move(
             else None
           else None
 
-        h2.withCastles(Castles(castleRights)).copy(epSquare = epSquare, unmovedRooks = unmovedRooks)
+        h2.withCastles(castleRights).copy(epSquare = epSquare, unmovedRooks = unmovedRooks)
       },
       toUci,
       capture flatMap { before(_) }

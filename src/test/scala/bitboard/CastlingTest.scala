@@ -5,11 +5,10 @@ import munit.FunSuite
 
 class CastlingTest extends FunSuite:
 
-  import Bitboard.*
   import Castles.*
 
   test("corner case") {
-    val castle = Bitboard.corners
+    val castle = Castles.full
     assertEquals(castle.whiteKingSide, true)
     assertEquals(castle.whiteQueenSide, true)
     assertEquals(castle.blackKingSide, true)

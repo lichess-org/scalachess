@@ -99,5 +99,5 @@ class BitboardTest extends ScalaCheckSuite:
     assertEquals(4264L.bb.count, 4)
     assertEquals((1L.bb & Pos.A1.bitboard).nonEmpty, true)
     import Castles.*
-    assertEquals(Castles(1L.bb).can(White).any, true)
+    assertEquals(Castles(1L).can(White).any, true)
   }

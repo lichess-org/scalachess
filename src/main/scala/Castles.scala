@@ -57,8 +57,6 @@ object Castles extends OpaqueBitboard[Castles]:
 
     def toSeq: Array[Boolean] = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
 
-    def isEmpty = c.isEmpty
-
   extension (b: Boolean)
     def whiteKing: Castles  = if (b) H1.bitboard else empty
     def whiteQueen: Castles = if (b) A1.bitboard else empty
@@ -89,7 +87,7 @@ object Castles extends OpaqueBitboard[Castles]:
     case 'Q' => Some(A1)
     case _   => None
 
-  val all: Castles  = corners
+  val full: Castles  = corners
   val none: Castles = empty
   def init: Castles = all
 
@@ -102,7 +100,6 @@ object Castles extends OpaqueBitboard[Castles]:
         case (Black, QueenSide) => castles.blackQueenSide
     def any = on(KingSide) || on(QueenSide)
 
-type  UnmovedRooks = Bitboard
-// object UnmovedRooks:
-  // def apply(b: Long): Castles = b
-
+opaque type UnmovedRooks = Long
+object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
+  def apply(b: Bitboard): UnmovedRooks = b.value

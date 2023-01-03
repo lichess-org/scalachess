@@ -3,7 +3,6 @@ package chess
 import variant.{ Crazyhouse, Variant }
 import bitboard.Board as BBoard
 import bitboard.Bitboard
-import Castles.*
 
 case class Board(
     board: BBoard,

@@ -130,12 +130,7 @@ object Bitboard extends OpaqueBitboard[Bitboard]:
     def knightAttacks: Bitboard =
       KNIGHT_ATTACKS(s.value)
 
-    def bitboard: Bitboard =
-      1L << s.value
-
   private def distance(a: Int, b: Int): Int =
     inline def file(p: Int) = p & 7
     inline def rank(p: Int) = p >>> 3
     Math.max(Math.abs(file(a) - file(b)), Math.abs(rank(a) - rank(b)))
-
-  extension (a: Long) def bb = Bitboard(a)

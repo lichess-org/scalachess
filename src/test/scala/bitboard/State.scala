@@ -30,15 +30,14 @@ case class State(
     // positionhash: positionhash
     // checkcount: Option[CheckCount]
     // unmovedRooks?????
-):
-  import Castles.*
-  lazy val castles: chess.Castles =
-    chess.Castles(
-      castlingRights.whiteKingSide,
-      castlingRights.whiteQueenSide,
-      castlingRights.blackKingSide,
-      castlingRights.blackQueenSide
-    )
+)
+  // lazy val castles: chess.Castles =
+  //   chess.Castles(
+  //     castlingRights.whiteKingSide,
+  //     castlingRights.whiteQueenSide,
+  //     castlingRights.blackKingSide,
+  //     castlingRights.blackQueenSide
+  //   )
 
 object State:
   val start = State(Color.White, None, Bitboard.corners, HalfMoveClock(0), FullMoveNumber(1))

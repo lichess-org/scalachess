@@ -1,14 +1,19 @@
 package chess
 
+import bitboard.OpaqueBitboard
+import bitboard.OpaqueBitboard.*
 import bitboard.Bitboard
-import bitboard.Bitboard.*
+import bitboard.Bitboard.given
+
 import Pos.*
 
-type Castles = Bitboard
-object Castles:
+opaque type Castles = Long
+object Castles extends OpaqueBitboard[Castles]:
 
   import cats.syntax.all.*
+
   extension (c: Castles)
+
     inline def can(inline color: Color) = Castles.Can(c, color)
 
     def whiteKingSide: Boolean  = (c & H1.bitboard).nonEmpty
@@ -55,12 +60,10 @@ object Castles:
     def isEmpty = c.isEmpty
 
   extension (b: Boolean)
-    def whiteKing: Castles  = if (b) H1.bitboard else Bitboard.empty
-    def whiteQueen: Castles = if (b) A1.bitboard else Bitboard.empty
-    def blackKing: Castles  = if (b) H8.bitboard else Bitboard.empty
-    def blackQueen: Castles = if (b) A8.bitboard else Bitboard.empty
-
-  def apply(b: Bitboard): Castles = b
+    def whiteKing: Castles  = if (b) H1.bitboard else empty
+    def whiteQueen: Castles = if (b) A1.bitboard else empty
+    def blackKing: Castles  = if (b) H8.bitboard else empty
+    def blackQueen: Castles = if (b) A8.bitboard else empty
 
   def apply(
       castles: (Boolean, Boolean, Boolean, Boolean)
@@ -72,12 +75,12 @@ object Castles:
     whiteKing | whiteQueen | blackKing | blackQueen
 
   def apply(str: String): Castles = str match
-    case "-" => Bitboard.empty
+    case "-" => empty
     case _ =>
       str.toList
         .traverse(charToSquare)
-        .map(_.foldRight(Bitboard.empty)((s, b) => s.bitboard | b))
-        .getOrElse(Bitboard.empty)
+        .map(_.foldRight(empty)((s, b) => s.bitboard | b))
+        .getOrElse(empty)
 
   private def charToSquare: (c: Char) => Option[Pos] =
     case 'k' => Some(H8)
@@ -86,8 +89,8 @@ object Castles:
     case 'Q' => Some(A1)
     case _   => None
 
-  val all: Castles  = Bitboard.corners // yep that's not chess960 friendly
-  val none: Castles = Bitboard.empty
+  val all: Castles  = corners
+  val none: Castles = empty
   def init: Castles = all
 
   final class Can(castles: Castles, color: Color):
@@ -98,3 +101,8 @@ object Castles:
         case (Black, KingSide)  => castles.blackKingSide
         case (Black, QueenSide) => castles.blackQueenSide
     def any = on(KingSide) || on(QueenSide)
+
+type  UnmovedRooks = Bitboard
+// object UnmovedRooks:
+  // def apply(b: Long): Castles = b
+

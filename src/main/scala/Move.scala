@@ -40,8 +40,8 @@ case class Move(
         )
 
         val halfCastlingRights: Bitboard =
-          if captures then h1.castles & ~dest.bitboard
-          else h1.castles
+          if captures then h1.castles.value & ~dest.bitboard
+          else h1.castles.value
 
         val castleRights: Bitboard =
           if (piece is Rook) && (orig.bitboard & h2.unmovedRooks).nonEmpty then

@@ -62,7 +62,7 @@ case object Atomic
 
       val rooksToExploded = affectedPos.filter(boardPieces.get(_).exists(_.is(Rook)))
 
-      val castles  = rooksToExploded.foldLeft(afterBoard.history.castles)((c, pos) => c & ~pos.bitboard)
+      val castles  = rooksToExploded.foldLeft(afterBoard.history.castles.value)((c, pos) => c & ~pos.bitboard)
       val newBoard = (afterBoard withPieces afterExplosions).withCastles(Castles(castles))
       move withAfter newBoard
     else move

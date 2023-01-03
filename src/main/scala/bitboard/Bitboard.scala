@@ -1,14 +1,14 @@
 package chess
 package bitboard
 
-import scala.collection.mutable.ListBuffer
+import OpaqueBitboard.*
 
 opaque type Bitboard = Long
-object Bitboard extends TotalWrapper[Bitboard, Long]:
+object Bitboard extends OpaqueBitboard[Bitboard]:
 
   val ALL: Bitboard     = Bitboard(-1L)
-  val empty: Bitboard   = Bitboard(0L)
-  val corners: Bitboard = Bitboard(0x8100000000000081L)
+  // val empty: Bitboard   = Bitboard(0L)
+  // val corners: Bitboard = Bitboard(0x8100000000000081L)
 
   private val RANKS = Array.fill(8)(0L)
   private val FILES = Array.fill(8)(0L)
@@ -132,60 +132,6 @@ object Bitboard extends TotalWrapper[Bitboard, Long]:
 
     def bitboard: Bitboard =
       1L << s.value
-
-  type LongRuntime[A] = SameRuntime[A, Long]
-  extension (a: Bitboard)
-    inline def unary_- : Bitboard                                            = -a
-    inline def unary_~ : Bitboard                                            = ~a
-    inline infix def >(inline o: Long): Boolean                              = a > o
-    inline infix def <(inline o: Long): Boolean                              = a < o
-    inline infix def >=(inline o: Long): Boolean                             = a >= o
-    inline infix def <=(inline o: Long): Boolean                             = a <= o
-    inline infix def +(inline o: Long): Bitboard                             = a + o
-    inline infix def -(inline o: Long): Bitboard                             = a - o
-    inline infix def &(inline o: Long): Bitboard                             = a & o
-    inline infix def ^(inline o: Long): Bitboard                             = a ^ o
-    inline infix def |(inline o: Long): Bitboard                             = a | o
-    inline infix def <<(inline o: Long): Bitboard                            = a << o
-    inline infix def >>>(inline o: Long): Bitboard                           = a >>> o
-    inline infix def >[B](inline o: B)(using sr: LongRuntime[B]): Boolean    = >(sr(o))
-    inline infix def <[B](inline o: B)(using sr: LongRuntime[B]): Boolean    = <(sr(o))
-    inline infix def >=[B](inline o: B)(using sr: LongRuntime[B]): Boolean   = >=(sr(o))
-    inline infix def <=[B](inline o: B)(using sr: LongRuntime[B]): Boolean   = <=(sr(o))
-    inline infix def +[B](inline o: B)(using sr: LongRuntime[B]): Bitboard   = a + sr(o)
-    inline infix def -[B](inline o: B)(using sr: LongRuntime[B]): Bitboard   = a - sr(o)
-    inline infix def &[B](inline o: B)(using sr: LongRuntime[B]): Bitboard   = a & sr(o)
-    inline infix def ^[B](inline o: B)(using sr: LongRuntime[B]): Bitboard   = a ^ sr(o)
-    inline infix def |[B](inline o: B)(using sr: LongRuntime[B]): Bitboard   = a | sr(o)
-    inline infix def <<[B](inline o: B)(using sr: LongRuntime[B]): Bitboard  = a << sr(o)
-    inline infix def >>>[B](inline o: B)(using sr: LongRuntime[B]): Bitboard = a >>> sr(o)
-
-    def contains(pos: Pos): Boolean =
-      (a & (1L << pos.value)).nonEmpty
-
-    def moreThanOne: Boolean =
-      (a & (a - 1L)).nonEmpty
-
-    def lsb: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(a))
-
-    def occupiedSquares: List[Pos] =
-      fold(List[Pos]())((xs, pos) => xs :+ pos)
-
-    // total non empty position
-    def count: Int =
-      fold(0)((count, _) => count + 1)
-
-    def fold[A](init: A)(f: (A, Pos) => A): A =
-      var bb     = a
-      var result = init
-      while bb != 0
-      do
-        result = f(result, bb.lsb.get)
-        bb &= (bb - 1L)
-      result
-
-    inline def isEmpty: Boolean  = a == empty
-    inline def nonEmpty: Boolean = !isEmpty
 
   private def distance(a: Int, b: Int): Int =
     inline def file(p: Int) = p & 7

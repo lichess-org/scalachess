@@ -25,7 +25,7 @@ case class History(
     positionHashes: PositionHash = Monoid[PositionHash].empty,
     castles: Castles = Castles.all, // => castlingRight
     checkCount: CheckCount = CheckCount(0, 0),
-    unmovedRooks: Castles = Bitboard.corners,
+    unmovedRooks: UnmovedRooks = Bitboard.corners,
     halfMoveClock: HalfMoveClock = HalfMoveClock(0),
     // fullMoves: FullMoveNumber = FullMoveNumber(0), // do we need it nows? => no
     // possible en-passant square

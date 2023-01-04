@@ -32,6 +32,8 @@ case class Situation(board: Board, color: Color):
 
   def checkSquare = if (check) ourKing else None
 
+  def piecesOf(c: Color): Map[Pos, Piece] = board.piecesOf(c)
+
   inline def history = board.history
 
   inline def checkMate: Boolean = board.variant checkmate this
@@ -112,19 +114,6 @@ case class Situation(board: Board, color: Color):
   private def isWhiteTurn: Boolean       = color.white
   private def isOccupied: Pos => Boolean = board.board.isOccupied
 
-  def isSafe(king: Pos, move: Move, blockers: Bitboard): Boolean =
-    if move.enpassant then
-      val newOccupied = {
-        board.occupied ^
-          move.orig.bitboard ^ move.dest.withRankOf(move.orig).bitboard
-      } | move.dest.bitboard
-      (king.rookAttacks(newOccupied) & them & (board.rooks ^ board.queens)).isEmpty &&
-      (king.bishopAttacks(newOccupied) & them & (board.bishops ^ board.queens)).isEmpty
-    else
-      move.capture.isDefined || {
-        !(us & blockers).contains(move.orig) || Bitboard.aligned(move.orig, move.dest, king)
-      }
-
   /** The moves without taking defending the king into account */
   lazy val allMoves: List[Move] =
     val enPassantMoves = board.history.epSquare.fold(Nil)(genEnPassant)
@@ -139,34 +128,6 @@ case class Situation(board: Board, color: Color):
     // apply special effect
     if board.variant.hasMoveEffects then moves.map(board.variant.addVariantEffect(_))
     else moves
-
-  // It works now but we have two versions of move generator: generateMoves and allMoves
-  // we should somehow reconcile them
-  lazy val generateMoves: List[Move] =
-    val enPassantMoves = board.history.epSquare.fold(Nil)(genEnPassant)
-    val mask           = checkers.getOrElse(Bitboard.empty)
-    val movesWithoutEnpassant = if mask == Bitboard.empty then
-      val targets        = ~us
-      val withoutCastles = genNonKing(targets) ++ genSafeKing(targets)
-      if board.variant.allowsCastling then withoutCastles ::: genCastling()
-      else withoutCastles
-    else genEvasions(mask)
-    val moves = movesWithoutEnpassant ++ enPassantMoves
-
-    // king is no special in antichess so no need to verify it is in checked
-    val safeMoves =
-      if board.variant.antichess then moves
-      else
-        ourKing.fold(moves)(king =>
-          val blockers = sliderBlockers
-          if blockers != Bitboard.empty || !board.history.epSquare.isDefined then
-            moves.filter(m => isSafe(king, m, blockers))
-          else moves
-        )
-
-    // apply special effect
-    if board.variant.hasMoveEffects then safeMoves.map(board.variant.addVariantEffect(_))
-    else safeMoves
 
   // TODO we depend on the correctness of epSQuare here
   private def genEnPassant(ep: Pos): List[Move] =

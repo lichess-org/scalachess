@@ -59,7 +59,7 @@ case class Board(
   def checkOf(c: Color): Boolean =
     variant.kingThreatened(this, c)
 
-  // todo fix
+  // TODO delete, this only used in test
   def destsFrom(from: Pos): Option[List[Pos]] = actorAt(from).map(_.destinations)
 
   def seq(actions: Board => Option[Board]*): Option[Board] =

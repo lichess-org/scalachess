@@ -14,7 +14,7 @@ case class Actor(
 
   lazy val situation = Situation(board, piece.color)
 
-  lazy val moves: List[Move] = situation.generateMoves.filter(_.orig == pos)
+  lazy val moves: List[Move] = situation.legalMoves.filter(_.orig == pos)
 
   lazy val destinations: List[Pos] = moves.map(_.dest)
 

@@ -123,6 +123,22 @@ case class Situation(board: Board, color: Color):
     if board.variant.hasMoveEffects then moves.map(board.variant.addVariantEffect(_))
     else moves
 
+  // Test generateMovesAt(pos) = generateMoves.filter(_.orig == pos)
+  def generateMovesAt(pos: Pos): List[Move] =
+    board.apply(pos).fold(Nil) { piece =>
+      if piece.color != color then Nil
+      else
+        val targets        = ~us
+        val bb = pos.bitboard
+        piece.role match
+          case Pawn   => genEnPassant(us & bb) ++ genPawn(bb, targets)
+          case Knight => genKnight(us & bb, targets)
+          case Bishop => genBishop(us & bb, targets)
+          case Rook   => genRook(us & bb, targets)
+          case Queen  => genQueen(us & bb, targets)
+          case King   => genKings(targets)
+    }
+
   private def genKings(mask: Bitboard) =
     val withoutCastles      = ourKing.fold(Nil)(genUnsafeKing(_, mask))
     if board.variant.allowsCastling then withoutCastles ::: genCastling()

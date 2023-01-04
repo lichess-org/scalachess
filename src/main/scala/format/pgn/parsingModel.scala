@@ -55,14 +55,32 @@ case class Std(
 
   def withMetas(m: Metas) = copy(metas = m)
 
-  def isMove(m: chess.Move): Boolean =
-    !m.castles && m.dest == dest && m.piece.role == role &&
-      compare(file, m.orig.file + 1) && compare(rank, m.orig.rank + 1)
+  // def isMove(m: chess.Move): Boolean =
+  //   !m.castles && m.dest == dest && m.piece.role == role &&
+  //     compare(file, m.orig.file + 1) && compare(rank, m.orig.rank + 1)
 
   def move(situation: Situation): Validated[String, chess.Move] =
-    situation.legalMoves.find(isMove) match
+    situation.board.pieces.foldLeft(none[chess.Move]) {
+      case (None, (pos, piece))
+          if piece.color == situation.color && piece.role == role && compare(
+            file,
+            pos.file.index + 1
+          ) && compare(
+            rank,
+            pos.rank.index + 1
+          ) && piece.eyesMovable(pos, dest) =>
+        situation.generateMovesAt(pos) find { m =>
+          m.dest == dest && situation.board.variant.kingSafety(m)
+        }
+      case (m, _) => m
+    } match
       case None       => Validated invalid s"No move found: $this\n$situation"
       case Some(move) => move withPromotion promotion toValid "Wrong promotion"
+
+  // def move(situation: Situation): Validated[String, chess.Move] =
+  //   situation.legalMoves.find(isMove) match
+  //     case None       => Validated invalid s"No move found: $this\n$situation"
+  //     case Some(move) => move withPromotion promotion toValid "Wrong promotion"
 
   override def toString = s"$role ${dest.key}"
 

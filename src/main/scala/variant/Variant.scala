@@ -48,7 +48,7 @@ abstract class Variant private[variant] (
       case _                                    => false
 
   def validMoves(situation: Situation): List[Move] =
-    situation.allMoves.filter(kingSafety)
+    situation.generateMoves.filter(kingSafety)
 
   // Optimised for performance
   def pieceThreatened(board: Board, color: Color, to: Pos): Boolean =

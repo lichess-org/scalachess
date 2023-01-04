@@ -103,7 +103,7 @@ case class Situation(board: Board, color: Color):
 
   def unary_! = copy(color = !color)
 
-  // =======================================bitboard========================
+  // ========================bitboard===========================
 
   val ourKing: Option[Pos]               = board.board.king(color)
   val theirKing: Option[Pos]             = board.board.king(!color)
@@ -115,7 +115,7 @@ case class Situation(board: Board, color: Color):
   private def isOccupied: Pos => Boolean = board.board.isOccupied
 
   /** The moves without taking defending the king into account */
-  lazy val allMoves: List[Move] =
+  lazy val generateMoves: List[Move] =
     val enPassantMoves = board.history.epSquare.fold(Nil)(genEnPassant)
     val targets        = ~us
     val withoutCastles = genNonKing(targets) ++ genUnsafeKing(targets)

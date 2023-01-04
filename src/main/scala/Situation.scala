@@ -105,38 +105,41 @@ case class Situation(board: Board, color: Color):
 
   // ========================bitboard===========================
 
-  val ourKing: Option[Pos]               = board.board.king(color)
-  val theirKing: Option[Pos]             = board.board.king(!color)
-  val us: Bitboard                       = board.board.byColor(color)
-  private def them: Bitboard             = board.board.byColor(!color)
-  private def checkers: Option[Bitboard] = ourKing.map(board.board.attacksTo(_, !color))
-  private def sliderBlockers: Bitboard   = board.board.sliderBlockers(color)
-  private def isWhiteTurn: Boolean       = color.white
-  private def isOccupied: Pos => Boolean = board.board.isOccupied
+  lazy val ourKing: Option[Pos]       = board.board.king(color)
+  lazy val theirKing: Option[Pos]     = board.board.king(!color)
+  lazy val us: Bitboard               = board.board.byColor(color)
+  lazy val them: Bitboard             = board.board.byColor(!color)
+  lazy val checkers: Option[Bitboard] = ourKing.map(board.board.attacksTo(_, !color))
+  lazy val sliderBlockers: Bitboard   = board.board.sliderBlockers(color)
+  lazy val isWhiteTurn: Boolean       = color.white
+  lazy val isOccupied: Pos => Boolean = board.board.isOccupied
 
   /** The moves without taking defending the king into account */
   lazy val generateMoves: List[Move] =
-    val enPassantMoves = board.history.epSquare.fold(Nil)(genEnPassant)
     val targets        = ~us
-    val withoutCastles = genNonKing(targets) ++ genUnsafeKing(targets)
-    val movesWithoutEnPassant =
-      if board.variant.allowsCastling then withoutCastles ::: genCastling()
-      else withoutCastles
-
-    val moves = movesWithoutEnPassant ++ enPassantMoves
+    val moves = genNonKing(targets) ++ genKings(targets) ++ genEnPassant(us & board.pawns)
 
     // apply special effect
     if board.variant.hasMoveEffects then moves.map(board.variant.addVariantEffect(_))
     else moves
 
+  private def genKings(mask: Bitboard) =
+    val withoutCastles      = ourKing.fold(Nil)(genUnsafeKing(_, mask))
+    if board.variant.allowsCastling then withoutCastles ::: genCastling()
+    else withoutCastles
+
   // TODO we depend on the correctness of epSQuare here
-  private def genEnPassant(ep: Pos): List[Move] =
-    val pawns                                   = us & board.board.pawns & ep.pawnAttacks(!color)
-    val ff: Bitboard => Option[(Pos, Bitboard)] = bb => bb.lsb.map((_, bb & (bb - 1L.bb)))
-    List.unfold(pawns)(ff).mapFilter(enpassant(_, ep))
+  private def genEnPassant(pawns: Bitboard): List[Move] =
+    board.history.epSquare.fold(Nil)(ep =>
+      val pawnsCanEnPassant                       = pawns & ep.pawnAttacks(!color)
+      val ff: Bitboard => Option[(Pos, Bitboard)] = bb => bb.lsb.map((_, bb & (bb - 1L.bb)))
+      List.unfold(pawnsCanEnPassant)(ff).mapFilter(enpassant(_, ep))
+    )
 
   private def genNonKing(mask: Bitboard): List[Move] =
-    genPawn(mask) ++ genKnight(mask) ++ genBishop(mask) ++ genRook(mask) ++ genQueen(mask)
+    genPawn(us & board.pawns, mask) ++ genKnight(us & board.knights, mask) ++
+      genBishop(us & board.bishops, mask) ++ genRook(us & board.rooks, mask) ++
+      genQueen(us & board.queens, mask)
 
   /** Generate all pawn moves except en passant
     *  This includes
@@ -149,11 +152,9 @@ case class Situation(board: Board, color: Color):
     *   TODO @mask includes enemy King now, which should not be because
     *   enemy King cannot be captured by law
     */
-  private def genPawn(mask: Bitboard): List[Move] =
-    val moves = ListBuffer[Move]()
-
+  private def genPawn(pawns: Bitboard, mask: Bitboard): List[Move] =
     // our pawns which are called captures
-    val capturers = us & board.board.pawns
+    val capturers = pawns
 
     val s1: List[Move] = for
       from <- capturers.occupiedSquares
@@ -164,6 +165,8 @@ case class Situation(board: Board, color: Color):
 
     // normal pawn moves
     val singleMoves = ~board.occupied & {
+      // if isWhiteTurn then pawns << 8
+      // else pawns >>> 8
       if isWhiteTurn then (board.white & board.pawns) << 8
       else (board.black & board.pawns) >>> 8
     }
@@ -188,8 +191,7 @@ case class Situation(board: Board, color: Color):
 
     s1 ++ s2 ++ s3
 
-  private def genKnight(mask: Bitboard): List[Move] =
-    val knights = us & board.knights
+  private def genKnight(knights: Bitboard, mask: Bitboard): List[Move] =
     for
       from <- knights.occupiedSquares
       targets = Bitboard.knightAttacks(from) & mask
@@ -197,8 +199,7 @@ case class Situation(board: Board, color: Color):
       move <- normalMove(from, to, Knight, isOccupied(to))
     yield move
 
-  private def genBishop(mask: Bitboard): List[Move] =
-    val bishops = us & board.bishops
+  private def genBishop(bishops: Bitboard, mask: Bitboard): List[Move] =
     for
       from <- bishops.occupiedSquares
       targets = from.bishopAttacks(board.occupied) & mask
@@ -206,8 +207,7 @@ case class Situation(board: Board, color: Color):
       move <- normalMove(from, to, Bishop, isOccupied(to))
     yield move
 
-  private def genRook(mask: Bitboard): List[Move] =
-    val rooks = us & board.rooks
+  private def genRook(rooks: Bitboard, mask: Bitboard): List[Move] =
     for
       from <- rooks.occupiedSquares
       targets = from.rookAttacks(board.occupied) & mask
@@ -215,8 +215,7 @@ case class Situation(board: Board, color: Color):
       move <- normalMove(from, to, Rook, isOccupied(to))
     yield move
 
-  private def genQueen(mask: Bitboard): List[Move] =
-    val queens = us & board.queens
+  private def genQueen(queens: Bitboard, mask: Bitboard): List[Move] =
     for
       from <- queens.occupiedSquares
       targets = from.queenAttacks(board.occupied) & mask
@@ -238,11 +237,9 @@ case class Situation(board: Board, color: Color):
       safeKings ++ blockers
     )
 
-  private def genUnsafeKing(mask: Bitboard): List[Move] =
-    ourKing.fold(Nil)(king =>
-      val targets = king.kingAttacks & mask
-      targets.occupiedSquares.flatMap(to => normalMove(king, to, King, isOccupied(to)))
-    )
+  private def genUnsafeKing(king: Pos, mask: Bitboard): List[Move] =
+    val targets = king.kingAttacks & mask
+    targets.occupiedSquares.flatMap(to => normalMove(king, to, King, isOccupied(to)))
 
   // this can still generate unsafe king moves
   private def genSafeKing(mask: Bitboard): List[Move] =
@@ -380,7 +377,7 @@ case class Situation(board: Board, color: Color):
 
     for
       a            <- after.toList
-      inputKingPos <- destInput // .filter(_ != king)
+      inputKingPos <- destInput
     yield Move(
       piece = color.king,
       orig = king,

@@ -24,7 +24,7 @@ case class Piece(color: Color, role: Role):
       case Rook   => from.rookAttacks(occupied).nonEmpty
       case Bishop => from.bishopAttacks(occupied).nonEmpty
       case Knight => from.knightAttacks.contains(to)
-      case Pawn => from.pawnAttacks(color).contains(to)
+      case Pawn   => from.pawnAttacks(color).contains(to)
 
   // movable positions assuming empty board
   def eyesMovable(from: Pos, to: Pos): Boolean =

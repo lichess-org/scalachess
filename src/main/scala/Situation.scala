@@ -116,8 +116,8 @@ case class Situation(board: Board, color: Color):
 
   /** The moves without taking defending the king into account */
   lazy val generateMoves: List[Move] =
-    val targets        = ~us
-    val moves = genNonKing(targets) ++ genKings(targets) ++ genEnPassant(us & board.pawns)
+    val targets = ~us
+    val moves   = genNonKing(targets) ++ genKings(targets) ++ genEnPassant(us & board.pawns)
 
     // apply special effect
     if board.variant.hasMoveEffects then moves.map(board.variant.addVariantEffect(_))
@@ -128,8 +128,8 @@ case class Situation(board: Board, color: Color):
     board.apply(pos).fold(Nil) { piece =>
       if piece.color != color then Nil
       else
-        val targets        = ~us
-        val bb = pos.bitboard
+        val targets = ~us
+        val bb      = pos.bitboard
         piece.role match
           case Pawn   => genEnPassant(us & bb) ++ genPawn(bb, targets)
           case Knight => genKnight(us & bb, targets)
@@ -140,7 +140,7 @@ case class Situation(board: Board, color: Color):
     }
 
   private def genKings(mask: Bitboard) =
-    val withoutCastles      = ourKing.fold(Nil)(genUnsafeKing(_, mask))
+    val withoutCastles = ourKing.fold(Nil)(genUnsafeKing(_, mask))
     if board.variant.allowsCastling then withoutCastles ::: genCastling()
     else withoutCastles
 

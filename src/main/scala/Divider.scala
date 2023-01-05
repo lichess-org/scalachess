@@ -51,7 +51,7 @@ object Divider:
     )
 
   private def majorsAndMinors(board: Board): Int =
-    (board.occupied & ~(board.kings ^ board.pawns)).count
+    (board.occupied & ~(board.kings | board.pawns)).count
 
   private val backranks =
     List(Pos.whiteBackrank -> Color.White, Pos.blackBackrank -> Color.Black)

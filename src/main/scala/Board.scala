@@ -135,6 +135,9 @@ case class Board(
 
 object Board:
 
+  def apply(pieces: PieceMap, history: History, variant: Variant, crazyData: Option[Crazyhouse.Data]): Board =
+    Board(BBoard.fromMap(pieces), history, variant, crazyData)
+
   def apply(pieces: Iterable[(Pos, Piece)], variant: Variant): Board =
     Board(pieces.toMap, if (variant.allowsCastling) Castles.all else Castles.none, variant)
 

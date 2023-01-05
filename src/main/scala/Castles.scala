@@ -64,12 +64,15 @@ object Castles extends OpaqueBitboard[Castles]:
     def blackQueen: Castles = if (b) A8.bitboard else empty
 
   def apply(
-      castles: (Boolean, Boolean, Boolean, Boolean)
+      whiteKingSide: Boolean,
+      whiteQueenSide: Boolean,
+      blackKingSide: Boolean,
+      blackQueenSide: Boolean
   ): Castles =
-    val whiteKing  = castles._1.whiteKing
-    val whiteQueen = castles._2.whiteQueen
-    val blackKing  = castles._3.blackKing
-    val blackQueen = castles._4.blackQueen
+    val whiteKing  = whiteKingSide.whiteKing
+    val whiteQueen = whiteQueenSide.whiteQueen
+    val blackKing  = blackKingSide.blackKing
+    val blackQueen = blackQueenSide.blackQueen
     whiteKing | whiteQueen | blackKing | blackQueen
 
   def apply(str: String): Castles = str match
@@ -102,4 +105,11 @@ object Castles extends OpaqueBitboard[Castles]:
 
 opaque type UnmovedRooks = Long
 object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
-  def apply(b: Bitboard): UnmovedRooks = b.value
+  val default: UnmovedRooks = UnmovedRooks(Bitboard.rank(Rank.First) | Bitboard.rank(Rank.Eighth))
+
+  def apply(b: Bitboard): UnmovedRooks   = b.value
+  def apply(set: Set[Pos]): UnmovedRooks = set.foldLeft(empty)((b, p) => b | p.bitboard)
+
+  extension (ur: UnmovedRooks)
+    def toList: List[Pos]        = ur.occupiedSquares
+    def apply(pos: Pos): Boolean = (ur.value & pos.bitboard).nonEmpty

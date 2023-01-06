@@ -1,6 +1,8 @@
 package chess
 package variant
 
+import bitboard.Bitboard.*
+
 case object Atomic
     extends Variant(
       id = Variant.Id(7),
@@ -24,39 +26,23 @@ case object Atomic
 
   /** Move threatens to illegally explode our own king */
   private def explodesOwnKing(situation: Situation)(move: Move): Boolean =
-    move.captures && situation.kingPos.exists { move.dest.touches(_) }
-
-  private def protectedByOtherKing(board: Board, to: Pos, color: Color): Boolean =
-    board.kingPosOf(color) exists { to.touches(_) }
+    move.captures && situation.ourKing.exists { move.dest.touches(_) }
 
   /** In atomic chess, a king cannot be threatened while it is in the perimeter of the other king as were the other player
     * to capture it, their own king would explode. This effectively makes a king invincible while connected with another
     * king.
     */
-  override def kingThreatened(
-      board: Board,
-      color: Color,
-      to: Pos,
-      filter: Piece => Boolean = _ => true
-  ): Boolean =
-    board.pieces exists {
-      case (pos, piece)
-          if piece.color == color && filter(piece) && piece.eyes(pos, to) && !protectedByOtherKing(
-            board,
-            to,
-            color
-          ) =>
-        (!piece.role.projection) || piece.role.dir(pos, to).exists {
-          longRangeThreatens(board, pos, _, to)
-        }
-      case _ => false
-    }
+  override def kingThreatened(board: Board, color: Color): Boolean =
+    board.board.atomicCheck(color)
+
+  private def protectedByOtherKing(board: Board, to: Pos, color: Color): Boolean =
+    board.kingPosOf(color) exists { to.touches(_) }
 
   // moves exploding opponent king are always playable
-  override def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean = {
-    !kingPos.exists(kingThreatened(m.after, !m.color, _, filter)) ||
-    explodesOpponentKing(m.situationBefore)(m)
-  } && !explodesOwnKing(m.situationBefore)(m)
+  override def kingSafety(m: Move): Boolean =
+    (!kingThreatened(m.after, m.color) ||
+      explodesOpponentKing(m.situationBefore)(m))
+      && !explodesOwnKing(m.situationBefore)(m)
 
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
   private def explodeSurroundingPieces(move: Move): Move =
@@ -69,10 +55,15 @@ case object Atomic
 
       // Pawns are immune (for some reason), but all pieces surrounding the captured piece and the capturing piece
       // itself explode
-      val piecesToExplode = affectedPos.filter(boardPieces.get(_).fold(false)(_.isNot(Pawn))) + destination
+      // todo use bitboard
+      val piecesToExplode: Set[Pos] =
+        affectedPos.filter(boardPieces.get(_).exists(_.isNot(Pawn))) + destination
       val afterExplosions = boardPieces -- piecesToExplode
 
-      val newBoard = afterBoard withPieces afterExplosions
+      val rooksToExploded = affectedPos.filter(boardPieces.get(_).exists(_.is(Rook)))
+
+      val castles  = rooksToExploded.foldLeft(afterBoard.history.castles)((c, pos) => c & ~pos.bitboard)
+      val newBoard = (afterBoard withPieces afterExplosions).withCastles(castles)
       move withAfter newBoard
     else move
 
@@ -88,25 +79,25 @@ case object Atomic
     * then either a queen or multiple pieces are required for checkmate.
     */
   private def insufficientAtomicWinningMaterial(board: Board) =
-    val kingsAndBishopsOnly = board.pieces forall { p =>
-      (p._2 is King) || (p._2 is Bishop)
+    val kingsAndBishopsOnly = board.allPieces forall { p =>
+      (p is King) || (p is Bishop)
     }
     lazy val bishopsOnOppositeColors = InsufficientMatingMaterial.bishopsOnOppositeColors(board)
-    lazy val kingsAndKnightsOnly = board.pieces forall { p =>
-      (p._2 is King) || (p._2 is Knight)
+    lazy val kingsAndKnightsOnly = board.allPieces forall { p =>
+      (p is King) || (p is Knight)
     }
-    lazy val kingsRooksAndMinorsOnly = board.pieces forall { p =>
-      (p._2 is King) || (p._2 is Rook) || (p._2 is Bishop) || (p._2 is Knight)
+    lazy val kingsRooksAndMinorsOnly = board.allPieces forall { p =>
+      (p is King) || (p is Rook) || (p is Bishop) || (p is Knight)
     }
 
     // Bishops of opposite color (no other pieces) endgames are dead drawn
     // except if either player has multiple bishops so a helpmate is possible
     if (board.count(White) >= 2 && board.count(Black) >= 2)
-      kingsAndBishopsOnly && board.pieces.size <= 4 && bishopsOnOppositeColors
+      kingsAndBishopsOnly && board.allPieces.size <= 4 && bishopsOnOppositeColors
 
     // Queen, rook + any, bishop + any (same piece color), or 3 knights can mate
     else if (kingsAndKnightsOnly) board.pieces.size <= 4
-    else kingsRooksAndMinorsOnly && !bishopsOnOppositeColors && board.pieces.size <= 3
+    else kingsRooksAndMinorsOnly && !bishopsOnOppositeColors && board.allPieces.size <= 3
 
   /*
    * Bishops on opposite coloured squares can never capture each other to cause a king to explode and a traditional
@@ -146,4 +137,4 @@ case object Atomic
     situation.board.rolesOf(!situation.color) == List(King)
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
-  override def specialEnd(situation: Situation) = situation.board.kingPos.size != 2
+  override def specialEnd(situation: Situation) = situation.board.board.kings.count < 2

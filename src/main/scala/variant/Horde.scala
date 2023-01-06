@@ -37,18 +37,19 @@ case object Horde
 
   /** The game has a special end condition when black manages to capture all of white's pawns */
   override def specialEnd(situation: Situation) =
-    situation.board.piecesOf(White).isEmpty
+    situation.piecesOf(White).isEmpty
 
   /** Any vs K + any where horde is stalemated and only king can move is a fortress draw
     * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
     * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
     */
   private def hordeClosedPosition(board: Board) =
-    lazy val notKingBoard = board.kingPos.get(Color.black).flatMap(board.take).getOrElse(board)
-    val hordePos          = board.occupation(Color.white) // may include promoted pieces
+    def notKingBoard = board.board.king(Color.black).flatMap(board.take) | board
+    val hordePos     = board.occupation(Color.white) // may include promoted pieces
     val mateInOne =
-      hordePos.sizeIs == 1 && hordePos.forall(pos => pieceThreatened(board, Color.black, pos, (_ => true)))
-    !mateInOne && notKingBoard.actors.values.forall(actor => actor.moves.isEmpty)
+      hordePos.sizeIs == 1 && hordePos.forall(pos => pieceThreatened(board, Color.black, pos))
+    !mateInOne && Color.all.map(Situation(notKingBoard, _)).forall(_.legalMoves.isEmpty)
+    // !mateInOne && notKingBoard.actors.values.forall(actor => actor.moves.isEmpty)
 
   /** In horde chess, black can win unless a fortress stalemate is unavoidable.
     *  Auto-drawing the game should almost never happen, but it did in https://lichess.org/xQ2RsU8N#121

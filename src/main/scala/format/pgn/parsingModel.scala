@@ -55,6 +55,10 @@ case class Std(
 
   def withMetas(m: Metas) = copy(metas = m)
 
+  // def isMove(m: chess.Move): Boolean =
+  //   !m.castles && m.dest == dest && m.piece.role == role &&
+  //     compare(file, m.orig.file + 1) && compare(rank, m.orig.rank + 1)
+
   def move(situation: Situation): Validated[String, chess.Move] =
     situation.board.pieces.foldLeft(none[chess.Move]) {
       case (None, (pos, piece))
@@ -65,14 +69,18 @@ case class Std(
             rank,
             pos.rank.index + 1
           ) && piece.eyesMovable(pos, dest) =>
-        val a = Actor(piece, pos, situation.board)
-        a trustedMoves false find { m =>
-          m.dest == dest && a.board.variant.kingSafety(a, m)
+        situation.generateMovesAt(pos) find { m =>
+          m.dest == dest && situation.board.variant.kingSafety(m)
         }
       case (m, _) => m
     } match
       case None       => Validated invalid s"No move found: $this\n$situation"
       case Some(move) => move withPromotion promotion toValid "Wrong promotion"
+
+  // def move(situation: Situation): Validated[String, chess.Move] =
+  //   situation.legalMoves.find(isMove) match
+  //     case None       => Validated invalid s"No move found: $this\n$situation"
+  //     case Some(move) => move withPromotion promotion toValid "Wrong promotion"
 
   override def toString = s"$role ${dest.key}"
 
@@ -129,11 +137,9 @@ case class Castle(
   def withMetas(m: Metas) = copy(metas = m)
 
   def move(situation: Situation): Validated[String, chess.Move] =
-    for {
-      kingPos <- situation.board kingPosOf situation.color toValid "No king found"
-      actor   <- situation.board actorAt kingPos toValid "No actor found"
-      move <- actor.castleOn(side).headOption toValid "Cannot castle / variant is " + situation.board.variant
-    } yield move
+    situation.legalMoves.find(
+      _.castle.exists(_.side == side)
+    ) toValid "Cannot castle / variant is " + situation.board.variant
 
 case class Suffixes(
     check: Boolean,

@@ -1,10 +1,74 @@
 package chess
 
 import scala.language.implicitConversions
-import chess.Pos.*
-import chess.variant.FromPosition
+import Pos.*
+import variant.FromPosition
+import variant.Chess960
+import format.EpdFen
 
 class CastleTest extends ChessTest:
+
+  // todo add a test case for Atomic when a rook is exploded
+  // todo more sophisicated tests
+  "castle object" should {
+    import Castles.*
+
+    "init" in {
+      val castles: Castles = Castles.init
+      castles.whiteKingSide mustEqual true
+      castles.whiteQueenSide mustEqual true
+      castles.blackKingSide mustEqual true
+      castles.blackQueenSide mustEqual true
+    }
+
+    "without White" in {
+      val castles: Castles = Castles.init.without(White)
+      castles.whiteKingSide mustEqual false
+      castles.whiteQueenSide mustEqual false
+      castles.blackKingSide mustEqual true
+      castles.blackQueenSide mustEqual true
+    }
+
+    "without Black" in {
+      val castles: Castles = Castles.init.without(Black)
+      castles.whiteKingSide mustEqual true
+      castles.whiteQueenSide mustEqual true
+      castles.blackKingSide mustEqual false
+      castles.blackQueenSide mustEqual false
+    }
+
+    "without Black" in {
+      val castles: Castles = Castles.init.without(Black)
+      castles.whiteKingSide mustEqual true
+      castles.whiteQueenSide mustEqual true
+      castles.blackKingSide mustEqual false
+      castles.blackQueenSide mustEqual false
+    }
+
+    "without White Kingside" in {
+      val castles: Castles = Castles.init.without(White, KingSide)
+      castles.whiteKingSide mustEqual false
+      castles.whiteQueenSide mustEqual true
+      castles.blackKingSide mustEqual true
+      castles.blackQueenSide mustEqual true
+    }
+
+    "without White QueenSide" in {
+      val castles: Castles = Castles.init.without(White, QueenSide)
+      castles.whiteKingSide mustEqual true
+      castles.whiteQueenSide mustEqual false
+      castles.blackKingSide mustEqual true
+      castles.blackQueenSide mustEqual true
+    }
+
+    "update" in {
+      val castles: Castles = Castles.init.update(White, false, true)
+      castles.whiteKingSide mustEqual false
+      castles.whiteQueenSide mustEqual true
+      castles.blackKingSide mustEqual true
+      castles.blackQueenSide mustEqual true
+    }
+  }
 
   "king side" should {
     val goodHist = """
@@ -250,6 +314,14 @@ PPPPPPPP
         }
       }
     }
+
+    "chess960" in {
+      val fenPosition = EpdFen("r3k2r/8/8/8/8/8/8/1R2K2R b KQk - 1 1")
+      val init        = fenToGame(fenPosition, Chess960).toOption.get
+      val game        = init.playMoves((A8, A1), (H1, H2), (A1, A7)).toOption.get
+      game.situation.legalMoves.exists(_.castles) must beTrue
+    }
+
   }
   "threat on king prevents castling" in {
     val board: Board = """R   K  R"""
@@ -314,4 +386,5 @@ PPPPPPPP
         F2
       )
     }
+
   }

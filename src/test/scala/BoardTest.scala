@@ -47,7 +47,7 @@ class BoardTest extends ChessTest:
     }
 
     "have pieces by default" in {
-      board.pieces must not beEmpty
+      board.allPieces must not beEmpty
     }
 
     "have castling rights by default" in {

@@ -1,77 +1,97 @@
 package chess
 
-case class Castles(
-    whiteKingSide: Boolean,
-    whiteQueenSide: Boolean,
-    blackKingSide: Boolean,
-    blackQueenSide: Boolean
-):
+import bitboard.OpaqueBitboard
+import bitboard.Bitboard
+import bitboard.Bitboard.given
 
-  inline def can(inline color: Color) = Castles.Can(this, color)
+import Pos.*
 
-  def without(color: Color) =
-    color match
-      case White =>
-        copy(
-          whiteKingSide = false,
-          whiteQueenSide = false
-        )
-      case Black =>
-        copy(
-          blackKingSide = false,
-          blackQueenSide = false
-        )
+opaque type Castles = Long
+object Castles extends OpaqueBitboard[Castles]:
 
-  def without(color: Color, side: Side) =
-    (color, side) match
-      case (White, KingSide)  => copy(whiteKingSide = false)
-      case (White, QueenSide) => copy(whiteQueenSide = false)
-      case (Black, KingSide)  => copy(blackKingSide = false)
-      case (Black, QueenSide) => copy(blackQueenSide = false)
+  import cats.syntax.all.*
 
-  def add(color: Color, side: Side) =
-    (color, side) match
-      case (White, KingSide)  => copy(whiteKingSide = true)
-      case (White, QueenSide) => copy(whiteQueenSide = true)
-      case (Black, KingSide)  => copy(blackKingSide = true)
-      case (Black, QueenSide) => copy(blackQueenSide = true)
+  extension (c: Castles)
 
-  override lazy val toString: String = {
-    (if (whiteKingSide) "K" else "") +
-      (if (whiteQueenSide) "Q" else "") +
-      (if (blackKingSide) "k" else "") +
-      (if (blackQueenSide) "q" else "")
-  } match
-    case "" => "-"
-    case n  => n
+    inline def can(inline color: Color) = Castles.Can(c, color)
 
-  def toSeq = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
+    def whiteKingSide: Boolean  = (c & H1.bitboard).nonEmpty
+    def whiteQueenSide: Boolean = (c & A1.bitboard).nonEmpty
+    def blackKingSide: Boolean  = (c & H8.bitboard).nonEmpty
+    def blackQueenSide: Boolean = (c & A8.bitboard).nonEmpty
 
-  def isEmpty = !(whiteKingSide || whiteQueenSide || blackKingSide || blackQueenSide)
+    def without(color: Color): Castles =
+      color match
+        case White =>
+          c & ~A1.bitboard & ~H1.bitboard
+        case Black =>
+          c & ~A8.bitboard & ~H8.bitboard
 
-object Castles:
+    def without(color: Color, side: Side): Castles =
+      (color, side) match
+        case (White, KingSide)  => c & ~H1.bitboard
+        case (White, QueenSide) => c & ~A1.bitboard
+        case (Black, KingSide)  => c & ~H8.bitboard
+        case (Black, QueenSide) => c & ~A8.bitboard
+
+    def add(color: Color, side: Side): Castles =
+      (color, side) match
+        case (White, KingSide)  => c | H1.bitboard
+        case (White, QueenSide) => c | A1.bitboard
+        case (Black, KingSide)  => c | H8.bitboard
+        case (Black, QueenSide) => c | A8.bitboard
+
+    def update(color: Color, kingSide: Boolean, queenSide: Boolean): Castles = color match
+      case White => c.without(color) | kingSide.whiteKing | queenSide.whiteQueen
+      case Black => c.without(color) | kingSide.blackKing | queenSide.blackQueen
+
+    def toFenString: String = {
+      (if (whiteKingSide) "K" else "") +
+        (if (whiteQueenSide) "Q" else "") +
+        (if (blackKingSide) "k" else "") +
+        (if (blackQueenSide) "q" else "")
+    } match
+      case "" => "-"
+      case n  => n
+
+    def toSeq: Array[Boolean] = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
+
+  extension (b: Boolean)
+    def whiteKing: Castles  = if (b) H1.bitboard else empty
+    def whiteQueen: Castles = if (b) A1.bitboard else empty
+    def blackKing: Castles  = if (b) H8.bitboard else empty
+    def blackQueen: Castles = if (b) A8.bitboard else empty
 
   def apply(
-      castles: (Boolean, Boolean, Boolean, Boolean)
+      whiteKingSide: Boolean,
+      whiteQueenSide: Boolean,
+      blackKingSide: Boolean,
+      blackQueenSide: Boolean
   ): Castles =
-    new Castles(
-      whiteKingSide = castles._1,
-      whiteQueenSide = castles._2,
-      blackKingSide = castles._3,
-      blackQueenSide = castles._4
-    )
+    val whiteKing  = whiteKingSide.whiteKing
+    val whiteQueen = whiteQueenSide.whiteQueen
+    val blackKing  = blackKingSide.blackKing
+    val blackQueen = blackQueenSide.blackQueen
+    whiteKing | whiteQueen | blackKing | blackQueen
 
-  def apply(str: String): Castles =
-    new Castles(
-      str contains 'K',
-      str contains 'Q',
-      str contains 'k',
-      str contains 'q'
-    )
+  def apply(str: String): Castles = str match
+    case "-" => empty
+    case _ =>
+      str.toList
+        .traverse(charToSquare)
+        .map(_.foldRight(empty)((s, b) => s.bitboard | b))
+        .getOrElse(empty)
 
-  val all  = new Castles(true, true, true, true)
-  val none = new Castles(false, false, false, false)
-  def init = all
+  private def charToSquare: (c: Char) => Option[Pos] =
+    case 'k' => Some(H8)
+    case 'q' => Some(A1)
+    case 'K' => Some(H1)
+    case 'Q' => Some(A1)
+    case _   => None
+
+  val full: Castles = corners
+  val none: Castles = empty
+  def init: Castles = all
 
   final class Can(castles: Castles, color: Color):
     def on(side: Side): Boolean =
@@ -81,3 +101,14 @@ object Castles:
         case (Black, KingSide)  => castles.blackKingSide
         case (Black, QueenSide) => castles.blackQueenSide
     def any = on(KingSide) || on(QueenSide)
+
+opaque type UnmovedRooks = Long
+object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
+  val default: UnmovedRooks = UnmovedRooks(Bitboard.rank(Rank.First) | Bitboard.rank(Rank.Eighth))
+
+  def apply(b: Bitboard): UnmovedRooks   = b.value
+  def apply(set: Set[Pos]): UnmovedRooks = set.foldLeft(empty)((b, p) => b | p.bitboard)
+
+  extension (ur: UnmovedRooks)
+    def toList: List[Pos]        = ur.occupiedSquares
+    def apply(pos: Pos): Boolean = (ur & pos.bitboard).nonEmpty

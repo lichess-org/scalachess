@@ -21,18 +21,18 @@ case object Antichess
   override val initialFen = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1")
 
   // In antichess, the king can't be put into check so we always return false
-  override def kingThreatened(board: Board, color: Color, to: Pos, filter: Piece => Boolean = _ => true) =
+  override def kingSafety(m: Move): Boolean =
+    true
+
+  override def kingThreatened(board: Board, color: Color) =
     false
 
-  // In this variant, a player must capture if a capturing move is available
   override def validMoves(situation: Situation) =
-    val allMoves       = super.validMoves(situation)
-    val capturingMoves = allMoves.view mapValues (_.filter(_.captures)) filterNot (_._2.isEmpty)
-
-    (if (capturingMoves.nonEmpty) capturingMoves else allMoves).toMap
+    val capturingMoves = situation.generateMoves.filter(_.captures)
+    if (capturingMoves.nonEmpty) capturingMoves else situation.generateMoves
 
   override def valid(board: Board, strict: Boolean) =
-    board.pieces.size >= 2 && board.pieces.size <= 32
+    board.allPieces.size >= 2 && board.allPieces.size <= 32
 
   // In antichess, there is no checkmate condition, and the winner is the current player if they have no legal moves
   override def winner(situation: Situation): Option[Color] =
@@ -40,11 +40,11 @@ case object Antichess
 
   override def specialEnd(situation: Situation) =
     // The game ends with a win when one player manages to lose all their pieces or is in stalemate
-    situation.board.piecesOf(situation.color).isEmpty || situation.moves.isEmpty
+    situation.board.piecesOf(situation.color).isEmpty || situation.legalMoves.isEmpty
 
   // In antichess, it is valuable for your opponent to have pieces.
   override def materialImbalance(board: Board): Int =
-    board.pieces.values.foldLeft(0) { case (acc, Piece(color, _)) =>
+    board.allPieces.foldLeft(0) { case (acc, Piece(color, _)) =>
       acc + color.fold(-2, 2)
     }
 
@@ -52,7 +52,7 @@ case object Antichess
   // blockade or stalemate. Only one player can win if the only remaining pieces are two knights
   override def opponentHasInsufficientMaterial(situation: Situation) =
     // Exit early if we are not in a situation with only knights
-    situation.board.pieces.values.forall(_.is(Knight)) && {
+    situation.board.allPieces.forall(_.is(Knight)) && {
 
       val whiteKnights = situation.board.actorsOf(White)
       val blackKnights = situation.board.actorsOf(Black)
@@ -72,8 +72,8 @@ case object Antichess
   // of square to allow the player to force their opponent to capture their bishop, also resulting in a draw
   override def isInsufficientMaterial(board: Board) =
     // Exit early if we are not in a situation with only bishops and pawns
-    val bishopsAndPawns = board.pieces.values.forall(p => p.is(Bishop) || p.is(Pawn)) &&
-      board.pieces.values.exists(_.is(Bishop))
+    val bishopsAndPawns = board.allPieces.forall(p => p.is(Bishop) || p.is(Pawn)) &&
+      board.allPieces.exists(_.is(Bishop))
 
     lazy val drawnBishops = board.actors.values.partition(_.is(White)) match
       case (whitePieces, blackPieces) =>

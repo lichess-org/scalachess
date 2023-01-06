@@ -8,6 +8,7 @@ import org.specs2.mutable.Specification
 
 import chess.format.{ EpdFen, Fen, Visual }
 import chess.variant.Variant
+import bitboard.Board as BBoard
 
 trait ChessTest extends Specification with ValidatedMatchers:
 
@@ -81,7 +82,7 @@ trait ChessTest extends Specification with ValidatedMatchers:
     }
 
   def makeBoard(pieces: (Pos, Piece)*): Board =
-    Board(pieces.toMap, History(), chess.variant.Standard)
+    Board(BBoard.fromMap(pieces.toMap), History(), chess.variant.Standard)
 
   def makeBoard(str: String, variant: Variant) =
     Visual << str withVariant variant
@@ -92,7 +93,7 @@ trait ChessTest extends Specification with ValidatedMatchers:
 
   def bePoss(poss: Pos*) = // : Matcher[Option[Iterable[Pos]]] =
     beSome { (p: Iterable[Pos]) =>
-      sortPoss(p.toList) must_== sortPoss(poss.toList)
+      sortPoss(p.toList).map(_.key) must_== sortPoss(poss.toList).map(_.key)
     }
 
   def makeGame: Game = Game(makeBoard, White)
@@ -117,7 +118,7 @@ trait ChessTest extends Specification with ValidatedMatchers:
       g.board.visual must_== (Visual << visual).visual
     }
 
-  def sortPoss(poss: Seq[Pos]): Seq[Pos] = poss sortBy (_.toString)
+  def sortPoss(poss: Seq[Pos]): Seq[Pos] = poss.sortBy(_.key)
 
   def pieceMoves(piece: Piece, pos: Pos): Option[List[Pos]] =
     (makeEmptyBoard place (piece, pos)) flatMap { b =>

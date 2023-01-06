@@ -1,17 +1,38 @@
 package chess
 
 import variant.{ Crazyhouse, Variant }
+import bitboard.Board as BBoard
+import bitboard.Bitboard
 
 case class Board(
-    pieces: PieceMap,
+    board: BBoard,
     history: History,
     variant: Variant,
     crazyData: Option[Crazyhouse.Data] = None
 ):
 
-  inline def apply(inline at: Pos): Option[Piece]        = pieces get at
-  inline def apply(inline file: File, inline rank: Rank) = pieces get Pos(file, rank)
+  val white: Bitboard    = board.white
+  val black: Bitboard    = board.black
+  val pawns: Bitboard    = board.pawns
+  val knights: Bitboard  = board.knights
+  val bishops: Bitboard  = board.bishops
+  val rooks: Bitboard    = board.rooks
+  val queens: Bitboard   = board.queens
+  val kings: Bitboard    = board.kings
+  val occupied: Bitboard = board.occupied
+  val sliders: Bitboard  = board.sliders
 
+  inline def apply(inline at: Pos): Option[Piece]        = board.pieceAt(at)
+  inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Pos(file, rank))
+
+  // todo remove
+  lazy val pieces = board.pieceMap
+  // todo maybe remove?
+  lazy val allPieces = board.pieces
+
+  def contains = board.contains
+
+  // TODO fix
   lazy val actors: Map[Pos, Actor] = pieces map { case (pos, piece) =>
     (pos, Actor(piece, pos, this))
   }
@@ -21,66 +42,49 @@ case class Board(
     Color.Map(w, b)
 
   def rolesOf(c: Color): List[Role] =
-    pieces.values
-      .collect {
-        case piece if piece.color == c => piece.role
-      }
-      .to(List)
+    allPieces.collect { case p if p.color == c => p.role }
 
+  // todo fix
   inline def actorAt(inline at: Pos): Option[Actor] = actors get at
 
-  def piecesOf(c: Color): Map[Pos, Piece] = pieces filter (_._2 is c)
+  def piecesOf(c: Color): Map[Pos, Piece] = board.piecesOf(c)
 
-  lazy val kingPos: Map[Color, Pos] = pieces.collect { case (pos, Piece(color, King)) =>
-    color -> pos
-  }
-
-  def kingPosOf(c: Color): Option[Pos] = kingPos get c
-
-  def check(c: Color): Boolean = c.fold(checkWhite, checkBlack)
+  def kingPosOf(c: Color): Option[Pos] = board.king(c)
 
   def checkColor: Option[Color] = checkWhite.option(White) orElse checkBlack.option(Black)
 
-  lazy val checkWhite = checkOf(White)
-  lazy val checkBlack = checkOf(Black)
+  lazy val checkWhite: Boolean = checkOf(White)
+  lazy val checkBlack: Boolean = checkOf(Black)
 
-  private def checkOf(c: Color): Boolean =
-    kingPosOf(c) exists { kingPos =>
-      variant.kingThreatened(this, !c, kingPos)
-    }
+  def checkOf(c: Color): Boolean =
+    variant.kingThreatened(this, c)
 
+  // TODO delete, this only used in test
   def destsFrom(from: Pos): Option[List[Pos]] = actorAt(from).map(_.destinations)
 
   def seq(actions: Board => Option[Board]*): Option[Board] =
     actions.foldLeft(Option(this): Option[Board])(_ flatMap _)
 
+  def withBoard(b: BBoard): Board = copy(board = b)
+
   def place(piece: Piece, at: Pos): Option[Board] =
-    if (pieces contains at) None
-    else Option(copy(pieces = pieces + ((at, piece))))
+    board.put(piece, at).map(withBoard)
+
+  def putOrReplace(piece: Piece, at: Pos): Board =
+    withBoard(board.putOrReplace(at, piece))
 
   def take(at: Pos): Option[Board] =
-    if (pieces contains at) Option(copy(pieces = pieces - at))
-    else None
+    board.take(at).map(withBoard)
 
   def move(orig: Pos, dest: Pos): Option[Board] =
-    if (pieces contains dest) None
-    else
-      pieces get orig map { piece =>
-        copy(pieces = pieces - orig + ((dest, piece)))
-      }
+    board.move(orig, dest).map(withBoard)
 
   def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] =
-    for {
-      piece <- pieces get orig
-      takenPos = taking getOrElse dest
-      if pieces contains takenPos
-    } yield copy(pieces = pieces - takenPos - orig + (dest -> piece))
+    board.taking(orig, dest, taking).map(withBoard)
 
-  lazy val occupation: Color.Map[Set[Pos]] = Color.Map { color =>
-    pieces.collect { case (pos, piece) if piece is color => pos }.to(Set)
-  }
+  lazy val occupation: Color.Map[Set[Pos]] = board.occupation
 
-  inline def hasPiece(inline p: Piece) = pieces.values.exists(p ==)
+  inline def hasPiece(inline p: Piece) = board.hasPiece(p)
 
   def promote(pos: Pos): Option[Board] =
     for {
@@ -96,7 +100,7 @@ case class Board(
 
   def withCastles(c: Castles) = withHistory(history withCastles c)
 
-  def withPieces(newPieces: PieceMap) = copy(pieces = newPieces)
+  def withPieces(newPieces: PieceMap) = copy(board = BBoard.fromMap(newPieces))
 
   def withVariant(v: Variant): Board =
     if (v == Crazyhouse)
@@ -109,60 +113,36 @@ case class Board(
   def withCrazyData(f: Crazyhouse.Data => Crazyhouse.Data): Board =
     withCrazyData(f(crazyData | Crazyhouse.Data.init))
 
-  def ensureCrazyData = withCrazyData(crazyData | Crazyhouse.Data.init)
+  def ensureCrazyData: Board = withCrazyData(crazyData | Crazyhouse.Data.init)
 
-  def unmovedRooks =
-    UnmovedRooks {
-      history.unmovedRooks.value.filter(pos =>
-        apply(pos).exists(piece => piece.is(Rook) && piece.color.backRank == pos.rank)
-      )
-    }
-
-  def fixCastles: Board =
-    withCastles {
-      if (variant.allowsCastling)
-        val wkPos   = kingPosOf(White)
-        val bkPos   = kingPosOf(Black)
-        val wkReady = wkPos.fold(false)(_.rank == Rank.First)
-        val bkReady = bkPos.fold(false)(_.rank == Rank.Eighth)
-        def rookReady(color: Color, kPos: Option[Pos], left: Boolean) =
-          kPos.fold(false) { kp =>
-            actorsOf(color) exists { a =>
-              a.piece.is(Rook) && a.pos ?- kp && (left ^ (a.pos ?> kp)) && history.unmovedRooks.value(a.pos)
-            }
-          }
-        Castles(
-          whiteKingSide = castles.whiteKingSide && wkReady && rookReady(White, wkPos, left = false),
-          whiteQueenSide = castles.whiteQueenSide && wkReady && rookReady(White, wkPos, left = true),
-          blackKingSide = castles.blackKingSide && bkReady && rookReady(Black, bkPos, left = false),
-          blackQueenSide = castles.blackQueenSide && bkReady && rookReady(Black, bkPos, left = true)
-        )
-      else Castles.none
-    }
+  def unmovedRooks = history.unmovedRooks
 
   inline def updateHistory(inline f: History => History) = copy(history = f(history))
 
-  def count(p: Piece): Int = pieces.values.count(_ == p)
-  def count(c: Color): Int = pieces.values.count(_.color == c)
+  def count(p: Piece): Int = board.piece(p).count
+  def count(c: Color): Int = board.color(c).count
 
   def autoDraw: Boolean =
     variant.fiftyMoves(history) || variant.isInsufficientMaterial(this) || history.fivefoldRepetition
 
   inline def situationOf(inline color: Color) = Situation(this, color)
 
-  inline def valid(inline strict: Boolean) = variant.valid(this, strict)
+  inline def valid(inline strict: Boolean): Boolean = variant.valid(this, strict)
 
   def materialImbalance: Int = variant.materialImbalance(this)
 
-  override def toString = s"$variant ${history.lastMove}\n"
+  override def toString = s"$board $variant ${history.lastMove}\n"
 
 object Board:
+
+  def apply(pieces: PieceMap, history: History, variant: Variant, crazyData: Option[Crazyhouse.Data]): Board =
+    Board(BBoard.fromMap(pieces), history, variant, crazyData)
 
   def apply(pieces: Iterable[(Pos, Piece)], variant: Variant): Board =
     Board(pieces.toMap, if (variant.allowsCastling) Castles.all else Castles.none, variant)
 
   def apply(pieces: Iterable[(Pos, Piece)], castles: Castles, variant: Variant): Board =
-    Board(pieces.toMap, History(castles = castles), variant, variantCrazyData(variant))
+    Board(BBoard.fromMap(pieces.toMap), History(castles = castles), variant, variantCrazyData(variant))
 
   def init(variant: Variant): Board = Board(variant.pieces, variant.castles, variant)
 

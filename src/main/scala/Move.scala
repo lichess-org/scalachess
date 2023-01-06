@@ -1,8 +1,10 @@
 package chess
 
 import chess.format.Uci
+import bitboard.Bitboard.*
 import cats.syntax.option.*
 import cats.kernel.Monoid
+import chess.bitboard.Bitboard
 
 case class Move(
     piece: Piece,
@@ -12,7 +14,7 @@ case class Move(
     after: Board,
     capture: Option[Pos],
     promotion: Option[PromotableRole],
-    castle: Option[((Pos, Pos), (Pos, Pos))],
+    castle: Option[Move.Castle],
     enpassant: Boolean,
     metrics: MoveMetrics = MoveMetrics()
 ):
@@ -22,6 +24,10 @@ case class Move(
 
   inline def withHistory(inline h: History) = copy(after = after withHistory h)
 
+  val isWhiteTurn: Boolean = piece.color.white
+
+  // TODO rethink about how handle castling
+  // it's quite messy and error prone now
   def finalizeAfter: Board =
     val board = after.variant.finalizeBoard(
       after updateHistory { h1 =>
@@ -29,22 +35,41 @@ case class Move(
           lastMove = Option(toUci),
           unmovedRooks = before.unmovedRooks,
           halfMoveClock =
-            if ((piece is Pawn) || captures || promotes) HalfMoveClock(0)
+            if (piece.is(Pawn) || captures || promotes) HalfMoveClock(0)
             else h1.halfMoveClock + 1
         )
 
-        // my broken castles
-        if ((piece is King) && h2.canCastle(color).any)
-          h2 withoutCastles color
-        else if (piece is Rook) (for {
-          kingPos <- after kingPosOf color
-          side <- Side.kingRookSide(kingPos, orig).filter { s =>
-            (h2 canCastle color on s) &&
-            h1.unmovedRooks.value(orig)
-          }
-        } yield h2.withoutCastle(color, side)) | h2
-        else h2
-      } fixCastles,
+        val halfCastlingRights: Castles =
+          if captures then h1.castles & ~dest.bitboard
+          else h1.castles
+
+        val castleRights: Castles =
+          if (piece is Rook) && (orig.bitboard & h2.unmovedRooks).nonEmpty then
+            halfCastlingRights & ~orig.bitboard
+          else if piece.is(King) then halfCastlingRights & Bitboard.rank(piece.color.lastRank)
+          else halfCastlingRights
+
+        var unmovedRooks: UnmovedRooks =
+          if captures then h2.unmovedRooks & ~dest.bitboard
+          else h2.unmovedRooks
+
+        unmovedRooks =
+          if piece is Rook then unmovedRooks & ~orig.bitboard
+          else if piece is King then unmovedRooks & Bitboard.rank(piece.color.lastRank)
+          else unmovedRooks
+
+        // var castles = h1.castles
+        val epSquare: Option[Pos] =
+          if piece is Pawn then
+            // todo pawns need to be in the second rank
+            if Math.abs((orig - dest).value) == 16 && orig.rank != piece.color.backRank then
+              // TODO calculate their pawns attacks
+              Some(Pos(orig.value + (if isWhiteTurn then 8 else -8)))
+            else None
+          else None
+
+        h2.withCastles(castleRights).copy(epSquare = epSquare, unmovedRooks = unmovedRooks)
+      },
       toUci,
       capture flatMap { before(_) }
     )
@@ -72,7 +97,7 @@ case class Move(
   inline def castles = castle.isDefined
 
   inline def normalizeCastle =
-    castle.fold(this) { case (_, (rookOrig, _)) =>
+    Move.Castle.raw(castle).fold(this) { case (_, (rookOrig, _)) =>
       copy(dest = rookOrig)
     }
 
@@ -95,3 +120,17 @@ case class Move(
   inline def toUci = Uci.Move(orig, dest, promotion)
 
   override def toString = s"$piece ${toUci.uci}"
+end Move
+
+object Move:
+
+  // ((king, kingTo), (rook, rookTo))
+  opaque type Castle = ((Pos, Pos), (Pos, Pos))
+  object Castle extends TotalWrapper[Castle, ((Pos, Pos), (Pos, Pos))]:
+    extension (e: Castle)
+      inline def king         = e._1._1
+      inline def kingTo       = e._1._2
+      inline def rook         = e._2._1
+      inline def rookTo       = e._2._2
+      def side: Side          = if king.file > kingTo.file then QueenSide else KingSide
+      def isStandard: Boolean = king.file == File.E && (rook.file == File.A || rook.file == File.H)

@@ -91,12 +91,3 @@ class PlayBench:
       }
       // vg foreach { x => println("========= PGN: " + x.pgnMoves) }
       vg
-
-    def playMove(
-        orig: Pos,
-        dest: Pos,
-        promotion: Option[PromotableRole] = None
-    ): Validated[String, Game] =
-      game.apply(orig, dest, promotion) map (_._1)
-
-    def withClock(c: Clock) = game.copy(clock = Option(c))

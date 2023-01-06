@@ -5,6 +5,8 @@ import cats.implicits.*
 import variant.{ Standard, Variant }
 import cats.kernel.Monoid
 import ornicar.scalalib.zeros.given_Zero_Option
+import bitboard.Bitboard
+import bitboard.Bitboard.bitboard
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *
@@ -13,13 +15,15 @@ import ornicar.scalalib.zeros.given_Zero_Option
   * http://scidb.sourceforge.net/help/en/FEN.html#ThreeCheck
   */
 trait FenReader:
-
   def read(variant: Variant, fen: EpdFen): Option[Situation] =
     makeBoard(variant, fen) map { board =>
+      // why it is different when the variant is Atomic?
       val situation = Situation(board, if variant.atomic then fen.color else board.checkColor | fen.color)
-      val (castles, unmovedRooks) = fen.castling.foldLeft(Castles.none -> Set.empty[Pos]) {
+      // todo verify unmovedRooks vs board.rooks
+      val (castles, unmovedRooks) = fen.castling.foldLeft(Castles.none -> UnmovedRooks.empty) {
         case ((c, r), ch) =>
           val color = Color.fromWhite(ch.isUpper)
+          // todo (board.rooks & board.us).occupiedSquares or fold
           val rooks: List[Pos] = board
             .piecesOf(color)
             .collect {
@@ -35,14 +39,16 @@ trait FenReader:
               case file => rooks.find(_.file.char == file)
             })
             side <- Side.kingRookSide(kingPos, rookPos)
-          } yield (c.add(color, side), r + rookPos)).getOrElse((c, r))
+          } yield (c.add(color, side), r | rookPos.bitboard)).getOrElse((c, r))
       }
 
       val fifthRank   = if (situation.color.white) Rank.Fifth else Rank.Fourth
       val sixthRank   = if (situation.color.white) Rank.Sixth else Rank.Third
       val seventhRank = if (situation.color.white) Rank.Seventh else Rank.Second
+
+      val enpassantPos = fen.enpassant
       val enpassantMove = for {
-        pos <- fen.enpassant
+        pos <- enpassantPos
         if pos.rank == sixthRank
         orig = Pos(pos.file, seventhRank)
         dest = Pos(pos.file, fifthRank)
@@ -56,7 +62,8 @@ trait FenReader:
           lastMove = enpassantMove,
           positionHashes = Monoid[PositionHash].empty,
           castles = castles,
-          unmovedRooks = UnmovedRooks(unmovedRooks)
+          unmovedRooks = unmovedRooks,
+          epSquare = enpassantPos
         )
         val checkCount = variant.threeCheck.?? {
           val splitted = fen.value split ' '
@@ -66,7 +73,7 @@ trait FenReader:
             .orElse(splitted.lift(6).flatMap(readCheckCount))
         }
         checkCount.foldLeft(history)(_ withCheckCount _)
-      } fixCastles
+      }
     }
 
   def read(fen: EpdFen): Option[Situation] = read(Standard, fen)

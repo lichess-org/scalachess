@@ -45,6 +45,7 @@ case object RacingKings
   override def isInsufficientMaterial(board: Board)                  = false
   override def opponentHasInsufficientMaterial(situation: Situation) = false
 
+  // todo bitboard => kings & byColor & Rank.Eight
   private def reachedGoal(board: Board, color: Color) =
     board.kingPosOf(color) exists (_.rank == Rank.Eighth)
 
@@ -60,8 +61,7 @@ case object RacingKings
       case White =>
         reachedGoal(situation.board, White) ^ reachedGoal(situation.board, Black)
       case Black =>
-        reachedGoal(situation.board, White) && (validMoves(situation).view mapValues (_.filter(reachesGoal)))
-          .forall(_._2.isEmpty)
+        reachedGoal(situation.board, White) && situation.legalMoves.filter(reachesGoal).isEmpty
 
   // If white reaches the goal and black also reaches the goal directly after,
   // then it is a draw.
@@ -73,12 +73,9 @@ case object RacingKings
 
   // Not only check that our king is safe,
   // but also check the opponent's
-  override def kingSafety(m: Move, filter: Piece => Boolean, kingPos: Option[Pos]): Boolean =
-    super.kingSafety(m, filter, kingPos) &&
-      !m.after.kingPos.get(!m.color).exists { theirKingPos =>
-        kingThreatened(m.after, m.color, theirKingPos, (_ => true))
-      }
+  override def kingSafety(m: Move): Boolean =
+    super.kingSafety(m) && !m.after.board.isCheck(!m.color)
 
   // When considering stalemate, take into account that checks are not allowed.
   override def staleMate(situation: Situation): Boolean =
-    !situation.check && !specialEnd(situation) && !validMoves(situation).exists(_._2.nonEmpty)
+    !situation.check && !specialEnd(situation) && situation.legalMoves.isEmpty

@@ -21,7 +21,7 @@ object Perft:
 
   lazy val threeCheckPerfts  = Perft.read("3check.perft")
   lazy val antichessPerfts   = Perft.read("antichess.perft")
-  lazy val atomicPerfts       = Perft.read("atomic.perft")
+  lazy val atomicPerfts      = Perft.read("atomic.perft")
   lazy val crazyhousePerfts  = Perft.read("crazyhouse.perft")
   lazy val hordePerfts       = Perft.read("horde.perft")
   lazy val racingkingsPerfts = Perft.read("racingkings.perft")
@@ -33,14 +33,22 @@ object Perft:
     Parser.parse(str).getOrElse(throw RuntimeException(s"Parse perft file failed: $file"))
 
   private def perft(game: Game, depth: Int): Long =
-    if (depth > 0)
-      (game.situation.moves.values.toList.flatten: List[Move]).foldLeft(0L)((p, move) =>
-        if (move.piece.role == Pawn && (move.dest.rank == Rank.First || move.dest.rank == Rank.Eighth))
-          p + List(Queen, Rook, Bishop, Knight)
-            .flatMap(move.withPromotion)
-            .map(move => perft(game(move), depth - 1))
-            .sum
-        else
-          p + perft(game.apply(move), depth - 1)
-      )
-    else 1L
+    import chess.Move.Castle.*
+    import Perft.*
+
+    if depth == 0 then 1L
+    else if game.situation.perftEnd then 0L
+    else
+      val allMoves = game.situation.legalMoves
+      // if variant is not chess960 we need to deduplicated castlings moves
+      val moves =
+        if game.situation.board.variant.chess960 then allMoves
+        // We filter out castling move that is Standard and king's dest is not in the rook position
+        else allMoves.filterNot(m => m.castle.exists(c => c.isStandard && m.dest != c.rook))
+
+      if (depth == 1) then moves.size.toLong
+      else moves.map(move => perft(game.apply(move), depth - 1)).sum
+
+  extension (s: Situation)
+    // when calculate perft we don't do autoDraw
+    def perftEnd = s.checkMate || s.staleMate || s.variantEnd || s.board.variant.specialDraw(s)

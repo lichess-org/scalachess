@@ -89,7 +89,6 @@ class AtomicVariantTest extends ChessTest:
       val gameWin = maybeGame flatMap (_.playMoves((Pos.B6, Pos.B7)))
 
       gameWin must beValid.like { case game =>
-        game.situation.moves
         game.situation.end must beTrue
         game.situation.staleMate must beTrue
       }
@@ -149,7 +148,7 @@ class AtomicVariantTest extends ChessTest:
         game.situation.end must beFalse
         game.situation.winner must beNone
         game.situation.moves must haveKeys(Pos.D4, Pos.H7)
-        game.situation.moves.values.forall(_.forall(_.captures)) must beTrue
+        game.situation.legalMoves.forall(_.captures) must beTrue
       }
     }
 

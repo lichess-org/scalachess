@@ -1,6 +1,7 @@
 package chess
 
 import cats.syntax.option.none
+import bitboard.Bitboard
 
 case class Division(middle: Option[Ply], end: Option[Ply], plies: Ply):
 
@@ -50,20 +51,20 @@ object Divider:
     )
 
   private def majorsAndMinors(board: Board): Int =
-    board.pieces.values.foldLeft(0) { (v, p) =>
-      if (p.role == Pawn || p.role == King) v else v + 1
-    }
+    (board.occupied & ~(board.kings | board.pawns)).count
 
   private val backranks =
     List(Pos.whiteBackrank -> Color.White, Pos.blackBackrank -> Color.Black)
 
   // Sparse back-rank indicates that pieces have been developed
   private def backrankSparse(board: Board): Boolean =
-    backranks.exists { case (backrank, color) =>
-      backrank.count { pos =>
-        board(pos).fold(false)(_ is color)
-      } < 4
-    }
+    (board.occupied & Bitboard.rank(Rank.First) & board.white).count < 4 ||
+      (board.occupied & Bitboard.rank(Rank.Eighth) & board.black).count < 4
+    // backranks.exists { case (backrank, color) =>
+    //   backrank.count { pos =>
+    //     board(pos).exists(_ is color)
+    //   } < 4
+    // }
 
   private def score(white: Int, black: Int, y: Int): Int =
     (white, black) match
@@ -106,13 +107,12 @@ object Divider:
   }.toList
 
   private def mixedness(board: Board): Int =
-    val boardValues = board.pieces.view.mapValues(_ is Color.white)
     mixednessRegions.foldLeft(0) { case (mix, region) =>
       var white = 0
       var black = 0
       region foreach { p =>
-        boardValues get p foreach { v =>
-          if (v) white = white + 1
+        board(p) foreach { v =>
+          if (v is White) white = white + 1
           else black = black + 1
         }
       }

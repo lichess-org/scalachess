@@ -22,7 +22,7 @@ case object Crazyhouse
   override val initialFen = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1")
 
   override def valid(board: Board, strict: Boolean) =
-    val pieces = board.pieces.values
+    val pieces = board.allPieces
     (Color.all forall validSide(board, false)) &&
     (!strict || (pieces.count(_ is Pawn) <= 16 && pieces.sizeIs <= 32))
 
@@ -38,7 +38,7 @@ case object Crazyhouse
       d2     <- d1.drop(piece) toValid s"No $piece to drop on $pos"
       board1 <- situation.board.place(piece, pos) toValid s"Can't drop $role on $pos, it's occupied"
       _ <-
-        if (!board1.check(situation.color)) Validated.valid(board1)
+        if (!board1.checkOf(situation.color)) Validated.valid(board1)
         else Validated.invalid(s"Dropping $role on $pos doesn't uncheck the king")
     } yield Drop(
       piece = piece,
@@ -64,7 +64,7 @@ case object Crazyhouse
       case _ => board
 
   private def canDropStuff(situation: Situation) =
-    situation.board.crazyData.fold(false) { (data: Data) =>
+    situation.board.crazyData.exists { (data: Data) =>
       val roles = data.pockets(situation.color).roles
       roles.nonEmpty && possibleDrops(situation).fold(true) { squares =>
         squares.nonEmpty && {
@@ -85,7 +85,7 @@ case object Crazyhouse
 
   def possibleDrops(situation: Situation): Option[List[Pos]] =
     if (!situation.check) None
-    else situation.kingPos.map { blockades(situation, _) }
+    else situation.ourKing.map(blockades(situation, _))
 
   private def blockades(situation: Situation, kingPos: Pos): List[Pos] =
     def attacker(piece: Piece) = piece.role.projection && piece.color != situation.color
@@ -98,7 +98,7 @@ case object Crazyhouse
         case Some(next)                                           => forward(next, dir, next :: squares)
     Queen.dirs flatMap { forward(kingPos, _, Nil) } filter { square =>
       situation.board.place(Piece(situation.color, Knight), square) exists { defended =>
-        !defended.check(situation.color)
+        !defended.checkOf(situation.color)
       }
     }
 

@@ -18,7 +18,7 @@ object Visual:
       case 8          => lines
       case n if n > 8 => lines.slice(1, 9)
       case n          => (List.fill(8 - n)("")) ::: lines
-    Board(
+    val b = Board(
       pieces = (for {
         (l, y) <- (filtered zipWithIndex)
         (c, x) <- (l zipWithIndex)
@@ -30,6 +30,7 @@ object Visual:
       }) flatten,
       variant = chess.variant.Variant.default
     )
+    b.withHistory(History().copy(unmovedRooks = b.board.defaultUnmovedRooks))
 
   def >>(board: Board): String = >>|(board, Map.empty)
 

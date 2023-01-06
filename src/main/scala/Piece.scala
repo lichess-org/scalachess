@@ -14,17 +14,17 @@ case class Piece(color: Color, role: Role):
   def forsyth: Char = if (color == White) role.forsythUpper else role.forsyth
 
   // attackable positions assuming empty board
+  import bitboard.Bitboard
+  import bitboard.Bitboard.*
   def eyes(from: Pos, to: Pos): Boolean =
+    val occupied: Bitboard = to.bitboard
     role match
-      case King   => from touches to
-      case Queen  => (from onSameLine to) || (from onSameDiagonal to)
-      case Rook   => from onSameLine to
-      case Bishop => from onSameDiagonal to
-      case Knight =>
-        val xd = from xDist to
-        val yd = from yDist to
-        (xd == 1 && yd == 2) || (xd == 2 && yd == 1)
-      case Pawn => Piece.pawnEyes(color, from, to)
+      case King   => from.kingAttacks.contains(to)
+      case Queen  => from.queenAttacks(occupied).nonEmpty
+      case Rook   => from.rookAttacks(occupied).nonEmpty
+      case Bishop => from.bishopAttacks(occupied).nonEmpty
+      case Knight => from.knightAttacks.contains(to)
+      case Pawn   => from.pawnAttacks(color).contains(to)
 
   // movable positions assuming empty board
   def eyesMovable(from: Pos, to: Pos): Boolean =

@@ -2,6 +2,8 @@ package chess
 
 import format.Uci
 import cats.kernel.Monoid
+import bitboard.Bitboard
+// import Castles.*
 
 // Checks received by the respective side.
 case class CheckCount(white: Int = 0, black: Int = 0):
@@ -16,18 +18,20 @@ case class CheckCount(white: Int = 0, black: Int = 0):
 
   def apply(color: Color) = color.fold(white, black)
 
-opaque type UnmovedRooks = Set[Pos]
-object UnmovedRooks extends TotalWrapper[UnmovedRooks, Set[Pos]]:
-  val default: UnmovedRooks = (Pos.whiteBackrank ::: Pos.blackBackrank).toSet
-
+// color
 case class History(
     lastMove: Option[Uci] = None,
+    // turn: Color,
     positionHashes: PositionHash = Monoid[PositionHash].empty,
-    castles: Castles = Castles.all,
+    castles: Castles = Castles.corners,
     checkCount: CheckCount = CheckCount(0, 0),
-    unmovedRooks: UnmovedRooks = UnmovedRooks.default,
-    halfMoveClock: HalfMoveClock = HalfMoveClock(0)
+    unmovedRooks: UnmovedRooks = UnmovedRooks.corners,
+    halfMoveClock: HalfMoveClock = HalfMoveClock(0),
+    // fullMoves: FullMoveNumber = FullMoveNumber(0), // do we need it nows? => no
+    // possible en-passant square
+    epSquare: Option[Pos] = None
 ):
+
   def setHalfMoveClock(v: HalfMoveClock) = copy(halfMoveClock = v)
 
   private def isRepetition(times: Int) =
@@ -81,19 +85,6 @@ object History:
     )
 
   def castle(color: Color, kingSide: Boolean, queenSide: Boolean) =
-    History(
-      castles = color match {
-        case White =>
-          Castles.init.copy(
-            whiteKingSide = kingSide,
-            whiteQueenSide = queenSide
-          )
-        case Black =>
-          Castles.init.copy(
-            blackKingSide = kingSide,
-            blackQueenSide = queenSide
-          )
-      }
-    )
+    History(castles = Castles.init.update(color, kingSide, queenSide))
 
   def noCastle = History(castles = Castles.none)

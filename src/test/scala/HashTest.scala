@@ -15,6 +15,7 @@ class HashTest extends ChessTest:
 
     // Reference values available at:
     // http://hardy.uhasselt.be/Toga/book_format.html
+    // https://web.archive.org/web/20191216195456/http://hardy.uhasselt.be:80/Toga/book_format.html
 
     "match on the starting position" in {
       val fen  = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
@@ -187,6 +188,7 @@ class HashTest extends ChessTest:
       }
       def runOne(moves: List[SanStr]) =
         Replay.gameMoveWhileValid(moves, Fen.initial, chess.variant.ThreeCheck)
+
       def hex(buf: Array[Byte]): String = buf.map("%02x" format _).mkString
       val g                             = gameMoves.map(runOne)
       g.exists(_._3.nonEmpty) must beFalse

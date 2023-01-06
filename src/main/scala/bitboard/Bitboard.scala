@@ -1,8 +1,6 @@
 package chess
 package bitboard
 
-import OpaqueBitboard.*
-
 opaque type Bitboard = Long
 object Bitboard extends OpaqueBitboard[Bitboard]:
 

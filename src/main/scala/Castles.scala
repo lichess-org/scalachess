@@ -1,7 +1,6 @@
 package chess
 
 import bitboard.OpaqueBitboard
-import bitboard.OpaqueBitboard.*
 import bitboard.Bitboard
 import bitboard.Bitboard.given
 

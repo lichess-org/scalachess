@@ -111,4 +111,4 @@ object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
 
   extension (ur: UnmovedRooks)
     def toList: List[Pos]        = ur.occupiedSquares
-    def apply(pos: Pos): Boolean = (ur.value & pos.bitboard).nonEmpty
+    def apply(pos: Pos): Boolean = (ur & pos.bitboard).nonEmpty

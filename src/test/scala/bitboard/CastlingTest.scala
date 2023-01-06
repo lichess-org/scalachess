@@ -8,7 +8,7 @@ class CastlingTest extends FunSuite:
   import Castles.*
 
   test("corner case") {
-    val castle = Castles.corners
+    val castle = Castles.all
     assertEquals(castle.whiteKingSide, true)
     assertEquals(castle.whiteQueenSide, true)
     assertEquals(castle.blackKingSide, true)

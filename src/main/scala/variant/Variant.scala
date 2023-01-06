@@ -37,7 +37,7 @@ abstract class Variant private[variant] (
 
   protected val backRank = Vector(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
 
-  def castles: Castles = Castles.corners
+  def castles: Castles = Castles.all
 
   val initialFen: EpdFen = EpdFen.initial
 

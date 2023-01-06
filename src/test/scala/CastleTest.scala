@@ -14,7 +14,7 @@ class CastleTest extends ChessTest:
     import Castles.*
 
     "init" in {
-      val castles: Castles = Castles.corners
+      val castles: Castles = Castles.all
       castles.whiteKingSide mustEqual true
       castles.whiteQueenSide mustEqual true
       castles.blackKingSide mustEqual true
@@ -22,7 +22,7 @@ class CastleTest extends ChessTest:
     }
 
     "without White" in {
-      val castles: Castles = Castles.corners.without(White)
+      val castles: Castles = Castles.all.without(White)
       castles.whiteKingSide mustEqual false
       castles.whiteQueenSide mustEqual false
       castles.blackKingSide mustEqual true
@@ -30,7 +30,7 @@ class CastleTest extends ChessTest:
     }
 
     "without Black" in {
-      val castles: Castles = Castles.corners.without(Black)
+      val castles: Castles = Castles.all.without(Black)
       castles.whiteKingSide mustEqual true
       castles.whiteQueenSide mustEqual true
       castles.blackKingSide mustEqual false
@@ -38,7 +38,7 @@ class CastleTest extends ChessTest:
     }
 
     "without Black" in {
-      val castles: Castles = Castles.corners.without(Black)
+      val castles: Castles = Castles.all.without(Black)
       castles.whiteKingSide mustEqual true
       castles.whiteQueenSide mustEqual true
       castles.blackKingSide mustEqual false
@@ -46,7 +46,7 @@ class CastleTest extends ChessTest:
     }
 
     "without White Kingside" in {
-      val castles: Castles = Castles.corners.without(White, KingSide)
+      val castles: Castles = Castles.all.without(White, KingSide)
       castles.whiteKingSide mustEqual false
       castles.whiteQueenSide mustEqual true
       castles.blackKingSide mustEqual true
@@ -54,7 +54,7 @@ class CastleTest extends ChessTest:
     }
 
     "without White QueenSide" in {
-      val castles: Castles = Castles.corners.without(White, QueenSide)
+      val castles: Castles = Castles.all.without(White, QueenSide)
       castles.whiteKingSide mustEqual true
       castles.whiteQueenSide mustEqual false
       castles.blackKingSide mustEqual true
@@ -62,7 +62,7 @@ class CastleTest extends ChessTest:
     }
 
     "update" in {
-      val castles: Castles = Castles.corners.update(White, false, true)
+      val castles: Castles = Castles.all.update(White, false, true)
       castles.whiteKingSide mustEqual false
       castles.whiteQueenSide mustEqual true
       castles.blackKingSide mustEqual true

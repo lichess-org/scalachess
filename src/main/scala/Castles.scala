@@ -89,8 +89,9 @@ object Castles extends OpaqueBitboard[Castles]:
     case 'Q' => Some(A1)
     case _   => None
 
-  val corners: Castles = CORNERS
-  val none: Castles    = empty
+  val all: Castles  = CORNERS
+  val init: Castles = all
+  val none: Castles = empty
 
   final class Can(castles: Castles, color: Color):
     def on(side: Side): Boolean =

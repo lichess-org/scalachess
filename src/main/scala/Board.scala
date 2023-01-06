@@ -139,7 +139,7 @@ object Board:
     Board(BBoard.fromMap(pieces), history, variant, crazyData)
 
   def apply(pieces: Iterable[(Pos, Piece)], variant: Variant): Board =
-    Board(pieces.toMap, if (variant.allowsCastling) Castles.all else Castles.none, variant)
+    Board(pieces.toMap, if (variant.allowsCastling) Castles.corners else Castles.none, variant)
 
   def apply(pieces: Iterable[(Pos, Piece)], castles: Castles, variant: Variant): Board =
     val board = BBoard.fromMap(pieces.toMap)

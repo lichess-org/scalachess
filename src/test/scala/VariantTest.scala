@@ -87,7 +87,7 @@ class VariantTest extends ChessTest:
     }
 
     "initialize the board with castling rights" in {
-      Board.init(Chess960).history.castles must_== Castles.all
+      Board.init(Chess960).history.castles must_== Castles.corners
     }
   }
 
@@ -131,7 +131,7 @@ PP
     }
 
     "initialize the board with castling rights" in {
-      Board.init(KingOfTheHill).history.castles must_== Castles.all
+      Board.init(KingOfTheHill).history.castles must_== Castles.corners
     }
   }
 
@@ -227,7 +227,7 @@ K  r
     }
 
     "initialize the board with castling rights" in {
-      Board.init(KingOfTheHill).history.castles must_== Castles.all
+      Board.init(KingOfTheHill).history.castles must_== Castles.corners
     }
   }
 

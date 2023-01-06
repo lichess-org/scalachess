@@ -51,7 +51,7 @@ class BoardTest extends ChessTest:
     }
 
     "have castling rights by default" in {
-      board.history.castles == Castles.all
+      board.history.castles == Castles.corners
     }
 
     "allow a piece to be placed" in {

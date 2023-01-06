@@ -85,6 +85,6 @@ object History:
     )
 
   def castle(color: Color, kingSide: Boolean, queenSide: Boolean) =
-    History(castles = Castles.init.update(color, kingSide, queenSide))
+    History(castles = Castles.corners.update(color, kingSide, queenSide))
 
   def noCastle = History(castles = Castles.none)

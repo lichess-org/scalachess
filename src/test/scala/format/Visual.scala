@@ -30,7 +30,7 @@ object Visual:
       }) flatten,
       variant = chess.variant.Variant.default
     )
-    b.withHistory(History().copy(unmovedRooks = b.board.defaultUnmovedRooks))
+    b.withHistory(History(unmovedRooks = b.board.defaultUnmovedRooks))
 
   def >>(board: Board): String = >>|(board, Map.empty)
 

@@ -107,6 +107,7 @@ object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
   // for lila testing only
   val default: UnmovedRooks = UnmovedRooks(Bitboard.rank(Rank.First) | Bitboard.rank(Rank.Eighth))
   val corners: UnmovedRooks = CORNERS
+  val none: UnmovedRooks    = empty
 
   def apply(b: Bitboard): UnmovedRooks   = b.value
   def apply(set: Set[Pos]): UnmovedRooks = set.foldLeft(empty)((b, p) => b | p.bitboard)

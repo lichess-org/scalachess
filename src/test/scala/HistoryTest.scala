@@ -7,11 +7,11 @@ class HistoryTest extends ChessTest:
   "threefold repetition" should {
     def toHash(a: Int) = PositionHash(Array(a.toByte, 0.toByte, 0.toByte))
     def makeHistory(positions: List[Int]) =
-      (positions map toHash).foldLeft(History()) { (history, hash) =>
+      (positions map toHash).foldLeft(defaultHistory()) { (history, hash) =>
         history.copy(positionHashes = Monoid[PositionHash].combine(hash, history.positionHashes))
       }
     "empty history" in {
-      History().threefoldRepetition must_== false
+      defaultHistory().threefoldRepetition must_== false
     }
     "not 3 same elements" in {
       val history = makeHistory(List(1, 2, 3, 4, 5, 2, 5, 6, 23, 55))
@@ -29,9 +29,9 @@ class HistoryTest extends ChessTest:
 
   "set half move clock" should {
     "set 0" in {
-      History().setHalfMoveClock(HalfMoveClock(0)).halfMoveClock must_== HalfMoveClock(0)
+      defaultHistory().setHalfMoveClock(HalfMoveClock(0)).halfMoveClock must_== HalfMoveClock(0)
     }
     "set 5" in {
-      History().setHalfMoveClock(HalfMoveClock(5)).halfMoveClock must_== HalfMoveClock(5)
+      defaultHistory().setHalfMoveClock(HalfMoveClock(5)).halfMoveClock must_== HalfMoveClock(5)
     }
   }

@@ -13,7 +13,7 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
     "joda-time"            % "joda-time"         % "2.12.2",
     "org.typelevel"       %% "cats-core"         % "2.9.0",
     "org.typelevel"       %% "alleycats-core"    % "2.9.0",
-    "org.typelevel"       %% "cats-parse"        % "0.3.8"
+    "org.typelevel"       %% "cats-parse"        % "0.3.9"
   ),
   testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
   scalacOptions := Seq(

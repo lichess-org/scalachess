@@ -37,7 +37,7 @@ class BitboardTest extends ScalaCheckSuite:
   }
 
   test("slidingAttack with all occupied") {
-    val occupied = Bitboard.ALL
+    val occupied = Bitboard(-1L)
     for
       i      <- 0 to 63
       deltas <- allDeltas

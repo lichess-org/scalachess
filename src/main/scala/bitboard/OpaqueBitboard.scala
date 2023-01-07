@@ -4,9 +4,9 @@ package bitboard
 type BitboardRuntime[A] = SameRuntime[A, Long]
 trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
 
-  def empty: A   = 0L.bb
-  def all: A     = -1L.bb
-  def corners: A = 0x8100000000000081L.bb
+  val empty: A             = 0L.bb
+  protected val ALL: A     = -1L.bb
+  protected val CORNERS: A = 0x8100000000000081L.bb
 
   extension (l: Long)
     def bb: A                    = l.asInstanceOf[A]

@@ -14,7 +14,7 @@ class CastleTest extends ChessTest:
     import Castles.*
 
     "init" in {
-      val castles: Castles = Castles.init
+      val castles: Castles = Castles.all
       castles.whiteKingSide mustEqual true
       castles.whiteQueenSide mustEqual true
       castles.blackKingSide mustEqual true
@@ -22,7 +22,7 @@ class CastleTest extends ChessTest:
     }
 
     "without White" in {
-      val castles: Castles = Castles.init.without(White)
+      val castles: Castles = Castles.all.without(White)
       castles.whiteKingSide mustEqual false
       castles.whiteQueenSide mustEqual false
       castles.blackKingSide mustEqual true
@@ -30,7 +30,7 @@ class CastleTest extends ChessTest:
     }
 
     "without Black" in {
-      val castles: Castles = Castles.init.without(Black)
+      val castles: Castles = Castles.all.without(Black)
       castles.whiteKingSide mustEqual true
       castles.whiteQueenSide mustEqual true
       castles.blackKingSide mustEqual false
@@ -38,7 +38,7 @@ class CastleTest extends ChessTest:
     }
 
     "without Black" in {
-      val castles: Castles = Castles.init.without(Black)
+      val castles: Castles = Castles.all.without(Black)
       castles.whiteKingSide mustEqual true
       castles.whiteQueenSide mustEqual true
       castles.blackKingSide mustEqual false
@@ -46,7 +46,7 @@ class CastleTest extends ChessTest:
     }
 
     "without White Kingside" in {
-      val castles: Castles = Castles.init.without(White, KingSide)
+      val castles: Castles = Castles.all.without(White, KingSide)
       castles.whiteKingSide mustEqual false
       castles.whiteQueenSide mustEqual true
       castles.blackKingSide mustEqual true
@@ -54,7 +54,7 @@ class CastleTest extends ChessTest:
     }
 
     "without White QueenSide" in {
-      val castles: Castles = Castles.init.without(White, QueenSide)
+      val castles: Castles = Castles.all.without(White, QueenSide)
       castles.whiteKingSide mustEqual true
       castles.whiteQueenSide mustEqual false
       castles.blackKingSide mustEqual true
@@ -62,7 +62,7 @@ class CastleTest extends ChessTest:
     }
 
     "update" in {
-      val castles: Castles = Castles.init.update(White, false, true)
+      val castles: Castles = Castles.all.update(White, false, true)
       castles.whiteKingSide mustEqual false
       castles.whiteQueenSide mustEqual true
       castles.blackKingSide mustEqual true
@@ -320,6 +320,13 @@ PPPPPPPP
       val init        = fenToGame(fenPosition, Chess960).toOption.get
       val game        = init.playMoves((A8, A1), (H1, H2), (A1, A7)).toOption.get
       game.situation.legalMoves.exists(_.castles) must beTrue
+    }
+
+    "test games" in {
+      val fenPosition = EpdFen("1rnk1bqr/pppp1bpp/1n2p3/5p2/5P2/1N1N4/PPPPPBPP/1R1K1BQR w KQkq - 0 5")
+      val init        = fenToGame(fenPosition, Chess960).toOption.get
+      init.situation.legalMoves.exists(_.castles) must beTrue
+      init.situation.legalMoves.exists(_.castle.exists(_.side == QueenSide)) must beTrue
     }
 
   }

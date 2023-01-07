@@ -23,7 +23,7 @@ case class History(
     lastMove: Option[Uci] = None,
     // turn: Color,
     positionHashes: PositionHash = Monoid[PositionHash].empty,
-    castles: Castles = Castles.corners,
+    castles: Castles = Castles.all,
     checkCount: CheckCount = CheckCount(0, 0),
     unmovedRooks: UnmovedRooks = UnmovedRooks.corners,
     halfMoveClock: HalfMoveClock = HalfMoveClock(0),
@@ -85,6 +85,6 @@ object History:
     )
 
   def castle(color: Color, kingSide: Boolean, queenSide: Boolean) =
-    History(castles = Castles.init.update(color, kingSide, queenSide))
+    History(castles = Castles.all.update(color, kingSide, queenSide))
 
   def noCastle = History(castles = Castles.none)

@@ -139,10 +139,12 @@ object Board:
     Board(BBoard.fromMap(pieces), history, variant, crazyData)
 
   def apply(pieces: Iterable[(Pos, Piece)], variant: Variant): Board =
-    Board(pieces.toMap, if (variant.allowsCastling) Castles.all else Castles.none, variant)
+    Board(pieces, if (variant.allowsCastling) Castles.all else Castles.none, variant)
 
   def apply(pieces: Iterable[(Pos, Piece)], castles: Castles, variant: Variant): Board =
-    Board(BBoard.fromMap(pieces.toMap), History(castles = castles), variant, variantCrazyData(variant))
+    val board        = BBoard.fromMap(pieces.toMap)
+    val unmovedRooks = UnmovedRooks(board.rooks)
+    Board(board, History(castles = castles, unmovedRooks = unmovedRooks), variant, variantCrazyData(variant))
 
   def init(variant: Variant): Board = Board(variant.pieces, variant.castles, variant)
 

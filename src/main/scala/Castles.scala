@@ -89,9 +89,9 @@ object Castles extends OpaqueBitboard[Castles]:
     case 'Q' => Some(A1)
     case _   => None
 
-  val full: Castles = corners
+  val all: Castles  = CORNERS
+  val init: Castles = all
   val none: Castles = empty
-  def init: Castles = all
 
   final class Can(castles: Castles, color: Color):
     def on(side: Side): Boolean =
@@ -104,7 +104,9 @@ object Castles extends OpaqueBitboard[Castles]:
 
 opaque type UnmovedRooks = Long
 object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
+  // for lila testing only
   val default: UnmovedRooks = UnmovedRooks(Bitboard.rank(Rank.First) | Bitboard.rank(Rank.Eighth))
+  val corners: UnmovedRooks = CORNERS
 
   def apply(b: Bitboard): UnmovedRooks   = b.value
   def apply(set: Set[Pos]): UnmovedRooks = set.foldLeft(empty)((b, p) => b | p.bitboard)

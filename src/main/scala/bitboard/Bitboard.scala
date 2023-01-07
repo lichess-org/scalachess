@@ -4,8 +4,6 @@ package bitboard
 opaque type Bitboard = Long
 object Bitboard extends OpaqueBitboard[Bitboard]:
 
-  val ALL: Bitboard = Bitboard(-1L)
-
   private val RANKS = Array.fill(8)(0L)
   private val FILES = Array.fill(8)(0L)
 

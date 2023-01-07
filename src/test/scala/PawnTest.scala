@@ -81,17 +81,17 @@ class PawnTest extends ChessTest:
           board destsFrom D5 must bePoss(D6)
         }
         "with irrelevant history" in {
-          board withHistory History(
+          board withHistory defaultHistory(
             lastMove = Option(Uci.Move(A2, A4))
           ) destsFrom D5 must bePoss(D6)
         }
         "with relevant history on the left" in {
-          board withHistory History(
+          board withHistory defaultHistory(
             epSquare = Option(C6)
           ) destsFrom D5 must bePoss(D6, C6)
         }
         "with relevant history on the right" in {
-          board withHistory History(
+          board withHistory defaultHistory(
             epSquare = Option(E6)
           ) destsFrom D5 must bePoss(D6, E6)
         }
@@ -100,7 +100,7 @@ class PawnTest extends ChessTest:
         makeBoard(
           D5 -> White.pawn,
           E5 -> Black.rook
-        ) withHistory History(
+        ) withHistory defaultHistory(
           lastMove = Option(Uci.Move(E7, E5))
         ) destsFrom D5 must bePoss(D6)
       }
@@ -108,7 +108,7 @@ class PawnTest extends ChessTest:
         makeBoard(
           D5 -> White.pawn,
           E5 -> White.pawn
-        ) withHistory History(
+        ) withHistory defaultHistory(
           lastMove = Option(Uci.Move(E7, E5))
         ) destsFrom D5 must bePoss(D6)
       }
@@ -191,7 +191,7 @@ class PawnTest extends ChessTest:
           board destsFrom D4 must bePoss(D3)
         }
         "with relevant history on the left" in {
-          board withHistory History(
+          board withHistory defaultHistory(
             epSquare = Option(C3)
           ) destsFrom D4 must bePoss(D3, C3)
         }
@@ -200,7 +200,7 @@ class PawnTest extends ChessTest:
         makeBoard(
           D4 -> Black.pawn,
           E4 -> White.rook
-        ) withHistory History(
+        ) withHistory defaultHistory(
           lastMove = Option(Uci.Move(E2, E4))
         ) destsFrom D4 must bePoss(D3)
       }

@@ -17,10 +17,6 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
   extension (a: A)
     inline def unary_- : A                                                     = (-a.value).bb
     inline def unary_~ : A                                                     = (~a.value).bb
-    inline infix def >(inline o: Long): Boolean                                = a.value > o
-    inline infix def <(inline o: Long): Boolean                                = a.value < o
-    inline infix def >=(inline o: Long): Boolean                               = a.value >= o
-    inline infix def <=(inline o: Long): Boolean                               = a.value <= o
     inline infix def +(inline o: Long): A                                      = (a.value + o).bb
     inline infix def -(inline o: Long): A                                      = (a.value - o).bb
     inline infix def &(inline o: Long): A                                      = (a.value & o).bb
@@ -28,10 +24,6 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
     inline infix def |(inline o: Long): A                                      = (a.value | o).bb
     inline infix def <<(inline o: Long): A                                     = (a.value << o).bb
     inline infix def >>>(inline o: Long): A                                    = (a.value >>> o).bb
-    inline infix def >[B](inline o: B)(using sr: BitboardRuntime[B]): Boolean  = >(sr(o))
-    inline infix def <[B](inline o: B)(using sr: BitboardRuntime[B]): Boolean  = <(sr(o))
-    inline infix def >=[B](inline o: B)(using sr: BitboardRuntime[B]): Boolean = >=(sr(o))
-    inline infix def <=[B](inline o: B)(using sr: BitboardRuntime[B]): Boolean = <=(sr(o))
     inline infix def +[B](inline o: B)(using sr: BitboardRuntime[B]): A        = a + sr(o)
     inline infix def -[B](inline o: B)(using sr: BitboardRuntime[B]): A        = a - sr(o)
     inline infix def &[B](inline o: B)(using sr: BitboardRuntime[B]): A        = a & sr(o)

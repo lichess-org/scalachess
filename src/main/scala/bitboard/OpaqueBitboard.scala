@@ -50,8 +50,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
       fold(List[Pos]())((xs, pos) => xs :+ pos)
 
     // total non empty position
-    def count: Int =
-      fold(0)((count, _) => count + 1)
+    def count: Int = java.lang.Long.bitCount(a)
 
     def lsb: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(a))
 

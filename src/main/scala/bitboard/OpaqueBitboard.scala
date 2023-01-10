@@ -15,30 +15,17 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
   extension (s: Pos) inline def bitboard: A = (1L << s.value).bb
 
   extension (a: A)
-    inline def unary_- : A                                                     = (-a.value).bb
-    inline def unary_~ : A                                                     = (~a.value).bb
-    inline infix def >(inline o: Long): Boolean                                = a.value > o
-    inline infix def <(inline o: Long): Boolean                                = a.value < o
-    inline infix def >=(inline o: Long): Boolean                               = a.value >= o
-    inline infix def <=(inline o: Long): Boolean                               = a.value <= o
-    inline infix def +(inline o: Long): A                                      = (a.value + o).bb
-    inline infix def -(inline o: Long): A                                      = (a.value - o).bb
-    inline infix def &(inline o: Long): A                                      = (a.value & o).bb
-    inline infix def ^(inline o: Long): A                                      = (a.value ^ o).bb
-    inline infix def |(inline o: Long): A                                      = (a.value | o).bb
-    inline infix def <<(inline o: Long): A                                     = (a.value << o).bb
-    inline infix def >>>(inline o: Long): A                                    = (a.value >>> o).bb
-    inline infix def >[B](inline o: B)(using sr: BitboardRuntime[B]): Boolean  = >(sr(o))
-    inline infix def <[B](inline o: B)(using sr: BitboardRuntime[B]): Boolean  = <(sr(o))
-    inline infix def >=[B](inline o: B)(using sr: BitboardRuntime[B]): Boolean = >=(sr(o))
-    inline infix def <=[B](inline o: B)(using sr: BitboardRuntime[B]): Boolean = <=(sr(o))
-    inline infix def +[B](inline o: B)(using sr: BitboardRuntime[B]): A        = a + sr(o)
-    inline infix def -[B](inline o: B)(using sr: BitboardRuntime[B]): A        = a - sr(o)
-    inline infix def &[B](inline o: B)(using sr: BitboardRuntime[B]): A        = a & sr(o)
-    inline infix def ^[B](inline o: B)(using sr: BitboardRuntime[B]): A        = a ^ sr(o)
-    inline infix def |[B](inline o: B)(using sr: BitboardRuntime[B]): A        = a | sr(o)
-    inline infix def <<[B](inline o: B)(using sr: BitboardRuntime[B]): A       = a << sr(o)
-    inline infix def >>>[B](inline o: B)(using sr: BitboardRuntime[B]): A      = a >>> sr(o)
+    inline def unary_~ : A                                                = (~a.value).bb
+    inline infix def &(inline o: Long): A                                 = (a.value & o).bb
+    inline infix def ^(inline o: Long): A                                 = (a.value ^ o).bb
+    inline infix def |(inline o: Long): A                                 = (a.value | o).bb
+    inline infix def <<(inline o: Long): A                                = (a.value << o).bb
+    inline infix def >>>(inline o: Long): A                               = (a.value >>> o).bb
+    inline infix def &[B](inline o: B)(using sr: BitboardRuntime[B]): A   = a & sr(o)
+    inline infix def ^[B](inline o: B)(using sr: BitboardRuntime[B]): A   = a ^ sr(o)
+    inline infix def |[B](inline o: B)(using sr: BitboardRuntime[B]): A   = a | sr(o)
+    inline infix def <<[B](inline o: B)(using sr: BitboardRuntime[B]): A  = a << sr(o)
+    inline infix def >>>[B](inline o: B)(using sr: BitboardRuntime[B]): A = a >>> sr(o)
 
     def contains(pos: Pos): Boolean =
       (a.value & (1L << pos.value)) != 0L
@@ -52,9 +39,13 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
     // total non empty position
     def count: Int = java.lang.Long.bitCount(a)
 
-    def lsb: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(a))
+    // the first non empty position
+    def first: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(a))
 
-    def fold[A](init: A)(f: (A, Pos) => A): A =
+    // remove the first non empty position
+    def removeFirst: A = (a.value & (a.value - 1L)).bb
+
+    def fold[B](init: B)(f: (B, Pos) => B): B =
       var b      = a.value
       var result = init
       while b != 0

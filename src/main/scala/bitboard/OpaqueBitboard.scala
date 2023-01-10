@@ -15,17 +15,17 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
   extension (s: Pos) inline def bitboard: A = (1L << s.value).bb
 
   extension (a: A)
-    inline def unary_~ : A                                                     = (~a.value).bb
-    inline infix def &(inline o: Long): A                                      = (a.value & o).bb
-    inline infix def ^(inline o: Long): A                                      = (a.value ^ o).bb
-    inline infix def |(inline o: Long): A                                      = (a.value | o).bb
-    inline infix def <<(inline o: Long): A                                     = (a.value << o).bb
-    inline infix def >>>(inline o: Long): A                                    = (a.value >>> o).bb
-    inline infix def &[B](inline o: B)(using sr: BitboardRuntime[B]): A        = a & sr(o)
-    inline infix def ^[B](inline o: B)(using sr: BitboardRuntime[B]): A        = a ^ sr(o)
-    inline infix def |[B](inline o: B)(using sr: BitboardRuntime[B]): A        = a | sr(o)
-    inline infix def <<[B](inline o: B)(using sr: BitboardRuntime[B]): A       = a << sr(o)
-    inline infix def >>>[B](inline o: B)(using sr: BitboardRuntime[B]): A      = a >>> sr(o)
+    inline def unary_~ : A                                                = (~a.value).bb
+    inline infix def &(inline o: Long): A                                 = (a.value & o).bb
+    inline infix def ^(inline o: Long): A                                 = (a.value ^ o).bb
+    inline infix def |(inline o: Long): A                                 = (a.value | o).bb
+    inline infix def <<(inline o: Long): A                                = (a.value << o).bb
+    inline infix def >>>(inline o: Long): A                               = (a.value >>> o).bb
+    inline infix def &[B](inline o: B)(using sr: BitboardRuntime[B]): A   = a & sr(o)
+    inline infix def ^[B](inline o: B)(using sr: BitboardRuntime[B]): A   = a ^ sr(o)
+    inline infix def |[B](inline o: B)(using sr: BitboardRuntime[B]): A   = a | sr(o)
+    inline infix def <<[B](inline o: B)(using sr: BitboardRuntime[B]): A  = a << sr(o)
+    inline infix def >>>[B](inline o: B)(using sr: BitboardRuntime[B]): A = a >>> sr(o)
 
     def contains(pos: Pos): Boolean =
       (a.value & (1L << pos.value)) != 0L

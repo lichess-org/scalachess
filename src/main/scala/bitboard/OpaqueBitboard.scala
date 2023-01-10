@@ -15,17 +15,12 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
   extension (s: Pos) inline def bitboard: A = (1L << s.value).bb
 
   extension (a: A)
-    inline def unary_- : A                                                     = (-a.value).bb
     inline def unary_~ : A                                                     = (~a.value).bb
-    inline infix def +(inline o: Long): A                                      = (a.value + o).bb
-    inline infix def -(inline o: Long): A                                      = (a.value - o).bb
     inline infix def &(inline o: Long): A                                      = (a.value & o).bb
     inline infix def ^(inline o: Long): A                                      = (a.value ^ o).bb
     inline infix def |(inline o: Long): A                                      = (a.value | o).bb
     inline infix def <<(inline o: Long): A                                     = (a.value << o).bb
     inline infix def >>>(inline o: Long): A                                    = (a.value >>> o).bb
-    inline infix def +[B](inline o: B)(using sr: BitboardRuntime[B]): A        = a + sr(o)
-    inline infix def -[B](inline o: B)(using sr: BitboardRuntime[B]): A        = a - sr(o)
     inline infix def &[B](inline o: B)(using sr: BitboardRuntime[B]): A        = a & sr(o)
     inline infix def ^[B](inline o: B)(using sr: BitboardRuntime[B]): A        = a ^ sr(o)
     inline infix def |[B](inline o: B)(using sr: BitboardRuntime[B]): A        = a | sr(o)
@@ -44,9 +39,14 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
     // total non empty position
     def count: Int = java.lang.Long.bitCount(a)
 
+    // the first non empty position
+    // first?
     def lsb: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(a))
 
-    def fold[A](init: A)(f: (A, Pos) => A): A =
+    // remove the first non empty position
+    def removeFirst: A = (a.value & (a.value - 1L)).bb
+
+    def fold[B](init: B)(f: (B, Pos) => B): B =
       var b      = a.value
       var result = init
       while b != 0

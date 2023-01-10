@@ -40,8 +40,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
     def count: Int = java.lang.Long.bitCount(a)
 
     // the first non empty position
-    // first?
-    def lsb: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(a))
+    def first: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(a))
 
     // remove the first non empty position
     def removeFirst: A = (a.value & (a.value - 1L)).bb

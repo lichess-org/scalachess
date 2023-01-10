@@ -52,7 +52,7 @@ case class Board(
     colorAt(s).contains(Color.Black)
 
   def king(color: Color): Option[Pos] =
-    (kings & byColor(color)).lsb
+    (kings & byColor(color)).first
 
   def attacksTo(s: Pos, attacker: Color): Bitboard =
     attacksTo(s, attacker, occupied)

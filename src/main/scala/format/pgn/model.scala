@@ -92,7 +92,7 @@ case class Turn(
 object Turn:
 
   def fromMoves(moves: List[Move], ply: Ply): List[Turn] = {
-    moves.foldLeft((List[Turn](), ply)) {
+    moves.foldLeft((List.empty[Turn], ply)) {
       case ((turns, p), move) if (p.value & 1) == 1 =>
         (Turn((p.value + 1) / 2, move.some, none) :: turns) -> (p + 1)
       case ((Nil, p), move) =>

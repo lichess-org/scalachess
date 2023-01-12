@@ -148,7 +148,7 @@ case class Situation(board: Board, color: Color):
   private def genEnPassant(pawns: Bitboard): List[Move] =
     board.history.epSquare.fold(Nil)(ep =>
       val pawnsCanEnPassant = pawns & ep.pawnAttacks(!color)
-      pawnsCanEnPassant.fold(List[Move]())((moves, pos) => enpassant(pos, ep).fold(moves)(moves :+ _))
+      pawnsCanEnPassant.flatMap(enpassant(_, ep))
     )
 
   private def genNonKing(mask: Bitboard): List[Move] =

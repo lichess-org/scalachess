@@ -34,7 +34,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
       (a.value & (a.value - 1L)) != 0L
 
     def occupiedSquares: List[Pos] =
-      fold(List.empty)((xs, pos) => xs :+ pos)
+      fold(List.empty)((xs, pos) => pos :: xs)
 
     // total non empty position
     def count: Int = java.lang.Long.bitCount(a)

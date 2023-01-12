@@ -55,11 +55,11 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
       result
 
     def flatMap[B](f: Pos => IterableOnce[B]): List[B] =
-      var b      = a.value
+      var b       = a.value
       var builder = List.newBuilder[B]
       while b != 0
       do
-        builder ++= f(b.lsb.get) 
+        builder ++= f(b.lsb.get)
         b &= (b - 1L)
       builder.result
 

@@ -4,6 +4,7 @@ import cats.syntax.option.*
 
 import chess.variant.Atomic
 import chess.format.EpdFen
+import chess.format.pgn.SanStr
 
 class AtomicVariantTest extends ChessTest:
 
@@ -608,5 +609,15 @@ class AtomicVariantTest extends ChessTest:
         game.situation.autoDraw must beFalse
         game.situation.end must beTrue
       }
+    }
+
+    "Replay an entire game" in {
+      val sans: Vector[SanStr] =
+        SanStr from "Nf3 f6 e3 d5 Ng5 fxg5 Qh5+ g6 Qe5 Be6 Bb5+ c6 Qc7 Qxc7 b3 d4 Nc3 dxc3 Bc4 O-O-O O-O h5 Ba3 c5 Bd5 b5 Bb7+ Kb8 c4 h4 d4 Nf6 h3 Ng4 hxg4 h3 g4 h2+ Kh1 Bg7 Rad1 b4 Bb2 Bf5 f3 Bd3 Rxd3 Rh3 d5 Rg3 Be5+ Bxe5 d6 Rg1#"
+          .split(' ')
+          .toVector
+      val (game, steps, error) = chess.Replay.gameMoveWhileValid(sans, Atomic.initialFen, Atomic)
+      error must beNone
+      steps.size === (sans.size + 1)
     }
   }

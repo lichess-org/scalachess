@@ -618,6 +618,6 @@ class AtomicVariantTest extends ChessTest:
           .toVector
       val (game, steps, error) = chess.Replay.gameMoveWhileValid(sans, Atomic.initialFen, Atomic)
       error must beNone
-      steps.size === sans.size + 1
+      steps.size === sans.size
     }
   }

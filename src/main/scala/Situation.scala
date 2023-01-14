@@ -119,9 +119,7 @@ case class Situation(board: Board, color: Color):
     val targets = ~us
     val moves   = genNonKing(targets) ++ genKings(targets) ++ genEnPassant(us & board.pawns)
 
-    // apply special effect
-    if board.variant.hasMoveEffects then moves.map(board.variant.addVariantEffect)
-    else moves
+    board.variant.applyVariantEffect(moves)
 
   // Test generateMovesAt(pos) = generateMoves.filter(_.orig == pos)
   def generateMovesAt(pos: Pos): List[Move] =
@@ -139,8 +137,7 @@ case class Situation(board: Board, color: Color):
           case King   => genKings(targets)
     }
 
-    if board.variant.hasMoveEffects then moves.map(board.variant.addVariantEffect)
-    else moves
+    board.variant.applyVariantEffect(moves)
 
   private def genKings(mask: Bitboard) =
     val withoutCastles = ourKing.fold(Nil)(genUnsafeKing(_, mask))

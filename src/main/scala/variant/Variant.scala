@@ -132,6 +132,9 @@ abstract class Variant private[variant] (
     */
   def addVariantEffect(move: Move): Move = move
 
+  def applyVariantEffect(moves: List[Move]): List[Move] =
+    if (hasMoveEffects) moves.map(addVariantEffect) else moves
+
   def fiftyMoves(history: History): Boolean = history.halfMoveClock >= 100
 
   def isIrreversible(move: Move): Boolean =

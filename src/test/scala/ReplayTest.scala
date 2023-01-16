@@ -1,7 +1,9 @@
 package chess
 
+import cats.syntax.option.*
 import format.{ EpdFen, Fen, Uci }
 import chess.format.pgn.SanStr
+import chess.variant.Chess960
 
 class ReplayTest extends ChessTest:
 
@@ -41,4 +43,15 @@ class ReplayTest extends ChessTest:
         variant = chess.variant.RacingKings
       ) must beValid
     }
+
+    "chess960 castlings" in {
+      val sans: Vector[SanStr] =
+        SanStr from "e4 e5 Ne3 f6 Nb3 Nb6 O-O-O Ne6 Ba6 O-O-O Nd5 Nxd5 Bxb7+ Kb8"
+          .split(' ')
+          .toVector
+      val (game, steps, error) = chess.Replay.gameMoveWhileValid(sans, Fen.Epd("nrknbbqr/pppppppp/8/8/8/8/PPPPPPPP/NRKNBBQR w KQkq - 0 1"), Chess960)
+      error must beNone
+      steps.size === sans.size
+    }
+
   }

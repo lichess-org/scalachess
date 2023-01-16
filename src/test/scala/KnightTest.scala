@@ -2,6 +2,8 @@ package chess
 
 import scala.language.implicitConversions
 import Pos.*
+import bitboard.Bitboard
+import bitboard.Bitboard.*
 
 class KnightTest extends ChessTest:
 
@@ -79,6 +81,7 @@ n
 PPP  PPP
  NBQKBNR
 """
+      val knightAttacks = C4.knightAttacks
       "a reachable enemy" in {
         board actorAt C4 map (_ threatens A5) must beSome(true)
       }

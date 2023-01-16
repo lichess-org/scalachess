@@ -61,7 +61,10 @@ case class Board(
     variant.kingThreatened(this, c)
 
   // TODO delete, this only used in test
-  def destsFrom(from: Pos): Option[List[Pos]] = actorAt(from).map(_.destinations)
+  def destsFrom(from: Pos): Option[List[Pos]] =
+    apply(from).map { piece =>
+      Situation(this, piece.color).legalMoves.filter(_.orig == from).map(_.dest)
+    }
 
   def seq(actions: Board => Option[Board]*): Option[Board] =
     actions.foldLeft(Option(this): Option[Board])(_ flatMap _)

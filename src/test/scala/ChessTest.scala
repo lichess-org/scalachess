@@ -11,6 +11,8 @@ import chess.format.{ EpdFen, Fen, Visual }
 import chess.format.pgn.PgnStr
 import chess.variant.Variant
 import bitboard.Board as BBoard
+import bitboard.Bitboard
+import bitboard.Bitboard.bitboard
 import cats.kernel.Monoid
 import chess.format.Uci
 import chess.variant.Chess960
@@ -36,6 +38,9 @@ trait ChessTest extends Specification with ValidatedMatchers:
     def threeCheck: Board           = makeBoard(str, chess.variant.ThreeCheck)
     def as(color: Color): Situation = Situation(Visual << str, color)
 
+  extension (ps: List[Pos])
+    def bb: Bitboard = ps.foldLeft(Bitboard.empty)((bb, pos) => bb | pos.bitboard)
+
   extension (actor: Actor)
     def threatens(to: Pos): Boolean =
       actor.piece.eyes(actor.pos, to) && {
@@ -59,7 +64,7 @@ trait ChessTest extends Specification with ValidatedMatchers:
         // }
         // because possible moves are asked for player highlight
         // before the move is played (on initial situation)
-        val _ = vg map { _.situation.destinations }
+        // val _ = vg map { _.situation.destinations }
         val ng = vg flatMap { g =>
           g(move._1, move._2) map (_._1)
         }
@@ -131,8 +136,8 @@ trait ChessTest extends Specification with ValidatedMatchers:
   def sortPoss(poss: Seq[Pos]): Seq[Pos] = poss.sortBy(_.key)
 
   def pieceMoves(piece: Piece, pos: Pos): Option[List[Pos]] =
-    (makeEmptyBoard place (piece, pos)) flatMap { b =>
-      b actorAt pos map (_.destinations)
+    (makeEmptyBoard place (piece, pos)) map { b =>
+      Situation(b, piece.color).movesAt(pos).map(_.dest)
     }
 
   def defaultHistory(

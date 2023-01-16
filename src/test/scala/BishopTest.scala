@@ -2,6 +2,8 @@ package chess
 
 import scala.language.implicitConversions
 import Pos.*
+import bitboard.Bitboard.*
+import chess.bitboard.Bitboard
 
 class BishopTest extends ChessTest:
 
@@ -79,20 +81,13 @@ N B    P
 PPPPPPPP
  NBQKBNR
 """
+      val bitshopAttacks = C4.bishopAttacks(board.black)
       "a reachable enemy" in {
-        board actorAt C4 map (_ threatens A6) must beSome(true)
+        val targets: Bitboard = List(A6, A2, B5, D3).bb
+        bitshopAttacks & targets must_== targets
       }
       "an unreachable enemy" in {
-        board actorAt C4 map (_ threatens C7) must beSome(false)
-      }
-      "a reachable friend" in {
-        board actorAt C4 map (_ threatens A2) must beSome(true)
-      }
-      "nothing up left" in {
-        board actorAt C4 map (_ threatens B5) must beSome(true)
-      }
-      "nothing down right" in {
-        board actorAt C4 map (_ threatens D3) must beSome(true)
+        bitshopAttacks & C7.bitboard must_== 0
       }
     }
   }

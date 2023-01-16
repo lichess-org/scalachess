@@ -20,6 +20,8 @@ case class Situation(board: Board, color: Color):
   lazy val moves: Map[Pos, List[Move]] =
     legalMoves.groupBy(_.orig)
 
+  val movesAt: Pos => List[Move] = moves.get(_).getOrElse(Nil)
+
   lazy val playerCanCapture: Boolean = legalMoves.exists(_.captures)
 
   lazy val destinations: Map[Pos, List[Pos]] = moves.view.mapValues { _.map(_.dest) }.to(Map)

@@ -128,7 +128,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       )
 
       game must beValid.like { case newGame =>
-        newGame.board.kingPosOf(Color.black) must beNone
+        newGame.board.kingPosOf(Color.black) === Nil
       }
     }
 
@@ -155,6 +155,13 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         (_: Game).board(Pos.F8).mustEqual(Option(White - King))
       }
 
+    }
+
+    "deal with 2 white kings" in {
+      val position     = EpdFen("K3k1nr/p2q2pp/p2p1p2/8/2PP4/8/PP4PP/RNBQK1NR w - - 0 11")
+      val originalGame = fenToGame(position, Antichess).toOption.get
+
+      originalGame.situation.destinations.pp === Map(Pos.A8 -> List(Pos.A7))
     }
 
     "Be drawn when there are only opposite colour bishops remaining" in {

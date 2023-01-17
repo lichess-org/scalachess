@@ -121,7 +121,7 @@ case class Situation(board: Board, color: Color):
 
     board.variant.applyVariantEffect(moves)
 
-  // Test generateMovesAt(pos) = generateMoves.filter(_.orig == pos)
+  // TODO test generateMovesAt(pos) = generateMoves.filter(_.orig == pos)
   def generateMovesAt(pos: Pos): List[Move] =
     val moves = board.apply(pos).fold(Nil) { piece =>
       if piece.color != color then Nil
@@ -134,17 +134,18 @@ case class Situation(board: Board, color: Color):
           case Bishop => genBishop(us & bb, targets)
           case Rook   => genRook(us & bb, targets)
           case Queen  => genQueen(us & bb, targets)
-          case King   => genKings(targets)
+          case King   => genKings(targets, Some(pos))
     }
 
     board.variant.applyVariantEffect(moves)
 
-  private def genKings(mask: Bitboard) =
-    val withoutCastles = ourKings.flatMap(genUnsafeKing(_, mask))
+  private def genKings(mask: Bitboard, pos: Option[Pos] = None) =
+    val kingPos        = pos.fold(ourKings)(List(_))
+    val withoutCastles = kingPos.flatMap(genUnsafeKing(_, mask))
     if board.variant.allowsCastling then withoutCastles ::: genCastling()
     else withoutCastles
 
-  // TODO we depend on the correctness of epSQuare here
+  // TODO we depend on the correctness of epSquare here
   private def genEnPassant(pawns: Bitboard): List[Move] =
     board.history.epSquare.fold(Nil)(ep =>
       val pawnsCanEnPassant = pawns & ep.pawnAttacks(!color)

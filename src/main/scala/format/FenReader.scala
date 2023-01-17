@@ -62,8 +62,7 @@ trait FenReader:
           lastMove = enpassantMove,
           positionHashes = Monoid[PositionHash].empty,
           castles = castles,
-          unmovedRooks = unmovedRooks,
-          epSquare = enpassantPos
+          unmovedRooks = unmovedRooks
         )
         val checkCount = variant.threeCheck.?? {
           val splitted = fen.value split ' '

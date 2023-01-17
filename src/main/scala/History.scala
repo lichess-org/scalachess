@@ -25,10 +25,8 @@ case class History(
     castles: Castles = Castles.all,
     checkCount: CheckCount = CheckCount(0, 0),
     unmovedRooks: UnmovedRooks,
-    halfMoveClock: HalfMoveClock = HalfMoveClock(0),
+    halfMoveClock: HalfMoveClock = HalfMoveClock(0)
     // fullMoves: FullMoveNumber = FullMoveNumber(0), // do we need it nows? => no
-    // possible en-passant square
-    epSquare: Option[Pos] = None
 ):
 
   def setHalfMoveClock(v: HalfMoveClock) = copy(halfMoveClock = v)

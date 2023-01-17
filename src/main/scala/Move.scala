@@ -58,16 +58,7 @@ case class Move(
           else if piece is King then unmovedRooks & Bitboard.rank(piece.color.lastRank)
           else unmovedRooks
 
-        val epSquare: Option[Pos] =
-          if piece is Pawn then
-            // todo pawns need to be in the second rank
-            if Math.abs((orig - dest).value) == 16 && orig.rank != piece.color.backRank then
-              // TODO calculate their pawns attacks
-              Some(Pos(orig.value + (if isWhiteTurn then 8 else -8)))
-            else None
-          else None
-
-        h2.withCastles(castleRights).copy(epSquare = epSquare, unmovedRooks = unmovedRooks)
+        h2.withCastles(castleRights).copy(unmovedRooks = unmovedRooks)
       },
       toUci,
       capture flatMap { before(_) }

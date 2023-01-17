@@ -9,6 +9,7 @@ import bitboard.Bitboard.*
 
 import chess.format.Uci
 import chess.variant.Chess960
+import Pos.prevRank
 
 case class Situation(board: Board, color: Color):
 
@@ -151,13 +152,17 @@ case class Situation(board: Board, color: Color):
       pawnsCanEnPassant.flatMap(enpassant(_, ep))
     )
 
+  /** Get the potential en passant square, if any.
+    * In order to be a potential en passant square,
+    * the last move must have been a double pawn push
+    * and not start from the back rank
+    */
   private def potentialEpSquare: Option[Pos] = history.lastMove.flatMap {
     case Uci.Move(orig, dest, _) =>
       board(dest).flatMap { piece =>
-        if piece.color != color && piece.role == Pawn && Math.abs(
-            (orig - dest).value
-          ) == 16 && orig.rank != piece.color.backRank
-        then Some(Pos(orig.value + (if isWhiteTurn then -8 else 8)))
+        if piece.color == !color && piece.role == Pawn &&
+          orig.yDist(dest) == 2 && orig.rank != piece.color.backRank
+        then dest.prevRank(!color)
         else None
       }
     case _ => None

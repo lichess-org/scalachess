@@ -14,6 +14,8 @@ object Pos extends OpaqueInt[Pos]:
     inline def upLeft: Option[Pos]    = Pos.at(file.value - 1, rank.value + 1)
     inline def upRight: Option[Pos]   = Pos.at(file.value + 1, rank.value + 1)
 
+    inline def prevRank(color: Color) = color.fold(p.down, p.up)
+
     def >|(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.right)
     def |<(stop: Pos => Boolean): List[Pos] = |<>|(stop, _.left)
     def |<>|(stop: Pos => Boolean, dir: Direction): List[Pos] =

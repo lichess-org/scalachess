@@ -71,12 +71,12 @@ class OpeningTest extends Specification:
       OpeningDb findByEpdFen EpdFen(
         "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR/ b KQkq - 0 1"
       ) must beSome {
-        (_: Opening).name == OpeningName("King's Pawn")
+        (_: Opening).name == OpeningName("King's Pawn Game")
       }
       OpeningDb findByEpdFen EpdFen(
         "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR[] b KQkq - 0 1"
       ) must beSome {
-        (_: Opening).name == OpeningName("King's Pawn")
+        (_: Opening).name == OpeningName("King's Pawn Game")
       }
     }
     "ignore crazyhouse pocket" in {

@@ -129,24 +129,18 @@ trait ChessTest extends Specification with ValidatedMatchers:
 
   def defaultHistory(
       lastMove: Option[Uci] = None,
-      // turn: Color,
       positionHashes: PositionHash = Monoid[PositionHash].empty,
       castles: Castles = Castles.all,
       checkCount: CheckCount = CheckCount(0, 0),
       unmovedRooks: UnmovedRooks = UnmovedRooks.corners,
       halfMoveClock: HalfMoveClock = HalfMoveClock(0),
-      // fullMoves: FullMoveNumber = FullMoveNumber(0), // do we need it nows? => no
-      // possible en-passant square
       epSquare: Option[Pos] = None
   ) = History(
     lastMove = lastMove,
-    // turn = turn,
     positionHashes = positionHashes,
     castles = castles,
     checkCount = checkCount,
     unmovedRooks = unmovedRooks,
     halfMoveClock = halfMoveClock,
-    // fullMoves = fullMoves,
-    // possible en-passant square
     epSquare = epSquare
   )

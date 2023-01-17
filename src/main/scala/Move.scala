@@ -58,7 +58,6 @@ case class Move(
           else if piece is King then unmovedRooks & Bitboard.rank(piece.color.lastRank)
           else unmovedRooks
 
-        // var castles = h1.castles
         val epSquare: Option[Pos] =
           if piece is Pawn then
             // todo pawns need to be in the second rank

@@ -17,7 +17,7 @@ Opening("B00", "Goldsmith Defense: Picklepuss Defense", "rnbqkb1r/ppppppp1/5n2/7
 Opening("B00", "Guatemala Defense", "rn1qkbnr/p1pppppp/bp6/8/3PP3/8/PPP2PPP/RNBQKBNR w KQkq -", "e2e4 b7b6 d2d4 c8a6", "1. e4 b6 2. d4 Ba6"),
 Opening("B00", "Hippopotamus Defense", "rnbqkb1r/pppppppp/7n/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -", "e2e4 g8h6", "1. e4 Nh6"),
 Opening("B00", "Hippopotamus Defense", "rnbqkb1r/ppppp2p/5ppn/8/2PPP3/8/PP3PPP/RNBQKBNR w KQkq -", "e2e4 g8h6 d2d4 g7g6 c2c4 f7f6", "1. e4 Nh6 2. d4 g6 3. c4 f6"),
-Opening("B00", "King's Pawn", "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq -", "e2e4", "1. e4"),
+Opening("B00", "King's Pawn Game", "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq -", "e2e4", "1. e4"),
 Opening("B00", "Lemming Defense", "r1bqkbnr/pppppppp/n7/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -", "e2e4 b8a6", "1. e4 Na6"),
 Opening("B00", "Lion Defense: Lion's Jaw", "rnbqkb1r/ppp1pppp/3p1n2/8/3PP3/5P2/PPP3PP/RNBQKBNR b KQkq -", "e2e4 d7d6 d2d4 g8f6 f2f3", "1. e4 d6 2. d4 Nf6 3. f3"),
 Opening("B00", "Nimzowitsch Defense", "r1bqkbnr/pppppppp/2n5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -", "e2e4 b8c6", "1. e4 Nc6"),

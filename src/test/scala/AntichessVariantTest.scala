@@ -344,7 +344,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
     "two kings on replay" in {
 
-      val pgn = """
+      val pgn  = """
 [Event "Rated Antichess game"]
 [Site "https://lichess.org/60a0EiZh"]
 [Date "2023.01.16"]

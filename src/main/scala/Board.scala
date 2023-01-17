@@ -49,7 +49,7 @@ case class Board(
 
   def piecesOf(c: Color): Map[Pos, Piece] = board.piecesOf(c)
 
-  def kingPosOf(c: Color): Option[Pos] = board.king(c)
+  def kingPosOf(c: Color): List[Pos] = board.kings(c)
 
   def checkColor: Option[Color] = checkWhite.option(White) orElse checkBlack.option(Black)
 

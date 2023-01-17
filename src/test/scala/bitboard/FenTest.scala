@@ -16,7 +16,7 @@ class FenTests extends FunSuite:
     FenFixtures.fens.foreach { str =>
       val fen      = Fen.parse(str).getOrElse(throw RuntimeException("boooo"))
       val result   = fen.checkers.get
-      val king     = fen.ourKing.get
+      val king     = fen.ourKings.head
       val expected = fen.cBoard.attacksTo(king, !fen.isWhiteTurn)
       assertEquals(result, expected.bb)
     }

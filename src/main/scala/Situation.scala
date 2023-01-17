@@ -30,7 +30,7 @@ case class Situation(board: Board, color: Color):
 
   lazy val check: Boolean = board checkOf color
 
-  def checkSquare = if (check) ourKing else None
+  def checkSquare = if (check) ourKings.headOption else None
 
   def piecesOf(c: Color): Map[Pos, Piece] = board.piecesOf(c)
 
@@ -105,11 +105,11 @@ case class Situation(board: Board, color: Color):
 
   // ========================bitboard===========================
 
-  lazy val ourKing: Option[Pos]       = board.board.king(color)
-  lazy val theirKing: Option[Pos]     = board.board.king(!color)
+  lazy val ourKings: List[Pos]        = board.board.kings(color)
+  lazy val theirKings: List[Pos]      = board.board.kings(!color)
   lazy val us: Bitboard               = board.board.byColor(color)
   lazy val them: Bitboard             = board.board.byColor(!color)
-  lazy val checkers: Option[Bitboard] = ourKing.map(board.board.attacksTo(_, !color))
+  lazy val checkers: Option[Bitboard] = ourKings.headOption.map(board.board.attacksTo(_, !color))
   lazy val sliderBlockers: Bitboard   = board.board.sliderBlockers(color)
   lazy val isWhiteTurn: Boolean       = color.white
   lazy val isOccupied: Pos => Boolean = board.board.isOccupied
@@ -140,7 +140,7 @@ case class Situation(board: Board, color: Color):
     board.variant.applyVariantEffect(moves)
 
   private def genKings(mask: Bitboard) =
-    val withoutCastles = ourKing.fold(Nil)(genUnsafeKing(_, mask))
+    val withoutCastles = ourKings.flatMap(genUnsafeKing(_, mask))
     if board.variant.allowsCastling then withoutCastles ::: genCastling()
     else withoutCastles
 
@@ -239,7 +239,7 @@ case class Situation(board: Board, color: Color):
     yield move
 
   private def genEvasions(checkers: Bitboard): List[Move] =
-    ourKing.fold(Nil)(king =>
+    ourKings.headOption.fold(Nil)(king =>
       // Checks by these sliding pieces can maybe be blocked.
       val sliders = checkers & (board.sliders)
       val attacked =
@@ -258,7 +258,7 @@ case class Situation(board: Board, color: Color):
 
   // this can still generate unsafe king moves
   private def genSafeKing(mask: Bitboard): List[Move] =
-    ourKing.fold(Nil)(king =>
+    ourKings.headOption.fold(Nil)(king =>
       val targets = king.kingAttacks & mask
       for
         to <- targets.occupiedSquares
@@ -270,7 +270,7 @@ case class Situation(board: Board, color: Color):
   // check king position
   private def genCastling(): List[Move] =
     import Castles.*
-    ourKing.fold(Nil) { king =>
+    ourKings.headOption.fold(Nil) { king =>
       def checkSafeSquare(pos: Pos, rookTo: Pos): Boolean =
         if board.variant.atomic then
           !board.board.atomicKingAttack(

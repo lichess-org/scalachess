@@ -11,8 +11,8 @@ import chess.variant.Crazyhouse
 case class Fen(board: Board, state: State):
   def us: Bitboard               = board.byColor(state.turn)
   def them: Bitboard             = board.byColor(!state.turn)
-  def ourKing: Option[Pos]       = board.king(state.turn)
-  def checkers: Option[Bitboard] = ourKing.map(board.attacksTo(_, !state.turn))
+  def ourKings: List[Pos]        = board.kings(state.turn)
+  def checkers: Option[Bitboard] = ourKings.headOption.map(board.attacksTo(_, !state.turn))
   def sliderBlockers: Bitboard   = board.sliderBlockers(state.turn)
   def isWhiteTurn: Boolean       = state.turn.white
   def occupied: Bitboard         = board.occupied

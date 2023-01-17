@@ -51,8 +51,8 @@ case class Board(
   def blackAt(s: Pos): Boolean =
     colorAt(s).contains(Color.Black)
 
-  def king(color: Color): Option[Pos] =
-    (kings & byColor(color)).first
+  def kings(color: Color): List[Pos] =
+    (kings & byColor(color)).occupiedSquares
 
   def attacksTo(s: Pos, attacker: Color): Bitboard =
     attacksTo(s, attacker, occupied)
@@ -80,7 +80,7 @@ case class Board(
 
   def atomicCheck(color: Color): Boolean =
     val their = byColor(!color)
-    king(color).exists(k =>
+    kings(color).exists(k =>
       (their & k.kingAttacks & kings).isEmpty && attacksToWithoutKing(k, !color, occupied).nonEmpty
     )
 
@@ -91,7 +91,7 @@ case class Board(
   // return true if the king with color is in check
   // return false in case of no king
   def isCheck(color: Color): Boolean =
-    king(color).exists(k => attacksTo(k, !color).nonEmpty)
+    kings(color).exists(k => attacksTo(k, !color).nonEmpty)
 
   /** Find all blockers between the king and attacking sliders First we find all snipers (all potential sliders which
     * can attack the king) Then we loop over those snipers if there is only one blockers between the king and the sniper
@@ -100,7 +100,7 @@ case class Board(
     * This is being used when checking a move is safe for the king or not
     */
   def sliderBlockers(us: Color): Bitboard =
-    king(us).fold(Bitboard.empty) { ourKing =>
+    kings(us).headOption.fold(Bitboard.empty) { ourKing =>
       val snipers = byColor(!us) & (
         ourKing.rookAttacks(Bitboard.empty) & (rooks ^ queens) |
           ourKing.bishopAttacks(Bitboard.empty) & (bishops ^ queens)

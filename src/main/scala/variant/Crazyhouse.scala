@@ -85,7 +85,7 @@ case object Crazyhouse
 
   def possibleDrops(situation: Situation): Option[List[Pos]] =
     if (!situation.check) None
-    else situation.ourKing.map(blockades(situation, _))
+    else situation.ourKings.headOption.map(blockades(situation, _))
 
   private def blockades(situation: Situation, kingPos: Pos): List[Pos] =
     def attacker(piece: Piece) = piece.role.projection && piece.color != situation.color

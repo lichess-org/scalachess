@@ -19,7 +19,7 @@ class BoardTest extends FunSuite:
     FenFixtures.fens.foreach { str =>
       val fen      = Fen.parse(str).getOrElse(throw RuntimeException("boooo"))
       val result   = fen.board.sliderBlockers(fen.state.turn)
-      val king     = fen.ourKing.get
+      val king     = fen.ourKings.head
       val expected = fen.cBoard.sliderBlockers(king)
       assertEquals(result, expected.bb)
     }
@@ -29,7 +29,7 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       fen  = Fen.parse(str).getOrElse(throw RuntimeException("boooo"))
-      king = fen.ourKing.get
+      king = fen.ourKings.head
       i <- 0 to 63
       sq = Pos.at(i).get
       color <- List(Color.White, Color.Black)

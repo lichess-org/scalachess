@@ -145,12 +145,21 @@ case class Situation(board: Board, color: Color):
     if board.variant.allowsCastling then withoutCastles ::: genCastling()
     else withoutCastles
 
-  // TODO we depend on the correctness of epSquare here
   private def genEnPassant(pawns: Bitboard): List[Move] =
-    board.history.epSquare.fold(Nil)(ep =>
-      val pawnsCanEnPassant = pawns & ep.pawnAttacks(!color)
-      pawnsCanEnPassant.flatMap(enpassant(_, ep))
-    )
+    history.lastMove.fold(Nil) {
+      case Uci.Move(orig, dest, _) =>
+        board(dest).fold(Nil) { piece =>
+          if piece.color != color && piece.role == Pawn && Math.abs(
+              (orig - dest).value
+            ) == 16 && orig.rank != piece.color.backRank
+          then
+            val ep                = Pos(orig.value + (if isWhiteTurn then -8 else 8))
+            val pawnsCanEnPassant = pawns & ep.pawnAttacks(!color)
+            pawnsCanEnPassant.flatMap(enpassant(_, ep))
+          else Nil
+        }
+      case _ => Nil
+    }
 
   private def genNonKing(mask: Bitboard): List[Move] =
     genPawn(us & board.pawns, mask) ++ genKnight(us & board.knights, mask) ++

@@ -12,6 +12,10 @@ class FenTest extends ChessTest:
       val sit = Reader.full("d4 e5 d5 c5").flatMap(_.valid).toOption.get
       Fen.write(sit.state) === EpdFen("rnbqkbnr/pp1p1ppp/8/2pPp3/8/8/PPP1PPPP/RNBQKBNR w KQkq c6 0 3")
     }
+    "enpassant 2" in {
+      val sit = Reader.full("e4 c5 e5 f5").flatMap(_.valid).toOption.get
+      Fen.write(sit.state) === EpdFen("rnbqkbnr/pp1pp1pp/8/2p1Pp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3")
+    }
     "enpassant in game" in {
       val pgn =
         """1. e4 e5 2. Nf3 Bc5?? { (0.29 → 2.18) Blunder. Nc6 was best. } { C40 King's Pawn Game: Busch-Gass Gambit } (2... Nc6 3. Bb5 Nf6 4. O-O Nxe4 5. Re1 Nd6 6. Nxe5 Nxe5 7. Rxe5+) 3. c3? { (2.18 → 0.76) Mistake. Nxe5 was best. } (3. Nxe5 Nc6 4. Nxc6 dxc6 5. Qe2 Be6 6. d3 Qe7 7. Nc3 Bd4) 3... Bxf2+?? { (0.76 → 3.66) Blunder. d5 was best. } (3... d5 4. exd5 Qxd5 5. d4 exd4 6. cxd4 Bb4+ 7. Nc3 Nf6 8. Bd3) 4. Kxf2 Nf6 5. Bd3 Ng4+? { (2.87 → 5.46) Mistake. d5 was best. } (5... d5) 6. Kf1?! { (5.46 → 3.90) Inaccuracy. Kg1 was best. } (6. Kg1 O-O 7. Bc2 f5 8. exf5 d5 9. h3 Nh6 10. Nxe5 Nc6) 6... d6?! { (3.90 → 5.46) Inaccuracy. f5 was best. } (6... f5 7. exf5) 7. Qe2?! { (5.46 → 3.59) Inaccuracy. h3 was best. } (7. h3 Nf6 8. Bc2 O-O 9. Qe1 Nh5 10. g4 Nf4 11. d3 Ng6 12. Rh2 c5 13. Kg1 d5) 7... O-O 8. Bc2 f5 9. exf5 Rxf5? { (3.47 → 5.80) Mistake. d5 was best. } (9... d5 10. d3 Bxf5 11. Kg1 Nc6 12. h3 Nf6 13. Nh4 Be6 14. Bg5 Qd6 15. Nd2 h6 16. Bxf6) 10. Bxf5 Bxf5 11. Kg1 e4 12. Nd4 Qd7 13. Nxf5 Qxf5 14. b3?? { (6.28 → -0.68) Blunder. d4 was best. } (14. d4 Nc6 15. h3 Nf6 16. Kh2 Qg6 17. Rf1 Re8 18. Be3 d5 19. Nd2 Ne7 20. Kg1 Nf5) 14... Nc6 15. Bb2?? { (0.00 → -4.72) Blunder. b4 was best. } (15. b4 Rf8 16. h3 Nf2 17. Bb2 Qg6 18. c4 Rf3 19. b5 Nd3 20. Rh2 Qg5 21. Na3 Qc5+) 15... Rf8 16. Na3?? { (-4.78 → Mate in 6) Checkmate is now unavoidable. Ba3 was best. } (16. Ba3 Nf2) 16... Qc5+ 17. d4"""
@@ -30,6 +34,12 @@ class FenTest extends ChessTest:
     "enpassant" in {
       Fen
         .read(Fen.Epd("1brr2k1/1pq3p1/p6p/P1p1Pp2/2P5/3PRB2/2Q2PPP/R5K1 w - f6 0 28"))
+        .get
+        .enPassantSquare === Some(Pos.F6)
+    }
+    "enpassant 2" in {
+      Fen
+        .read(Fen.Epd("rnbqkbnr/pp1pp1pp/8/2p1Pp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3"))
         .get
         .enPassantSquare === Some(Pos.F6)
     }

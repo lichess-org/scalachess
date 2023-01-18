@@ -387,10 +387,12 @@ case class Situation(board: Board, color: Color):
   // Here is the rules:
   // if the variant is Standard => 2 moves
   // if the variant is Chess960 => 1 move
-  // if the variatn is not either of those two then
+  // if the variant is not either of those two then
   //     if King and Rook are in standard position  => 2 moves
   //     else => 1 move
   // check logic in isChess960 function
+  // make sure that the 960 move is first since it will be the representative
+  // move and we want 960 uci notation
   private def castle(king: Pos, kingTo: Pos, rook: Pos, rookTo: Pos): List[Move] =
     val after = for
       b1    <- board.take(king)
@@ -404,7 +406,7 @@ case class Situation(board: Board, color: Color):
       else if board.variant.chess960 then true
       else king.file != File.E || !(rook.file == File.A || rook.file == File.H)
 
-    val destInput = if (!isChess960) then List(kingTo, rook) else List(rook)
+    val destInput = if (!isChess960) then List(rook, kingTo) else List(rook)
 
     for
       a            <- after.toList

@@ -58,3 +58,19 @@ class ReplayTest extends ChessTest:
     error must beNone
     steps.size === sans.size
   }
+
+  "castling always 960 notation" in {
+    val sans: Vector[SanStr] =
+      SanStr from "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3 e5 d5 Nh5 Qd2 Qh4+ g3 Qe7 O-O-O"
+        .split(' ')
+        .toVector
+    val (game, steps, error) = chess.Replay.gameMoveWhileValid(
+      sans,
+      Fen.Epd.initial,
+      variant.Standard
+    )
+    error must beNone
+    steps.size must_== sans.size
+    steps(9)._2.uci.uci must_== "e8h8"
+    steps(18)._2.uci.uci must_== "e1a1"
+  }

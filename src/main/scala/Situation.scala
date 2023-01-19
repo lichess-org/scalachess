@@ -85,22 +85,7 @@ case class Situation(board: Board, color: Color):
   export board.history.canCastle
 
   def enPassantSquare: Option[Pos] =
-    // Before potentially expensive move generation, first ensure some basic
-    // conditions are met.
-    // todo we can do better with bitboard
-    history.lastMove match
-      case Some(move: Uci.Move) =>
-        if (
-          move.dest.yDist(move.orig) == 2 &&
-          board(move.dest).exists(_.is(Pawn)) &&
-          List(
-            move.dest.file.offset(-1),
-            move.dest.file.offset(1)
-          ).flatten.flatMap(board(_, color.passablePawnRank)).exists(_ == color.pawn)
-        )
-          legalMoves.find(_.enpassant).map(_.dest)
-        else None
-      case _ => None
+    potentialEpSquare.flatMap(_ => legalMoves.find(_.enpassant).map(_.dest))
 
   def unary_! = copy(color = !color)
 

@@ -249,7 +249,9 @@ object Parser:
     }
 
   private val pgnParser: P0[ParsedPgn] =
-    P.string("\uFEFF").? *> escape *> P.string("[pgn]").? *> tagsAndMovesParser <* P.string("[/pgn]").? <* escape
+    P.string("\uFEFF").? *> escape *> P.string("[pgn]").? *> tagsAndMovesParser <* P
+      .string("[/pgn]")
+      .? <* escape
 
   private def showExpectations(context: String, str: String, error: P.Error): String =
     val lm  = LocationMap(str)

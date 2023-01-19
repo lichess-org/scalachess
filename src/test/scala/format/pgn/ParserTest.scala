@@ -7,23 +7,21 @@ class ParserTest extends ChessTest:
 
   import Fixtures.*
 
-  val parser    = Parser.full
+  val parser = Parser.full
 
   def parseMove(s: String) = Parser.move(SanStr(s))
 
   "bom header" should {
     "be ignored" in {
       "with tags" in {
-        parser("\uFEFF[Event \"Some event\"]\n1. e4 e5") must beValid.like {
-          case parsed =>
-            parsed.tags(_.Event) must_== Some("Some event")
-            parsed.sans.value.size must_== 2
+        parser("\uFEFF[Event \"Some event\"]\n1. e4 e5") must beValid.like { case parsed =>
+          parsed.tags(_.Event) must_== Some("Some event")
+          parsed.sans.value.size must_== 2
         }
       }
       "without tags" in {
-        parser("\uFEFF1. e4 e5 3. Nf3") must beValid.like {
-          case parsed =>
-            parsed.sans.value.size must_== 3
+        parser("\uFEFF1. e4 e5 3. Nf3") must beValid.like { case parsed =>
+          parsed.sans.value.size must_== 3
         }
       }
     }

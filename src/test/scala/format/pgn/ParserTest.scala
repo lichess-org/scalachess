@@ -10,6 +10,24 @@ class ParserTest extends ChessTest:
   val parser    = Parser.full
   val parseMove = Parser.move
 
+  "bom header" should {
+    "be ignored" in {
+      "with tags" in {
+        parser("\uFEFF[Event \"Some event\"]\n1. e4 e5") must beValid.like {
+          case parsed =>
+            parsed.tags(_.Event) must_== Some("Some event")
+            parsed.sans.value.size must_== 2
+        }
+      }
+      "without tags" in {
+        parser("\uFEFF1. e4 e5 3. Nf3") must beValid.like {
+          case parsed =>
+            parsed.sans.value.size must_== 3
+        }
+      }
+    }
+  }
+
   "pgnComment" should {
     "parse valid comment" in {
       Parser.pgnComment.parse("% comment") must beRight

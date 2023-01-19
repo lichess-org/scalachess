@@ -50,6 +50,7 @@ object OpeningFen extends OpaqueString[OpeningFen]:
       case Array(board, turn, castle, ep) =>
         OpeningFen(s"${BoardFen(board).removePockets} $turn $castle $ep")
       case _ => fen into OpeningFen
+  val initial: OpeningFen = EpdFen.initial.opening
 
 // r3k2r/p3n1pp/2q2p2/4n1B1/5Q2/5P2/PP3P1P/R4RK1 b
 opaque type BoardAndColorFen = String

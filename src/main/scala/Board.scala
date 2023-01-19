@@ -45,9 +45,6 @@ case class Board(
   def rolesOf(c: Color): List[Role] =
     allPieces.collect { case p if p.color == c => p.role }
 
-  // todo fix
-  inline def actorAt(inline at: Pos): Option[Actor] = actors get at
-
   def piecesOf(c: Color): Map[Pos, Piece] = board.piecesOf(c)
 
   def kingPosOf(c: Color): Bitboard = board.kings & board.byColor(c)

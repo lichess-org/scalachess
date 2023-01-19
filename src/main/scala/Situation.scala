@@ -13,8 +13,6 @@ import Pos.prevRank
 
 case class Situation(board: Board, color: Color):
 
-  lazy val actors = board actorsOf color
-
   lazy val legalMoves = board.variant.validMoves(this)
 
   lazy val moves: Map[Pos, List[Move]] =

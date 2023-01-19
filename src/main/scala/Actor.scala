@@ -23,8 +23,6 @@ case class Actor(
   inline def is(inline r: Role)  = r == piece.role
   inline def is(inline p: Piece) = p == piece
 
-  def castleOn(side: Side): List[Move] = moves.filter(_.castle.exists(_.side == side))
-
 object Actor:
 
   inline def pawnDirOf(inline color: Color): Direction = color.fold(_.up, _.down)

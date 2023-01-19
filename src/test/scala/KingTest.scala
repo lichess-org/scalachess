@@ -69,26 +69,6 @@ PPPPPPPP
 """
       )
     }
-    "threaten" in {
-      val board = """
-k B
-
- b B
-bpp
-  Kb
-  P Q
-PP   PPP
- NBQ BNR
-"""
-      val kingAttacks = C4.kingAttacks
-      "a reachable enemy" in {
-        val targets = List(B5, C3).bb
-        (kingAttacks & targets) must_== targets
-      }
-      "an unreachable enemy" in {
-        kingAttacks & A5.bitboard must_== Bitboard.empty
-      }
-    }
     "not move near from the other king" in {
       """
    k

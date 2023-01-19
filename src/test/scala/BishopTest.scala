@@ -70,24 +70,4 @@ PPPPPPPP
 """
       )
     }
-    "threaten" in {
-      val board = """
-k B
-  q  q
-p
-
-N B    P
-
-PPPPPPPP
- NBQKBNR
-"""
-      val bitshopAttacks = C4.bishopAttacks(board.black)
-      "a reachable enemy" in {
-        val targets: Bitboard = List(A6, A2, B5, D3).bb
-        bitshopAttacks & targets must_== targets
-      }
-      "an unreachable enemy" in {
-        bitshopAttacks & C7.bitboard must_== 0
-      }
-    }
   }

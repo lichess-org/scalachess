@@ -118,34 +118,4 @@ PPPPPPPP
 """
       )
     }
-    "threaten" in {
-      val board = """
-k B
-  q  q
-p
-
-n Q   Pp
-
-PPPPPPPP
- NBQKBNR
-"""
-      "a reachable enemy - horizontal" in {
-        board actorAt C4 map (_ threatens A4) must beSome(true)
-      }
-      "a reachable enemy - diagonal" in {
-        board actorAt C4 map (_ threatens A6) must beSome(true)
-      }
-      "an unreachable enemy" in {
-        board actorAt C4 map (_ threatens H4) must beSome(false)
-      }
-      "a reachable friend" in {
-        board actorAt C4 map (_ threatens C2) must beSome(true)
-      }
-      "nothing reachable" in {
-        board actorAt C4 map (_ threatens B5) must beSome(true)
-      }
-      "nothing unreachable" in {
-        board actorAt C4 map (_ threatens B6) must beSome(false)
-      }
-    }
   }

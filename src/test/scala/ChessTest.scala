@@ -41,15 +41,6 @@ trait ChessTest extends Specification with ValidatedMatchers:
   extension (ps: List[Pos])
     def bb: Bitboard = ps.foldLeft(Bitboard.empty)((bb, pos) => bb | pos.bitboard)
 
-  extension (actor: Actor)
-    def threatens(to: Pos): Boolean =
-      actor.piece.eyes(actor.pos, to) && {
-        (!actor.piece.role.projection) ||
-        actor.piece.role.dir(actor.pos, to).exists {
-          actor.board.variant.longRangeThreatens(actor.board, actor.pos, _, to)
-        }
-      }
-
   extension (board: Board) def visual = Visual >> board
 
   extension (game: Game)

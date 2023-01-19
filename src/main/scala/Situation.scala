@@ -73,14 +73,10 @@ case class Situation(board: Board, color: Color):
     board.variant.drop(this, role, pos)
 
   def withHistory(history: History) =
-    copy(
-      board = board withHistory history
-    )
+    copy(board = board withHistory history)
 
   def withVariant(variant: chess.variant.Variant) =
-    copy(
-      board = board withVariant variant
-    )
+    copy(board = board withVariant variant)
 
   export board.history.canCastle
 
@@ -104,10 +100,10 @@ case class Situation(board: Board, color: Color):
   lazy val generateMoves: List[Move] =
     val targets = ~us
     val moves   = genNonKing(targets) ++ genKings(targets) ++ genEnPassant(us & board.pawns)
-
     board.variant.applyVariantEffect(moves)
 
   // TODO test generateMovesAt(pos) = generateMoves.filter(_.orig == pos)
+  // TODO test generateMoves == generateMovesAt(pos) for all pos
   def generateMovesAt(pos: Pos): List[Move] =
     val moves = board.apply(pos).fold(Nil) { piece =>
       if piece.color != color then Nil
@@ -122,7 +118,6 @@ case class Situation(board: Board, color: Color):
           case Queen  => genQueen(us & bb, targets)
           case King   => genKings(targets, Some(pos))
     }
-
     board.variant.applyVariantEffect(moves)
 
   private def genKings(mask: Bitboard, pos: Option[Pos] = None) =

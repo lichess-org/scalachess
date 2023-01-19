@@ -87,12 +87,12 @@ case class Board(
   inline def hasPiece(inline p: Piece) = board.hasPiece(p)
 
   def promote(pos: Pos): Option[Board] =
-    for {
+    for
       pawn <- apply(pos)
       if pawn is Pawn
       b2 <- take(pos)
       b3 <- b2.place(pawn.color.queen, pos)
-    } yield b3
+    yield b3
 
   def castles: Castles = history.castles
 

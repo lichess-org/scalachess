@@ -6,7 +6,7 @@ import variant.{ Standard, Variant }
 import cats.kernel.Monoid
 import ornicar.scalalib.zeros.given_Zero_Option
 import bitboard.Bitboard
-import bitboard.Bitboard.{bitboard, occupiedSquares}
+import bitboard.Bitboard.{ bitboard, occupiedSquares }
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *

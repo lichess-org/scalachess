@@ -131,7 +131,10 @@ class UnmovedRooksTest extends ChessTest:
         }
     }
     "black" in {
-      fenToGame(EpdFen("rkrnnqbb/p1pppppp/1p6/8/5P2/1P6/P1PPP1PP/RKRNNQBB b KQkq - 0 2"), Chess960) must beValid
+      fenToGame(
+        EpdFen("rkrnnqbb/p1pppppp/1p6/8/5P2/1P6/P1PPP1PP/RKRNNQBB b KQkq - 0 2"),
+        Chess960
+      ) must beValid
         .like { game =>
           game.playMoves(B8 -> B7) must beValid.like { case g =>
             g.board.history.unmovedRooks(A1) must_== true

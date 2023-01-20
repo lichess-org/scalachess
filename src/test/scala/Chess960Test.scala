@@ -48,33 +48,15 @@ class Chess960Test extends ChessTest:
 
     "Castles when a1 is being taken" in {
       val pgn = """
-[Event "Hourly Chess960 Arena"]
-[Site "https://lichess.org/guOuBSra"]
-[Date "2023.01.20"]
-[White "e4_d5_cxd5"]
-[Black "Cpt_Wrongel"]
-[Result "0-1"]
-[UTCDate "2023.01.20"]
-[UTCTime "06:13:12"]
-[WhiteElo "1951"]
-[BlackElo "1956"]
-[WhiteRatingDiff "-6"]
-[BlackRatingDiff "+8"]
 [Variant "Chess960"]
-[TimeControl "300+0"]
-[ECO "?"]
-[Opening "?"]
-[Termination "Normal"]
 [FEN "brnqknrb/pppppppp/8/8/8/8/PPPPPPPP/BRNQKNRB w KQkq - 0 1"]
-[SetUp "1"]
-[Annotator "lichess.org"]
 1. d4 g6 2. e4 b6 3. g3 f5 4. exf5 Bxh1 5. Rxh1 gxf5 6. Qh5+ Rg6 7. Qxf5 Nd6 8. Qd3 Ne6 9. Ne2 c5 10. b3 Qc7 11. d5 Bxa1 12. dxe6 Bf6 13. exd7+ Qxd7 14. Ne3 O-O-O
       """
 
-      val game = Reader.full(pgn)
-      game must beValid.like { case Reader.Result.Complete(replay) =>
-        val game = replay.state
-        game.situation.legalMoves.find(_.castles) must beSome
+      Reader.full(pgn) must beValid.like { case Reader.Result.Complete(replay) =>
+        replay.state.situation.legalMoves.find(_.castles).map(_.toUci) === Some(
+          format.Uci.Move(Pos.E1, Pos.B1)
+        )
       }
     }
 

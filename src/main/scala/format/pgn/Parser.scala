@@ -260,7 +260,7 @@ object Parser:
       throw new RuntimeException("This is impossible")
     }
     val line         = lm.getLine(caret.line).getOrElse("")
-    val errorLine    = line ++ "\n" ++ " ".repeat(caret.col) ++ "^"
+    val errorLine    = line ++ "\n" ++ " ".*(caret.col) ++ "^"
     val errorMessage = s"$context: [${caret.line + 1}.${caret.col + 1}]: ${expToString(error.expected.head)}"
     errorMessage ++ "\n\n" ++ errorLine ++ "\n" ++ str
 

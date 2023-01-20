@@ -57,8 +57,9 @@ case class Move(
                   castleRights = castleRights.without(!piece.color)
             case _ =>
 
-        // If the Rook is moved
-        // Remove that rook from castlingRight and unmovedRooks.
+        // If a Rook is moved
+        // Remove that rook from unmovedRooks.
+        // check the captured rook's side and remove it from castlingRights
         if piece is Rook then
           unmovedRooks.side(orig) match
             case Some(result) =>

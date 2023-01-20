@@ -14,9 +14,11 @@ case object Chess960
       standardInitialPosition = false
     ):
 
-  def pieces =
+  def pieces = pieces(scala.util.Random.nextInt(960))
+
+  def pieces(position: Int) =
     Variant.symmetricRank {
-      positions(scala.util.Random.nextInt(960)) flatMap Role.allByForsyth.get
+      positions(position) flatMap Role.allByForsyth.get
     }
 
   def positionNumber(fen: EpdFen): Option[Int] =

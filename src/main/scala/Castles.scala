@@ -124,7 +124,7 @@ object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
       val bitboard = pos.bitboard
       if (ur & bitboard).isEmpty then None
       else
-        (ur & ~bitboard).first match
+        (ur & ~bitboard & Bitboard.rank(pos.rank)).first match
           case Some(otherRook) =>
             if (otherRook.file > pos.file) then Some(Some(QueenSide))
             else Some(Some(KingSide))

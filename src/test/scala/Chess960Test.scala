@@ -33,19 +33,6 @@ class Chess960Test extends ChessTest:
       Chess960 positionNumber EpdFen("bbqnnrkr/pppppppp/8/8/8/8/PPPPPPPP/BBQNNRKR w AHah - 0 1") must beNone
     }
 
-    "UnmovedRooks with initial fen" in {
-      Fen
-        .read(Chess960, EpdFen("rkrnnqbb/pppppppp/8/8/8/8/PPPPPPPP/RKRNNQBB w KQkq - 0 1"))
-        .map(_.board.history.unmovedRooks) must beSome(360287970189639685L)
-    }
-
-    "UnmovedRooks with board init" in {
-      val pieces = Chess960.pieces
-      Board(pieces, Chess960.castles, Chess960).history.unmovedRooks must beEqualTo(
-        bitboard.Board.fromMap(pieces).rooks
-      )
-    }
-
     "Castles when a1 is being taken" in {
       val pgn = """
 [Variant "Chess960"]

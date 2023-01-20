@@ -11,6 +11,7 @@ import chess.variant.Variant
 import bitboard.Board as BBoard
 import cats.kernel.Monoid
 import chess.format.Uci
+import chess.variant.Chess960
 
 trait ChessTest extends Specification with ValidatedMatchers:
 
@@ -90,6 +91,10 @@ trait ChessTest extends Specification with ValidatedMatchers:
     Visual << str withVariant variant
 
   def makeBoard: Board = Board init chess.variant.Standard
+
+  def makeChess960Board(position: Int) = Board(Chess960.pieces(position), Chess960.castles, Chess960)
+  def makeChess960Game(position: Int) = Game(makeChess960Board(position))
+  def chess960Boards = (0 to 959).map(makeChess960Board).toList
 
   def makeEmptyBoard: Board = Board empty chess.variant.Standard
 

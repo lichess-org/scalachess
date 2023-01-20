@@ -39,7 +39,7 @@ case class Move(
             else h1.halfMoveClock + 1
         )
 
-        var castleRights: Castles      = h1.castles
+        var castleRights: Castles      = h2.castles
         var unmovedRooks: UnmovedRooks = h2.unmovedRooks
 
         // If the rook is captured
@@ -59,7 +59,6 @@ case class Move(
           val lastRank = Bitboard.rank(piece.color.lastRank)
           unmovedRooks = unmovedRooks & lastRank
           castleRights = castleRights & lastRank
-        else unmovedRooks
 
         h2.withCastles(castleRights).copy(unmovedRooks = unmovedRooks)
       },

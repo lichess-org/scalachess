@@ -27,6 +27,7 @@ object Perft:
   lazy val racingkingsPerfts = Perft.read("racingkings.perft")
   lazy val randomPerfts      = Perft.read("random.perft")
   lazy val trickyPerfts      = Perft.read("tricky.perft")
+  lazy val chess960          = Perft.read("chess960.perft")
 
   private def read(file: String): List[Perft] =
     val str = io.Source.fromResource(file).mkString

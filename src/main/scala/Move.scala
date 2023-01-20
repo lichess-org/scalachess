@@ -43,22 +43,39 @@ case class Move(
         var unmovedRooks: UnmovedRooks = h2.unmovedRooks
 
         // If the rook is captured
-        // update castling rights and unmoved rooks bitboard.
-        if captures && (h2.unmovedRooks & dest.bitboard).nonEmpty then
-          unmovedRooks = unmovedRooks & ~dest.bitboard
-          castleRights = castleRights & ~dest.bitboard
+        // remove the captured rook from unmovedRooks
+        // check the captured rook's side and remove it from castlingRights
+        if captures then
+          unmovedRooks.side(dest) match
+            case Some(result) =>
+              unmovedRooks = unmovedRooks & ~dest.bitboard
+              result match
+                case Some(side) =>
+                  castleRights = castleRights.without(!piece.color, side)
+                case None =>
+                  // There is only one unmovedrook left so just remove the color from castlingRights
+                  castleRights = castleRights.without(!piece.color)
+            case _ =>
 
         // If the Rook is moved
         // Remove that rook from castlingRight and unmovedRooks.
-        if (piece is Rook) && (orig.bitboard & h2.unmovedRooks).nonEmpty then
-          unmovedRooks = unmovedRooks & ~orig.bitboard
-          castleRights = castleRights & ~orig.bitboard
+        if piece is Rook then
+          unmovedRooks.side(orig) match
+            case Some(result) =>
+              unmovedRooks = unmovedRooks & ~orig.bitboard
+              result match
+                case Some(side) =>
+                  castleRights = castleRights.without(piece.color, side)
+                case None =>
+                  // There is only one unmovedrook left so just remove the color from castlingRights
+                  castleRights = castleRights.without(piece.color)
+            case _ =>
+
         // If the King is moved
         // remove castlingRights and unmovedRooks for the moving side
         else if piece is King then
-          val lastRank = Bitboard.rank(piece.color.lastRank)
-          unmovedRooks = unmovedRooks & lastRank
-          castleRights = castleRights & lastRank
+          unmovedRooks = unmovedRooks.without(piece.color)
+          castleRights = castleRights.without(piece.color)
 
         h2.withCastles(castleRights).copy(unmovedRooks = unmovedRooks)
       },

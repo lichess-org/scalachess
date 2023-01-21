@@ -12,6 +12,10 @@ object SanStr extends OpaqueString[SanStr]
 opaque type PgnMovesStr = String
 object PgnMovesStr extends OpaqueString[PgnMovesStr]
 
+// full PGN game
+opaque type PgnStr = String
+object PgnStr extends OpaqueString[PgnStr]
+
 case class Pgn(tags: Tags, turns: List[Turn], initial: Initial = Initial.empty):
 
   // index is NOT a full move turn!
@@ -34,11 +38,9 @@ case class Pgn(tags: Tags, turns: List[Turn], initial: Initial = Initial.empty):
     }
 
   def withEvent(title: String) =
-    copy(
-      tags = tags + Tag(_.Event, title)
-    )
+    copy(tags = tags + Tag(_.Event, title))
 
-  def render: String = {
+  def render: PgnStr = PgnStr {
     val initStr =
       if (initial.comments.nonEmpty) initial.comments.mkString("{ ", " } { ", " }\n")
       else ""
@@ -47,10 +49,10 @@ case class Pgn(tags: Tags, turns: List[Turn], initial: Initial = Initial.empty):
     val endStr =
       if (turnStr.nonEmpty) s" $resultStr"
       else resultStr
-    s"$tags\n\n$initStr$turnStr$endStr"
-  }.trim
+    s"$tags\n\n$initStr$turnStr$endStr".trim
+  }
 
-  override def toString = render
+  override def toString = render.value
 
 case class Initial(comments: List[String] = Nil)
 

@@ -5,8 +5,10 @@ import cats.syntax.option.*
 import org.specs2.matcher.Matcher
 import org.specs2.matcher.ValidatedMatchers
 import org.specs2.mutable.Specification
+import scala.language.implicitConversions
 
 import chess.format.{ EpdFen, Fen, Visual }
+import chess.format.pgn.PgnStr
 import chess.variant.Variant
 import bitboard.Board as BBoard
 import cats.kernel.Monoid
@@ -15,8 +17,9 @@ import chess.variant.Chess960
 
 trait ChessTest extends Specification with ValidatedMatchers:
 
-  given Conversion[String, Board] with
-    def apply(str: String) = Visual << str
+  given Conversion[String, Board]  = Visual.<<
+  given Conversion[String, PgnStr] = PgnStr(_)
+  given Conversion[PgnStr, String] = _.value
 
   extension (color: Color)
     def -(role: Role) = Piece(color, role)

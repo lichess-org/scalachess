@@ -14,14 +14,14 @@ object Reader:
     case class Incomplete(replay: Replay, failure: String) extends Result:
       def valid = Validated.invalid(failure)
 
-  def full(pgn: String, tags: Tags = Tags.empty): Validated[String, Result] =
+  def full(pgn: PgnStr, tags: Tags = Tags.empty): Validated[String, Result] =
     fullWithSans(pgn, identity, tags)
 
   def moves(sans: Iterable[SanStr], tags: Tags): Validated[String, Result] =
     movesWithSans(sans, identity, tags)
 
-  def fullWithSans(pgn: String, op: Sans => Sans, tags: Tags = Tags.empty): Validated[String, Result] =
-    Parser.full(cleanUserInput(pgn)) map { parsed =>
+  def fullWithSans(pgn: PgnStr, op: Sans => Sans, tags: Tags = Tags.empty): Validated[String, Result] =
+    Parser.full(pgn.map(cleanUserInput)) map { parsed =>
       makeReplay(makeGame(parsed.tags ++ tags), op(parsed.sans))
     }
 
@@ -34,7 +34,7 @@ object Reader:
     }
 
   // remove invisible byte order mark
-  def cleanUserInput(str: String) = str.replace(s"\ufeff", "")
+  private def cleanUserInput(str: String) = str.replace(s"\ufeff", "")
 
   private def makeReplay(game: Game, sans: Sans): Result =
     sans.value.foldLeft[Result](Result.Complete(Replay(game))) {

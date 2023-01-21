@@ -72,10 +72,6 @@ perft 4 118388
 perft 5 3223406
 perft 6 44554839
 perft 7 1205627532
-perft 5 985298
-perft 6 14751778
-perft 6 259604208
-perft 8 3914405614
 
 id xfen-03
 epd 2r5/8/8/8/8/8/6PP/k2KR3 w K -
@@ -156,7 +152,6 @@ epd 8/8/8/1k6/3Pp3/8/8/4KQ2 b - d3
 perft 1 6
 perft 2 121
 perft 3 711
-perft 4 405636
-perft 5 8992652
-perft 6 281330710
-perft 7 6447669114
+perft 4 16325
+perft 5 94099
+perft 6 2213124

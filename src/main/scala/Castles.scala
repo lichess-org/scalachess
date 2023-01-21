@@ -21,11 +21,7 @@ object Castles extends OpaqueBitboard[Castles]:
     def blackQueenSide: Boolean = (c & A8.bitboard).nonEmpty
 
     def without(color: Color): Castles =
-      color match
-        case White =>
-          c & ~A1.bitboard & ~H1.bitboard
-        case Black =>
-          c & ~A8.bitboard & ~H8.bitboard
+      c & Bitboard.rank(color.lastRank)
 
     def without(color: Color, side: Side): Castles =
       (color, side) match
@@ -115,3 +111,21 @@ object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
   extension (ur: UnmovedRooks)
     def toList: List[Pos]        = ur.occupiedSquares
     def apply(pos: Pos): Boolean = (ur & pos.bitboard).nonEmpty
+
+    def without(color: Color): UnmovedRooks =
+      ur & Bitboard.rank(color.lastRank)
+
+    // Try to guess the side of the rook at postion `pos`
+    // If the position is not a ummovedRook return None
+    // If the position is a ummovedRook but there is no other rook on the
+    // same rank return Some(None) (because we cannot guess)
+    // If there are two rooks on the same rank, return the side of the rook
+    def side(pos: Pos): Option[Option[Side]] =
+      val bitboard = pos.bitboard
+      if (ur & bitboard).isEmpty then None
+      else
+        (ur & ~bitboard & Bitboard.rank(pos.rank)).first match
+          case Some(otherRook) =>
+            if (otherRook.file > pos.file) then Some(Some(QueenSide))
+            else Some(Some(KingSide))
+          case None => Some(None)

@@ -39,24 +39,44 @@ case class Move(
             else h1.halfMoveClock + 1
         )
 
-        val halfCastlingRights: Castles =
-          if captures then h1.castles & ~dest.bitboard
-          else h1.castles
+        var castleRights: Castles      = h2.castles
+        var unmovedRooks: UnmovedRooks = h2.unmovedRooks
 
-        val castleRights: Castles =
-          if (piece is Rook) && (orig.bitboard & h2.unmovedRooks).nonEmpty then
-            halfCastlingRights & ~orig.bitboard
-          else if piece.is(King) then halfCastlingRights & Bitboard.rank(piece.color.lastRank)
-          else halfCastlingRights
+        // If the rook is captured
+        // remove the captured rook from unmovedRooks
+        // check the captured rook's side and remove it from castlingRights
+        if captures then
+          unmovedRooks.side(dest) match
+            case Some(result) =>
+              unmovedRooks = unmovedRooks & ~dest.bitboard
+              result match
+                case Some(side) =>
+                  castleRights = castleRights.without(!piece.color, side)
+                case None =>
+                  // There is only one unmovedrook left so just remove the color from castlingRights
+                  castleRights = castleRights.without(!piece.color)
+            case _ =>
 
-        var unmovedRooks: UnmovedRooks =
-          if captures then h2.unmovedRooks & ~dest.bitboard
-          else h2.unmovedRooks
+        // If a Rook is moved
+        // Remove that rook from unmovedRooks.
+        // check the captured rook's side and remove it from castlingRights
+        if piece is Rook then
+          unmovedRooks.side(orig) match
+            case Some(result) =>
+              unmovedRooks = unmovedRooks & ~orig.bitboard
+              result match
+                case Some(side) =>
+                  castleRights = castleRights.without(piece.color, side)
+                case None =>
+                  // There is only one unmovedrook left so just remove the color from castlingRights
+                  castleRights = castleRights.without(piece.color)
+            case _ =>
 
-        unmovedRooks =
-          if piece is Rook then unmovedRooks & ~orig.bitboard
-          else if piece is King then unmovedRooks & Bitboard.rank(piece.color.lastRank)
-          else unmovedRooks
+        // If the King is moved
+        // remove castlingRights and unmovedRooks for the moving side
+        else if piece is King then
+          unmovedRooks = unmovedRooks.without(piece.color)
+          castleRights = castleRights.without(piece.color)
 
         h2.withCastles(castleRights).copy(unmovedRooks = unmovedRooks)
       },

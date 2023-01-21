@@ -6,7 +6,7 @@ import variant.{ Standard, Variant }
 import cats.kernel.Monoid
 import ornicar.scalalib.zeros.given_Zero_Option
 import bitboard.Bitboard
-import bitboard.Bitboard.bitboard
+import bitboard.Bitboard.{ bitboard, occupiedSquares }
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *
@@ -23,14 +23,7 @@ trait FenReader:
       val (castles, unmovedRooks) = fen.castling.foldLeft(Castles.none -> UnmovedRooks.empty) {
         case ((c, r), ch) =>
           val color = Color.fromWhite(ch.isUpper)
-          // todo (board.rooks & board.us).occupiedSquares or fold
-          val rooks: List[Pos] = board
-            .piecesOf(color)
-            .collect {
-              case (pos, piece) if piece.is(Rook) && pos.rank == color.backRank => pos
-            }
-            .toList
-            .sortBy(_.file.value)
+          val rooks = (board.rooks & board(color)).occupiedSquares.sortBy(_.file.value)
           (for {
             kingPos <- board.kingPosOf(color).headOption
             rookPos <- (ch.toLower match {

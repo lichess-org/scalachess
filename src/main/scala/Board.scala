@@ -22,6 +22,7 @@ case class Board(
   val occupied: Bitboard = board.occupied
   val sliders: Bitboard  = board.sliders
 
+  inline def apply(inline color: Color): Bitboard        = color.fold(white, black)
   inline def apply(inline at: Pos): Option[Piece]        = board.pieceAt(at)
   inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Pos(file, rank))
 

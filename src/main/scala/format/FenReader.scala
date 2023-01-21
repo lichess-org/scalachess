@@ -20,20 +20,23 @@ trait FenReader:
       // why it is different when the variant is Atomic?
       val situation = Situation(board, if variant.atomic then fen.color else board.checkColor | fen.color)
       // todo verify unmovedRooks vs board.rooks
-      val (castles, unmovedRooks) = fen.castling.foldLeft(Castles.none -> UnmovedRooks.empty) {
-        case ((c, r), ch) =>
-          val color = Color.fromWhite(ch.isUpper)
-          val rooks = (board.rooks & board(color)).occupiedSquares.sortBy(_.file.value)
-          (for {
-            kingPos <- board.kingPosOf(color).headOption
-            rookPos <- (ch.toLower match {
-              case 'k'  => rooks.reverse.find(_ ?> kingPos)
-              case 'q'  => rooks.find(_ ?< kingPos)
-              case file => rooks.find(_.file.char == file)
-            })
-            side <- Side.kingRookSide(kingPos, rookPos)
-          } yield (c.add(color, side), r | rookPos.bitboard)).getOrElse((c, r))
-      }
+      val (castles, unmovedRooks) =
+        if variant.antichess then (Castles.none -> UnmovedRooks.empty)
+        else
+          fen.castling
+            .foldLeft(Castles.none -> UnmovedRooks.empty) { case ((c, r), ch) =>
+              val color = Color.fromWhite(ch.isUpper)
+              val rooks = (board.rooks & board(color)).occupiedSquares.sortBy(_.file.value)
+              (for {
+                kingPos <- board.kingPosOf(color).headOption
+                rookPos <- (ch.toLower match {
+                  case 'k'  => rooks.reverse.find(_ ?> kingPos)
+                  case 'q'  => rooks.find(_ ?< kingPos)
+                  case file => rooks.find(_.file.char == file)
+                })
+                side <- Side.kingRookSide(kingPos, rookPos)
+              } yield (c.add(color, side), r | rookPos.bitboard)).getOrElse((c, r))
+            }
 
       val fifthRank   = if (situation.color.white) Rank.Fifth else Rank.Fourth
       val sixthRank   = if (situation.color.white) Rank.Sixth else Rank.Third

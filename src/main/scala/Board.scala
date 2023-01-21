@@ -144,7 +144,7 @@ object Board:
 
   def apply(pieces: Iterable[(Pos, Piece)], castles: Castles, variant: Variant): Board =
     val board        = BBoard.fromMap(pieces.toMap)
-    val unmovedRooks = UnmovedRooks(board.rooks)
+    val unmovedRooks = if variant.antichess then UnmovedRooks.none else UnmovedRooks(board.rooks)
     Board(board, History(castles = castles, unmovedRooks = unmovedRooks), variant, variantCrazyData(variant))
 
   def init(variant: Variant): Board = Board(variant.pieces, variant.castles, variant)

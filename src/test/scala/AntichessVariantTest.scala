@@ -376,4 +376,12 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       }
     }
 
+    "fen with castles" in {
+      println("fen with castles")
+      val game = fenToGame(EpdFen("rnbqk2r/ppppppbp/5np1/8/8/5NP1/PPPPPPBP/RNBQK2R w KQkq - 4 4"), Antichess)
+
+      game must beValid.like { case game =>
+        game.situation.board.history.castles must_== Castles.none
+      }
+    }
   }

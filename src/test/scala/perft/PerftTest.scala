@@ -30,6 +30,6 @@ class PerftTest extends ChessTest:
   genTests("calculate Horde perfts", Perft.hordePerfts, Horde, 1_000_000L)
   genTests("calculate RacingKings perfts", Perft.racingkingsPerfts, RacingKings, 1_000_000L)
   // for the shake of time we only test the first 50 cases in random.peft, run FullRandomPerftTest.scala for all cases
-  genTests("calculate random perfts", Perft.randomPerfts.take(50), Chess960, 10_000L)
+  genTests("calculate random perfts", Perft.randomPerfts.take(100), Chess960, 1_000_000L)
   genTests("calculate tricky perfts", Perft.trickyPerfts, Chess960, 1_000_000L)
   genTests("calculate chess960 perfts", Perft.chess960, Chess960, 1_000_000L)

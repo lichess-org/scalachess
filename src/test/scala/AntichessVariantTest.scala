@@ -382,6 +382,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       game must beValid.like { case game =>
         game.situation.board.history.castles must_== Castles.none
+        game.situation.board.history.unmovedRooks must_== UnmovedRooks.none
       }
     }
   }

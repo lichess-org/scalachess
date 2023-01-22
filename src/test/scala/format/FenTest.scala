@@ -1,6 +1,8 @@
 package chess
 package format
 
+import scala.language.implicitConversions
+
 class FenTest extends ChessTest:
 
   import pgn.Fixtures.*
@@ -43,4 +45,9 @@ class FenTest extends ChessTest:
         .get
         .enPassantSquare === Some(Pos.F6)
     }
+  }
+
+  "castling rights" >> {
+    val fen = Fen.Epd("2bqkb1r/1pp1ppp1/7r/pN2p2p/3PP3/P3P3/1PP1B1PP/R2Q1RK1 w k - 3 13")
+    Fen.write(Fen.read(fen).get) === fen
   }

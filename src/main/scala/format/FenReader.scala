@@ -17,23 +17,29 @@ import bitboard.Bitboard.{ bitboard, occupiedSquares }
 trait FenReader:
   def read(variant: Variant, fen: EpdFen): Option[Situation] =
     makeBoard(variant, fen) map { board =>
-      // why it is different when the variant is Atomic?
+      // if a king is in check then we know whose turn it is to play, and we can ignore the manual turn flag.
+      // Except in atomic where it's ok to be in check
       val situation = Situation(board, if variant.atomic then fen.color else board.checkColor | fen.color)
       // todo verify unmovedRooks vs board.rooks
-      val (castles, unmovedRooks) = fen.castling.foldLeft(Castles.none -> UnmovedRooks.empty) {
-        case ((c, r), ch) =>
-          val color = Color.fromWhite(ch.isUpper)
-          val rooks = (board.rooks & board(color)).occupiedSquares.sortBy(_.file.value)
-          (for {
-            kingPos <- board.kingPosOf(color).headOption
-            rookPos <- (ch.toLower match {
-              case 'k'  => rooks.reverse.find(_ ?> kingPos)
-              case 'q'  => rooks.find(_ ?< kingPos)
-              case file => rooks.find(_.file.char == file)
-            })
-            side <- Side.kingRookSide(kingPos, rookPos)
-          } yield (c.add(color, side), r | rookPos.bitboard)).getOrElse((c, r))
-      }
+      val (castles, unmovedRooks) =
+        if variant.antichess then (Castles.none -> UnmovedRooks.empty)
+        else
+          fen.castling
+            .foldLeft(Castles.none -> UnmovedRooks.empty) { case ((c, r), ch) =>
+              val color = Color.fromWhite(ch.isUpper)
+              val rooks = (board.rooks & board(color) & Bitboard.rank(color.backRank)).occupiedSquares
+                .sortBy(_.file.value)
+              {
+                for
+                  kingPos <- board.kingPosOf(color).headOption
+                  rookPos <- ch.toLower match
+                    case 'k'  => rooks.reverse.find(_ ?> kingPos)
+                    case 'q'  => rooks.find(_ ?< kingPos)
+                    case file => rooks.find(_.file.char == file)
+                  side <- Side.kingRookSide(kingPos, rookPos)
+                yield (c.add(color, side), r | rookPos.bitboard)
+              }.getOrElse((c, r))
+            }
 
       val fifthRank   = if (situation.color.white) Rank.Fifth else Rank.Fourth
       val sixthRank   = if (situation.color.white) Rank.Sixth else Rank.Third

@@ -17,7 +17,8 @@ import bitboard.Bitboard.{ bitboard, occupiedSquares }
 trait FenReader:
   def read(variant: Variant, fen: EpdFen): Option[Situation] =
     makeBoard(variant, fen) map { board =>
-      // why it is different when the variant is Atomic?
+      // if a king is in check then we know whose turn it is to play, and we can ignore the manual turn flag.
+      // Except in atomic where it's ok to be in check
       val situation = Situation(board, if variant.atomic then fen.color else board.checkColor | fen.color)
       // todo verify unmovedRooks vs board.rooks
       val (castles, unmovedRooks) =

@@ -74,3 +74,11 @@ class ReplayTest extends ChessTest:
     steps(9)._2.uci.uci must_== "e8h8"
     steps(18)._2.uci.uci must_== "e1a1"
   }
+
+  "replay from fen then castle" >> {
+    val fen                  = Fen.Epd("2bqkb1r/1pp1ppp1/7r/pN2p2p/3PP3/P3P3/1PP1B1PP/R2Q1RK1 w k - 3 13")
+    val moves                = SanStr from "dxe5 Qxd1 Raxd1 Rc6 Rd2 e6 Rfd1 Be7 Na7 O-O".split(" ")
+    val (game, steps, error) = chess.Replay.gameMoveWhileValid(moves, fen, variant.Standard)
+    error must beNone
+    steps.size must_== moves.size
+  }

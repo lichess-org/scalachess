@@ -27,16 +27,18 @@ trait FenReader:
           fen.castling
             .foldLeft(Castles.none -> UnmovedRooks.empty) { case ((c, r), ch) =>
               val color = Color.fromWhite(ch.isUpper)
-              val rooks = (board.rooks & board(color)).occupiedSquares.sortBy(_.file.value)
-              (for {
-                kingPos <- board.kingPosOf(color).headOption
-                rookPos <- (ch.toLower match {
-                  case 'k'  => rooks.reverse.find(_ ?> kingPos)
-                  case 'q'  => rooks.find(_ ?< kingPos)
-                  case file => rooks.find(_.file.char == file)
-                })
-                side <- Side.kingRookSide(kingPos, rookPos)
-              } yield (c.add(color, side), r | rookPos.bitboard)).getOrElse((c, r))
+              val rooks = (board.rooks & board(color) & Bitboard.rank(color.backRank)).occupiedSquares
+                .sortBy(_.file.value)
+              {
+                for
+                  kingPos <- board.kingPosOf(color).headOption
+                  rookPos <- ch.toLower match
+                    case 'k'  => rooks.reverse.find(_ ?> kingPos)
+                    case 'q'  => rooks.find(_ ?< kingPos)
+                    case file => rooks.find(_.file.char == file)
+                  side <- Side.kingRookSide(kingPos, rookPos)
+                yield (c.add(color, side), r | rookPos.bitboard)
+              }.getOrElse((c, r))
             }
 
       val fifthRank   = if (situation.color.white) Rank.Fifth else Rank.Fourth

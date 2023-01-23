@@ -1,5 +1,6 @@
 package chess
 
+import scala.language.implicitConversions
 import cats.syntax.option.*
 import org.specs2.matcher.ValidatedMatchers
 

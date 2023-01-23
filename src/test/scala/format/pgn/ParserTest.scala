@@ -2,6 +2,7 @@ package chess
 package format.pgn
 
 import cats.syntax.option.*
+import scala.language.implicitConversions
 
 class ParserTest extends ChessTest:
 

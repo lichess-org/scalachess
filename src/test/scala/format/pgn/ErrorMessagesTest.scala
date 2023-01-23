@@ -1,6 +1,8 @@
 package chess
 package format.pgn
 
+import scala.language.implicitConversions
+
 class ErrorMessagesTest extends ChessTest:
 
   args(skipAll = true)

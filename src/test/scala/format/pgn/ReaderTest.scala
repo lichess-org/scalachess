@@ -1,6 +1,8 @@
 package chess
 package format.pgn
 
+import scala.language.implicitConversions
+
 class ReaderTest extends ChessTest:
 
   import Fixtures.*

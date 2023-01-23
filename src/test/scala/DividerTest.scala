@@ -1,6 +1,6 @@
 package chess
 
-// import org.specs2.matcher.MustExpectations.akaMust
+import scala.language.implicitConversions
 import org.specs2.matcher.MustMatchers.akaMust
 
 class DividerTest extends ChessTest:

@@ -91,7 +91,7 @@ case class Situation(board: Board, color: Color):
   lazy val theirKings: List[Pos]      = board.board.kings(!color)
   lazy val us: Bitboard               = board.board.byColor(color)
   lazy val them: Bitboard             = board.board.byColor(!color)
-  lazy val checkers: Option[Bitboard] = ourKings.headOption.map(board.board.attacksTo(_, !color))
+  lazy val checkers: Option[Bitboard] = ourKings.headOption.map(board.board.attackers(_, !color))
   lazy val sliderBlockers: Bitboard   = board.board.sliderBlockers(color)
   lazy val isWhiteTurn: Boolean       = color.white
   lazy val isOccupied: Pos => Boolean = board.board.isOccupied
@@ -259,7 +259,7 @@ case class Situation(board: Board, color: Color):
       val targets = king.kingAttacks & mask
       for
         to <- targets.occupiedSquares
-        if board.board.attacksTo(to, !color).isEmpty
+        if board.board.attackers(to, !color).isEmpty
         move <- normalMove(king, to, King, isOccupied(to))
       yield move
     )
@@ -275,7 +275,7 @@ case class Situation(board: Board, color: Color):
             color,
             (board.occupied ^ king.bitboard)
           )
-        else board.board.attacksTo(pos, !color, board.occupied ^ king.bitboard).isEmpty
+        else board.board.attackers(pos, !color, board.occupied ^ king.bitboard).isEmpty
 
       // can castle but which side?
       if !board.history.castles.can(color).any || king.rank != color.backRank then Nil

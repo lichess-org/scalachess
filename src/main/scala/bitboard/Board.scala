@@ -54,13 +54,13 @@ case class Board(
   def kings(color: Color): List[Pos] =
     (kings & byColor(color)).occupiedSquares
 
-  def attacksTo(s: Pos, attacker: Color): Bitboard =
-    attacksTo(s, attacker, occupied)
+  def attackers(s: Pos, attacker: Color): Bitboard =
+    attackers(s, attacker, occupied)
 
-  def isAttacksTo(s: Pos, attacker: Color): Boolean =
-    attacksTo(s, attacker).nonEmpty
+  def attacks(s: Pos, attacker: Color): Boolean =
+    attackers(s, attacker).nonEmpty
 
-  def attacksTo(s: Pos, attacker: Color, occupied: Bitboard): Bitboard =
+  def attackers(s: Pos, attacker: Color, occupied: Bitboard): Bitboard =
     byColor(attacker) & (
       s.rookAttacks(occupied) & (rooks ^ queens) |
         s.bishopAttacks(occupied) & (bishops ^ queens) |
@@ -70,7 +70,7 @@ case class Board(
     )
 
   // temporary function for Atomic
-  def attacksToWithoutKing(s: Pos, attacker: Color, occupied: Bitboard): Bitboard =
+  def attackersWithoutKing(s: Pos, attacker: Color, occupied: Bitboard): Bitboard =
     byColor(attacker) & (
       s.rookAttacks(occupied) & (rooks ^ queens) |
         s.bishopAttacks(occupied) & (bishops ^ queens) |
@@ -81,18 +81,18 @@ case class Board(
   def atomicCheck(color: Color): Boolean =
     val their = byColor(!color)
     kings(color).exists(k =>
-      (their & k.kingAttacks & kings).isEmpty && attacksToWithoutKing(k, !color, occupied).nonEmpty
+      (their & k.kingAttacks & kings).isEmpty && attackersWithoutKing(k, !color, occupied).nonEmpty
     )
 
   // In Atomic, when the kings are connected, checks do not apply
   def atomicKingAttack(king: Pos, color: Color, occupied: Bitboard): Boolean =
     val their = byColor(!color)
-    (king.kingAttacks & their & kings).isEmpty && attacksToWithoutKing(king, !color, occupied).nonEmpty
+    (king.kingAttacks & their & kings).isEmpty && attackersWithoutKing(king, !color, occupied).nonEmpty
 
   // return true if the king with color is in check
   // return false in case of no king
   def isCheck(color: Color): Boolean =
-    kings(color).exists(k => attacksTo(k, !color).nonEmpty)
+    kings(color).exists(k => attackers(k, !color).nonEmpty)
 
   /** Find all blockers between the king and attacking sliders First we find all snipers (all potential sliders which
     * can attack the king) Then we loop over those snipers if there is only one blockers between the king and the sniper

@@ -33,7 +33,7 @@ class BoardTest extends FunSuite:
       i <- 0 to 63
       sq = Pos.at(i).get
       color <- List(Color.White, Color.Black)
-      result   = fen.board.attacksTo(sq, color)
+      result   = fen.board.attackers(sq, color)
       expected = fen.cBoard.attacksTo(sq, color.white)
     yield assertEquals(result, expected.bb)
   }

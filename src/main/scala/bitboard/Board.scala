@@ -69,26 +69,6 @@ case class Board(
         s.pawnAttacks(!attacker) & pawns
     )
 
-  // temporary function for Atomic
-  def attackersWithoutKing(s: Pos, attacker: Color, occupied: Bitboard): Bitboard =
-    byColor(attacker) & (
-      s.rookAttacks(occupied) & (rooks ^ queens) |
-        s.bishopAttacks(occupied) & (bishops ^ queens) |
-        s.knightAttacks & knights |
-        s.pawnAttacks(!attacker) & pawns
-    )
-
-  def atomicCheck(color: Color): Boolean =
-    val their = byColor(!color)
-    kings(color).exists(k =>
-      (their & k.kingAttacks & kings).isEmpty && attackersWithoutKing(k, !color, occupied).nonEmpty
-    )
-
-  // In Atomic, when the kings are connected, checks do not apply
-  def atomicKingAttack(king: Pos, color: Color, occupied: Bitboard): Boolean =
-    val their = byColor(!color)
-    (king.kingAttacks & their & kings).isEmpty && attackersWithoutKing(king, !color, occupied).nonEmpty
-
   // return true if the king with color is in check
   // return false in case of no king
   def isCheck(color: Color): Boolean =

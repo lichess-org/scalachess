@@ -268,15 +268,6 @@ case class Situation(board: Board, color: Color):
   private def genCastling: List[Move] =
     import Castles.*
     ourKings.headOption.fold(Nil) { king =>
-      def checkSafeSquare(pos: Pos, rookTo: Pos): Boolean =
-        if board.variant.atomic then
-          !board.board.atomicKingAttack(
-            pos,
-            color,
-            (board.occupied ^ king.bitboard)
-          )
-        else board.board.attackers(pos, !color, board.occupied ^ king.bitboard).isEmpty
-
       // can castle but which side?
       if !board.history.castles.can(color).any || king.rank != color.backRank then Nil
       else
@@ -294,7 +285,7 @@ case class Situation(board: Board, color: Color):
             else Bitboard.between(king, rook)
           if (path & (board.occupied & ~rook.bitboard)).isEmpty
           kingPath = Bitboard.between(king, kingTo) | king.bitboard
-          if kingPath.occupiedSquares.forall(checkSafeSquare(_, rookTo))
+          if kingPath.occupiedSquares.forall(board.variant.castleCheckSafeSquare(this, king, _))
           moves <- castle(king, kingTo, rook, rookTo)
         yield moves
     }

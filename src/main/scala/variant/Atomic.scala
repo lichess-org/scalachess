@@ -1,6 +1,7 @@
 package chess
 package variant
 
+import bitboard.Bitboard
 import bitboard.Bitboard.*
 
 case object Atomic
@@ -33,7 +34,25 @@ case object Atomic
     * king.
     */
   override def kingThreatened(board: Board, color: Color): Boolean =
-    board.board.atomicCheck(color)
+    import board.board.{ byColor, kings }
+    val their = byColor(!color)
+    kings(color).exists(k =>
+      (their & k.kingAttacks & kings).isEmpty && attackersWithoutKing(
+        board,
+        board.board.occupied,
+        k,
+        !color
+      ).nonEmpty
+    )
+
+  private def attackersWithoutKing(board: Board, occupied: Bitboard, s: Pos, attacker: Color) =
+    import board.board.{ byColor, kings, rooks, queens, bishops, knights, pawns }
+    byColor(attacker) & (
+      s.rookAttacks(occupied) & (rooks ^ queens) |
+        s.bishopAttacks(occupied) & (bishops ^ queens) |
+        s.knightAttacks & knights |
+        s.pawnAttacks(!attacker) & pawns
+    )
 
   private def protectedByOtherKing(board: Board, to: Pos, color: Color): Boolean =
     board.kingPosOf(color).occupiedSquares exists { to.touches(_) }
@@ -43,6 +62,17 @@ case object Atomic
     (!kingThreatened(m.after, m.color) ||
       explodesOpponentKing(m.situationBefore)(m))
       && !explodesOwnKing(m.situationBefore)(m)
+
+  override def castleCheckSafeSquare(situation: Situation, kingFrom: Pos, kingTo: Pos): Boolean =
+    // In Atomic, when the kings are connected, checks do not apply
+    import situation.board.board.{ byColor, kings }
+    val their = byColor(!situation.color)
+    (kingTo.kingAttacks & their & kings).nonEmpty || attackersWithoutKing(
+      situation.board,
+      (situation.board.occupied ^ kingFrom.bitboard),
+      kingTo,
+      !situation.color
+    ).isEmpty
 
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
   private def explodeSurroundingPieces(move: Move): Move =

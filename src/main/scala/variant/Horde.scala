@@ -56,7 +56,7 @@ case object Horde
     */
   override def isInsufficientMaterial(board: Board) = hordeClosedPosition(board)
 
-  /** In horde chess, the horde cannot win on * V K or [BN]{2} v K or just one piece
+  /** In horde chess, the horde cannot win on * v K or [BN]{2} v K or just one piece
     * since they lack a king for checkmate support.
     * Technically there are some positions where stalemate is unavoidable which
     * this method does not detect; however, such are trivial to premove.

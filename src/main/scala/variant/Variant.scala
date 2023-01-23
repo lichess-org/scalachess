@@ -51,8 +51,8 @@ abstract class Variant private[variant] (
     situation.generateMoves.filter(kingSafety)
 
   // Optimised for performance
-  def pieceThreatened(board: Board, color: Color, to: Pos): Boolean =
-    board.board.isAttacksTo(to, color)
+  def pieceThreatened(board: Board, by: Color, to: Pos): Boolean =
+    board.board.isAttacksTo(to, by)
 
   def kingThreatened(board: Board, color: Color): Boolean =
     board.board.isCheck(color)

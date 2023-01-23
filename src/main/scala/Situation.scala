@@ -123,7 +123,7 @@ case class Situation(board: Board, color: Color):
   private def genKings(mask: Bitboard, pos: Option[Pos] = None) =
     val kingPos        = pos.fold(ourKings)(List(_))
     val withoutCastles = kingPos.flatMap(genUnsafeKing(_, mask))
-    if board.variant.allowsCastling then withoutCastles ::: genCastling()
+    if board.variant.allowsCastling then withoutCastles ::: genCastling
     else withoutCastles
 
   private def genEnPassant(pawns: Bitboard): List[Move] =
@@ -265,7 +265,7 @@ case class Situation(board: Board, color: Color):
     )
 
   // TODO verify kings & rooks are in back rank only
-  private def genCastling(): List[Move] =
+  private def genCastling: List[Move] =
     import Castles.*
     ourKings.headOption.fold(Nil) { king =>
       def checkSafeSquare(pos: Pos, rookTo: Pos): Boolean =

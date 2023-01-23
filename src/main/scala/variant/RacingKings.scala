@@ -48,7 +48,7 @@ case object RacingKings
 
   // todo bitboard => kings & byColor & Rank.Eight
   private def reachedGoal(board: Board, color: Color) =
-    (board.kingPosOf(color) & Bitboard.rank(color.lastRank)).nonEmpty
+    (board.kingPosOf(color) & Bitboard.rank(Rank.Eighth)).nonEmpty
 
   private def reachesGoal(move: Move) =
     reachedGoal(move.situationAfter.board, move.piece.color)

@@ -26,12 +26,13 @@ trait FenReader:
         else
           fen.castling
             .foldLeft(Castles.none -> UnmovedRooks.empty) { case ((c, r), ch) =>
-              val color = Color.fromWhite(ch.isUpper)
-              val rooks = (board.rooks & board(color) & Bitboard.rank(color.backRank)).occupiedSquares
+              val color    = Color.fromWhite(ch.isUpper)
+              val backRank = Bitboard.rank(color.backRank)
+              val rooks = (board.rooks & board(color) & backRank).occupiedSquares
                 .sortBy(_.file.value)
               {
                 for
-                  kingPos <- board.kingPosOf(color).headOption
+                  kingPos <- (board.kingPosOf(color) & backRank).first
                   rookPos <- ch.toLower match
                     case 'k'  => rooks.reverse.find(_ ?> kingPos)
                     case 'q'  => rooks.find(_ ?< kingPos)

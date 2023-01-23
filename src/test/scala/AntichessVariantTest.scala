@@ -128,7 +128,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       )
 
       game must beValid.like { case newGame =>
-        newGame.board.kingPosOf(Color.black) === Nil
+        newGame.board.kingPosOf(Color.black).isEmpty
       }
     }
 

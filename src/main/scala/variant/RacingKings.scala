@@ -2,6 +2,7 @@ package chess
 package variant
 
 import chess.format.EpdFen
+import bitboard.Bitboard
 
 case object RacingKings
     extends Variant(
@@ -47,7 +48,7 @@ case object RacingKings
 
   // todo bitboard => kings & byColor & Rank.Eight
   private def reachedGoal(board: Board, color: Color) =
-    board.kingPosOf(color) exists (_.rank == Rank.Eighth)
+    (board.kingPosOf(color) & Bitboard.rank(color.lastRank)).nonEmpty
 
   private def reachesGoal(move: Move) =
     reachedGoal(move.situationAfter.board, move.piece.color)

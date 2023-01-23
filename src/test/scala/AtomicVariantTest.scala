@@ -613,7 +613,7 @@ class AtomicVariantTest extends ChessTest:
     "Allow castling with touching kings and rook shielding final attack 2" in {
       val position = EpdFen("r3k1rR/5K2/8/8/8/8/8/8 b kq - 0 1")
       val game     = fenToGame(position, Atomic)
-      val newGame  = game flatMap (_.playMoves((Pos.G8, Pos.G6),(Pos.F7, Pos.E7), (Pos.E8, Pos.A8)))
+      val newGame  = game flatMap (_.playMoves((Pos.G8, Pos.G6), (Pos.F7, Pos.E7), (Pos.E8, Pos.A8)))
 
       newGame must beValid.like { case game =>
         game.board(Pos.C8) must beEqualTo(Black.king.some)

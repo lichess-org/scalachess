@@ -57,10 +57,12 @@ object Perft:
       if depth == 0 then Nil
       else if game.situation.perftEnd then Nil
       else
-        game.perftMoves.map { move =>
-          val nodes = game(move).perft(depth - 1)
-          DivideResult(move, nodes)
-        }.sortBy(_.move.toUci.uci)
+        game.perftMoves
+          .map { move =>
+            val nodes = game(move).perft(depth - 1)
+            DivideResult(move, nodes)
+          }
+          .sortBy(_.move.toUci.uci)
 
     def perft(depth: Int): Long =
       import chess.Move.Castle.*

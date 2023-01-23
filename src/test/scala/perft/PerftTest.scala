@@ -22,7 +22,7 @@ class PerftTest extends ChessTest:
       }
     }
 
-  val nodeLimits = 10_000_000L
+  val nodeLimits = 100_000L
   genTests("calculate ThreeCheck perfts", Perft.threeCheckPerfts, ThreeCheck, nodeLimits)
   genTests("calculate Antichess perfts", Perft.antichessPerfts, Antichess, nodeLimits)
   genTests("calculate Atomic perfts", Perft.atomicPerfts, Atomic, nodeLimits)

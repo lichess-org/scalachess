@@ -58,7 +58,7 @@ case class Board(
     attacksTo(s, attacker, occupied)
 
   def isAttacksTo(s: Pos, attacker: Color): Boolean =
-    attacksTo(s, attacker).isEmpty
+    attacksTo(s, attacker).nonEmpty
 
   def attacksTo(s: Pos, attacker: Color, occupied: Bitboard): Bitboard =
     byColor(attacker) & (

@@ -84,9 +84,10 @@ case class Board(
       (their & k.kingAttacks & kings).isEmpty && attacksToWithoutKing(k, !color, occupied).nonEmpty
     )
 
+  // In Atomic, when the kings are connected, checks do not apply
   def atomicKingAttack(king: Pos, color: Color, occupied: Bitboard): Boolean =
     val their = byColor(!color)
-    (their & (king.kingAttacks & kings)).isEmpty && attacksToWithoutKing(king, !color, occupied).nonEmpty
+    (king.kingAttacks & their & kings).isEmpty && attacksToWithoutKing(king, !color, occupied).nonEmpty
 
   // return true if the king with color is in check
   // return false in case of no king

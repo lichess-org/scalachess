@@ -7,15 +7,24 @@ import chess.variant.Variant
 import org.specs2.specification.core.*
 
 case class Perft(id: String, epd: EpdFen, cases: List[TestCase]):
+  import Perft.*
   def calculate(variant: Variant): List[Result] =
     val game = Game(Option(variant), Option(epd))
-    cases.map(c => Result(c.depth, Perft.perft(game, c.depth), c.result))
+    cases.map(c =>
+      // printResult(game.divide(c.depth))
+      Result(c.depth, game.perft(c.depth), c.result)
+    )
 
   def withLimit(limit: Long): Perft =
     copy(cases = cases.filter(_.result < limit))
 
 case class TestCase(depth: Int, result: Long)
 case class Result(depth: Int, result: Long, expected: Long)
+
+case class DivideResult(val move: Move, nodes: Long) {
+  override def toString(): String =
+    s"${move.toUci.uci} $nodes"
+}
 
 object Perft:
 
@@ -33,22 +42,45 @@ object Perft:
     val str = io.Source.fromResource(file).mkString
     Parser.parse(str).getOrElse(throw RuntimeException(s"Parse perft file failed: $file"))
 
-  private def perft(game: Game, depth: Int): Long =
-    import chess.Move.Castle.*
-    import Perft.*
+  def printResult(results: List[DivideResult]) =
+    val builder = StringBuilder()
+    var sum     = 0L
+    results.foreach { r =>
+      sum += r.nodes
+      builder.append(r).append("\n")
+    }
+    builder.append("\n").append(sum)
+    println(builder)
 
-    if depth == 0 then 1L
-    else if game.situation.perftEnd then 0L
-    else
-      val allMoves = game.situation.legalMoves
+  extension (game: Game)
+    def divide(depth: Int): List[DivideResult] =
+      if depth == 0 then Nil
+      else if game.situation.perftEnd then Nil
+      else
+        game.perftMoves
+          .map { move =>
+            val nodes = game(move).perft(depth - 1)
+            DivideResult(move, nodes)
+          }
+          .sortBy(_.move.toUci.uci)
+
+    def perft(depth: Int): Long =
+      import chess.Move.Castle.*
+      import Perft.*
+
+      if depth == 0 then 1L
+      else if game.situation.perftEnd then 0L
+      else
+        val moves = game.perftMoves
+        if (depth == 1) then moves.size.toLong
+        else moves.map(move => game(move).perft(depth - 1)).sum
+
+    private def perftMoves: List[Move] =
+      val legalMoves = game.situation.legalMoves
+      if game.situation.board.variant.chess960 then legalMoves
       // if variant is not chess960 we need to deduplicated castlings moves
-      val moves =
-        if game.situation.board.variant.chess960 then allMoves
-        // We filter out castling move that is Standard and king's dest is not in the rook position
-        else allMoves.filterNot(m => m.castle.exists(c => c.isStandard && m.dest != c.rook))
-
-      if (depth == 1) then moves.size.toLong
-      else moves.map(move => perft(game.apply(move), depth - 1)).sum
+      // We filter out castling move that is Standard and king's dest is not in the rook position
+      else legalMoves.filterNot(m => m.castle.exists(c => c.isStandard && m.dest != c.rook))
 
   extension (s: Situation)
     // when calculate perft we don't do autoDraw

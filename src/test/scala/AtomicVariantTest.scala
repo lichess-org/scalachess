@@ -542,31 +542,6 @@ class AtomicVariantTest extends ChessTest:
       }
     }
 
-    "Allow castling with touching kings and rook shielding final attack" in {
-      val position = EpdFen("8/8/8/8/8/8/4k3/R3K2r w Q - 0 1")
-      val game     = fenToGame(position, Atomic)
-      val newGame  = game flatMap (_.playMove(Pos.E1, Pos.C1))
-
-      newGame must beValid.like { case game =>
-        game.board(Pos.C1) must beEqualTo(White.king.some)
-        game.board(Pos.D1) must beEqualTo(White.rook.some)
-      }
-    }
-
-    "Disallow castling through atomic check" in {
-      val position  = EpdFen("8/8/8/8/8/8/5k2/R3K2r w Q - 0 1")
-      val game      = fenToGame(position, Atomic)
-      val errorGame = game flatMap (_.playMove(Pos.E1, Pos.C1))
-      errorGame must beInvalid
-    }
-
-    "Disallow castling into atomic check" in {
-      val position  = EpdFen("4k3/8/8/8/8/8/8/rR2K3 w Q - 0 1")
-      val game      = fenToGame(position, Atomic)
-      val errorGame = game flatMap (_.playMove(Pos.E1, Pos.B1))
-      errorGame must beInvalid
-    }
-
     "An automatic draw in a closed position with kings, pawns and a pawnitized bishop" in {
       val position = EpdFen("8/8/2k1p3/5p2/4PP2/1b6/4K3/8 w - - 0 1")
       val game     = fenToGame(position, Atomic)
@@ -620,4 +595,44 @@ class AtomicVariantTest extends ChessTest:
       error must beNone
       steps.size === sans.size
     }
+  }
+
+  "castlings" should {
+
+    "Allow castling with touching kings and rook shielding final attack" in {
+      val position = EpdFen("8/8/8/8/8/8/4k3/R3K2r w Q - 0 1")
+      val game     = fenToGame(position, Atomic)
+      val newGame  = game flatMap (_.playMove(Pos.E1, Pos.C1))
+
+      newGame must beValid.like { case game =>
+        game.board(Pos.C1) must beEqualTo(White.king.some)
+        game.board(Pos.D1) must beEqualTo(White.rook.some)
+      }
+    }
+
+    "Allow castling with touching kings and rook shielding final attack 2" in {
+      val position = EpdFen("r3k1rR/5K2/8/8/8/8/8/8 b kq - 0 1")
+      val game     = fenToGame(position, Atomic)
+      val newGame  = game flatMap (_.playMoves((Pos.G8, Pos.G6), (Pos.F7, Pos.E7), (Pos.E8, Pos.A8)))
+
+      newGame must beValid.like { case game =>
+        game.board(Pos.C8) must beEqualTo(Black.king.some)
+        game.board(Pos.D8) must beEqualTo(Black.rook.some)
+      }
+    }
+
+    "Disallow castling through atomic check" in {
+      val position  = EpdFen("8/8/8/8/8/8/5k2/R3K2r w Q - 0 1")
+      val game      = fenToGame(position, Atomic)
+      val errorGame = game flatMap (_.playMove(Pos.E1, Pos.C1))
+      errorGame must beInvalid
+    }
+
+    "Disallow castling into atomic check" in {
+      val position  = EpdFen("4k3/8/8/8/8/8/8/rR2K3 w Q - 0 1")
+      val game      = fenToGame(position, Atomic)
+      val errorGame = game flatMap (_.playMove(Pos.E1, Pos.B1))
+      errorGame must beInvalid
+    }
+
   }

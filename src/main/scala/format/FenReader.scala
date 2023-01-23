@@ -22,16 +22,17 @@ trait FenReader:
       val situation = Situation(board, if variant.atomic then fen.color else board.checkColor | fen.color)
       // todo verify unmovedRooks vs board.rooks
       val (castles, unmovedRooks) =
-        if variant.antichess then (Castles.none -> UnmovedRooks.empty)
+        if !variant.allowsCastling then (Castles.none -> UnmovedRooks.empty)
         else
           fen.castling
             .foldLeft(Castles.none -> UnmovedRooks.empty) { case ((c, r), ch) =>
-              val color = Color.fromWhite(ch.isUpper)
-              val rooks = (board.rooks & board(color) & Bitboard.rank(color.backRank)).occupiedSquares
+              val color    = Color.fromWhite(ch.isUpper)
+              val backRank = Bitboard.rank(color.backRank)
+              val rooks = (board.rooks & board(color) & backRank).occupiedSquares
                 .sortBy(_.file.value)
               {
                 for
-                  kingPos <- board.kingPosOf(color).headOption
+                  kingPos <- (board.kingPosOf(color) & backRank).first
                   rookPos <- ch.toLower match
                     case 'k'  => rooks.reverse.find(_ ?> kingPos)
                     case 'q'  => rooks.find(_ ?< kingPos)

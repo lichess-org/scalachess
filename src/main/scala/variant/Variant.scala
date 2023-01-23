@@ -50,8 +50,8 @@ abstract class Variant private[variant] (
   def validMoves(situation: Situation): List[Move] =
     situation.generateMoves.filter(kingSafety)
 
-  def pieceThreatened(board: Board, color: Color, to: Pos): Boolean =
-    board.board.attacks(to, color)
+  def pieceThreatened(board: Board, by: Color, to: Pos): Boolean =
+    board.board.attacks(to, by)
 
   def kingThreatened(board: Board, color: Color): Boolean =
     board.board.isCheck(color)

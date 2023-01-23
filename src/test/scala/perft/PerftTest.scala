@@ -27,7 +27,7 @@ class PerftTest extends ChessTest:
   genTests("calculate Antichess perfts", Perft.antichessPerfts, Antichess, nodeLimits)
   genTests("calculate Atomic perfts", Perft.atomicPerfts, Atomic, nodeLimits)
   // TODO scalachess doesn't generate drops now
-  // genTests("calculate Crazyhouse perfts", Perft.crazyhousePerfts, Crazyhouse, 10_000_000L)
+  // genTests("calculate Crazyhouse perfts", Perft.crazyhousePerfts, Crazyhouse, nodeLimits)
   genTests("calculate Horde perfts", Perft.hordePerfts, Horde, nodeLimits)
   genTests("calculate RacingKings perfts", Perft.racingkingsPerfts, RacingKings, nodeLimits)
   // for the shake of time we only test the first 50 cases in random.peft, run FullRandomPerftTest.scala for all cases

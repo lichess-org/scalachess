@@ -264,7 +264,7 @@ case class Situation(board: Board, color: Color):
       yield move
     )
 
-  // check king position
+  // TODO verify kings & rooks are in back rank only
   private def genCastling(): List[Move] =
     import Castles.*
     ourKings.headOption.fold(Nil) { king =>
@@ -273,7 +273,7 @@ case class Situation(board: Board, color: Color):
           !board.board.atomicKingAttack(
             pos,
             color,
-            (board.occupied ^ king.bitboard | rookTo.bitboard)
+            (board.occupied ^ king.bitboard)
           )
         else board.board.attacksTo(pos, !color, board.occupied ^ king.bitboard).isEmpty
 
@@ -293,9 +293,8 @@ case class Situation(board: Board, color: Color):
             then (Bitboard.between(king, rook) | Bitboard.between(king, kingTo))
             else Bitboard.between(king, rook)
           if (path & (board.occupied & ~rook.bitboard)).isEmpty
-          kingPath = Bitboard.between(king, kingTo) | kingTo.bitboard | king.bitboard
-          safe     = kingPath.occupiedSquares.forall(checkSafeSquare(_, rookTo))
-          if safe
+          kingPath = Bitboard.between(king, kingTo) | king.bitboard
+          if kingPath.occupiedSquares.forall(checkSafeSquare(_, rookTo))
           moves <- castle(king, kingTo, rook, rookTo)
         yield moves
     }

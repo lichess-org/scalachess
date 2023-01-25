@@ -26,7 +26,8 @@ case class Tags(value: List[Tag]) extends AnyVal:
     value.find(_.name == tagType).map(_.value)
 
   def apply(which: Tag.type => TagType): Option[String] =
-    value find (_.name == which(Tag)) map (_.value)
+    val name = which(Tag)
+    value.find(_.name == name).map(_.value)
 
   def clockConfig: Option[Clock.Config] =
     value.collectFirst { case Tag(Tag.TimeControl, str) =>
@@ -51,7 +52,11 @@ case class Tags(value: List[Tag]) extends AnyVal:
   def fen: Option[EpdFen] = EpdFen from apply(_.FEN)
 
   def exists(which: Tag.type => TagType): Boolean =
-    value.exists(_.name == which(Tag))
+    val name = which(Tag)
+    value.exists(_.name == name)
+  def exists(name: String): Boolean =
+    val tagType = Tag tagType name
+    value.exists(_.name == tagType)
 
   def outcome: Option[Outcome] =
     apply(_.Result) flatMap Outcome.fromResult
@@ -110,6 +115,8 @@ object Tag:
   case object BlackTitle      extends TagType
   case object WhiteTeam       extends TagType
   case object BlackTeam       extends TagType
+  case object WhiteFideId     extends TagType
+  case object BlackFideId     extends TagType
   case object Result          extends TagType
   case object FEN             extends TagType
   case object Variant         extends TagType
@@ -152,25 +159,22 @@ object Tag:
   )
   val tagTypesByLowercase: Map[String, TagType] = tagTypes.mapBy(_.lowercase)
 
-  def apply(name: String, value: Any): Tag =
-    new Tag(
-      name = tagType(name),
-      value = value.toString
-    )
+  def apply(name: String, value: Any): Tag = Tag(
+    name = tagType(name),
+    value = value.toString
+  )
 
-  def apply(name: Tag.type => TagType, value: Any): Tag =
-    new Tag(
-      name = name(this),
-      value = value.toString
-    )
+  def apply(name: Tag.type => TagType, value: Any): Tag = Tag(
+    name = name(this),
+    value = value.toString
+  )
 
   def tagType(name: String) =
-    (tagTypesByLowercase get name.toLowerCase) | Unknown(name)
+    tagTypesByLowercase.getOrElse(name.toLowerCase, Unknown(name))
 
-  def timeControl(clock: Option[Clock.Config]) =
-    Tag(
-      TimeControl,
-      clock.fold("-") { c =>
-        s"${c.limit.roundSeconds}+${c.increment.roundSeconds}"
-      }
-    )
+  def timeControl(clock: Option[Clock.Config]) = Tag(
+    TimeControl,
+    clock.fold("-") { c =>
+      s"${c.limit.roundSeconds}+${c.increment.roundSeconds}"
+    }
+  )

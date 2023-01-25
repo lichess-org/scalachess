@@ -149,6 +149,8 @@ object Tag:
     BlackTitle,
     WhiteTeam,
     BlackTeam,
+    WhiteFideId,
+    BlackFideId,
     Result,
     FEN,
     Variant,

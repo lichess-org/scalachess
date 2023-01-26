@@ -39,8 +39,9 @@ object Perft:
   lazy val chess960          = Perft.read("chess960.perft")
 
   private def read(file: String): List[Perft] =
+    import cats.implicits.toShow
     val str = io.Source.fromResource(file).mkString
-    Parser.parse(str).getOrElse(throw RuntimeException(s"Parse perft file failed: $file"))
+    Parser.parse(str).fold(ex => throw RuntimeException(s"Parsing error: $file: ${ex.show}"), identity)
 
   def printResult(results: List[DivideResult]) =
     val builder = StringBuilder()

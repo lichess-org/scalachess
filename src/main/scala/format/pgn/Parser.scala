@@ -12,7 +12,7 @@ import cats.data.NonEmptyList
 object Parser:
 
   // https://unicode-explorer.com/c/00A0
-  val nbsp = P.char('\u00A0')
+  val nbsp       = P.char('\u00A0')
   val whitespace = R.cr | R.lf | R.wsp | nbsp
   val pgnComment = P.caret.filter(_.col == 0) *> P.char('%') *> P.until(P.char('\n')).void
   // pgnComment with % or whitespaces

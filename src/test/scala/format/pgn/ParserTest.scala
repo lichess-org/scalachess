@@ -404,3 +404,10 @@ class ParserTest extends ChessTest:
       a.sans.value.size must_== 106
     }
   }
+
+  "none break space" in {
+    val nbsp = "1.  e4 e5"
+    parser(nbsp) must beValid.like { case a =>
+      a.sans.value.size must_== 2
+    }
+  }

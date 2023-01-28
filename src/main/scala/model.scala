@@ -18,3 +18,6 @@ object Ply extends OpaqueInt[Ply]:
  * It is reset to zero after a capture or a pawn move and incremented otherwise. */
 opaque type HalfMoveClock = Int
 object HalfMoveClock extends OpaqueInt[HalfMoveClock]
+
+opaque type Check = Boolean
+object Check extends YesNo[Check]

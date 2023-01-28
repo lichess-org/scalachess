@@ -54,6 +54,6 @@ object Dumper:
     apply(data, data.finalizeAfter situationOf !data.color)
 
   private def checkOrWinnerSymbol(next: Situation): String =
-    if (next.winner.isDefined) "#"
-    else if (next.check) "+"
+    if next.winner.isDefined then "#"
+    else if next.check.yes then "+"
     else ""

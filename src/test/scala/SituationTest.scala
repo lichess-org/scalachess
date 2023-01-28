@@ -7,13 +7,13 @@ class SituationTest extends ChessTest:
       "by rook" in {
         ("""
 K  r
-""" as White).check must beTrue
+""" as White).check === Check.Yes
       }
       "by knight" in {
         ("""
   n
 K
-""" as White).check must beTrue
+""" as White).check === Check.Yes
       }
       "by bishop" in {
         ("""
@@ -21,19 +21,19 @@ K
 
 
      K
-""" as White).check must beTrue
+""" as White).check === Check.Yes
       }
       "by pawn" in {
         ("""
     p
      K
-""" as White).check must beTrue
+""" as White).check === Check.Yes
       }
       "not" in {
         ("""
    n
 K
-""" as White).check must beFalse
+""" as White).check === Check.No
       }
     }
     "detect check mate" in {

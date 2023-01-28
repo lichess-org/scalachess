@@ -69,10 +69,9 @@ case class Board(
         s.pawnAttacks(!attacker) & pawns
     )
 
-  // return true if the king with color is in check
-  // return false in case of no king
-  def isCheck(color: Color): Boolean =
-    kings(color).exists(k => attackers(k, !color).nonEmpty)
+  // is a king of this color in check
+  def isCheck(color: Color): Check =
+    Check(kings(color).exists(attacks(_, !color)))
 
   /** Find all blockers between the king and attacking sliders First we find all snipers (all potential sliders which
     * can attack the king) Then we loop over those snipers if there is only one blockers between the king and the sniper

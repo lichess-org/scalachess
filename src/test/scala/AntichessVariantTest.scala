@@ -114,8 +114,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         Pos.D1 -> Pos.H5
       )
 
-      game must beValid.like { case newGame =>
-        newGame.situation.check must beFalse
+      game must beValid.like { newGame =>
+        newGame.situation.check === Check.No
       }
     }
 

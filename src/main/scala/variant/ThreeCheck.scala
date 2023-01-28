@@ -24,7 +24,7 @@ case object ThreeCheck
     }
 
   override def specialEnd(situation: Situation) =
-    situation.check && {
+    situation.check.yes && {
       val checks = situation.board.history.checkCount
       situation.color.fold(checks.white, checks.black) >= 3
     }

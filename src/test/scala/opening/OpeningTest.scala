@@ -26,6 +26,11 @@ class OpeningTest extends Specification:
     }
     "find Muzio" in {
       searchStr(
+        "e4 e5 f4 exf4 Nf3 g5 Bc4 g4 O-O gxf3 Qxf3"
+      ) must beSome {
+        (_: Opening).name == OpeningName("King's Gambit Accepted: Muzio Gambit, Wild Muzio Gambit")
+      }
+      searchStr(
         "e4 e5 f4 exf4 Nf3 g5 Bc4 g4 O-O gxf3 Qxf3 Nc6 Qxf4 f6 Nc3 d6 Nd5 Ne5 Bb3 Ng6 Nxf6+ Qxf6 Qxf6 Nxf6 Rxf6 Bd7 Bf7+ Ke7 Rf2 Be8 Bb3 Bg7 c3 Rf8 Rxf8 Kxf8 d4 Bf7 Bxf7 Kxf7 Bg5 c5 Rf1+ Kg8 d5 Re8 Re1 Rf8 Be3"
       ) must beSome {
         (_: Opening).name == OpeningName("King's Gambit Accepted: Muzio Gambit, Holloway Defense")
@@ -35,6 +40,9 @@ class OpeningTest extends Specification:
       searchStr("d4") must beSome {
         (_: Opening).name == OpeningName("Queen's Pawn Game")
       }
+      val op = OpeningDb.search(SanStr.from(List("d4"))).get
+      op.opening.name === OpeningName("Queen's Pawn Game")
+      op.ply === Ply(1)
     }
     "find Old Benoni Defense" in {
       searchStr("d4 c5 d5 e5") must beSome {
@@ -42,18 +50,23 @@ class OpeningTest extends Specification:
       }
     }
     "find by replay" in {
-      val replay = Replay(
-        "e4 e5 f4 exf4 Nf3 g5 Bc4 g4 O-O gxf3 Qxf3 Nc6 Qxf4 f6 Nc3 d6 Nd5 Ne5 Bb3 Ng6 Nxf6+ Qxf6 Qxf6 Nxf6 Rxf6 Bd7 Bf7+ Ke7 Rf2 Be8 Bb3 Bg7 c3 Rf8 Rxf8 Kxf8 d4 Bf7 Bxf7 Kxf7 Bg5 c5 Rf1+ Kg8 d5 Re8 Re1 Rf8 Be3"
-          .split(' ')
-          .toList
-          .map(SanStr(_)),
-        None,
-        variant.Standard
-      ).toOption.get.valid.toOption.get
-      OpeningDb.search(replay) must beSome {
-        (_: Opening.AtPly).opening.name == OpeningName(
-          "King's Gambit Accepted: Muzio Gambit, Holloway Defense"
-        )
+      "d4" >> {
+        val replay = Replay(List(SanStr("d4")), None, variant.Standard).toOption.get.valid.toOption.get
+        val op     = OpeningDb.search(replay).get
+        op.opening.name === OpeningName("Queen's Pawn Game")
+        op.ply === Ply(1)
+      }
+      "full" >> {
+        val replay = Replay(
+          SanStr from "e4 e5 f4 exf4 Nf3 g5 Bc4 g4 O-O gxf3 Qxf3 Nc6 Qxf4 f6 Nc3 d6 Nd5 Ne5 Bb3 Ng6 Nxf6+ Qxf6 Qxf6 Nxf6 Rxf6 Bd7 Bf7+ Ke7 Rf2 Be8 Bb3 Bg7 c3 Rf8 Rxf8 Kxf8 d4 Bf7 Bxf7 Kxf7 Bg5 c5 Rf1+ Kg8 d5 Re8 Re1 Rf8 Be3"
+            .split(' ')
+            .toList,
+          None,
+          variant.Standard
+        ).toOption.get.valid.toOption.get
+        val op = OpeningDb.search(replay).get
+        op.opening.name === OpeningName("King's Gambit Accepted: Muzio Gambit, Holloway Defense")
+        op.ply === Ply(12)
       }
     }
   }

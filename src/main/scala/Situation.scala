@@ -118,7 +118,7 @@ case class Situation(board: Board, color: Color):
           case Queen  => genQueen(us & bb, targets)
           case King   => genKings(targets, Some(pos))
     }
-    board.variant.applyVariantEffect(moves)
+    board.variant.applyVariantEffect(moves).filter(board.variant.kingSafety)
 
   private def genKings(mask: Bitboard, pos: Option[Pos] = None) =
     val kingPos        = pos.fold(ourKings)(List(_))

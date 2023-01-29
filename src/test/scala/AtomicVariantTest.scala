@@ -112,7 +112,7 @@ class AtomicVariantTest extends ChessTest:
       val threatenedGame = fenToGame(positionFen, Atomic)
 
       threatenedGame must beValid.like { case (game: Game) =>
-        game.situation.check must beTrue
+        game.situation.check.yes must beTrue
         game.situation.end must beFalse
         game.situation.winner must beNone
         game.situation.moves must haveKeys(Pos.D4, Pos.H7, Pos.C8)
@@ -161,7 +161,7 @@ class AtomicVariantTest extends ChessTest:
 
       successGame must beValid.like { case game =>
         game.situation.board(Pos.D7) must beSome
-        game.situation.check must beFalse
+        game.situation.check.yes must beFalse
       }
     }
 
@@ -256,8 +256,8 @@ class AtomicVariantTest extends ChessTest:
 
       val successGame = game flatMap (_.playMoves((Pos.F6, Pos.F5), (Pos.G4, Pos.H3)))
 
-      successGame must beValid.like { case game =>
-        game.situation.check must beTrue
+      successGame must beValid.like { game =>
+        game.situation.check === Check.Yes
       }
     }
 
@@ -267,7 +267,7 @@ class AtomicVariantTest extends ChessTest:
 
       val successGame = game flatMap (_.playMoves((Pos.D8, Pos.D2)))
 
-      successGame must beValid.like { case game =>
+      successGame must beValid.like { game =>
         game.situation.end must beTrue
         game.situation.winner must beSome { (_: Color) == Black }
       }
@@ -279,8 +279,8 @@ class AtomicVariantTest extends ChessTest:
 
       val successGame = game flatMap (_.playMoves((Pos.B5, Pos.D7)))
 
-      successGame must beValid.like { case game =>
-        game.situation.check must beFalse
+      successGame must beValid.like { game =>
+        game.situation.check === Check.No
       }
     }
 

@@ -60,8 +60,8 @@ case class History(
 
   inline def withLastMove(inline m: Uci) = copy(lastMove = Option(m))
 
-  def withCheck(color: Color, v: Boolean) =
-    if (v) copy(checkCount = checkCount add color) else this
+  def withCheck(color: Color, check: Check) =
+    if check.yes then copy(checkCount = checkCount add color) else this
 
   def withCheckCount(cc: CheckCount) = copy(checkCount = cc)
 

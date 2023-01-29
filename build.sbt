@@ -31,7 +31,7 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
 )
 
 ThisBuild / organization           := "org.lichess"
-ThisBuild / version                := "14.1.6"
+ThisBuild / version                := "14.2.1"
 ThisBuild / scalaVersion           := "3.2.1"
 ThisBuild / licenses += "AGPL-3.0" -> url("https://opensource.org/licenses/AGPL-3.0")
 

@@ -53,11 +53,11 @@ abstract class Variant private[variant] (
   def pieceThreatened(board: Board, by: Color, to: Pos): Boolean =
     board.board.attacks(to, by)
 
-  def kingThreatened(board: Board, color: Color): Boolean =
+  def kingThreatened(board: Board, color: Color): Check =
     board.board.isCheck(color)
 
   def kingSafety(m: Move): Boolean =
-    !kingThreatened(m.after, m.color)
+    kingThreatened(m.after, m.color).no
 
   def castleCheckSafeSquare(situation: Situation, kingFrom: Pos, kingTo: Pos): Boolean =
     import bitboard.Bitboard.bitboard
@@ -95,9 +95,9 @@ abstract class Variant private[variant] (
   def drop(situation: Situation, role: Role, pos: Pos): Validated[String, Drop] =
     Validated.invalid(s"$this variant cannot drop $situation $role $pos")
 
-  def staleMate(situation: Situation): Boolean = !situation.check && situation.legalMoves.isEmpty
+  def staleMate(situation: Situation): Boolean = situation.check.no && situation.legalMoves.isEmpty
 
-  def checkmate(situation: Situation) = situation.check && situation.legalMoves.isEmpty
+  def checkmate(situation: Situation) = situation.check.yes && situation.legalMoves.isEmpty
 
   // In most variants, the winner is the last player to have played and there is a possibility of either a traditional
   // checkmate or a variant end condition

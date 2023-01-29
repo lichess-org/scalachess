@@ -49,13 +49,12 @@ case class Board(
 
   def kingPosOf(c: Color): Bitboard = board.kings & board.byColor(c)
 
-  def checkColor: Option[Color] = checkWhite.option(White) orElse checkBlack.option(Black)
+  def checkColor: Option[Color] = checkWhite.yes.option(White) orElse checkBlack.yes.option(Black)
 
-  lazy val checkWhite: Boolean = checkOf(White)
-  lazy val checkBlack: Boolean = checkOf(Black)
+  lazy val checkWhite: Check = checkOf(White)
+  lazy val checkBlack: Check = checkOf(Black)
 
-  def checkOf(c: Color): Boolean =
-    variant.kingThreatened(this, c)
+  def checkOf(c: Color): Check = variant.kingThreatened(this, c)
 
   // TODO delete, this only used in test
   def destsFrom(from: Pos): Option[List[Pos]] =

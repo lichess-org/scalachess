@@ -24,8 +24,7 @@ case object Antichess
   override def kingSafety(m: Move): Boolean =
     true
 
-  override def kingThreatened(board: Board, color: Color) =
-    false
+  override def kingThreatened(board: Board, color: Color) = Check.No
 
   override def validMoves(situation: Situation) =
     val capturingMoves = situation.generateMoves.filter(_.captures)

@@ -38,7 +38,7 @@ case object Crazyhouse
       d2     <- d1.drop(piece) toValid s"No $piece to drop on $pos"
       board1 <- situation.board.place(piece, pos) toValid s"Can't drop $role on $pos, it's occupied"
       _ <-
-        if (!board1.checkOf(situation.color)) Validated.valid(board1)
+        if board1.checkOf(situation.color).no then Validated.valid(board1)
         else Validated.invalid(s"Dropping $role on $pos doesn't uncheck the king")
     } yield Drop(
       piece = piece,
@@ -83,8 +83,9 @@ case object Crazyhouse
   override def opponentHasInsufficientMaterial(situation: Situation) = false
   override def isInsufficientMaterial(board: Board)                  = false
 
+  // if the king is not in check, all drops are possible, we just return None
   def possibleDrops(situation: Situation): Option[List[Pos]] =
-    if (!situation.check) None
+    if situation.check.no then None
     else situation.ourKings.headOption.map(blockades(situation, _))
 
   private def blockades(situation: Situation, kingPos: Pos): List[Pos] =
@@ -98,7 +99,7 @@ case object Crazyhouse
         case Some(next)                                           => forward(next, dir, next :: squares)
     Queen.dirs flatMap { forward(kingPos, _, Nil) } filter { square =>
       situation.board.place(Piece(situation.color, Knight), square) exists { defended =>
-        !defended.checkOf(situation.color)
+        defended.checkOf(situation.color).no
       }
     }
 

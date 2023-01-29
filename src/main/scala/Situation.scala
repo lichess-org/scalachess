@@ -29,9 +29,9 @@ case class Situation(board: Board, color: Color):
       case v: variant.Crazyhouse.type => v possibleDrops this
       case _                          => None
 
-  lazy val check: Boolean = board checkOf color
+  lazy val check: Check = board checkOf color
 
-  def checkSquare = if (check) ourKings.headOption else None
+  def checkSquare = if check.yes then ourKings.headOption else None
 
   def piecesOf(c: Color): Map[Pos, Piece] = board.piecesOf(c)
 
@@ -54,7 +54,7 @@ case class Situation(board: Board, color: Color):
   inline def winner: Option[Color] = board.variant.winner(this)
 
   def playable(strict: Boolean): Boolean =
-    (board valid strict) && !end && !copy(color = !color).check
+    (board valid strict) && !end && copy(color = !color).check.no
 
   lazy val status: Option[Status] =
     if (checkMate) Status.Mate.some

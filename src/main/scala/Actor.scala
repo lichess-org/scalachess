@@ -14,9 +14,7 @@ case class Actor(
 
   lazy val situation = Situation(board, piece.color)
 
-  lazy val moves: List[Move] = situation.legalMoves.filter(_.orig == pos)
-
-  lazy val destinations: List[Pos] = moves.map(_.dest)
+  lazy val moves: List[Move] = situation.generateMovesAt(pos)
 
   inline def color               = piece.color
   inline def is(inline c: Color) = c == piece.color
@@ -25,6 +23,7 @@ case class Actor(
 
 object Actor:
 
+  import bitboard.Bitboard.{ occupiedSquares, pawnAttacks }
   inline def pawnDirOf(inline color: Color): Direction = color.fold(_.up, _.down)
 
   /** Determines the position one ahead of a pawn based on the color of the piece.
@@ -35,9 +34,4 @@ object Actor:
   /** Determines the squares that a pawn attacks based on the colour of the pawn.
     */
   def pawnAttacks(pos: Pos, color: Color): List[Pos] =
-    color
-      .fold(
-        List(pos.upLeft, pos.upRight),
-        List(pos.downLeft, pos.downRight)
-      )
-      .flatten
+    pos.pawnAttacks(color).occupiedSquares

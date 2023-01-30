@@ -156,7 +156,7 @@ class HordeVariantTest extends ChessTest:
     "the h8 rooks move" in {
       val position = EpdFen("r3kbnr/p1pqppp1/1pnp3P/PPPP1P1P/PPP1PPP1/1PPP1PPP/PPPPPPPP/PPPPPPPP b kq - 0 7")
       val game     = fenToGame(position, Horde)
-      val newGame = game.flatMap(_.apply(Pos.H8, Pos.H6))
+      val newGame  = game.flatMap(_.apply(Pos.H8, Pos.H6))
       newGame must beValid.like { case game =>
         game._1.situation.board.history.unmovedRooks must_== UnmovedRooks(Set(Pos.A8))
         game._1.situation.board.history.castles.pp must_== Castles("q")

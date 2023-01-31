@@ -69,7 +69,7 @@ case object Antichess
 
   override def isInsufficientMaterial(board: Board) =
     // Exit early if we are not in a situation with only bishops and pawns
-    if (board.bishops | board.pawns) == board.occupied then false
+    if (board.bishops | board.pawns) != board.occupied then false
     else
       val whiteBishops = (board.white & board.bishops).occupiedSquares
       val blackBishops = (board.black & board.bishops).occupiedSquares

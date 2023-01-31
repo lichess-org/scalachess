@@ -143,7 +143,7 @@ case object Atomic
   private def atomicClosedPosition(board: Board) =
     val closedStructure = board.actors.values.forall(actor =>
       (actor.piece.is(Pawn) && actor.moves.isEmpty
-        && InsufficientMatingMaterial.pawnBlockedByPawn(actor, board))
+        && InsufficientMatingMaterial.pawnBlockedByPawn(actor.pos, board))
         || actor.piece.is(King) || actor.piece.is(Bishop)
     )
     val randomBishop = board.pieces.find { case (_, piece) => piece.is(Bishop) }

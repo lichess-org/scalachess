@@ -69,14 +69,13 @@ case object Antichess
 
   override def isInsufficientMaterial(board: Board) =
     // Exit early if we are not in a situation with only bishops and pawns
-    if (board.bishops | board.pawns) == board.occupied then
-      false
+    if (board.bishops | board.pawns) == board.occupied then false
     else
       val whiteBishops = (board.white & board.bishops).occupiedSquares
       val blackBishops = (board.black & board.bishops).occupiedSquares
       if whiteBishops.map(_.isLight).to(Set).size != 1 ||
-          blackBishops.map(_.isLight).to(Set).size != 1
-        then false
+        blackBishops.map(_.isLight).to(Set).size != 1
+      then false
       else
         val whitePawns = (board.white & board.pawns).occupiedSquares
         val blackPawns = (board.black & board.pawns).occupiedSquares
@@ -86,7 +85,7 @@ case object Antichess
         } yield whiteBishopLight != blackBishopLight && whitePawns.forall(
           pawnNotAttackable(_, blackBishopLight, board)
         ) && blackPawns.forall(pawnNotAttackable(_, whiteBishopLight, board)))
-        .getOrElse(false)
+          .getOrElse(false)
 
   // No player can win if the only remaining pieces are opposing bishops on different coloured
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color

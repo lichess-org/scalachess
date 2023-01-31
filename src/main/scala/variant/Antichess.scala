@@ -122,7 +122,6 @@ case object Antichess
   private def pawnNotAttackable(pawn: Pos, oppositeBishopLight: Boolean, board: Board): Boolean =
     // The pawn cannot attack a bishop or be attacked by a bishop
     val cannotAttackBishop = pawn.isLight != oppositeBishopLight
-
     InsufficientMatingMaterial.pawnBlockedByPawn(pawn, board) && cannotAttackBishop
 
   // In this game variant, a king is a valid promotion

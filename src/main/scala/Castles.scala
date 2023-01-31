@@ -80,7 +80,7 @@ object Castles extends OpaqueBitboard[Castles]:
 
   private def charToSquare: (c: Char) => Option[Pos] =
     case 'k' => Some(H8)
-    case 'q' => Some(A1)
+    case 'q' => Some(A8)
     case 'K' => Some(H1)
     case 'Q' => Some(A1)
     case _   => None

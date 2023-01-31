@@ -1,8 +1,8 @@
 lazy val scalachess = Project("scalachess", file(".")).settings(
   name := "scalachess",
   libraryDependencies ++= List(
-    "org.specs2"     %% "specs2-core"      % "4.19.0"   % Test,
-    "org.specs2"     %% "specs2-cats"      % "4.19.0"   % Test,
+    "org.specs2"     %% "specs2-core"      % "4.19.2"   % Test,
+    "org.specs2"     %% "specs2-cats"      % "4.19.2"   % Test,
     "org.scalameta"  %% "munit"            % "1.0.0-M7" % Test,
     "org.scalacheck" %% "scalacheck"       % "1.17.0"   % Test,
     "org.scalameta"  %% "munit-scalacheck" % "1.0.0-M7" % Test,
@@ -31,7 +31,7 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
 )
 
 ThisBuild / organization           := "org.lichess"
-ThisBuild / version                := "14.2.1"
+ThisBuild / version                := "14.2.3"
 ThisBuild / scalaVersion           := "3.2.1"
 ThisBuild / licenses += "AGPL-3.0" -> url("https://opensource.org/licenses/AGPL-3.0")
 

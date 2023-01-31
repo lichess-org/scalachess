@@ -13,7 +13,7 @@ import bitboard.Bitboard.bitboard
 
 class UnmovedRooksTest extends ChessTest:
 
-  "UnmovedRooks with initial fen" in {
+  "UnmovedRooks with 960 initial fen" in {
     Fen
       .read(Chess960, EpdFen("rkrnnqbb/pppppppp/8/8/8/8/PPPPPPPP/RKRNNQBB w KQkq - 0 1"))
       .map(_.board.history.unmovedRooks) must beSome(360287970189639685L)

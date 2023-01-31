@@ -31,6 +31,8 @@ case class Board(
   // todo maybe remove?
   lazy val allPieces = board.pieces
 
+  def nbPieces = board.occupied.count
+
   def contains = board.contains
 
   // TODO fix

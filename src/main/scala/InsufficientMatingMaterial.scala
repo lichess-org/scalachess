@@ -20,7 +20,7 @@ object InsufficientMatingMaterial:
     board(pawn).exists(p =>
       p.is(Pawn) &&
         Situation(board, p.color).generateMovesAt(pawn).isEmpty && {
-          val blockingPosition = Actor.posAheadOfPawn(pawn, p.color)
+          val blockingPosition = posAheadOfPawn(pawn, p.color)
           blockingPosition.flatMap(board(_)).exists(_.is(Pawn))
         }
     )
@@ -66,3 +66,10 @@ object InsufficientMatingMaterial:
         !(rolesOfOpponentColor.exists(r => r == Knight || r == Pawn) || bishopsOnOppositeColors(board))
       case _ => false
     })
+
+  inline def pawnDirOf(inline color: Color): Direction = color.fold(_.up, _.down)
+
+  /** Determines the position one ahead of a pawn based on the color of the piece.
+    * White pawns move up and black pawns move down.
+    */
+  def posAheadOfPawn(pos: Pos, color: Color): Option[Pos] = pawnDirOf(color)(pos)

@@ -67,6 +67,9 @@ case object Antichess
       } getOrElse false
     }
 
+  // No player can win if the only remaining pieces are opposing bishops on different coloured
+  // diagonals. There may be pawns that are incapable of moving and do not attack the right color
+  // of square to allow the player to force their opponent to capture their bishop, also resulting in a draw
   override def isInsufficientMaterial(board: Board) =
     // Exit early if we are not in a situation with only bishops and pawns
     if (board.bishops | board.pawns) != board.occupied then false
@@ -86,37 +89,6 @@ case object Antichess
           pawnNotAttackable(_, blackBishopLight, board)
         ) && blackPawns.forall(pawnNotAttackable(_, whiteBishopLight, board)))
           .getOrElse(false)
-
-  // No player can win if the only remaining pieces are opposing bishops on different coloured
-  // diagonals. There may be pawns that are incapable of moving and do not attack the right color
-  // of square to allow the player to force their opponent to capture their bishop, also resulting in a draw
-  // override def isInsufficientMaterial(board: Board) =
-  //   // Exit early if we are not in a situation with only bishops and pawns
-  //   val bishopsAndPawns = (board.bishops | board.pawns) == board.occupied
-  //
-  //   lazy val drawnBishops = board.actors.values.partition(_.is(White)) match
-  //     case (whitePieces, blackPieces) =>
-  //       val whiteBishops    = whitePieces.filter(_.is(Bishop))
-  //       val blackBishops    = blackPieces.filter(_.is(Bishop))
-  //       lazy val whitePawns = whitePieces.filter(_.is(Pawn))
-  //       lazy val blackPawns = blackPieces.filter(_.is(Pawn))
-  //
-  //       // We consider the case where a player has two bishops on the same diagonal after promoting.
-  //       if (
-  //         whiteBishops.map(_.pos.isLight).to(Set).size != 1 ||
-  //         blackBishops.map(_.pos.isLight).to(Set).size != 1
-  //       ) false
-  //       else {
-  //         for {
-  //           whiteBishopLight <- whiteBishops.headOption map (_.pos.isLight)
-  //           blackBishopLight <- blackBishops.headOption map (_.pos.isLight)
-  //         } yield whiteBishopLight != blackBishopLight && whitePawns.forall(
-  //           pawnNotAttackable(_, blackBishopLight, board)
-  //         ) &&
-  //           blackPawns.forall(pawnNotAttackable(_, whiteBishopLight, board))
-  //       } getOrElse false
-  //
-  //   bishopsAndPawns && drawnBishops
 
   private def pawnNotAttackable(pawn: Pos, oppositeBishopLight: Boolean, board: Board): Boolean =
     // The pawn cannot attack a bishop or be attacked by a bishop

@@ -9,34 +9,31 @@ object InsufficientMatingMaterial:
 
   def nonKingPieces(board: Board): PieceMap = board.pieces filter (_._2.role != King)
 
+  // verify if there are at least two bishops of opposite color
+  // no matter which sides they are on
   def bishopsOnOppositeColors(board: Board) =
-    (board.pieces collect { case (pos, Piece(_, Bishop)) => pos.isLight } toList).distinct
-    .lengthCompare(2) == 0
+    board.bishops.occupiedSquares.map(_.isLight).distinct.size == 2
 
   /*
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
+   * and it doesn't have any capture
    */
-  def pawnBlockedByPawn(pawn: Actor, board: Board) =
-    pawn.moves.isEmpty && {
-      val blockingPosition = Actor.posAheadOfPawn(pawn.pos, pawn.piece.color)
-      blockingPosition.flatMap(board(_)).exists(_.is(Pawn))
-    }
+  def pawnBlockedByPawn(pawn: Pos, board: Board) =
+    board(pawn).exists(p =>
+      p.is(Pawn) &&
+        Situation(board, p.color).generateMovesAt(pawn).isEmpty && {
+          val blockingPosition = posAheadOfPawn(pawn, p.color)
+          blockingPosition.flatMap(board(_)).exists(_.is(Pawn))
+        }
+    )
 
   /*
    * Determines whether a board position is an automatic draw due to neither player
    * being able to mate the other as informed by the traditional chess rules.
    */
   def apply(board: Board) =
-    lazy val kingsAndBishopsOnly = board.allPieces forall { p =>
-      (p is King) || (p is Bishop)
-    }
-    val kingsAndMinorsOnly = board.allPieces forall { p =>
-      (p is King) || (p is Bishop) || (p is Knight)
-    }
-
-    kingsAndMinorsOnly && (board.allPieces.size <= 3 || (kingsAndBishopsOnly && !bishopsOnOppositeColors(
-      board
-    )))
+    board.kingsAndMinorsOnly &&
+      (board.nbPieces <= 3 || (board.kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
 
   /*
    * Determines whether a color does not have mating material. In general:
@@ -46,20 +43,17 @@ object InsufficientMatingMaterial:
    * King + bishop(s) versus king + bishop(s) depends upon bishop square colors
    */
   def apply(board: Board, color: Color) =
+    if board.kingsOnlyOf(color) then true
+    else if board.kingsAndKnightsOnlyOf(color) then
+      board.nonKingsOf(color).count == 1 &&
+      board.onlyOf(!color, board.kings | board.queens)
+    else if board.kingsAndBishopsOnlyOf(color) then
+      !(bishopsOnOppositeColors(board) || (board(!color, Knight) | board(!color, Pawn)).nonEmpty)
+    else false
 
-    val kingsAndMinorsOnlyOfColor = board.piecesOf(color) forall { p =>
-      (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight)
-    }
-    lazy val nonKingRolesOfColor  = board rolesOf color filter (King !=)
-    lazy val rolesOfOpponentColor = board rolesOf !color
+  inline def pawnDirOf(inline color: Color): Direction = color.fold(_.up, _.down)
 
-    kingsAndMinorsOnlyOfColor && (nonKingRolesOfColor.distinct match {
-      case Nil => true
-      case List(Knight) =>
-        nonKingRolesOfColor.lengthCompare(
-          1
-        ) == 0 && !(rolesOfOpponentColor filter (King !=) exists (Queen !=))
-      case List(Bishop) =>
-        !(rolesOfOpponentColor.exists(r => r == Knight || r == Pawn) || bishopsOnOppositeColors(board))
-      case _ => false
-    })
+  /** Determines the position one ahead of a pawn based on the color of the piece.
+    * White pawns move up and black pawns move down.
+    */
+  def posAheadOfPawn(pos: Pos, color: Color): Option[Pos] = pawnDirOf(color)(pos)

@@ -2,6 +2,8 @@ package chess
 
 import scala.language.implicitConversions
 import Pos.*
+import bitboard.Bitboard.*
+import chess.bitboard.Bitboard
 
 class BishopTest extends ChessTest:
 
@@ -67,32 +69,5 @@ PPPPPPPP
  NBQKBNR
 """
       )
-    }
-    "threaten" in {
-      val board = """
-k B
-  q  q
-p
-
-N B    P
-
-PPPPPPPP
- NBQKBNR
-"""
-      "a reachable enemy" in {
-        board actorAt C4 map (_ threatens A6) must beSome(true)
-      }
-      "an unreachable enemy" in {
-        board actorAt C4 map (_ threatens C7) must beSome(false)
-      }
-      "a reachable friend" in {
-        board actorAt C4 map (_ threatens A2) must beSome(true)
-      }
-      "nothing up left" in {
-        board actorAt C4 map (_ threatens B5) must beSome(true)
-      }
-      "nothing down right" in {
-        board actorAt C4 map (_ threatens D3) must beSome(true)
-      }
     }
   }

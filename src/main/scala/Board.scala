@@ -11,18 +11,12 @@ case class Board(
     crazyData: Option[Crazyhouse.Data] = None
 ):
 
-  val white: Bitboard    = board.white
-  val black: Bitboard    = board.black
-  val pawns: Bitboard    = board.pawns
-  val knights: Bitboard  = board.knights
-  val bishops: Bitboard  = board.bishops
-  val rooks: Bitboard    = board.rooks
-  val queens: Bitboard   = board.queens
-  val kings: Bitboard    = board.kings
-  val occupied: Bitboard = board.occupied
-  val sliders: Bitboard  = board.sliders
+  export board.{ bishops, black, contains, kings, knights, occupied, pawns, queens, rooks, sliders, white }
 
-  inline def apply(inline color: Color): Bitboard        = color.fold(white, black)
+  inline def apply(inline color: Color): Bitboard = color.fold(white, black)
+  inline def apply(inline color: Color, inline role: Role): Bitboard =
+    color.fold(white, black) & board.byRole(role)
+
   inline def apply(inline at: Pos): Option[Piece]        = board.pieceAt(at)
   inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Pos(file, rank))
 
@@ -31,24 +25,10 @@ case class Board(
   // todo maybe remove?
   lazy val allPieces = board.pieces
 
-  def nbPieces = board.occupied.count
-
-  def contains = board.contains
-
-  // TODO fix
-  lazy val actors: Map[Pos, Actor] = pieces map { case (pos, piece) =>
-    (pos, Actor(piece, pos, this))
-  }
-
-  lazy val actorsOf: Color.Map[Seq[Actor]] =
-    val (w, b) = actors.values.toSeq.partition { _.color.white }
-    Color.Map(w, b)
+  lazy val nbPieces = board.occupied.count
 
   def rolesOf(c: Color): List[Role] =
     allPieces.collect { case p if p.color == c => p.role }
-
-  // todo fix
-  inline def actorAt(inline at: Pos): Option[Actor] = actors get at
 
   def piecesOf(c: Color): Map[Pos, Piece] = board.piecesOf(c)
 
@@ -60,9 +40,6 @@ case class Board(
   lazy val checkBlack: Check = checkOf(Black)
 
   def checkOf(c: Color): Check = variant.kingThreatened(this, c)
-
-  // TODO delete, this only used in test
-  def destsFrom(from: Pos): Option[List[Pos]] = actorAt(from).map(_.destinations)
 
   def seq(actions: Board => Option[Board]*): Option[Board] =
     actions.foldLeft(Option(this): Option[Board])(_ flatMap _)
@@ -132,6 +109,45 @@ case class Board(
   inline def valid(inline strict: Boolean): Boolean = variant.valid(this, strict)
 
   def materialImbalance: Int = variant.materialImbalance(this)
+
+  lazy val kingsAndBishopsOnly: Boolean =
+    (kings | bishops) == occupied
+
+  lazy val kingsAndKnightsOnly: Boolean =
+    (kings | knights) == occupied
+
+  lazy val onlyKnights: Boolean = knights == occupied
+
+  lazy val minors: Bitboard =
+    bishops | knights
+
+  lazy val kingsAndMinorsOnly: Boolean =
+    (kings | minors) == occupied
+
+  lazy val kingsRooksAndMinorsOnly: Boolean =
+    (kings | rooks | minors) == occupied
+
+  def kingsAndBishopsOnlyOf(color: Color): Boolean =
+    onlyOf(color, kings | bishops)
+
+  def kingsAndMinorsOnlyOf(color: Color): Boolean =
+    onlyOf(color, kings | minors)
+
+  def kingsOnlyOf(color: Color) =
+    onlyOf(color, kings)
+
+  def kingsAndKnightsOnlyOf(color: Color) =
+    onlyOf(color, kings | knights)
+
+  def onlyOf(color: Color, roles: Bitboard): Boolean =
+    val colorPieces = apply(color)
+    (roles & colorPieces) == colorPieces
+
+  def nonKingsOf(color: Color): Bitboard =
+    apply(color) & ~kings
+
+  lazy val nonKing: Bitboard =
+    occupied & ~kings
 
   override def toString = s"$board $variant ${history.lastMove}\n"
 

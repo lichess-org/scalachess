@@ -2,6 +2,7 @@ package chess
 package variant
 
 import chess.format.EpdFen
+import bitboard.Bitboard.pawnAttacks
 
 case object Antichess
     extends Variant(
@@ -51,10 +52,10 @@ case object Antichess
   // blockade or stalemate. Only one player can win if the only remaining pieces are two knights
   override def opponentHasInsufficientMaterial(situation: Situation) =
     // Exit early if we are not in a situation with only knights
-    situation.board.allPieces.forall(_.is(Knight)) && {
+    situation.board.onlyKnights && {
 
-      val whiteKnights = situation.board.actorsOf(White)
-      val blackKnights = situation.board.actorsOf(Black)
+      val whiteKnights = situation.board.white.occupiedSquares
+      val blackKnights = situation.board.black.occupiedSquares
 
       // We consider the case where a player has two knights
       if (whiteKnights.size != 1 || blackKnights.size != 1) false
@@ -62,7 +63,7 @@ case object Antichess
         for {
           whiteKnight <- whiteKnights.headOption
           blackKnight <- blackKnights.headOption
-        } yield whiteKnight.pos.isLight == blackKnight.pos.isLight
+        } yield whiteKnight.isLight == blackKnight.isLight
       } getOrElse false
     }
 
@@ -71,36 +72,27 @@ case object Antichess
   // of square to allow the player to force their opponent to capture their bishop, also resulting in a draw
   override def isInsufficientMaterial(board: Board) =
     // Exit early if we are not in a situation with only bishops and pawns
-    val bishopsAndPawns = board.allPieces.forall(p => p.is(Bishop) || p.is(Pawn)) &&
-      board.allPieces.exists(_.is(Bishop))
+    if (board.bishops | board.pawns) != board.occupied then false
+    else
+      val whiteBishops = (board.white & board.bishops).occupiedSquares
+      val blackBishops = (board.black & board.bishops).occupiedSquares
+      if whiteBishops.map(_.isLight).to(Set).size != 1 ||
+        blackBishops.map(_.isLight).to(Set).size != 1
+      then false
+      else
+        val whitePawns = (board.white & board.pawns).occupiedSquares
+        val blackPawns = (board.black & board.pawns).occupiedSquares
+        (for {
+          whiteBishopLight <- whiteBishops.headOption map (_.isLight)
+          blackBishopLight <- blackBishops.headOption map (_.isLight)
+        } yield whiteBishopLight != blackBishopLight && whitePawns.forall(
+          pawnNotAttackable(_, blackBishopLight, board)
+        ) && blackPawns.forall(pawnNotAttackable(_, whiteBishopLight, board)))
+          .getOrElse(false)
 
-    lazy val drawnBishops = board.actors.values.partition(_.is(White)) match
-      case (whitePieces, blackPieces) =>
-        val whiteBishops    = whitePieces.filter(_.is(Bishop))
-        val blackBishops    = blackPieces.filter(_.is(Bishop))
-        lazy val whitePawns = whitePieces.filter(_.is(Pawn))
-        lazy val blackPawns = blackPieces.filter(_.is(Pawn))
-
-        // We consider the case where a player has two bishops on the same diagonal after promoting.
-        if (
-          whiteBishops.map(_.pos.isLight).to(Set).size != 1 ||
-          blackBishops.map(_.pos.isLight).to(Set).size != 1
-        ) false
-        else {
-          for {
-            whiteBishopLight <- whiteBishops.headOption map (_.pos.isLight)
-            blackBishopLight <- blackBishops.headOption map (_.pos.isLight)
-          } yield whiteBishopLight != blackBishopLight && whitePawns.forall(
-            pawnNotAttackable(_, blackBishopLight, board)
-          ) &&
-            blackPawns.forall(pawnNotAttackable(_, whiteBishopLight, board))
-        } getOrElse false
-
-    bishopsAndPawns && drawnBishops
-
-  private def pawnNotAttackable(pawn: Actor, oppositeBishopLight: Boolean, board: Board) =
+  private def pawnNotAttackable(pawn: Pos, oppositeBishopLight: Boolean, board: Board): Boolean =
     // The pawn cannot attack a bishop or be attacked by a bishop
-    val cannotAttackBishop = pawn.pos.isLight != oppositeBishopLight
+    val cannotAttackBishop = pawn.isLight != oppositeBishopLight
     InsufficientMatingMaterial.pawnBlockedByPawn(pawn, board) && cannotAttackBishop
 
   // In this game variant, a king is a valid promotion

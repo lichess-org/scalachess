@@ -2,6 +2,8 @@ package chess
 
 import scala.language.implicitConversions
 import Pos.*
+import bitboard.Bitboard
+import bitboard.Bitboard.*
 
 class KingTest extends ChessTest:
 
@@ -66,27 +68,6 @@ PPPPPPPP
 
 """
       )
-    }
-    "threaten" in {
-      val board = """
-k B
-
- b B
-bpp
-  Kb
-  P Q
-PP   PPP
- NBQ BNR
-"""
-      "a reachable enemy" in {
-        board actorAt C4 map (_ threatens B5) must beSome(true)
-      }
-      "an unreachable enemy" in {
-        board actorAt C4 map (_ threatens A5) must beSome(false)
-      }
-      "a reachable friend" in {
-        board actorAt C4 map (_ threatens C3) must beSome(true)
-      }
     }
     "not move near from the other king" in {
       """

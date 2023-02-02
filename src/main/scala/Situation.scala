@@ -13,12 +13,12 @@ import Pos.prevRank
 
 case class Situation(board: Board, color: Color):
 
-  lazy val actors = board actorsOf color
-
   lazy val legalMoves = board.variant.validMoves(this)
 
   lazy val moves: Map[Pos, List[Move]] =
     legalMoves.groupBy(_.orig)
+
+  val movesAt: Pos => List[Move] = moves.getOrElse(_, Nil)
 
   lazy val playerCanCapture: Boolean = legalMoves.exists(_.captures)
 
@@ -118,7 +118,7 @@ case class Situation(board: Board, color: Color):
           case Queen  => genQueen(us & bb, targets)
           case King   => genKings(targets, Some(pos))
     }
-    board.variant.applyVariantEffect(moves)
+    board.variant.applyVariantEffect(moves).filter(board.variant.kingSafety)
 
   private def genKings(mask: Bitboard, pos: Option[Pos] = None) =
     val kingPos        = pos.fold(ourKings)(List(_))

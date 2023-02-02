@@ -65,9 +65,7 @@ case class Std(
             rank,
             pos.rank.index + 1
           ) && piece.eyesMovable(pos, dest) =>
-        situation.generateMovesAt(pos) find { m =>
-          m.dest == dest && situation.board.variant.kingSafety(m)
-        }
+        situation.generateMovesAt(pos) find { _.dest == dest }
       case (m, _) => m
     } match
       case None       => Validated invalid s"No move found: $this\n$situation"

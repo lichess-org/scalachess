@@ -110,25 +110,16 @@ case object Atomic
     * then either a queen or multiple pieces are required for checkmate.
     */
   private def insufficientAtomicWinningMaterial(board: Board) =
-    val kingsAndBishopsOnly = board.allPieces forall { p =>
-      (p is King) || (p is Bishop)
-    }
     lazy val bishopsOnOppositeColors = InsufficientMatingMaterial.bishopsOnOppositeColors(board)
-    lazy val kingsAndKnightsOnly = board.allPieces forall { p =>
-      (p is King) || (p is Knight)
-    }
-    lazy val kingsRooksAndMinorsOnly = board.allPieces forall { p =>
-      (p is King) || (p is Rook) || (p is Bishop) || (p is Knight)
-    }
 
     // Bishops of opposite color (no other pieces) endgames are dead drawn
     // except if either player has multiple bishops so a helpmate is possible
     if (board.count(White) >= 2 && board.count(Black) >= 2)
-      kingsAndBishopsOnly && board.allPieces.size <= 4 && bishopsOnOppositeColors
+      board.kingsAndBishopsOnly && board.nbPieces <= 4 && bishopsOnOppositeColors
 
     // Queen, rook + any, bishop + any (same piece color), or 3 knights can mate
-    else if (kingsAndKnightsOnly) board.pieces.size <= 4
-    else kingsRooksAndMinorsOnly && !bishopsOnOppositeColors && board.allPieces.size <= 3
+    else if (board.kingsAndKnightsOnly) board.nbPieces <= 4
+    else board.kingsRooksAndMinorsOnly && !bishopsOnOppositeColors && board.nbPieces <= 3
 
   /*
    * Bishops on opposite coloured squares can never capture each other to cause a king to explode and a traditional
@@ -141,10 +132,9 @@ case object Atomic
   /** Since a king cannot capture, K + P vs K + P where none of the pawns can move is an automatic draw
     */
   private def atomicClosedPosition(board: Board) =
-    val closedStructure = board.actors.values.forall(actor =>
-      (actor.piece.is(Pawn) && actor.moves.isEmpty
-        && InsufficientMatingMaterial.pawnBlockedByPawn(actor, board))
-        || actor.piece.is(King) || actor.piece.is(Bishop)
+    val closedStructure = board.pieces.forall((pos, piece) =>
+      InsufficientMatingMaterial.pawnBlockedByPawn(pos, board)
+        || piece.is(King) || piece.is(Bishop)
     )
     val randomBishop = board.pieces.find { case (_, piece) => piece.is(Bishop) }
     val bishopsAbsentOrPawnitized = randomBishop match
@@ -153,11 +143,11 @@ case object Atomic
     closedStructure && bishopsAbsentOrPawnitized
 
   private def bishopPawnitized(board: Board, sideWithBishop: Color, bishopLight: Boolean) =
-    board.actors.values.forall(actor =>
-      (actor.piece.is(Pawn) && actor.piece.is(sideWithBishop)) ||
-        (actor.piece.is(Pawn) && actor.piece.is(!sideWithBishop) && actor.pos.isLight == !bishopLight) ||
-        (actor.piece.is(Bishop) && actor.piece.is(sideWithBishop) && actor.pos.isLight == bishopLight) ||
-        actor.piece.is(King)
+    board.pieces.forall((pos, piece) =>
+      (piece.is(Pawn) && piece.is(sideWithBishop)) ||
+        (piece.is(Pawn) && piece.is(!sideWithBishop) && pos.isLight == !bishopLight) ||
+        (piece.is(Bishop) && piece.is(sideWithBishop) && pos.isLight == bishopLight) ||
+        piece.is(King)
     )
 
   /** In atomic chess, it is possible to win with a single knight, bishop, etc, by exploding

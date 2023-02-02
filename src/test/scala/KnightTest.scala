@@ -2,6 +2,8 @@ package chess
 
 import scala.language.implicitConversions
 import Pos.*
+import bitboard.Bitboard
+import bitboard.Bitboard.*
 
 class KnightTest extends ChessTest:
 
@@ -67,32 +69,5 @@ PPPx PPP
  NBQKBNR
 """
       )
-    }
-    "threaten" in {
-      val board = """
-k B
-
- b B
-n
-  N
-    Q
-PPP  PPP
- NBQKBNR
-"""
-      "a reachable enemy" in {
-        board actorAt C4 map (_ threatens A5) must beSome(true)
-      }
-      "an unreachable enemy" in {
-        board actorAt C4 map (_ threatens A8) must beSome(false)
-      }
-      "a reachable friend" in {
-        board actorAt C4 map (_ threatens E3) must beSome(true)
-      }
-      "nothing left" in {
-        board actorAt C4 map (_ threatens B4) must beSome(false)
-      }
-      "nothing up" in {
-        board actorAt C4 map (_ threatens C5) must beSome(false)
-      }
     }
   }

@@ -40,7 +40,12 @@ trait ChessTest extends Specification with ValidatedMatchers:
 
   extension (ps: List[Pos]) def bb: Bitboard = ps.foldLeft(Bitboard.empty)((bb, pos) => bb | pos.bitboard)
 
-  extension (board: Board) def visual = Visual >> board
+  extension (board: Board)
+    def visual = Visual >> board
+    def destsFrom(from: Pos): Option[List[Pos]] =
+      board(from).map { piece =>
+        Situation(board, piece.color).generateMovesAt(from).filter(_.orig == from).map(_.dest)
+      }
 
   extension (game: Game)
     def as(color: Color): Game = game.withPlayer(color)

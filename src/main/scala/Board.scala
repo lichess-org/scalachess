@@ -11,16 +11,7 @@ case class Board(
     crazyData: Option[Crazyhouse.Data] = None
 ):
 
-  val white: Bitboard    = board.white
-  val black: Bitboard    = board.black
-  val pawns: Bitboard    = board.pawns
-  val knights: Bitboard  = board.knights
-  val bishops: Bitboard  = board.bishops
-  val rooks: Bitboard    = board.rooks
-  val queens: Bitboard   = board.queens
-  val kings: Bitboard    = board.kings
-  val occupied: Bitboard = board.occupied
-  val sliders: Bitboard  = board.sliders
+  export board.{ bishops, black, contains, kings, knights, occupied, pawns, queens, rooks, sliders, white }
 
   inline def apply(inline color: Color): Bitboard = color.fold(white, black)
   inline def apply(inline color: Color, inline role: Role): Bitboard =
@@ -35,8 +26,6 @@ case class Board(
   lazy val allPieces = board.pieces
 
   lazy val nbPieces = board.occupied.count
-
-  def contains = board.contains
 
   def rolesOf(c: Color): List[Role] =
     allPieces.collect { case p if p.color == c => p.role }

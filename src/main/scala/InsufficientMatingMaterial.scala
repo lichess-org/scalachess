@@ -9,9 +9,10 @@ object InsufficientMatingMaterial:
 
   def nonKingPieces(board: Board): PieceMap = board.pieces filter (_._2.role != King)
 
+  // verify if there are at least two bishops of opposite color
+  // no matter which sides they are on
   def bishopsOnOppositeColors(board: Board) =
-    (board.pieces collect { case (pos, Piece(_, Bishop)) => pos.isLight } toList).distinct
-    .lengthCompare(2) == 0
+    board.bishops.occupiedSquares.map(_.isLight).distinct.size == 2
 
   /*
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
@@ -30,16 +31,11 @@ object InsufficientMatingMaterial:
    * being able to mate the other as informed by the traditional chess rules.
    */
   def apply(board: Board) =
-    lazy val kingsAndBishopsOnly = board.allPieces forall { p =>
-      (p is King) || (p is Bishop)
-    }
-    val kingsAndMinorsOnly = board.allPieces forall { p =>
-      (p is King) || (p is Bishop) || (p is Knight)
-    }
+    lazy val kingsAndBishopsOnly = board.kingsAndBishopsOnly
 
-    kingsAndMinorsOnly && (board.allPieces.size <= 3 || (kingsAndBishopsOnly && !bishopsOnOppositeColors(
-      board
-    )))
+    val kingsAndMinorsOnly = board.kingsAndMinorsOnly
+
+    kingsAndMinorsOnly && (board.nbPieces <= 3 || (kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
 
   /*
    * Determines whether a color does not have mating material. In general:
@@ -73,3 +69,17 @@ object InsufficientMatingMaterial:
     * White pawns move up and black pawns move down.
     */
   def posAheadOfPawn(pos: Pos, color: Color): Option[Pos] = pawnDirOf(color)(pos)
+
+  import bitboard.Bitboard
+  extension (board: Board)
+    def kingsAndBishopsOnly: Boolean =
+      (board.kings | board.bishops) == board.occupied
+
+    def kingsAndMinorsOnly: Boolean =
+      (board.kings | board.minors) == board.occupied
+
+    def minors: Bitboard =
+      board.bishops | board.knights
+
+    def nonKing: Bitboard =
+      board.occupied & ~board.kings

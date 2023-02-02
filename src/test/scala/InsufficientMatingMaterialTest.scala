@@ -30,7 +30,7 @@ class InsufficientMatingMaterialTest extends ChessTest:
       forall(trues) { fen =>
         val maybeGame = fenToGame(fen, Standard)
         maybeGame must beValid.like { case game =>
-          bishopsOnOppositeColors(game.situation.board) must_== true
+          bishopsOnOppositeColors(game.situation.board) must beTrue
         }
       }
     }
@@ -39,7 +39,52 @@ class InsufficientMatingMaterialTest extends ChessTest:
       forall(falses) { fen =>
         val maybeGame = fenToGame(fen, Standard)
         maybeGame must beValid.like { case game =>
-          bishopsOnOppositeColors(game.situation.board) must_== false
+          bishopsOnOppositeColors(game.situation.board) must beFalse
+        }
+      }
+    }
+
+  }
+
+  // Determines whether a color does not have mating material.
+  "apply with board and color" should {
+    val trues = List(
+      "8/6R1/K7/2NNN3/5NN1/4KN2/8/k7 w - - 0 1",
+      "8/8/K7/8/1k6/8/8/8 w - - 0 1",
+      "7k/8/8/8/3K4/8/8/8 w - - 0 1",
+      "7k/5R2/5NQ1/8/3K4/8/8/8 w - - 0 1",
+      "krq5/bqqq4/qqr5/1qq5/8/8/8/3qB2K b - -",
+      "8/3k4/2q5/8/8/K1N5/8/8 b - -",
+      "7k/8/6Q1/8/3K4/8/1n6/8 w - - 0 1"
+    ).map(EpdFen(_))
+
+    val falses = List(
+      "krq5/bqqq4/qqrp4/1qq5/8/8/8/3qB2K b - - 0 1",
+      "8/7B/K7/2b5/1k6/8/8/8 b - -",
+      "8/8/K7/2b5/1k6/5N2/8/8 b - - 0 1",
+      "7k/5R2/5NQ1/8/3K4/8/1p6/8 w - - 0 1",
+      "7k/5R2/5NQ1/8/3K4/8/2n5/8 w - - 0 1",
+      "7k/5R2/5NQ1/8/3K4/1r6/8/8 w - - 0 1",
+      "7k/8/8/5R2/3K4/8/1n6/8 w - - 0 1",
+      "7k/8/6B1/8/3K4/8/1n6/8 w - - 0 1",
+      "7k/5P2/8/8/3K4/8/1n6/8 w - - 0 1",
+      "7k/6N1/8/8/3K4/8/1n6/8 w - - 0 1"
+    ).map(EpdFen(_))
+
+    "return true" in {
+      forall(trues) { fen =>
+        val maybeGame = fenToGame(fen, Standard)
+        maybeGame must beValid.like { case game =>
+          apply(game.situation.board, !game.situation.color) must beTrue
+        }
+      }
+    }
+
+    "return false" in {
+      forall(falses) { fen =>
+        val maybeGame = fenToGame(fen, Standard)
+        maybeGame must beValid.like { case game =>
+          apply(game.situation.board, !game.situation.color) must beFalse
         }
       }
     }

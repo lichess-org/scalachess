@@ -23,6 +23,15 @@ case class Board(
 
   lazy val byColor = Color.Map(white, black)
 
+  def byRole(role: Role): Bitboard =
+    role match
+      case Pawn   => pawns
+      case Knight => knights
+      case Bishop => bishops
+      case Rook   => rooks
+      case Queen  => queens
+      case King   => kings
+
   def contains(p: Pos) = occupied.contains(p)
 
   def roleAt(s: Pos): Option[Role] =

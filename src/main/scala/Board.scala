@@ -22,7 +22,10 @@ case class Board(
   val occupied: Bitboard = board.occupied
   val sliders: Bitboard  = board.sliders
 
-  inline def apply(inline color: Color): Bitboard        = color.fold(white, black)
+  inline def apply(inline color: Color): Bitboard = color.fold(white, black)
+  inline def apply(inline color: Color, inline role: Role): Bitboard =
+    color.fold(white, black) & board.byRole(role)
+
   inline def apply(inline at: Pos): Option[Piece]        = board.pieceAt(at)
   inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Pos(file, rank))
 
@@ -134,6 +137,25 @@ case class Board(
 
   lazy val kingsRooksAndMinorsOnly: Boolean =
     (kings | rooks | minors) == occupied
+
+  def kingsAndBishopsOnlyOf(color: Color): Boolean =
+    onlyOf(color, kings | bishops)
+
+  def kingsAndMinorsOnlyOf(color: Color): Boolean =
+    onlyOf(color, kings | minors)
+
+  def kingsOnlyOf(color: Color) =
+    onlyOf(color, kings)
+
+  def kingsAndKnightsOnlyOf(color: Color) =
+    onlyOf(color, kings | knights)
+
+  def onlyOf(color: Color, roles: Bitboard): Boolean =
+    val colorPieces = apply(color)
+    (roles & colorPieces) == colorPieces
+
+  def nonKingsOf(color: Color): Bitboard =
+    apply(color) & ~kings
 
   lazy val nonKing: Bitboard =
     occupied & ~kings

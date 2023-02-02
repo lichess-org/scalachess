@@ -32,11 +32,8 @@ object InsufficientMatingMaterial:
    * being able to mate the other as informed by the traditional chess rules.
    */
   def apply(board: Board) =
-    lazy val kingsAndBishopsOnly = board.kingsAndBishopsOnly
-
-    val kingsAndMinorsOnly = board.kingsAndMinorsOnly
-
-    kingsAndMinorsOnly && (board.nbPieces <= 3 || (kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
+    board.kingsAndMinorsOnly &&
+      (board.nbPieces <= 3 || (board.kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
 
   /*
    * Determines whether a color does not have mating material. In general:
@@ -46,23 +43,13 @@ object InsufficientMatingMaterial:
    * King + bishop(s) versus king + bishop(s) depends upon bishop square colors
    */
   def apply(board: Board, color: Color) =
-
-    val kingsAndMinorsOnlyOfColor = board.piecesOf(color) forall { p =>
-      (p._2 is King) || (p._2 is Bishop) || (p._2 is Knight)
-    }
-    lazy val nonKingRolesOfColor  = board rolesOf color filter (King !=)
-    lazy val rolesOfOpponentColor = board rolesOf !color
-
-    kingsAndMinorsOnlyOfColor && (nonKingRolesOfColor.distinct match {
-      case Nil => true
-      case List(Knight) =>
-        nonKingRolesOfColor.lengthCompare(
-          1
-        ) == 0 && !(rolesOfOpponentColor filter (King !=) exists (Queen !=))
-      case List(Bishop) =>
-        !(rolesOfOpponentColor.exists(r => r == Knight || r == Pawn) || bishopsOnOppositeColors(board))
-      case _ => false
-    })
+    if board.kingsOnlyOf(color) then true
+    else if board.kingsAndKnightsOnlyOf(color) then
+      board.nonKingsOf(color).count == 1 &&
+      board.onlyOf(!color, board.kings | board.queens)
+    else if board.kingsAndBishopsOnlyOf(color) then
+      !(bishopsOnOppositeColors(board) || (board(!color, Knight) | board(!color, Pawn)).nonEmpty)
+    else false
 
   inline def pawnDirOf(inline color: Color): Direction = color.fold(_.up, _.down)
 

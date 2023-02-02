@@ -16,6 +16,7 @@ object InsufficientMatingMaterial:
 
   /*
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
+   * and it doesn't have any capture
    */
   def pawnBlockedByPawn(pawn: Pos, board: Board) =
     board(pawn).exists(p =>

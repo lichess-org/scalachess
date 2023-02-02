@@ -69,17 +69,3 @@ object InsufficientMatingMaterial:
     * White pawns move up and black pawns move down.
     */
   def posAheadOfPawn(pos: Pos, color: Color): Option[Pos] = pawnDirOf(color)(pos)
-
-  import bitboard.Bitboard
-  extension (board: Board)
-    def kingsAndBishopsOnly: Boolean =
-      (board.kings | board.bishops) == board.occupied
-
-    def kingsAndMinorsOnly: Boolean =
-      (board.kings | board.minors) == board.occupied
-
-    def minors: Bitboard =
-      board.bishops | board.knights
-
-    def nonKing: Bitboard =
-      board.occupied & ~board.kings

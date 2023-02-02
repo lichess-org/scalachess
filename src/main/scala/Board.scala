@@ -133,6 +133,24 @@ case class Board(
 
   def materialImbalance: Int = variant.materialImbalance(this)
 
+  lazy val kingsAndBishopsOnly: Boolean =
+    (kings | bishops) == occupied
+
+  lazy val kingsAndKnightsOnly: Boolean =
+    (kings | knights) == occupied
+
+  lazy val minors: Bitboard =
+    bishops | knights
+
+  lazy val kingsAndMinorsOnly: Boolean =
+    (kings | minors) == occupied
+
+  lazy val kingsRooksAndMinorsOnly: Boolean =
+    (kings | rooks | minors) == occupied
+
+  lazy val nonKing: Bitboard =
+    occupied & ~kings
+
   override def toString = s"$board $variant ${history.lastMove}\n"
 
 object Board:

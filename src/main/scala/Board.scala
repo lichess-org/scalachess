@@ -139,6 +139,8 @@ case class Board(
   lazy val kingsAndKnightsOnly: Boolean =
     (kings | knights) == occupied
 
+  lazy val onlyKnighs: Boolean = knights == occupied
+
   lazy val minors: Bitboard =
     bishops | knights
 

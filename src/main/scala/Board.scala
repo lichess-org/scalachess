@@ -35,15 +35,6 @@ case class Board(
 
   def contains = board.contains
 
-  // TODO fix
-  lazy val actors: Map[Pos, Actor] = pieces map { case (pos, piece) =>
-    (pos, Actor(piece, pos, this))
-  }
-
-  lazy val actorsOf: Color.Map[Seq[Actor]] =
-    val (w, b) = actors.values.toSeq.partition { _.color.white }
-    Color.Map(w, b)
-
   def rolesOf(c: Color): List[Role] =
     allPieces.collect { case p if p.color == c => p.role }
 
@@ -139,7 +130,7 @@ case class Board(
   lazy val kingsAndKnightsOnly: Boolean =
     (kings | knights) == occupied
 
-  lazy val onlyKnighs: Boolean = knights == occupied
+  lazy val onlyKnights: Boolean = knights == occupied
 
   lazy val minors: Bitboard =
     bishops | knights

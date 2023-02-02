@@ -52,7 +52,7 @@ case object Antichess
   // blockade or stalemate. Only one player can win if the only remaining pieces are two knights
   override def opponentHasInsufficientMaterial(situation: Situation) =
     // Exit early if we are not in a situation with only knights
-    situation.board.onlyKnighs && {
+    situation.board.onlyKnights && {
 
       val whiteKnights = situation.board.white.occupiedSquares
       val blackKnights = situation.board.black.occupiedSquares

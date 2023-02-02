@@ -198,7 +198,9 @@ case class Board(
   def piecesOf(c: Color): Map[Pos, Piece] =
     color(c).occupiedSquares.view.map(s => (s, pieceAt(s).get)).toMap
 
-  def pieces: List[Piece] =
+  def pieces: List[Piece] = pieces(occupied)
+
+  def pieces(occupied: Bitboard): List[Piece] =
     occupied.occupiedSquares.flatMap(pieceAt)
 
   def color(c: Color): Bitboard = c.fold(white, black)

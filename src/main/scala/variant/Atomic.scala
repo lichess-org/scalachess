@@ -143,11 +143,11 @@ case object Atomic
     closedStructure && bishopsAbsentOrPawnitized
 
   private def bishopPawnitized(board: Board, sideWithBishop: Color, bishopLight: Boolean) =
-    board.actors.values.forall(actor =>
-      (actor.piece.is(Pawn) && actor.piece.is(sideWithBishop)) ||
-        (actor.piece.is(Pawn) && actor.piece.is(!sideWithBishop) && actor.pos.isLight == !bishopLight) ||
-        (actor.piece.is(Bishop) && actor.piece.is(sideWithBishop) && actor.pos.isLight == bishopLight) ||
-        actor.piece.is(King)
+    board.pieces.forall((pos, piece) =>
+      (piece.is(Pawn) && piece.is(sideWithBishop)) ||
+        (piece.is(Pawn) && piece.is(!sideWithBishop) && pos.isLight == !bishopLight) ||
+        (piece.is(Bishop) && piece.is(sideWithBishop) && pos.isLight == bishopLight) ||
+        piece.is(King)
     )
 
   /** In atomic chess, it is possible to win with a single knight, bishop, etc, by exploding

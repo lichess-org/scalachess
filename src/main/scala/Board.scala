@@ -133,6 +133,9 @@ case class Board(
   def kingsAndMinorsOnlyOf(color: Color): Boolean =
     onlyOf(color, kings | minors)
 
+  def kingsOnly =
+    kings == occupied
+
   def kingsOnlyOf(color: Color) =
     onlyOf(color, kings)
 

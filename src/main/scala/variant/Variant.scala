@@ -7,6 +7,7 @@ import scala.annotation.nowarn
 
 import chess.format.EpdFen
 import chess.bitboard.Bitboard
+import bitboard.Bitboard.bitboard
 
 // Correctness depends on singletons for each variant ID
 abstract class Variant private[variant] (
@@ -61,15 +62,9 @@ abstract class Variant private[variant] (
     kingThreatened(m.after, m.color).no
 
   def castleCheckSafeSquare(situation: Situation, kingFrom: Pos, kingTo: Pos): Boolean =
-    import bitboard.Bitboard.bitboard
     situation.board.board
       .attackers(kingTo, !situation.color, situation.board.occupied ^ kingFrom.bitboard)
       .isEmpty
-
-  def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
-    dir(p) exists { next =>
-      next == to || (!board.contains(next) && longRangeThreatens(board, next, dir, to))
-    }
 
   def move(
       situation: Situation,

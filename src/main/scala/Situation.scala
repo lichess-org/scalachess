@@ -63,13 +63,13 @@ case class Situation(board: Board, color: Color):
     else if (autoDraw) Status.Draw.some
     else none
 
-  def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Validated[String, Move] =
+  def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Validated[ErrorStr, Move] =
     board.variant.move(this, from, to, promotion)
 
-  def move(uci: Uci.Move): Validated[String, Move] =
+  def move(uci: Uci.Move): Validated[ErrorStr, Move] =
     board.variant.move(this, uci.orig, uci.dest, uci.promotion)
 
-  def drop(role: Role, pos: Pos): Validated[String, Drop] =
+  def drop(role: Role, pos: Pos): Validated[ErrorStr, Drop] =
     board.variant.drop(this, role, pos)
 
   def withHistory(history: History) =

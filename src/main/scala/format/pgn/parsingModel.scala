@@ -18,7 +18,7 @@ object Sans:
 // Standard Algebraic Notation
 sealed trait San:
 
-  def apply(situation: Situation): Validated[String, MoveOrDrop]
+  def apply(situation: Situation): Validated[ErrorStr, MoveOrDrop]
 
   def metas: Metas
 
@@ -55,7 +55,7 @@ case class Std(
 
   def withMetas(m: Metas) = copy(metas = m)
 
-  def move(situation: Situation): Validated[String, chess.Move] =
+  def move(situation: Situation): Validated[ErrorStr, chess.Move] =
     situation.board.pieces.foldLeft(none[chess.Move]) {
       case (None, (pos, piece))
           if piece.color == situation.color && piece.role == role && compare(
@@ -68,8 +68,8 @@ case class Std(
         situation.generateMovesAt(pos) find { _.dest == dest }
       case (m, _) => m
     } match
-      case None       => Validated invalid s"No move found: $this\n$situation"
-      case Some(move) => move withPromotion promotion toValid "Wrong promotion"
+      case None       => Validated invalid ErrorStr(s"No move found: $this\n$situation")
+      case Some(move) => move withPromotion promotion toValid ErrorStr("Wrong promotion")
 
   override def toString = s"$role ${dest.key}"
 
@@ -85,7 +85,7 @@ case class Drop(
 
   def withMetas(m: Metas) = copy(metas = m)
 
-  def drop(situation: Situation): Validated[String, chess.Drop] =
+  def drop(situation: Situation): Validated[ErrorStr, chess.Drop] =
     situation.drop(role, pos)
 
 case class InitialPosition(
@@ -125,10 +125,10 @@ case class Castle(
 
   def withMetas(m: Metas) = copy(metas = m)
 
-  def move(situation: Situation): Validated[String, chess.Move] =
+  def move(situation: Situation): Validated[ErrorStr, chess.Move] =
     situation.legalMoves.find(
       _.castle.exists(_.side == side)
-    ) toValid "Cannot castle / variant is " + situation.board.variant
+    ) toValid ErrorStr(s"Cannot castle / variant is ${situation.board.variant}")
 
 case class Suffixes(
     check: Boolean,

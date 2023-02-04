@@ -18,20 +18,18 @@ object Parser:
   // pgnComment with % or whitespaces
   val escape = pgnComment.? *> whitespace.rep0.?
 
-  def full(pgn: PgnStr): Validated[String, ParsedPgn] =
+  def full(pgn: PgnStr): Validated[ErrorStr, ParsedPgn] =
     pgnParser.parse(pgn.value) match
       case Right((_, parsedResult)) =>
         valid(parsedResult)
       case Left(err) =>
         invalid(showExpectations("Cannot parse pgn", pgn.value, err))
 
-  def moves(str: PgnMovesStr): Validated[String, Sans] =
+  def moves(str: PgnMovesStr): Validated[ErrorStr, Sans] =
     MovesParser.moves(str)
 
-  def moves(strMoves: Iterable[SanStr]): Validated[String, Sans] =
-    strMoves.toList
-      .traverse(MovesParser.move)
-      .map(Sans(_))
+  def moves(strMoves: Iterable[SanStr]): Validated[ErrorStr, Sans] =
+    strMoves.toList.traverse(MovesParser.move).map(Sans(_))
 
   def move(str: SanStr) = MovesParser.move(str)
 
@@ -39,12 +37,12 @@ object Parser:
 
     private def cleanComments(comments: List[String]) = comments.map(_.trim).filter(_.nonEmpty)
 
-    def moves(str: PgnMovesStr): Validated[String, Sans] =
+    def moves(str: PgnMovesStr): Validated[ErrorStr, Sans] =
       strMove.rep.map(xs => Sans(xs.toList)).parse(str.value) match
         case Right((_, sans)) => valid(sans)
         case Left(err)        => invalid(showExpectations("Cannot parse moves", str.value, err))
 
-    def move(str: SanStr): Validated[String, San] =
+    def move(str: SanStr): Validated[ErrorStr, San] =
       strMove.parse(str.value) match
         case Right((_, san)) => valid(san)
         case Left(err)       => invalid(showExpectations("Cannot parse move", str.value, err))
@@ -255,7 +253,7 @@ object Parser:
       .string("[/pgn]")
       .? <* escape
 
-  private def showExpectations(context: String, str: String, error: P.Error): String =
+  private def showExpectations(context: String, str: String, error: P.Error): ErrorStr =
     val lm  = LocationMap(str)
     val idx = error.failedAtOffset
     val caret = lm.toCaret(idx).getOrElse {
@@ -264,7 +262,7 @@ object Parser:
     val line         = lm.getLine(caret.line).getOrElse("")
     val errorLine    = line ++ "\n" ++ " ".*(caret.col) ++ "^"
     val errorMessage = s"$context: [${caret.line + 1}.${caret.col + 1}]: ${expToString(error.expected.head)}"
-    errorMessage ++ "\n\n" ++ errorLine ++ "\n" ++ str
+    ErrorStr(s"$errorMessage\n\n$errorLine\n$str")
 
   private def expToString(expectation: Expectation): String =
     expectation match

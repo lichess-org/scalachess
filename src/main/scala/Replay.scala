@@ -29,8 +29,8 @@ object Replay:
       sans: Iterable[SanStr],
       initialFen: Option[Fen.Epd],
       variant: Variant
-  ): Validated[String, Reader.Result] =
-    sans.some.filter(_.nonEmpty) toValid "[replay] pgn is empty" andThen { nonEmptyMoves =>
+  ): Validated[ErrorStr, Reader.Result] =
+    sans.some.filter(_.nonEmpty).toValid(ErrorStr("[replay] pgn is empty")).andThen { nonEmptyMoves =>
       Reader.moves(
         nonEmptyMoves,
         Tags(
@@ -46,9 +46,9 @@ object Replay:
       )
     }
 
-  private def computeGames(game: Game, sans: List[San]): Validated[String, List[Game]] =
+  private def computeGames(game: Game, sans: List[San]): Validated[ErrorStr, List[Game]] =
     sans
-      .foldLeft(valid[String, List[Game]](List(game))) { (acc, move) =>
+      .foldLeft(valid[ErrorStr, List[Game]](List(game))) { (acc, move) =>
         acc andThen { games =>
           val current = games.head
           move(current.situation) map { moveOrDrop =>
@@ -62,7 +62,7 @@ object Replay:
       sans: Iterable[SanStr],
       initialFen: Option[Fen.Epd],
       variant: Variant
-  ): Validated[String, List[Game]] =
+  ): Validated[ErrorStr, List[Game]] =
     Parser.moves(sans) andThen { moves =>
       computeGames(makeGame(variant, initialFen), moves.value)
     }
@@ -71,7 +71,7 @@ object Replay:
       sans: Seq[SanStr],
       initialFen: Fen.Epd,
       variant: Variant
-  ): (Game, List[(Game, Uci.WithSan)], Option[String]) =
+  ): (Game, List[(Game, Uci.WithSan)], Option[ErrorStr]) =
     val init       = makeGame(variant, initialFen.some)
     val emptyGames = List.empty[(Game, Uci.WithSan)]
     Parser
@@ -79,7 +79,7 @@ object Replay:
       .fold(
         err => emptyGames -> err.some,
         moves =>
-          moves.value.zip(sans).foldLeft((emptyGames, none[String])) {
+          moves.value.zip(sans).foldLeft((emptyGames, none[ErrorStr])) {
             case ((games, None), (san, sanStr)) =>
               val game = games.headOption.fold(init)(_._1)
               san(game.situation).fold(
@@ -98,10 +98,10 @@ object Replay:
   private def computeSituations[M](
       sit: Situation,
       moves: List[M],
-      play: M => Situation => Validated[String, MoveOrDrop]
-  ): Validated[String, List[Situation]] =
+      play: M => Situation => Validated[ErrorStr, MoveOrDrop]
+  ): Validated[ErrorStr, List[Situation]] =
     moves
-      .foldLeft(valid[String, List[Situation]](List(sit))) { (acc, move) =>
+      .foldLeft(valid[ErrorStr, List[Situation]](List(sit))) { (acc, move) =>
         acc andThen { sits =>
           val current = sits.head
           play(move)(current) map { moveOrDrop =>
@@ -112,7 +112,7 @@ object Replay:
       .map(_.reverse)
 
   @scala.annotation.tailrec
-  private def computeReplay(replay: Replay, ucis: List[Uci]): Validated[String, Replay] =
+  private def computeReplay(replay: Replay, ucis: List[Uci]): Validated[ErrorStr, Replay] =
     ucis match
       case Nil => valid(replay)
       case uci :: rest =>
@@ -132,13 +132,13 @@ object Replay:
       sans: Iterable[SanStr],
       initialFen: Option[Fen.Epd],
       variant: Variant
-  ): Validated[String, List[Board]] = situations(sans, initialFen, variant) map (_ map (_.board))
+  ): Validated[ErrorStr, List[Board]] = situations(sans, initialFen, variant) map (_ map (_.board))
 
   def situations(
       sans: Iterable[SanStr],
       initialFen: Option[Fen.Epd],
       variant: Variant
-  ): Validated[String, List[Situation]] =
+  ): Validated[ErrorStr, List[Situation]] =
     val sit = initialFenToSituation(initialFen, variant)
     Parser.moves(sans) andThen { moves =>
       computeSituations[San](sit, moves.value, _.apply)
@@ -148,20 +148,20 @@ object Replay:
       moves: List[Uci],
       initialFen: Option[Fen.Epd],
       variant: Variant
-  ): Validated[String, List[Board]] = situationsFromUci(moves, initialFen, variant) map (_ map (_.board))
+  ): Validated[ErrorStr, List[Board]] = situationsFromUci(moves, initialFen, variant) map (_ map (_.board))
 
   def situationsFromUci(
       moves: List[Uci],
       initialFen: Option[Fen.Epd],
       variant: Variant
-  ): Validated[String, List[Situation]] =
+  ): Validated[ErrorStr, List[Situation]] =
     computeSituations[Uci](initialFenToSituation(initialFen, variant), moves, _.apply)
 
   def apply(
       moves: List[Uci],
       initialFen: Option[Fen.Epd],
       variant: Variant
-  ): Validated[String, Replay] =
+  ): Validated[ErrorStr, Replay] =
     computeReplay(Replay(makeGame(variant, initialFen)), moves)
 
   def plyAtFen(
@@ -169,8 +169,8 @@ object Replay:
       initialFen: Option[Fen.Epd],
       variant: Variant,
       atFen: Fen.Epd
-  ): Validated[String, Ply] =
-    if (Fen.read(variant, atFen).isEmpty) invalid(s"Invalid Fen $atFen")
+  ): Validated[ErrorStr, Ply] =
+    if (Fen.read(variant, atFen).isEmpty) invalid(ErrorStr(s"Invalid Fen $atFen"))
     else
 
       // we don't want to compare the full move number, to match transpositions
@@ -179,9 +179,9 @@ object Replay:
       def compareFen(fen: Fen.Epd)  = truncateFen(fen) == atFenTruncated
 
       @scala.annotation.tailrec
-      def recursivePlyAtFen(sit: Situation, sans: List[San], ply: Ply): Validated[String, Ply] =
+      def recursivePlyAtFen(sit: Situation, sans: List[San], ply: Ply): Validated[ErrorStr, Ply] =
         sans match
-          case Nil => invalid(s"Can't find $atFenTruncated, reached ply $ply")
+          case Nil => invalid(ErrorStr(s"Can't find $atFenTruncated, reached ply $ply"))
           case san :: rest =>
             san(sit) match
               case fail: Validated.Invalid[?] => fail

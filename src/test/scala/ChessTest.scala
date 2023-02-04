@@ -50,10 +50,10 @@ trait ChessTest extends Specification with ValidatedMatchers:
   extension (game: Game)
     def as(color: Color): Game = game.withPlayer(color)
 
-    def playMoves(moves: (Pos, Pos)*): Validated[String, Game] = playMoveList(moves)
+    def playMoves(moves: (Pos, Pos)*): Validated[ErrorStr, Game] = playMoveList(moves)
 
-    def playMoveList(moves: Iterable[(Pos, Pos)]): Validated[String, Game] =
-      val vg = moves.foldLeft(Validated.valid(game): Validated[String, Game]) { (vg, move) =>
+    def playMoveList(moves: Iterable[(Pos, Pos)]): Validated[ErrorStr, Game] =
+      val vg = moves.foldLeft(Validated.valid(game): Validated[ErrorStr, Game]) { (vg, move) =>
         // vg foreach { x =>
         // println(s"------------------------ ${x.turns} = $move")
         // }
@@ -72,7 +72,7 @@ trait ChessTest extends Specification with ValidatedMatchers:
         orig: Pos,
         dest: Pos,
         promotion: Option[PromotableRole] = None
-    ): Validated[String, Game] =
+    ): Validated[ErrorStr, Game] =
       game.apply(orig, dest, promotion) map (_._1)
 
     def withClock(c: Clock) = game.copy(clock = Option(c))
@@ -113,17 +113,17 @@ trait ChessTest extends Specification with ValidatedMatchers:
       Visual.addNewLines(Visual.>>|(board, Map(p -> 'x'))) must_== visual
     }
 
-  def beBoard(visual: String): Matcher[Validated[String, Board]] =
+  def beBoard(visual: String): Matcher[Validated[ErrorStr, Board]] =
     beValid.like { case b =>
       b.visual must_== (Visual << visual).visual
     }
 
-  def beSituation(visual: String): Matcher[Validated[String, Situation]] =
+  def beSituation(visual: String): Matcher[Validated[ErrorStr, Situation]] =
     beValid.like { case s =>
       s.board.visual must_== (Visual << visual).visual
     }
 
-  def beGame(visual: String): Matcher[Validated[String, Game]] =
+  def beGame(visual: String): Matcher[Validated[ErrorStr, Game]] =
     beValid.like { case g =>
       g.board.visual must_== (Visual << visual).visual
     }

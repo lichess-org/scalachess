@@ -1,5 +1,7 @@
 package chess
 
+import cats.kernel.Semigroup
+
 /** Fullmove number: The number of the full move.
   * It starts at 1, and is incremented after Black's move. */
 opaque type FullMoveNumber = Int
@@ -21,3 +23,7 @@ object HalfMoveClock extends OpaqueInt[HalfMoveClock]
 
 opaque type Check = Boolean
 object Check extends YesNo[Check]
+
+opaque type ErrorStr = String
+object ErrorStr extends OpaqueString[ErrorStr]:
+  given Semigroup[ErrorStr] = Semigroup.instance[ErrorStr]((a, b) => s"$a\n$b")

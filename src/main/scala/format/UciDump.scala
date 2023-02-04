@@ -16,7 +16,7 @@ object UciDump:
       initialFen: Option[EpdFen],
       variant: Variant,
       force960Notation: Boolean = false
-  ): Validated[String, List[String]] =
+  ): Validated[ErrorStr, List[String]] =
     if (moves.isEmpty) Validated.valid(Nil)
     else Replay(moves, initialFen, variant) andThen (_.valid) map apply(force960Notation)
 

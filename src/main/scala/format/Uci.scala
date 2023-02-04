@@ -11,7 +11,7 @@ sealed trait Uci:
 
   def origDest: (Pos, Pos)
 
-  def apply(situation: Situation): Validated[String, MoveOrDrop]
+  def apply(situation: Situation): Validated[ErrorStr, MoveOrDrop]
 
 object Uci:
 

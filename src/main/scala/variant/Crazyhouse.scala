@@ -28,19 +28,19 @@ case object Crazyhouse
 
   private def canDropPawnOn(pos: Pos) = pos.rank != Rank.First && pos.rank != Rank.Eighth
 
-  override def drop(situation: Situation, role: Role, pos: Pos): Validated[String, Drop] =
-    for {
-      d1 <- situation.board.crazyData toValid "Board has no crazyhouse data"
+  override def drop(situation: Situation, role: Role, pos: Pos): Validated[ErrorStr, Drop] =
+    for
+      d1 <- situation.board.crazyData toValid ErrorStr("Board has no crazyhouse data")
       _ <-
         if (role != Pawn || canDropPawnOn(pos)) Validated.valid(d1)
-        else Validated.invalid(s"Can't drop $role on $pos")
+        else Validated.invalid(ErrorStr(s"Can't drop $role on $pos"))
       piece = Piece(situation.color, role)
-      d2     <- d1.drop(piece) toValid s"No $piece to drop on $pos"
-      board1 <- situation.board.place(piece, pos) toValid s"Can't drop $role on $pos, it's occupied"
+      d2     <- d1.drop(piece) toValid ErrorStr(s"No $piece to drop on $pos")
+      board1 <- situation.board.place(piece, pos) toValid ErrorStr(s"Can't drop $role on $pos, it's occupied")
       _ <-
         if board1.checkOf(situation.color).no then Validated.valid(board1)
-        else Validated.invalid(s"Dropping $role on $pos doesn't uncheck the king")
-    } yield Drop(
+        else Validated.invalid(ErrorStr(s"Dropping $role on $pos doesn't uncheck the king"))
+    yield Drop(
       piece = piece,
       pos = pos,
       situationBefore = situation,

@@ -75,25 +75,25 @@ abstract class Variant private[variant] (
       from: Pos,
       to: Pos,
       promotion: Option[PromotableRole]
-  ): Validated[String, Move] =
+  ): Validated[ErrorStr, Move] =
     // Find the move in the variant specific list of valid moves
     def findMove(from: Pos, to: Pos) =
       situation.legalMoves.find(m => m.orig == from && m.dest == to)
 
-    for {
-      piece <- situation.board(from) toValid s"No piece on ${from.key}"
+    for
+      piece <- situation.board(from) toValid ErrorStr(s"No piece on ${from.key}")
       _ <-
         if (piece.color == situation.color) Validated.valid(piece)
-        else Validated.invalid(s"Not my piece on ${from.key}")
-      m1 <- findMove(from, to) toValid s"Piece on ${from.key} cannot move to ${to.key}"
-      m2 <- m1 withPromotion promotion toValid s"Piece on ${from.key} cannot promote to $promotion"
+        else Validated.invalid(ErrorStr(s"Not my piece on ${from.key}"))
+      m1 <- findMove(from, to) toValid ErrorStr(s"Piece on ${from.key} cannot move to ${to.key}")
+      m2 <- m1 withPromotion promotion toValid ErrorStr(s"Piece on ${from.key} cannot promote to $promotion")
       m3 <-
         if isValidPromotion(promotion) then Validated.valid(m2)
-        else Validated.invalid(s"Cannot promote to $promotion in this game mode")
-    } yield m3
+        else Validated.invalid(ErrorStr(s"Cannot promote to $promotion in this game mode"))
+    yield m3
 
-  def drop(situation: Situation, role: Role, pos: Pos): Validated[String, Drop] =
-    Validated.invalid(s"$this variant cannot drop $situation $role $pos")
+  def drop(situation: Situation, role: Role, pos: Pos): Validated[ErrorStr, Drop] =
+    Validated.invalid(ErrorStr(s"$this variant cannot drop $situation $role $pos"))
 
   def staleMate(situation: Situation): Boolean = situation.check.no && situation.legalMoves.isEmpty
 

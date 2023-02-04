@@ -22,7 +22,7 @@ case class Game(
       dest: Pos,
       promotion: Option[PromotableRole] = None,
       metrics: MoveMetrics = MoveMetrics()
-  ): Validated[String, (Game, Move)] =
+  ): Validated[ErrorStr, (Game, Move)] =
     moveWithCompensated(orig, dest, promotion, metrics).map { case (game, move) =>
       (game.value, move)
     }
@@ -32,7 +32,7 @@ case class Game(
       dest: Pos,
       promotion: Option[PromotableRole] = None,
       metrics: MoveMetrics = MoveMetrics()
-  ): Validated[String, (Clock.WithCompensatedLag[Game], Move)] =
+  ): Validated[ErrorStr, (Clock.WithCompensatedLag[Game], Move)] =
     situation.move(orig, dest, promotion).map(_.normalizeCastle withMetrics metrics) map { move =>
       applyWithCompensated(move) -> move
     }
@@ -57,7 +57,7 @@ case class Game(
       role: Role,
       pos: Pos,
       metrics: MoveMetrics = MoveMetrics()
-  ): Validated[String, (Game, Drop)] =
+  ): Validated[ErrorStr, (Game, Drop)] =
     situation.drop(role, pos).map(_ withMetrics metrics) map { drop =>
       applyDrop(drop) -> drop
     }
@@ -84,9 +84,9 @@ case class Game(
       }
     }
 
-  def apply(uci: Uci.Move): Validated[String, (Game, Move)] = apply(uci.orig, uci.dest, uci.promotion)
-  def apply(uci: Uci.Drop): Validated[String, (Game, Drop)] = drop(uci.role, uci.pos)
-  def apply(uci: Uci): Validated[String, (Game, MoveOrDrop)] =
+  def apply(uci: Uci.Move): Validated[ErrorStr, (Game, Move)] = apply(uci.orig, uci.dest, uci.promotion)
+  def apply(uci: Uci.Drop): Validated[ErrorStr, (Game, Drop)] = drop(uci.role, uci.pos)
+  def apply(uci: Uci): Validated[ErrorStr, (Game, MoveOrDrop)] =
     uci match
       case u: Uci.Move => apply(u) map { case (g, m) => g -> Left(m) }
       case u: Uci.Drop => apply(u) map { case (g, d) => g -> Right(d) }

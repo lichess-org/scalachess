@@ -74,10 +74,10 @@ class PlayBench:
   extension (game: Game)
     def as(color: Color): Game = game.withPlayer(color)
 
-    def playMoves(moves: (Pos, Pos)*): Validated[String, Game] = playMoveList(moves)
+    def playMoves(moves: (Pos, Pos)*): Validated[ErrorStr, Game] = playMoveList(moves)
 
-    def playMoveList(moves: Iterable[(Pos, Pos)]): Validated[String, Game] =
-      val vg = moves.foldLeft(Validated.valid(game): Validated[String, Game]) { (vg, move) =>
+    def playMoveList(moves: Iterable[(Pos, Pos)]): Validated[ErrorStr, Game] =
+      val vg = moves.foldLeft(Validated.valid(game): Validated[ErrorStr, Game]) { (vg, move) =>
         // vg foreach { x =>
         // println(s"------------------------ ${x.turns} = $move")
         // }

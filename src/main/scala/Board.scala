@@ -157,11 +157,11 @@ object Board:
     Board(BBoard.fromMap(pieces), history, variant, crazyData)
 
   def apply(pieces: Iterable[(Pos, Piece)], variant: Variant): Board =
-    Board(pieces, if (variant.allowsCastling) Castles.all else Castles.none, variant)
+    Board(pieces, variant.castles, variant)
 
   def apply(pieces: Iterable[(Pos, Piece)], castles: Castles, variant: Variant): Board =
     val board        = BBoard.fromMap(pieces.toMap)
-    val unmovedRooks = if variant.antichess then UnmovedRooks.none else UnmovedRooks(board.rooks)
+    val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Board(board, History(castles = castles, unmovedRooks = unmovedRooks), variant, variantCrazyData(variant))
 
   def init(variant: Variant): Board = Board(variant.pieces, variant.castles, variant)
@@ -169,4 +169,4 @@ object Board:
   def empty(variant: Variant): Board = Board(Nil, variant)
 
   private def variantCrazyData(variant: Variant) =
-    (variant == Crazyhouse) option Crazyhouse.Data.init
+    variant.crazyhouse option Crazyhouse.Data.init

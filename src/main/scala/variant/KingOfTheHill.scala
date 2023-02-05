@@ -14,10 +14,11 @@ case object KingOfTheHill
 
   def pieces = Standard.pieces
 
-  private val center = Set(Pos.D4, Pos.D5, Pos.E4, Pos.E5)
+  // E4, D4, E5, D5
+  private val center = 0x1818000000L
 
   override def specialEnd(situation: Situation) =
-    situation.board.kingPosOf(!situation.color).occupiedSquares exists center.contains
+    (situation.board.kingPosOf(!situation.color) & center).nonEmpty
 
   /** You only need a king to be able to win in this variant
     */

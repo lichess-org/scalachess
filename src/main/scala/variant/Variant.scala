@@ -6,6 +6,8 @@ import cats.syntax.option.*
 import scala.annotation.nowarn
 
 import chess.format.EpdFen
+import chess.bitboard.Bitboard
+import bitboard.Bitboard.bitboard
 
 // Correctness depends on singletons for each variant ID
 abstract class Variant private[variant] (
@@ -60,15 +62,9 @@ abstract class Variant private[variant] (
     kingThreatened(m.after, m.color).no
 
   def castleCheckSafeSquare(situation: Situation, kingFrom: Pos, kingTo: Pos): Boolean =
-    import bitboard.Bitboard.bitboard
     situation.board.board
       .attackers(kingTo, !situation.color, situation.board.occupied ^ kingFrom.bitboard)
       .isEmpty
-
-  def longRangeThreatens(board: Board, p: Pos, dir: Direction, to: Pos): Boolean =
-    dir(p) exists { next =>
-      next == to || (!board.contains(next) && longRangeThreatens(board, next, dir, to))
-    }
 
   def move(
       situation: Situation,
@@ -150,23 +146,16 @@ abstract class Variant private[variant] (
   @nowarn def finalizeBoard(board: Board, uci: format.Uci, captured: Option[Piece]): Board = board
 
   protected def pawnsOnPromotionRank(board: Board, color: Color) =
-    board.pieces.exists {
-      case (pos, Piece(c, Pawn)) if c == color && pos.rank == color.promotablePawnRank => true
-      case _                                                                           => false
-    }
+    (board(color, Pawn) & Bitboard.rank(color.promotablePawnRank)).nonEmpty
 
   protected def pawnsOnBackRank(board: Board, color: Color) =
-    board.pieces.exists {
-      case (pos, Piece(c, Pawn)) if c == color && pos.rank == color.backRank => true
-      case _                                                                 => false
-    }
+    (board(color, Pawn) & Bitboard.rank(color.backRank)).nonEmpty
 
   protected def validSide(board: Board, strict: Boolean)(color: Color) =
-    val roles = board rolesOf color
-    roles.count(_ == King) == 1 &&
-    (!strict || { roles.count(_ == Pawn) <= 8 && roles.lengthCompare(16) <= 0 }) &&
-    !pawnsOnPromotionRank(board, color) &&
-    !pawnsOnBackRank(board, color)
+    board(color, King).count == 1 &&
+      (!strict || { board(color, Pawn).count <= 8 && board(color).count <= 16 }) &&
+      !pawnsOnPromotionRank(board, color) &&
+      !pawnsOnBackRank(board, color)
 
   def valid(board: Board, strict: Boolean) = Color.all forall validSide(board, strict)
 

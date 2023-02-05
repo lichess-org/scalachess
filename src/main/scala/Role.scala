@@ -7,7 +7,6 @@ sealed trait Role:
   lazy val name               = toString.toLowerCase
   val projection: Boolean
   val dirs: Directions
-  def dir(from: Pos, to: Pos): Option[Direction]
 
 sealed trait PromotableRole extends Role
 
@@ -15,37 +14,21 @@ sealed trait PromotableRole extends Role
 case object King extends PromotableRole:
   val forsyth                 = 'k'
   val dirs: Directions        = Queen.dirs
-  def dir(from: Pos, to: Pos) = None
   val projection              = false
 
 case object Queen extends PromotableRole:
   val forsyth                 = 'q'
   val dirs: Directions        = Rook.dirs ::: Bishop.dirs
-  def dir(from: Pos, to: Pos) = Rook.dir(from, to) orElse Bishop.dir(from, to)
   val projection              = true
 
 case object Rook extends PromotableRole:
   val forsyth          = 'r'
   val dirs: Directions = List(_.up, _.down, _.left, _.right)
-  def dir(from: Pos, to: Pos) =
-    if (to ?| from)
-      Option(if (to ?^ from) (_.up) else (_.down))
-    else if (to ?- from)
-      Option(if (to ?< from) (_.left) else (_.right))
-    else None
   val projection = true
 
 case object Bishop extends PromotableRole:
   val forsyth          = 'b'
   val dirs: Directions = List(_.upLeft, _.upRight, _.downLeft, _.downRight)
-  def dir(from: Pos, to: Pos) =
-    if (to onSameDiagonal from)
-      Option(if (to ?^ from) {
-        if (to ?< from) (_.upLeft) else (_.upRight)
-      } else {
-        if (to ?< from) (_.downLeft) else (_.downRight)
-      })
-    else None
   val projection = true
 
 case object Knight extends PromotableRole:
@@ -60,13 +43,11 @@ case object Knight extends PromotableRole:
     p => Pos.at(p.file.index + 2, p.rank.index + 1),
     p => Pos.at(p.file.index + 2, p.rank.index - 1)
   )
-  def dir(from: Pos, to: Pos) = None
   val projection              = false
 
 case object Pawn extends Role:
   val forsyth                 = 'p'
   val dirs: Directions        = Nil
-  def dir(from: Pos, to: Pos) = None
   val projection              = false
 
 object Role:

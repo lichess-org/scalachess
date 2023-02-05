@@ -211,16 +211,7 @@ case class Board(
 
   def color(c: Color): Bitboard = c.fold(white, black)
 
-  def role(r: Role): Bitboard =
-    r match
-      case Pawn   => pawns
-      case Knight => knights
-      case Bishop => bishops
-      case Rook   => rooks
-      case Queen  => queens
-      case King   => kings
-
-  def piece(p: Piece): Bitboard = color(p.color) & role(p.role)
+  def piece(p: Piece): Bitboard = color(p.color) & byRole(p.role)
 
   // guess unmovedRooks from board
   // we assume rooks are on their initial position

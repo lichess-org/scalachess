@@ -23,7 +23,7 @@ case object Crazyhouse
 
   override def valid(board: Board, strict: Boolean) =
     (Color.all forall validSide(board, false)) &&
-    (!strict || (board.board.byRole(Pawn).count <= 16 && board.nbPieces <= 32))
+      (!strict || (board.board.byRole(Pawn).count <= 16 && board.nbPieces <= 32))
 
   private def canDropPawnOn(pos: Pos) = pos.rank != Rank.First && pos.rank != Rank.Eighth
 

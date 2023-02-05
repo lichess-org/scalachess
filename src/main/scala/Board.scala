@@ -27,9 +27,6 @@ case class Board(
 
   lazy val nbPieces = board.occupied.count
 
-  def rolesOf(c: Color): List[Role] =
-    allPieces.collect { case p if p.color == c => p.role }
-
   def piecesOf(c: Color): Map[Pos, Piece] = board.piecesOf(c)
 
   def kingPosOf(c: Color): Bitboard = board.kings & board.byColor(c)

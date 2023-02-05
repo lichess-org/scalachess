@@ -33,8 +33,6 @@ case class Situation(board: Board, color: Color):
 
   def checkSquare = if check.yes then ourKings.headOption else None
 
-  def piecesOf(c: Color): Map[Pos, Piece] = board.piecesOf(c)
-
   inline def history = board.history
 
   inline def checkMate: Boolean = board.variant checkmate this

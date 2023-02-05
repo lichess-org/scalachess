@@ -22,8 +22,7 @@ case object Antichess
   override val initialFen = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1")
 
   // In antichess, the king can't be put into check so we always return false
-  override def kingSafety(m: Move): Boolean =
-    true
+  override def kingSafety(m: Move): Boolean = true
 
   override def kingThreatened(board: Board, color: Color) = Check.No
 
@@ -40,7 +39,7 @@ case object Antichess
 
   override def specialEnd(situation: Situation) =
     // The game ends with a win when one player manages to lose all their pieces or is in stalemate
-    situation.board.piecesOf(situation.color).isEmpty || situation.legalMoves.isEmpty
+    situation.board(situation.color).isEmpty || situation.legalMoves.isEmpty
 
   // In antichess, it is valuable for your opponent to have pieces.
   override def materialImbalance(board: Board): Int =

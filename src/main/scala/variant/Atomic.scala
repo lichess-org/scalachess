@@ -155,7 +155,7 @@ case object Atomic
     * immobile pawns is not sufficient material to win with.
     */
   override def opponentHasInsufficientMaterial(situation: Situation) =
-    situation.board.rolesOf(!situation.color) == List(King)
+    situation.board.kingsOnlyOf(!situation.color)
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
-  override def specialEnd(situation: Situation) = situation.board.board.kings.count < 2
+  override def specialEnd(situation: Situation) = situation.board.kings.count < 2

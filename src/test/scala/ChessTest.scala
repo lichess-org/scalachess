@@ -12,7 +12,7 @@ import chess.format.pgn.PgnStr
 import chess.variant.Variant
 import bitboard.Board as BBoard
 import bitboard.Bitboard
-import bitboard.Bitboard.bitboard
+import bitboard.Bitboard.bb
 import cats.kernel.Monoid
 import chess.format.Uci
 import chess.variant.Chess960
@@ -38,7 +38,7 @@ trait ChessTest extends Specification with ValidatedMatchers:
     def threeCheck: Board           = makeBoard(str, chess.variant.ThreeCheck)
     def as(color: Color): Situation = Situation(Visual << str, color)
 
-  extension (ps: List[Pos]) def bb: Bitboard = ps.foldLeft(Bitboard.empty)((bb, pos) => bb | pos.bitboard)
+  extension (ps: List[Pos]) def bb: Bitboard = ps.foldLeft(Bitboard.empty)((bb, pos) => bb | pos.bb)
 
   extension (board: Board)
     def visual = Visual >> board

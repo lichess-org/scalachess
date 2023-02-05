@@ -6,7 +6,7 @@ import variant.{ Standard, Variant }
 import cats.kernel.Monoid
 import ornicar.scalalib.zeros.given_Zero_Option
 import bitboard.Bitboard
-import bitboard.Bitboard.{ bitboard, occupiedSquares }
+import bitboard.Bitboard.{ bb, occupiedSquares }
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *
@@ -38,7 +38,7 @@ trait FenReader:
                     case 'q'  => rooks.find(_ ?< kingPos)
                     case file => rooks.find(_.file.char == file)
                   side <- Side.kingRookSide(kingPos, rookPos)
-                yield (c.add(color, side), r | rookPos.bitboard)
+                yield (c.add(color, side), r | rookPos.bb)
               }.getOrElse((c, r))
             }
 

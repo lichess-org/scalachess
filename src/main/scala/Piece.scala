@@ -17,7 +17,7 @@ case class Piece(color: Color, role: Role):
   import bitboard.Bitboard
   import bitboard.Bitboard.*
   def eyes(from: Pos, to: Pos): Boolean =
-    val occupied: Bitboard = to.bitboard
+    val occupied: Bitboard = to.bb
     role match
       case King   => from.kingAttacks.contains(to)
       case Queen  => from.queenAttacks(occupied).nonEmpty

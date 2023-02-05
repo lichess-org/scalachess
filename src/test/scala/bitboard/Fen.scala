@@ -25,7 +25,7 @@ case class Fen(board: Board, state: State):
         val result = !(us & blockers).contains(from) || Bitboard.aligned(from, to, king)
         result
       case Move.EnPassant(from, to) =>
-        val newOccupied = (occupied ^ from.bitboard ^ to.withRankOf(from).bitboard) | to.bitboard
+        val newOccupied = (occupied ^ from.bb ^ to.withRankOf(from).bb) | to.bb
         (king.rookAttacks(newOccupied) & them & (board.rooks ^ board.queens)).isEmpty &&
         (king.bishopAttacks(newOccupied) & them & (board.bishops ^ board.queens)).isEmpty
       case _ => true
@@ -45,7 +45,7 @@ case class Fen(board: Board, state: State):
     val fullMoves = if state.turn.black then state.fullMoves + 1 else state.fullMoves
     val turn      = !state.turn
     val halfCastlingRights =
-      if move.isCapture then state.castlingRights & ~move.to.bitboard
+      if move.isCapture then state.castlingRights & ~move.to.bb
       else state.castlingRights
     val haftState = state.copy(
       turn = turn,
@@ -64,7 +64,7 @@ case class Fen(board: Board, state: State):
           else None
         haftState.copy(epSquare = epSquare)
       case Move.Normal(from, _, Rook, _) =>
-        val castlingRights = halfCastlingRights & ~from.bitboard
+        val castlingRights = halfCastlingRights & ~from.bb
         haftState.copy(castlingRights = castlingRights)
       case Move.Normal(_, _, King, _) | Move.Castle(_, _) =>
         val castlingRights = halfCastlingRights & Bitboard.rank(state.turn.lastRank)
@@ -112,7 +112,7 @@ object Fen:
       case _ =>
         s.toList
           .traverse(charToSquare)
-          .map(_.foldRight(Bitboard.empty)((s, b) => s.bitboard | b))
+          .map(_.foldRight(Bitboard.empty)((s, b) => s.bb | b))
           .toRight(ParseFenError.InvalidCastling)
 
   // TODO naming is hard

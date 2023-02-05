@@ -15,27 +15,27 @@ object Castles extends OpaqueBitboard[Castles]:
 
     inline def can(inline color: Color) = Castles.Can(c, color)
 
-    def whiteKingSide: Boolean  = (c & H1.bitboard).nonEmpty
-    def whiteQueenSide: Boolean = (c & A1.bitboard).nonEmpty
-    def blackKingSide: Boolean  = (c & H8.bitboard).nonEmpty
-    def blackQueenSide: Boolean = (c & A8.bitboard).nonEmpty
+    def whiteKingSide: Boolean  = (c & H1.bb).nonEmpty
+    def whiteQueenSide: Boolean = (c & A1.bb).nonEmpty
+    def blackKingSide: Boolean  = (c & H8.bb).nonEmpty
+    def blackQueenSide: Boolean = (c & A8.bb).nonEmpty
 
     def without(color: Color): Castles =
       c & Bitboard.rank(color.lastRank)
 
     def without(color: Color, side: Side): Castles =
       (color, side) match
-        case (White, KingSide)  => c & ~H1.bitboard
-        case (White, QueenSide) => c & ~A1.bitboard
-        case (Black, KingSide)  => c & ~H8.bitboard
-        case (Black, QueenSide) => c & ~A8.bitboard
+        case (White, KingSide)  => c & ~H1.bb
+        case (White, QueenSide) => c & ~A1.bb
+        case (Black, KingSide)  => c & ~H8.bb
+        case (Black, QueenSide) => c & ~A8.bb
 
     def add(color: Color, side: Side): Castles =
       (color, side) match
-        case (White, KingSide)  => c | H1.bitboard
-        case (White, QueenSide) => c | A1.bitboard
-        case (Black, KingSide)  => c | H8.bitboard
-        case (Black, QueenSide) => c | A8.bitboard
+        case (White, KingSide)  => c | H1.bb
+        case (White, QueenSide) => c | A1.bb
+        case (Black, KingSide)  => c | H8.bb
+        case (Black, QueenSide) => c | A8.bb
 
     def update(color: Color, kingSide: Boolean, queenSide: Boolean): Castles = color match
       case White => c.without(color) | kingSide.whiteKing | queenSide.whiteQueen
@@ -53,10 +53,10 @@ object Castles extends OpaqueBitboard[Castles]:
     def toSeq: Array[Boolean] = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
 
   extension (b: Boolean)
-    def whiteKing: Castles  = if (b) H1.bitboard else empty
-    def whiteQueen: Castles = if (b) A1.bitboard else empty
-    def blackKing: Castles  = if (b) H8.bitboard else empty
-    def blackQueen: Castles = if (b) A8.bitboard else empty
+    def whiteKing: Castles  = if (b) H1.bb else empty
+    def whiteQueen: Castles = if (b) A1.bb else empty
+    def blackKing: Castles  = if (b) H8.bb else empty
+    def blackQueen: Castles = if (b) A8.bb else empty
 
   def apply(
       whiteKingSide: Boolean,
@@ -75,7 +75,7 @@ object Castles extends OpaqueBitboard[Castles]:
     case _ =>
       str.toList
         .traverse(charToSquare)
-        .map(_.foldRight(empty)((s, b) => s.bitboard | b))
+        .map(_.foldRight(empty)((s, b) => s.bb | b))
         .getOrElse(empty)
 
   private def charToSquare: (c: Char) => Option[Pos] =
@@ -106,11 +106,11 @@ object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
   val none: UnmovedRooks    = empty
 
   def apply(b: Bitboard): UnmovedRooks   = b.value
-  def apply(set: Set[Pos]): UnmovedRooks = set.foldLeft(empty)((b, p) => b | p.bitboard)
+  def apply(set: Set[Pos]): UnmovedRooks = set.foldLeft(empty)((b, p) => b | p.bb)
 
   extension (ur: UnmovedRooks)
     def toList: List[Pos]        = ur.occupiedSquares
-    def apply(pos: Pos): Boolean = (ur & pos.bitboard).nonEmpty
+    def apply(pos: Pos): Boolean = (ur & pos.bb).nonEmpty
 
     def without(color: Color): UnmovedRooks =
       ur & Bitboard.rank(color.lastRank)
@@ -121,7 +121,7 @@ object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
     // same rank return Some(None) (because we cannot guess)
     // If there are two rooks on the same rank, return the side of the rook
     def side(pos: Pos): Option[Option[Side]] =
-      val bitboard = pos.bitboard
+      val bitboard = pos.bb
       if (ur & bitboard).isEmpty then None
       else
         (ur & ~bitboard & Bitboard.rank(pos.rank)).first match

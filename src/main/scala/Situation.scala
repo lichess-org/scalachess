@@ -107,7 +107,7 @@ case class Situation(board: Board, color: Color):
       if piece.color != color then Nil
       else
         val targets = ~us
-        val bb      = pos.bitboard
+        val bb      = pos.bb
         piece.role match
           case Pawn   => genEnPassant(us & bb) ++ genPawn(bb, targets)
           case Knight => genKnight(us & bb, targets)
@@ -238,7 +238,7 @@ case class Situation(board: Board, color: Color):
       // Checks by these sliding pieces can maybe be blocked.
       val sliders = checkers & (board.sliders)
       val attacked =
-        sliders.occupiedSquares.foldRight(Bitboard.empty)((s, a) => a | (s.bitboard ^ Bitboard.ray(king, s)))
+        sliders.occupiedSquares.foldRight(Bitboard.empty)((s, a) => a | (s.bb ^ Bitboard.ray(king, s)))
       val safeKings = genSafeKing(~us & ~attacked)
       val blockers =
         if !checkers.moreThanOne then
@@ -281,8 +281,8 @@ case class Situation(board: Board, color: Color):
             if board.variant.chess960 || board.variant.fromPosition
             then (Bitboard.between(king, rook) | Bitboard.between(king, kingTo))
             else Bitboard.between(king, rook)
-          if (path & (board.occupied & ~rook.bitboard)).isEmpty
-          kingPath = Bitboard.between(king, kingTo) | king.bitboard
+          if (path & (board.occupied & ~rook.bb)).isEmpty
+          kingPath = Bitboard.between(king, kingTo) | king.bb
           if kingPath.occupiedSquares.forall(board.variant.castleCheckSafeSquare(this, king, _))
           moves <- castle(king, kingTo, rook, rookTo)
         yield moves

@@ -7,7 +7,7 @@ import scala.annotation.nowarn
 
 import chess.format.EpdFen
 import chess.bitboard.Bitboard
-import bitboard.Bitboard.bitboard
+import bitboard.Bitboard.bb
 
 // Correctness depends on singletons for each variant ID
 abstract class Variant private[variant] (
@@ -63,7 +63,7 @@ abstract class Variant private[variant] (
 
   def castleCheckSafeSquare(situation: Situation, kingFrom: Pos, kingTo: Pos): Boolean =
     situation.board.board
-      .attackers(kingTo, !situation.color, situation.board.occupied ^ kingFrom.bitboard)
+      .attackers(kingTo, !situation.color, situation.board.occupied ^ kingFrom.bb)
       .isEmpty
 
   def move(

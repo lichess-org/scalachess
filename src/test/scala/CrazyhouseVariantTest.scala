@@ -332,31 +332,39 @@ class CrazyhouseVariantTest extends ChessTest:
     }
 
     val dropTestCases: List[DropTestCase] = List(
+      // Queen check in diagonal
       DropTestCase(
         EpdFen("rnb1kbnr/p2p1ppp/1p6/2P1p3/6Pq/5P2/PPP1P2P/RNBQKBNR/P w KQkq - 1 5"),
         Some(Set(F2, G3))
       ),
+      // Queen check in column
       DropTestCase(
         EpdFen("rnb1kbnr/1pppppPp/p3q3/8/8/8/PPPP1PPP/RNBQKBNR/P w KQkq - 1 3"),
         Some(Set(E2, E3, E4, E5))
       ),
+      // bishop check
       DropTestCase(
         EpdFen("b2nkbnQ~/p1pppp1p/pP1q2p1/r7/8/R5PR/P1PP1P1P/1NBQ1BNK/R w - - 1 2"),
         Some(Set(G2, F3, E4, D5, C6, B7))
       ),
+      // No check
       DropTestCase(EpdFen("b3kbnQ~/pnpppp1p/pP1q2p1/3r4/8/R5PR/P1PP1P1P/1NBQ1BNK/R w - - 1 2"), None),
+      // No check
       DropTestCase(
         EpdFen("b3kb2/pn1ppp1Q~/pPqr2p1/2p5/7R/R5P1/P1PP1PBP/1NBQ2NK/PNR w - - 4 6"),
         None
       ),
+      // Double check
       DropTestCase(
         EpdFen("b3kbnQ~/pnpppp1p/pP4p1/7q/4r3/R5PR/P1PPKP1P/1NBQ1BN1/R w - - 1 2"),
         Some(Set())
       ),
+      // Double check
       DropTestCase(
         EpdFen("b3kb1N~/pnpppp1p/pP3rp1/7q/8/R5PR/P1PPKP1P/1NBQ1Bn1/Rn w - - 0 2"),
         Some(Set())
       ),
+      // Knight check
       DropTestCase(
         EpdFen("b3kb2/pnpppN~1p/pP3rpq/8/3n4/R5PR/P1PPKP1P/1NBQ1BN1/PR w - - 1 3"),
         Some(Set())

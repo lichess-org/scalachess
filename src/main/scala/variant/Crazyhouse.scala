@@ -84,7 +84,7 @@ case object Crazyhouse
 
   // if the king is not in check, all drops are possible, we just return None
   // king is in single check, we return the squares between the king and the checker
-  // king is in double (or more) check, no drop is possible
+  // king is in double check, no drop is possible
   def possibleDrops(situation: Situation): Option[List[Pos]] =
     import bitboard.Bitboard
     situation.ourKings.headOption.flatMap(king =>

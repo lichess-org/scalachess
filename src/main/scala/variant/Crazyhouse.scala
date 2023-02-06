@@ -83,24 +83,15 @@ case object Crazyhouse
   override def isInsufficientMaterial(board: Board)                  = false
 
   // if the king is not in check, all drops are possible, we just return None
+  // king is in single check, we return the squares between the king and the checker
+  // king is in double check, no drop is possible
   def possibleDrops(situation: Situation): Option[List[Pos]] =
-    if situation.check.no then None
-    else situation.ourKings.headOption.map(blockades(situation, _))
-
-  private def blockades(situation: Situation, kingPos: Pos): List[Pos] =
-    def attacker(piece: Piece) = piece.role.projection && piece.color != situation.color
-    @scala.annotation.tailrec
-    def forward(p: Pos, dir: Direction, squares: List[Pos]): List[Pos] =
-      dir(p) match
-        case None                                                 => Nil
-        case Some(next) if situation.board(next).exists(attacker) => next :: squares
-        case Some(next) if situation.board(next).isDefined        => Nil
-        case Some(next)                                           => forward(next, dir, next :: squares)
-    Queen.dirs flatMap { forward(kingPos, _, Nil) } filter { square =>
-      situation.board.place(Piece(situation.color, Knight), square) exists { defended =>
-        defended.checkOf(situation.color).no
-      }
-    }
+    import bitboard.Bitboard
+    situation.ourKings.headOption.flatMap(king =>
+      val checkers = situation.board.board.attackers(king, !situation.color)
+      if checkers.moreThanOne then Some(Nil)
+      else checkers.singleSquare.map(checker => Bitboard.between(king, checker).occupiedSquares)
+    )
 
   val storableRoles = List(Pawn, Knight, Bishop, Rook, Queen)
 

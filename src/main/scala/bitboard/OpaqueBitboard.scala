@@ -33,6 +33,11 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
     def moreThanOne: Boolean =
       (a.value & (a.value - 1L)) != 0L
 
+    // Gets the only square in the set, if there is exactly one.
+    def singleSquare: Option[Pos] =
+      if moreThanOne then None
+      else first
+
     def occupiedSquares: List[Pos] =
       fold(List.empty)((xs, pos) => pos :: xs)
 

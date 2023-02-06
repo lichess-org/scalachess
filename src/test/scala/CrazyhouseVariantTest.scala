@@ -371,7 +371,7 @@ class CrazyhouseVariantTest extends ChessTest:
       )
     )
 
-    "possible drop" in {
+    "possible drops" in {
       forall(dropTestCases) { case DropTestCase(fen, drops) =>
         val maybeGame = fenToGame(fen, Crazyhouse)
         maybeGame must beValid.like { case game =>

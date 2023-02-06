@@ -89,11 +89,8 @@ case object Crazyhouse
     import bitboard.Bitboard
     situation.ourKings.headOption.flatMap(king =>
       val checkers = situation.board.board.attackers(king, !situation.color)
-      if checkers.isEmpty then None
-      else if checkers.moreThanOne then Some(Nil)
-      else
-        val checker = checkers.first.get // this is safe
-        Some(Bitboard.between(king, checker).occupiedSquares)
+      if checkers.moreThanOne then Some(Nil)
+      else checkers.singleSquare.map(checker => Bitboard.between(king, checker).occupiedSquares)
     )
 
   val storableRoles = List(Pawn, Knight, Bishop, Rook, Queen)

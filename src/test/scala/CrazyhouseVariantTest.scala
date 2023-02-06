@@ -5,6 +5,7 @@ import cats.syntax.option.*
 import chess.format.EpdFen
 import chess.variant.Crazyhouse
 import chess.format.pgn.SanStr
+import chess.Pos.*
 
 class CrazyhouseVariantTest extends ChessTest:
 
@@ -49,7 +50,6 @@ class CrazyhouseVariantTest extends ChessTest:
     }
 
     "autodraw" in {
-      import Pos.*
       "tons of pointless moves but shouldn't apply 50-moves" in {
         val moves = List.fill(30)(List(B1 -> C3, B8 -> C6, C3 -> B1, C6 -> B8))
         Game(Crazyhouse).playMoves(moves.flatten*) must beValid.like { case g =>
@@ -305,7 +305,6 @@ class CrazyhouseVariantTest extends ChessTest:
     }
 
     "destinations prod bug on game VVXRgsQT" in {
-      import chess.Pos.*
       chess
         .Game(
           Crazyhouse.some,
@@ -331,4 +330,48 @@ class CrazyhouseVariantTest extends ChessTest:
         variant = Crazyhouse
       ) must beValid
     }
+
+    val dropTestCases: List[DropTestCase] = List(
+      DropTestCase(
+        EpdFen("rnb1kbnr/p2p1ppp/1p6/2P1p3/6Pq/5P2/PPP1P2P/RNBQKBNR/P w KQkq - 1 5"),
+        Some(Set(F2, G3))
+      ),
+      DropTestCase(
+        EpdFen("rnb1kbnr/1pppppPp/p3q3/8/8/8/PPPP1PPP/RNBQKBNR/P w KQkq - 1 3"),
+        Some(Set(E2, E3, E4, E5))
+      ),
+      DropTestCase(
+        EpdFen("b2nkbnQ~/p1pppp1p/pP1q2p1/r7/8/R5PR/P1PP1P1P/1NBQ1BNK/R w - - 1 2"),
+        Some(Set(G2, F3, E4, D5, C6, B7))
+      ),
+      DropTestCase(EpdFen("b3kbnQ~/pnpppp1p/pP1q2p1/3r4/8/R5PR/P1PP1P1P/1NBQ1BNK/R w - - 1 2"), None),
+      DropTestCase(
+        EpdFen("b3kb2/pn1ppp1Q~/pPqr2p1/2p5/7R/R5P1/P1PP1PBP/1NBQ2NK/PNR w - - 4 6"),
+        None
+      ),
+      DropTestCase(
+        EpdFen("b3kbnQ~/pnpppp1p/pP4p1/7q/4r3/R5PR/P1PPKP1P/1NBQ1BN1/R w - - 1 2"),
+        Some(Set())
+      ),
+      DropTestCase(
+        EpdFen("b3kb1N~/pnpppp1p/pP3rp1/7q/8/R5PR/P1PPKP1P/1NBQ1Bn1/Rn w - - 0 2"),
+        Some(Set())
+      ),
+      DropTestCase(
+        EpdFen("b3kb2/pnpppN~1p/pP3rpq/8/3n4/R5PR/P1PPKP1P/1NBQ1BN1/PR w - - 1 3"),
+        Some(Set())
+      )
+    )
+
+    "possible drop" in {
+      forall(dropTestCases) { case DropTestCase(fen, drops) =>
+        val maybeGame = fenToGame(fen, Crazyhouse)
+        maybeGame must beValid.like { case game =>
+          Crazyhouse.possibleDrops(game.situation).map(_.toSet) must_== drops
+        }
+      }
+    }
+
   }
+
+case class DropTestCase(fen: EpdFen, drops: Option[Set[Pos]])

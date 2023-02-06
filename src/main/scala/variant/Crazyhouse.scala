@@ -84,23 +84,15 @@ case object Crazyhouse
 
   // if the king is not in check, all drops are possible, we just return None
   def possibleDrops(situation: Situation): Option[List[Pos]] =
-    if situation.check.no then None
-    else situation.ourKings.headOption.map(blockades(situation, _))
-
-  private def blockades(situation: Situation, kingPos: Pos): List[Pos] =
-    def attacker(piece: Piece) = piece.role.projection && piece.color != situation.color
-    @scala.annotation.tailrec
-    def forward(p: Pos, dir: Direction, squares: List[Pos]): List[Pos] =
-      dir(p) match
-        case None                                                 => Nil
-        case Some(next) if situation.board(next).exists(attacker) => next :: squares
-        case Some(next) if situation.board(next).isDefined        => Nil
-        case Some(next)                                           => forward(next, dir, next :: squares)
-    Queen.dirs flatMap { forward(kingPos, _, Nil) } filter { square =>
-      situation.board.place(Piece(situation.color, Knight), square) exists { defended =>
-        defended.checkOf(situation.color).no
-      }
-    }
+    import bitboard.Bitboard
+    situation.checkers.flatMap(checkers =>
+      if checkers.isEmpty then None
+      else if checkers.moreThanOne then Some(Nil)
+      else
+        val checker = checkers.first.get                // this is safe
+        val king    = situation.ourKings.headOption.get // this is also safe
+        Some(Bitboard.between(king, checker).occupiedSquares)
+    )
 
   val storableRoles = List(Pawn, Knight, Bishop, Rook, Queen)
 

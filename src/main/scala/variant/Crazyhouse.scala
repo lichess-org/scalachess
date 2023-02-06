@@ -83,14 +83,16 @@ case object Crazyhouse
   override def isInsufficientMaterial(board: Board)                  = false
 
   // if the king is not in check, all drops are possible, we just return None
+  // king is in single check, we return the squares between the king and the checker
+  // king is in double (or more) check, no drop is possible
   def possibleDrops(situation: Situation): Option[List[Pos]] =
     import bitboard.Bitboard
-    situation.checkers.flatMap(checkers =>
+    situation.ourKings.headOption.flatMap(king =>
+      val checkers = situation.board.board.attackers(king, !situation.color)
       if checkers.isEmpty then None
       else if checkers.moreThanOne then Some(Nil)
       else
-        val checker = checkers.first.get                // this is safe
-        val king    = situation.ourKings.headOption.get // this is also safe
+        val checker = checkers.first.get // this is safe
         Some(Bitboard.between(king, checker).occupiedSquares)
     )
 

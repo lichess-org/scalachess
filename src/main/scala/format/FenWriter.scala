@@ -1,7 +1,7 @@
 package chess
 package format
 
-import cats.implicits.*
+import cats.syntax.all.*
 import variant.{ Standard, Variant }
 import cats.kernel.Monoid
 

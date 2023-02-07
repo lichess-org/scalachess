@@ -2,7 +2,7 @@ package chess
 
 import scala.collection.mutable.ListBuffer
 import cats.data.Validated
-import cats.implicits.*
+import cats.syntax.all.*
 
 import bitboard.Bitboard
 import bitboard.Bitboard.*

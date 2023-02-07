@@ -2,7 +2,7 @@ package chess
 package format
 
 import cats.data.Validated
-import cats.implicits.*
+import cats.syntax.all.*
 
 sealed trait Uci:
 

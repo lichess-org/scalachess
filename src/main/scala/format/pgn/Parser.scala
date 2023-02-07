@@ -4,7 +4,7 @@ package format.pgn
 import cats.parse.{ LocationMap, Numbers as N, Parser as P, Parser0 as P0, Rfc5234 as R }
 import cats.data.Validated
 import cats.data.Validated.{ invalid, valid }
-import cats.implicits.*
+import cats.syntax.all.*
 import cats.parse.Parser.Expectation
 import cats.data.NonEmptyList
 

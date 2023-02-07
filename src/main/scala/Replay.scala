@@ -2,7 +2,7 @@ package chess
 
 import cats.data.Validated
 import cats.data.Validated.{ invalid, valid }
-import cats.implicits.*
+import cats.syntax.all.*
 
 import chess.format.pgn.{ Parser, Reader, San, SanStr, Tag, Tags }
 import chess.format.{ Fen, Uci }

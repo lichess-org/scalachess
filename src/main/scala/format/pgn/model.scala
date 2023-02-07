@@ -2,7 +2,7 @@ package chess
 package format
 package pgn
 
-import cats.implicits.*
+import cats.syntax.all.*
 
 // Nf6
 opaque type SanStr = String

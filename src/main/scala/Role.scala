@@ -5,34 +5,27 @@ sealed trait Role:
   lazy val forsythUpper: Char = forsyth.toUpper
   lazy val pgn: Char          = forsythUpper
   lazy val name               = toString.toLowerCase
-  val projection: Boolean
 
 sealed trait PromotableRole extends Role
 
 /** Promotable in antichess. */
 case object King extends PromotableRole:
   val forsyth          = 'k'
-  val projection       = false
 
 case object Queen extends PromotableRole:
   val forsyth          = 'q'
-  val projection       = true
 
 case object Rook extends PromotableRole:
   val forsyth          = 'r'
-  val projection       = true
 
 case object Bishop extends PromotableRole:
   val forsyth          = 'b'
-  val projection       = true
 
 case object Knight extends PromotableRole:
   val forsyth = 'n'
-  val projection = false
 
 case object Pawn extends Role:
   val forsyth          = 'p'
-  val projection       = false
 
 object Role:
 

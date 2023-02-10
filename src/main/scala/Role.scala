@@ -12,24 +12,24 @@ sealed trait PromotableRole extends Role
 
 /** Promotable in antichess. */
 case object King extends PromotableRole:
-  val forsyth                 = 'k'
-  val dirs: Directions        = Queen.dirs
-  val projection              = false
+  val forsyth          = 'k'
+  val dirs: Directions = Queen.dirs
+  val projection       = false
 
 case object Queen extends PromotableRole:
-  val forsyth                 = 'q'
-  val dirs: Directions        = Rook.dirs ::: Bishop.dirs
-  val projection              = true
+  val forsyth          = 'q'
+  val dirs: Directions = Rook.dirs ::: Bishop.dirs
+  val projection       = true
 
 case object Rook extends PromotableRole:
   val forsyth          = 'r'
   val dirs: Directions = List(_.up, _.down, _.left, _.right)
-  val projection = true
+  val projection       = true
 
 case object Bishop extends PromotableRole:
   val forsyth          = 'b'
   val dirs: Directions = List(_.upLeft, _.upRight, _.downLeft, _.downRight)
-  val projection = true
+  val projection       = true
 
 case object Knight extends PromotableRole:
   val forsyth = 'n'
@@ -43,12 +43,12 @@ case object Knight extends PromotableRole:
     p => Pos.at(p.file.index + 2, p.rank.index + 1),
     p => Pos.at(p.file.index + 2, p.rank.index - 1)
   )
-  val projection              = false
+  val projection = false
 
 case object Pawn extends Role:
-  val forsyth                 = 'p'
-  val dirs: Directions        = Nil
-  val projection              = false
+  val forsyth          = 'p'
+  val dirs: Directions = Nil
+  val projection       = false
 
 object Role:
 

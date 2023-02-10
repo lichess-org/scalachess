@@ -10,22 +10,22 @@ sealed trait PromotableRole extends Role
 
 /** Promotable in antichess. */
 case object King extends PromotableRole:
-  val forsyth          = 'k'
+  val forsyth = 'k'
 
 case object Queen extends PromotableRole:
-  val forsyth          = 'q'
+  val forsyth = 'q'
 
 case object Rook extends PromotableRole:
-  val forsyth          = 'r'
+  val forsyth = 'r'
 
 case object Bishop extends PromotableRole:
-  val forsyth          = 'b'
+  val forsyth = 'b'
 
 case object Knight extends PromotableRole:
   val forsyth = 'n'
 
 case object Pawn extends Role:
-  val forsyth          = 'p'
+  val forsyth = 'p'
 
 object Role:
 

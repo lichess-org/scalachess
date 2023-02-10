@@ -167,8 +167,6 @@ abstract class Variant private[variant] (
 
   lazy val rolesPromotableByPgn: Map[Char, PromotableRole] = promotableRoles.mapBy(_.pgn)
 
-  def isUnmovedPawn(color: Color, pos: Pos) = pos.rank == color.fold(Rank.Second, Rank.Seventh)
-
   override def toString = s"Variant($name)"
 
   override def equals(that: Any): Boolean = this eq that.asInstanceOf[AnyRef]

@@ -241,9 +241,7 @@ case class Situation(board: Board, color: Color):
         sliders.occupiedSquares.foldRight(Bitboard.empty)((s, a) => a | (s.bitboard ^ Bitboard.ray(king, s)))
       val safeKings = genSafeKing(~us & ~attacked)
       val blockers =
-        if !checkers.moreThanOne then
-          checkers.first.map(c => genNonKing(Bitboard.between(king, c) | checkers)).getOrElse(Nil)
-        else Nil
+        checkers.singleSquare.map(c => genNonKing(Bitboard.between(king, c) | checkers)).getOrElse(Nil)
       safeKings ++ blockers
     )
 

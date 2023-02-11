@@ -39,7 +39,7 @@ trait ChessTest extends Specification with ValidatedMatchers:
 
   extension (ps: List[Pos])
     def bb: Bitboard =
-      ps.foldLeft(Bitboard.empty)((b, pos) => b | Bitboard.bb(pos))
+      ps.foldLeft(Bitboard.empty)((b, pos) => b.addPos(pos))
 
   extension (board: Board)
     def visual = Visual >> board

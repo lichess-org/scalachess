@@ -30,6 +30,8 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
     def contains(pos: Pos): Boolean =
       (a.value & (1L << pos.value)) != 0L
 
+    def addPos(pos: Pos): A = a | pos.bb
+
     def moreThanOne: Boolean =
       (a.value & (a.value - 1L)) != 0L
 

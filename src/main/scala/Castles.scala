@@ -15,6 +15,15 @@ object Castles extends OpaqueBitboard[Castles]:
 
     inline def can(inline color: Color) = Castles.Can(c, color)
 
+    inline def apply(color: Color, side: Side): Pos =
+      (color, side) match
+        case (White, KingSide)  => H1
+        case (White, QueenSide) => A1
+        case (Black, KingSide)  => H8
+        case (Black, QueenSide) => A8
+
+    inline def apply(p: (Color, Side)): Pos = apply(p._1, p._2)
+
     def whiteKingSide: Boolean  = (c & H1.bb).nonEmpty
     def whiteQueenSide: Boolean = (c & A1.bb).nonEmpty
     def blackKingSide: Boolean  = (c & H8.bb).nonEmpty
@@ -24,18 +33,10 @@ object Castles extends OpaqueBitboard[Castles]:
       c & Bitboard.rank(color.lastRank)
 
     def without(color: Color, side: Side): Castles =
-      (color, side) match
-        case (White, KingSide)  => c & ~H1.bb
-        case (White, QueenSide) => c & ~A1.bb
-        case (Black, KingSide)  => c & ~H8.bb
-        case (Black, QueenSide) => c & ~A8.bb
+      c & ~apply(color, side).bb
 
     def add(color: Color, side: Side): Castles =
-      (color, side) match
-        case (White, KingSide)  => c | H1.bb
-        case (White, QueenSide) => c | A1.bb
-        case (Black, KingSide)  => c | H8.bb
-        case (Black, QueenSide) => c | A8.bb
+      c.addPos(apply(color, side))
 
     def update(color: Color, kingSide: Boolean, queenSide: Boolean): Castles = color match
       case White => c.without(color) | kingSide.whiteKing | queenSide.whiteQueen
@@ -75,7 +76,7 @@ object Castles extends OpaqueBitboard[Castles]:
     case _ =>
       str.toList
         .traverse(charToSquare)
-        .map(_.foldRight(empty)((s, b) => s.bb | b))
+        .map(_.foldRight(empty)((p, b) => b.addPos(p)))
         .getOrElse(empty)
 
   private def charToSquare: (c: Char) => Option[Pos] =
@@ -91,11 +92,8 @@ object Castles extends OpaqueBitboard[Castles]:
 
   final class Can(castles: Castles, color: Color):
     def on(side: Side): Boolean =
-      (color, side) match
-        case (White, KingSide)  => castles.whiteKingSide
-        case (White, QueenSide) => castles.whiteQueenSide
-        case (Black, KingSide)  => castles.blackKingSide
-        case (Black, QueenSide) => castles.blackQueenSide
+      (castles & castles(color, side).bb).nonEmpty
+
     def any = on(KingSide) || on(QueenSide)
 
 opaque type UnmovedRooks = Long

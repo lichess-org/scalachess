@@ -1,8 +1,6 @@
 package chess
 package bitboard
 
-import cats.syntax.all.*
-
 import Bitboard.*
 
 // Pieces position on the board

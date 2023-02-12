@@ -11,7 +11,7 @@ case class Piece(color: Color, role: Role):
   def isMinor = oneOf(Set(Knight, Bishop))
   def isMajor = oneOf(Set(Queen, Rook))
 
-  def forsyth: Char = if (color == White) role.forsythUpper else role.forsyth
+  def forsyth: Char = if color.white then role.forsythUpper else role.forsyth
 
   // attackable positions assuming empty board
   import bitboard.Bitboard

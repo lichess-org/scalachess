@@ -42,9 +42,9 @@ trait FenReader:
               }.getOrElse((c, r))
             }
 
-      val fifthRank   = situation.color.fold(Rank.Fifth, Rank.Fourth)
-      val sixthRank   = situation.color.fold(Rank.Sixth, Rank.Third)
-      val seventhRank = situation.color.fold(Rank.Seventh, Rank.Second)
+      val fifthRank   = situation.color.fifthRank
+      val sixthRank   = situation.color.sixthRank
+      val seventhRank = situation.color.seventhRank
 
       val enpassantPos = fen.enpassant
       val enpassantMove = for

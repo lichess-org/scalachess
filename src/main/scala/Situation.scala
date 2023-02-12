@@ -263,7 +263,7 @@ case class Situation(board: Board, color: Color):
     import Castles.*
     ourKings.headOption.fold(Nil) { king =>
       // can castle but which side?
-      if !board.history.castles.can(color).any || king.rank != color.backRank then Nil
+      if !board.history.castles.can(color) || king.rank != color.backRank then Nil
       else
         val rooks = board.history.unmovedRooks & Bitboard.rank(color.backRank) & board.rooks
         for

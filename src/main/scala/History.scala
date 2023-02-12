@@ -48,7 +48,8 @@ case class History(
 
   inline def fivefoldRepetition = isRepetition(5)
 
-  inline def canCastle(inline color: Color) = castles can color
+  inline def canCastle(inline color: Color)                    = castles can color
+  inline def canCastle(inline color: Color, inline side: Side) = castles.can(color, side)
 
   inline def withoutCastles(inline color: Color) = copy(castles = castles without color)
 

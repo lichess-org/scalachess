@@ -11,7 +11,8 @@ object Castles extends OpaqueBitboard[Castles]:
 
   extension (c: Castles)
 
-    inline def can(inline color: Color) = Castles.Can(c, color)
+    inline def can(inline color: Color): Boolean           = (c & Bitboard.rank(color.backRank)).nonEmpty
+    inline def can(inline color: Color, inline side: Side) = c.contains(color(side))
 
     def whiteKingSide: Boolean  = c.contains(H1)
     def whiteQueenSide: Boolean = c.contains(A1)
@@ -83,9 +84,3 @@ object Castles extends OpaqueBitboard[Castles]:
   val all: Castles  = CORNERS
   val init: Castles = all
   val none: Castles = empty
-
-  final class Can(castles: Castles, color: Color):
-    def on(side: Side): Boolean =
-      castles.contains(color(side))
-
-    def any = on(KingSide) || on(QueenSide)

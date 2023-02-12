@@ -1,69 +1,78 @@
 package chess
 
+import munit.ScalaCheckSuite
+
+import org.scalacheck.Prop
+import Arbitraries.given
+
 import Pos.*
 import Castles.*
 
-class CastlesTest extends ChessTest:
+class CastlesTest extends ScalaCheckSuite:
 
-  // todo add a test case for Atomic when a rook is exploded
-  // todo more sophisicated tests
-
-
-  "castle object" should {
-
-    "init" in {
-      val castles: Castles = Castles.all
-      castles.whiteKingSide mustEqual true
-      castles.whiteQueenSide mustEqual true
-      castles.blackKingSide mustEqual true
-      castles.blackQueenSide mustEqual true
+  test("can(color, side) should be consistent with properties") {
+    Prop.forAll { (c: Castles) =>
+      (c.can(White, KingSide) == c.whiteKingSide) &&
+      (c.can(White, QueenSide) == c.whiteQueenSide) &&
+      (c.can(Black, KingSide) == c.blackKingSide) &&
+      (c.can(Black, QueenSide) == c.blackQueenSide)
     }
+  }
 
-    "without White" in {
-      val castles: Castles = Castles.all.without(White)
-      castles.whiteKingSide mustEqual false
-      castles.whiteQueenSide mustEqual false
-      castles.blackKingSide mustEqual true
-      castles.blackQueenSide mustEqual true
+  test("apply with booleans") {
+    Prop.forAll {
+      (whiteKingSide: Boolean, whiteQueenSide: Boolean, blackKingSide: Boolean, blackQueenSide: Boolean) =>
+        val c = Castles(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
+        (c.can(White, KingSide) == whiteKingSide) &&
+        (c.can(White, QueenSide) == whiteQueenSide) &&
+        (c.can(Black, KingSide) == blackKingSide) &&
+        (c.can(Black, QueenSide) == blackQueenSide)
     }
+  }
 
-    "without Black" in {
-      val castles: Castles = Castles.all.without(Black)
-      castles.whiteKingSide mustEqual true
-      castles.whiteQueenSide mustEqual true
-      castles.blackKingSide mustEqual false
-      castles.blackQueenSide mustEqual false
+  test("without color") {
+    Prop.forAll { (c: Castles, color: Color) =>
+      val updated = c.without(color)
+      updated.can(color) == false &&
+      updated.can(!color) == c.can(!color)
     }
+  }
 
-    "without Black" in {
-      val castles: Castles = Castles.all.without(Black)
-      castles.whiteKingSide mustEqual true
-      castles.whiteQueenSide mustEqual true
-      castles.blackKingSide mustEqual false
-      castles.blackQueenSide mustEqual false
+  test("without color and side") {
+    Prop.forAll { (c: Castles, color: Color, side: Side) =>
+      val updated = c.without(color, side)
+      updated.can(color, side) == false &&
+      updated.can(color, !side) == c.can(color, !side) &&
+      updated.can(!color) == c.can(!color)
     }
+  }
 
-    "without White Kingside" in {
-      val castles: Castles = Castles.all.without(White, KingSide)
-      castles.whiteKingSide mustEqual false
-      castles.whiteQueenSide mustEqual true
-      castles.blackKingSide mustEqual true
-      castles.blackQueenSide mustEqual true
+  test("add") {
+    Prop.forAll { (c: Castles, color: Color, side: Side) =>
+      val updated = c.add(color, side)
+      updated.can(color) == true &&
+      updated.can(!color) == c.can(!color)
     }
+  }
 
-    "without White QueenSide" in {
-      val castles: Castles = Castles.all.without(White, QueenSide)
-      castles.whiteKingSide mustEqual true
-      castles.whiteQueenSide mustEqual false
-      castles.blackKingSide mustEqual true
-      castles.blackQueenSide mustEqual true
+  test("update") {
+    Prop.forAll { (c: Castles, color: Color, kingSide: Boolean, queenSide: Boolean) =>
+      val updated = c.update(color, kingSide, queenSide)
+      updated.can(color, KingSide) == kingSide &&
+      updated.can(color, QueenSide) == queenSide &&
+      updated.can(!color) == c.can(!color)
     }
+  }
 
-    "update" in {
-      val castles: Castles = Castles.all.update(White, false, true)
-      castles.whiteKingSide mustEqual false
-      castles.whiteQueenSide mustEqual true
-      castles.blackKingSide mustEqual true
-      castles.blackQueenSide mustEqual true
+  test("toFenString.apply == identity") {
+    Prop.forAll { (c: Castles) =>
+      Castles(c.toFenString) == c
+    }
+  }
+
+  test("apply(fenString).toFenString == fenString") {
+    Prop.forAll { (c: Castles) =>
+      val fenString = c.toFenString
+      Castles(fenString).toFenString == fenString
     }
   }

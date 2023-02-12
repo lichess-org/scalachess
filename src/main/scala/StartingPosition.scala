@@ -200,7 +200,7 @@ object StartingPosition:
 
   val all: IndexedSeq[StartingPosition] = categories.flatMap(_.positions).toIndexedSeq
 
-  lazy val featurable = new scala.util.Random(475591).shuffle(all.filter(_.featurable))
+  lazy val featurable = scala.util.Random(475591).shuffle(all.filter(_.featurable))
 
   def randomFeaturable = featurable(scala.util.Random.nextInt(featurable.size))
 

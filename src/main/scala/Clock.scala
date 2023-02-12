@@ -160,7 +160,7 @@ object ClockPlayer:
     )
 
 object Clock:
-  private val limitFormatter = new DecimalFormat("#.##")
+  private val limitFormatter = DecimalFormat("#.##")
 
   opaque type LimitSeconds = Int
   object LimitSeconds extends OpaqueInt[LimitSeconds]

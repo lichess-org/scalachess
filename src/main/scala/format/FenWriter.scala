@@ -43,7 +43,7 @@ trait FenWriter:
   }
 
   def writeBoard(board: Board): BoardFen =
-    val fen   = new scala.collection.mutable.StringBuilder(70)
+    val fen   = scala.collection.mutable.StringBuilder(70)
     var empty = 0
     for (y <- Rank.allReversed)
       empty = 0

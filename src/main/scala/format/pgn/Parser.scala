@@ -257,7 +257,7 @@ object Parser:
     val lm  = LocationMap(str)
     val idx = error.failedAtOffset
     val caret = lm.toCaret(idx).getOrElse {
-      throw new RuntimeException("This is impossible")
+      throw RuntimeException("This is impossible")
     }
     val line         = lm.getLine(caret.line).getOrElse("")
     val errorLine    = line ++ "\n" ++ " ".*(caret.col) ++ "^"

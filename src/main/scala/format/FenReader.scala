@@ -42,12 +42,12 @@ trait FenReader:
               }.getOrElse((c, r))
             }
 
-      val fifthRank   = if (situation.color.white) Rank.Fifth else Rank.Fourth
-      val sixthRank   = if (situation.color.white) Rank.Sixth else Rank.Third
-      val seventhRank = if (situation.color.white) Rank.Seventh else Rank.Second
+      val fifthRank   = situation.color.fold(Rank.Fifth, Rank.Fourth)
+      val sixthRank   = situation.color.fold(Rank.Sixth, Rank.Third)
+      val seventhRank = situation.color.fold(Rank.Seventh, Rank.Second)
 
       val enpassantPos = fen.enpassant
-      val enpassantMove = for {
+      val enpassantMove = for
         pos <- enpassantPos
         if pos.rank == sixthRank
         orig = Pos(pos.file, seventhRank)
@@ -55,7 +55,7 @@ trait FenReader:
         if situation.board(dest).contains(Piece(!situation.color, Pawn)) &&
           situation.board(pos.file, sixthRank).isEmpty &&
           situation.board(orig).isEmpty
-      } yield Uci.Move(orig, dest)
+      yield Uci.Move(orig, dest)
 
       situation withHistory {
         val history = History(
@@ -123,7 +123,7 @@ trait FenReader:
         word.span('[' !=) match
           case (position, pockets) => position -> pockets.stripPrefix("[").stripSuffix("]").some
       case word => word -> None
-    if (pockets.isDefined && !variant.crazyhouse) None
+    if pockets.isDefined && !variant.crazyhouse then None
     else
       makePiecesWithCrazyPromoted(position.toList, 0, 7) map { (pieces, promoted) =>
         val board = Board(pieces, variant = variant)

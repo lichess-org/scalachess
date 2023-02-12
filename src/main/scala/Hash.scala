@@ -39,8 +39,8 @@ object Hash extends OpaqueInt[Hash]:
 
   // The following masks are compatible with the Polyglot
   // opening book format.
-  private val polyglotTable    = new ZobristConstants(0)
-  private lazy val randomTable = new ZobristConstants(16)
+  private val polyglotTable    = ZobristConstants(0)
+  private lazy val randomTable = ZobristConstants(16)
 
   private def roleIndex(role: Role) =
     role match

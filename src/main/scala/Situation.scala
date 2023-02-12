@@ -76,8 +76,6 @@ case class Situation(board: Board, color: Color):
   def withVariant(variant: chess.variant.Variant) =
     copy(board = board withVariant variant)
 
-  export board.history.canCastle
-
   def enPassantSquare: Option[Pos] =
     potentialEpSquare.flatMap(_ => legalMoves.find(_.enpassant).map(_.dest))
 

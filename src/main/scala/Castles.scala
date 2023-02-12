@@ -15,32 +15,22 @@ object Castles extends OpaqueBitboard[Castles]:
 
     inline def can(inline color: Color) = Castles.Can(c, color)
 
-    inline def apply(color: Color, side: Side): Pos =
-      (color, side) match
-        case (White, KingSide)  => H1
-        case (White, QueenSide) => A1
-        case (Black, KingSide)  => H8
-        case (Black, QueenSide) => A8
-
-    inline def apply(p: (Color, Side)): Pos = apply(p._1, p._2)
-
-    def whiteKingSide: Boolean  = (c & H1.bb).nonEmpty
-    def whiteQueenSide: Boolean = (c & A1.bb).nonEmpty
-    def blackKingSide: Boolean  = (c & H8.bb).nonEmpty
-    def blackQueenSide: Boolean = (c & A8.bb).nonEmpty
+    def whiteKingSide: Boolean  = c.contains(H1)
+    def whiteQueenSide: Boolean = c.contains(A1)
+    def blackKingSide: Boolean  = c.contains(H8)
+    def blackQueenSide: Boolean = c.contains(A8)
 
     def without(color: Color): Castles =
       c & Bitboard.rank(color.lastRank)
 
     def without(color: Color, side: Side): Castles =
-      c & ~apply(color, side).bb
+      c & ~color(side).bb
 
     def add(color: Color, side: Side): Castles =
-      c.addPos(apply(color, side))
+      c.addPos(color(side))
 
-    def update(color: Color, kingSide: Boolean, queenSide: Boolean): Castles = color match
-      case White => c.without(color) | kingSide.whiteKing | queenSide.whiteQueen
-      case Black => c.without(color) | kingSide.blackKing | queenSide.blackQueen
+    def update(color: Color, kingSide: Boolean, queenSide: Boolean): Castles =
+      c.without(color) | kingSide.at(color(KingSide)) | queenSide.at(color(QueenSide))
 
     def toFenString: String = {
       (if (whiteKingSide) "K" else "") +
@@ -53,11 +43,18 @@ object Castles extends OpaqueBitboard[Castles]:
 
     def toSeq: Array[Boolean] = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
 
-  extension (b: Boolean)
-    def whiteKing: Castles  = if (b) H1.bb else empty
-    def whiteQueen: Castles = if (b) A1.bb else empty
-    def blackKing: Castles  = if (b) H8.bb else empty
-    def blackQueen: Castles = if (b) A8.bb else empty
+  extension (b: Boolean) inline def at(pos: Pos) = if b then pos.bb else empty
+
+  extension (color: Color)
+    inline def apply(side: Side): Pos =
+      (color, side) match
+        case (White, KingSide)  => H1
+        case (White, QueenSide) => A1
+        case (Black, KingSide)  => H8
+        case (Black, QueenSide) => A8
+
+    inline def kingSide: Pos  = apply(KingSide)
+    inline def queenSide: Pos = apply(QueenSide)
 
   def apply(
       whiteKingSide: Boolean,
@@ -65,10 +62,10 @@ object Castles extends OpaqueBitboard[Castles]:
       blackKingSide: Boolean,
       blackQueenSide: Boolean
   ): Castles =
-    whiteKingSide.whiteKing |
-      whiteQueenSide.whiteQueen |
-      blackKingSide.blackKing |
-      blackQueenSide.blackQueen
+    whiteKingSide.at(White.kingSide) |
+      whiteQueenSide.at(White.queenSide) |
+      blackKingSide.at(Black.kingSide) |
+      blackQueenSide.at(Black.queenSide)
 
   def apply(str: String): Castles = str match
     case "-" => empty
@@ -91,6 +88,6 @@ object Castles extends OpaqueBitboard[Castles]:
 
   final class Can(castles: Castles, color: Color):
     def on(side: Side): Boolean =
-      (castles & castles(color, side).bb).nonEmpty
+      castles.contains(color(side))
 
     def any = on(KingSide) || on(QueenSide)

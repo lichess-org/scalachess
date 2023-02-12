@@ -14,8 +14,7 @@ object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
   def apply(set: Set[Pos]): UnmovedRooks = set.foldLeft(empty)((b, p) => b | p.bb)
 
   extension (ur: UnmovedRooks)
-    def toList: List[Pos]        = ur.occupiedSquares
-    def apply(pos: Pos): Boolean = (ur & pos.bb).nonEmpty
+    def toList: List[Pos] = ur.occupiedSquares
 
     def without(color: Color): UnmovedRooks =
       ur & Bitboard.rank(color.lastRank)

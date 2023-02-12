@@ -9,7 +9,7 @@ import chess.format.Fen
 import cats.syntax.all.*
 
 import bitboard.Board as BBoard
-import bitboard.Bitboard.bb
+import bitboard.Bitboard.{ bb, contains }
 
 class UnmovedRooksTest extends ChessTest:
 
@@ -53,10 +53,10 @@ class UnmovedRooksTest extends ChessTest:
       Chess960
     ) must beValid.like { game =>
       game.playMoves(B1 -> B8) must beValid.like { case g =>
-        g.board.history.unmovedRooks(B1) must_== false
-        g.board.history.unmovedRooks(B8) must_== false
-        g.board.history.unmovedRooks(G1) must_== true
-        g.board.history.unmovedRooks(G8) must_== true
+        g.board.history.unmovedRooks.contains(B1) must_== false
+        g.board.history.unmovedRooks.contains(B8) must_== false
+        g.board.history.unmovedRooks.contains(G1) must_== true
+        g.board.history.unmovedRooks.contains(G8) must_== true
         g.board.castles must_== Castles(true, false, true, false)
       }
     }
@@ -68,8 +68,8 @@ class UnmovedRooksTest extends ChessTest:
       Chess960
     ) must beValid.like { game =>
       game.playMoves(H8 -> A1) must beValid.like { case g =>
-        g.board.history.unmovedRooks(B1) must_== true
-        g.board.history.unmovedRooks(B8) must_== true
+        g.board.history.unmovedRooks.contains(B1) must_== true
+        g.board.history.unmovedRooks.contains(B8) must_== true
         g.board.castles must_== Castles(false, true, false, true)
       }
     }
@@ -81,10 +81,10 @@ class UnmovedRooksTest extends ChessTest:
       Chess960
     ) must beValid.like { game =>
       game.playMoves(D4 -> G1) must beValid.like { case g =>
-        g.board.history.unmovedRooks(B1) must_== true
-        g.board.history.unmovedRooks(B8) must_== true
-        g.board.history.unmovedRooks(G1) must_== false
-        g.board.history.unmovedRooks(G8) must_== true
+        g.board.history.unmovedRooks.contains(B1) must_== true
+        g.board.history.unmovedRooks.contains(B8) must_== true
+        g.board.history.unmovedRooks.contains(G1) must_== false
+        g.board.history.unmovedRooks.contains(G8) must_== true
         g.board.castles must_== Castles(false, true, true, true)
       }
     }
@@ -95,10 +95,10 @@ class UnmovedRooksTest extends ChessTest:
       fenToGame(EpdFen("qrnbkrbn/ppppp1pp/8/5p2/5P2/8/PPPPP1PP/QRNBKRBN w KQkq - 0 2"), Chess960) must beValid
         .like { game =>
           game.playMoves(F1 -> F2) must beValid.like { case g =>
-            g.board.history.unmovedRooks(B1) must_== true
-            g.board.history.unmovedRooks(B8) must_== true
-            g.board.history.unmovedRooks(F1) must_== false
-            g.board.history.unmovedRooks(F8) must_== true
+            g.board.history.unmovedRooks.contains(B1) must_== true
+            g.board.history.unmovedRooks.contains(B8) must_== true
+            g.board.history.unmovedRooks.contains(F1) must_== false
+            g.board.history.unmovedRooks.contains(F8) must_== true
             g.board.castles must_== Castles(false, true, true, true)
           }
         }
@@ -107,10 +107,10 @@ class UnmovedRooksTest extends ChessTest:
       fenToGame(EpdFen("qrnbkrbn/ppppp1pp/8/5p2/4PP2/8/PPPP2PP/QRNBKRBN b KQkq - 0 2"), Chess960) must beValid
         .like { game =>
           game.playMoves(F8 -> F6) must beValid.like { case g =>
-            g.board.history.unmovedRooks(B1) must_== true
-            g.board.history.unmovedRooks(B8) must_== true
-            g.board.history.unmovedRooks(F1) must_== true
-            g.board.history.unmovedRooks(F8) must_== false
+            g.board.history.unmovedRooks.contains(B1) must_== true
+            g.board.history.unmovedRooks.contains(B8) must_== true
+            g.board.history.unmovedRooks.contains(F1) must_== true
+            g.board.history.unmovedRooks.contains(F8) must_== false
             g.board.castles must_== Castles(true, true, false, true)
           }
         }
@@ -122,10 +122,10 @@ class UnmovedRooksTest extends ChessTest:
       fenToGame(EpdFen("rkrnnqbb/p1pppppp/1p6/8/8/1P6/P1PPPPPP/RKRNNQBB w KQkq - 0 2"), Chess960) must beValid
         .like { game =>
           game.playMoves(B1 -> B2) must beValid.like { case g =>
-            g.board.history.unmovedRooks(A1) must_== false
-            g.board.history.unmovedRooks(A8) must_== true
-            g.board.history.unmovedRooks(C1) must_== false
-            g.board.history.unmovedRooks(C8) must_== true
+            g.board.history.unmovedRooks.contains(A1) must_== false
+            g.board.history.unmovedRooks.contains(A8) must_== true
+            g.board.history.unmovedRooks.contains(C1) must_== false
+            g.board.history.unmovedRooks.contains(C8) must_== true
             g.board.castles must_== Castles(false, false, true, true)
           }
         }
@@ -137,10 +137,10 @@ class UnmovedRooksTest extends ChessTest:
       ) must beValid
         .like { game =>
           game.playMoves(B8 -> B7) must beValid.like { case g =>
-            g.board.history.unmovedRooks(A1) must_== true
-            g.board.history.unmovedRooks(A8) must_== false
-            g.board.history.unmovedRooks(C1) must_== true
-            g.board.history.unmovedRooks(C8) must_== false
+            g.board.history.unmovedRooks.contains(A1) must_== true
+            g.board.history.unmovedRooks.contains(A8) must_== false
+            g.board.history.unmovedRooks.contains(C1) must_== true
+            g.board.history.unmovedRooks.contains(C8) must_== false
             g.board.castles must_== Castles(true, true, false, false)
           }
         }

@@ -4,8 +4,6 @@ import cats.syntax.all.*
 
 import bitboard.OpaqueBitboard
 import bitboard.Bitboard
-import bitboard.Bitboard.given
-
 import Pos.*
 
 opaque type Castles = Long

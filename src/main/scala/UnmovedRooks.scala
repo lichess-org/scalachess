@@ -2,8 +2,6 @@ package chess
 
 import bitboard.OpaqueBitboard
 import bitboard.Bitboard
-import bitboard.Bitboard.given
-import Pos.*
 
 opaque type UnmovedRooks = Long
 object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:

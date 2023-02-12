@@ -70,10 +70,10 @@ object Castles extends OpaqueBitboard[Castles]:
     case _ =>
       str.toList
         .traverse(charToSquare)
-        .map(_.foldRight(empty)((p, b) => b.addPos(p)))
+        .map(Bitboard(_).value)
         .getOrElse(empty)
 
-  private def charToSquare: (c: Char) => Option[Pos] =
+  def charToSquare: (c: Char) => Option[Pos] =
     case 'k' => Some(H8)
     case 'q' => Some(A8)
     case 'K' => Some(H1)

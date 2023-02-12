@@ -111,8 +111,8 @@ object Fen:
       case "-" => Right(Bitboard.empty)
       case _ =>
         s.toList
-          .traverse(charToSquare)
-          .map(_.foldRight(Bitboard.empty)((s, b) => s.bb | b))
+          .traverse(Castles.charToSquare)
+          .map(Bitboard(_))
           .toRight(ParseFenError.InvalidCastling)
 
   // TODO naming is hard
@@ -130,13 +130,6 @@ object Fen:
       case ep if epSquares contains ep => Right(fromString(ep))
       case "-"                         => Right(None)
       case _                           => Left(ParseFenError.InvalidEpSquare)
-
-  def charToSquare: (c: Char) => Option[Pos] =
-    case 'k' => Some(Pos(File.H, Rank.Eighth))
-    case 'q' => Some(Pos(File.A, Rank.Eighth))
-    case 'K' => Some(Pos(File.H, Rank.First))
-    case 'Q' => Some(Pos(File.A, Rank.First))
-    case _   => None
 
   def parseBoard(boardFen: String): Either[ParseFenError, Board] =
     var rank   = 7

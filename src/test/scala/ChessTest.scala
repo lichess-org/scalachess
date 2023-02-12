@@ -37,10 +37,6 @@ trait ChessTest extends Specification with ValidatedMatchers:
     def threeCheck: Board           = makeBoard(str, chess.variant.ThreeCheck)
     def as(color: Color): Situation = Situation(Visual << str, color)
 
-  extension (ps: List[Pos])
-    def bb: Bitboard =
-      ps.foldLeft(Bitboard.empty)((b, pos) => b.addPos(pos))
-
   extension (board: Board)
     def visual = Visual >> board
     def destsFrom(from: Pos): Option[List[Pos]] =

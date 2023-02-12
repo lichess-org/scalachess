@@ -29,6 +29,8 @@ object Bitboard extends OpaqueBitboard[Bitboard]:
   inline def file(inline f: File): Bitboard                  = FILES(f.value)
   inline def ray(inline from: Pos, inline to: Pos): Bitboard = RAYS(from.value)(to.value)
 
+  inline def apply(inline xs: Iterable[Pos]): Bitboard = xs.foldLeft(empty)((b, p) => b | p.bb)
+
   /** Slow attack set generation. Used only to bootstrap the attack tables.
     */
   private[bitboard] def slidingAttacks(square: Int, occupied: Bitboard, deltas: Array[Int]): Bitboard =

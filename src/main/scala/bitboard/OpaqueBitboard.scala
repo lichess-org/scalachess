@@ -12,7 +12,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
     def bb: A                    = l.asInstanceOf[A]
     private def lsb: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(l))
 
-  extension (s: Pos) inline def bitboard: A = (1L << s.value).bb
+  extension (s: Pos) inline def bb: A = (1L << s.value).bb
 
   extension (a: A)
     inline def unary_~ : A                                                = (~a.value).bb
@@ -29,6 +29,8 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
 
     def contains(pos: Pos): Boolean =
       (a.value & (1L << pos.value)) != 0L
+
+    def addPos(pos: Pos): A = a | pos.bb
 
     def moreThanOne: Boolean =
       (a.value & (a.value - 1L)) != 0L

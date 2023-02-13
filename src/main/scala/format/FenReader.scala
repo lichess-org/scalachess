@@ -6,7 +6,7 @@ import variant.{ Standard, Variant }
 import cats.kernel.Monoid
 import ornicar.scalalib.zeros.given_Zero_Option
 import bitboard.Bitboard
-import bitboard.Bitboard.{ bitboard, occupiedSquares }
+import bitboard.Bitboard.{ bb, occupiedSquares }
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *
@@ -38,16 +38,14 @@ trait FenReader:
                     case 'q'  => rooks.find(_ ?< kingPos)
                     case file => rooks.find(_.file.char == file)
                   side <- Side.kingRookSide(kingPos, rookPos)
-                yield (c.add(color, side), r | rookPos.bitboard)
+                yield (c.add(color, side), r | rookPos.bb)
               }.getOrElse((c, r))
             }
 
-      val fifthRank   = if (situation.color.white) Rank.Fifth else Rank.Fourth
-      val sixthRank   = if (situation.color.white) Rank.Sixth else Rank.Third
-      val seventhRank = if (situation.color.white) Rank.Seventh else Rank.Second
+      import situation.color.{ fifthRank, sixthRank, seventhRank }
 
       val enpassantPos = fen.enpassant
-      val enpassantMove = for {
+      val enpassantMove = for
         pos <- enpassantPos
         if pos.rank == sixthRank
         orig = Pos(pos.file, seventhRank)
@@ -55,7 +53,7 @@ trait FenReader:
         if situation.board(dest).contains(Piece(!situation.color, Pawn)) &&
           situation.board(pos.file, sixthRank).isEmpty &&
           situation.board(orig).isEmpty
-      } yield Uci.Move(orig, dest)
+      yield Uci.Move(orig, dest)
 
       situation withHistory {
         val history = History(
@@ -123,7 +121,7 @@ trait FenReader:
         word.span('[' !=) match
           case (position, pockets) => position -> pockets.stripPrefix("[").stripSuffix("]").some
       case word => word -> None
-    if (pockets.isDefined && !variant.crazyhouse) None
+    if pockets.isDefined && !variant.crazyhouse then None
     else
       makePiecesWithCrazyPromoted(position.toList, 0, 7) map { (pieces, promoted) =>
         val board = Board(pieces, variant = variant)

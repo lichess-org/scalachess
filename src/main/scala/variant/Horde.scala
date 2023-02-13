@@ -103,7 +103,3 @@ case object Horde
         true
       else fortress
     else fortress
-
-  override def isUnmovedPawn(color: Color, pos: Pos) =
-    if (color.white) pos.rank <= Rank.Second
-    else pos.rank == Rank.Seventh

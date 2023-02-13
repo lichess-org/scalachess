@@ -70,7 +70,7 @@ case object Atomic
     val their = byColor(!situation.color)
     (kingTo.kingAttacks & their & kings).nonEmpty || attackersWithoutKing(
       situation.board,
-      (situation.board.occupied ^ kingFrom.bitboard),
+      (situation.board.occupied ^ kingFrom.bb),
       kingTo,
       !situation.color
     ).isEmpty
@@ -93,7 +93,7 @@ case object Atomic
 
       val rooksToExploded = affectedPos.filter(boardPieces.get(_).exists(_.is(Rook)))
 
-      val castles  = rooksToExploded.foldLeft(afterBoard.history.castles)((c, pos) => c & ~pos.bitboard)
+      val castles  = rooksToExploded.foldLeft(afterBoard.history.castles)((c, pos) => c & ~pos.bb)
       val newBoard = (afterBoard withPieces afterExplosions).withCastles(castles)
       move withAfter newBoard
     else move

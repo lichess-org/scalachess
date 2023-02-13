@@ -13,16 +13,16 @@ R   K""",
       Black
     )
     "can castle queenside" in {
-      game.board.history canCastle White on QueenSide must_== true
+      game.board.history.canCastle(White, QueenSide) must_== true
     }
     "can still castle queenside" in {
       game.playMoves(B2 -> A3) must beValid.like { case g =>
-        g.board.history canCastle White on QueenSide must_== true
+        g.board.history.canCastle(White, QueenSide) must_== true
       }
     }
     "can not castle queenside anymore" in {
       game.playMoves(B2 -> A1) must beValid.like { case g =>
-        g.board.history canCastle White on QueenSide must_== false
+        g.board.history canCastle (White, QueenSide) must_== false
       }
     }
   }

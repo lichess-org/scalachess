@@ -48,7 +48,7 @@ case class Move(
         if captures then
           unmovedRooks.side(dest) match
             case Some(result) =>
-              unmovedRooks = unmovedRooks & ~dest.bitboard
+              unmovedRooks = unmovedRooks & ~dest.bb
               result match
                 case Some(side) =>
                   castleRights = castleRights.without(!piece.color, side)
@@ -63,7 +63,7 @@ case class Move(
         if piece is Rook then
           unmovedRooks.side(orig) match
             case Some(result) =>
-              unmovedRooks = unmovedRooks & ~orig.bitboard
+              unmovedRooks = unmovedRooks & ~orig.bb
               result match
                 case Some(side) =>
                   castleRights = castleRights.without(piece.color, side)

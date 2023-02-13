@@ -43,7 +43,7 @@ trait FenWriter:
   }
 
   def writeBoard(board: Board): BoardFen =
-    val fen   = new scala.collection.mutable.StringBuilder(70)
+    val fen   = scala.collection.mutable.StringBuilder(70)
     var empty = 0
     for (y <- Rank.allReversed)
       empty = 0
@@ -79,15 +79,5 @@ trait FenWriter:
           pockets.black.roles.map(_.forsyth).mkString
       case _ => ""
 
-  // todo we can do better with bitboard
   private[chess] def writeCastles(board: Board): String =
-    import Castles.*
-    {
-      // castling rights with inner rooks are represented by their file name
-      (if (board.castles.whiteKingSide) "K" else "") +
-        (if (board.castles.whiteQueenSide) "Q" else "") +
-        (if (board.castles.blackKingSide) "k" else "") +
-        (if (board.castles.blackQueenSide) "q" else "")
-    } match
-      case "" => "-"
-      case n  => n
+    board.castles.toFenString

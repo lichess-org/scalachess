@@ -1,8 +1,6 @@
 package chess
 package bitboard
 
-import cats.syntax.all.*
-
 import Bitboard.*
 
 // Pieces position on the board
@@ -106,7 +104,7 @@ case class Board(
   // todo more efficient
   def discard(s: Pos): Board =
     pieceAt(s).fold(this) { p =>
-      val m = s.bitboard
+      val m = s.bb
       copy(
         pawns = updateRole(m, Pawn)(p.role),
         knights = updateRole(m, Knight)(p.role),
@@ -153,7 +151,7 @@ case class Board(
 
   def putOrReplace(s: Pos, role: Role, color: Color): Board =
     val b = discard(s)
-    val m = s.bitboard
+    val m = s.bb
     b.copy(
       pawns = b.updateRole(m, Pawn)(role),
       knights = b.updateRole(m, Knight)(role),
@@ -256,7 +254,7 @@ object Board:
     var occupied = Bitboard.empty
 
     pieces.foreach { (s, p) =>
-      val position = s.bitboard
+      val position = s.bb
       occupied |= position
       p.role match
         case Pawn   => pawns |= position

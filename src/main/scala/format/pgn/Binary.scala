@@ -111,7 +111,7 @@ object Binary:
     private def bitAt(i: Int, p: Int): Boolean       = cut(i, p, p - 1) != 0
     private val lengthMasks =
       Map(1 -> 0x01, 2 -> 0x03, 3 -> 0x07, 4 -> 0x0f, 5 -> 0x1f, 6 -> 0x3f, 7 -> 0x7f, 8 -> 0xff)
-    private def !!(msg: String) = throw new Exception("Binary reader failed: " + msg)
+    private def !!(msg: String) = throw Exception("Binary reader failed: " + msg)
 
   private object Writer:
 

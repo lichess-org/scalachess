@@ -52,7 +52,8 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
     // remove the first non empty position
     def removeFirst: A = (a.value & (a.value - 1L)).bb
 
-    def hasAny(o: A): Boolean = (a.value & o.value) != 0L
+    def sharedAny(o: A, xs: A*): Boolean =
+      (a.value & xs.foldLeft(o.value)(_ & _.value)) != 0L
 
     def fold[B](init: B)(f: (B, Pos) => B): B =
       var b      = a.value

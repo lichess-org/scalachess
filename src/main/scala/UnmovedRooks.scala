@@ -25,10 +25,10 @@ object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
     // same rank return Some(None) (because we cannot guess)
     // If there are two rooks on the same rank, return the side of the rook
     def side(pos: Pos): Option[Option[Side]] =
-      val bitboard = pos.bb
-      if (ur & bitboard).isEmpty then None
+      val rook = pos.bb
+      if ur.sharedAny(rook) then None
       else
-        (ur & ~bitboard & Bitboard.rank(pos.rank)).first match
+        (ur & ~rook & Bitboard.rank(pos.rank)).first match
           case Some(otherRook) =>
             if (otherRook.file > pos.file) then Some(Some(QueenSide))
             else Some(Some(KingSide))

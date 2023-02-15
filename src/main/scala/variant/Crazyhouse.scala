@@ -93,6 +93,21 @@ case object Crazyhouse
       else checkers.first.map(checker => Bitboard.between(king, checker).occupiedSquares)
     )
 
+  // if the king is not in check, all empty squares are possible drop
+  // king is in single check, we return the squares between the king and the checker
+  // king is in double check, no drop is possible
+  def legalDropSquares(situation: Situation): List[Pos] =
+    import bitboard.Bitboard
+    situation.ourKings.headOption
+      .map(king =>
+        val checkers = situation.board.board.attackers(king, !situation.color)
+        if checkers.isEmpty then (~situation.board.occupied).occupiedSquares
+        else checkers.singleSquare.map(Bitboard.between(king, _).occupiedSquares).getOrElse(Nil)
+      )
+      .getOrElse(Nil)
+
+  def legalMoves(situation: Situation): List[MoveOrDrop] = ???
+
   val storableRoles = List(Pawn, Knight, Bishop, Rook, Queen)
 
   case class Data(

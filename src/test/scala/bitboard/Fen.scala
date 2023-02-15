@@ -26,8 +26,8 @@ case class Fen(board: Board, state: State):
         result
       case Move.EnPassant(from, to) =>
         val newOccupied = (occupied ^ from.bb ^ to.withRankOf(from).bb) | to.bb
-        (king.rookAttacks(newOccupied) & them & (board.rooks ^ board.queens)).isEmpty &&
-        (king.bishopAttacks(newOccupied) & them & (board.bishops ^ board.queens)).isEmpty
+        king.rookAttacks(newOccupied).sharedNone(them, (board.rooks ^ board.queens)) &&
+        king.bishopAttacks(newOccupied).sharedNone(them, (board.bishops ^ board.queens))
       case _ => true
 
   // TODO now it works with valid move only

@@ -79,3 +79,28 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
       assertEquals(bb.first, bb.occupiedSquares.minByOption(_.value))
     }
   }
+
+  test("sharedAny should be true when the two bitboards have at least one common square") {
+    forAll { (b1: Bitboard, b2: Bitboard, p: Pos) =>
+      b1.addPos(p).sharedAny(b2.addPos(p))
+    }
+  }
+
+  test("sharedAny and intersection should be consistent") {
+    forAll { (s1: Set[Pos], s2: Set[Pos]) =>
+      val b1 = Bitboard(s1)
+      val b2 = Bitboard(s2)
+      val s  = s1 intersect s2
+      b1.sharedAny(b2) == s.nonEmpty
+    }
+  }
+
+  test("sharedAny and intersection should be consistent") {
+    forAll { (s1: Set[Pos], s2: Set[Pos], xs: List[Set[Pos]]) =>
+      val b1 = Bitboard(s1)
+      val b2 = Bitboard(s2)
+      val s  = s1.intersect(xs.foldLeft(s2)(_ intersect _))
+      val bs = xs.map(Bitboard(_))
+      b1.sharedAny(b2, bs*) == s.nonEmpty
+    }
+  }

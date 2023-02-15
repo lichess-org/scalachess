@@ -260,7 +260,6 @@ case class Situation(board: Board, color: Color):
 
   // TODO verify kings & rooks are in back rank only
   private def genCastling: List[Move] =
-    import Castles.*
     ourKings.headOption.fold(Nil) { king =>
       // can castle but which side?
       if !board.history.castles.can(color) || king.rank != color.backRank then Nil
@@ -277,7 +276,7 @@ case class Situation(board: Board, color: Color):
             if board.variant.chess960 || board.variant.fromPosition
             then (Bitboard.between(king, rook) | Bitboard.between(king, kingTo))
             else Bitboard.between(king, rook)
-          if (path & (board.occupied & ~rook.bb)).isEmpty
+          if path.sharedNone(board.occupied, ~rook.bb)
           kingPath = Bitboard.between(king, kingTo) | king.bb
           if kingPath.occupiedSquares.forall(board.variant.castleCheckSafeSquare(this, king, _))
           moves <- castle(king, kingTo, rook, rookTo)

@@ -18,7 +18,7 @@ case object KingOfTheHill
   private val center = 0x1818000000L
 
   override def specialEnd(situation: Situation) =
-    (situation.board.kingPosOf(!situation.color) & center).nonEmpty
+    situation.board.kingPosOf(!situation.color).sharedAny(center)
 
   /** You only need a king to be able to win in this variant
     */

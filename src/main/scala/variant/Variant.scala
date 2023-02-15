@@ -146,10 +146,10 @@ abstract class Variant private[variant] (
   @nowarn def finalizeBoard(board: Board, uci: format.Uci, captured: Option[Piece]): Board = board
 
   protected def pawnsOnPromotionRank(board: Board, color: Color) =
-    (board(color, Pawn) & Bitboard.rank(color.promotablePawnRank)).nonEmpty
+    board(color, Pawn).sharedAny(Bitboard.rank(color.promotablePawnRank))
 
   protected def pawnsOnBackRank(board: Board, color: Color) =
-    (board(color, Pawn) & Bitboard.rank(color.backRank)).nonEmpty
+    board(color, Pawn).sharedAny(Bitboard.rank(color.backRank))
 
   protected def validSide(board: Board, strict: Boolean)(color: Color) =
     board(color, King).count == 1 &&

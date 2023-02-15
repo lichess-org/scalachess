@@ -35,9 +35,9 @@ case object Atomic
     */
   override def kingThreatened(board: Board, color: Color): Check = Check {
     import board.board.{ byColor, kings }
-    val their = byColor(!color)
+    val theirKings = byColor(!color) & kings
     kings(color).exists { k =>
-      (their & k.kingAttacks & kings).isEmpty && attackersWithoutKing(
+      k.kingAttacks.sharedNone(theirKings) && attackersWithoutKing(
         board,
         board.board.occupied,
         k,
@@ -67,8 +67,8 @@ case object Atomic
   override def castleCheckSafeSquare(situation: Situation, kingFrom: Pos, kingTo: Pos): Boolean =
     // In Atomic, when the kings are connected, checks do not apply
     import situation.board.board.{ byColor, kings }
-    val their = byColor(!situation.color)
-    (kingTo.kingAttacks & their & kings).nonEmpty || attackersWithoutKing(
+    val theirKings = byColor(!situation.color) & kings
+    kingTo.kingAttacks.sharedAny(theirKings) || attackersWithoutKing(
       situation.board,
       (situation.board.occupied ^ kingFrom.bb),
       kingTo,

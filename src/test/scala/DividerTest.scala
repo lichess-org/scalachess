@@ -2,6 +2,7 @@ package chess
 
 import scala.language.implicitConversions
 import org.specs2.matcher.MustMatchers.akaMust
+import MoveOrDrop.*
 
 class DividerTest extends ChessTest:
 

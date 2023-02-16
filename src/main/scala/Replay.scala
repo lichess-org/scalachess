@@ -7,6 +7,7 @@ import cats.syntax.all.*
 import chess.format.pgn.{ Parser, Reader, San, SanStr, Tag, Tags }
 import chess.format.{ Fen, Uci }
 import chess.variant.Variant
+import MoveOrDrop.*
 
 case class Replay(setup: Game, moves: List[MoveOrDrop], state: Game):
 

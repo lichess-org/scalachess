@@ -5,6 +5,7 @@ import chess.format.Uci
 import cats.syntax.option.*
 import cats.data.Validated
 import chess.format.EpdFen
+import bitboard.Bitboard
 
 case object Crazyhouse
     extends Variant(
@@ -86,7 +87,6 @@ case object Crazyhouse
   // king is in single check, we return the squares between the king and the checker
   // king is in double check, no drop is possible
   def possibleDrops(situation: Situation): Option[List[Pos]] =
-    import bitboard.Bitboard
     situation.ourKings.headOption.flatMap(king =>
       val checkers = situation.board.board.attackers(king, !situation.color)
       if checkers.moreThanOne then Some(Nil)
@@ -94,19 +94,45 @@ case object Crazyhouse
     )
 
   // if the king is not in check, all empty squares are possible drop
-  // king is in single check, we return the squares between the king and the checker
+  // king is in single check, return the squares between the king and the checker
   // king is in double check, no drop is possible
-  def legalDropSquares(situation: Situation): List[Pos] =
+  def legalDropSquares(situation: Situation): Bitboard =
     import bitboard.Bitboard
     situation.ourKings.headOption
       .map(king =>
         val checkers = situation.board.board.attackers(king, !situation.color)
-        if checkers.isEmpty then (~situation.board.occupied).occupiedSquares
-        else checkers.singleSquare.map(Bitboard.between(king, _).occupiedSquares).getOrElse(Nil)
+        if checkers.isEmpty then ~situation.board.occupied
+        else checkers.singleSquare.map(Bitboard.between(king, _)).getOrElse(Bitboard.empty)
       )
-      .getOrElse(Nil)
+      .getOrElse(Bitboard.empty)
 
-  def legalMoves(situation: Situation): List[MoveOrDrop] = ???
+  def legalMoves(situation: Situation): List[MoveOrDrop] =
+    legalDrops(situation) ::: legalMoves(situation)
+
+  def legalDrops(situation: Situation): List[Drop] =
+    val targets = legalDropSquares(situation)
+    if targets.isEmpty then Nil
+    else
+      situation.board.crazyData.fold(List.empty[Drop]) { data =>
+        val roles = data.pockets(situation.color).roles
+        val dropsWithoutPawn =
+          for
+            role <- List(Knight, Bishop, Rook, Queen)
+            if roles contains role
+            to <- targets.occupiedSquares
+            piece = Piece(situation.color, role)
+            after = situation.board.place(piece, to).get // this is safe, we checked the target squares
+          yield Drop(piece, to, situation, after)
+        val dropWithPawn =
+          if roles contains Pawn then
+            for
+              to <- (targets & ~Bitboard.firstRank & ~Bitboard.lastRank).occupiedSquares
+              piece = Piece(situation.color, Pawn)
+              after = situation.board.place(piece, to).get // this is safe, we checked the target squares
+            yield Drop(piece, to, situation, after)
+          else Nil
+        dropsWithoutPawn ::: dropWithPawn
+      }
 
   val storableRoles = List(Pawn, Knight, Bishop, Rook, Queen)
 

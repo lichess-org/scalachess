@@ -46,13 +46,13 @@ object OpeningDb:
 
   def search(replay: Replay): Option[Opening.AtPly] =
     searchInSituations {
-      val moves = replay.chronoMoves.view
+      val moves: Vector[Move] = replay.chronoMoves.view
         .take(SEARCH_MAX_PLIES)
         .takeWhile {
-          case Left(move) => move.situationBefore.board.nbPieces >= SEARCH_MIN_PIECES
+          case move: Move => move.situationBefore.board.nbPieces >= SEARCH_MIN_PIECES
           case _          => false
         }
-        .collect { case Left(move) => move }
+        .collect { case move: Move => move }
         .toVector
       moves.map(_.situationBefore) ++ moves.lastOption.map(_.situationAfter).toVector
     }

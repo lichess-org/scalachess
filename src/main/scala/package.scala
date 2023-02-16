@@ -11,5 +11,3 @@ type Direction  = Pos => Option[Pos]
 type Directions = List[Direction]
 
 type PieceMap = Map[Pos, Piece]
-
-type MoveOrDrop = Either[Move, Drop]

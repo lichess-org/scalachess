@@ -31,7 +31,7 @@ object Uci:
 
     def origDest = orig -> dest
 
-    def apply(situation: Situation) = situation.move(orig, dest, promotion) map Left.apply
+    def apply(situation: Situation) = situation.move(orig, dest, promotion)
 
     override def toString = s"Move(${orig.key}${dest.key}${promotion.fold("")(_.forsyth)})"
 
@@ -66,7 +66,7 @@ object Uci:
 
     def origDest = pos -> pos
 
-    def apply(situation: Situation) = situation.drop(role, pos) map Right.apply
+    def apply(situation: Situation) = situation.drop(role, pos)
 
   object Drop:
 

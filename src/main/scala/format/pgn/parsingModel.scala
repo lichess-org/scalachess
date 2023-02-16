@@ -45,7 +45,7 @@ case class Std(
     metas: Metas = Metas.empty
 ) extends San:
 
-  def apply(situation: Situation) = move(situation) map Left.apply
+  def apply(situation: Situation) = move(situation)
 
   override def withSuffixes(s: Suffixes) =
     copy(
@@ -81,7 +81,7 @@ case class Drop(
     metas: Metas = Metas.empty
 ) extends San:
 
-  def apply(situation: Situation) = drop(situation) map Right.apply
+  def apply(situation: Situation) = drop(situation)
 
   def withMetas(m: Metas) = copy(metas = m)
 
@@ -121,7 +121,7 @@ case class Castle(
     metas: Metas = Metas.empty
 ) extends San:
 
-  def apply(situation: Situation) = move(situation) map Left.apply
+  def apply(situation: Situation) = move(situation)
 
   def withMetas(m: Metas) = copy(metas = m)
 

@@ -126,7 +126,7 @@ case object Crazyhouse
             to <- targets.occupiedSquares
             piece = Piece(situation.color, role)
             after = situation.board.place(piece, to).get // this is safe, we checked the target squares
-            d2 = data.drop(piece).get // this is safe, we checked the pocket
+            d2    = data.drop(piece).get                 // this is safe, we checked the pocket
           yield Drop(piece, to, situation, after withCrazyData d2)
         val dropWithPawn =
           if roles contains Pawn then
@@ -134,7 +134,7 @@ case object Crazyhouse
               to <- (targets & ~Bitboard.firstRank & ~Bitboard.lastRank).occupiedSquares
               piece = Piece(situation.color, Pawn)
               after = situation.board.place(piece, to).get // this is safe, we checked the target squares
-              d2 = data.drop(piece).get // this is safe, we checked the pocket
+              d2    = data.drop(piece).get                 // this is safe, we checked the pocket
             yield Drop(piece, to, situation, after withCrazyData d2)
           else Nil
         dropsWithoutPawn ::: dropWithPawn

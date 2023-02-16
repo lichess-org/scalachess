@@ -8,7 +8,7 @@ object Bitboard extends OpaqueBitboard[Bitboard]:
   private val FILES = Array.fill(8)(0L)
 
   val firstRank = Bitboard(0xffL)
-  val lastRank = Bitboard(0xffL << 56)
+  val lastRank  = Bitboard(0xffL << 56)
 
   private[bitboard] val KNIGHT_DELTAS     = Array[Int](17, 15, 10, 6, -17, -15, -10, -6)
   private[bitboard] val BISHOP_DELTAS     = Array[Int](7, -7, 9, -9)

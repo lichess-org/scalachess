@@ -18,7 +18,6 @@ object FullPerftTest extends SimpleIOSuite:
 
   val nodeLimits = 10_000_000L
 
-  // Tests all perft scenario on random.perft with node limitation is 10_000
   test("random.perft") {
     perfts(Perft.randomPerfts, Chess960, 10_000L)
       .map(assert(_))
@@ -36,6 +35,11 @@ object FullPerftTest extends SimpleIOSuite:
 
   test("atomic.perft") {
     perfts(Perft.atomicPerfts, Atomic, nodeLimits)
+      .map(assert(_))
+  }
+
+  test("crazyhouse.perft") {
+    perfts(Perft.crazyhousePerfts, Crazyhouse, nodeLimits)
       .map(assert(_))
   }
 

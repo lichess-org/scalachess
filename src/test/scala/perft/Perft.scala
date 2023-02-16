@@ -6,6 +6,7 @@ import chess.variant.Chess960
 import chess.variant.Variant
 import org.specs2.specification.core.*
 import chess.variant.Crazyhouse
+import MoveOrDrop.*
 
 case class Perft(id: String, epd: EpdFen, cases: List[TestCase]):
   import Perft.*
@@ -22,7 +23,7 @@ case class Perft(id: String, epd: EpdFen, cases: List[TestCase]):
 case class TestCase(depth: Int, result: Long)
 case class Result(depth: Int, result: Long, expected: Long)
 
-case class DivideResult(val move: Move, nodes: Long) {
+case class DivideResult(val move: Move | Drop, nodes: Long) {
   override def toString(): String =
     s"${move.toUci.uci} $nodes"
 }
@@ -55,6 +56,11 @@ object Perft:
     println(builder)
 
   extension (game: Game)
+
+    private def apply(md: MoveOrDrop): Game = md match
+      case m: Move => game.apply(m)
+      case d: Drop => game.applyDrop(d)
+
     def divide(depth: Int): List[DivideResult] =
       if depth == 0 then Nil
       else if game.situation.perftEnd then Nil
@@ -67,30 +73,22 @@ object Perft:
           .sortBy(_.move.toUci.uci)
 
     def perft(depth: Int): Long =
-      if (game.situation.board.variant == chess.variant.Crazyhouse) then crazyhousePerft(depth)
-      else if depth == 0 then 1L
+      if depth == 0 then 1L
       else if game.situation.perftEnd then 0L
       else
         val moves = game.perftMoves
         if (depth == 1) then moves.size.toLong
-        else moves.map(move => game(move).perft(depth - 1)).sum
+        else moves.map(game(_).perft(depth - 1)).sum
 
-    private def perftMoves: List[Move] =
-      val legalMoves = game.situation.legalMoves
-      if game.situation.board.variant.chess960 then legalMoves
-      // if variant is not chess960 we need to deduplicated castlings moves
-      // We filter out castling move that is Standard and king's dest is not in the rook position
-      else legalMoves.filterNot(m => m.castle.exists(c => c.isStandard && m.dest != c.rook))
-
-    def crazyhousePerft(depth: Int): Long =
-      import MoveOrDrop.*
-
-      if depth == 0 then 1L
-      else if game.situation.perftEnd then 0L
+    private def perftMoves: List[MoveOrDrop] =
+      if game.situation.board.variant == chess.variant.Crazyhouse
+      then Crazyhouse.legalMoves(game.situation)
       else
-        val moves = game.crazyhousePerftMoves
-        if (depth == 1) then moves.size.toLong
-        else moves.map(_.fold(game.apply, game.applyDrop).crazyhousePerft(depth - 1)).sum
+        val legalMoves = game.situation.legalMoves
+        if game.situation.board.variant.chess960 then legalMoves
+        // if variant is not chess960 we need to deduplicated castlings moves
+        // We filter out castling move that is Standard and king's dest is not in the rook position
+        else legalMoves.filterNot(m => m.castle.exists(c => c.isStandard && m.dest != c.rook))
 
     private def crazyhousePerftMoves: List[MoveOrDrop] =
       Crazyhouse.legalMoves(game.situation)

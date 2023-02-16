@@ -5,6 +5,7 @@ import chess.format.EpdFen
 import chess.variant.Chess960
 import chess.variant.Variant
 import org.specs2.specification.core.*
+import chess.variant.Crazyhouse
 
 case class Perft(id: String, epd: EpdFen, cases: List[TestCase]):
   import Perft.*
@@ -66,10 +67,8 @@ object Perft:
           .sortBy(_.move.toUci.uci)
 
     def perft(depth: Int): Long =
-      import chess.Move.Castle.*
-      import Perft.*
-
-      if depth == 0 then 1L
+      if (game.situation.board.variant == chess.variant.Crazyhouse) then crazyhousePerft(depth)
+      else if depth == 0 then 1L
       else if game.situation.perftEnd then 0L
       else
         val moves = game.perftMoves
@@ -82,6 +81,19 @@ object Perft:
       // if variant is not chess960 we need to deduplicated castlings moves
       // We filter out castling move that is Standard and king's dest is not in the rook position
       else legalMoves.filterNot(m => m.castle.exists(c => c.isStandard && m.dest != c.rook))
+
+    def crazyhousePerft(depth: Int): Long =
+      import MoveOrDrop.*
+
+      if depth == 0 then 1L
+      else if game.situation.perftEnd then 0L
+      else
+        val moves = game.crazyhousePerftMoves
+        if (depth == 1) then moves.size.toLong
+        else moves.map(_.fold(game.apply, game.applyDrop).crazyhousePerft(depth - 1)).sum
+
+    private def crazyhousePerftMoves: List[MoveOrDrop] =
+      Crazyhouse.legalMoves(game.situation)
 
   extension (s: Situation)
     // when calculate perft we don't do autoDraw

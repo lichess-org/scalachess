@@ -106,8 +106,12 @@ case object Crazyhouse
       )
       .getOrElse(Bitboard.empty)
 
+  // all legal moves, including drops
+  // this function is used in perfts only
   def legalMoves(situation: Situation): List[MoveOrDrop] =
-    legalDrops(situation) ::: legalMoves(situation)
+    legalDrops(situation) ::: situation.legalMoves.filterNot(m =>
+      m.castle.exists(c => c.isStandard && m.dest != c.rook)
+    )
 
   def legalDrops(situation: Situation): List[Drop] =
     val targets = legalDropSquares(situation)

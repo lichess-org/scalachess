@@ -87,9 +87,7 @@ case class Game(
   def apply(uci: Uci.Move): Validated[ErrorStr, (Game, Move)] = apply(uci.orig, uci.dest, uci.promotion)
   def apply(uci: Uci.Drop): Validated[ErrorStr, (Game, Drop)] = drop(uci.role, uci.pos)
   def apply(uci: Uci): Validated[ErrorStr, (Game, MoveOrDrop)] =
-    uci match
-      case u: Uci.Move => apply(u) map { case (g, m) => g -> Left(m) }
-      case u: Uci.Drop => apply(u) map { case (g, d) => g -> Right(d) }
+    apply(uci) map { case (g, m) => g -> m }
 
   inline def isStandardInit = board.pieces == chess.variant.Standard.pieces
 

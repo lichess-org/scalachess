@@ -7,14 +7,15 @@ import cats.syntax.all.*
 import chess.format.pgn.{ Parser, Reader, San, SanStr, Tag, Tags }
 import chess.format.{ Fen, Uci }
 import chess.variant.Variant
+import MoveOrDrop.*
 
 case class Replay(setup: Game, moves: List[MoveOrDrop], state: Game):
 
-  lazy val chronoMoves = moves.reverse
+  lazy val chronoMoves: List[MoveOrDrop] = moves.reverse
 
   def addMove(moveOrDrop: MoveOrDrop) =
     copy(
-      moves = moveOrDrop.left.map(_.applyVariantEffect) :: moves,
+      moves = moveOrDrop.applyVariantEffect :: moves,
       state = moveOrDrop.fold(state.apply, state.applyDrop)
     )
 

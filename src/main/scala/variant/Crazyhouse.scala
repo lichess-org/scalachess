@@ -93,10 +93,18 @@ case object Crazyhouse
       else checkers.first.map(checker => Bitboard.between(king, checker).occupiedSquares)
     )
 
+  // all legal moves and drops
+  // this function is used in perfts only
+  def legalMoves(situation: Situation): List[MoveOrDrop] =
+    legalDrops(situation) ::: situation.legalMoves.filterNot(m =>
+      m.castle.exists(c => c.isStandard && m.dest != c.rook)
+    )
+
   // if the king is not in check, all empty squares are possible drop
   // king is in single check, return the squares between the king and the checker
   // king is in double check, no drop is possible
-  def legalDropSquares(situation: Situation): Bitboard =
+  // this function is used in perfts only
+  private def legalDropSquares(situation: Situation): Bitboard =
     import bitboard.Bitboard
     situation.ourKings.headOption
       .map(king =>
@@ -106,14 +114,9 @@ case object Crazyhouse
       )
       .getOrElse(Bitboard.empty)
 
-  // all legal moves, including drops
+  // generate all legal drops
   // this function is used in perfts only
-  def legalMoves(situation: Situation): List[MoveOrDrop] =
-    legalDrops(situation) ::: situation.legalMoves.filterNot(m =>
-      m.castle.exists(c => c.isStandard && m.dest != c.rook)
-    )
-
-  def legalDrops(situation: Situation): List[Drop] =
+  private def legalDrops(situation: Situation): List[Drop] =
     val targets = legalDropSquares(situation)
     if targets.isEmpty then Nil
     else

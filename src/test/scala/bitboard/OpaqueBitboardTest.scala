@@ -102,9 +102,7 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
   }
 
   test("isDisjoint and intersects always return the opposite value") {
-    forAll { (s1: Set[Pos], s2: Set[Pos]) =>
-      val b1 = Bitboard(s1)
-      val b2 = Bitboard(s2)
+    forAll { (b1: Bitboard, b2: Bitboard) =>
       b1.isDisjoint(b2) == !b1.intersects(b2)
     }
   }

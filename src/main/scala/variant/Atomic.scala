@@ -37,7 +37,7 @@ case object Atomic
     import board.board.{ byColor, kings }
     val theirKings = byColor(!color) & kings
     kings(color).exists { k =>
-      k.kingAttacks.sharedNone(theirKings) && attackersWithoutKing(
+      k.kingAttacks.isDisjoint(theirKings) && attackersWithoutKing(
         board,
         board.board.occupied,
         k,
@@ -68,7 +68,7 @@ case object Atomic
     // In Atomic, when the kings are connected, checks do not apply
     import situation.board.board.{ byColor, kings }
     val theirKings = byColor(!situation.color) & kings
-    kingTo.kingAttacks.sharedAny(theirKings) || attackersWithoutKing(
+    kingTo.kingAttacks.intersects(theirKings) || attackersWithoutKing(
       situation.board,
       (situation.board.occupied ^ kingFrom.bb),
       kingTo,

@@ -22,8 +22,7 @@ case class Fen(board: Board, state: State):
   def isSafe(king: Pos, move: Move, blockers: Bitboard): Boolean =
     move match
       case Move.Normal(from, to, _, _) =>
-        val result = !(us & blockers).contains(from) || Bitboard.aligned(from, to, king)
-        result
+        !(us & blockers).contains(from) || Bitboard.aligned(from, to, king)
       case Move.EnPassant(from, to) =>
         val newOccupied = (occupied ^ from.bb ^ to.withRankOf(from).bb) | to.bb
         (king.rookAttacks(newOccupied) & them & (board.rooks ^ board.queens)).isEmpty &&

@@ -11,7 +11,7 @@ object Castles extends OpaqueBitboard[Castles]:
 
   extension (c: Castles)
 
-    inline def can(inline color: Color): Boolean           = c.sharedAny(Bitboard.rank(color.backRank))
+    inline def can(inline color: Color): Boolean           = c.intersects(Bitboard.rank(color.backRank))
     inline def can(inline color: Color, inline side: Side) = c.contains(color.at(side))
 
     def whiteKingSide: Boolean  = c.contains(H1)

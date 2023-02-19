@@ -52,19 +52,17 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
     // remove the first non empty position
     def removeFirst: A = (a.value & (a.value - 1L)).bb
 
-    // check if the intersection of all bitboards is not empty
-    def sharedAny(o: Long, xs: Long*): Boolean =
-      (a & xs.foldLeft(o)(_ & _)).nonEmpty
+    def intersects(o: Long): Boolean =
+      (a.value & o) != 0L
 
-    // check if the intersection of all bitboards is not empty
-    def sharedAny[B](o: B, xs: B*)(using sr: BitboardRuntime[B]): Boolean =
-      (a & xs.foldLeft(sr(o))(_ & sr(_))).nonEmpty
+    def intersects[B](o: B)(using sr: BitboardRuntime[B]): Boolean =
+      (a & sr(o)).nonEmpty
 
-    // check if the intersection of all bitboards is empty
-    def sharedNone(o: Long, xs: Long*): Boolean = !sharedAny(o, xs*)
+    def isDisjoint(o: Long): Boolean =
+      (a & o).isEmpty
 
-    // check if the intersection of all bitboards is empty
-    def sharedNone[B](o: B, xs: B*)(using BitboardRuntime[B]): Boolean = !sharedAny(o, xs*)
+    def isDisjoint[B](o: B)(using sr: BitboardRuntime[B]): Boolean =
+      (a & sr(o)).isEmpty
 
     def fold[B](init: B)(f: (B, Pos) => B): B =
       var b      = a.value

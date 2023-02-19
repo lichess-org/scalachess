@@ -276,7 +276,7 @@ case class Situation(board: Board, color: Color):
             if board.variant.chess960 || board.variant.fromPosition
             then (Bitboard.between(king, rook) | Bitboard.between(king, kingTo))
             else Bitboard.between(king, rook)
-          if path.sharedNone(board.occupied, ~rook.bb)
+          if (path & board.occupied & ~rook.bb).isEmpty
           kingPath = Bitboard.between(king, kingTo) | king.bb
           if kingPath.occupiedSquares.forall(board.variant.castleCheckSafeSquare(this, king, _))
           moves <- castle(king, kingTo, rook, rookTo)

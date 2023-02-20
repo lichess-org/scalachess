@@ -11,7 +11,20 @@ case class Board(
     crazyData: Option[Crazyhouse.Data] = None
 ):
 
-  export board.{ bishops, black, contains, kings, knights, occupied, pawns, queens, rooks, sliders, white }
+  export board.{
+    attackers,
+    bishops,
+    black,
+    contains,
+    kings,
+    knights,
+    occupied,
+    pawns,
+    queens,
+    rooks,
+    sliders,
+    white
+  }
 
   inline def apply(inline color: Color): Bitboard = color.fold(white, black)
   inline def apply(inline color: Color, inline role: Role): Bitboard =

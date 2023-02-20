@@ -279,6 +279,7 @@ case class Situation(board: Board, color: Color):
           if (path & board.occupied & ~rook.bb).isEmpty
           kingPath = Bitboard.between(king, kingTo) | king.bb | kingTo.bb
           if kingPath.occupiedSquares.forall(board.variant.castleCheckSafeSquare(this, king, _))
+          if board.attackers(kingTo, !color, board.occupied ^ king.bb ^ rook.bb ^ rookTo.bb).isEmpty
           moves <- castle(king, kingTo, rook, rookTo)
         yield moves
     }

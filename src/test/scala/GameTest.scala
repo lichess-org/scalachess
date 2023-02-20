@@ -8,6 +8,7 @@ class GameTest extends ChessTest:
   "prevent castle by capturing a rook" should {
     val game = Game(
       """
+    k
  b
 R   K""",
       Black

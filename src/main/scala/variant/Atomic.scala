@@ -19,6 +19,18 @@ case object Atomic
 
   override def hasMoveEffects = true
 
+  override def validMoves(situation: Situation): List[Move] =
+    import situation.{ genNonKing, genEnPassant, us, board }
+    val targets = ~us
+    val moves   = genNonKing(targets) ++ genKings(situation, targets) ++ genEnPassant(us & board.pawns)
+    applyVariantEffect(moves).filter(kingSafety)
+
+  def genKings(situation: Situation, mask: Bitboard) =
+    import situation.{ genUnsafeKing, genCastling, ourKings }
+    ourKings.headOption.fold(Nil) { king =>
+      genCastling ++ genUnsafeKing(king, mask)
+    }
+
   /** Move threatens to explode the opponent's king */
   private def explodesOpponentKing(situation: Situation)(move: Move): Boolean =
     move.captures && {
@@ -64,10 +76,10 @@ case object Atomic
       explodesOpponentKing(m.situationBefore)(m))
       && !explodesOwnKing(m.situationBefore)(m)
 
-  override def castleCheckSafeSquare(board: Board, kingTo: Pos, color: Color, occupied: Bitboard): Boolean =
+  override def castleCheckSafeSquare(board: Board, king: Pos, color: Color, occupied: Bitboard): Boolean =
     val theirKings = board.board.byColor(!color) & board.kings
-    kingTo.kingAttacks.intersects(theirKings) ||
-    attackersWithoutKing(board, occupied, kingTo, !color).isEmpty
+    king.kingAttacks.intersects(theirKings) ||
+    attackersWithoutKing(board, occupied, king, !color).isEmpty
 
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
   private def explodeSurroundingPieces(move: Move): Move =

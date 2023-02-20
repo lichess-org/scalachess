@@ -131,6 +131,7 @@ abstract class Variant private[variant] (
     */
   def addVariantEffect(move: Move): Move = move
 
+  // TODO remove this implementation
   def applyVariantEffect(moves: List[Move]): List[Move] =
     if (hasMoveEffects) moves.map(addVariantEffect) else moves
 

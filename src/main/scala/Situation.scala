@@ -102,6 +102,9 @@ case class Situation(board: Board, color: Color):
 
   // TODO test generateMovesAt(pos) = generateMoves.filter(_.orig == pos)
   // TODO test generateMoves == generateMovesAt(pos) for all pos
+  // in antichess we need to generate all capture moves first
+  // if no capture move then use this
+  // if there are capture moves filter from
   def generateMovesAt(pos: Pos): List[Move] =
     val moves = board.apply(pos).fold(Nil) { piece =>
       if piece.color != color then Nil
@@ -279,7 +282,7 @@ case class Situation(board: Board, color: Color):
             then Bitboard.between(king, rook) | Bitboard.between(king, kingTo)
             else Bitboard.between(king, rook)
           if (path & board.occupied & ~rook.bb).isEmpty
-          kingPath = Bitboard.between(king, kingTo) | king.bb | kingTo.bb
+          kingPath = Bitboard.between(king, kingTo) | king.bb
           if kingPath.occupiedSquares
             .forall(variant.castleCheckSafeSquare(board, _, color, board.occupied ^ king.bb))
           if variant.castleCheckSafeSquare(

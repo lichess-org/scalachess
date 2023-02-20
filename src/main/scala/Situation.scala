@@ -289,7 +289,7 @@ case class Situation(board: Board, color: Color):
       val newOccupied = (board.occupied ^ move.orig.bb ^ move.dest.withRankOf(move.orig).bb) | move.dest.bb
       (king.rookAttacks(newOccupied) & them & (board.rooks ^ board.queens)).isEmpty &&
       (king.bishopAttacks(newOccupied) & them & (board.bishops ^ board.queens)).isEmpty
-    else if !move.castles then
+    else if !move.castles || !move.promotes then
       !(us & blockers).contains(move.orig) || Bitboard.aligned(move.orig, move.dest, king)
     else true
 

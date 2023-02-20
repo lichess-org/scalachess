@@ -15,6 +15,7 @@ case object Standard
   val pieces: Map[Pos, Piece] = Variant.symmetricRank(backRank)
 
   override def validMoves(situation: Situation): List[Move] =
+    import situation.{ genNonKing, genSafeKing, genCastling }
     val enPassantMoves = situation.genEnPassant(situation.us & situation.board.pawns)
     situation.ourKings.headOption
       .fold(Nil)(king =>
@@ -22,9 +23,7 @@ case object Standard
         val candidates =
           if checkers.isEmpty then
             val targets = ~situation.us
-            situation.genNonKing(targets) ::: situation.genSafeKing(
-              targets
-            ) ::: situation.genCastling ::: enPassantMoves
+            genNonKing(targets) ::: genSafeKing(targets) ::: genCastling ::: enPassantMoves
           else situation.genEvasions(checkers) ::: enPassantMoves
         if situation.sliderBlockers.nonEmpty || enPassantMoves.nonEmpty then
           candidates.filter(situation.isSafe(king, _, situation.sliderBlockers))

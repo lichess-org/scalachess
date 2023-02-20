@@ -61,10 +61,8 @@ abstract class Variant private[variant] (
   def kingSafety(m: Move): Boolean =
     kingThreatened(m.after, m.color).no
 
-  def castleCheckSafeSquare(situation: Situation, kingFrom: Pos, kingTo: Pos): Boolean =
-    situation.board.board
-      .attackers(kingTo, !situation.color, situation.board.occupied ^ kingFrom.bb)
-      .isEmpty
+  def castleCheckSafeSquare(board: Board, kingTo: Pos, color: Color, occupied: Bitboard): Boolean =
+    board.board.attackers(kingTo, !color, occupied).isEmpty
 
   def move(
       situation: Situation,

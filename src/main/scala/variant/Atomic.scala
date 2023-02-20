@@ -64,16 +64,10 @@ case object Atomic
       explodesOpponentKing(m.situationBefore)(m))
       && !explodesOwnKing(m.situationBefore)(m)
 
-  override def castleCheckSafeSquare(situation: Situation, kingFrom: Pos, kingTo: Pos): Boolean =
-    // In Atomic, when the kings are connected, checks do not apply
-    import situation.board.board.{ byColor, kings }
-    val theirKings = byColor(!situation.color) & kings
-    kingTo.kingAttacks.intersects(theirKings) || attackersWithoutKing(
-      situation.board,
-      (situation.board.occupied ^ kingFrom.bb),
-      kingTo,
-      !situation.color
-    ).isEmpty
+  override def castleCheckSafeSquare(board: Board, kingTo: Pos, color: Color, occupied: Bitboard): Boolean =
+    val theirKings = board.board.byColor(!color) & board.kings
+    kingTo.kingAttacks.intersects(theirKings) ||
+    attackersWithoutKing(board, occupied, kingTo, !color).isEmpty
 
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
   private def explodeSurroundingPieces(move: Move): Move =

@@ -15,7 +15,6 @@ case object Standard
   val pieces: Map[Pos, Piece] = Variant.symmetricRank(backRank)
 
   override def validMoves(situation: Situation): List[Move] =
-    situation.pp
     val enPassantMoves = situation.genEnPassant(situation.us & situation.board.pawns)
     situation.ourKings.headOption
       .fold(Nil)(king =>

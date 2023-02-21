@@ -13,3 +13,7 @@ case object FromPosition
     ):
 
   def pieces = Standard.pieces
+
+  override def validMoves(situation: Situation): List[Move] =
+    Standard.validMoves(situation)
+

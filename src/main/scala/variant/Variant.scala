@@ -49,8 +49,7 @@ abstract class Variant private[variant] (
       case Some(Queen | Rook | Knight | Bishop) => true
       case _                                    => false
 
-  def validMoves(situation: Situation): List[Move] =
-    situation.generateMoves.filter(kingSafety)
+  def validMoves(situation: Situation): List[Move]
 
   def pieceThreatened(board: Board, by: Color, to: Pos): Boolean =
     board.board.attacks(to, by)

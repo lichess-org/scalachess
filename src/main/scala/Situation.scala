@@ -252,7 +252,6 @@ case class Situation(board: Board, color: Color):
     val targets = king.kingAttacks & mask
     targets.occupiedSquares.flatMap(to => normalMove(king, to, King, isOccupied(to)))
 
-  // this can still generate unsafe king moves
   def genSafeKing(mask: Bitboard): List[Move] =
     ourKings.headOption.fold(Nil)(king =>
       val targets = king.kingAttacks & mask

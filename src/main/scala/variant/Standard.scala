@@ -34,7 +34,7 @@ case object Standard
       )
 
   // Used for filtering candidate moves that would leave put the king in check.
-  private def isSafe(situation: Situation, king: Pos, move: Move, blockers: Bitboard): Boolean =
+  def isSafe(situation: Situation, king: Pos, move: Move, blockers: Bitboard): Boolean =
     import situation.{ board, color, us, them }
     if move.enpassant then
       val newOccupied = (board.occupied ^ move.orig.bb ^ move.dest.withRankOf(move.orig).bb) | move.dest.bb

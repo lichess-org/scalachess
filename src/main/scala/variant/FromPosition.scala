@@ -16,4 +16,3 @@ case object FromPosition
 
   override def validMoves(situation: Situation): List[Move] =
     Standard.validMoves(situation)
-

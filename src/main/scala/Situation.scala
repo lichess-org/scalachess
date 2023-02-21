@@ -295,16 +295,6 @@ case class Situation(board: Board, color: Color):
         yield moves
     }
 
-  // Used for filtering candidate moves that would leave put the king in check.
-  def isSafe(king: Pos, move: Move, blockers: Bitboard): Boolean =
-    if move.enpassant then
-      val newOccupied = (board.occupied ^ move.orig.bb ^ move.dest.withRankOf(move.orig).bb) | move.dest.bb
-      (king.rookAttacks(newOccupied) & them & (board.rooks ^ board.queens)).isEmpty &&
-      (king.bishopAttacks(newOccupied) & them & (board.bishops ^ board.queens)).isEmpty
-    else if !move.castles || !move.promotes then
-      !(us & blockers).contains(move.orig) || Bitboard.aligned(move.orig, move.dest, king)
-    else true
-
   private def genPawnMoves(from: Pos, to: Pos, capture: Boolean): List[Move] =
     if from.rank == color.seventhRank then variant.promotableRoles.flatMap(promotion(from, to, _, capture))
     else normalMove(from, to, Pawn, capture).toList

@@ -11,6 +11,7 @@ import chess.format.Uci
 import chess.variant.Chess960
 import Pos.prevRank
 import chess.variant.Crazyhouse
+import chess.variant.Antichess
 
 case class Situation(board: Board, color: Color):
   export board.variant
@@ -94,32 +95,34 @@ case class Situation(board: Board, color: Color):
   lazy val isWhiteTurn: Boolean       = color.white
   lazy val isOccupied: Pos => Boolean = board.board.isOccupied
 
-  /** The moves without taking defending the king into account */
-  lazy val generateMoves: List[Move] =
-    val targets = ~us
-    val moves   = genNonKing(targets) ++ genKings(targets) ++ genEnPassant(us & board.pawns)
-    variant.applyVariantEffect(moves)
-
   // TODO test generateMovesAt(pos) = generateMoves.filter(_.orig == pos)
   // TODO test generateMoves == generateMovesAt(pos) for all pos
-  // in antichess we need to generate all capture moves first
-  // if no capture move then use this
-  // if there are capture moves filter from
   def generateMovesAt(pos: Pos): List[Move] =
-    val moves = board.apply(pos).fold(Nil) { piece =>
-      if piece.color != color then Nil
-      else
-        val targets = ~us
-        val bb      = pos.bb
-        piece.role match
-          case Pawn   => genEnPassant(us & bb) ++ genPawn(bb, targets)
-          case Knight => genKnight(us & bb, targets)
-          case Bishop => genBishop(us & bb, targets)
-          case Rook   => genRook(us & bb, targets)
-          case Queen  => genQueen(us & bb, targets)
-          case King   => genKings(targets, Some(pos))
-    }
-    variant.applyVariantEffect(moves).filter(variant.kingSafety)
+    def moveAt =
+      val moves = board.apply(pos).fold(Nil) { piece =>
+        if piece.color != color then Nil
+        else
+          val targets = ~us
+          val bb      = pos.bb
+          piece.role match
+            case Pawn   => genEnPassant(us & bb) ++ genPawn(bb, targets)
+            case Knight => genKnight(us & bb, targets)
+            case Bishop => genBishop(us & bb, targets)
+            case Rook   => genRook(us & bb, targets)
+            case Queen  => genQueen(us & bb, targets)
+            case King   => genKings(targets, Some(pos))
+      }
+      variant.applyVariantEffect(moves).filter(variant.kingSafety)
+
+    // in antichess, if there are capture moves, only capture moves are allowed
+    // so, we have to find all captures first,
+    // if they're not empty then filter by orig
+    // else use the normal moveAt
+    if variant.antichess then
+      val captureMoves = Antichess.captureMoves(this)
+      if captureMoves.nonEmpty then captureMoves.filter(_.orig == pos)
+      else moveAt
+    else moveAt
 
   def genKings(mask: Bitboard, pos: Option[Pos] = None) =
     val kingPos        = pos.fold(ourKings)(List(_))

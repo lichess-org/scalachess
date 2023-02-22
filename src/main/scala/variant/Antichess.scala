@@ -32,7 +32,7 @@ case object Antichess
     if capturingMoves.nonEmpty then capturingMoves
     else genNonKing(~board.occupied) ++ ourKings.flatMap(genUnsafeKing(_, ~board.occupied))
 
-  private def captureMoves(situation: Situation): List[Move] =
+  def captureMoves(situation: Situation): List[Move] =
     import situation.{ them, us, genNonKing, genEnPassant, board, genUnsafeKing, ourKings }
     ourKings.flatMap(genUnsafeKing(_, them)) ++ genEnPassant(us & board.pawns) ++ genNonKing(them)
 

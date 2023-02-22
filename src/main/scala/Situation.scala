@@ -58,10 +58,10 @@ case class Situation(board: Board, color: Color):
     (board valid strict) && !end && copy(color = !color).check.no
 
   lazy val status: Option[Status] =
-    if (checkMate) Status.Mate.some
-    else if (variantEnd) Status.VariantEnd.some
-    else if (staleMate) Status.Stalemate.some
-    else if (autoDraw) Status.Draw.some
+    if checkMate then Status.Mate.some
+    else if variantEnd then Status.VariantEnd.some
+    else if staleMate then Status.Stalemate.some
+    else if autoDraw then Status.Draw.some
     else none
 
   def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Validated[ErrorStr, Move] =

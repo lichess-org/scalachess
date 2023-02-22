@@ -95,7 +95,7 @@ abstract class Variant private[variant] (
   // In most variants, the winner is the last player to have played and there is a possibility of either a traditional
   // checkmate or a variant end condition
   def winner(situation: Situation): Option[Color] =
-    if (situation.checkMate || specialEnd(situation)) Option(!situation.color) else None
+    if situation.checkMate || specialEnd(situation) then Option(!situation.color) else None
 
   @nowarn def specialEnd(situation: Situation) = false
 

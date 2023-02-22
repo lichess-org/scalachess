@@ -25,7 +25,7 @@ case object Atomic
     val moves   = genNonKing(targets) ++ genKings(situation, targets) ++ genEnPassant(us & board.pawns)
     applyVariantEffect(moves).filter(kingSafety)
 
-  def genKings(situation: Situation, mask: Bitboard) =
+  private def genKings(situation: Situation, mask: Bitboard) =
     import situation.{ genUnsafeKing, genCastling, ourKings }
     ourKings.headOption.fold(Nil) { king =>
       genCastling ++ genUnsafeKing(king, mask)
@@ -33,9 +33,7 @@ case object Atomic
 
   /** Move threatens to explode the opponent's king */
   private def explodesOpponentKing(situation: Situation)(move: Move): Boolean =
-    move.captures && {
-      situation.board.kingPosOf(!situation.color).occupiedSquares exists { move.dest.touches(_) }
-    }
+    move.captures && situation.theirKings.exists { move.dest.touches(_) }
 
   /** Move threatens to illegally explode our own king */
   private def explodesOwnKing(situation: Situation)(move: Move): Boolean =
@@ -83,7 +81,7 @@ case object Atomic
 
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
   private def explodeSurroundingPieces(move: Move): Move =
-    if (move.captures)
+    if move.captures then
       val affectedPos = surroundingPositions(move.dest)
       val afterBoard  = move.after
       val destination = move.dest

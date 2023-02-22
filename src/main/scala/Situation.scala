@@ -98,7 +98,7 @@ case class Situation(board: Board, color: Color):
   // TODO test generateMovesAt(pos) = generateMoves.filter(_.orig == pos)
   // TODO test generateMoves == generateMovesAt(pos) for all pos
   def generateMovesAt(pos: Pos): List[Move] =
-    def moveAt =
+    def movesAt =
       val moves = board.apply(pos).fold(Nil) { piece =>
         if piece.color != color then Nil
         else
@@ -121,8 +121,8 @@ case class Situation(board: Board, color: Color):
     if variant.antichess then
       val captureMoves = Antichess.captureMoves(this)
       if captureMoves.nonEmpty then captureMoves.filter(_.orig == pos)
-      else moveAt
-    else moveAt
+      else movesAt
+    else movesAt
 
   def genKings(mask: Bitboard, pos: Option[Pos] = None) =
     val kingPos        = pos.fold(ourKings)(List(_))

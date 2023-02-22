@@ -181,8 +181,8 @@ case class Situation(board: Board, color: Color):
 
     // normal pawn moves
     val singleMoves = ~board.occupied & {
-      if isWhiteTurn then (board.white & board.pawns) << 8
-      else (board.black & board.pawns) >>> 8
+      if isWhiteTurn then (board.white & pawns) << 8
+      else (board.black & pawns) >>> 8
     }
 
     val doubleMoves =

@@ -47,10 +47,7 @@ case object RacingKings
     import situation.{ genSafeKing, genNonKing, us, board, sliderBlockers }
     val targets = ~us
     val moves   = genNonKing(targets) ++ genSafeKing(targets)
-    if sliderBlockers.nonEmpty then
-      val king = situation.ourKings.head
-      moves.filter(m => Standard.isSafe(situation, king, m, sliderBlockers) && kingSafety(m))
-    else moves.filter(kingSafety)
+    moves.filter(kingSafety)
 
   override def isInsufficientMaterial(board: Board)                  = false
   override def opponentHasInsufficientMaterial(situation: Situation) = false

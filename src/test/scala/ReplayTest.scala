@@ -16,6 +16,7 @@ class ReplayTest extends ChessTest:
         games(1)._2._2 === "d5"
       }
     }
+
   }
 
   "castle rights" in {
@@ -81,4 +82,12 @@ class ReplayTest extends ChessTest:
     val (game, steps, error) = chess.Replay.gameMoveWhileValid(moves, fen, variant.Standard)
     error must beNone
     steps.size must_== moves.size
+  }
+
+  "antichess replay invalid san" in {
+    val fen   = EpdFen("r1b1k3/pp3p2/n2pp3/2p5/4p3/2P2N2/P4n2/R7 b - - 0 17")
+    val moves = List(SanStr("c4"))
+    Replay.gameMoveWhileValid(moves, fen, variant.Antichess) must beLike { case (_, games, Some(_)) =>
+      games.size must_== 0
+    }
   }

@@ -41,7 +41,7 @@ trait ChessTest extends Specification with ValidatedMatchers:
     def visual = Visual >> board
     def destsFrom(from: Pos): Option[List[Pos]] =
       board(from).map { piece =>
-        Situation(board, piece.color).generateMovesAt(from).filter(_.orig == from).map(_.dest)
+        Situation(board, piece.color).generateMovesAt(from).map(_.dest)
       }
 
   extension (game: Game)

@@ -49,8 +49,7 @@ abstract class Variant private[variant] (
       case Some(Queen | Rook | Knight | Bishop) => true
       case _                                    => false
 
-  def validMoves(situation: Situation): List[Move] =
-    situation.generateMoves.filter(kingSafety)
+  def validMoves(situation: Situation): List[Move]
 
   def pieceThreatened(board: Board, by: Color, to: Pos): Boolean =
     board.board.attacks(to, by)
@@ -61,10 +60,8 @@ abstract class Variant private[variant] (
   def kingSafety(m: Move): Boolean =
     kingThreatened(m.after, m.color).no
 
-  def castleCheckSafeSquare(situation: Situation, kingFrom: Pos, kingTo: Pos): Boolean =
-    situation.board.board
-      .attackers(kingTo, !situation.color, situation.board.occupied ^ kingFrom.bb)
-      .isEmpty
+  def castleCheckSafeSquare(board: Board, kingTo: Pos, color: Color, occupied: Bitboard): Boolean =
+    board.board.attackers(kingTo, !color, occupied).isEmpty
 
   def move(
       situation: Situation,
@@ -98,7 +95,7 @@ abstract class Variant private[variant] (
   // In most variants, the winner is the last player to have played and there is a possibility of either a traditional
   // checkmate or a variant end condition
   def winner(situation: Situation): Option[Color] =
-    if (situation.checkMate || specialEnd(situation)) Option(!situation.color) else None
+    if situation.checkMate || specialEnd(situation) then Option(!situation.color) else None
 
   @nowarn def specialEnd(situation: Situation) = false
 
@@ -133,6 +130,7 @@ abstract class Variant private[variant] (
     */
   def addVariantEffect(move: Move): Move = move
 
+  // TODO remove this implementation
   def applyVariantEffect(moves: List[Move]): List[Move] =
     if (hasMoveEffects) moves.map(addVariantEffect) else moves
 

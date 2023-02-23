@@ -14,6 +14,9 @@ case object KingOfTheHill
 
   def pieces = Standard.pieces
 
+  def validMoves(situation: Situation): List[Move] =
+    Standard.validMoves(situation)
+
   // E4, D4, E5, D5
   private val center = 0x1818000000L
 

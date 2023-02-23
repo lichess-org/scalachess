@@ -32,6 +32,11 @@ case object Horde
     "rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1"
   )
 
+  def validMoves(situation: Situation): List[Move] =
+    import situation.{ genEnPassant, genNonKing, isWhiteTurn, us, board }
+    if isWhiteTurn then genEnPassant(us & board.pawns) ++ genNonKing(~us)
+    else Standard.validMoves(situation)
+
   override def valid(board: Board, strict: Boolean) =
     board.kingPosOf(White).isEmpty && validSide(board, strict)(Black) && !pawnsOnPromotionRank(board, White)
 

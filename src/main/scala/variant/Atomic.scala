@@ -19,11 +19,21 @@ case object Atomic
 
   override def hasMoveEffects = true
 
+  def validMoves(situation: Situation): List[Move] =
+    import situation.{ genNonKing, genEnPassant, us, board }
+    val targets = ~us
+    val moves   = genNonKing(targets) ++ genKings(situation, targets) ++ genEnPassant(us & board.pawns)
+    applyVariantEffect(moves).filter(kingSafety)
+
+  private def genKings(situation: Situation, mask: Bitboard) =
+    import situation.{ genUnsafeKing, genCastling, ourKings }
+    ourKings.headOption.fold(Nil) { king =>
+      genCastling ++ genUnsafeKing(king, mask)
+    }
+
   /** Move threatens to explode the opponent's king */
   private def explodesOpponentKing(situation: Situation)(move: Move): Boolean =
-    move.captures && {
-      situation.board.kingPosOf(!situation.color).occupiedSquares exists { move.dest.touches(_) }
-    }
+    move.captures && situation.theirKings.exists { move.dest.touches(_) }
 
   /** Move threatens to illegally explode our own king */
   private def explodesOwnKing(situation: Situation)(move: Move): Boolean =
@@ -64,20 +74,14 @@ case object Atomic
       explodesOpponentKing(m.situationBefore)(m))
       && !explodesOwnKing(m.situationBefore)(m)
 
-  override def castleCheckSafeSquare(situation: Situation, kingFrom: Pos, kingTo: Pos): Boolean =
-    // In Atomic, when the kings are connected, checks do not apply
-    import situation.board.board.{ byColor, kings }
-    val theirKings = byColor(!situation.color) & kings
-    kingTo.kingAttacks.intersects(theirKings) || attackersWithoutKing(
-      situation.board,
-      (situation.board.occupied ^ kingFrom.bb),
-      kingTo,
-      !situation.color
-    ).isEmpty
+  override def castleCheckSafeSquare(board: Board, king: Pos, color: Color, occupied: Bitboard): Boolean =
+    val theirKings = board.board.byColor(!color) & board.kings
+    king.kingAttacks.intersects(theirKings) ||
+    attackersWithoutKing(board, occupied, king, !color).isEmpty
 
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
   private def explodeSurroundingPieces(move: Move): Move =
-    if (move.captures)
+    if move.captures then
       val affectedPos = surroundingPositions(move.dest)
       val afterBoard  = move.after
       val destination = move.dest

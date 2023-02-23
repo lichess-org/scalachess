@@ -43,6 +43,12 @@ case object RacingKings
 
   override val initialFen = EpdFen("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
 
+  def validMoves(situation: Situation): List[Move] =
+    import situation.{ genSafeKing, genNonKing, us, board, sliderBlockers }
+    val targets = ~us
+    val moves   = genNonKing(targets) ++ genSafeKing(targets)
+    moves.filter(kingSafety)
+
   override def isInsufficientMaterial(board: Board)                  = false
   override def opponentHasInsufficientMaterial(situation: Situation) = false
 

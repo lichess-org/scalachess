@@ -66,7 +66,7 @@ case class Clock(
   def withFrameLag(frameLag: Centis) = updatePlayer(color)(_ withFrameLag frameLag)
 
   def step(
-      metrics: MoveMetrics = MoveMetrics(),
+      metrics: MoveMetrics = MoveMetrics.empty,
       gameActive: Boolean = true
   ): Clock.WithCompensatedLag[Clock] =
     timer match

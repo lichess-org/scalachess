@@ -21,7 +21,7 @@ case class Game(
       orig: Pos,
       dest: Pos,
       promotion: Option[PromotableRole] = None,
-      metrics: MoveMetrics = MoveMetrics()
+      metrics: MoveMetrics = MoveMetrics.empty
   ): Validated[ErrorStr, (Game, Move)] =
     moveWithCompensated(orig, dest, promotion, metrics).map { case (game, move) =>
       (game.value, move)
@@ -31,7 +31,7 @@ case class Game(
       orig: Pos,
       dest: Pos,
       promotion: Option[PromotableRole] = None,
-      metrics: MoveMetrics = MoveMetrics()
+      metrics: MoveMetrics = MoveMetrics.empty
   ): Validated[ErrorStr, (Clock.WithCompensatedLag[Game], Move)] =
     situation.move(orig, dest, promotion).map(_.normalizeCastle withMetrics metrics) map { move =>
       applyWithCompensated(move) -> move
@@ -56,7 +56,7 @@ case class Game(
   def drop(
       role: Role,
       pos: Pos,
-      metrics: MoveMetrics = MoveMetrics()
+      metrics: MoveMetrics = MoveMetrics.empty
   ): Validated[ErrorStr, (Game, Drop)] =
     situation.drop(role, pos).map(_ withMetrics metrics) map { drop =>
       applyDrop(drop) -> drop

@@ -16,7 +16,7 @@ case class Move(
     promotion: Option[PromotableRole],
     castle: Option[Move.Castle],
     enpassant: Boolean,
-    metrics: MoveMetrics = MoveMetrics()
+    metrics: MoveMetrics = MoveMetrics.empty
 ):
   inline def before = situationBefore.board
 

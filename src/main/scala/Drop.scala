@@ -10,7 +10,7 @@ case class Drop(
     pos: Pos,
     situationBefore: Situation,
     after: Board,
-    metrics: MoveMetrics = MoveMetrics()
+    metrics: MoveMetrics = MoveMetrics.empty
 ):
 
   inline def before = situationBefore.board

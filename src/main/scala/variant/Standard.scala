@@ -17,7 +17,7 @@ case object Standard
 
   val pieces: Map[Pos, Piece] = Variant.symmetricRank(backRank)
 
-  override def validMoves(situation: Situation): List[Move] =
+  def validMoves(situation: Situation): List[Move] =
     import situation.{ genNonKing, genSafeKing, genCastling }
     val enPassantMoves = situation.genEnPassant(situation.us & situation.board.pawns)
     situation.ourKings.headOption

@@ -26,7 +26,7 @@ case object Antichess
 
   override def kingThreatened(board: Board, color: Color) = Check.No
 
-  override def validMoves(situation: Situation) =
+  def validMoves(situation: Situation) =
     import situation.{ them, us, genNonKing, genEnPassant, board, genUnsafeKing, ourKings }
     val capturingMoves = captureMoves(situation)
     if capturingMoves.nonEmpty then capturingMoves

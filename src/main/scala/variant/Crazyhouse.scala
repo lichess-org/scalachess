@@ -22,7 +22,7 @@ case object Crazyhouse
 
   override val initialFen = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1")
 
-  override def validMoves(situation: Situation): List[Move] =
+  def validMoves(situation: Situation): List[Move] =
     Standard.validMoves(situation)
 
   override def valid(board: Board, strict: Boolean) =

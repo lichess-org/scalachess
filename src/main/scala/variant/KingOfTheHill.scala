@@ -14,7 +14,7 @@ case object KingOfTheHill
 
   def pieces = Standard.pieces
 
-  override def validMoves(situation: Situation): List[Move] =
+  def validMoves(situation: Situation): List[Move] =
     Standard.validMoves(situation)
 
   // E4, D4, E5, D5

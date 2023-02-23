@@ -19,7 +19,7 @@ case object Atomic
 
   override def hasMoveEffects = true
 
-  override def validMoves(situation: Situation): List[Move] =
+  def validMoves(situation: Situation): List[Move] =
     import situation.{ genNonKing, genEnPassant, us, board }
     val targets = ~us
     val moves   = genNonKing(targets) ++ genKings(situation, targets) ++ genEnPassant(us & board.pawns)

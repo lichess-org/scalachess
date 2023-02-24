@@ -33,7 +33,9 @@ object Pos extends OpaqueInt[Pos]:
     def <->(other: Pos): Iterable[Pos] =
       min(file.value, other.file.value) to max(file.value, other.file.value) flatMap { Pos.at(_, rank.value) }
 
-    inline def touches(other: Pos): Boolean = xDist(other) <= 1 && yDist(other) <= 1
+    inline def touches(other: Pos): Boolean =
+      import bitboard.Bitboard.*
+      p.kingAttacks.contains(other)
 
     inline def onSameDiagonal(other: Pos): Boolean =
       file.value - rank.value == other.file.value - other.rank.value || file.value + rank.value == other.file.value + other.rank.value

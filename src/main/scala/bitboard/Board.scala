@@ -101,22 +101,22 @@ case class Board(
       bs.fold(Bitboard.empty)((a, b) => a | b)
     }
 
-  // todo more efficient
   def discard(s: Pos): Board =
-    pieceAt(s).fold(this) { p =>
-      val m = s.bb
-      copy(
-        pawns = updateRole(m, Pawn)(p.role),
-        knights = updateRole(m, Knight)(p.role),
-        bishops = updateRole(m, Bishop)(p.role),
-        rooks = updateRole(m, Rook)(p.role),
-        queens = updateRole(m, Queen)(p.role),
-        kings = updateRole(m, King)(p.role),
-        white = updateColor(m, Color.White)(p.color),
-        black = updateColor(m, Color.Black)(p.color),
-        occupied ^ m
-      )
-    }
+    discard(s.bb)
+
+  def discard(mask: Bitboard): Board =
+    val notMask = ~mask
+    copy(
+      pawns = pawns & notMask,
+      knights = knights & notMask,
+      bishops = bishops & notMask,
+      rooks = rooks & notMask,
+      queens = queens & notMask,
+      kings = kings & notMask,
+      white = white & notMask,
+      black = black & notMask,
+      occupied & notMask
+    )
 
   def updateRole(mask: Bitboard, role: Role): Role => Bitboard =
     case Pawn if role == Pawn     => pawns ^ mask

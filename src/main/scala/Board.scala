@@ -83,7 +83,7 @@ case class Board(
       b3 <- b2.place(pawn.color.queen, pos)
     yield b3
 
-  def castles: Castles = history.castles
+  export history.{ castles, unmovedRooks }
 
   def withHistory(h: History): Board = copy(history = h)
 
@@ -103,8 +103,6 @@ case class Board(
     withCrazyData(f(crazyData | Crazyhouse.Data.init))
 
   def ensureCrazyData: Board = withCrazyData(crazyData | Crazyhouse.Data.init)
-
-  def unmovedRooks = history.unmovedRooks
 
   inline def updateHistory(inline f: History => History) = copy(history = f(history))
 

@@ -118,6 +118,20 @@ case class Board(
       )
     }
 
+  def discard(mask: Bitboard): Board =
+    val notMask = ~mask
+    copy(
+      pawns = pawns & notMask,
+      knights = knights & notMask,
+      bishops = bishops & notMask,
+      rooks = rooks & notMask,
+      queens = queens & notMask,
+      kings = kings & notMask,
+      white = white & notMask,
+      black = black & notMask,
+      occupied & notMask
+    )
+
   def updateRole(mask: Bitboard, role: Role): Role => Bitboard =
     case Pawn if role == Pawn     => pawns ^ mask
     case Knight if role == Knight => knights ^ mask

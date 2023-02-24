@@ -226,8 +226,8 @@ class AtomicVariantTest extends ChessTest:
       validGame must beValid.like { case game =>
         game.board(Pos.E6) must beNone // The pawn that captures during en-passant should explode
         // Every piece surrounding the en-passant destination square that is not a pawn should be empty
-        Atomic
-          .surroundingPositions(Pos.E6)
+        import bitboard.Bitboard.*
+        Pos.E6.kingAttacks.occupiedSquares
           .forall(pos => game.board(pos).isEmpty || pos == Pos.E7 || pos == Pos.D7) must beTrue
       }
     }
@@ -633,6 +633,15 @@ class AtomicVariantTest extends ChessTest:
       val game      = fenToGame(position, Atomic)
       val errorGame = game flatMap (_.playMove(Pos.E1, Pos.B1))
       errorGame must beInvalid
+    }
+
+    "Exploded rooks can't castle" in {
+      val position = EpdFen("1r2k3/8/8/8/8/8/1P6/1R2K3 b Q - 0 1")
+      val game     = fenToGame(position, Atomic)
+      val newGame  = game flatMap (_.playMove(Pos.B8, Pos.B2))
+      newGame must beValid.like { case game =>
+        game.situation.legalMoves.filter(_.castles) must beEmpty
+      }
     }
 
   }

@@ -33,11 +33,11 @@ case object Atomic
 
   /** Move threatens to explode the opponent's king */
   private def explodesOpponentKing(situation: Situation)(move: Move): Boolean =
-    move.captures && situation.theirKings.exists { move.dest.touches(_) }
+    move.captures && (situation.them & situation.board.kings).intersects(move.dest.kingAttacks)
 
   /** Move threatens to illegally explode our own king */
   private def explodesOwnKing(situation: Situation)(move: Move): Boolean =
-    move.captures && situation.ourKings.exists { move.dest.touches(_) }
+    move.captures && (situation.us & situation.board.kings).intersects(move.dest.kingAttacks)
 
   /** In atomic chess, a king cannot be threatened while it is in the perimeter of the other king as were the other player
     * to capture it, their own king would explode. This effectively makes a king invincible while connected with another
@@ -66,7 +66,7 @@ case object Atomic
     )
 
   private def protectedByOtherKing(board: Board, to: Pos, color: Color): Boolean =
-    board.kingPosOf(color).occupiedSquares exists { to.touches(_) }
+    to.kingAttacks.intersects(board.kingPosOf(color))
 
   // moves exploding opponent king are always playable
   override def kingSafety(m: Move): Boolean =
@@ -82,31 +82,19 @@ case object Atomic
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
   private def explodeSurroundingPieces(move: Move): Move =
     if move.captures then
-      val affectedPos = surroundingPositions(move.dest)
-      val afterBoard  = move.after
-      val destination = move.dest
-
-      val boardPieces = afterBoard.pieces
-
+      val afterBoard = move.after
       // Pawns are immune (for some reason), but all pieces surrounding the captured piece and the capturing piece
       // itself explode
-      // todo use bitboard
-      val piecesToExplode: Set[Pos] =
-        affectedPos.filter(boardPieces.get(_).exists(_.isNot(Pawn))) + destination
-      val afterExplosions = boardPieces -- piecesToExplode
+      val squaresToExplode = (move.dest.kingAttacks & afterBoard.occupied & ~afterBoard.pawns) | move.dest.bb
+      val afterExplosions  = afterBoard.withBoard(afterBoard.board.discard(squaresToExplode))
 
-      val rooksToExploded = affectedPos.filter(boardPieces.get(_).exists(_.is(Rook)))
+      val rooksToExploded = squaresToExplode & afterBoard.rooks
 
-      val castles  = rooksToExploded.foldLeft(afterBoard.history.castles)((c, pos) => c & ~pos.bb)
-      val newBoard = (afterBoard withPieces afterExplosions).withCastles(castles)
+      val castles      = afterBoard.castles & ~rooksToExploded
+      val unMovedRooks = afterBoard.unmovedRooks & ~rooksToExploded
+      val newBoard     = afterExplosions.updateHistory(_.copy(castles = castles, unmovedRooks = unMovedRooks))
       move withAfter newBoard
     else move
-
-  /** The positions surrounding a given position on the board. Any square at the edge of the board has
-    * less surrounding positions than the usual eight.
-    */
-  private[chess] def surroundingPositions(pos: Pos): Set[Pos] =
-    Set(pos.up, pos.down, pos.left, pos.right, pos.upLeft, pos.upRight, pos.downLeft, pos.downRight).flatten
 
   override def addVariantEffect(move: Move): Move = explodeSurroundingPieces(move)
 

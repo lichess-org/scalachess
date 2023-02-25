@@ -121,6 +121,16 @@ class HordeVariantTest extends ChessTest:
       }
     }
 
+    "Must auto-draw if horde is stalemated and only king can move" in {
+      val position = EpdFen("b7/pk6/P7/P7/8/8/8/8 b - - 0 1")
+      val game     = fenToGame(position, Horde)
+
+      game must beValid.like { case game =>
+        game.situation.autoDraw must beTrue
+        game.situation.opponentHasInsufficientMaterial must beTrue
+      }
+    }
+
     "Must not auto-draw in B vs K endgame, king can win" in {
       val position = EpdFen("7B/6k1/8/8/8/8/8/8 b - -")
       val game     = fenToGame(position, Horde)
@@ -169,7 +179,7 @@ class HordeVariantTest extends ChessTest:
       val newGame  = game.flatMap(_.apply(Pos.H8, Pos.H6))
       newGame must beValid.like { case game =>
         game._1.situation.board.history.unmovedRooks must_== UnmovedRooks(Set(Pos.A8))
-        game._1.situation.board.history.castles.pp must_== Castles("q")
+        game._1.situation.board.history.castles must_== Castles("q")
       }
     }
 

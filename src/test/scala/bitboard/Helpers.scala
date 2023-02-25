@@ -13,30 +13,7 @@ object Helpers:
   given Conversion[Bitboard, Long] = _.value
   given Conversion[Long, Bitboard] = _.bb
 
-  extension (cb: CBoard)
-    def fen(halfMoves: HalfMoveClock, fullMoves: FullMoveNumber) =
-      val b = Board(
-        pawns = cb.pawns,
-        knights = cb.knights,
-        bishops = cb.bishops,
-        rooks = cb.rooks,
-        queens = cb.queens,
-        kings = cb.kings,
-        white = cb.white,
-        black = cb.black,
-        occupied = cb.occupied
-      )
-      val epSquare = if cb.epSquare == 0 then None else Pos.at(cb.epSquare)
-      val state = State(
-        turn = Color.fromWhite(cb.turn),
-        epSquare = epSquare,
-        castlingRights = cb.castlingRights,
-        halfMoves = halfMoves,
-        fullMoves = fullMoves
-      )
-      Fen(b, state)
-
-  extension (f: Fen)
+  extension (f: Situation)
     def cBoard: CBoard =
       CBoard(
         f.board.pawns,
@@ -48,8 +25,8 @@ object Helpers:
         f.board.white,
         f.board.black,
         f.isWhiteTurn,
-        f.state.epSquare.fold(0)(p => p.value),
-        f.state.castlingRights
+        f.potentialEpSquare.fold(0)(_.value),
+        f.history.castles.value
       )
 
   extension (ml: MoveList)

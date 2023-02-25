@@ -5,30 +5,36 @@ import cats.syntax.all.*
 import munit.FunSuite
 
 import Pos.*
+import Helpers.*
+import Bitboard.*
+import chess.variant.Standard
+import chess.format.Fen
+import chess.format.EpdFen
 
 class BoardTest extends FunSuite:
 
   import scala.language.implicitConversions
   given Conversion[Pos, Int] = _.value
 
-  import Helpers.*
-  import Bitboard.*
-  import Fen.*
+  def parseFen(fen: EpdFen): Board =
+    Fen.read(fen).map(_.board.board).getOrElse(throw RuntimeException("boooo"))
 
   test("sliderBlockers") {
-    FenFixtures.fens.foreach { str =>
-      val fen      = Fen.parse(str).getOrElse(throw RuntimeException("boooo"))
-      val result   = fen.board.sliderBlockers(fen.state.turn)
-      val king     = fen.ourKings.head
-      val expected = fen.cBoard.sliderBlockers(king)
-      assertEquals(result, expected.bb)
-    }
+    for
+      fen <- FenFixtures.fens
+      situation = Fen.read(fen).getOrElse(throw RuntimeException("boooo"))
+      color <- Color.all
+      result   = situation.sliderBlockers
+      king     = situation.ourKings.head
+      expected = situation.cBoard.sliderBlockers(king)
+    yield assertEquals(result, expected.bb)
+
   }
 
   test("attacksTo") {
     for
       str <- FenFixtures.fens
-      fen  = Fen.parse(str).getOrElse(throw RuntimeException("boooo"))
+      fen  = Fen.read(str).getOrElse(throw RuntimeException("boooo"))
       king = fen.ourKings.head
       i <- 0 to 63
       sq = Pos.at(i).get
@@ -46,8 +52,8 @@ class BoardTest extends FunSuite:
 
   test("discard with test fixtures") {
     FenFixtures.fens.foreach { str =>
-      val fen    = Fen.parse(str).getOrElse(throw RuntimeException("boooo"))
-      val result = List.range(0, 64).foldRight(fen.board)((s, b) => b.discard(Pos.at(s).get))
+      val board  = parseFen(str)
+      val result = List.range(0, 64).foldRight(board)((s, b) => b.discard(Pos.at(s).get))
       assertEquals(result, Board.empty)
     }
   }
@@ -77,32 +83,25 @@ class BoardTest extends FunSuite:
 
   test("putOrReplace with test fixtures") {
     FenFixtures.fens.foreach { str =>
-      val fen                        = Fen.parse(str).getOrElse(throw RuntimeException("boooo"))
+      val board                      = parseFen(str)
       val ss                         = List.range(0, 64).map(Pos.at(_).get)
-      val pieces: List[(Pos, Piece)] = ss.mapFilter(s => fen.board.pieceAt(s).map((s, _)))
+      val pieces: List[(Pos, Piece)] = ss.mapFilter(s => board.pieceAt(s).map((s, _)))
       val result                     = pieces.foldRight(Board.empty)((s, b) => b.putOrReplace(s._1, s._2))
-      assertEquals(result, fen.board)
+      assertEquals(result, board)
     }
   }
 
   test("putOrReplace case 1") {
-    val fen         = Fen.parse("8/8/8/8/p7/1P6/8/8 w - - 0 1").getOrElse(throw RuntimeException("booo"))
-    val result      = fen.board.putOrReplace(Pos.A4, Piece(White, Pawn))
-    val expectedMap = fen.board.pieceMap + (Pos.A4 -> Piece(White, Pawn))
+    val board =
+      Fen.read(EpdFen("8/8/8/8/p7/1P6/8/8 w - - 0 1")).getOrElse(throw RuntimeException("booo")).board.board
+    val result      = board.putOrReplace(Pos.A4, Piece(White, Pawn))
+    val expectedMap = board.pieceMap + (Pos.A4 -> Piece(White, Pawn))
     assertEquals(result.pieceMap, expectedMap)
-  }
-
-  test("play with standard board") {
-    val board       = Board.standard
-    val newBoard    = board.play(Color.White)(Move.Normal(Pos.E2, Pos.E4, Pawn, false))
-    val expectedMap = (board.pieceMap - Pos.E2) + (Pos.E4 -> Piece(White, Pawn))
-    val result      = newBoard.pieceMap
-    assertEquals(result, expectedMap)
   }
 
   test("pieceMap . fromMap === identity") {
     FenFixtures.fens.foreach { str =>
-      val board  = Fen.parse(str).getOrElse(throw RuntimeException("boooo")).board
+      val board  = Fen.read(str).getOrElse(throw RuntimeException("boooo")).board.board
       val result = Board.fromMap(board.pieceMap)
       assertEquals(result, board)
     }
@@ -133,14 +132,4 @@ class BoardTest extends FunSuite:
     val map = Map(A2 -> White.pawn, A3 -> White.rook)
     assertEquals(Board.fromMap(map).hasPiece(A2), true)
     assertEquals(Board.fromMap(map).hasPiece(A3), true)
-  }
-
-  test("move - a random case") {
-    val fen =
-      Fen
-        .parse("rnbqkbnr/1ppppppp/8/8/p7/PPP5/3PPPPP/RNBQKBNR w KQkq - 0 4")
-        .getOrElse(throw RuntimeException("booo"))
-    val result      = fen.play(Move.Normal(Pos.B3, Pos.A4, Pawn, true))
-    val expectedMap = (fen.board.pieceMap - Pos.B3) + (Pos.A4 -> Piece(White, Pawn))
-    assertEquals(result.board.pieceMap, expectedMap)
   }

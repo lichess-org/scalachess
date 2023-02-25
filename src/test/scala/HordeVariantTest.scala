@@ -91,6 +91,16 @@ class HordeVariantTest extends ChessTest:
       }
     }
 
+    "Must not be insufficient winning material for king with queen and rook left" in {
+      val position = EpdFen("8/5k2/7q/7P/6rP/6P1/6P1/8 b - - 0 52")
+      val game     = fenToGame(position, Horde)
+
+      game must beValid.like { case game =>
+        game.situation.opponentHasInsufficientMaterial must beFalse
+        game.situation.autoDraw must beFalse
+      }
+    }
+
     "Must auto-draw in simple pawn fortress" in {
       val position = EpdFen("8/p7/pk6/P7/P7/8/8/8 b - -")
       val game     = fenToGame(position, Horde)
@@ -103,6 +113,16 @@ class HordeVariantTest extends ChessTest:
 
     "Must auto-draw if horde is stalemated and only king can move" in {
       val position = EpdFen("QNBRRBNQ/PPpPPpPP/P1P2PkP/8/8/8/8/8 b - -")
+      val game     = fenToGame(position, Horde)
+
+      game must beValid.like { case game =>
+        game.situation.autoDraw must beTrue
+        game.situation.opponentHasInsufficientMaterial must beTrue
+      }
+    }
+
+    "Must auto-draw if horde is stalemated and only king can move" in {
+      val position = EpdFen("b7/pk6/P7/P7/8/8/8/8 b - - 0 1")
       val game     = fenToGame(position, Horde)
 
       game must beValid.like { case game =>
@@ -159,7 +179,7 @@ class HordeVariantTest extends ChessTest:
       val newGame  = game.flatMap(_.apply(Pos.H8, Pos.H6))
       newGame must beValid.like { case game =>
         game._1.situation.board.history.unmovedRooks must_== UnmovedRooks(Set(Pos.A8))
-        game._1.situation.board.history.castles.pp must_== Castles("q")
+        game._1.situation.board.history.castles must_== Castles("q")
       }
     }
 

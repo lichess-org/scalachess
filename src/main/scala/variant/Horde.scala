@@ -34,7 +34,7 @@ case object Horde
 
   def validMoves(situation: Situation): List[Move] =
     import situation.{ genEnPassant, genNonKing, isWhiteTurn, us, board }
-    if isWhiteTurn then genEnPassant(us & board.pawns) ++ genNonKing(~us)
+    if isWhiteTurn then genEnPassant(us & board.pawns) ++ genNonKing(~us & ~board.kings)
     else Standard.validMoves(situation)
 
   override def valid(board: Board, strict: Boolean) =
@@ -49,12 +49,15 @@ case object Horde
     * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
     */
   private def hordeClosedPosition(board: Board) =
-    def notKingBoard = board.board.kings(Color.black).headOption.flatMap(board.take) | board
-    val hordePos     = board.occupation(Color.white) // may include promoted pieces
+    def hasLegalMovesWithoutKing(situation: Situation): Boolean =
+      val legalMoves = validMoves(situation)
+      if situation.isWhiteTurn then legalMoves.isEmpty
+      else legalMoves.filter(_.piece.role != King).isEmpty
+
+    val hordePos = board.occupation(Color.white) // may include promoted pieces
     val mateInOne =
       hordePos.sizeIs == 1 && hordePos.forall(pos => pieceThreatened(board, Color.black, pos))
-    !mateInOne && Color.all.map(Situation(notKingBoard, _)).forall(_.legalMoves.isEmpty)
-    // !mateInOne && notKingBoard.actors.values.forall(actor => actor.moves.isEmpty)
+    !mateInOne && Color.all.map(board.situationOf(_)).forall(hasLegalMovesWithoutKing)
 
   /** In horde chess, black can win unless a fortress stalemate is unavoidable.
     *  Auto-drawing the game should almost never happen, but it did in https://lichess.org/xQ2RsU8N#121
@@ -70,7 +73,7 @@ case object Horde
     val board         = situation.board
     val opponentColor = !situation.color
     lazy val fortress = hordeClosedPosition(board) // costly function call
-    if (opponentColor == Color.white)
+    if opponentColor == Color.white then
       lazy val notKingPieces           = InsufficientMatingMaterial.nonKingPieces(board) toList
       val horde                        = board.piecesOf(Color.white)
       lazy val hordeBishopSquareColors = horde.filter(_._2.is(Bishop)).toList.map(_._1.isLight).distinct

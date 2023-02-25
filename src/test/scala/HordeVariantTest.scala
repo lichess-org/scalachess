@@ -97,6 +97,7 @@ class HordeVariantTest extends ChessTest:
 
       game must beValid.like { case game =>
         game.situation.opponentHasInsufficientMaterial must beFalse
+        game.situation.autoDraw must beFalse
       }
     }
 

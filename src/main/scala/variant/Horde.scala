@@ -34,7 +34,7 @@ case object Horde
 
   def validMoves(situation: Situation): List[Move] =
     import situation.{ genEnPassant, genNonKing, isWhiteTurn, us, board }
-    if isWhiteTurn then genEnPassant(us & board.pawns) ++ genNonKing(~us)
+    if isWhiteTurn then genEnPassant(us & board.pawns) ++ genNonKing(~us & ~board.kings)
     else Standard.validMoves(situation)
 
   override def valid(board: Board, strict: Boolean) =

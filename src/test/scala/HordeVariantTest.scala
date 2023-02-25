@@ -91,6 +91,15 @@ class HordeVariantTest extends ChessTest:
       }
     }
 
+    "Must not be insufficient winning material for king with queen and rook left" in {
+      val position = EpdFen("8/5k2/7q/7P/6rP/6P1/6P1/8 b - - 0 52")
+      val game     = fenToGame(position, Horde)
+
+      game must beValid.like { case game =>
+        game.situation.opponentHasInsufficientMaterial must beFalse
+      }
+    }
+
     "Must auto-draw in simple pawn fortress" in {
       val position = EpdFen("8/p7/pk6/P7/P7/8/8/8 b - -")
       val game     = fenToGame(position, Horde)

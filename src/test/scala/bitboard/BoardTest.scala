@@ -43,13 +43,24 @@ class BoardTest extends FunSuite:
     yield assertEquals(result, expected.bb)
   }
 
-  test("discard returns the same board if the pos is empty") {
+  test("discard a empty square returns the same board") {
     for
       str <- FenFixtures.fens
       board = parseFen(str)
       s <- Pos.all
+      if !board.hasPiece(s)
       newBoard = board.discard(s)
-    yield assert(newBoard == board || (board.hasPiece(s) && newBoard != board))
+    yield assert(newBoard == board)
+  }
+
+  test("discard an occupied square returns a board with one piece left") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      s <- Pos.all
+      if board.hasPiece(s)
+      newBoard = board.discard(s)
+    yield assert(board.hasPiece(s) && newBoard.nbPieces == board.nbPieces - 1)
   }
 
   test("take return some if the pos is not empty") {
@@ -86,7 +97,7 @@ class BoardTest extends FunSuite:
     yield assertEquals(result, board)
   }
 
-  test("pieceMap . fromMap === identity") {
+  test("pieceMap . fromMap == identity") {
     for
       str <- FenFixtures.fens
       board  = parseFen(str)
@@ -135,10 +146,33 @@ class BoardTest extends FunSuite:
     yield assert(moved.isEmpty)
   }
 
+  test("move(from, to).isDefined == hasPiece(from) && !hasPiece(to)") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      from <- Pos.all
+      to   <- Pos.all
+      if from != to
+      moved = board.move(from, to)
+    yield assertEquals(moved.isDefined, board.hasPiece(from) && !board.hasPiece(to))
+  }
+
+  test("move(from, to).move(to, from) == identity") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      from <- Pos.all
+      to   <- Pos.all
+      if from != to
+      moved     = board.move(from, to)
+      movedBack = moved.flatMap(_.move(to, from))
+    yield assert(movedBack.isEmpty || movedBack == Some(board))
+  }
+
   test("if from != to then move(from, to) == take(from) . put(to)") {
     for
-      str <- FenFixtures.fens.take(1)
-      board = parseFen(str).pp
+      str <- FenFixtures.fens
+      board = parseFen(str)
       from <- Pos.all
       to   <- Pos.all
       if from != to

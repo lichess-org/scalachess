@@ -55,7 +55,7 @@ abstract class Variant private[variant] (
     board.board.attacks(to, by)
 
   def kingThreatened(board: Board, color: Color): Check =
-    board.board.isCheck(color)
+    board.isCheck(color)
 
   def kingSafety(m: Move): Boolean =
     kingThreatened(m.after, m.color).no

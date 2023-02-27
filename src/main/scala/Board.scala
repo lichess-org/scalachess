@@ -15,7 +15,7 @@ case class Board(
     attackers,
     bishops,
     black,
-    contains,
+    isCheck,
     kings,
     knights,
     occupied,

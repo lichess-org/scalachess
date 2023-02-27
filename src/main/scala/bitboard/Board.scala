@@ -21,6 +21,8 @@ case class Board(
 
   lazy val byColor = Color.Map(white, black)
 
+  lazy val nbPieces = occupied.count
+
   def byRole(role: Role): Bitboard =
     role match
       case Pawn   => pawns

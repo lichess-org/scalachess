@@ -18,6 +18,7 @@ case class Board(
     isCheck,
     kings,
     knights,
+    nbPieces,
     occupied,
     pawns,
     queens,
@@ -37,8 +38,6 @@ case class Board(
   lazy val pieces = board.pieceMap
   // todo maybe remove?
   lazy val allPieces = board.pieces
-
-  lazy val nbPieces = board.occupied.count
 
   def piecesOf(c: Color): Map[Pos, Piece] = board.piecesOf(c)
 

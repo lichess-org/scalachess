@@ -129,9 +129,15 @@ case class Board(
   def hasPiece(at: Pos): Boolean =
     occupied.contains(at)
 
+  // put a piece to an empty square
   def put(piece: Piece, at: Pos): Option[Board] =
-    !hasPiece(at) option putOrReplace(at, piece) // todo no need to discard
+    !hasPiece(at) option putOrReplace(piece, at) // todo no need to discard
 
+  // put a piece to an occupied square
+  def replace(piece: Piece, at: Pos): Option[Board] =
+    hasPiece(at) option putOrReplace(piece, at)
+
+  // put a piece into the board
   def putOrReplace(s: Pos, role: Role, color: Color): Board =
     val b = discard(s)
     val m = s.bb
@@ -149,7 +155,7 @@ case class Board(
 
   // put a piece into the board
   // remove the existing piece at that pos if needed
-  def putOrReplace(s: Pos, p: Piece): Board =
+  def putOrReplace(p: Piece, s: Pos): Board =
     putOrReplace(s, p.role, p.color)
 
   def take(at: Pos): Option[Board] =
@@ -158,14 +164,14 @@ case class Board(
   // move without capture
   def move(orig: Pos, dest: Pos): Option[Board] =
     if hasPiece(dest) then None
-    else pieceAt(orig).map(discard(orig).putOrReplace(dest, _))
+    else pieceAt(orig).map(discard(orig).putOrReplace(_, dest))
 
   def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] =
     for
       piece <- pieceAt(orig)
       takenPos = taking getOrElse dest
       if hasPiece(takenPos)
-    yield discard(orig).discard(takenPos).putOrReplace(dest, piece)
+    yield discard(orig).discard(takenPos).putOrReplace(piece, dest)
 
   lazy val occupation: Color.Map[Set[Pos]] = Color.Map { c =>
     color(c).occupiedSquares.toSet

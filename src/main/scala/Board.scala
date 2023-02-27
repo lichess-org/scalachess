@@ -59,7 +59,7 @@ case class Board(
     board.put(piece, at).map(withBoard)
 
   def putOrReplace(piece: Piece, at: Pos): Board =
-    withBoard(board.putOrReplace(at, piece))
+    withBoard(board.putOrReplace(piece, at))
 
   def take(at: Pos): Option[Board] =
     board.take(at).map(withBoard)

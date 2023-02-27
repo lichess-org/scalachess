@@ -43,14 +43,14 @@ class BoardTest extends FunSuite:
     yield assertEquals(result, expected.bb)
   }
 
-  test("discard a empty square returns the same board") {
+  test("discard an empty square returns the same board") {
     for
       str <- FenFixtures.fens
       board = parseFen(str)
       s <- Pos.all
       if !board.hasPiece(s)
       newBoard = board.discard(s)
-    yield assert(newBoard == board)
+    yield assertEquals(newBoard, board)
   }
 
   test("discard an occupied square returns a board with one piece left") {
@@ -60,41 +60,127 @@ class BoardTest extends FunSuite:
       s <- Pos.all
       if board.hasPiece(s)
       newBoard = board.discard(s)
-    yield assert(board.hasPiece(s) && newBoard.nbPieces == board.nbPieces - 1)
+    yield assertEquals(newBoard.nbPieces, board.nbPieces - 1)
   }
 
-  test("take return some if the pos is not empty") {
+  test("discard all occupied squares returns an empty board") {
+    for
+      str <- FenFixtures.fens
+      board    = parseFen(str)
+      newBoard = board.occupied.fold(board) { (b, s) => b.discard(s) }
+    yield assertEquals(newBoard, Board.empty)
+  }
+
+  test("take an occupied square returns Some(board.discard)") {
     for
       str <- FenFixtures.fens
       board = parseFen(str)
       s <- Pos.all
+      if board.hasPiece(s)
       newBoard = board.take(s)
-    yield assert(newBoard.isEmpty || (board.hasPiece(s) && newBoard.isDefined && newBoard.get != board))
+    yield assertEquals(newBoard.get, board.discard(s))
   }
 
-  test("put returns None if the pos is not empty") {
+  test("take returns None if the square is empty") {
     for
       str <- FenFixtures.fens
       board = parseFen(str)
       s <- Pos.all
-      newBoard = board.put(Piece(White, King), s)
+      if !board.hasPiece(s)
+      newBoard = board.take(s)
+    yield assert(newBoard.isEmpty)
+  }
+
+  test("put returns None if the square is not empty") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      s <- Pos.all
+      newBoard = board.put(White.king, s)
     yield assert(newBoard.isDefined || (board.hasPiece(s) && newBoard.isEmpty))
   }
 
   test("discard . put == identity") {
     for
       str <- FenFixtures.fens
-      board    = parseFen(str)
-      newBoard = board.pieceMap.foldLeft(board)((b, s) => b.discard(s._1).put(s._2, s._1).get)
+      board = parseFen(str)
+      s <- Pos.all
+      if board.hasPiece(s)
+      piece    <- board.pieceAt(s)
+      newBoard <- board.discard(s).put(piece, s)
     yield assertEquals(newBoard, board)
+  }
+
+  test("replace returns None if the square is empty") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      s <- Pos.all
+      if !board.hasPiece(s)
+      newBoard = board.replace(White.king, s)
+    yield assert(newBoard.isEmpty)
+  }
+
+  test("replace returns some if the square is occupied") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      s <- Pos.all
+      if board.hasPiece(s)
+      newBoard = board.replace(White.king, s)
+    yield assert(newBoard.isDefined)
+  }
+
+  test("put.replace.pieceAt returns the piece that was replace") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      s <- Pos.all
+      _ = board.put(White.king, s)
+      newBoard <- board.replace(White.queen, s)
+      newPiece <- newBoard.pieceAt(s)
+    yield assertEquals(newPiece, White.queen)
+  }
+
+  test("putOrReplace an empty square returns a board with one more piece") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      s <- Pos.all
+      if !board.hasPiece(s)
+      newBoard = board.putOrReplace(White.queen, s)
+    yield assertEquals(newBoard.nbPieces, board.nbPieces + 1)
+  }
+
+  test("putOrReplace an occupied square returns a board with the same number of pieces") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      s <- Pos.all
+      if board.hasPiece(s)
+      newBoard = board.putOrReplace(White.queen, s)
+    yield assertEquals(newBoard.nbPieces, board.nbPieces)
   }
 
   test("putOrReplace for every occupied square returns the same board") {
     for
       str <- FenFixtures.fens
-      board  = parseFen(str)
-      result = board.pieceMap.foldLeft(Board.empty)((b, s) => b.putOrReplace(s._1, s._2))
+      board = parseFen(str)
+      result = board.occupied.fold(board) { (b, s) =>
+        val piece = b.pieceAt(s).get
+        b.putOrReplace(piece, s)
+      }
     yield assertEquals(result, board)
+  }
+
+  test("putOrReplace == put orElse replace") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      s <- Pos.all
+      result = board.putOrReplace(White.king, s)
+      expected <- board.put(White.king, s) orElse board.replace(White.king, s)
+    yield assertEquals(result, expected)
   }
 
   test("pieceMap . fromMap == identity") {
@@ -169,7 +255,7 @@ class BoardTest extends FunSuite:
     yield assert(movedBack.isEmpty || movedBack == Some(board))
   }
 
-  test("if from != to then move(from, to) == take(from) . put(to)") {
+  test("move(from, to) == take(from) . put(to)") {
     for
       str <- FenFixtures.fens
       board = parseFen(str)
@@ -183,6 +269,40 @@ class BoardTest extends FunSuite:
         newBoard  <- afterTake.put(piece, to)
       yield newBoard
     yield assertEquals(moved, takeAndPut)
+  }
+
+  test("taking(from, to, None) == take(from) . replace(to)") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      from <- Pos.all
+      to   <- Pos.all
+      if from != to
+      taking = board.taking(from, to)
+      takeAndReplace = for
+        piece     <- board.pieceAt(from)
+        afterTake <- board.take(from)
+        newBoard  <- afterTake.replace(piece, to)
+      yield newBoard
+    yield assertEquals(taking, takeAndReplace)
+  }
+
+  test("taking(from, to, taken) == take(from) . put(to) . take(taken)") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      from  <- Pos.all
+      to    <- Pos.all
+      taken <- Pos.all
+      if taken != from && from != to && taken != to
+      taking <- board.taking(from, to, Some(taken))
+      takeAndPutAndTake <- for
+        piece     <- board.pieceAt(from)
+        afterTake <- board.take(from)
+        afterPut  <- afterTake.put(piece, to)
+        newBoard  <- afterPut.take(taken)
+      yield newBoard
+    yield assertEquals(taking, takeAndPutAndTake)
   }
 
   test("occupation") {

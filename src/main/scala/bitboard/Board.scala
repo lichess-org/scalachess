@@ -30,8 +30,6 @@ case class Board(
       case Queen  => queens
       case King   => kings
 
-  def contains(p: Pos) = occupied.contains(p)
-
   def roleAt(s: Pos): Option[Role] =
     if pawns.contains(s) then Some(Pawn)
     else if knights.contains(s) then Some(Knight)
@@ -53,10 +51,10 @@ case class Board(
     yield Piece(color, role)
 
   def whiteAt(s: Pos): Boolean =
-    colorAt(s).contains(Color.White)
+    white.contains(s)
 
   def blackAt(s: Pos): Boolean =
-    colorAt(s).contains(Color.Black)
+    black.contains(s)
 
   def kings(color: Color): List[Pos] =
     (kings & byColor(color)).occupiedSquares
@@ -118,15 +116,6 @@ case class Board(
       occupied & notMask
     )
 
-  def updateRole(mask: Bitboard, role: Role): Role => Bitboard =
-    case Pawn if role == Pawn     => pawns ^ mask
-    case Knight if role == Knight => knights ^ mask
-    case Bishop if role == Bishop => bishops ^ mask
-    case Rook if role == Rook     => rooks ^ mask
-    case Queen if role == Queen   => queens ^ mask
-    case King if role == King     => kings ^ mask
-    case _                        => roles(role)
-
   def roles: Role => Bitboard =
     case Pawn   => pawns
     case Knight => knights
@@ -135,16 +124,8 @@ case class Board(
     case Queen  => queens
     case King   => kings
 
-  def updateColor(mask: Bitboard, color: Color): Color => Bitboard =
-    case Color.White if color == Color.White => white ^ mask
-    case Color.Black if color == Color.Black => black ^ mask
-    case _                                   => byColor(color)
-
   def hasPiece(at: Pos): Boolean =
-    colorAt(at).isDefined
-
-  def take(at: Pos): Option[Board] =
-    hasPiece(at) option discard(at)
+    occupied.contains(at)
 
   def put(piece: Piece, at: Pos): Option[Board] =
     !hasPiece(at) option putOrReplace(at, piece) // todo no need to discard
@@ -153,14 +134,14 @@ case class Board(
     val b = discard(s)
     val m = s.bb
     b.copy(
-      pawns = b.updateRole(m, Pawn)(role),
-      knights = b.updateRole(m, Knight)(role),
-      bishops = b.updateRole(m, Bishop)(role),
-      rooks = b.updateRole(m, Rook)(role),
-      queens = b.updateRole(m, Queen)(role),
-      kings = b.updateRole(m, King)(role),
-      white = b.updateColor(m, Color.White)(color),
-      black = b.updateColor(m, Color.Black)(color),
+      pawns = if role == Pawn then b.pawns | m else b.pawns,
+      knights = if role == Knight then b.knights | m else b.knights,
+      bishops = if role == Bishop then b.bishops | m else b.bishops,
+      rooks = if role == Rook then b.rooks | m else b.rooks,
+      queens = if role == Queen then b.queens | m else b.queens,
+      kings = if role == King then b.kings | m else b.kings,
+      white = if color.white then b.white | m else b.white,
+      black = if color.black then b.black | m else b.black,
       occupied = b.occupied ^ m
     )
 
@@ -169,33 +150,29 @@ case class Board(
   def putOrReplace(s: Pos, p: Piece): Board =
     putOrReplace(s, p.role, p.color)
 
+  def take(at: Pos): Option[Board] =
+    hasPiece(at) option discard(at)
+
   // move without capture
-  // TODO test
   def move(orig: Pos, dest: Pos): Option[Board] =
     if hasPiece(dest) then None
-    else pieceAt(orig).flatMap(p => discard(orig).put(p, dest))
+    else pieceAt(orig).map(p => discard(orig).putOrReplace(dest, p))
 
-  // TODO test
   def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] =
     for
       piece <- pieceAt(orig)
       takenPos = taking getOrElse dest
       if hasPiece(takenPos)
-      newBoard <- discard(orig).discard(takenPos).put(piece, dest)
-    yield newBoard
+    yield discard(orig).discard(takenPos).putOrReplace(dest, piece)
 
-  // TODO test
   lazy val occupation: Color.Map[Set[Pos]] = Color.Map { c =>
     color(c).occupiedSquares.toSet
   }
 
-  // TODO test
   inline def hasPiece(inline p: Piece) =
     piece(p).nonEmpty
 
   // TODO remove unsafe get
-  // we believe in the integrity of bitboard
-  // tests pieceMap . fromMap = identity
   lazy val pieceMap: Map[Pos, Piece] =
     occupied.occupiedSquares.view.map(s => (s, pieceAt(s).get)).toMap
 

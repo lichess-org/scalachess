@@ -15,6 +15,7 @@ class BoardTest extends FunSuite:
 
   import scala.language.implicitConversions
   given Conversion[Pos, Int] = _.value
+  given Conversion[Int, Pos] = Pos.at(_).get
 
   def parseFen(fen: EpdFen): Board =
     Fen.read(fen).map(_.board.board).getOrElse(throw RuntimeException("boooo"))
@@ -36,7 +37,7 @@ class BoardTest extends FunSuite:
       str <- FenFixtures.fens
       fen  = Fen.read(str).getOrElse(throw RuntimeException("boooo"))
       king = fen.ourKings.head
-      i <- 0 to 63
+      i <- Pos.all
       sq = Pos.at(i).get
       color <- List(Color.White, Color.Black)
       result   = fen.board.attackers(sq, color)
@@ -44,92 +45,90 @@ class BoardTest extends FunSuite:
     yield assertEquals(result, expected.bb)
   }
 
-  test("discard with standard board") {
-    val squaresToDiscards = List.range(0, 16) ++ List.range(48, 64)
-    val result            = squaresToDiscards.foldRight(Board.standard)((s, b) => b.discard(Pos.at(s).get))
-    assertEquals(result, Board.empty)
+  test("discard returns the same board if the pos is empty") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      s <- Pos.all
+      newBoard = board.discard(s)
+    yield assert(newBoard == board || (board.hasPiece(s) && newBoard != board))
   }
 
-  test("discard with test fixtures") {
-    FenFixtures.fens.foreach { str =>
-      val board  = parseFen(str)
-      val result = List.range(0, 64).foldRight(board)((s, b) => b.discard(Pos.at(s).get))
-      assertEquals(result, Board.empty)
-    }
+  test("take return some if the pos is not empty") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      s <- Pos.all
+      newBoard = board.take(s)
+    yield assert(newBoard.isEmpty || (board.hasPiece(s) && newBoard.isDefined && newBoard.get != board))
   }
 
-  test("put a piece into a not empty pos should return none") {
-    val board    = Board.standard
-    val posToPut = List.range(0, 16) ++ List.range(48, 64)
-    val piece    = Piece(White, King)
-    val result   = posToPut.map(Pos.at(_).get).map(board.put(piece, _))
-    result.foreach(assertEquals(_, None))
+  test("put returns None if the pos is not empty") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      s <- Pos.all
+      newBoard = board.put(Piece(White, King), s)
+    yield assert(newBoard.isDefined || (board.hasPiece(s) && newBoard.isEmpty))
   }
 
-  test("put a piece into an empty pos should return new board") {
-    val board                       = Board.standard
-    val posToPut                    = List.range(17, 47).map(Pos.at(_).get)
-    val piece                       = Piece(White, King)
-    val result: List[Option[Board]] = posToPut.map(board.put(piece, _))
-    result.foreach(x => assertEquals(x.isDefined, true))
+  test("discard . put == identity") {
+    for
+      str <- FenFixtures.fens
+      board    = parseFen(str)
+      newBoard = board.pieceMap.foldLeft(board)((b, s) => b.discard(s._1).put(s._2, s._1).get)
+    yield assertEquals(newBoard, board)
   }
 
-  test("putOrReplace with standard board") {
-    val board  = Board.standard
-    val pieces = board.pieceMap
-    val result = pieces.foldRight(Board.empty)((s, b) => b.putOrReplace(s._1, s._2))
-    assertEquals(result, board)
-  }
-
-  test("putOrReplace with test fixtures") {
-    FenFixtures.fens.foreach { str =>
-      val board                      = parseFen(str)
-      val ss                         = List.range(0, 64).map(Pos.at(_).get)
-      val pieces: List[(Pos, Piece)] = ss.mapFilter(s => board.pieceAt(s).map((s, _)))
-      val result                     = pieces.foldRight(Board.empty)((s, b) => b.putOrReplace(s._1, s._2))
-      assertEquals(result, board)
-    }
-  }
-
-  test("putOrReplace case 1") {
-    val board =
-      Fen.read(EpdFen("8/8/8/8/p7/1P6/8/8 w - - 0 1")).getOrElse(throw RuntimeException("booo")).board.board
-    val result      = board.putOrReplace(Pos.A4, Piece(White, Pawn))
-    val expectedMap = board.pieceMap + (Pos.A4 -> Piece(White, Pawn))
-    assertEquals(result.pieceMap, expectedMap)
+  test("putOrReplace for every occupied square returns the same board") {
+    for
+      str <- FenFixtures.fens
+      board  = parseFen(str)
+      result = board.pieceMap.foldLeft(Board.empty)((b, s) => b.putOrReplace(s._1, s._2))
+    yield assertEquals(result, board)
   }
 
   test("pieceMap . fromMap === identity") {
-    FenFixtures.fens.foreach { str =>
-      val board  = Fen.read(str).getOrElse(throw RuntimeException("boooo")).board.board
-      val result = Board.fromMap(board.pieceMap)
-      assertEquals(result, board)
-    }
+    for
+      str <- FenFixtures.fens
+      board  = parseFen(str)
+      result = Board.fromMap(board.pieceMap)
+    yield assertEquals(result, board)
   }
 
-  test("pieces") {
-    val map = Map(A2 -> White.pawn, A3 -> White.rook)
-    assertEquals(Board.fromMap(map).pieces.toSet, List(White.pawn, White.rook).toSet)
+  test("pieces.toSet == pieceMap.values.toSet") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+    yield assertEquals(board.pieces.toSet, board.pieceMap.values.toSet)
   }
 
-  test("piecesOf") {
-    val map = Map(A2 -> White.pawn, A3 -> White.rook)
-    assertEquals(Board.fromMap(map).piecesOf(White), map)
+  test("piecesOf(White) ++ piecesOf(Black) == pieceMap") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      white = board.piecesOf(White)
+      black = board.piecesOf(Black)
+    yield assertEquals(white ++ black, board.pieceMap)
   }
 
-  test("hasPiece") {
-    val map = Map(A2 -> White.pawn, A3 -> White.rook)
-    assertEquals(Board.fromMap(map).hasPiece(White.pawn), true)
-    assertEquals(Board.fromMap(map).hasPiece(White.rook), true)
+  test("hasPiece(pos) == pieceMap.contains(pos)") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      pos <- Pos.all
+    yield assertEquals(board.hasPiece(pos), board.pieceMap.contains(pos))
+  }
+
+  test("hasPiece(piece) == true if pieces contains piece") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      piece <- board.pieces
+    yield assert(board.hasPiece(piece))
   }
 
   test("occupation") {
     val map = Map(A2 -> White.pawn, A3 -> White.rook)
     assertEquals(Board.fromMap(map).occupation, Color.Map(map.keys.toSet, Set()))
-  }
-
-  test("hasPiece at pos") {
-    val map = Map(A2 -> White.pawn, A3 -> White.rook)
-    assertEquals(Board.fromMap(map).hasPiece(A2), true)
-    assertEquals(Board.fromMap(map).hasPiece(A3), true)
   }

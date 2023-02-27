@@ -16,6 +16,7 @@ case class Board(
     bishops,
     black,
     isCheck,
+    isOccupied,
     kings,
     knights,
     nbPieces,
@@ -71,8 +72,6 @@ case class Board(
     board.taking(orig, dest, taking).map(withBoard)
 
   lazy val occupation: Color.Map[Set[Pos]] = board.occupation
-
-  inline def hasPiece(inline p: Piece) = board.hasPiece(p)
 
   def promote(pos: Pos): Option[Board] =
     for

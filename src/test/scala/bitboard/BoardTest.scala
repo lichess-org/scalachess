@@ -48,7 +48,7 @@ class BoardTest extends FunSuite:
       str <- FenFixtures.fens
       board = parseFen(str)
       s <- Pos.all
-      if !board.hasPiece(s)
+      if !board.isOccupied(s)
       newBoard = board.discard(s)
     yield assertEquals(newBoard, board)
   }
@@ -58,7 +58,7 @@ class BoardTest extends FunSuite:
       str <- FenFixtures.fens
       board = parseFen(str)
       s <- Pos.all
-      if board.hasPiece(s)
+      if board.isOccupied(s)
       newBoard = board.discard(s)
     yield assertEquals(newBoard.nbPieces, board.nbPieces - 1)
   }
@@ -76,7 +76,7 @@ class BoardTest extends FunSuite:
       str <- FenFixtures.fens
       board = parseFen(str)
       s <- Pos.all
-      if board.hasPiece(s)
+      if board.isOccupied(s)
       newBoard = board.take(s)
     yield assertEquals(newBoard.get, board.discard(s))
   }
@@ -86,7 +86,7 @@ class BoardTest extends FunSuite:
       str <- FenFixtures.fens
       board = parseFen(str)
       s <- Pos.all
-      if !board.hasPiece(s)
+      if !board.isOccupied(s)
       newBoard = board.take(s)
     yield assert(newBoard.isEmpty)
   }
@@ -97,7 +97,7 @@ class BoardTest extends FunSuite:
       board = parseFen(str)
       s <- Pos.all
       newBoard = board.put(White.king, s)
-    yield assert(newBoard.isDefined || (board.hasPiece(s) && newBoard.isEmpty))
+    yield assert(newBoard.isDefined || (board.isOccupied(s) && newBoard.isEmpty))
   }
 
   test("discard . put == identity") {
@@ -105,7 +105,7 @@ class BoardTest extends FunSuite:
       str <- FenFixtures.fens
       board = parseFen(str)
       s <- Pos.all
-      if board.hasPiece(s)
+      if board.isOccupied(s)
       piece    <- board.pieceAt(s)
       newBoard <- board.discard(s).put(piece, s)
     yield assertEquals(newBoard, board)
@@ -116,7 +116,7 @@ class BoardTest extends FunSuite:
       str <- FenFixtures.fens
       board = parseFen(str)
       s <- Pos.all
-      if !board.hasPiece(s)
+      if !board.isOccupied(s)
       newBoard = board.replace(White.king, s)
     yield assert(newBoard.isEmpty)
   }
@@ -126,7 +126,7 @@ class BoardTest extends FunSuite:
       str <- FenFixtures.fens
       board = parseFen(str)
       s <- Pos.all
-      if board.hasPiece(s)
+      if board.isOccupied(s)
       newBoard = board.replace(White.king, s)
     yield assert(newBoard.isDefined)
   }
@@ -147,7 +147,7 @@ class BoardTest extends FunSuite:
       str <- FenFixtures.fens
       board = parseFen(str)
       s <- Pos.all
-      if !board.hasPiece(s)
+      if !board.isOccupied(s)
       newBoard = board.putOrReplace(White.queen, s)
     yield assertEquals(newBoard.nbPieces, board.nbPieces + 1)
   }
@@ -157,7 +157,7 @@ class BoardTest extends FunSuite:
       str <- FenFixtures.fens
       board = parseFen(str)
       s <- Pos.all
-      if board.hasPiece(s)
+      if board.isOccupied(s)
       newBoard = board.putOrReplace(White.queen, s)
     yield assertEquals(newBoard.nbPieces, board.nbPieces)
   }
@@ -207,20 +207,20 @@ class BoardTest extends FunSuite:
     yield assertEquals(white ++ black, board.pieceMap)
   }
 
-  test("hasPiece(pos) == pieceMap.contains(pos)") {
+  test("isOccupied(pos) == pieceMap.contains(pos)") {
     for
       str <- FenFixtures.fens
       board = parseFen(str)
       pos <- Pos.all
-    yield assertEquals(board.hasPiece(pos), board.pieceMap.contains(pos))
+    yield assertEquals(board.isOccupied(pos), board.pieceMap.contains(pos))
   }
 
-  test("hasPiece(piece) == true if pieces contains piece") {
+  test("isOccupied(piece) == true if pieces contains piece") {
     for
       str <- FenFixtures.fens
       board = parseFen(str)
       piece <- board.pieces
-    yield assert(board.hasPiece(piece))
+    yield assert(board.isOccupied(piece))
   }
 
   test("move(x, x) always return None") {
@@ -232,7 +232,7 @@ class BoardTest extends FunSuite:
     yield assert(moved.isEmpty)
   }
 
-  test("move(from, to).isDefined == hasPiece(from) && !hasPiece(to)") {
+  test("move(from, to).isDefined == isOccupied(from) && !isOccupied(to)") {
     for
       str <- FenFixtures.fens
       board = parseFen(str)
@@ -240,7 +240,7 @@ class BoardTest extends FunSuite:
       to   <- Pos.all
       if from != to
       moved = board.move(from, to)
-    yield assertEquals(moved.isDefined, board.hasPiece(from) && !board.hasPiece(to))
+    yield assertEquals(moved.isDefined, board.isOccupied(from) && !board.isOccupied(to))
   }
 
   test("move(from, to).move(to, from) == identity") {

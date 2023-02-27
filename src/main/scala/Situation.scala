@@ -92,8 +92,8 @@ case class Situation(board: Board, color: Color):
   lazy val them: Bitboard             = board.board.byColor(!color)
   lazy val checkers: Option[Bitboard] = ourKings.headOption.map(board.board.attackers(_, !color))
   lazy val sliderBlockers: Bitboard   = board.board.sliderBlockers(color)
-  lazy val isWhiteTurn: Boolean       = color.white
-  lazy val isOccupied: Pos => Boolean = board.board.isOccupied
+  val isWhiteTurn: Boolean            = color.white
+  val isOccupied: Pos => Boolean      = board.isOccupied
 
   // TODO test generateMovesAt(pos) = generateMoves.filter(_.orig == pos)
   // TODO test generateMoves == generateMovesAt(pos) for all pos

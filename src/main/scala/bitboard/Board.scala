@@ -126,16 +126,13 @@ case class Board(
     case Queen  => queens
     case King   => kings
 
-  def hasPiece(at: Pos): Boolean =
-    occupied.contains(at)
-
   // put a piece to an empty square
   def put(piece: Piece, at: Pos): Option[Board] =
-    !hasPiece(at) option putOrReplace(piece, at) // todo no need to discard
+    !isOccupied(at) option putOrReplace(piece, at)
 
   // put a piece to an occupied square
   def replace(piece: Piece, at: Pos): Option[Board] =
-    hasPiece(at) option putOrReplace(piece, at)
+    isOccupied(at) option putOrReplace(piece, at)
 
   // put a piece into the board
   def putOrReplace(s: Pos, role: Role, color: Color): Board =
@@ -159,25 +156,25 @@ case class Board(
     putOrReplace(s, p.role, p.color)
 
   def take(at: Pos): Option[Board] =
-    hasPiece(at) option discard(at)
+    isOccupied(at) option discard(at)
 
   // move without capture
   def move(orig: Pos, dest: Pos): Option[Board] =
-    if hasPiece(dest) then None
+    if isOccupied(dest) then None
     else pieceAt(orig).map(discard(orig).putOrReplace(_, dest))
 
   def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] =
     for
       piece <- pieceAt(orig)
       takenPos = taking getOrElse dest
-      if hasPiece(takenPos)
+      if isOccupied(takenPos)
     yield discard(orig).discard(takenPos).putOrReplace(piece, dest)
 
   lazy val occupation: Color.Map[Set[Pos]] = Color.Map { c =>
     color(c).occupiedSquares.toSet
   }
 
-  inline def hasPiece(inline p: Piece) =
+  inline def isOccupied(inline p: Piece) =
     piece(p).nonEmpty
 
   // TODO remove unsafe get
@@ -185,7 +182,7 @@ case class Board(
     occupied.occupiedSquares.view.map(s => (s, pieceAt(s).get)).toMap
 
   def piecesOf(c: Color): Map[Pos, Piece] =
-    color(c).occupiedSquares.view.map(s => (s, pieceAt(s).get)).toMap
+    pieceMap.filter((_, p) => p.color == c)
 
   def pieces: List[Piece] = pieces(occupied)
 

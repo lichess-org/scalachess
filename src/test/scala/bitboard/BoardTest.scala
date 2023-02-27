@@ -29,7 +29,6 @@ class BoardTest extends FunSuite:
       king     = situation.ourKings.head
       expected = situation.cBoard.sliderBlockers(king)
     yield assertEquals(result, expected.bb)
-
   }
 
   test("attacksTo") {
@@ -37,8 +36,7 @@ class BoardTest extends FunSuite:
       str <- FenFixtures.fens
       fen  = Fen.read(str).getOrElse(throw RuntimeException("boooo"))
       king = fen.ourKings.head
-      i <- Pos.all
-      sq = Pos.at(i).get
+      sq    <- Pos.all
       color <- List(Color.White, Color.Black)
       result   = fen.board.attackers(sq, color)
       expected = fen.cBoard.attacksTo(sq, color.white)
@@ -126,6 +124,31 @@ class BoardTest extends FunSuite:
       board = parseFen(str)
       piece <- board.pieces
     yield assert(board.hasPiece(piece))
+  }
+
+  test("move(x, x) always return None") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      from <- Pos.all
+      moved = board.move(from, from)
+    yield assert(moved.isEmpty)
+  }
+
+  test("if from != to then move(from, to) == take(from) . put(to)") {
+    for
+      str <- FenFixtures.fens.take(1)
+      board = parseFen(str).pp
+      from <- Pos.all
+      to   <- Pos.all
+      if from != to
+      moved = board.move(from, to)
+      takeAndPut = for
+        piece     <- board.pieceAt(from)
+        afterTake <- board.take(from)
+        newBoard  <- afterTake.put(piece, to)
+      yield newBoard
+    yield assertEquals(moved, takeAndPut)
   }
 
   test("occupation") {

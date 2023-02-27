@@ -156,7 +156,7 @@ case class Board(
   // move without capture
   def move(orig: Pos, dest: Pos): Option[Board] =
     if hasPiece(dest) then None
-    else pieceAt(orig).map(p => discard(orig).putOrReplace(dest, p))
+    else pieceAt(orig).map(discard(orig).putOrReplace(dest, _))
 
   def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] =
     for

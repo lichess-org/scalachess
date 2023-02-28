@@ -17,6 +17,7 @@ case class Board(
     black,
     isCheck,
     isOccupied,
+    kingOf,
     kingPosOf,
     kings,
     knights,

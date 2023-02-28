@@ -14,7 +14,7 @@ import chess.variant.Crazyhouse
 import chess.variant.Antichess
 
 case class Situation(board: Board, color: Color):
-  export board.{ history, variant }
+  export board.{ history, kingOf, variant }
 
   lazy val legalMoves = variant.validMoves(this)
 
@@ -84,8 +84,8 @@ case class Situation(board: Board, color: Color):
 
   // ========================bitboard===========================
 
-  lazy val ourKing   = board.kingPosOf(color).singleSquare
-  lazy val theirKing = board.kingPosOf(!color).singleSquare
+  lazy val ourKing   = board.kingPosOf(color)
+  lazy val theirKing = board.kingPosOf(!color)
   // alternative version of ourKing is used in Antichess only
   lazy val ourKings: List[Pos] = board.board.kings(color)
   // alternative version of their is used in Antichess only

@@ -44,15 +44,15 @@ case object Atomic
     * king.
     */
   override def kingThreatened(board: Board, color: Color): Check = Check {
-    import board.board.{ kingPosOf, occupied }
-    kingPosOf(color).singleSquare.exists { k =>
-      k.kingAttacks.isDisjoint(kingPosOf(!color)) &&
+    import board.{ kingPosOf, kingOf, occupied }
+    kingPosOf(color).exists { k =>
+      k.kingAttacks.isDisjoint(kingOf(!color)) &&
       attackersWithoutKing(board, occupied, k, !color).nonEmpty
     }
   }
 
   private def attackersWithoutKing(board: Board, occupied: Bitboard, s: Pos, attacker: Color) =
-    import board.board.{ byColor, kings, rooks, queens, bishops, knights, pawns }
+    import board.board.{ byColor, rooks, queens, bishops, knights, pawns }
     byColor(attacker) & (
       s.rookAttacks(occupied) & (rooks ^ queens) |
         s.bishopAttacks(occupied) & (bishops ^ queens) |
@@ -61,7 +61,7 @@ case object Atomic
     )
 
   private def protectedByOtherKing(board: Board, to: Pos, color: Color): Boolean =
-    to.kingAttacks.intersects(board.kingPosOf(color))
+    to.kingAttacks.intersects(board.kingOf(color))
 
   // moves exploding opponent king are always playable
   override def kingSafety(m: Move): Boolean =
@@ -70,7 +70,7 @@ case object Atomic
       && !explodesOwnKing(m.situationBefore)(m)
 
   override def castleCheckSafeSquare(board: Board, king: Pos, color: Color, occupied: Bitboard): Boolean =
-    king.kingAttacks.intersects(board.kingPosOf(!color)) ||
+    king.kingAttacks.intersects(board.kingOf(!color)) ||
       attackersWithoutKing(board, occupied, king, !color).isEmpty
 
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */

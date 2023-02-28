@@ -22,7 +22,6 @@ case object Standard
     val enPassantMoves = situation.genEnPassant(situation.us & board.pawns)
     board
       .kingPosOf(color)
-      .singleSquare
       .fold(Nil)(king =>
         val checkers = board.attackers(king, !situation.color)
         val candidates =
@@ -52,7 +51,7 @@ case object Standard
       // Checks by these sliding pieces can maybe be blocked.
       val sliders = checkers & (board.sliders)
       val attacked =
-        sliders.occupiedSquares.foldRight(Bitboard.empty)((s, a) => a | (s.bb ^ Bitboard.ray(king, s)))
+        sliders.occupiedSquares.foldLeft(Bitboard.empty)((a, s) => a | (s.bb ^ Bitboard.ray(king, s)))
       val safeKings = genSafeKing(~us & ~attacked)
       val blockers =
         checkers.singleSquare.map(c => genNonKing(Bitboard.between(king, c) | checkers)).getOrElse(Nil)

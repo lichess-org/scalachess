@@ -38,7 +38,7 @@ case object Horde
     else Standard.validMoves(situation)
 
   override def valid(board: Board, strict: Boolean) =
-    board.kingPosOf(White).isEmpty && validSide(board, strict)(Black) && !pawnsOnPromotionRank(board, White)
+    board.kingOf(White).isEmpty && validSide(board, strict)(Black) && !pawnsOnPromotionRank(board, White)
 
   /** The game has a special end condition when black manages to capture all of white's pawns */
   override def specialEnd(situation: Situation) =

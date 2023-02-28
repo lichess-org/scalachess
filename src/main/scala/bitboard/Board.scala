@@ -61,7 +61,8 @@ case class Board(
   def kings(color: Color): List[Pos] =
     (kings & byColor(color)).occupiedSquares
 
-  def kingPosOf(c: Color): Bitboard = kings & byColor(c)
+  def kingOf(c: Color): Bitboard       = kings & byColor(c)
+  def kingPosOf(c: Color): Option[Pos] = kingOf(c).singleSquare
 
   def attackers(s: Pos, attacker: Color): Bitboard =
     attackers(s, attacker, occupied)
@@ -89,7 +90,7 @@ case class Board(
     * This is being used when checking a move is safe for the king or not
     */
   def sliderBlockers(us: Color): Bitboard =
-    kingPosOf(us).singleSquare.fold(Bitboard.empty) { ourKing =>
+    kingOf(us).singleSquare.fold(Bitboard.empty) { ourKing =>
       val snipers = byColor(!us) & (
         ourKing.rookAttacks(Bitboard.empty) & (rooks ^ queens) |
           ourKing.bishopAttacks(Bitboard.empty) & (bishops ^ queens)

@@ -100,7 +100,7 @@ case class Situation(board: Board, color: Color):
   // TODO test generateMoves == generateMovesAt(pos) for all pos
   def generateMovesAt(pos: Pos): List[Move] =
     def movesAt =
-      val moves = board.apply(pos).fold(Nil) { piece =>
+      val moves = board(pos).fold(Nil) { piece =>
         if piece.color != color then Nil
         else
           val targets = ~us
@@ -246,7 +246,7 @@ case class Situation(board: Board, color: Color):
       val targets = king.kingAttacks & mask
       for
         to <- targets.occupiedSquares
-        if board.board.attackers(to, !color).isEmpty
+        if board.attackers(to, !color).isEmpty
         move <- normalMove(king, to, King, isOccupied(to))
       yield move
     )

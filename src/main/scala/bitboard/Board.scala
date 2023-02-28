@@ -90,7 +90,7 @@ case class Board(
     * This is being used when checking a move is safe for the king or not
     */
   def sliderBlockers(us: Color): Bitboard =
-    kingOf(us).singleSquare.fold(Bitboard.empty) { ourKing =>
+    kingPosOf(us).fold(Bitboard.empty) { ourKing =>
       val snipers = byColor(!us) & (
         ourKing.rookAttacks(Bitboard.empty) & (rooks ^ queens) |
           ourKing.bishopAttacks(Bitboard.empty) & (bishops ^ queens)

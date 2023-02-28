@@ -380,7 +380,7 @@ case class Situation(board: Board, color: Color):
       else if variant.chess960 then true
       else king.file != File.E || !(rook.file == File.A || rook.file == File.H)
 
-    val destInput = if (!isChess960) then List(rook, kingTo) else List(rook)
+    val destInput = if !isChess960 then List(rook, kingTo) else List(rook)
 
     for
       a            <- after.toList

@@ -3,7 +3,7 @@ package bitboard
 
 import Bitboard.*
 
-// Pieces position on the board
+// Chess board representation
 case class Board(
     pawns: Bitboard,
     knights: Bitboard,
@@ -151,7 +151,7 @@ case class Board(
     )
 
   // put a piece into the board
-  // remove the existing piece at that pos if needed
+  // remove the existing piece at that square if needed
   def putOrReplace(p: Piece, s: Pos): Board =
     putOrReplace(s, p.role, p.color)
 
@@ -192,13 +192,6 @@ case class Board(
   def color(c: Color): Bitboard = c.fold(white, black)
 
   def piece(p: Piece): Bitboard = color(p.color) & byRole(p.role)
-
-  // guess unmovedRooks from board
-  // we assume rooks are on their initial position
-  def defaultUnmovedRooks: UnmovedRooks =
-    val wr = rooks & white & Bitboard.rank(White.backRank)
-    val br = rooks & black & Bitboard.rank(Black.backRank)
-    UnmovedRooks(wr | br)
 
 object Board:
   val empty = Board(

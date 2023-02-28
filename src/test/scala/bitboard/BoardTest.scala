@@ -223,7 +223,7 @@ class BoardTest extends FunSuite:
     yield assert(board.isOccupied(piece))
   }
 
-  test("move(x, x) always return None") {
+  test("move(x, x) always returns None") {
     for
       str <- FenFixtures.fens
       board = parseFen(str)

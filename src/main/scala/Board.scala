@@ -17,11 +17,14 @@ case class Board(
     black,
     isCheck,
     isOccupied,
+    kingPosOf,
     kings,
     knights,
     nbPieces,
+    occupation,
     occupied,
     pawns,
+    piecesOf,
     queens,
     rooks,
     sliders,
@@ -35,14 +38,8 @@ case class Board(
   inline def apply(inline at: Pos): Option[Piece]        = board.pieceAt(at)
   inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Pos(file, rank))
 
-  // todo remove
-  lazy val pieces = board.pieceMap
-  // todo maybe remove?
+  lazy val pieces    = board.pieceMap
   lazy val allPieces = board.pieces
-
-  def piecesOf(c: Color): Map[Pos, Piece] = board.piecesOf(c)
-
-  def kingPosOf(c: Color): Bitboard = board.kings & board.byColor(c)
 
   def checkColor: Option[Color] = checkWhite.yes.option(White) orElse checkBlack.yes.option(Black)
 
@@ -71,15 +68,8 @@ case class Board(
   def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] =
     board.taking(orig, dest, taking).map(withBoard)
 
-  lazy val occupation: Color.Map[Set[Pos]] = board.occupation
-
-  def promote(pos: Pos): Option[Board] =
-    for
-      pawn <- apply(pos)
-      if pawn is Pawn
-      b2 <- take(pos)
-      b3 <- b2.place(pawn.color.queen, pos)
-    yield b3
+  def promote(orig: Pos, dest: Pos, piece: Piece): Option[Board] =
+    board.promote(orig, dest, piece).map(withBoard)
 
   export history.{ castles, unmovedRooks }
 

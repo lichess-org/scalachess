@@ -61,6 +61,8 @@ case class Board(
   def kings(color: Color): List[Pos] =
     (kings & byColor(color)).occupiedSquares
 
+  def kingPosOf(c: Color): Bitboard = kings & byColor(c)
+
   def attackers(s: Pos, attacker: Color): Bitboard =
     attackers(s, attacker, occupied)
 
@@ -87,7 +89,7 @@ case class Board(
     * This is being used when checking a move is safe for the king or not
     */
   def sliderBlockers(us: Color): Bitboard =
-    kings(us).headOption.fold(Bitboard.empty) { ourKing =>
+    kingPosOf(us).singleSquare.fold(Bitboard.empty) { ourKing =>
       val snipers = byColor(!us) & (
         ourKing.rookAttacks(Bitboard.empty) & (rooks ^ queens) |
           ourKing.bishopAttacks(Bitboard.empty) & (bishops ^ queens)
@@ -169,6 +171,9 @@ case class Board(
       takenPos = taking getOrElse dest
       if isOccupied(takenPos)
     yield discard(orig).discard(takenPos).putOrReplace(piece, dest)
+
+  def promote(orig: Pos, dest: Pos, piece: Piece): Option[Board] =
+    take(orig).map(_.putOrReplace(piece, dest))
 
   lazy val occupation: Color.Map[Set[Pos]] = Color.Map { c =>
     color(c).occupiedSquares.toSet

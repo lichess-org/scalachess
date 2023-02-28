@@ -338,11 +338,8 @@ case class Situation(board: Board, color: Color):
 
   private def promotion(orig: Pos, dest: Pos, promotion: PromotableRole, capture: Boolean): Option[Move] =
     val taken = if capture then Option(dest) else None
-    val after: Option[Board] =
-      if (capture) then board.taking(orig, dest, taken)
-      else board.move(orig, dest)
-    after
-      .map(_.putOrReplace(Piece(color, promotion), dest))
+    board
+      .promote(orig, dest, color - promotion)
       .map(board =>
         Move(
           piece = color.pawn,

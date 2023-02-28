@@ -26,7 +26,7 @@ case object Atomic
     applyVariantEffect(moves).filter(kingSafety)
 
   private def genKing(situation: Situation, mask: Bitboard) =
-    import situation.{ genUnsafeKing, genCastling, board }
+    import situation.{ genUnsafeKing, genCastling }
     situation.ourKing.fold(Nil) { king =>
       genCastling(king) ++ genUnsafeKing(king, mask)
     }

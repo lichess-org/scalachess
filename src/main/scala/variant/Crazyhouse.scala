@@ -90,7 +90,7 @@ case object Crazyhouse
   // king is in single check, we return the squares between the king and the checker
   // king is in double check, no drop is possible
   def possibleDrops(situation: Situation): Option[List[Pos]] =
-    situation.ourKings.headOption.flatMap(king =>
+    situation.ourKing.flatMap(king =>
       val checkers = situation.board.board.attackers(king, !situation.color)
       if checkers.moreThanOne then Some(Nil)
       else checkers.first.map(checker => Bitboard.between(king, checker).occupiedSquares)
@@ -109,7 +109,7 @@ case object Crazyhouse
   // this function is used in perfts only
   private def legalDropSquares(situation: Situation): Bitboard =
     import bitboard.Bitboard
-    situation.ourKings.headOption
+    situation.ourKing
       .map(king =>
         val checkers = situation.board.board.attackers(king, !situation.color)
         if checkers.isEmpty then ~situation.board.occupied

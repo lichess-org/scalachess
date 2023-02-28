@@ -22,13 +22,13 @@ case object Atomic
   def validMoves(situation: Situation): List[Move] =
     import situation.{ genNonKing, genEnPassant, us, board }
     val targets = ~us
-    val moves   = genNonKing(targets) ++ genKings(situation, targets) ++ genEnPassant(us & board.pawns)
+    val moves   = genNonKing(targets) ++ genKing(situation, targets) ++ genEnPassant(us & board.pawns)
     applyVariantEffect(moves).filter(kingSafety)
 
-  private def genKings(situation: Situation, mask: Bitboard) =
-    import situation.{ genUnsafeKing, genCastling, ourKings }
-    ourKings.headOption.fold(Nil) { king =>
-      genCastling ++ genUnsafeKing(king, mask)
+  private def genKing(situation: Situation, mask: Bitboard) =
+    import situation.{ genUnsafeKing, genCastling, board }
+    situation.ourKing.fold(Nil) { king =>
+      genCastling(king) ++ genUnsafeKing(king, mask)
     }
 
   /** Move threatens to explode the opponent's king */

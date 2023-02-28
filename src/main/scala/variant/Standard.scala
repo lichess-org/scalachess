@@ -18,15 +18,17 @@ case object Standard
   val pieces: Map[Pos, Piece] = Variant.symmetricRank(backRank)
 
   def validMoves(situation: Situation): List[Move] =
-    import situation.{ genNonKing, genSafeKing, genCastling }
-    val enPassantMoves = situation.genEnPassant(situation.us & situation.board.pawns)
-    situation.ourKings.headOption
+    import situation.{ genNonKing, genSafeKing, genCastling, color, board }
+    val enPassantMoves = situation.genEnPassant(situation.us & board.pawns)
+    board
+      .kingPosOf(color)
+      .singleSquare
       .fold(Nil)(king =>
-        val checkers = situation.board.board.attackers(king, !situation.color)
+        val checkers = board.attackers(king, !situation.color)
         val candidates =
           if checkers.isEmpty then
             val targets = ~situation.us
-            genNonKing(targets) ::: genSafeKing(targets) ::: genCastling ::: enPassantMoves
+            genNonKing(targets) ::: genSafeKing(targets) ::: genCastling(king) ::: enPassantMoves
           else situation.genEvasions(checkers) ::: enPassantMoves
         if situation.sliderBlockers.nonEmpty || enPassantMoves.nonEmpty then
           candidates.filter(isSafe(situation, king, _, situation.sliderBlockers))

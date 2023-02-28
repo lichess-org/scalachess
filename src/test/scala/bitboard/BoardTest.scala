@@ -305,6 +305,38 @@ class BoardTest extends FunSuite:
     yield assertEquals(taking, takeAndPutAndTake)
   }
 
+  test("promote(from, to, piece) == move(from, to).replace(piece, to) when to is empty") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      from <- Pos.all
+      to   <- Pos.all
+      if from != to && !board.isOccupied(to)
+      piece    = White.knight
+      promoted = board.promote(from, to, piece)
+      moveAndReplace = for
+        moved    <- board.move(from, to)
+        newBoard <- moved.replace(piece, to)
+      yield newBoard
+    yield assertEquals(promoted, moveAndReplace)
+  }
+
+  test("promote(from, to, piece) == taking(from, to).put(piece, to) when to is occupied") {
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      from <- Pos.all
+      to   <- Pos.all
+      if from != to && board.isOccupied(to)
+      piece    = White.knight
+      promoted = board.promote(from, to, piece)
+      takingAndReplace = for
+        moved    <- board.taking(from, to)
+        newBoard <- moved.replace(piece, to)
+      yield newBoard
+    yield assertEquals(promoted, takingAndReplace)
+  }
+
   test("occupation") {
     val map = Map(A2 -> White.pawn, A3 -> White.rook)
     assertEquals(Board.fromMap(map).occupation, Color.Map(map.keys.toSet, Set()))

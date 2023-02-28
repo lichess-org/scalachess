@@ -14,7 +14,7 @@ import chess.variant.Crazyhouse
 import chess.variant.Antichess
 
 case class Situation(board: Board, color: Color):
-  export board.variant
+  export board.{ history, variant }
 
   lazy val legalMoves = variant.validMoves(this)
 
@@ -36,8 +36,6 @@ case class Situation(board: Board, color: Color):
 
   def checkSquare = if check.yes then ourKing else None
 
-  inline def history = board.history
-
   inline def checkMate: Boolean = variant checkmate this
 
   inline def staleMate: Boolean = variant staleMate this
@@ -46,7 +44,7 @@ case class Situation(board: Board, color: Color):
 
   inline def opponentHasInsufficientMaterial: Boolean = variant.opponentHasInsufficientMaterial(this)
 
-  lazy val threefoldRepetition: Boolean = board.history.threefoldRepetition
+  lazy val threefoldRepetition: Boolean = history.threefoldRepetition
 
   inline def variantEnd = variant specialEnd this
 
@@ -256,9 +254,9 @@ case class Situation(board: Board, color: Color):
 
   def genCastling(king: Pos): List[Move] =
     // can castle but which side?
-    if !board.history.castles.can(color) || king.rank != color.backRank then Nil
+    if !history.castles.can(color) || king.rank != color.backRank then Nil
     else
-      val rooks = board.history.unmovedRooks & Bitboard.rank(color.backRank) & board.rooks
+      val rooks = history.unmovedRooks & Bitboard.rank(color.backRank) & board.rooks
       for
         rook <- rooks.occupiedSquares
         toKingFile = if rook < king then File.C else File.G

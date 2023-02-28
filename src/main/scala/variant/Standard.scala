@@ -29,7 +29,7 @@ case object Standard
           if checkers.isEmpty then
             val targets = ~situation.us
             genNonKing(targets) ::: genSafeKing(targets) ::: genCastling(king) ::: enPassantMoves
-          else situation.genEvasions(checkers) ::: enPassantMoves
+          else genEvasions(situation, checkers) ::: enPassantMoves
         if situation.sliderBlockers.nonEmpty || enPassantMoves.nonEmpty then
           candidates.filter(isSafe(situation, king, _, situation.sliderBlockers))
         else candidates
@@ -45,3 +45,16 @@ case object Standard
     else if !move.castles || !move.promotes then
       !(us & blockers).contains(move.orig) || Bitboard.aligned(move.orig, move.dest, king)
     else true
+
+  private def genEvasions(situation: Situation, checkers: Bitboard): List[Move] =
+    import situation.{ genNonKing, genSafeKing, color, us, board, ourKing }
+    ourKing.fold(Nil)(king =>
+      // Checks by these sliding pieces can maybe be blocked.
+      val sliders = checkers & (board.sliders)
+      val attacked =
+        sliders.occupiedSquares.foldRight(Bitboard.empty)((s, a) => a | (s.bb ^ Bitboard.ray(king, s)))
+      val safeKings = genSafeKing(~us & ~attacked)
+      val blockers =
+        checkers.singleSquare.map(c => genNonKing(Bitboard.between(king, c) | checkers)).getOrElse(Nil)
+      safeKings ++ blockers
+    )

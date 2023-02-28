@@ -44,15 +44,10 @@ case object Atomic
     * king.
     */
   override def kingThreatened(board: Board, color: Color): Check = Check {
-    import board.board.{ byColor, kings }
-    val theirKings = byColor(!color) & kings
-    kings(color).exists { k =>
-      k.kingAttacks.isDisjoint(theirKings) && attackersWithoutKing(
-        board,
-        board.board.occupied,
-        k,
-        !color
-      ).nonEmpty
+    import board.board.{ kingPosOf, occupied }
+    kingPosOf(color).singleSquare.exists { k =>
+      k.kingAttacks.isDisjoint(kingPosOf(!color)) &&
+      attackersWithoutKing(board, occupied, k, !color).nonEmpty
     }
   }
 
@@ -75,9 +70,8 @@ case object Atomic
       && !explodesOwnKing(m.situationBefore)(m)
 
   override def castleCheckSafeSquare(board: Board, king: Pos, color: Color, occupied: Bitboard): Boolean =
-    val theirKings = board.board.byColor(!color) & board.kings
-    king.kingAttacks.intersects(theirKings) ||
-    attackersWithoutKing(board, occupied, king, !color).isEmpty
+    king.kingAttacks.intersects(board.kingPosOf(!color)) ||
+      attackersWithoutKing(board, occupied, king, !color).isEmpty
 
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
   private def explodeSurroundingPieces(move: Move): Move =

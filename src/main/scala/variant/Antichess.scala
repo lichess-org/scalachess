@@ -41,7 +41,7 @@ case object Antichess
 
   // In antichess, there is no checkmate condition, and the winner is the current player if they have no legal moves
   override def winner(situation: Situation): Option[Color] =
-    if (specialEnd(situation)) Option(situation.color) else None
+    specialEnd(situation) option situation.color
 
   override def specialEnd(situation: Situation) =
     // The game ends with a win when one player manages to lose all their pieces or is in stalemate

@@ -14,7 +14,7 @@ import chess.variant.Crazyhouse
 import chess.variant.Antichess
 
 case class Situation(board: Board, color: Color):
-  export board.{ history, kingOf, variant }
+  export board.{ history, isOccupied, kingOf, variant }
 
   lazy val legalMoves = variant.validMoves(this)
 
@@ -87,15 +87,14 @@ case class Situation(board: Board, color: Color):
   lazy val ourKing   = board.kingPosOf(color)
   lazy val theirKing = board.kingPosOf(!color)
   // alternative version of ourKing is used in Antichess only
-  lazy val ourKings: List[Pos] = board.board.kings(color)
-  // alternative version of their is used in Antichess only
-  lazy val theirKings: List[Pos]      = board.board.kings(!color)
-  lazy val us: Bitboard               = board.board.byColor(color)
-  lazy val them: Bitboard             = board.board.byColor(!color)
-  lazy val checkers: Option[Bitboard] = ourKing.map(board.board.attackers(_, !color))
-  lazy val sliderBlockers: Bitboard   = board.board.sliderBlockers(color)
+  lazy val ourKings: List[Pos] = board.kings(color)
+  // alternative version of theirKing is used in Antichess only
+  lazy val theirKings: List[Pos]      = board.kings(!color)
+  lazy val us: Bitboard               = board.byColor(color)
+  lazy val them: Bitboard             = board.byColor(!color)
+  lazy val checkers: Option[Bitboard] = ourKing.map(board.attackers(_, !color))
+  lazy val sliderBlockers: Bitboard   = board.sliderBlockers(color)
   val isWhiteTurn: Boolean            = color.white
-  val isOccupied: Pos => Boolean      = board.isOccupied
 
   // TODO test generateMovesAt(pos) = generateMoves.filter(_.orig == pos)
   // TODO test generateMoves == generateMovesAt(pos) for all pos

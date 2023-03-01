@@ -56,7 +56,6 @@ case class Std(
   def withMetas(m: Metas) = copy(metas = m)
 
   def move(situation: Situation): Validated[ErrorStr, chess.Move] =
-    import bitboard.Bitboard.occupiedSquares
     val pieces = situation.board.board.byRole(role) & situation.us
     pieces.first { pos =>
       if compare(file, pos.file.index + 1) &&
@@ -122,8 +121,12 @@ case class Castle(
   def withMetas(m: Metas) = copy(metas = m)
 
   def move(situation: Situation): Validated[ErrorStr, chess.Move] =
-    situation.legalMoves.find(
-      _.castle.exists(_.side == side)
+    import situation.{ genCastling, ourKing, variant }
+    ourKing.flatMap(k =>
+      variant
+        .applyVariantEffect(genCastling(k))
+        .filter(variant.kingSafety)
+        .find(_.castle.exists(_.side == side))
     ) toValid ErrorStr(s"Cannot castle / variant is ${situation.board.variant}")
 
 case class Suffixes(

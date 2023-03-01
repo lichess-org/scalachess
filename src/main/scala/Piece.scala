@@ -26,17 +26,6 @@ case class Piece(color: Color, role: Role):
       case Knight => from.knightAttacks.contains(to)
       case Pawn   => from.pawnAttacks(color).contains(to)
 
-  // movable positions assuming empty board
-  def eyesMovable(from: Pos, to: Pos): Boolean =
-    if (role == Pawn) Piece.pawnEyes(color, from, to) || {
-      (from ?| to) && {
-        val dy = to.rank.value - from.rank.value
-        if (color.white) (dy == 1 || (from.rank <= Rank.Second && dy == 2))
-        else (dy == -1 || (from.rank >= Rank.Seventh && dy == -2))
-      }
-    }
-    else eyes(from, to)
-
   override def toString = s"$color-$role".toLowerCase
 
 object Piece:
@@ -44,9 +33,4 @@ object Piece:
   def fromChar(c: Char): Option[Piece] =
     Role.allByPgn get c.toUpper map {
       Piece(Color.fromWhite(c.isUpper), _)
-    }
-
-  private def pawnEyes(color: Color, from: Pos, to: Pos) =
-    (from xDist to) == 1 && (to.rank.value - from.rank.value) == {
-      if (color.white) 1 else -1
     }

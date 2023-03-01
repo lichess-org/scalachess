@@ -32,7 +32,7 @@ trait FenReader:
                 .sortBy(_.file.value)
               {
                 for
-                  kingPos <- (board.kingPosOf(color) & backRank).first
+                  kingPos <- (board.kingOf(color) & backRank).first
                   rookPos <- ch.toLower match
                     case 'k'  => rooks.reverse.find(_ ?> kingPos)
                     case 'q'  => rooks.find(_ ?< kingPos)

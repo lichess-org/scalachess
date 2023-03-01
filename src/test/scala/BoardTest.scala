@@ -80,12 +80,6 @@ class BoardTest extends ChessTest:
       board.move(A1, A2) must beNone
     }
 
-    "allow a pawn to be promoted to a queen" in {
-      makeEmptyBoard.place(Black.pawn, A8) flatMap (_ promote A8) must beSome {
-        (_: Board)(A8) must beSome(Black.queen)
-      }
-    }
-
     "allow chaining actions" in {
       makeEmptyBoard.seq(
         _.place(White - Pawn, A2),

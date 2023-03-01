@@ -22,13 +22,13 @@ case object Atomic
   def validMoves(situation: Situation): List[Move] =
     import situation.{ genNonKing, genEnPassant, us, board }
     val targets = ~us
-    val moves   = genNonKing(targets) ++ genKings(situation, targets) ++ genEnPassant(us & board.pawns)
+    val moves   = genNonKing(targets) ++ genKing(situation, targets) ++ genEnPassant(us & board.pawns)
     applyVariantEffect(moves).filter(kingSafety)
 
-  private def genKings(situation: Situation, mask: Bitboard) =
-    import situation.{ genUnsafeKing, genCastling, ourKings }
-    ourKings.headOption.fold(Nil) { king =>
-      genCastling ++ genUnsafeKing(king, mask)
+  private def genKing(situation: Situation, mask: Bitboard) =
+    import situation.{ genUnsafeKing, genCastling }
+    situation.ourKing.fold(Nil) { king =>
+      genCastling(king) ++ genUnsafeKing(king, mask)
     }
 
   /** Move threatens to explode the opponent's king */
@@ -44,20 +44,15 @@ case object Atomic
     * king.
     */
   override def kingThreatened(board: Board, color: Color): Check = Check {
-    import board.board.{ byColor, kings }
-    val theirKings = byColor(!color) & kings
-    kings(color).exists { k =>
-      k.kingAttacks.isDisjoint(theirKings) && attackersWithoutKing(
-        board,
-        board.board.occupied,
-        k,
-        !color
-      ).nonEmpty
+    import board.{ kingPosOf, kingOf, occupied }
+    kingPosOf(color).exists { k =>
+      k.kingAttacks.isDisjoint(kingOf(!color)) &&
+      attackersWithoutKing(board, occupied, k, !color).nonEmpty
     }
   }
 
   private def attackersWithoutKing(board: Board, occupied: Bitboard, s: Pos, attacker: Color) =
-    import board.board.{ byColor, kings, rooks, queens, bishops, knights, pawns }
+    import board.board.{ byColor, rooks, queens, bishops, knights, pawns }
     byColor(attacker) & (
       s.rookAttacks(occupied) & (rooks ^ queens) |
         s.bishopAttacks(occupied) & (bishops ^ queens) |
@@ -66,7 +61,7 @@ case object Atomic
     )
 
   private def protectedByOtherKing(board: Board, to: Pos, color: Color): Boolean =
-    to.kingAttacks.intersects(board.kingPosOf(color))
+    to.kingAttacks.intersects(board.kingOf(color))
 
   // moves exploding opponent king are always playable
   override def kingSafety(m: Move): Boolean =
@@ -75,9 +70,8 @@ case object Atomic
       && !explodesOwnKing(m.situationBefore)(m)
 
   override def castleCheckSafeSquare(board: Board, king: Pos, color: Color, occupied: Bitboard): Boolean =
-    val theirKings = board.board.byColor(!color) & board.kings
-    king.kingAttacks.intersects(theirKings) ||
-    attackersWithoutKing(board, occupied, king, !color).isEmpty
+    king.kingAttacks.intersects(board.kingOf(!color)) ||
+      attackersWithoutKing(board, occupied, king, !color).isEmpty
 
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
   private def explodeSurroundingPieces(move: Move): Move =

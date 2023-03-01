@@ -3,7 +3,7 @@ package bitboard
 
 import Bitboard.*
 
-// Pieces position on the board
+// Chess board representation
 case class Board(
     pawns: Bitboard,
     knights: Bitboard,
@@ -21,6 +21,8 @@ case class Board(
 
   lazy val byColor = Color.Map(white, black)
 
+  lazy val nbPieces = occupied.count
+
   def byRole(role: Role): Bitboard =
     role match
       case Pawn   => pawns
@@ -29,8 +31,6 @@ case class Board(
       case Rook   => rooks
       case Queen  => queens
       case King   => kings
-
-  def contains(p: Pos) = occupied.contains(p)
 
   def roleAt(s: Pos): Option[Role] =
     if pawns.contains(s) then Some(Pawn)
@@ -53,13 +53,16 @@ case class Board(
     yield Piece(color, role)
 
   def whiteAt(s: Pos): Boolean =
-    colorAt(s).contains(Color.White)
+    white.contains(s)
 
   def blackAt(s: Pos): Boolean =
-    colorAt(s).contains(Color.Black)
+    black.contains(s)
 
   def kings(color: Color): List[Pos] =
     (kings & byColor(color)).occupiedSquares
+
+  def kingOf(c: Color): Bitboard       = kings & byColor(c)
+  def kingPosOf(c: Color): Option[Pos] = kingOf(c).singleSquare
 
   def attackers(s: Pos, attacker: Color): Bitboard =
     attackers(s, attacker, occupied)
@@ -87,7 +90,7 @@ case class Board(
     * This is being used when checking a move is safe for the king or not
     */
   def sliderBlockers(us: Color): Bitboard =
-    kings(us).headOption.fold(Bitboard.empty) { ourKing =>
+    kingPosOf(us).fold(Bitboard.empty) { ourKing =>
       val snipers = byColor(!us) & (
         ourKing.rookAttacks(Bitboard.empty) & (rooks ^ queens) |
           ourKing.bishopAttacks(Bitboard.empty) & (bishops ^ queens)
@@ -118,15 +121,6 @@ case class Board(
       occupied & notMask
     )
 
-  def updateRole(mask: Bitboard, role: Role): Role => Bitboard =
-    case Pawn if role == Pawn     => pawns ^ mask
-    case Knight if role == Knight => knights ^ mask
-    case Bishop if role == Bishop => bishops ^ mask
-    case Rook if role == Rook     => rooks ^ mask
-    case Queen if role == Queen   => queens ^ mask
-    case King if role == King     => kings ^ mask
-    case _                        => roles(role)
-
   def roles: Role => Bitboard =
     case Pawn   => pawns
     case Knight => knights
@@ -135,72 +129,66 @@ case class Board(
     case Queen  => queens
     case King   => kings
 
-  def updateColor(mask: Bitboard, color: Color): Color => Bitboard =
-    case Color.White if color == Color.White => white ^ mask
-    case Color.Black if color == Color.Black => black ^ mask
-    case _                                   => byColor(color)
-
-  def hasPiece(at: Pos): Boolean =
-    colorAt(at).isDefined
-
-  def take(at: Pos): Option[Board] =
-    hasPiece(at) option discard(at)
-
+  // put a piece to an empty square
   def put(piece: Piece, at: Pos): Option[Board] =
-    !hasPiece(at) option putOrReplace(at, piece) // todo no need to discard
+    !isOccupied(at) option putOrReplace(piece, at)
 
+  // put a piece to an occupied square
+  def replace(piece: Piece, at: Pos): Option[Board] =
+    isOccupied(at) option putOrReplace(piece, at)
+
+  // put a piece into the board
   def putOrReplace(s: Pos, role: Role, color: Color): Board =
     val b = discard(s)
     val m = s.bb
     b.copy(
-      pawns = b.updateRole(m, Pawn)(role),
-      knights = b.updateRole(m, Knight)(role),
-      bishops = b.updateRole(m, Bishop)(role),
-      rooks = b.updateRole(m, Rook)(role),
-      queens = b.updateRole(m, Queen)(role),
-      kings = b.updateRole(m, King)(role),
-      white = b.updateColor(m, Color.White)(color),
-      black = b.updateColor(m, Color.Black)(color),
+      pawns = if role == Pawn then b.pawns | m else b.pawns,
+      knights = if role == Knight then b.knights | m else b.knights,
+      bishops = if role == Bishop then b.bishops | m else b.bishops,
+      rooks = if role == Rook then b.rooks | m else b.rooks,
+      queens = if role == Queen then b.queens | m else b.queens,
+      kings = if role == King then b.kings | m else b.kings,
+      white = if color.white then b.white | m else b.white,
+      black = if color.black then b.black | m else b.black,
       occupied = b.occupied ^ m
     )
 
   // put a piece into the board
-  // remove the existing piece at that pos if needed
-  def putOrReplace(s: Pos, p: Piece): Board =
+  // remove the existing piece at that square if needed
+  def putOrReplace(p: Piece, s: Pos): Board =
     putOrReplace(s, p.role, p.color)
 
-  // move without capture
-  // TODO test
-  def move(orig: Pos, dest: Pos): Option[Board] =
-    if hasPiece(dest) then None
-    else pieceAt(orig).flatMap(p => discard(orig).put(p, dest))
+  def take(at: Pos): Option[Board] =
+    isOccupied(at) option discard(at)
 
-  // TODO test
+  // move without capture
+  def move(orig: Pos, dest: Pos): Option[Board] =
+    if isOccupied(dest) then None
+    else pieceAt(orig).map(discard(orig).putOrReplace(_, dest))
+
   def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] =
     for
       piece <- pieceAt(orig)
       takenPos = taking getOrElse dest
-      if hasPiece(takenPos)
-      newBoard <- discard(orig).discard(takenPos).put(piece, dest)
-    yield newBoard
+      if isOccupied(takenPos)
+    yield discard(orig).discard(takenPos).putOrReplace(piece, dest)
 
-  // TODO test
+  def promote(orig: Pos, dest: Pos, piece: Piece): Option[Board] =
+    take(orig).map(_.putOrReplace(piece, dest))
+
   lazy val occupation: Color.Map[Set[Pos]] = Color.Map { c =>
     color(c).occupiedSquares.toSet
   }
 
-  // TODO test
-  inline def hasPiece(inline p: Piece) =
+  inline def isOccupied(inline p: Piece) =
     piece(p).nonEmpty
 
   // TODO remove unsafe get
-  // we believe in the integrity of bitboard
-  // tests pieceMap . fromMap = identity
   lazy val pieceMap: Map[Pos, Piece] =
     occupied.occupiedSquares.view.map(s => (s, pieceAt(s).get)).toMap
 
   def piecesOf(c: Color): Map[Pos, Piece] =
-    color(c).occupiedSquares.view.map(s => (s, pieceAt(s).get)).toMap
+    pieceMap.filter((_, p) => p.color == c)
 
   def pieces: List[Piece] = pieces(occupied)
 
@@ -210,13 +198,6 @@ case class Board(
   def color(c: Color): Bitboard = c.fold(white, black)
 
   def piece(p: Piece): Bitboard = color(p.color) & byRole(p.role)
-
-  // guess unmovedRooks from board
-  // we assume rooks are on their initial position
-  def defaultUnmovedRooks: UnmovedRooks =
-    val wr = rooks & white & Bitboard.rank(White.backRank)
-    val br = rooks & black & Bitboard.rank(Black.backRank)
-    UnmovedRooks(wr | br)
 
 object Board:
   val empty = Board(

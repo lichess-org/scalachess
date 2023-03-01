@@ -10,11 +10,6 @@ enum Side:
   lazy val castledKingFile: File = fold(File.G, File.C)
   lazy val castledRookFile: File = fold(File.F, File.D)
 
-  lazy val tripToRook: (Pos, Board) => List[Pos] = fold(
-    (pos, board) => pos >| board.contains,
-    (pos, board) => pos |< board.contains
-  )
-
   private lazy val isKingSide = this == Side.KingSide
 
 object Side:

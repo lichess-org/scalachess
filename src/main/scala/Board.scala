@@ -11,17 +11,28 @@ case class Board(
     crazyData: Option[Crazyhouse.Data] = None
 ):
 
+  export history.{ castles, unmovedRooks }
   export board.{
     attackers,
     bishops,
     black,
-    contains,
+    byColor,
+    isCheck,
+    isOccupied,
+    kingOf,
+    kingPosOf,
     kings,
     knights,
+    nbPieces,
+    occupation,
     occupied,
     pawns,
+    pieceMap as pieces,
+    pieces as allPieces,
+    piecesOf,
     queens,
     rooks,
+    sliderBlockers,
     sliders,
     white
   }
@@ -32,17 +43,6 @@ case class Board(
 
   inline def apply(inline at: Pos): Option[Piece]        = board.pieceAt(at)
   inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Pos(file, rank))
-
-  // todo remove
-  lazy val pieces = board.pieceMap
-  // todo maybe remove?
-  lazy val allPieces = board.pieces
-
-  lazy val nbPieces = board.occupied.count
-
-  def piecesOf(c: Color): Map[Pos, Piece] = board.piecesOf(c)
-
-  def kingPosOf(c: Color): Bitboard = board.kings & board.byColor(c)
 
   def checkColor: Option[Color] = checkWhite.yes.option(White) orElse checkBlack.yes.option(Black)
 
@@ -60,7 +60,7 @@ case class Board(
     board.put(piece, at).map(withBoard)
 
   def putOrReplace(piece: Piece, at: Pos): Board =
-    withBoard(board.putOrReplace(at, piece))
+    withBoard(board.putOrReplace(piece, at))
 
   def take(at: Pos): Option[Board] =
     board.take(at).map(withBoard)
@@ -71,19 +71,8 @@ case class Board(
   def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] =
     board.taking(orig, dest, taking).map(withBoard)
 
-  lazy val occupation: Color.Map[Set[Pos]] = board.occupation
-
-  inline def hasPiece(inline p: Piece) = board.hasPiece(p)
-
-  def promote(pos: Pos): Option[Board] =
-    for
-      pawn <- apply(pos)
-      if pawn is Pawn
-      b2 <- take(pos)
-      b3 <- b2.place(pawn.color.queen, pos)
-    yield b3
-
-  export history.{ castles, unmovedRooks }
+  def promote(orig: Pos, dest: Pos, piece: Piece): Option[Board] =
+    board.promote(orig, dest, piece).map(withBoard)
 
   def withHistory(h: History): Board = copy(history = h)
 
@@ -118,21 +107,21 @@ case class Board(
 
   def materialImbalance: Int = variant.materialImbalance(this)
 
-  lazy val kingsAndBishopsOnly: Boolean =
+  def kingsAndBishopsOnly: Boolean =
     (kings | bishops) == occupied
 
-  lazy val kingsAndKnightsOnly: Boolean =
+  def kingsAndKnightsOnly: Boolean =
     (kings | knights) == occupied
 
-  lazy val onlyKnights: Boolean = knights == occupied
+  def onlyKnights: Boolean = knights == occupied
 
-  lazy val minors: Bitboard =
+  def minors: Bitboard =
     bishops | knights
 
-  lazy val kingsAndMinorsOnly: Boolean =
+  def kingsAndMinorsOnly: Boolean =
     (kings | minors) == occupied
 
-  lazy val kingsRooksAndMinorsOnly: Boolean =
+  def kingsRooksAndMinorsOnly: Boolean =
     (kings | rooks | minors) == occupied
 
   def kingsAndBishopsOnlyOf(color: Color): Boolean =
@@ -141,8 +130,7 @@ case class Board(
   def kingsAndMinorsOnlyOf(color: Color): Boolean =
     onlyOf(color, kings | minors)
 
-  def kingsOnly =
-    kings == occupied
+  def kingsOnly = kings == occupied
 
   def kingsOnlyOf(color: Color) =
     onlyOf(color, kings)
@@ -151,13 +139,13 @@ case class Board(
     onlyOf(color, kings | knights)
 
   def onlyOf(color: Color, roles: Bitboard): Boolean =
-    val colorPieces = apply(color)
+    val colorPieces = byColor(color)
     (roles & colorPieces) == colorPieces
 
   def nonKingsOf(color: Color): Bitboard =
     apply(color) & ~kings
 
-  lazy val nonKing: Bitboard =
+  def nonKing: Bitboard =
     occupied & ~kings
 
   override def toString = s"$board $variant ${history.lastMove}\n"

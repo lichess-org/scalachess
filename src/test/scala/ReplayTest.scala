@@ -93,6 +93,14 @@ class ReplayTest extends ChessTest:
     }
   }
 
+  "Castling should not be possible when in check" in {
+    val fen   = EpdFen("r1bq1rk1/ppp2ppp/2n5/8/1bB1Pp2/5N2/PPP1Q1PP/R1B1K2R w KQ - 1 10")
+    val moves = List(SanStr("O-O"))
+    Replay.gameMoveWhileValid(moves, fen, variant.Standard) must beLike { case (_, games, Some(_)) =>
+      games.size must_== 0
+    }
+  }
+
   "replay from standard positions" in {
     val nb    = 500
     val games = Fixtures.prod500standard

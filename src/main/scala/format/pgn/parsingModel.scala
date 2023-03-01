@@ -56,17 +56,13 @@ case class Std(
   def withMetas(m: Metas) = copy(metas = m)
 
   def move(situation: Situation): Validated[ErrorStr, chess.Move] =
-    situation.board.pieces.foldLeft(none[chess.Move]) {
-      case (None, (pos, piece))
-          if piece.color == situation.color && piece.role == role && compare(
-            file,
-            pos.file.index + 1
-          ) && compare(
-            rank,
-            pos.rank.index + 1
-          ) && piece.eyesMovable(pos, dest) =>
-        situation.generateMovesAt(pos) find { _.dest == dest }
-      case (m, _) => m
+    import bitboard.Bitboard.occupiedSquares
+    val pieces = situation.board.board.byRole(role) & situation.us
+    pieces.first { pos =>
+      if compare(file, pos.file.index + 1) &&
+        compare(rank, pos.rank.index + 1)
+      then situation.generateMovesAt(pos) find { _.dest == dest }
+      else None
     } match
       case None       => Validated invalid ErrorStr(s"No move found: $this\n$situation")
       case Some(move) => move withPromotion promotion toValid ErrorStr("Wrong promotion")

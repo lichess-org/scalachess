@@ -64,6 +64,15 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
     def isDisjoint[B](o: B)(using sr: BitboardRuntime[B]): Boolean =
       (a & sr(o)).isEmpty
 
+    def first[B](f: Pos => Option[B]): Option[B] =
+      var b                 = a.value
+      var result: Option[B] = None
+      while b != 0L || result.isDefined
+      do
+        result = f(b.lsb.get)
+        b &= (b - 1L)
+      result
+
     def fold[B](init: B)(f: (B, Pos) => B): B =
       var b      = a.value
       var result = init

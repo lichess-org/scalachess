@@ -67,7 +67,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
     def first[B](f: Pos => Option[B]): Option[B] =
       var b                 = a.value
       var result: Option[B] = None
-      while b != 0L || result.isDefined
+      while b != 0L && result.isEmpty
       do
         result = f(b.lsb.get)
         b &= (b - 1L)

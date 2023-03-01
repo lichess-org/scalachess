@@ -4,6 +4,7 @@ import cats.syntax.option.*
 import format.{ EpdFen, Fen, Uci }
 import chess.format.pgn.SanStr
 import chess.variant.Chess960
+import chess.format.pgn.Fixtures
 
 class ReplayTest extends ChessTest:
 
@@ -89,5 +90,19 @@ class ReplayTest extends ChessTest:
     val moves = List(SanStr("c4"))
     Replay.gameMoveWhileValid(moves, fen, variant.Antichess) must beLike { case (_, games, Some(_)) =>
       games.size must_== 0
+    }
+  }
+
+  "replay from standard positions" in {
+    val nb    = 500
+    val games = Fixtures.prod500standard
+    val gameMoves = (games take nb).map { g =>
+      SanStr from g.split(' ').toList
+    }
+    gameMoves forall { moves =>
+      Replay.gameMoveWhileValid(moves, chess.format.Fen.initial, chess.variant.Standard) must beLike {
+        case (_, games, None) =>
+          games.size must_== moves.size
+      }
     }
   }

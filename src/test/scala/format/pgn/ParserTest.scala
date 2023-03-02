@@ -3,6 +3,7 @@ package format.pgn
 
 import cats.syntax.option.*
 import scala.language.implicitConversions
+import Sans.*
 
 class ParserTest extends ChessTest:
 
@@ -124,43 +125,43 @@ class ParserTest extends ChessTest:
       a.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
     }
   }
+  extension (sans: Sans) def head = sans.value.head
 
   "nags" in {
     parser(withNag) must beValid
 
-    parser("Ne7g6+! $13") must beValid.like { case ParsedPgn(_, _, Sans(List(san))) =>
-      san.metas.glyphs.move must_== Option(Glyph.MoveAssessment.good)
-      san.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
+    parser("Ne7g6+! $13") must beValid.like { case ParsedPgn(_, _, sans) =>
+      sans.head.metas.glyphs.move must_== Option(Glyph.MoveAssessment.good)
+      sans.head.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
     }
   }
 
   "non-nags" in {
     parser(withGlyphAnnotations) must beValid
 
-    parser("Bxd3?? ∞") must beValid.like { case ParsedPgn(_, _, Sans(List(san))) =>
-      san.metas.glyphs.move must_== Option(Glyph.MoveAssessment.blunder)
-      san.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
+    parser("Bxd3?? ∞") must beValid.like { case ParsedPgn(_, _, sans) =>
+      sans.head.metas.glyphs.move must_== Option(Glyph.MoveAssessment.blunder)
+      sans.head.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
     }
   }
 
   "comments" in {
-    parser("Ne7g6+! {such a neat comment}") must beValid.like { case ParsedPgn(_, _, Sans(List(san))) =>
-      san.metas.comments must_== List("such a neat comment")
+    parser("Ne7g6+! {such a neat comment}") must beValid.like { case ParsedPgn(_, _, sans) =>
+      sans.head.metas.comments must_== List("such a neat comment")
     }
   }
 
   "variations" in {
-    parser("Ne7g6+! {such a neat comment} (e4 Ng6)") must beValid.like {
-      case ParsedPgn(_, _, Sans(List(san))) =>
-        san.metas.variations.headOption must beSome {
-          (_: Sans).value must haveSize(2)
-        }
+    parser("Ne7g6+! {such a neat comment} (e4 Ng6)") must beValid.like { case ParsedPgn(_, _, sans) =>
+      sans.head.metas.variations.headOption must beSome {
+        (_: Sans).value must haveSize(2)
+      }
     }
   }
 
   "first move variation" in {
-    parser("1. e4 (1. d4)") must beValid.like { case ParsedPgn(_, _, Sans(List(san))) =>
-      san.metas.variations.headOption must beSome {
+    parser("1. e4 (1. d4)") must beValid.like { case ParsedPgn(_, _, sans) =>
+      sans.head.metas.variations.headOption must beSome {
         (_: Sans).value must haveSize(1)
       }
     }

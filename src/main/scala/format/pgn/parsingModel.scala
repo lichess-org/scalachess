@@ -4,16 +4,18 @@ package format.pgn
 import cats.data.Validated
 import cats.syntax.option.*
 
+opaque type Sans = List[San]
+object Sans:
+  val empty                        = Nil
+  def apply(sans: List[San]): Sans = sans
+
+  extension (sans: Sans) def value: List[San] = sans
+
 case class ParsedPgn(
     initialPosition: InitialPosition,
     tags: Tags,
     sans: Sans
 )
-
-case class Sans(value: List[San]) extends AnyVal
-
-object Sans:
-  val empty = Sans(Nil)
 
 // Standard Algebraic Notation
 sealed trait San:

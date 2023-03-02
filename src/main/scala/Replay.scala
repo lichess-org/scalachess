@@ -31,9 +31,10 @@ object Replay:
       initialFen: Option[Fen.Epd],
       variant: Variant
   ): Validated[ErrorStr, Reader.Result] =
-    sans.some.filter(_.nonEmpty).toValid(ErrorStr("[replay] pgn is empty")).andThen { nonEmptyMoves =>
+    if sans.isEmpty then ErrorStr("[replay] pgn is empty").invalid
+    else
       Reader.moves(
-        nonEmptyMoves,
+        sans,
         Tags(
           List(
             initialFen map { fen =>
@@ -45,7 +46,6 @@ object Replay:
           ).flatten
         )
       )
-    }
 
   private def computeGames(game: Game, sans: List[San]): Validated[ErrorStr, List[Game]] =
     sans

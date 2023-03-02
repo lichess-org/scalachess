@@ -101,6 +101,14 @@ class ReplayTest extends ChessTest:
     }
   }
 
+  "Castling in Antichess is not allowed" in {
+    val fen   = EpdFen("r3kbnr/p3pp1p/1p4p1/8/8/P7/1P1P1PPP/RNB2KNR b - - 0 9")
+    val moves = List(SanStr("O-O-0"))
+    Replay.gameMoveWhileValid(moves, fen, variant.Antichess) must beLike { case (_, games, Some(_)) =>
+      games.size must_== 0
+    }
+  }
+
   "replay from standard positions" in {
     val nb    = 500
     val games = Fixtures.prod500standard

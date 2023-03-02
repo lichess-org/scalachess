@@ -127,7 +127,7 @@ case class Castle(
         .applyVariantEffect(genCastling(k))
         .filter(variant.kingSafety)
         .find(_.castle.exists(_.side == side))
-    ) toValid ErrorStr(s"Cannot castle / variant is ${situation.board.variant}")
+    ) toValid ErrorStr(s"Cannot castle / variant is $variant")
 
 case class Suffixes(
     check: Boolean,

@@ -497,6 +497,7 @@ Opening("B30", "Sicilian Defense: Closed, Anti-Sveshnikov Variation, Kharlov-Kra
 Opening("B30", "Sicilian Defense: Nyezhmetdinov-Rossolimo Attack", "r1bqkbnr/pp1ppppp/2n5/1Bp5/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq -", "e2e4 c7c5 g1f3 b8c6 f1b5", "1. e4 c5 2. Nf3 Nc6 3. Bb5"),
 Opening("B30", "Sicilian Defense: Nyezhmetdinov-Rossolimo Attack, San Francisco Gambit", "r1bqkbnr/pp1ppppp/8/nBp5/1P2P3/5N2/P1PP1PPP/RNBQK2R b KQkq -", "e2e4 c7c5 g1f3 b8c6 f1b5 c6a5 b2b4", "1. e4 c5 2. Nf3 Nc6 3. Bb5 Na5 4. b4"),
 Opening("B30", "Sicilian Defense: Old Sicilian", "r1bqkbnr/pp1ppppp/2n5/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq -", "e2e4 c7c5 g1f3 b8c6", "1. e4 c5 2. Nf3 Nc6"),
+Opening("B30", "Sicilian Defense: Portsmouth Gambit", "r1bqkbnr/pp1ppppp/2n5/2p5/1P2P3/5N2/P1PP1PPP/RNBQKB1R b KQkq -", "e2e4 c7c5 g1f3 b8c6 b2b4", "1. e4 c5 2. Nf3 Nc6 3. b4"),
 Opening("B30", "Sicilian Defense: Rossolimo Variation, Brooklyn Retreat Defense", "rnbqkbnr/pp1ppppp/8/1Bp5/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq -", "e2e4 c7c5 g1f3 b8c6 f1b5 c6b8", "1. e4 c5 2. Nf3 Nc6 3. Bb5 Nb8"),
 Opening("B31", "Sicilian Defense: Nyezhmetdinov-Rossolimo Attack, Fianchetto Variation", "r1bqkbnr/pp1ppp1p/2n3p1/1Bp5/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq -", "e2e4 c7c5 g1f3 b8c6 f1b5 g7g6", "1. e4 c5 2. Nf3 Nc6 3. Bb5 g6"),
 Opening("B31", "Sicilian Defense: Nyezhmetdinov-Rossolimo Attack, Fianchetto Variation, Gufeld Gambit", "r1bqk1nr/pp1p1pbp/2n3p1/1Bp1p3/3PP3/2P2N2/PP3PPP/RNBQ1RK1 b kq -", "e2e4 c7c5 g1f3 b8c6 f1b5 g7g6 e1g1 f8g7 c2c3 e7e5 d2d4", "1. e4 c5 2. Nf3 Nc6 3. Bb5 g6 4. O-O Bg7 5. c3 e5 6. d4"),

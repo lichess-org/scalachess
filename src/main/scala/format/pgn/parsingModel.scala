@@ -4,16 +4,18 @@ package format.pgn
 import cats.data.Validated
 import cats.syntax.option.*
 
+opaque type Sans = List[San]
+object Sans:
+  val empty                        = Nil
+  def apply(sans: List[San]): Sans = sans
+
+  extension (sans: Sans) def value: List[San] = sans
+
 case class ParsedPgn(
     initialPosition: InitialPosition,
     tags: Tags,
     sans: Sans
 )
-
-case class Sans(value: List[San]) extends AnyVal
-
-object Sans:
-  val empty = Sans(Nil)
 
 // Standard Algebraic Notation
 sealed trait San:
@@ -56,17 +58,12 @@ case class Std(
   def withMetas(m: Metas) = copy(metas = m)
 
   def move(situation: Situation): Validated[ErrorStr, chess.Move] =
-    situation.board.pieces.foldLeft(none[chess.Move]) {
-      case (None, (pos, piece))
-          if piece.color == situation.color && piece.role == role && compare(
-            file,
-            pos.file.index + 1
-          ) && compare(
-            rank,
-            pos.rank.index + 1
-          ) && piece.eyesMovable(pos, dest) =>
-        situation.generateMovesAt(pos) find { _.dest == dest }
-      case (m, _) => m
+    val pieces = situation.board.board.byRole(role) & situation.us
+    pieces.first { pos =>
+      if compare(file, pos.file.index + 1) &&
+        compare(rank, pos.rank.index + 1)
+      then situation.generateMovesAt(pos) find { _.dest == dest }
+      else None
     } match
       case None       => Validated invalid ErrorStr(s"No move found: $this\n$situation")
       case Some(move) => move withPromotion promotion toValid ErrorStr("Wrong promotion")
@@ -126,9 +123,13 @@ case class Castle(
   def withMetas(m: Metas) = copy(metas = m)
 
   def move(situation: Situation): Validated[ErrorStr, chess.Move] =
-    situation.legalMoves.find(
-      _.castle.exists(_.side == side)
-    ) toValid ErrorStr(s"Cannot castle / variant is ${situation.board.variant}")
+    import situation.{ genCastling, ourKing, variant }
+    ourKing.flatMap(k =>
+      variant
+        .applyVariantEffect(genCastling(k))
+        .filter(variant.kingSafety)
+        .find(_.castle.exists(_.side == side))
+    ) toValid ErrorStr(s"Cannot castle / variant is $variant")
 
 case class Suffixes(
     check: Boolean,

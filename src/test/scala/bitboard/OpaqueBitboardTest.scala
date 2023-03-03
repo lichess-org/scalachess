@@ -52,6 +52,24 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
     }
   }
 
+  test("first with a function that always return None should return None") {
+    forAll { (bb: Bitboard) =>
+      assertEquals(bb.first(_ => None), None)
+    }
+  }
+
+  test("first with a function that always return Some should return the first pos") {
+    forAll { (bb: Bitboard) =>
+      assertEquals(bb.first(Some(_)), bb.first)
+    }
+  }
+
+  test("first returns the correct pos") {
+    forAll { (xs: Set[Pos], x: Pos) =>
+      def f = (p: Pos) => if p == x then Some(p) else None
+      Bitboard(xs + x).first(f) == Some(x)
+    }
+  }
   test("bitboard created by set of pos should contains and only contains those pos") {
     forAll { (xs: Set[Pos]) =>
       val bb = Bitboard(xs)

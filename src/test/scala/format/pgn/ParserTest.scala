@@ -248,11 +248,20 @@ class ParserTest extends ChessTest:
     }
   }
 
-  "root comments in variation" in {
+  "block comment in variation root" in {
     parser(rootCommentInVariation) must beValid.like { case a =>
       a.sans.head.metas.variations.head.comments must_==
         List(
           "This move:"
+        )
+    }
+  }
+
+  "inline comment in variation root" in {
+    parser(rootCommentInVariation) must beValid.like { case a =>
+      a.sans.head.metas.variations.tail.head.comments must_==
+        List(
+          "Neither does :"
         )
     }
   }

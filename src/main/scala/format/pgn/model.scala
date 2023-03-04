@@ -18,15 +18,13 @@ object PgnStr extends OpaqueString[PgnStr]
 
 case class Pgn(tags: Tags, turns: List[Turn], initial: Initial = Initial.empty):
 
-  // index is NOT a full move turn!
-  private def updateTurnAt(index: Int, f: Turn => Turn) =
-    // val index = fullMove.value - 1
-    (turns lift index).fold(this) { turn =>
-      copy(turns = turns.updated(index, f(turn)))
+  private def updateTurnAt(ply: Ply, f: Turn => Turn) =
+    (turns lift ply.value).fold(this) { turn =>
+      copy(turns = turns.updated(ply.value, f(turn)))
     }
 
   def updatePly(ply: Ply, f: Move => Move) =
-    updateTurnAt((ply + 1).value / 2 - 1, _.update(!ply.color, f))
+    updateTurnAt(Ply((ply + 1).value / 2 - 1), _.update(!ply.color, f))
 
   def updateLastPly(f: Move => Move) = updatePly(Ply(nbPlies), f)
 

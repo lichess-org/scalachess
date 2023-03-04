@@ -115,8 +115,8 @@ object Parser:
     val strMove: P[San] = P
       .recursive[San] { recuse =>
         val variation: P[Variation] =
-          ((P.char('(') ~ escape) *> (commentary.rep0 <* escape) ~ recuse.rep0 <* (P.char(')') ~ escape))
-            .map {case (comments, sanList) => Variation(comments, Sans(sanList))}
+          (P.char('(') *> commentary.rep0.surroundedBy(escape) ~ recuse.rep0 <* (P.char(')') ~ escape))
+            .map { case (comments, sanList) => Variation(comments, Sans(sanList)) }
 
         ((number.backtrack | (commentary <* escape)).rep0 ~ forbidNullMove).with1 *>
           (((MoveParser.moveWithSuffix ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0) <* escape).backtrack

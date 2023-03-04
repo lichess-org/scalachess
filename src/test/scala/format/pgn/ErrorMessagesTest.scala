@@ -21,7 +21,7 @@ class ErrorMessagesTest extends ChessTest:
     }
   }
 
-  "Lichess does not support null moves" should {
+  "Null moves are not supported" should {
     "fail" in {
       val e =
         """[abc "def"]

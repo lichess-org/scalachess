@@ -47,8 +47,8 @@ class ParserTest extends ChessTest:
       }
     }
     "as a rook" in {
-      parser("b8=R ") must beValid {
-        (_: ParsedPgn).sans.value.headOption must beSome { (san: San) =>
+      parser("b8=R ") must beValid { (parsed: ParsedPgn) =>
+        parsed.sans.value.headOption must beSome { (san: San) =>
           san.asInstanceOf[Std].promotion must_== Option(Rook)
         }
       }

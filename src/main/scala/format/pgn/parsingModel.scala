@@ -5,17 +5,9 @@ import cats.data.Validated
 import cats.syntax.option.*
 
 opaque type Sans = List[San]
-object Sans:
-  val empty                        = Nil
-  def apply(sans: List[San]): Sans = sans
+object Sans extends TotalWrapper[Sans, List[San]]
 
-  extension (sans: Sans) def value: List[San] = sans
-
-case class ParsedPgn(
-    initialPosition: InitialPosition,
-    tags: Tags,
-    sans: Sans
-)
+case class ParsedPgn(initialPosition: InitialPosition, tags: Tags, sans: Sans)
 
 // Standard Algebraic Notation
 sealed trait San:

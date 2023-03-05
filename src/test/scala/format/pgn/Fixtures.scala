@@ -1511,13 +1511,24 @@ Ke7 39. h4 c4 40. Bxc4 Kd6 41. h5 Kc5 42. b3 a4 43. bxa4 Kxc4 44. h6 Kb4 45. h7
 Kxa4 46. h8=Q Kb5 47. d6+ Kxb6 48. d7 Kc6 49. d8=Q b5 50. Qd5+ Kb6 51. Qxb5+
 Kc7 52. Qhb8# 1-0
 """
-  
+
   val rootCommentInVariation = """
   {This move:} 1.e4! {, was cosidered by R.J.Fischer as "best by test"} 
     ( {This move:} 1.d4?! {not.} ) 
     ( ;Neither does :
       1.b4?! {this one} )
   """
+
+  val multipleRootCommentsInVariation = """
+  {This move:} 1.e4! {, was cosidered by R.J.Fischer as "best by test"} 
+    ( {This move:} {looks pretty} 1.d4?! {not.} ) 
+    ( ;Neither does :
+      ;this or that
+      {or whatever}
+      1.b4?! {this one} )
+  """
+
+
 
   val bySmartChess = """
 [Event "?"]

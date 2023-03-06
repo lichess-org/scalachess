@@ -152,10 +152,12 @@ case class Situation(board: Board, color: Color):
     case _ => None
   }
 
+  def genNonKingAndNonPawn(mask: Bitboard): List[Move] =
+    genKnight(us & board.knights, mask) ++ genBishop(us & board.bishops, mask) ++
+      genRook(us & board.rooks, mask) ++ genQueen(us & board.queens, mask)
+
   def genNonKing(mask: Bitboard): List[Move] =
-    genPawn(us & board.pawns, mask) ++ genKnight(us & board.knights, mask) ++
-      genBishop(us & board.bishops, mask) ++ genRook(us & board.rooks, mask) ++
-      genQueen(us & board.queens, mask)
+    genPawn(us & board.pawns, mask) ++ genNonKingAndNonPawn(mask)
 
   /** Generate all pawn moves except en passant
     *  This includes

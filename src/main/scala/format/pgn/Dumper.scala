@@ -24,12 +24,13 @@ object Dumper:
         //       - file
         //       - rank
         //       - both (only happens w/ at least 3 pieces of the same role)
-        val candidates = situation.board.byPiece(piece).occupiedSquares collect {
-          case square if square != orig && piece.eyes(square, dest) => square
-        } filter { square =>
-          // We know Role ≠ Pawn, so it is fine to always pass None as promotion target
-          situation.move(square, dest, None).isValid
-        }
+        // We know Role ≠ Pawn, so it is fine to always pass None as promotion target
+        val candidates = (situation.board.byPiece(piece) ^ orig.bb).occupiedSquares
+          .filter(square =>
+            piece.eyes(square, dest) && {
+              situation.move(square, dest, None).isValid
+            }
+          )
 
         val disambiguation: String =
           if (candidates.isEmpty)

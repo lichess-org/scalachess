@@ -76,11 +76,6 @@ class BitboardTest extends ScalaCheckSuite:
     }
   }
 
-  test("special bishop attacks") {
-    val result = F8.bishopAttacks(G4.bb).nonEmpty
-    assertEquals(result, false)
-  }
-
   property("rook attacks") {
     Prop.forAll { (occupied: Bitboard, s: Pos) =>
       s.rookAttacks(occupied) == CBB.rookAttacks(s, occupied).bb

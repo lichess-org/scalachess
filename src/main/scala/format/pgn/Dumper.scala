@@ -27,7 +27,7 @@ object Dumper:
         // We know Role ≠ Pawn, so it is fine to always pass None as promotion target
         val candidates = (situation.board.byPiece(piece) ^ orig.bb).occupiedSquares
           .filter(square =>
-            piece.eyes(square, dest) && {
+            piece.eyes(square, dest, situation.board.occupied) && {
               situation.move(square, dest, None).isValid
             }
           )

@@ -17,7 +17,7 @@ class PerftBench {
 
   var threecheckPerfts = Perft.threeCheckPerfts
   @Benchmark
-  def thresscheck() =
+  def threecheck() =
     bench(threecheckPerfts, ThreeCheck, 100_000L)
 
   var antichessPerfts = Perft.antichessPerfts

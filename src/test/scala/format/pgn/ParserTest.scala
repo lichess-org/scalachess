@@ -153,7 +153,7 @@ class ParserTest extends ChessTest:
 
   "variations" in {
     parser("Ne7g6+! {such a neat comment} (e4 Ng6)") must beValid.like { case ParsedPgn(_, _, sans) =>
-      sans.head.metas.variations.headOption must beSome {
+      sans.head.metas.variations.headOption.map(_.sans) must beSome {
         (_: Sans).value must haveSize(2)
       }
     }
@@ -161,7 +161,7 @@ class ParserTest extends ChessTest:
 
   "first move variation" in {
     parser("1. e4 (1. d4)") must beValid.like { case ParsedPgn(_, _, sans) =>
-      sans.head.metas.variations.headOption must beSome {
+      sans.head.metas.variations.headOption.map(_.sans) must beSome {
         (_: Sans).value must haveSize(1)
       }
     }
@@ -245,6 +245,34 @@ class ParserTest extends ChessTest:
   "inline comments" in {
     parser(inlineComments) must beValid.like { case a =>
       a.sans.value.size must_== 85
+    }
+  }
+
+  "block comment in variation root" in {
+    parser(rootCommentInVariation) must beValid.like { case a =>
+      a.sans.head.metas.variations.head.comments must_==
+        List("This move:")
+    }
+  }
+
+  "inline comment in variation root" in {
+    parser(rootCommentInVariation) must beValid.like { case a =>
+      a.sans.head.metas.variations.tail.head.comments must_==
+        List("Neither does :")
+    }
+  }
+
+  "block comments in variation root" in {
+    parser(multipleRootCommentsInVariation) must beValid.like { case a =>
+      a.sans.head.metas.variations.head.comments must_==
+        List("This move:", "looks pretty")
+    }
+  }
+
+  "multiple comments in variation root" in {
+    parser(multipleRootCommentsInVariation) must beValid.like { case a =>
+      a.sans.head.metas.variations.tail.head.comments must_==
+        List("Neither does :", "this or that", "or whatever")
     }
   }
 

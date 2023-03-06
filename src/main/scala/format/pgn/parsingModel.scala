@@ -22,7 +22,7 @@ sealed trait San:
 
   def withComments(s: List[String]): San = withMetas(metas withComments s)
 
-  def withVariations(s: List[Sans]): San = withMetas(metas withVariations s)
+  def withVariations(v: List[Variation]): San = withMetas(metas withVariations v)
 
   def mergeGlyphs(glyphs: Glyphs): San =
     withMetas(
@@ -81,12 +81,17 @@ case class InitialPosition(
     comments: List[String]
 )
 
+// could be factored as `PgnNode` and used directly in `ParsedPgn` too
+// not done for the moment for backward compat
+// see `GameNode` in python-chess
+case class Variation(comments: List[String], sans: Sans)
+
 case class Metas(
     check: Boolean,
     checkmate: Boolean,
     comments: List[String],
     glyphs: Glyphs,
-    variations: List[Sans]
+    variations: List[Variation]
 ):
 
   def withSuffixes(s: Suffixes) =
@@ -100,7 +105,7 @@ case class Metas(
 
   def withComments(c: List[String]) = copy(comments = c)
 
-  def withVariations(v: List[Sans]) = copy(variations = v)
+  def withVariations(v: List[Variation]) = copy(variations = v)
 
 object Metas:
   val empty = Metas(check = false, checkmate = false, Nil, Glyphs.empty, Nil)

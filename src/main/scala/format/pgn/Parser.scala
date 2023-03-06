@@ -114,11 +114,11 @@ object Parser:
 
     val strMove: P[San] = P
       .recursive[San] { recuse =>
-        val variation: P[Sans] =
-          (((P.char('(') <* escape) *> recuse.rep0 <* (P.char(')') ~ escape)) <* escape)
-            .map(Sans(_))
+        val variation: P[Variation] =
+          (P.char('(') *> commentary.rep0.surroundedBy(escape) ~ recuse.rep0 <* (P.char(')') ~ escape))
+            .map { case (comments, sans) => Variation(comments, Sans(sans)) }
 
-        ((number.backtrack | (commentary <* escape)).rep0 ~ forbidNullMove).with1 *>
+        ((number.backtrack | commentary).rep0 ~ forbidNullMove).with1 *>
           (((MoveParser.moveWithSuffix ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0) <* escape).backtrack
             .map { case ((((san, glyphs), comments), glyphs2), variations) =>
               san withComments comments withVariations variations mergeGlyphs (glyphs merge glyphs2)
@@ -235,7 +235,7 @@ object Parser:
     val tags: P[NonEmptyList[Tag]] = tag.rep
 
   private val tagsAndMovesParser: P0[ParsedPgn] =
-    ((escape *> TagParser.tags.? <* escape) ~ MovesParser.strMoves.?).map {
+    (TagParser.tags.?.surroundedBy(escape) ~ MovesParser.strMoves.?).map {
       case (optionalTags, optionalMoves) => {
         val preTags = Tags(optionalTags.map(_.toList).getOrElse(Nil))
         optionalMoves match

@@ -8,6 +8,8 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
   protected val ALL: A     = -1L.bb
   protected val CORNERS: A = 0x8100000000000081L.bb
 
+  inline def apply(inline xs: Iterable[Pos]): A = xs.foldLeft(empty)((b, p) => b | p.bb)
+
   extension (l: Long)
     def bb: A                    = l.asInstanceOf[A]
     private def lsb: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(l))

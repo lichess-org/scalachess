@@ -26,3 +26,8 @@ object MoveOrDrop:
       md match
         case m: Move => m.toUci
         case d: Drop => d.toUci
+
+    inline def situationAfter: Situation =
+      md match
+        case m: Move => m.situationAfter
+        case d: Drop => d.situationAfter

@@ -86,6 +86,13 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
     }
   }
 
+  test("apply(Set[Pos]).squares.toSet == Set[Pos]") {
+    forAll { (xs: Set[Pos]) =>
+      val result = Bitboard(xs).squares.toSet
+      assertEquals(result, xs)
+    }
+  }
+
   test("nonEmpty bitboard should have at least one square") {
     forAll { (bb: Bitboard) =>
       assertEquals(bb.nonEmpty, bb.first.isDefined)

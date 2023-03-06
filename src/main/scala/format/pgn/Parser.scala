@@ -110,7 +110,7 @@ object Parser:
     val forbidNullMove =
       P.stringIn(List("--", "Z0", "null", "pass", "@@@@"))
         .?
-        .flatMap(o => o.fold(P.unit)(_ => P.failWith("Lichess does not support null moves").void))
+        .flatMap(o => o.fold(P.unit)(_ => P.failWith("Null moves are not supported").void))
 
     val strMove: P[San] = P
       .recursive[San] { recuse =>

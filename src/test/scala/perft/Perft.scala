@@ -7,14 +7,16 @@ import chess.variant.Variant
 import org.specs2.specification.core.*
 import chess.variant.Crazyhouse
 import MoveOrDrop.*
+import chess.format.Fen
 
 case class Perft(id: String, epd: EpdFen, cases: List[TestCase]):
   import Perft.*
   def calculate(variant: Variant): List[Result] =
-    val game = Game(Option(variant), Option(epd))
+    val situation =
+      Fen.read(variant, epd).getOrElse { throw RuntimeException(s"Invalid fen: $epd for variant: $variant") }
     cases.map(c =>
-      // printResult(game.divide(c.depth))
-      Result(c.depth, game.perft(c.depth), c.result)
+      // printResult(situation.divide(c.depth))
+      Result(c.depth, situation.perft(c.depth), c.result)
     )
 
   def withLimit(limit: Long): Perft =
@@ -55,44 +57,39 @@ object Perft:
     builder.append("\n").append(sum)
     println(builder)
 
-  extension (game: Game)
-
-    private def apply(md: MoveOrDrop): Game = md match
-      case m: Move => game.apply(m)
-      case d: Drop => game.applyDrop(d)
+  extension (s: Situation)
 
     def divide(depth: Int): List[DivideResult] =
       if depth == 0 then Nil
-      else if game.situation.perftEnd then Nil
+      else if s.perftEnd then Nil
       else
-        game.perftMoves
+        s.perftMoves
           .map { move =>
-            val nodes = game(move).perft(depth - 1)
+            val nodes = move.situationAfter.perft(depth - 1)
             DivideResult(move, nodes)
           }
           .sortBy(_.move.toUci.uci)
 
     def perft(depth: Int): Long =
       if depth == 0 then 1L
-      else if game.situation.perftEnd then 0L
+      else if s.perftEnd then 0L
       else
-        val moves = game.perftMoves
+        val moves = s.perftMoves
         if (depth == 1) then moves.size.toLong
-        else moves.map(game(_).perft(depth - 1)).sum
+        else moves.map(_.situationAfter.perft(depth - 1)).sum
 
     private def perftMoves: List[MoveOrDrop] =
-      if game.situation.board.variant == chess.variant.Crazyhouse
-      then Crazyhouse.legalMoves(game.situation)
+      if s.board.variant == chess.variant.Crazyhouse
+      then Crazyhouse.legalMoves(s)
       else
-        val legalMoves = game.situation.legalMoves
-        if game.situation.board.variant.chess960 then legalMoves
+        val legalMoves = s.legalMoves
+        if s.board.variant.chess960 then legalMoves
         // if variant is not chess960 we need to deduplicated castlings moves
         // We filter out castling move that is Standard and king's dest is not in the rook position
         else legalMoves.filterNot(m => m.castle.exists(c => c.isStandard && m.dest != c.rook))
 
     private def crazyhousePerftMoves: List[MoveOrDrop] =
-      Crazyhouse.legalMoves(game.situation)
+      Crazyhouse.legalMoves(s)
 
-  extension (s: Situation)
     // when calculate perft we don't do autoDraw
     def perftEnd = s.checkMate || s.staleMate || s.variantEnd || s.board.variant.specialDraw(s)

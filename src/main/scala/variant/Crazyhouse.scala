@@ -93,7 +93,7 @@ case object Crazyhouse
     situation.ourKing.flatMap(king =>
       val checkers = situation.board.board.attackers(king, !situation.color)
       if checkers.moreThanOne then Some(Nil)
-      else checkers.first.map(checker => Bitboard.between(king, checker).occupiedSquares)
+      else checkers.first.map(Bitboard.between(king, _).squares)
     )
 
   // all legal moves and drops
@@ -129,7 +129,7 @@ case object Crazyhouse
           for
             role <- List(Knight, Bishop, Rook, Queen)
             if roles contains role
-            to <- targets.occupiedSquares
+            to <- targets.squares
             piece = Piece(situation.color, role)
             after = situation.board.place(piece, to).get // this is safe, we checked the target squares
             d2    = data.drop(piece).get                 // this is safe, we checked the pocket
@@ -137,7 +137,7 @@ case object Crazyhouse
         val dropWithPawn =
           if roles contains Pawn then
             for
-              to <- (targets & ~Bitboard.firstRank & ~Bitboard.lastRank).occupiedSquares
+              to <- (targets & ~Bitboard.firstRank & ~Bitboard.lastRank).squares
               piece = Piece(situation.color, Pawn)
               after = situation.board.place(piece, to).get // this is safe, we checked the target squares
               d2    = data.drop(piece).get                 // this is safe, we checked the pocket

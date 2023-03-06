@@ -20,7 +20,7 @@ object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
     UnmovedRooks(wr | br)
 
   extension (ur: UnmovedRooks)
-    def toList: List[Pos] = ur.occupiedSquares
+    def toList: List[Pos] = ur.squares
 
     def without(color: Color): UnmovedRooks =
       ur & Bitboard.rank(color.lastRank)

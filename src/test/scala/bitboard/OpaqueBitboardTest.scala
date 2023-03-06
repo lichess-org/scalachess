@@ -22,9 +22,9 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
     }
   }
 
-  test("count has the same value as occupiedSquares.size") {
+  test("count has the same value as squares.size") {
     forAll { (bb: Bitboard) =>
-      assertEquals(bb.count, bb.occupiedSquares.size)
+      assertEquals(bb.count, bb.squares.size)
     }
   }
 
@@ -92,9 +92,9 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
     }
   }
 
-  test("first should be the minimum of occupiedSquares") {
+  test("first should be the minimum of squares") {
     forAll { (bb: Bitboard) =>
-      assertEquals(bb.first, bb.occupiedSquares.minByOption(_.value))
+      assertEquals(bb.first, bb.squares.minByOption(_.value))
     }
   }
 

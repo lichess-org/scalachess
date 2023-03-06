@@ -42,7 +42,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
       if moreThanOne then None
       else first
 
-    def occupiedSquares: List[Pos] =
+    def squares: List[Pos] =
       fold(List.empty)((xs, pos) => pos :: xs)
 
     // total non empty position

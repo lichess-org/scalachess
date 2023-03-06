@@ -50,7 +50,7 @@ case class Std(
   def withMetas(m: Metas) = copy(metas = m)
 
   def move(situation: Situation): Validated[ErrorStr, chess.Move] =
-    val pieces = situation.board.board.byRole(role) & situation.us
+    val pieces = situation.board.byPiece(situation.color - role)
     pieces.first { pos =>
       if compare(file, pos.file.index + 1) &&
         compare(rank, pos.rank.index + 1)

@@ -10,8 +10,7 @@ object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
   val corners: UnmovedRooks = CORNERS
   val none: UnmovedRooks    = empty
 
-  def apply(b: Bitboard): UnmovedRooks       = b.value
-  def apply(xs: Iterable[Pos]): UnmovedRooks = Bitboard(xs).value
+  def apply(b: Bitboard): UnmovedRooks = b.value
 
   // guess unmovedRooks from board
   // we assume rooks are on their initial position
@@ -21,7 +20,7 @@ object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
     UnmovedRooks(wr | br)
 
   extension (ur: UnmovedRooks)
-    def toList: List[Pos] = ur.occupiedSquares
+    def toList: List[Pos] = ur.squares
 
     def without(color: Color): UnmovedRooks =
       ur & Bitboard.rank(color.lastRank)

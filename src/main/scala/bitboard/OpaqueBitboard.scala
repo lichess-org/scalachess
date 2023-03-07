@@ -8,6 +8,8 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
   protected val ALL: A     = -1L.bb
   protected val CORNERS: A = 0x8100000000000081L.bb
 
+  inline def apply(inline xs: Iterable[Pos]): A = xs.foldLeft(empty)((b, p) => b | p.bb)
+
   extension (l: Long)
     def bb: A                    = l.asInstanceOf[A]
     private def lsb: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(l))
@@ -30,7 +32,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
     def contains(pos: Pos): Boolean =
       (a.value & (1L << pos.value)) != 0L
 
-    def addPos(pos: Pos): A = a | pos.bb
+    def addSquare(pos: Pos): A = a | pos.bb
 
     def moreThanOne: Boolean =
       (a.value & (a.value - 1L)) != 0L
@@ -40,7 +42,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
       if moreThanOne then None
       else first
 
-    def occupiedSquares: List[Pos] =
+    def squares: List[Pos] =
       fold(List.empty)((xs, pos) => pos :: xs)
 
     // total non empty position

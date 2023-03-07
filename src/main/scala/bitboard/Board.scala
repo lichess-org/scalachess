@@ -59,7 +59,7 @@ case class Board(
     black.contains(s)
 
   def kings(color: Color): List[Pos] =
-    (kings & byColor(color)).occupiedSquares
+    (kings & byColor(color)).squares
 
   def kingOf(c: Color): Bitboard       = kings & byColor(c)
   def kingPosOf(c: Color): Option[Pos] = kingOf(c).singleSquare
@@ -96,7 +96,7 @@ case class Board(
           ourKing.bishopAttacks(Bitboard.empty) & (bishops ^ queens)
       )
       val bs = for
-        sniper <- snipers.occupiedSquares
+        sniper <- snipers.squares
         between = Bitboard.between(ourKing, sniper) & occupied
         if !between.moreThanOne
       yield between
@@ -177,7 +177,7 @@ case class Board(
     take(orig).map(_.putOrReplace(piece, dest))
 
   lazy val occupation: Color.Map[Set[Pos]] = Color.Map { c =>
-    color(c).occupiedSquares.toSet
+    color(c).squares.toSet
   }
 
   inline def isOccupied(inline p: Piece) =
@@ -185,7 +185,7 @@ case class Board(
 
   // TODO remove unsafe get
   lazy val pieceMap: Map[Pos, Piece] =
-    occupied.occupiedSquares.view.map(s => (s, pieceAt(s).get)).toMap
+    occupied.squares.view.map(s => (s, pieceAt(s).get)).toMap
 
   def piecesOf(c: Color): Map[Pos, Piece] =
     pieceMap.filter((_, p) => p.color == c)
@@ -193,7 +193,7 @@ case class Board(
   def pieces: List[Piece] = pieces(occupied)
 
   def pieces(occupied: Bitboard): List[Piece] =
-    occupied.occupiedSquares.flatMap(pieceAt)
+    occupied.squares.flatMap(pieceAt)
 
   def color(c: Color): Bitboard = c.fold(white, black)
 

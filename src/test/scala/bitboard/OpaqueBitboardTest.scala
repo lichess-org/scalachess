@@ -10,9 +10,9 @@ import Bitboard.*
 
 class OpaqueBitboardTest extends ScalaCheckSuite:
 
-  test("the result of addPos should contain the added pos") {
+  test("the result of addSquare should contain the added pos") {
     forAll { (bb: Bitboard, pos: Pos) =>
-      assertEquals((bb.addPos(pos).contains(pos)), true)
+      assertEquals((bb.addSquare(pos).contains(pos)), true)
     }
   }
 
@@ -22,9 +22,9 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
     }
   }
 
-  test("count has the same value as occupiedSquares.size") {
+  test("count has the same value as squares.size") {
     forAll { (bb: Bitboard) =>
-      assertEquals(bb.count, bb.occupiedSquares.size)
+      assertEquals(bb.count, bb.squares.size)
     }
   }
 
@@ -78,11 +78,18 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
     }
   }
 
-  test("apply set of pos should be the same as using addPos") {
+  test("apply set of pos should be the same as using addSquare") {
     forAll { (xs: Set[Pos]) =>
       val bb  = Bitboard(xs)
-      val bb2 = xs.foldLeft(Bitboard.empty)(_ addPos _)
+      val bb2 = xs.foldLeft(Bitboard.empty)(_ addSquare _)
       assertEquals(bb, bb2)
+    }
+  }
+
+  test("apply(Set[Pos]).squares.toSet == Set[Pos]") {
+    forAll { (xs: Set[Pos]) =>
+      val result = Bitboard(xs).squares.toSet
+      assertEquals(result, xs)
     }
   }
 
@@ -92,15 +99,15 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
     }
   }
 
-  test("first should be the minimum of occupiedSquares") {
+  test("first should be the minimum of squares") {
     forAll { (bb: Bitboard) =>
-      assertEquals(bb.first, bb.occupiedSquares.minByOption(_.value))
+      assertEquals(bb.first, bb.squares.minByOption(_.value))
     }
   }
 
   test("intersects should be true when the two bitboards have at least one common square") {
     forAll { (b1: Bitboard, b2: Bitboard, p: Pos) =>
-      b1.addPos(p).intersects(b2.addPos(p))
+      b1.addSquare(p).intersects(b2.addSquare(p))
     }
   }
 
@@ -115,7 +122,7 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
 
   test("isDisjoint should be false when the two bitboards have at least common square") {
     forAll { (b1: Bitboard, b2: Bitboard, p: Pos) =>
-      !b1.addPos(p).isDisjoint(b2.addPos(p))
+      !b1.addSquare(p).isDisjoint(b2.addSquare(p))
     }
   }
 

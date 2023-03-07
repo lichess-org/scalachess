@@ -38,7 +38,7 @@ class UnmovedRooksTest extends ChessTest:
 
   chess960Boards.mapWithIndex { (board, n) =>
     s"unmovedRooks at position number: $n" in {
-      board.rooks.occupiedSquares.traverse { pos =>
+      board.rooks.squares.traverse { pos =>
         board.history.unmovedRooks.side(pos).flatten
       } must beSome { (sides: List[Side]) =>
         sides.filter(_ == QueenSide).size must_== 2

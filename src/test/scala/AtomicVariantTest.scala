@@ -227,7 +227,7 @@ class AtomicVariantTest extends ChessTest:
         game.board(Pos.E6) must beNone // The pawn that captures during en-passant should explode
         // Every piece surrounding the en-passant destination square that is not a pawn should be empty
         import bitboard.Bitboard.*
-        Pos.E6.kingAttacks.occupiedSquares
+        Pos.E6.kingAttacks.squares
           .forall(pos => game.board(pos).isEmpty || pos == Pos.E7 || pos == Pos.D7) must beTrue
       }
     }

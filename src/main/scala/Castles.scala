@@ -26,7 +26,7 @@ object Castles extends OpaqueBitboard[Castles]:
       c & ~color.at(side).bb
 
     def add(color: Color, side: Side): Castles =
-      c.addPos(color.at(side))
+      c.addSquare(color.at(side))
 
     def update(color: Color, kingSide: Boolean, queenSide: Boolean): Castles =
       c.without(color) | kingSide.at(color.kingSide) | queenSide.at(color.queenSide)

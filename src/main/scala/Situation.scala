@@ -152,10 +152,12 @@ case class Situation(board: Board, color: Color):
     case _ => None
   }
 
+  def genNonKingAndNonPawn(mask: Bitboard): List[Move] =
+    genKnight(us & board.knights, mask) ++ genBishop(us & board.bishops, mask) ++
+      genRook(us & board.rooks, mask) ++ genQueen(us & board.queens, mask)
+
   def genNonKing(mask: Bitboard): List[Move] =
-    genPawn(us & board.pawns, mask) ++ genKnight(us & board.knights, mask) ++
-      genBishop(us & board.bishops, mask) ++ genRook(us & board.rooks, mask) ++
-      genQueen(us & board.queens, mask)
+    genPawn(us & board.pawns, mask) ++ genNonKingAndNonPawn(mask)
 
   /** Generate all pawn moves except en passant
     *  This includes
@@ -173,9 +175,9 @@ case class Situation(board: Board, color: Color):
     val capturers = pawns
 
     val s1: List[Move] = for
-      from <- capturers.occupiedSquares
+      from <- capturers.squares
       targets = from.pawnAttacks(color) & them & mask
-      to   <- targets.occupiedSquares
+      to   <- targets.squares
       move <- genPawnMoves(from, to, true)
     yield move
 
@@ -192,13 +194,13 @@ case class Situation(board: Board, color: Color):
          else Bitboard.rank(color.fourthRank))
 
     val s2: List[Move] = for
-      to   <- (singleMoves & mask).occupiedSquares
+      to   <- (singleMoves & mask).squares
       from <- Pos.at(to.value + (if isWhiteTurn then -8 else 8)).toList
       move <- genPawnMoves(from, to, false)
     yield move
 
     val s3: List[Move] = for
-      to   <- (doubleMoves & mask).occupiedSquares
+      to   <- (doubleMoves & mask).squares
       from <- Pos.at(to.value + (if isWhiteTurn then -16 else 16))
       move <- normalMove(from, to, Pawn, false)
     yield move
@@ -207,45 +209,45 @@ case class Situation(board: Board, color: Color):
 
   def genKnight(knights: Bitboard, mask: Bitboard): List[Move] =
     for
-      from <- knights.occupiedSquares
+      from <- knights.squares
       targets = Bitboard.knightAttacks(from) & mask
-      to   <- targets.occupiedSquares
+      to   <- targets.squares
       move <- normalMove(from, to, Knight, isOccupied(to))
     yield move
 
   def genBishop(bishops: Bitboard, mask: Bitboard): List[Move] =
     for
-      from <- bishops.occupiedSquares
+      from <- bishops.squares
       targets = from.bishopAttacks(board.occupied) & mask
-      to   <- targets.occupiedSquares
+      to   <- targets.squares
       move <- normalMove(from, to, Bishop, isOccupied(to))
     yield move
 
   def genRook(rooks: Bitboard, mask: Bitboard): List[Move] =
     for
-      from <- rooks.occupiedSquares
+      from <- rooks.squares
       targets = from.rookAttacks(board.occupied) & mask
-      to   <- targets.occupiedSquares
+      to   <- targets.squares
       move <- normalMove(from, to, Rook, isOccupied(to))
     yield move
 
   def genQueen(queens: Bitboard, mask: Bitboard): List[Move] =
     for
-      from <- queens.occupiedSquares
+      from <- queens.squares
       targets = from.queenAttacks(board.occupied) & mask
-      to   <- targets.occupiedSquares
+      to   <- targets.squares
       move <- normalMove(from, to, Queen, isOccupied(to))
     yield move
 
   def genUnsafeKing(king: Pos, mask: Bitboard): List[Move] =
     val targets = king.kingAttacks & mask
-    targets.occupiedSquares.flatMap(to => normalMove(king, to, King, isOccupied(to)))
+    targets.squares.flatMap(to => normalMove(king, to, King, isOccupied(to)))
 
   def genSafeKing(mask: Bitboard): List[Move] =
     ourKing.fold(Nil)(king =>
       val targets = king.kingAttacks & mask
       for
-        to <- targets.occupiedSquares
+        to <- targets.squares
         if board.attackers(to, !color).isEmpty
         move <- normalMove(king, to, King, isOccupied(to))
       yield move
@@ -257,7 +259,7 @@ case class Situation(board: Board, color: Color):
     else
       val rooks = history.unmovedRooks & Bitboard.rank(color.backRank) & board.rooks
       for
-        rook <- rooks.occupiedSquares
+        rook <- rooks.squares
         toKingFile = if rook < king then File.C else File.G
         toRookFile = if rook < king then File.D else File.F
         kingTo     = Pos(toKingFile, king.rank)
@@ -269,7 +271,7 @@ case class Situation(board: Board, color: Color):
           else Bitboard.between(king, rook)
         if (path & board.occupied & ~rook.bb).isEmpty
         kingPath = Bitboard.between(king, kingTo) | king.bb
-        if kingPath.occupiedSquares
+        if kingPath.squares
           .forall(variant.castleCheckSafeSquare(board, _, color, board.occupied ^ king.bb))
         if variant.castleCheckSafeSquare(
           board,

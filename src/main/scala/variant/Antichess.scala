@@ -59,8 +59,8 @@ case object Antichess
     // Exit early if we are not in a situation with only knights
     situation.board.onlyKnights && {
 
-      val whiteKnights = situation.board.white.occupiedSquares
-      val blackKnights = situation.board.black.occupiedSquares
+      val whiteKnights = situation.board.white.squares
+      val blackKnights = situation.board.black.squares
 
       // We consider the case where a player has two knights
       if (whiteKnights.size != 1 || blackKnights.size != 1) false
@@ -79,14 +79,14 @@ case object Antichess
     // Exit early if we are not in a situation with only bishops and pawns
     if (board.bishops | board.pawns) != board.occupied then false
     else
-      val whiteBishops = (board.white & board.bishops).occupiedSquares
-      val blackBishops = (board.black & board.bishops).occupiedSquares
+      val whiteBishops = (board.white & board.bishops).squares
+      val blackBishops = (board.black & board.bishops).squares
       if whiteBishops.map(_.isLight).to(Set).size != 1 ||
         blackBishops.map(_.isLight).to(Set).size != 1
       then false
       else
-        val whitePawns = (board.white & board.pawns).occupiedSquares
-        val blackPawns = (board.black & board.pawns).occupiedSquares
+        val whitePawns = (board.white & board.pawns).squares
+        val blackPawns = (board.black & board.pawns).squares
         (for {
           whiteBishopLight <- whiteBishops.headOption map (_.isLight)
           blackBishopLight <- blackBishops.headOption map (_.isLight)

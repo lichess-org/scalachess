@@ -71,7 +71,7 @@ abstract class Variant private[variant] (
   ): Validated[ErrorStr, Move] =
     // Find the move in the variant specific list of valid moves
     def findMove(from: Pos, to: Pos) =
-      situation.legalMoves.find(m => m.orig == from && m.dest == to)
+      situation.generateMovesAt(from).find(_.dest == to)
 
     for
       piece <- situation.board(from) toValid ErrorStr(s"No piece on ${from.key}")

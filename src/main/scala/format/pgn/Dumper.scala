@@ -5,6 +5,7 @@ object Dumper:
 
   def apply(situation: Situation, data: chess.Move, next: Situation): SanStr =
     import data.*
+    import bitboard.Bitboard.*
 
     val base = (promotion, piece.role) match
       case _ if castles =>
@@ -23,12 +24,13 @@ object Dumper:
         //       - file
         //       - rank
         //       - both (only happens w/ at least 3 pieces of the same role)
-        val candidates = situation.board.pieces collect {
-          case (cpos, cpiece) if cpiece == piece && cpos != orig && cpiece.eyes(cpos, dest) => cpos
-        } filter { cpos =>
-          // We know Role ≠ Pawn, so it is fine to always pass None as promotion target
-          situation.move(cpos, dest, None).isValid
-        }
+        // We know Role ≠ Pawn, so it is fine to always pass None as promotion target
+        val candidates = (situation.board.byPiece(piece) ^ orig.bb).squares
+          .filter(square =>
+            piece.eyes(square, dest, situation.board.occupied) && {
+              situation.move(square, dest, None).isValid
+            }
+          )
 
         val disambiguation: String =
           if (candidates.isEmpty)
@@ -48,10 +50,10 @@ object Dumper:
     SanStr(s"${data.toUci.uci}${checkOrWinnerSymbol(next)}")
 
   def apply(data: chess.Move): SanStr =
-    apply(data.situationBefore, data, data.finalizeAfter situationOf !data.color)
+    apply(data.situationBefore, data, data.situationAfter)
 
   def apply(data: chess.Drop): SanStr =
-    apply(data, data.finalizeAfter situationOf !data.color)
+    apply(data, data.situationAfter)
 
   private def checkOrWinnerSymbol(next: Situation): String =
     if next.winner.isDefined then "#"

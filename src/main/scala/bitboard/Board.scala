@@ -32,6 +32,9 @@ case class Board(
       case Queen  => queens
       case King   => kings
 
+  def byPiece(piece: Piece): Bitboard =
+    byColor(piece.color) & byRole(piece.role)
+
   def roleAt(s: Pos): Option[Role] =
     if pawns.contains(s) then Some(Pawn)
     else if knights.contains(s) then Some(Knight)

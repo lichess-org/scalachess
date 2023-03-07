@@ -1,5 +1,8 @@
 package chess
 
+import bitboard.Bitboard
+import bitboard.Bitboard.*
+
 case class Piece(color: Color, role: Role):
 
   def is(c: Color)   = c == color
@@ -13,16 +16,13 @@ case class Piece(color: Color, role: Role):
 
   def forsyth: Char = if color.white then role.forsythUpper else role.forsyth
 
-  // attackable positions assuming empty board
-  import bitboard.Bitboard
-  import bitboard.Bitboard.*
-  def eyes(from: Pos, to: Pos): Boolean =
-    val occupied: Bitboard = to.bb
+  // the piece at from can attack the target to when mask are all the occupied squares
+  def eyes(from: Pos, to: Pos, mask: Bitboard): Boolean =
     role match
       case King   => from.kingAttacks.contains(to)
-      case Queen  => from.queenAttacks(occupied).nonEmpty
-      case Rook   => from.rookAttacks(occupied).nonEmpty
-      case Bishop => from.bishopAttacks(occupied).nonEmpty
+      case Queen  => from.queenAttacks(mask).contains(to)
+      case Rook   => from.rookAttacks(mask).contains(to)
+      case Bishop => from.bishopAttacks(mask).contains(to)
       case Knight => from.knightAttacks.contains(to)
       case Pawn   => from.pawnAttacks(color).contains(to)
 

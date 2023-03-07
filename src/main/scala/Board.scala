@@ -17,6 +17,8 @@ case class Board(
     bishops,
     black,
     byColor,
+    byPiece,
+    byRole,
     isCheck,
     isOccupied,
     kingOf,

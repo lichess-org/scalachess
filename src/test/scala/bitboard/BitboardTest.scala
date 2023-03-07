@@ -4,6 +4,7 @@ package bitboard
 import munit.ScalaCheckSuite
 import org.lichess.compression.game.Bitboard as CBB
 import org.scalacheck.Prop
+import Pos.*
 
 import Arbitraries.given
 
@@ -69,7 +70,7 @@ class BitboardTest extends ScalaCheckSuite:
     }
   }
 
-  property("bitshop attacks") {
+  property("bishop attacks") {
     Prop.forAll { (occupied: Bitboard, s: Pos) =>
       s.bishopAttacks(occupied) == CBB.bishopAttacks(s, occupied).bb
     }

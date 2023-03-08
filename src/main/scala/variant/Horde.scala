@@ -48,21 +48,23 @@ case object Horde
     * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
     * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
     */
-  private def hordeClosedPosition(board: Board) =
-    def hasLegalMovesWithoutKing(situation: Situation): Boolean =
-      val legalMoves = validMoves(situation)
-      if situation.isWhiteTurn then legalMoves.isEmpty
-      else legalMoves.filter(_.piece.role != King).isEmpty
-
-    val hordePos = board.occupation(Color.white) // may include promoted pieces
+  private def hordeClosedPosition(situation: Situation): Boolean =
+    val hordePos = situation.board.occupation(Color.white) // may include promoted pieces
     val mateInOne =
-      hordePos.sizeIs == 1 && hordePos.forall(pos => pieceThreatened(board, Color.black, pos))
-    !mateInOne && Color.all.map(board.situationOf(_)).forall(hasLegalMovesWithoutKing)
+      hordePos.sizeIs == 1 && hordePos.forall(pos => pieceThreatened(situation.board, Color.black, pos))
+    !mateInOne && {
+      if situation.isWhiteTurn then situation.legalMoves.isEmpty
+      else
+        val legalMoves = validMoves(situation)
+        legalMoves.filter(_.piece.role != King).isEmpty &&
+        legalMoves.filter(_.piece.role == King).forall(move => validMoves(move.situationAfter).isEmpty)
+    }
 
   /** In horde chess, black can win unless a fortress stalemate is unavoidable.
     *  Auto-drawing the game should almost never happen, but it did in https://lichess.org/xQ2RsU8N#121
     */
-  override def isInsufficientMaterial(board: Board) = hordeClosedPosition(board)
+  override def isInsufficientMaterial(board: Board) =
+    Color.all.forall(color => hordeClosedPosition(board.situationOf(color)))
 
   /** In horde chess, the horde cannot win on * v K or [BN]{2} v K or just one piece
     * since they lack a king for checkmate support.
@@ -72,7 +74,7 @@ case object Horde
   override def opponentHasInsufficientMaterial(situation: Situation): Boolean =
     val board         = situation.board
     val opponentColor = !situation.color
-    lazy val fortress = hordeClosedPosition(board) // costly function call
+    lazy val fortress = hordeClosedPosition(situation) // costly function call
     if opponentColor == Color.white then
       lazy val notKingPieces           = InsufficientMatingMaterial.nonKingPieces(board) toList
       val horde                        = board.piecesOf(Color.white)

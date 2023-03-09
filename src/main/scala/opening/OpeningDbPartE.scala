@@ -177,6 +177,7 @@ Opening("E60", "Indian Defense: Anti-Grünfeld, Adorjan Gambit", "rnbqkb1r/p1ppp
 Opening("E60", "Indian Defense: Anti-Grünfeld, Advance Variation", "rnbqkb1r/pppppp1p/5np1/3P4/2P5/8/PP2PPPP/RNBQKBNR b KQkq -", "d2d4 g8f6 c2c4 g7g6 d4d5", "1. d4 Nf6 2. c4 g6 3. d5"),
 Opening("E60", "Indian Defense: Anti-Grünfeld, Alekhine Variation", "rnbqkb1r/pppppp1p/5np1/8/2PP4/5P2/PP2P1PP/RNBQKBNR b KQkq -", "d2d4 g8f6 c2c4 g7g6 f2f3", "1. d4 Nf6 2. c4 g6 3. f3"),
 Opening("E60", "Indian Defense: Anti-Grünfeld, Alekhine Variation, Leko Gambit", "rnbqkb1r/pppp1p1p/5np1/4p3/2PP4/5P2/PP2P1PP/RNBQKBNR w KQkq -", "d2d4 g8f6 c2c4 g7g6 f2f3 e7e5", "1. d4 Nf6 2. c4 g6 3. f3 e5"),
+Opening("E60", "Indian Defense: Anti-Grünfeld, Basman-Williams Attack", "rnbqkb1r/pppppp1p/5np1/8/2PP3P/8/PP2PPP1/RNBQKBNR b KQkq -", "d2d4 g8f6 c2c4 g7g6 h2h4", "1. d4 Nf6 2. c4 g6 3. h4"),
 Opening("E60", "Indian Defense: King's Indian Variation, Fianchetto Variation", "rnbqk2r/ppppppbp/5np1/8/2PP4/6P1/PP2PPBP/RNBQK1NR b KQkq -", "d2d4 g8f6 c2c4 g7g6 g2g3 f8g7 f1g2", "1. d4 Nf6 2. c4 g6 3. g3 Bg7 4. Bg2"),
 Opening("E60", "Indian Defense: West Indian Defense", "rnbqkb1r/pppppp1p/5np1/8/2PP4/8/PP2PPPP/RNBQKBNR w KQkq -", "d2d4 g8f6 c2c4 g7g6", "1. d4 Nf6 2. c4 g6"),
 Opening("E60", "King's Indian Defense: Fianchetto Variation, Immediate Fianchetto", "rnbqkb1r/pppppp1p/5np1/8/2PP4/6P1/PP2PP1P/RNBQKBNR b KQkq -", "d2d4 g8f6 c2c4 g7g6 g2g3", "1. d4 Nf6 2. c4 g6 3. g3"),

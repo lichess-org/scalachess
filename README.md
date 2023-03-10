@@ -11,9 +11,7 @@ Clone scalachess
 
     git clone git://github.com/ornicar/scalachess
 
-Get latest sbt on http://www.scala-sbt.org/download.html
-
-Start sbt in scalachess directory
+Start [sbt](http://www.scala-sbt.org/download.html) in scalachess directory
 
     sbt
 
@@ -21,18 +19,21 @@ In the sbt shell, to compile scalachess, run
 
     compile
 
-To run the tests (with coverage):
+To run the tests
 
-    clean coverage test
-    coverageReport
+    test
 
-To run benchmarks (takes 10-20 minutes to finish):
+To run benchmarks (takes more than 1 hour to finish to finish):
 
-    sbt "bench / Jmh / run"
+    bench / Jmh / run
 
-To run quick benchmarks (results may be incorrect):
+Or to ouput a json file
 
-    sbt "bench / Jmh / run -i 1 -wi 1 -f1 -t1"
+    bench / Jmh / run -rf json
+
+To run quick benchmarks (results may be inaccurate):
+
+    bench / Jmh / run -i 1 -wi 1 -f1 -t1
 
 Code formatting
 ---------------

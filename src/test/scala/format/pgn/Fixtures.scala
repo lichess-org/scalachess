@@ -2078,9 +2078,9 @@ Rh5 52. Kf2 Rg5 53. Rf8 Ke5 1/2-1/2"""
 
   val gamesForPerfTest = PgnStr from List(enpassantEP, enpassantEP2, recentChessCom, chessComCrazyhouse, fromPosProdCloseChess,
   fromChessProgrammingWiki, noTagButResult, inlineTags, whiteResignsInTags, whiteResignsInMoves, whiteResignsInTagsAndMoves,
-  festivalFigueira, crazyhouseFromProd, complete960, fromWikipedia, stLouisFischerandom, inlineComments, fromChessgames,
+  crazyhouseFromProd, complete960, fromWikipedia, stLouisFischerandom, inlineComments, fromChessgames,
   fromChessgamesWithEscapeChar, chessgamesWeirdComments, withDelimiters, withDelimitersOnNewLines, fromProd1, fromProd2,
   promoteRook, castleCheck1, castleCheck2, fromCrafty, withNag, fromTcec, fromLichessBadPromotion, fromTcecWithEngineOutput,
   fromPositionEmptyFen, chessbaseWeird, chessbaseArrows, commentsAndVariations, bySmartChess, android, chesskids, variations,
   caissa, handwritten, chessByPost, atomicRegression, atomicPromotion, weirdDashes, lichobile, overflow, overflow3,
-  crazyhouse1, crazyhouse2, crazyhouseNoVariantTag, stackOverflow, explorerPartialDate, withGlyphAnnotations)
+  crazyhouse1, crazyhouse2, stackOverflow, explorerPartialDate, withGlyphAnnotations)

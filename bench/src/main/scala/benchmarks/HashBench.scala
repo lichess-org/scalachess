@@ -23,8 +23,7 @@ class HashBench {
   val situations = games.flatMap(_.moves).flatMap(_.move).map(_.situationAfter)
 
   @Benchmark
-  def hashes(): Boolean =
+  def hashes() =
     situations.foreach(Hash(_))
-    true
 
 }

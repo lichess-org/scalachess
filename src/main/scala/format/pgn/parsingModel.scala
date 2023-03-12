@@ -77,9 +77,9 @@ case class Drop(
   def drop(situation: Situation): Validated[ErrorStr, chess.Drop] =
     situation.drop(role, pos)
 
-case class InitialPosition(
-    comments: List[String]
-)
+opaque type InitialPosition = List[String]
+object InitialPosition extends TotalWrapper[InitialPosition, List[String]]:
+  extension (ip: InitialPosition) inline def comments = ip.value
 
 // could be factored as `PgnNode` and used directly in `ParsedPgn` too
 // not done for the moment for backward compat

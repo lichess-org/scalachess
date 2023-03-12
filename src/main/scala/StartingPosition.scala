@@ -204,7 +204,7 @@ object StartingPosition:
 
   def randomFeaturable = featurable(scala.util.Random.nextInt(featurable.size))
 
-  private inline def of(inline fen: OpeningFen, featurable: Boolean = true): Option[StartingPosition] =
+  private def of(fen: OpeningFen, featurable: Boolean = true): Option[StartingPosition] =
     OpeningDb.findByOpeningFen(fen).map { StartingPosition(_, featurable) }
 
   object presets:

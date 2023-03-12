@@ -30,10 +30,10 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
   )
 )
 
-ThisBuild / organization           := "org.lichess"
-ThisBuild / version                := "14.5.8"
-ThisBuild / scalaVersion           := "3.2.2"
-ThisBuild / licenses += "AGPL-3.0" -> url("https://opensource.org/licenses/AGPL-3.0")
+ThisBuild / organization      := "org.lichess"
+ThisBuild / version           := "14.5.8"
+ThisBuild / scalaVersion      := "3.2.2"
+ThisBuild / licenses += "MIT" -> url("https://opensource.org/licenses/MIT")
 
 resolvers += "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-maven/master"
 resolvers += "jitpack" at "https://jitpack.io"

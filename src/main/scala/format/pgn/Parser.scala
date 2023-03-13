@@ -35,7 +35,9 @@ object Parser:
 
   private object MovesParser:
 
-    private def cleanComments(comments: List[String]) = comments.map(_.trim).filter(_.nonEmpty)
+    private def cleanComments(comments: List[String]) = comments.collect {
+      case c if !c.isBlank => c.trim
+    }
 
     def moves(str: PgnMovesStr): Validated[ErrorStr, Sans] =
       strMove.rep.map(xs => Sans(xs.toList)).parse(str.value) match

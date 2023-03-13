@@ -20,7 +20,7 @@ sealed trait San:
 
   def withSuffixes(s: Suffixes): San = withMetas(metas withSuffixes s)
 
-  def withComments(s: List[String]): San = withMetas(metas withComments s)
+  def withComments(s: List[Comment]): San = withMetas(metas withComments s)
 
   def withVariations(v: List[Variation]): San = withMetas(metas withVariations v)
 
@@ -77,19 +77,22 @@ case class Drop(
   def drop(situation: Situation): Validated[ErrorStr, chess.Drop] =
     situation.drop(role, pos)
 
-opaque type InitialPosition = List[String]
-object InitialPosition extends TotalWrapper[InitialPosition, List[String]]:
-  extension (ip: InitialPosition) inline def comments = ip.value
+opaque type Comment = String
+object Comment extends TotalWrapper[Comment, String]
+
+opaque type InitialPosition = List[Comment]
+object InitialPosition extends TotalWrapper[InitialPosition, List[Comment]]:
+  extension (ip: InitialPosition) inline def comments: List[Comment] = ip
 
 // could be factored as `PgnNode` and used directly in `ParsedPgn` too
 // not done for the moment for backward compat
 // see `GameNode` in python-chess
-case class Variation(comments: List[String], sans: Sans)
+case class Variation(comments: List[Comment], sans: Sans)
 
 case class Metas(
     check: Boolean,
     checkmate: Boolean,
-    comments: List[String],
+    comments: List[Comment],
     glyphs: Glyphs,
     variations: List[Variation]
 ):
@@ -103,7 +106,7 @@ case class Metas(
 
   def withGlyphs(g: Glyphs) = copy(glyphs = g)
 
-  def withComments(c: List[String]) = copy(comments = c)
+  def withComments(c: List[Comment]) = copy(comments = c)
 
   def withVariations(v: List[Variation]) = copy(variations = v)
 

@@ -1451,6 +1451,12 @@ Akesson,R (2465)-Van Wely,L (2585) Antwerp 1995} )Nd5 16. Nxd7 Qxd7 17. Nc4 Qe7 
 {[%csl Gb4,Yd5,Rf6][%cal Ge2e4,Ye2d4,Re2g4]} 1. e4 {[%csl Gb4,Yd5,Rf6] blabla}
 """
 
+  val multipleInitalCommentsWithEmpty = """{this}
+{}
+{that}
+1. e4 e5
+"""
+
   val commentsAndVariations = """
 [Event "ICC"]
 [Site "Internet Chess Club"]

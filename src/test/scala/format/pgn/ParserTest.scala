@@ -369,6 +369,11 @@ class ParserTest extends ChessTest:
       )
     }
   }
+  "multiple initial comments with empty" in {
+    parser(multipleInitalCommentsWithEmpty) must beValid.like { case a =>
+      a.initialPosition must_== List("this", "that")
+    }
+  }
   "chessbase weird" in {
     parser(chessbaseWeird) must beValid.like { case a =>
       a.sans.value.size must_== 115

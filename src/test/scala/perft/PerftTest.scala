@@ -14,9 +14,7 @@ class PerftTest extends ChessTest:
         perft.id >> {
           val result = perft.withLimit(nodeLimit).calculate(variant)
           Fragments.foreach(result) { r =>
-            s"${r.depth}" in {
-              r.result === r.expected
-            }
+            s"${r.depth}" in { r.isOk must beTrue }
           }
         }
       }

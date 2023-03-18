@@ -2,6 +2,8 @@ package chess
 package variant
 
 import chess.format.EpdFen
+import chess.bitboard.Bitboard
+import chess.bitboard.Bitboard.*
 
 case object Horde
     extends Variant(
@@ -113,3 +115,50 @@ case object Horde
         true
       else fortress
     else fortress
+
+  extension (s: Situation)
+    def hasBishopPair: Color => Boolean = side =>
+      val bishops = s.board.bishops & s.board.byColor(side)
+      bishops.intersects(Bitboard.lightSquares) && bishops.intersects(Bitboard.darkSquares)
+
+    def byRole: Color => ByRole[Bitboard] = side =>
+      Map(
+        Pawn   -> (s.board.pawns & s.board.byColor(side)),
+        Knight -> (s.board.knights & s.board.byColor(side)),
+        Bishop -> (s.board.bishops & s.board.byColor(side)),
+        Rook   -> (s.board.rooks & s.board.byColor(side)),
+        Queen  -> (s.board.queens & s.board.byColor(side)),
+        King   -> (s.board.kings & s.board.byColor(side))
+      )
+
+  // port from Shakmaty
+  def hasInsufficientMaterial(situation: Situation): Boolean =
+    import situation.{ board, color }
+    import SquareColor.*
+    // Black can always win by capturing the horde
+    if !situation.isWhiteTurn then false
+    else
+      val horde = situation.byRole(Color.white)
+      val hordeBishops: SquareColor => Int = color => (horde(Bishop) & color.bb).count
+      val hordeBishopColor = if hordeBishops(Light) >= 1 then Light else Dark
+
+      // Two same color bishops suffice to cover all the light and dark squares
+      // around the enemy king.
+      val hordeNum = horde.values.map(_.count).sum
+      val piecesNum = board.nbPieces
+      // horde or all?
+      val piecesOfTypeNot = (role: Role) => piecesNum - horde(role).count
+      true
+
+enum SquareColor:
+  case Light, Dark
+
+  def bb = this match
+    case Light => Bitboard.lightSquares
+    case Dark  => Bitboard.darkSquares
+
+  def unary_! = this match
+    case Light => Dark
+    case Dark  => Light
+
+type ByRole[A] = Map[Role, A]

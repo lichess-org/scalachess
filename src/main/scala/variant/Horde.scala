@@ -76,8 +76,7 @@ case object Horde
     * this method does not detect; however, such are trivial to premove.
     */
   override def opponentHasInsufficientMaterial(situation: Situation): Boolean =
-    if hasInsufficientMaterial(situation.board, !situation.color) then true
-    else hordeClosedPosition(situation) // costly function call
+    hasInsufficientMaterial(situation.board, !situation.color) || hordeClosedPosition(situation)
 
   extension (board: Board)
     def hasBishopPair: Color => Boolean = side =>
@@ -114,7 +113,7 @@ case object Horde
       val pieces   = piecesb.map(_.count)
       val piecesBishops: SquareColor => Int = color => (piecesb.bishop & color.bb).count
       val piecesNum                         = piecesb.map(_.count).values.sum
-      val piecesOfTypeNot = (pieces: Int) => piecesNum - pieces
+      val piecesOfTypeNot                   = (pieces: Int) => piecesNum - pieces
       if hordeNum == 0 then true
       else if hordeNum >= 4 then false // Four or more white pieces can always deliver mate.
       // Pawns/queens are never insufficient material when paired with any other

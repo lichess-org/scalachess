@@ -118,59 +118,62 @@ case object Horde
       else fortress
     else fortress
 
-  extension (s: Situation)
+  extension (board: Board)
     def hasBishopPair: Color => Boolean = side =>
-      val bishops = s.board.bishops & s.board.byColor(side)
+      val bishops = board.bishops & board.byColor(side)
       bishops.intersects(Bitboard.lightSquares) && bishops.intersects(Bitboard.darkSquares)
 
     def byRole: Color => ByRole[Bitboard] = side =>
       ByRole[Bitboard](
-        s.board.pawns & s.board.byColor(side),
-        s.board.knights & s.board.byColor(side),
-        s.board.bishops & s.board.byColor(side),
-        s.board.rooks & s.board.byColor(side),
-        s.board.queens & s.board.byColor(side),
-        s.board.kings & s.board.byColor(side)
+        board.pawns & board.byColor(side),
+        board.knights & board.byColor(side),
+        board.bishops & board.byColor(side),
+        board.rooks & board.byColor(side),
+        board.queens & board.byColor(side),
+        board.kings & board.byColor(side)
       )
 
   // port from Shakmaty
   import ByRole.*
-  def hasInsufficientMaterial(situation: Situation): Boolean =
-    import situation.{ board, color }
+  def hasInsufficientMaterial(board: Board, color: Color): Boolean =
     import SquareColor.*
     // Black can always win by capturing the horde
-    if !situation.isWhiteTurn then false
+    if color.black then false
     else
-      val horde                            = situation.byRole(Color.white)
-      val hordeCount                       = horde.map(_.count)
-      val hordeBishops: SquareColor => Int = color => (horde.bishop & color.bb).count
+      val hordeb                           = board.byRole(color)
+      val horde                            = hordeb.map(_.count)
+      val hordeBishops: SquareColor => Int = color => (hordeb.bishop & color.bb).count
       val hordeBishopColor                 = if hordeBishops(Light) >= 1 then Light else Dark
 
       val hordeBishopNum = Math.min(hordeBishops(Light), 2) + Math.min(hordeBishops(Dark), 2)
       // Two same color bishops suffice to cover all the light and dark squares
       // around the enemy king.
-      val hordeNum = hordeCount.pawn + hordeCount.knight + hordeCount.rook + hordeCount.queen + hordeBishopNum
-      val pieces   = situation.byRole(Color.black)
-      val piecesCount                       = pieces.map(_.count)
-      val piecesBishops: SquareColor => Int = color => (pieces.bishop & color.bb).count
-      val piecesNum                         = pieces.map(_.count).values.sum
+      val hordeNum = horde.pawn + horde.knight + horde.rook + horde.queen + hordeBishopNum
+      val piecesb  = board.byRole(Color.black)
+      val pieces   = piecesb.map(_.count)
+      val piecesBishops: SquareColor => Int = color => (piecesb.bishop & color.bb).count
+      val piecesNum                         = piecesb.map(_.count).values.sum
       // horde or all?
       val piecesOfTypeNot = (pieces: Int) => piecesNum - pieces
       if hordeNum == 0 then true
       else if hordeNum >= 4 then false // Four or more white pieces can always deliver mate.
       // Pawns/queens are never insufficient material when paired with any other
       // piece (a pawn promotes to a queen and delivers mate).
-      else if (hordeCount.pawn >= 1 || hordeCount.queen >= 1) && hordeNum >= 2 then false
+      else if (horde.pawn >= 1 || horde.queen >= 1) && hordeNum >= 2 then false
       // A rook is insufficient material only when it is paired with a bishop
       // against a lone king. The horde can mate in any other case.
       // A rook on A1 and a bishop on C3 mate a king on B1 when there is a
       // friendly pawn/opposite-color-bishop/rook/queen on C2.
       // A rook on B8 and a bishop C3 mate a king on A1 when there is a friendly
       // knight on A2.
-      else if (hordeCount.rook >= 1 && hordeNum >= 2) && !(hordeNum == 2 && hordeCount(Rook) == 1) then false
+      else if (horde.rook >= 1 && hordeNum >= 2)
+        && !(hordeNum == 2 && horde(Rook) == 1
+          && horde.bishop == 1
+          && piecesOfTypeNot(piecesBishops(hordeBishopColor)) == 1)
+      then false
       else if hordeNum == 1 then
         if piecesNum == 1 then true // A lone piece cannot mate a lone King
-        else if hordeCount.queen == 1 then
+        else if horde.queen == 1 then
           // The horde has a lone queen.
           // A lone queen mates a king on A1 bounded by:
           //  -- a pawn/rook on A2
@@ -178,30 +181,26 @@ case object Horde
           // We ignore every other mating case, since it can be reduced to
           // the two previous cases (e.g. a black pawn on A2 and a black
           // bishop on B1).
-          !(piecesCount.pawn >= 1 || piecesCount.rook >= 1 || piecesBishops(Light) >= 2 || piecesBishops(
+          !(pieces.pawn >= 1 || pieces.rook >= 1 || piecesBishops(Light) >= 2 || piecesBishops(
             Dark
           ) >= 2)
-        else if hordeCount.pawn == 1 then
+        else if horde.pawn == 1 then
           // Promote the pawn to a queen or a knight and check whether white
           // can mate.
-          val pawnSquare =
-            (situation.board.pawns & situation.board.byColor(
-              Color.white
-            )).first.get // we know there is a pawn
-          val promoteToQueen = situation.board.putOrReplace(White.queen, pawnSquare).situationOf(Color.white)
-          val promoteToKnight =
-            situation.board.putOrReplace(White.knight, pawnSquare).situationOf(Color.white)
-          hasInsufficientMaterial(promoteToQueen) && hasInsufficientMaterial(promoteToKnight)
-        else if hordeCount.rook == 1 then
+          val pawnSquare     = (board.pawns & board.byColor(Color.white)).first.get // we know there is a pawn
+          val promoteToQueen = board.putOrReplace(White.queen, pawnSquare)
+          val promoteToKnight = board.putOrReplace(White.knight, pawnSquare)
+          hasInsufficientMaterial(promoteToQueen, color) && hasInsufficientMaterial(promoteToKnight, color)
+        else if horde.rook == 1 then
           // A lone rook mates a king on A8 bounded by a pawn/rook on A7 and a
           // pawn/knight on B7. We ignore every other case, since it can be
           // reduced to the two previous cases.
           // (e.g. three pawns on A7, B7, C7)
-          !(piecesCount.pawn >= 2
-            || (piecesCount.rook >= 1 && piecesCount.pawn >= 1)
-            || (piecesCount.rook >= 1 && piecesCount.knight >= 1)
-            || (piecesCount.pawn >= 1 && piecesCount.knight >= 1))
-        else if hordeCount.bishop == 1 then // The horde has a lone bishop.
+          !(pieces.pawn >= 2
+            || (pieces.rook >= 1 && pieces.pawn >= 1)
+            || (pieces.rook >= 1 && pieces.knight >= 1)
+            || (pieces.pawn >= 1 && pieces.knight >= 1))
+        else if horde.bishop == 1 then // The horde has a lone bishop.
           // The king can be mated on A1 if there is a pawn/opposite-color-bishop
           // on A2 and an opposite-color-bishop on B1.
           // If black has two or more pawns, white gets the benefit of the doubt;
@@ -214,8 +213,8 @@ case object Horde
           // a pawn/opposite-color-bishop on A4, a pawn/opposite-color-bishop on
           // B3, a pawn/bishop/rook/queen on A2 and any other piece on B2.
           !(piecesBishops(!hordeBishopColor) >= 2
-            || (piecesBishops(!hordeBishopColor) >= 1 && piecesCount.pawn >= 1)
-            || piecesCount.pawn >= 2)
+            || (piecesBishops(!hordeBishopColor) >= 1 && pieces.pawn >= 1)
+            || pieces.pawn >= 2)
         else // the Horde has a lone knight
           // The king on A1 can be smother mated by a knight on C2 if there is
           // a pawn/knight/bishop on B2, a knight/rook on B1 and any other piece
@@ -223,24 +222,33 @@ case object Horde
           // Moreover, when black has four or more pieces and two of them are
           // pawns, black can promote their pawns and selfmate theirself.
           !(piecesNum >= 4
-            && (piecesCount.knight >= 2
-              || piecesCount.pawn >= 2
-              || (piecesCount.rook >= 1 && piecesCount.knight >= 1)
-              || (piecesCount.rook >= 1 && piecesCount.bishop >= 1)
-              || (piecesCount.rook >= 1 && piecesCount.pawn >= 1)
-              || (piecesCount.knight >= 1 && piecesCount.bishop >= 1)
-              || (piecesCount.knight >= 1 && piecesCount.pawn >= 1)
-              || (piecesCount.bishop >= 1 && piecesCount.pawn >= 1)
-              || (piecesCount.bishop >= 1 && piecesCount.pawn >= 1)
-              || (situation.hasBishopPair(Black) && piecesCount.pawn >= 1))
+            && (pieces.knight >= 2
+              || pieces.pawn >= 2
+              || (pieces.rook >= 1 && pieces.knight >= 1)
+              || (pieces.rook >= 1 && pieces.bishop >= 1)
+              || (pieces.rook >= 1 && pieces.pawn >= 1)
+              || (pieces.knight >= 1 && pieces.bishop >= 1)
+              || (pieces.knight >= 1 && pieces.pawn >= 1)
+              || (pieces.bishop >= 1 && pieces.pawn >= 1)
+              || (pieces.bishop >= 1 && pieces.pawn >= 1)
+              || (board.hasBishopPair(Black) && pieces.pawn >= 1))
             && (piecesBishops(Dark) < 2 || piecesOfTypeNot(piecesBishops(Dark)) >= 3)
             && (piecesBishops(Light) < 2 || piecesOfTypeNot(piecesBishops(Light)) >= 3))
       // By this point, we only need to deal with white's minor pieces.
       else if hordeNum == 2 then
         if piecesNum == 1 then true
-        else if hordeCount.knight == 2 then piecesCount.pawn + piecesCount.bishop + piecesCount.knight < 1
-        else if situation.hasBishopPair(White) then
-          !(piecesCount.pawn >= 1 || piecesBishops(!hordeBishopColor) >= 1 ||
+        else if horde.knight == 2 then pieces.pawn + pieces.bishop + pieces.knight < 1
+        else if board.hasBishopPair(color) then
+          !(pieces.pawn >= 1 || pieces.bishop >= 1 ||
+            (pieces.knight >= 1 && pieces.rook + pieces.queen >= 1))
+        else if horde.bishop >= 1 && horde.knight >= 1 then
+          // The horde has a bishop and a knight.
+          // A king on A1 obstructed by a pawn/opposite-color-bishop on
+          // A2 is mated by a knight on D2 and a bishop on C3.
+          !(pieces.pawn >= 1 || piecesBishops(!hordeBishopColor) >= 1 ||
+            // A king on A1 bounded by two friendly pieces on A2 and B1 is
+            // mated when the knight moves from D4 to C2 so that both the
+            // knight and the bishop deliver check.
             piecesOfTypeNot(piecesBishops(hordeBishopColor)) >= 3)
         else
           // The horde has two or more bishops on the same color.
@@ -251,18 +259,18 @@ case object Horde
           // bishops on B2 and C3. This position is theoretically
           // achievable even when black has two pawns or when they
           // have a pawn and an opposite color bishop.
-          !((piecesCount.pawn >= 1 && piecesBishops(!hordeBishopColor) >= 1)
-            || (piecesCount.pawn >= 1 && piecesCount.knight >= 1)
-            || (piecesBishops(!hordeBishopColor) >= 1 && piecesCount.knight >= 1)
+          !((pieces.pawn >= 1 && piecesBishops(!hordeBishopColor) >= 1)
+            || (pieces.pawn >= 1 && pieces.knight >= 1)
+            || (piecesBishops(!hordeBishopColor) >= 1 && pieces.knight >= 1)
             || piecesBishops(!hordeBishopColor) >= 2
-            || piecesCount.knight >= 2
-            || piecesCount.pawn >= 2)
+            || pieces.knight >= 2
+            || pieces.pawn >= 2)
       else // hordeNum == 3
-        if (hordeCount.knight == 2 && hordeCount.bishop == 1)
-          || hordeCount.knight == 3
-          || situation.hasBishopPair(White)
-        then false
-        else piecesNum == 1
+      if (horde.knight == 2 && horde.bishop == 1)
+        || horde.knight == 3
+        || board.hasBishopPair(White)
+      then false
+      else piecesNum == 1
 
 enum SquareColor:
   case Light, Dark

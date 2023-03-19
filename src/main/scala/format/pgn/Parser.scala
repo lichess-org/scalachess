@@ -35,7 +35,9 @@ object Parser:
 
   private object MovesParser:
 
-    private def cleanComments(comments: List[String]) = comments.map(_.trim).filter(_.nonEmpty)
+    private def cleanComments(comments: List[String]) = Comment from comments.collect {
+      case c if !c.isBlank => c.trim
+    }
 
     def moves(str: PgnMovesStr): Validated[ErrorStr, Sans] =
       strMove.rep.map(xs => Sans(xs.toList)).parse(str.value) match
@@ -116,12 +118,15 @@ object Parser:
       .recursive[San] { recuse =>
         val variation: P[Variation] =
           (P.char('(') *> commentary.rep0.surroundedBy(escape) ~ recuse.rep0 <* (P.char(')') ~ escape))
-            .map { case (comments, sans) => Variation(comments, Sans(sans)) }
+            .map { (comments, sans) => Variation(Comment from comments, Sans(sans)) }
 
         ((number.backtrack | commentary).rep0 ~ forbidNullMove).with1 *>
           (((MoveParser.moveWithSuffix ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0) <* escape).backtrack
             .map { case ((((san, glyphs), comments), glyphs2), variations) =>
-              san withComments comments withVariations variations mergeGlyphs (glyphs merge glyphs2)
+              san
+                .withComments(Comment.from(comments))
+                .withVariations(variations)
+                .mergeGlyphs(glyphs merge glyphs2)
             }
       }
 

@@ -18,7 +18,7 @@ class ParserBench {
 
   var games = Fixtures.gamesForPerfTest
   @Benchmark
-  def PgnParser(): Boolean =
+  def pgnParser(): Boolean =
     games.traverse(Parser.full).isValid
 
 }

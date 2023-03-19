@@ -114,7 +114,6 @@ case object Horde
       val pieces   = piecesb.map(_.count)
       val piecesBishops: SquareColor => Int = color => (piecesb.bishop & color.bb).count
       val piecesNum                         = piecesb.map(_.count).values.sum
-      // horde or all?
       val piecesOfTypeNot = (pieces: Int) => piecesNum - pieces
       if hordeNum == 0 then true
       else if hordeNum >= 4 then false // Four or more white pieces can always deliver mate.
@@ -198,9 +197,18 @@ case object Horde
       // By this point, we only need to deal with white's minor pieces.
       else if hordeNum == 2 then
         if piecesNum == 1 then true
-        else if horde.knight == 2 then pieces.pawn + pieces.bishop + pieces.knight < 1
+        else if horde.knight == 2 then
+          // A king on A1 is mated by two knights, if it is obstructed by a
+          // pawn/bishop/knight on B2. On the other hand, if black only has
+          // major pieces it is a draw.
+          pieces.pawn + pieces.bishop + pieces.knight < 1
         else if board.hasBishopPair(color) then
+          // A king on A1 obstructed by a pawn/bishop on A2 is mated
+          // by the bishop pair.
           !(pieces.pawn >= 1 || pieces.bishop >= 1 ||
+            // A pawn/bishop/knight on B4, a pawn/bishop/rook/queen on
+            // A4 and the king on A3 enable Boden's mate by the bishop
+            // pair. In every other case white cannot win.
             (pieces.knight >= 1 && pieces.rook + pieces.queen >= 1))
         else if horde.bishop >= 1 && horde.knight >= 1 then
           // The horde has a bishop and a knight.
@@ -226,11 +234,18 @@ case object Horde
             || piecesBishops(!hordeBishopColor) >= 2
             || pieces.knight >= 2
             || pieces.pawn >= 2)
-      else // hordeNum == 3
+      // hordeNum == 3
+      else
+      // A king in the corner is mated by two knights and a bishop or three
+      // knights or the bishop pair and a knight/bishop.
       if (horde.knight == 2 && horde.bishop == 1)
         || horde.knight == 3
         || board.hasBishopPair(White)
       then false
+      // White has two same color bishops and a knight.
+      // A king on A1 is mated by a bishop on B2, a bishop on C1 and a
+      // knight on C3, as long as there is another black piece to waste
+      // a tempo.
       else piecesNum == 1
 
 enum SquareColor:

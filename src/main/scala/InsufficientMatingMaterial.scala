@@ -7,8 +7,6 @@ package chess
   */
 object InsufficientMatingMaterial:
 
-  def nonKingPieces(board: Board): PieceMap = board.pieces filter (_._2.role != King)
-
   // verify if there are at least two bishops of opposite color
   // no matter which sides they are on
   def bishopsOnOppositeColors(board: Board) =

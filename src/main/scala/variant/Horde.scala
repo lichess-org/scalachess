@@ -4,7 +4,6 @@ package variant
 import chess.format.EpdFen
 import chess.bitboard.Bitboard
 import chess.bitboard.Bitboard.*
-import cats.Functor
 import cats.syntax.all.*
 
 case object Horde
@@ -259,25 +258,3 @@ enum SquareColor:
     case Light => Dark
     case Dark  => Light
 
-case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
-  def apply(role: Role): A = role match
-    case Pawn   => pawn
-    case Knight => knight
-    case Bishop => bishop
-    case Rook   => rook
-    case Queen  => queen
-    case King   => king
-
-  def values: List[A] = List(pawn, knight, bishop, rook, queen, king)
-
-object ByRole:
-  given Functor[ByRole] with
-    def map[A, B](byRole: ByRole[A])(f: A => B): ByRole[B] =
-      ByRole(
-        f(byRole.pawn),
-        f(byRole.knight),
-        f(byRole.bishop),
-        f(byRole.rook),
-        f(byRole.queen),
-        f(byRole.king)
-      )

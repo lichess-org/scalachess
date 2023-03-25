@@ -5,32 +5,27 @@ import Bitboard.*
 
 // Chess board representation
 case class Board(
-    pawns: Bitboard,
-    knights: Bitboard,
-    bishops: Bitboard,
-    rooks: Bitboard,
-    queens: Bitboard,
-    kings: Bitboard,
+    occupied: Bitboard,
     white: Bitboard,
     black: Bitboard,
-    occupied: Bitboard
+    byRole: ByRole[Bitboard]
 ):
   def isOccupied(s: Pos): Boolean = occupied.contains(s)
+
+  import byRole.{
+    bishop as bishops,
+    king as kings,
+    knight as knights,
+    pawn as pawns,
+    queen as queens,
+    rook as rooks
+  }
 
   def sliders = bishops ^ rooks ^ queens
 
   lazy val byColor = Color.Map(white, black)
 
   lazy val nbPieces = occupied.count
-
-  def byRole(role: Role): Bitboard =
-    role match
-      case Pawn   => pawns
-      case Knight => knights
-      case Bishop => bishops
-      case Rook   => rooks
-      case Queen  => queens
-      case King   => kings
 
   def byPiece(piece: Piece): Bitboard =
     byColor(piece.color) & byRole(piece.role)
@@ -121,12 +116,7 @@ case class Board(
     )
 
   def roles: Role => Bitboard =
-    case Pawn   => pawns
-    case Knight => knights
-    case Bishop => bishops
-    case Rook   => rooks
-    case Queen  => queens
-    case King   => kings
+    byRole
 
   // put a piece to an empty square
   def put(piece: Piece, at: Pos): Option[Board] =

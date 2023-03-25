@@ -4,7 +4,6 @@ package perft
 import chess.format.EpdFen
 import chess.variant.Chess960
 import chess.variant.Variant
-import org.specs2.specification.core.*
 import chess.variant.Crazyhouse
 import MoveOrDrop.*
 import chess.format.Fen
@@ -75,7 +74,7 @@ object Perft:
       else if s.perftEnd then 0L
       else
         val moves = s.perftMoves
-        if (depth == 1) then moves.size.toLong
+        if depth == 1 then moves.size.toLong
         else moves.map(_.situationAfter.perft(depth - 1)).sum
 
     private def perftMoves: List[MoveOrDrop] =

@@ -23,7 +23,7 @@ To run the tests
 
     test
 
-To run benchmarks (takes more than 1 hour to finish to finish):
+To run benchmarks (takes more than 1 hour to finish):
 
     bench / Jmh / run
 

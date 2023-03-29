@@ -9,7 +9,7 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
     "com.github.lenguyenthanh" % "compression" % "aacf55bea2" % Test, // a fork of lichess compression which public everything so we can use it for testing.
     "com.disneystreaming" %% "weaver-cats"       % "0.8.2" % Test,
     "com.disneystreaming" %% "weaver-scalacheck" % "0.8.2" % Test,
-    "com.github.ornicar"  %% "scalalib"          % "9.1.3",
+    "com.github.ornicar"  %% "scalalib"          % "9.2.0",
     "co.fs2"              %% "fs2-core"          % "3.6.1" % Test,
     "co.fs2"              %% "fs2-io"            % "3.6.1" % Test,
     "joda-time"            % "joda-time"         % "2.12.4",
@@ -35,7 +35,7 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
 )
 
 ThisBuild / organization      := "org.lichess"
-ThisBuild / version           := "14.7.0"
+ThisBuild / version           := "14.7.1"
 ThisBuild / scalaVersion      := "3.3.0-RC3"
 ThisBuild / licenses += "MIT" -> url("https://opensource.org/licenses/MIT")
 

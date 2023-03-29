@@ -127,6 +127,15 @@ class HordeVariantTest extends ChessTest:
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
 
+    "Must not auto-draw black King doesn't have to take white" in:
+      val position = EpdFen("8/8/8/7k/7P/7P/8/8 b - - 0 58")
+
+      val game     = fenToGame(position, Horde)
+      game must beValid.like { case game =>
+        game.situation.autoDraw must beFalse
+        game.situation.opponentHasInsufficientMaterial must beFalse
+      }
+
     "Must not auto-draw in B vs K endgame, king can win" in:
       val position = EpdFen("7B/6k1/8/8/8/8/8/8 b - -")
       val game     = fenToGame(position, Horde)

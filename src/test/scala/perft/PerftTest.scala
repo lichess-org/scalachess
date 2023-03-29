@@ -9,16 +9,14 @@ import chess.variant.*
 class PerftTest extends ChessTest:
 
   private def genTests(name: String, tests: List[Perft], variant: Variant, nodeLimit: Long): Fragments =
-    name >> {
+    name should:
       Fragments.foreach(tests) { perft =>
-        perft.id >> {
+        perft.id in:
           val result = perft.withLimit(nodeLimit).calculate(variant)
           Fragments.foreach(result) { r =>
             s"${r.depth}" in { r.result must_== r.expected }
           }
-        }
       }
-    }
 
   val nodeLimits = 1_000_000L
   // genTests("calculate ThreeCheck perfts", Perft.threeCheckPerfts, ThreeCheck, nodeLimits)

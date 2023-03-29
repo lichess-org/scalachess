@@ -7,11 +7,11 @@ import bitboard.Bitboard.*
 
 class KnightTest extends ChessTest:
 
-  "a knight" should {
+  "a knight" should:
 
     val knight = White - Knight
 
-    "not move to positions that are occupied by the same colour" in {
+    "not move to positions that are occupied by the same colour" in:
       val board = """
 k B
 
@@ -35,9 +35,8 @@ PPPx PPP
  NBQKBNR
 """
       )
-    }
 
-    "capture opponent pieces" in {
+    "capture opponent pieces" in:
       val board = """
 k B
 
@@ -61,5 +60,3 @@ PPPx PPP
  NBQKBNR
 """
       )
-    }
-  }

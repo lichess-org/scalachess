@@ -10,9 +10,9 @@ class VariantTest extends ChessTest:
 
   val board = makeBoard
 
-  "standard" should {
+  "standard" should:
 
-    "position pieces correctly" in {
+    "position pieces correctly" in:
       Standard.pieces must havePairs(
         A1 -> (White - Rook),
         B1 -> (White - Knight),
@@ -47,9 +47,8 @@ class VariantTest extends ChessTest:
         G8 -> (Black - Knight),
         H8 -> (Black - Rook)
       )
-    }
 
-    "Identify insufficient mating material when called (bishop)." in {
+    "Identify insufficient mating material when called (bishop)." in:
       val position = EpdFen("krq5/bqqq4/qqr5/1qq5/8/8/8/3qB2K b - -")
       val game     = fenToGame(position, Standard)
 
@@ -57,9 +56,8 @@ class VariantTest extends ChessTest:
         game.board.materialImbalance must_== -91
         game.situation.opponentHasInsufficientMaterial must beTrue
       }
-    }
 
-    "Identify sufficient mating material when called (bishop)." in {
+    "Identify sufficient mating material when called (bishop)." in:
       val position = EpdFen("8/7B/K7/2b5/1k6/8/8/8 b - -")
       val game     = fenToGame(position, Standard)
 
@@ -67,9 +65,8 @@ class VariantTest extends ChessTest:
         game.board.materialImbalance must_== 0
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
-    }
 
-    "Identify insufficient mating material when called (knight)." in {
+    "Identify insufficient mating material when called (knight)." in:
       val position = EpdFen("8/3k4/2q5/8/8/K1N5/8/8 b - -")
       val game     = fenToGame(position, Standard)
 
@@ -77,23 +74,18 @@ class VariantTest extends ChessTest:
         game.board.materialImbalance must_== -6
         game.situation.opponentHasInsufficientMaterial must beTrue
       }
-    }
-  }
 
-  "chess960" should {
+  "chess960" should:
 
-    "position pieces correctly" in {
+    "position pieces correctly" in:
       Chess960.pieces must havePair(A2 -> (White - Pawn))
-    }
 
-    "initialize the board with castling rights" in {
+    "initialize the board with castling rights" in:
       Board.init(Chess960).history.castles must_== Castles.all
-    }
-  }
 
-  "kingOfTheHill" should {
-    "detect win" in {
-      "not" in {
+  "kingOfTheHill" should:
+    "detect win" in:
+      "not" in:
         Game(
           """
 PPk
@@ -101,8 +93,7 @@ K
 """.kingOfTheHill,
           White
         ).situation.end must beFalse
-      }
-      "regular checkMate" in {
+      "regular checkMate" in:
         val game = Game(
           """
 PP
@@ -113,8 +104,7 @@ K  r
 
         game.situation.end must beTrue
         game.situation.winner must beSome { (_: Color) == Black }
-      }
-      "centered black king" in {
+      "centered black king" in:
         val sit = Game(
           """
    k
@@ -127,17 +117,12 @@ PP
         sit.end must beTrue
         sit.winner must beSome { (_: Color) == Black }
 
-      }
-    }
-
-    "initialize the board with castling rights" in {
+    "initialize the board with castling rights" in:
       Board.init(KingOfTheHill).history.castles must_== Castles.all
-    }
-  }
 
-  "threeCheck" should {
-    "detect win" in {
-      "not" in {
+  "threeCheck" should:
+    "detect win" in:
+      "not" in:
         Game(
           """
 PPk
@@ -145,8 +130,7 @@ K
 """.threeCheck,
           White
         ).situation.end must beFalse
-      }
-      "regular checkMate" in {
+      "regular checkMate" in:
         val game = Game(
           """
 PP
@@ -156,8 +140,7 @@ K  r
         )
         game.situation.end must beTrue
         game.situation.winner must beSome { (_: Color) == Black }
-      }
-      "1 check" in {
+      "1 check" in:
         val game = Game(Board init ThreeCheck)
           .playMoves(
             E2 -> E4,
@@ -168,8 +151,7 @@ K  r
           .toOption
           .get
         game.situation.end must beFalse
-      }
-      "2 checks" in {
+      "2 checks" in:
         val game = Game(Board init ThreeCheck)
           .playMoves(
             E2 -> E4,
@@ -182,8 +164,7 @@ K  r
           .toOption
           .get
         game.situation.end must beFalse
-      }
-      "3 checks" in {
+      "3 checks" in:
         val game = Game(Board init ThreeCheck)
           .playMoves(
             E2 -> E4,
@@ -202,10 +183,8 @@ K  r
         game.situation.end must beTrue
 
         game.situation.winner must beSome { (_: Color) == Black }
-      }
-    }
 
-    "Not force a draw when there is insufficient mating material" in {
+    "Not force a draw when there is insufficient mating material" in:
       val position = EpdFen("8/6K1/8/8/8/8/k6p/8 b - - 1 39")
       val game     = fenToGame(position, ThreeCheck)
 
@@ -214,9 +193,8 @@ K  r
       successGame must beValid.like { case game =>
         game.situation.end must beFalse
       }
-    }
 
-    "Force a draw when there are only kings remaining" in {
+    "Force a draw when there are only kings remaining" in:
       val position = EpdFen("8/6K1/8/8/8/8/k7/8 b - -")
       val game     = fenToGame(position, ThreeCheck)
 
@@ -224,15 +202,12 @@ K  r
         game.situation.end must beTrue
         game.situation.status must beEqualTo(Status.Draw.some)
       }
-    }
 
-    "initialize the board with castling rights" in {
+    "initialize the board with castling rights" in:
       Board.init(KingOfTheHill).history.castles must_== Castles.all
-    }
-  }
 
-  "racingKings" should {
-    "call it stalemate when there is no legal move" in {
+  "racingKings" should:
+    "call it stalemate when there is no legal move" in:
       val position = EpdFen("8/8/8/8/3K4/8/1k6/b7 b - - 5 3")
       val game     = fenToGame(position, RacingKings)
 
@@ -240,9 +215,8 @@ K  r
         game.situation.end must beTrue
         game.situation.staleMate must beTrue
       }
-    }
 
-    "should not draw because of insufficient material" in {
+    "should not draw because of insufficient material" in:
       val position = EpdFen("8/8/8/8/5K2/8/2k5/8 w - - 0 1")
       val game     = fenToGame(position, RacingKings)
 
@@ -250,10 +224,9 @@ K  r
         game.situation.end must beFalse
         game.situation.staleMate must beFalse
       }
-    }
 
-    "should recognize a king in the goal" in {
-      "white" in {
+    "should recognize a king in the goal" in:
+      "white" in:
         val position = EpdFen("2K5/8/6k1/8/8/8/8/Q6q w - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
@@ -261,9 +234,8 @@ K  r
           game.situation.end must beTrue
           game.situation.winner must beSome { (_: Color) == White }
         }
-      }
 
-      "black" in {
+      "black" in:
         val position = EpdFen("6k1/8/8/8/8/2r5/1KB5/2B5 w - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
@@ -271,33 +243,27 @@ K  r
           game.situation.end must beTrue
           game.situation.winner must beSome { (_: Color) == Black }
         }
-      }
-    }
 
-    "should give black one more move" in {
-      "when white is in the goal" in {
+    "should give black one more move" in:
+      "when white is in the goal" in:
         val position = EpdFen("2K5/5k2/8/8/8/8/8/8 b - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
         game must beValid.like { case game =>
           game.situation.end must beFalse
         }
-      }
 
-      "but not if it does not matter anyway" in {
+      "but not if it does not matter anyway" in:
         val position = EpdFen("2K5/8/2n1nk2/8/8/8/8/4r3 b - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
         game must beValid { (game: Game) =>
           game.situation.end must beTrue
-          game.situation.winner must beSome {
+          game.situation.winner must beSome:
             (_: Color) == White
-          }
         }
-      }
-    }
 
-    "should call it a draw with both kings in the goal" in {
+    "should call it a draw with both kings in the goal" in:
       val position = EpdFen("2K2k2/8/8/8/8/1b6/1b6/8 w - - 0 1")
       val game     = fenToGame(position, RacingKings)
 
@@ -305,30 +271,22 @@ K  r
         game.situation.end must beTrue
         game.situation.status must beEqualTo(Status.Draw.some)
       }
-    }
 
-    "initialize the board without castling rights" in {
+    "initialize the board without castling rights" in:
       Board.init(RacingKings).history.castles.isEmpty must beTrue
-    }
-  }
 
-  "antichess" should {
-    "initialize the board without castling rights" in {
+  "antichess" should:
+    "initialize the board without castling rights" in:
       Board.init(Antichess).history.castles.isEmpty must beTrue
-    }
 
-    "calculate material imbalance" in {
+    "calculate material imbalance" in:
       val position = EpdFen("8/p7/8/8/2B5/b7/PPPK2PP/RNB3NR w - - 1 16")
       val game     = fenToGame(position, Antichess)
 
       game must beValid.like { case game =>
         game.situation.board.materialImbalance must_== -20
       }
-    }
-  }
 
-  "horde" should {
-    "initialize the board with black castling rights" in {
+  "horde" should:
+    "initialize the board with black castling rights" in:
       Board.init(Horde).history.castles must_== Castles("kq")
-    }
-  }

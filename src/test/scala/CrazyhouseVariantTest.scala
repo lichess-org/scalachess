@@ -9,9 +9,9 @@ import chess.Pos.*
 
 class CrazyhouseVariantTest extends ChessTest:
 
-  "Crazyhouse" should {
+  "Crazyhouse" should:
 
-    "nothing to drop" in {
+    "nothing to drop" in:
       val fenPosition = EpdFen("3Nkb1r/1pQP1ppp/4p3/3N4/N5N1/6B1/PPPPBPPP/R1B2RK1 b - - 0 25")
       val game = {
         fenToGame(fenPosition, Crazyhouse).toOption.get
@@ -28,9 +28,8 @@ class CrazyhouseVariantTest extends ChessTest:
       }
       game.situation.checkMate must beTrue
       game.situation.opponentHasInsufficientMaterial must beFalse
-    }
 
-    "pieces to drop, in vain" in {
+    "pieces to drop, in vain" in:
       val fenPosition = EpdFen("3Nkb1r/1pQP1ppp/4p3/3N4/N5N1/6B1/PPPPBPPP/R1B2RK1 b - - 0 25")
       val game = {
         fenToGame(fenPosition, Crazyhouse).toOption.get
@@ -47,17 +46,15 @@ class CrazyhouseVariantTest extends ChessTest:
       }
       game.situation.checkMate must beTrue
       game.situation.opponentHasInsufficientMaterial must beFalse
-    }
 
-    "autodraw" in {
-      "tons of pointless moves but shouldn't apply 50-moves" in {
+    "autodraw" in:
+      "tons of pointless moves but shouldn't apply 50-moves" in:
         val moves = List.fill(30)(List(B1 -> C3, B8 -> C6, C3 -> B1, C6 -> B8))
         Game(Crazyhouse).playMoves(moves.flatten*) must beValid.like { case g =>
           g.board.variant.fiftyMoves(g.board.history) must beFalse
           g.board.autoDraw must beTrue // fivefold repetition
         }
-      }
-      "from prod should 3fold" in {
+      "from prod should 3fold" in:
         val moves = List(
           E2 -> E4,
           E7 -> E6,
@@ -160,8 +157,7 @@ class CrazyhouseVariantTest extends ChessTest:
         Game(Crazyhouse).playMoves(moves*) must beValid.like { case g =>
           g.board.history.threefoldRepetition must beTrue
         }
-      }
-      "from prod with captures and drops should 3fold" in {
+      "from prod with captures and drops should 3fold" in:
         chess.Replay.boards(
           sans = SanStr.from(
             "e4 e5 Nf3 Nc6 Bc4 Bc5 d3 d6 Nc3 h6 O-O Nf6 Be3 Bg4 Na4 b6 Nxc5 bxc5 B@b7 Nd4 Bxd4 cxd4 N@c6 O-O Nxd8 Raxd8 Bbd5 B@h5 Bxf7+ Bxf7 P@e7 Bxc4 exf8=Q+ Rxf8 dxc4 B@f7 B@d5 B@h5 Bxf7+ Bxf7 B@f5 B@h5 Bxg4 Bxg4"
@@ -173,8 +169,7 @@ class CrazyhouseVariantTest extends ChessTest:
         ) must beValid.like { boards =>
           boards.last.history.threefoldRepetition must beTrue
         }
-      }
-      "from prod should not 3fold" in {
+      "from prod should not 3fold" in:
         val moves = List(
           E2 -> E4,
           E7 -> E6,
@@ -271,17 +266,14 @@ class CrazyhouseVariantTest extends ChessTest:
         Game(Crazyhouse).playMoves(moves*) must beValid.like { case g =>
           g.board.history.threefoldRepetition must beFalse
         }
-      }
-      "not draw when only kings left" in {
+      "not draw when only kings left" in:
         val fenPosition = EpdFen("k6K/8/8/8/8/8/8/8 w - - 0 25")
         val game =
           fenToGame(fenPosition, Crazyhouse).toOption.get
         game.situation.autoDraw must beFalse
         game.situation.end must beFalse
         game.situation.opponentHasInsufficientMaterial must beFalse
-      }
-    }
-    "prod 50 games accumulate hash" in {
+    "prod 50 games accumulate hash" in:
       val gameMoves = format.pgn.Fixtures.prod50crazyhouse.map { g =>
         SanStr from g.split(' ').toList
       }
@@ -293,18 +285,16 @@ class CrazyhouseVariantTest extends ChessTest:
       val m8  = java.security.MessageDigest getInstance "MD5"
       val m16 = java.security.MessageDigest getInstance "MD5"
       val h   = Hash(16)
-      g.foreach {
+      g.foreach:
         _._2.foreach { x =>
           val ph = h(x._1.situation)
           m8.update(PositionHash.value(ph).slice(0, 8))
           m16.update(PositionHash value ph)
         }
-      }
       hex(m8.digest) must beEqualTo("fcf5867ad3324c4be6d28108ff27212c")
       hex(m16.digest) must beEqualTo("80c4edf5fbd41eff78d3d563777beb61")
-    }
 
-    "destinations prod bug on game VVXRgsQT" in {
+    "destinations prod bug on game VVXRgsQT" in:
       chess
         .Game(
           Crazyhouse.some,
@@ -318,9 +308,8 @@ class CrazyhouseVariantTest extends ChessTest:
         G3 -> Set(G2),
         F1 -> Set(G2)
       )
-    }
 
-    "replay ZH" in {
+    "replay ZH" in:
       chess.Replay.boards(
         sans =
           SanStr from "e4 c5 Na3 d6 Nf3 Bg4 Bc4 Bxf3 Qxf3 N@b4 Bxf7+ Kd7 P@d5 Nf6 O-O Nxc2 Nb5 P@c4 Be6+ Ke8 B@f7#"
@@ -329,7 +318,6 @@ class CrazyhouseVariantTest extends ChessTest:
         initialFen = None,
         variant = Crazyhouse
       ) must beValid
-    }
 
     val dropTestCases: List[DropTestCase] = List(
       // Queen check in diagonal
@@ -371,15 +359,12 @@ class CrazyhouseVariantTest extends ChessTest:
       )
     )
 
-    "possible drops" in {
+    "possible drops" in:
       forall(dropTestCases) { case DropTestCase(fen, drops) =>
         val maybeGame = fenToGame(fen, Crazyhouse)
         maybeGame must beValid.like { case game =>
           Crazyhouse.possibleDrops(game.situation).map(_.toSet) must_== drops
         }
       }
-    }
-
-  }
 
 case class DropTestCase(fen: EpdFen, drops: Option[Set[Pos]])

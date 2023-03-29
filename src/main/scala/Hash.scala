@@ -12,7 +12,7 @@ object PositionHash extends TotalWrapper[PositionHash, Array[Byte]]:
 opaque type Hash = Int
 object Hash extends OpaqueInt[Hash]:
   extension (size: Hash)
-    def apply(situation: Situation): PositionHash = PositionHash {
+    def apply(situation: Situation): PositionHash = PositionHash:
       val l = Hash.get(situation, Hash.polyglotTable)
       if (size <= 8) Array.tabulate(size)(i => (l >>> ((7 - i) * 8)).toByte)
       else
@@ -21,7 +21,6 @@ object Hash extends OpaqueInt[Hash]:
           if (i < 8) (l >>> ((7 - i) * 8)).toByte
           else (m >>> ((15 - i) * 8)).toByte
         )
-    }
 
   val size = 3
 

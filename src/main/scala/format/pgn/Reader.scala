@@ -37,14 +37,13 @@ object Reader:
   private def cleanUserInput(str: String) = str.replace(s"\ufeff", "")
 
   private def makeReplay(game: Game, sans: Sans): Result =
-    sans.value.foldLeft[Result](Result.Complete(Replay(game))) {
+    sans.value.foldLeft[Result](Result.Complete(Replay(game))):
       case (Result.Complete(replay), san) =>
         san(replay.state.situation).fold(
           err => Result.Incomplete(replay, err),
           move => Result.Complete(replay addMove move)
         )
       case (r: Result.Incomplete, _) => r
-    }
 
   private def makeGame(tags: Tags) =
     val g = Game(

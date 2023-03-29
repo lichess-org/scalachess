@@ -51,9 +51,9 @@ Ne5 {[%emt 0.364]} 30. Rxc8 {[%emt 0.469]} Nc4 {[%emt 0.201]} 31. Rxc4 {[%emt 1.
 b5 {[%emt 0.223]} 32. Rxd4 {[%emt 0.359]} b4 {[%emt 0.202]} 33. Rxb4 {[%emt 0.500]}
 g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
-  "Antichess " should {
+  "Antichess " should:
 
-    "Allow an opening move for white taking into account a player may move without taking if possible" in {
+    "Allow an opening move for white taking into account a player may move without taking if possible" in:
       val startingPosition = Game(Antichess)
       val afterFirstMove   = startingPosition.playMove(Pos.E2, Pos.E4, None)
 
@@ -61,18 +61,16 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         val fen = Fen write newGame
         fen mustEqual EpdFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b - - 0 1")
       }
-    }
 
-    "Not allow a player to make a non capturing move if a capturing move is available" in {
+    "Not allow a player to make a non capturing move if a capturing move is available" in:
       val game             = Game(Antichess)
       val gameAfterOpening = game.playMoves((Pos.E2, Pos.E4), (Pos.F7, Pos.F5))
 
       val invalidGame = gameAfterOpening flatMap (_.playMove(Pos.H2, Pos.H4))
 
       invalidGame must beInvalid("Piece on h2 cannot move to h4")
-    }
 
-    "A situation in antichess should only present the capturing moves if the player can capture" in {
+    "A situation in antichess should only present the capturing moves if the player can capture" in:
       val game             = Game(Antichess)
       val gameAfterOpening = game.playMoves((Pos.E2, Pos.E4), (Pos.F7, Pos.F5))
 
@@ -81,14 +79,11 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         newGame.situation.legalMoves.exists(_.captures == false) must beEqualTo(false)
       }
 
-    }
-
-    "Allow a capturing move to be made" in {
+    "Allow a capturing move to be made" in:
       val game = Game(Antichess).playMoves((Pos.E2, Pos.E4), (Pos.F7, Pos.F5), (Pos.E4, Pos.F5))
       game must beValid
-    }
 
-    "Not permit a player to castle" in {
+    "Not permit a player to castle" in:
       // Castling is not allowed in antichess
       val game = Game(Antichess).playMoves(
         (Pos.E2, Pos.E4),
@@ -105,9 +100,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         dests must beEqualTo(List(Pos.F1))
       }
 
-    }
-
-    "Not allow a king to be put into check" in {
+    "Not allow a king to be put into check" in:
       val game = Game(Antichess).playMoves(
         Pos.E2 -> Pos.E4,
         Pos.E7 -> Pos.E5,
@@ -117,9 +110,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       game must beValid.like { newGame =>
         newGame.situation.check === Check.No
       }
-    }
 
-    "Allow kings to be captured" in {
+    "Allow kings to be captured" in:
       val game = Game(Antichess).playMoves(
         Pos.E2 -> Pos.E4,
         Pos.E7 -> Pos.E5,
@@ -131,9 +123,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       game must beValid.like { case newGame =>
         newGame.board.kingOf(Color.black).isEmpty
       }
-    }
 
-    "Not allow a king to be check mated" in {
+    "Not allow a king to be check mated" in:
       val game = Game(Antichess).playMoves(
         Pos.F2 -> Pos.F3,
         Pos.E7 -> Pos.E6,
@@ -144,28 +135,23 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       game must beValid.like { case newGame =>
         newGame.situation.checkMate must beFalse
       }
-    }
 
-    "Allow a pawn to be promoted to a king" in {
+    "Allow a pawn to be promoted to a king" in:
       val position     = EpdFen("8/5P2/8/2b5/8/8/4B3/8 w - -")
       val originalGame = fenToGame(position, Antichess)
 
       val newGame = originalGame flatMap (_.apply(Pos.F7, Pos.F8, Option(King))) map (_._1)
 
-      newGame must beValid {
+      newGame must beValid:
         (_: Game).board(Pos.F8).mustEqual(Option(White - King))
-      }
 
-    }
-
-    "deal with 2 white kings" in {
+    "deal with 2 white kings" in:
       val position     = EpdFen("K3k1nr/p2q2pp/p2p1p2/8/2PP4/8/PP4PP/RNBQK1NR w - - 0 11")
       val originalGame = fenToGame(position, Antichess).toOption.get
 
       originalGame.situation.destinations === Map(Pos.A8 -> List(Pos.A7))
-    }
 
-    "Be drawn when there are only opposite colour bishops remaining" in {
+    "Be drawn when there are only opposite colour bishops remaining" in:
       val position     = EpdFen("8/2b5/8/8/8/6Q1/4B3/8 b - -")
       val originalGame = fenToGame(position, Antichess)
 
@@ -177,9 +163,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         drawnGame.situation.winner must beNone
         drawnGame.situation.status must beSome(Status.Draw)
       }
-    }
 
-    "Be drawn on multiple bishops on the opposite color" in {
+    "Be drawn on multiple bishops on the opposite color" in:
       val position     = EpdFen("8/6P1/8/8/1b6/8/8/5B2 w - -")
       val originalGame = fenToGame(position, Antichess)
 
@@ -192,9 +177,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         drawnGame.situation.status must beSome(Status.Draw)
       }
 
-    }
-
-    "Not be drawn when the black and white bishops are on the same coloured squares " in {
+    "Not be drawn when the black and white bishops are on the same coloured squares " in:
       val position     = EpdFen("7b/8/1p6/8/8/8/5B2/8 w - -")
       val originalGame = fenToGame(position, Antichess)
 
@@ -205,9 +188,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         nonDrawnGame.situation.autoDraw must beFalse
         nonDrawnGame.situation.winner must beNone
       }
-    }
 
-    "Be drawn when there are only opposite colour bishops and pawns which could not attack those bishops remaining" in {
+    "Be drawn when there are only opposite colour bishops and pawns which could not attack those bishops remaining" in:
       val position     = EpdFen("8/6p1/4B1P1/4p3/4P3/8/2p5/8 b - - 1 28")
       val originalGame = fenToGame(position, Antichess)
 
@@ -218,9 +200,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         drawnGame.situation.autoDraw must beTrue
         drawnGame.situation.status must beSome(Status.Draw)
       }
-    }
 
-    "Not be drawn on opposite color bishops but with pawns that could be forced to attack a bishop" in {
+    "Not be drawn on opposite color bishops but with pawns that could be forced to attack a bishop" in:
       val position     = EpdFen("8/6p1/1B4P1/4p3/4P3/8/3p4/8 b - -")
       val originalGame = fenToGame(position, Antichess)
 
@@ -231,9 +212,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         nonDrawnGame.situation.autoDraw must beFalse
         nonDrawnGame.situation.status must beNone
       }
-    }
 
-    "Not be drawn where a white bishop can attack a black pawn in an almost closed position" in {
+    "Not be drawn where a white bishop can attack a black pawn in an almost closed position" in:
       val position     = EpdFen("5b2/1P4p1/4B1P1/4p3/4P3/8/8/8 w - -")
       val originalGame = fenToGame(position, Antichess)
 
@@ -245,9 +225,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         nonDrawnGame.situation.status must beNone
       }
 
-    }
-
-    "Not be drawn where a pawn is unattackable, but is blocked by a bishop, not a pawn" in {
+    "Not be drawn where a pawn is unattackable, but is blocked by a bishop, not a pawn" in:
       val position     = EpdFen("8/8/4BbP1/4p3/4P3/8/8/8 b - -")
       val originalGame = fenToGame(position, Antichess)
 
@@ -258,40 +236,34 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         nonDrawnGame.situation.autoDraw must beFalse
         nonDrawnGame.situation.status must beNone
       }
-    }
 
-    "Opponent has insufficient material when there are only two remaining knights on same color squares" in {
+    "Opponent has insufficient material when there are only two remaining knights on same color squares" in:
       val position     = EpdFen("8/8/3n2N1/8/8/8/8/8 w - -")
       val originalGame = fenToGame(position, Antichess)
 
       val newGame = originalGame flatMap (_.playMoves(Pos.G6 -> Pos.F4))
 
-      newGame must beValid.like {
+      newGame must beValid.like:
         _.situation.opponentHasInsufficientMaterial must beTrue
-      }
-    }
 
-    "Opponent has sufficient material when there are only two remaining knights on opposite color squares" in {
+    "Opponent has sufficient material when there are only two remaining knights on opposite color squares" in:
       val position     = EpdFen("7n/8/8/8/8/8/8/N7 w - -")
       val originalGame = fenToGame(position, Antichess)
 
       val newGame = originalGame flatMap (_.playMoves(Pos.A1 -> Pos.B3))
 
-      newGame must beValid.like {
+      newGame must beValid.like:
         _.situation.opponentHasInsufficientMaterial must beFalse
-      }
-    }
 
-    "Not be drawn on insufficient mating material" in {
+    "Not be drawn on insufficient mating material" in:
       val position  = EpdFen("4K3/8/1b6/8/8/8/5B2/3k4 b - -")
       val maybeGame = fenToGame(position, Antichess)
 
       maybeGame must beValid.like { case game =>
         game.situation.end must beFalse
       }
-    }
 
-    "Be drawn on a three move repetition" in {
+    "Be drawn on a three move repetition" in:
       val game = Game(Antichess)
 
       val moves = List((Pos.G1, Pos.F3), (Pos.G8, Pos.F6), (Pos.F3, Pos.G1), (Pos.F6, Pos.G8))
@@ -303,9 +275,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         g.situation.threefoldRepetition must beTrue
       }
 
-    }
-
-    "Successfully play through a full game until one player loses all their pieces" in {
+    "Successfully play through a full game until one player loses all their pieces" in:
       val game = Reader.full(fullGame)
 
       game must beValid.like { case Reader.Result.Complete(replay) =>
@@ -316,9 +286,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         // In antichess, the player who has just lost all their pieces is the winner
         game.situation.winner must beSome(Black)
       }
-    }
 
-    "Win on a traditional stalemate where the player has no valid moves" in {
+    "Win on a traditional stalemate where the player has no valid moves" in:
       val position  = EpdFen("8/p7/8/P7/8/8/8/8 w - -")
       val maybeGame = fenToGame(position, Antichess)
 
@@ -328,9 +297,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         game.situation.end must beTrue
         game.situation.winner must beSome(Black)
       }
-    }
 
-    "Stalemate is a win - second test" in {
+    "Stalemate is a win - second test" in:
       val fen       = EpdFen("2Q5/8/p7/8/8/8/6PR/8 w - -")
       val maybeGame = fenToGame(fen, Antichess)
 
@@ -341,9 +309,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         game.situation.status must beSome(Status.VariantEnd)
         game.situation.winner must beSome(Black)
       }
-    }
 
-    "two kings on replay" in {
+    "two kings on replay" in:
 
       val pgn  = """
 [Event "Rated Antichess game"]
@@ -375,14 +342,11 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         game.situation.end must beFalse
         game.situation.winner must beNone
       }
-    }
 
-    "fen with castles" in {
+    "fen with castles" in:
       val game = fenToGame(EpdFen("rnbqk2r/ppppppbp/5np1/8/8/5NP1/PPPPPPBP/RNBQK2R w KQkq - 4 4"), Antichess)
 
       game must beValid.like { case game =>
         game.situation.board.history.castles must_== Castles.none
         game.situation.board.history.unmovedRooks must_== UnmovedRooks.none
       }
-    }
-  }

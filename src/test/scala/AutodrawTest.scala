@@ -7,83 +7,66 @@ import chess.format.EpdFen
 
 class AutodrawTest extends ChessTest:
 
-  "detect automatic draw" should {
-    "by lack of pieces" in {
-      "empty" in {
+  "detect automatic draw" should:
+    "by lack of pieces" in:
+      "empty" in:
         makeEmptyBoard.autoDraw must_== true
-      }
-      "new" in {
+      "new" in:
         makeBoard.autoDraw must_== false
-      }
-      "opened" in {
+      "opened" in:
         makeGame.playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5) map { g =>
           g.board.autoDraw
         } must beValid(false)
-      }
-      "two kings" in {
+      "two kings" in:
         """
       k
 K      """.autoDraw must_== true
-      }
-      "one pawn" in {
+      "one pawn" in:
         """
   P   k
 K      """.autoDraw must_== false
-      }
-      "one bishop" in {
+      "one bishop" in:
         """
       k
 K     B""".autoDraw must_== true
-      }
-      "one knight" in {
+      "one knight" in:
         """
       k
 K     N""".autoDraw must_== true
-      }
-      "one bishop and one knight of different colors" in {
+      "one bishop and one knight of different colors" in:
         """
       k
 K n   B""".autoDraw must_== false
-      }
-      "one bishop and one knight of same color" in {
+      "one bishop and one knight of same color" in:
         """
   B   k
 K N    """.autoDraw must_== false
-      }
-      "one bishop and one rook of different colors" in {
+      "one bishop and one rook of different colors" in:
         """
       k
 K r   B""".autoDraw must_== false
-      }
-      "two bishops and one bishop of same colors" in {
+      "two bishops and one bishop of same colors" in:
         """
       k
 K B b B""".autoDraw must_== true
-      }
-      "one bishop and one bishop of different colors" in {
+      "one bishop and one bishop of different colors" in:
         """
       k
 K   bB""".autoDraw must_== false
-      }
-    }
-    "by fifty moves" in {
-      "new" in {
+    "by fifty moves" in:
+      "new" in:
         makeBoard.autoDraw must_== false
-      }
-      "opened" in {
+      "opened" in:
         makeGame.playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5) map { g =>
           g.board.autoDraw
         } must beValid(false)
-      }
-      "tons of pointless moves" in {
+      "tons of pointless moves" in:
         val moves = List.fill(30)(List(B1 -> C3, B8 -> C6, C3 -> B1, C6 -> B8))
         makeGame.playMoves(moves.flatten*) must beValid.like { case g =>
           g.board.autoDraw must_== true
         }
-      }
-    }
-    "by threefold" in {
-      "from prod should 3fold" in {
+    "by threefold" in:
+      "from prod should 3fold" in:
         val moves = List(
           E2 -> E4,
           E7 -> E6,
@@ -186,8 +169,7 @@ K   bB""".autoDraw must_== false
         makeGame.playMoves(moves*) must beValid.like { case g =>
           g.board.history.threefoldRepetition must beTrue
         }
-      }
-      "from prod should not 3fold" in {
+      "from prod should not 3fold" in:
         val moves = List(
           E2 -> E4,
           E7 -> E6,
@@ -284,22 +266,17 @@ K   bB""".autoDraw must_== false
         makeGame.playMoves(moves*) must beValid.like { case g =>
           g.board.history.threefoldRepetition must beFalse
         }
-      }
-      "3fold on initial position" in {
+      "3fold on initial position" in:
         val moves: List[(Pos, Pos)] = List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten
         makeGame.playMoves(moves*) must beValid.like { case g =>
           g.board.history.threefoldRepetition must beTrue
         }
-      }
-      "pawn move then minimalist 3fold" in {
+      "pawn move then minimalist 3fold" in:
         val moves: List[(Pos, Pos)] = List(E2 -> E4, E7 -> E5) :::
           (List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten: List[(Pos, Pos)])
-        makeGame.playMoves(moves*) must beValid {
+        makeGame.playMoves(moves*) must beValid:
           (_: Game).board.history.threefoldRepetition must beTrue
-        }
-      }
-    }
-    "by fivefold" in {
+    "by fivefold" in:
       // https://lichess.org/BdvgPSMd#82
       val moves = List(
         E2 -> E4,
@@ -385,28 +362,23 @@ K   bB""".autoDraw must_== false
         F7 -> F8,
         H6 -> H7
       )
-      "from prod should be fivefold" in {
+      "from prod should be fivefold" in:
         makeGame.playMoves(moves*) must beValid.like { case g =>
           g.situation.autoDraw must beTrue
         }
-      }
-      "from prod should not be fivefold" in {
+      "from prod should not be fivefold" in:
         makeGame.playMoves(moves.dropRight(1)*) must beValid.like { case g =>
           g.situation.autoDraw must beFalse
         }
-      }
-    }
-  }
-  "do not detect insufficient material" should {
-    "on two knights" in {
+  "do not detect insufficient material" should:
+    "on two knights" in:
       val position = EpdFen("1n2k1n1/8/8/8/8/8/8/4K3 w - - 0 1")
       fenToGame(position, Standard) must beValid.like { case game =>
         game.situation.autoDraw must beFalse
         game.situation.end must beFalse
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
-    }
-    "on knight versus pawn" in {
+    "on knight versus pawn" in:
       val position = EpdFen("7K/5k2/7P/6n1/8/8/8/8 b - - 0 40")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
@@ -418,8 +390,7 @@ K   bB""".autoDraw must_== false
         game.situation.end must beFalse
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
-    }
-    "on bishops versus pawn" in {
+    "on bishops versus pawn" in:
       val position = EpdFen("1b1b3K/8/5k1P/8/8/8/8/8 b - - 0 40")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
@@ -431,8 +402,7 @@ K   bB""".autoDraw must_== false
         game.situation.end must beFalse
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
-    }
-    "on bishops versus queen" in {
+    "on bishops versus queen" in:
       val position = EpdFen("b2b3K/8/5k1Q/8/8/8/8/8 b - -")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
@@ -444,8 +414,7 @@ K   bB""".autoDraw must_== false
         game.situation.end must beFalse
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
-    }
-    "on bishops versus queen" in {
+    "on bishops versus queen" in:
       val position = EpdFen("1b1b3K/8/5k1Q/8/8/8/8/8 b - -")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
@@ -457,8 +426,7 @@ K   bB""".autoDraw must_== false
         game.situation.end must beFalse
         game.situation.opponentHasInsufficientMaterial must beTrue
       }
-    }
-    "on knight versus pawns" in {
+    "on knight versus pawns" in:
       val position = EpdFen("8/8/5N2/8/6p1/8/5K1p/7k w - - 0 37")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
@@ -470,8 +438,7 @@ K   bB""".autoDraw must_== false
         game.situation.end must beFalse
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
-    }
-    "on knight versus pieces" in {
+    "on knight versus pieces" in:
       val position = EpdFen("8/8/8/4N3/4k1p1/6K1/8/3b4 w - - 5 59")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
@@ -483,8 +450,7 @@ K   bB""".autoDraw must_== false
         game.situation.end must beFalse
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
-    }
-    "on opposite bishops with queen" in {
+    "on opposite bishops with queen" in:
       val position = EpdFen("8/8/3Q4/2bK4/B7/8/8/k7 b - - 0 67")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
@@ -496,8 +462,7 @@ K   bB""".autoDraw must_== false
         game.situation.end must beFalse
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
-    }
-    "on same-color bishops on both sides" in {
+    "on same-color bishops on both sides" in:
       val position = EpdFen("5K2/8/8/1B6/8/k7/6b1/8 w - - 0 39")
       val game     = fenToGame(position, Standard)
       game must beValid.like { case game =>
@@ -505,5 +470,3 @@ K   bB""".autoDraw must_== false
         game.situation.end must beTrue
         game.situation.opponentHasInsufficientMaterial must beTrue
       }
-    }
-  }

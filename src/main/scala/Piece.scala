@@ -31,6 +31,5 @@ case class Piece(color: Color, role: Role):
 object Piece:
 
   def fromChar(c: Char): Option[Piece] =
-    Role.allByPgn get c.toUpper map {
+    Role.allByPgn get c.toUpper map:
       Piece(Color.fromWhite(c.isUpper), _)
-    }

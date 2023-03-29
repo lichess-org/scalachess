@@ -7,7 +7,6 @@ import scala.annotation.nowarn
 
 import chess.format.EpdFen
 import chess.bitboard.Bitboard
-import bitboard.Bitboard.bb
 
 // Correctness depends on singletons for each variant ID
 abstract class Variant private[variant] (

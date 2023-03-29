@@ -27,6 +27,8 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
     "-explaintypes",
     "-feature",
     "-language:postfixOps"
+    // "-Wunused:all",
+    // "-Werror"
     // Warnings as errors!
     /* "-Xfatal-warnings" */
   )
@@ -34,7 +36,7 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
 
 ThisBuild / organization      := "org.lichess"
 ThisBuild / version           := "14.6.3"
-ThisBuild / scalaVersion      := "3.2.2"
+ThisBuild / scalaVersion      := "3.3.0-RC3"
 ThisBuild / licenses += "MIT" -> url("https://opensource.org/licenses/MIT")
 
 resolvers += "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-maven/master"

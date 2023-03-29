@@ -2,7 +2,6 @@ package chess
 package variant
 
 import chess.format.EpdFen
-import bitboard.Bitboard.pawnAttacks
 
 case object Antichess
     extends Variant(
@@ -27,7 +26,7 @@ case object Antichess
   override def kingThreatened(board: Board, color: Color) = Check.No
 
   def validMoves(situation: Situation) =
-    import situation.{ them, us, genNonKing, genEnPassant, board, genUnsafeKing, ourKings }
+    import situation.{ genNonKing, board, genUnsafeKing, ourKings }
     val capturingMoves = captureMoves(situation)
     if capturingMoves.nonEmpty then capturingMoves
     else genNonKing(~board.occupied) ++ ourKings.flatMap(genUnsafeKing(_, ~board.occupied))
@@ -64,12 +63,13 @@ case object Antichess
 
       // We consider the case where a player has two knights
       if (whiteKnights.size != 1 || blackKnights.size != 1) false
-      else {
-        for {
-          whiteKnight <- whiteKnights.headOption
-          blackKnight <- blackKnights.headOption
-        } yield whiteKnight.isLight == blackKnight.isLight
-      } getOrElse false
+      else
+        {
+          for {
+            whiteKnight <- whiteKnights.headOption
+            blackKnight <- blackKnights.headOption
+          } yield whiteKnight.isLight == blackKnight.isLight
+        } getOrElse false
     }
 
   // No player can win if the only remaining pieces are opposing bishops on different coloured

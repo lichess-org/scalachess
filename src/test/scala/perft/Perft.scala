@@ -24,10 +24,9 @@ case class Perft(id: String, epd: EpdFen, cases: List[TestCase]):
 case class TestCase(depth: Int, result: Long)
 case class Result(depth: Int, result: Long, expected: Long)
 
-case class DivideResult(val move: MoveOrDrop, nodes: Long) {
+case class DivideResult(val move: MoveOrDrop, nodes: Long):
   override def toString(): String =
     s"${move.toUci.uci} $nodes"
-}
 
 object Perft:
 

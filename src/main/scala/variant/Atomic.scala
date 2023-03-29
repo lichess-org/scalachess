@@ -43,13 +43,12 @@ case object Atomic
     * to capture it, their own king would explode. This effectively makes a king invincible while connected with another
     * king.
     */
-  override def kingThreatened(board: Board, color: Color): Check = Check {
+  override def kingThreatened(board: Board, color: Color): Check = Check:
     import board.{ kingPosOf, kingOf, occupied }
     kingPosOf(color).exists { k =>
       k.kingAttacks.isDisjoint(kingOf(!color)) &&
       attackersWithoutKing(board, occupied, k, !color).nonEmpty
     }
-  }
 
   private def attackersWithoutKing(board: Board, occupied: Bitboard, s: Pos, attacker: Color) =
     import board.board.{ byColor, rooks, queens, bishops, knights, pawns }
@@ -59,9 +58,6 @@ case object Atomic
         s.knightAttacks & knights |
         s.pawnAttacks(!attacker) & pawns
     )
-
-  private def protectedByOtherKing(board: Board, to: Pos, color: Color): Boolean =
-    to.kingAttacks.intersects(board.kingOf(color))
 
   // moves exploding opponent king are always playable
   override def kingSafety(m: Move): Boolean =

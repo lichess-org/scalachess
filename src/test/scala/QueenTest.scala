@@ -5,11 +5,11 @@ import Pos.*
 
 class QueenTest extends ChessTest:
 
-  "a queen" should {
+  "a queen" should:
 
     val queen = White - Queen
 
-    "not move to positions that are occupied by the same colour" in {
+    "not move to positions that are occupied by the same colour" in:
       val board = """
 k B
 
@@ -33,9 +33,8 @@ PPPPPPPP
  NBQKBNR
 """
       )
-    }
 
-    "capture opponent pieces" in {
+    "capture opponent pieces" in:
       val board = """
 k B
      q
@@ -59,5 +58,3 @@ PPPPPPPP
  NBQKBNR
 """
       )
-    }
-  }

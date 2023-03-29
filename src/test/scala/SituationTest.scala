@@ -2,76 +2,63 @@ package chess
 
 class SituationTest extends ChessTest:
 
-  "a game" should {
-    "detect check" should {
-      "by rook" in {
+  "a game" should:
+    "detect check" should:
+      "by rook" in:
         ("""
 K  r
 """ as White).check === Check.Yes
-      }
-      "by knight" in {
+      "by knight" in:
         ("""
   n
 K
 """ as White).check === Check.Yes
-      }
-      "by bishop" in {
+      "by bishop" in:
         ("""
   b
 
 
      K
 """ as White).check === Check.Yes
-      }
-      "by pawn" in {
+      "by pawn" in:
         ("""
     p
      K
 """ as White).check === Check.Yes
-      }
-      "not" in {
+      "not" in:
         ("""
    n
 K
 """ as White).check === Check.No
-      }
-    }
-    "detect check mate" in {
-      "by rook" in {
+    "detect check mate" in:
+      "by rook" in:
         ("""
 PP
 K  r
 """ as White).checkMate must beTrue
-      }
-      "by knight" in {
+      "by knight" in:
         ("""
 PPn
 KR
 """ as White).checkMate must beTrue
-      }
-      "not" in {
+      "not" in:
         ("""
   n
 K
 """ as White).checkMate must beFalse
-      }
-    }
-    "stale mate" in {
-      "stuck in a corner" in {
+    "stale mate" in:
+      "stuck in a corner" in:
         ("""
 prr
 K
 """ as White).staleMate must beTrue
-      }
-      "not" in {
+      "not" in:
         ("""
   b
 K
 """ as White).staleMate must beFalse
-      }
-    }
 
-    "Give the correct winner for a game" in {
+    "Give the correct winner for a game" in:
       val game =
         """
 PP
@@ -80,9 +67,8 @@ K  r
 
       game.checkMate must beTrue
       game.winner must beSome { (_: Color) == Black }
-    }
 
-    "Not give a winner if the game is still in progress" in {
+    "Not give a winner if the game is still in progress" in:
       val game = """
     p
      K
@@ -90,20 +76,13 @@ K  r
 
       game.winner must beNone
 
-    }
-
-    "not be playable" in {
-      "with touching kings" in {
+    "not be playable" in:
+      "with touching kings" in:
         val game = "kK BN" as Black
         game.playable(true) must beFalse
         game.playable(false) must beFalse
-      }
 
-      "with other side in check" in {
+      "with other side in check" in:
         val game = "k Q K" as White
         game.playable(true) must beFalse
         game.playable(false) must beFalse
-      }
-    }
-
-  }

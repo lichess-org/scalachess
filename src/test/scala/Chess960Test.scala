@@ -8,9 +8,9 @@ import chess.format.Fen
 
 class Chess960Test extends ChessTest:
 
-  "Chess960 chess" should {
+  "Chess960 chess" should:
 
-    "recognize position numbers" in {
+    "recognize position numbers" in:
       Chess960 positionNumber EpdFen("k7/ppP5/brp5/8/8/8/8/8 b - -") must beNone
 
       Chess960 positionNumber EpdFen("rnqbbknr/pppppppp/8/8/8/8/PPPPPPPP/RNQBBKNR w KQkq - 0 1") must beSome(
@@ -31,9 +31,8 @@ class Chess960Test extends ChessTest:
 
       Chess960 positionNumber EpdFen("rnqbbknr/pppppppp/8/8/8/8/PPPPPPPP/RNQBBKNR w AHa - 0 1") must beNone
       Chess960 positionNumber EpdFen("bbqnnrkr/pppppppp/8/8/8/8/PPPPPPPP/BBQNNRKR w AHah - 0 1") must beNone
-    }
 
-    "Castles when a1 is being taken" in {
+    "Castles when a1 is being taken" in:
       val pgn = """
 [Variant "Chess960"]
 [FEN "brnqknrb/pppppppp/8/8/8/8/PPPPPPPP/BRNQKNRB w KQkq - 0 1"]
@@ -45,6 +44,3 @@ class Chess960Test extends ChessTest:
           format.Uci.Move(Pos.E1, Pos.B1)
         )
       }
-    }
-
-  }

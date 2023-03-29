@@ -1,6 +1,5 @@
 package chess
 
-import scala.collection.mutable.ListBuffer
 import cats.data.Validated
 import cats.syntax.all.*
 
@@ -8,7 +7,6 @@ import bitboard.Bitboard
 import bitboard.Bitboard.*
 
 import chess.format.Uci
-import chess.variant.Chess960
 import Pos.prevRank
 import chess.variant.Crazyhouse
 import chess.variant.Antichess
@@ -141,7 +139,7 @@ case class Situation(board: Board, color: Color):
     * the last move must have been a double pawn push
     * and not start from the back rank
     */
-  def potentialEpSquare: Option[Pos] = history.lastMove.flatMap {
+  def potentialEpSquare: Option[Pos] = history.lastMove.flatMap:
     case Uci.Move(orig, dest, _) =>
       board(dest).flatMap { piece =>
         if piece.color == !color && piece.role == Pawn &&
@@ -150,7 +148,6 @@ case class Situation(board: Board, color: Color):
         else None
       }
     case _ => None
-  }
 
   def genNonKingAndNonPawn(mask: Bitboard): List[Move] =
     genKnight(us & board.knights, mask) ++ genBishop(us & board.bishops, mask) ++

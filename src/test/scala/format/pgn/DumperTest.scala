@@ -11,14 +11,12 @@ class DumperTest extends ChessTest:
 
   given Conversion[String, SanStr] = SanStr(_)
 
-  "Check with pawn" should {
-    "not be checkmate if pawn can be taken en passant" in {
+  "Check with pawn" should:
+    "not be checkmate if pawn can be taken en passant" in:
       val game = Fen.readWithMoveNumber(EpdFen("8/3b4/6R1/1P2kp2/6pp/2N1P3/4KPPP/8 w - -")).get match
         case s: Situation.AndFullMoveNumber => Game(s.situation, ply = s.ply)
       val move = game(Pos.F2, Pos.F4).toOption.get._2
       Dumper(move) must_== "f4+"
-    }
-  }
 
   val gioachineGreco = makeGame.playMoves(
     D2 -> D4,
@@ -76,35 +74,29 @@ class DumperTest extends ChessTest:
     H5 -> G6
   )
 
-  "standard game" should {
-    "move list" in {
-      "Gioachine Greco" in {
+  "standard game" should:
+    "move list" in:
+      "Gioachine Greco" in:
         gioachineGreco map (_.sans) must beValid.like { case ms =>
           ms must_== "d4 d5 c4 dxc4 e3 b5 a4 c6 axb5 cxb5 Qf3".split(' ').toList
         }
-      }
-      "Peruvian Immortal" in {
+      "Peruvian Immortal" in:
         peruvianImmortal map (_.sans) must beValid.like { case ms =>
           ms must_== "e4 d5 exd5 Qxd5 Nc3 Qa5 d4 c6 Nf3 Bg4 Bf4 e6 h3 Bxf3 Qxf3 Bb4 Be2 Nd7 a3 O-O-O axb4 Qxa1+ Kd2 Qxh1 Qxc6+ bxc6 Ba6#"
             .split(' ')
             .toList
         }
-      }
-    }
-  }
 
-  "three check variant" should {
-    "move list" in {
+  "three check variant" should:
+    "move list" in:
       threeCheck map (_.sans) must beValid.like { case ms =>
         ms must_== "e4 c5 Bc4 Nc6 Bxf7+ Kxf7 Qh5+ g6 Qxg6#"
           .split(' ')
           .toList
       }
-    }
-  }
 
-  "dump a promotion move" should {
-    "without check" in {
+  "dump a promotion move" should:
+    "without check" in:
       val game = Game("""
 
 P    k
@@ -118,8 +110,7 @@ KNBQ BNR
       game.playMoves(A7 -> A8) map (_.sans) must beValid.like { case ms =>
         ms must_== List("a8=Q")
       }
-    }
-    "with check" in {
+    "with check" in:
       val game = Game("""
     k
 P
@@ -133,8 +124,7 @@ KNBQ BNR
       game.playMoves(A7 -> A8) map (_.sans) must beValid.like { case ms =>
         ms must_== List("a8=Q+")
       }
-    }
-    "with checkmate" in {
+    "with checkmate" in:
       val game = Game("""
     k
 P  ppp
@@ -148,27 +138,23 @@ KNBQ BNR
       game.playMoves(A7 -> A8) map (_.sans) must beValid.like { case ms =>
         ms must_== List("a8=Q#")
       }
-    }
-    "castle kingside" in {
+    "castle kingside" in:
       Game("""
 PP   PPP
 R   K  R
 """).playMoves(E1 -> G1) map (_.sans) must beValid.like { case ms =>
         ms must_== List("O-O")
       }
-    }
-    "castle queenside" in {
+    "castle queenside" in:
       Game("""
 PP   PPP
 R   K  R
 """).playMoves(E1 -> C1) map (_.sans) must beValid.like { case ms =>
         ms must_== List("O-O-O")
       }
-    }
-  }
 
-  "ambiguous moves" should {
-    "ambiguous file only" in {
+  "ambiguous moves" should:
+    "ambiguous file only" in:
       val game = Game("""
 k
 
@@ -182,8 +168,7 @@ R      R
       game.playMoves(H1 -> B1) map (_.sans) must beValid.like { case ms =>
         ms must_== List("Rhb1")
       }
-    }
-    "ambiguous rank only" in {
+    "ambiguous rank only" in:
       val game = Game("""
 k
 
@@ -197,8 +182,7 @@ k
       game.playMoves(B5 -> C3) map (_.sans) must beValid.like { case ms =>
         ms must_== List("N5c3")
       }
-    }
-    "ambiguous file and rank" in {
+    "ambiguous file and rank" in:
       val game = Game("""
 
 
@@ -212,8 +196,7 @@ k
       game.playMoves(C6 -> D5) map (_.sans) must beValid.like { case ms =>
         ms must_== List("Qc6d5")
       }
-    }
-    "unambiguous file" in {
+    "unambiguous file" in:
       val game = Game("""
 k
 
@@ -227,8 +210,7 @@ R   K  R
       game.playMoves(H1 -> F1) map (_.sans) must beValid.like { case ms =>
         ms must_== List("Rf1")
       }
-    }
-    "unambiguous rank" in {
+    "unambiguous rank" in:
       val game = Game("""
 k
 
@@ -242,11 +224,9 @@ k
       game.playMoves(E4 -> E5) map (_.sans) must beValid.like { case ms =>
         ms must_== List("Re5")
       }
-    }
-  }
 
-  "chess960" should {
-    "castle queenside as white" in {
+  "chess960" should:
+    "castle queenside as white" in:
       Game(
         makeBoard(
           """
@@ -258,8 +238,7 @@ NRK RQBB
       ).playMoves(C1 -> B1) map (_.sans) must beValid.like { case ms =>
         ms must_== List("O-O-O")
       }
-    }
-    "castle kingside as white" in {
+    "castle kingside as white" in:
       Game(
         makeBoard(
           """
@@ -271,8 +250,7 @@ NRK R  B
       ).playMoves(C1 -> E1) map (_.sans) must beValid.like { case ms =>
         ms must_== List("O-O")
       }
-    }
-    "castle queenside as black" in {
+    "castle queenside as black" in:
       Game(
         makeBoard(
           """
@@ -290,8 +268,7 @@ NRK RQBB
       ).withPlayer(Black).playMoves(C8 -> B8) map (_.sans) must beValid.like { case ms =>
         ms must_== List("O-O-O")
       }
-    }
-    "castle kingside as black" in {
+    "castle kingside as black" in:
       Game(
         makeBoard(
           """
@@ -309,8 +286,7 @@ NRK RQBB
       ).withPlayer(Black).playMoves(C8 -> E8) map (_.sans) must beValid.like { case ms =>
         ms must_== List("O-O")
       }
-    }
-    "opening with castles" in {
+    "opening with castles" in:
       Game(
         makeBoard(
           """
@@ -336,28 +312,23 @@ NRKNRQBB
       ) map (_.sans) must beValid.like { case ms =>
         ms must_== "f4 Nc6 Nc3 g6 Nb5 O-O-O O-O-O".split(' ').toList
       }
-    }
-    "tricky rook disambiguation" in {
+    "tricky rook disambiguation" in:
       val fen           = EpdFen("r5k1/1b5p/N3p1p1/Q4p2/4r3/2P1q3/1PK2RP1/5R2 w - - 1 38")
       val sit           = Fen.read(fen).get
       val game1         = Game(sit.board, sit.color)
       val (game2, move) = game1(Pos.F2, Pos.F3).toOption.get
       Dumper(game1.situation, move, game2.situation) must_== "Rf3"
-    }
-  }
-  "move comment" should {
-    "simple" in {
+  "move comment" should:
+    "simple" in:
       Move("e4", List("Some comment")).toString must_== "e4 { Some comment }"
-    }
-    "one line break" in {
+    "one line break" in:
       Move(
         "e4",
         List("""Some
 comment""")
       ).toString must_== """e4 { Some
 comment }"""
-    }
-    "two line breaks" in {
+    "two line breaks" in:
       Move(
         "e4",
         List("""Some
@@ -365,8 +336,7 @@ comment }"""
 comment""")
       ).toString must_== """e4 { Some
 comment }"""
-    }
-    "three line breaks" in {
+    "three line breaks" in:
       Move(
         "e4",
         List("""Some
@@ -375,5 +345,3 @@ comment }"""
 comment""")
       ).toString must_== """e4 { Some
 comment }"""
-    }
-  }

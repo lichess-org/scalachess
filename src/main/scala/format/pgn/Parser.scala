@@ -35,9 +35,8 @@ object Parser:
 
   private object MovesParser:
 
-    private def cleanComments(comments: List[String]) = Comment from comments.collect {
+    private def cleanComments(comments: List[String]) = Comment from comments.collect:
       case c if !c.isBlank => c.trim
-    }
 
     def moves(str: PgnMovesStr): Validated[ErrorStr, Sans] =
       strMove.rep.map(xs => Sans(xs.toList)).parse(str.value) match
@@ -131,9 +130,8 @@ object Parser:
       }
 
     val strMoves: P0[(InitialPosition, List[San], Option[String])] =
-      ((commentary.rep0 ~ strMove.rep0) ~ (result <* escape).? <* commentary.rep0).map {
+      ((commentary.rep0 ~ strMove.rep0) ~ (result <* escape).? <* commentary.rep0).map:
         case ((coms, sans), res) => (InitialPosition(cleanComments(coms)), sans.toList, res)
-      }
 
   private object MoveParser:
 
@@ -202,10 +200,9 @@ object Parser:
     val optionalEnPassant = (R.wsp.rep0.soft ~ P.string("e.p.")).void.?
 
     // d7d5 d7xd5
-    val disambiguatedPawn: P[Std] = (((file.? ~ rank.?) ~ x).with1 ~ dest <* optionalEnPassant).map {
+    val disambiguatedPawn: P[Std] = (((file.? ~ rank.?) ~ x).with1 ~ dest <* optionalEnPassant).map:
       case (((fi, ra), ca), de) =>
         Std(dest = de, role = Pawn, capture = ca, file = File from fi, rank = Rank from ra)
-    }
 
     val suffixes: P0[Suffixes] = (promotion.? ~ checkmate ~ check ~ glyphs).map { case (((p, cm), c), g) =>
       Suffixes(c, cm, p, g)
@@ -240,7 +237,7 @@ object Parser:
     val tags: P[NonEmptyList[Tag]] = tag.rep
 
   private val tagsAndMovesParser: P0[ParsedPgn] =
-    (TagParser.tags.?.surroundedBy(escape) ~ MovesParser.strMoves.?).map {
+    (TagParser.tags.?.surroundedBy(escape) ~ MovesParser.strMoves.?).map:
       case (optionalTags, optionalMoves) => {
         val preTags = Tags(optionalTags.map(_.toList).getOrElse(Nil))
         optionalMoves match
@@ -251,7 +248,6 @@ object Parser:
             ParsedPgn(init, tags, Sans(sans))
           }
       }
-    }
 
   private val pgnParser: P0[ParsedPgn] =
     P.string("\uFEFF").? *> escape *> P.string("[pgn]").? *> tagsAndMovesParser <* P
@@ -261,9 +257,10 @@ object Parser:
   private def showExpectations(context: String, str: String, error: P.Error): ErrorStr =
     val lm  = LocationMap(str)
     val idx = error.failedAtOffset
-    val caret = lm.toCaret(idx).getOrElse {
-      throw RuntimeException("This is impossible")
-    }
+    val caret = lm
+      .toCaret(idx)
+      .getOrElse:
+        throw RuntimeException("This is impossible")
     val line         = lm.getLine(caret.line).getOrElse("")
     val errorLine    = line ++ "\n" ++ " ".*(caret.col) ++ "^"
     val errorMessage = s"$context: [${caret.line + 1}.${caret.col + 1}]: ${expToString(error.expected.head)}"

@@ -40,7 +40,7 @@ case class Pgn(tags: Tags, turns: List[Turn], initial: Initial = Initial.empty):
   def withEvent(title: String) =
     copy(tags = tags + Tag(_.Event, title))
 
-  def render: PgnStr = PgnStr {
+  def render: PgnStr = PgnStr:
     val initStr =
       if (initial.comments.nonEmpty) initial.comments.mkString("{ ", " } { ", " }\n")
       else ""
@@ -50,7 +50,6 @@ case class Pgn(tags: Tags, turns: List[Turn], initial: Initial = Initial.empty):
       if (turnStr.nonEmpty) s" $resultStr"
       else resultStr
     s"$tags\n\n$initStr$turnStr$endStr".trim
-  }
 
   override def toString = render.value
 
@@ -94,14 +93,13 @@ case class Turn(
 object Turn:
 
   def fromMoves(moves: List[Move], ply: Ply): List[Turn] = {
-    moves.foldLeft((List.empty[Turn], ply)) {
+    moves.foldLeft((List.empty[Turn], ply)):
       case ((turns, p), move) if (p.value & 1) == 1 =>
         (Turn((p.value + 1) / 2, move.some, none) :: turns) -> (p + 1)
       case ((Nil, p), move) =>
         (Turn((p.value + 1) / 2, none, move.some) :: Nil) -> (p + 1)
       case ((t :: tt, p), move) =>
         (t.copy(black = move.some) :: tt) -> (p + 1)
-    }
   }._1.reverse
 
 case class Move(

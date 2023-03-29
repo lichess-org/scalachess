@@ -9,8 +9,8 @@ class ErrorMessagesTest extends ChessTest:
 
   val parser = Parser.full
 
-  "Invalid move" should {
-    "fail" in {
+  "Invalid move" should:
+    "fail" in:
       val e =
         """[abc "def"]
           |
@@ -18,11 +18,9 @@ class ErrorMessagesTest extends ChessTest:
           |2. bla
           |""".stripMargin
       parser(e) must beValid
-    }
-  }
 
-  "Null moves are not supported" should {
-    "fail" in {
+  "Null moves are not supported" should:
+    "fail" in:
       val e =
         """[abc "def"]
           |
@@ -30,11 +28,9 @@ class ErrorMessagesTest extends ChessTest:
           |2. c6
           |""".stripMargin
       parser(e) must beValid
-    }
-  }
 
-  "too many glyphs" should {
-    "fail" in {
+  "too many glyphs" should:
+    "fail" in:
       val e =
         """[abc "def"]
           |
@@ -42,11 +38,9 @@ class ErrorMessagesTest extends ChessTest:
           |2. c6
           |""".stripMargin
       parser(e) must beInvalid
-    }
-  }
 
-  "invalid glyphs" should {
-    "fail" in {
+  "invalid glyphs" should:
+    "fail" in:
       val e =
         """[abc "def"]
           |
@@ -54,11 +48,9 @@ class ErrorMessagesTest extends ChessTest:
           |2. c6
           |""".stripMargin
       parser(e) must beValid
-    }
-  }
 
-  "bad comment" should {
-    "fail" in {
+  "bad comment" should:
+    "fail" in:
       val e =
         """[abc "def"]
           |
@@ -66,11 +58,9 @@ class ErrorMessagesTest extends ChessTest:
           |2. c6
           |""".stripMargin
       parser(e) must beValid
-    }
-  }
 
-  "invalid tags 1" should {
-    "failed" in {
+  "invalid tags 1" should:
+    "failed" in:
       val e =
         """|[ab "cdef]
            |
@@ -78,11 +68,9 @@ class ErrorMessagesTest extends ChessTest:
            |2. c6
            |""".stripMargin
       parser(e) must beValid
-    }
-  }
 
-  "invalid tags 2" should {
-    "failed" in {
+  "invalid tags 2" should:
+    "failed" in:
       val e =
         """|[ab "cdef"]    [123]
            |
@@ -90,11 +78,9 @@ class ErrorMessagesTest extends ChessTest:
            |2. c6
            |""".stripMargin
       parser(e) must beValid
-    }
-  }
 
-  "invalid promotion" should {
-    "failed" in {
+  "invalid promotion" should:
+    "failed" in:
       val e =
         """|[abc "def"]
            |
@@ -102,5 +88,3 @@ class ErrorMessagesTest extends ChessTest:
            |2. c6
            """.stripMargin
       parser(e) must beValid
-    }
-  }

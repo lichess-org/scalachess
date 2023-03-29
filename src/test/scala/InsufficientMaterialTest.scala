@@ -15,9 +15,8 @@ import cats.kernel.Monoid
 
 object InsufficientMaterialTest extends SimpleIOSuite:
 
-  test("horde") {
+  test("horde"):
     run("src/test/resources/horde_insufficient_material.csv", Horde).map(assert(_))
-  }
 
   given Monoid[Boolean] with
     def empty                           = true
@@ -45,8 +44,7 @@ object InsufficientMaterialTest extends SimpleIOSuite:
   private def parseSample(sample: List[String]): Case =
     Case(EpdFen(sample(0)), sample(1).toBoolean, sample.get(2))
 
-private case class Case(fen: EpdFen, expected: Boolean, comment: Option[String]) {
+private case class Case(fen: EpdFen, expected: Boolean, comment: Option[String]):
   def run(variant: Variant): Boolean =
     val situation = Fen.read(variant, fen).get
     Horde.hasInsufficientMaterial(situation.board, !situation.color) == expected
-}

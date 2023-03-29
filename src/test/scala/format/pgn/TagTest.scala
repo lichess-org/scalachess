@@ -3,9 +3,9 @@ package format.pgn
 
 class TagTest extends ChessTest:
 
-  "Tags" should {
+  "Tags" should:
     // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm#c8.1.1
-    "be sorted" in {
+    "be sorted" in:
       Tags(
         List(
           Tag(Tag.Site, "https://lichess.org/QuCzSfxw"),
@@ -37,11 +37,7 @@ class TagTest extends ChessTest:
         Tag.WhiteRatingDiff,
         Tag.BlackRatingDiff
       )
-    }
-  }
 
-  "test" should {
-    "beSome" in {
+  "test" should:
+    "beSome" in:
       Option(3) must beSome((_: Int) == 3)
-    }
-  }

@@ -39,8 +39,8 @@ O-O { Black breaks the symmetry but this is still the main line of chess
 opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
    */
 
-  "PGN string output" should {
-    "be correct when there are no move times" in {
+  "PGN string output" should:
+    "be correct when there are no move times" in:
       val pgn = Pgn(
         tags = Tags(
           List(
@@ -86,8 +86,7 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
 [ECO "D14"]
 
 1. d4 d5 2. c4! c6? 3. Nc3!! Nf6 4. cxd5 { The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one } 4... cxd5 5. Bf4 Nc6"""
-    }
-    "be correct when there are move times" in {
+    "be correct when there are move times" in:
       val pgn = Pgn(
         tags = Tags(
           List(
@@ -136,9 +135,8 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
 [ECO "A00e"]
 
 1. a4 { [%clk 0:04:58] } 1... Nf6 { [%clk 0:04:59] } 2. d4 { [%clk 0:04:55] } 2... d5 { [%clk 0:04:58] } 3. h4 { [%clk 0:04:52] } 3... e6 { [%clk 0:04:57] } 4. Qd3! { An invention of true genius. } { [%clk 0:04:48] } 4... c5 { [%clk 0:04:56] } 5. dxc5 { [%clk 0:04:18] } 5... Bxc5! { [%clk 0:04:55] }"""
-    }
 
-    "be correct with NAGs" in {
+    "be correct with NAGs" in:
       val pgn = Pgn(
         tags = Tags.empty,
         turns = List(
@@ -167,9 +165,8 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         )
       )
       pgn.toString must_== """1. d3?! Nc6 $10 2. Qd2 Nb4?? $18 $138 3. Qxb4 $7"""
-    }
 
-    "be correct with variations" in {
+    "be correct with variations" in:
       val pgn = Pgn(
         tags = Tags.empty,
         turns = List(
@@ -203,8 +200,7 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         )
       )
       pgn.toString must_== """1. d4 (1. e4) 1... Nf6 (1... d5)"""
-    }
-    "handle Elon Musk-style baby names like [=0040.34h5a4] in tags" in {
+    "handle Elon Musk-style baby names like [=0040.34h5a4] in tags" in:
       val pgn = Pgn(
         tags = Tags(
           List(
@@ -253,8 +249,7 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
 [ECO "A00e"]
 
 1. a4 { [%clk 0:04:58] } 1... Nf6 { [%clk 0:04:59] } 2. d4 { [%clk 0:04:55] } 2... d5 { [%clk 0:04:58] } 3. h4 { [%clk 0:04:52] } 3... e6 { [%clk 0:04:57] } 4. Qd3! { An invention of true genius. } { [%clk 0:04:48] } 4... c5 { [%clk 0:04:56] } 5. dxc5 { [%clk 0:04:18] } 5... Bxc5! { [%clk 0:04:55] }"""
-    }
-    "result only" in {
+    "result only" in:
       val pgn = Pgn(
         tags = Tags(
           List(
@@ -266,26 +261,22 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
       pgn.toString must_== """[Result "0-1"]
 
 0-1"""
-    }
-  }
 
-  "initial comments" should {
-    "empty" in {
+  "initial comments" should:
+    "empty" in:
       val pgn = Pgn(
         tags = Tags.empty,
         turns = List()
       )
       pgn.toString must_== """"""
-    }
-    "empty with initial comment" in {
+    "empty with initial comment" in:
       val pgn = Pgn(
         tags = Tags.empty,
         turns = List(),
         initial = Initial(List("Why hello there!"))
       )
       pgn.toString must_== """{ Why hello there! }"""
-    }
-    "empty with initial comments" in {
+    "empty with initial comments" in:
       val pgn = Pgn(
         tags = Tags.empty,
         turns = List(),
@@ -297,8 +288,7 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         )
       )
       pgn.toString must_== """{ Why hello there! } { The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one }"""
-    }
-    "moves with initial comments" in {
+    "moves with initial comments" in:
       val pgn = Pgn(
         tags = Tags.empty,
         turns = List(
@@ -339,11 +329,9 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
       )
       pgn.toString must_== """{ Why hello there! } { The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one }
 1. d4 (1. e4) 1... Nf6 (1... d5)"""
-    }
-  }
 
-  "tags" should {
-    "tag with \" in it" in {
+  "tags" should:
+    "tag with \" in it" in:
       val pgn = Pgn(
         tags = Tags(
           List(
@@ -353,9 +341,8 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         turns = List()
       )
       pgn.toString must_== """[TimeControl "\""]"""
-    }
 
-    "tag with \\ in it" in {
+    "tag with \\ in it" in:
       val pgn = Pgn(
         tags = Tags(
           List(
@@ -365,5 +352,3 @@ opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1 13.
         turns = List()
       )
       pgn.toString must_== """[TimeControl "\\"]"""
-    }
-  }

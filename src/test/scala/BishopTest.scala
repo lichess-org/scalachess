@@ -7,11 +7,11 @@ import chess.bitboard.Bitboard
 
 class BishopTest extends ChessTest:
 
-  "a bishop" should {
+  "a bishop" should:
 
     val bishop = White - Bishop
 
-    "not move to positions that are occupied by the same colour" in {
+    "not move to positions that are occupied by the same colour" in:
       val board = """
 k B
 
@@ -35,9 +35,8 @@ PPPPPPPP
  NBQKBNR
 """
       )
-    }
 
-    "capture opponent pieces" in {
+    "capture opponent pieces" in:
       val board = """
 k B
      q
@@ -61,5 +60,3 @@ PPPPPPPP
  NBQKBNR
 """
       )
-    }
-  }

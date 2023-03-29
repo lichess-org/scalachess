@@ -4,6 +4,7 @@ package format
 import cats.syntax.all.*
 import variant.{ Standard, Variant }
 import cats.kernel.Monoid
+import ornicar.scalalib.zeros.given
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *
@@ -21,7 +22,7 @@ trait FenWriter:
   def write(parsed: Situation.AndFullMoveNumber): EpdFen =
     write(Game(parsed.situation, ply = parsed.ply))
 
-  def write(game: Game): EpdFen = EpdFen {
+  def write(game: Game): EpdFen = EpdFen:
     {
       List[String](
         s"${writeBoard(game.board)}${writeCrazyPocket(game.board)}",
@@ -30,17 +31,12 @@ trait FenWriter:
         game.situation.enPassantSquare.fold("-")(_.key),
         game.halfMoveClock.toString,
         game.fullMoveNumber.toString
-      ) ::: {
-        if (game.board.variant == variant.ThreeCheck) List(writeCheckCount(game.board))
-        else Nil
-      }
+      ) ::: (game.board.variant == variant.ThreeCheck) ?? List(writeCheckCount(game.board))
     } mkString " "
-  }
 
-  def writeOpening(situation: Situation): OpeningFen = OpeningFen {
+  def writeOpening(situation: Situation): OpeningFen = OpeningFen:
     s"${writeBoard(situation.board)} ${situation.color.letter} ${writeCastles(situation.board)} ${situation.enPassantSquare
         .fold("-")(_.key)}"
-  }
 
   def writeBoard(board: Board): BoardFen =
     val fen   = scala.collection.mutable.StringBuilder(70)

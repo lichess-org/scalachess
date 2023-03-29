@@ -55,7 +55,7 @@ trait FenReader:
           situation.board(orig).isEmpty
       yield Uci.Move(orig, dest)
 
-      situation withHistory {
+      situation withHistory:
         val history = History(
           lastMove = enpassantMove,
           positionHashes = Monoid[PositionHash].empty,
@@ -70,7 +70,6 @@ trait FenReader:
             .orElse(splitted.lift(6).flatMap(readCheckCount))
         }
         checkCount.foldLeft(history)(_ withCheckCount _)
-      }
     }
 
   def read(fen: EpdFen): Option[Situation] = read(Standard, fen)

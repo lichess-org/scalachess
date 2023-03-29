@@ -22,9 +22,8 @@ case object ThreeCheck
     Standard.validMoves(situation)
 
   override def finalizeBoard(board: Board, uci: format.Uci, capture: Option[Piece]): Board =
-    board updateHistory {
+    board updateHistory:
       _.withCheck(Color.White, board.checkWhite).withCheck(Color.Black, board.checkBlack)
-    }
 
   override def specialEnd(situation: Situation) =
     situation.check.yes && {

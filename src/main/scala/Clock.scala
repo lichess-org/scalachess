@@ -91,10 +91,9 @@ case class Clock(
         val clockActive = gameActive && moveTime < player.remaining
         val inc         = clockActive ?? player.increment
 
-        val newC = updatePlayer(color) {
+        val newC = updatePlayer(color):
           _.takeTime(moveTime - inc)
             .copy(lag = lagTrack)
-        }
 
         Clock.WithCompensatedLag(
           (if (clockActive) newC else newC.hardStop).switch,
@@ -107,14 +106,12 @@ case class Clock(
   def takeback = switch
 
   def giveTime(c: Color, t: Centis) =
-    updatePlayer(c) {
+    updatePlayer(c):
       _.giveTime(t)
-    }
 
   def setRemainingTime(c: Color, centis: Centis) =
-    updatePlayer(c) {
+    updatePlayer(c):
       _.setRemaining(centis)
-    }
 
   def incrementOf(c: Color) = players(c).increment
 

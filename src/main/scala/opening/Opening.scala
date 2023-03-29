@@ -36,7 +36,7 @@ object Opening:
     private val splitAccentRegex = "[\u0300-\u036f]".r
     private val multiSpaceRegex  = """\s+""".r
     private val badChars         = """[^\w\-]+""".r
-    def apply(name: OpeningName) = OpeningKey {
+    def apply(name: OpeningName) = OpeningKey:
       badChars.replaceAllIn(
         multiSpaceRegex.replaceAllIn(
           splitAccentRegex.replaceAllIn(
@@ -48,4 +48,3 @@ object Opening:
         ),
         ""
       )
-    }

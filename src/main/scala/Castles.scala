@@ -31,14 +31,13 @@ object Castles extends OpaqueBitboard[Castles]:
     def update(color: Color, kingSide: Boolean, queenSide: Boolean): Castles =
       c.without(color) | kingSide.at(color.kingSide) | queenSide.at(color.queenSide)
 
-    def toFenString: String = {
+    def toFenString: String =
       (if (whiteKingSide) "K" else "") +
         (if (whiteQueenSide) "Q" else "") +
         (if (blackKingSide) "k" else "") +
-        (if (blackQueenSide) "q" else "")
-    } match
-      case "" => "-"
-      case n  => n
+        (if (blackQueenSide) "q" else "") match
+        case "" => "-"
+        case n  => n
 
     def toSeq: Array[Boolean] = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
 

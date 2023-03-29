@@ -5,11 +5,11 @@ import chess.Pos.*
 
 class PlayTest extends ChessTest:
 
-  "playing a game" should {
-    "opening one" in {
+  "playing a game" should:
+    "opening one" in:
       val game =
         makeGame.playMoves(E2 -> E4, E7 -> E5, F1 -> C4, G8 -> F6, D2 -> D3, C7 -> C6, C1 -> G5, H7 -> H6)
-      "current game" in {
+      "current game" in:
         game must beValid.like { case g =>
           addNewLines(g.board.visual) must_== """
 rnbqkb r
@@ -22,8 +22,7 @@ PPP  PPP
 RN QK NR
 """
         }
-      }
-      "after recapture" in {
+      "after recapture" in:
         game flatMap { _.playMoves(G5 -> F6, D8 -> F6) } must beValid.like { case g =>
           addNewLines(g.board.visual) must_== """
 rnb kb r
@@ -36,9 +35,7 @@ PPP  PPP
 RN QK NR
 """
         }
-      }
-    }
-    "Deep Blue vs Kasparov 1" in {
+    "Deep Blue vs Kasparov 1" in:
       makeGame.playMoves(
         E2 -> E4,
         C7 -> C5,
@@ -72,8 +69,7 @@ PP  BPP
 RN Q RK
 """
       }
-    }
-    "Peruvian Immortal" in {
+    "Peruvian Immortal" in:
       makeGame.playMoves(
         E2 -> E4,
         D7 -> D5,
@@ -114,6 +110,3 @@ B p p
        q
 """
       }
-    }
-
-  }

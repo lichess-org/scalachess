@@ -6,7 +6,7 @@ import chess.variant.Standard
 
 class InsufficientMatingMaterialTest extends ChessTest:
 
-  "bishops on Opposite colors" should {
+  "bishops on Opposite colors" should:
 
     val trues = List(
       "8/4b3/8/8/8/8/4B3/8 w - - 0 1",
@@ -26,28 +26,24 @@ class InsufficientMatingMaterialTest extends ChessTest:
       "5b2/8/8/8/8/3R4/1K2Q3/8 w - - 0 1"
     ).map(EpdFen(_))
 
-    "return true" in {
+    "return true" in:
       forall(trues) { fen =>
         val maybeGame = fenToGame(fen, Standard)
         maybeGame must beValid.like { case game =>
           bishopsOnOppositeColors(game.situation.board) must beTrue
         }
       }
-    }
 
-    "return false" in {
+    "return false" in:
       forall(falses) { fen =>
         val maybeGame = fenToGame(fen, Standard)
         maybeGame must beValid.like { case game =>
           bishopsOnOppositeColors(game.situation.board) must beFalse
         }
       }
-    }
-
-  }
 
   // Determines whether a color does not have mating material.
-  "apply with board and color" should {
+  "apply with board and color" should:
     val trues = List(
       "8/6R1/K7/2NNN3/5NN1/4KN2/8/k7 w - - 0 1",
       "8/8/K7/8/1k6/8/8/8 w - - 0 1",
@@ -71,22 +67,18 @@ class InsufficientMatingMaterialTest extends ChessTest:
       "7k/6N1/8/8/3K4/8/1n6/8 w - - 0 1"
     ).map(EpdFen(_))
 
-    "return true" in {
+    "return true" in:
       forall(trues) { fen =>
         val maybeGame = fenToGame(fen, Standard)
         maybeGame must beValid.like { case game =>
           apply(game.situation.board, !game.situation.color) must beTrue
         }
       }
-    }
 
-    "return false" in {
+    "return false" in:
       forall(falses) { fen =>
         val maybeGame = fenToGame(fen, Standard)
         maybeGame must beValid.like { case game =>
           apply(game.situation.board, !game.situation.color) must beFalse
         }
       }
-    }
-
-  }

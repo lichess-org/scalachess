@@ -7,9 +7,9 @@ class BoardTest extends ChessTest:
 
   val board = makeBoard
 
-  "a board" should {
+  "a board" should:
 
-    "position pieces correctly" in {
+    "position pieces correctly" in:
       board.pieces must havePairs(
         A1 -> (White - Rook),
         B1 -> (White - Knight),
@@ -44,61 +44,47 @@ class BoardTest extends ChessTest:
         G8 -> (Black - Knight),
         H8 -> (Black - Rook)
       )
-    }
 
-    "have pieces by default" in {
+    "have pieces by default" in:
       board.allPieces must not beEmpty
-    }
 
-    "have castling rights by default" in {
+    "have castling rights by default" in:
       board.history.castles == Castles.all
-    }
 
-    "allow a piece to be placed" in {
-      board.place(White - Rook, E3) must beSome {
+    "allow a piece to be placed" in:
+      board.place(White - Rook, E3) must beSome:
         (_: Board)(E3) mustEqual Option(White - Rook)
-      }
-    }
 
-    "allow a piece to be taken" in {
-      board take A1 must beSome {
+    "allow a piece to be taken" in:
+      board take A1 must beSome:
         (_: Board)(A1) must beNone
-      }
-    }
 
-    "allow a piece to move" in {
-      board.move(E2, E4) must beSome {
+    "allow a piece to move" in:
+      board.move(E2, E4) must beSome:
         (_: Board)(E4) mustEqual Option(White - Pawn)
-      }
-    }
 
-    "not allow an empty position to move" in {
+    "not allow an empty position to move" in:
       board.move(E5, E6) must beNone
-    }
 
-    "not allow a piece to move to an occupied position" in {
+    "not allow a piece to move to an occupied position" in:
       board.move(A1, A2) must beNone
-    }
 
-    "allow chaining actions" in {
+    "allow chaining actions" in:
       makeEmptyBoard.seq(
         _.place(White - Pawn, A2),
         _.place(White - Pawn, A3),
         _.move(A2, A4)
-      ) must beSome {
+      ) must beSome:
         (_: Board)(A4) mustEqual Option(White - Pawn)
-      }
-    }
 
-    "fail on bad actions chain" in {
+    "fail on bad actions chain" in:
       makeEmptyBoard.seq(
         _.place(White - Pawn, A2),
         _.place(White - Pawn, A3),
         _.move(B2, B4)
       ) must beNone
-    }
 
-    "provide occupation map" in {
+    "provide occupation map" in:
       makeBoard(
         A2 -> (White - Pawn),
         A3 -> (White - Pawn),
@@ -109,28 +95,21 @@ class BoardTest extends ChessTest:
         white = Set(A2, A3, D1),
         black = Set(E8, H4)
       )
-    }
 
-    "navigate in pos based on pieces" in {
-      "right to end" in {
+    "navigate in pos based on pieces" in:
+      "right to end" in:
         val board: Board = """
 R   K  R"""
         E1 >| (p => board.pieces contains p) must_== List(F1, G1, H1)
-      }
-      "right to next" in {
+      "right to next" in:
         val board: Board = """
 R   KB R"""
         E1 >| (p => board.pieces contains p) must_== List(F1)
-      }
-      "left to end" in {
+      "left to end" in:
         val board: Board = """
 R   K  R"""
         E1 |< (p => board.pieces contains p) must_== List(D1, C1, B1, A1)
-      }
-      "right to next" in {
+      "right to next" in:
         val board: Board = """
 R  BK  R"""
         E1 |< (p => board.pieces contains p) must_== List(D1)
-      }
-    }
-  }

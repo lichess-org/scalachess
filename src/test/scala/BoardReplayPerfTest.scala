@@ -15,8 +15,8 @@ class BoardReplayPerfTest extends ChessTest:
   def runOne      = Replay.boards(moves, None, variant.Standard)
   def run(): Unit = { for (_ <- 1 to nb) runOne }
 
-  "playing a game" should {
-    "many times" in {
+  "playing a game" should:
+    "many times" in:
       runOne must beValid
       if (nb * iterations > 1)
         println("warming up")
@@ -33,5 +33,3 @@ class BoardReplayPerfTest extends ChessTest:
       println(s"Average = $moveMicros microseconds per game")
       println(s"          ${1000000 / moveMicros} games per second")
       true === true
-    }
-  }

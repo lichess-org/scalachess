@@ -116,9 +116,8 @@ object Game:
     val variant = variantOption | chess.variant.Standard
     val g       = apply(variant)
     fen
-      .flatMap {
+      .flatMap:
         format.Fen.readWithMoveNumber(variant, _)
-      }
       .fold(g) { parsed =>
         g.copy(
           situation = Situation(

@@ -43,10 +43,9 @@ object Centis extends OpaqueInt[Centis]:
     else Integer.MIN_VALUE
 
   def apply(d: FiniteDuration): Centis =
-    ofMillis {
+    ofMillis:
       if (d.unit eq MILLISECONDS) d.length
       else d.toMillis
-    }
 
   inline def ofFloat(f: Float): Centis   = Math.round(f)
   inline def ofDouble(d: Double): Centis = ofLong(Math.round(d))

@@ -20,9 +20,8 @@ case object Chess960
   def pieces = pieces(scala.util.Random.nextInt(960))
 
   def pieces(position: Int) =
-    Variant.symmetricRank {
+    Variant.symmetricRank:
       positions(position) flatMap Role.allByForsyth.get
-    }
 
   def positionNumber(fen: EpdFen): Option[Int] =
     fen.value split ' ' match

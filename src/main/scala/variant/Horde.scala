@@ -248,7 +248,8 @@ case object Horde
       else piecesNum == 1
 
 enum SquareColor:
-  case Light, Dark
+  case Light
+  case Dark
 
   def bb = this match
     case Light => Bitboard.lightSquares

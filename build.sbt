@@ -27,6 +27,8 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
     "-explaintypes",
     "-feature",
     "-language:postfixOps"
+    // "-Wunused:all",
+    // "-Werror"
     // Warnings as errors!
     /* "-Xfatal-warnings" */
   )

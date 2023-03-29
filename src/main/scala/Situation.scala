@@ -1,6 +1,5 @@
 package chess
 
-import scala.collection.mutable.ListBuffer
 import cats.data.Validated
 import cats.syntax.all.*
 
@@ -8,7 +7,6 @@ import bitboard.Bitboard
 import bitboard.Bitboard.*
 
 import chess.format.Uci
-import chess.variant.Chess960
 import Pos.prevRank
 import chess.variant.Crazyhouse
 import chess.variant.Antichess

@@ -2,8 +2,6 @@ package chess
 package format
 
 import cats.syntax.all.*
-import variant.{ Standard, Variant }
-import cats.kernel.Monoid
 import ornicar.scalalib.zeros.given
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation

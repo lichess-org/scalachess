@@ -2,7 +2,6 @@ package chess
 
 import format.Uci
 import cats.kernel.Monoid
-import bitboard.Bitboard
 
 // Checks received by the respective side.
 case class CheckCount(white: Int = 0, black: Int = 0):

@@ -59,9 +59,6 @@ case object Atomic
         s.pawnAttacks(!attacker) & pawns
     )
 
-  private def protectedByOtherKing(board: Board, to: Pos, color: Color): Boolean =
-    to.kingAttacks.intersects(board.kingOf(color))
-
   // moves exploding opponent king are always playable
   override def kingSafety(m: Move): Boolean =
     (kingThreatened(m.after, m.color).no ||

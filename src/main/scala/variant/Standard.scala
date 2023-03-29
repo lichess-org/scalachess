@@ -36,7 +36,7 @@ case object Standard
 
   // Used for filtering candidate moves that would leave put the king in check.
   def isSafe(situation: Situation, king: Pos, move: Move, blockers: Bitboard): Boolean =
-    import situation.{ board, color, us, them }
+    import situation.{ board, us, them }
     if move.enpassant then
       val newOccupied = (board.occupied ^ move.orig.bb ^ move.dest.withRankOf(move.orig).bb) | move.dest.bb
       (king.rookAttacks(newOccupied) & them & (board.rooks ^ board.queens)).isEmpty &&
@@ -46,7 +46,7 @@ case object Standard
     else true
 
   private def genEvasions(situation: Situation, checkers: Bitboard): List[Move] =
-    import situation.{ genNonKing, genSafeKing, color, us, board, ourKing }
+    import situation.{ genNonKing, genSafeKing, us, board, ourKing }
     ourKing.fold(Nil)(king =>
       // Checks by these sliding pieces can maybe be blocked.
       val sliders = checkers & (board.sliders)

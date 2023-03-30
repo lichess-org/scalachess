@@ -127,12 +127,15 @@ class HordeVariantTest extends ChessTest:
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
 
-    "Must not auto-draw black King doesn't have to take white" in:
+    "Must not auto-draw if not all black King moves leads to stalemate" in:
       val position = EpdFen("8/8/8/7k/7P/7P/8/8 b - - 0 58")
-
       val game     = fenToGame(position, Horde)
+
       game must beValid.like { case game =>
         game.situation.autoDraw must beFalse
+        game.situation.end must beFalse
+        game.situation.status must beNone
+        Horde.isInsufficientMaterial(game.situation.board) must beFalse
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
 

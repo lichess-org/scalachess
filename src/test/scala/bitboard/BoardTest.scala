@@ -30,6 +30,23 @@ class BoardTest extends FunSuite:
       expected = situation.cBoard.sliderBlockers(king)
     yield assertEquals(result, expected.bb)
 
+  test("generateMoves = generateMovesAt for all pos"):
+    for
+      fen <- FenFixtures.fens
+      situation     = Fen.read(fen).getOrElse(throw RuntimeException("boooo"))
+      legalMoves    = situation.legalMoves
+      legalMovesAll = Pos.all.flatMap(situation.generateMovesAt(_))
+    yield assertEquals(legalMoves.toSet, legalMovesAll.toSet)
+
+  test("generateMovesAt(pos) = generateMoves.filter(_.orig == pos)"):
+    for
+      fen <- FenFixtures.fens
+      situation = Fen.read(fen).getOrElse(throw RuntimeException("boooo"))
+      sq <- Pos.all
+      legalMoves   = situation.legalMoves.filter(_.orig == sq)
+      legalMovesAt = situation.generateMovesAt(sq)
+    yield assertEquals(legalMoves.toSet, legalMovesAt.toSet)
+
   test("attacksTo"):
     for
       str <- FenFixtures.fens

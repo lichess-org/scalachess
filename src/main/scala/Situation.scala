@@ -94,8 +94,6 @@ case class Situation(board: Board, color: Color):
   lazy val sliderBlockers: Bitboard   = board.sliderBlockers(color)
   val isWhiteTurn: Boolean            = color.white
 
-  // TODO test generateMovesAt(pos) = generateMoves.filter(_.orig == pos)
-  // TODO test generateMoves == generateMovesAt(pos) for all pos
   def generateMovesAt(pos: Pos): List[Move] =
     def movesAt =
       val moves = board(pos).fold(Nil) { piece =>

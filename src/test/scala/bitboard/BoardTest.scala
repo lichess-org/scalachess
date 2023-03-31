@@ -24,10 +24,9 @@ class BoardTest extends FunSuite:
     for
       fen <- FenFixtures.fens
       situation = Fen.read(fen).getOrElse(throw RuntimeException("boooo"))
-      color <- Color.all
-      result   = situation.sliderBlockers
-      king     = situation.ourKings.head
-      expected = situation.cBoard.sliderBlockers(king)
+      king      = situation.ourKings.head
+      result    = situation.board.sliderBlockers(king, situation.color)
+      expected  = situation.cBoard.sliderBlockers(king)
     yield assertEquals(result, expected.bb)
 
   test("attacksTo"):

@@ -91,7 +91,6 @@ case class Situation(board: Board, color: Color):
   lazy val us: Bitboard               = board.byColor(color)
   lazy val them: Bitboard             = board.byColor(!color)
   lazy val checkers: Option[Bitboard] = ourKing.map(board.attackers(_, !color))
-  lazy val sliderBlockers: Bitboard   = board.sliderBlockers(color)
   val isWhiteTurn: Boolean            = color.white
 
   def generateMovesAt(pos: Pos): List[Move] =

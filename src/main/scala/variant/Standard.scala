@@ -29,8 +29,9 @@ case object Standard
             val targets = ~situation.us
             genNonKing(targets) ::: genSafeKing(targets) ::: genCastling(king) ::: enPassantMoves
           else genEvasions(situation, checkers) ::: enPassantMoves
-        if situation.sliderBlockers.nonEmpty || enPassantMoves.nonEmpty then
-          candidates.filter(isSafe(situation, king, _, situation.sliderBlockers))
+        val sliderBlockers = board.sliderBlockers(king, color)
+        if sliderBlockers.nonEmpty || enPassantMoves.nonEmpty then
+          candidates.filter(isSafe(situation, king, _, sliderBlockers))
         else candidates
       )
 

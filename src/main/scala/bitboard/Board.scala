@@ -92,19 +92,15 @@ case class Board(
     *
     * This is being used when checking a move is safe for the king or not
     */
-  def sliderBlockers(us: Color): Bitboard =
-    kingPosOf(us).fold(Bitboard.empty) { ourKing =>
-      val snipers = byColor(!us) & (
-        ourKing.rookAttacks(Bitboard.empty) & (rooks ^ queens) |
-          ourKing.bishopAttacks(Bitboard.empty) & (bishops ^ queens)
-      )
-      val bs = for
-        sniper <- snipers.squares
-        between = Bitboard.between(ourKing, sniper) & occupied
-        if !between.moreThanOne
-      yield between
-
-      bs.fold(Bitboard.empty)((a, b) => a | b)
+  def sliderBlockers(ourKing: Pos, us: Color): Bitboard =
+    val snipers = byColor(!us) & (
+      ourKing.rookAttacks(Bitboard.empty) & (rooks ^ queens) |
+        ourKing.bishopAttacks(Bitboard.empty) & (bishops ^ queens)
+    )
+    snipers.squares.foldLeft(Bitboard.empty) { case (blockers, sniper) =>
+      val between = Bitboard.between(ourKing, sniper) & occupied
+      if between.moreThanOne then blockers
+      else blockers | between
     }
 
   def discard(s: Pos): Board =

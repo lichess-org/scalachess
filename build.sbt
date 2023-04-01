@@ -12,7 +12,7 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
     "com.github.ornicar"  %% "scalalib"          % "9.2.0",
     "co.fs2"              %% "fs2-core"          % "3.6.1" % Test,
     "co.fs2"              %% "fs2-io"            % "3.6.1" % Test,
-    "joda-time"            % "joda-time"         % "2.12.4",
+    "joda-time"            % "joda-time"         % "2.12.5",
     "org.typelevel"       %% "cats-core"         % "2.9.0",
     "org.typelevel"       %% "alleycats-core"    % "2.9.0",
     "org.typelevel"       %% "cats-parse"        % "0.3.9"

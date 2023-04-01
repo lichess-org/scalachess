@@ -131,7 +131,7 @@ abstract class Variant private[variant] (
 
   // TODO remove this implementation
   def applyVariantEffect(moves: List[Move]): List[Move] =
-    if (hasMoveEffects) moves.map(addVariantEffect) else moves
+    if hasMoveEffects then moves.map(addVariantEffect) else moves
 
   def fiftyMoves(history: History): Boolean = history.halfMoveClock >= 100
 

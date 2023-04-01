@@ -32,7 +32,7 @@ class PerftBench {
 
   var crazyhousePerfts = Perft.crazyhousePerfts
   @Benchmark
-  def cracyhouse() =
+  def crazyhouse() =
     bench(crazyhousePerfts, Crazyhouse, 100_000L)
 
   var hordePerfts = Perft.hordePerfts

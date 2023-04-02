@@ -1,9 +1,8 @@
 package chess
 package format.pgn
 
-import org.joda.time.DateTimeZone
-import org.joda.time.format.DateTimeFormat
 import cats.syntax.option.*
+import java.time.format.DateTimeFormatter
 
 import chess.format.EpdFen
 
@@ -97,9 +96,9 @@ object Tag:
   case object Site  extends TagType
   case object Date  extends TagType
   case object UTCDate extends TagType:
-    val format = DateTimeFormat forPattern "yyyy.MM.dd" withZone DateTimeZone.UTC
+    val format = DateTimeFormatter.ofPattern("yyyy.MM.dd")
   case object UTCTime extends TagType:
-    val format = DateTimeFormat forPattern "HH:mm:ss" withZone DateTimeZone.UTC
+    val format = DateTimeFormatter.ofPattern("HH:mm:ss")
   case object Round           extends TagType
   case object Board           extends TagType
   case object White           extends TagType

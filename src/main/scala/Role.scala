@@ -2,6 +2,8 @@ package chess
 
 import cats.Functor
 import cats.Foldable
+import cats.syntax.all.*
+import chess.bitboard.Bitboard
 
 sealed trait Role:
   val forsyth: Char
@@ -70,6 +72,14 @@ case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
     case Queen  => queen
     case King   => king
 
+  def update(role: Role, f: A => A): ByRole[A] = role match
+    case Pawn   => copy(pawn = f(pawn))
+    case Knight => copy(knight = f(knight))
+    case Bishop => copy(bishop = f(bishop))
+    case Rook   => copy(rook = f(rook))
+    case Queen  => copy(queen = f(queen))
+    case King   => copy(king = f(king))
+
   def values: List[A] = List(pawn, knight, bishop, rook, queen, king)
 
 object ByRole:
@@ -83,3 +93,8 @@ object ByRole:
         f(byRole.queen),
         f(byRole.king)
       )
+
+  extension (byRole: ByRole[Bitboard])
+    def discard(mask: Bitboard): ByRole[Bitboard] =
+      val notMask = ~mask
+      byRole.map(_ & notMask)

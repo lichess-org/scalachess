@@ -1,6 +1,8 @@
 package chess
 package bitboard
 
+import cats.syntax.all.*
+
 import Bitboard.*
 
 // Chess board representation
@@ -12,14 +14,12 @@ case class Board(
 ):
   def isOccupied(s: Pos): Boolean = occupied.contains(s)
 
-  import byRole.{
-    bishop as bishops,
-    king as kings,
-    knight as knights,
-    pawn as pawns,
-    queen as queens,
-    rook as rooks
-  }
+  val pawns   = byRole.pawn
+  val knights = byRole.knight
+  val bishops = byRole.bishop
+  val rooks   = byRole.rook
+  val queens  = byRole.queen
+  val kings   = byRole.king
 
   def sliders = bishops ^ rooks ^ queens
 
@@ -103,20 +103,15 @@ case class Board(
 
   def discard(mask: Bitboard): Board =
     val notMask = ~mask
-    copy(
-      pawns = pawns & notMask,
-      knights = knights & notMask,
-      bishops = bishops & notMask,
-      rooks = rooks & notMask,
-      queens = queens & notMask,
-      kings = kings & notMask,
-      white = white & notMask,
-      black = black & notMask,
-      occupied & notMask
+    Board(
+      occupied & notMask,
+      white & notMask,
+      black & notMask,
+      byRole.map(_ & notMask)
     )
 
-  def roles: Role => Bitboard =
-    byRole
+  def roles: Role => Bitboard                  = role => byRole(role)
+  def byRoleOf(color: Color): ByRole[Bitboard] = byRole.map(_ & byColor(color))
 
   // put a piece to an empty square
   def put(piece: Piece, at: Pos): Option[Board] =
@@ -130,16 +125,11 @@ case class Board(
   def putOrReplace(s: Pos, role: Role, color: Color): Board =
     val b = discard(s)
     val m = s.bb
-    b.copy(
-      pawns = if role == Pawn then b.pawns | m else b.pawns,
-      knights = if role == Knight then b.knights | m else b.knights,
-      bishops = if role == Bishop then b.bishops | m else b.bishops,
-      rooks = if role == Rook then b.rooks | m else b.rooks,
-      queens = if role == Queen then b.queens | m else b.queens,
-      kings = if role == King then b.kings | m else b.kings,
-      white = if color.white then b.white | m else b.white,
-      black = if color.black then b.black | m else b.black,
-      occupied = b.occupied ^ m
+    Board(
+      b.occupied ^ m,
+      if color.white then b.white | m else b.white,
+      if color.black then b.black | m else b.black,
+      byRole.update(role, _ | m)
     )
 
   // put a piece into the board
@@ -189,29 +179,8 @@ case class Board(
   def piece(p: Piece): Bitboard = color(p.color) & byRole(p.role)
 
 object Board:
-  val empty = Board(
-    pawns = Bitboard.empty,
-    knights = Bitboard.empty,
-    bishops = Bitboard.empty,
-    rooks = Bitboard.empty,
-    queens = Bitboard.empty,
-    kings = Bitboard.empty,
-    white = Bitboard.empty,
-    black = Bitboard.empty,
-    occupied = Bitboard.empty
-  )
-  val standard = Board(
-    pawns = Bitboard(0xff00000000ff00L),
-    knights = Bitboard(0x4200000000000042L),
-    bishops = Bitboard(0x2400000000000024L),
-    rooks = Bitboard(0x8100000000000081L),
-    queens = Bitboard(0x800000000000008L),
-    kings = Bitboard(0x1000000000000010L),
-    white = Bitboard(0xffffL),
-    black = Bitboard(0xffff000000000000L),
-    occupied = Bitboard(0xffff00000000ffffL)
-  )
 
+  val empty: Board = Board(Bitboard.empty, Bitboard.empty, Bitboard.empty, ByRole(Bitboard.empty, Bitboard.empty, Bitboard.empty, Bitboard.empty, Bitboard.empty, Bitboard.empty))
   def fromMap(pieces: PieceMap): Board =
     var pawns    = Bitboard.empty
     var knights  = Bitboard.empty
@@ -238,4 +207,4 @@ object Board:
         case Color.White => white |= position
         case Color.Black => black |= position
     }
-    Board(pawns, knights, bishops, rooks, queens, kings, white, black, occupied)
+    Board(occupied, white, black, ByRole(pawns, knights, bishops, rooks, queens, kings))

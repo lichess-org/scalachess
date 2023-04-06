@@ -33,6 +33,7 @@ case class Board(
     pieces as allPieces,
     piecesOf,
     queens,
+    byRoleOf,
     rooks,
     sliderBlockers,
     sliders,

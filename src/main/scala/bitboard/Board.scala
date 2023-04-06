@@ -110,7 +110,7 @@ case class Board(
       byRole.map(_ & notMask)
     )
 
-  def roles: Role => Bitboard                  = role => byRole(role)
+  def roles: Role => Bitboard                  = byRole.apply
   def byRoleOf(color: Color): ByRole[Bitboard] = byRole.map(_ & byColor(color))
 
   // put a piece to an empty square
@@ -126,10 +126,10 @@ case class Board(
     val b = discard(s)
     val m = s.bb
     Board(
-      b.occupied ^ m,
-      if color.white then b.white | m else b.white,
-      if color.black then b.black | m else b.black,
-      byRole.update(role, _ | m)
+      occupied = b.occupied | m,
+      white = if color.white then b.white | m else b.white,
+      black = if color.black then b.black | m else b.black,
+      b.byRole.update(role, _ | m)
     )
 
   // put a piece into the board
@@ -180,7 +180,13 @@ case class Board(
 
 object Board:
 
-  val empty: Board = Board(Bitboard.empty, Bitboard.empty, Bitboard.empty, ByRole(Bitboard.empty, Bitboard.empty, Bitboard.empty, Bitboard.empty, Bitboard.empty, Bitboard.empty))
+  val empty: Board = Board(
+    Bitboard.empty,
+    Bitboard.empty,
+    Bitboard.empty,
+    ByRole(Bitboard.empty, Bitboard.empty, Bitboard.empty, Bitboard.empty, Bitboard.empty, Bitboard.empty)
+  )
+
   def fromMap(pieces: PieceMap): Board =
     var pawns    = Bitboard.empty
     var knights  = Bitboard.empty

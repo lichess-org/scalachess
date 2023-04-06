@@ -141,10 +141,13 @@ class BoardTest extends FunSuite:
       str <- FenFixtures.fens
       board = parseFen(str)
       s <- Pos.all
-      _ = board.put(White.king, s)
-      newBoard <- board.replace(White.queen, s)
-      newPiece <- newBoard.pieceAt(s)
-    yield assertEquals(newPiece, White.queen)
+      if !board.isOccupied(s)
+      newPiece = for
+        x        <- board.put(White.king, s)
+        newBoard <- x.replace(White.queen, s)
+        newPiece <- newBoard.pieceAt(s)
+      yield newPiece
+    yield assertEquals(newPiece.get, White.queen)
 
   test("putOrReplace an empty square returns a board with one more piece"):
     for

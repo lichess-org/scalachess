@@ -1,5 +1,9 @@
 package chess
 
+import cats.Functor
+import cats.syntax.all.*
+import chess.bitboard.Bitboard
+
 sealed trait Role:
   val forsyth: Char
   lazy val forsythUpper: Char = forsyth.toUpper
@@ -57,3 +61,40 @@ object Role:
       case Rook   => Option(5)
       case Queen  => Option(9)
       case King   => None
+
+case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
+  def apply(role: Role): A = role match
+    case Pawn   => pawn
+    case Knight => knight
+    case Bishop => bishop
+    case Rook   => rook
+    case Queen  => queen
+    case King   => king
+
+  def update(role: Role, f: A => A): ByRole[A] = role match
+    case Pawn   => copy(pawn = f(pawn))
+    case Knight => copy(knight = f(knight))
+    case Bishop => copy(bishop = f(bishop))
+    case Rook   => copy(rook = f(rook))
+    case Queen  => copy(queen = f(queen))
+    case King   => copy(king = f(king))
+
+  def values: List[A] = List(pawn, knight, bishop, rook, queen, king)
+
+object ByRole:
+  def apply[A](a: A): ByRole[A] = ByRole(a, a, a, a, a, a)
+  given Functor[ByRole] with
+    def map[A, B](byRole: ByRole[A])(f: A => B): ByRole[B] =
+      ByRole(
+        f(byRole.pawn),
+        f(byRole.knight),
+        f(byRole.bishop),
+        f(byRole.rook),
+        f(byRole.queen),
+        f(byRole.king)
+      )
+
+  extension (byRole: ByRole[Bitboard])
+    def discard(mask: Bitboard): ByRole[Bitboard] =
+      val notMask = ~mask
+      byRole.map(_ & notMask)

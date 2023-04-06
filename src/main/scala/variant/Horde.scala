@@ -4,7 +4,6 @@ package variant
 import chess.format.EpdFen
 import chess.bitboard.Bitboard
 import chess.bitboard.Bitboard.*
-import cats.Functor
 import cats.syntax.all.*
 
 case object Horde
@@ -83,36 +82,26 @@ case object Horde
       val bishops = board.bishops & board.byColor(side)
       bishops.intersects(Bitboard.lightSquares) && bishops.intersects(Bitboard.darkSquares)
 
-    def byRole: Color => ByRole[Bitboard] = side =>
-      ByRole[Bitboard](
-        board.pawns & board.byColor(side),
-        board.knights & board.byColor(side),
-        board.bishops & board.byColor(side),
-        board.rooks & board.byColor(side),
-        board.queens & board.byColor(side),
-        board.kings & board.byColor(side)
-      )
-
-  // port from Shakmaty
-  import ByRole.*
   def hasInsufficientMaterial(board: Board, color: Color): Boolean =
     import SquareColor.*
+    import ByRole.*
+    import Bitboard.*
     // Black can always win by capturing the horde
     if color.black then false
     else
-      val hordeb                           = board.byRole(color)
-      val horde                            = hordeb.map(_.count)
-      val hordeBishops: SquareColor => Int = color => (hordeb.bishop & color.bb).count
+      val hordeRole                        = board.byRoleOf(color)
+      val horde                            = hordeRole.map(_.count)
+      val hordeBishops: SquareColor => Int = color => (hordeRole.bishop & color.bb).count
       val hordeBishopColor                 = if hordeBishops(Light) >= 1 then Light else Dark
 
       val hordeBishopNum = Math.min(hordeBishops(Light), 2) + Math.min(hordeBishops(Dark), 2)
       // Two same color bishops suffice to cover all the light and dark squares
       // around the enemy king.
-      val hordeNum = horde.pawn + horde.knight + horde.rook + horde.queen + hordeBishopNum
-      val piecesb  = board.byRole(Color.black)
-      val pieces   = piecesb.map(_.count)
-      val piecesBishops: SquareColor => Int = color => (piecesb.bishop & color.bb).count
-      val piecesNum                         = piecesb.map(_.count).values.sum
+      val hordeNum   = horde.pawn + horde.knight + horde.rook + horde.queen + hordeBishopNum
+      val piecesRole = board.byRoleOf(Color.black)
+      val pieces     = piecesRole.map(_.count)
+      val piecesBishops: SquareColor => Int = color => (piecesRole.bishop & color.bb).count
+      val piecesNum                         = piecesRole.map(_.count).values.sum
       val piecesOfTypeNot                   = (pieces: Int) => piecesNum - pieces
       if hordeNum == 0 then true
       else if hordeNum >= 4 then false // Four or more white pieces can always deliver mate.
@@ -258,26 +247,3 @@ enum SquareColor:
   def unary_! = this match
     case Light => Dark
     case Dark  => Light
-
-case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
-  def apply(role: Role): A = role match
-    case Pawn   => pawn
-    case Knight => knight
-    case Bishop => bishop
-    case Rook   => rook
-    case Queen  => queen
-    case King   => king
-
-  def values: List[A] = List(pawn, knight, bishop, rook, queen, king)
-
-object ByRole:
-  given Functor[ByRole] with
-    def map[A, B](byRole: ByRole[A])(f: A => B): ByRole[B] =
-      ByRole(
-        f(byRole.pawn),
-        f(byRole.knight),
-        f(byRole.bishop),
-        f(byRole.rook),
-        f(byRole.queen),
-        f(byRole.king)
-      )

@@ -19,6 +19,7 @@ case class Board(
     byColor,
     byPiece,
     byRole,
+    byRoleOf,
     isCheck,
     isOccupied,
     kingOf,

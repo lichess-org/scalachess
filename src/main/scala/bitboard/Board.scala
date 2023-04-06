@@ -8,12 +8,11 @@ import Bitboard.*
 // Chess board representation
 case class Board(
     occupied: Bitboard,
-    white: Bitboard,
-    black: Bitboard,
+    byColor: ByColor[Bitboard],
     byRole: ByRole[Bitboard]
 ):
-  def isOccupied(s: Pos): Boolean = occupied.contains(s)
-
+  val white   = byColor.white
+  val black   = byColor.black
   val pawns   = byRole.pawn
   val knights = byRole.knight
   val bishops = byRole.bishop
@@ -21,9 +20,8 @@ case class Board(
   val queens  = byRole.queen
   val kings   = byRole.king
 
-  def sliders = bishops ^ rooks ^ queens
-
-  lazy val byColor = ByColor(white, black)
+  def sliders                     = bishops ^ rooks ^ queens
+  def isOccupied(s: Pos): Boolean = occupied.contains(s)
 
   lazy val nbPieces = occupied.count
 
@@ -105,8 +103,7 @@ case class Board(
     val notMask = ~mask
     Board(
       occupied & notMask,
-      white & notMask,
-      black & notMask,
+      byColor.map(_ & notMask),
       byRole.map(_ & notMask)
     )
 
@@ -126,9 +123,8 @@ case class Board(
     val b = discard(s)
     val m = s.bb
     Board(
-      occupied = b.occupied | m,
-      white = if color.white then b.white | m else b.white,
-      black = if color.black then b.black | m else b.black,
+      b.occupied | m,
+      b.byColor.update(color, _ | m),
       b.byRole.update(role, _ | m)
     )
 
@@ -182,8 +178,7 @@ object Board:
 
   val empty: Board = Board(
     Bitboard.empty,
-    Bitboard.empty,
-    Bitboard.empty,
+    ByColor(Bitboard.empty, Bitboard.empty),
     ByRole(Bitboard.empty, Bitboard.empty, Bitboard.empty, Bitboard.empty, Bitboard.empty, Bitboard.empty)
   )
 
@@ -213,4 +208,4 @@ object Board:
         case Color.White => white |= position
         case Color.Black => black |= position
     }
-    Board(occupied, white, black, ByRole(pawns, knights, bishops, rooks, queens, kings))
+    Board(occupied, ByColor(white, black), ByRole(pawns, knights, bishops, rooks, queens, kings))

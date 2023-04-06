@@ -1,7 +1,6 @@
 package chess
 
 import cats.Functor
-import cats.Foldable
 import cats.syntax.all.*
 import chess.bitboard.Bitboard
 

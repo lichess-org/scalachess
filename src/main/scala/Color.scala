@@ -56,10 +56,10 @@ object Color:
   inline def fromWhite(inline white: Boolean): Color = if white then White else Black
 
 case class ByColor[A](white: A, black: A):
-  def apply(color: Color) = if (color.white) white else black
+  def apply(color: Color) = if color.white then white else black
 
   def update(color: Color, f: A => A) =
-    if (color.white) copy(white = f(white))
+    if color.white then copy(white = f(white))
     else copy(black = f(black))
 
   def map[B](fw: A => B, fb: A => B) = copy(white = fw(white), black = fb(black))

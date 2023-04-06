@@ -82,6 +82,7 @@ case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
   def values: List[A] = List(pawn, knight, bishop, rook, queen, king)
 
 object ByRole:
+  def apply[A](a: A): ByRole[A] = ByRole(a, a, a, a, a, a)
   given Functor[ByRole] with
     def map[A, B](byRole: ByRole[A])(f: A => B): ByRole[B] =
       ByRole(

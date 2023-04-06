@@ -178,8 +178,8 @@ object Board:
 
   val empty: Board = Board(
     Bitboard.empty,
-    ByColor(Bitboard.empty, Bitboard.empty),
-    ByRole(Bitboard.empty, Bitboard.empty, Bitboard.empty, Bitboard.empty, Bitboard.empty, Bitboard.empty)
+    ByColor(Bitboard.empty),
+    ByRole(Bitboard.empty)
   )
 
   def fromMap(pieces: PieceMap): Board =

@@ -75,4 +75,5 @@ case class ByColor[A](white: A, black: A):
   def exists(pred: A => Boolean) = pred(white) || pred(black)
 
 object ByColor:
+  def apply[A](a: A): ByColor[A] = ByColor(a, a)
   def apply[A](f: Color => A): ByColor[A] = ByColor(white = f(White), black = f(Black))

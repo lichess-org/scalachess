@@ -91,7 +91,7 @@ class BoardTest extends ChessTest:
         D1 -> (White - King),
         E8 -> (Black - King),
         H4 -> (Black - Queen)
-      ).occupation must_== Color.Map(
+      ).occupation must_== ByColor(
         white = Set(A2, A3, D1),
         black = Set(E8, H4)
       )

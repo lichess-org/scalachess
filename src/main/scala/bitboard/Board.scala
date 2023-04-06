@@ -23,7 +23,7 @@ case class Board(
 
   def sliders = bishops ^ rooks ^ queens
 
-  lazy val byColor = Color.Map(white, black)
+  lazy val byColor = ByColor(white, black)
 
   lazy val nbPieces = occupied.count
 
@@ -155,7 +155,7 @@ case class Board(
   def promote(orig: Pos, dest: Pos, piece: Piece): Option[Board] =
     take(orig).map(_.putOrReplace(piece, dest))
 
-  lazy val occupation: Color.Map[Set[Pos]] = Color.Map { c =>
+  lazy val occupation: ByColor[Set[Pos]] = ByColor { c =>
     color(c).squares.toSet
   }
 

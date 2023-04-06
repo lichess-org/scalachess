@@ -9,7 +9,7 @@ import chess.Clock.Config
 case class Clock(
     config: Config,
     color: Color,
-    players: Color.Map[ClockPlayer],
+    players: ByColor[ClockPlayer],
     timer: Option[Timestamp] = None,
     timestamper: Timestamper = RealTimestamper
 ):
@@ -227,7 +227,7 @@ object Clock:
     Clock(
       config = config,
       color = White,
-      players = Color.Map(player, player),
+      players = ByColor(player, player),
       timer = None
     )
 

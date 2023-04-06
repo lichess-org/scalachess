@@ -329,4 +329,4 @@ class BoardTest extends FunSuite:
 
   test("occupation"):
     val map = Map(A2 -> White.pawn, A3 -> White.rook)
-    assertEquals(Board.fromMap(map).occupation, Color.Map(map.keys.toSet, Set()))
+    assertEquals(Board.fromMap(map).occupation, ByColor(map.keys.toSet, Set()))

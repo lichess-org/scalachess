@@ -29,7 +29,7 @@ class CrazyhouseDataTest extends ScalaCheckSuite:
         Data.init.promote(pos).store(piece, pos).drop(!piece.color.pawn).isDefined
     }
 
-  property("move"):
+  property("move a promoted piece and drop Pawn"):
     forAll { (piece: Piece, from: Pos, to: Pos) =>
       (piece.role != King) ==>
         Data.init

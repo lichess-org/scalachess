@@ -148,6 +148,7 @@ case object Crazyhouse
 
   val storableRoles: Set[Role] = Set(Pawn, Knight, Bishop, Rook, Queen)
 
+  type Pockets = ByColor[Pocket]
   case class Data(
       pockets: Pockets,
       // in crazyhouse, a promoted piece becomes a pawn
@@ -181,27 +182,17 @@ case object Crazyhouse
     def size    = pockets.white.size + pockets.black.size
 
   object Data:
-    val init = Data(Pockets(Pocket.empty, Pocket.empty), Set.empty)
+    val init = Data(ByColor(Pocket.empty), Set.empty)
 
-  case class Pockets(white: Pocket, black: Pocket):
-
-    def apply(color: Color) = color.fold(white, black)
+  extension (pockets: Pockets)
 
     def take(piece: Piece): Option[Pockets] =
-      piece.color.fold(
-        white take piece.role map { np =>
-          copy(white = np)
-        },
-        black take piece.role map { np =>
-          copy(black = np)
-        }
-      )
+      pockets(piece.color).take(piece.role).map { np =>
+        pockets.update(piece.color, _ => np)
+      }
 
-    def store(piece: Piece) =
-      piece.color.fold(
-        copy(black = black store piece.role),
-        copy(white = white store piece.role)
-      )
+    def store(piece: Piece): Pockets =
+      pockets.update(!piece.color, _.store(piece.role))
 
   case class Pocket(pawn: Natural, knight: Natural, bishop: Natural, rook: Natural, queen: Natural):
 

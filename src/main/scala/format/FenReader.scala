@@ -127,11 +127,11 @@ trait FenReader:
         if (promoted.isEmpty) board else board.withCrazyData(_.copy(promoted = promoted))
       } map { board =>
         pockets.fold(board) { str =>
-          import chess.variant.Crazyhouse.{ Pocket, Pockets }
+          import chess.variant.Crazyhouse.Pocket
           val (white, black) = str.toList.flatMap(Piece.fromChar).partition(_ is White)
           board.withCrazyData(
             _.copy(
-              pockets = Pockets(
+              pockets = ByColor(
                 white = Pocket(white.map(_.role)),
                 black = Pocket(black.map(_.role))
               )

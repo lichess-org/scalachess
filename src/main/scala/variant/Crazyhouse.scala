@@ -192,6 +192,8 @@ case object Crazyhouse
     def store(piece: Piece): Pockets =
       pockets.update(!piece.color, _.store(piece.role))
 
+    def forsyth = pockets.white.forsythUpper + pockets.black.forsyth
+
   case class Pocket(pawn: Int, knight: Int, bishop: Int, rook: Int, queen: Int):
 
     def forsythUpper = forsyth.toUpperCase

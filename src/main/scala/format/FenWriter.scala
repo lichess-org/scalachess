@@ -68,9 +68,7 @@ trait FenWriter:
   private def writeCrazyPocket(board: Board) =
     board.crazyData match
       case Some(variant.Crazyhouse.Data(pockets, _)) =>
-        "/" +
-          pockets.white.forsythUpper +
-          pockets.black.forsyth
+        "/" + pockets.forsyth
       case _ => ""
 
   private[chess] def writeCastles(board: Board): String =

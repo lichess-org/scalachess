@@ -144,9 +144,9 @@ trait FenReader:
       chars: List[Char],
       x: Int,
       y: Int
-  ): Option[(List[(Pos, Piece)], Set[Pos])] =
+  ): Option[(List[(Pos, Piece)], Bitboard)] =
     chars match
-      case Nil                               => Option((Nil, Set.empty))
+      case Nil                               => Option((Nil, Bitboard.empty))
       case '/' :: rest                       => makePiecesWithCrazyPromoted(rest, 0, y - 1)
       case c :: rest if '1' <= c && c <= '8' => makePiecesWithCrazyPromoted(rest, x + (c - '0').toInt, y)
       case c :: '~' :: rest =>
@@ -154,7 +154,7 @@ trait FenReader:
           pos                        <- Pos.at(x, y)
           piece                      <- Piece.fromChar(c)
           (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
-        } yield (pos -> piece :: nextPieces, nextPromoted + pos)
+        } yield (pos -> piece :: nextPieces, nextPromoted.addSquare(pos))
       case c :: rest =>
         for {
           pos                        <- Pos.at(x, y)

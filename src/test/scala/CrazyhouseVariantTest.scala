@@ -6,6 +6,7 @@ import chess.format.EpdFen
 import chess.variant.Crazyhouse
 import chess.format.pgn.SanStr
 import chess.Pos.*
+import chess.bitboard.Bitboard
 
 class CrazyhouseVariantTest extends ChessTest:
 
@@ -32,7 +33,7 @@ class CrazyhouseVariantTest extends ChessTest:
               Crazyhouse.Pocket(Queen :: Nil),
               Crazyhouse.Pocket(Rook :: Pawn :: Pawn :: Nil)
             ),
-            promoted = Set.empty
+            promoted = Bitboard.empty
           )
         )
       }

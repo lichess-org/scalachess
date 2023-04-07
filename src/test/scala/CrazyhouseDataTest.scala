@@ -7,10 +7,9 @@ import org.scalacheck.Prop.propBoolean
 import Arbitraries.given
 import chess.bitboard.Arbitraries.given
 import chess.variant.Crazyhouse.Data
+import chess.bitboard.Bitboard
 
 class CrazyhouseDataTest extends ScalaCheckSuite:
-
-  override def scalaCheckInitialSeed = "cyiY-djH6CzUsZN2_-G8vcJyBXpkZbaw4MJ1gs1rDaE="
 
   property("store a piece and drop it"):
     forAll { (piece: Piece, pos: Pos) =>
@@ -54,7 +53,7 @@ class CrazyhouseDataTest extends ScalaCheckSuite:
     }
 
   property("store and drop multiple pieces with promotion"):
-    forAll { (ps: List[Piece], pos: Pos, promoted: Set[Pos]) =>
+    forAll { (ps: List[Piece], pos: Pos, promoted: Bitboard) =>
       val filtered = ps.filter(_.role != King)
       val data = filtered.foldLeft(Data.init.copy(promoted = promoted)) { (data, piece) =>
         data.store(piece, pos)

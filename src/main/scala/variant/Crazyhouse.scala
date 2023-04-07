@@ -108,7 +108,6 @@ case object Crazyhouse
   // king is in double check, no drop is possible
   // this function is used in perfts only
   private def legalDropSquares(situation: Situation): Bitboard =
-    import bitboard.Bitboard
     situation.ourKing
       .map(king =>
         val checkers = situation.board.board.attackers(king, !situation.color)
@@ -155,9 +154,10 @@ case object Crazyhouse
       // when captured and put in the pocket.
       // there we need to remember which pieces are issued from promotions.
       // we do that by tracking their positions on the board.
-      promoted: Set[Pos]
+      promoted: Bitboard
   ):
 
+    import bitboard.Bitboard.bb
     def drop(piece: Piece): Option[Data] =
       pockets take piece map { nps =>
         copy(pockets = nps)
@@ -166,23 +166,23 @@ case object Crazyhouse
     def store(piece: Piece, from: Pos): Data =
       copy(
         pockets = pockets store {
-          if (promoted(from)) piece.color.pawn else piece
+          if promoted.contains(from) then piece.color.pawn else piece
         },
-        promoted = promoted - from
+        promoted = promoted.removeSquare(from)
       )
 
-    def promote(pos: Pos) = copy(promoted = promoted + pos)
+    def promote(pos: Pos) = copy(promoted = promoted.addSquare(pos))
 
     def move(orig: Pos, dest: Pos) =
       copy(
-        promoted = if (promoted(orig)) promoted - orig + dest else promoted
+        promoted = if promoted.contains(orig) then promoted.removeSquare(orig).addSquare(dest) else promoted
       )
 
     def isEmpty = pockets.white.isEmpty && pockets.black.isEmpty
     def size    = pockets.white.size + pockets.black.size
 
   object Data:
-    val init = Data(ByColor(Pocket.empty), Set.empty)
+    val init = Data(ByColor(Pocket.empty), Bitboard.empty)
 
   extension (pockets: Pockets)
 

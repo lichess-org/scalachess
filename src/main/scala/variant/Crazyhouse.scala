@@ -162,7 +162,7 @@ case object Crazyhouse
         copy(pockets = nps)
       }
 
-    def store(piece: Piece, from: Pos) =
+    def store(piece: Piece, from: Pos): Data =
       copy(
         pockets = pockets store {
           if (promoted(from)) piece.color.pawn else piece
@@ -176,6 +176,9 @@ case object Crazyhouse
       copy(
         promoted = if (promoted(orig)) promoted - orig + dest else promoted
       )
+
+    def isEmpty = pockets.white.roles.isEmpty && pockets.black.roles.isEmpty
+    def size = pockets.white.roles.size + pockets.black.roles.size
 
   object Data:
     val init = Data(Pockets(Pocket(Nil), Pocket(Nil)), Set.empty)

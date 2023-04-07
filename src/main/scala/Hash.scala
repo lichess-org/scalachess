@@ -59,7 +59,7 @@ object Hash extends OpaqueInt[Hash]:
 
   private def get(situation: Situation, table: ZobristConstants): Long =
 
-    def crazyPocketMask(role: Role, colorshift: Int, count: Int) =
+    def crazyPocketMask(role: Role, colorshift: Int, count: Int): Option[Long] =
       // There should be no kings and at most 16 pieces of any given type
       // in a pocket.
       if (0 < count && count <= 16 && roleIndex(role) < 5)
@@ -96,23 +96,20 @@ object Hash extends OpaqueInt[Hash]:
       case _ => hep
 
     // Hash in special crazyhouse data.
-    val hcrazy = board.crazyData.fold(hchecks) { data =>
-      val hcrazypromotions = data.promoted.view
-        .map { p =>
-          table.crazyPromotionMasks(p.hashCode)
-        }
+    board.crazyData.fold(hchecks) { data =>
+      val hcrazypromotions: Long = data.promoted.squares
+        .map { p => table.crazyPromotionMasks(p.hashCode) }
         .fold(hchecks)(_ ^ _)
       Color.all
         .flatMap { color =>
           val colorshift = color.fold(79, -1)
-          data.pockets(color).roles.groupBy(identity).flatMap { case (role, list) =>
-            crazyPocketMask(role, colorshift, list.size)
-          }
+          data
+            .pockets(color)
+            .values
+            .flatMap((role, size) => crazyPocketMask(role, colorshift, size))
         }
         .fold(hcrazypromotions)(_ ^ _)
     }
-
-    hcrazy
 
   private val h: Hash = size
 

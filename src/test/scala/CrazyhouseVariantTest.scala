@@ -6,6 +6,7 @@ import chess.format.EpdFen
 import chess.variant.Crazyhouse
 import chess.format.pgn.SanStr
 import chess.Pos.*
+import chess.bitboard.Bitboard
 
 class CrazyhouseVariantTest extends ChessTest:
 
@@ -16,15 +17,7 @@ class CrazyhouseVariantTest extends ChessTest:
       val game = {
         fenToGame(fenPosition, Crazyhouse).toOption.get
       }.updateBoard { b =>
-        b.withCrazyData(
-          Crazyhouse.Data(
-            pockets = Crazyhouse.Pockets(
-              Crazyhouse.Pocket(Nil),
-              Crazyhouse.Pocket(Nil)
-            ),
-            promoted = Set.empty
-          )
-        )
+        b.withCrazyData(Crazyhouse.Data.init)
       }
       game.situation.checkMate must beTrue
       game.situation.opponentHasInsufficientMaterial must beFalse
@@ -36,11 +29,11 @@ class CrazyhouseVariantTest extends ChessTest:
       }.updateBoard { b =>
         b.withCrazyData(
           Crazyhouse.Data(
-            pockets = Crazyhouse.Pockets(
+            pockets = ByColor(
               Crazyhouse.Pocket(Queen :: Nil),
               Crazyhouse.Pocket(Rook :: Pawn :: Pawn :: Nil)
             ),
-            promoted = Set.empty
+            promoted = Bitboard.empty
           )
         )
       }

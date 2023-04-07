@@ -74,6 +74,11 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
       assertEquals(bb, bb2)
     }
 
+  test("addSquare andThen removeSquare should be the same as identity"):
+    forAll { (bb: Bitboard, pos: Pos) =>
+      !bb.contains(pos) ==> assertEquals(bb.addSquare(pos).removeSquare(pos), bb)
+    }
+
   test("apply(Set[Pos]).squares.toSet == Set[Pos]"):
     forAll { (xs: Set[Pos]) =>
       val result = Bitboard(xs).squares.toSet

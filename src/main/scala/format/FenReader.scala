@@ -127,11 +127,11 @@ trait FenReader:
         if (promoted.isEmpty) board else board.withCrazyData(_.copy(promoted = promoted))
       } map { board =>
         pockets.fold(board) { str =>
-          import chess.variant.Crazyhouse.{ Pocket, Pockets }
+          import chess.variant.Crazyhouse.Pocket
           val (white, black) = str.toList.flatMap(Piece.fromChar).partition(_ is White)
           board.withCrazyData(
             _.copy(
-              pockets = Pockets(
+              pockets = ByColor(
                 white = Pocket(white.map(_.role)),
                 black = Pocket(black.map(_.role))
               )
@@ -144,9 +144,9 @@ trait FenReader:
       chars: List[Char],
       x: Int,
       y: Int
-  ): Option[(List[(Pos, Piece)], Set[Pos])] =
+  ): Option[(List[(Pos, Piece)], Bitboard)] =
     chars match
-      case Nil                               => Option((Nil, Set.empty))
+      case Nil                               => Option((Nil, Bitboard.empty))
       case '/' :: rest                       => makePiecesWithCrazyPromoted(rest, 0, y - 1)
       case c :: rest if '1' <= c && c <= '8' => makePiecesWithCrazyPromoted(rest, x + (c - '0').toInt, y)
       case c :: '~' :: rest =>
@@ -154,7 +154,7 @@ trait FenReader:
           pos                        <- Pos.at(x, y)
           piece                      <- Piece.fromChar(c)
           (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
-        } yield (pos -> piece :: nextPieces, nextPromoted + pos)
+        } yield (pos -> piece :: nextPieces, nextPromoted.addSquare(pos))
       case c :: rest =>
         for {
           pos                        <- Pos.at(x, y)

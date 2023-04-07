@@ -68,10 +68,10 @@ case object Crazyhouse
 
   private def canDropStuff(situation: Situation) =
     situation.board.crazyData.exists { (data: Data) =>
-      val roles = data.pockets(situation.color).roles
+      val pocket = data.pockets(situation.color)
       roles.nonEmpty && possibleDrops(situation).fold(true) { squares =>
         squares.nonEmpty && {
-          squares.exists(canDropPawnOn) || roles.exists(chess.Pawn !=)
+          squares.exists(canDropPawnOn) || pocket.hasNonPawn
         }
       }
     }
@@ -124,18 +124,18 @@ case object Crazyhouse
     if targets.isEmpty then Nil
     else
       situation.board.crazyData.fold(List.empty[Drop]) { data =>
-        val roles = data.pockets(situation.color).roles
+        val pocket = data.pockets(situation.color)
         val dropsWithoutPawn =
           for
             role <- List(Knight, Bishop, Rook, Queen)
-            if roles contains role
+            if pocket contains role
             to <- targets.squares
             piece = Piece(situation.color, role)
             after = situation.board.place(piece, to).get // this is safe, we checked the target squares
             d2    = data.drop(piece).get                 // this is safe, we checked the pocket
           yield Drop(piece, to, situation, after withCrazyData d2)
         val dropWithPawn =
-          if roles contains Pawn then
+          if pocket contains Pawn then
             for
               to <- (targets & ~Bitboard.firstRank & ~Bitboard.lastRank).squares
               piece = Piece(situation.color, Pawn)
@@ -146,7 +146,7 @@ case object Crazyhouse
         dropsWithoutPawn ::: dropWithPawn
       }
 
-  val storableRoles = List(Pawn, Knight, Bishop, Rook, Queen)
+  val storableRoles: Set[Role] = Set(Pawn, Knight, Bishop, Rook, Queen)
 
   case class Data(
       pockets: Pockets,
@@ -177,11 +177,11 @@ case object Crazyhouse
         promoted = if (promoted(orig)) promoted - orig + dest else promoted
       )
 
-    def isEmpty = pockets.white.roles.isEmpty && pockets.black.roles.isEmpty
-    def size = pockets.white.roles.size + pockets.black.roles.size
+    def isEmpty = pockets.white.isEmpty && pockets.black.isEmpty
+    def size    = pockets.white.size + pockets.black.size
 
   object Data:
-    val init = Data(Pockets(Pocket(Nil), Pocket(Nil)), Set.empty)
+    val init = Data(Pockets(Pocket.empty, Pocket.empty), Set.empty)
 
   case class Pockets(white: Pocket, black: Pocket):
 
@@ -203,12 +203,73 @@ case object Crazyhouse
         copy(white = white store piece.role)
       )
 
-  case class Pocket(roles: List[Role]):
+  case class Pocket(pawn: Natural, knight: Natural, bishop: Natural, rook: Natural, queen: Natural):
 
-    def take(role: Role) =
-      if (roles contains role) Option(copy(roles = roles diff List(role)))
-      else None
+    def forsythUpper = forsyth.toUpperCase
+    def forsyth: String = forsyth(pawn, 'p') + forsyth(knight, 'n') +
+      forsyth(bishop, 'b') + forsyth(rook, 'r') + forsyth(queen, 'q')
 
-    def store(role: Role) =
-      if (storableRoles contains role) copy(roles = role :: roles)
-      else this
+    def forsyth(role: Int, char: Char) = List.fill(role)(char).mkString
+
+    def roles(count: Int, role: Role): List[Role] = List.fill(count)(role)
+    def roles: List[Role] = roles(pawn, Pawn) ::: roles(knight, Knight) ::: roles(bishop, Bishop) :::
+      roles(rook, Rook) ::: roles(queen, Queen)
+
+    def size       = pawn + knight + bishop + rook + queen
+    def isEmpty    = size == 0
+    def nonEmpty   = size > 0
+    def hasPawn    = pawn > 0
+    def hasNonPawn = knight + bishop + rook + queen > 0
+
+    def contains(r: Role): Boolean = r match
+      case Pawn   => pawn > 0
+      case Knight => knight > 0
+      case Bishop => bishop > 0
+      case Rook   => rook > 0
+      case Queen  => queen > 0
+      case King   => false
+
+    def apply(role: Role): Option[Natural] =
+      role match
+        case Pawn   => Some(pawn)
+        case Knight => Some(knight)
+        case Bishop => Some(bishop)
+        case Rook   => Some(rook)
+        case Queen  => Some(queen)
+        case King   => None
+
+    def take(role: Role): Option[Pocket] =
+      update(role, (x => if x > 0 then Some(x - 1) else None))
+
+    def store(role: Role): Pocket = update(role, _ + 1)
+
+    def update(role: Role, f: Natural => Natural): Pocket = role match
+      case Pawn   => copy(pawn = f(pawn))
+      case Knight => copy(knight = f(knight))
+      case Bishop => copy(bishop = f(bishop))
+      case Rook   => copy(rook = f(rook))
+      case Queen  => copy(queen = f(queen))
+      case King   => this
+
+    def update(role: Role, f: Natural => Option[Natural]): Option[Pocket] = role match
+      case Pawn   => f(pawn).map(x => copy(pawn = x))
+      case Knight => f(knight).map(x => copy(knight = x))
+      case Bishop => f(bishop).map(x => copy(bishop = x))
+      case Rook   => f(rook).map(x => copy(rook = x))
+      case Queen  => f(queen).map(x => copy(queen = x))
+      case King   => None
+
+  type Natural = Int
+
+  object Pocket:
+    val empty = Pocket(0, 0, 0, 0, 0)
+    def apply(roles: List[Role]): Pocket =
+      roles.foldLeft(empty) { (p, r) =>
+        p store r
+      }
+
+  // opaque type Natural <: Int = Int
+  // def Natural(x: Int): Option[Natural] =
+  //   if x >= 0 then Some(x) else None
+  //
+  // extension (n: Natural) def -(m: Int): Option[Natural] = Natural(n - m)

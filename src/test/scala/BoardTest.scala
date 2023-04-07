@@ -84,18 +84,6 @@ class BoardTest extends ChessTest:
         _.move(B2, B4)
       ) must beNone
 
-    "provide occupation map" in:
-      makeBoard(
-        A2 -> (White - Pawn),
-        A3 -> (White - Pawn),
-        D1 -> (White - King),
-        E8 -> (Black - King),
-        H4 -> (Black - Queen)
-      ).occupation must_== ByColor(
-        white = Set(A2, A3, D1),
-        black = Set(E8, H4)
-      )
-
     "navigate in pos based on pieces" in:
       "right to end" in:
         val board: Board = """

@@ -52,9 +52,9 @@ case object Horde
     * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
     */
   private def hordeClosedPosition(situation: Situation): Boolean =
-    val hordePos = situation.board.occupation(Color.white) // may include promoted pieces
-    val mateInOne =
-      hordePos.sizeIs == 1 && hordePos.forall(pos => pieceThreatened(situation.board, Color.black, pos))
+    val hordePos = situation.board.byColor(White)
+    val mateInOne = hordePos.count == 1 &&
+      hordePos.singleSquare.exists(pieceThreatened(situation.board, Color.black, _))
     !mateInOne && {
       if situation.isWhiteTurn then situation.legalMoves.isEmpty
       else

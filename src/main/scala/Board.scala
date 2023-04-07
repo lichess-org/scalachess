@@ -27,7 +27,6 @@ case class Board(
     kings,
     knights,
     nbPieces,
-    occupation,
     occupied,
     pawns,
     pieceMap as pieces,

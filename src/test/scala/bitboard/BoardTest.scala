@@ -326,7 +326,3 @@ class BoardTest extends FunSuite:
         newBoard <- moved.replace(piece, to)
       yield newBoard
     yield assertEquals(promoted, takingAndReplace)
-
-  test("occupation"):
-    val map = Map(A2 -> White.pawn, A3 -> White.rook)
-    assertEquals(Board.fromMap(map).occupation, ByColor(map.keys.toSet, Set()))

@@ -151,10 +151,6 @@ case class Board(
   def promote(orig: Pos, dest: Pos, piece: Piece): Option[Board] =
     take(orig).map(_.putOrReplace(piece, dest))
 
-  lazy val occupation: ByColor[Set[Pos]] = ByColor { c =>
-    color(c).squares.toSet
-  }
-
   inline def isOccupied(inline p: Piece) =
     piece(p).nonEmpty
 

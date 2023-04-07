@@ -194,7 +194,7 @@ case object Crazyhouse
     def store(piece: Piece): Pockets =
       pockets.update(!piece.color, _.store(piece.role))
 
-  case class Pocket(pawn: Natural, knight: Natural, bishop: Natural, rook: Natural, queen: Natural):
+  case class Pocket(pawn: Int, knight: Int, bishop: Int, rook: Int, queen: Int):
 
     def forsythUpper = forsyth.toUpperCase
     def forsyth: String = forsyth(pawn, 'p') + forsyth(knight, 'n') +
@@ -202,14 +202,11 @@ case object Crazyhouse
 
     def forsyth(role: Int, char: Char) = List.fill(role)(char).mkString
 
-    def roles(count: Int, role: Role): List[Role] = List.fill(count)(role)
-    def roles: List[Role] = roles(pawn, Pawn) ::: roles(knight, Knight) ::: roles(bishop, Bishop) :::
-      roles(rook, Rook) ::: roles(queen, Queen)
+    def values = List(Pawn -> pawn, Knight -> knight, Bishop -> bishop, Rook -> rook, Queen -> queen)
 
     def size       = pawn + knight + bishop + rook + queen
     def isEmpty    = size == 0
     def nonEmpty   = size > 0
-    def hasPawn    = pawn > 0
     def hasNonPawn = knight + bishop + rook + queen > 0
 
     def contains(r: Role): Boolean = r match
@@ -220,7 +217,7 @@ case object Crazyhouse
       case Queen  => queen > 0
       case King   => false
 
-    def apply(role: Role): Option[Natural] =
+    def apply(role: Role): Option[Int] =
       role match
         case Pawn   => Some(pawn)
         case Knight => Some(knight)
@@ -234,7 +231,7 @@ case object Crazyhouse
 
     def store(role: Role): Pocket = update(role, _ + 1)
 
-    def update(role: Role, f: Natural => Natural): Pocket = role match
+    def update(role: Role, f: Int => Int): Pocket = role match
       case Pawn   => copy(pawn = f(pawn))
       case Knight => copy(knight = f(knight))
       case Bishop => copy(bishop = f(bishop))
@@ -242,7 +239,7 @@ case object Crazyhouse
       case Queen  => copy(queen = f(queen))
       case King   => this
 
-    def update(role: Role, f: Natural => Option[Natural]): Option[Pocket] = role match
+    def update(role: Role, f: Int => Option[Int]): Option[Pocket] = role match
       case Pawn   => f(pawn).map(x => copy(pawn = x))
       case Knight => f(knight).map(x => copy(knight = x))
       case Bishop => f(bishop).map(x => copy(bishop = x))
@@ -250,17 +247,9 @@ case object Crazyhouse
       case Queen  => f(queen).map(x => copy(queen = x))
       case King   => None
 
-  type Natural = Int
-
   object Pocket:
     val empty = Pocket(0, 0, 0, 0, 0)
     def apply(roles: List[Role]): Pocket =
       roles.foldLeft(empty) { (p, r) =>
         p store r
       }
-
-  // opaque type Natural <: Int = Int
-  // def Natural(x: Int): Option[Natural] =
-  //   if x >= 0 then Some(x) else None
-  //
-  // extension (n: Natural) def -(m: Int): Option[Natural] = Natural(n - m)

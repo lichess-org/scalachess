@@ -145,8 +145,6 @@ case object Crazyhouse
         dropsWithoutPawn ::: dropWithPawn
       }
 
-  val storableRoles: Set[Role] = Set(Pawn, Knight, Bishop, Rook, Queen)
-
   type Pockets = ByColor[Pocket]
   case class Data(
       pockets: Pockets,

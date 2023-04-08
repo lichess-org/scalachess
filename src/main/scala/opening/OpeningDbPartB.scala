@@ -128,6 +128,8 @@ Opening("B01", "Scandinavian Defense: Richter Variation", "rnbqkb1r/ppp1pp1p/5np
 Opening("B01", "Scandinavian Defense: Schiller-Pytel Variation", "rnb1kbnr/pp2pppp/2pq4/8/3P4/2N5/PPP2PPP/R1BQKBNR w KQkq -", "e2e4 d7d5 e4d5 d8d5 b1c3 d5d6 d2d4 c7c6", "1. e4 d5 2. exd5 Qxd5 3. Nc3 Qd6 4. d4 c6"),
 Opening("B01", "Scandinavian Defense: Schiller-Pytel Variation, Modern Variation", "rn2kb1r/pp2pppp/2p2n2/5b2/1qBP1B2/2N5/PPP1NPPP/R2QK2R w KQkq -", "e2e4 d7d5 e4d5 d8d5 b1c3 d5d6 d2d4 g8f6 f1c4 c7c6 g1e2 c8f5 c1f4 d6b4", "1. e4 d5 2. exd5 Qxd5 3. Nc3 Qd6 4. d4 Nf6 5. Bc4 c6 6. Nge2 Bf5 7. Bf4 Qb4"),
 Opening("B01", "Scandinavian Defense: Valencian Variation", "rnbqkbnr/ppp1pppp/8/8/8/2N5/PPPP1PPP/R1BQKBNR w KQkq -", "e2e4 d7d5 e4d5 d8d5 b1c3 d5d8", "1. e4 d5 2. exd5 Qxd5 3. Nc3 Qd8"),
+Opening("B01", "Scandinavian Defense: Valencian Variation, Ilundain Variation", "rnbqkb1r/pp2pppp/2p2n2/8/3P4/2N2N2/PPP2PPP/R1BQKB1R w KQkq -", "e2e4 d7d5 e4d5 d8d5 b1c3 d5d8 d2d4 g8f6 g1f3 c7c6", "1. e4 d5 2. exd5 Qxd5 3. Nc3 Qd8 4. d4 Nf6 5. Nf3 c6"),
+Opening("B01", "Scandinavian Defense: Valencian Variation, Main Line", "rn1qkb1r/ppp1pppp/5n2/8/3P2b1/2N2N2/PPP2PPP/R1BQKB1R w KQkq -", "e2e4 d7d5 e4d5 d8d5 b1c3 d5d8 d2d4 g8f6 g1f3 c8g4", "1. e4 d5 2. exd5 Qxd5 3. Nc3 Qd8 4. d4 Nf6 5. Nf3 Bg4"),
 Opening("B01", "Scandinavian Defense: Zilbermints Gambit", "rnbqkbnr/ppp1pppp/8/3p4/1P2P3/8/P1PP1PPP/RNBQKBNR b KQkq -", "e2e4 d7d5 b2b4", "1. e4 d5 2. b4"),
 Opening("B01", "Van Geet Opening: Grünfeld Defense", "rnbqkbnr/ppp2ppp/8/4p3/4N3/8/PPPP1PPP/R1BQKBNR w KQkq -", "e2e4 d7d5 b1c3 d5e4 c3e4 e7e5", "1. e4 d5 2. Nc3 dxe4 3. Nxe4 e5"),
 Opening("B02", "Alekhine Defense", "rnbqkb1r/pppppppp/5n2/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq -", "e2e4 g8f6", "1. e4 Nf6"),

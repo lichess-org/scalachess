@@ -149,6 +149,7 @@ Opening("D10", "Slav Defense", "rnbqkbnr/pp2pppp/2p5/3p4/2PP4/2N5/PP2PPPP/R1BQKB
 Opening("D10", "Slav Defense", "rnbqkbnr/pp2pppp/2p5/8/2pP4/2N5/PP2PPPP/R1BQKBNR w KQkq -", "d2d4 d7d5 c2c4 c7c6 b1c3 d5c4", "1. d4 d5 2. c4 c6 3. Nc3 dxc4"),
 Opening("D10", "Slav Defense: Diemer Gambit", "rnbqkbnr/pp2pppp/2p5/3p4/2PPP3/8/PP3PPP/RNBQKBNR b KQkq -", "d2d4 d7d5 c2c4 c7c6 e2e4", "1. d4 d5 2. c4 c6 3. e4"),
 Opening("D10", "Slav Defense: Exchange Variation", "rnbqkbnr/pp2pppp/2p5/3P4/3P4/8/PP2PPPP/RNBQKBNR b KQkq -", "d2d4 d7d5 c2c4 c7c6 c4d5", "1. d4 d5 2. c4 c6 3. cxd5"),
+Opening("D10", "Slav Defense: Exchange Variation, Boor Attack", "rnbqkb1r/pp2pppp/5n2/3p4/3P4/2N2P2/PP2P1PP/R1BQKBNR b KQkq -", "d2d4 d7d5 c2c4 c7c6 c4d5 c6d5 b1c3 g8f6 f2f3", "1. d4 d5 2. c4 c6 3. cxd5 cxd5 4. Nc3 Nf6 5. f3"),
 Opening("D10", "Slav Defense: Slav Gambit, Alekhine Attack", "rnbqkbnr/pp2pppp/2p5/8/2pPP3/2N5/PP3PPP/R1BQKBNR b KQkq -", "d2d4 d7d5 c2c4 c7c6 b1c3 d5c4 e2e4", "1. d4 d5 2. c4 c6 3. Nc3 dxc4 4. e4"),
 Opening("D10", "Slav Defense: Winawer Countergambit", "rnbqkbnr/pp3ppp/2p5/3pp3/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq -", "d2d4 d7d5 c2c4 c7c6 b1c3 e7e5", "1. d4 d5 2. c4 c6 3. Nc3 e5"),
 Opening("D10", "Slav Defense: Winawer Countergambit, Anti-Winawer Gambit", "rnbqkbnr/pp3ppp/2p5/3pp3/2PPP3/2N5/PP3PPP/R1BQKBNR b KQkq -", "d2d4 d7d5 c2c4 c7c6 b1c3 e7e5 e2e4", "1. d4 d5 2. c4 c6 3. Nc3 e5 4. e4"),

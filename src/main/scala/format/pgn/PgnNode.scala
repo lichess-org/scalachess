@@ -20,13 +20,13 @@ type PgnTree = Node[PgnNodeData, List[Comment]]
 // isomorphic to ParsedPgn
 case class NewPgn(initialPosition: InitialPosition, tags: Tags, tree: Option[PgnTree]):
   def toParsedPgn: ParsedPgn =
-    val sans = tree.fold(List.empty[San])(_.mainLine.map(_.san))
+    val sans = tree.fold(List.empty[San])(traverse)
     ParsedPgn(initialPosition, tags, Sans(sans))
 
   def traverse(node: PgnTree): List[San] =
     val variations = node.variations.map(x => Variation(x.extra, Sans(traverse(x.node))))
     val san        = node.move.san.withMetas(node.move.metas).withVariations(variations)
-    san :: node.child.fold(List(san))(traverse)
+    san :: node.child.fold(Nil)(traverse)
 
 object NewPgn:
   extension (san: San) def clean: San = san.withMetas(Metas.empty).withVariations(Nil)

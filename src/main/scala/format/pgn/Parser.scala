@@ -91,11 +91,7 @@ object Parser:
 
     val nag = (P.char('$') ~ R.digit.rep).string | nagGlyphsRE
 
-    val nagGlyphs: P0[Glyphs] = (nag <* escape).rep0.map(nags =>
-      Glyphs fromList nags.flatMap {
-        Glyph.find
-      }
-    )
+    val nagGlyphs: P0[Glyphs] = (nag <* escape).rep0.map(nags => Glyphs fromList nags.flatMap(Glyph.find(_)))
 
     val moveExtras = commentary.void
 
@@ -108,10 +104,10 @@ object Parser:
     // 10. or 10... but not 0 or 1-0 or 1/2
     val number = (positiveIntString <* !P.charIn('‑', '–', '-', '/') ~ numberSuffix).string
 
-    val forbidNullMove =
-      P.stringIn(List("--", "Z0", "null", "pass", "@@@@"))
-        .?
-        .flatMap(o => o.fold(P.unit)(_ => P.failWith("Null moves are not supported").void))
+    val forbidNullMove = P
+      .stringIn(List("--", "Z0", "null", "pass", "@@@@"))
+      .?
+      .flatMap(o => o.fold(P.unit)(_ => P.failWith("Null moves are not supported").void))
 
     val strMove: P[San] = P
       .recursive[San] { recuse =>
@@ -187,7 +183,7 @@ object Parser:
     }
 
     // B@g5
-    val drop: P[Drop] = ((role <* P.char('@')) ~ dest).map { case (role, pos) => Drop(role, pos) }
+    val drop: P[Drop] = ((role <* P.char('@')) ~ dest).map((role, pos) => Drop(role, pos))
 
     val pawnDrop: P[Drop] = (P.char('@') *> dest).map(Drop(Pawn, _))
 
@@ -214,11 +210,8 @@ object Parser:
       (disambiguatedPawn :: pawn :: disambiguated :: ambigous :: drop :: pawnDrop :: Nil).map(_.backtrack)
     )
 
-    val move: P[San] = (castle | standard).withContext("Invalid chess move")
-    val moveWithSuffix: P[San] = (move ~ suffixes <* escape)
-      .map { case (std, suf) =>
-        std withSuffixes suf
-      }
+    val move: P[San]           = (castle | standard).withContext("Invalid chess move")
+    val moveWithSuffix: P[San] = (move ~ suffixes <* escape).map((san, suf) => san withSuffixes suf)
 
     def mapParser[A](pairMap: Map[String, A], name: String): P[A] =
       P.stringIn(pairMap.keySet).map(pairMap.apply) | P.failWith(name + " not found")

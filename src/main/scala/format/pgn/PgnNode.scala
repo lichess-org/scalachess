@@ -4,17 +4,15 @@ package pgn
 
 import cats.syntax.all.*
 
-case class Node[A, B](
+case class Node[A](
     move: A,
-    child: Option[Node[A, B]],
-    variations: List[VariationNode[A, B]]
+    child: Option[Node[A]],
+    variations: List[Node[A]]
 ):
-  def mainLine: List[A] = move :: child.fold(List.empty[A])(_.mainLine)
+  def mainLine: List[A] = move :: child.fold(Nil)(_.mainLine)
 
-case class VariationNode[A, B](node: Node[A, B], extra: B)
-
-case class PgnNodeData(san: San, metas: Metas)
-type ParsedPgnTree = Node[PgnNodeData, List[Comment]]
+case class PgnNodeData(san: San, metas: Metas, variationComments: Option[List[Comment]])
+type ParsedPgnTree = Node[PgnNodeData]
 
 // isomorphic to ParsedPgn
 case class NewParsedPgn(initialPosition: InitialPosition, tags: Tags, tree: Option[ParsedPgnTree]):
@@ -23,9 +21,14 @@ case class NewParsedPgn(initialPosition: InitialPosition, tags: Tags, tree: Opti
     ParsedPgn(initialPosition, tags, Sans(sans))
 
   def toSan(node: ParsedPgnTree): List[San] =
-    val variations = node.variations.map(x => Variation(x.extra, Sans(toSan(x.node))))
+    val variations = node.variations.map(toVariation)
     val san        = node.move.san.withMetas(node.move.metas).withVariations(variations)
     san :: node.child.fold(Nil)(toSan)
+
+  def toVariation(node: ParsedPgnTree): Variation =
+    val comments = node.move.variationComments.getOrElse(Nil)
+    val sans     = toSan(node)
+    Variation(comments, Sans(sans))
 
 object NewParsedPgn:
   extension (san: San) def clean: San = san.withMetas(Metas.empty).withVariations(Nil)
@@ -39,20 +42,17 @@ object NewParsedPgn:
 
   def toNode(san: San, child: Option[ParsedPgnTree]): ParsedPgnTree =
     Node(
-      PgnNodeData(san.clean, san.metas),
+      PgnNodeData(san.clean, san.metas, None),
       child,
       san.metas.variations.flatMap(v => toVariationNode(v.sans, v.comments))
     )
 
   def toVariationNode(sans: Sans, comments: List[Comment]) =
-    val node = sans.value.reverse.foldLeft(none[ParsedPgnTree]) { (o, san) =>
-      o match
-        case None       => Some(toNode(san, None))
-        case Some(node) => Some(toNode(san, Some(node)))
-    }
-    node.map(VariationNode(_, comments))
+    sans.value.reverse
+      .foldLeft(none[ParsedPgnTree])((o, san) => Some(toNode(san, o)))
+      .map(x => x.copy(move = x.move.copy(variationComments = comments.some)))
 
-type PgnTree = Node[Move, Unit]
+type PgnTree = Node[Move]
 // isomorphic to Pgn
 case class NewPgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
   def toPgn: Pgn =
@@ -61,7 +61,7 @@ case class NewPgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
     Pgn(tags, turns, initial)
 
   def toMove(node: PgnTree, ply: Ply): List[Move] =
-    val variations = node.variations.map(x => Turn.fromMoves(toMove(x.node, ply), ply))
+    val variations = node.variations.map(x => Turn.fromMoves(toMove(x, ply), ply))
     val move       = node.move.copy(variations = variations)
     move :: node.child.fold(Nil)(toMove(_, ply + 1))
 
@@ -78,5 +78,5 @@ object NewPgn:
     Node(
       move.clean,
       child,
-      move.variations.map(_.flatMap(moves)).map(x => VariationNode(toNode(x.head, None), ()))
+      move.variations.map(_.flatMap(moves)).map(x => toNode(x.head, None))
     )

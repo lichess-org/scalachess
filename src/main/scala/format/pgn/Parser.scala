@@ -35,9 +35,6 @@ object Parser:
 
   private object MovesParser:
 
-    private def cleanComments(comments: List[String]) = Comment from comments.collect:
-      case c if !c.isBlank => c.trim
-
     def moves(str: PgnMovesStr): Validated[ErrorStr, Sans] =
       strMove.rep.map(xs => Sans(xs.toList)).parse(str.value) match
         case Right((_, sans)) => valid(sans)
@@ -48,11 +45,12 @@ object Parser:
         case Right((_, san)) => valid(san)
         case Left(err)       => invalid(showExpectations("Cannot parse move", str.value, err))
 
-    val blockCommentary: P[String] = P.until0(P.char('}')).with1.between(P.char('{'), P.char('}'))
+    val blockCommentary: P[Comment] =
+      P.until0(P.char('}')).with1.between(P.char('{'), P.char('}')).map(Comment(_))
 
-    val inlineCommentary: P[String] = P.char(';') *> P.until(R.lf)
+    val inlineCommentary: P[Comment] = P.char(';') *> P.until(R.lf).map(Comment(_))
 
-    val commentary = (blockCommentary | inlineCommentary).withContext("Invalid comment") <* escape
+    val commentary: P[Comment] = (blockCommentary | inlineCommentary).withContext("Invalid comment") <* escape
     val resultList = List(
       "*",
       "1/2-1/2",
@@ -113,21 +111,22 @@ object Parser:
       .recursive[San] { recuse =>
         val variation: P[Variation] =
           (P.char('(') *> commentary.rep0.surroundedBy(escape) ~ recuse.rep0 <* (P.char(')') ~ escape))
-            .map { (comments, sans) => Variation(Comment from comments, Sans(sans)) }
+            .map { (comments, sans) => Variation(comments, Sans(sans)) }
 
         ((number.backtrack | commentary).rep0 ~ forbidNullMove).with1 *>
           (((MoveParser.moveWithSuffix ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0) <* escape).backtrack
             .map { case ((((san, glyphs), comments), glyphs2), variations) =>
               san
-                .withComments(Comment.from(comments))
+                .withComments(comments)
                 .withVariations(variations)
                 .mergeGlyphs(glyphs merge glyphs2)
             }
       }
 
+    // todo: we can add post move comments
     val strMoves: P0[(InitialPosition, List[San], Option[String])] =
       ((commentary.rep0 ~ strMove.rep0) ~ (result <* escape).? <* commentary.rep0).map:
-        case ((coms, sans), res) => (InitialPosition(cleanComments(coms)), sans.toList, res)
+        case ((comments, sans), res) => (InitialPosition(comments.cleanUp), sans.toList, res)
 
   private object MoveParser:
 

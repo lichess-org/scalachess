@@ -78,7 +78,10 @@ case class Drop(
     situation.drop(role, pos)
 
 opaque type Comment = String
-object Comment extends TotalWrapper[Comment, String]
+object Comment extends TotalWrapper[Comment, String]:
+  extension (cs: List[Comment])
+    inline def cleanUp: List[Comment] =
+      cs.collect { case c if !c.isBlank => c.trim }
 
 opaque type InitialPosition = List[Comment]
 object InitialPosition extends TotalWrapper[InitialPosition, List[Comment]]:

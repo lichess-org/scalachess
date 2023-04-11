@@ -3,13 +3,18 @@ package format
 package pgn
 
 import cats.syntax.all.*
+import cats.derived.*
+import cats.Functor
+import cats.Traverse
 
 case class Node[A](
     move: A,
     child: Option[Node[A]],
     variations: List[Node[A]]
-):
+) derives Functor,
+      Traverse:
   def mainLine: List[A] = move :: child.fold(Nil)(_.mainLine)
+  def totalNodes: Int   = this.foldLeft(0)((b, a) => b + 1)
 
 case class PgnNodeData(san: San, metas: Metas, variationComments: Option[List[Comment]])
 type ParsedPgnTree = Node[PgnNodeData]
@@ -33,12 +38,11 @@ case class NewParsedPgn(initialPosition: InitialPosition, tags: Tags, tree: Opti
 object NewParsedPgn:
   extension (san: San) def clean: San = san.withMetas(Metas.empty).withVariations(Nil)
 
-  extension (pgn: ParsedPgn)
-    def toNewPgn: NewParsedPgn =
-      val tree = pgn.sans.value.reverse.foldLeft(none[ParsedPgnTree]) { (o, san) =>
-        Some(toNode(san, o))
-      }
-      NewParsedPgn(initialPosition = pgn.initialPosition, tags = pgn.tags, tree = tree)
+  def apply(pgn: ParsedPgn): NewParsedPgn =
+    val tree = pgn.sans.value.reverse.foldLeft(none[ParsedPgnTree]) { (o, san) =>
+      Some(toNode(san, o))
+    }
+    NewParsedPgn(initialPosition = pgn.initialPosition, tags = pgn.tags, tree = tree)
 
   def toNode(san: San, child: Option[ParsedPgnTree]): ParsedPgnTree =
     Node(
@@ -53,6 +57,7 @@ object NewParsedPgn:
       .map(x => x.copy(move = x.move.copy(variationComments = comments.some)))
 
 type PgnTree = Node[Move]
+
 // isomorphic to Pgn
 case class NewPgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
   def toPgn: Pgn =
@@ -70,7 +75,7 @@ object NewPgn:
   def moves(pgn: Pgn): List[Move]   = pgn.turns.flatMap(moves)
 
   extension (move: Move) def clean: Move = move.copy(variations = Nil)
-  def toNewPgn(pgn: Pgn): NewPgn =
+  def apply(pgn: Pgn): NewPgn =
     val tree = moves(pgn).reverse.foldLeft(none[PgnTree]) { (o, move) => Some(toNode(move, o)) }
     NewPgn(tags = pgn.tags, initial = pgn.initial, tree = tree)
 

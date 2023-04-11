@@ -19,7 +19,7 @@ class PgnNodeTest extends FunSuite:
   test("NewParsePgn and ParsedPgn are isomorphic"):
     Fixtures.gamesForPerfTest.foreach { str =>
       val parsedPgn = Parser.full(str).valueOr(err => throw new Exception(err.toString))
-      val newPgn    = NewParsedPgn.toNewPgn(parsedPgn)
+      val newPgn    = NewParsedPgn(parsedPgn)
       assertEquals(parsedPgn, newPgn.toParsedPgn)
     }
 
@@ -302,6 +302,6 @@ class PgnNodeTest extends FunSuite:
 
   test("NewPgn and Pgn are isomorphic"):
     pgns.foreach { pgn =>
-      val newPgn = NewPgn.toNewPgn(pgn)
+      val newPgn = NewPgn(pgn)
       assertEquals(pgn, newPgn.toPgn)
     }

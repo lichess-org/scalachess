@@ -9,20 +9,20 @@ class ParserTest extends ChessTest:
 
   import Fixtures.*
 
-  val parser = Parser.full
+  val parse = Parser.full
 
   def parseMove(s: String) = Parser.move(SanStr(s))
 
   "bom header" should:
     "be ignored" in:
       "with tags" in:
-        parser("\uFEFF[Event \"Some event\"]\n1. e4 e5") must beValid.like { case parsed =>
+        parse("\uFEFF[Event \"Some event\"]\n1. e4 e5") must beValid.like { case parsed =>
           parsed.tags(_.Event) must_== Some("Some event")
-          parsed.sans.value.size must_== 2
+          parsed.mainLine.size must_== 2
         }
       "without tags" in:
-        parser("\uFEFF1. e4 e5 3. Nf3") must beValid.like { case parsed =>
-          parsed.sans.value.size must_== 3
+        parse("\uFEFF1. e4 e5 3. Nf3") must beValid.like { case parsed =>
+          parsed.mainLine.size must_== 3
         }
 
   "pgnComment" should:
@@ -33,53 +33,53 @@ class ParserTest extends ChessTest:
 
   "promotion check" should:
     "as a queen" in:
-      parser("b8=Q ") must beValid { (parsed: ParsedPgn) =>
-        parsed.sans.value.headOption must beSome { (san: San) =>
+      parse("b8=Q ") must beValid { (parsed: NewParsedPgn) =>
+        parsed.mainLine.headOption must beSome { (san: San) =>
           san.asInstanceOf[Std].promotion == Option(Queen)
         }
       }
     "as a rook" in:
-      parser("b8=R ") must beValid { (parsed: ParsedPgn) =>
-        parsed.sans.value.headOption must beSome { (san: San) =>
+      parse("b8=R ") must beValid { (parsed: NewParsedPgn) =>
+        parsed.mainLine.headOption must beSome { (san: San) =>
           san.asInstanceOf[Std].promotion must_== Option(Rook)
         }
       }
 
   "carriage return" in:
     "none" in:
-      parser("1. e4 c6\n2. d4 d5") must beValid.like { case parsed =>
-        parsed.sans.value.size must_== 4
+      parse("1. e4 c6\n2. d4 d5") must beValid.like { case parsed =>
+        parsed.mainLine.size must_== 4
       }
     "one" in:
-      parser("1. e4 c6\r\n2. d4 d5") must beValid.like { case parsed =>
-        parsed.sans.value.size must_== 4
+      parse("1. e4 c6\r\n2. d4 d5") must beValid.like { case parsed =>
+        parsed.mainLine.size must_== 4
       }
     "two" in:
-      parser("1. e4 c6\r\r\n2. d4 d5") must beValid.like { case parsed =>
-        parsed.sans.value.size must_== 4
+      parse("1. e4 c6\r\r\n2. d4 d5") must beValid.like { case parsed =>
+        parsed.mainLine.size must_== 4
       }
     "between tags" in:
-      parser("[White \"carriage\"]\r\n[Black \"return\"]\r\n\r\n1. a3 a6\r\n") must beValid.like:
+      parse("[White \"carriage\"]\r\n[Black \"return\"]\r\n\r\n1. a3 a6\r\n") must beValid.like:
         case parsed =>
           parsed.tags(_.White) must_== Some("carriage")
           parsed.tags(_.Black) must_== Some("return")
-          parsed.sans.value.size must_== 2
+          parsed.mainLine.size must_== 2
 
   "result" in:
     "no tag but inline result" in:
-      parser(noTagButResult) must beValid.like { case parsed =>
+      parse(noTagButResult) must beValid.like { case parsed =>
         parsed.tags("Result") must_== Option("1-0")
       }
     "in tags" in:
-      parser(whiteResignsInTags) must beValid.like { case parsed =>
+      parse(whiteResignsInTags) must beValid.like { case parsed =>
         parsed.tags("Result") must_== Option("0-1")
       }
     "in moves" in:
-      parser(whiteResignsInMoves) must beValid.like { case parsed =>
+      parse(whiteResignsInMoves) must beValid.like { case parsed =>
         parsed.tags("Result") must_== Option("0-1")
       }
     "in tags and moves" in:
-      parser(whiteResignsInTagsAndMoves) must beValid.like { case parsed =>
+      parse(whiteResignsInTagsAndMoves) must beValid.like { case parsed =>
         parsed.tags("Result") must_== Option("0-1")
       }
 
@@ -97,276 +97,276 @@ class ParserTest extends ChessTest:
       a.role === Knight
       a.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
     }
-    parser("Ne7g6+!") must beValid
+    parse("Ne7g6+!") must beValid
     parseMove("P@e4?!") must beValid.like { case a: Drop =>
       a.pos === Pos.E4
       a.role === Pawn
       a.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
     }
-  extension (sans: Sans) def head = sans.value.head
+  extension (tree: Option[PgnNode[PgnNodeData]]) def head = tree.get.mainLine.head
 
   "nags" in:
-    parser(withNag) must beValid
+    parse(withNag) must beValid
 
-    parser("Ne7g6+! $13") must beValid.like { case ParsedPgn(_, _, sans) =>
-      sans.head.metas.glyphs.move must_== Option(Glyph.MoveAssessment.good)
-      sans.head.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
+    parse("Ne7g6+! $13") must beValid.like { parsed =>
+      parsed.tree.get.move.metas.glyphs.move must_== Option(Glyph.MoveAssessment.good)
+      parsed.tree.get.move.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
     }
 
   "non-nags" in:
-    parser(withGlyphAnnotations) must beValid
+    parse(withGlyphAnnotations) must beValid
 
-    parser("Bxd3?? ∞") must beValid.like { case ParsedPgn(_, _, sans) =>
-      sans.head.metas.glyphs.move must_== Option(Glyph.MoveAssessment.blunder)
-      sans.head.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
+    parse("Bxd3?? ∞") must beValid.like { parsed =>
+      parsed.tree.head.metas.glyphs.move must_== Option(Glyph.MoveAssessment.blunder)
+      parsed.tree.head.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
     }
 
   "comments" in:
-    parser("Ne7g6+! {such a neat comment}") must beValid.like { case ParsedPgn(_, _, sans) =>
-      sans.head.metas.comments must_== List("such a neat comment")
+    parse("Ne7g6+! {such a neat comment}") must beValid.like { parsed =>
+      parsed.tree.head.metas.comments must_== List("such a neat comment")
     }
 
   "variations" in:
-    parser("Ne7g6+! {such a neat comment} (e4 Ng6)") must beValid.like { case ParsedPgn(_, _, sans) =>
-      sans.head.metas.variations.headOption.map(_.sans) must beSome:
+    parse("Ne7g6+! {such a neat comment} (e4 Ng6)") must beValid.like { parsed =>
+      parsed.tree.head.metas.variations.headOption.map(_.sans) must beSome:
         (_: Sans).value must haveSize(2)
     }
 
   "first move variation" in:
-    parser("1. e4 (1. d4)") must beValid.like { case ParsedPgn(_, _, sans) =>
-      sans.head.metas.variations.headOption.map(_.sans) must beSome:
+    parse("1. e4 (1. d4)") must beValid.like { case parsed =>
+      parsed.tree.head.metas.variations.headOption.map(_.sans) must beSome:
         (_: Sans).value must haveSize(1)
     }
 
   raws foreach { sans =>
     val size = sans.split(' ').length
     "sans only size: " + size in:
-      parser(sans) must beValid.like { case a =>
-        a.sans.value.size must_== size
+      parse(sans) must beValid.like { a =>
+        a.mainLine.size must_== size
       }
   }
 
   (shortCastles ++ longCastles ++ annotatedCastles) foreach { sans =>
     val size = sans.split(' ').length
     "sans only size: " + size in:
-      parser(sans) must beValid.like { case a =>
-        a.sans.value.size must_== size
+      parse(sans) must beValid.like { case a =>
+        a.mainLine.size must_== size
       }
   }
 
   "disambiguated" in:
-    parser(disambiguated) must beValid.like { case a =>
-      a.sans.value.size must_== 3
+    parse(disambiguated) must beValid.like { case a =>
+      a.mainLine.size must_== 3
     }
 
   List(fromProd1, fromProd2, castleCheck1, castleCheck2) foreach { sans =>
     val size = sans.split(' ').length
     "sans only from prod size: " + size in:
-      parser(sans) must beValid.like { case a =>
-        a.sans.value.size must_== size
+      parse(sans) must beValid.like { case a =>
+        a.mainLine.size must_== size
       }
   }
 
   "variations" in:
-    parser(variations) must beValid.like { case a =>
-      a.sans.value.size must_== 20
+    parse(variations) must beValid.like { case a =>
+      a.mainLine.size must_== 20
     }
 
   "inline tags" in:
-    parser(inlineTags) must beValid.like { case a =>
+    parse(inlineTags) must beValid.like { case a =>
       a.tags.value must contain { (tag: Tag) =>
         tag.name == Tag.White && tag.value == "Blazquez, Denis"
       }
     }
 
   "tag with nested quotes" in:
-    parser("""[Black "Schwarzenegger, Arnold \"The Terminator\""]""") must beValid.like { case a =>
+    parse("""[Black "Schwarzenegger, Arnold \"The Terminator\""]""") must beValid.like { case a =>
       a.tags.value must contain { (tag: Tag) =>
         tag.name == Tag.Black && tag.value == """Schwarzenegger, Arnold "The Terminator""""
       }
     }
 
   "tag with inner brackets" in:
-    parser("""[Black "[=0040.34h5a4]"]""") must beValid.like { case a =>
+    parse("""[Black "[=0040.34h5a4]"]""") must beValid.like { case a =>
       a.tags.value must contain { (tag: Tag) =>
         tag.name == Tag.Black && tag.value == "[=0040.34h5a4]"
       }
     }
 
   "game from wikipedia" in:
-    parser(fromWikipedia) must beValid.like { case a =>
-      a.sans.value.size must_== 85
+    parse(fromWikipedia) must beValid.like { case a =>
+      a.mainLine.size must_== 85
     }
 
   "game from crafty" in:
-    parser(fromCrafty) must beValid.like { case a =>
-      a.sans.value.size must_== 68
+    parse(fromCrafty) must beValid.like { case a =>
+      a.mainLine.size must_== 68
     }
 
   "inline comments" in:
-    parser(inlineComments) must beValid.like { case a =>
-      a.sans.value.size must_== 85
+    parse(inlineComments) must beValid.like { case a =>
+      a.mainLine.size must_== 85
     }
 
   "block comment in variation root" in:
-    parser(rootCommentInVariation) must beValid.like { case a =>
-      a.sans.head.metas.variations.head.comments must_==
+    parse(rootCommentInVariation) must beValid.like { case a =>
+      a.tree.head.metas.variations.head.comments must_==
         List("This move:")
     }
 
   "inline comment in variation root" in:
-    parser(rootCommentInVariation) must beValid.like { case a =>
-      a.sans.head.metas.variations.tail.head.comments must_==
+    parse(rootCommentInVariation) must beValid.like { case a =>
+      a.tree.head.metas.variations.tail.head.comments must_==
         List("Neither does :")
     }
 
   "block comments in variation root" in:
-    parser(multipleRootCommentsInVariation) must beValid.like { case a =>
-      a.sans.head.metas.variations.head.comments must_==
+    parse(multipleRootCommentsInVariation) must beValid.like { case a =>
+      a.tree.head.metas.variations.head.comments must_==
         List("This move:", "looks pretty")
     }
 
   "multiple comments in variation root" in:
-    parser(multipleRootCommentsInVariation) must beValid.like { case a =>
-      a.sans.head.metas.variations.tail.head.comments must_==
+    parse(multipleRootCommentsInVariation) must beValid.like { case a =>
+      a.tree.head.metas.variations.tail.head.comments must_==
         List("Neither does :", "this or that", "or whatever")
     }
 
   "comments and variations" in:
-    parser(commentsAndVariations) must beValid.like { case a =>
-      a.sans.value.size must_== 103
+    parse(commentsAndVariations) must beValid.like { case a =>
+      a.mainLine.size must_== 103
     }
 
   "comments and lines by smartchess" in:
-    parser(bySmartChess) must beValid.like { case a =>
-      a.sans.value.size must_== 65
+    parse(bySmartChess) must beValid.like { case a =>
+      a.mainLine.size must_== 65
     }
 
   "complete 960" in:
-    parser(complete960) must beValid.like { case a =>
-      a.sans.value.size must_== 42
+    parse(complete960) must beValid.like { case a =>
+      a.mainLine.size must_== 42
     }
 
   "TCEC" in:
-    parser(fromTcec) must beValid.like { case a =>
-      a.sans.value.size must_== 142
+    parse(fromTcec) must beValid.like { case a =>
+      a.mainLine.size must_== 142
     }
 
   "TCEC with engine output" in:
-    parser(fromTcecWithEngineOutput) must beValid.like { case a =>
-      a.sans.value.size must_== 165
+    parse(fromTcecWithEngineOutput) must beValid.like { case a =>
+      a.mainLine.size must_== 165
     }
 
   "chesskids iphone" in:
-    parser(chesskids) must beValid.like { case a =>
-      a.sans.value.size must_== 135
+    parse(chesskids) must beValid.like { case a =>
+      a.mainLine.size must_== 135
     }
 
   "handwritten" in:
-    parser(handwritten) must beValid.like { case a =>
-      a.sans.value.size must_== 139
+    parse(handwritten) must beValid.like { case a =>
+      a.mainLine.size must_== 139
     }
 
   "chess by post" in:
-    parser(chessByPost) must beValid.like { case a =>
-      a.sans.value.size must_== 100
+    parse(chessByPost) must beValid.like { case a =>
+      a.mainLine.size must_== 100
     }
 
   "Android device" in:
-    parser(android) must beValid.like { case a =>
-      a.sans.value.size must_== 69
+    parse(android) must beValid.like { case a =>
+      a.mainLine.size must_== 69
     }
 
   "weird dashes" in:
-    parser(weirdDashes) must beValid.like { case a =>
-      a.sans.value.size must_== 74
+    parse(weirdDashes) must beValid.like { case a =>
+      a.mainLine.size must_== 74
     }
 
   "lichobile" in:
-    parser(lichobile) must beValid.like { case a =>
-      a.sans.value.size must_== 68
+    parse(lichobile) must beValid.like { case a =>
+      a.mainLine.size must_== 68
     }
 
   "overflow" in:
-    parser(overflow) must beValid.like { case a =>
-      a.sans.value.size must_== 67
+    parse(overflow) must beValid.like { case a =>
+      a.mainLine.size must_== 67
     }
   "overflow 2" in:
-    parser(stackOverflow) must beValid.like { case a =>
-      a.sans.value.size must_== 8
+    parse(stackOverflow) must beValid.like { case a =>
+      a.mainLine.size must_== 8
     }
   "overflow 3" in:
-    parser(overflow3) must beValid.like { case a =>
-      a.sans.value.size must_== 343
+    parse(overflow3) must beValid.like { case a =>
+      a.mainLine.size must_== 343
     }
   "overflow 3: tags" in:
-    parser(overflow3) must beValid.like { case a =>
+    parse(overflow3) must beValid.like { case a =>
       a.tags.value.size must_== 9
     }
   "chessbase arrows" in:
-    parser(chessbaseArrows) must beValid.like { case a =>
+    parse(chessbaseArrows) must beValid.like { case a =>
       a.initialPosition.comments must_== List(
         "[%csl Gb4,Yd5,Rf6][%cal Ge2e4,Ye2d4,Re2g4]"
       )
     }
   "multiple initial comments with empty" in:
-    parser(multipleInitalCommentsWithEmpty) must beValid.like { case a =>
+    parse(multipleInitalCommentsWithEmpty) must beValid.like { case a =>
       a.initialPosition must_== List("this", "that")
     }
   "chessbase weird" in:
-    parser(chessbaseWeird) must beValid.like { case a =>
-      a.sans.value.size must_== 115
+    parse(chessbaseWeird) must beValid.like { case a =>
+      a.mainLine.size must_== 115
     }
   "crazyhouse from prod" in:
-    parser(crazyhouseFromProd) must beValid.like { case a =>
-      a.sans.value.size must_== 49
+    parse(crazyhouseFromProd) must beValid.like { case a =>
+      a.mainLine.size must_== 49
     }
   "crazyhouse from chess.com" in:
-    parser(chessComCrazyhouse) must beValid.like { case a =>
-      a.sans.value.size must_== 42
+    parse(chessComCrazyhouse) must beValid.like { case a =>
+      a.mainLine.size must_== 42
     }
   "en passant e.p. notation" in:
-    parser(enpassantEP) must beValid.like { case a =>
-      a.sans.value.size must_== 36
+    parse(enpassantEP) must beValid.like { case a =>
+      a.mainLine.size must_== 36
     }
-    parser(enpassantEP2) must beValid.like { case a =>
-      a.sans.value.size must_== 36
+    parse(enpassantEP2) must beValid.like { case a =>
+      a.mainLine.size must_== 36
     }
 
   "year" in:
     "full date" in:
-      parser(recentChessCom) must beValid.like { case parsed =>
+      parse(recentChessCom) must beValid.like { case parsed =>
         parsed.tags.year must_== Option(2016)
       }
     "only year" in:
-      parser(explorerPartialDate) must beValid.like { case parsed =>
+      parse(explorerPartialDate) must beValid.like { case parsed =>
         parsed.tags.year must_== Option(1978)
       }
 
   "weird variant names" in:
-    parser(stLouisFischerandom) must beValid.like { case parsed =>
+    parse(stLouisFischerandom) must beValid.like { case parsed =>
       parsed.tags.variant must_== Option(variant.Chess960)
     }
 
   "example from chessgames.com with weird comments" in:
-    parser(chessgamesWeirdComments) must beValid
+    parse(chessgamesWeirdComments) must beValid
 
   "exotic notation from clono.no" in:
-    parser(clonoNoExoticNotation) must beValid
+    parse(clonoNoExoticNotation) must beValid
 
   "example with tags & comments without moves 1" in:
-    parser(tagsCommentsWithoutMoves1) must beValid
+    parse(tagsCommentsWithoutMoves1) must beValid
 
   "example with tags & comments without moves 2" in:
-    parser(tagsCommentsWithoutMoves2) must beValid
+    parse(tagsCommentsWithoutMoves2) must beValid
 
   "game with comments" in:
-    parser(gameWithComments) must beValid.like { case a =>
-      a.sans.value.size must_== 106
+    parse(gameWithComments) must beValid.like { case a =>
+      a.mainLine.size must_== 106
     }
 
   "none break space" in:
     val nbsp = "1.  e4 e5"
-    parser(nbsp) must beValid.like { case a =>
-      a.sans.value.size must_== 2
+    parse(nbsp) must beValid.like { case a =>
+      a.mainLine.size must_== 2
     }

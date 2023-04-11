@@ -22,11 +22,11 @@ object Reader:
 
   def fullWithSans(pgn: PgnStr, op: Sans => Sans, tags: Tags = Tags.empty): Validated[ErrorStr, Result] =
     Parser.full(pgn.map(cleanUserInput)) map { parsed =>
-      makeReplay(makeGame(parsed.tags ++ tags), op(parsed.sans))
+      makeReplay(makeGame(parsed.tags ++ tags), op(Sans(parsed.mainLine)))
     }
 
-  def fullWithSans(parsed: ParsedPgn, op: Sans => Sans): Result =
-    makeReplay(makeGame(parsed.tags), op(parsed.sans))
+  def fullWithSans(parsed: NewParsedPgn, op: Sans => Sans): Result =
+    makeReplay(makeGame(parsed.tags), op(Sans(parsed.mainLine)))
 
   def movesWithSans(sans: Iterable[SanStr], op: Sans => Sans, tags: Tags): Validated[ErrorStr, Result] =
     Parser.moves(sans) map { moves =>
@@ -43,6 +43,17 @@ object Reader:
           err => Result.Incomplete(replay, err),
           move => Result.Complete(replay addMove move)
         )
+      case (r: Result.Incomplete, _) => r
+
+  private def makeReplay(game: Game, tree: ParsedPgnTree): Result =
+    tree.mainLine.foldLeft[Result](Result.Complete(Replay(game))):
+      case (Result.Complete(replay), node) =>
+        node
+          .san(replay.state.situation)
+          .fold(
+            err => Result.Incomplete(replay, err),
+            move => Result.Complete(replay addMove move)
+          )
       case (r: Result.Incomplete, _) => r
 
   private def makeGame(tags: Tags) =

@@ -7,20 +7,21 @@ import cats.derived.*
 import cats.Functor
 import cats.Traverse
 
-case class Node[A](
+case class PgnNode[A](
     move: A,
-    child: Option[Node[A]],
-    variations: List[Node[A]]
+    child: Option[PgnNode[A]],
+    variations: List[PgnNode[A]]
 ) derives Functor,
       Traverse:
   def mainLine: List[A] = move :: child.fold(Nil)(_.mainLine)
   def totalNodes: Int   = this.foldLeft(0)((b, a) => b + 1)
 
 case class PgnNodeData(san: San, metas: Metas, variationComments: Option[List[Comment]])
-type ParsedPgnTree = Node[PgnNodeData]
+type ParsedPgnTree = PgnNode[PgnNodeData]
 
 // isomorphic to ParsedPgn
 case class NewParsedPgn(initialPosition: InitialPosition, tags: Tags, tree: Option[ParsedPgnTree]):
+  def mainLine = tree.fold(List.empty[San])(_.mainLine.map(_.san))
   def toParsedPgn: ParsedPgn =
     val sans = tree.fold(List.empty[San])(toSan)
     ParsedPgn(initialPosition, tags, Sans(sans))
@@ -45,7 +46,7 @@ object NewParsedPgn:
     NewParsedPgn(initialPosition = pgn.initialPosition, tags = pgn.tags, tree = tree)
 
   def toNode(san: San, child: Option[ParsedPgnTree]): ParsedPgnTree =
-    Node(
+    PgnNode(
       PgnNodeData(san.clean, san.metas, None),
       child,
       san.metas.variations.flatMap(v => toVariationNode(v.sans, v.comments))
@@ -56,7 +57,7 @@ object NewParsedPgn:
       .foldLeft(none[ParsedPgnTree])((o, san) => Some(toNode(san, o)))
       .map(x => x.copy(move = x.move.copy(variationComments = comments.some)))
 
-type PgnTree = Node[Move]
+type PgnTree = PgnNode[Move]
 
 // isomorphic to Pgn
 case class NewPgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
@@ -80,7 +81,7 @@ object NewPgn:
     NewPgn(tags = pgn.tags, initial = pgn.initial, tree = tree)
 
   def toNode(move: Move, child: Option[PgnTree]): PgnTree =
-    Node(
+    PgnNode(
       move.clean,
       child,
       move.variations.map(_.flatMap(moves)).map(x => toNode(x.head, None))

@@ -18,10 +18,10 @@ object Parser:
   // pgnComment with % or whitespaces
   val escape = pgnComment.? *> whitespace.rep0.?
 
-  def full(pgn: PgnStr): Validated[ErrorStr, ParsedPgn] =
+  def full(pgn: PgnStr): Validated[ErrorStr, NewParsedPgn] =
     pgnParser.parse(pgn.value) match
       case Right((_, parsedResult)) =>
-        valid(parsedResult)
+        valid(NewParsedPgn(parsedResult))
       case Left(err) =>
         invalid(showExpectations("Cannot parse pgn", pgn.value, err))
 

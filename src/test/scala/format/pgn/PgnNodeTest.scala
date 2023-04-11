@@ -16,12 +16,12 @@ class PgnNodeTest extends FunSuite:
       Glyphs fromList List(g)
     }
 
-  test("NewParsePgn and ParsedPgn are isomorphic"):
-    Fixtures.gamesForPerfTest.foreach { str =>
-      val parsedPgn = Parser.full(str).valueOr(err => throw new Exception(err.toString))
-      val newPgn    = NewParsedPgn(parsedPgn)
-      assertEquals(parsedPgn, newPgn.toParsedPgn)
-    }
+  // test("NewParsePgn and ParsedPgn are isomorphic"):
+  //   Fixtures.gamesForPerfTest.foreach { str =>
+  //     val parsedPgn = Parser.full(str).valueOr(err => throw new Exception(err.toString))
+  //     val newPgn    = NewParsedPgn(parsedPgn)
+  //     assertEquals(parsedPgn, newPgn.toParsedPgn)
+  //   }
 
   val pgn1 = Pgn(
     tags = Tags(

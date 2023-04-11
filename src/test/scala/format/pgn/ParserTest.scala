@@ -85,21 +85,21 @@ class ParserTest extends ChessTest:
 
   "glyphs" in:
     parseMove("e4") must beValid.like { case a =>
-      a must_== Std(Pos.E4, Pawn)
+      a must_== Std(Square.E4, Pawn)
     }
     parseMove("e4!") must beValid.like { case a: Std =>
-      a.dest === Pos.E4
+      a.dest === Square.E4
       a.role === Pawn
       a.metas.glyphs === Glyphs(Glyph.MoveAssessment.good.some, None, Nil)
     }
     parseMove("Ne7g6+?!") must beValid.like { case a: Std =>
-      a.dest === Pos.G6
+      a.dest === Square.G6
       a.role === Knight
       a.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
     }
     parser("Ne7g6+!") must beValid
     parseMove("P@e4?!") must beValid.like { case a: Drop =>
-      a.pos === Pos.E4
+      a.square === Square.E4
       a.role === Pawn
       a.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
     }

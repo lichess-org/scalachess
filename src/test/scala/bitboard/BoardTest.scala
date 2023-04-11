@@ -4,7 +4,7 @@ package bitboard
 import cats.syntax.all.*
 import munit.FunSuite
 
-import Pos.*
+import Square.*
 import Helpers.*
 import Bitboard.*
 import chess.variant.Standard
@@ -14,8 +14,8 @@ import chess.format.EpdFen
 class BoardTest extends FunSuite:
 
   import scala.language.implicitConversions
-  given Conversion[Pos, Int] = _.value
-  given Conversion[Int, Pos] = Pos.at(_).get
+  given Conversion[Square, Int] = _.value
+  given Conversion[Int, Square] = Square.at(_).get
 
   def parseFen(fen: EpdFen): Board =
     Fen.read(fen).map(_.board.board).getOrElse(throw RuntimeException("boooo"))
@@ -29,19 +29,19 @@ class BoardTest extends FunSuite:
       expected  = situation.cBoard.sliderBlockers(king)
     yield assertEquals(result, expected.bb)
 
-  test("generateMoves = generateMovesAt for all pos"):
+  test("generateMoves = generateMovesAt for all square"):
     for
       fen <- FenFixtures.fens
       situation     = Fen.read(fen).getOrElse(throw RuntimeException("boooo"))
       legalMoves    = situation.legalMoves
-      legalMovesAll = Pos.all.flatMap(situation.generateMovesAt(_))
+      legalMovesAll = Square.all.flatMap(situation.generateMovesAt(_))
     yield assertEquals(legalMoves.toSet, legalMovesAll.toSet)
 
-  test("generateMovesAt(pos) = generateMoves.filter(_.orig == pos)"):
+  test("generateMovesAt(square) = generateMoves.filter(_.orig == square)"):
     for
       fen <- FenFixtures.fens
       situation = Fen.read(fen).getOrElse(throw RuntimeException("boooo"))
-      sq <- Pos.all
+      sq <- Square.all
       legalMoves   = situation.legalMoves.filter(_.orig == sq)
       legalMovesAt = situation.generateMovesAt(sq)
     yield assertEquals(legalMoves.toSet, legalMovesAt.toSet)
@@ -51,7 +51,7 @@ class BoardTest extends FunSuite:
       str <- FenFixtures.fens
       fen  = Fen.read(str).getOrElse(throw RuntimeException("boooo"))
       king = fen.ourKings.head
-      sq    <- Pos.all
+      sq    <- Square.all
       color <- List(Color.White, Color.Black)
       result   = fen.board.attackers(sq, color)
       expected = fen.cBoard.attacksTo(sq, color.white)
@@ -61,7 +61,7 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      s <- Pos.all
+      s <- Square.all
       if !board.isOccupied(s)
       newBoard = board.discard(s)
     yield assertEquals(newBoard, board)
@@ -70,7 +70,7 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      s <- Pos.all
+      s <- Square.all
       if board.isOccupied(s)
       newBoard = board.discard(s)
     yield assertEquals(newBoard.nbPieces, board.nbPieces - 1)
@@ -86,7 +86,7 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      s <- Pos.all
+      s <- Square.all
       if board.isOccupied(s)
       newBoard = board.take(s)
     yield assertEquals(newBoard.get, board.discard(s))
@@ -95,7 +95,7 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      s <- Pos.all
+      s <- Square.all
       if !board.isOccupied(s)
       newBoard = board.take(s)
     yield assert(newBoard.isEmpty)
@@ -104,7 +104,7 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      s <- Pos.all
+      s <- Square.all
       newBoard = board.put(White.king, s)
     yield assert(newBoard.isDefined || (board.isOccupied(s) && newBoard.isEmpty))
 
@@ -112,7 +112,7 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      s <- Pos.all
+      s <- Square.all
       if board.isOccupied(s)
       piece    <- board.pieceAt(s)
       newBoard <- board.discard(s).put(piece, s)
@@ -122,7 +122,7 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      s <- Pos.all
+      s <- Square.all
       if !board.isOccupied(s)
       newBoard = board.replace(White.king, s)
     yield assert(newBoard.isEmpty)
@@ -131,7 +131,7 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      s <- Pos.all
+      s <- Square.all
       if board.isOccupied(s)
       newBoard = board.replace(White.king, s)
     yield assert(newBoard.isDefined)
@@ -140,7 +140,7 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      s <- Pos.all
+      s <- Square.all
       if !board.isOccupied(s)
       newPiece = for
         x        <- board.put(White.king, s)
@@ -153,7 +153,7 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      s <- Pos.all
+      s <- Square.all
       if !board.isOccupied(s)
       newBoard = board.putOrReplace(White.queen, s)
     yield assertEquals(newBoard.nbPieces, board.nbPieces + 1)
@@ -162,7 +162,7 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      s <- Pos.all
+      s <- Square.all
       if board.isOccupied(s)
       newBoard = board.putOrReplace(White.queen, s)
     yield assertEquals(newBoard.nbPieces, board.nbPieces)
@@ -181,7 +181,7 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      s <- Pos.all
+      s <- Square.all
       result = board.putOrReplace(White.king, s)
       expected <- board.put(White.king, s) orElse board.replace(White.king, s)
     yield assertEquals(result, expected)
@@ -207,12 +207,12 @@ class BoardTest extends FunSuite:
       black = board.piecesOf(Black)
     yield assertEquals(white ++ black, board.pieceMap)
 
-  test("isOccupied(pos) == pieceMap.contains(pos)"):
+  test("isOccupied(square) == pieceMap.contains(square)"):
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      pos <- Pos.all
-    yield assertEquals(board.isOccupied(pos), board.pieceMap.contains(pos))
+      square <- Square.all
+    yield assertEquals(board.isOccupied(square), board.pieceMap.contains(square))
 
   test("isOccupied(piece) == true if pieces contains piece"):
     for
@@ -225,7 +225,7 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      from <- Pos.all
+      from <- Square.all
       moved = board.move(from, from)
     yield assert(moved.isEmpty)
 
@@ -233,8 +233,8 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      from <- Pos.all
-      to   <- Pos.all
+      from <- Square.all
+      to   <- Square.all
       if from != to
       moved = board.move(from, to)
     yield assertEquals(moved.isDefined, board.isOccupied(from) && !board.isOccupied(to))
@@ -243,8 +243,8 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      from <- Pos.all
-      to   <- Pos.all
+      from <- Square.all
+      to   <- Square.all
       if from != to
       moved     = board.move(from, to)
       movedBack = moved.flatMap(_.move(to, from))
@@ -254,8 +254,8 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      from <- Pos.all
-      to   <- Pos.all
+      from <- Square.all
+      to   <- Square.all
       if from != to
       moved = board.move(from, to)
       takeAndPut = for
@@ -269,8 +269,8 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      from <- Pos.all
-      to   <- Pos.all
+      from <- Square.all
+      to   <- Square.all
       if from != to
       taking = board.taking(from, to)
       takeAndReplace = for
@@ -284,9 +284,9 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      from  <- Pos.all
-      to    <- Pos.all
-      taken <- Pos.all
+      from  <- Square.all
+      to    <- Square.all
+      taken <- Square.all
       if taken != from && from != to && taken != to
       taking <- board.taking(from, to, Some(taken))
       takeAndPutAndTake <- for
@@ -301,8 +301,8 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      from <- Pos.all
-      to   <- Pos.all
+      from <- Square.all
+      to   <- Square.all
       if from != to && !board.isOccupied(to)
       piece    = White.knight
       promoted = board.promote(from, to, piece)
@@ -316,8 +316,8 @@ class BoardTest extends FunSuite:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      from <- Pos.all
-      to   <- Pos.all
+      from <- Square.all
+      to   <- Square.all
       if from != to && board.isOccupied(to)
       piece    = White.knight
       promoted = board.promote(from, to, piece)

@@ -1,6 +1,6 @@
 package chess
 
-import Pos.*
+import Square.*
 
 class PlayOneMoveTest extends ChessTest:
 

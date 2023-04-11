@@ -1,6 +1,6 @@
 package chess
 
-import Pos.*
+import Square.*
 import format.Uci
 
 class PawnTest extends ChessTest:

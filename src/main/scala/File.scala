@@ -20,7 +20,7 @@ object File extends OpaqueInt[File]:
     if (0 <= index && index < 8) Some(index)
     else None
 
-  inline def of(inline pos: Pos): File = pos.value & 0x7
+  inline def of(inline square: Square): File = square.value & 0x7
 
   inline def fromChar(inline ch: Char): Option[File] = atIndex(ch.toInt - 97)
 

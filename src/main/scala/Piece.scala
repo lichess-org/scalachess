@@ -18,7 +18,7 @@ case class Piece(color: Color, role: Role):
   def forsyth: Char = if color.white then role.forsythUpper else role.forsyth
 
   // the piece at from can attack the target to when mask are all the occupied squares
-  def eyes(from: Pos, to: Pos, mask: Bitboard): Boolean =
+  def eyes(from: Square, to: Square, mask: Bitboard): Boolean =
     role match
       case King   => from.kingAttacks.contains(to)
       case Queen  => from.queenAttacks(mask).contains(to)

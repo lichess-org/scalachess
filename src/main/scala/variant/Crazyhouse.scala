@@ -29,23 +29,25 @@ case object Crazyhouse
     (Color.all forall validSide(board, false)) &&
       (!strict || (board.board.byRole(Pawn).count <= 16 && board.nbPieces <= 32))
 
-  private def canDropPawnOn(pos: Pos) = pos.rank != Rank.First && pos.rank != Rank.Eighth
+  private def canDropPawnOn(square: Square) = square.rank != Rank.First && square.rank != Rank.Eighth
 
-  override def drop(situation: Situation, role: Role, pos: Pos): Validated[ErrorStr, Drop] =
+  override def drop(situation: Situation, role: Role, square: Square): Validated[ErrorStr, Drop] =
     for
       d1 <- situation.board.crazyData toValid ErrorStr("Board has no crazyhouse data")
       _ <-
-        if (role != Pawn || canDropPawnOn(pos)) Validated.valid(d1)
-        else Validated.invalid(ErrorStr(s"Can't drop $role on $pos"))
+        if (role != Pawn || canDropPawnOn(square)) Validated.valid(d1)
+        else Validated.invalid(ErrorStr(s"Can't drop $role on $square"))
       piece = Piece(situation.color, role)
-      d2     <- d1.drop(piece) toValid ErrorStr(s"No $piece to drop on $pos")
-      board1 <- situation.board.place(piece, pos) toValid ErrorStr(s"Can't drop $role on $pos, it's occupied")
+      d2 <- d1.drop(piece) toValid ErrorStr(s"No $piece to drop on $square")
+      board1 <- situation.board.place(piece, square) toValid ErrorStr(
+        s"Can't drop $role on $square, it's occupied"
+      )
       _ <-
         if board1.checkOf(situation.color).no then Validated.valid(board1)
-        else Validated.invalid(ErrorStr(s"Dropping $role on $pos doesn't uncheck the king"))
+        else Validated.invalid(ErrorStr(s"Dropping $role on $square doesn't uncheck the king"))
     yield Drop(
       piece = piece,
-      pos = pos,
+      square = square,
       situationBefore = situation,
       after = board1 withCrazyData d2
     )
@@ -89,7 +91,7 @@ case object Crazyhouse
   // if the king is not in check, all drops are possible, we just return None
   // king is in single check, we return the squares between the king and the checker
   // king is in double check, no drop is possible
-  def possibleDrops(situation: Situation): Option[List[Pos]] =
+  def possibleDrops(situation: Situation): Option[List[Square]] =
     situation.ourKing.flatMap(king =>
       val checkers = situation.board.board.attackers(king, !situation.color)
       if checkers.moreThanOne then Some(Nil)
@@ -161,7 +163,7 @@ case object Crazyhouse
         copy(pockets = nps)
       }
 
-    def store(piece: Piece, from: Pos): Data =
+    def store(piece: Piece, from: Square): Data =
       copy(
         pockets = pockets store {
           if promoted.contains(from) then piece.color.pawn else piece
@@ -169,9 +171,9 @@ case object Crazyhouse
         promoted = promoted.removeSquare(from)
       )
 
-    def promote(pos: Pos) = copy(promoted = promoted.addSquare(pos))
+    def promote(square: Square) = copy(promoted = promoted.addSquare(square))
 
-    def move(orig: Pos, dest: Pos) =
+    def move(orig: Square, dest: Square) =
       copy(
         promoted = if promoted.contains(orig) then promoted.removeSquare(orig).addSquare(dest) else promoted
       )

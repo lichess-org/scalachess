@@ -1,7 +1,7 @@
 package chess
 
 import scala.language.implicitConversions
-import Pos.*
+import Square.*
 
 class QueenTest extends ChessTest:
 

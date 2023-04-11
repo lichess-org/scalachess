@@ -1,7 +1,7 @@
 package chess
 
 import scala.language.implicitConversions
-import Pos.*
+import Square.*
 import variant.FromPosition
 import variant.Chess960
 import format.EpdFen
@@ -35,8 +35,8 @@ class UnmovedRooksTest extends ChessTest:
 
   chess960Boards.mapWithIndex { (board, n) =>
     s"unmovedRooks at position number: $n" in:
-      board.rooks.squares.traverse { pos =>
-        board.history.unmovedRooks.side(pos).flatten
+      board.rooks.squares.traverse { square =>
+        board.history.unmovedRooks.side(square).flatten
       } must beSome { (sides: List[Side]) =>
         sides.filter(_ == QueenSide).size must_== 2
         sides.filter(_ == KingSide).size must_== 2

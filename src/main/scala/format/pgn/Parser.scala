@@ -168,7 +168,7 @@ object Parser:
 
     val rank = mapParserChar(rankMap, "rank")
 
-    val dest: P[Pos] = mapParser(Pos.allKeys, "dest")
+    val dest: P[Square] = mapParser(Square.allKeys, "dest")
 
     val promotable = Role.allPromotableByPgn.mapKeys(_.toUpper)
 
@@ -183,7 +183,7 @@ object Parser:
     }
 
     // B@g5
-    val drop: P[Drop] = ((role <* P.char('@')) ~ dest).map((role, pos) => Drop(role, pos))
+    val drop: P[Drop] = ((role <* P.char('@')) ~ dest).map((role, square) => Drop(role, square))
 
     val pawnDrop: P[Drop] = (P.char('@') *> dest).map(Drop(Pawn, _))
 

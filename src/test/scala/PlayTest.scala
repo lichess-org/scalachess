@@ -1,7 +1,7 @@
 package chess
 
 import chess.format.Visual.addNewLines
-import chess.Pos.*
+import chess.Square.*
 
 class PlayTest extends ChessTest:
 

@@ -13,9 +13,9 @@ object UciCharPair:
     uci match
       case Uci.Move(orig, dest, None)       => UciCharPair(toChar(orig), toChar(dest))
       case Uci.Move(orig, dest, Some(role)) => UciCharPair(toChar(orig), toChar(dest.file, role))
-      case Uci.Drop(role, pos) =>
+      case Uci.Drop(role, square) =>
         UciCharPair(
-          toChar(pos),
+          toChar(square),
           dropRole2charMap.getOrElse(role, voidChar)
         )
 
@@ -24,11 +24,11 @@ object UciCharPair:
     val charShift = 35        // Start at Char(35) == '#'
     val voidChar  = 33.toChar // '!'. We skipped Char(34) == '"'.
 
-    val pos2charMap: Map[Pos, Char] = Pos.all.map { pos =>
-      pos -> (pos.hashCode + charShift).toChar
+    val pos2charMap: Map[Square, Char] = Square.all.map { square =>
+      square -> (Square.hashCode + charShift).toChar
     }.toMap
 
-    inline def toChar(inline pos: Pos) = pos2charMap.getOrElse(pos, voidChar)
+    inline def toChar(inline square: Square) = pos2charMap.getOrElse(square, voidChar)
 
     val promotion2charMap: Map[(File, PromotableRole), Char] = for {
       (role, index) <- Role.allPromotable.zipWithIndex.toMap

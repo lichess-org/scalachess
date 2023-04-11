@@ -24,8 +24,8 @@ object Visual:
         (c, x) <- (l zipWithIndex)
         role   <- Role forsyth c.toLower
       } yield {
-        Pos.at(x, 7 - y) map { pos =>
-          pos -> (Color.fromWhite(c isUpper) - role)
+        Square.at(x, 7 - y) map { square =>
+          square -> (Color.fromWhite(c isUpper) - role)
         }
       }) flatten,
       variant = chess.variant.Variant.default
@@ -34,16 +34,16 @@ object Visual:
 
   def >>(board: Board): String = >>|(board, Map.empty)
 
-  def >>|(board: Board, marks: Map[Iterable[Pos], Char]): String = {
-    val markedPoss: Map[Pos, Char] = marks.foldLeft(Map[Pos, Char]()) { case (marks, (poss, char)) =>
-      marks ++ (poss.toList map { pos =>
-        (pos, char)
+  def >>|(board: Board, marks: Map[Iterable[Square], Char]): String = {
+    val markedPoss: Map[Square, Char] = marks.foldLeft(Map[Square, Char]()) { case (marks, (poss, char)) =>
+      marks ++ (poss.toList map { square =>
+        (square, char)
       })
     }
     for (y <- Rank.allReversed) yield {
       for (x <- File.all) yield
-        val pos = Pos(x, y)
-        markedPoss.get(pos) getOrElse board(pos).fold(' ')(_ forsyth)
+        val square = Square(x, y)
+        markedPoss.get(square) getOrElse board(square).fold(' ')(_ forsyth)
     } mkString
   } map { """\s*$""".r.replaceFirstIn(_, "") } mkString "\n"
 

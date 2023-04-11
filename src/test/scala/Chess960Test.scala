@@ -41,6 +41,6 @@ class Chess960Test extends ChessTest:
 
       Reader.full(pgn) must beValid.like { case Reader.Result.Complete(replay) =>
         replay.state.situation.legalMoves.find(_.castles).map(_.toUci) === Some(
-          format.Uci.Move(Pos.E1, Pos.B1)
+          format.Uci.Move(Square.E1, Square.B1)
         )
       }

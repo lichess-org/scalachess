@@ -5,7 +5,7 @@ import cats.syntax.option.*
 import chess.format.EpdFen
 import chess.variant.Crazyhouse
 import chess.format.pgn.SanStr
-import chess.Pos.*
+import chess.Square.*
 import chess.bitboard.Bitboard
 
 class CrazyhouseVariantTest extends ChessTest:
@@ -360,4 +360,4 @@ class CrazyhouseVariantTest extends ChessTest:
         }
       }
 
-case class DropTestCase(fen: EpdFen, drops: Option[Set[Pos]])
+case class DropTestCase(fen: EpdFen, drops: Option[Set[Square]])

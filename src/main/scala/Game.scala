@@ -18,8 +18,8 @@ case class Game(
   export situation.board.history.halfMoveClock
 
   def apply(
-      orig: Pos,
-      dest: Pos,
+      orig: Square,
+      dest: Square,
       promotion: Option[PromotableRole] = None,
       metrics: MoveMetrics = MoveMetrics.empty
   ): Validated[ErrorStr, (Game, Move)] =
@@ -28,8 +28,8 @@ case class Game(
     }
 
   def moveWithCompensated(
-      orig: Pos,
-      dest: Pos,
+      orig: Square,
+      dest: Square,
       promotion: Option[PromotableRole] = None,
       metrics: MoveMetrics = MoveMetrics.empty
   ): Validated[ErrorStr, (Clock.WithCompensatedLag[Game], Move)] =
@@ -55,10 +55,10 @@ case class Game(
 
   def drop(
       role: Role,
-      pos: Pos,
+      square: Square,
       metrics: MoveMetrics = MoveMetrics.empty
   ): Validated[ErrorStr, (Game, Drop)] =
-    situation.drop(role, pos).map(_ withMetrics metrics) map { drop =>
+    situation.drop(role, square).map(_ withMetrics metrics) map { drop =>
       applyDrop(drop) -> drop
     }
 
@@ -85,7 +85,7 @@ case class Game(
     }
 
   def apply(uci: Uci.Move): Validated[ErrorStr, (Game, Move)] = apply(uci.orig, uci.dest, uci.promotion)
-  def apply(uci: Uci.Drop): Validated[ErrorStr, (Game, Drop)] = drop(uci.role, uci.pos)
+  def apply(uci: Uci.Drop): Validated[ErrorStr, (Game, Drop)] = drop(uci.role, uci.square)
   def apply(uci: Uci): Validated[ErrorStr, (Game, MoveOrDrop)] =
     apply(uci) map { case (g, m) => g -> m }
 

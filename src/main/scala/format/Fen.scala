@@ -14,7 +14,7 @@ object EpdFen extends OpaqueString[EpdFen]:
   extension (a: EpdFen)
     def color: Color           = SimpleFen color a
     def castling: String       = SimpleFen castling a
-    def enpassant: Option[Pos] = SimpleFen enpassant a
+    def enpassant: Option[Square] = SimpleFen enpassant a
 
     def isInitial: Boolean = a == initial
 
@@ -32,7 +32,7 @@ object SimpleFen extends OpaqueString[SimpleFen]:
   extension (a: SimpleFen)
     def color: Color           = a.split(' ').lift(1).flatMap(_.headOption).flatMap(Color.apply) | Color.white
     def castling: String       = a.split(' ').lift(2) | "-"
-    def enpassant: Option[Pos] = a.split(' ').lift(3).flatMap(Pos.fromKey(_))
+    def enpassant: Option[Square] = a.split(' ').lift(3).flatMap(Square.fromKey(_))
     def opening: OpeningFen    = OpeningFen.fromSimple(a)
     def board: BoardFen        = a.takeWhile(_ != ' ')
   def fromEpd(fen: EpdFen): OpeningFen =

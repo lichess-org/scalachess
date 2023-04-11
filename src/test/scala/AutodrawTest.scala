@@ -1,7 +1,7 @@
 package chess
 
 import scala.language.implicitConversions
-import Pos.*
+import Square.*
 import variant.Standard
 import chess.format.EpdFen
 
@@ -267,13 +267,13 @@ K   bB""".autoDraw must_== false
           g.board.history.threefoldRepetition must beFalse
         }
       "3fold on initial position" in:
-        val moves: List[(Pos, Pos)] = List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten
+        val moves: List[(Square, Square)] = List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten
         makeGame.playMoves(moves*) must beValid.like { case g =>
           g.board.history.threefoldRepetition must beTrue
         }
       "pawn move then minimalist 3fold" in:
-        val moves: List[(Pos, Pos)] = List(E2 -> E4, E7 -> E5) :::
-          (List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten: List[(Pos, Pos)])
+        val moves: List[(Square, Square)] = List(E2 -> E4, E7 -> E5) :::
+          (List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten: List[(Square, Square)])
         makeGame.playMoves(moves*) must beValid:
           (_: Game).board.history.threefoldRepetition must beTrue
     "by fivefold" in:
@@ -382,8 +382,8 @@ K   bB""".autoDraw must_== false
       val position = EpdFen("7K/5k2/7P/6n1/8/8/8/8 b - - 0 40")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
-        Pos.F7,
-        Pos.F8
+        Square.F7,
+        Square.F8
       ))
       newGame must beValid.like { case game =>
         game.situation.autoDraw must beFalse
@@ -394,8 +394,8 @@ K   bB""".autoDraw must_== false
       val position = EpdFen("1b1b3K/8/5k1P/8/8/8/8/8 b - - 0 40")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
-        Pos.B8,
-        Pos.E5
+        Square.B8,
+        Square.E5
       ))
       newGame must beValid.like { case game =>
         game.situation.autoDraw must beFalse
@@ -406,8 +406,8 @@ K   bB""".autoDraw must_== false
       val position = EpdFen("b2b3K/8/5k1Q/8/8/8/8/8 b - -")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
-        Pos.F6,
-        Pos.E5
+        Square.F6,
+        Square.E5
       ))
       newGame must beValid.like { case game =>
         game.situation.autoDraw must beFalse
@@ -418,8 +418,8 @@ K   bB""".autoDraw must_== false
       val position = EpdFen("1b1b3K/8/5k1Q/8/8/8/8/8 b - -")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
-        Pos.F6,
-        Pos.E5
+        Square.F6,
+        Square.E5
       ))
       newGame must beValid.like { case game =>
         game.situation.autoDraw must beFalse
@@ -430,8 +430,8 @@ K   bB""".autoDraw must_== false
       val position = EpdFen("8/8/5N2/8/6p1/8/5K1p/7k w - - 0 37")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
-        Pos.F6,
-        Pos.E4
+        Square.F6,
+        Square.E4
       ))
       newGame must beValid.like { case game =>
         game.situation.autoDraw must beFalse
@@ -442,8 +442,8 @@ K   bB""".autoDraw must_== false
       val position = EpdFen("8/8/8/4N3/4k1p1/6K1/8/3b4 w - - 5 59")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
-        Pos.E5,
-        Pos.F7
+        Square.E5,
+        Square.F7
       ))
       newGame must beValid.like { case game =>
         game.situation.autoDraw must beFalse
@@ -454,8 +454,8 @@ K   bB""".autoDraw must_== false
       val position = EpdFen("8/8/3Q4/2bK4/B7/8/8/k7 b - - 0 67")
       val game     = fenToGame(position, Standard)
       val newGame = game flatMap (_.playMove(
-        Pos.A1,
-        Pos.B2
+        Square.A1,
+        Square.B2
       ))
       newGame must beValid.like { case game =>
         game.situation.autoDraw must beFalse

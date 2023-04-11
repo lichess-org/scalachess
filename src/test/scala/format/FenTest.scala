@@ -7,7 +7,7 @@ class FenTest extends ChessTest:
 
   import pgn.Fixtures.*
   import pgn.Reader
-  import Pos.*
+  import Square.*
 
   "write" should:
     "enpassant" in:
@@ -32,12 +32,12 @@ class FenTest extends ChessTest:
       Fen
         .read(Fen.Epd("1brr2k1/1pq3p1/p6p/P1p1Pp2/2P5/3PRB2/2Q2PPP/R5K1 w - f6 0 28"))
         .get
-        .enPassantSquare === Some(Pos.F6)
+        .enPassantSquare === Some(Square.F6)
     "enpassant 2" in:
       Fen
         .read(Fen.Epd("rnbqkbnr/pp1pp1pp/8/2p1Pp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3"))
         .get
-        .enPassantSquare === Some(Pos.F6)
+        .enPassantSquare === Some(Square.F6)
 
   "castling rights with 2 rooks on the same file" in:
     val fen = Fen.Epd("2bqkb1r/1pp1ppp1/7r/pN2p2p/3PP3/P3P3/1PP1B1PP/R2Q1RK1 w k -")

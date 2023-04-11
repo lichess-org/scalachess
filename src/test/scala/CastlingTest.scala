@@ -1,7 +1,7 @@
 package chess
 
 import scala.language.implicitConversions
-import Pos.*
+import Square.*
 import variant.FromPosition
 import variant.Chess960
 import format.EpdFen

@@ -21,7 +21,7 @@ object Parser:
   def full(pgn: PgnStr): Validated[ErrorStr, NewParsedPgn] =
     pgnParser.parse(pgn.value) match
       case Right((_, parsedResult)) =>
-        valid(NewParsedPgn(parsedResult))
+        valid(parsedResult)
       case Left(err) =>
         invalid(showExpectations("Cannot parse pgn", pgn.value, err))
 
@@ -31,16 +31,17 @@ object Parser:
   def moves(strMoves: Iterable[SanStr]): Validated[ErrorStr, Sans] =
     strMoves.toList.traverse(MovesParser.move).map(Sans(_))
 
-  def move(str: SanStr) = MovesParser.move(str)
+  def move(str: SanStr)  = MovesParser.move(str)
 
   private object MovesParser:
 
-    def moves(str: PgnMovesStr): Validated[ErrorStr, Sans] =
-      strMove.rep.map(xs => Sans(xs.toList)).parse(str.value) match
-        case Right((_, sans)) => valid(sans)
+    def moves(str: PgnMovesStr): Validated[ErrorStr, ParsedPgnTree] =
+      strMove.rep.parse(str.value) match
+        case Right((_, sans)) =>
+          valid(sans.foldLeft(none[ParsedPgnTree])((acc, x) => x.copy(child = acc)))
         case Left(err)        => invalid(showExpectations("Cannot parse moves", str.value, err))
 
-    def move(str: SanStr): Validated[ErrorStr, San] =
+    def move(str: SanStr): Validated[ErrorStr, ParsedPgnTree] =
       strMove.parse(str.value) match
         case Right((_, san)) => valid(san)
         case Left(err)       => invalid(showExpectations("Cannot parse move", str.value, err))
@@ -107,26 +108,39 @@ object Parser:
       .?
       .flatMap(o => o.fold(P.unit)(_ => P.failWith("Null moves are not supported").void))
 
-    val strMove: P[San] = P
-      .recursive[San] { recuse =>
-        val variation: P[Variation] =
+    val strMove: P[ParsedPgnTree] = P
+      .recursive[ParsedPgnTree] { recuse =>
+        // TODO: if a variation only contains comments, we ignore it
+        // Will fix it after support null move
+        val variation: P[Option[ParsedPgnTree]] =
           (P.char('(') *> commentary.rep0.surroundedBy(escape) ~ recuse.rep0 <* (P.char(')') ~ escape))
-            .map { (comments, sans) => Variation(comments, Sans(sans)) }
+            .map((comments, sans) =>
+              sans match
+                case Nil => None
+                case x :: xs =>
+                  val child = xs.reverse.foldLeft(none[ParsedPgnTree])((acc, x) => x.copy(child = acc).some)
+                  Some(x.copy(child = child, move = x.move.copy(variationComments = comments.some)))
+            )
 
         ((number.backtrack | commentary).rep0 ~ forbidNullMove).with1 *>
           (((MoveParser.moveWithSuffix ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0) <* escape).backtrack
-            .map { case ((((san, glyphs), comments), glyphs2), variations) =>
-              san
-                .withComments(comments)
-                .withVariations(variations)
-                .mergeGlyphs(glyphs merge glyphs2)
+            .map { case (((((san, suffixes), glyphs), comments), glyphs2), variations) =>
+              val metas =
+                Metas(suffixes.check, suffixes.checkmate, comments, suffixes.glyphs merge glyphs merge glyphs2, Nil)
+              val s = san match
+                case x: Std => x.copy(promotion = suffixes.promotion)
+                case _      => san
+
+              val data = PgnNodeData(s, metas, None)
+              PgnNode(data, None, variations.flatten)
             }
       }
 
-    // todo: we can add post move comments
-    val strMoves: P0[(InitialPosition, List[San], Option[String])] =
+    val strMoves: P0[(InitialPosition, Option[ParsedPgnTree], Option[String])] =
       ((commentary.rep0 ~ strMove.rep0) ~ (result <* escape).? <* commentary.rep0).map:
-        case ((comments, sans), res) => (InitialPosition(comments.cleanUp), sans.toList, res)
+        case ((comments, sans), res) =>
+          val node = sans.reverse.foldLeft(none[ParsedPgnTree])((acc, x) => x.copy(child = acc).some)
+          (InitialPosition(comments.cleanUp), node, res)
 
   private object MoveParser:
 
@@ -209,8 +223,8 @@ object Parser:
       (disambiguatedPawn :: pawn :: disambiguated :: ambigous :: drop :: pawnDrop :: Nil).map(_.backtrack)
     )
 
-    val move: P[San]           = (castle | standard).withContext("Invalid chess move")
-    val moveWithSuffix: P[San] = (move ~ suffixes <* escape).map((san, suf) => san withSuffixes suf)
+    val move: P[San]                       = (castle | standard).withContext("Invalid chess move")
+    val moveWithSuffix: P[(San, Suffixes)] = move ~ suffixes <* escape
 
     def mapParser[A](pairMap: Map[String, A], name: String): P[A] =
       P.stringIn(pairMap.keySet).map(pairMap.apply) | P.failWith(name + " not found")
@@ -228,20 +242,20 @@ object Parser:
     val tag: P[Tag]                = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
     val tags: P[NonEmptyList[Tag]] = tag.rep
 
-  private val tagsAndMovesParser: P0[ParsedPgn] =
-    (TagParser.tags.?.surroundedBy(escape) ~ MovesParser.strMoves.?).map:
+  private val tagsAndMovesParser: P0[NewParsedPgn] =
+    (TagParser.tags.?.surroundedBy(escape) ~ MovesParser.strMoves1.?).map:
       case (optionalTags, optionalMoves) => {
         val preTags = Tags(optionalTags.map(_.toList).getOrElse(Nil))
         optionalMoves match
-          case None => ParsedPgn(InitialPosition(Nil), preTags, Sans(Nil))
-          case Some((init, sans, resultOption)) => {
+          case None => NewParsedPgn(InitialPosition(Nil), preTags, None)
+          case Some((init, tree, resultOption)) => {
             val tags =
               resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
-            ParsedPgn(init, tags, Sans(sans))
+            NewParsedPgn(init, tags, tree)
           }
       }
 
-  private val pgnParser: P0[ParsedPgn] =
+  private val pgnParser: P0[NewParsedPgn] =
     P.string("\uFEFF").? *> escape *> P.string("[pgn]").? *> tagsAndMovesParser <* P
       .string("[/pgn]")
       .? <* escape

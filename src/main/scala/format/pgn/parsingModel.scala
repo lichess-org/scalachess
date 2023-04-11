@@ -60,7 +60,7 @@ case class Std(
       case None       => Validated invalid ErrorStr(s"No move found: $this\n$situation")
       case Some(move) => move withPromotion promotion toValid ErrorStr("Wrong promotion")
 
-  override def toString = s"$role ${dest.key}"
+  // override def toString = s"$role ${dest.key}"
 
   private inline def compare[A](a: Option[A], b: A) = a.fold(true)(b ==)
 

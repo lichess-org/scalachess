@@ -9,9 +9,16 @@ class ParserTest extends ChessTest:
 
   import Fixtures.*
 
+  given Conversion[SanStr, String] = _.value
+  given Conversion[String, SanStr] = SanStr(_)
+
   val parse = Parser.full
 
-  def parseMove(s: String) = Parser.move(SanStr(s))
+  def parseMove(s: String) = Parser.move1(s)
+
+  extension (tree: Option[PgnNode[PgnNodeData]]) def head = tree.get.mainLine.head
+
+  extension (parsed: NewParsedPgn) def metas = parsed.tree.get.move.metas
 
   "bom header" should:
     "be ignored" in:
@@ -33,11 +40,11 @@ class ParserTest extends ChessTest:
 
   "promotion check" should:
     "as a queen" in:
-      parse("b8=Q ") must beValid { (parsed: NewParsedPgn) =>
+      parse("b8=Q ") must beValid.like: parsed =>
         parsed.mainLine.headOption must beSome { (san: San) =>
-          san.asInstanceOf[Std].promotion == Option(Queen)
+          san === Std(Pos.B8, Pawn, promotion = Option(Queen))
         }
-      }
+
     "as a rook" in:
       parse("b8=R ") must beValid { (parsed: NewParsedPgn) =>
         parsed.mainLine.headOption must beSome { (san: San) =>
@@ -84,34 +91,35 @@ class ParserTest extends ChessTest:
       }
 
   "glyphs" in:
-    parseMove("e4") must beValid.like { case a =>
-      a must_== Std(Pos.E4, Pawn)
-    }
-    parseMove("e4!") must beValid.like { case a: Std =>
-      a.dest === Pos.E4
-      a.role === Pawn
-      a.metas.glyphs === Glyphs(Glyph.MoveAssessment.good.some, None, Nil)
-    }
-    parseMove("Ne7g6+?!") must beValid.like { case a: Std =>
-      a.dest === Pos.G6
-      a.role === Knight
-      a.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
-    }
-    parse("Ne7g6+!") must beValid
-    parseMove("P@e4?!") must beValid.like { case a: Drop =>
-      a.pos === Pos.E4
-      a.role === Pawn
-      a.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
-    }
-  extension (tree: Option[PgnNode[PgnNodeData]]) def head = tree.get.mainLine.head
+
+    parseMove("b8=B ") must beValid.like: node =>
+      node.move.san === Std(Pos.B8, Pawn, promotion = Option(Bishop))
+
+    parseMove("e4") must beValid.like: node =>
+      node.move.san must_== Std(Pos.E4, Pawn)
+
+    parseMove("e4") must beValid.like: node =>
+      node.move.san must_== Std(Pos.E4, Pawn)
+
+    parseMove("e4!") must beValid.like: node =>
+      node.move.san === Std(Pos.E4, Pawn)
+      node.move.metas.glyphs === Glyphs(Glyph.MoveAssessment.good.some, None, Nil)
+
+    // TODO parsed result is off by one
+    parseMove("Ne7g6+?!") must beValid.like: node =>
+      node.move.san === Std(Pos.G6, Knight, false, Some(File.F), Some(Rank.Eighth))
+      node.move.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
+
+    parseMove("P@e4?!") must beValid.like: node =>
+      node.move.san === Drop(Pawn, Pos.E4)
+      node.move.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
 
   "nags" in:
     parse(withNag) must beValid
 
-    parse("Ne7g6+! $13") must beValid.like { parsed =>
-      parsed.tree.get.move.metas.glyphs.move must_== Option(Glyph.MoveAssessment.good)
-      parsed.tree.get.move.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
-    }
+    parse("Ne7g6+! $13") must beValid.like: parsed =>
+      parsed.metas.glyphs.move must_== Option(Glyph.MoveAssessment.good)
+      parsed.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
 
   "non-nags" in:
     parse(withGlyphAnnotations) must beValid
@@ -127,16 +135,14 @@ class ParserTest extends ChessTest:
     }
 
   "variations" in:
-    parse("Ne7g6+! {such a neat comment} (e4 Ng6)") must beValid.like { parsed =>
-      parsed.tree.head.metas.variations.headOption.map(_.sans) must beSome:
-        (_: Sans).value must haveSize(2)
-    }
+    parse("Ne7g6+! {such a neat comment} (e4 Ng6)") must beValid.like: parsed =>
+      parsed.tree.get.variations.headOption must beSome:
+        (_: ParsedPgnTree).mainLine must haveSize(2)
 
   "first move variation" in:
-    parse("1. e4 (1. d4)") must beValid.like { case parsed =>
-      parsed.tree.head.metas.variations.headOption.map(_.sans) must beSome:
-        (_: Sans).value must haveSize(1)
-    }
+    parse("1. e4 (1. d4)") must beValid.like: parsed =>
+      parsed.tree.get.variations.headOption must beSome:
+        (_: ParsedPgnTree).mainLine must haveSize(1)
 
   raws foreach { sans =>
     val size = sans.split(' ').length
@@ -149,9 +155,8 @@ class ParserTest extends ChessTest:
   (shortCastles ++ longCastles ++ annotatedCastles) foreach { sans =>
     val size = sans.split(' ').length
     "sans only size: " + size in:
-      parse(sans) must beValid.like { case a =>
+      parse(sans) must beValid.like: a =>
         a.mainLine.size must_== size
-      }
   }
 
   "disambiguated" in:

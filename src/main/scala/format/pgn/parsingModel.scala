@@ -7,7 +7,6 @@ import cats.syntax.option.*
 case class PgnNodeData(san: San, metas: Metas, variationComments: Option[List[Comment]])
 type ParsedPgnTree = PgnNode[PgnNodeData]
 
-// isomorphic to ParsedPgn
 case class ParsedPgn(initialPosition: InitialPosition, tags: Tags, tree: Option[ParsedPgnTree]):
   def mainLine = tree.fold(List.empty[San])(_.mainLine.map(_.san))
 
@@ -82,11 +81,7 @@ case class Metas(
     checkmate: Boolean,
     comments: List[Comment],
     glyphs: Glyphs
-):
-
-  def withGlyphs(g: Glyphs) = copy(glyphs = g)
-
-  def withComments(c: List[Comment]) = copy(comments = c)
+)
 
 object Metas:
   val empty = Metas(check = false, checkmate = false, Nil, Glyphs.empty)

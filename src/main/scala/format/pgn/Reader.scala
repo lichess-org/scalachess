@@ -25,7 +25,7 @@ object Reader:
       makeReplay(makeGame(parsed.tags ++ tags), op(Sans(parsed.mainLine)))
     }
 
-  def fullWithSans(parsed: NewParsedPgn, op: Sans => Sans): Result =
+  def fullWithSans(parsed: ParsedPgn, op: Sans => Sans): Result =
     makeReplay(makeGame(parsed.tags), op(Sans(parsed.mainLine)))
 
   def movesWithSans(sans: Iterable[SanStr], op: Sans => Sans, tags: Tags): Validated[ErrorStr, Result] =

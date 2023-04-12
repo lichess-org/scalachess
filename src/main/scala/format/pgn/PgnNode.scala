@@ -23,13 +23,6 @@ case class PgnNode[A](
   def mainLine: List[A] = move :: child.fold(Nil)(_.mainLine)
   def totalNodes: Int   = this.foldLeft(0)((b, a) => b + 1)
 
-case class PgnNodeData(san: San, metas: Metas, variationComments: Option[List[Comment]])
-type ParsedPgnTree = PgnNode[PgnNodeData]
-
-// isomorphic to ParsedPgn
-case class NewParsedPgn(initialPosition: InitialPosition, tags: Tags, tree: Option[ParsedPgnTree]):
-  def mainLine = tree.fold(List.empty[San])(_.mainLine.map(_.san))
-
 type PgnTree = PgnNode[Move]
 
 // isomorphic to Pgn

@@ -4,12 +4,15 @@ package format.pgn
 import cats.data.Validated
 import cats.syntax.option.*
 
-opaque type Sans = List[San]
-object Sans extends TotalWrapper[Sans, List[San]]
+case class PgnNodeData(san: San, metas: Metas, variationComments: Option[List[Comment]])
+type ParsedPgnTree = PgnNode[PgnNodeData]
+
+// isomorphic to ParsedPgn
+case class ParsedPgn(initialPosition: InitialPosition, tags: Tags, tree: Option[ParsedPgnTree]):
+  def mainLine = tree.fold(List.empty[San])(_.mainLine.map(_.san))
 
 // Standard Algebraic Notation
 sealed trait San:
-
   def apply(situation: Situation): Validated[ErrorStr, MoveOrDrop]
 
 case class Std(
@@ -18,7 +21,7 @@ case class Std(
     capture: Boolean = false,
     file: Option[File] = None,
     rank: Option[Rank] = None,
-    promotion: Option[PromotableRole] = None,
+    promotion: Option[PromotableRole] = None
 ) extends San:
 
   def apply(situation: Situation) = move(situation)
@@ -34,19 +37,35 @@ case class Std(
       case None       => Validated invalid ErrorStr(s"No move found: $this\n$situation")
       case Some(move) => move withPromotion promotion toValid ErrorStr("Wrong promotion")
 
-  // override def toString = s"$role ${dest.key}"
+  override def toString = s"$role ${dest.key}"
 
   private inline def compare[A](a: Option[A], b: A) = a.fold(true)(b ==)
 
 case class Drop(
     role: Role,
-    pos: Pos,
+    pos: Pos
 ) extends San:
 
   def apply(situation: Situation) = drop(situation)
 
   def drop(situation: Situation): Validated[ErrorStr, chess.Drop] =
     situation.drop(role, pos)
+
+case class Castle(side: Side) extends San:
+
+  def apply(situation: Situation) = move(situation)
+
+  def move(situation: Situation): Validated[ErrorStr, chess.Move] =
+    import situation.{ genCastling, ourKing, variant }
+    ourKing.flatMap(k =>
+      variant
+        .applyVariantEffect(genCastling(k))
+        .filter(variant.kingSafety)
+        .find(_.castle.exists(_.side == side))
+    ) toValid ErrorStr(s"Cannot castle / variant is $variant")
+
+opaque type Sans = List[San]
+object Sans extends TotalWrapper[Sans, List[San]]
 
 opaque type Comment = String
 object Comment extends TotalWrapper[Comment, String]:
@@ -62,7 +81,7 @@ case class Metas(
     check: Boolean,
     checkmate: Boolean,
     comments: List[Comment],
-    glyphs: Glyphs,
+    glyphs: Glyphs
 ):
 
   def withSuffixes(s: Suffixes) =
@@ -78,19 +97,6 @@ case class Metas(
 
 object Metas:
   val empty = Metas(check = false, checkmate = false, Nil, Glyphs.empty)
-
-case class Castle( side: Side) extends San:
-
-  def apply(situation: Situation) = move(situation)
-
-  def move(situation: Situation): Validated[ErrorStr, chess.Move] =
-    import situation.{ genCastling, ourKing, variant }
-    ourKing.flatMap(k =>
-      variant
-        .applyVariantEffect(genCastling(k))
-        .filter(variant.kingSafety)
-        .find(_.castle.exists(_.side == side))
-    ) toValid ErrorStr(s"Cannot castle / variant is $variant")
 
 case class Suffixes(
     check: Boolean,

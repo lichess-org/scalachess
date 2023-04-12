@@ -18,7 +18,7 @@ class ParserTest extends ChessTest:
 
   extension (tree: Option[PgnNode[PgnNodeData]]) def head = tree.get.mainLine.head
 
-  extension (parsed: NewParsedPgn) def metas = parsed.tree.get.move.metas
+  extension (parsed: ParsedPgn) def metas = parsed.tree.get.move.metas
 
   "bom header" should:
     "be ignored" in:
@@ -46,7 +46,7 @@ class ParserTest extends ChessTest:
         }
 
     "as a rook" in:
-      parse("b8=R ") must beValid { (parsed: NewParsedPgn) =>
+      parse("b8=R ") must beValid { (parsed: ParsedPgn) =>
         parsed.mainLine.headOption must beSome { (san: San) =>
           san.asInstanceOf[Std].promotion must_== Option(Rook)
         }

@@ -18,7 +18,7 @@ object Parser:
   // pgnComment with % or whitespaces
   val escape = pgnComment.? *> whitespace.rep0.?
 
-  def full(pgn: PgnStr): Validated[ErrorStr, NewParsedPgn] =
+  def full(pgn: PgnStr): Validated[ErrorStr, ParsedPgn] =
     pgnParser.parse(pgn.value) match
       case Right((_, parsedResult)) =>
         valid(parsedResult)
@@ -266,20 +266,20 @@ object Parser:
     val tag: P[Tag]                = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
     val tags: P[NonEmptyList[Tag]] = tag.rep
 
-  private val tagsAndMovesParser: P0[NewParsedPgn] =
+  private val tagsAndMovesParser: P0[ParsedPgn] =
     (TagParser.tags.?.surroundedBy(escape) ~ MovesParser.strMoves.?).map:
       case (optionalTags, optionalMoves) => {
         val preTags = Tags(optionalTags.map(_.toList).getOrElse(Nil))
         optionalMoves match
-          case None => NewParsedPgn(InitialPosition(Nil), preTags, None)
+          case None => ParsedPgn(InitialPosition(Nil), preTags, None)
           case Some((init, tree, resultOption)) => {
             val tags =
               resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
-            NewParsedPgn(init, tags, tree)
+            ParsedPgn(init, tags, tree)
           }
       }
 
-  private val pgnParser: P0[NewParsedPgn] =
+  private val pgnParser: P0[ParsedPgn] =
     P.string("\uFEFF").? *> escape *> P.string("[pgn]").? *> tagsAndMovesParser <* P
       .string("[/pgn]")
       .? <* escape

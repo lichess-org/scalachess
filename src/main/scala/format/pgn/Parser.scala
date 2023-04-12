@@ -149,8 +149,7 @@ object Parser:
                   suffixes.check,
                   suffixes.checkmate,
                   comments,
-                  suffixes.glyphs merge glyphs merge glyphs2,
-                  Nil
+                  suffixes.glyphs merge glyphs merge glyphs2
                 )
               val s = san match
                 case x: Std => x.copy(promotion = suffixes.promotion)

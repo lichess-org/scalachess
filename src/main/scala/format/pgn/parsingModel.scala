@@ -7,27 +7,10 @@ import cats.syntax.option.*
 opaque type Sans = List[San]
 object Sans extends TotalWrapper[Sans, List[San]]
 
-case class ParsedPgn(initialPosition: InitialPosition, tags: Tags, sans: Sans)
-
 // Standard Algebraic Notation
 sealed trait San:
 
   def apply(situation: Situation): Validated[ErrorStr, MoveOrDrop]
-
-  def metas: Metas
-
-  def withMetas(m: Metas): San
-
-  def withSuffixes(s: Suffixes): San = withMetas(metas withSuffixes s)
-
-  def withComments(s: List[Comment]): San = withMetas(metas withComments s)
-
-  def withVariations(v: List[Variation]): San = withMetas(metas withVariations v)
-
-  def mergeGlyphs(glyphs: Glyphs): San =
-    withMetas(
-      metas.withGlyphs(metas.glyphs merge glyphs)
-    )
 
 case class Std(
     dest: Pos,
@@ -36,18 +19,9 @@ case class Std(
     file: Option[File] = None,
     rank: Option[Rank] = None,
     promotion: Option[PromotableRole] = None,
-    metas: Metas = Metas.empty
 ) extends San:
 
   def apply(situation: Situation) = move(situation)
-
-  override def withSuffixes(s: Suffixes) =
-    copy(
-      metas = metas withSuffixes s,
-      promotion = s.promotion
-    )
-
-  def withMetas(m: Metas) = copy(metas = m)
 
   def move(situation: Situation): Validated[ErrorStr, chess.Move] =
     val pieces = situation.board.byPiece(situation.color - role)
@@ -67,12 +41,9 @@ case class Std(
 case class Drop(
     role: Role,
     pos: Pos,
-    metas: Metas = Metas.empty
 ) extends San:
 
   def apply(situation: Situation) = drop(situation)
-
-  def withMetas(m: Metas) = copy(metas = m)
 
   def drop(situation: Situation): Validated[ErrorStr, chess.Drop] =
     situation.drop(role, pos)
@@ -87,17 +58,11 @@ opaque type InitialPosition = List[Comment]
 object InitialPosition extends TotalWrapper[InitialPosition, List[Comment]]:
   extension (ip: InitialPosition) inline def comments: List[Comment] = ip
 
-// could be factored as `PgnNode` and used directly in `ParsedPgn` too
-// not done for the moment for backward compat
-// see `GameNode` in python-chess
-case class Variation(comments: List[Comment], sans: Sans)
-
 case class Metas(
     check: Boolean,
     checkmate: Boolean,
     comments: List[Comment],
     glyphs: Glyphs,
-    variations: List[Variation]
 ):
 
   def withSuffixes(s: Suffixes) =
@@ -111,19 +76,12 @@ case class Metas(
 
   def withComments(c: List[Comment]) = copy(comments = c)
 
-  def withVariations(v: List[Variation]) = copy(variations = v)
-
 object Metas:
-  val empty = Metas(check = false, checkmate = false, Nil, Glyphs.empty, Nil)
+  val empty = Metas(check = false, checkmate = false, Nil, Glyphs.empty)
 
-case class Castle(
-    side: Side,
-    metas: Metas = Metas.empty
-) extends San:
+case class Castle( side: Side) extends San:
 
   def apply(situation: Situation) = move(situation)
-
-  def withMetas(m: Metas) = copy(metas = m)
 
   def move(situation: Situation): Validated[ErrorStr, chess.Move] =
     import situation.{ genCastling, ourKing, variant }

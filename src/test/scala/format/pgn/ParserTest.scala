@@ -14,7 +14,7 @@ class ParserTest extends ChessTest:
 
   val parse = Parser.full
 
-  def parseMove(s: String) = Parser.move1(s)
+  def parseMove(s: String) = Parser.move(s)
 
   extension (tree: Option[PgnNode[PgnNodeData]]) def head = tree.get.mainLine.head
 
@@ -214,33 +214,28 @@ class ParserTest extends ChessTest:
     }
 
   "block comment in variation root" in:
-    parse(rootCommentInVariation) must beValid.like { case a =>
-      a.tree.head.metas.variations.head.comments must_==
-        List("This move:")
-    }
+    parse(rootCommentInVariation) must beValid.like: parsed =>
+      parsed.tree.get.variations.head.move.variationComments must_==
+        Some(List("This move:"))
 
   "inline comment in variation root" in:
-    parse(rootCommentInVariation) must beValid.like { case a =>
-      a.tree.head.metas.variations.tail.head.comments must_==
-        List("Neither does :")
-    }
+    parse(rootCommentInVariation) must beValid.like: parsed =>
+      parsed.tree.get.variations.tail.head.move.variationComments must_==
+        Some(List("Neither does :"))
 
   "block comments in variation root" in:
-    parse(multipleRootCommentsInVariation) must beValid.like { case a =>
-      a.tree.head.metas.variations.head.comments must_==
-        List("This move:", "looks pretty")
-    }
+    parse(multipleRootCommentsInVariation) must beValid.like: parsed =>
+      parsed.tree.get.variations.head.move.variationComments must_==
+        Some(List("This move:", "looks pretty"))
 
   "multiple comments in variation root" in:
-    parse(multipleRootCommentsInVariation) must beValid.like { case a =>
-      a.tree.head.metas.variations.tail.head.comments must_==
-        List("Neither does :", "this or that", "or whatever")
-    }
+    parse(multipleRootCommentsInVariation) must beValid.like: parsed =>
+      parsed.tree.get.variations.tail.head.move.variationComments must_==
+        Some(List("Neither does :", "this or that", "or whatever"))
 
   "comments and variations" in:
-    parse(commentsAndVariations) must beValid.like { case a =>
-      a.mainLine.size must_== 103
-    }
+    parse(commentsAndVariations) must beValid.like: parsed =>
+      parsed.mainLine.size must_== 103
 
   "comments and lines by smartchess" in:
     parse(bySmartChess) must beValid.like { case a =>

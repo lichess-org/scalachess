@@ -120,11 +120,7 @@ object Parser:
       val variation = (P.char('(').endWith(P.char(')'))).void
       ((number.backtrack | commentary).rep0 ~ forbidNullMove).with1 *>
         (((MoveParser.moveWithSuffix <* (nagGlyphs.void ~ commentary.rep0.void ~ nagGlyphs.void ~ variation.rep0.void)) <* moveExtras.rep0) <* escape).backtrack
-          .map { case (san, suffixes) =>
-            san match
-              case x: Std => x.copy(promotion = suffixes.promotion)
-              case _      => san
-          }
+          .map((san, suffixes) => san)
     }
 
     val strMove: P[ParsedPgnTree] = P
@@ -151,11 +147,7 @@ object Parser:
                   comments,
                   suffixes.glyphs merge glyphs merge glyphs2
                 )
-              val s = san match
-                case x: Std => x.copy(promotion = suffixes.promotion)
-                case _      => san
-
-              val data = PgnNodeData(s, metas, None)
+              val data = PgnNodeData(san, metas, None)
               PgnNode(data, None, variations.flatten)
             }
       }
@@ -212,12 +204,26 @@ object Parser:
     val promotion: P[PromotableRole] = P.char('=').?.with1 *> mapParserChar(promotable, "promotion")
 
     // e5 or e5
-    val pawn: P[Std] = dest.map(Std(_, Pawn))
+    val stdPawn: P[Std] = dest.map(Std(_, Pawn))
 
     // Bg5
     val ambigous: P[Std] = (role ~ x ~ dest).map { case ((ro, ca), de) =>
       Std(dest = de, role = ro, capture = ca)
     }
+
+    // optional e.p.
+    val optionalEnPassant = (R.wsp.rep0.soft ~ P.string("e.p.")).void.?
+
+    // d7d5 d7xd5
+    val disambiguatedPawn: P[Std] = (((file.? ~ rank.?) ~ x).with1 ~ dest <* optionalEnPassant).map:
+      case (((fi, ra), ca), de) =>
+        Std(dest = de, role = Pawn, capture = ca, file = File from fi, rank = Rank from ra)
+
+    // only pawn can promote
+    val pawn: P[Std] =
+      ((disambiguatedPawn.backtrack | stdPawn) ~ promotion.?).map((pawn, promo) =>
+        pawn.copy(promotion = promo)
+      )
 
     // B@g5
     val drop: P[Drop] = ((role <* P.char('@')) ~ dest).map((role, pos) => Drop(role, pos))
@@ -229,23 +235,14 @@ object Parser:
       Std(dest = de, role = ro, capture = ca, file = File from fi, rank = Rank from ra)
     }
 
-    // optional e.p.
-    val optionalEnPassant = (R.wsp.rep0.soft ~ P.string("e.p.")).void.?
-
-    // d7d5 d7xd5
-    val disambiguatedPawn: P[Std] = (((file.? ~ rank.?) ~ x).with1 ~ dest <* optionalEnPassant).map:
-      case (((fi, ra), ca), de) =>
-        Std(dest = de, role = Pawn, capture = ca, file = File from fi, rank = Rank from ra)
-
-    val suffixes: P0[Suffixes] = (promotion.? ~ checkmate ~ check ~ glyphs).map { case (((p, cm), c), g) =>
-      Suffixes(c, cm, p, g)
+    val suffixes: P0[Suffixes] = (checkmate ~ check ~ glyphs).map { case ((cm, c), g) =>
+      Suffixes(c, cm, g)
     }
 
     val castle: P[San] = (qCastle | kCastle).map(Castle(_))
 
-    val standard: P[San] = P.oneOf(
-      (disambiguatedPawn :: pawn :: disambiguated :: ambigous :: drop :: pawnDrop :: Nil).map(_.backtrack)
-    )
+    val standard: P[San] =
+      P.oneOf((pawn :: disambiguated :: ambigous :: drop :: pawnDrop :: Nil).map(_.backtrack))
 
     val move: P[San]                       = (castle | standard).withContext("Invalid chess move")
     val moveWithSuffix: P[(San, Suffixes)] = move ~ suffixes <* escape

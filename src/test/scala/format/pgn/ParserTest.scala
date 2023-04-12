@@ -95,7 +95,7 @@ class ParserTest extends ChessTest:
     parseMove("b8=B ") must beValid.like: node =>
       node.move.san === Std(Pos.B8, Pawn, promotion = Option(Bishop))
 
-    parseMove("e4") must beValid.like: node =>
+    parseMove("1. e4") must beValid.like: node =>
       node.move.san must_== Std(Pos.E4, Pawn)
 
     parseMove("e4") must beValid.like: node =>

@@ -101,6 +101,5 @@ object Metas:
 case class Suffixes(
     check: Boolean,
     checkmate: Boolean,
-    promotion: Option[PromotableRole],
     glyphs: Glyphs
 )

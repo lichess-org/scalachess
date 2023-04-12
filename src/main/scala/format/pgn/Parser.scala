@@ -276,6 +276,12 @@ object Parser:
           }
       }
 
+  case class Suffixes(
+      check: Boolean,
+      checkmate: Boolean,
+      glyphs: Glyphs
+  )
+
   private val pgnParser: P0[ParsedPgn] =
     P.string("\uFEFF").? *> escape *> P.string("[pgn]").? *> tagsAndMovesParser <* P
       .string("[/pgn]")

@@ -84,22 +84,9 @@ case class Metas(
     glyphs: Glyphs
 ):
 
-  def withSuffixes(s: Suffixes) =
-    copy(
-      check = s.check,
-      checkmate = s.checkmate,
-      glyphs = s.glyphs
-    )
-
   def withGlyphs(g: Glyphs) = copy(glyphs = g)
 
   def withComments(c: List[Comment]) = copy(comments = c)
 
 object Metas:
   val empty = Metas(check = false, checkmate = false, Nil, Glyphs.empty)
-
-case class Suffixes(
-    check: Boolean,
-    checkmate: Boolean,
-    glyphs: Glyphs
-)

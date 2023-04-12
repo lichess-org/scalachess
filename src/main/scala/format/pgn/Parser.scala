@@ -109,10 +109,13 @@ object Parser:
   extension (p: P0[Any])
     private def endWith(p1: P[Any]): P[String] = p.with1 *> (p1.string | (P.until(p1) <* p1))
 
+  private val preMoveEscape  = ((number.backtrack | commentary).rep0 ~ forbidNullMove).void
+  private val moveAndMetas   = MoveParser.move ~ MoveParser.metas
+  private val postMoveEscape = moveExtras.rep0.void <* escape
+
   val sanOnly: P[San] =
     val variation = (P.char('(').endWith(P.char(')'))).void
-    ((number.backtrack | commentary).rep0 ~ forbidNullMove).with1 *>
-      MoveParser.move <* (MoveParser.metas(variation.rep0))
+    preMoveEscape.with1 *> MoveParser.move <* (MoveParser.metas.void ~ variation.rep0.void ~ postMoveEscape.void)
 
   val strMove: P[ParsedPgnTree] = P
     .recursive[ParsedPgnTree] { recuse =>
@@ -128,14 +131,10 @@ object Parser:
                 Some(x.copy(child = child, move = x.move.copy(variationComments = comments.some)))
           )
 
-      ((number.backtrack | commentary).rep0 ~ forbidNullMove).with1 *>
-        ((((MoveParser.move ~ ((MoveParser.checkmate ~ MoveParser.check ~ MoveParser.glyphs) <* escape) ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation.rep0) <* moveExtras.rep0.void <* escape) <* moveExtras.rep0) <* escape)
-          .map { case (((((san, ((checkmate, check), glyphs1)), glyphs2), comments), glyphs3), variations) =>
-            val glyphs = glyphs1 merge glyphs2 merge glyphs3
-            val metas  = Metas(check, checkmate, comments, glyphs)
-            val data   = PgnNodeData(san, metas, None)
-            PgnNode(data, None, variations.flatten)
-          }
+      preMoveEscape.with1 *> ((moveAndMetas ~ variation.rep0) <* postMoveEscape).map:
+        case ((san, metas), variations) =>
+          val data = PgnNodeData(san, metas, None)
+          PgnNode(data, None, variations.flatten)
     }
 
   val strMoves: P0[(InitialPosition, Option[ParsedPgnTree], Option[String])] =
@@ -158,15 +157,7 @@ object Parser:
 
     val kCastle: P[Side] = P.stringIn(castleKSide).as(KingSide)
 
-    val glyph: P[Glyph] = mapParser(
-      Glyph.MoveAssessment.all
-        .sortBy(_.symbol.length)
-        .map { g =>
-          g.symbol -> g
-        }
-        .toMap,
-      "glyph"
-    )
+    val glyph: P[Glyph] = mapParser(Glyph.MoveAssessment.all.mapBy(_.symbol), "glyph")
 
     val glyphs = glyph.rep0.map(Glyphs.fromList)
 
@@ -220,12 +211,11 @@ object Parser:
       Std(dest = de, role = ro, capture = ca, file = File from fi, rank = Rank from ra)
     }
 
-    def metas[A](variation: P0[A]): P0[(Metas, A)] =
-      ((((checkmate ~ check ~ glyphs) <* escape) ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs ~ variation) <* moveExtras.rep0.void <* escape)
-        .map { case ((((((checkmate, check), glyphs1), glyphs2), comments), glyphs3), variation) =>
+    val metas: P0[Metas] =
+      (((checkmate ~ check ~ glyphs) <* escape) ~ nagGlyphs ~ commentary.rep0 ~ nagGlyphs)
+        .map { case (((((checkmate, check), glyphs1), glyphs2), comments), glyphs3) =>
           val glyphs = glyphs1 merge glyphs2 merge glyphs3
-          val metas  = Metas(check, checkmate, comments, glyphs)
-          (metas, variation)
+          Metas(check, checkmate, comments, glyphs)
         }
 
     val castle: P[San] = (qCastle | kCastle).map(Castle(_))

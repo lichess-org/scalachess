@@ -13,7 +13,7 @@ import ornicar.scalalib.zeros.given
 trait FenWriter:
 
   private given Ordering[File] = intOrdering[File]
-  given Ordering[Square]          = Ordering.by[Square, File](_.file)
+  given Ordering[Square]       = Ordering.by[Square, File](_.file)
 
   def write(situation: Situation): EpdFen = write(Situation.AndFullMoveNumber(situation, FullMoveNumber(1)))
 

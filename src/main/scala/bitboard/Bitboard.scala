@@ -33,8 +33,8 @@ object Bitboard extends OpaqueBitboard[Bitboard]:
   // Large overlapping attack table indexed using magic multiplication.
   private[bitboard] val ATTACKS = Array.fill(88772)(0L)
 
-  inline def rank(inline r: Rank): Bitboard                  = RANKS(r.value)
-  inline def file(inline f: File): Bitboard                  = FILES(f.value)
+  inline def rank(inline r: Rank): Bitboard                        = RANKS(r.value)
+  inline def file(inline f: File): Bitboard                        = FILES(f.value)
   inline def ray(inline from: Square, inline to: Square): Bitboard = RAYS(from.value)(to.value)
 
   /** Slow attack set generation. Used only to bootstrap the attack tables.

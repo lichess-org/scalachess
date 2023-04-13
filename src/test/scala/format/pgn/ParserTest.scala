@@ -16,9 +16,9 @@ class ParserTest extends ChessTest:
 
   def parseMove(s: String) = Parser.move(s)
 
-  extension (tree: Option[PgnNode[PgnNodeData]]) def head = tree.get.mainLine.head
+  extension (tree: Option[Node[PgnNodeData]]) def head = tree.get.mainLine.head
 
-  extension (parsed: ParsedPgn) def metas = parsed.tree.get.move.metas
+  extension (parsed: ParsedPgn) def metas = parsed.tree.get.value.metas
 
   "bom header" should:
     "be ignored" in:
@@ -100,26 +100,26 @@ class ParserTest extends ChessTest:
   "glyphs" in:
 
     parseMove("b8=B ") must beValid.like: node =>
-      node.move.san === Std(Square.B8, Pawn, promotion = Option(Bishop))
+      node.value.san === Std(Square.B8, Pawn, promotion = Option(Bishop))
 
     parseMove("1. e4") must beValid.like: node =>
-      node.move.san must_== Std(Square.E4, Pawn)
+      node.value.san must_== Std(Square.E4, Pawn)
 
     parseMove("e4") must beValid.like: node =>
-      node.move.san must_== Std(Square.E4, Pawn)
+      node.value.san must_== Std(Square.E4, Pawn)
 
     parseMove("e4!") must beValid.like: node =>
-      node.move.san === Std(Square.E4, Pawn)
-      node.move.metas.glyphs === Glyphs(Glyph.MoveAssessment.good.some, None, Nil)
+      node.value.san === Std(Square.E4, Pawn)
+      node.value.metas.glyphs === Glyphs(Glyph.MoveAssessment.good.some, None, Nil)
 
     // TODO parsed result is off by one
     parseMove("Ne7g6+?!") must beValid.like: node =>
-      node.move.san === Std(Square.G6, Knight, false, Some(File.F), Some(Rank.Eighth))
-      node.move.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
+      node.value.san === Std(Square.G6, Knight, false, Some(File.F), Some(Rank.Eighth))
+      node.value.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
 
     parseMove("P@e4?!") must beValid.like: node =>
-      node.move.san === Drop(Pawn, Square.E4)
-      node.move.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
+      node.value.san === Drop(Pawn, Square.E4)
+      node.value.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
 
   "nags" in:
     parse(withNag) must beValid
@@ -222,22 +222,22 @@ class ParserTest extends ChessTest:
 
   "block comment in variation root" in:
     parse(rootCommentInVariation) must beValid.like: parsed =>
-      parsed.tree.get.variations.head.move.variationComments must_==
+      parsed.tree.get.variations.head.value.variationComments must_==
         Some(List("This move:"))
 
   "inline comment in variation root" in:
     parse(rootCommentInVariation) must beValid.like: parsed =>
-      parsed.tree.get.variations.tail.head.move.variationComments must_==
+      parsed.tree.get.variations.tail.head.value.variationComments must_==
         Some(List("Neither does :"))
 
   "block comments in variation root" in:
     parse(multipleRootCommentsInVariation) must beValid.like: parsed =>
-      parsed.tree.get.variations.head.move.variationComments must_==
+      parsed.tree.get.variations.head.value.variationComments must_==
         Some(List("This move:", "looks pretty"))
 
   "multiple comments in variation root" in:
     parse(multipleRootCommentsInVariation) must beValid.like: parsed =>
-      parsed.tree.get.variations.tail.head.move.variationComments must_==
+      parsed.tree.get.variations.tail.head.value.variationComments must_==
         Some(List("Neither does :", "this or that", "or whatever"))
 
   "comments and variations" in:

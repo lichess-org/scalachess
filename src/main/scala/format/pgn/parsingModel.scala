@@ -5,7 +5,7 @@ import cats.data.Validated
 import cats.syntax.option.*
 
 case class PgnNodeData(san: San, metas: Metas, variationComments: Option[List[Comment]])
-type ParsedPgnTree = PgnNode[PgnNodeData]
+type ParsedPgnTree = Node[PgnNodeData]
 
 case class ParsedPgn(initialPosition: InitialPosition, tags: Tags, tree: Option[ParsedPgnTree]):
   def mainLine = tree.fold(List.empty[San])(_.mainLine.map(_.san))

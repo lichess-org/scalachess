@@ -21,7 +21,7 @@ object Reader:
     movesWithSans(sans, identity, tags)
 
   def fullWithSans(pgn: PgnStr, op: Sans => Sans, tags: Tags = Tags.empty): Validated[ErrorStr, Result] =
-    Parser.full(pgn.map(cleanUserInput)) map { parsed =>
+    Parser.full(pgn) map { parsed =>
       makeReplay(makeGame(parsed.tags ++ tags), op(Sans(parsed.mainLine)))
     }
 
@@ -32,9 +32,6 @@ object Reader:
     Parser.moves(sans) map { moves =>
       makeReplay(makeGame(tags), op(moves))
     }
-
-  // remove invisible byte order mark
-  private def cleanUserInput(str: String) = str.replace(s"\ufeff", "")
 
   private def makeReplay(game: Game, sans: Sans): Result =
     sans.value.foldLeft[Result](Result.Complete(Replay(game))):

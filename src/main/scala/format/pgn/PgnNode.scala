@@ -7,11 +7,6 @@ import cats.derived.*
 import cats.Functor
 import cats.Traverse
 
-// other idea?
-enum Tree[+A] derives Functor, Traverse:
-  case Node(move: A, child: Tree[A], variations: List[Tree[A]])
-  case Empty
-
 // question: what if a variation without moves?
 // answer: it's possible but we need to support null move first
 case class PgnNode[A](

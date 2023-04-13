@@ -23,14 +23,21 @@ class ParserTest extends ChessTest:
   "bom header" should:
     "be ignored" in:
       "with tags" in:
-        parse("\uFEFF[Event \"Some event\"]\n1. e4 e5") must beValid.like { case parsed =>
+        parse("\uFEFF[Event \"Some event\"]\n1. e4 e5") must beValid.like: parsed =>
           parsed.tags(_.Event) must_== Some("Some event")
           parsed.mainLine.size must_== 2
-        }
+
       "without tags" in:
-        parse("\uFEFF1. e4 e5 3. Nf3") must beValid.like { case parsed =>
+        parse("\uFEFF1. e4 e5 3. Nf3") must beValid.like: parsed =>
           parsed.mainLine.size must_== 3
-        }
+
+      "lowercase" in:
+        parse("\ufeff1. e4 e5 3. Nf3") must beValid.like: parsed =>
+          parsed.mainLine.size must_== 3
+
+      "in the middle of the string" in:
+        parse("\ufeff1. e4 \ufeff e5 3. Nf3") must beValid.like: parsed =>
+          parsed.mainLine.size must_== 3
 
   "pgnComment" should:
     "parse valid comment" in:

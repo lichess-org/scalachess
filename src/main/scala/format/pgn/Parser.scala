@@ -13,7 +13,7 @@ object Parser:
 
   // https://unicode-explorer.com/c/00A0
   val nbsp       = P.char('\u00A0')
-  val whitespace = R.cr | R.lf | R.wsp | nbsp
+  val whitespace = R.cr | R.lf | R.wsp | nbsp | P.char('\uFEFF')
   val pgnComment = P.caret.filter(_.col == 0) *> P.char('%') *> P.until(P.char('\n')).void
   // pgnComment with % or whitespaces
   val escape = pgnComment.? *> whitespace.rep0.?
@@ -241,7 +241,7 @@ object Parser:
             ParsedPgn(init, tags, tree)
 
   private val pgnParser: P0[ParsedPgn] =
-    P.string("\uFEFF").? *> escape *> P.string("[pgn]").? *> tagsAndMovesParser <* P
+    escape *> P.string("[pgn]").? *> tagsAndMovesParser <* P
       .string("[/pgn]")
       .? <* escape
 

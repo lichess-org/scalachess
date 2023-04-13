@@ -20,15 +20,15 @@ case class Board(
   val queens  = byRole.queen
   val kings   = byRole.king
 
-  def sliders                     = bishops ^ rooks ^ queens
-  def isOccupied(s: Pos): Boolean = occupied.contains(s)
+  def sliders                        = bishops ^ rooks ^ queens
+  def isOccupied(s: Square): Boolean = occupied.contains(s)
 
   lazy val nbPieces = occupied.count
 
   def byPiece(piece: Piece): Bitboard =
     byColor(piece.color) & byRole(piece.role)
 
-  def roleAt(s: Pos): Option[Role] =
+  def roleAt(s: Square): Option[Role] =
     if pawns.contains(s) then Some(Pawn)
     else if knights.contains(s) then Some(Knight)
     else if bishops.contains(s) then Some(Bishop)
@@ -37,36 +37,36 @@ case class Board(
     else if kings.contains(s) then Some(King)
     else None
 
-  def colorAt(s: Pos): Option[Color] =
+  def colorAt(s: Square): Option[Color] =
     if white.contains(s) then Some(Color.White)
     else if black.contains(s) then Some(Color.Black)
     else None
 
-  def pieceAt(s: Pos): Option[Piece] =
+  def pieceAt(s: Square): Option[Piece] =
     for
       color <- colorAt(s)
       role  <- roleAt(s)
     yield Piece(color, role)
 
-  def whiteAt(s: Pos): Boolean =
+  def whiteAt(s: Square): Boolean =
     white.contains(s)
 
-  def blackAt(s: Pos): Boolean =
+  def blackAt(s: Square): Boolean =
     black.contains(s)
 
-  def kings(color: Color): List[Pos] =
+  def kings(color: Color): List[Square] =
     (kings & byColor(color)).squares
 
-  def kingOf(c: Color): Bitboard       = kings & byColor(c)
-  def kingPosOf(c: Color): Option[Pos] = kingOf(c).singleSquare
+  def kingOf(c: Color): Bitboard          = kings & byColor(c)
+  def kingPosOf(c: Color): Option[Square] = kingOf(c).singleSquare
 
-  def attackers(s: Pos, attacker: Color): Bitboard =
+  def attackers(s: Square, attacker: Color): Bitboard =
     attackers(s, attacker, occupied)
 
-  def attacks(s: Pos, attacker: Color): Boolean =
+  def attacks(s: Square, attacker: Color): Boolean =
     attackers(s, attacker).nonEmpty
 
-  def attackers(s: Pos, attacker: Color, occupied: Bitboard): Bitboard =
+  def attackers(s: Square, attacker: Color, occupied: Bitboard): Bitboard =
     byColor(attacker) & (
       s.rookAttacks(occupied) & (rooks ^ queens) |
         s.bishopAttacks(occupied) & (bishops ^ queens) |
@@ -85,7 +85,7 @@ case class Board(
     *
     * This is being used when checking a move is safe for the king or not
     */
-  def sliderBlockers(ourKing: Pos, us: Color): Bitboard =
+  def sliderBlockers(ourKing: Square, us: Color): Bitboard =
     val snipers = byColor(!us) & (
       ourKing.rookAttacks(Bitboard.empty) & (rooks ^ queens) |
         ourKing.bishopAttacks(Bitboard.empty) & (bishops ^ queens)
@@ -96,7 +96,7 @@ case class Board(
       else blockers | between
     }
 
-  def discard(s: Pos): Board =
+  def discard(s: Square): Board =
     discard(s.bb)
 
   def discard(mask: Bitboard): Board =
@@ -111,15 +111,15 @@ case class Board(
   def byRoleOf(color: Color): ByRole[Bitboard] = byRole.map(_ & byColor(color))
 
   // put a piece to an empty square
-  def put(piece: Piece, at: Pos): Option[Board] =
+  def put(piece: Piece, at: Square): Option[Board] =
     !isOccupied(at) option putOrReplace(piece, at)
 
   // put a piece to an occupied square
-  def replace(piece: Piece, at: Pos): Option[Board] =
+  def replace(piece: Piece, at: Square): Option[Board] =
     isOccupied(at) option putOrReplace(piece, at)
 
   // put a piece into the board
-  def putOrReplace(s: Pos, role: Role, color: Color): Board =
+  def putOrReplace(s: Square, role: Role, color: Color): Board =
     val b = discard(s)
     val m = s.bb
     Board(
@@ -130,35 +130,35 @@ case class Board(
 
   // put a piece into the board
   // remove the existing piece at that square if needed
-  def putOrReplace(p: Piece, s: Pos): Board =
+  def putOrReplace(p: Piece, s: Square): Board =
     putOrReplace(s, p.role, p.color)
 
-  def take(at: Pos): Option[Board] =
+  def take(at: Square): Option[Board] =
     isOccupied(at) option discard(at)
 
   // move without capture
-  def move(orig: Pos, dest: Pos): Option[Board] =
+  def move(orig: Square, dest: Square): Option[Board] =
     if isOccupied(dest) then None
     else pieceAt(orig).map(discard(orig).putOrReplace(_, dest))
 
-  def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] =
+  def taking(orig: Square, dest: Square, taking: Option[Square] = None): Option[Board] =
     for
       piece <- pieceAt(orig)
-      takenPos = taking getOrElse dest
-      if isOccupied(takenPos)
-    yield discard(orig).discard(takenPos).putOrReplace(piece, dest)
+      takenSquare = taking getOrElse dest
+      if isOccupied(takenSquare)
+    yield discard(orig).discard(takenSquare).putOrReplace(piece, dest)
 
-  def promote(orig: Pos, dest: Pos, piece: Piece): Option[Board] =
+  def promote(orig: Square, dest: Square, piece: Piece): Option[Board] =
     take(orig).map(_.putOrReplace(piece, dest))
 
   inline def isOccupied(inline p: Piece) =
     piece(p).nonEmpty
 
   // TODO remove unsafe get
-  lazy val pieceMap: Map[Pos, Piece] =
+  lazy val pieceMap: Map[Square, Piece] =
     occupied.squares.view.map(s => (s, pieceAt(s).get)).toMap
 
-  def piecesOf(c: Color): Map[Pos, Piece] =
+  def piecesOf(c: Color): Map[Square, Piece] =
     pieceMap.filter((_, p) => p.color == c)
 
   def pieces: List[Piece] = pieces(occupied)

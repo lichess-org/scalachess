@@ -8,13 +8,13 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
   protected val ALL: A     = -1L.bb
   protected val CORNERS: A = 0x8100000000000081L.bb
 
-  inline def apply(inline xs: Iterable[Pos]): A = xs.foldLeft(empty)((b, p) => b | p.bb)
+  inline def apply(inline xs: Iterable[Square]): A = xs.foldLeft(empty)((b, p) => b | p.bb)
 
   extension (l: Long)
-    def bb: A                    = l.asInstanceOf[A]
-    private def lsb: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(l))
+    def bb: A                       = l.asInstanceOf[A]
+    private def lsb: Option[Square] = Square.at(java.lang.Long.numberOfTrailingZeros(l))
 
-  extension (s: Pos) inline def bb: A = (1L << s.value).bb
+  extension (s: Square) inline def bb: A = (1L << s.value).bb
 
   extension (a: A)
     inline def unary_~ : A                                                = (~a.value).bb
@@ -29,28 +29,28 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
     inline infix def <<[B](inline o: B)(using sr: BitboardRuntime[B]): A  = a << sr(o)
     inline infix def >>>[B](inline o: B)(using sr: BitboardRuntime[B]): A = a >>> sr(o)
 
-    def contains(pos: Pos): Boolean =
-      (a.value & (1L << pos.value)) != 0L
+    def contains(square: Square): Boolean =
+      (a.value & (1L << square.value)) != 0L
 
-    def addSquare(pos: Pos): A    = a | pos.bb
-    def removeSquare(pos: Pos): A = a & ~pos.bb
+    def addSquare(square: Square): A    = a | square.bb
+    def removeSquare(square: Square): A = a & ~square.bb
 
     def moreThanOne: Boolean =
       (a.value & (a.value - 1L)) != 0L
 
     // Gets the only square in the set, if there is exactly one.
-    def singleSquare: Option[Pos] =
+    def singleSquare: Option[Square] =
       if moreThanOne then None
       else first
 
-    def squares: List[Pos] =
-      fold(List.empty)((xs, pos) => pos :: xs)
+    def squares: List[Square] =
+      fold(List.empty)((xs, square) => square :: xs)
 
     // total non empty position
     def count: Int = java.lang.Long.bitCount(a)
 
     // the first non empty position
-    def first: Option[Pos] = Pos.at(java.lang.Long.numberOfTrailingZeros(a))
+    def first: Option[Square] = Square.at(java.lang.Long.numberOfTrailingZeros(a))
 
     // remove the first non empty position
     def removeFirst: A = (a.value & (a.value - 1L)).bb
@@ -67,7 +67,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
     def isDisjoint[B](o: B)(using sr: BitboardRuntime[B]): Boolean =
       (a & sr(o)).isEmpty
 
-    def first[B](f: Pos => Option[B]): Option[B] =
+    def first[B](f: Square => Option[B]): Option[B] =
       var b                 = a.value
       var result: Option[B] = None
       while b != 0L && result.isEmpty
@@ -76,7 +76,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
         b &= (b - 1L)
       result
 
-    def fold[B](init: B)(f: (B, Pos) => B): B =
+    def fold[B](init: B)(f: (B, Square) => B): B =
       var b      = a.value
       var result = init
       while b != 0L
@@ -85,7 +85,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
         b &= (b - 1L)
       result
 
-    def flatMap[B](f: Pos => IterableOnce[B]): List[B] =
+    def flatMap[B](f: Square => IterableOnce[B]): List[B] =
       var b       = a.value
       val builder = List.newBuilder[B]
       while b != 0L

@@ -19,7 +19,7 @@ abstract class Variant private[variant] (
     val standardInitialPosition: Boolean
 ):
 
-  def pieces: Map[Pos, Piece]
+  def pieces: Map[Square, Piece]
 
   inline def standard      = this == Standard
   inline def chess960      = this == Chess960
@@ -50,7 +50,7 @@ abstract class Variant private[variant] (
 
   def validMoves(situation: Situation): List[Move]
 
-  def pieceThreatened(board: Board, by: Color, to: Pos): Boolean =
+  def pieceThreatened(board: Board, by: Color, to: Square): Boolean =
     board.board.attacks(to, by)
 
   def kingThreatened(board: Board, color: Color): Check =
@@ -59,17 +59,17 @@ abstract class Variant private[variant] (
   def kingSafety(m: Move): Boolean =
     kingThreatened(m.after, m.color).no
 
-  def castleCheckSafeSquare(board: Board, kingTo: Pos, color: Color, occupied: Bitboard): Boolean =
+  def castleCheckSafeSquare(board: Board, kingTo: Square, color: Color, occupied: Bitboard): Boolean =
     board.board.attackers(kingTo, !color, occupied).isEmpty
 
   def move(
       situation: Situation,
-      from: Pos,
-      to: Pos,
+      from: Square,
+      to: Square,
       promotion: Option[PromotableRole]
   ): Validated[ErrorStr, Move] =
     // Find the move in the variant specific list of valid moves
-    def findMove(from: Pos, to: Pos) =
+    def findMove(from: Square, to: Square) =
       situation.generateMovesAt(from).find(_.dest == to)
 
     for
@@ -84,8 +84,8 @@ abstract class Variant private[variant] (
         else Validated.invalid(ErrorStr(s"Cannot promote to $promotion in this game mode"))
     yield m3
 
-  def drop(situation: Situation, role: Role, pos: Pos): Validated[ErrorStr, Drop] =
-    Validated.invalid(ErrorStr(s"$this variant cannot drop $situation $role $pos"))
+  def drop(situation: Situation, role: Role, square: Square): Validated[ErrorStr, Drop] =
+    Validated.invalid(ErrorStr(s"$this variant cannot drop $situation $role $square"))
 
   def staleMate(situation: Situation): Boolean = situation.check.no && situation.legalMoves.isEmpty
 
@@ -225,8 +225,8 @@ object Variant:
 
   def exists(id: Id): Boolean = list.byId contains id
 
-  private[variant] def symmetricRank(rank: IndexedSeq[Role]): Map[Pos, Piece] =
-    File.all.zip(rank).map { (x, role) => Pos(x, Rank.First) -> (White - role) } ++
-      File.all.map { Pos(_, Rank.Second) -> White.pawn } ++
-      File.all.map { Pos(_, Rank.Seventh) -> Black.pawn } ++
-      File.all.zip(rank).map { (x, role) => Pos(x, Rank.Eighth) -> (Black - role) } toMap
+  private[variant] def symmetricRank(rank: IndexedSeq[Role]): Map[Square, Piece] =
+    File.all.zip(rank).map { (x, role) => Square(x, Rank.First) -> (White - role) } ++
+      File.all.map { Square(_, Rank.Second) -> White.pawn } ++
+      File.all.map { Square(_, Rank.Seventh) -> Black.pawn } ++
+      File.all.zip(rank).map { (x, role) => Square(x, Rank.Eighth) -> (Black - role) } toMap

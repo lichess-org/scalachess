@@ -10,14 +10,14 @@ import Bitboard.*
 
 class OpaqueBitboardTest extends ScalaCheckSuite:
 
-  test("the result of addSquare should contain the added pos"):
-    forAll { (bb: Bitboard, pos: Pos) =>
-      assertEquals((bb.addSquare(pos).contains(pos)), true)
+  test("the result of addSquare should contain the added square"):
+    forAll { (bb: Bitboard, square: Square) =>
+      assertEquals((bb.addSquare(square).contains(square)), true)
     }
 
-  test("pos.bb.singleSquare == Some(pos)"):
-    forAll { (pos: Pos) =>
-      assertEquals(pos.bb.singleSquare, Some(pos))
+  test("Square.bb.singleSquare == Some(square)"):
+    forAll { (square: Square) =>
+      assertEquals(square.bb.singleSquare, Some(square))
     }
 
   test("count has the same value as squares.size"):
@@ -50,37 +50,37 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
       assertEquals(bb.first(_ => None), None)
     }
 
-  test("first with a function that always return Some should return the first pos"):
+  test("first with a function that always return Some should return the first square"):
     forAll { (bb: Bitboard) =>
       assertEquals(bb.first(Some(_)), bb.first)
     }
 
-  test("first returns the correct pos"):
-    forAll { (xs: Set[Pos], x: Pos) =>
-      def f = (p: Pos) => if p == x then Some(p) else None
+  test("first returns the correct square"):
+    forAll { (xs: Set[Square], x: Square) =>
+      def f = (p: Square) => if p == x then Some(p) else None
       Bitboard(xs + x).first(f) == Some(x)
     }
-  test("bitboard created by set of pos should contains and only contains those pos"):
-    forAll { (xs: Set[Pos]) =>
+  test("bitboard created by set of square should contains and only contains those square"):
+    forAll { (xs: Set[Square]) =>
       val bb = Bitboard(xs)
       assertEquals(xs.forall(bb.contains), true)
       assertEquals(xs.size, bb.count)
     }
 
-  test("apply set of pos should be the same as using addSquare"):
-    forAll { (xs: Set[Pos]) =>
+  test("apply set of square should be the same as using addSquare"):
+    forAll { (xs: Set[Square]) =>
       val bb  = Bitboard(xs)
       val bb2 = xs.foldLeft(Bitboard.empty)(_ addSquare _)
       assertEquals(bb, bb2)
     }
 
   test("addSquare andThen removeSquare should be the same as identity"):
-    forAll { (bb: Bitboard, pos: Pos) =>
-      !bb.contains(pos) ==> assertEquals(bb.addSquare(pos).removeSquare(pos), bb)
+    forAll { (bb: Bitboard, square: Square) =>
+      !bb.contains(square) ==> assertEquals(bb.addSquare(square).removeSquare(square), bb)
     }
 
-  test("apply(Set[Pos]).squares.toSet == Set[Pos]"):
-    forAll { (xs: Set[Pos]) =>
+  test("apply(Set[square]).squares.toSet == Set[square]"):
+    forAll { (xs: Set[Square]) =>
       val result = Bitboard(xs).squares.toSet
       assertEquals(result, xs)
     }
@@ -96,12 +96,12 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
     }
 
   test("intersects should be true when the two bitboards have at least one common square"):
-    forAll { (b1: Bitboard, b2: Bitboard, p: Pos) =>
+    forAll { (b1: Bitboard, b2: Bitboard, p: Square) =>
       b1.addSquare(p).intersects(b2.addSquare(p))
     }
 
   test("intersects and set intersection should be consistent"):
-    forAll { (s1: Set[Pos], s2: Set[Pos]) =>
+    forAll { (s1: Set[Square], s2: Set[Square]) =>
       val b1 = Bitboard(s1)
       val b2 = Bitboard(s2)
       val s  = s1 intersect s2
@@ -109,7 +109,7 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
     }
 
   test("isDisjoint should be false when the two bitboards have at least common square"):
-    forAll { (b1: Bitboard, b2: Bitboard, p: Pos) =>
+    forAll { (b1: Bitboard, b2: Bitboard, p: Square) =>
       !b1.addSquare(p).isDisjoint(b2.addSquare(p))
     }
 

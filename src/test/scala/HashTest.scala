@@ -1,6 +1,6 @@
 package chess
 
-import Pos.*
+import Square.*
 import variant.{ Antichess, Atomic, Crazyhouse, Standard, ThreeCheck }
 import chess.format.{ EpdFen, Fen, Uci }
 import chess.format.pgn.SanStr
@@ -132,7 +132,7 @@ class HashTest extends ChessTest:
       // from https://lichess.org/j4r7XHTB/black
       val fen           = EpdFen("r2qkb1r/ppp1pppp/2n2n2/3p2B1/3P2b1/4PN2/PPP1BPPP/RN1QK2R/ b KQkq - 9 5")
       val situation     = Fen.read(Crazyhouse, fen).get
-      val move          = situation.move(Pos.G4, Pos.F3, None).toOption.get
+      val move          = situation.move(Square.G4, Square.F3, None).toOption.get
       val hashAfterMove = hash(move.situationAfter)
 
       // 5 ... Bxf3
@@ -145,7 +145,7 @@ class HashTest extends ChessTest:
     "be consistent when king is captured in antichess" in:
       val fen           = EpdFen("rnbqkb1r/ppp1pppp/3p1n2/1B6/8/4P3/PPPP1PPP/RNBQK1NR w KQkq - 2 3")
       val situation     = Fen.read(Antichess, fen).get
-      val move          = situation.move(Pos.B5, Pos.E8, None).toOption.get
+      val move          = situation.move(Square.B5, Square.E8, None).toOption.get
       val hashAfterMove = hash(move.situationAfter)
 
       // 3. BxK
@@ -158,7 +158,7 @@ class HashTest extends ChessTest:
     "be consistent when rook is exploded in atomic" in:
       val fen           = EpdFen("rnbqkb1r/ppppp1pp/5p1n/6N1/8/8/PPPPPPPP/RNBQKB1R w KQkq - 2 3")
       val situation     = Fen.read(Atomic, fen).get
-      val move          = situation.move(Pos.G5, Pos.H7, None).toOption.get
+      val move          = situation.move(Square.G5, Square.H7, None).toOption.get
       val hashAfterMove = hash(move.situationAfter)
 
       // 3. Nxh7

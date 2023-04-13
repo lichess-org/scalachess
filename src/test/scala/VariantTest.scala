@@ -3,7 +3,7 @@ package chess
 import cats.syntax.option.*
 
 import chess.format.EpdFen
-import chess.Pos.*
+import chess.Square.*
 import chess.variant.*
 
 class VariantTest extends ChessTest:
@@ -188,7 +188,7 @@ K  r
       val position = EpdFen("8/6K1/8/8/8/8/k6p/8 b - - 1 39")
       val game     = fenToGame(position, ThreeCheck)
 
-      val successGame = game flatMap (_.playMove(Pos.H2, Pos.H1, Knight.some))
+      val successGame = game flatMap (_.playMove(Square.H2, Square.H1, Knight.some))
 
       successGame must beValid.like { case game =>
         game.situation.end must beFalse

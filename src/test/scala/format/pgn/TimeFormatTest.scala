@@ -15,6 +15,6 @@ class TimeFormatTest extends ChessTest:
 
   "format PGN tags" should:
     "UTCDate" in:
-      Tag.UTCDate.format.format(millisToDate(1680424483730L)) === "2023.04.02"
+      Tag.UTCDate.format.format(millisToDateTime(1680424483730L)) === "2023.04.02"
     "UTCDate" in:
-      Tag.UTCTime.format.format(millisToDate(1680424483730L)) === "08:34:43"
+      Tag.UTCTime.format.format(millisToDateTime(1680424483730L)) === "08:34:43"

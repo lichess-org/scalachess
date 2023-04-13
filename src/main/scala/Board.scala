@@ -43,8 +43,8 @@ case class Board(
   inline def apply(inline color: Color, inline role: Role): Bitboard =
     color.fold(white, black) & board.byRole(role)
 
-  inline def apply(inline at: Pos): Option[Piece]        = board.pieceAt(at)
-  inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Pos(file, rank))
+  inline def apply(inline at: Square): Option[Piece]        = board.pieceAt(at)
+  inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Square(file, rank))
 
   def checkColor: Option[Color] = checkWhite.yes.option(White) orElse checkBlack.yes.option(Black)
 
@@ -58,22 +58,22 @@ case class Board(
 
   def withBoard(b: BBoard): Board = copy(board = b)
 
-  def place(piece: Piece, at: Pos): Option[Board] =
+  def place(piece: Piece, at: Square): Option[Board] =
     board.put(piece, at).map(withBoard)
 
-  def putOrReplace(piece: Piece, at: Pos): Board =
+  def putOrReplace(piece: Piece, at: Square): Board =
     withBoard(board.putOrReplace(piece, at))
 
-  def take(at: Pos): Option[Board] =
+  def take(at: Square): Option[Board] =
     board.take(at).map(withBoard)
 
-  def move(orig: Pos, dest: Pos): Option[Board] =
+  def move(orig: Square, dest: Square): Option[Board] =
     board.move(orig, dest).map(withBoard)
 
-  def taking(orig: Pos, dest: Pos, taking: Option[Pos] = None): Option[Board] =
+  def taking(orig: Square, dest: Square, taking: Option[Square] = None): Option[Board] =
     board.taking(orig, dest, taking).map(withBoard)
 
-  def promote(orig: Pos, dest: Pos, piece: Piece): Option[Board] =
+  def promote(orig: Square, dest: Square, piece: Piece): Option[Board] =
     board.promote(orig, dest, piece).map(withBoard)
 
   def withHistory(h: History): Board = copy(history = h)
@@ -157,10 +157,10 @@ object Board:
   def apply(pieces: PieceMap, history: History, variant: Variant, crazyData: Option[Crazyhouse.Data]): Board =
     Board(BBoard.fromMap(pieces), history, variant, crazyData)
 
-  def apply(pieces: Iterable[(Pos, Piece)], variant: Variant): Board =
+  def apply(pieces: Iterable[(Square, Piece)], variant: Variant): Board =
     Board(pieces, variant.castles, variant)
 
-  def apply(pieces: Iterable[(Pos, Piece)], castles: Castles, variant: Variant): Board =
+  def apply(pieces: Iterable[(Square, Piece)], castles: Castles, variant: Variant): Board =
     val board        = BBoard.fromMap(pieces.toMap)
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Board(board, History(castles = castles, unmovedRooks = unmovedRooks), variant, variantCrazyData(variant))

@@ -15,7 +15,7 @@ case object Standard
       standardInitialPosition = true
     ):
 
-  val pieces: Map[Pos, Piece] = Variant.symmetricRank(backRank)
+  val pieces: Map[Square, Piece] = Variant.symmetricRank(backRank)
 
   def validMoves(situation: Situation): List[Move] =
     import situation.{ genNonKing, genSafeKing, genCastling, color, board }
@@ -36,7 +36,7 @@ case object Standard
       )
 
   // Used for filtering candidate moves that would leave put the king in check.
-  def isSafe(situation: Situation, king: Pos, move: Move, blockers: Bitboard): Boolean =
+  def isSafe(situation: Situation, king: Square, move: Move, blockers: Bitboard): Boolean =
     import situation.{ board, us, them }
     if move.enpassant then
       val newOccupied = (board.occupied ^ move.orig.bb ^ move.dest.withRankOf(move.orig).bb) | move.dest.bb

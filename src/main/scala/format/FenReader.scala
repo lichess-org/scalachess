@@ -32,26 +32,26 @@ trait FenReader:
                 .sortBy(_.file.value)
               {
                 for
-                  kingPos <- (board.kingOf(color) & backRank).first
-                  rookPos <- ch.toLower match
-                    case 'k'  => rooks.reverse.find(_ ?> kingPos)
-                    case 'q'  => rooks.find(_ ?< kingPos)
+                  kingSquare <- (board.kingOf(color) & backRank).first
+                  rookSquare <- ch.toLower match
+                    case 'k'  => rooks.reverse.find(_ ?> kingSquare)
+                    case 'q'  => rooks.find(_ ?< kingSquare)
                     case file => rooks.find(_.file.char == file)
-                  side <- Side.kingRookSide(kingPos, rookPos)
-                yield (c.add(color, side), r | rookPos.bb)
+                  side <- Side.kingRookSide(kingSquare, rookSquare)
+                yield (c.add(color, side), r | rookSquare.bb)
               }.getOrElse((c, r))
             }
 
       import situation.color.{ fifthRank, sixthRank, seventhRank }
 
-      val enpassantPos = fen.enpassant
+      val enpassantSquare = fen.enpassant
       val enpassantMove = for
-        pos <- enpassantPos
-        if pos.rank == sixthRank
-        orig = Pos(pos.file, seventhRank)
-        dest = Pos(pos.file, fifthRank)
+        square <- enpassantSquare
+        if square.rank == sixthRank
+        orig = square withRank seventhRank
+        dest = square withRank fifthRank
         if situation.board(dest).contains(Piece(!situation.color, Pawn)) &&
-          situation.board(pos.file, sixthRank).isEmpty &&
+          situation.board(square.file, sixthRank).isEmpty &&
           situation.board(orig).isEmpty
       yield Uci.Move(orig, dest)
 
@@ -144,20 +144,20 @@ trait FenReader:
       chars: List[Char],
       x: Int,
       y: Int
-  ): Option[(List[(Pos, Piece)], Bitboard)] =
+  ): Option[(List[(Square, Piece)], Bitboard)] =
     chars match
       case Nil                               => Option((Nil, Bitboard.empty))
       case '/' :: rest                       => makePiecesWithCrazyPromoted(rest, 0, y - 1)
       case c :: rest if '1' <= c && c <= '8' => makePiecesWithCrazyPromoted(rest, x + (c - '0').toInt, y)
       case c :: '~' :: rest =>
         for {
-          pos                        <- Pos.at(x, y)
+          square                     <- Square.at(x, y)
           piece                      <- Piece.fromChar(c)
           (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
-        } yield (pos -> piece :: nextPieces, nextPromoted.addSquare(pos))
+        } yield (square -> piece :: nextPieces, nextPromoted.addSquare(square))
       case c :: rest =>
         for {
-          pos                        <- Pos.at(x, y)
+          square                     <- Square.at(x, y)
           piece                      <- Piece.fromChar(c)
           (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
-        } yield (pos -> piece :: nextPieces, nextPromoted)
+        } yield (square -> piece :: nextPieces, nextPromoted)

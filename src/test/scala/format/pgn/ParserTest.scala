@@ -49,7 +49,7 @@ class ParserTest extends ChessTest:
     "as a queen" in:
       parse("b8=Q ") must beValid.like: parsed =>
         parsed.mainLine.headOption must beSome { (san: San) =>
-          san === Std(Pos.B8, Pawn, promotion = Option(Queen))
+          san === Std(Square.B8, Pawn, promotion = Option(Queen))
         }
 
     "as a rook" in:
@@ -100,25 +100,25 @@ class ParserTest extends ChessTest:
   "glyphs" in:
 
     parseMove("b8=B ") must beValid.like: node =>
-      node.move.san === Std(Pos.B8, Pawn, promotion = Option(Bishop))
+      node.move.san === Std(Square.B8, Pawn, promotion = Option(Bishop))
 
     parseMove("1. e4") must beValid.like: node =>
-      node.move.san must_== Std(Pos.E4, Pawn)
+      node.move.san must_== Std(Square.E4, Pawn)
 
     parseMove("e4") must beValid.like: node =>
-      node.move.san must_== Std(Pos.E4, Pawn)
+      node.move.san must_== Std(Square.E4, Pawn)
 
     parseMove("e4!") must beValid.like: node =>
-      node.move.san === Std(Pos.E4, Pawn)
+      node.move.san === Std(Square.E4, Pawn)
       node.move.metas.glyphs === Glyphs(Glyph.MoveAssessment.good.some, None, Nil)
 
     // TODO parsed result is off by one
     parseMove("Ne7g6+?!") must beValid.like: node =>
-      node.move.san === Std(Pos.G6, Knight, false, Some(File.F), Some(Rank.Eighth))
+      node.move.san === Std(Square.G6, Knight, false, Some(File.F), Some(Rank.Eighth))
       node.move.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
 
     parseMove("P@e4?!") must beValid.like: node =>
-      node.move.san === Drop(Pawn, Pos.E4)
+      node.move.san === Drop(Pawn, Square.E4)
       node.move.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
 
   "nags" in:

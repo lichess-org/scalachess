@@ -7,7 +7,7 @@ export ornicar.scalalib.extensions.*
 export Color.{ Black, White }
 export Side.{ KingSide, QueenSide }
 
-type Direction  = Pos => Option[Pos]
+type Direction  = Square => Option[Square]
 type Directions = List[Direction]
 
-type PieceMap = Map[Pos, Piece]
+type PieceMap = Map[Square, Piece]

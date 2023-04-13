@@ -16,7 +16,7 @@ object InsufficientMatingMaterial:
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
    * and it doesn't have any capture
    */
-  def pawnBlockedByPawn(pawn: Pos, board: Board) =
+  def pawnBlockedByPawn(pawn: Square, board: Board) =
     board(pawn).exists(p =>
       p.is(Pawn) &&
         Situation(board, p.color).generateMovesAt(pawn).isEmpty && {
@@ -54,4 +54,4 @@ object InsufficientMatingMaterial:
   /** Determines the position one ahead of a pawn based on the color of the piece.
     * White pawns move up and black pawns move down.
     */
-  def posAheadOfPawn(pos: Pos, color: Color): Option[Pos] = pawnDirOf(color)(pos)
+  def posAheadOfPawn(square: Square, color: Color): Option[Square] = pawnDirOf(color)(square)

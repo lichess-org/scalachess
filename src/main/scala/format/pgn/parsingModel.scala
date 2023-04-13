@@ -15,7 +15,7 @@ sealed trait San:
   def apply(situation: Situation): Validated[ErrorStr, MoveOrDrop]
 
 case class Std(
-    dest: Pos,
+    dest: Square,
     role: Role,
     capture: Boolean = false,
     file: Option[File] = None,
@@ -27,10 +27,10 @@ case class Std(
 
   def move(situation: Situation): Validated[ErrorStr, chess.Move] =
     val pieces = situation.board.byPiece(situation.color - role)
-    pieces.first { pos =>
-      if compare(file, pos.file.index + 1) &&
-        compare(rank, pos.rank.index + 1)
-      then situation.generateMovesAt(pos) find { _.dest == dest }
+    pieces.first { square =>
+      if compare(file, square.file.index + 1) &&
+        compare(rank, square.rank.index + 1)
+      then situation.generateMovesAt(square) find { _.dest == dest }
       else None
     } match
       case None       => Validated invalid ErrorStr(s"No move found: $this\n$situation")
@@ -42,13 +42,14 @@ case class Std(
 
 case class Drop(
     role: Role,
-    pos: Pos
+    square: Square,
+    metas: Metas = Metas.empty
 ) extends San:
 
   def apply(situation: Situation) = drop(situation)
 
   def drop(situation: Situation): Validated[ErrorStr, chess.Drop] =
-    situation.drop(role, pos)
+    situation.drop(role, square)
 
 case class Castle(side: Side) extends San:
 

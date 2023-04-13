@@ -1,7 +1,7 @@
 package chess
 
 import scala.language.implicitConversions
-import Pos.*
+import Square.*
 
 class BoardTest extends ChessTest:
 
@@ -84,7 +84,7 @@ class BoardTest extends ChessTest:
         _.move(B2, B4)
       ) must beNone
 
-    "navigate in pos based on pieces" in:
+    "navigate in square based on pieces" in:
       "right to end" in:
         val board: Board = """
 R   K  R"""

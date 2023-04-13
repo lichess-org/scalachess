@@ -152,15 +152,15 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("8/pp1k2q1/3P2p1/8/P3PP2/PPP2r2/PPP5/PPPP4 w - - 1 2")
       val game     = fenToGame(position, Horde)
       game must beValid.like { case game =>
-        game.situation.legalMoves.exists(m => m.orig == Pos.D1 && m.dest == Pos.D3) must beTrue
+        game.situation.legalMoves.exists(m => m.orig == Square.D1 && m.dest == Square.D3) must beTrue
       }
 
     "Cannot en passant a pawn from the first rank" in:
       val position = EpdFen("k7/5p2/4p2P/3p2P1/2p2P2/1p2P2P/p2P2P1/2P2P2 w - - 0 1")
       val game     = fenToGame(position, Horde)
-      val newGame  = game.flatMap(_.apply(Pos.C1, Pos.C3))
+      val newGame  = game.flatMap(_.apply(Square.C1, Square.C3))
       newGame must beValid.like { case game =>
-        game._1.situation.legalMoves.exists(m => m.orig == Pos.B3 && m.dest == Pos.C2) must beFalse
+        game._1.situation.legalMoves.exists(m => m.orig == Square.B3 && m.dest == Square.C2) must beFalse
       }
 
     "Castle with one rook moved" in:
@@ -173,14 +173,14 @@ class HordeVariantTest extends ChessTest:
 
     "UnmovedRooks & castles at the starting position" in:
       val board = Board.init(Horde)
-      board.history.unmovedRooks must_== UnmovedRooks(Set(Pos.A8, Pos.H8))
+      board.history.unmovedRooks must_== UnmovedRooks(Set(Square.A8, Square.H8))
       board.history.castles must_== Castles("kq")
 
     "the h8 rooks move" in:
       val position = EpdFen("r3kbnr/p1pqppp1/1pnp3P/PPPP1P1P/PPP1PPP1/1PPP1PPP/PPPPPPPP/PPPPPPPP b kq - 0 7")
       val game     = fenToGame(position, Horde)
-      val newGame  = game.flatMap(_.apply(Pos.H8, Pos.H6))
+      val newGame  = game.flatMap(_.apply(Square.H8, Square.H6))
       newGame must beValid.like { case game =>
-        game._1.situation.board.history.unmovedRooks must_== UnmovedRooks(Set(Pos.A8))
+        game._1.situation.board.history.unmovedRooks must_== UnmovedRooks(Set(Square.A8))
         game._1.situation.board.history.castles must_== Castles("q")
       }

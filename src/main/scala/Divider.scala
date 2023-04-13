@@ -82,7 +82,7 @@ object Divider:
 
       case _ => 0
 
-  private val mixednessRegions: List[List[Pos]] = {
+  private val mixednessRegions: List[List[Square]] = {
     for {
       y <- Rank.all.take(7)
       x <- File.all.take(7)
@@ -92,7 +92,7 @@ object Divider:
         dx   <- 0 to 1
         file <- x.offset(dx)
         rank <- y.offset(dy)
-      } yield Pos(file, rank)
+      } yield Square(file, rank)
     }.toList
   }.toList
 

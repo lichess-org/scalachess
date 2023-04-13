@@ -17,7 +17,7 @@ object Rank extends OpaqueInt[Rank]:
     if (0 <= index && index < 8) Some(index)
     else None
 
-  inline def of(inline pos: Pos): Rank = pos.value >> 3
+  inline def of(inline square: Square): Rank = square.value >> 3
 
   inline def fromChar(inline ch: Char): Option[Rank] = atIndex(ch.toInt - 49)
 

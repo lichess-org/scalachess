@@ -13,7 +13,7 @@ case class State(
     // color
     turn: Color,
     // possible en-passant square
-    epSquare: Option[Pos],
+    epSquare: Option[Square],
     // 1 in position of a rook means castling right
     // isomorphic to chess.Castling case class
     // TODO more sophiciated type for Castle

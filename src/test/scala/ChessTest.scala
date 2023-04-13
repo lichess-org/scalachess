@@ -39,7 +39,7 @@ trait ChessTest extends Specification with ValidatedMatchers:
 
   extension (board: Board)
     def visual = Visual >> board
-    def destsFrom(from: Pos): Option[List[Pos]] =
+    def destsFrom(from: Square): Option[List[Square]] =
       board(from).map { piece =>
         Situation(board, piece.color).generateMovesAt(from).map(_.dest)
       }
@@ -47,9 +47,9 @@ trait ChessTest extends Specification with ValidatedMatchers:
   extension (game: Game)
     def as(color: Color): Game = game.withPlayer(color)
 
-    def playMoves(moves: (Pos, Pos)*): Validated[ErrorStr, Game] = playMoveList(moves)
+    def playMoves(moves: (Square, Square)*): Validated[ErrorStr, Game] = playMoveList(moves)
 
-    def playMoveList(moves: Iterable[(Pos, Pos)]): Validated[ErrorStr, Game] =
+    def playMoveList(moves: Iterable[(Square, Square)]): Validated[ErrorStr, Game] =
       val vg = moves.foldLeft(Validated.valid(game): Validated[ErrorStr, Game]) { (vg, move) =>
         // vg foreach { x =>
         // println(s"------------------------ ${x.turns} = $move")
@@ -66,8 +66,8 @@ trait ChessTest extends Specification with ValidatedMatchers:
       vg
 
     def playMove(
-        orig: Pos,
-        dest: Pos,
+        orig: Square,
+        dest: Square,
         promotion: Option[PromotableRole] = None
     ): Validated[ErrorStr, Game] =
       game.apply(orig, dest, promotion) map (_._1)
@@ -84,7 +84,7 @@ trait ChessTest extends Specification with ValidatedMatchers:
       )
     }
 
-  def makeBoard(pieces: (Pos, Piece)*): Board =
+  def makeBoard(pieces: (Square, Piece)*): Board =
     Board(BBoard.fromMap(pieces.toMap), defaultHistory(), chess.variant.Standard)
 
   def makeBoard(str: String, variant: Variant) =
@@ -98,15 +98,15 @@ trait ChessTest extends Specification with ValidatedMatchers:
 
   def makeEmptyBoard: Board = Board empty chess.variant.Standard
 
-  def bePoss(poss: Pos*) = // : Matcher[Option[Iterable[Pos]]] =
-    beSome { (p: Iterable[Pos]) =>
+  def bePoss(poss: Square*) = // : Matcher[Option[Iterable[square]]] =
+    beSome { (p: Iterable[Square]) =>
       sortPoss(p.toList).map(_.key) must_== sortPoss(poss.toList).map(_.key)
     }
 
   def makeGame: Game = Game(makeBoard, White)
 
-  def bePoss(board: Board, visual: String) = // : Matcher[Option[Iterable[Pos]]] =
-    beSome { (p: Iterable[Pos]) =>
+  def bePoss(board: Board, visual: String) = // : Matcher[Option[Iterable[square]]] =
+    beSome { (p: Iterable[Square]) =>
       Visual.addNewLines(Visual.>>|(board, Map(p -> 'x'))) must_== visual
     }
 
@@ -125,11 +125,11 @@ trait ChessTest extends Specification with ValidatedMatchers:
       g.board.visual must_== (Visual << visual).visual
     }
 
-  def sortPoss(poss: Seq[Pos]): Seq[Pos] = poss.sortBy(_.key)
+  def sortPoss(poss: Seq[Square]): Seq[Square] = poss.sortBy(_.key)
 
-  def pieceMoves(piece: Piece, pos: Pos): Option[List[Pos]] =
-    (makeEmptyBoard place (piece, pos)) map { b =>
-      Situation(b, piece.color).movesAt(pos).map(_.dest)
+  def pieceMoves(piece: Piece, square: Square): Option[List[Square]] =
+    (makeEmptyBoard place (piece, square)) map { b =>
+      Situation(b, piece.color).movesAt(square).map(_.dest)
     }
 
   def defaultHistory(

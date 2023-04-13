@@ -8,11 +8,11 @@ import chess.bitboard.Bitboard
 
 case class Move(
     piece: Piece,
-    orig: Pos,
-    dest: Pos,
+    orig: Square,
+    dest: Square,
     situationBefore: Situation,
     after: Board,
-    capture: Option[Pos],
+    capture: Option[Square],
     promotion: Option[PromotableRole],
     castle: Option[Move.Castle],
     enpassant: Boolean,
@@ -135,8 +135,8 @@ end Move
 object Move:
 
   // ((king, kingTo), (rook, rookTo))
-  opaque type Castle = ((Pos, Pos), (Pos, Pos))
-  object Castle extends TotalWrapper[Castle, ((Pos, Pos), (Pos, Pos))]:
+  opaque type Castle = ((Square, Square), (Square, Square))
+  object Castle extends TotalWrapper[Castle, ((Square, Square), (Square, Square))]:
     extension (e: Castle)
       inline def king         = e._1._1
       inline def kingTo       = e._1._2

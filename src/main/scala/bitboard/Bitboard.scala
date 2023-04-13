@@ -35,7 +35,7 @@ object Bitboard extends OpaqueBitboard[Bitboard]:
 
   inline def rank(inline r: Rank): Bitboard                  = RANKS(r.value)
   inline def file(inline f: File): Bitboard                  = FILES(f.value)
-  inline def ray(inline from: Pos, inline to: Pos): Bitboard = RAYS(from.value)(to.value)
+  inline def ray(inline from: Square, inline to: Square): Bitboard = RAYS(from.value)(to.value)
 
   /** Slow attack set generation. Used only to bootstrap the attack tables.
     */
@@ -51,7 +51,7 @@ object Bitboard extends OpaqueBitboard[Bitboard]:
         if (!con)
           attacks |= 1L << sq
 
-        !(occupied.contains(Pos(sq)) || con)
+        !(occupied.contains(Square(sq)) || con)
       do ()
     }
     attacks
@@ -90,11 +90,11 @@ object Bitboard extends OpaqueBitboard[Bitboard]:
       a <- squareRange
       b <- squareRange
       _ =
-        if slidingAttacks(a, 0, ROOK_DELTAS).contains(Pos(b)) then
+        if slidingAttacks(a, 0, ROOK_DELTAS).contains(Square(b)) then
           BETWEEN(a)(b) = slidingAttacks(a, 1L << b, ROOK_DELTAS) & slidingAttacks(b, 1L << a, ROOK_DELTAS)
           RAYS(a)(b) =
             (1L << a) | (1L << b) | slidingAttacks(a, 0, ROOK_DELTAS) & slidingAttacks(b, 0, ROOK_DELTAS)
-        else if slidingAttacks(a, 0, BISHOP_DELTAS).contains(Pos(b)) then
+        else if slidingAttacks(a, 0, BISHOP_DELTAS).contains(Square(b)) then
           BETWEEN(a)(b) =
             slidingAttacks(a, 1L << b, BISHOP_DELTAS) & slidingAttacks(b, 1L << a, BISHOP_DELTAS)
           RAYS(a)(b) =
@@ -103,13 +103,13 @@ object Bitboard extends OpaqueBitboard[Bitboard]:
 
   initialize()
 
-  def aligned(a: Pos, b: Pos, c: Pos): Boolean =
+  def aligned(a: Square, b: Square, c: Square): Boolean =
     ray(a, b).contains(c)
 
-  def between(a: Pos, b: Pos): Bitboard =
+  def between(a: Square, b: Square): Bitboard =
     BETWEEN(a.value)(b.value)
 
-  extension (s: Pos)
+  extension (s: Square)
     def bishopAttacks(occupied: Bitboard): Bitboard =
       val magic = Magic.BISHOP(s.value)
       ATTACKS(((magic.factor * (occupied & magic.mask) >>> (64 - 9)).toInt + magic.offset))

@@ -9,15 +9,15 @@ sealed trait Uci:
   def uci: String
   def chars: String
 
-  def origDest: (Pos, Pos)
+  def origDest: (Square, Square)
 
   def apply(situation: Situation): Validated[ErrorStr, MoveOrDrop]
 
 object Uci:
 
   case class Move(
-      orig: Pos,
-      dest: Pos,
+      orig: Square,
+      dest: Square,
       promotion: Option[PromotableRole] = None
   ) extends Uci:
 
@@ -39,59 +39,59 @@ object Uci:
 
     def apply(move: String): Option[Move] =
       for {
-        orig <- Pos.fromKey(move take 2)
-        dest <- Pos.fromKey(move.slice(2, 4))
+        orig <- Square.fromKey(move take 2)
+        dest <- Square.fromKey(move.slice(2, 4))
         promotion = move lift 4 flatMap Role.promotable
       } yield Move(orig, dest, promotion)
 
     def fromChars(move: String) =
       for {
-        orig <- move.headOption flatMap { Pos.fromChar(_) }
-        dest <- move lift 1 flatMap { Pos.fromChar(_) }
+        orig <- move.headOption flatMap { Square.fromChar(_) }
+        dest <- move lift 1 flatMap { Square.fromChar(_) }
         promotion = move lift 2 flatMap { Role.promotable(_) }
       } yield Move(orig, dest, promotion)
 
     def fromStrings(origS: String, destS: String, promS: Option[String]) =
       for {
-        orig <- Pos.fromKey(origS)
-        dest <- Pos.fromKey(destS)
+        orig <- Square.fromKey(origS)
+        dest <- Square.fromKey(destS)
         promotion = Role promotable promS
       } yield Move(orig, dest, promotion)
 
-  case class Drop(role: Role, pos: Pos) extends Uci:
+  case class Drop(role: Role, square: Square) extends Uci:
 
-    def uci = s"${role.pgn}@${pos.key}"
+    def uci = s"${role.pgn}@${square.key}"
 
-    def chars = s"${role.pgn}@${pos.asChar}"
+    def chars = s"${role.pgn}@${square.asChar}"
 
-    def origDest = pos -> pos
+    def origDest = square -> square
 
-    def apply(situation: Situation) = situation.drop(role, pos)
+    def apply(situation: Situation) = situation.drop(role, square)
 
   object Drop:
 
     def fromChars(move: String) = for {
-      role <- move.headOption flatMap Role.allByPgn.get
-      pos  <- move lift 2 flatMap { Pos.fromChar(_) }
-    } yield Uci.Drop(role, pos)
+      role   <- move.headOption flatMap Role.allByPgn.get
+      square <- move lift 2 flatMap { Square.fromChar(_) }
+    } yield Uci.Drop(role, square)
 
     def fromStrings(roleS: String, posS: String) =
       for {
-        role <- Role.allByName get roleS
-        pos  <- Pos.fromKey(posS)
-      } yield Drop(role, pos)
+        role   <- Role.allByName get roleS
+        square <- Square.fromKey(posS)
+      } yield Drop(role, square)
 
   case class WithSan(uci: Uci, san: pgn.SanStr)
 
   def apply(move: chess.Move) = Uci.Move(move.orig, move.dest, move.promotion)
 
-  def apply(drop: chess.Drop) = Uci.Drop(drop.piece.role, drop.pos)
+  def apply(drop: chess.Drop) = Uci.Drop(drop.piece.role, drop.square)
 
   def apply(move: String): Option[Uci] =
     if (move lift 1 contains '@') for {
-      role <- move.headOption flatMap Role.allByPgn.get
-      pos  <- Pos.fromKey(move.slice(2, 4))
-    } yield Uci.Drop(role, pos)
+      role   <- move.headOption flatMap Role.allByPgn.get
+      square <- Square.fromKey(move.slice(2, 4))
+    } yield Uci.Drop(role, square)
     else Uci.Move(move)
 
   def fromChars(move: String): Option[Uci] =

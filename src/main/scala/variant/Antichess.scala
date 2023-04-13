@@ -95,7 +95,7 @@ case object Antichess
         ) && blackPawns.forall(pawnNotAttackable(_, whiteBishopLight, board)))
           .getOrElse(false)
 
-  private def pawnNotAttackable(pawn: Pos, oppositeBishopLight: Boolean, board: Board): Boolean =
+  private def pawnNotAttackable(pawn: Square, oppositeBishopLight: Boolean, board: Board): Boolean =
     // The pawn cannot attack a bishop or be attacked by a bishop
     val cannotAttackBishop = pawn.isLight != oppositeBishopLight
     InsufficientMatingMaterial.pawnBlockedByPawn(pawn, board) && cannotAttackBishop

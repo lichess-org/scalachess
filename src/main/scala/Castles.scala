@@ -4,7 +4,7 @@ import cats.syntax.all.*
 
 import bitboard.OpaqueBitboard
 import bitboard.Bitboard
-import Pos.*
+import Square.*
 
 opaque type Castles = Long
 object Castles extends OpaqueBitboard[Castles]:
@@ -41,18 +41,18 @@ object Castles extends OpaqueBitboard[Castles]:
 
     def toSeq: Array[Boolean] = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
 
-  extension (b: Boolean) inline def at(pos: Pos) = if b then pos.bb else empty
+  extension (b: Boolean) inline def at(square: Square) = if b then square.bb else empty
 
   extension (color: Color)
-    inline def at(side: Side): Pos =
+    inline def at(side: Side): Square =
       (color, side) match
         case (White, KingSide)  => H1
         case (White, QueenSide) => A1
         case (Black, KingSide)  => H8
         case (Black, QueenSide) => A8
 
-    inline def kingSide: Pos  = at(KingSide)
-    inline def queenSide: Pos = at(QueenSide)
+    inline def kingSide: Square  = at(KingSide)
+    inline def queenSide: Square = at(QueenSide)
 
   def apply(
       whiteKingSide: Boolean,
@@ -73,7 +73,7 @@ object Castles extends OpaqueBitboard[Castles]:
         .map(Bitboard(_).value)
         .getOrElse(empty)
 
-  val charToSquare: (c: Char) => Option[Pos] =
+  val charToSquare: (c: Char) => Option[Square] =
     case 'k' => Some(H8)
     case 'q' => Some(A8)
     case 'K' => Some(H1)

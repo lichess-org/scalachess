@@ -7,7 +7,7 @@ import cats.kernel.Monoid
 
 case class Drop(
     piece: Piece,
-    pos: Pos,
+    square: Square,
     situationBefore: Situation,
     after: Board,
     metrics: MoveMetrics = MoveMetrics.empty
@@ -23,7 +23,7 @@ case class Drop(
     val board = after.variant.finalizeBoard(
       after updateHistory { h =>
         h.copy(
-          lastMove = Option(Uci.Drop(piece.role, pos)),
+          lastMove = Option(Uci.Drop(piece.role, square)),
           unmovedRooks = before.unmovedRooks,
           halfMoveClock = if (piece is Pawn) HalfMoveClock(0) else h.halfMoveClock + 1
         )
@@ -53,6 +53,6 @@ case class Drop(
 
   inline def withMetrics(m: MoveMetrics) = copy(metrics = m)
 
-  inline def toUci = Uci.Drop(piece.role, pos)
+  inline def toUci = Uci.Drop(piece.role, square)
 
   override def toString = toUci.uci

@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 import cats.data.Validated
 import cats.syntax.option.*
 
-import chess.Pos.*
+import chess.Square.*
 import chess.format.pgn.Fixtures
 import chess.format.pgn.SanStr
 import chess.variant.Standard
@@ -74,9 +74,9 @@ class PlayBench:
   extension (game: Game)
     def as(color: Color): Game = game.withPlayer(color)
 
-    def playMoves(moves: (Pos, Pos)*): Validated[ErrorStr, Game] = playMoveList(moves)
+    def playMoves(moves: (Square, Square)*): Validated[ErrorStr, Game] = playMoveList(moves)
 
-    def playMoveList(moves: Iterable[(Pos, Pos)]): Validated[ErrorStr, Game] =
+    def playMoveList(moves: Iterable[(Square, Square)]): Validated[ErrorStr, Game] =
       val vg = moves.foldLeft(Validated.valid(game): Validated[ErrorStr, Game]) { (vg, move) =>
         // vg foreach { x =>
         // println(s"------------------------ ${x.turns} = $move")

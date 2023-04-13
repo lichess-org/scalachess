@@ -13,7 +13,7 @@ import ornicar.scalalib.zeros.given
 trait FenWriter:
 
   private given Ordering[File] = intOrdering[File]
-  given Ordering[Pos]          = Ordering.by[Pos, File](_.file)
+  given Ordering[Square]          = Ordering.by[Square, File](_.file)
 
   def write(situation: Situation): EpdFen = write(Situation.AndFullMoveNumber(situation, FullMoveNumber(1)))
 
@@ -49,7 +49,7 @@ trait FenWriter:
             else
               fen append s"$empty${piece.forsyth}"
               empty = 0
-            if (piece.role != Pawn && board.crazyData.exists(_.promoted.contains(Pos(x, y))))
+            if (piece.role != Pawn && board.crazyData.exists(_.promoted.contains(Square(x, y))))
               fen append '~'
       if (empty > 0) fen append empty
       if (y > Rank.First) fen append '/'

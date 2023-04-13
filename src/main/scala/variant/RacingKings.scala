@@ -20,23 +20,23 @@ case object RacingKings
   // Both sides start on the first two ranks:
   // krbnNBRK
   // qrbnNBRQ
-  override val pieces: Map[Pos, Piece] = Map(
-    Pos.A1 -> Black.queen,
-    Pos.A2 -> Black.king,
-    Pos.B1 -> Black.rook,
-    Pos.B2 -> Black.rook,
-    Pos.C1 -> Black.bishop,
-    Pos.C2 -> Black.bishop,
-    Pos.D1 -> Black.knight,
-    Pos.D2 -> Black.knight,
-    Pos.E1 -> White.knight,
-    Pos.E2 -> White.knight,
-    Pos.F1 -> White.bishop,
-    Pos.F2 -> White.bishop,
-    Pos.G1 -> White.rook,
-    Pos.G2 -> White.rook,
-    Pos.H1 -> White.queen,
-    Pos.H2 -> White.king
+  override val pieces: Map[Square, Piece] = Map(
+    Square.A1 -> Black.queen,
+    Square.A2 -> Black.king,
+    Square.B1 -> Black.rook,
+    Square.B2 -> Black.rook,
+    Square.C1 -> Black.bishop,
+    Square.C2 -> Black.bishop,
+    Square.D1 -> Black.knight,
+    Square.D2 -> Black.knight,
+    Square.E1 -> White.knight,
+    Square.E2 -> White.knight,
+    Square.F1 -> White.bishop,
+    Square.F2 -> White.bishop,
+    Square.G1 -> White.rook,
+    Square.G2 -> White.rook,
+    Square.H1 -> White.queen,
+    Square.H2 -> White.king
   )
 
   override val castles = Castles.none

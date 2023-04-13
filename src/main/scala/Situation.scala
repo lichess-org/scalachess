@@ -7,7 +7,7 @@ import bitboard.Bitboard
 import bitboard.Bitboard.*
 
 import chess.format.Uci
-import Pos.prevRank
+import Square.prevRank
 import chess.variant.Crazyhouse
 import chess.variant.Antichess
 
@@ -16,16 +16,16 @@ case class Situation(board: Board, color: Color):
 
   lazy val legalMoves = variant.validMoves(this)
 
-  lazy val moves: Map[Pos, List[Move]] =
+  lazy val moves: Map[Square, List[Move]] =
     legalMoves.groupBy(_.orig)
 
-  val movesAt: Pos => List[Move] = moves.getOrElse(_, Nil)
+  val movesAt: Square => List[Move] = moves.getOrElse(_, Nil)
 
   lazy val playerCanCapture: Boolean = legalMoves.exists(_.captures)
 
-  lazy val destinations: Map[Pos, List[Pos]] = moves.view.mapValues { _.map(_.dest) }.to(Map)
+  lazy val destinations: Map[Square, List[Square]] = moves.view.mapValues { _.map(_.dest) }.to(Map)
 
-  def drops: Option[List[Pos]] =
+  def drops: Option[List[Square]] =
     variant match
       case v: Crazyhouse.type => v possibleDrops this
       case _                  => None
@@ -60,14 +60,14 @@ case class Situation(board: Board, color: Color):
     else if autoDraw then Status.Draw.some
     else none
 
-  def move(from: Pos, to: Pos, promotion: Option[PromotableRole]): Validated[ErrorStr, Move] =
+  def move(from: Square, to: Square, promotion: Option[PromotableRole]): Validated[ErrorStr, Move] =
     variant.move(this, from, to, promotion)
 
   def move(uci: Uci.Move): Validated[ErrorStr, Move] =
     variant.move(this, uci.orig, uci.dest, uci.promotion)
 
-  def drop(role: Role, pos: Pos): Validated[ErrorStr, Drop] =
-    variant.drop(this, role, pos)
+  def drop(role: Role, square: Square): Validated[ErrorStr, Drop] =
+    variant.drop(this, role, square)
 
   def withHistory(history: History) =
     copy(board = board withHistory history)
@@ -75,7 +75,7 @@ case class Situation(board: Board, color: Color):
   def withVariant(variant: chess.variant.Variant) =
     copy(board = board withVariant variant)
 
-  def enPassantSquare: Option[Pos] =
+  def enPassantSquare: Option[Square] =
     potentialEpSquare.flatMap(_ => legalMoves.find(_.enpassant).map(_.dest))
 
   def unary_! = copy(color = !color)
@@ -85,28 +85,28 @@ case class Situation(board: Board, color: Color):
   lazy val ourKing   = board.kingPosOf(color)
   lazy val theirKing = board.kingPosOf(!color)
   // alternative version of ourKing is used in Antichess only
-  lazy val ourKings: List[Pos] = board.kings(color)
+  lazy val ourKings: List[Square] = board.kings(color)
   // alternative version of theirKing is used in Antichess only
-  lazy val theirKings: List[Pos]      = board.kings(!color)
+  lazy val theirKings: List[Square]   = board.kings(!color)
   lazy val us: Bitboard               = board.byColor(color)
   lazy val them: Bitboard             = board.byColor(!color)
   lazy val checkers: Option[Bitboard] = ourKing.map(board.attackers(_, !color))
   val isWhiteTurn: Boolean            = color.white
 
-  def generateMovesAt(pos: Pos): List[Move] =
+  def generateMovesAt(square: Square): List[Move] =
     def movesAt =
-      val moves = board(pos).fold(Nil) { piece =>
+      val moves = board(square).fold(Nil) { piece =>
         if piece.color != color then Nil
         else
           val targets = ~us
-          val bb      = pos.bb
+          val bb      = square.bb
           piece.role match
             case Pawn   => genEnPassant(us & bb) ++ genPawn(bb, targets)
             case Knight => genKnight(us & bb, targets)
             case Bishop => genBishop(us & bb, targets)
             case Rook   => genRook(us & bb, targets)
             case Queen  => genQueen(us & bb, targets)
-            case King   => genKingAt(targets, pos)
+            case King   => genKingAt(targets, square)
       }
       variant.applyVariantEffect(moves).filter(variant.kingSafety)
 
@@ -116,13 +116,13 @@ case class Situation(board: Board, color: Color):
     // else use the normal moveAt
     if variant.antichess then
       val captureMoves = Antichess.captureMoves(this)
-      if captureMoves.nonEmpty then captureMoves.filter(_.orig == pos)
+      if captureMoves.nonEmpty then captureMoves.filter(_.orig == square)
       else movesAt
     else movesAt
 
-  def genKingAt(mask: Bitboard, pos: Pos) =
-    val withoutCastles = genUnsafeKing(pos, mask)
-    if variant.allowsCastling then withoutCastles ::: genCastling(pos)
+  def genKingAt(mask: Bitboard, square: Square) =
+    val withoutCastles = genUnsafeKing(square, mask)
+    if variant.allowsCastling then withoutCastles ::: genCastling(square)
     else withoutCastles
 
   def genEnPassant(pawns: Bitboard): List[Move] =
@@ -136,7 +136,7 @@ case class Situation(board: Board, color: Color):
     * the last move must have been a double pawn push
     * and not start from the back rank
     */
-  def potentialEpSquare: Option[Pos] = history.lastMove.flatMap:
+  def potentialEpSquare: Option[Square] = history.lastMove.flatMap:
     case Uci.Move(orig, dest, _) =>
       board(dest).flatMap { piece =>
         if piece.color == !color && piece.role == Pawn &&
@@ -189,13 +189,13 @@ case class Situation(board: Board, color: Color):
 
     val s2: List[Move] = for
       to   <- (singleMoves & mask).squares
-      from <- Pos.at(to.value + (if isWhiteTurn then -8 else 8)).toList
+      from <- Square.at(to.value + (if isWhiteTurn then -8 else 8)).toList
       move <- genPawnMoves(from, to, false)
     yield move
 
     val s3: List[Move] = for
       to   <- (doubleMoves & mask).squares
-      from <- Pos.at(to.value + (if isWhiteTurn then -16 else 16))
+      from <- Square.at(to.value + (if isWhiteTurn then -16 else 16))
       move <- normalMove(from, to, Pawn, false)
     yield move
 
@@ -233,7 +233,7 @@ case class Situation(board: Board, color: Color):
       move <- normalMove(from, to, Queen, isOccupied(to))
     yield move
 
-  def genUnsafeKing(king: Pos, mask: Bitboard): List[Move] =
+  def genUnsafeKing(king: Square, mask: Bitboard): List[Move] =
     val targets = king.kingAttacks & mask
     targets.squares.flatMap(to => normalMove(king, to, King, isOccupied(to)))
 
@@ -247,7 +247,7 @@ case class Situation(board: Board, color: Color):
       yield move
     )
 
-  def genCastling(king: Pos): List[Move] =
+  def genCastling(king: Square): List[Move] =
     // can castle but which side?
     if !history.castles.can(color) || king.rank != color.backRank then Nil
     else
@@ -256,8 +256,8 @@ case class Situation(board: Board, color: Color):
         rook <- rooks.squares
         toKingFile = if rook < king then File.C else File.G
         toRookFile = if rook < king then File.D else File.F
-        kingTo     = Pos(toKingFile, king.rank)
-        rookTo     = Pos(toRookFile, rook.rank)
+        kingTo     = Square(toKingFile, king.rank)
+        rookTo     = Square(toRookFile, rook.rank)
         // calulate different path for standard vs chess960
         path =
           if variant.chess960 || variant.fromPosition
@@ -276,12 +276,12 @@ case class Situation(board: Board, color: Color):
         moves <- castle(king, kingTo, rook, rookTo)
       yield moves
 
-  private def genPawnMoves(from: Pos, to: Pos, capture: Boolean): List[Move] =
+  private def genPawnMoves(from: Square, to: Square, capture: Boolean): List[Move] =
     if from.rank == color.seventhRank then variant.promotableRoles.flatMap(promotion(from, to, _, capture))
     else normalMove(from, to, Pawn, capture).toList
 
-  private def enpassant(orig: Pos, dest: Pos): Option[Move] =
-    val capture = Pos(dest.file, orig.rank)
+  private def enpassant(orig: Square, dest: Square): Option[Move] =
+    val capture = Square(dest.file, orig.rank)
     board
       .taking(orig, dest, capture.some)
       .map(after =>
@@ -298,7 +298,7 @@ case class Situation(board: Board, color: Color):
         )
       )
 
-  private def normalMove(orig: Pos, dest: Pos, role: Role, capture: Boolean): Option[Move] =
+  private def normalMove(orig: Square, dest: Square, role: Role, capture: Boolean): Option[Move] =
     val taken = if capture then Option(dest) else None
     val after =
       if (capture) then board.taking(orig, dest, taken)
@@ -317,7 +317,12 @@ case class Situation(board: Board, color: Color):
       )
     )
 
-  private def promotion(orig: Pos, dest: Pos, promotion: PromotableRole, capture: Boolean): Option[Move] =
+  private def promotion(
+      orig: Square,
+      dest: Square,
+      promotion: PromotableRole,
+      capture: Boolean
+  ): Option[Move] =
     val taken = if capture then Option(dest) else None
     board
       .promote(orig, dest, color - promotion)
@@ -345,7 +350,7 @@ case class Situation(board: Board, color: Color):
   // check logic in isChess960 function
   // make sure that the 960 move is first since it will be the representative
   // move and we want 960 uci notation
-  private def castle(king: Pos, kingTo: Pos, rook: Pos, rookTo: Pos): List[Move] =
+  private def castle(king: Square, kingTo: Square, rook: Square, rookTo: Square): List[Move] =
     val after = for
       b1    <- board.take(king)
       b2    <- b1.take(rook)
@@ -361,12 +366,12 @@ case class Situation(board: Board, color: Color):
     val destInput = if !isChess960 then List(rook, kingTo) else List(rook)
 
     for
-      a            <- after.toList
-      inputKingPos <- destInput
+      a               <- after.toList
+      inputKingSquare <- destInput
     yield Move(
       piece = color.king,
       orig = king,
-      dest = inputKingPos,
+      dest = inputKingSquare,
       situationBefore = this,
       after = a,
       capture = None,

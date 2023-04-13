@@ -19,14 +19,14 @@ case object Horde
 
   /** In Horde chess white advances against black with a horde of pawns.
     */
-  lazy val pieces: Map[Pos, Piece] =
+  lazy val pieces: Map[Square, Piece] =
     val whitePawnsHorde = for {
       x <- File.all
       y <- Rank.all.take(4)
-    } yield (Pos(x, y) -> White.pawn)
-    val frontPawns  = List(Pos.B5, Pos.C5, Pos.F5, Pos.G5).map { _ -> White.pawn }
-    val blackPawns  = File.all.map { Pos(_, Rank.Seventh) -> Black.pawn }
-    val blackPieces = File.all.map { x => Pos(x, Rank.Eighth) -> (Black - backRank(x.index)) }
+    } yield (Square(x, y) -> White.pawn)
+    val frontPawns  = List(Square.B5, Square.C5, Square.F5, Square.G5).map { _ -> White.pawn }
+    val blackPawns  = File.all.map { Square(_, Rank.Seventh) -> Black.pawn }
+    val blackPieces = File.all.map { x => Square(x, Rank.Eighth) -> (Black - backRank(x.index)) }
     whitePawnsHorde ++ frontPawns ++ blackPawns ++ blackPieces toMap
 
   override val castles = Castles("kq")
@@ -52,9 +52,9 @@ case object Horde
     * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
     */
   private def hordeClosedPosition(situation: Situation): Boolean =
-    val hordePos = situation.board.byColor(White)
-    val mateInOne = hordePos.count == 1 &&
-      hordePos.singleSquare.exists(pieceThreatened(situation.board, Color.black, _))
+    val hordeSquare = situation.board.byColor(White)
+    val mateInOne = hordeSquare.count == 1 &&
+      hordeSquare.singleSquare.exists(pieceThreatened(situation.board, Color.black, _))
     !mateInOne && {
       if situation.isWhiteTurn then situation.legalMoves.isEmpty
       else

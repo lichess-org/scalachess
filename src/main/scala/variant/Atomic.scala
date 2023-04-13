@@ -50,7 +50,7 @@ case object Atomic
       attackersWithoutKing(board, occupied, k, !color).nonEmpty
     }
 
-  private def attackersWithoutKing(board: Board, occupied: Bitboard, s: Pos, attacker: Color) =
+  private def attackersWithoutKing(board: Board, occupied: Bitboard, s: Square, attacker: Color) =
     import board.board.{ byColor, rooks, queens, bishops, knights, pawns }
     byColor(attacker) & (
       s.rookAttacks(occupied) & (rooks ^ queens) |
@@ -65,7 +65,7 @@ case object Atomic
       explodesOpponentKing(m.situationBefore)(m))
       && !explodesOwnKing(m.situationBefore)(m)
 
-  override def castleCheckSafeSquare(board: Board, king: Pos, color: Color, occupied: Bitboard): Boolean =
+  override def castleCheckSafeSquare(board: Board, king: Square, color: Color, occupied: Bitboard): Boolean =
     king.kingAttacks.intersects(board.kingOf(!color)) ||
       attackersWithoutKing(board, occupied, king, !color).isEmpty
 
@@ -114,21 +114,21 @@ case object Atomic
   /** Since a king cannot capture, K + P vs K + P where none of the pawns can move is an automatic draw
     */
   private def atomicClosedPosition(board: Board) =
-    val closedStructure = board.pieces.forall((pos, piece) =>
-      InsufficientMatingMaterial.pawnBlockedByPawn(pos, board)
+    val closedStructure = board.pieces.forall((square, piece) =>
+      InsufficientMatingMaterial.pawnBlockedByPawn(square, board)
         || piece.is(King) || piece.is(Bishop)
     )
     val randomBishop = board.pieces.find { case (_, piece) => piece.is(Bishop) }
     val bishopsAbsentOrPawnitized = randomBishop match
-      case Some((pos, piece)) => bishopPawnitized(board, piece.color, pos.isLight)
-      case None               => true
+      case Some((square, piece)) => bishopPawnitized(board, piece.color, square.isLight)
+      case None                  => true
     closedStructure && bishopsAbsentOrPawnitized
 
   private def bishopPawnitized(board: Board, sideWithBishop: Color, bishopLight: Boolean) =
-    board.pieces.forall((pos, piece) =>
+    board.pieces.forall((square, piece) =>
       (piece.is(Pawn) && piece.is(sideWithBishop)) ||
-        (piece.is(Pawn) && piece.is(!sideWithBishop) && pos.isLight == !bishopLight) ||
-        (piece.is(Bishop) && piece.is(sideWithBishop) && pos.isLight == bishopLight) ||
+        (piece.is(Pawn) && piece.is(!sideWithBishop) && square.isLight == !bishopLight) ||
+        (piece.is(Bishop) && piece.is(sideWithBishop) && square.isLight == bishopLight) ||
         piece.is(King)
     )
 

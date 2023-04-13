@@ -163,7 +163,7 @@ object Parser:
 
     val rank = mapParserChar(rankMap, "rank")
 
-    val dest: P[Pos] = mapParser(Pos.allKeys, "dest")
+    val dest: P[Square] = mapParser(Square.allKeys, "dest")
 
     val promotable = Role.allPromotableByPgn.mapKeys(_.toUpper)
 
@@ -177,6 +177,11 @@ object Parser:
       case ((ro, ca), de) =>
         Std(dest = de, role = ro, capture = ca)
 
+    // B@g5
+    val drop: P[Drop] = ((role <* P.char('@')) ~ dest).map((role, square) => Drop(role, square))
+
+    val pawnDrop: P[Drop] = (P.char('@') *> dest).map(Drop(Pawn, _))
+
     // optional e.p.
     val optionalEnPassant = (R.wsp.rep0.soft ~ P.string("e.p.")).void.?
 
@@ -188,11 +193,6 @@ object Parser:
     // only pawn can promote
     val pawn: P[Std] = ((disambiguatedPawn.backtrack | stdPawn) ~ promotion.?).map: (pawn, promo) =>
       pawn.copy(promotion = promo)
-
-    // B@g5
-    val drop: P[Drop] = ((role <* P.char('@')) ~ dest).map((role, pos) => Drop(role, pos))
-
-    val pawnDrop: P[Drop] = (P.char('@') *> dest).map(Drop(Pawn, _))
 
     // Bac3 Baxc3 B2c3 B2xc3 Ba2xc3
     val disambiguated: P[Std] = (role ~ file.? ~ rank.? ~ x ~ dest).map:

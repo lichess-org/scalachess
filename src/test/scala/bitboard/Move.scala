@@ -1,14 +1,14 @@
 package chess
 package bitboard
 
-// case Capture(from: Pos, to: Pos, role: Role, capture: Role)???
-// case Drop/Put(role: Role, to: Pos)
-enum Move(val from: Pos, val to: Pos, val role: Role):
-  case Normal(override val from: Pos, override val to: Pos, override val role: Role, capture: Boolean)
+// case Capture(from: square, to: square, role: Role, capture: Role)???
+// case Drop/Put(role: Role, to: square)
+enum Move(val from: Square, val to: Square, val role: Role):
+  case Normal(override val from: Square, override val to: Square, override val role: Role, capture: Boolean)
       extends Move(from, to, role)
-  case Castle(override val from: Pos, override val to: Pos)    extends Move(from, to, King)
-  case EnPassant(override val from: Pos, override val to: Pos) extends Move(from, to, Pawn)
-  case Promotion(override val from: Pos, override val to: Pos, promoted: Role, capture: Boolean)
+  case Castle(override val from: Square, override val to: Square)    extends Move(from, to, King)
+  case EnPassant(override val from: Square, override val to: Square) extends Move(from, to, Pawn)
+  case Promotion(override val from: Square, override val to: Square, promoted: Role, capture: Boolean)
       extends Move(from, to, Pawn)
 
   def isCapture: Boolean =
@@ -21,10 +21,10 @@ enum Move(val from: Pos, val to: Pos, val role: Role):
   def isHalfMove: Boolean =
     role != Pawn && !isCapture
 
-  extension (pos: Pos)
+  extension (square: Square)
     def uci: String =
-      val f = pos.file.char
-      val r = pos.rank.char
+      val f = square.file.char
+      val r = square.rank.char
       s"$f$r"
 
   def uci: String =

@@ -40,11 +40,7 @@ case class Std(
 
   private inline def compare[A](a: Option[A], b: A) = a.fold(true)(b ==)
 
-case class Drop(
-    role: Role,
-    square: Square,
-    metas: Metas = Metas.empty
-) extends San:
+case class Drop(role: Role, square: Square) extends San:
 
   def apply(situation: Situation) = drop(situation)
 

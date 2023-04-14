@@ -79,14 +79,6 @@ object Square extends OpaqueInt[Square]:
   inline def fromChar(c: Char): Option[Square] = charMap get c
 
   inline def keyToChar(inline key: String) = fromKey(key).map(_.asChar)
-  inline def doubleKeyToChars(key: String) = for
-    a <- keyToChar(key take 2)
-    b <- keyToChar(key drop 2)
-  yield s"$a$b"
-  inline def doubleCharToKey(chars: String) = for
-    a <- fromChar(chars.head)
-    b <- fromChar(chars(1))
-  yield s"${a.key}${b.key}"
 
   val A1: Square = 0
   val B1: Square = 1

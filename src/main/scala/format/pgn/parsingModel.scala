@@ -63,12 +63,6 @@ case class Castle(side: Side) extends San:
 opaque type Sans = List[San]
 object Sans extends TotalWrapper[Sans, List[San]]
 
-opaque type Comment = String
-object Comment extends TotalWrapper[Comment, String]:
-  extension (cs: List[Comment])
-    inline def cleanUp: List[Comment] =
-      cs.collect { case c if !c.isBlank => c.trim }
-
 opaque type InitialPosition = List[Comment]
 object InitialPosition extends TotalWrapper[InitialPosition, List[Comment]]:
   extension (ip: InitialPosition) inline def comments: List[Comment] = ip

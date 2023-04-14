@@ -9,7 +9,8 @@ import chess.format.pgn.Fixtures
 
 class PgnNodeTest extends FunSuite:
 
-  given Conversion[String, SanStr] = SanStr(_)
+  given Conversion[String, SanStr]  = SanStr(_)
+  given Conversion[String, Comment] = Comment(_)
 
   private def glyphs(id: Int) =
     Glyph.find(id).fold(Glyphs.empty) { g =>

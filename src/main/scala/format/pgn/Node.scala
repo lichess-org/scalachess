@@ -11,11 +11,11 @@ import monocle.Traversal
 // answer: it's possible but we need to support null move first
 case class Node[A](
     value: A,
-    child: Option[Node[A]],
-    variations: List[Node[A]]
+    child: Option[Node[A]],   // main line next move
+    variations: List[Node[A]] // alternate moves, e.g. Node("e4", None, List("d4", "Nf3"))
 ):
   def mainLine: List[A] = value :: child.fold(Nil)(_.mainLine)
-  def totalNodes: Int   = this.foldLeft(0)((b, a) => b + 1)
+  def totalNodes: Int   = this.foldLeft(0)((b, _) => b + 1)
 
   // search and replace a node that satisfies the predicate (both child and variations)
   def setChild(predicate: A => Boolean)(node: Node[A]): Node[A] =

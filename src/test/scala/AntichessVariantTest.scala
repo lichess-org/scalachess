@@ -80,7 +80,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       }
 
     "Allow a capturing move to be made" in:
-      val game = Game(Antichess).playMoves((Square.E2, Square.E4), (Square.F7, Square.F5), (Square.E4, Square.F5))
+      val game =
+        Game(Antichess).playMoves((Square.E2, Square.E4), (Square.F7, Square.F5), (Square.E4, Square.F5))
       game must beValid
 
     "Not permit a player to castle" in:
@@ -93,7 +94,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         (Square.G1, Square.H3)
       )
 
-      val possibleDestinations = game flatMap (_.board.destsFrom(Square.E1).toValid("king has no destinations"))
+      val possibleDestinations =
+        game flatMap (_.board.destsFrom(Square.E1).toValid("king has no destinations"))
 
       possibleDestinations must beValid.like { case dests =>
         // G1 (to castle) should not be a valid destination
@@ -266,7 +268,8 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     "Be drawn on a three move repetition" in:
       val game = Game(Antichess)
 
-      val moves = List((Square.G1, Square.F3), (Square.G8, Square.F6), (Square.F3, Square.G1), (Square.F6, Square.G8))
+      val moves =
+        List((Square.G1, Square.F3), (Square.G8, Square.F6), (Square.F3, Square.G1), (Square.F6, Square.G8))
       val repeatedMoves: List[(Square, Square)] = List.fill(3)(moves).flatten
 
       val drawnGame = game.playMoveList(repeatedMoves)

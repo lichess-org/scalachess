@@ -24,9 +24,10 @@ class AtomicVariantTest extends ChessTest:
       }
 
     "Must explode all surrounding non pawn pieces on capture (contrived situation)" in:
-      val fenPosition     = EpdFen("k7/3bbn2/3rqn2/3qr3/8/7B/8/1K6 w - -")
-      val maybeGame       = fenToGame(fenPosition, Atomic)
-      val explodedSquares = List(Square.D5, Square.E5, Square.D6, Square.E6, Square.F6, Square.D7, Square.E7, Square.F7)
+      val fenPosition = EpdFen("k7/3bbn2/3rqn2/3qr3/8/7B/8/1K6 w - -")
+      val maybeGame   = fenToGame(fenPosition, Atomic)
+      val explodedSquares =
+        List(Square.D5, Square.E5, Square.D6, Square.E6, Square.F6, Square.D7, Square.E7, Square.F7)
 
       val explosionGame = maybeGame flatMap (_.playMoves((Square.H3, Square.E6)))
 
@@ -35,9 +36,10 @@ class AtomicVariantTest extends ChessTest:
       }
 
     "Must explode all surrounding non pawn pieces on capture (contrived situation with bottom right position)" in:
-      val fenPosition     = EpdFen("k7/3bbn2/3rqn2/4rq2/8/1B6/8/K7 w - -")
-      val maybeGame       = fenToGame(fenPosition, Atomic)
-      val explodedSquares = List(Square.F5, Square.E5, Square.D6, Square.E6, Square.F6, Square.D7, Square.E7, Square.F7)
+      val fenPosition = EpdFen("k7/3bbn2/3rqn2/4rq2/8/1B6/8/K7 w - -")
+      val maybeGame   = fenToGame(fenPosition, Atomic)
+      val explodedSquares =
+        List(Square.F5, Square.E5, Square.D6, Square.E6, Square.F6, Square.D7, Square.E7, Square.F7)
 
       val explosionGame = maybeGame flatMap (_.playMoves((Square.B3, Square.E6)))
 
@@ -211,7 +213,9 @@ class AtomicVariantTest extends ChessTest:
         // Every piece surrounding the en-passant destination square that is not a pawn should be empty
         import bitboard.Bitboard.*
         Square.E6.kingAttacks.squares
-          .forall(square => game.board(square).isEmpty || square == Square.E7 || square == Square.D7) must beTrue
+          .forall(square =>
+            game.board(square).isEmpty || square == Square.E7 || square == Square.D7
+          ) must beTrue
       }
 
     "Verify it is not possible to walk into check" in:
@@ -559,7 +563,8 @@ class AtomicVariantTest extends ChessTest:
     "Allow castling with touching kings and rook shielding final attack 2" in:
       val position = EpdFen("r3k1rR/5K2/8/8/8/8/8/8 b kq - 0 1")
       val game     = fenToGame(position, Atomic)
-      val newGame  = game flatMap (_.playMoves((Square.G8, Square.G6), (Square.F7, Square.E7), (Square.E8, Square.A8)))
+      val newGame =
+        game flatMap (_.playMoves((Square.G8, Square.G6), (Square.F7, Square.E7), (Square.E8, Square.A8)))
 
       newGame must beValid.like { case game =>
         game.board(Square.C8) must beEqualTo(Black.king.some)

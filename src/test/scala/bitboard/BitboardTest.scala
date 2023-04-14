@@ -11,7 +11,7 @@ import Arbitraries.given
 class BitboardTest extends ScalaCheckSuite:
 
   import scala.language.implicitConversions
-  given Conversion[Square, Int]       = _.value
+  given Conversion[Square, Int]    = _.value
   given Conversion[Bitboard, Long] = _.value
   import Bitboard.*
 

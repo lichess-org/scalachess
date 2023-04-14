@@ -43,7 +43,7 @@ case class Board(
   inline def apply(inline color: Color, inline role: Role): Bitboard =
     color.fold(white, black) & board.byRole(role)
 
-  inline def apply(inline at: Square): Option[Piece]        = board.pieceAt(at)
+  inline def apply(inline at: Square): Option[Piece]     = board.pieceAt(at)
   inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Square(file, rank))
 
   def checkColor: Option[Color] = checkWhite.yes.option(White) orElse checkBlack.yes.option(Black)

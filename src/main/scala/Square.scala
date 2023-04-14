@@ -39,8 +39,8 @@ object Square extends OpaqueInt[Square]:
       file.value - rank.value == other.file.value - other.rank.value || file.value + rank.value == other.file.value + other.rank.value
     inline def onSameLine(other: Square): Boolean = ?-(other) || ?|(other)
 
-    inline def xDist(inline other: Square) = abs(p.file.value - other.file.value)
-    inline def yDist(inline other: Square) = abs(p.rank.value - other.rank.value)
+    inline def xDist(inline other: Square): Int = abs(p.file.value - other.file.value)
+    inline def yDist(inline other: Square): Int = abs(p.rank.value - other.rank.value)
 
     inline def isLight: Boolean = (file.value + rank.value) % 2 == 1
 
@@ -74,9 +74,9 @@ object Square extends OpaqueInt[Square]:
     if (0 <= index && index < 64) Some(index)
     else None
 
-  inline def fromKey(key: String): Option[Square] = allKeys get key
+  inline def fromKey(inline key: String): Option[Square] = allKeys get key
 
-  inline def fromChar(c: Char): Option[Square] = charMap get c
+  inline def fromChar(inline c: Char): Option[Square] = charMap get c
 
   inline def keyToChar(inline key: String) = fromKey(key).map(_.asChar)
 
@@ -147,8 +147,8 @@ object Square extends OpaqueInt[Square]:
 
   val all: List[Square] = Square from (0 to 63).toList
 
-  val whiteBackrank = (A1 <-> H1).toList
-  val blackBackrank = (A8 <-> H8).toList
+  val whiteBackrank: List[Square] = (A1 <-> H1).toList
+  val blackBackrank: List[Square] = (A8 <-> H8).toList
 
   val allKeys: Map[String, Square] = all.mapBy(_.key)
   val charMap: Map[Char, Square]   = all.mapBy(square => Square(square).asChar)

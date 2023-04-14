@@ -6,8 +6,12 @@ import cats.syntax.option.*
 
 case class PgnNodeData(
     san: San,
-    metas: Metas,                    // describes the position after the move `san` is played
-    variationComments: List[Comment] // describe the position before the move `san` is played
+    metas: Metas, // describes the position after the move `san` is played
+    /* `variationComments` are comments before the first move of a variation. Example:
+     * `1.d4 {the best move} ( on the other hand 1.e4 is not as good )`
+     * => PgnNodeData(1.e4, Metas.empty, List(Node(1.e4, Metas(Comment("is not as good"), List("on the other hand")))
+     */
+    variationComments: List[Comment]
 )
 type ParsedPgnTree = Node[PgnNodeData]
 

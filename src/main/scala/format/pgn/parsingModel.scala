@@ -76,11 +76,11 @@ object InitialPosition extends TotalWrapper[InitialPosition, List[Comment]]:
   extension (ip: InitialPosition) inline def comments: List[Comment] = ip
 
 case class Metas(
-    check: Boolean,
+    check: Check,
     checkmate: Boolean,
     comments: List[Comment],
     glyphs: Glyphs
 )
 
 object Metas:
-  val empty = Metas(check = false, checkmate = false, Nil, Glyphs.empty)
+  val empty = Metas(Check.No, checkmate = false, Nil, Glyphs.empty)

@@ -203,7 +203,7 @@ object Parser:
       (checkmate ~ check ~ (glyphs <* escape) ~ nagGlyphs ~ comment.rep0 ~ nagGlyphs)
         .map { case (((((checkmate, check), glyphs1), glyphs2), comments), glyphs3) =>
           val glyphs = glyphs1 merge glyphs2 merge glyphs3
-          Metas(check, checkmate, comments, glyphs)
+          Metas(Check(check), checkmate, comments, glyphs)
         }
 
     val castle: P[San] = (qCastle | kCastle).map(Castle(_))

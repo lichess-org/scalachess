@@ -220,7 +220,7 @@ class ParserTest extends ChessTest:
   "block comment in variation root" in:
     parse(rootCommentInVariation) must beValid.like: parsed =>
       parsed.tree.get.variations.head.value.variationComments must_==
-        Some(List("This move:"))
+        Some(List("This other move:"))
 
   "inline comment in variation root" in:
     parse(rootCommentInVariation) must beValid.like: parsed =>
@@ -230,7 +230,7 @@ class ParserTest extends ChessTest:
   "block comments in variation root" in:
     parse(multipleRootCommentsInVariation) must beValid.like: parsed =>
       parsed.tree.get.variations.head.value.variationComments must_==
-        Some(List("This move:", "looks pretty"))
+        Some(List("This other move:", "looks pretty"))
 
   "multiple comments in variation root" in:
     parse(multipleRootCommentsInVariation) must beValid.like: parsed =>

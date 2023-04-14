@@ -3,7 +3,6 @@ package format
 package pgn
 
 import cats.syntax.all.*
-import cats.derived.*
 import cats.*
 
 import monocle.Traversal

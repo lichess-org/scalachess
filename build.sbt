@@ -15,7 +15,7 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
     "org.typelevel"       %% "cats-core"         % "2.9.0",
     "org.typelevel"       %% "alleycats-core"    % "2.9.0",
     "org.typelevel"       %% "cats-parse"        % "0.3.9",
-    "dev.optics"          %% "monocle-core"      % "3.1.0"
+    "dev.optics"          %% "monocle-core"      % "3.2.0"
   ),
   testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
   scalacOptions := Seq(

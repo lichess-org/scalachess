@@ -120,12 +120,12 @@ object Parser:
               case Nil => None
               case x :: xs =>
                 val child = xs.reverse.foldLeft(none[ParsedPgnTree])((acc, x) => x.copy(child = acc).some)
-                Some(x.copy(child = child, value = x.value.copy(variationComments = comments.some)))
+                Some(x.copy(child = child, value = x.value.copy(variationComments = comments)))
           )
 
       preMoveEscape.with1 *> ((moveAndMetas ~ variation.rep0) <* postMoveEscape).map:
         case ((san, metas), variations) =>
-          val data = PgnNodeData(san, metas, None)
+          val data = PgnNodeData(san, metas, Nil)
           Node(data, None, variations.flatten)
     }
 

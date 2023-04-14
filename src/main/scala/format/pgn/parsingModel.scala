@@ -4,7 +4,11 @@ package format.pgn
 import cats.data.Validated
 import cats.syntax.option.*
 
-case class PgnNodeData(san: San, metas: Metas, variationComments: Option[List[Comment]])
+case class PgnNodeData(
+    san: San,
+    metas: Metas,                    // describes the position after the move `san` is played
+    variationComments: List[Comment] // describe the position before the move `san` is played
+)
 type ParsedPgnTree = Node[PgnNodeData]
 
 case class ParsedPgn(initialPosition: InitialPosition, tags: Tags, tree: Option[ParsedPgnTree]):

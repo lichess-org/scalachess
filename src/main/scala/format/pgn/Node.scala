@@ -55,10 +55,9 @@ object Node:
       val b2 = fa.child.foldRight(b1)((a, b) => foldRight(a, b)(f))
       f(fa.value, b2)
 
-  def filterKey[A](predicate: A => Boolean): Traversal[Node[A], A] =
-    new Traversal[Node[A], A]:
-      def modifyA[F[_]: Applicative](f: A => F[A])(s: Node[A]): F[Node[A]] =
-        s.map(a => if predicate(a) then f(a) else a.pure[F]).sequence
+  def filterKey[A](predicate: A => Boolean): Traversal[Node[A], A] = new:
+    def modifyA[F[_]: Applicative](f: A => F[A])(s: Node[A]): F[Node[A]] =
+      s.map(a => if predicate(a) then f(a) else a.pure[F]).sequence
 
 type PgnTree = Node[Move]
 

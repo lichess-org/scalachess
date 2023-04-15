@@ -11,6 +11,8 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
     "com.disneystreaming" %% "weaver-scalacheck" % "0.8.2" % Test,
     "co.fs2"              %% "fs2-core"          % "3.6.1" % Test,
     "co.fs2"              %% "fs2-io"            % "3.6.1" % Test,
+    "org.typelevel"       %% "discipline-munit"  % "1.0.9" % Test,
+    "org.typelevel"       %% "cats-laws"         % "2.9.0" % Test,
     "com.github.ornicar"  %% "scalalib"          % "9.3.2",
     "org.typelevel"       %% "cats-core"         % "2.9.0",
     "org.typelevel"       %% "alleycats-core"    % "2.9.0",

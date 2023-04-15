@@ -50,8 +50,8 @@ object Node:
       fa.variations.foldLeft(b2)((b, a) => a.foldLeft(b)(f))
 
     def foldRight[A, B](fa: Node[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
-      val b1: Eval[B] = Foldable[List].foldRight(fa.variations, lb)((a, b) => a.foldRight(b)(f))
-      val b2: Eval[B] = Foldable[Option].foldRight(fa.child, b1)((a, b) => a.foldRight(b)(f))
+      val b1: Eval[B] = fa.variations.foldr(lb)((a, b) => a.foldRight(b)(f))
+      val b2: Eval[B] = fa.child.foldr(b1)((a, b) => a.foldRight(b)(f))
       Eval.defer(f(fa.value, b2))
 
   def filterKey[A](predicate: A => Boolean): Traversal[Node[A], A] = new:

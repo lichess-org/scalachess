@@ -28,7 +28,7 @@ case class Node[A](
   def replaceNode(predicate: A => Boolean)(node: Node[A]): Option[Node[A]] =
     modifyNode(predicate)(_ => node)
 
-  // modify a node that satisfies the predicate (dfs with main line and then variations)
+  // modify the first node that satisfies the predicate (dfs with main line and then variations)
   def modifyNode(predicate: A => Boolean)(f: Node[A] => Node[A]): Option[Node[A]] =
     if predicate(value) then f(this).some
     else
@@ -44,6 +44,27 @@ case class Node[A](
           } match
             case (true, ns) => copy(variations = ns).some
             case (false, _) => none
+
+  // delete the first node that satisfies the predicate (both child and variations)
+  // except the root
+  def deleteSubNode(predicate: A => Boolean): Option[Node[A]] =
+    child.flatMap { n =>
+      if predicate(n.value) then copy(child = None).some
+      else n.deleteSubNode(predicate).map(nn => this.copy(child = Some(nn)))
+    } match
+      case Some(n) => n.some
+      case None =>
+        variations.foldLeft((false, List.empty[Node[A]])) {
+          case ((true, acc), n) => (true, acc :+ n)
+          case ((false, acc), n) =>
+            if predicate(n.value) then (true, acc)
+            else
+              n.deleteSubNode(predicate) match
+                case Some(nn) => (true, acc :+ nn)
+                case None     => (false, acc :+ n)
+        } match
+          case (true, ns) => copy(variations = ns).some
+          case (false, _) => none
 
   // search and replace a node that satisfies the predicate (both child and variations)
   def setChild(predicate: A => Boolean)(node: Node[A]): Node[A] =

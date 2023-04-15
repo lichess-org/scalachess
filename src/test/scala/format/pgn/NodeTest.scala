@@ -9,6 +9,7 @@ import cats.syntax.all.*
 import Arbitraries.given
 
 class NodeTest extends ScalaCheckSuite:
+
   test("filterOptional isEmpty"):
     forAll: (node: Node[Int], p: Int => Boolean) =>
       val optional = Node.filterOptional(p)
@@ -38,3 +39,30 @@ class NodeTest extends ScalaCheckSuite:
           case (None, None)       => true
           case _                  => false
       }
+
+  test("filterTraversal"):
+    forAll: (node: Node[Int]) =>
+      val filter = Node.filterTraversal[Int](_ % 2 != 0)
+      val result = filter.modify(_ * 2)(node)
+      result.forall(_ % 2 == 0)
+
+  test("filterOptional"):
+    forAll: (node: Node[Int]) =>
+      val filter = Node.filterOptional[Int](_ => true)
+      val x      = Node(1, None, Nil)
+      val result = filter.replace(x)(node)
+      result == x
+
+  test("filterOptional can be used instead of replace"):
+    forAll: (node: Node[Int], p: Int => Boolean, newNode: Node[Int]) =>
+      val filter       = Node.filterOptional(p)
+      val withOptional = filter.replaceOption(newNode)(node)
+      val direct       = node.replaceNode(p)(newNode)
+      withOptional == direct
+
+  test("filterOptional can be used instead of modify"):
+    forAll: (node: Node[Int], p: Int => Boolean, f: Int => Int) =>
+      val filter       = Node.filterOptional(p)
+      val withOptional = filter.modifyOption(x => x.map(f))(node)
+      val direct       = node.modifyNode(p)(x => x.map(f))
+      withOptional == direct

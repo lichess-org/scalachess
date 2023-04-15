@@ -26,11 +26,21 @@ case class Node[A](
     if predicate(value) then copy(child = None)
     else copy(child = child.map(_.removeChild(predicate)))
 
-  def modifyChild(predicate: A => Boolean)(f: A => A): Node[A] = ???
+  def modifyChild(predicate: A => Boolean)(f: A => A): Node[A] =
+    if predicate(value) then copy(value = f(value))
+    else copy(child = child.map(_.modifyChild(predicate)(f)))
 
-  def setVariations(predicate: A => Boolean)(variations: List[Node[A]]): Node[A]            = ???
-  def modifyVariations(predicate: A => Boolean)(f: List[Node[A]] => List[Node[A]]): Node[A] = ???
-  def revalueVariations(predicate: A => Boolean): Node[A]                                   = ???
+  def setVariations(predicate: A => Boolean)(variations: List[Node[A]]): Node[A] =
+    if predicate(value) then copy(variations = variations)
+    else copy(variations = variations.map(_.setVariations(predicate)(variations)))
+
+  def modifyVariations(predicate: A => Boolean)(f: List[Node[A]] => List[Node[A]]): Node[A] =
+    if predicate(value) then copy(variations = f(variations))
+    else copy(variations = variations.map(_.modifyVariations(predicate)(f)))
+
+  def removeVariations(predicate: A => Boolean): Node[A] =
+    if predicate(value) then copy(variations = variations.map(_.removeVariations(predicate)))
+    else copy(variations = variations.map(_.removeVariations(predicate)))
 
 object Node:
   given Functor[Node] with
@@ -57,33 +67,3 @@ object Node:
   def filterKey[A](predicate: A => Boolean): Traversal[Node[A], A] = new:
     def modifyA[F[_]: Applicative](f: A => F[A])(s: Node[A]): F[Node[A]] =
       s.map(a => if predicate(a) then f(a) else a.pure[F]).sequence
-
-type PgnTree = Node[Move]
-
-// isomorphic to Pgn
-case class NewPgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
-  def toPgn: Pgn =
-    val moves = tree.fold(List.empty[Move])(toMove(_, Ply(1)))
-    val turns = Turn.fromMoves(moves, Ply(1))
-    Pgn(tags, turns, initial)
-
-  def toMove(node: PgnTree, ply: Ply): List[Move] =
-    val variations = node.variations.map(x => Turn.fromMoves(toMove(x, ply), ply))
-    val move       = node.value.copy(variations = variations)
-    move :: node.child.fold(Nil)(toMove(_, ply + 1))
-
-object NewPgn:
-  def moves(turn: Turn): List[Move] = List(turn.white, turn.black).flatten
-  def moves(pgn: Pgn): List[Move]   = pgn.turns.flatMap(moves)
-
-  extension (move: Move) def clean: Move = move.copy(variations = Nil)
-  def apply(pgn: Pgn): NewPgn =
-    val tree = moves(pgn).reverse.foldLeft(none[PgnTree]) { (o, move) => Some(toNode(move, o)) }
-    NewPgn(tags = pgn.tags, initial = pgn.initial, tree = tree)
-
-  def toNode(move: Move, child: Option[PgnTree]): PgnTree =
-    Node(
-      move.clean,
-      child,
-      move.variations.map(_.flatMap(moves)).map(x => toNode(x.head, None))
-    )

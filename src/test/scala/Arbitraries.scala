@@ -42,7 +42,7 @@ object Arbitraries:
     yield x
 
   def genChild[A](using Arbitrary[A]): Gen[Option[Node[A]]] =
-    Gen.frequency((10, Gen.const(None)), (1, genNode.map(Some(_))))
+    Gen.frequency((2, Gen.const(None)), (1, genNode.map(Some(_))))
 
   private val genBool = Gen.prob(0.5)
   private val castlesGen =

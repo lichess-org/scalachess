@@ -19,21 +19,21 @@ object UciCharPair:
           dropRole2charMap.getOrElse(role, voidChar)
         )
 
-  private[format] object implementation:
+  object implementation:
 
     val charShift = 35        // Start at Char(35) == '#'
     val voidChar  = 33.toChar // '!'. We skipped Char(34) == '"'.
 
-    val pos2charMap: Map[Square, Char] = Square.all.map { square =>
-      square -> (Square.hashCode + charShift).toChar
+    val square2charMap: Map[Square, Char] = Square.all.map { square =>
+      square -> (square.hashCode + charShift).toChar
     }.toMap
 
-    inline def toChar(inline square: Square) = pos2charMap.getOrElse(square, voidChar)
+    inline def toChar(inline square: Square) = square2charMap.getOrElse(square, voidChar)
 
     val promotion2charMap: Map[(File, PromotableRole), Char] = for {
       (role, index) <- Role.allPromotable.zipWithIndex.toMap
       file          <- File.all
-    } yield (file, role) -> (charShift + pos2charMap.size + index * 8 + file.index).toChar
+    } yield (file, role) -> (charShift + square2charMap.size + index * 8 + file.index).toChar
 
     def toChar(file: File, prom: PromotableRole) =
       promotion2charMap.getOrElse(file -> prom, voidChar)
@@ -43,6 +43,6 @@ object UciCharPair:
         .filterNot(King == _)
         .zipWithIndex
         .map { (role, index) =>
-          role -> (charShift + pos2charMap.size + promotion2charMap.size + index).toChar
+          role -> (charShift + square2charMap.size + promotion2charMap.size + index).toChar
         }
         .toMap

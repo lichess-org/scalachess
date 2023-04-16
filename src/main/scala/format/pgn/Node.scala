@@ -66,31 +66,6 @@ case class Node[A](
           case (true, ns) => copy(variations = ns).some
           case (false, _) => none
 
-  // search and replace a node that satisfies the predicate (both child and variations)
-  def setChild(predicate: A => Boolean)(node: Node[A]): Node[A] =
-    if predicate(value) then copy(child = Some(node))
-    else copy(child = child.map(_.setChild(predicate)(node)))
-
-  def removeChild(predicate: A => Boolean): Node[A] =
-    if predicate(value) then copy(child = None)
-    else copy(child = child.map(_.removeChild(predicate)))
-
-  def modifyChild(predicate: A => Boolean)(f: A => A): Node[A] =
-    if predicate(value) then copy(value = f(value))
-    else copy(child = child.map(_.modifyChild(predicate)(f)))
-
-  def setVariations(predicate: A => Boolean)(variations: List[Node[A]]): Node[A] =
-    if predicate(value) then copy(variations = variations)
-    else copy(variations = variations.map(_.setVariations(predicate)(variations)))
-
-  def modifyVariations(predicate: A => Boolean)(f: List[Node[A]] => List[Node[A]]): Node[A] =
-    if predicate(value) then copy(variations = f(variations))
-    else copy(variations = variations.map(_.modifyVariations(predicate)(f)))
-
-  def removeVariations(predicate: A => Boolean): Node[A] =
-    if predicate(value) then copy(variations = variations.map(_.removeVariations(predicate)))
-    else copy(variations = variations.map(_.removeVariations(predicate)))
-
 object Node:
   given Functor[Node] with
     def map[A, B](fa: Node[A])(f: A => B): Node[B] =

@@ -46,13 +46,6 @@ class NodeTest extends ScalaCheckSuite:
       val result = filter.modify(_ * 2)(node)
       result.forall(_ % 2 == 0)
 
-  test("filterOptional"):
-    forAll: (node: Node[Int]) =>
-      val filter = Node.filterOptional[Int](_ => true)
-      val x      = Node(1, None, Nil)
-      val result = filter.replace(x)(node)
-      result == x
-
   test("filterOptional can be used instead of replace"):
     forAll: (node: Node[Int], p: Int => Boolean, newNode: Node[Int]) =>
       val filter       = Node.filterOptional(p)
@@ -66,3 +59,9 @@ class NodeTest extends ScalaCheckSuite:
       val withOptional = filter.modifyOption(x => x.map(f))(node)
       val direct       = node.modifyNode(p)(x => x.map(f))
       withOptional == direct
+
+  test("filterOptional for removing child"):
+    val node   = Node(1, None, List(Node(2, Some(Node(3, None, Nil)), Nil)))
+    val filter = Node.filterOptional[Int](_ == 2)
+    val result = filter.modifyOption(_.copy(child = None))(node)
+    assert(result == Some(Node(1, None, List(Node(2, None, Nil)))))

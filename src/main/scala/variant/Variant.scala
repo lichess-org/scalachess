@@ -156,13 +156,7 @@ abstract class Variant private[variant] (
 
   def valid(board: Board, strict: Boolean) = Color.all forall validSide(board, strict)
 
-  val roles = List(Rook, Knight, King, Bishop, King, Queen, Pawn)
-
   val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
-
-  lazy val rolesByPgn: Map[Char, Role] = roles.mapBy(_.pgn)
-
-  lazy val rolesPromotableByPgn: Map[Char, PromotableRole] = promotableRoles.mapBy(_.pgn)
 
   override def toString = s"Variant($name)"
 

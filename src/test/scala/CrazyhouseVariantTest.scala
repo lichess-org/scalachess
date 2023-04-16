@@ -22,6 +22,11 @@ class CrazyhouseVariantTest extends ChessTest:
       game.situation.checkMate must beTrue
       game.situation.opponentHasInsufficientMaterial must beFalse
 
+    "checkmate" in:
+      val fenPosition = EpdFen("r2q1b1r/ppp1kPpp/2p5/2PpN3/1n1Pb3/3PK3/PPr1BPPP/n1q1N2R/b w - - 0 20")
+      val game        = fenToGame(fenPosition, Crazyhouse).toOption.get
+      game.situation.checkMate must beTrue
+
     "pieces to drop, in vain" in:
       val fenPosition = EpdFen("3Nkb1r/1pQP1ppp/4p3/3N4/N5N1/6B1/PPPPBPPP/R1B2RK1 b - - 0 25")
       val game = {

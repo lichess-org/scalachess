@@ -7,8 +7,13 @@ import cats.*
 
 import monocle.{ Optional, Traversal }
 
-// question: what if a variation without moves?
-// answer: it's possible but we need to support null move first
+/**
+ * Node is a tree structure specialized for chess games.
+ * It's a tree with a main line and variations.
+ * Node is a [Functor](https://typelevel.org/cats/typeclasses/functor.html)
+ * Node is a [Traverse](https://typelevel.org/cats/typeclasses/traverse.html)
+ * It is also provided some Monocle optics see Node.filterOptional and Node.filterTraversal
+  */
 case class Node[A](
     value: A,
     child: Option[Node[A]],   // main line next move

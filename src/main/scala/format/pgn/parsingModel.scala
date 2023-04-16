@@ -4,6 +4,8 @@ package format.pgn
 import cats.data.Validated
 import cats.syntax.option.*
 
+// We don't support variation without move now,
+// but we can in the future when we support null move
 case class PgnNodeData(
     san: San,
     metas: Metas, // describes the position after the move `san` is played

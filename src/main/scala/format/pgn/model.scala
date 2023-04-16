@@ -59,7 +59,7 @@ case class Pgn(tags: Tags, turns: List[Turn], initial: Initial = Initial.empty):
 
   override def toString = render.value
 
-case class Initial(comments: List[String] = Nil)
+case class Initial(comments: List[Comment] = Nil)
 
 object Initial:
   val empty = Initial(Nil)

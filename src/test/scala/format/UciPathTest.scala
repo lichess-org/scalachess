@@ -1,8 +1,13 @@
 package chess.format
 
 import org.specs2.mutable.*
+import chess.Square
 
 class UciPathTest extends Specification:
+
+  "UciCharPair" should:
+    "format" in:
+      UciCharPair(Uci.Move(Square.E2, Square.E4)).toString === "/?"
 
   "intersect" should:
     "nope" in:

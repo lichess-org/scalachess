@@ -71,7 +71,7 @@ case object Crazyhouse
   private def canDropStuff(situation: Situation) =
     situation.board.crazyData.exists { (data: Data) =>
       val pocket = data.pockets(situation.color)
-      roles.nonEmpty && possibleDrops(situation).fold(true) { squares =>
+      pocket.nonEmpty && possibleDrops(situation).fold(true) { squares =>
         squares.nonEmpty && {
           squares.exists(canDropPawnOn) || pocket.hasNonPawn
         }

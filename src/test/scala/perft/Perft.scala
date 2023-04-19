@@ -86,8 +86,5 @@ object Perft:
         // We filter out castling move that is Standard and king's dest is not in the rook position
         else legalMoves.filterNot(m => m.castle.exists(c => c.isStandard && m.dest != c.rook))
 
-    private def crazyhousePerftMoves: List[MoveOrDrop] =
-      Crazyhouse.legalMoves(s)
-
     // when calculate perft we don't do autoDraw
     def perftEnd = s.checkMate || s.staleMate || s.variantEnd || s.board.variant.specialDraw(s)

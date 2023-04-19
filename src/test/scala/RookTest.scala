@@ -2,14 +2,10 @@ package chess
 
 import scala.language.implicitConversions
 import Square.*
-import bitboard.Bitboard.*
-import chess.bitboard.Bitboard
 
 class RookTest extends ChessTest:
 
   "a rook" should:
-
-    val rook = White - Rook
 
     "not move to positions that are occupied by the same colour" in:
       """

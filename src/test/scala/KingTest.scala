@@ -2,8 +2,6 @@ package chess
 
 import scala.language.implicitConversions
 import Square.*
-import bitboard.Bitboard
-import bitboard.Bitboard.*
 
 class KingTest extends ChessTest:
 

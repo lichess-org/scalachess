@@ -3,7 +3,6 @@ package variant
 
 import cats.data.Validated
 import cats.syntax.option.*
-import scala.annotation.nowarn
 
 import chess.format.EpdFen
 import chess.bitboard.Bitboard
@@ -96,9 +95,9 @@ abstract class Variant private[variant] (
   def winner(situation: Situation): Option[Color] =
     if situation.checkMate || specialEnd(situation) then Option(!situation.color) else None
 
-  @nowarn def specialEnd(situation: Situation) = false
+  def specialEnd(situation: Situation) = false
 
-  @nowarn def specialDraw(situation: Situation) = false
+  def specialDraw(situation: Situation) = false
 
   /** Returns the material imbalance in pawns (overridden in Antichess)
     */
@@ -140,7 +139,7 @@ abstract class Variant private[variant] (
 
   /** Once a move has been decided upon from the available legal moves, the board is finalized
     */
-  @nowarn def finalizeBoard(board: Board, uci: format.Uci, captured: Option[Piece]): Board = board
+  def finalizeBoard(board: Board, uci: format.Uci, captured: Option[Piece]): Board = board
 
   protected def pawnsOnPromotionRank(board: Board, color: Color) =
     board(color, Pawn).intersects(Bitboard.rank(color.promotablePawnRank))

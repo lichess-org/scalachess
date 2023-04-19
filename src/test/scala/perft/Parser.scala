@@ -2,7 +2,7 @@ package chess
 package perft
 
 import cats.syntax.all.*
-import cats.parse.{ LocationMap, Numbers as N, Parser as P, Parser0 as P0, Rfc5234 as R }
+import cats.parse.{ Numbers as N, Parser as P, Parser0 as P0, Rfc5234 as R }
 
 import chess.format.EpdFen
 

@@ -84,7 +84,6 @@ case object Horde
 
   def hasInsufficientMaterial(board: Board, color: Color): Boolean =
     import SquareColor.*
-    import ByRole.*
     import Bitboard.*
     // Black can always win by capturing the horde
     if color.black then false

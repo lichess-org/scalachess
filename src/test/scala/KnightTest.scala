@@ -2,14 +2,10 @@ package chess
 
 import scala.language.implicitConversions
 import Square.*
-import bitboard.Bitboard
-import bitboard.Bitboard.*
 
 class KnightTest extends ChessTest:
 
   "a knight" should:
-
-    val knight = White - Knight
 
     "not move to positions that are occupied by the same colour" in:
       val board = """

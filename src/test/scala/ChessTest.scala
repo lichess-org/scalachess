@@ -11,7 +11,6 @@ import chess.format.{ EpdFen, Fen, Visual }
 import chess.format.pgn.PgnStr
 import chess.variant.Variant
 import bitboard.Board as BBoard
-import bitboard.Bitboard
 import cats.kernel.Monoid
 import chess.format.Uci
 import chess.variant.Chess960

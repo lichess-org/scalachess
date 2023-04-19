@@ -1,13 +1,11 @@
 package chess
 package bitboard
 
-import cats.syntax.all.*
 import munit.FunSuite
 
 import Square.*
 import Helpers.*
 import Bitboard.*
-import chess.variant.Standard
 import chess.format.Fen
 import chess.format.EpdFen
 

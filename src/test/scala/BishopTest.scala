@@ -2,14 +2,10 @@ package chess
 
 import scala.language.implicitConversions
 import Square.*
-import bitboard.Bitboard.*
-import chess.bitboard.Bitboard
 
 class BishopTest extends ChessTest:
 
   "a bishop" should:
-
-    val bishop = White - Bishop
 
     "not move to positions that are occupied by the same colour" in:
       val board = """

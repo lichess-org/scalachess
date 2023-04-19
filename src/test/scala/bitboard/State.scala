@@ -1,8 +1,6 @@
 package chess
 package bitboard
 
-import cats.syntax.all.*
-
 import Bitboard.*
 
 /** All the information needed to restart the game beside board position. We only deal with standard variant now, but in

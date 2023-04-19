@@ -42,17 +42,6 @@ object Reader:
         )
       case (r: Result.Incomplete, _) => r
 
-  private def makeReplay(game: Game, tree: ParsedPgnTree): Result =
-    tree.mainLine.foldLeft[Result](Result.Complete(Replay(game))):
-      case (Result.Complete(replay), node) =>
-        node
-          .san(replay.state.situation)
-          .fold(
-            err => Result.Incomplete(replay, err),
-            move => Result.Complete(replay addMove move)
-          )
-      case (r: Result.Incomplete, _) => r
-
   private def makeGame(tags: Tags) =
     val g = Game(
       variantOption = tags(_.Variant) flatMap chess.variant.Variant.byName,

@@ -157,7 +157,6 @@ case object Crazyhouse
       promoted: Bitboard
   ):
 
-    import bitboard.Bitboard.bb
     def drop(piece: Piece): Option[Data] =
       pockets take piece map { nps =>
         copy(pockets = nps)

@@ -85,7 +85,6 @@ class OpeningTest extends Specification:
   "nameToKey" in:
     "opening name" in:
       def nameToKey(n: String) = OpeningKey.fromName(OpeningName(n))
-      import Opening.nameToKey
       nameToKey("Grünfeld Defense") must_== OpeningKey("Grunfeld_Defense")
       nameToKey("King's Pawn Game") must_== OpeningKey("Kings_Pawn_Game")
       nameToKey("Neo-Grünfeld Defense") must_== OpeningKey("Neo-Grunfeld_Defense")

@@ -2,10 +2,8 @@ package chess
 package perft
 
 import cats.syntax.all.*
-import cats.effect.syntax.all.*
 import weaver.*
 
-import chess.format.EpdFen
 import chess.variant.*
 import cats.effect.IO
 import cats.kernel.Monoid

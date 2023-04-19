@@ -3,7 +3,6 @@ package perft
 
 import org.specs2.specification.core.Fragments
 
-import chess.format.EpdFen
 import chess.variant.*
 
 class PerftTest extends ChessTest:

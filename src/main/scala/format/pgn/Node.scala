@@ -19,16 +19,15 @@ case class Node[A](
     child: Option[Node[A]],   // main line next move
     variations: List[Node[A]] // alternate moves, e.g. Node("e4", None, List("d4", "Nf3"))
 ):
-  def mainLine: List[A] = value :: child.fold(Nil)(_.mainLine)
-  def totalNodes: Int   = this.foldLeft(0)((b, _) => b + 1)
-  def mainLineAndVariations = child.map(_ :: variations).getOrElse(variations)
-  def children = child.fold(Nil)(c => c :: c.variations)
+  def mainLine: List[A]                    = value :: child.fold(Nil)(_.mainLine)
+  def totalNodes: Int                      = this.foldLeft(0)((b, _) => b + 1)
+  def mainLineAndVariations: List[Node[A]] = child.map(_ :: variations).getOrElse(variations)
+  def children: List[Node[A]]              = child.fold(Nil)(c => c :: c.variations)
 
   // find the first Node that statisfies the predicate
   def findNode(predicate: A => Boolean): Option[Node[A]] =
     if predicate(value) then this.some
-    else
-      mainLineAndVariations.foldLeft(none[Node[A]])((b, n) => b.orElse(n.findNode(predicate)))
+    else mainLineAndVariations.foldLeft(none[Node[A]])((b, n) => b.orElse(n.findNode(predicate)))
 
   def replaceNode(predicate: A => Boolean)(node: Node[A]): Option[Node[A]] =
     modifyNode(predicate)(_ => node)

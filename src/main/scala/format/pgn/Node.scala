@@ -21,14 +21,14 @@ case class Node[A](
 ):
   def mainLine: List[A] = value :: child.fold(Nil)(_.mainLine)
   def totalNodes: Int   = this.foldLeft(0)((b, _) => b + 1)
+  def mainLineAndVariations = child.map(_ :: variations).getOrElse(variations)
+  def children = child.fold(Nil)(c => c :: c.variations)
 
   // find the first Node that statisfies the predicate
   def findNode(predicate: A => Boolean): Option[Node[A]] =
     if predicate(value) then this.some
     else
-      child
-        .flatMap(_.findNode(predicate))
-        .orElse(variations.foldLeft(none[Node[A]])((b, n) => b.orElse(n.findNode(predicate))))
+      mainLineAndVariations.foldLeft(none[Node[A]])((b, n) => b.orElse(n.findNode(predicate)))
 
   def replaceNode(predicate: A => Boolean)(node: Node[A]): Option[Node[A]] =
     modifyNode(predicate)(_ => node)

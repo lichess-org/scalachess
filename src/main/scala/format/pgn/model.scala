@@ -16,6 +16,12 @@ object PgnMovesStr extends OpaqueString[PgnMovesStr]
 opaque type PgnStr = String
 object PgnStr extends OpaqueString[PgnStr]
 
+opaque type Comment = String
+object Comment extends TotalWrapper[Comment, String]:
+  extension (cs: List[Comment])
+    inline def cleanUp: List[Comment] =
+      cs.collect { case c if !c.isBlank => c.trim }
+
 case class Pgn(tags: Tags, turns: List[Turn], initial: Initial = Initial.empty):
 
   // index is NOT a full move turn!
@@ -53,7 +59,7 @@ case class Pgn(tags: Tags, turns: List[Turn], initial: Initial = Initial.empty):
 
   override def toString = render.value
 
-case class Initial(comments: List[String] = Nil)
+case class Initial(comments: List[Comment] = Nil)
 
 object Initial:
   val empty = Initial(Nil)
@@ -104,7 +110,7 @@ object Turn:
 
 case class Move(
     san: SanStr,
-    comments: List[String] = Nil,
+    comments: List[Comment] = Nil,
     glyphs: Glyphs = Glyphs.empty,
     opening: Option[String] = None,
     result: Option[String] = None,
@@ -126,7 +132,7 @@ case class Move(
     val commentsOrTime =
       if (comments.nonEmpty || secondsLeft.isDefined || opening.isDefined || result.isDefined)
         List(clockString, opening, result).flatten
-          .:::(comments map Move.noDoubleLineBreak)
+          .:::(comments.map(_ map Move.noDoubleLineBreak))
           .map { text =>
             s" { $text }"
           }

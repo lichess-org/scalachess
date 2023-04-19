@@ -1519,15 +1519,15 @@ Kc7 52. Qhb8# 1-0
 """
 
   val rootCommentInVariation = """
-  {This move:} 1.e4! {, was cosidered by R.J.Fischer as "best by test"} 
-    ( {This move:} 1.d4?! {not.} ) 
+  {This move:} 1.e4! {, was considered by R.J.Fischer as "best by test"}
+    ( {This other move:} 1.d4?! {not.} )
     ( ;Neither does :
       1.b4?! {this one} )
   """
 
   val multipleRootCommentsInVariation = """
-  {This move:} 1.e4! {, was cosidered by R.J.Fischer as "best by test"} 
-    ( {This move:} {looks pretty} 1.d4?! {not.} ) 
+  {This move:} 1.e4! {, was considered by R.J.Fischer as "best by test"}
+    ( {This other move:} {looks pretty} 1.d4?! {not.} )
     ( ;Neither does :
       ;this or that
       {or whatever}

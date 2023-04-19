@@ -9,7 +9,8 @@ import chess.variant.ThreeCheck
 
 class DumperTest extends ChessTest:
 
-  given Conversion[String, SanStr] = SanStr(_)
+  given Conversion[String, SanStr]  = SanStr(_)
+  given Conversion[String, Comment] = Comment(_)
 
   "Check with pawn" should:
     "not be checkmate if pawn can be taken en passant" in:

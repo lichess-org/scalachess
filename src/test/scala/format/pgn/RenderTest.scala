@@ -6,7 +6,8 @@ import scala.language.implicitConversions
 
 class RenderTest extends ChessTest:
 
-  given Conversion[String, SanStr] = SanStr(_)
+  given Conversion[String, SanStr]  = SanStr(_)
+  given Conversion[String, Comment] = Comment(_)
 
   private def glyphs(id: Int) =
     Glyph.find(id).fold(Glyphs.empty) { g =>

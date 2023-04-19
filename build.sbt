@@ -11,10 +11,13 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
     "com.disneystreaming" %% "weaver-scalacheck" % "0.8.3" % Test,
     "co.fs2"              %% "fs2-core"          % "3.6.1" % Test,
     "co.fs2"              %% "fs2-io"            % "3.6.1" % Test,
-    "com.github.ornicar"  %% "scalalib"          % "9.3.4",
+    "org.typelevel"       %% "discipline-munit"  % "1.0.9" % Test,
+    "org.typelevel"       %% "cats-laws"         % "2.9.0" % Test,
+    "com.github.ornicar"  %% "scalalib"          % "9.3.5",
     "org.typelevel"       %% "cats-core"         % "2.9.0",
     "org.typelevel"       %% "alleycats-core"    % "2.9.0",
-    "org.typelevel"       %% "cats-parse"        % "0.3.9"
+    "org.typelevel"       %% "cats-parse"        % "0.3.9",
+    "dev.optics"          %% "monocle-core"      % "3.2.0"
   ),
   testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
   scalacOptions := Seq(
@@ -34,7 +37,7 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
 )
 
 ThisBuild / organization      := "org.lichess"
-ThisBuild / version           := "14.9.4"
+ThisBuild / version           := "15.0.0"
 ThisBuild / scalaVersion      := "3.3.0-RC3"
 ThisBuild / licenses += "MIT" -> url("https://opensource.org/licenses/MIT")
 

@@ -14,7 +14,7 @@ class ParserTest extends ChessTest:
 
   import Parser.{ full as parse, move as parseMove }
 
-  extension (tree: Option[Node[PgnNodeData]]) def head = tree.get.mainLine.head
+  extension (tree: Option[ParsedPgnTree]) def firstMove: PgnNodeData = tree.get.mainLine.head
 
   extension (parsed: ParsedPgn) def metas = parsed.tree.get.value.metas
 
@@ -129,13 +129,13 @@ class ParserTest extends ChessTest:
     parse(withGlyphAnnotations) must beValid
 
     parse("Bxd3?? ∞") must beValid.like { parsed =>
-      parsed.tree.head.metas.glyphs.move must_== Option(Glyph.MoveAssessment.blunder)
-      parsed.tree.head.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
+      parsed.tree.firstMove.metas.glyphs.move must_== Option(Glyph.MoveAssessment.blunder)
+      parsed.tree.firstMove.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
     }
 
   "comments" in:
     parse("Ne7g6+! {such a neat comment}") must beValid.like { parsed =>
-      parsed.tree.head.metas.comments must_== List("such a neat comment")
+      parsed.tree.firstMove.metas.comments must_== List("such a neat comment")
     }
 
   "variations" in:

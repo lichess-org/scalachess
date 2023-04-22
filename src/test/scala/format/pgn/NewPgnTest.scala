@@ -5,6 +5,7 @@ import scala.language.implicitConversions
 
 import cats.syntax.all.*
 import munit.FunSuite
+import Parser.*
 
 class NewPgnTest extends FunSuite:
 
@@ -38,7 +39,7 @@ class NewPgnTest extends FunSuite:
       Node(
         move.clean,
         child,
-        move.variations.map(_.flatMap(moves)).map(x => toNode(x.head, None))
+        move.variations.map(_.flatMap(moves)).map(x => toNode(x.head, None)).toVariations
       )
 
   private def glyphs(id: Int) =

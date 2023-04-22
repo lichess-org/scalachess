@@ -61,7 +61,7 @@ class NodeTest extends ScalaCheckSuite:
       withOptional == direct
 
   test("filterOptional for removing child"):
-    val node   = Node(1, None, List(Node(2, Some(Node(3, None, Nil)), Nil)))
+    val node   = Node(1, Some(Node(2, Some(Node(3, None, None)), None)), None)
     val filter = Node.filterOptional[Int](_ == 2)
     val result = filter.modifyOption(_.copy(child = None))(node)
-    assert(result == Some(Node(1, None, List(Node(2, None, Nil)))))
+    assertEquals(result, Some(Node(1, Some(Node(2, None, None)), None)))

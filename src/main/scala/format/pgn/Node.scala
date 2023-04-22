@@ -58,8 +58,8 @@ case class Node[A](
       case Some(n) => n.some
       case None =>
         variation.flatMap { n =>
-          if predicate(n.value) then copy(child = None).some
-          else n.deleteSubNode(predicate).map(nn => this.copy(child = Some(nn)))
+          if predicate(n.value) then copy(variation = None).some
+          else n.deleteSubNode(predicate).map(nn => this.copy(variation = Some(nn)))
         } match
           case Some(n) => n.some
           case None    => None

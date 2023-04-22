@@ -29,6 +29,17 @@ class NodeTest extends ScalaCheckSuite:
         case (None, None)       => true
         case _                  => false
 
+  test("delete and find are consistent"):
+    forAll: (node: Node[Int], p: Int => Boolean) =>
+      val original = node.findNode(p)
+      val result   = node.deleteSubNode(p)
+      original == node.some || {
+        (original, result) match
+          case (Some(x), Some(y)) => x.totalNodes + y.totalNodes == node.totalNodes
+          case (None, None)       => true
+          case _                  => false
+      }
+
   test("filterTraversal"):
     forAll: (node: Node[Int]) =>
       val filter = Node.filterTraversal[Int](_ % 2 != 0)

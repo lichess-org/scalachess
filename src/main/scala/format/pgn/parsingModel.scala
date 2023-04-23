@@ -18,7 +18,7 @@ case class PgnNodeData(
 type ParsedPgnTree = Node[PgnNodeData]
 
 case class ParsedPgn(initialPosition: InitialPosition, tags: Tags, tree: Option[ParsedPgnTree]):
-  def mainLine = tree.fold(List.empty[San])(_.mainline.map(_.san))
+  def mainline = tree.fold(List.empty[San])(_.mainline.map(_.san))
 
 // Standard Algebraic Notation
 sealed trait San:

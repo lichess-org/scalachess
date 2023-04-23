@@ -28,6 +28,7 @@ case class Node[A](
   def mainLineAndVariations: List[Node[A]] = child.map(_ :: variations).getOrElse(variations)
   def children: List[Node[A]]              = child.fold(Nil)(c => c :: c.variations)
 
+  // Akin to map, but allows to keep track of a state value when calling the function.
   def mapAccuml[S, B](init: S)(f: (S, A) => (S, B)): (S, Node[B]) =
     val (s1, b) = f(init, value)
     val v       = variation.map(_.mapAccuml(init)(f)._2)
@@ -38,6 +39,9 @@ case class Node[A](
   def mapAccuml_[S, B](init: S)(f: (S, A) => (S, B)): Node[B] =
     mapAccuml(init)(f)._2
 
+  // Akin to mapAccuml, return an Option[Node[B]]
+  // when a node from mainline returns None, we stop traverse down that line
+  // when a variatioon node returns None, we just ignore it
   // TODO: now if the f(value) is None, the whole tree is None
   // should we promote a variation to mainline if the f(value) is None?
   def _mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): (S, Option[Node[B]]) =
@@ -119,8 +123,8 @@ object Node:
   def filterOptional[A](predicate: A => Boolean): Optional[Node[A], Node[A]] =
     Optional[Node[A], Node[A]](x => x.findNode(predicate))(x => n => n.replaceNode(predicate)(x).getOrElse(x))
 
-  def filterVariation[A](predicate: A => Boolean): Optional[Node[A], Node[A]] =
-    Optional[Node[A], Node[A]](x => x.findNode(predicate))(x => n => n.replaceNode(predicate)(x).getOrElse(x))
+  // def filterVariation[A](predicate: A => Boolean): Optional[Node[A], Node[A]] =
+  //   Optional[Node[A], Node[A]](x => x.findNode(predicate))(x => n => n.replaceNode(predicate)(x).getOrElse(x))
 
   extension [A](xs: List[Node[A]])
     def toVariations: Option[Node[A]] =

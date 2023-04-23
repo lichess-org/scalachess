@@ -25,14 +25,60 @@ case class Node[A](
 
   def mainLine: List[A]                    = value :: child.fold(Nil)(_.mainLine)
   def variations: List[Node[A]]            = variation.fold(Nil)(v => v :: v.variations)
-  def totalNodes: Int                      = this.foldLeft(0)((b, _) => b + 1)
   def mainLineAndVariations: List[Node[A]] = child.map(_ :: variations).getOrElse(variations)
   def children: List[Node[A]]              = child.fold(Nil)(c => c :: c.variations)
+
+  def mapAccuml[S, B](init: S)(f: (S, A) => (S, B)): (S, Node[B]) =
+    val (s1, b) = f(init, value)
+    val v       = variation.map(_.mapAccuml(init)(f)._2)
+    child.map(_.mapAccuml(s1)(f)) match
+      case None    => (s1, Node(b, None, v))
+      case Some(s) => (s._1, Node(b, s._2.some, v))
+
+  def mapAccuml_[S, B](init: S)(f: (S, A) => (S, B)): Node[B] =
+    mapAccuml(init)(f)._2
+
+  // TODO: now if the f(value) is None, the whole tree is None
+  // should we promote a variation to mainline if the f(value) is None?
+  def _mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): (S, Option[Node[B]]) =
+    f(init, value) match
+      case (s1, None) => (s1, None)
+      case (s1, Some(b)) =>
+        val vs = variation.map(_._mapAccumlOption(init)(f)._2).flatten
+        child.map(_._mapAccumlOption(s1)(f)) match
+          case None    => (s1, Node(b, None, vs).some)
+          case Some(s) => (s._1, Node(b, s._2, vs).some)
+
+  def mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): Option[Node[B]] =
+    _mapAccumlOption(init)(f)._2
 
   // find the first Node that statisfies the predicate
   def findNode(predicate: A => Boolean): Option[Node[A]] =
     if predicate(value) then this.some
     else mainLineAndVariations.foldLeft(none[Node[A]])((b, n) => b.orElse(n.findNode(predicate)))
+
+  // find the first variation that statisfies the predicate
+  def findVariation(predicate: A => Boolean): Option[Node[A]] =
+    if predicate(value) then this.some
+    else
+      variation.fold(none[Node[A]]): v =>
+        if predicate(v.value) then v.some
+        else v.findVariation(predicate)
+
+  def findMainlineNode(predicate: A => Boolean): Option[Node[A]] =
+    if predicate(value) then this.some
+    else
+      child.fold(none[Node[A]]): c =>
+        if predicate(c.value) then c.some
+        else c.findMainlineNode(predicate)
+
+  def findChildOrVariation(predicate: A => Boolean): Option[Node[A]] =
+    child.fold(none[Node[A]]): c =>
+      if predicate(c.value) then c.some
+      else
+        variation.fold(none[Node[A]]): v =>
+          if predicate(v.value) then v.some
+          else None
 
   def replaceNode(predicate: A => Boolean)(node: Node[A]): Option[Node[A]] =
     modifyNode(predicate)(_ => node)
@@ -72,3 +118,20 @@ object Node:
 
   def filterOptional[A](predicate: A => Boolean): Optional[Node[A], Node[A]] =
     Optional[Node[A], Node[A]](x => x.findNode(predicate))(x => n => n.replaceNode(predicate)(x).getOrElse(x))
+
+  def filterVariation[A](predicate: A => Boolean): Optional[Node[A], Node[A]] =
+    Optional[Node[A], Node[A]](x => x.findNode(predicate))(x => n => n.replaceNode(predicate)(x).getOrElse(x))
+
+  extension [A](xs: List[Node[A]])
+    def toVariations: Option[Node[A]] =
+      xs.reverse.foldLeft(none[Node[A]])((acc, x) => x.copy(variation = acc).some)
+
+    def toChild: Option[Node[A]] =
+      xs.reverse.foldLeft(none[Node[A]])((acc, x) => x.copy(child = acc).some)
+
+  extension [A](xs: List[A])
+    def toVariations[B](f: A => Node[B]) =
+      xs.reverse.foldLeft(none[Node[B]])((acc, x) => f(x).copy(variation = acc).some)
+
+    def toChild[B](f: A => Node[B]) =
+      xs.reverse.foldLeft(none[Node[B]])((acc, x) => f(x).copy(child = acc).some)

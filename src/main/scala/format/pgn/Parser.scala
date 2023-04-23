@@ -129,13 +129,6 @@ object Parser:
           Node(data, None, vs.sequence.flatMap(_.toVariations))
     }
 
-  extension [A](xs: List[Node[A]])
-    def toVariations: Option[Node[A]] =
-      xs.reverse.foldLeft(none[Node[A]])((acc, x) => x.copy(variation = acc).some)
-
-    def toChild: Option[Node[A]] =
-      xs.reverse.foldLeft(none[Node[A]])((acc, x) => x.copy(child = acc).some)
-
   val strMoves: P0[(InitialPosition, Option[ParsedPgnTree], Option[String])] =
     ((comment.rep0 ~ strMove.rep0) ~ (result <* escape).? <* comment.rep0).map:
       case ((comments, sans), res) =>

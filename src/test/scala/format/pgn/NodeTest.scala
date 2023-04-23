@@ -35,7 +35,7 @@ class NodeTest extends ScalaCheckSuite:
       val result   = node.deleteSubNode(p)
       original == node.some || {
         (original, result) match
-          case (Some(x), Some(y)) => x.totalNodes + y.totalNodes == node.totalNodes
+          case (Some(x), Some(y)) => x.size + y.size == node.size
           case (None, None)       => true
           case _                  => false
       }
@@ -65,3 +65,7 @@ class NodeTest extends ScalaCheckSuite:
     val filter = Node.filterOptional[Int](_ == 2)
     val result = filter.modifyOption(_.copy(child = None))(node)
     assertEquals(result, Some(Node(1, Some(Node(2, None, None)), None)))
+
+  test("mainline"):
+    val node = Node(1, Some(Node(2, Some(Node(3, None, None)), None)), None)
+    assertEquals(node.mainLine, List(1, 2, 3))

@@ -5,7 +5,6 @@ import scala.language.implicitConversions
 
 import cats.syntax.all.*
 import munit.FunSuite
-import Parser.*
 
 class NewPgnTest extends FunSuite:
 

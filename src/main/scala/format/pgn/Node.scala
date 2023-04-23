@@ -23,7 +23,7 @@ case class Node[A](
 ) derives Functor,
       Traverse:
 
-  def mainLine: List[A]                    = value :: child.fold(Nil)(_.mainLine)
+  def mainline: List[A]                    = value :: child.fold(Nil)(_.mainline)
   def variations: List[Node[A]]            = variation.fold(Nil)(v => v :: v.variations)
   def mainLineAndVariations: List[Node[A]] = child.map(_ :: variations).getOrElse(variations)
   def children: List[Node[A]]              = child.fold(Nil)(c => c :: c.variations)
@@ -69,12 +69,19 @@ case class Node[A](
         if predicate(v.value) then v.some
         else v.findVariation(predicate)
 
+  // find node in the mainline
   def findMainlineNode(predicate: A => Boolean): Option[Node[A]] =
     if predicate(value) then this.some
     else
       child.fold(none[Node[A]]): c =>
         if predicate(c.value) then c.some
         else c.findMainlineNode(predicate)
+
+  def lastMainlineNode: Node[A] =
+    child.fold(this)(_.lastMainlineNode)
+
+  def modifyLastMainlineNode(f: Node[A] => Node[A]): Node[A] =
+    child.fold(this)(c => copy(child = Some(c.modifyLastMainlineNode(f))))
 
   def findChildOrVariation(predicate: A => Boolean): Option[Node[A]] =
     child.fold(none[Node[A]]): c =>

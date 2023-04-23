@@ -68,4 +68,4 @@ class NodeTest extends ScalaCheckSuite:
 
   test("mainline"):
     val node = Node(1, Some(Node(2, Some(Node(3, None, None)), None)), None)
-    assertEquals(node.mainLine, List(1, 2, 3))
+    assertEquals(node.mainline, List(1, 2, 3))

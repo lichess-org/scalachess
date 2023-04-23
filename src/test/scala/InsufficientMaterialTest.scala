@@ -2,7 +2,6 @@ package chess
 
 import cats.effect.IO
 import cats.syntax.all.*
-import cats.effect.syntax.all.*
 import fs2.*
 import fs2.io.file.Files
 

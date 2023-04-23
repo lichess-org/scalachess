@@ -5,7 +5,6 @@ import scala.language.implicitConversions
 
 class FenTest extends ChessTest:
 
-  import pgn.Fixtures.*
   import pgn.Reader
   import Square.*
 

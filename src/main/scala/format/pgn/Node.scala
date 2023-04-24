@@ -7,6 +7,7 @@ import cats.derived.*
 import cats.syntax.all.*
 
 import monocle.{ Optional, Traversal }
+import scala.annotation.tailrec
 
 /**
  * Node is a tree structure specialized for chess games.
@@ -27,15 +28,37 @@ case class Node[A](
   lazy val variations: List[Node[A]]         = variation.fold(Nil)(v => v :: v.variations)
   lazy val childAndVariations: List[Node[A]] = child.map(_ :: variations).getOrElse(variations)
 
+  final def find[Id](path: List[Id])(using h: HasId[A, Id]): Option[Node[A]] =
+    @tailrec
+    def loop(node: Node[A], path: List[Id]): Option[Node[A]] =
+      path match
+        case Nil => None
+        case head :: rest if h.getId(node.value) == head =>
+          rest match
+            case Nil => Some(node)
+            case _ =>
+              node.child match
+                case Some(child) => loop(child, rest)
+                case None        => None
+        case _ =>
+          node.variation match
+            case Some(variation) => loop(variation, path)
+            case None            => None
+
+    loop(this, path)
+
+  final def find[Id](id: Id)(using h: HasId[A, Id]): Option[Node[A]] =
+    this.findNode(h.getId(_) == id)
+
   // Akin to map, but allows to keep track of a state value when calling the function.
-  def mapAccuml[S, B](init: S)(f: (S, A) => (S, B)): (S, Node[B]) =
+  final def mapAccuml[S, B](init: S)(f: (S, A) => (S, B)): (S, Node[B]) =
     val (s1, b) = f(init, value)
     val v       = variation.map(_.mapAccuml(init)(f)._2)
     child.map(_.mapAccuml(s1)(f)) match
       case None    => (s1, Node(b, None, v))
       case Some(s) => (s._1, Node(b, s._2.some, v))
 
-  def mapAccuml_[S, B](init: S)(f: (S, A) => (S, B)): Node[B] =
+  final def mapAccuml_[S, B](init: S)(f: (S, A) => (S, B)): Node[B] =
     mapAccuml(init)(f)._2
 
   // Akin to mapAccuml, return an Option[Node[B]]
@@ -43,7 +66,7 @@ case class Node[A](
   // when a variatioon node returns None, we just ignore it
   // TODO: now if the f(value) is None, the whole tree is None
   // should we promote a variation to mainline if the f(value) is None?
-  def _mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): (S, Option[Node[B]]) =
+  final def _mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): (S, Option[Node[B]]) =
     f(init, value) match
       case (s1, None) => (s1, None)
       case (s1, Some(b)) =>
@@ -52,16 +75,16 @@ case class Node[A](
           case None    => (s1, Node(b, None, vs).some)
           case Some(s) => (s._1, Node(b, s._2, vs).some)
 
-  def mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): Option[Node[B]] =
+  final def mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): Option[Node[B]] =
     _mapAccumlOption(init)(f)._2
 
   // find the first Node that statisfies the predicate
-  def findNode(predicate: A => Boolean): Option[Node[A]] =
+  final def findNode(predicate: A => Boolean): Option[Node[A]] =
     if predicate(value) then this.some
     else childAndVariations.foldLeft(none[Node[A]])((b, n) => b.orElse(n.findNode(predicate)))
 
   // find the first variation that statisfies the predicate
-  def findVariation(predicate: A => Boolean): Option[Node[A]] =
+  final def findVariation(predicate: A => Boolean): Option[Node[A]] =
     if predicate(value) then this.some
     else
       variation.fold(none[Node[A]]): v =>
@@ -69,30 +92,30 @@ case class Node[A](
         else v.findVariation(predicate)
 
   // find node in the mainline
-  def findMainlineNode(predicate: A => Boolean): Option[Node[A]] =
+  final def findMainlineNode(predicate: A => Boolean): Option[Node[A]] =
     if predicate(value) then this.some
     else
       child.fold(none[Node[A]]): c =>
         if predicate(c.value) then c.some
         else c.findMainlineNode(predicate)
 
-  def lastMainlineNode: Node[A] =
+  final def lastMainlineNode: Node[A] =
     child.fold(this)(_.lastMainlineNode)
 
-  def modifyLastMainlineNode(f: Node[A] => Node[A]): Node[A] =
+  final def modifyLastMainlineNode(f: Node[A] => Node[A]): Node[A] =
     child.fold(this)(c => copy(child = Some(c.modifyLastMainlineNode(f))))
 
-  def findChildOrVariation(predicate: A => Boolean): Option[Node[A]] =
+  final def findChildOrVariation(predicate: A => Boolean): Option[Node[A]] =
     childAndVariations.foldLeft(none[Node[A]]): (acc, v) =>
       if acc.isDefined then acc
       else if predicate(v.value) then v.some
       else None
 
-  def replaceNode(predicate: A => Boolean)(node: Node[A]): Option[Node[A]] =
+  final def replaceNode(predicate: A => Boolean)(node: Node[A]): Option[Node[A]] =
     modifyNode(predicate)(_ => node)
 
   // modify the first node that satisfies the predicate (dfs with main line and then variations)
-  def modifyNode(predicate: A => Boolean)(f: Node[A] => Node[A]): Option[Node[A]] =
+  final def modifyNode(predicate: A => Boolean)(f: Node[A] => Node[A]): Option[Node[A]] =
     if predicate(value) then f(this).some
     else
       child.flatMap(_.modifyNode(predicate)(f)) match
@@ -104,7 +127,7 @@ case class Node[A](
 
   // // delete the first node that satisfies the predicate (both child and variations)
   // // except the root
-  def deleteSubNode(predicate: A => Boolean): Option[Node[A]] =
+  final def deleteSubNode(predicate: A => Boolean): Option[Node[A]] =
     child.flatMap { n =>
       if predicate(n.value) then copy(child = None).some
       else n.deleteSubNode(predicate).map(nn => this.copy(child = Some(nn)))

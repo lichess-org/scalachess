@@ -60,12 +60,21 @@ class NodeTest extends ScalaCheckSuite:
       val direct       = node.modifyNode(p)(x => x.map(f))
       withOptional == direct
 
-  test("filterOptional for removing child"):
-    val node   = Node(1, Some(Node(2, Some(Node(3, None, None)), None)), None)
-    val filter = Node.filterOptional[Int](_ == 2)
-    val result = filter.modifyOption(_.copy(child = None))(node)
-    assertEquals(result, Some(Node(1, Some(Node(2, None, None)), None)))
+  test("mainline size <= node.size"):
+    forAll: (node: Node[Int]) =>
+      node.mainline.size <= node.size
 
-  test("mainline"):
-    val node = Node(1, Some(Node(2, Some(Node(3, None, None)), None)), None)
-    assertEquals(node.mainline, List(1, 2, 3))
+  test("mainline is a sub set of node"):
+    forAll: (node: Node[Int]) =>
+      node.mainline.forall(x => node.exists(_ == x))
+
+  test("mainline.size + variations.size == node.size"):
+    forAll: (node: Node[Int]) =>
+      node.mainline.size + variationsCount(node) == node.size
+
+  test("find with mainline as path retuns last mainline node"):
+    forAll: (node: Node[Int]) =>
+      node.find(node.mainline).get == node.lastMainlineNode
+
+  def variationsCount[A](node: Node[A]): Long =
+    node.child.foldLeft(node.variation.fold(0L)(_.size))(_ + variationsCount(_))

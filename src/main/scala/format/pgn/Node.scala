@@ -23,10 +23,9 @@ case class Node[A](
 ) derives Functor,
       Traverse:
 
-  def mainline: List[A]                    = value :: child.fold(Nil)(_.mainline)
-  def variations: List[Node[A]]            = variation.fold(Nil)(v => v :: v.variations)
-  def mainLineAndVariations: List[Node[A]] = child.map(_ :: variations).getOrElse(variations)
-  def children: List[Node[A]]              = child.fold(Nil)(c => c :: c.variations)
+  lazy val mainline: List[A]                 = value :: child.fold(Nil)(_.mainline)
+  lazy val variations: List[Node[A]]         = variation.fold(Nil)(v => v :: v.variations)
+  lazy val childAndVariations: List[Node[A]] = child.map(_ :: variations).getOrElse(variations)
 
   // Akin to map, but allows to keep track of a state value when calling the function.
   def mapAccuml[S, B](init: S)(f: (S, A) => (S, B)): (S, Node[B]) =
@@ -59,7 +58,7 @@ case class Node[A](
   // find the first Node that statisfies the predicate
   def findNode(predicate: A => Boolean): Option[Node[A]] =
     if predicate(value) then this.some
-    else mainLineAndVariations.foldLeft(none[Node[A]])((b, n) => b.orElse(n.findNode(predicate)))
+    else childAndVariations.foldLeft(none[Node[A]])((b, n) => b.orElse(n.findNode(predicate)))
 
   // find the first variation that statisfies the predicate
   def findVariation(predicate: A => Boolean): Option[Node[A]] =
@@ -84,12 +83,10 @@ case class Node[A](
     child.fold(this)(c => copy(child = Some(c.modifyLastMainlineNode(f))))
 
   def findChildOrVariation(predicate: A => Boolean): Option[Node[A]] =
-    child.fold(none[Node[A]]): c =>
-      if predicate(c.value) then c.some
-      else
-        variation.fold(none[Node[A]]): v =>
-          if predicate(v.value) then v.some
-          else None
+    childAndVariations.foldLeft(none[Node[A]]): (acc, v) =>
+      if acc.isDefined then acc
+      else if predicate(v.value) then v.some
+      else None
 
   def replaceNode(predicate: A => Boolean)(node: Node[A]): Option[Node[A]] =
     modifyNode(predicate)(_ => node)
@@ -146,3 +143,7 @@ object Node:
 
     def toChild[B](f: A => Node[B]) =
       xs.reverse.foldLeft(none[Node[B]])((acc, x) => f(x).copy(child = acc).some)
+
+  extension [A](o: Option[Node[A]])
+    def mergeVariations(other: Option[Node[A]]): Option[Node[A]] =
+      o.fold(other)(n => n.copy(variation = n.variation.mergeVariations(other)).some)

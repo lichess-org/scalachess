@@ -24,17 +24,21 @@ object Arbitraries:
   given EQ[A](using Eq[A]): Eq[Node[A]] = Eq.fromUniversalEquals
 
   def genNode[A](using Arbitrary[A]): Gen[Node[A]] =
-    for
-      a <- Arbitrary.arbitrary[A]
-      c <- genChild[A]
-      v <- genVariation[A]
-    yield Node(a, c, v)
+    Gen.sized: size =>
+      val sqrt = scala.math.sqrt(size).asInstanceOf[Int]
+      for
+        a <- Arbitrary.arbitrary[A]
+        c <- genChild[A](size)
+        v <- genVariation[A](sqrt)
+      yield Node(a, c, v)
 
-  def genChild[A](using Arbitrary[A]): Gen[Option[Node[A]]] =
-    Gen.frequency((1, Gen.const(None)), (1, genNode.map(Some(_))))
+  def genChild[A](size: Int)(using Arbitrary[A]): Gen[Option[Node[A]]] =
+    if size == 0 then Gen.const(None)
+    else Gen.resize(size - 1, genNode.map(Some(_)))
 
-  def genVariation[A](using Arbitrary[A]): Gen[Option[Node[A]]] =
-    Gen.frequency((3, Gen.const(None)), (1, genNode.map(Some(_))))
+  def genVariation[A](size: Int)(using Arbitrary[A]): Gen[Option[Node[A]]] =
+    if size == 0 then Gen.const(None)
+    else Gen.resize(size - 1, genNode.map(Some(_)))
 
   private val genBool = Gen.prob(0.5)
   private val castlesGen =

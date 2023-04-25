@@ -72,9 +72,26 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (node: Node[Int]) =>
       node.mainline.size + variationsCount(node) == node.size
 
-  test("find with mainline as path retuns last mainline node"):
+  test("find ids with mainline as path retuns last mainline node"):
     forAll: (node: Node[Int]) =>
       node.find(node.mainline).get == node.lastMainlineNode
+
+  test("use mainline as path for nodesOn"):
+    forAll: (node: Node[Int]) =>
+      node.findPath(node.mainline).map(_.value) == node.mainline
+
+  test("find"):
+    forAll: (node: Node[Int], n: Int) =>
+      node.find(n).isDefined == node.exists(_ == n)
+
+  test("findNode and find are consistent"):
+    forAll: (node: Node[Int], n: Int) =>
+      node.findNode(_ == n) == node.find(n)
+
+  test("modifyAt with mainline == modifyLastMainlineNode"):
+    forAll: (node: Node[Int], f: Int => Int) =>
+      def m(n: Node[Int]) = n.copy(value = f(n.value))
+      node.modifyAt(node.mainline, m) == node.modifyLastMainlineNode(m).some
 
   def variationsCount[A](node: Node[A]): Long =
     node.child.foldLeft(node.variation.fold(0L)(_.size))(_ + variationsCount(_))

@@ -66,7 +66,7 @@ class NodeTest extends ScalaCheckSuite:
 
   test("mainline is a sub set of node"):
     forAll: (node: Node[Int]) =>
-      node.mainline.forall(x => node.exists(_ == x))
+      node.mainlineValues.forall(x => node.exists(_ == x))
 
   test("mainline.size + variations.size == node.size"):
     forAll: (node: Node[Int]) =>
@@ -74,11 +74,11 @@ class NodeTest extends ScalaCheckSuite:
 
   test("find ids with mainline as path retuns last mainline node"):
     forAll: (node: Node[Int]) =>
-      node.find(node.mainline).get == node.lastMainlineNode
+      node.find(node.mainlineValues).get == node.lastMainlineNode
 
   test("use mainline as path for nodesOn"):
     forAll: (node: Node[Int]) =>
-      node.findPath(node.mainline).map(_.value) == node.mainline
+      node.findPath(node.mainlineValues) == node.mainline
 
   test("find"):
     forAll: (node: Node[Int], n: Int) =>
@@ -91,7 +91,11 @@ class NodeTest extends ScalaCheckSuite:
   test("modifyAt with mainline == modifyLastMainlineNode"):
     forAll: (node: Node[Int], f: Int => Int) =>
       def m(n: Node[Int]) = n.copy(value = f(n.value))
-      node.modifyAt(node.mainline, m) == node.modifyLastMainlineNode(m).some
+      node.modifyAt(node.mainlineValues, m) == node.modifyLastMainlineNode(m).some
 
   def variationsCount[A](node: Node[A]): Long =
     node.child.foldLeft(node.variation.fold(0L)(_.size))(_ + variationsCount(_))
+
+  extension [A](node: Node[A])
+    def mainlineValues: List[A] =
+      node.mainline.map(_.value)

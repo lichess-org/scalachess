@@ -14,7 +14,7 @@ class ParserTest extends ChessTest:
 
   import Parser.{ full as parse, move as parseMove }
 
-  extension (tree: Option[ParsedPgnTree]) def firstMove: PgnNodeData = tree.get.mainline.head
+  extension (tree: Option[ParsedPgnTree]) def firstMove: PgnNodeData = tree.get.mainline.head.value
 
   extension (parsed: ParsedPgn) def metas = parsed.tree.get.value.metas
 

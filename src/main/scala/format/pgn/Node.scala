@@ -28,7 +28,7 @@ case class Node[A](
   lazy val variations: List[Node[A]]         = variation.fold(Nil)(v => v :: v.variations)
   lazy val childAndVariations: List[Node[A]] = child.map(_ :: variations).getOrElse(variations)
 
-  final def setValue(v: A) = copy(value = v)
+  final def withValue(v: A) = copy(value = v)
 
   final def findPath[Id](path: List[Id])(using h: HasId[A, Id]): List[Node[A]] =
     @tailrec
@@ -65,11 +65,11 @@ case class Node[A](
       case head :: rest if h.getId(value) == head =>
         child.flatMap(_.modifyAt(rest, f)) match
           case None    => None
-          case Some(c) => setChild(c).some
+          case Some(c) => withChild(c).some
       case _ =>
         variation.flatMap(_.modifyAt(path, f)) match
           case None    => None
-          case Some(v) => setVariations(v).some
+          case Some(v) => withVariations(v).some
 
   // delete the node at the end of the path
   // return None if path is not found
@@ -102,8 +102,8 @@ case class Node[A](
       case Nil => None
       case head :: rest if h.getId(value) == head =>
         rest match
-          case Nil => child.map(f).map(setChild)
-          case _   => child.flatMap(_.modifyChild(rest, f)).map(setChild)
+          case Nil => child.map(f).map(withChild)
+          case _   => child.flatMap(_.modifyChild(rest, f)).map(withChild)
       case _ =>
         variation.flatMap(_.modifyChild(path, f))
 
@@ -143,7 +143,7 @@ case class Node[A](
   final def getChild(predicate: A => Boolean): Option[Node[A]] =
     child.flatMap(c => if predicate(c.value) then c.some else None)
 
-  final def setChild(child: Node[A]): Node[A] =
+  final def withChild(child: Node[A]): Node[A] =
     copy(child = child.some)
 
   final def withoutChild: Node[A] =
@@ -172,7 +172,7 @@ case class Node[A](
   final def hasVariation[Id](id: Id)(using h: HasId[A, Id]): Boolean =
     hasVariation(h.getId(_) == id)
 
-  final def setVariations(variation: Node[A]): Node[A] =
+  final def withVariations(variation: Node[A]): Node[A] =
     copy(variation = variation.some)
 
   final def withoutVariations: Node[A] =
@@ -190,7 +190,7 @@ case class Node[A](
     child.fold(this)(_.lastMainlineNode)
 
   final def modifyLastMainlineNode(f: Node[A] => Node[A]): Node[A] =
-    child.fold(f(this))(c => setChild(c.modifyLastMainlineNode(f)))
+    child.fold(f(this))(c => withChild(c.modifyLastMainlineNode(f)))
 
   // final def findChildOrVariation(predicate: A => Boolean): Option[Node[A]] =
   //   childAndVariations.foldLeft(none[Node[A]]): (acc, v) =>

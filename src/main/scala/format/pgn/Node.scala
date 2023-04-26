@@ -24,8 +24,7 @@ case class Node[A](
 ) derives Functor,
       Traverse:
 
-  lazy val mainline: List[A]                 = value :: child.fold(Nil)(_.mainline)
-  lazy val mainlineNodes: List[Node[A]]      = this.withoutChild :: child.fold(Nil)(_.mainlineNodes)
+  lazy val mainline: List[Node[A]]           = withoutChild :: child.fold(Nil)(_.mainline)
   lazy val variations: List[Node[A]]         = variation.fold(Nil)(v => v :: v.variations)
   lazy val childAndVariations: List[Node[A]] = child.map(_ :: variations).getOrElse(variations)
 

@@ -24,33 +24,35 @@ final case class Node[A](
 ) derives Functor,
       Traverse:
 
-  lazy val mainline: List[Node[A]]           = withoutChild :: child.fold(Nil)(_.mainline)
+  // mainline nodes with duplication
+  lazy val mainline: List[Node[A]]           = this :: child.fold(Nil)(_.mainline)
+  lazy val mainlineValues: List[A]           = value :: child.fold(Nil)(_.mainlineValues)
   lazy val variations: List[Node[A]]         = variation.fold(Nil)(v => v :: v.variations)
+  lazy val variationValues: List[A]          = variation.fold(Nil)(v => v.value :: v.variationValues)
   lazy val childAndVariations: List[Node[A]] = child.map(_ :: variations).getOrElse(variations)
 
   def withValue(v: A) = copy(value = v)
 
-  def findPath[Id](path: List[Id])(using h: HasId[A, Id]): List[Node[A]] =
+  def findPath[Id](path: List[Id])(using h: HasId[A, Id]): Option[List[Node[A]]] =
     @tailrec
-    def loop(node: Node[A], path: List[Id], acc: List[Node[A]]): List[Node[A]] =
+    def loop(node: Node[A], path: List[Id], acc: List[Node[A]]): Option[List[Node[A]]] =
       path match
-        case Nil => acc
+        case Nil => acc.some
+        case head :: Nil if h.getId(node.value) == head =>
+          (node :: acc).some
         case head :: rest if h.getId(node.value) == head =>
-          rest match
-            case Nil => node :: acc
-            case _ =>
-              node.child match
-                case Some(child) => loop(child, rest, node :: acc)
-                case None        => acc
+          node.child match
+            case Some(child) => loop(child, rest, node :: acc)
+            case None        => None
         case _ =>
           node.variation match
             case Some(variation) => loop(variation, path, acc)
-            case None            => acc
+            case None            => None
 
-    loop(this, path, Nil).reverse
+    if path.isEmpty then None else loop(this, path, Nil).map(_.reverse)
 
   def find[Id](path: List[Id])(using h: HasId[A, Id]): Option[Node[A]] =
-    findPath(path).lastOption
+    findPath(path).flatMap(_.lastOption)
 
   def find[Id](id: Id)(using h: HasId[A, Id]): Option[Node[A]] =
     findNode(h.getId(_) == id)
@@ -71,13 +73,14 @@ final case class Node[A](
           case None    => None
           case Some(v) => withVariations(v).some
 
+  // TODO implement lift function: f: A => B => Node[A] => Node[B]
   // delete the node at the end of the path
   // return None if path is not found
   // return Some(None) if the node is deleted
   def deleteAt[Id](path: List[Id])(using h: HasId[A, Id]): Option[Option[Node[A]]] =
     path match
       case Nil                                   => None
-      case head :: Nil if h.getId(value) == head => variation.some
+      case head :: Nil if h.getId(value) == head => Some(None)
       case head :: rest if h.getId(value) == head =>
         child.flatMap(_.deleteAt(rest)) match
           case None    => None

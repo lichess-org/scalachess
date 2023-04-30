@@ -113,20 +113,20 @@ object Parser:
     .recursive[ParsedPgnTree] { recuse =>
       // TODO: if a variation only contains comments, we ignore it
       // Will fix it after support null move
-      val variation: P[Option[ParsedPgnTree]] =
+      val variation: P[Option[Variation[PgnNodeData]]] =
         (P.char('(') *> comment.rep0.surroundedBy(escape) ~ recuse.rep0 <* (P.char(')') ~ escape))
           .map((comments, sans) =>
             sans match
               case Nil => None
               case x :: xs =>
                 val child = xs.reverse.foldLeft(none[ParsedPgnTree])((acc, x) => x.copy(child = acc).some)
-                Some(x.copy(child = child, value = x.value.copy(variationComments = comments)))
+                Some(Variation(x.value.copy(variationComments = comments), child))
           )
 
       preMoveEscape.with1 *> ((moveAndMetas ~ variation.rep0) <* postMoveEscape).map:
         case ((san, metas), vs) =>
           val data = PgnNodeData(san, metas, Nil)
-          Node(data, None, vs.sequence.flatMap(_.toVariations))
+          Node(data, None, vs.flatten)
     }
 
   val strMoves: P0[(InitialPosition, Option[ParsedPgnTree], Option[String])] =

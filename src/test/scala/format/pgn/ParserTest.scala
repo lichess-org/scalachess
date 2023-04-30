@@ -141,12 +141,12 @@ class ParserTest extends ChessTest:
   "variations" in:
     parse("Ne7g6+! {such a neat comment} (e4 Ng6)") must beValid.like: parsed =>
       parsed.tree.get.variations.headOption must beSome:
-        (_: ParsedPgnTree).mainline must haveSize(2)
+        (_: Variation[PgnNodeData]).mainline must haveSize(2)
 
   "first move variation" in:
     parse("1. e4 (1. d4)") must beValid.like: parsed =>
       parsed.tree.get.variations.headOption must beSome:
-        (_: ParsedPgnTree).mainline must haveSize(1)
+        (_: Variation[PgnNodeData]).mainline must haveSize(1)
 
   raws foreach { sans =>
     val size = sans.split(' ').length

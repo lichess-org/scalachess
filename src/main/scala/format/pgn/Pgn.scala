@@ -2,35 +2,11 @@ package chess
 package format.pgn
 
 import cats.syntax.all.*
-import chess.Node as CNode
 
-type PgnTree = CNode[NewMove]
+type PgnTree = Node[Move]
 
 // isomorphic to Pgn
-case class NewPgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
-  def toPgn: Pgn =
-    val moves = tree.fold(List.empty[Move])(toMove(_))
-    val turns = Turn.fromMoves(moves, Ply(1))
-    Pgn(tags, turns, initial)
-
-  def toMove(node: Tree[NewMove]): List[Move] =
-    val variations = node match
-      case n: CNode[NewMove]     => n.variations.map(x => Turn.fromMoves(toMove(x), x.value.ply))
-      case v: Variation[NewMove] => Nil
-    val move = toMove(node.value, variations)
-    move :: node.child.fold(Nil)(toMove(_))
-
-  def toMove(move: NewMove, variations: List[List[Turn]]): Move =
-    Move(
-      san = move.san,
-      comments = move.comments,
-      glyphs = move.glyphs,
-      opening = move.opening,
-      result = move.result,
-      variations = variations,
-      secondsLeft = move.secondsLeft
-    )
-
+case class Pgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
   def render: PgnStr = PgnStr:
     import PgnTree.*
     val initStr =
@@ -65,7 +41,7 @@ object PgnTree:
       val childStr = tree.child.fold("")(x => s" ${x.render(d)}")
       s"$str$childStr"
 
-  extension (v: Variation[NewMove])
+  extension (v: Variation[Move])
     def _render: String =
       v.value.toString
 
@@ -81,48 +57,12 @@ object PgnTree:
       val childStr = v.child.fold("")(x => s" ${x.render(d)}")
       s"$str$childStr"
 
-object NewPgn:
-  def moves(turn: Turn): List[(Ply, Move)] =
-    List(
-      turn.white.map(m => turn.plyOf(White) -> m),
-      turn.black.map(m => turn.plyOf(Black) -> m)
-    ).flatten
-  def moves(pgn: Pgn): List[(Ply, Move)] = pgn.turns.flatMap(moves)
-
-  extension (move: Move)
-    def clean(ply: Ply): NewMove = NewMove(
-      ply = ply,
-      san = move.san,
-      comments = move.comments,
-      glyphs = move.glyphs,
-      opening = move.opening,
-      result = move.result,
-      secondsLeft = move.secondsLeft
-    )
-
-  def apply(pgn: Pgn): NewPgn =
-    val tree = moves(pgn).reverse.foldLeft(none[PgnTree]) { (o, move) => Some(toNode(move._2, move._1, o)) }
-    NewPgn(tags = pgn.tags, initial = pgn.initial, tree = tree)
-
-  def toNode(move: Move, ply: Ply, child: Option[PgnTree]): PgnTree =
-    CNode(
-      move.clean(ply),
-      child,
-      move.variations.map(_.flatMap(moves)).map(x => toVariation(x.head._2, ply, None))
-    )
-
-  def toVariation(move: Move, ply: Ply, child: Option[PgnTree]): Variation[NewMove] =
-    Variation(
-      move.clean(ply),
-      child
-    )
-
 private def glyphs(id: Int) =
   Glyph.find(id).fold(Glyphs.empty) { g =>
     Glyphs fromList List(g)
   }
 
-case class NewMove(
+case class Move(
     ply: Ply,
     san: SanStr,
     comments: List[Comment] = Nil,
@@ -153,3 +93,14 @@ case class NewMove(
           .mkString
       else ""
     s"$san$glyphStr$commentsOrTime"
+
+object Move:
+
+  val noDoubleLineBreakRegex = "(\r?\n){2,}".r
+
+  def noDoubleLineBreak(txt: String) =
+    noDoubleLineBreakRegex.replaceAllIn(txt, "\n")
+
+  def formatPgnSeconds(t: Int): String =
+    val d = java.time.Duration.ofSeconds(t)
+    f"${d.toHours}:${d.toMinutesPart}%02d:${d.toSecondsPart}%02d"

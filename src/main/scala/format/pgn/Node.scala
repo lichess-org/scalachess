@@ -249,6 +249,9 @@ object Node:
   def filterOptional[A](predicate: A => Boolean): Optional[Node[A], Node[A]] =
     Optional[Node[A], Node[A]](x => x.findNode(predicate))(x => n => n.replaceNode(predicate)(x).getOrElse(x))
 
+  def lift[A, B](f: A => B): Node[A] => Node[B] =
+    _.map(f)
+
   extension [A](xs: List[Node[A]])
     def toVariations: Option[Node[A]] =
       xs.reverse.foldLeft(none[Node[A]])((acc, x) => x.copy(variation = acc).some)

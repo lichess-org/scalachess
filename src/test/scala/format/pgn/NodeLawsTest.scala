@@ -5,7 +5,7 @@ package pgn
 import cats.laws.discipline.FunctorTests
 import munit.DisciplineSuite
 import org.scalacheck.*
-import Arbitraries.given
+import NodeGen.given
 import cats.laws.discipline.TraverseTests
 
 class NodeLawTests extends DisciplineSuite:

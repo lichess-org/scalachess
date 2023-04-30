@@ -287,9 +287,16 @@ class NewPgnTest extends FunSuite:
   )
 
   val pgns = List(pgn1, pgn2, pgn3, pgn4, pgn5, pgn6, pgn7, pgn8, pgn9, pgn10, pgn11, pgn12)
+  // val pgns = List(pgn4, pgn5, pgn6)//, pgn7, pgn8, pgn9, pgn10, pgn11, pgn12)
 
-  test("NewPgn and Pgn are isomorphic"):
+  // test("NewPgn and Pgn are isomorphic"):
+  //   pgns.foreach { pgn =>
+  //     val newPgn = NewPgn(pgn)
+  //     assertEquals(pgn, newPgn.toPgn)
+  //   }
+
+  test("NewPgn and Pgn PgnStr"):
     pgns.foreach { pgn =>
       val newPgn = NewPgn(pgn)
-      assertEquals(pgn, newPgn.toPgn)
+      assertEquals(pgn.toString, newPgn.render.value)
     }

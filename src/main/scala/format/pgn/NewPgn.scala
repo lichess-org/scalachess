@@ -2,20 +2,23 @@ package chess
 package format.pgn
 
 import cats.syntax.all.*
+import chess.Node as CNode
 
-type PgnTree = Node[NewMove]
+type PgnTree = CNode[NewMove]
 
 // isomorphic to Pgn
 case class NewPgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
   def toPgn: Pgn =
-    val moves = tree.fold(List.empty[Move])(toMove(_, Ply(1)))
+    val moves = tree.fold(List.empty[Move])(toMove(_))
     val turns = Turn.fromMoves(moves, Ply(1))
     Pgn(tags, turns, initial)
 
-  def toMove(node: PgnTree, ply: Ply): List[Move] =
-    val variations = node.variations.map(x => Turn.fromMoves(toMove(x, ply), ply))
-    val move       = toMove(node.value, variations)
-    move :: node.child.fold(Nil)(toMove(_, ply + 1))
+  def toMove(node: Tree[NewMove]): List[Move] =
+    val variations = node match
+      case n: CNode[NewMove]     => n.variations.map(x => Turn.fromMoves(toMove(x), x.value.ply))
+      case v: Variation[NewMove] => Nil
+    val move = toMove(node.value, variations)
+    move :: node.child.fold(Nil)(toMove(_))
 
   def toMove(move: NewMove, variations: List[List[Turn]]): Move =
     Move(
@@ -29,10 +32,11 @@ case class NewPgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
     )
 
   def render: PgnStr = PgnStr:
+    import PgnTree.*
     val initStr =
       if initial.comments.nonEmpty then initial.comments.mkString("{ ", " } { ", " }\n")
       else ""
-    val turnStr: String = ???
+    val turnStr: String = tree.fold("")(_.render)
     val resultStr       = tags(_.Result) | ""
     val endStr =
       if (turnStr.nonEmpty) s" $resultStr"
@@ -41,22 +45,41 @@ case class NewPgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
 
 object PgnTree:
   extension (tree: PgnTree)
-    def isLong = tree.value.isLong || tree.variation.isDefined
+    def isLong = tree.value.isLong || tree.variations.nonEmpty
     def _render: String =
       val moveStr = tree.value.toString
       val varStr =
-        if tree.variation.isEmpty then ""
-        else tree.variations.map(x => s" ($x )").mkString(" ")
+        if tree.variations.isEmpty then ""
+        else tree.variations.map(x => s" (${x.render})").mkString(" ")
       s"$moveStr$varStr"
 
-    def render: (Boolean, String) =
+    def render: String =
       render(!tree.value.ply.color.white)
 
-    def render(dot: Boolean): (Boolean, String) =
-      if tree.value.ply.color.white then (isLong, s" ${tree.value.ply.fullMoveNumber}.$_render")
-      else
-        val number = if dot then s"${tree.value.ply.fullMoveNumber}..." else ""
-        (false, s" $number$_render")
+    def render(dot: Boolean): String =
+      val (d, str) =
+        if tree.value.ply.color.white then (isLong, s"${tree.value.ply.fullMoveNumber}. $_render")
+        else
+          val number = if dot then s"${tree.value.ply.fullMoveNumber}... " else ""
+          (false, s"$number$_render")
+      val childStr = tree.child.fold("")(x => s" ${x.render(d)}")
+      s"$str$childStr"
+
+  extension (v: Variation[NewMove])
+    def _render: String =
+      v.value.toString
+
+    def render: String =
+      render(!v.value.ply.color.white)
+
+    def render(dot: Boolean): String =
+      val (d, str) =
+        if v.value.ply.color.white then (v.value.isLong, s"${v.value.ply.fullMoveNumber}. $_render")
+        else
+          val number = if dot then s"${v.value.ply.fullMoveNumber}... " else ""
+          (false, s"$number$_render")
+      val childStr = v.child.fold("")(x => s" ${x.render(d)}")
+      s"$str$childStr"
 
 object NewPgn:
   def moves(turn: Turn): List[(Ply, Move)] =
@@ -82,10 +105,16 @@ object NewPgn:
     NewPgn(tags = pgn.tags, initial = pgn.initial, tree = tree)
 
   def toNode(move: Move, ply: Ply, child: Option[PgnTree]): PgnTree =
-    Node(
+    CNode(
       move.clean(ply),
       child,
-      move.variations.map(_.flatMap(moves)).map(x => toNode(x.head._2, ply, None)).toVariations
+      move.variations.map(_.flatMap(moves)).map(x => toVariation(x.head._2, ply, None))
+    )
+
+  def toVariation(move: Move, ply: Ply, child: Option[PgnTree]): Variation[NewMove] =
+    Variation(
+      move.clean(ply),
+      child
     )
 
 private def glyphs(id: Int) =

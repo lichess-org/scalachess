@@ -15,6 +15,7 @@ object Ply extends OpaqueInt[Ply]:
     def fullMoveNumber = FullMoveNumber(1 + e / 2)
     inline def isEven  = (e & 1) == 0
     inline def isOdd   = !e.isEven
+    inline def next    = Ply(e + 1)
 
 /* The halfmove clock specifies a decimal number of half moves with respect to the 50 move draw rule.
  * It is reset to zero after a capture or a pawn move and incremented otherwise. */

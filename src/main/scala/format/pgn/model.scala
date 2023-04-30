@@ -38,7 +38,7 @@ case class Pgn(tags: Tags, turns: List[Turn], initial: Initial = Initial.empty):
 
   def nbPlies = turns.foldLeft(0)(_ + _.count)
 
-  def moves =
+  def moves: List[Move] =
     turns.flatMap { t =>
       List(t.white, t.black).flatten
     }
@@ -83,7 +83,7 @@ case class Turn(
 
   def isEmpty = white.isEmpty && black.isEmpty
 
-  def plyOf(color: Color) = number * 2 - color.fold(1, 0)
+  def plyOf(color: Color) = Ply(number * 2 - color.fold(1, 0))
 
   def count = List(white, black) count (_.isDefined)
 
@@ -92,8 +92,9 @@ case class Turn(
       case (Some(w), Some(b)) if w.isLong => s" $w $number... $b"
       case (Some(w), Some(b))             => s" $w $b"
       case (Some(w), None)                => s" $w"
-      case (None, Some(b))                => s".. $b"
-      case _                              => ""
+      // the begin of a variation
+      case (None, Some(b)) => s".. $b"
+      case _               => ""
     s"$number.$text"
 
 object Turn:
@@ -145,11 +146,11 @@ case class Move(
 
 object Move:
 
-  private val noDoubleLineBreakRegex = "(\r?\n){2,}".r
+  val noDoubleLineBreakRegex = "(\r?\n){2,}".r
 
-  private def noDoubleLineBreak(txt: String) =
+  def noDoubleLineBreak(txt: String) =
     noDoubleLineBreakRegex.replaceAllIn(txt, "\n")
 
-  private[pgn] def formatPgnSeconds(t: Int): String =
+  def formatPgnSeconds(t: Int): String =
     val d = java.time.Duration.ofSeconds(t)
     f"${d.toHours}:${d.toMinutesPart}%02d:${d.toSecondsPart}%02d"

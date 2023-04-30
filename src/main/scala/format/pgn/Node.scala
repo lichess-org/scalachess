@@ -33,6 +33,10 @@ final case class Node[A](
 
   def withValue(v: A) = copy(value = v)
 
+  def foldMainline[B](init: B)(f: (B, Node[A]) => B): B =
+    val x = f(init, withoutChild)
+    child.fold(x)(_.foldMainline(x)(f))
+
   def findPath[Id](path: List[Id])(using h: HasId[A, Id]): Option[List[Node[A]]] =
     @tailrec
     def loop(node: Node[A], path: List[Id], acc: List[Node[A]]): Option[List[Node[A]]] =

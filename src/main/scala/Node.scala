@@ -24,25 +24,15 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   def mainline: List[Tree[A]] = this :: child.fold(List.empty[Tree[A]])(_.mainline)
   def mainlineValues: List[A] = value :: child.fold(List.empty[A])(_.mainlineValues)
 
-  def hasId[Id](id: Id)(using h: HasId[A, Id]): Boolean = h.getId(value) == id
+  def hasId[Id](id: Id)(using HasId[A, Id]): Boolean = value.id == id
 
-  def findPath[Id](path: List[Id])(using h: HasId[A, Id]): Option[List[Tree[A]]]
+  def findPath[Id](path: List[Id])(using HasId[A, Id]): Option[List[Tree[A]]]
 
-  def find[Id](path: List[Id])(using h: HasId[A, Id]): Option[Tree[A]] =
+  def find[Id](path: List[Id])(using HasId[A, Id]): Option[Tree[A]] =
     findPath(path).flatMap(_.lastOption)
 
-  // find a node with path
-  // if not found, return None
-  // if found node has no child, add new value as a child
-  // if found node has a child, add new value as it's child's variation
-  def addNodeAt[Id](path: List[Id])(node: A)(using h: HasId[A, Id]): Option[Tree[A]] =
-    val f: TreeModifier[A] = (tree: Tree[A]) =>
-      val child =
-        tree.child.fold(Node(node))(child => child.withVariations(child.variations :+ Variation(node)))
-      tree.withChild(child)
-    modifyAt(path, f)
-
-  def modifyAt[Id](path: List[Id], f: TreeModifier[A])(using h: HasId[A, Id]): Option[Tree[A]]
+  def modifyAt[Id](path: List[Id], f: TreeModifier[A])(using HasId[A, Id]): Option[Tree[A]]
+  // def modifyChildAt[Id](path: List[Id], f: TreeModifier[A])(using HasId[A, Id]): Option[Tree[A]]
 
 object Tree:
   def lift[A](f: A => A): TreeModifier[A] = tree => tree.withValue(f(tree.value))
@@ -63,7 +53,7 @@ final case class Node[A](
     derives Functor,
       Traverse:
 
-  def findPath[Id](path: List[Id])(using h: HasId[A, Id]): Option[List[Tree[A]]] =
+  def findPath[Id](path: List[Id])(using HasId[A, Id]): Option[List[Tree[A]]] =
     @tailrec
     def loop(node: Node[A], path: List[Id], acc: List[Tree[A]]): Option[List[Tree[A]]] =
       path match
@@ -81,7 +71,7 @@ final case class Node[A](
 
     if path.isEmpty then None else loop(this, path, Nil).map(_.reverse)
 
-  def modifyAt[Id](path: List[Id], f: TreeModifier[A])(using h: HasId[A, Id]): Option[Node[A]] =
+  def modifyAt[Id](path: List[Id], f: TreeModifier[A])(using HasId[A, Id]): Option[Node[A]] =
     path match
       case Nil                        => None
       case head :: Nil if hasId(head) => f(this).some
@@ -165,11 +155,11 @@ final case class Node[A](
     copy(variations = Nil)
 
   // find the first variation by id
-  def findVariation[Id](id: Id)(using h: HasId[A, Id]): Option[Variation[A]] =
+  def findVariation[Id](id: Id)(using HasId[A, Id]): Option[Variation[A]] =
     variations.find(_.hasId(id))
 
   // check if exist a variation that has Id
-  def hasVariation[Id](id: Id)(using h: HasId[A, Id]): Boolean =
+  def hasVariation[Id](id: Id)(using HasId[A, Id]): Boolean =
     variations.exists(_.hasId(id))
 
 object Node:
@@ -178,10 +168,10 @@ object Node:
 final case class Variation[A](override val value: A, override val child: Option[Node[A]] = None)
     extends Tree[A](value, child) derives Functor, Traverse:
 
-  def findPath[Id](path: List[Id])(using h: HasId[A, Id]): Option[List[Tree[A]]] =
+  def findPath[Id](path: List[Id])(using HasId[A, Id]): Option[List[Tree[A]]] =
     toNode.findPath(path)
 
-  def modifyAt[Id](path: List[Id], f: TreeModifier[A])(using h: HasId[A, Id]): Option[Variation[A]] =
+  def modifyAt[Id](path: List[Id], f: TreeModifier[A])(using HasId[A, Id]): Option[Variation[A]] =
     path match
       case Nil                        => None
       case head :: Nil if hasId(head) => f(this).some

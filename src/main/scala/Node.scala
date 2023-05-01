@@ -24,7 +24,7 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   def mainline: List[Tree[A]] = this :: child.fold(List.empty[Tree[A]])(_.mainline)
   def mainlineValues: List[A] = value :: child.fold(List.empty[A])(_.mainlineValues)
 
-  def hasId[Id](id: Id)(using HasId[A, Id]): Boolean = value.id == id
+  def hasId[Id](id: Id)(using HasId[A, Id]): Boolean = value.hasId(id)
 
   def findPath[Id](path: List[Id])(using HasId[A, Id]): Option[List[Tree[A]]]
 
@@ -32,7 +32,7 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
     findPath(path).flatMap(_.lastOption)
 
   def modifyAt[Id](path: List[Id], f: TreeModifier[A])(using HasId[A, Id]): Option[Tree[A]]
-  // def modifyChildAt[Id](path: List[Id], f: TreeModifier[A])(using HasId[A, Id]): Option[Tree[A]]
+  def modifyWithParentPath[Id](path: List[Id], f: Node[A] => Node[A])(using HasId[A, Id]): Option[Tree[A]]
 
 object Tree:
   def lift[A](f: A => A): TreeModifier[A] = tree => tree.withValue(f(tree.value))
@@ -99,6 +99,25 @@ final case class Node[A](
 
     if path.isEmpty then None else loop(this, path, Nil).map(_.reverse)
 
+  def modifyWithParentPath[Id](path: List[Id], f: Node[A] => Node[A])(using HasId[A, Id]): Option[Node[A]] =
+    path match
+      case Nil                        => f(this).some
+      case head :: Nil if hasId(head) => child.map(c => withChild(f(c)))
+      case head :: rest if hasId(head) =>
+        child.flatMap(_.modifyWithParentPath(rest, f)) match
+          case None    => None
+          case Some(c) => copy(child = c.some).some
+      case _ =>
+        variations.foldLeft((false, List.empty[Variation[A]])) {
+          case ((true, acc), n) => (true, acc :+ n)
+          case ((false, acc), n) =>
+            n.modifyWithParentPath(path, f) match
+              case Some(nn) => (true, acc :+ nn)
+              case None     => (false, acc :+ n)
+        } match
+          case (true, ns) => copy(variations = ns).some
+          case (false, _) => none
+
   def modifyAt[Id](path: List[Id], f: TreeModifier[A])(using HasId[A, Id]): Option[Node[A]] =
     path match
       case Nil                        => None
@@ -118,14 +137,6 @@ final case class Node[A](
           case (true, ns) => copy(variations = ns).some
           case (false, _) => none
 
-  // def modifyChildAt[Id](path: List[Id], f: TreeModifier[A])(using HasId[A, Id]): Option[Node[A]] =
-  //   path match
-  //     case Nil => f(this).some
-  //     case head :: Nil if hasId(head) =>
-  //       child.flatMap(_.modifyAt(path, f)) match
-  //         case None    => None
-  //         case Some(c) => copy(child = c.some).some
-
   // find a node with path
   // if not found, return None
   // if found node has no child, add new value as a child
@@ -134,6 +145,14 @@ final case class Node[A](
       value: A
   )(using HasId[A, Id], Mergeable[A]): Option[Node[A]] =
     modifyAt(path, Tree.addValueAsChildOrVariation(value))
+
+  // add a node with path to the tree
+  // which basically is addChildOrVariationAt with path +: h.getId(value)
+  def addValueAt[Id](path: List[Id])(value: A)(using HasId[A, Id], Mergeable[A]): Option[Node[A]] =
+    addNodeAt(path)(Node(value))
+
+  def addNodeAt[Id](path: List[Id])(other: Node[A])(using HasId[A, Id], Mergeable[A]): Option[Node[A]] =
+    modifyWithParentPath(path, _.merge(other))
 
   // Akin to map, but allows to keep track of a state value when calling the function.
   def mapAccuml[S, B](init: S)(f: (S, A) => (S, B)): (S, Node[B]) =
@@ -196,6 +215,7 @@ final case class Node[A](
 
   // merge two nodes
   // in case of same id, merge values
+  // else add as variation
   def merge[Id](other: Node[A])(using HasId[A, Id], Mergeable[A]): Node[A] =
     if value.sameId(value) then withValue(value.merge(value)).withVariations(variations.add(other.variations))
     else withVariations(variations.add(other.toVariations))
@@ -222,6 +242,18 @@ final case class Variation[A](override val value: A, override val child: Option[
 
   def findPath[Id](path: List[Id])(using HasId[A, Id]): Option[List[Tree[A]]] =
     toNode.findPath(path)
+
+  def modifyWithParentPath[Id](path: List[Id], f: Node[A] => Node[A])(using
+      HasId[A, Id]
+  ): Option[Variation[A]] =
+    path match
+      case Nil                        => None
+      case head :: Nil if hasId(head) => child.map(c => withChild(f(c)))
+      case head :: rest if hasId(head) =>
+        child.flatMap(_.modifyWithParentPath(rest, f)) match
+          case None    => None
+          case Some(c) => copy(child = c.some).some
+      case _ => None
 
   def modifyAt[Id](path: List[Id], f: TreeModifier[A])(using HasId[A, Id]): Option[Variation[A]] =
     path match

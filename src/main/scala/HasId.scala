@@ -3,8 +3,9 @@ package chess
 trait HasId[A, Id]:
   def getId(a: A): Id
   extension [A](a: A)
-    inline def id[Id](using HasId[A, Id]): Id = summon[HasId[A, Id]].getId(a)
+    inline def id[Id](using HasId[A, Id]): Id                    = summon[HasId[A, Id]].getId(a)
     inline def sameId[Id](other: A)(using HasId[A, Id]): Boolean = a.id == other.id
+    inline def hasId[Id](id: Id)(using HasId[A, Id]): Boolean    = a.id == id
 
 object HasId:
   given [A]: HasId[A, A] with

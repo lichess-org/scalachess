@@ -39,6 +39,34 @@ object Tree:
   def build[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
     s.reverse.foldLeft(none[Node[B]])((acc, a) => Node(f(a), acc).some)
 
+  // Add a value as a child or variation
+  // if the tree has no child, add value as child
+  // if the value has the same id as the child, merge the values
+  // otherwise add value as a variation (and merge it to one of the existing variation if necessary)
+  def addValueAsChildOrVariation[A, Id]: HasId[A, Id] ?=> Mergeable[A] ?=> A => TreeModifier[A] = value =>
+    tree => addChildOrVariation(Node(value))(tree)
+
+  def addChildOrVariation[A, Id]: HasId[A, Id] ?=> Mergeable[A] ?=> Node[A] => TreeModifier[A] = other =>
+    tree =>
+      val child = tree.child.fold(other)(_.merge(other))
+      tree.withChild(child)
+
+  extension [A](vs: List[Variation[A]])
+    // add a variation to the list of variations
+    // if there is already a variation with the same id, merge the values
+    def add[Id](v: Variation[A])(using HasId[A, Id], Mergeable[A]): List[Variation[A]] =
+      @tailrec
+      def loop(acc: List[Variation[A]], rest: List[Variation[A]]): List[Variation[A]] =
+        rest match
+          case Nil => acc :+ v
+          case x :: xs =>
+            if x.sameId(v) then (acc ++ (x.withValue(x.value.merge(v.value)) +: xs))
+            else loop(acc :+ x, xs)
+      loop(Nil, vs)
+
+    def add[Id](xs: List[Variation[A]])(using HasId[A, Id], Mergeable[A]): List[Variation[A]] =
+      xs.foldLeft(vs)((acc, x) => acc.add(x))
+
 type IsTree[A, X <: Tree[A]] = X match
   case Node[A]      => Node[A]
   case Variation[A] => Variation[A]
@@ -89,6 +117,23 @@ final case class Node[A](
         } match
           case (true, ns) => copy(variations = ns).some
           case (false, _) => none
+
+  // def modifyChildAt[Id](path: List[Id], f: TreeModifier[A])(using HasId[A, Id]): Option[Node[A]] =
+  //   path match
+  //     case Nil => f(this).some
+  //     case head :: Nil if hasId(head) =>
+  //       child.flatMap(_.modifyAt(path, f)) match
+  //         case None    => None
+  //         case Some(c) => copy(child = c.some).some
+
+  // find a node with path
+  // if not found, return None
+  // if found node has no child, add new value as a child
+  // if found node has a child, add new value as it's child's variation
+  def addValueAsChildOrVariationAt[Id](path: List[Id])(
+      value: A
+  )(using HasId[A, Id], Mergeable[A]): Option[Node[A]] =
+    modifyAt(path, Tree.addValueAsChildOrVariation(value))
 
   // Akin to map, but allows to keep track of a state value when calling the function.
   def mapAccuml[S, B](init: S)(f: (S, A) => (S, B)): (S, Node[B]) =
@@ -146,7 +191,14 @@ final case class Node[A](
 
   def mapMainlineWithIndex[B](f: (A, Int) => B): Node[B] = ???
 
-  def toVariation: Variation[A] = Variation(value, child)
+  def toVariation: Variation[A]        = Variation(value, child)
+  def toVariations: List[Variation[A]] = Variation(value, child) +: variations
+
+  // merge two nodes
+  // in case of same id, merge values
+  def merge[Id](other: Node[A])(using HasId[A, Id], Mergeable[A]): Node[A] =
+    if value.sameId(value) then withValue(value.merge(value)).withVariations(variations.add(other.variations))
+    else withVariations(variations.add(other.toVariations))
 
   def withVariations(variations: List[Variation[A]]): Node[A] =
     copy(variations = variations)

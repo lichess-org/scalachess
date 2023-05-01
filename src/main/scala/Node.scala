@@ -56,11 +56,11 @@ object Tree:
     // if there is already a variation with the same id, merge the values
     def add[Id](v: Variation[A])(using HasId[A, Id], Mergeable[A]): List[Variation[A]] =
       @tailrec
-      def loop(acc: List[Variation[A]], rest: List[Variation[A]]): List[Variation[A]] =
+      def loop(acc: List[Variation[A]], rest: List[Variation[A]])(using HasId[A, Id]): List[Variation[A]] =
         rest match
           case Nil => acc :+ v
           case x :: xs =>
-            if x.sameId(v) then (acc ++ (x.withValue(x.value.merge(v.value)) +: xs))
+            if x.value.sameId(v.value) then (acc ++ (x.withValue(x.value.merge(v.value)) +: xs))
             else loop(acc :+ x, xs)
       loop(Nil, vs)
 
@@ -219,6 +219,12 @@ final case class Node[A](
   def merge[Id](other: Node[A])(using HasId[A, Id], Mergeable[A]): Node[A] =
     if value.sameId(value) then withValue(value.merge(value)).withVariations(variations.add(other.variations))
     else withVariations(variations.add(other.toVariations))
+
+  def addVariation[Id](v: Variation[A])(using HasId[A, Id], Mergeable[A]): Node[A] =
+    withVariations(variations.add(v))
+
+  def addVariations[Id](vs: List[Variation[A]])(using HasId[A, Id], Mergeable[A]): Node[A] =
+    withVariations(variations.add(vs))
 
   def withVariations(variations: List[Variation[A]]): Node[A] =
     copy(variations = variations)

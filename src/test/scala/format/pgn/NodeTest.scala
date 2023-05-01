@@ -12,6 +12,9 @@ import scala.util.Random
 
 class NodeTest extends ScalaCheckSuite:
 
+  given [A]: HasId[A, A] with
+    def getId(a: A): A = a
+
   test("filterOptional isEmpty"):
     forAll: (node: Node[Int], p: Int => Boolean) =>
       val optional = Node.filterOptional(p)

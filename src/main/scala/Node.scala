@@ -46,6 +46,8 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
 
 object Tree:
   def lift[A](f: A => A): TreeModifier[A] = tree => tree.withValue(f(tree.value))
+  def build[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
+    s.reverse.foldLeft(none[Node[B]])((acc, a) => Node(f(a), acc).some)
 
 type IsTree[A, X <: Tree[A]] = X match
   case Node[A]      => Node[A]

@@ -81,6 +81,9 @@ final case class Node[A](
     derives Functor,
       Traverse:
 
+  def mainlinePath[Id](using HasId[A, Id]): List[Id] =
+    value.id +: child.fold(List.empty[Id])(_.mainlinePath)
+
   def findPath[Id](path: List[Id])(using HasId[A, Id]): Option[List[Tree[A]]] =
     @tailrec
     def loop(node: Node[A], path: List[Id], acc: List[Tree[A]]): Option[List[Tree[A]]] =

@@ -10,8 +10,8 @@ import scala.util.Random
 
 class NodeTest extends ScalaCheckSuite:
 
-  given [A]: HasId[A, A] with
-    def getId(a: A): A = a
+  given HasId[Int, Int] with
+    def getId(a: Int): Int = a
 
   test("use mainline as path for findPath"):
     forAll: (node: Tree[Int]) =>

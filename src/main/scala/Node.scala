@@ -24,6 +24,7 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   def mainline: List[Tree[A]] = this :: child.fold(List.empty[Tree[A]])(_.mainline)
   def mainlineValues: List[A] = value :: child.fold(List.empty[A])(_.mainlineValues)
 
+
   def hasId[Id](id: Id)(using h: HasId[A, Id]): Boolean = h.getId(value) == id
 
   def findPath[Id](path: List[Id])(using h: HasId[A, Id]): Option[List[Tree[A]]]
@@ -43,6 +44,9 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
     modifyAt(path, f)
 
   def modifyAt[Id](path: List[Id], f: TreeModifier[A])(using h: HasId[A, Id]): Option[Tree[A]]
+
+object Tree:
+  def lift[A](f: A => A): TreeModifier[A] =  tree => tree.withValue(f(tree.value))
 
 type IsTree[A, X <: Tree[A]] = X match
   case Node[A]      => Node[A]
@@ -95,6 +99,34 @@ final case class Node[A](
           case (true, ns) => copy(variations = ns).some
           case (false, _) => none
 
+  // find node in the mainline
+  def findInMainline(predicate: A => Boolean): Option[Node[A]] =
+    if predicate(value) then this.some
+    else
+      child.fold(none[Node[A]]): c =>
+        if predicate(c.value) then c.some
+        else c.findInMainline(predicate)
+
+  def modifyInMainline(predicate: A => Boolean, f: Node[A] => Node[A]): Option[Node[A]] =
+    if predicate(value) then f(this).some
+    else
+      child.flatMap(_.modifyInMainline(predicate, f)) match
+        case Some(c) => withChild(c).some
+        case None    => None
+
+  def lastMainlineNode: Node[A] =
+    child.fold(this)(_.lastMainlineNode)
+
+  def modifyLastMainlineNode(f: Node[A] => Node[A]): Node[A] =
+    child.fold(f(this))(c => withChild(c.modifyLastMainlineNode(f)))
+
+  // map values from mainline
+  // remove all variations
+  def mapMainline[B](f: A => B): Node[B] =
+    copy(value = f(value), child = child.map(_.mapMainline(f)), variations = Nil)
+
+  def mapMainlineWithIndex[B](f: (A, Int) => B): Node[B] = ???
+
   def toVariation: Variation[A] = Variation(value, child)
 
   def withVariations(variations: List[Variation[A]]): Node[A] =
@@ -110,6 +142,9 @@ final case class Node[A](
   // check if exist a variation that has Id
   def hasVariation[Id](id: Id)(using h: HasId[A, Id]): Boolean =
     variations.exists(_.hasId(id))
+
+object Node:
+  def lift[A](f: A => A): Node[A] => Node[A] = tree => tree.withValue(f(tree.value))
 
 final case class Variation[A](override val value: A, override val child: Option[Node[A]] = None)
     extends Tree[A](value, child) derives Functor, Traverse:

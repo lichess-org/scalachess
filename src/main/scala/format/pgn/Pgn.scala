@@ -1,23 +1,40 @@
 package chess
 package format.pgn
 
+import monocle.syntax.all.*
 import cats.syntax.all.*
 
 type PgnTree = Node[Move]
 
-// isomorphic to Pgn
 case class Pgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
+
   def render: PgnStr = PgnStr:
+    toString
+
+  override def toString(): String =
     import PgnTree.*
     val initStr =
       if initial.comments.nonEmpty then initial.comments.mkString("{ ", " } { ", " }\n")
       else ""
-    val turnStr: String = tree.fold("")(_.render)
-    val resultStr       = tags(_.Result) | ""
+    val movesStr: String = tree.fold("")(_.render)
+    val resultStr        = tags(_.Result) | ""
     val endStr =
-      if (turnStr.nonEmpty) s" $resultStr"
+      if (movesStr.nonEmpty) s" $resultStr"
       else resultStr
-    s"$tags\n\n$initStr$turnStr$endStr".trim
+    s"$tags\n\n$initStr$movesStr$endStr".trim
+
+  def updatePly(ply: Ply, f: Move => Move): Option[Pgn] =
+    val predicate = (m: Move) => m.ply == ply
+    this.focus(_.tree.some).modifyA(_.modifyInMainline(predicate, Node.lift(f)))
+
+  def updateLastPly(f: Move => Move): Pgn =
+    this.focus(_.tree.some).modify(_.modifyLastMainlineNode(Node.lift(f)))
+
+  def moves: List[Move] = tree.fold(List.empty[Move])(_.mainlineValues)
+
+  def withEvent(title: String) =
+    copy(tags = tags + Tag(_.Event, title))
+
 
 object PgnTree:
   extension (tree: PgnTree)

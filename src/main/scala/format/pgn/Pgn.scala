@@ -2,7 +2,6 @@ package chess
 package format.pgn
 
 import monocle.syntax.all.*
-import cats.syntax.all.*
 
 type PgnTree = Node[Move]
 
@@ -34,7 +33,6 @@ case class Pgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
 
   def withEvent(title: String) =
     copy(tags = tags + Tag(_.Event, title))
-
 
 object PgnTree:
   extension (tree: PgnTree)

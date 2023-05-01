@@ -24,7 +24,6 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   def mainline: List[Tree[A]] = this :: child.fold(List.empty[Tree[A]])(_.mainline)
   def mainlineValues: List[A] = value :: child.fold(List.empty[A])(_.mainlineValues)
 
-
   def hasId[Id](id: Id)(using h: HasId[A, Id]): Boolean = h.getId(value) == id
 
   def findPath[Id](path: List[Id])(using h: HasId[A, Id]): Option[List[Tree[A]]]
@@ -46,7 +45,7 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   def modifyAt[Id](path: List[Id], f: TreeModifier[A])(using h: HasId[A, Id]): Option[Tree[A]]
 
 object Tree:
-  def lift[A](f: A => A): TreeModifier[A] =  tree => tree.withValue(f(tree.value))
+  def lift[A](f: A => A): TreeModifier[A] = tree => tree.withValue(f(tree.value))
 
 type IsTree[A, X <: Tree[A]] = X match
   case Node[A]      => Node[A]
@@ -98,6 +97,34 @@ final case class Node[A](
         } match
           case (true, ns) => copy(variations = ns).some
           case (false, _) => none
+
+  // Akin to map, but allows to keep track of a state value when calling the function.
+  def mapAccuml[S, B](init: S)(f: (S, A) => (S, B)): (S, Node[B]) =
+    val (s1, b) = f(init, value)
+    val v       = variations.map(_.mapAccuml(init)(f)._2)
+    child.map(_.mapAccuml(s1)(f)) match
+      case None    => (s1, Node(b, None, v))
+      case Some(s) => (s._1, Node(b, s._2.some, v))
+
+  def mapAccuml_[S, B](init: S)(f: (S, A) => (S, B)): Node[B] =
+    mapAccuml(init)(f)._2
+
+  // Akin to mapAccuml, return an Option[Node[B]]
+  // when a node from mainline returns None, we stop traverse down that line
+  // when a variation node returns None, we just ignore it and continue to traverse next variations
+  // TODO: now if the f(value) is None, the whole tree is None
+  // should we promote a variation to mainline if the f(value) is None?
+  def _mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): (S, Option[Node[B]]) =
+    f(init, value) match
+      case (s1, None) => (s1, None)
+      case (s1, Some(b)) =>
+        val vs = variations.map(_._mapAccumlOption(init)(f)._2).flatten
+        child.map(_._mapAccumlOption(s1)(f)) match
+          case None    => (s1, Node(b, None, vs).some)
+          case Some(s) => (s._1, Node(b, s._2, vs).some)
+
+  def mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): Option[Node[B]] =
+    _mapAccumlOption(init)(f)._2
 
   // find node in the mainline
   def findInMainline(predicate: A => Boolean): Option[Node[A]] =
@@ -161,5 +188,25 @@ final case class Variation[A](override val value: A, override val child: Option[
           case None    => None
           case Some(c) => copy(child = c.some).some
       case _ => None
+
+  // Akin to map, but allows to keep track of a state value when calling the function.
+  def mapAccuml[S, B](init: S)(f: (S, A) => (S, B)): (S, Variation[B]) =
+    val (s1, b) = f(init, value)
+    child.map(_.mapAccuml(s1)(f)) match
+      case None    => (s1, Variation(b, None))
+      case Some(s) => (s._1, Variation(b, s._2.some))
+
+  // Akin to mapAccuml, return an Option[Node[B]]
+  // when a node from mainline returns None, we stop traverse down that line
+  // when a variation node returns None, we just ignore it and continue to traverse next variations
+  // TODO: now if the f(value) is None, the whole tree is None
+  // should we promote a variation to mainline if the f(value) is None?
+  def _mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): (S, Option[Variation[B]]) =
+    f(init, value) match
+      case (s1, None) => (s1, None)
+      case (s1, Some(b)) =>
+        child.map(_._mapAccumlOption(s1)(f)) match
+          case None    => (s1, Variation(b, None).some)
+          case Some(s) => (s._1, Variation(b, s._2).some)
 
   def toNode: Node[A] = Node(value, child)

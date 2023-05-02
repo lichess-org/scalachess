@@ -22,7 +22,7 @@ case class History(
     castles: Castles = Castles.all,
     checkCount: CheckCount = CheckCount(0, 0),
     unmovedRooks: UnmovedRooks,
-    halfMoveClock: HalfMoveClock = HalfMoveClock(0)
+    halfMoveClock: HalfMoveClock = HalfMoveClock.initial
 ):
 
   def setHalfMoveClock(v: HalfMoveClock) = copy(halfMoveClock = v)

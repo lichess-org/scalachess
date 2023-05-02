@@ -137,7 +137,7 @@ trait ChessTest extends Specification with ValidatedMatchers:
       castles: Castles = Castles.all,
       checkCount: CheckCount = CheckCount(0, 0),
       unmovedRooks: UnmovedRooks = UnmovedRooks.corners,
-      halfMoveClock: HalfMoveClock = HalfMoveClock(0)
+      halfMoveClock: HalfMoveClock = HalfMoveClock.initial
   ) = History(
     lastMove = lastMove,
     positionHashes = positionHashes,

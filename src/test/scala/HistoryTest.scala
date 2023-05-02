@@ -24,6 +24,6 @@ class HistoryTest extends ChessTest:
 
   "set half move clock" should:
     "set 0" in:
-      defaultHistory().setHalfMoveClock(HalfMoveClock(0)).halfMoveClock must_== HalfMoveClock(0)
+      defaultHistory().setHalfMoveClock(HalfMoveClock.initial).halfMoveClock must_== HalfMoveClock(0)
     "set 5" in:
       defaultHistory().setHalfMoveClock(HalfMoveClock(5)).halfMoveClock must_== HalfMoveClock(5)

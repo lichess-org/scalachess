@@ -88,9 +88,14 @@ trait FenReader:
 
   def readHalfMoveClockAndFullMoveNumber(fen: EpdFen): (Option[HalfMoveClock], Option[FullMoveNumber]) =
     val splitted = fen.value.split(' ').drop(4).dropWhile(_.contains('+')) // skip winboards 3check notation
-    val halfMoveClock  = splitted.lift(0).flatMap(_.toIntOption).map(_ max 0 min 100)
-    val fullMoveNumber = splitted.lift(1).flatMap(_.toIntOption).map(_ max 1 min 500)
-    (HalfMoveClock from halfMoveClock, FullMoveNumber from fullMoveNumber)
+    val halfMoveClock =
+      HalfMoveClock
+        .from(splitted.lift(0).flatMap(_.toIntOption))
+        .map(_ atLeast HalfMoveClock.initial atMost 100)
+    val fullMoveNumber = FullMoveNumber
+      .from(splitted.lift(1).flatMap(_.toIntOption))
+      .map(_ atLeast FullMoveNumber.initial atMost 500)
+    (halfMoveClock, fullMoveNumber)
 
   def readPly(fen: EpdFen): Option[Ply] =
     val (_, fullMoveNumber) = readHalfMoveClockAndFullMoveNumber(fen)

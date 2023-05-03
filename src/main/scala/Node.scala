@@ -36,8 +36,6 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
 
 object Tree:
   def lift[A](f: A => A): TreeModifier[A] = tree => tree.withValue(f(tree.value))
-  def build[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
-    s.reverse.foldLeft(none[Node[B]])((acc, a) => Node(f(a), acc).some)
 
   // Add a value as a child or variation
   // if the tree has no child, add value as child
@@ -246,6 +244,14 @@ final case class Node[A](
 object Node:
   def lift[A](f: A => A): Node[A] => Node[A] = tree => tree.withValue(f(tree.value))
 
+  def build[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
+    s.reverse.foldLeft(none[Node[B]])((acc, a) => Node(f(a), acc).some)
+
+  def buildWithNode[A, B](s: Seq[A], f: A => Node[B]): Option[Node[B]] =
+    s.reverse match
+      case Nil     => none[Node[B]]
+      case x :: xs => xs.foldLeft(f(x))((acc, a) => f(a).withChild(acc)).some
+
 final case class Variation[A](override val value: A, override val child: Option[Node[A]] = None)
     extends Tree[A](value, child) derives Functor, Traverse:
 
@@ -295,3 +301,8 @@ final case class Variation[A](override val value: A, override val child: Option[
           case Some(s) => (s._1, Variation(b, s._2).some)
 
   def toNode: Node[A] = Node(value, child)
+
+object Variation:
+
+  def build[A, B](s: Seq[A], f: A => B): Option[Variation[B]] =
+    Node.build(s, f).map(_.toVariation)

@@ -31,6 +31,9 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   def find[Id](path: List[Id])(using HasId[A, Id]): Option[Tree[A]] =
     findPath(path).flatMap(_.lastOption)
 
+  def pathExists[Id](path: List[Id]): HasId[A, Id] ?=> Boolean =
+    find(path).isDefined
+
   def modifyAt[Id](path: List[Id], f: TreeModifier[A])(using HasId[A, Id]): Option[Tree[A]]
   def modifyWithParentPath[Id](path: List[Id], f: Node[A] => Node[A])(using HasId[A, Id]): Option[Tree[A]]
 

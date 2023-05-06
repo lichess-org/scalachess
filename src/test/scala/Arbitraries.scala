@@ -17,9 +17,10 @@ object Arbitraries:
     yield Piece(color, role)
   )
 
-  given [A](using Arbitrary[A]): Arbitrary[Tree[A]]      = Arbitrary(genNode)
+  given [A](using Arbitrary[A]): Arbitrary[Tree[A]]      = Arbitrary(Gen.oneOf(genNode, genVariation))
   given [A](using Arbitrary[A]): Arbitrary[Node[A]]      = Arbitrary(genNode)
   given [A](using Arbitrary[A]): Arbitrary[Variation[A]] = Arbitrary(genVariation)
+
   type NodeWithPath[A] = (Node[A], List[A])
   given [A](using Arbitrary[A]): Arbitrary[NodeWithPath[A]] = Arbitrary(genNodeWithPath)
 

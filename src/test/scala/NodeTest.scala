@@ -7,11 +7,28 @@ import cats.syntax.all.*
 import Arbitraries.given
 import org.scalacheck.Prop.propBoolean
 import scala.util.Random
+import cats.kernel.Monoid
 
 class NodeTest extends ScalaCheckSuite:
 
   given HasId[Int, Int] with
     def getId(a: Int): Int = a
+
+  test("mainline size <= node.size"):
+    forAll: (node: Node[Int]) =>
+      node.mainline.size <= node.size
+
+  test("mainline is a sub set of node"):
+    forAll: (node: Node[Int]) =>
+      node.mainlineValues.forall(x => node.exists(_ == x))
+
+  test("mainline.size + variations.size == node.size"):
+    forAll: (node: Node[Int]) =>
+      node.mainline.size + variationsCount(node) == node.size
+
+  test("find ids with mainline as path retuns last mainline node"):
+    forAll: (node: Node[Int]) =>
+      node.find(node.mainlineValues).get == node.lastMainlineNode
 
   test("use mainline as path for findPath"):
     forAll: (node: Tree[Int]) =>
@@ -33,27 +50,41 @@ class NodeTest extends ScalaCheckSuite:
         found.isEmpty || (found.isDefined && found.get == path)
       }
 
-  // test("modifyAt with mainline == modifyLastMainlineNode"):
-  //   forAll: (node: Node[Int], f: Int => Int) =>
-  //     def m(n: Node[Int]) = n.copy(value = f(n.value))
-  //     node.modifyAt(node.mainlineValues, m) == node.modifyLastMainlineNode(m).some
+  test("modifyAt with mainline == modifyLastMainlineNode"):
+    forAll: (node: Node[Int], f: Int => Int) =>
+      node.modifyAt(node.mainlineValues, Tree.lift(f)) == node.modifyLastMainlineNode(Node.lift(f)).some
 
   test("modifyAt and find are consistent"):
     forAll: (node: Node[Int]) =>
       val path = node.randomPath
-      def f[A]: TreeModifier[A] = node =>
+      def f[A]: TreeMapper[A] = node =>
         node match
           case n: Node[A]      => n
           case v: Variation[A] => v
       node.modifyAt(path, f).flatMap(_.find(path)) == node.find(path)
 
-  // test("find and exist are consistent"):
-  //   forAll: (node: Node[Int], n: Int) =>
-  //     node.find(List(n)).isDefined == node.exists(_ == n)
+  test("deleteAt with root value return Some(None)"):
+    forAll: (node: Node[Int]) =>
+      val deleted = node.deleteAt(List(node.value))
+      deleted == Some(None)
+
+  test("deleteAt with mainline == deleteLastMainlineNode"):
+    forAll: (node: Node[Int]) =>
+      node.size >= 2 ==> {
+        val deleted = node.deleteAt(node.mainlineValues)
+        deleted.isDefined && deleted.get.get.size == node.size - 1
+      }
+
+  test("deleteAt and findAt are consistent"):
+    forAll: (node: Node[Int]) =>
+      val path = node.randomPath
+      node.deleteAt(path).isDefined == node.find(path).isDefined
+
+  given Monoid[Long] with
+    def empty                     = 0L
+    def combine(x: Long, y: Long) = x + y
 
   extension [A](node: Node[A])
-    // def variationsCount: Long =
-    //   node.child.foldLeft(node.variation.fold(0L)(_.size))((acc, v) => acc + v.variationsCount)
 
     // generate a path from the root to a random node
     def randomPath: List[A] =
@@ -63,3 +94,6 @@ class NodeTest extends ScalaCheckSuite:
         val v = node.variations(Random.nextInt(node.variations.size - 1))
         v.value :: v.child.fold(List.empty[A])(_.randomPath)
       else Nil
+
+    def variationsCount: Long =
+      node.child.foldLeft(node.variations.foldMap(_.size))((acc, v) => acc + v.variationsCount)

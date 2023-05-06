@@ -133,13 +133,13 @@ final case class Node[A](
           case Some(c) => copy(child = c.some).some
       case _ =>
         variations.foldLeft((false, List.empty[Variation[A]])) {
-          case ((true, acc), n) => (true, acc :+ n)
+          case ((true, acc), n) => (true, n :: acc)
           case ((false, acc), n) =>
             n.modifyAt(path, f) match
-              case Some(nn) => (true, acc :+ nn)
-              case None     => (false, acc :+ n)
+              case Some(nn) => (true, nn :: acc)
+              case None     => (false, n :: acc)
         } match
-          case (true, ns) => copy(variations = ns).some
+          case (true, ns) => copy(variations = ns.reverse).some
           case (false, _) => none
 
   // delete the node at the end of the path
@@ -155,16 +155,13 @@ final case class Node[A](
           case Some(c) => copy(child = c).some.some
       case _ =>
         variations.foldLeft((false, List.empty[Variation[A]])) {
-          case ((true, acc), n) => (true, acc :+ n)
+          case ((true, acc), n) => (true, n :: acc)
           case ((false, acc), n) =>
             n.deleteAt(path) match
-              case Some(nn) =>
-                nn match
-                  case None      => (true, acc)
-                  case Some(nnn) => (true, acc :+ nnn)
-              case None => (false, acc :+ n)
+              case Some(nn) => (true, nn ++: acc)
+              case None => (false, n :: acc)
         } match
-          case (true, ns) => copy(variations = ns).some.some
+          case (true, ns) => copy(variations = ns.reverse).some.some
           case (false, _) => none
 
   // find a node with path

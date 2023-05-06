@@ -75,10 +75,10 @@ class NodeTest extends ScalaCheckSuite:
         deleted.isDefined && deleted.get.get.size == node.size - 1
       }
 
-  test("deleteAt and findAt are consistent"):
-    forAll: (node: Node[Int]) =>
+  test("deleteAt and modifyAt are consistent"):
+    forAll: (node: Node[Int], f: Int => Int) =>
       val path = node.randomPath
-      node.deleteAt(path).isDefined == node.find(path).isDefined
+      node.deleteAt(path).isDefined == node.modifyAt(path, Tree.lift(f)).isDefined
 
   given Monoid[Long] with
     def empty                     = 0L

@@ -4,7 +4,7 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Prop.forAll
 
 import cats.syntax.all.*
-import Arbitraries.given
+import Arbitraries.{ *, given }
 import org.scalacheck.Prop.propBoolean
 import scala.util.Random
 import cats.kernel.Monoid
@@ -43,8 +43,8 @@ class NodeTest extends ScalaCheckSuite:
       }
 
   test("use randomPath for findPath"):
-    forAll: (node: Node[Int]) =>
-      val path = node.randomPath
+    forAll: (p: NodeWithPath[Int]) =>
+      val (node, path) = p
       path.nonEmpty ==> {
         val found = node.findPath(path).map(_.map(_.value))
         found.isEmpty || (found.isDefined && found.get == path)
@@ -55,8 +55,8 @@ class NodeTest extends ScalaCheckSuite:
       node.modifyAt(node.mainlineValues, Tree.lift(f)) == node.modifyLastMainlineNode(Node.lift(f)).some
 
   test("modifyAt and find are consistent"):
-    forAll: (node: Node[Int]) =>
-      val path = node.randomPath
+    forAll: (p: NodeWithPath[Int]) =>
+      val (node, path) = p
       def f[A]: TreeMapper[A] = node =>
         node match
           case n: Node[A]      => n
@@ -76,8 +76,8 @@ class NodeTest extends ScalaCheckSuite:
       }
 
   test("deleteAt and modifyAt are consistent"):
-    forAll: (node: Node[Int], f: Int => Int) =>
-      val path = node.randomPath
+    forAll: (p: (Node[Int], List[Int]), f: Int => Int) =>
+      val (node, path) = p
       node.deleteAt(path).isDefined == node.modifyAt(path, Tree.lift(f)).isDefined
 
   given Monoid[Long] with
@@ -85,15 +85,5 @@ class NodeTest extends ScalaCheckSuite:
     def combine(x: Long, y: Long) = x + y
 
   extension [A](node: Node[A])
-
-    // generate a path from the root to a random node
-    def randomPath: List[A] =
-      if Random.nextBoolean() then node.value :: node.child.fold(List.empty[A])(_.randomPath)
-      else if node.variations.size <= 1 then Nil
-      else if Random.nextBoolean() then
-        val v = node.variations(Random.nextInt(node.variations.size - 1))
-        v.value :: v.child.fold(List.empty[A])(_.randomPath)
-      else Nil
-
     def variationsCount: Long =
       node.child.foldLeft(node.variations.foldMap(_.size))((acc, v) => acc + v.variationsCount)

@@ -159,7 +159,7 @@ final case class Node[A](
           case ((false, acc), n) =>
             n.deleteAt(path) match
               case Some(nn) => (true, nn ++: acc)
-              case None => (false, n :: acc)
+              case None     => (false, n :: acc)
         } match
           case (true, ns) => copy(variations = ns.reverse).some.some
           case (false, _) => none

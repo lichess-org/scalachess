@@ -244,6 +244,9 @@ final case class Node[A](
   def hasVariation[Id](id: Id)(using HasId[A, Id]): Boolean =
     variations.exists(_.hasId(id))
 
+  def withoutChildAndVariations: Node[A] =
+    copy(child = None, variations = Nil)
+
 object Node:
   def lift[A](f: A => A): Node[A] => Node[A] = tree => tree.withValue(f(tree.value))
 

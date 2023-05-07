@@ -35,7 +35,7 @@ case class Move(
           lastMove = Option(toUci),
           unmovedRooks = before.unmovedRooks,
           halfMoveClock =
-            if (piece.is(Pawn) || captures || promotes) HalfMoveClock(0)
+            if (piece.is(Pawn) || captures || promotes) HalfMoveClock.initial
             else h1.halfMoveClock + 1
         )
 

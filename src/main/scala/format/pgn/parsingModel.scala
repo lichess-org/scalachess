@@ -3,6 +3,7 @@ package format.pgn
 
 import cats.data.Validated
 import cats.syntax.option.*
+import chess.Node as CNode
 
 // We don't support variation without move now,
 // but we can in the future when we support null move
@@ -14,11 +15,13 @@ case class PgnNodeData(
      * => PgnNodeData(1.d4, Metas.empty, List(Node(1.e4, Metas(Comment("is not as good"), List("on the other hand")))
      */
     variationComments: List[Comment]
-)
-type ParsedPgnTree = Node[PgnNodeData]
+):
+  export metas.*
+
+type ParsedPgnTree = CNode[PgnNodeData]
 
 case class ParsedPgn(initialPosition: InitialPosition, tags: Tags, tree: Option[ParsedPgnTree]):
-  def mainLine = tree.fold(List.empty[San])(_.mainLine.map(_.san))
+  def mainline = tree.fold(List.empty[San])(_.mainline.map(_.value.san))
 
 // Standard Algebraic Notation
 sealed trait San:

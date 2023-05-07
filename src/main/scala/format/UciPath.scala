@@ -11,6 +11,7 @@ object UciPath extends OpaqueString[UciPath]:
   extension (e: UciPath)
 
     def computeIds: Iterator[UciCharPair] = e.grouped(2).flatMap { strToId(_) }
+    def ids: List[UciCharPair]            = computeIds.toList
 
     def head: Option[UciCharPair] = strToId(e)
 

@@ -38,4 +38,5 @@ case class State(
 //   )
 
 object State:
-  val start = State(Color.White, None, Bitboard(0x8100000000000081L), HalfMoveClock(0), FullMoveNumber(1))
+  val start =
+    State(Color.White, None, Bitboard(0x8100000000000081L), HalfMoveClock.initial, FullMoveNumber.initial)

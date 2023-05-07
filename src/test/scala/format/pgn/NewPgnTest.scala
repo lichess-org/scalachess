@@ -5,49 +5,13 @@ import scala.language.implicitConversions
 
 import cats.syntax.all.*
 import munit.FunSuite
-import Parser.*
 
-class NewPgnTest extends FunSuite:
+class PgnTest extends FunSuite:
 
   given Conversion[String, SanStr]  = SanStr(_)
   given Conversion[String, Comment] = Comment(_)
 
-  type PgnTree = Node[Move]
-
-  // isomorphic to Pgn
-  case class NewPgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
-    def toPgn: Pgn =
-      val moves = tree.fold(List.empty[Move])(toMove(_, Ply(1)))
-      val turns = Turn.fromMoves(moves, Ply(1))
-      Pgn(tags, turns, initial)
-
-    def toMove(node: PgnTree, ply: Ply): List[Move] =
-      val variations = node.variations.map(x => Turn.fromMoves(toMove(x, ply), ply))
-      val move       = node.value.copy(variations = variations)
-      move :: node.child.fold(Nil)(toMove(_, ply + 1))
-
-  object NewPgn:
-    def moves(turn: Turn): List[Move] = List(turn.white, turn.black).flatten
-    def moves(pgn: Pgn): List[Move]   = pgn.turns.flatMap(moves)
-
-    extension (move: Move) def clean: Move = move.copy(variations = Nil)
-    def apply(pgn: Pgn): NewPgn =
-      val tree = moves(pgn).reverse.foldLeft(none[PgnTree]) { (o, move) => Some(toNode(move, o)) }
-      NewPgn(tags = pgn.tags, initial = pgn.initial, tree = tree)
-
-    def toNode(move: Move, child: Option[PgnTree]): PgnTree =
-      Node(
-        move.clean,
-        child,
-        move.variations.map(_.flatMap(moves)).map(x => toNode(x.head, None)).toVariations
-      )
-
-  private def glyphs(id: Int) =
-    Glyph.find(id).fold(Glyphs.empty) { g =>
-      Glyphs fromList List(g)
-    }
-
-  val pgn1 = Pgn(
+  val pgn1 = TestPgn(
     tags = Tags(
       List(
         Tag(_.White, "Kramnik,V"),
@@ -58,37 +22,37 @@ class NewPgnTest extends FunSuite:
     turns = List(
       Turn(
         number = 1,
-        white = Move("d4").some,
-        black = Move("d5").some
+        white = TestMove("d4").some,
+        black = TestMove("d5").some
       ),
       Turn(
         number = 2,
-        white = Move("c4", glyphs = glyphs(1)).some,
-        black = Move("c6", glyphs = glyphs(2)).some
+        white = TestMove("c4", glyphs = glyphs(1)).some,
+        black = TestMove("c6", glyphs = glyphs(2)).some
       ),
       Turn(
         number = 3,
-        white = Move("Nc3", glyphs = glyphs(3)).some,
-        black = Move("Nf6").some
+        white = TestMove("Nc3", glyphs = glyphs(3)).some,
+        black = TestMove("Nf6").some
       ),
       Turn(
         number = 4,
-        white = Move(
+        white = TestMove(
           "cxd5",
           comments =
             "The Exchange Slav, the sure way to play with zero losing chances so an ideal choice for game one" :: Nil
         ).some,
-        black = Move("cxd5").some
+        black = TestMove("cxd5").some
       ),
       Turn(
         number = 5,
-        white = Move("Bf4").some,
-        black = Move("Nc6").some
+        white = TestMove("Bf4").some,
+        black = TestMove("Nc6").some
       )
     )
   )
 
-  val pgn2 = Pgn(
+  val pgn2 = TestPgn(
     tags = Tags(
       List(
         Tag(_.White, "tsinnema"),
@@ -100,49 +64,49 @@ class NewPgnTest extends FunSuite:
     turns = List(
       Turn(
         number = 1,
-        white = Move("a4", secondsLeft = 298.some).some,
-        black = Move("Nf6", secondsLeft = 299.some).some
+        white = TestMove("a4", secondsLeft = 298.some).some,
+        black = TestMove("Nf6", secondsLeft = 299.some).some
       ),
       Turn(
         number = 2,
-        white = Move("d4", secondsLeft = 295.some).some,
-        black = Move("d5", secondsLeft = 298.some).some
+        white = TestMove("d4", secondsLeft = 295.some).some,
+        black = TestMove("d5", secondsLeft = 298.some).some
       ),
       Turn(
         number = 3,
-        white = Move("h4", secondsLeft = 292.some).some,
-        black = Move("e6", secondsLeft = 297.some).some
+        white = TestMove("h4", secondsLeft = 292.some).some,
+        black = TestMove("e6", secondsLeft = 297.some).some
       ),
       Turn(
         number = 4,
-        white = Move(
+        white = TestMove(
           "Qd3",
           glyphs = glyphs(1),
           secondsLeft = 288.some,
           comments = "An invention of true genius." :: Nil
         ).some,
-        black = Move("c5", secondsLeft = 296.some).some
+        black = TestMove("c5", secondsLeft = 296.some).some
       ),
       Turn(
         number = 5,
-        white = Move("dxc5", secondsLeft = 258.some).some,
-        black = Move("Bxc5", glyphs = glyphs(1), secondsLeft = 295.some).some
+        white = TestMove("dxc5", secondsLeft = 258.some).some,
+        black = TestMove("Bxc5", glyphs = glyphs(1), secondsLeft = 295.some).some
       )
     )
   )
 
-  val pgn3 = Pgn(
+  val pgn3 = TestPgn(
     tags = Tags.empty,
     turns = List(
       Turn(
         number = 1,
-        white = Move("d3", glyphs = glyphs(6)).some,
-        black = Move("Nc6", glyphs = glyphs(10)).some
+        white = TestMove("d3", glyphs = glyphs(6)).some,
+        black = TestMove("Nc6", glyphs = glyphs(10)).some
       ),
       Turn(
         number = 2,
-        white = Move("Qd2").some,
-        black = Move(
+        white = TestMove("Qd2").some,
+        black = TestMove(
           "Nb4",
           glyphs = Glyphs(
             Glyph.MoveAssessment.blunder.some,
@@ -153,37 +117,37 @@ class NewPgnTest extends FunSuite:
       ),
       Turn(
         number = 3,
-        white = Move("Qxb4", glyphs = glyphs(7)).some,
+        white = TestMove("Qxb4", glyphs = glyphs(7)).some,
         black = None
       )
     )
   )
 
-  val pgn4 = Pgn(
+  val pgn4 = TestPgn(
     tags = Tags.empty,
     turns = List(
       Turn(
         number = 1,
-        white = Move(
+        white = TestMove(
           "d4",
           variations = List(
             List(
               Turn(
                 number = 1,
-                white = Move("e4").some,
+                white = TestMove("e4").some,
                 black = None
               )
             )
           )
         ).some,
-        black = Move(
+        black = TestMove(
           "Nf6",
           variations = List(
             List(
               Turn(
                 number = 1,
                 white = None,
-                black = Move("d5").some
+                black = TestMove("d5").some
               )
             )
           )
@@ -191,7 +155,7 @@ class NewPgnTest extends FunSuite:
       )
     )
   )
-  val pgn5 = Pgn(
+  val pgn5 = TestPgn(
     tags = Tags(
       List(
         Tag(_.White, "tsinnema"),
@@ -203,38 +167,38 @@ class NewPgnTest extends FunSuite:
     turns = List(
       Turn(
         number = 1,
-        white = Move("a4", secondsLeft = 298.some).some,
-        black = Move("Nf6", secondsLeft = 299.some).some
+        white = TestMove("a4", secondsLeft = 298.some).some,
+        black = TestMove("Nf6", secondsLeft = 299.some).some
       ),
       Turn(
         number = 2,
-        white = Move("d4", secondsLeft = 295.some).some,
-        black = Move("d5", secondsLeft = 298.some).some
+        white = TestMove("d4", secondsLeft = 295.some).some,
+        black = TestMove("d5", secondsLeft = 298.some).some
       ),
       Turn(
         number = 3,
-        white = Move("h4", secondsLeft = 292.some).some,
-        black = Move("e6", secondsLeft = 297.some).some
+        white = TestMove("h4", secondsLeft = 292.some).some,
+        black = TestMove("e6", secondsLeft = 297.some).some
       ),
       Turn(
         number = 4,
-        white = Move(
+        white = TestMove(
           "Qd3",
           glyphs = glyphs(1),
           secondsLeft = 288.some,
           comments = "An invention of true genius." :: Nil
         ).some,
-        black = Move("c5", secondsLeft = 296.some).some
+        black = TestMove("c5", secondsLeft = 296.some).some
       ),
       Turn(
         number = 5,
-        white = Move("dxc5", secondsLeft = 258.some).some,
-        black = Move("Bxc5", glyphs = glyphs(1), secondsLeft = 295.some).some
+        white = TestMove("dxc5", secondsLeft = 258.some).some,
+        black = TestMove("Bxc5", glyphs = glyphs(1), secondsLeft = 295.some).some
       )
     )
   )
 
-  val pgn6 = Pgn(
+  val pgn6 = TestPgn(
     tags = Tags(
       List(
         Tag(_.Result, "0-1")
@@ -243,18 +207,18 @@ class NewPgnTest extends FunSuite:
     turns = List()
   )
 
-  val pgn7 = Pgn(
+  val pgn7 = TestPgn(
     tags = Tags.empty,
     turns = List()
   )
 
-  val pgn8 = Pgn(
+  val pgn8 = TestPgn(
     tags = Tags.empty,
     turns = List(),
     initial = Initial(List("Why hello there!"))
   )
 
-  val pgn9 = Pgn(
+  val pgn9 = TestPgn(
     tags = Tags.empty,
     turns = List(),
     initial = Initial(
@@ -265,31 +229,31 @@ class NewPgnTest extends FunSuite:
     )
   )
 
-  val pgn10 = Pgn(
+  val pgn10 = TestPgn(
     tags = Tags.empty,
     turns = List(
       Turn(
         number = 1,
-        white = Move(
+        white = TestMove(
           "d4",
           variations = List(
             List(
               Turn(
                 number = 1,
-                white = Move("e4").some,
+                white = TestMove("e4").some,
                 black = None
               )
             )
           )
         ).some,
-        black = Move(
+        black = TestMove(
           "Nf6",
           variations = List(
             List(
               Turn(
                 number = 1,
                 white = None,
-                black = Move("d5").some
+                black = TestMove("d5").some
               )
             )
           )
@@ -304,7 +268,7 @@ class NewPgnTest extends FunSuite:
     )
   )
 
-  val pgn11 = Pgn(
+  val pgn11 = TestPgn(
     tags = Tags(
       List(
         Tag(_.TimeControl, "\"")
@@ -313,7 +277,7 @@ class NewPgnTest extends FunSuite:
     turns = List()
   )
 
-  val pgn12 = Pgn(
+  val pgn12 = TestPgn(
     tags = Tags(
       List(
         Tag(_.TimeControl, "\\")
@@ -324,8 +288,8 @@ class NewPgnTest extends FunSuite:
 
   val pgns = List(pgn1, pgn2, pgn3, pgn4, pgn5, pgn6, pgn7, pgn8, pgn9, pgn10, pgn11, pgn12)
 
-  test("NewPgn and Pgn are isomorphic"):
+  test("TestPgn and Pgn PgnStr"):
     pgns.foreach { pgn =>
       val newPgn = NewPgn(pgn)
-      assertEquals(pgn, newPgn.toPgn)
+      assertEquals(pgn.toString, newPgn.render.value)
     }

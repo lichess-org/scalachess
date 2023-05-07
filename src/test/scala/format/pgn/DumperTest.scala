@@ -321,16 +321,16 @@ NRKNRQBB
       Dumper(game1.situation, move, game2.situation) must_== "Rf3"
   "move comment" should:
     "simple" in:
-      Move("e4", List("Some comment")).toString must_== "e4 { Some comment }"
+      TestMove("e4", List("Some comment")).toString must_== "e4 { Some comment }"
     "one line break" in:
-      Move(
+      TestMove(
         "e4",
         List("""Some
 comment""")
       ).toString must_== """e4 { Some
 comment }"""
     "two line breaks" in:
-      Move(
+      TestMove(
         "e4",
         List("""Some
 
@@ -338,7 +338,7 @@ comment""")
       ).toString must_== """e4 { Some
 comment }"""
     "three line breaks" in:
-      Move(
+      TestMove(
         "e4",
         List("""Some
 

@@ -113,28 +113,21 @@ object Parser:
     .recursive[ParsedPgnTree] { recuse =>
       // TODO: if a variation only contains comments, we ignore it
       // Will fix it after support null move
-      val variation: P[Option[ParsedPgnTree]] =
+      val variation: P[Option[Variation[PgnNodeData]]] =
         (P.char('(') *> comment.rep0.surroundedBy(escape) ~ recuse.rep0 <* (P.char(')') ~ escape))
           .map((comments, sans) =>
             sans match
               case Nil => None
               case x :: xs =>
                 val child = xs.reverse.foldLeft(none[ParsedPgnTree])((acc, x) => x.copy(child = acc).some)
-                Some(x.copy(child = child, value = x.value.copy(variationComments = comments)))
+                Some(Variation(x.value.copy(variationComments = comments.cleanUp), child))
           )
 
       preMoveEscape.with1 *> ((moveAndMetas ~ variation.rep0) <* postMoveEscape).map:
         case ((san, metas), vs) =>
           val data = PgnNodeData(san, metas, Nil)
-          Node(data, None, vs.sequence.flatMap(_.toVariations))
+          Node(data, None, vs.flatten)
     }
-
-  extension [A](xs: List[Node[A]])
-    def toVariations: Option[Node[A]] =
-      xs.reverse.foldLeft(none[Node[A]])((acc, x) => x.copy(variation = acc).some)
-
-    def toChild: Option[Node[A]] =
-      xs.reverse.foldLeft(none[Node[A]])((acc, x) => x.copy(child = acc).some)
 
   val strMoves: P0[(InitialPosition, Option[ParsedPgnTree], Option[String])] =
     ((comment.rep0 ~ strMove.rep0) ~ (result <* escape).? <* comment.rep0).map:
@@ -210,7 +203,7 @@ object Parser:
       (checkmate ~ check ~ (glyphs <* escape) ~ nagGlyphs ~ comment.rep0 ~ nagGlyphs)
         .map { case (((((checkmate, check), glyphs1), glyphs2), comments), glyphs3) =>
           val glyphs = glyphs1 merge glyphs2 merge glyphs3
-          Metas(Check(check), checkmate, comments, glyphs)
+          Metas(Check(check), checkmate, comments.cleanUp, glyphs)
         }
 
     val castle: P[San] = (qCastle | kCastle).map(Castle(_))

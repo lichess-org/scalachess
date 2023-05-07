@@ -22,11 +22,11 @@ object Reader:
 
   def fullWithSans(pgn: PgnStr, op: Sans => Sans, tags: Tags = Tags.empty): Validated[ErrorStr, Result] =
     Parser.full(pgn) map { parsed =>
-      makeReplay(makeGame(parsed.tags ++ tags), op(Sans(parsed.mainLine)))
+      makeReplay(makeGame(parsed.tags ++ tags), op(Sans(parsed.mainline)))
     }
 
   def fullWithSans(parsed: ParsedPgn, op: Sans => Sans): Result =
-    makeReplay(makeGame(parsed.tags), op(Sans(parsed.mainLine)))
+    makeReplay(makeGame(parsed.tags), op(Sans(parsed.mainline)))
 
   def movesWithSans(sans: Iterable[SanStr], op: Sans => Sans, tags: Tags): Validated[ErrorStr, Result] =
     Parser.moves(sans) map { moves =>

@@ -14,7 +14,7 @@ class ParserTest extends ChessTest:
 
   import Parser.{ full as parse, move as parseMove }
 
-  extension (tree: Option[ParsedPgnTree]) def firstMove: PgnNodeData = tree.get.mainLine.head
+  extension (tree: Option[ParsedPgnTree]) def firstMove: PgnNodeData = tree.get.mainline.head.value
 
   extension (parsed: ParsedPgn) def metas = parsed.tree.get.value.metas
 
@@ -23,19 +23,19 @@ class ParserTest extends ChessTest:
       "with tags" in:
         parse("\uFEFF[Event \"Some event\"]\n1. e4 e5") must beValid.like: parsed =>
           parsed.tags(_.Event) must_== Some("Some event")
-          parsed.mainLine.size must_== 2
+          parsed.mainline.size must_== 2
 
       "without tags" in:
         parse("\uFEFF1. e4 e5 3. Nf3") must beValid.like: parsed =>
-          parsed.mainLine.size must_== 3
+          parsed.mainline.size must_== 3
 
       "lowercase" in:
         parse("\ufeff1. e4 e5 3. Nf3") must beValid.like: parsed =>
-          parsed.mainLine.size must_== 3
+          parsed.mainline.size must_== 3
 
       "in the middle of the string" in:
         parse("\ufeff1. e4 \ufeff e5 3. Nf3") must beValid.like: parsed =>
-          parsed.mainLine.size must_== 3
+          parsed.mainline.size must_== 3
 
   "pgnComment" should:
     "parse valid comment" in:
@@ -46,13 +46,13 @@ class ParserTest extends ChessTest:
   "promotion check" should:
     "as a queen" in:
       parse("b8=Q ") must beValid.like: parsed =>
-        parsed.mainLine.headOption must beSome { (san: San) =>
+        parsed.mainline.headOption must beSome { (san: San) =>
           san === Std(Square.B8, Pawn, promotion = Option(Queen))
         }
 
     "as a rook" in:
       parse("b8=R ") must beValid { (parsed: ParsedPgn) =>
-        parsed.mainLine.headOption must beSome { (san: San) =>
+        parsed.mainline.headOption must beSome { (san: San) =>
           san.asInstanceOf[Std].promotion must_== Option(Rook)
         }
       }
@@ -60,21 +60,21 @@ class ParserTest extends ChessTest:
   "carriage return" in:
     "none" in:
       parse("1. e4 c6\n2. d4 d5") must beValid.like { parsed =>
-        parsed.mainLine.size must_== 4
+        parsed.mainline.size must_== 4
       }
     "one" in:
       parse("1. e4 c6\r\n2. d4 d5") must beValid.like { parsed =>
-        parsed.mainLine.size must_== 4
+        parsed.mainline.size must_== 4
       }
     "two" in:
       parse("1. e4 c6\r\r\n2. d4 d5") must beValid.like { parsed =>
-        parsed.mainLine.size must_== 4
+        parsed.mainline.size must_== 4
       }
     "between tags" in:
       parse("[White \"carriage\"]\r\n[Black \"return\"]\r\n\r\n1. a3 a6\r\n") must beValid.like: parsed =>
         parsed.tags(_.White) must_== Some("carriage")
         parsed.tags(_.Black) must_== Some("return")
-        parsed.mainLine.size must_== 2
+        parsed.mainline.size must_== 2
 
   "result" in:
     "no tag but inline result" in:
@@ -141,18 +141,18 @@ class ParserTest extends ChessTest:
   "variations" in:
     parse("Ne7g6+! {such a neat comment} (e4 Ng6)") must beValid.like: parsed =>
       parsed.tree.get.variations.headOption must beSome:
-        (_: ParsedPgnTree).mainLine must haveSize(2)
+        (_: Variation[PgnNodeData]).mainline must haveSize(2)
 
   "first move variation" in:
     parse("1. e4 (1. d4)") must beValid.like: parsed =>
       parsed.tree.get.variations.headOption must beSome:
-        (_: ParsedPgnTree).mainLine must haveSize(1)
+        (_: Variation[PgnNodeData]).mainline must haveSize(1)
 
   raws foreach { sans =>
     val size = sans.split(' ').length
     "sans only size: " + size in:
       parse(sans) must beValid.like { a =>
-        a.mainLine.size must_== size
+        a.mainline.size must_== size
       }
   }
 
@@ -160,25 +160,25 @@ class ParserTest extends ChessTest:
     val size = sans.split(' ').length
     "sans only size: " + size in:
       parse(sans) must beValid.like: a =>
-        a.mainLine.size must_== size
+        a.mainline.size must_== size
   }
 
   "disambiguated" in:
     parse(disambiguated) must beValid.like { a =>
-      a.mainLine.size must_== 3
+      a.mainline.size must_== 3
     }
 
   List(fromProd1, fromProd2, castleCheck1, castleCheck2) foreach { sans =>
     val size = sans.split(' ').length
     "sans only from prod size: " + size in:
       parse(sans) must beValid.like { a =>
-        a.mainLine.size must_== size
+        a.mainline.size must_== size
       }
   }
 
   "variations" in:
     parse(variations) must beValid.like { a =>
-      a.mainLine.size must_== 20
+      a.mainline.size must_== 20
     }
 
   "inline tags" in:
@@ -204,17 +204,17 @@ class ParserTest extends ChessTest:
 
   "game from wikipedia" in:
     parse(fromWikipedia) must beValid.like { a =>
-      a.mainLine.size must_== 85
+      a.mainline.size must_== 85
     }
 
   "game from crafty" in:
     parse(fromCrafty) must beValid.like { a =>
-      a.mainLine.size must_== 68
+      a.mainline.size must_== 68
     }
 
   "inline comments" in:
     parse(inlineComments) must beValid.like { a =>
-      a.mainLine.size must_== 85
+      a.mainline.size must_== 85
     }
 
   "block comment in variation root" in:
@@ -243,69 +243,69 @@ class ParserTest extends ChessTest:
 
   "comments and variations" in:
     parse(commentsAndVariations) must beValid.like: parsed =>
-      parsed.mainLine.size must_== 103
+      parsed.mainline.size must_== 103
 
   "comments and lines by smartchess" in:
     parse(bySmartChess) must beValid.like { a =>
-      a.mainLine.size must_== 65
+      a.mainline.size must_== 65
     }
 
   "complete 960" in:
     parse(complete960) must beValid.like { a =>
-      a.mainLine.size must_== 42
+      a.mainline.size must_== 42
     }
 
   "TCEC" in:
     parse(fromTcec) must beValid.like { a =>
-      a.mainLine.size must_== 142
+      a.mainline.size must_== 142
     }
 
   "TCEC with engine output" in:
     parse(fromTcecWithEngineOutput) must beValid.like { a =>
-      a.mainLine.size must_== 165
+      a.mainline.size must_== 165
     }
 
   "chesskids iphone" in:
     parse(chesskids) must beValid.like { a =>
-      a.mainLine.size must_== 135
+      a.mainline.size must_== 135
     }
 
   "handwritten" in:
     parse(handwritten) must beValid.like { a =>
-      a.mainLine.size must_== 139
+      a.mainline.size must_== 139
     }
 
   "chess by post" in:
     parse(chessByPost) must beValid.like { a =>
-      a.mainLine.size must_== 100
+      a.mainline.size must_== 100
     }
 
   "Android device" in:
     parse(android) must beValid.like { a =>
-      a.mainLine.size must_== 69
+      a.mainline.size must_== 69
     }
 
   "weird dashes" in:
     parse(weirdDashes) must beValid.like { a =>
-      a.mainLine.size must_== 74
+      a.mainline.size must_== 74
     }
 
   "lichobile" in:
     parse(lichobile) must beValid.like { a =>
-      a.mainLine.size must_== 68
+      a.mainline.size must_== 68
     }
 
   "overflow" in:
     parse(overflow) must beValid.like { a =>
-      a.mainLine.size must_== 67
+      a.mainline.size must_== 67
     }
   "overflow 2" in:
     parse(stackOverflow) must beValid.like { a =>
-      a.mainLine.size must_== 8
+      a.mainline.size must_== 8
     }
   "overflow 3" in:
     parse(overflow3) must beValid.like { a =>
-      a.mainLine.size must_== 343
+      a.mainline.size must_== 343
     }
   "overflow 3: tags" in:
     parse(overflow3) must beValid.like { a =>
@@ -323,22 +323,22 @@ class ParserTest extends ChessTest:
     }
   "chessbase weird" in:
     parse(chessbaseWeird) must beValid.like { a =>
-      a.mainLine.size must_== 115
+      a.mainline.size must_== 115
     }
   "crazyhouse from prod" in:
     parse(crazyhouseFromProd) must beValid.like { a =>
-      a.mainLine.size must_== 49
+      a.mainline.size must_== 49
     }
   "crazyhouse from chess.com" in:
     parse(chessComCrazyhouse) must beValid.like { a =>
-      a.mainLine.size must_== 42
+      a.mainline.size must_== 42
     }
   "en passant e.p. notation" in:
     parse(enpassantEP) must beValid.like { a =>
-      a.mainLine.size must_== 36
+      a.mainline.size must_== 36
     }
     parse(enpassantEP2) must beValid.like { a =>
-      a.mainLine.size must_== 36
+      a.mainline.size must_== 36
     }
 
   "year" in:
@@ -370,11 +370,11 @@ class ParserTest extends ChessTest:
 
   "game with comments" in:
     parse(gameWithComments) must beValid.like { a =>
-      a.mainLine.size must_== 106
+      a.mainline.size must_== 106
     }
 
   "none break space" in:
     val nbsp = "1.  e4 e5"
     parse(nbsp) must beValid.like { a =>
-      a.mainLine.size must_== 2
+      a.mainline.size must_== 2
     }

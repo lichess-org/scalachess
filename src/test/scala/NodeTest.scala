@@ -30,7 +30,6 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (node: Node[Int]) =>
       node.find(node.mainlineValues).get == node.lastMainlineNode
 
-  override def scalaCheckInitialSeed = "2Y0pCqyyRUgfvPp3mCSYUM5Jx1D0IxF0JKPzfuv5KtD="
   test("use mainline as path for findPath"):
     forAll: (node: Tree[Int]) =>
       node.findPath(node.mainlineValues) == node.mainline.some
@@ -81,10 +80,37 @@ class NodeTest extends ScalaCheckSuite:
       val (node, path) = p
       node.deleteAt(path).isDefined == node.modifyAt(path, Tree.lift(f)).isDefined
 
+  test("mapAccuml without using accumulator is the same as map"):
+    forAll: (node: Node[Int], f: Int => Int) =>
+      node.mapAccuml_(0)((s, a) => (s, f(a))) == node.map(f)
+
+  test("mapAccuml is the same as mapAccumlOption"):
+    forAll: (node: Node[Int], init: Int, f: (Int, Int) => (Int, Int)) =>
+      node.mapAccuml_(init)(f).some == node.mapAccumlOption_(init)((s, a) => f(s, a).map(Some(_)))
+
+  test("mapAccuml is the different thatn mapAccumulate if variation is exist"):
+    forAll: (node: Node[Int], n: Int, f: (Int, Int) => (Int, Int)) =>
+      val x = node.mapAccuml(n)(f)
+      val y = node.mapAccumulate(n)(f)
+      node.variationIsEmpty || x != y
+
+  test("mapAccuml with sum"):
+    forAll: (node: Node[Int], n: Int) =>
+      val s1 = node.mapAccuml_(n.toLong)((s, a) => (s, s + a.toLong)).sumAll
+      val s2 = node.foldMap(_.toLong) + node.size * n.toLong
+      s1 == s2
+
   given Monoid[Long] with
     def empty                     = 0L
     def combine(x: Long, y: Long) = x + y
 
+  given Monoid[Int] with
+    def empty                   = 0
+    def combine(x: Int, y: Int) = x + y
+
   extension [A](node: Node[A])
     def variationsCount: Long =
       node.child.foldLeft(node.variations.foldMap(_.size))((acc, v) => acc + v.variationsCount)
+
+    def variationIsEmpty: Boolean =
+      node.child.foldLeft(node.variations.isEmpty)((acc, v) => acc || v.variationIsEmpty)

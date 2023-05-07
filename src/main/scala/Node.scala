@@ -184,6 +184,8 @@ final case class Node[A](
     modifyWithParentPath(path, _.merge(other))
 
   // Akin to map, but allows to keep track of a state value when calling the function.
+  // This is different from Traverse.mapAccumulate
+  // because variations only use accumulated value from the parent
   def mapAccuml[S, B](init: S)(f: (S, A) => (S, B)): (S, Node[B]) =
     val (s1, b) = f(init, value)
     val v       = variations.map(_.mapAccuml(init)(f)._2)

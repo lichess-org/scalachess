@@ -30,6 +30,7 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (node: Node[Int]) =>
       node.find(node.mainlineValues).get == node.lastMainlineNode
 
+  override def scalaCheckInitialSeed = "2Y0pCqyyRUgfvPp3mCSYUM5Jx1D0IxF0JKPzfuv5KtD="
   test("use mainline as path for findPath"):
     forAll: (node: Tree[Int]) =>
       node.findPath(node.mainlineValues) == node.mainline.some

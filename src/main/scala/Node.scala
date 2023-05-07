@@ -26,7 +26,26 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
 
   def hasId[Id](id: Id)(using HasId[A, Id]): Boolean = value.hasId(id)
 
-  def findPath[Id](path: List[Id])(using HasId[A, Id]): Option[List[Tree[A]]]
+  def findPath[Id](path: List[Id])(using HasId[A, Id]): Option[List[Tree[A]]] =
+    @tailrec
+    def loop(tree: Tree[A], path: List[Id], acc: List[Tree[A]]): Option[List[Tree[A]]] =
+      path match
+        case Nil => acc.some
+        case head :: Nil if tree.hasId(head) =>
+          (tree :: acc).some
+        case head :: rest if tree.hasId(head) =>
+          tree.child match
+            case Some(child) => loop(child, rest, tree :: acc)
+            case None        => None
+        case _ =>
+          tree match
+            case node: Node[A] =>
+              node.findVariation(path.head) match
+                case Some(variation) => loop(variation.toNode, path, acc)
+                case None            => None
+            case _ => None
+
+    if path.isEmpty then None else loop(this, path, Nil).map(_.reverse)
 
   def find[Id](path: List[Id])(using HasId[A, Id]): Option[Tree[A]] =
     findPath(path).flatMap(_.lastOption)
@@ -85,24 +104,6 @@ final case class Node[A](
 
   def mainlinePath[Id](using HasId[A, Id]): List[Id] =
     value.id +: child.fold(List.empty[Id])(_.mainlinePath)
-
-  def findPath[Id](path: List[Id])(using HasId[A, Id]): Option[List[Tree[A]]] =
-    @tailrec
-    def loop(node: Node[A], path: List[Id], acc: List[Tree[A]]): Option[List[Tree[A]]] =
-      path match
-        case Nil => acc.some
-        case head :: Nil if node.hasId(head) =>
-          (node :: acc).some
-        case head :: rest if node.hasId(head) =>
-          node.child match
-            case Some(child) => loop(child, rest, node :: acc)
-            case None        => None
-        case _ =>
-          node.findVariation(path.head) match
-            case Some(variation) => loop(variation.toNode, path, acc)
-            case None            => None
-
-    if path.isEmpty then None else loop(this, path, Nil).map(_.reverse)
 
   def modifyWithParentPath[Id](path: List[Id], f: Node[A] => Node[A])(using HasId[A, Id]): Option[Node[A]] =
     path match
@@ -283,9 +284,6 @@ object Node:
 
 final case class Variation[A](override val value: A, override val child: Option[Node[A]] = None)
     extends Tree[A](value, child) derives Functor, Traverse:
-
-  def findPath[Id](path: List[Id])(using HasId[A, Id]): Option[List[Tree[A]]] =
-    toNode.findPath(path)
 
   def modifyWithParentPath[Id](path: List[Id], f: Node[A] => Node[A])(using
       HasId[A, Id]

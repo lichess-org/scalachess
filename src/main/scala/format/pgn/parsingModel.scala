@@ -15,7 +15,9 @@ case class PgnNodeData(
      * => PgnNodeData(1.d4, Metas.empty, List(Node(1.e4, Metas(Comment("is not as good"), List("on the other hand")))
      */
     variationComments: List[Comment]
-)
+):
+  export metas.*
+
 type ParsedPgnTree = CNode[PgnNodeData]
 
 case class ParsedPgn(initialPosition: InitialPosition, tags: Tags, tree: Option[ParsedPgnTree]):

@@ -15,10 +15,10 @@ case class Pgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
     val initStr =
       if initial.comments.nonEmpty then initial.comments.mkString("{ ", " } { ", " }\n")
       else ""
-    val movesStr: String = tree.fold("")(_.render)
-    val resultStr        = tags(_.Result) | ""
+    val movesStr  = tree.fold("")(_.render)
+    val resultStr = tags(_.Result) | ""
     val endStr =
-      if (movesStr.nonEmpty) s" $resultStr"
+      if movesStr.nonEmpty then s" $resultStr"
       else resultStr
     s"$tags\n\n$initStr$movesStr$endStr".trim
 
@@ -69,8 +69,9 @@ object PgnTree:
         else
           val number = if dot then s"${v.value.ply.fullMoveNumber}... " else ""
           (false, s"$number$_render")
-      val childStr = v.child.fold("")(x => s" ${x.render(d)}")
-      s"$str$childStr"
+      val childStr          = v.child.fold("")(x => s" ${x.render(d)}")
+      val variationComments = Move.render(v.value.variationComments)
+      s"$variationComments$str$childStr"
 
 private def glyphs(id: Int) =
   Glyph.find(id).fold(Glyphs.empty) { g =>
@@ -85,7 +86,8 @@ case class Move(
     opening: Option[String] = None,
     result: Option[String] = None,
     // time left for the user who made the move, after he made it
-    secondsLeft: Option[Int] = None
+    secondsLeft: Option[Int] = None,
+    variationComments: List[Comment] = Nil
 ):
 
   def isLong = comments.nonEmpty || secondsLeft.isDefined
@@ -112,6 +114,9 @@ case class Move(
 object Move:
 
   val noDoubleLineBreakRegex = "(\r?\n){2,}".r
+
+  def render(cm: List[Comment]): String =
+    cm.foldLeft("")((acc, x) => acc ++ s" { ${noDoubleLineBreak(x.value)} }")
 
   def noDoubleLineBreak(txt: String) =
     noDoubleLineBreakRegex.replaceAllIn(txt, "\n")

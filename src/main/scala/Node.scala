@@ -169,9 +169,10 @@ final case class Node[A](
   // if not found, return None
   // if found node has no child, add new value as a child
   // if found node has a child, add new value as it's child's variation
-  def addValueAsChildOrVariationAt[Id](path: List[Id])(
-      value: A
-  )(using HasId[A, Id], Mergeable[A]): Option[Node[A]] =
+  def addValueAsChildOrVariationAt[Id](path: List[Id], value: A)(using
+      HasId[A, Id],
+      Mergeable[A]
+  ): Option[Node[A]] =
     modifyAt(path, Tree.addValueAsChildOrVariation(value))
 
   // add a node with path to the tree

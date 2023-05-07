@@ -13,6 +13,41 @@ class RenderTest extends munit.FunSuite:
   given Conversion[PgnStr, String]  = _.value
   given Conversion[String, Comment] = Comment(_)
 
+  import Fixtures.*
+
+  lazy val pgns = List(
+    aPgn,
+    recentChessCom,
+    chessComCrazyhouse,
+    fromChessProgrammingWiki,
+    fromPosProdCloseChess,
+    noTagButResult,
+    inlineTags,
+    whiteResignsInMoves,
+    whiteResignsInTags,
+    stLouisFischerandom,
+    inlineComments,
+    fromChessgames,
+    chessgamesWeirdComments,
+    fromCrafty,
+    fromTcecWithEngineOutput
+  )
+
+  test("pgn round trip tests compare ParsedPgn"):
+    (pgns ++ wcc2023).foreach(x =>
+      val pgn    = Parser.full(x).toOption.get
+      val output = Parser.full(pgn.toPgn.render).toOption.get
+      assertEquals(output.cleanTags, pgn.cleanTags)
+    )
+
+  test("pgn round trip tests compare ouput"):
+    val results = pgns.map(Parser.full(_).toOption.get.toPgn.render).mkString("\n\n")
+    assertEquals(results, ouput)
+
+  test("wcc2023 study round trip tests"):
+    val results = wcc2023.map(Parser.full(_).toOption.get.toPgn.render).mkString("\n\n")
+    assertEquals(results, ouput2)
+
   private def makeGame(tags: Tags) =
     val g = Game(
       variantOption = tags(_.Variant) flatMap chess.variant.Variant.byName,
@@ -96,41 +131,6 @@ too long of course but this is the most solid choice } 8. Qb3 Bb4 9. Bb5
 O-O { Black breaks the symmetry but this is still the main line of chess
 opening theory } 10. Bxc6 (10. O-O Bxc3 11. Bxc6 Bxb2 12. Bxb7 Bxa1) 1/2-1/2
   """
-
-  import Fixtures.*
-
-  val pgns = List(
-    aPgn,
-    recentChessCom,
-    chessComCrazyhouse,
-    fromChessProgrammingWiki,
-    fromPosProdCloseChess,
-    noTagButResult,
-    inlineTags,
-    whiteResignsInMoves,
-    whiteResignsInTags,
-    stLouisFischerandom,
-    inlineComments,
-    fromChessgames,
-    chessgamesWeirdComments,
-    fromCrafty,
-    fromTcecWithEngineOutput
-  )
-
-  test("pgn round trip tests compare ParsedPgn"):
-    pgns.foreach(x =>
-      val pgn    = Parser.full(x).toOption.get
-      val output = Parser.full(pgn.toPgn.render).toOption.get
-      assertEquals(output.cleanTags, pgn.cleanTags)
-    )
-
-  test("pgn round trip tests compare ouput"):
-    val results = pgns.map(Parser.full(_).toOption.get.toPgn.render).mkString("\n\n")
-    assertEquals(results, ouput)
-
-  test("wcc2023 study round trip tests"):
-    val results = wcc2023.map(Parser.full(_).toOption.get.toPgn.render).mkString("\n\n")
-    assertEquals(results, ouput2)
 
   val ouput =
     """

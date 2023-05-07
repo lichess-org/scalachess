@@ -199,17 +199,17 @@ final case class Node[A](
   // when a variation node returns None, we just ignore it and continue to traverse next variations
   // TODO: now if the f(value) is None, the whole tree is None
   // should we promote a variation to mainline if the f(value) is None?
-  def _mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): (S, Option[Node[B]]) =
+  def mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): (S, Option[Node[B]]) =
     f(init, value) match
       case (s1, None) => (s1, None)
       case (s1, Some(b)) =>
-        val vs = variations.map(_._mapAccumlOption(init)(f)._2).flatten
-        child.map(_._mapAccumlOption(s1)(f)) match
+        val vs = variations.map(_.mapAccumlOption(init)(f)._2).flatten
+        child.map(_.mapAccumlOption(s1)(f)) match
           case None    => (s1, Node(b, None, vs).some)
           case Some(s) => (s._1, Node(b, s._2, vs).some)
 
-  def mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): Option[Node[B]] =
-    _mapAccumlOption(init)(f)._2
+  def mapAccumlOption_[S, B](init: S)(f: (S, A) => (S, Option[B])): Option[Node[B]] =
+    mapAccumlOption(init)(f)._2
 
   // find node in the mainline
   def findInMainline(predicate: A => Boolean): Option[Node[A]] =
@@ -333,11 +333,11 @@ final case class Variation[A](override val value: A, override val child: Option[
   // when a variation node returns None, we just ignore it and continue to traverse next variations
   // TODO: now if the f(value) is None, the whole tree is None
   // should we promote a variation to mainline if the f(value) is None?
-  def _mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): (S, Option[Variation[B]]) =
+  def mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): (S, Option[Variation[B]]) =
     f(init, value) match
       case (s1, None) => (s1, None)
       case (s1, Some(b)) =>
-        child.map(_._mapAccumlOption(s1)(f)) match
+        child.map(_.mapAccumlOption(s1)(f)) match
           case None    => (s1, Variation(b, None).some)
           case Some(s) => (s._1, Variation(b, s._2).some)
 

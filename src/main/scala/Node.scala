@@ -57,6 +57,21 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   def modifyWithParentPath[Id](path: List[Id], f: Node[A] => Node[A])(using HasId[A, Id]): Option[Tree[A]]
   def deleteAt[Id](path: List[Id])(using HasId[A, Id]): Option[Option[Tree[A]]]
 
+  // take the first n nodes of the mainline
+  // keep all variations
+  def take(n: Int): TreeSelector[A, this.type] =
+    if n <= 0 then self
+    else child.fold(self)(c => withChild(c.take(n - 1)))
+
+  // get the nth node of the mainline
+  def apply(n: Int): Option[Tree[A]] =
+    if n <= 0 then this.some
+    else child.flatMap(_.apply(n - 1))
+
+  private def self: TreeSelector[A, this.type] = this match
+    case n: Node[A]      => n
+    case v: Variation[A] => v
+
 object Tree:
   def lift[A](f: A => A): TreeMapper[A] = tree => tree.withValue(f(tree.value))
 

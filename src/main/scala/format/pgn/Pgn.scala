@@ -25,7 +25,7 @@ case class Pgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
   // TODO: decrease ply by 1 before comparing
   // This is temporary fix for lila
   def updatePly(ply: Ply, f: Move => Move): Option[Pgn] =
-    val predicate = (m: Move) => (m.ply - 1) == ply
+    val predicate = (m: Move) => m.ply == ply - 1
     this.focus(_.tree.some).modifyA(_.modifyInMainline(predicate, Node.lift(f)))
 
   def updateLastPly(f: Move => Move): Pgn =

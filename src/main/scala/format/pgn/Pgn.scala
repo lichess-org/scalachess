@@ -40,10 +40,10 @@ object PgnTree:
   extension (tree: PgnTree)
     def isLong = tree.value.isLong || tree.variations.nonEmpty
     def _render: String =
-      val moveStr = tree.value.toString
+      val moveStr = tree.value.render
       val varStr =
         if tree.variations.isEmpty then ""
-        else tree.variations.map(x => s" (${x.render})").mkString(" ")
+        else tree.variations.map(x => s" (${x.render})").mkString
       s"$moveStr$varStr"
 
     def render: String =
@@ -60,7 +60,7 @@ object PgnTree:
 
   extension (v: Variation[Move])
     def _render: String =
-      v.value.toString
+      v.value.render
 
     def render: String =
       render(!v.value.ply.color.white)
@@ -97,18 +97,19 @@ case class Move(
   private def clockString: Option[String] =
     secondsLeft.map(seconds => "[%clk " + Move.formatPgnSeconds(seconds) + "]")
 
-  override def toString =
+  private def hasCommentsOrTime =
+    comments.nonEmpty || secondsLeft.isDefined || opening.isDefined || result.isDefined
+
+  def render =
     val glyphStr = glyphs.toList.map {
       case glyph if glyph.id <= 6 => glyph.symbol
       case glyph                  => s" $$${glyph.id}"
     }.mkString
     val commentsOrTime =
-      if (comments.nonEmpty || secondsLeft.isDefined || opening.isDefined || result.isDefined)
+      if hasCommentsOrTime then
         List(clockString, opening, result).flatten
           .:::(comments.map(_ map Move.noDoubleLineBreak))
-          .map { text =>
-            s" { $text }"
-          }
+          .map(x => s" { $x }")
           .mkString
       else ""
     s"$san$glyphStr$commentsOrTime"

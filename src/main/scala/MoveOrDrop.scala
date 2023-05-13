@@ -49,7 +49,7 @@ object MoveOrDrop:
         case m: Move => Dumper(m.situationBefore, m, m.situationAfter)
         case d: Drop => Dumper(d, d.situationAfter)
 
-    inline def move(game: Game): Game =
+    inline def applyGame(game: Game): Game =
       md match
         case m: Move => game(m)
         case d: Drop => game.applyDrop(d)

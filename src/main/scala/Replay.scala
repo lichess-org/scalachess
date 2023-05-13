@@ -18,7 +18,7 @@ case class Replay(setup: Game, moves: List[MoveOrDrop], state: Game):
   def addMove(moveOrDrop: MoveOrDrop) =
     copy(
       moves = moveOrDrop.applyVariantEffect :: moves,
-      state = moveOrDrop.fold(state.apply, state.applyDrop)
+      state = moveOrDrop.applyGame(state)
     )
 
   def moveAtPly(ply: Ply): Option[MoveOrDrop] =
@@ -108,7 +108,7 @@ object Replay:
         acc andThen { sits =>
           val current = sits.head
           play(move)(current) map { moveOrDrop =>
-            Situation(moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter), !current.color) :: sits
+            Situation(moveOrDrop.finalizeAfter, !current.color) :: sits
           }
         }
       }

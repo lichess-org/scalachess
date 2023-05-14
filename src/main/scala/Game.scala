@@ -11,8 +11,8 @@ case class Game(
     situation: Situation,
     sans: Vector[SanStr] = Vector(),
     clock: Option[Clock] = None,
-    ply: Ply = Ply(0), // plies
-    startedAtPly: Ply = Ply(0)
+    ply: Ply = Ply.initial, // plies
+    startedAtPly: Ply = Ply.initial
 ):
 
   export situation.{ board, color as player }

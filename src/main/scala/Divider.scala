@@ -21,7 +21,7 @@ case class Division(middle: Option[Ply], end: Option[Ply], plies: Ply):
   def endBounds = end.map(_ -> plies)
 
 object Division:
-  val empty = Division(None, None, Ply(0))
+  val empty = Division(None, None, Ply.initial)
 
 object Divider:
 

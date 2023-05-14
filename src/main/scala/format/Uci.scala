@@ -99,13 +99,13 @@ object Uci:
     else Uci.Move.fromChars(move)
 
   def readList(moves: String): Option[List[Uci]] =
-    moves.split(' ').toList.map(apply).sequence
+    moves.split(' ').toList.traverse(apply)
 
   def writeList(moves: List[Uci]): String =
     moves.map(_.uci) mkString " "
 
   def readListChars(moves: String): Option[List[Uci]] =
-    moves.split(' ').toList.map(fromChars).sequence
+    moves.split(' ').toList.traverse(fromChars)
 
   def writeListChars(moves: List[Uci]): String =
     moves.map(_.chars) mkString " "

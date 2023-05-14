@@ -1,6 +1,8 @@
 package chess
 package format
 
+import cats.syntax.all.*
+
 case class UciCharPair(a: Char, b: Char):
 
   override def toString = s"$a$b"
@@ -41,8 +43,6 @@ object UciCharPair:
     val dropRole2charMap: Map[Role, Char] =
       Role.all
         .filterNot(King == _)
-        .zipWithIndex
-        .map { (role, index) =>
+        .mapWithIndex: (role, index) =>
           role -> (charShift + square2charMap.size + promotion2charMap.size + index).toChar
-        }
         .toMap

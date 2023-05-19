@@ -13,7 +13,7 @@ case class Glyphs(
 
   def isEmpty = this == Glyphs.empty
 
-  def nonEmpty: Option[Glyphs] = if (isEmpty) None else Option(this)
+  def nonEmpty: Option[Glyphs] = if isEmpty then None else Option(this)
 
   def toggle(glyph: Glyph) =
     glyph match
@@ -27,8 +27,8 @@ case class Glyphs(
       case _ => this
 
   def merge(g: Glyphs) =
-    if (isEmpty) g
-    else if (g.isEmpty) this
+    if isEmpty then g
+    else if g.isEmpty then this
     else
       Glyphs(
         g.move orElse move,
@@ -47,6 +47,7 @@ object Glyphs:
       position = glyphs.collectFirst { case g: Glyph.PositionAssessment => g },
       observations = glyphs.collect { case g: Glyph.Observation => g }
     )
+
   val all = Glyph.MoveAssessment.all ++ Glyph.Observation.all ++ Glyph.PositionAssessment.all
 
   val bySymbol: Map[String, Glyph] = all.mapBy(_.symbol)
@@ -119,7 +120,5 @@ object Glyph:
       Observation.byId.get(id)
 
   def find(s: String): Option[Glyph] =
-    if (s.startsWith("$"))
-      s.drop(1).toIntOption flatMap Glyph.find
-    else
-      Glyphs.bySymbol.get(s)
+    if s.startsWith("$") then s.drop(1).toIntOption.flatMap(Glyph.find)
+    else Glyphs.bySymbol.get(s)

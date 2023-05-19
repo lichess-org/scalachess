@@ -1,6 +1,7 @@
 package chess
 package format.pgn
 
+import util.chaining.scalaUtilChainingOps
 import cats.data.Validated
 
 object Reader:
@@ -43,8 +44,6 @@ object Reader:
       case (r: Result.Incomplete, _) => r
 
   private def makeGame(tags: Tags) =
-    val g = Game(variantOption = tags.variant, fen = tags.fen)
-    g.copy(
-      startedAtPly = g.ply,
-      clock = tags.clockConfig map Clock.apply
+    Game(variantOption = tags.variant, fen = tags.fen).pipe(self =>
+      self.copy(startedAtPly = self.ply, clock = tags.clockConfig.map(Clock.apply))
     )

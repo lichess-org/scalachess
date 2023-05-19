@@ -43,10 +43,7 @@ object Reader:
       case (r: Result.Incomplete, _) => r
 
   private def makeGame(tags: Tags) =
-    val g = Game(
-      variantOption = tags(_.Variant) flatMap chess.variant.Variant.byName,
-      fen = tags.fen
-    )
+    val g = Game(variantOption = tags.variant, fen = tags.fen)
     g.copy(
       startedAtPly = g.ply,
       clock = tags.clockConfig map Clock.apply

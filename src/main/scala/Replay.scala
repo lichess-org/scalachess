@@ -49,27 +49,6 @@ object Replay:
         )
       )
 
-  private def computeGames(game: Game, sans: List[San]): Validated[ErrorStr, List[Game]] =
-    sans
-      .foldLeft(valid[ErrorStr, List[Game]](List(game))) { (acc, move) =>
-        acc andThen { games =>
-          val current = games.head
-          move(current.situation) map { moveOrDrop =>
-            moveOrDrop.fold(game.apply, game.applyDrop) :: games
-          }
-        }
-      }
-      .map(_.reverse)
-
-  def games(
-      sans: Iterable[SanStr],
-      initialFen: Option[Fen.Epd],
-      variant: Variant
-  ): Validated[ErrorStr, List[Game]] =
-    Parser.moves(sans) andThen { moves =>
-      computeGames(makeGame(variant, initialFen), moves.value)
-    }
-
   def gameMoveWhileValid(
       sans: Seq[SanStr],
       initialFen: Fen.Epd,

@@ -2,7 +2,7 @@ package chess
 package format.pgn
 
 import cats.data.Validated
-import cats.syntax.option.*
+import cats.syntax.all.*
 import chess.Node as CNode
 
 // We don't support variation without move now,
@@ -66,12 +66,15 @@ case class Castle(side: Side) extends San:
 
   def move(situation: Situation): Validated[ErrorStr, chess.Move] =
     import situation.{ genCastling, ourKing, variant }
-    ourKing.flatMap(k =>
-      variant
-        .applyVariantEffect(genCastling(k))
-        .filter(variant.kingSafety)
-        .find(_.castle.exists(_.side == side))
-    ) toValid ErrorStr(s"Cannot castle / variant is $variant")
+    def error: ErrorStr = ErrorStr(s"Cannot castle / variant is $variant")
+    if !variant.allowsCastling then error.invalid
+    else
+      ourKing.flatMap(k =>
+        variant
+          .applyVariantEffect(genCastling(k))
+          .filter(variant.kingSafety)
+          .find(_.castle.exists(_.side == side))
+      ) toValid error
 
 opaque type Sans = List[San]
 object Sans extends TotalWrapper[Sans, List[San]]

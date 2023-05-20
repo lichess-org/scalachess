@@ -77,7 +77,7 @@ class ReaderTest extends ChessTest:
     "crazyhouse 1" in:
       Reader.full(crazyhouse1) must beValid.like { case Complete(replay) =>
         replay.chronoMoves lift 11 must beSome:
-          (_: MoveOrDrop).fold(_.toUci.uci, _.toUci.uci) must_== "P@c6"
+          (_: MoveOrDrop).toUci.uci must_== "P@c6"
       }
     "crazyhouse 2" in:
       Reader.full(crazyhouse2) must beValid.like { case Complete(replay) =>

@@ -1,6 +1,8 @@
 package chess
 
 import chess.format.Uci
+import chess.format.pgn.SanStr
+import chess.format.pgn.Dumper
 
 type MoveOrDrop = Move | Drop
 
@@ -22,12 +24,32 @@ object MoveOrDrop:
         case m: Move => m.applyVariantEffect
         case d: Drop => d
 
-    inline def toUci: Uci =
+    inline def finalizeAfter: Board =
       md match
-        case m: Move => m.toUci
-        case d: Drop => d.toUci
+        case m: Move => m.finalizeAfter
+        case d: Drop => d.finalizeAfter
+
+    inline def situationBefore: Situation =
+      md match
+        case m: Move => m.situationBefore
+        case d: Drop => d.situationBefore
 
     inline def situationAfter: Situation =
       md match
         case m: Move => m.situationAfter
         case d: Drop => d.situationAfter
+
+    inline def toUci: Uci =
+      md match
+        case m: Move => m.toUci
+        case d: Drop => d.toUci
+
+    inline def toSanStr: SanStr =
+      md match
+        case m: Move => Dumper(m.situationBefore, m, m.situationAfter)
+        case d: Drop => Dumper(d, d.situationAfter)
+
+    inline def applyGame(game: Game): Game =
+      md match
+        case m: Move => game(m)
+        case d: Drop => game.applyDrop(d)

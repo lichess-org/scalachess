@@ -18,7 +18,7 @@ case class Replay(setup: Game, moves: List[MoveOrDrop], state: Game):
   def addMove(moveOrDrop: MoveOrDrop) =
     copy(
       moves = moveOrDrop.applyVariantEffect :: moves,
-      state = moveOrDrop.fold(state.apply, state.applyDrop)
+      state = moveOrDrop.applyGame(state)
     )
 
   def moveAtPly(ply: Ply): Option[MoveOrDrop] =
@@ -49,27 +49,6 @@ object Replay:
         )
       )
 
-  private def computeGames(game: Game, sans: List[San]): Validated[ErrorStr, List[Game]] =
-    sans
-      .foldLeft(valid[ErrorStr, List[Game]](List(game))) { (acc, move) =>
-        acc andThen { games =>
-          val current = games.head
-          move(current.situation) map { moveOrDrop =>
-            moveOrDrop.fold(game.apply, game.applyDrop) :: games
-          }
-        }
-      }
-      .map(_.reverse)
-
-  def games(
-      sans: Iterable[SanStr],
-      initialFen: Option[Fen.Epd],
-      variant: Variant
-  ): Validated[ErrorStr, List[Game]] =
-    Parser.moves(sans) andThen { moves =>
-      computeGames(makeGame(variant, initialFen), moves.value)
-    }
-
   def gameMoveWhileValid(
       sans: Seq[SanStr],
       initialFen: Fen.Epd,
@@ -88,8 +67,8 @@ object Replay:
               san(game.situation).fold(
                 err => (games, err.some),
                 moveOrDrop => {
-                  val newGame = moveOrDrop.fold(game.apply, game.applyDrop)
-                  val uci     = moveOrDrop.fold(_.toUci, _.toUci)
+                  val newGame = moveOrDrop.applyGame(game)
+                  val uci     = moveOrDrop.toUci
                   ((newGame, Uci.WithSan(uci, sanStr)) :: games, None)
                 }
               )
@@ -108,7 +87,7 @@ object Replay:
         acc andThen { sits =>
           val current = sits.head
           play(move)(current) map { moveOrDrop =>
-            Situation(moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter), !current.color) :: sits
+            Situation(moveOrDrop.finalizeAfter, !current.color) :: sits
           }
         }
       }
@@ -189,7 +168,7 @@ object Replay:
             san(sit) match
               case fail: Validated.Invalid[?] => fail
               case Validated.Valid(moveOrDrop) =>
-                val after = moveOrDrop.fold(_.finalizeAfter, _.finalizeAfter)
+                val after = moveOrDrop.finalizeAfter
                 val fen   = Fen write Game(Situation(after, ply.color), ply = ply)
                 if (compareFen(fen)) Validated.valid(ply)
                 else recursivePlyAtFen(Situation(after, !sit.color), rest, ply + 1)

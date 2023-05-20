@@ -17,7 +17,7 @@ object UciDump:
       variant: Variant,
       force960Notation: Boolean = false
   ): Validated[ErrorStr, List[String]] =
-    if (moves.isEmpty) Validated.valid(Nil)
+    if moves.isEmpty then Validated.valid(Nil)
     else Replay(moves, initialFen, variant) andThen (_.valid) map apply(force960Notation)
 
   def move(variant: Variant, force960Notation: Boolean = false)(mod: MoveOrDrop): String =

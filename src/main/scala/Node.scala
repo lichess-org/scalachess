@@ -254,7 +254,11 @@ final case class Node[A](
   def mapMainline[B](f: A => B): Node[B] =
     copy(value = f(value), child = child.map(_.mapMainline(f)), variations = Nil)
 
-  def mapMainlineWithIndex[B](f: (A, Int) => B): Node[B] = ???
+  // akin to mapMainline, but also pass index to the function
+  def mapMainlineWithIndex[B](f: (A, Int) => B): Node[B] =
+    def loop(n: Node[A], i: Int): Node[B] =
+      n.copy(value = f(n.value, i), child = n.child.map(c => loop(c, i + 1)), variations = Nil)
+    loop(this, 0)
 
   def toVariation: Variation[A]        = Variation(value, child)
   def toVariations: List[Variation[A]] = Variation(value, child) +: variations
@@ -294,6 +298,9 @@ object Node:
 
   def build[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
     s.reverse.foldLeft(none[Node[B]])((acc, a) => Node(f(a), acc).some)
+
+  def buildWithIndex[A, B](s: Seq[A], f: (A, Int) => B): Option[Node[B]] =
+    build(s.zipWithIndex, f.tupled)
 
   def buildWithNode[A, B](s: Seq[A], f: A => Node[B]): Option[Node[B]] =
     s.reverse match
@@ -364,3 +371,6 @@ object Variation:
 
   def build[A, B](s: Seq[A], f: A => B): Option[Variation[B]] =
     Node.build(s, f).map(_.toVariation)
+
+  def buildWithIndex[A, B](s: Seq[A], f: (A, Int) => B): Option[Variation[B]] =
+    Node.buildWithIndex(s, f).map(_.toVariation)

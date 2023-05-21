@@ -12,3 +12,5 @@ target
 .bsp
 .bloop/
 .metals/
+# docker sbt
+/?

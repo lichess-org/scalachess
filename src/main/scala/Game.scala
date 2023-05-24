@@ -94,8 +94,6 @@ case class Game(
 
   inline def fullMoveNumber: FullMoveNumber = ply.fullMoveNumber
 
-  def moveString = s"$fullMoveNumber${player.fold(".", "...")}"
-
   inline def withBoard(inline b: Board) = copy(situation = situation.copy(board = b))
 
   inline def updateBoard(inline f: Board => Board) = withBoard(f(board))

@@ -1,7 +1,6 @@
 package chess
 
 import scala.language.implicitConversions
-import cats.syntax.option.*
 
 import chess.format.EpdFen
 import chess.Square.*

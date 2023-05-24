@@ -47,11 +47,11 @@ object PgnTree:
       s"$moveStr$varStr"
 
     def render: String =
-      render(!tree.value.ply.color.white)
+      render(!tree.value.ply.turn.white)
 
     def render(dot: Boolean): String =
       val (d, str) =
-        if tree.value.ply.color.white then (isLong, s"${tree.value.ply.fullMoveNumber}. $_render")
+        if tree.value.ply.turn.white then (isLong, s"${tree.value.ply.fullMoveNumber}. $_render")
         else
           val number = if dot then s"${tree.value.ply.fullMoveNumber}... " else ""
           (false, s"$number$_render")
@@ -63,11 +63,11 @@ object PgnTree:
       v.value.render
 
     def render: String =
-      render(!v.value.ply.color.white)
+      render(!v.value.ply.turn.white)
 
     def render(dot: Boolean): String =
       val (d, str) =
-        if v.value.ply.color.white then (v.value.isLong, s"${v.value.ply.fullMoveNumber}. $_render")
+        if v.value.ply.turn.white then (v.value.isLong, s"${v.value.ply.fullMoveNumber}. $_render")
         else
           val number = if dot then s"${v.value.ply.fullMoveNumber}... " else ""
           (false, s"$number$_render")

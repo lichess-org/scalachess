@@ -169,7 +169,7 @@ object Replay:
               case fail: Validated.Invalid[?] => fail
               case Validated.Valid(moveOrDrop) =>
                 val after = moveOrDrop.finalizeAfter
-                val fen   = Fen write Game(Situation(after, ply.color), ply = ply)
+                val fen   = Fen write Game(Situation(after, ply.turn), ply = ply)
                 if (compareFen(fen)) Validated.valid(ply)
                 else recursivePlyAtFen(Situation(after, !sit.color), rest, ply + 1)
 

@@ -15,7 +15,7 @@ case class TestPgn(tags: Tags, turns: List[Turn], initial: Initial = Initial.emp
     }
 
   def updatePly(ply: Ply, f: TestMove => TestMove) =
-    updateTurnAt((ply + 1).value / 2 - 1, _.update(!ply.color, f))
+    updateTurnAt((ply + 1).value / 2 - 1, _.update(!ply.turn, f))
 
   def updateLastPly(f: TestMove => TestMove) = updatePly(Ply(nbPlies), f)
 

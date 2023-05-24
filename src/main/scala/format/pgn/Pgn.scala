@@ -22,14 +22,14 @@ case class Pgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
       else resultStr
     s"$tags\n\n$initStr$movesStr$endStr".trim
 
-  // TODO: decrease ply by 1 before comparing
-  // This is temporary fix for lila
   def updatePly(ply: Ply, f: Move => Move): Option[Pgn] =
-    val predicate = (m: Move) => m.ply == ply - 1
-    this.focus(_.tree.some).modifyA(_.modifyInMainline(predicate, Node.lift(f)))
+    this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, Node.lift(f)))
 
   def updateLastPly(f: Move => Move): Pgn =
     this.focus(_.tree.some).modify(_.modifyLastMainlineNode(Node.lift(f)))
+
+  def modifyInMainline(ply: Ply, f: Node[Move] => Node[Move]): Option[Pgn] =
+    this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, f))
 
   def moves: List[Move] = tree.fold(List.empty[Move])(_.mainlineValues)
 

@@ -86,7 +86,7 @@ class RenderTest extends munit.FunSuite:
 
   extension (tree: ParsedPgnTree)
     def toPgn(game: Game): Option[PgnTree] =
-      tree.mapAccumlOption_(Context(game.situation, game.ply)) { (ctx, d) =>
+      tree.mapAccumlOption_(Context(game.situation, game.ply + 1)) { (ctx, d) =>
         d.toMove(ctx) match
           case Some((sit, m)) => (Context(sit, ctx.ply.next), m.some)
           case None           => (ctx, None)

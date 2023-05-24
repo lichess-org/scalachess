@@ -61,7 +61,7 @@ case class Turn(
 
   def isEmpty = white.isEmpty && black.isEmpty
 
-  def plyOf(color: Color) = Ply(number * 2 - color.fold(2, 1))
+  def plyOf(color: Color) = Ply(number * 2 - color.fold(1, 0))
 
   def count = List(white, black) count (_.isDefined)
 

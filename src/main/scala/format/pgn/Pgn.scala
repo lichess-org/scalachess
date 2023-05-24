@@ -22,14 +22,14 @@ case class Pgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
       else resultStr
     s"$tags\n\n$initStr$movesStr$endStr".trim
 
-  // TODO: decrease ply by 1 before comparing
-  // This is temporary fix for lila
   def updatePly(ply: Ply, f: Move => Move): Option[Pgn] =
-    val predicate = (m: Move) => m.ply == ply - 1
-    this.focus(_.tree.some).modifyA(_.modifyInMainline(predicate, Node.lift(f)))
+    this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, Node.lift(f)))
 
   def updateLastPly(f: Move => Move): Pgn =
     this.focus(_.tree.some).modify(_.modifyLastMainlineNode(Node.lift(f)))
+
+  def modifyInMainline(ply: Ply, f: Node[Move] => Node[Move]): Option[Pgn] =
+    this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, f))
 
   def moves: List[Move] = tree.fold(List.empty[Move])(_.mainlineValues)
 
@@ -47,13 +47,13 @@ object PgnTree:
       s"$moveStr$varStr"
 
     def render: String =
-      render(!tree.value.ply.turn.white)
+      render(!tree.value.ply.turn.black)
 
     def render(dot: Boolean): String =
       val (d, str) =
-        if tree.value.ply.turn.white then (isLong, s"${tree.value.ply.fullMoveNumber}. $_render")
+        if tree.value.ply.turn.black then (isLong, s"${tree.value.turnNumber}. $_render")
         else
-          val number = if dot then s"${tree.value.ply.fullMoveNumber}... " else ""
+          val number = if dot then s"${tree.value.turnNumber}... " else ""
           (false, s"$number$_render")
       val childStr = tree.child.fold("")(x => s" ${x.render(d)}")
       s"$str$childStr"
@@ -63,13 +63,13 @@ object PgnTree:
       v.value.render
 
     def render: String =
-      render(!v.value.ply.turn.white)
+      render(!v.value.ply.turn.black)
 
     def render(dot: Boolean): String =
       val (d, str) =
-        if v.value.ply.turn.white then (v.value.isLong, s"${v.value.ply.fullMoveNumber}. $_render")
+        if v.value.ply.turn.black then (v.value.isLong, s"${v.value.turnNumber}. $_render")
         else
-          val number = if dot then s"${v.value.ply.fullMoveNumber}... " else ""
+          val number = if dot then s"${v.value.turnNumber}... " else ""
           (false, s"$number$_render")
       val childStr          = v.child.fold("")(x => s" ${x.render(d)}")
       val variationComments = Move.render(v.value.variationComments)
@@ -91,8 +91,8 @@ case class Move(
     secondsLeft: Option[Int] = None,
     variationComments: List[Comment] = Nil
 ):
-
-  def isLong = comments.nonEmpty || secondsLeft.isDefined
+  def turnNumber = if ply.turn.black then ply.fullMoveNumber else ply.fullMoveNumber - 1
+  def isLong     = comments.nonEmpty || secondsLeft.isDefined
 
   private def clockString: Option[String] =
     secondsLeft.map(seconds => "[%clk " + Move.formatPgnSeconds(seconds) + "]")

@@ -6,7 +6,6 @@ import chess.format.Fen
 import chess.format.{ pgn, Uci }
 import chess.format.pgn.SanStr
 
-// this is also a Node without variations
 case class Game(
     situation: Situation,
     sans: Vector[SanStr] = Vector(),

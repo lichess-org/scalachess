@@ -10,25 +10,17 @@ class PlyTest extends ChessTest:
 
   "plies" should:
     "to full move number" in:
-      Ply.from((0 to 6).toList).map(ply => ply -> ply.fullMoveNumber) must_== List(
-        Ply(0) -> FullMoveNumber(1), // root
-        Ply(1) -> FullMoveNumber(1), // e4
-        Ply(2) -> FullMoveNumber(2), // e5
-        Ply(3) -> FullMoveNumber(2), // f4
-        Ply(4) -> FullMoveNumber(3), // Nf6
-        Ply(5) -> FullMoveNumber(3),
-        Ply(6) -> FullMoveNumber(4)
-      )
+      Ply(0).fullMoveNumber === FullMoveNumber(1) // root
+      Ply(1).fullMoveNumber === FullMoveNumber(1) // e4
+      Ply(2).fullMoveNumber === FullMoveNumber(2) // e5
+      Ply(3).fullMoveNumber === FullMoveNumber(2) // f4
+      Ply(4).fullMoveNumber === FullMoveNumber(3) // Nf6
+      Ply(5).fullMoveNumber === FullMoveNumber(3)
+      Ply(6).fullMoveNumber === FullMoveNumber(4)
     "from full move number" in:
-      val set = for
-        fmn  <- FullMoveNumber.from((1 to 3).toList)
-        turn <- Color.all
-      yield (fmn, turn, fmn.ply(turn))
-      set must_== List(
-        (FullMoveNumber(1), White, Ply(0)),
-        (FullMoveNumber(1), Black, Ply(1)),
-        (FullMoveNumber(2), White, Ply(2)),
-        (FullMoveNumber(2), Black, Ply(3)),
-        (FullMoveNumber(3), White, Ply(4)),
-        (FullMoveNumber(3), Black, Ply(5))
-      )
+      FullMoveNumber(1).ply(White) === Ply(0)
+      FullMoveNumber(1).ply(Black) === Ply(1)
+      FullMoveNumber(2).ply(White) === Ply(2)
+      FullMoveNumber(2).ply(Black) === Ply(3)
+      FullMoveNumber(3).ply(White) === Ply(4)
+      FullMoveNumber(3).ply(Black) === Ply(5)

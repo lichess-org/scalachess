@@ -12,6 +12,7 @@ object FullMoveNumber extends OpaqueInt[FullMoveNumber]:
 opaque type Ply = Int
 object Ply extends OpaqueInt[Ply]:
   val initial: Ply = 0
+  val firstMove: Ply = 1
   extension (e: Ply)
     inline def turn    = Color.fromWhite(e.isEven) // whose turn it is to play now
     def fullMoveNumber = FullMoveNumber(1 + e / 2)

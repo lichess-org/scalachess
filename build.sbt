@@ -1,17 +1,17 @@
 lazy val scalachess = Project("scalachess", file(".")).settings(
   name := "scalachess",
   libraryDependencies ++= List(
-    "org.specs2"     %% "specs2-core"      % "4.19.2"   % Test,
-    "org.specs2"     %% "specs2-cats"      % "4.19.2"   % Test,
+    "org.specs2"     %% "specs2-core"      % "4.20.0"   % Test,
+    "org.specs2"     %% "specs2-cats"      % "4.20.0"   % Test,
     "org.scalameta"  %% "munit"            % "1.0.0-M7" % Test,
     "org.scalacheck" %% "scalacheck"       % "1.17.0"   % Test,
     "org.scalameta"  %% "munit-scalacheck" % "1.0.0-M7" % Test,
     "com.github.lenguyenthanh" % "compression" % "aacf55bea2" % Test, // a fork of lichess compression which public everything so we can use it for testing.
     "com.disneystreaming" %% "weaver-cats"       % "0.8.3" % Test,
     "com.disneystreaming" %% "weaver-scalacheck" % "0.8.3" % Test,
-    "co.fs2"              %% "fs2-core"          % "3.6.1" % Test,
-    "co.fs2"              %% "fs2-io"            % "3.6.1" % Test,
-    "com.github.ornicar"  %% "scalalib"          % "9.3.4",
+    "co.fs2"              %% "fs2-core"          % "3.7.0" % Test,
+    "co.fs2"              %% "fs2-io"            % "3.7.0" % Test,
+    "com.github.ornicar"  %% "scalalib"          % "9.3.8",
     "org.typelevel"       %% "cats-core"         % "2.9.0",
     "org.typelevel"       %% "alleycats-core"    % "2.9.0",
     "org.typelevel"       %% "cats-parse"        % "0.3.9"
@@ -34,8 +34,8 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
 )
 
 ThisBuild / organization      := "org.lichess"
-ThisBuild / version           := "14.9.4"
-ThisBuild / scalaVersion      := "3.3.0-RC3"
+ThisBuild / version           := "14.9.5"
+ThisBuild / scalaVersion      := "3.3.0"
 ThisBuild / licenses += "MIT" -> url("https://opensource.org/licenses/MIT")
 
 resolvers += "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-maven/master"

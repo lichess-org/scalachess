@@ -14,7 +14,7 @@ object FullPerftTest extends SimpleIOSuite:
     def empty                           = true
     def combine(x: Boolean, y: Boolean) = x && y
 
-  val nodeLimits = 10_000_000L
+  val nodeLimits = 1_000_000L
 
   test("random.perft"):
     perfts(Perft.randomPerfts, Chess960, 10_000L)

@@ -10,7 +10,7 @@ import chess.Square.*
 import chess.format.pgn.Fixtures
 import chess.format.pgn.SanStr
 import chess.variant.Standard
-import chess.{Mode => _ , *}
+import chess.{ Mode => _, * }
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -24,13 +24,13 @@ class PlayBench:
 
   @Benchmark
   def divider() =
-    var moves       = Fixtures.fromProd2
-    val gameReplay  = Replay.boards(SanStr from moves.split(' ').toList, None, Standard).toOption.get
+    var moves      = Fixtures.fromProd2
+    val gameReplay = Replay.boards(SanStr from moves.split(' ').toList, None, Standard).toOption.get
     Divider(gameReplay)
 
   @Benchmark
   def replay() =
-    var nb = 500
+    var nb    = 500
     var games = Fixtures.prod500standard
     var gameMoves = (games take nb).map { g =>
       SanStr from g.split(' ').toList

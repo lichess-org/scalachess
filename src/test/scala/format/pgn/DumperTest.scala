@@ -9,8 +9,7 @@ import chess.variant.ThreeCheck
 
 class DumperTest extends ChessTest:
 
-  given Conversion[String, SanStr]  = SanStr(_)
-  given Conversion[String, Comment] = Comment(_)
+  given Conversion[String, SanStr] = SanStr(_)
 
   "Check with pawn" should:
     "not be checkmate if pawn can be taken en passant" in:
@@ -287,6 +286,7 @@ NRK RQBB
       ).withPlayer(Black).playMoves(C8 -> E8) map (_.sans) must beValid.like { case ms =>
         ms must_== List("O-O")
       }
+
     "opening with castles" in:
       Game(
         makeBoard(
@@ -313,36 +313,10 @@ NRKNRQBB
       ) map (_.sans) must beValid.like { case ms =>
         ms must_== "f4 Nc6 Nc3 g6 Nb5 O-O-O O-O-O".split(' ').toList
       }
+
     "tricky rook disambiguation" in:
       val fen           = EpdFen("r5k1/1b5p/N3p1p1/Q4p2/4r3/2P1q3/1PK2RP1/5R2 w - - 1 38")
       val sit           = Fen.read(fen).get
       val game1         = Game(sit.board, sit.color)
       val (game2, move) = game1(Square.F2, Square.F3).toOption.get
       Dumper(game1.situation, move, game2.situation) must_== "Rf3"
-  "move comment" should:
-    "simple" in:
-      TestMove("e4", List("Some comment")).toString must_== "e4 { Some comment }"
-    "one line break" in:
-      TestMove(
-        "e4",
-        List("""Some
-comment""")
-      ).toString must_== """e4 { Some
-comment }"""
-    "two line breaks" in:
-      TestMove(
-        "e4",
-        List("""Some
-
-comment""")
-      ).toString must_== """e4 { Some
-comment }"""
-    "three line breaks" in:
-      TestMove(
-        "e4",
-        List("""Some
-
-
-comment""")
-      ).toString must_== """e4 { Some
-comment }"""

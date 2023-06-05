@@ -11,17 +11,17 @@ class PlyTest extends munit.FunSuite:
 
   test("to full move number"):
     assertEquals(Ply(0).fullMoveNumber, FullMoveNumber(1)) // root
-    assertEquals(Ply(1).fullMoveNumber , FullMoveNumber(1)) // e4
-    assertEquals(Ply(2).fullMoveNumber , FullMoveNumber(2)) // e5
-    assertEquals(Ply(3).fullMoveNumber , FullMoveNumber(2)) // f4
-    assertEquals(Ply(4).fullMoveNumber , FullMoveNumber(3)) // Nf6
-    assertEquals(Ply(5).fullMoveNumber , FullMoveNumber(3))
-    assertEquals(Ply(6).fullMoveNumber , FullMoveNumber(4))
+    assertEquals(Ply(1).fullMoveNumber, FullMoveNumber(1)) // e4
+    assertEquals(Ply(2).fullMoveNumber, FullMoveNumber(2)) // e5
+    assertEquals(Ply(3).fullMoveNumber, FullMoveNumber(2)) // f4
+    assertEquals(Ply(4).fullMoveNumber, FullMoveNumber(3)) // Nf6
+    assertEquals(Ply(5).fullMoveNumber, FullMoveNumber(3))
+    assertEquals(Ply(6).fullMoveNumber, FullMoveNumber(4))
 
   test("from full move number"):
-    assertEquals(FullMoveNumber(1).ply(White) , Ply(0))
-    assertEquals(FullMoveNumber(1).ply(Black) , Ply(1))
-    assertEquals(FullMoveNumber(2).ply(White) , Ply(2))
-    assertEquals(FullMoveNumber(2).ply(Black) , Ply(3))
-    assertEquals(FullMoveNumber(3).ply(White) , Ply(4))
-    assertEquals(FullMoveNumber(3).ply(Black) , Ply(5))
+    assertEquals(FullMoveNumber(1).ply(White), Ply(0))
+    assertEquals(FullMoveNumber(1).ply(Black), Ply(1))
+    assertEquals(FullMoveNumber(2).ply(White), Ply(2))
+    assertEquals(FullMoveNumber(2).ply(Black), Ply(3))
+    assertEquals(FullMoveNumber(3).ply(White), Ply(4))
+    assertEquals(FullMoveNumber(3).ply(Black), Ply(5))

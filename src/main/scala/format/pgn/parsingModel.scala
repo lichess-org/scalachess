@@ -3,7 +3,6 @@ package format.pgn
 
 import cats.data.Validated
 import cats.syntax.all.*
-import chess.Node as CNode
 
 // We don't support variation without move now,
 // but we can in the future when we support null move
@@ -18,7 +17,7 @@ case class PgnNodeData(
 ):
   export metas.*
 
-type ParsedPgnTree = CNode[PgnNodeData]
+type ParsedPgnTree = Node[PgnNodeData]
 
 case class ParsedPgn(initialPosition: InitialPosition, tags: Tags, tree: Option[ParsedPgnTree]):
   def mainline = tree.fold(List.empty[San])(_.mainline.map(_.value.san))

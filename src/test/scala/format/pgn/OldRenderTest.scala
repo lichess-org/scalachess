@@ -3,7 +3,6 @@ package format.pgn
 
 import cats.syntax.option.*
 import scala.language.implicitConversions
-import chess.Node as CNode
 
 case class TestPgn(tags: Tags, turns: List[Turn], initial: Initial = Initial.empty):
 
@@ -146,7 +145,7 @@ object NewPgn:
     Pgn(tags = pgn.tags, initial = pgn.initial, tree = tree)
 
   def toNode(move: TestMove, ply: Ply, child: Option[PgnTree]): PgnTree =
-    CNode(
+    Node(
       move.clean(ply),
       child,
       move.variations.map(_.flatMap(moves)).map(x => toVariation(x.head._2, ply, None))

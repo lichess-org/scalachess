@@ -20,7 +20,6 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
     "dev.optics"          %% "monocle-core"      % "3.2.0",
     "org.typelevel"       %% "kittens"           % "3.0.0"
   ),
-  testFrameworks += new TestFramework("weaver.framework.CatsEffect"),
   scalacOptions := Seq(
     "-encoding",
     "utf-8",

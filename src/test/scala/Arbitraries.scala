@@ -50,7 +50,7 @@ object Arbitraries:
 
   def genNode[A](using Arbitrary[A]): Gen[Node[A]] =
     Gen.sized: size =>
-      val sqrt = Math.sqrt(size.toDouble).toInt
+      val sqrt = size / 2
       for
         a <- Arbitrary.arbitrary[A]
         c <- genChild[A](size)

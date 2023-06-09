@@ -7,26 +7,31 @@ import scala.annotation.tailrec
 
 sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives Functor, Traverse:
 
-  def withValue(value: A): TreeSelector[A, this.type] = this match
+  final def withValue(value: A): TreeSelector[A, this.type] = this match
     case n: Node[A]      => n.copy(value = value)
     case v: Variation[A] => v.copy(value = value)
 
-  def withChild(child: Node[A]): TreeSelector[A, this.type] =
+  final def withChild(child: Node[A]): TreeSelector[A, this.type] =
     this match
       case n: Node[A]      => n.copy(child = child.some)
       case v: Variation[A] => v.copy(child = child.some)
 
-  def withoutChild: TreeSelector[A, this.type] =
+  final def setChild(child: Option[Node[A]]): TreeSelector[A, this.type] =
+    this match
+      case n: Node[A]      => n.copy(child = child)
+      case v: Variation[A] => v.copy(child = child)
+
+  final def withoutChild: TreeSelector[A, this.type] =
     this match
       case n: Node[A]      => n.copy(child = None)
       case v: Variation[A] => v.copy(child = None)
 
-  def mainline: List[Tree[A]] = this :: child.fold(List.empty[Tree[A]])(_.mainline)
-  def mainlineValues: List[A] = value :: child.fold(List.empty[A])(_.mainlineValues)
+  final def mainline: List[Tree[A]] = this :: child.fold(List.empty[Tree[A]])(_.mainline)
+  final def mainlineValues: List[A] = value :: child.fold(List.empty[A])(_.mainlineValues)
 
-  def hasId[Id](id: Id)(using HasId[A, Id]): Boolean = value.hasId(id)
+  final def hasId[Id](id: Id)(using HasId[A, Id]): Boolean = value.hasId(id)
 
-  def findPath[Id](path: List[Id])(using HasId[A, Id]): Option[List[Tree[A]]] =
+  final def findPath[Id](path: List[Id])(using HasId[A, Id]): Option[List[Tree[A]]] =
     @tailrec
     def loop(tree: Tree[A], path: List[Id], acc: List[Tree[A]]): Option[List[Tree[A]]] =
       path match
@@ -47,26 +52,15 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
 
     if path.isEmpty then None else loop(this, path, Nil).map(_.reverse)
 
-  def find[Id](path: List[Id])(using HasId[A, Id]): Option[Tree[A]] =
+  final def find[Id](path: List[Id])(using HasId[A, Id]): Option[Tree[A]] =
     findPath(path).flatMap(_.lastOption)
 
-  def pathExists[Id](path: List[Id]): HasId[A, Id] ?=> Boolean =
-    find(path).isDefined
+  final def pathExists[Id](path: List[Id]): HasId[A, Id] ?=> Boolean =
+    findPath(path).isDefined
 
   def modifyAt[Id](path: List[Id], f: TreeMapper[A])(using HasId[A, Id]): Option[Tree[A]]
   def modifyWithParentPath[Id](path: List[Id], f: Node[A] => Node[A])(using HasId[A, Id]): Option[Tree[A]]
   def deleteAt[Id](path: List[Id])(using HasId[A, Id]): Option[Option[Tree[A]]]
-
-  // take the first n nodes of the mainline
-  // keep all variations
-  def take(n: Int): TreeSelector[A, this.type] =
-    if n <= 0 then self
-    else child.fold(self)(c => withChild(c.take(n - 1)))
-
-  // get the nth node of the mainline
-  def apply(n: Int): Option[Tree[A]] =
-    if n <= 0 then this.some
-    else child.flatMap(_.apply(n - 1))
 
   private def self: TreeSelector[A, this.type] = this match
     case n: Node[A]      => n
@@ -116,6 +110,28 @@ final case class Node[A](
 ) extends Tree[A](value, child)
     derives Functor,
       Traverse:
+
+  // take the first n nodes in the mainline
+  // keep all variations
+  // n > 0
+  def take(n: Int): Node[A] =
+    @tailrec
+    def loop(n: Int, node: Node[A], acc: List[Node[A]]): List[Node[A]] =
+      if n <= 0 then acc
+      else
+        node.child match
+          case None        => node :: acc
+          case Some(child) => loop(n - 1, child, node.withoutChild :: acc)
+    if n == 0 then this
+    else loop(n, this, Nil).foldLeft(none[Node[A]])((acc, node) => node.setChild(acc).some).getOrElse(this)
+
+  // get the nth node of in the mainline
+  def apply(n: Int): Option[Node[A]] =
+    @tailrec
+    def loop(tree: Option[Node[A]], n: Int): Option[Node[A]] =
+      if n <= 0 then tree
+      else loop(tree.flatMap(_.child), n - 1)
+    loop(this.some, n)
 
   def mainlinePath[Id](using HasId[A, Id]): List[Id] =
     value.id +: child.fold(List.empty[Id])(_.mainlinePath)

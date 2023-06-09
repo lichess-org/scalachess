@@ -2,10 +2,34 @@ package chess
 package format
 
 import munit.ScalaCheckSuite
-import org.scalacheck.{ Arbitrary, Gen, Prop }
-import Arbitraries.given
+import org.scalacheck.Prop
+import UciArbitraries.given
 
 class UciChairPairTest extends ScalaCheckSuite:
+
+  test("convert move to pair"):
+    assertEquals(UciCharPair(Uci.Move(Square.E2, Square.E4)).toString, "/?")
+
+  test("convert drop to pair"):
+    assertEquals(UciCharPair(Uci.Drop(Pawn, Square.C7)), UciCharPair('U', '\u008f'))
+    assertEquals(UciCharPair(Uci.Drop(Knight, Square.C7)), UciCharPair('U', '\u008e'))
+    assertEquals(UciCharPair(Uci.Drop(Bishop, Square.C7)), UciCharPair('U', '\u008d'))
+    assertEquals(UciCharPair(Uci.Drop(Rook, Square.C7)), UciCharPair('U', '\u008c'))
+    assertEquals(UciCharPair(Uci.Drop(Queen, Square.C7)), UciCharPair('U', '\u008b'))
+
+  test("apply.toUci == identity"):
+    Prop.forAll: (uci: Uci) =>
+      assertEquals(UciCharPair(uci).toUci, uci)
+
+  test("List[Uci] => UciPath => String => List[Uci]"):
+    Prop.forAll: (xs: List[Uci]) =>
+      val str = UciPath.fromIds(xs.map(UciCharPair(_))).debug
+      assertEquals(str.split(" ").toList.map(Uci.apply).flatten, xs)
+
+object UciArbitraries:
+
+  import org.scalacheck.{ Arbitrary, Gen }
+  import Arbitraries.given
 
   def normalUciMoveGen =
     for
@@ -30,14 +54,4 @@ class UciChairPairTest extends ScalaCheckSuite:
       role <- Gen.oneOf(Pawn, Knight, Bishop, Rook, Queen)
     yield Uci.Drop(role, dest)
 
-  test("identity rule for Uci.Move"):
-    Prop.forAll(normalUciMoveGen): (uci: Uci) =>
-      assertEquals(UciCharPair(uci).toUci, uci)
-
-  test("identity rule for promotion Uci.Move"):
-    Prop.forAll(promotionUciMoveGen): (uci: Uci) =>
-      assertEquals(UciCharPair(uci).toUci, uci)
-
-  test("identity rule for Uci.Drop"):
-    Prop.forAll(dropUciMoveGen): (uci: Uci) =>
-      assertEquals(UciCharPair(uci).toUci, uci)
+  given Arbitrary[Uci] = Arbitrary(Gen.oneOf(normalUciMoveGen, promotionUciMoveGen, dropUciMoveGen))

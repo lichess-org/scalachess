@@ -41,7 +41,7 @@ object UciCharPair:
       square -> (square.hashCode + charShift).toChar
     }.toMap
 
-    val char2squareMap: Map[Char, Square] = square2charMap.map(_.swap)
+    lazy val char2squareMap: Map[Char, Square] = square2charMap.map(_.swap)
 
     inline def toChar(inline square: Square) = square2charMap.getOrElse(square, voidChar)
 
@@ -50,7 +50,7 @@ object UciCharPair:
       file          <- File.all
     } yield (file, role) -> (charShift + square2charMap.size + index * 8 + file.index).toChar
 
-    val char2promotionMap: Map[Char, (File, PromotableRole)] =
+    lazy val char2promotionMap: Map[Char, (File, PromotableRole)] =
       promotion2charMap.map(_.swap)
 
     def toChar(file: File, prom: PromotableRole) =
@@ -63,7 +63,7 @@ object UciCharPair:
           role -> (charShift + square2charMap.size + promotion2charMap.size + index).toChar
         .toMap
 
-    val char2dropRoleMap: Map[Char, Role] =
+    lazy val char2dropRoleMap: Map[Char, Role] =
       dropRole2charMap.map(_.swap)
 
     private[format] def lastRank(from: Square): Rank =

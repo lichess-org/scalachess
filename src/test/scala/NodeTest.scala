@@ -31,7 +31,7 @@ class NodeTest extends ScalaCheckSuite:
       node.find(node.mainlineValues).get == node.lastMainlineNode
 
   test("use mainline as path for findPath"):
-    forAll: (node: Tree[Int]) =>
+    forAll: (node: Node[Int]) =>
       node.findPath(node.mainlineValues) == node.mainline.some
 
   test("use subset of mainline as path for findPath"):
@@ -68,7 +68,7 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (node: Node[Int]) =>
       node.take(node.mainline.size) == node
 
-  test("apply(n) return None if n >= node.size"):
+  test("apply(n) return None if n >= node.mainline.size"):
     forAll: (node: Node[Int]) =>
       node(node.mainline.size).isEmpty
 

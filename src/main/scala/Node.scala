@@ -26,8 +26,13 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
       case n: Node[A]      => n.copy(child = None)
       case v: Variation[A] => v.copy(child = None)
 
-  final def mainline: List[Tree[A]] = this :: child.fold(List.empty[Tree[A]])(_.mainline)
-  final def mainlineValues: List[A] = value :: child.fold(List.empty[A])(_.mainlineValues)
+  final def mainlineValues: List[A] =
+    @tailrec
+    def loop(tree: Tree[A], acc: List[A]): List[A] =
+      tree.child match
+        case None        => tree.value :: acc
+        case Some(child) => loop(child, tree.value :: acc)
+    loop(this, Nil).reverse
 
   final def hasId[Id](id: Id)(using HasId[A, Id]): Boolean = value.hasId(id)
 
@@ -110,6 +115,14 @@ final case class Node[A](
 ) extends Tree[A](value, child)
     derives Functor,
       Traverse:
+
+  final def mainline: List[Node[A]] =
+    @tailrec
+    def loop(tree: Node[A], acc: List[Node[A]]): List[Node[A]] =
+      tree.child match
+        case Some(child) => loop(child, tree :: acc)
+        case None        => tree :: acc
+    loop(this, Nil).reverse
 
   // take the first n nodes in the mainline
   // keep all variations
@@ -245,12 +258,13 @@ final case class Node[A](
     mapAccumlOption(init)(f)._2
 
   // find node in the mainline
+  @tailrec
   def findInMainline(predicate: A => Boolean): Option[Node[A]] =
     if predicate(value) then this.some
     else
-      child.fold(none[Node[A]]): c =>
-        if predicate(c.value) then c.some
-        else c.findInMainline(predicate)
+      child.match
+        case None    => None
+        case Some(c) => c.findInMainline(predicate)
 
   def modifyInMainline(predicate: A => Boolean, f: Node[A] => Node[A]): Option[Node[A]] =
     if predicate(value) then f(this).some
@@ -259,13 +273,16 @@ final case class Node[A](
         case Some(c) => withChild(c).some
         case None    => None
 
+  @tailrec
   def lastMainlineNode: Node[A] =
-    child.fold(this)(_.lastMainlineNode)
+    child match
+      case None    => this
+      case Some(c) => c.lastMainlineNode
 
   def modifyLastMainlineNode(f: Node[A] => Node[A]): Node[A] =
     child.fold(f(this))(c => withChild(c.modifyLastMainlineNode(f)))
 
-  // map values from mainline
+  // map values in the mainline
   // remove all variations
   def mapMainline[B](f: A => B): Node[B] =
     copy(value = f(value), child = child.map(_.mapMainline(f)), variations = Nil)

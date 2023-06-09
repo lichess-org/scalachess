@@ -39,7 +39,7 @@ class NodeTest extends ScalaCheckSuite:
       node.mainlineValues.size >= 2 ==> {
         val size = Random.nextInt(node.mainlineValues.size - 1) + 1
         val path = node.mainlineValues.take(size)
-        node.findPath(path).isDefined == true
+        node.findPath(path).isDefined
       }
 
   test("use randomPath for findPath"):
@@ -48,6 +48,44 @@ class NodeTest extends ScalaCheckSuite:
       path.nonEmpty ==> {
         val found = node.findPath(path).map(_.map(_.value))
         found.isEmpty || (found.isDefined && found.get == path)
+      }
+
+  test("with 0 < n <= node.mainline.size => take(n).mainline size == n"):
+    forAll: (node: Node[Int]) =>
+      val n = Random.nextInt(node.mainline.size)
+      n > 0 ==> {
+        node.take(n).mainline.size == n
+      }
+
+  test("findPath.take(n).mainlineValues isDefined"):
+    forAll: (node: Node[Int]) =>
+      val n = Random.nextInt(node.mainline.size)
+      n > 0 ==> {
+        node.findPath(node.take(n).mainlineValues).isDefined
+      }
+
+  test("take(node.mainline.size) == node"):
+    forAll: (node: Node[Int]) =>
+      node.take(node.mainline.size) == node
+
+  test("apply(n) return None if n >= node.size"):
+    forAll: (node: Node[Int]) =>
+      node(node.mainline.size).isEmpty
+
+  test("apply(n) return None if n < node.size"):
+    forAll: (node: Node[Int]) =>
+      val n = if node.mainline.size == 1 then 0 else Random.nextInt(node.mainline.size - 1)
+      node(n).isDefined
+
+  test("apply(0) return itself"):
+    forAll: (node: Node[Int]) =>
+      node(0) == node.some
+
+  test("take(n).size + apply(n).size == node.size"):
+    forAll: (node: Node[Int]) =>
+      val n = Random.nextInt(node.mainline.size)
+      n > 0 ==> {
+        node.take(n).size + node(n).map(_.size).getOrElse(0L) == node.size
       }
 
   test("modifyAt with mainline == modifyLastMainlineNode"):

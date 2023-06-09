@@ -9,6 +9,9 @@ object Arbitraries:
   given Arbitrary[Color]   = Arbitrary(Gen.oneOf(Color.all))
   given Arbitrary[Side]    = Arbitrary(Gen.oneOf(Side.all))
   given Arbitrary[Role]    = Arbitrary(Gen.oneOf(Role.all))
+  given Arbitrary[File]    = Arbitrary(Gen.oneOf(File.all))
+  given Arbitrary[Rank]    = Arbitrary(Gen.oneOf(Rank.all))
+  given Arbitrary[Square]  = Arbitrary(Gen.oneOf(Square.all))
 
   given Arbitrary[Piece] = Arbitrary(
     for

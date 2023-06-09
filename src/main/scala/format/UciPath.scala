@@ -35,6 +35,8 @@ object UciPath extends OpaqueString[UciPath]:
 
     def depth = e.size / 2
 
+    def debug: String = e.computeIds.map(_.toUci.uci).mkString(" ").trim
+
   private inline def strToId(inline str: String): Option[UciCharPair] = for
     a <- str.headOption
     b <- str.lift(1)

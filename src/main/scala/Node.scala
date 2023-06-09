@@ -11,49 +11,44 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
     case n: Node[A]      => n.copy(value = value)
     case v: Variation[A] => v.copy(value = value)
 
-  final def withChild(child: Node[A]): TreeSelector[A, this.type] =
-    this match
-      case n: Node[A]      => n.copy(child = child.some)
-      case v: Variation[A] => v.copy(child = child.some)
+  final def withChild(child: Node[A]): TreeSelector[A, this.type] = this match
+    case n: Node[A]      => n.copy(child = child.some)
+    case v: Variation[A] => v.copy(child = child.some)
 
-  final def setChild(child: Option[Node[A]]): TreeSelector[A, this.type] =
-    this match
-      case n: Node[A]      => n.copy(child = child)
-      case v: Variation[A] => v.copy(child = child)
+  final def setChild(child: Option[Node[A]]): TreeSelector[A, this.type] = this match
+    case n: Node[A]      => n.copy(child = child)
+    case v: Variation[A] => v.copy(child = child)
 
-  final def withoutChild: TreeSelector[A, this.type] =
-    this match
-      case n: Node[A]      => n.copy(child = None)
-      case v: Variation[A] => v.copy(child = None)
+  final def withoutChild: TreeSelector[A, this.type] = this match
+    case n: Node[A]      => n.copy(child = None)
+    case v: Variation[A] => v.copy(child = None)
 
   final def mainlineValues: List[A] =
     @tailrec
-    def loop(tree: Tree[A], acc: List[A]): List[A] =
-      tree.child match
-        case None        => tree.value :: acc
-        case Some(child) => loop(child, tree.value :: acc)
+    def loop(tree: Tree[A], acc: List[A]): List[A] = tree.child match
+      case None        => tree.value :: acc
+      case Some(child) => loop(child, tree.value :: acc)
     loop(this, Nil).reverse
 
   final def hasId[Id](id: Id)(using HasId[A, Id]): Boolean = value.hasId(id)
 
   final def findPath[Id](path: List[Id])(using HasId[A, Id]): Option[List[Tree[A]]] =
     @tailrec
-    def loop(tree: Tree[A], path: List[Id], acc: List[Tree[A]]): Option[List[Tree[A]]] =
-      path match
-        case Nil => acc.some
-        case head :: Nil if tree.hasId(head) =>
-          (tree :: acc).some
-        case head :: rest if tree.hasId(head) =>
-          tree.child match
-            case Some(child) => loop(child, rest, tree :: acc)
-            case None        => None
-        case _ =>
-          tree match
-            case node: Node[A] =>
-              node.findVariation(path.head) match
-                case Some(variation) => loop(variation.toNode, path, acc)
-                case None            => None
-            case _ => None
+    def loop(tree: Tree[A], path: List[Id], acc: List[Tree[A]]): Option[List[Tree[A]]] = path match
+      case Nil => acc.some
+      case head :: Nil if tree.hasId(head) =>
+        (tree :: acc).some
+      case head :: rest if tree.hasId(head) =>
+        tree.child match
+          case Some(child) => loop(child, rest, tree :: acc)
+          case None        => None
+      case _ =>
+        tree match
+          case node: Node[A] =>
+            node.findVariation(path.head) match
+              case Some(variation) => loop(variation.toNode, path, acc)
+              case None            => None
+          case _ => None
 
     if path.isEmpty then None else loop(this, path, Nil).map(_.reverse)
 
@@ -66,10 +61,6 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   def modifyAt[Id](path: List[Id], f: TreeMapper[A])(using HasId[A, Id]): Option[Tree[A]]
   def modifyWithParentPath[Id](path: List[Id], f: Node[A] => Node[A])(using HasId[A, Id]): Option[Tree[A]]
   def deleteAt[Id](path: List[Id])(using HasId[A, Id]): Option[Option[Tree[A]]]
-
-  private def self: TreeSelector[A, this.type] = this match
-    case n: Node[A]      => n
-    case v: Variation[A] => v
 
 object Tree:
   def lift[A](f: A => A): TreeMapper[A] = tree => tree.withValue(f(tree.value))

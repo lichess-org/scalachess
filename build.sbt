@@ -3,9 +3,9 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
   libraryDependencies ++= List(
     "org.specs2"     %% "specs2-core"      % "4.20.0"   % Test,
     "org.specs2"     %% "specs2-cats"      % "4.20.0"   % Test,
-    "org.scalameta"  %% "munit"            % "1.0.0-M7" % Test,
+    "org.scalameta"  %% "munit"            % "1.0.0-M8" % Test,
     "org.scalacheck" %% "scalacheck"       % "1.17.0"   % Test,
-    "org.scalameta"  %% "munit-scalacheck" % "1.0.0-M7" % Test,
+    "org.scalameta"  %% "munit-scalacheck" % "1.0.0-M8" % Test,
     "com.github.lenguyenthanh" % "compression" % "aacf55bea2" % Test, // a fork of lichess compression which public everything so we can use it for testing.
     "com.disneystreaming" %% "weaver-cats"       % "0.8.3" % Test,
     "com.disneystreaming" %% "weaver-scalacheck" % "0.8.3" % Test,

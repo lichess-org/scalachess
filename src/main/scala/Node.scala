@@ -11,6 +11,10 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
     case n: Node[A]      => n.copy(value = value)
     case v: Variation[A] => v.copy(value = value)
 
+  final def withValue(f: A => A): TreeSelector[A, this.type] = this match
+    case n: Node[A]      => n.copy(value = f(value))
+    case v: Variation[A] => v.copy(value = f(value))
+
   final def withChild(child: Node[A]): TreeSelector[A, this.type] = this match
     case n: Node[A]      => n.copy(child = child.some)
     case v: Variation[A] => v.copy(child = child.some)
@@ -60,49 +64,6 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   // if the chile does not exist, return None
   def modifyChildAt[Id](path: List[Id], f: Node[A] => Node[A])(using HasId[A, Id]): Option[Tree[A]]
   def deleteAt[Id](path: List[Id])(using HasId[A, Id]): Option[Option[Tree[A]]]
-
-object Tree:
-  def lift[A](f: A => A): TreeMapper[A] = tree => tree.withValue(f(tree.value))
-
-  // Add a value as a child or variation
-  // if the tree has no child, add value as child
-  // if the value has the same id as the child, merge the values
-  // otherwise add value as a variation (and merge it to one of the existing variation if necessary)
-  def addValueAsChildOrVariation[A, Id]: HasId[A, Id] ?=> Mergeable[A] ?=> A => TreeMapper[A] = value =>
-    tree => addChildOrVariation(Node(value))(tree)
-
-  def addChildOrVariation[A, Id]: HasId[A, Id] ?=> Mergeable[A] ?=> Node[A] => TreeMapper[A] = other =>
-    tree =>
-      val child = tree.child.fold(other)(_.merge(other))
-      tree.withChild(child)
-
-  given treeHasId[A, Id](using HasId[A, Id]): HasId[Tree[A], Id] =
-    new HasId[Tree[A], Id]:
-      def getId(tree: Tree[A]): Id = tree.value.id
-
-  given nodeHasId[A, Id](using HasId[A, Id]): HasId[Node[A], Id] =
-    new HasId[Node[A], Id]:
-      def getId(tree: Node[A]): Id = tree.value.id
-
-  given variationHasId[A, Id](using HasId[A, Id]): HasId[Variation[A], Id] =
-    new HasId[Variation[A], Id]:
-      def getId(tree: Variation[A]): Id = tree.value.id
-
-  extension [A](vs: List[Variation[A]])
-    // add a variation to the list of variations
-    // if there is already a variation with the same id, merge the values
-    def add[Id](v: Variation[A])(using HasId[A, Id], Mergeable[A]): List[Variation[A]] =
-      @tailrec
-      def loop(acc: List[Variation[A]], rest: List[Variation[A]])(using HasId[A, Id]): List[Variation[A]] =
-        rest match
-          case Nil => acc :+ v
-          case x :: xs =>
-            if x.sameId(v) then (acc ++ (x.withValue(x.value.merge(v.value)) +: xs))
-            else loop(acc :+ x, xs)
-      loop(Nil, vs)
-
-    def add[Id](xs: List[Variation[A]])(using HasId[A, Id], Mergeable[A]): List[Variation[A]] =
-      xs.foldLeft(vs)((acc, x) => acc.add(x))
 
 type TreeSelector[A, X <: Tree[A]] = X match
   case Node[A]      => Node[A]
@@ -337,20 +298,6 @@ final case class Node[A](
   def withoutChildAndVariations: Node[A] =
     copy(child = None, variations = Nil)
 
-object Node:
-  def lift[A](f: A => A): Node[A] => Node[A] = tree => tree.withValue(f(tree.value))
-
-  def build[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
-    s.reverse.foldLeft(none[Node[B]])((acc, a) => Node(f(a), acc).some)
-
-  def buildWithIndex[A, B](s: Seq[A], f: (A, Int) => B): Option[Node[B]] =
-    build(s.zipWithIndex, f.tupled)
-
-  def buildWithNode[A, B](s: Seq[A], f: A => Node[B]): Option[Node[B]] =
-    s.reverse match
-      case Nil     => none[Node[B]]
-      case x :: xs => xs.foldLeft(f(x))((acc, a) => f(a).withChild(acc)).some
-
 final case class Variation[A](override val value: A, override val child: Option[Node[A]] = None)
     extends Tree[A](value, child) derives Functor, Traverse:
 
@@ -411,10 +358,56 @@ final case class Variation[A](override val value: A, override val child: Option[
 
   def toNode: Node[A] = Node(value, child)
 
-object Variation:
+object Tree:
+  def lift[A](f: A => A): TreeMapper[A] = tree => tree.withValue(f(tree.value))
 
-  def build[A, B](s: Seq[A], f: A => B): Option[Variation[B]] =
-    Node.build(s, f).map(_.toVariation)
+  // Add a value as a child or variation
+  // if the tree has no child, add value as child
+  // if the value has the same id as the child, merge the values
+  // otherwise add value as a variation (and merge it to one of the existing variation if necessary)
+  def addValueAsChildOrVariation[A, Id]: HasId[A, Id] ?=> Mergeable[A] ?=> A => TreeMapper[A] = value =>
+    tree => addChildOrVariation(Node(value))(tree)
 
-  def buildWithIndex[A, B](s: Seq[A], f: (A, Int) => B): Option[Variation[B]] =
-    Node.buildWithIndex(s, f).map(_.toVariation)
+  def addChildOrVariation[A, Id]: HasId[A, Id] ?=> Mergeable[A] ?=> Node[A] => TreeMapper[A] = other =>
+    tree =>
+      val child = tree.child.fold(other)(_.merge(other))
+      tree.withChild(child)
+
+  given treeHasId[A, Id](using HasId[A, Id]): HasId[Tree[A], Id] =
+    new HasId[Tree[A], Id]:
+      def getId(tree: Tree[A]): Id = tree.value.id
+
+  given nodeHasId[A, Id](using HasId[A, Id]): HasId[Node[A], Id] =
+    new HasId[Node[A], Id]:
+      def getId(tree: Node[A]): Id = tree.value.id
+
+  given variationHasId[A, Id](using HasId[A, Id]): HasId[Variation[A], Id] =
+    new HasId[Variation[A], Id]:
+      def getId(tree: Variation[A]): Id = tree.value.id
+
+  extension [A](vs: List[Variation[A]])
+    // add a variation to the list of variations
+    // if there is already a variation with the same id, merge the values
+    def add[Id](v: Variation[A])(using HasId[A, Id], Mergeable[A]): List[Variation[A]] =
+      @tailrec
+      def loop(acc: List[Variation[A]], rest: List[Variation[A]])(using HasId[A, Id]): List[Variation[A]] =
+        rest match
+          case Nil => acc :+ v
+          case x :: xs =>
+            if x.sameId(v) then (acc ++ (x.withValue(x.value.merge(v.value)) +: xs))
+            else loop(acc :+ x, xs)
+      loop(Nil, vs)
+
+    def add[Id](xs: List[Variation[A]])(using HasId[A, Id], Mergeable[A]): List[Variation[A]] =
+      xs.foldLeft(vs)((acc, x) => acc.add(x))
+
+  def build[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
+    s.reverse.foldLeft(none[Node[B]])((acc, a) => Node(f(a), acc).some)
+
+  def buildWithIndex[A, B](s: Seq[A], f: (A, Int) => B): Option[Node[B]] =
+    build(s.zipWithIndex, f.tupled)
+
+  def buildWithNode[A, B](s: Seq[A], f: A => Node[B]): Option[Node[B]] =
+    s.reverse match
+      case Nil     => none[Node[B]]
+      case x :: xs => xs.foldLeft(f(x))((acc, a) => f(a).withChild(acc)).some

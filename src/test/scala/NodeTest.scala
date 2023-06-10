@@ -96,7 +96,7 @@ class NodeTest extends ScalaCheckSuite:
 
   test("modifyAt with mainline == modifyLastMainlineNode"):
     forAll: (node: Node[Int], f: Int => Int) =>
-      node.modifyAt(node.mainlineValues, Tree.lift(f)) == node.modifyLastMainlineNode(Node.lift(f)).some
+      node.modifyAt(node.mainlineValues, Tree.lift(f)) == node.modifyLastMainlineNode(_.withValue(f)).some
 
   test("modifyAt and find are consistent"):
     forAll: (p: NodeWithPath[Int]) =>
@@ -110,7 +110,7 @@ class NodeTest extends ScalaCheckSuite:
         node.setChild(node.child.map(c => c.withValue(f(c.value))))
 
       node.find(path).flatMap(_.child).isDefined ==> {
-        node.modifyAt(path, modifyChild) == node.modifyChildAt(path, Node.lift(f))
+        node.modifyAt(path, modifyChild) == node.modifyChildAt(path, _.withValue(f(_)))
       }
 
   test("addValueAsChildOrVariationAt and find are consistent"):
@@ -118,8 +118,6 @@ class NodeTest extends ScalaCheckSuite:
       val (node, ps) = p
       val path       = ps.map(_.id)
       val added      = node.addValueAsChildOrVariationAt(path, foo)
-      node.findPath(path).map(_.map(_.value))
-      added.flatMap(_.find(path))
       added.isEmpty || added.flatMap(_.find(path :+ foo.id)).isDefined
 
   test("addValueAsChildOrVariationAt size"):
@@ -140,6 +138,10 @@ class NodeTest extends ScalaCheckSuite:
         val addedTwice = added.flatMap(_.addValueAsChildOrVariationAt(path, foo))
         added.isEmpty || added.get.size == addedTwice.get.size
       }
+
+  test("mapMainline f . mainlineValues == mainlineValues . f"):
+    forAll: (node: Node[Int], f: Int => Int) =>
+      node.mapMainline(f).mainlineValues == node.mainlineValues.map(f)
 
   test("deleteAt with root value return Some(None)"):
     forAll: (node: Node[Int]) =>

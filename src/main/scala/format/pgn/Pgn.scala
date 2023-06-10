@@ -23,10 +23,10 @@ case class Pgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
     s"$tags\n\n$initStr$movesStr$endStr".trim
 
   def updatePly(ply: Ply, f: Move => Move): Option[Pgn] =
-    this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, Node.lift(f)))
+    this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, _.withValue(f)))
 
   def updateLastPly(f: Move => Move): Pgn =
-    this.focus(_.tree.some).modify(_.modifyLastMainlineNode(Node.lift(f)))
+    this.focus(_.tree.some).modify(_.modifyLastMainlineNode(_.withValue(f)))
 
   def modifyInMainline(ply: Ply, f: Node[Move] => Node[Move]): Option[Pgn] =
     this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, f))

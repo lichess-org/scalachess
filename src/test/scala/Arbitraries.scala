@@ -45,7 +45,7 @@ object Arbitraries:
         then Gen.const(Nil)
         else
           genBool.flatMap:
-            case true  => Gen.oneOf(node.variations).flatMap(v => genPath(v.toNode).map(v.value :: _))
+            case true  => Gen.oneOf(node.variations).flatMap(v => genPath(v.toNode))
             case false => Gen.const(node.value :: Nil)
 
   def genNode[A](using Arbitrary[A]): Gen[Node[A]] =

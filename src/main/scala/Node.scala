@@ -59,7 +59,9 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
     findPath(path).isDefined
 
   def modifyAt[Id](path: List[Id], f: TreeMapper[A])(using HasId[A, Id]): Option[Tree[A]]
-  def modifyWithParentPath[Id](path: List[Id], f: Node[A] => Node[A])(using HasId[A, Id]): Option[Tree[A]]
+  // modify the child of the node at the given path
+  // if the chile does not exist, return None
+  def modifyChildAt[Id](path: List[Id], f: Node[A] => Node[A])(using HasId[A, Id]): Option[Tree[A]]
   def deleteAt[Id](path: List[Id])(using HasId[A, Id]): Option[Option[Tree[A]]]
 
 object Tree:
@@ -140,19 +142,19 @@ final case class Node[A](
   def mainlinePath[Id](using HasId[A, Id]): List[Id] =
     value.id +: child.fold(List.empty[Id])(_.mainlinePath)
 
-  def modifyWithParentPath[Id](path: List[Id], f: Node[A] => Node[A])(using HasId[A, Id]): Option[Node[A]] =
+  def modifyChildAt[Id](path: List[Id], f: Node[A] => Node[A])(using HasId[A, Id]): Option[Node[A]] =
     path match
       case Nil                        => f(this).some
       case head :: Nil if hasId(head) => child.map(c => withChild(f(c)))
       case head :: rest if hasId(head) =>
-        child.flatMap(_.modifyWithParentPath(rest, f)) match
+        child.flatMap(_.modifyChildAt(rest, f)) match
           case None    => None
           case Some(c) => copy(child = c.some).some
       case _ =>
         variations.foldLeft((false, List.empty[Variation[A]])) {
           case ((true, acc), n) => (true, acc :+ n)
           case ((false, acc), n) =>
-            n.modifyWithParentPath(path, f) match
+            n.modifyChildAt(path, f) match
               case Some(nn) => (true, acc :+ nn)
               case None     => (false, acc :+ n)
         } match
@@ -216,7 +218,7 @@ final case class Node[A](
     addNodeAt(path)(Node(value))
 
   def addNodeAt[Id](path: List[Id])(other: Node[A])(using HasId[A, Id], Mergeable[A]): Option[Node[A]] =
-    modifyWithParentPath(path, _.merge(other))
+    modifyChildAt(path, _.merge(other))
 
   // Akin to map, but allows to keep track of a state value when calling the function.
   // This is different from Traverse.mapAccumulate
@@ -334,14 +336,14 @@ object Node:
 final case class Variation[A](override val value: A, override val child: Option[Node[A]] = None)
     extends Tree[A](value, child) derives Functor, Traverse:
 
-  def modifyWithParentPath[Id](path: List[Id], f: Node[A] => Node[A])(using
+  def modifyChildAt[Id](path: List[Id], f: Node[A] => Node[A])(using
       HasId[A, Id]
   ): Option[Variation[A]] =
     path match
       case Nil                        => None
       case head :: Nil if hasId(head) => child.map(c => withChild(f(c)))
       case head :: rest if hasId(head) =>
-        child.flatMap(_.modifyWithParentPath(rest, f)) match
+        child.flatMap(_.modifyChildAt(rest, f)) match
           case None    => None
           case Some(c) => copy(child = c.some).some
       case _ => None

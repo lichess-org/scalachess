@@ -26,7 +26,7 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (node: Node[Int]) =>
       node.mainline.size + variationsCount(node) == node.size
 
-  test("find ids with mainline as path retuns last mainline node"):
+  test("find with mainline as path retuns last mainline node"):
     forAll: (node: Node[Int]) =>
       node.find(node.mainlineValues).get == node.lastMainlineNode
 
@@ -93,18 +93,30 @@ class NodeTest extends ScalaCheckSuite:
       node.modifyAt(node.mainlineValues, Tree.lift(f)) == node.modifyLastMainlineNode(Node.lift(f)).some
 
   test("modifyAt and find are consistent"):
-    forAll: (p: NodeWithPath[Int]) =>
+    forAll: (p: NodeWithPath[Int], f: Int => Int) =>
       val (node, path) = p
-      def f[A]: TreeMapper[A] = node =>
-        node match
-          case n: Node[A]      => n
-          case v: Variation[A] => v
-      node.modifyAt(path, f).flatMap(_.find(path)) == node.find(path)
+      node.modifyAt(path, Tree.lift(identity)).flatMap(_.find(path)) == node.find(path)
+
+  test("modifyAt and modifyChildAt are consistent if the child exists"):
+    forAll: (p: NodeWithPath[Int], f: Int => Int) =>
+      val (node, path) = p
+      def modifyChild(node: Tree[Int]) =
+        node.setChild(node.child.map(c => c.withValue(f(c.value))))
+      node.find(path).flatMap(_.child).isDefined ==> {
+        node.modifyAt(path, modifyChild) == node.modifyChildAt(path, Node.lift(f))
+      }
+
+  test("modifyChildAt with mainlineValues.init == modifyLastMainlineNode"):
+    forAll: (node: Node[Int], f: Int => Int) =>
+      node.mainline.size > 1 ==> {
+        node.modifyChildAt(node.mainlineValues.init, Node.lift(f)) == node
+          .modifyLastMainlineNode(Node.lift(f))
+          .some
+      }
 
   test("deleteAt with root value return Some(None)"):
     forAll: (node: Node[Int]) =>
-      val deleted = node.deleteAt(List(node.value))
-      deleted == Some(None)
+      node.deleteAt(List(node.value)) == Some(None)
 
   test("deleteAt with mainline == deleteLastMainlineNode"):
     forAll: (node: Node[Int]) =>
@@ -114,9 +126,9 @@ class NodeTest extends ScalaCheckSuite:
       }
 
   test("deleteAt and modifyAt are consistent"):
-    forAll: (p: (Node[Int], List[Int]), f: Int => Int) =>
+    forAll: (p: (Node[Int], List[Int])) =>
       val (node, path) = p
-      node.deleteAt(path).isDefined == node.modifyAt(path, Tree.lift(f)).isDefined
+      node.deleteAt(path).isDefined == node.modifyAt(path, Tree.lift(identity)).isDefined
 
   test("mapAccuml without using accumulator is the same as map"):
     forAll: (node: Node[Int], f: Int => Int) =>

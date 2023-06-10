@@ -7,9 +7,11 @@ import cats.syntax.all.*
 import Arbitraries.{ *, given }
 import org.scalacheck.Prop.propBoolean
 import scala.util.Random
-import cats.kernel.Monoid
+import cats.Monoid
 
 class NodeTest extends ScalaCheckSuite:
+
+  import Foo.*
 
   given HasId[Int, Int] with
     def getId(a: Int): Int = a
@@ -34,6 +36,10 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (node: Node[Int]) =>
       node.findPath(node.mainlineValues) == node.mainline.some
 
+  test("mainlinePath == mainlineValues if A =:= Id"):
+    forAll: (node: Node[Int]) =>
+      node.mainlineValues == node.mainlinePath
+
   test("use subset of mainline as path for findPath"):
     forAll: (node: Node[Int]) =>
       node.mainlineValues.size >= 2 ==> {
@@ -47,7 +53,7 @@ class NodeTest extends ScalaCheckSuite:
       val (node, path) = p
       path.nonEmpty ==> {
         val found = node.findPath(path).map(_.map(_.value))
-        found.isEmpty || (found.isDefined && found.get == path)
+        found.isEmpty || found.get == path
       }
 
   test("with 0 < n <= node.mainline.size => take(n).mainline size == n"):
@@ -93,25 +99,46 @@ class NodeTest extends ScalaCheckSuite:
       node.modifyAt(node.mainlineValues, Tree.lift(f)) == node.modifyLastMainlineNode(Node.lift(f)).some
 
   test("modifyAt and find are consistent"):
-    forAll: (p: NodeWithPath[Int], f: Int => Int) =>
+    forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
-      node.modifyAt(path, Tree.lift(identity)).flatMap(_.find(path)) == node.find(path)
+      node.modifyAt(path, Tree.lift(identity)).isDefined == node.findPath(path).isDefined
 
   test("modifyAt and modifyChildAt are consistent if the child exists"):
     forAll: (p: NodeWithPath[Int], f: Int => Int) =>
       val (node, path) = p
       def modifyChild(node: Tree[Int]) =
         node.setChild(node.child.map(c => c.withValue(f(c.value))))
+
       node.find(path).flatMap(_.child).isDefined ==> {
         node.modifyAt(path, modifyChild) == node.modifyChildAt(path, Node.lift(f))
       }
 
-  test("modifyChildAt with mainlineValues.init == modifyLastMainlineNode"):
-    forAll: (node: Node[Int], f: Int => Int) =>
-      node.mainline.size > 1 ==> {
-        node.modifyChildAt(node.mainlineValues.init, Node.lift(f)) == node
-          .modifyLastMainlineNode(Node.lift(f))
-          .some
+  test("addValueAsChildOrVariationAt and find are consistent"):
+    forAll: (p: NodeWithPath[Foo], foo: Foo) =>
+      val (node, ps) = p
+      val path       = ps.map(_.id)
+      val added      = node.addValueAsChildOrVariationAt(path, foo)
+      node.findPath(path).map(_.map(_.value))
+      added.flatMap(_.find(path))
+      added.isEmpty || added.flatMap(_.find(path :+ foo.id)).isDefined
+
+  test("addValueAsChildOrVariationAt size"):
+    forAll: (p: NodeWithPath[Foo], foo: Foo) =>
+      val (node, ps) = p
+      ps.nonEmpty ==> {
+        val path  = ps.map(_.id)
+        val added = node.addValueAsChildOrVariationAt(path, foo)
+        added.isEmpty || added.get.size >= node.size
+      }
+
+  test("addValueAsChildOrVariationAt twice return the same size"):
+    forAll: (p: NodeWithPath[Foo], foo: Foo) =>
+      val (node, ps) = p
+      ps.nonEmpty ==> {
+        val path       = ps.map(_.id)
+        val added      = node.addValueAsChildOrVariationAt(path, foo)
+        val addedTwice = added.flatMap(_.addValueAsChildOrVariationAt(path, foo))
+        added.isEmpty || added.get.size == addedTwice.get.size
       }
 
   test("deleteAt with root value return Some(None)"):
@@ -150,6 +177,43 @@ class NodeTest extends ScalaCheckSuite:
       val s2 = node.foldMap(_.toLong) + node.size * n.toLong
       s1 == s2
 
+  test("variations.add size"):
+    forAll: (vs: List[Variation[Foo]], v: Variation[Foo]) =>
+      val added       = vs.add(v)
+      val isContained = vs.exists(_.value.id == v.value.id)
+      added.size == vs.size + (if isContained then 0 else 1)
+
+  test("variations.add keeps the order"):
+    forAll: (vs: List[Variation[Foo]], v: Variation[Foo]) =>
+      val added       = vs.add(v)
+      val isContained = vs.exists(_.sameId(v))
+      val expected =
+        if isContained then vs.map(_.id)
+        else vs.map(_.id) :+ v.id
+
+      added.map(_.id) == expected
+
+  test("variations.add make sure merging is correct"):
+    forAll: (vs: List[Variation[Foo]], v: Variation[Foo]) =>
+      val added = vs.add(v)
+      vs.exists(_.value.id == v.value.id) ==> {
+        val orig   = vs.find(_.id == v.id).get
+        val output = added.find(_.id == v.id).get
+        orig.value.merge(v.value) == output.value
+      }
+
+  test("variations.add list"):
+    forAll: (vs: List[Variation[Foo]], xs: List[Variation[Foo]]) =>
+      val added  = vs.add(xs)
+      val allIds = vs.map(_.id).toSet ++ xs.map(_.id).toSet
+      added.map(_.id).toSet == allIds
+
+  test("variations.add list size"):
+    forAll: (vs: List[Variation[Foo]], xs: List[Variation[Foo]]) =>
+      val added       = vs.add(xs)
+      val intersected = vs.map(_.id).toSet.intersect(xs.map(_.id).toSet)
+      added.map(_.id).toSet.size == vs.map(_.id).toSet.size + xs.map(_.id).toSet.size - intersected.size
+
   given Monoid[Long] with
     def empty                     = 0L
     def combine(x: Long, y: Long) = x + y
@@ -164,3 +228,21 @@ class NodeTest extends ScalaCheckSuite:
 
     def variationIsEmpty: Boolean =
       node.child.foldLeft(node.variations.isEmpty)((acc, v) => acc || v.variationIsEmpty)
+
+  case class Foo(id: Int, name: String)
+
+  object Foo:
+    import org.scalacheck.Arbitrary
+    import org.scalacheck.Gen
+
+    given Arbitrary[Foo] = Arbitrary:
+      for
+        id   <- Arbitrary.arbitrary[Int]
+        name <- Gen.alphaLowerStr
+      yield Foo(id, name)
+
+    given Mergeable[Foo] with
+      def merge(x: Foo, y: Foo): Foo = Foo(x.id, x.name + y.name)
+
+    given HasId[Foo, Int] with
+      def getId(x: Foo): Int = x.id

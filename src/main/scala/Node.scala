@@ -214,7 +214,10 @@ final case class Node[A](
   def addNodeAt[Id](path: List[Id])(other: Node[A])(using HasId[A, Id], Mergeable[A]): Option[Node[A]] =
     modifyChildAt(path, _.merge(other).some)
 
-  def promoteToMainline[Id](path: List[Id])(using HasId[A, Id]): Option[Node[A]] = ???
+  def promoteToMainline[Id](path: List[Id])(using HasId[A, Id]): Option[Node[A]] = path match
+    case Nil => None
+    case head :: rest =>
+      this.promote(head).flatMap(_.child.flatMap(_.promoteToMainline(rest)))
 
   // findPath
   // find the lastest variation in the path

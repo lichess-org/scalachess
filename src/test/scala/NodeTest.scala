@@ -40,7 +40,7 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (node: Node[Int]) =>
       node.mainlineValues == node.mainlinePath
 
-  test("use subset of mainline as path for findPath"):
+  test("findPath with subset of mainline returns Some"):
     forAll: (node: Node[Int]) =>
       node.mainlineValues.size >= 2 ==> {
         val size = Random.nextInt(node.mainlineValues.size - 1) + 1
@@ -96,21 +96,22 @@ class NodeTest extends ScalaCheckSuite:
 
   test("modifyAt with mainline == modifyLastMainlineNode"):
     forAll: (node: Node[Int], f: Int => Int) =>
-      node.modifyAt(node.mainlineValues, Tree.lift(f)) == node.modifyLastMainlineNode(_.withValue(f)).some
+      node
+        .modifyAt(node.mainlineValues, Tree.liftOption(f)) == node.modifyLastMainlineNode(_.withValue(f)).some
 
   test("modifyAt and find are consistent"):
     forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
-      node.modifyAt(path, Tree.lift(identity)).isDefined == node.findPath(path).isDefined
+      node.modifyAt(path, Tree.liftOption(identity)).isDefined == node.findPath(path).isDefined
 
   test("modifyAt and modifyChildAt are consistent if the child exists"):
     forAll: (p: NodeWithPath[Int], f: Int => Int) =>
       val (node, path) = p
       def modifyChild(node: Tree[Int]) =
-        node.setChild(node.child.map(c => c.withValue(f(c.value))))
+        node.setChild(node.child.map(c => c.withValue(f(c.value)))).some
 
       node.find(path).flatMap(_.child).isDefined ==> {
-        node.modifyAt(path, modifyChild) == node.modifyChildAt(path, _.withValue(f(_)))
+        node.modifyAt(path, modifyChild) == node.modifyChildAt(path, _.withValue(f(_)).some)
       }
 
   test("addValueAsChildOrVariationAt and find are consistent"):
@@ -157,8 +158,7 @@ class NodeTest extends ScalaCheckSuite:
   test("deleteAt and modifyAt are consistent"):
     forAll: (p: (Node[Int], List[Int])) =>
       val (node, path) = p
-      node.deleteAt(path).isDefined == node.modifyAt(path, Tree.lift(identity)).isDefined
-
+      node.deleteAt(path).isDefined == node.modifyAt(path, Tree.liftOption(identity)).isDefined
 
   test("clearVariations.size == mainline.size"):
     forAll: (node: Node[Int]) =>
@@ -167,6 +167,35 @@ class NodeTest extends ScalaCheckSuite:
   test("clearVariations.mainlineValues == mainlineValues"):
     forAll: (node: Node[Int]) =>
       node.clearVariations.mainlineValues == node.mainlineValues
+
+  test("promote with mainlinePath return none"):
+    forAll: (node: Node[Int]) =>
+      node.promote(node.mainlineValues).isEmpty
+
+  test("promote with subset of mainline return none"):
+    forAll: (node: Node[Int]) =>
+      node.mainlineValues.size >= 2 ==> {
+        val size = Random.nextInt(node.mainlineValues.size - 1) + 1
+        val path = node.mainlineValues.take(size)
+        node.promote(path).isEmpty
+      }
+
+  test("promote will never change node.size"):
+    forAll: (p: NodeWithPath[Int]) =>
+      val (node, path) = p
+      val ouput        = node.promote(path)
+      ouput.isEmpty || ouput.get.size == node.size
+
+  test("promote success reduce mainline nodes count in the path"):
+    def nodesInPath(node: Node[Int], path: List[Int]) =
+      node.findPath(path).map(_.count(_.isNode)).get
+
+    forAll: (p: NodeWithPath[Int]) =>
+      val (node, path) = p
+      val ouput        = node.promote(path)
+      ouput.isEmpty || {
+        nodesInPath(ouput.get, path) == nodesInPath(node, path) + 1
+      }
 
   test("mapAccuml without using accumulator is the same as map"):
     forAll: (node: Node[Int], f: Int => Int) =>

@@ -38,8 +38,9 @@ object Arbitraries:
     yield (node, path)
 
   def genPath[A](node: Node[A]): Gen[List[A]] =
+    val prob = if node.variations.isEmpty then 0.90 else 0.6
     Gen
-      .prob(0.8)
+      .prob(prob)
       .flatMap:
         case true => node.child.fold(Gen.const(Nil))(genPath(_)).map(node.value :: _)
         case false =>

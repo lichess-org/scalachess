@@ -110,9 +110,9 @@ class NodeTest extends ScalaCheckSuite:
       def modifyChild(node: Tree[Int]) =
         node.setChild(node.child.map(c => c.withValue(f(c.value)))).some
 
-      node.find(path).flatMap(_.child).isDefined ==> {
+      if node.find(path).flatMap(_.child).isDefined then
         node.modifyAt(path, modifyChild) == node.modifyChildAt(path, _.withValue(f(_)).some)
-      }
+      else true
 
   test("addValueAsChildOrVariationAt and find are consistent"):
     forAll: (p: NodeWithPath[Foo], foo: Foo) =>
@@ -197,6 +197,14 @@ class NodeTest extends ScalaCheckSuite:
         nodesInPath(ouput.get, path) == nodesInPath(node, path) + 1
       }
 
+  test("findPath.isEmpty => promote.isEmpty"):
+    forAll: (p: NodeWithPath[Int]) =>
+      val (node, path) = p
+      val ps           = node.findPath(path)
+      ps.isEmpty ==> {
+        node.promote(path).isEmpty
+      }
+
   test("promote and findPath are consistent"):
     forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
@@ -216,6 +224,14 @@ class NodeTest extends ScalaCheckSuite:
       val (node, path) = p
       val ouput        = node.promoteToMainline(path)
       ouput.isEmpty || ouput.get.mainlineValues.startsWith(path)
+
+  test("findPath.isEmpty => promoteToMainline.isEmpty"):
+    forAll: (p: NodeWithPath[Int]) =>
+      val (node, path) = p
+      val ps           = node.findPath(path)
+      ps.isEmpty ==> {
+        node.promoteToMainline(path).isEmpty
+      }
 
   test("promoteToMainline and findPath are consistent"):
     forAll: (p: NodeWithPath[Int]) =>

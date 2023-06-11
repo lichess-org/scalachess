@@ -197,17 +197,33 @@ class NodeTest extends ScalaCheckSuite:
         nodesInPath(ouput.get, path) == nodesInPath(node, path) + 1
       }
 
+  test("promote and findPath are consistent"):
+    forAll: (p: NodeWithPath[Int]) =>
+      val (node, path) = p
+      val ps           = node.findPath(path)
+      (ps.isDefined && ps.get.exists(_.isVariation)) ==> {
+        node.promote(path).isDefined
+      }
+
   test("promoteToMainline will never change node.size"):
     forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
       val ouput        = node.promoteToMainline(path)
       ouput.isEmpty || ouput.get.size == node.size
 
-  test("promoteToMainline => mainlineValues == path"):
+  test("promoteToMainline => path is a subset of mainlineValues"):
     forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
       val ouput        = node.promoteToMainline(path)
-      ouput.isEmpty || ouput.get.mainlineValues == path
+      ouput.isEmpty || ouput.get.mainlineValues.startsWith(path)
+
+  test("promoteToMainline and findPath are consistent"):
+    forAll: (p: NodeWithPath[Int]) =>
+      val (node, path) = p
+      val ps           = node.findPath(path)
+      ps.isDefined ==> {
+        node.promoteToMainline(path).isDefined
+      }
 
   test("mapAccuml without using accumulator is the same as map"):
     forAll: (node: Node[Int], f: Int => Int) =>

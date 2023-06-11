@@ -216,8 +216,10 @@ final case class Node[A](
 
   def promoteToMainline[Id](path: List[Id])(using HasId[A, Id]): Option[Node[A]] = path match
     case Nil => None
+    case head :: Nil =>
+      this.promote(head)
     case head :: rest =>
-      this.promote(head).flatMap(_.child.flatMap(_.promoteToMainline(rest)))
+      this.promote(head).flatMap(x => x.child.flatMap(_.promoteToMainline(rest)).map(c => x.withChild(c)))
 
   // findPath
   // find the lastest variation in the path
@@ -229,7 +231,7 @@ final case class Node[A](
         if ps.forall(_.isVariation) then this.promote(head)
         else if ps.forall(_.isNode) then None
         else
-          ps.dropWhile(!_.isNode).dropWhile(_.isVariation) match
+          ps.dropWhile(_.isNode).dropWhile(_.isVariation) match
             case Nil => this.promote(head)
             case rest =>
               val swappingNodePath = rest.map(_.id).reverse

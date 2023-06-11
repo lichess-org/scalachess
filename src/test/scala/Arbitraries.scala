@@ -38,15 +38,19 @@ object Arbitraries:
     yield (node, path)
 
   def genPath[A](node: Node[A]): Gen[List[A]] =
-    genBool.flatMap:
-      case true => node.child.fold(Gen.const(Nil))(genPath(_)).map(node.value :: _)
-      case false =>
-        if node.variations.isEmpty
-        then Gen.const(Nil)
-        else
-          genBool.flatMap:
-            case true  => Gen.oneOf(node.variations).flatMap(v => genPath(v.toNode))
-            case false => Gen.const(node.value :: Nil)
+    Gen
+      .prob(0.8)
+      .flatMap:
+        case true => node.child.fold(Gen.const(Nil))(genPath(_)).map(node.value :: _)
+        case false =>
+          if node.variations.isEmpty
+          then Gen.const(Nil)
+          else
+            Gen
+              .prob(0.95)
+              .flatMap:
+                case true  => Gen.oneOf(node.variations).flatMap(v => genPath(v.toNode))
+                case false => Gen.const(node.value :: Nil)
 
   def genNode[A](using Arbitrary[A]): Gen[Node[A]] =
     Gen.sized: size =>

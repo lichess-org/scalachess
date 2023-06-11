@@ -199,6 +199,12 @@ final case class Node[A](
   def addNodeAt[Id](path: List[Id])(other: Node[A])(using HasId[A, Id], Mergeable[A]): Option[Node[A]] =
     modifyChildAt(path, _.merge(other))
 
+  def promoteUp[Id](path: List[Id])(using HasId[A, Id]): Option[Node[A]] = ???
+  def promoteToMainline[Id](path: List[Id])(using HasId[A, Id]): Option[Node[A]] = ???
+
+  def clearVariations: Node[A] =
+    this.withoutVariations.copy(child = child.map(_.clearVariations))
+
   // Akin to map, but allows to keep track of a state value when calling the function.
   // This is different from Traverse.mapAccumulate
   // because variations only use accumulated value from the parent

@@ -159,6 +159,15 @@ class NodeTest extends ScalaCheckSuite:
       val (node, path) = p
       node.deleteAt(path).isDefined == node.modifyAt(path, Tree.lift(identity)).isDefined
 
+
+  test("clearVariations.size == mainline.size"):
+    forAll: (node: Node[Int]) =>
+      node.clearVariations.size == node.mainline.size
+
+  test("clearVariations.mainlineValues == mainlineValues"):
+    forAll: (node: Node[Int]) =>
+      node.clearVariations.mainlineValues == node.mainlineValues
+
   test("mapAccuml without using accumulator is the same as map"):
     forAll: (node: Node[Int], f: Int => Int) =>
       node.mapAccuml_(0)((s, a) => (s, f(a))) == node.map(f)

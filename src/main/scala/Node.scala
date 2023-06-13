@@ -433,14 +433,14 @@ object Tree:
       val child = tree.child.fold(other)(_.merge(other))
       tree.withChild(child)
 
-  given [A, Id] (using HasId[A, Id]): HasId[Tree[A], Id] =
-      _.value.id
+  given [A, Id](using HasId[A, Id]): HasId[Tree[A], Id] =
+    _.value.id
 
-  given [A, Id] (using HasId[A, Id]): HasId[Node[A], Id] =
-      _.value.id
+  given [A, Id](using HasId[A, Id]): HasId[Node[A], Id] =
+    _.value.id
 
-  given [A, Id] (using HasId[A, Id]): HasId[Variation[A], Id] =
-      _.value.id
+  given [A, Id](using HasId[A, Id]): HasId[Variation[A], Id] =
+    _.value.id
 
   extension [A](vs: List[Variation[A]])
     // add a variation to the list of variations

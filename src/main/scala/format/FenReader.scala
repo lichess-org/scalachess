@@ -62,13 +62,12 @@ trait FenReader:
           castles = castles,
           unmovedRooks = unmovedRooks
         )
-        val checkCount = variant.threeCheck.?? {
+        val checkCount = variant.threeCheck.so:
           val splitted = fen.value split ' '
           splitted
             .lift(4)
             .flatMap(readCheckCount)
             .orElse(splitted.lift(6).flatMap(readCheckCount))
-        }
         checkCount.foldLeft(history)(_ withCheckCount _)
     }
 

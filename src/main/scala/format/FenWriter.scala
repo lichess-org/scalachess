@@ -29,7 +29,7 @@ trait FenWriter:
         game.situation.enPassantSquare.fold("-")(_.key),
         game.halfMoveClock.toString,
         game.fullMoveNumber.toString
-      ) ::: (game.board.variant == variant.ThreeCheck) ?? List(writeCheckCount(game.board))
+      ) ::: (game.board.variant == variant.ThreeCheck).so(List(writeCheckCount(game.board)))
     } mkString " "
 
   def writeOpening(situation: Situation): OpeningFen = OpeningFen:

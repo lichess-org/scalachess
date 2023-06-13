@@ -89,7 +89,7 @@ case class Clock(
         val moveTime = (elapsed - lagComp) nonNeg
 
         val clockActive = gameActive && moveTime < player.remaining
-        val inc         = clockActive ?? player.increment
+        val inc         = clockActive so player.increment
 
         val newC = updatePlayer(color):
           _.takeTime(moveTime - inc)

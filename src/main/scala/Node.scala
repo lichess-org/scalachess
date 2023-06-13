@@ -433,17 +433,14 @@ object Tree:
       val child = tree.child.fold(other)(_.merge(other))
       tree.withChild(child)
 
-  given treeHasId[A, Id](using HasId[A, Id]): HasId[Tree[A], Id] =
-    new HasId[Tree[A], Id]:
-      def getId(tree: Tree[A]): Id = tree.value.id
+  given [A, Id] (using HasId[A, Id]): HasId[Tree[A], Id] =
+      _.value.id
 
-  given nodeHasId[A, Id](using HasId[A, Id]): HasId[Node[A], Id] =
-    new HasId[Node[A], Id]:
-      def getId(tree: Node[A]): Id = tree.value.id
+  given [A, Id] (using HasId[A, Id]): HasId[Node[A], Id] =
+      _.value.id
 
-  given variationHasId[A, Id](using HasId[A, Id]): HasId[Variation[A], Id] =
-    new HasId[Variation[A], Id]:
-      def getId(tree: Variation[A]): Id = tree.value.id
+  given [A, Id] (using HasId[A, Id]): HasId[Variation[A], Id] =
+      _.value.id
 
   extension [A](vs: List[Variation[A]])
     // add a variation to the list of variations

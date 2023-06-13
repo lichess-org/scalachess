@@ -9,14 +9,14 @@ case class UciCharPair(a: Char, b: Char):
 
   def toUci: Uci =
     import UciCharPair.implementation.*
-    val from = char2squareMap.get(a).get
+    val from: Square = unsafeCharToSquare(a) // :o
 
     char2squareMap.get(b) match
       case Some(sq) => Uci.Move(from, sq, None)
       case None =>
         char2promotionMap.get(b) match
           case Some((file, prom)) => Uci.Move(from, Square(file, lastRank(from)), Some(prom))
-          case None               => Uci.Drop(char2dropRoleMap.get(b).get, from)
+          case None               => Uci.Drop(unsafeCharToDropRole(b), from)
 
 object UciCharPair:
 
@@ -42,6 +42,7 @@ object UciCharPair:
     }.toMap
 
     lazy val char2squareMap: Map[Char, Square] = square2charMap.map(_.swap)
+    export char2squareMap.apply as unsafeCharToSquare
 
     inline def toChar(inline square: Square) = square2charMap.getOrElse(square, voidChar)
 
@@ -63,8 +64,8 @@ object UciCharPair:
           role -> (charShift + square2charMap.size + promotion2charMap.size + index).toChar
         .toMap
 
-    lazy val char2dropRoleMap: Map[Char, Role] =
-      dropRole2charMap.map(_.swap)
+    lazy val char2dropRoleMap: Map[Char, Role] = dropRole2charMap.map(_.swap)
+    export char2dropRoleMap.apply as unsafeCharToDropRole
 
     private[format] def lastRank(from: Square): Rank =
       if from.rank == Rank.Second then Rank.First

@@ -22,8 +22,6 @@ trait HasId[A, Id]:
       }._2
         .reverse
 
-// trait for merge two values of the same type
-// A may not sastify Semigroup laws, hence new Mergeable Trait
 trait Mergeable[A, Id] extends HasId[A, Id]:
   // laws
   // a1.sameId(a2) => Some
@@ -36,7 +34,7 @@ trait Mergeable[A, Id] extends HasId[A, Id]:
   extension (xs: List[A])
 
     def add(ys: List[A]): List[A] =
-      xs.foldLeft(ys)(_ `add` _)
+      ys.foldLeft(xs)(_ `add` _)
 
     def add(v: A): List[A] =
       @tailrec

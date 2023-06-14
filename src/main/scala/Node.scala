@@ -200,8 +200,8 @@ final case class Node[A](
   // if not found, return None
   // if found node has no child, add new value as a child
   // if found node has a child, add new value as it's child's variation
-  def addValueAsChildOrVariationAt[Id](path: List[Id], value: A)(using Mergeable[A, Id]): Option[Node[A]] =
-    modifyAt(path, Tree.addValueAsChildOrVariation(value).toOption)
+  def addValueAsChildAt[Id](path: List[Id], value: A)(using Mergeable[A, Id]): Option[Node[A]] =
+    modifyAt(path, Tree.addValueAsChild(value).toOption)
 
   // add a node with path to the tree
   // which basically is addChildOrVariationAt with path +: h.getId(value)
@@ -322,19 +322,19 @@ final case class Node[A](
 
   // we assume that they have the same path from the roof
   // merge two nodes
-  // in case of same id, merge values
+  // if they have same id, merge values and child, and variations
   // else add as variation
   def mergeOrAddAsVariation[Id](other: Node[A]): Mergeable[A, Id] ?=> Node[A] =
     value.merge(other.value) match
-      case Some(nv) =>
+      case Some(newValue) =>
         val newChild = (child, other.child) match
-          case (None, None)         => None
           case (Some(c1), None)     => Some(c1)
           case (None, Some(c2))     => Some(c2)
           case (Some(c1), Some(c2)) => Some(c1.mergeOrAddAsVariation(c2))
-        Node(nv, newChild, variations.add(other.variations))
+          case _                    => None
+        Node(newValue, newChild, variations.add(other.variations))
       case _ =>
-        withVariations(variations.add(other.toVariations))
+        addVariations(other.toVariations)
 
   def addVariation[Id](v: Variation[A])(using Mergeable[A, Id]): Node[A] =
     withVariations(variations.add(v))
@@ -427,14 +427,14 @@ object Tree:
 
   extension [A](tm: TreeMapper[A]) def toOption: TreeMapOption[A] = x => tm(x).some
 
-  // Add a value as a child or variation
+  // Add a value as a child or child's variation
   // if the tree has no child, add value as child
   // if the value has the same id as the child, merge the values
   // otherwise add value as a variation (and merge it to one of the existing variation if necessary)
-  def addValueAsChildOrVariation[A, Id]: Mergeable[A, Id] ?=> A => TreeMapper[A] = value =>
-    tree => addChildOrVariation(Node(value))(tree)
+  def addValueAsChild[A, Id]: Mergeable[A, Id] ?=> A => TreeMapper[A] = value => addChild(Node(value))
 
-  def addChildOrVariation[A, Id]: Mergeable[A, Id] ?=> Node[A] => TreeMapper[A] = other =>
+  // Add a node as a child or child's variation
+  def addChild[A, Id]: Mergeable[A, Id] ?=> Node[A] => TreeMapper[A] = other =>
     tree =>
       val child = tree.child.fold(other)(_.mergeOrAddAsVariation(other))
       tree.withChild(child)

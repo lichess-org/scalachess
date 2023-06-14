@@ -11,7 +11,7 @@ import cats.Monoid
 
 class NodeTest extends ScalaCheckSuite:
 
-  import Foo.*
+  import Foo.{ *, given }
 
   given HasId[Int, Int] with
     def getId(a: Int): Int = a
@@ -114,30 +114,38 @@ class NodeTest extends ScalaCheckSuite:
         node.modifyAt(path, modifyChild) == node.modifyChildAt(path, _.withValue(f(_)).some)
       else true
 
-  test("addValueAsChildOrVariationAt and find are consistent"):
+  test("mergeOrAddAsVariation size"):
+    forAll: (node: Node[Foo], other: Node[Foo]) =>
+      node.mergeOrAddAsVariation(other).size >= node.size
+
+  test("addChild size"):
+    forAll: (node: Node[Foo], other: Node[Foo]) =>
+      Tree.addChild(other)(node).size >= node.size
+
+  test("addValueAsChildAt and find are consistent"):
     forAll: (p: NodeWithPath[Foo], foo: Foo) =>
       val (node, ps) = p
       val path       = ps.map(_.id)
-      val added      = node.addValueAsChildOrVariationAt(path, foo)
+      val added      = node.addValueAsChildAt(path, foo)
       added.isEmpty || added.flatMap(_.find(path :+ foo.id)).isDefined
 
-  test("addValueAsChildOrVariationAt size".only):
+  test("addValueAsChildAt size"):
     forAll: (p: NodeWithPath[Foo], foo: Foo) =>
       val (node, ps) = p
       ps.nonEmpty ==> {
-        val path  = ps.map(_.id).pp
-        val added = node.addValueAsChildOrVariationAt(path, foo.pp)
-        // node.find(path).pp
-        added.isEmpty || added.get.size.pp >= node.size.pp
+        val path  = ps.map(_.id)
+        val added = node.addValueAsChildAt(path, foo)
+        added.flatMap(_.find(path).map(_.size))
+        added.isEmpty || (added.get.size >= node.size)
       }
 
-  test("addValueAsChildOrVariationAt twice return the same size"):
+  test("addValueAsChildAt twice return the same size"):
     forAll: (p: NodeWithPath[Foo], foo: Foo) =>
       val (node, ps) = p
       ps.nonEmpty ==> {
         val path       = ps.map(_.id)
-        val added      = node.addValueAsChildOrVariationAt(path, foo)
-        val addedTwice = added.flatMap(_.addValueAsChildOrVariationAt(path, foo))
+        val added      = node.addValueAsChildAt(path, foo)
+        val addedTwice = added.flatMap(_.addValueAsChildAt(path, foo))
         added.isEmpty || added.get.size == addedTwice.get.size
       }
 
@@ -268,7 +276,7 @@ class NodeTest extends ScalaCheckSuite:
       val isContained = vs.exists(_.value.id == v.value.id)
       added.size == vs.size + (if isContained then 0 else 1)
 
-  override def scalaCheckInitialSeed = "uKNE7Qq674LfGS-xyS3pvOugwah7gz71uiKaHgFB5YO="
+  // override def scalaCheckInitialSeed = "uKNE7Qq674LfGS-xyS3pvOugwah7gz71uiKaHgFB5YO="
   test("variations.add keeps the order"):
     forAll: (vs: List[Variation[Foo]], v: Variation[Foo]) =>
       val added       = vs.add(v)
@@ -278,6 +286,11 @@ class NodeTest extends ScalaCheckSuite:
         else vs.map(_.id) :+ v.id
 
       added.map(_.id) == expected
+
+  test("variations.add size"):
+    forAll: (vs: List[Variation[Foo]], foo: Foo) =>
+      val added = vs.add(Variation(foo))
+      added.size == vs.size || added.size == vs.size + 1
 
   test("variations.add make sure merging is correct"):
     forAll: (vs: List[Variation[Foo]], v: Variation[Foo]) =>
@@ -330,6 +343,5 @@ class NodeTest extends ScalaCheckSuite:
     given Mergeable[Foo, Int] with
       def getId(x: Foo): Int = x.id
       def tryMerge(x: Foo, y: Foo): Option[Foo] =
-        if x.id == y.id then
-          Foo(x.id, x.name + y.name).some
+        if x.id == y.id then Foo(x.id, x.name ++ y.name).some
         else None

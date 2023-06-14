@@ -97,7 +97,9 @@ class NodeTest extends ScalaCheckSuite:
   test("modifyAt with mainline == modifyLastMainlineNode"):
     forAll: (node: Node[Int], f: Int => Int) =>
       node
-        .modifyAt(node.mainlineValues, Tree.liftOption(f)) == node.modifyLastMainlineNode(_.withValue(f)).some
+        .modifyAt(node.mainlineValues, Tree.liftOption(f)) == node
+        .modifyLastMainlineNode(_.updateValue(f))
+        .some
 
   test("modifyAt and find are consistent"):
     forAll: (p: NodeWithPath[Int]) =>
@@ -108,10 +110,10 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (p: NodeWithPath[Int], f: Int => Int) =>
       val (node, path) = p
       def modifyChild(node: Tree[Int]) =
-        node.setChild(node.child.map(c => c.withValue(f(c.value)))).some
+        node.withChild(node.child.map(c => c.withValue(f(c.value)))).some
 
       if node.find(path).flatMap(_.child).isDefined then
-        node.modifyAt(path, modifyChild) == node.modifyChildAt(path, _.withValue(f(_)).some)
+        node.modifyAt(path, modifyChild) == node.modifyChildAt(path, _.updateValue(f).some)
       else true
 
   test("mergeOrAddAsVariation size"):

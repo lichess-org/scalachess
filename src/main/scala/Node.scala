@@ -11,15 +11,11 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
     case n: Node[A]      => n.copy(value = value)
     case v: Variation[A] => v.copy(value = value)
 
-  final def withValue(f: A => A): TreeSelector[A, this.type] = this match
+  final def updateValue(f: A => A): TreeSelector[A, this.type] = this match
     case n: Node[A]      => n.copy(value = f(value))
     case v: Variation[A] => v.copy(value = f(value))
 
-  final def withChild(child: Node[A]): TreeSelector[A, this.type] = this match
-    case n: Node[A]      => n.copy(child = child.some)
-    case v: Variation[A] => v.copy(child = child.some)
-
-  final def setChild(child: Option[Node[A]]): TreeSelector[A, this.type] = this match
+  final def withChild(child: Option[Node[A]]): TreeSelector[A, this.type] = this match
     case n: Node[A]      => n.copy(child = child)
     case v: Variation[A] => v.copy(child = child)
 
@@ -116,7 +112,7 @@ final case class Node[A](
           case None        => node :: acc
           case Some(child) => loop(n - 1, child, node.withoutChild :: acc)
     if n == 0 then this
-    else loop(n, this, Nil).foldLeft(none[Node[A]])((acc, node) => node.setChild(acc).some).getOrElse(this)
+    else loop(n, this, Nil).foldLeft(none[Node[A]])((acc, node) => node.withChild(acc).some).getOrElse(this)
 
   // get the nth node of in the mainline
   def apply(n: Int): Option[Node[A]] =
@@ -137,7 +133,7 @@ final case class Node[A](
   def modifyChildAt[Id](path: List[Id], f: Node[A] => Option[Node[A]])(using HasId[A, Id]): Option[Node[A]] =
     path match
       case Nil                             => f(this)
-      case head :: Nil if this.hasId(head) => child.map(c => setChild(f(c)))
+      case head :: Nil if this.hasId(head) => child.map(c => withChild(f(c)))
       case head :: rest if this.hasId(head) =>
         child.flatMap(_.modifyChildAt(rest, f)) match
           case None    => None
@@ -203,20 +199,17 @@ final case class Node[A](
   def addValueAsChildAt[Id](path: List[Id], value: A)(using Mergeable[A, Id]): Option[Node[A]] =
     modifyAt(path, Tree.addValueAsChild(value).toOption)
 
-  // add a node with path to the tree
-  // which basically is addChildOrVariationAt with path +: h.getId(value)
-  def addValueAt[Id](path: List[Id])(value: A)(using Mergeable[A, Id]): Option[Node[A]] =
-    addNodeAt(path)(Node(value))
-
-  def addNodeAt[Id](path: List[Id])(other: Node[A])(using Mergeable[A, Id]): Option[Node[A]] =
-    modifyChildAt(path, _.mergeOrAddAsVariation(other).some)
+  def addChildAt[Id](path: List[Id], node: Node[A])(using Mergeable[A, Id]): Option[Node[A]] =
+    modifyAt(path, Tree.addChild(node).toOption)
 
   def promoteToMainline[Id](path: List[Id])(using HasId[A, Id]): Option[Node[A]] = path match
     case Nil => None
     case head :: Nil =>
       this.promote(head)
     case head :: rest =>
-      this.promote(head).flatMap(x => x.child.flatMap(_.promoteToMainline(rest)).map(c => x.withChild(c)))
+      this
+        .promote(head)
+        .flatMap(x => x.child.flatMap(_.promoteToMainline(rest)).map(c => x.withChild(c.some)))
 
   // findPath
   // find the lastest variation in the path
@@ -294,7 +287,7 @@ final case class Node[A](
     if predicate(value) then f(this).some
     else
       child.flatMap(_.modifyInMainline(predicate, f)) match
-        case Some(c) => withChild(c).some
+        case Some(c) => withChild(c.some).some
         case None    => None
 
   @tailrec
@@ -304,7 +297,7 @@ final case class Node[A](
       case Some(c) => c.lastMainlineNode
 
   def modifyLastMainlineNode(f: Node[A] => Node[A]): Node[A] =
-    child.fold(f(this))(c => withChild(c.modifyLastMainlineNode(f)))
+    child.fold(f(this))(c => withChild(c.modifyLastMainlineNode(f).some))
 
   // map values in the mainline
   // remove all variations
@@ -327,11 +320,7 @@ final case class Node[A](
   def mergeOrAddAsVariation[Id](other: Node[A]): Mergeable[A, Id] ?=> Node[A] =
     value.merge(other.value) match
       case Some(newValue) =>
-        val newChild = (child, other.child) match
-          case (Some(c1), None)     => Some(c1)
-          case (None, Some(c2))     => Some(c2)
-          case (Some(c1), Some(c2)) => Some(c1.mergeOrAddAsVariation(c2))
-          case _                    => None
+        val newChild = Tree.merge(child, other.child)
         Node(newValue, newChild, variations.add(other.variations))
       case _ =>
         addVariations(other.toVariations)
@@ -367,7 +356,7 @@ final case class Variation[A](override val value: A, override val child: Option[
   ): Option[Variation[A]] =
     path match
       case Nil                             => None
-      case head :: Nil if this.hasId(head) => child.map(c => setChild(f(c)))
+      case head :: Nil if this.hasId(head) => child.map(c => withChild(f(c)))
       case head :: rest if this.hasId(head) =>
         child.flatMap(_.modifyChildAt(rest, f)) match
           case None    => None
@@ -437,7 +426,14 @@ object Tree:
   def addChild[A, Id]: Mergeable[A, Id] ?=> Node[A] => TreeMapper[A] = other =>
     tree =>
       val child = tree.child.fold(other)(_.mergeOrAddAsVariation(other))
-      tree.withChild(child)
+      tree.withChild(child.some)
+
+  def merge[A, Id](node: Option[Node[A]], other: Option[Node[A]]): Mergeable[A, Id] ?=> Option[Node[A]] =
+    (node, other) match
+      case (Some(c1), None)     => Some(c1)
+      case (None, Some(c2))     => Some(c2)
+      case (Some(c1), Some(c2)) => Some(c1.mergeOrAddAsVariation(c2))
+      case _                    => None
 
   def build[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
     s.reverse.foldLeft(none[Node[B]])((acc, a) => Node(f(a), acc).some)
@@ -448,7 +444,7 @@ object Tree:
   def buildWithNode[A, B](s: Seq[A], f: A => Node[B]): Option[Node[B]] =
     s.reverse match
       case Nil     => none[Node[B]]
-      case x :: xs => xs.foldLeft(f(x))((acc, a) => f(a).withChild(acc)).some
+      case x :: xs => xs.foldLeft(f(x))((acc, a) => f(a).withChild(acc.some)).some
 
   given [A, Id](using HasId[A, Id]): HasId[Tree[A], Id] =
     _.value.id
@@ -465,10 +461,6 @@ object Tree:
       def tryMerge(a1: Variation[A], a2: Variation[A]) =
         a1.value.merge(a2.value) match
           case Some(v) =>
-            val newChild = (a1.child, a2.child) match
-              case (None, None)         => None
-              case (Some(c1), None)     => Some(c1)
-              case (None, Some(c2))     => Some(c2)
-              case (Some(c1), Some(c2)) => Some(c1.mergeOrAddAsVariation(c2))
+            val newChild = Tree.merge(a1.child, a2.child)
             Variation(v, newChild).some
           case _ => None

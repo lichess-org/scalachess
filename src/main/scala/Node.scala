@@ -200,19 +200,16 @@ final case class Node[A](
   // if not found, return None
   // if found node has no child, add new value as a child
   // if found node has a child, add new value as it's child's variation
-  def addValueAsChildOrVariationAt[Id](path: List[Id], value: A)(using
-      HasId[A, Id],
-      Mergeable[A]
-  ): Option[Node[A]] =
+  def addValueAsChildOrVariationAt[Id](path: List[Id], value: A)(using Mergeable[A, Id]): Option[Node[A]] =
     modifyAt(path, Tree.addValueAsChildOrVariation(value).toOption)
 
   // add a node with path to the tree
   // which basically is addChildOrVariationAt with path +: h.getId(value)
-  def addValueAt[Id](path: List[Id])(value: A)(using HasId[A, Id], Mergeable[A]): Option[Node[A]] =
+  def addValueAt[Id](path: List[Id])(value: A)(using Mergeable[A, Id]): Option[Node[A]] =
     addNodeAt(path)(Node(value))
 
-  def addNodeAt[Id](path: List[Id])(other: Node[A])(using HasId[A, Id], Mergeable[A]): Option[Node[A]] =
-    modifyChildAt(path, _.merge(other).some)
+  def addNodeAt[Id](path: List[Id])(other: Node[A])(using Mergeable[A, Id]): Option[Node[A]] =
+    modifyChildAt(path, _.mergeOrAddAsVariation(other).some)
 
   def promoteToMainline[Id](path: List[Id])(using HasId[A, Id]): Option[Node[A]] = path match
     case Nil => None
@@ -323,17 +320,26 @@ final case class Node[A](
   def toVariation: Variation[A]        = Variation(value, child)
   def toVariations: List[Variation[A]] = Variation(value, child) +: variations
 
+  // we assume that they have the same path from the roof
   // merge two nodes
   // in case of same id, merge values
   // else add as variation
-  def merge[Id](other: Node[A])(using HasId[A, Id], Mergeable[A]): Node[A] =
-    if this.sameId(other) then withValue(value.merge(value)).withVariations(variations.add(other.variations))
-    else withVariations(variations.add(other.toVariations))
+  def mergeOrAddAsVariation[Id](other: Node[A]): Mergeable[A, Id] ?=> Node[A] =
+    value.merge(other.value) match
+      case Some(nv) =>
+        val newChild = (child, other.child) match
+          case (None, None)         => None
+          case (Some(c1), None)     => Some(c1)
+          case (None, Some(c2))     => Some(c2)
+          case (Some(c1), Some(c2)) => Some(c1.mergeOrAddAsVariation(c2))
+        Node(nv, newChild, variations.add(other.variations))
+      case _ =>
+        withVariations(variations.add(other.toVariations))
 
-  def addVariation[Id](v: Variation[A])(using HasId[A, Id], Mergeable[A]): Node[A] =
+  def addVariation[Id](v: Variation[A])(using Mergeable[A, Id]): Node[A] =
     withVariations(variations.add(v))
 
-  def addVariations[Id](vs: List[Variation[A]])(using HasId[A, Id], Mergeable[A]): Node[A] =
+  def addVariations[Id](vs: List[Variation[A]])(using Mergeable[A, Id]): Node[A] =
     withVariations(variations.add(vs))
 
   def withVariations(variations: List[Variation[A]]): Node[A] =
@@ -425,49 +431,13 @@ object Tree:
   // if the tree has no child, add value as child
   // if the value has the same id as the child, merge the values
   // otherwise add value as a variation (and merge it to one of the existing variation if necessary)
-  def addValueAsChildOrVariation[A, Id]: HasId[A, Id] ?=> Mergeable[A] ?=> A => TreeMapper[A] = value =>
+  def addValueAsChildOrVariation[A, Id]: Mergeable[A, Id] ?=> A => TreeMapper[A] = value =>
     tree => addChildOrVariation(Node(value))(tree)
 
-  def addChildOrVariation[A, Id]: HasId[A, Id] ?=> Mergeable[A] ?=> Node[A] => TreeMapper[A] = other =>
+  def addChildOrVariation[A, Id]: Mergeable[A, Id] ?=> Node[A] => TreeMapper[A] = other =>
     tree =>
-      val child = tree.child.fold(other)(_.merge(other))
+      val child = tree.child.fold(other)(_.mergeOrAddAsVariation(other))
       tree.withChild(child)
-
-  given [A, Id](using HasId[A, Id]): HasId[Tree[A], Id] =
-    _.value.id
-
-  given [A, Id](using HasId[A, Id]): HasId[Node[A], Id] =
-    _.value.id
-
-  given [A, Id](using HasId[A, Id]): HasId[Variation[A], Id] =
-    _.value.id
-
-  extension [A](vs: List[Variation[A]])
-    // add a variation to the list of variations
-    // if there is already a variation with the same id, merge the values
-    def add[Id](v: Variation[A])(using HasId[A, Id], Mergeable[A]): List[Variation[A]] =
-      @tailrec
-      def loop(acc: List[Variation[A]], rest: List[Variation[A]])(using HasId[A, Id]): List[Variation[A]] =
-        rest match
-          case Nil => acc :+ v
-          case x :: xs =>
-            if x.sameId(v) then (acc ++ (x.withValue(x.value.merge(v.value)) +: xs))
-            else loop(acc :+ x, xs)
-      loop(Nil, vs)
-
-    def add[Id](xs: List[Variation[A]])(using HasId[A, Id], Mergeable[A]): List[Variation[A]] =
-      xs.foldLeft(vs)((acc, x) => acc.add(x))
-
-    def remove[Id](v: Variation[A])(using HasId[A, Id]): List[Variation[A]] =
-      vs.removeById(v.value.id)
-
-    def removeById[Id](id: Id)(using HasId[A, Id]): List[Variation[A]] =
-      vs.foldLeft((false, List.empty[Variation[A]])) { (acc, v) =>
-        if acc._1 then (acc._1, v :: acc._2)
-        else if v.hasId(id) then (true, acc._2)
-        else (false, v :: acc._2)
-      }._2
-        .reverse
 
   def build[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
     s.reverse.foldLeft(none[Node[B]])((acc, a) => Node(f(a), acc).some)
@@ -479,3 +449,26 @@ object Tree:
     s.reverse match
       case Nil     => none[Node[B]]
       case x :: xs => xs.foldLeft(f(x))((acc, a) => f(a).withChild(acc)).some
+
+  given [A, Id](using HasId[A, Id]): HasId[Tree[A], Id] =
+    _.value.id
+
+  given [A, Id](using HasId[A, Id]): HasId[Node[A], Id] =
+    _.value.id
+
+  given [A, Id](using HasId[A, Id]): HasId[Variation[A], Id] =
+    _.value.id
+
+  given [A, Id](using Mergeable[A, Id]): Mergeable[Variation[A], Id] =
+    new:
+      def getId(a: Variation[A]): Id = a.value.id
+      def tryMerge(a1: Variation[A], a2: Variation[A]) =
+        a1.value.merge(a2.value) match
+          case Some(v) =>
+            val newChild = (a1.child, a2.child) match
+              case (None, None)         => None
+              case (Some(c1), None)     => Some(c1)
+              case (None, Some(c2))     => Some(c2)
+              case (Some(c1), Some(c2)) => Some(c1.mergeOrAddAsVariation(c2))
+            Variation(v, newChild).some
+          case _ => None

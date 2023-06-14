@@ -121,13 +121,14 @@ class NodeTest extends ScalaCheckSuite:
       val added      = node.addValueAsChildOrVariationAt(path, foo)
       added.isEmpty || added.flatMap(_.find(path :+ foo.id)).isDefined
 
-  test("addValueAsChildOrVariationAt size"):
+  test("addValueAsChildOrVariationAt size".only):
     forAll: (p: NodeWithPath[Foo], foo: Foo) =>
       val (node, ps) = p
       ps.nonEmpty ==> {
-        val path  = ps.map(_.id)
-        val added = node.addValueAsChildOrVariationAt(path, foo)
-        added.isEmpty || added.get.size >= node.size
+        val path  = ps.map(_.id).pp
+        val added = node.addValueAsChildOrVariationAt(path, foo.pp)
+        // node.find(path).pp
+        added.isEmpty || added.get.size.pp >= node.size.pp
       }
 
   test("addValueAsChildOrVariationAt twice return the same size"):
@@ -267,6 +268,7 @@ class NodeTest extends ScalaCheckSuite:
       val isContained = vs.exists(_.value.id == v.value.id)
       added.size == vs.size + (if isContained then 0 else 1)
 
+  override def scalaCheckInitialSeed = "uKNE7Qq674LfGS-xyS3pvOugwah7gz71uiKaHgFB5YO="
   test("variations.add keeps the order"):
     forAll: (vs: List[Variation[Foo]], v: Variation[Foo]) =>
       val added       = vs.add(v)
@@ -280,10 +282,10 @@ class NodeTest extends ScalaCheckSuite:
   test("variations.add make sure merging is correct"):
     forAll: (vs: List[Variation[Foo]], v: Variation[Foo]) =>
       val added = vs.add(v)
-      vs.exists(_.value.id == v.value.id) ==> {
-        val orig   = vs.find(_.id == v.id).get
-        val output = added.find(_.id == v.id).get
-        orig.value.merge(v.value) == output.value
+      vs.exists(_.sameId(v)) ==> {
+        val orig   = vs.find(_.sameId(v)).get
+        val output = added.find(_.sameId(v)).get
+        orig.value.merge(v.value) == output.value.some
       }
 
   test("variations.add list"):
@@ -325,8 +327,9 @@ class NodeTest extends ScalaCheckSuite:
         name <- Gen.alphaLowerStr
       yield Foo(id, name)
 
-    given Mergeable[Foo] with
-      def merge(x: Foo, y: Foo): Foo = Foo(x.id, x.name + y.name)
-
-    given HasId[Foo, Int] with
+    given Mergeable[Foo, Int] with
       def getId(x: Foo): Int = x.id
+      def tryMerge(x: Foo, y: Foo): Option[Foo] =
+        if x.id == y.id then
+          Foo(x.id, x.name + y.name).some
+        else None

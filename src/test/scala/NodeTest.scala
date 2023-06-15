@@ -122,7 +122,7 @@ class NodeTest extends ScalaCheckSuite:
 
   test("addChild size"):
     forAll: (node: Node[Foo], other: Node[Foo]) =>
-      Tree.addChild(other)(node).size >= node.size
+      node.addChild(other).size >= node.size
 
   test("addValueAsChildAt and find are consistent"):
     forAll: (p: NodeWithPath[Foo], foo: Foo) =>

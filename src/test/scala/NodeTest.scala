@@ -342,8 +342,10 @@ class NodeTest extends ScalaCheckSuite:
         name <- Gen.alphaLowerStr
       yield Foo(id, name)
 
-    given Mergeable[Foo, Int] with
+    given HasId[Foo, Int] with
       def getId(x: Foo): Int = x.id
+
+    given Mergeable[Foo] with
       def tryMerge(x: Foo, y: Foo): Option[Foo] =
         if x.id == y.id then Foo(x.id, x.name ++ y.name).some
         else None

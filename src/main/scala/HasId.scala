@@ -22,7 +22,7 @@ trait HasId[A, Id]:
       }._2
         .reverse
 
-trait Mergeable[A, Id] extends HasId[A, Id]:
+trait Mergeable[A]:
   // laws
   // a1.sameId(a2) => Some
   // !a1.sameId(a2) => None

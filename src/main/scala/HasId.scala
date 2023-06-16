@@ -29,7 +29,9 @@ trait Mergeable[A]:
   // a1.merge(a2).flatMap(_.merge(a3)) == a2.merge(a3).flatMap(a1.merge(_))
   def merge(a1: A, a2: A): Option[A]
 
-  extension (a1: A) infix def <>(a2: A): Option[A] = merge(a1, a2)
+  extension (a: A)
+    infix def <>(other: A): Option[A]                    = merge(a, other)
+    def canMerge[Id](other: A): HasId[A, Id] ?=> Boolean = a.sameId(other)
 
   extension (xs: List[A])
 

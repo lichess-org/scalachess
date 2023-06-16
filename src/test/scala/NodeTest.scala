@@ -7,11 +7,10 @@ import cats.syntax.all.*
 import Arbitraries.{ *, given }
 import org.scalacheck.Prop.propBoolean
 import scala.util.Random
-import cats.Monoid
 
 class NodeTest extends ScalaCheckSuite:
 
-  import Foo.*
+  import Foo.{ *, given }
 
   given HasId[Int, Int] with
     def getId(a: Int): Int = a
@@ -97,7 +96,9 @@ class NodeTest extends ScalaCheckSuite:
   test("modifyAt with mainline == modifyLastMainlineNode"):
     forAll: (node: Node[Int], f: Int => Int) =>
       node
-        .modifyAt(node.mainlineValues, Tree.liftOption(f)) == node.modifyLastMainlineNode(_.withValue(f)).some
+        .modifyAt(node.mainlineValues, Tree.liftOption(f)) == node
+        .modifyLastMainlineNode(_.updateValue(f))
+        .some
 
   test("modifyAt and find are consistent"):
     forAll: (p: NodeWithPath[Int]) =>
@@ -108,35 +109,44 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (p: NodeWithPath[Int], f: Int => Int) =>
       val (node, path) = p
       def modifyChild(node: Tree[Int]) =
-        node.setChild(node.child.map(c => c.withValue(f(c.value)))).some
+        node.withChild(node.child.map(c => c.withValue(f(c.value)))).some
 
       if node.find(path).flatMap(_.child).isDefined then
-        node.modifyAt(path, modifyChild) == node.modifyChildAt(path, _.withValue(f(_)).some)
+        node.modifyAt(path, modifyChild) == node.modifyChildAt(path, _.updateValue(f).some)
       else true
 
-  test("addValueAsChildOrVariationAt and find are consistent"):
+  test("mergeOrAddAsVariation size"):
+    forAll: (node: Node[Foo], other: Node[Foo]) =>
+      node.mergeOrAddAsVariation(other).size >= node.size
+
+  test("addChild size"):
+    forAll: (node: Node[Foo], other: Node[Foo]) =>
+      node.addChild(other).size >= node.size
+
+  test("addValueAsChildAt and find are consistent"):
     forAll: (p: NodeWithPath[Foo], foo: Foo) =>
       val (node, ps) = p
       val path       = ps.map(_.id)
-      val added      = node.addValueAsChildOrVariationAt(path, foo)
+      val added      = node.addValueAsChildAt(path, foo)
       added.isEmpty || added.flatMap(_.find(path :+ foo.id)).isDefined
 
-  test("addValueAsChildOrVariationAt size"):
+  test("addValueAsChildAt size"):
     forAll: (p: NodeWithPath[Foo], foo: Foo) =>
       val (node, ps) = p
       ps.nonEmpty ==> {
         val path  = ps.map(_.id)
-        val added = node.addValueAsChildOrVariationAt(path, foo)
-        added.isEmpty || added.get.size >= node.size
+        val added = node.addValueAsChildAt(path, foo)
+        added.flatMap(_.find(path).map(_.size))
+        added.isEmpty || (added.get.size >= node.size)
       }
 
-  test("addValueAsChildOrVariationAt twice return the same size"):
+  test("addValueAsChildAt twice return the same size"):
     forAll: (p: NodeWithPath[Foo], foo: Foo) =>
       val (node, ps) = p
       ps.nonEmpty ==> {
         val path       = ps.map(_.id)
-        val added      = node.addValueAsChildOrVariationAt(path, foo)
-        val addedTwice = added.flatMap(_.addValueAsChildOrVariationAt(path, foo))
+        val added      = node.addValueAsChildAt(path, foo)
+        val addedTwice = added.flatMap(_.addValueAsChildAt(path, foo))
         added.isEmpty || added.get.size == addedTwice.get.size
       }
 
@@ -267,6 +277,7 @@ class NodeTest extends ScalaCheckSuite:
       val isContained = vs.exists(_.value.id == v.value.id)
       added.size == vs.size + (if isContained then 0 else 1)
 
+  // override def scalaCheckInitialSeed = "uKNE7Qq674LfGS-xyS3pvOugwah7gz71uiKaHgFB5YO="
   test("variations.add keeps the order"):
     forAll: (vs: List[Variation[Foo]], v: Variation[Foo]) =>
       val added       = vs.add(v)
@@ -277,13 +288,18 @@ class NodeTest extends ScalaCheckSuite:
 
       added.map(_.id) == expected
 
+  test("variations.add size"):
+    forAll: (vs: List[Variation[Foo]], foo: Foo) =>
+      val added = vs.add(Variation(foo))
+      added.size == vs.size || added.size == vs.size + 1
+
   test("variations.add make sure merging is correct"):
     forAll: (vs: List[Variation[Foo]], v: Variation[Foo]) =>
       val added = vs.add(v)
-      vs.exists(_.value.id == v.value.id) ==> {
-        val orig   = vs.find(_.id == v.id).get
-        val output = added.find(_.id == v.id).get
-        orig.value.merge(v.value) == output.value
+      vs.exists(_.sameId(v)) ==> {
+        val orig   = vs.find(_.sameId(v)).get
+        val output = added.find(_.sameId(v)).get
+        orig.value <> v.value == output.value.some
       }
 
   test("variations.add list"):
@@ -298,14 +314,6 @@ class NodeTest extends ScalaCheckSuite:
       val intersected = vs.map(_.id).toSet.intersect(xs.map(_.id).toSet)
       added.map(_.id).toSet.size == vs.map(_.id).toSet.size + xs.map(_.id).toSet.size - intersected.size
 
-  given Monoid[Long] with
-    def empty                     = 0L
-    def combine(x: Long, y: Long) = x + y
-
-  given Monoid[Int] with
-    def empty                   = 0
-    def combine(x: Int, y: Int) = x + y
-
   extension [A](node: Node[A])
     def variationsCount: Long =
       node.child.foldLeft(node.variations.foldMap(_.size))((acc, v) => acc + v.variationsCount)
@@ -313,20 +321,22 @@ class NodeTest extends ScalaCheckSuite:
     def variationIsEmpty: Boolean =
       node.child.foldLeft(node.variations.isEmpty)((acc, v) => acc || v.variationIsEmpty)
 
-  case class Foo(id: Int, name: String)
+case class Foo(id: Int, name: String)
 
-  object Foo:
-    import org.scalacheck.Arbitrary
-    import org.scalacheck.Gen
+object Foo:
+  import org.scalacheck.Arbitrary
+  import org.scalacheck.Gen
 
-    given Arbitrary[Foo] = Arbitrary:
-      for
-        id   <- Arbitrary.arbitrary[Int]
-        name <- Gen.alphaLowerStr
-      yield Foo(id, name)
+  given Arbitrary[Foo] = Arbitrary:
+    for
+      id   <- Arbitrary.arbitrary[Int]
+      name <- Gen.alphaLowerStr
+    yield Foo(id, name)
 
-    given Mergeable[Foo] with
-      def merge(x: Foo, y: Foo): Foo = Foo(x.id, x.name + y.name)
+  given HasId[Foo, Int] with
+    def getId(x: Foo): Int = x.id
 
-    given HasId[Foo, Int] with
-      def getId(x: Foo): Int = x.id
+  given Mergeable[Foo] with
+    def merge(x: Foo, y: Foo): Option[Foo] =
+      if x.id == y.id then Foo(x.id, x.name ++ y.name).some
+      else None

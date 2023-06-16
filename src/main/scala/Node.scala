@@ -11,15 +11,11 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
     case n: Node[A]      => n.copy(value = value)
     case v: Variation[A] => v.copy(value = value)
 
-  final def withValue(f: A => A): TreeSelector[A, this.type] = this match
+  final def updateValue(f: A => A): TreeSelector[A, this.type] = this match
     case n: Node[A]      => n.copy(value = f(value))
     case v: Variation[A] => v.copy(value = f(value))
 
-  final def withChild(child: Node[A]): TreeSelector[A, this.type] = this match
-    case n: Node[A]      => n.copy(child = child.some)
-    case v: Variation[A] => v.copy(child = child.some)
-
-  final def setChild(child: Option[Node[A]]): TreeSelector[A, this.type] = this match
+  final def withChild(child: Option[Node[A]]): TreeSelector[A, this.type] = this match
     case n: Node[A]      => n.copy(child = child)
     case v: Variation[A] => v.copy(child = child)
 
@@ -79,6 +75,18 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   // or all nodes in the path are Mainline nodes
   def promote[Id](id: Id)(using HasId[A, Id]): Option[TreeSelector[A, this.type]]
 
+  // Add a value as a child or child's variation
+  // if the tree has no child, add value as child
+  // if the value has the same id as the child, merge the values
+  // otherwise add value as a variation (and merge it to one of the existing variation if necessary)
+  final def addValueAsChild[Id](value: A)(using HasId[A, Id], Mergeable[A]): TreeSelector[A, this.type] =
+    addChild(Node(value))
+
+  // Add a node as a child or child's variation
+  def addChild[Id](other: Node[A])(using HasId[A, Id], Mergeable[A]): TreeSelector[A, this.type] =
+    val newChild = child.fold(other)(_.mergeOrAddAsVariation(other))
+    withChild(newChild.some)
+
 type TreeSelector[A, X <: Tree[A]] = X match
   case Node[A]      => Node[A]
   case Variation[A] => Variation[A]
@@ -116,7 +124,7 @@ final case class Node[A](
           case None        => node :: acc
           case Some(child) => loop(n - 1, child, node.withoutChild :: acc)
     if n == 0 then this
-    else loop(n, this, Nil).foldLeft(none[Node[A]])((acc, node) => node.setChild(acc).some).getOrElse(this)
+    else loop(n, this, Nil).foldLeft(none[Node[A]])((acc, node) => node.withChild(acc).some).getOrElse(this)
 
   // get the nth node of in the mainline
   def apply(n: Int): Option[Node[A]] =
@@ -137,7 +145,7 @@ final case class Node[A](
   def modifyChildAt[Id](path: List[Id], f: Node[A] => Option[Node[A]])(using HasId[A, Id]): Option[Node[A]] =
     path match
       case Nil                             => f(this)
-      case head :: Nil if this.hasId(head) => child.map(c => setChild(f(c)))
+      case head :: Nil if this.hasId(head) => child.map(c => withChild(f(c)))
       case head :: rest if this.hasId(head) =>
         child.flatMap(_.modifyChildAt(rest, f)) match
           case None    => None
@@ -200,26 +208,20 @@ final case class Node[A](
   // if not found, return None
   // if found node has no child, add new value as a child
   // if found node has a child, add new value as it's child's variation
-  def addValueAsChildOrVariationAt[Id](path: List[Id], value: A)(using
-      HasId[A, Id],
-      Mergeable[A]
-  ): Option[Node[A]] =
-    modifyAt(path, Tree.addValueAsChildOrVariation(value).toOption)
+  def addValueAsChildAt[Id](path: List[Id], value: A)(using HasId[A, Id], Mergeable[A]): Option[Node[A]] =
+    modifyAt(path, _.addValueAsChild(value).some)
 
-  // add a node with path to the tree
-  // which basically is addChildOrVariationAt with path +: h.getId(value)
-  def addValueAt[Id](path: List[Id])(value: A)(using HasId[A, Id], Mergeable[A]): Option[Node[A]] =
-    addNodeAt(path)(Node(value))
-
-  def addNodeAt[Id](path: List[Id])(other: Node[A])(using HasId[A, Id], Mergeable[A]): Option[Node[A]] =
-    modifyChildAt(path, _.merge(other).some)
+  def addChildAt[Id](path: List[Id], node: Node[A])(using HasId[A, Id], Mergeable[A]): Option[Node[A]] =
+    modifyAt(path, _.addChild(node).some)
 
   def promoteToMainline[Id](path: List[Id])(using HasId[A, Id]): Option[Node[A]] = path match
     case Nil => None
     case head :: Nil =>
       this.promote(head)
     case head :: rest =>
-      this.promote(head).flatMap(x => x.child.flatMap(_.promoteToMainline(rest)).map(c => x.withChild(c)))
+      this
+        .promote(head)
+        .flatMap(x => x.child.flatMap(_.promoteToMainline(rest)).map(c => x.withChild(c.some)))
 
   // findPath
   // find the lastest variation in the path
@@ -297,7 +299,7 @@ final case class Node[A](
     if predicate(value) then f(this).some
     else
       child.flatMap(_.modifyInMainline(predicate, f)) match
-        case Some(c) => withChild(c).some
+        case Some(c) => withChild(c.some).some
         case None    => None
 
   @tailrec
@@ -307,7 +309,7 @@ final case class Node[A](
       case Some(c) => c.lastMainlineNode
 
   def modifyLastMainlineNode(f: Node[A] => Node[A]): Node[A] =
-    child.fold(f(this))(c => withChild(c.modifyLastMainlineNode(f)))
+    child.fold(f(this))(c => withChild(c.modifyLastMainlineNode(f).some))
 
   // map values in the mainline
   // remove all variations
@@ -323,17 +325,22 @@ final case class Node[A](
   def toVariation: Variation[A]        = Variation(value, child)
   def toVariations: List[Variation[A]] = Variation(value, child) +: variations
 
+  // we assume that they have the same path from the roof
   // merge two nodes
-  // in case of same id, merge values
+  // if they have same id, merge values and child, and variations
   // else add as variation
-  def merge[Id](other: Node[A])(using HasId[A, Id], Mergeable[A]): Node[A] =
-    if this.sameId(other) then withValue(value.merge(value)).withVariations(variations.add(other.variations))
-    else withVariations(variations.add(other.toVariations))
+  def mergeOrAddAsVariation[Id](other: Node[A])(using Mergeable[A]): Node[A] =
+    value <> other.value match
+      case Some(newValue) =>
+        val newChild = Tree.merge(child, other.child)
+        Node(newValue, newChild, variations.add(other.variations))
+      case _ =>
+        addVariations(other.toVariations)
 
-  def addVariation[Id](v: Variation[A])(using HasId[A, Id], Mergeable[A]): Node[A] =
+  def addVariation[Id](v: Variation[A])(using Mergeable[A]): Node[A] =
     withVariations(variations.add(v))
 
-  def addVariations[Id](vs: List[Variation[A]])(using HasId[A, Id], Mergeable[A]): Node[A] =
+  def addVariations[Id](vs: List[Variation[A]])(using Mergeable[A]): Node[A] =
     withVariations(variations.add(vs))
 
   def withVariations(variations: List[Variation[A]]): Node[A] =
@@ -361,7 +368,7 @@ final case class Variation[A](override val value: A, override val child: Option[
   ): Option[Variation[A]] =
     path match
       case Nil                             => None
-      case head :: Nil if this.hasId(head) => child.map(c => setChild(f(c)))
+      case head :: Nil if this.hasId(head) => child.map(c => withChild(f(c)))
       case head :: rest if this.hasId(head) =>
         child.flatMap(_.modifyChildAt(rest, f)) match
           case None    => None
@@ -421,53 +428,12 @@ object Tree:
 
   extension [A](tm: TreeMapper[A]) def toOption: TreeMapOption[A] = x => tm(x).some
 
-  // Add a value as a child or variation
-  // if the tree has no child, add value as child
-  // if the value has the same id as the child, merge the values
-  // otherwise add value as a variation (and merge it to one of the existing variation if necessary)
-  def addValueAsChildOrVariation[A, Id]: HasId[A, Id] ?=> Mergeable[A] ?=> A => TreeMapper[A] = value =>
-    tree => addChildOrVariation(Node(value))(tree)
-
-  def addChildOrVariation[A, Id]: HasId[A, Id] ?=> Mergeable[A] ?=> Node[A] => TreeMapper[A] = other =>
-    tree =>
-      val child = tree.child.fold(other)(_.merge(other))
-      tree.withChild(child)
-
-  given [A, Id](using HasId[A, Id]): HasId[Tree[A], Id] =
-    _.value.id
-
-  given [A, Id](using HasId[A, Id]): HasId[Node[A], Id] =
-    _.value.id
-
-  given [A, Id](using HasId[A, Id]): HasId[Variation[A], Id] =
-    _.value.id
-
-  extension [A](vs: List[Variation[A]])
-    // add a variation to the list of variations
-    // if there is already a variation with the same id, merge the values
-    def add[Id](v: Variation[A])(using HasId[A, Id], Mergeable[A]): List[Variation[A]] =
-      @tailrec
-      def loop(acc: List[Variation[A]], rest: List[Variation[A]])(using HasId[A, Id]): List[Variation[A]] =
-        rest match
-          case Nil => acc :+ v
-          case x :: xs =>
-            if x.sameId(v) then (acc ++ (x.withValue(x.value.merge(v.value)) +: xs))
-            else loop(acc :+ x, xs)
-      loop(Nil, vs)
-
-    def add[Id](xs: List[Variation[A]])(using HasId[A, Id], Mergeable[A]): List[Variation[A]] =
-      xs.foldLeft(vs)((acc, x) => acc.add(x))
-
-    def remove[Id](v: Variation[A])(using HasId[A, Id]): List[Variation[A]] =
-      vs.removeById(v.value.id)
-
-    def removeById[Id](id: Id)(using HasId[A, Id]): List[Variation[A]] =
-      vs.foldLeft((false, List.empty[Variation[A]])) { (acc, v) =>
-        if acc._1 then (acc._1, v :: acc._2)
-        else if v.hasId(id) then (true, acc._2)
-        else (false, v :: acc._2)
-      }._2
-        .reverse
+  def merge[A](node: Option[Node[A]], other: Option[Node[A]]): Mergeable[A] ?=> Option[Node[A]] =
+    (node, other) match
+      case (Some(c1), None)     => Some(c1)
+      case (None, Some(c2))     => Some(c2)
+      case (Some(c1), Some(c2)) => Some(c1.mergeOrAddAsVariation(c2))
+      case _                    => None
 
   def build[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
     s.reverse.foldLeft(none[Node[B]])((acc, a) => Node(f(a), acc).some)
@@ -478,4 +444,22 @@ object Tree:
   def buildWithNode[A, B](s: Seq[A], f: A => Node[B]): Option[Node[B]] =
     s.reverse match
       case Nil     => none[Node[B]]
-      case x :: xs => xs.foldLeft(f(x))((acc, a) => f(a).withChild(acc)).some
+      case x :: xs => xs.foldLeft(f(x))((acc, a) => f(a).withChild(acc.some)).some
+
+  given [A, Id](using HasId[A, Id]): HasId[Tree[A], Id] =
+    _.value.id
+
+  given [A, Id](using HasId[A, Id]): HasId[Node[A], Id] =
+    _.value.id
+
+  given [A, Id](using HasId[A, Id]): HasId[Variation[A], Id] =
+    _.value.id
+
+  given [A](using Mergeable[A]): Mergeable[Variation[A]] =
+    new:
+      def merge(a1: Variation[A], a2: Variation[A]) =
+        a1.value <> a2.value match
+          case Some(v) =>
+            val newChild = Tree.merge(a1.child, a2.child)
+            Variation(v, newChild).some
+          case _ => None

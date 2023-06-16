@@ -30,7 +30,9 @@ trait Mergeable[A]:
   def merge(a1: A, a2: A): Option[A]
 
   extension (a: A)
-    infix def <>(other: A): Option[A]                    = merge(a, other)
+    infix def <>(other: A): Option[A] = merge(a, other)
+    // laws
+    // canMerge == merge.isDefined
     def canMerge[Id](other: A): HasId[A, Id] ?=> Boolean = a.sameId(other)
 
   extension (xs: List[A])
@@ -50,5 +52,6 @@ trait Mergeable[A]:
 
       loop(Nil, xs)
 
+    // merge all elements that can be merged together
     def merge: List[A] =
       Nil.add(xs)

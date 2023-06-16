@@ -27,9 +27,9 @@ trait Mergeable[A]:
   // a1.sameId(a2) => Some
   // !a1.sameId(a2) => None
   // a1.merge(a2).flatMap(_.merge(a3)) == a2.merge(a3).flatMap(a1.merge(_))
-  def tryMerge(a1: A, a2: A): Option[A]
+  def merge(a1: A, a2: A): Option[A]
 
-  extension (a1: A) def merge(a2: A): Option[A] = tryMerge(a1, a2)
+  extension (a1: A) infix def <>(a2: A): Option[A] = merge(a1, a2)
 
   extension (xs: List[A])
 
@@ -42,8 +42,11 @@ trait Mergeable[A]:
         rest match
           case Nil => acc :+ v
           case y :: ys =>
-            y.merge(v) match
+            y <> v match
               case Some(m) => acc ++ (m +: ys)
               case _       => loop(acc :+ y, ys)
 
       loop(Nil, xs)
+
+    def merge: List[A] =
+      Nil.add(xs)

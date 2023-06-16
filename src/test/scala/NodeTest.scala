@@ -7,7 +7,6 @@ import cats.syntax.all.*
 import Arbitraries.{ *, given }
 import org.scalacheck.Prop.propBoolean
 import scala.util.Random
-import cats.Monoid
 
 class NodeTest extends ScalaCheckSuite:
 
@@ -300,7 +299,7 @@ class NodeTest extends ScalaCheckSuite:
       vs.exists(_.sameId(v)) ==> {
         val orig   = vs.find(_.sameId(v)).get
         val output = added.find(_.sameId(v)).get
-        orig.value.merge(v.value) == output.value.some
+        orig.value <> v.value == output.value.some
       }
 
   test("variations.add list"):
@@ -315,14 +314,6 @@ class NodeTest extends ScalaCheckSuite:
       val intersected = vs.map(_.id).toSet.intersect(xs.map(_.id).toSet)
       added.map(_.id).toSet.size == vs.map(_.id).toSet.size + xs.map(_.id).toSet.size - intersected.size
 
-  given Monoid[Long] with
-    def empty                     = 0L
-    def combine(x: Long, y: Long) = x + y
-
-  given Monoid[Int] with
-    def empty                   = 0
-    def combine(x: Int, y: Int) = x + y
-
   extension [A](node: Node[A])
     def variationsCount: Long =
       node.child.foldLeft(node.variations.foldMap(_.size))((acc, v) => acc + v.variationsCount)
@@ -330,22 +321,22 @@ class NodeTest extends ScalaCheckSuite:
     def variationIsEmpty: Boolean =
       node.child.foldLeft(node.variations.isEmpty)((acc, v) => acc || v.variationIsEmpty)
 
-  case class Foo(id: Int, name: String)
+case class Foo(id: Int, name: String)
 
-  object Foo:
-    import org.scalacheck.Arbitrary
-    import org.scalacheck.Gen
+object Foo:
+  import org.scalacheck.Arbitrary
+  import org.scalacheck.Gen
 
-    given Arbitrary[Foo] = Arbitrary:
-      for
-        id   <- Arbitrary.arbitrary[Int]
-        name <- Gen.alphaLowerStr
-      yield Foo(id, name)
+  given Arbitrary[Foo] = Arbitrary:
+    for
+      id   <- Arbitrary.arbitrary[Int]
+      name <- Gen.alphaLowerStr
+    yield Foo(id, name)
 
-    given HasId[Foo, Int] with
-      def getId(x: Foo): Int = x.id
+  given HasId[Foo, Int] with
+    def getId(x: Foo): Int = x.id
 
-    given Mergeable[Foo] with
-      def tryMerge(x: Foo, y: Foo): Option[Foo] =
-        if x.id == y.id then Foo(x.id, x.name ++ y.name).some
-        else None
+  given Mergeable[Foo] with
+    def merge(x: Foo, y: Foo): Option[Foo] =
+      if x.id == y.id then Foo(x.id, x.name ++ y.name).some
+      else None

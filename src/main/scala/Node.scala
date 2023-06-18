@@ -29,6 +29,19 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
 
   final def isVariation: Boolean = !this.isNode
 
+  def childAndVariations: List[Tree[A]] = child.toList ++ variations
+
+  def childVariations: List[Tree[A]] =
+    child.fold(Nil)(_.variations)
+
+  def childAndItsVariations: List[Tree[A]] =
+    child.fold(Nil)(x => x +: x.variations)
+
+  def variations: List[Tree[A]] =
+    this match
+      case n: Node[A]      => n.variations
+      case v: Variation[A] => Nil
+
   final def mainlineValues: List[A] =
     @tailrec
     def loop(tree: Tree[A], acc: List[A]): List[A] = tree.child match
@@ -97,7 +110,7 @@ type TreeMapOption[A] = (tree: Tree[A]) => Option[TreeSelector[A, tree.type]]
 final case class Node[A](
     override val value: A,
     override val child: Option[Node[A]] = None,
-    variations: List[Variation[A]] = Nil
+    override val variations: List[Variation[A]] = Nil
 ) extends Tree[A](value, child)
     derives Functor,
       Traverse:
@@ -430,10 +443,8 @@ object Tree:
 
   def merge[A](node: Option[Node[A]], other: Option[Node[A]]): Mergeable[A] ?=> Option[Node[A]] =
     (node, other) match
-      case (Some(c1), None)     => Some(c1)
-      case (None, Some(c2))     => Some(c2)
       case (Some(c1), Some(c2)) => Some(c1.mergeOrAddAsVariation(c2))
-      case _                    => None
+      case _                    => node.orElse(other)
 
   def build[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
     s.reverse.foldLeft(none[Node[B]])((acc, a) => Node(f(a), acc).some)

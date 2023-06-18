@@ -80,6 +80,7 @@ object Sans extends TotalWrapper[Sans, List[San]]
 
 opaque type InitialPosition = List[Comment]
 object InitialPosition extends TotalWrapper[InitialPosition, List[Comment]]:
+  val empty: InitialPosition = Nil
   extension (ip: InitialPosition) inline def comments: List[Comment] = ip
 
 case class Metas(

@@ -2,8 +2,6 @@ package chess
 package format
 package pgn
 
-import cats.syntax.all.*
-
 // Nf6
 opaque type SanStr = String
 object SanStr extends OpaqueString[SanStr]
@@ -21,8 +19,3 @@ object Comment extends TotalWrapper[Comment, String]:
   extension (cs: List[Comment])
     inline def cleanUp: List[Comment] =
       cs.collect { case c if !c.isBlank => c.trim }
-
-case class Initial(comments: List[Comment] = Nil)
-
-object Initial:
-  val empty = Initial(Nil)

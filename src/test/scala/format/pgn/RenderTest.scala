@@ -97,7 +97,7 @@ class RenderTest extends munit.FunSuite:
       val game = makeGame(pgn.tags)
       Pgn(
         tags = pgn.tags,
-        initial = InitialPosition(pgn.initialPosition.comments),
+        initial = pgn.initialPosition,
         tree = pgn.tree.flatMap(_.toPgn(game))
       )
 

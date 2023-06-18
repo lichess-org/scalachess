@@ -19,3 +19,9 @@ object Comment extends TotalWrapper[Comment, String]:
   extension (cs: List[Comment])
     inline def cleanUp: List[Comment] =
       cs.collect { case c if !c.isBlank => c.trim }
+
+opaque type InitialComments = List[Comment]
+object InitialComments extends TotalWrapper[InitialComments, List[Comment]]:
+  val empty: InitialComments = Nil
+
+  extension (ip: InitialComments) inline def comments: List[Comment] = ip

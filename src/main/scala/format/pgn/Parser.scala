@@ -129,11 +129,11 @@ object Parser:
           Node(data, None, vs.flatten)
     }
 
-  val strMoves: P0[(InitialPosition, Option[ParsedPgnTree], Option[String])] =
+  val strMoves: P0[(InitialComments, Option[ParsedPgnTree], Option[String])] =
     ((comment.rep0 ~ strMove.rep0) ~ (result <* escape).? <* comment.rep0).map:
       case ((comments, sans), res) =>
         val node = sans.reverse.foldLeft(none[ParsedPgnTree])((acc, x) => x.copy(child = acc).some)
-        (InitialPosition(comments.cleanUp), node, res)
+        (InitialComments(comments.cleanUp), node, res)
 
   private object MoveParser:
 
@@ -234,7 +234,7 @@ object Parser:
       case (optionalTags, optionalMoves) =>
         val preTags = Tags(optionalTags.map(_.toList).getOrElse(Nil))
         optionalMoves match
-          case None => ParsedPgn(InitialPosition(Nil), preTags, None)
+          case None => ParsedPgn(InitialComments.empty, preTags, None)
           case Some((init, tree, resultOption)) =>
             val tags =
               resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))

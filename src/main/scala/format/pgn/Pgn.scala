@@ -5,7 +5,7 @@ import monocle.syntax.all.*
 
 type PgnTree = Node[Move]
 
-case class Pgn(tags: Tags, initial: Initial, tree: Option[PgnTree]):
+case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
 
   def render: PgnStr = PgnStr:
     toString

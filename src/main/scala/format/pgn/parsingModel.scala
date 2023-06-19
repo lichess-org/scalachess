@@ -19,7 +19,7 @@ case class PgnNodeData(
 
 type ParsedPgnTree = Node[PgnNodeData]
 
-case class ParsedPgn(initialPosition: InitialPosition, tags: Tags, tree: Option[ParsedPgnTree]):
+case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[ParsedPgnTree]):
   def mainline = tree.fold(List.empty[San])(_.mainline.map(_.value.san))
 
 // Standard Algebraic Notation
@@ -77,10 +77,6 @@ case class Castle(side: Side) extends San:
 
 opaque type Sans = List[San]
 object Sans extends TotalWrapper[Sans, List[San]]
-
-opaque type InitialPosition = List[Comment]
-object InitialPosition extends TotalWrapper[InitialPosition, List[Comment]]:
-  extension (ip: InitialPosition) inline def comments: List[Comment] = ip
 
 case class Metas(
     check: Check,

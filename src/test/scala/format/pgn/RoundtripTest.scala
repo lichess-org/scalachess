@@ -8,6 +8,8 @@ class RoundtripTest extends ChessTest:
   "tags" should:
     "roundtrip with special chars" in:
       val value = "aä\\\"'$%/°á \t\b \"\\\\/"
-      Parser.full(Pgn(tags = Tags(List(Tag(_.Site, value))), Initial.empty, None).toString) must beValid.like:
+      Parser.full(
+        Pgn(tags = Tags(List(Tag(_.Site, value))), InitialComments.empty, None).toString
+      ) must beValid.like:
         case parsed =>
           parsed.tags("Site") must_== Some(value)

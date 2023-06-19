@@ -277,7 +277,6 @@ class NodeTest extends ScalaCheckSuite:
       val isContained = vs.exists(_.value.id == v.value.id)
       added.size == vs.size + (if isContained then 0 else 1)
 
-  // override def scalaCheckInitialSeed = "uKNE7Qq674LfGS-xyS3pvOugwah7gz71uiKaHgFB5YO="
   test("variations.add keeps the order"):
     forAll: (vs: List[Variation[Foo]], v: Variation[Foo]) =>
       val added       = vs.add(v)

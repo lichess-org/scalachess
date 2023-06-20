@@ -4,9 +4,8 @@ import cats.syntax.all.*
 import scala.annotation.tailrec
 
 trait HasId[A, Id]:
-  def getId(a: A): Id
   extension (a: A)
-    inline def id: Id                    = getId(a)
+    def id: Id
     inline def sameId(other: A): Boolean = a.id == other.id
     inline def hasId(id: Id): Boolean    = a.id == id
 

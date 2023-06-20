@@ -6,7 +6,8 @@ import org.scalacheck.Prop.forAll
 class HasIdTest extends ScalaCheckSuite:
 
   given HasId[Int, Int] with
-    def getId(a: Int): Int = a
+    extension (a: Int)
+      def id: Int = a
 
   test("removeById.size <= size"):
     forAll: (xs: List[Int], id: Int) =>

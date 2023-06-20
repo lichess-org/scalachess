@@ -13,7 +13,8 @@ class NodeTest extends ScalaCheckSuite:
   import Foo.{ *, given }
 
   given HasId[Int, Int] with
-    def getId(a: Int): Int = a
+    extension (a: Int)
+      def id: Int = a
 
   test("mainline size <= node.size"):
     forAll: (node: Node[Int]) =>
@@ -333,7 +334,8 @@ object Foo:
     yield Foo(id, name)
 
   given HasId[Foo, Int] with
-    def getId(x: Foo): Int = x.id
+    extension (a: Foo)
+      def id: Int = a.id
 
   given Mergeable[Foo] with
     def merge(x: Foo, y: Foo): Option[Foo] =

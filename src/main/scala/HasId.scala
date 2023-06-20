@@ -22,14 +22,15 @@ trait HasId[A, Id]:
         .reverse
 
 trait Mergeable[A]:
-  // laws
-  // a1.sameId(a2) => Some
-  // !a1.sameId(a2) => None
-  // a1.merge(a2).flatMap(_.merge(a3)) == a2.merge(a3).flatMap(a1.merge(_))
-  def merge(a1: A, a2: A): Option[A]
 
   extension (a: A)
-    infix def <>(other: A): Option[A] = merge(a, other)
+
+    // laws
+    // a1.sameId(a2) => Some
+    // !a1.sameId(a2) => None
+    // a1.merge(a2).flatMap(_.merge(a3)) == a2.merge(a3).flatMap(a1.merge(_))
+    def merge(other: A): Option[A]
+
     // laws
     // canMerge == merge.isDefined
     def canMerge[Id](other: A): HasId[A, Id] ?=> Boolean = a.sameId(other)
@@ -45,7 +46,7 @@ trait Mergeable[A]:
         rest match
           case Nil => acc :+ v
           case y :: ys =>
-            y <> v match
+            y.merge(v) match
               case Some(m) => acc ++ (m +: ys)
               case _       => loop(acc :+ y, ys)
 

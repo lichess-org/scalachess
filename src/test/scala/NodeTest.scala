@@ -13,8 +13,7 @@ class NodeTest extends ScalaCheckSuite:
   import Foo.{ *, given }
 
   given HasId[Int, Int] with
-    extension (a: Int)
-      def id: Int = a
+    extension (a: Int) def id: Int = a
 
   test("mainline size <= node.size"):
     forAll: (node: Node[Int]) =>
@@ -299,7 +298,7 @@ class NodeTest extends ScalaCheckSuite:
       vs.exists(_.sameId(v)) ==> {
         val orig   = vs.find(_.sameId(v)).get
         val output = added.find(_.sameId(v)).get
-        orig.value <> v.value == output.value.some
+        orig.value.merge(v.value) == output.value.some
       }
 
   test("variations.add list"):
@@ -334,10 +333,10 @@ object Foo:
     yield Foo(id, name)
 
   given HasId[Foo, Int] with
-    extension (a: Foo)
-      def id: Int = a.id
+    extension (a: Foo) def id: Int = a.id
 
   given Mergeable[Foo] with
-    def merge(x: Foo, y: Foo): Option[Foo] =
-      if x.id == y.id then Foo(x.id, x.name ++ y.name).some
-      else None
+    extension (x: Foo)
+      def merge(y: Foo): Option[Foo] =
+        if x.id == y.id then Foo(x.id, x.name ++ y.name).some
+        else None

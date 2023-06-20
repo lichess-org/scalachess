@@ -355,7 +355,7 @@ final case class Node[A](
   // if they have same id, merge values and child, and variations
   // else add as variation
   def mergeOrAddAsVariation[Id](other: Node[A])(using Mergeable[A]): Node[A] =
-    value <> other.value match
+    value.merge(other.value) match
       case Some(newValue) =>
         val newChild = Tree.merge(child, other.child)
         Node(newValue, newChild, variations.add(other.variations))
@@ -479,11 +479,11 @@ object Tree:
   given [A, Id](using HasId[A, Id]): HasId[Variation[A], Id] =
     _.value.id
 
-  given [A](using Mergeable[A]): Mergeable[Variation[A]] =
-    new:
-      def merge(a1: Variation[A], a2: Variation[A]) =
-        a1.value <> a2.value match
+  given [A](using Mergeable[A]): Mergeable[Variation[A]] with
+    extension (a: Variation[A])
+      def merge(other: Variation[A]): Option[Variation[A]] =
+        a.value.merge(other.value) match
           case Some(v) =>
-            val newChild = Tree.merge(a1.child, a2.child)
+            val newChild = Tree.merge(a.child, other.child)
             Variation(v, newChild).some
           case _ => None

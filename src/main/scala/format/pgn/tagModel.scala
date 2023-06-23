@@ -2,6 +2,7 @@ package chess
 package format.pgn
 
 import cats.syntax.option.*
+import cats.Eq
 import java.time.format.DateTimeFormatter
 
 import chess.format.EpdFen
@@ -91,6 +92,8 @@ object Tags:
   private val DateRegex = """(\d{4}|\?{4})\.(\d\d|\?\?)\.(\d\d|\?\?)""".r
 
 object Tag:
+
+  given Eq[Tag] = Eq.fromUniversalEquals
 
   case object Event extends TagType
   case object Site  extends TagType

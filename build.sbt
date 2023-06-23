@@ -13,7 +13,7 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
     "co.fs2"              %% "fs2-io"            % "3.7.0" % Test,
     "org.typelevel"       %% "discipline-munit"  % "1.0.9" % Test,
     "org.typelevel"       %% "cats-laws"         % "2.9.0" % Test,
-    "com.github.ornicar"  %% "scalalib"          % "9.5.3",
+    "com.github.ornicar"  %% "scalalib"          % "9.5.2",
     "org.typelevel"       %% "cats-core"         % "2.9.0",
     "org.typelevel"       %% "alleycats-core"    % "2.9.0",
     "org.typelevel"       %% "cats-parse"        % "0.3.9",
@@ -38,7 +38,7 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
 )
 
 ThisBuild / organization      := "org.lichess"
-ThisBuild / version           := "15.3.1"
+ThisBuild / version           := "15.3.0"
 ThisBuild / scalaVersion      := "3.3.0"
 ThisBuild / licenses += "MIT" -> url("https://opensource.org/licenses/MIT")
 

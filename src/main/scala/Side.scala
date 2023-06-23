@@ -1,6 +1,9 @@
 package chess
 
-enum Side:
+import cats.Eq
+import cats.derived.*
+
+enum Side derives Eq:
   case KingSide, QueenSide
 
   inline def fold[A](inline k: A, inline q: A): A = if isKingSide then k else q

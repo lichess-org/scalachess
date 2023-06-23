@@ -1,6 +1,9 @@
 package chess
 
-enum Mode(val id: Int, val rated: Boolean):
+import cats.Eq
+import cats.derived.*
+
+enum Mode(val id: Int, val rated: Boolean) derives Eq:
 
   case Casual extends Mode(0, false)
   case Rated  extends Mode(1, true)

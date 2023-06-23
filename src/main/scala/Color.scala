@@ -2,7 +2,10 @@ package chess
 
 import scala.annotation.targetName
 
-enum Color(val name: String, val letter: Char):
+import cats.Eq
+import cats.derived.*
+
+enum Color(val name: String, val letter: Char) derives Eq:
 
   case White extends Color("white", 'w')
   case Black extends Color("black", 'b')

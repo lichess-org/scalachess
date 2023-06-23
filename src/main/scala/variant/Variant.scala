@@ -1,6 +1,7 @@
 package chess
 package variant
 
+import cats.Eq
 import cats.data.Validated
 import cats.syntax.option.*
 
@@ -164,6 +165,8 @@ abstract class Variant private[variant] (
   override def hashCode: Int = id.value
 
 object Variant:
+
+  given Eq[Variant] = Eq.by(_.id)
 
   opaque type Id = Int
   object Id extends OpaqueInt[Id]

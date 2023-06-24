@@ -183,7 +183,7 @@ object Parser:
     val pawnDrop: P[Drop] = (P.char('@') *> dest).map(Drop(Pawn, _))
 
     // optional e.p.
-    val optionalEnPassant = (R.wsp.rep0.soft ~ P.string("e.p.")).void.?
+    val optionalEnPassant = (R.wsp.rep0.soft ~ P.stringIn(List("e.p.", "ep"))).void.?
 
     // d7d5 d7xd5
     val disambiguatedPawn: P[Std] = (((file.? ~ rank.?) ~ x).with1 ~ dest <* optionalEnPassant).map:

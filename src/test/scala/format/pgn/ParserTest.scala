@@ -333,13 +333,17 @@ class ParserTest extends ChessTest:
     parse(chessComCrazyhouse) must beValid.like { a =>
       a.mainline.size must_== 42
     }
+
   "en passant e.p. notation" in:
-    parse(enpassantEP) must beValid.like { a =>
+    parse(enpassantEP) must beValid.like: a =>
       a.mainline.size must_== 36
-    }
-    parse(enpassantEP2) must beValid.like { a =>
+
+    parse(enpassantEP2) must beValid.like: a =>
       a.mainline.size must_== 36
-    }
+
+  "en passant ep notation" in:
+    parse(enpassantEP3) must beValid.like: a =>
+      a.mainline.size must_== 5
 
   "year" in:
     "full date" in:

@@ -39,6 +39,7 @@ object Fixtures:
   val enpassantEP2 = """
 1. d4 Nf6 2. c4 e6 3. Nf3 c5 4. d5 exd5 5. cxd5 d6 6. Nc3 g6 7. Nd2 Bg7 8. e4 O-O 9. Be2 Na6 10. O-O Qe7 11. Re1 Nc7 12. a4 b6 13. h3 Nd7 14. Nb5 Nxb5 15. axb5 Qd8 16. Ra4 Nf6 17. Nf3 a5 18. bxa6e.p. Bd7 1-0
 """
+  val enpassantEP3 = """1.e4 d5 2.e5 f5 3.exf6ep *"""
 
   val recentChessCom = """[Event "Live Chess"]
 [Site "Chess.com"]

@@ -138,7 +138,7 @@ case object Crazyhouse
         val dropWithPawn =
           if pocket contains Pawn then
             for
-              to <- (targets & ~Bitboard.firstRank & ~Bitboard.lastRank)
+              to <- targets & ~Bitboard.firstRank & ~Bitboard.lastRank
               piece = Piece(situation.color, Pawn)
               after = situation.board.place(piece, to).get // this is safe, we checked the target squares
               d2    = data.drop(piece).get                 // this is safe, we checked the pocket

@@ -170,8 +170,7 @@ case class Situation(board: Board, color: Color):
 
     val s1: List[Move] = for
       from <- capturers
-      targets = from.pawnAttacks(color) & them & mask
-      to   <- targets
+      to   <- from.pawnAttacks(color) & them & mask
       move <- genPawnMoves(from, to, true)
     yield move
 
@@ -204,44 +203,38 @@ case class Situation(board: Board, color: Color):
   def genKnight(knights: Bitboard, mask: Bitboard): List[Move] =
     for
       from <- knights
-      targets = Bitboard.knightAttacks(from) & mask
-      to   <- targets
+      to   <- Bitboard.knightAttacks(from) & mask
       move <- normalMove(from, to, Knight, isOccupied(to))
     yield move
 
   def genBishop(bishops: Bitboard, mask: Bitboard): List[Move] =
     for
       from <- bishops
-      targets = from.bishopAttacks(board.occupied) & mask
-      to   <- targets
+      to   <- from.bishopAttacks(board.occupied) & mask
       move <- normalMove(from, to, Bishop, isOccupied(to))
     yield move
 
   def genRook(rooks: Bitboard, mask: Bitboard): List[Move] =
     for
       from <- rooks
-      targets = from.rookAttacks(board.occupied) & mask
-      to   <- targets
+      to   <- from.rookAttacks(board.occupied) & mask
       move <- normalMove(from, to, Rook, isOccupied(to))
     yield move
 
   def genQueen(queens: Bitboard, mask: Bitboard): List[Move] =
     for
       from <- queens
-      targets = from.queenAttacks(board.occupied) & mask
-      to   <- targets
+      to   <- from.queenAttacks(board.occupied) & mask
       move <- normalMove(from, to, Queen, isOccupied(to))
     yield move
 
   def genUnsafeKing(king: Square, mask: Bitboard): List[Move] =
-    val targets = king.kingAttacks & mask
-    targets.flatMap(to => normalMove(king, to, King, isOccupied(to)))
+    (king.kingAttacks & mask).flatMap(to => normalMove(king, to, King, isOccupied(to)))
 
   def genSafeKing(mask: Bitboard): List[Move] =
     ourKing.fold(Nil)(king =>
-      val targets = king.kingAttacks & mask
       for
-        to <- targets
+        to <- king.kingAttacks & mask
         if board.attackers(to, !color).isEmpty
         move <- normalMove(king, to, King, isOccupied(to))
       yield move

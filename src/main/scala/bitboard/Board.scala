@@ -29,18 +29,10 @@ case class Board(
     byColor(piece.color) & byRole(piece.role)
 
   def roleAt(s: Square): Option[Role] =
-    if pawns.contains(s) then Some(Pawn)
-    else if knights.contains(s) then Some(Knight)
-    else if bishops.contains(s) then Some(Bishop)
-    else if rooks.contains(s) then Some(Rook)
-    else if queens.contains(s) then Some(Queen)
-    else if kings.contains(s) then Some(King)
-    else None
+    byRole.findRole(_.contains(s))
 
   def colorAt(s: Square): Option[Color] =
-    if white.contains(s) then Some(Color.White)
-    else if black.contains(s) then Some(Color.Black)
-    else None
+    byColor.findColor(_.contains(s))
 
   def pieceAt(s: Square): Option[Piece] =
     for
@@ -55,7 +47,7 @@ case class Board(
     black.contains(s)
 
   def kings(color: Color): List[Square] =
-    (kings & byColor(color)).squares
+    kingOf(color).squares
 
   def kingOf(c: Color): Bitboard          = kings & byColor(c)
   def kingPosOf(c: Color): Option[Square] = kingOf(c).singleSquare
@@ -165,9 +157,9 @@ case class Board(
   def pieces(occupied: Bitboard): List[Piece] =
     occupied.flatMap(pieceAt)
 
-  def color(c: Color): Bitboard = c.fold(white, black)
+  def color(c: Color): Bitboard = byColor(c)
 
-  def piece(p: Piece): Bitboard = color(p.color) & byRole(p.role)
+  def piece(p: Piece): Bitboard = byColor(p.color) & byRole(p.role)
 
 object Board:
 
@@ -188,7 +180,7 @@ object Board:
     var black    = Bitboard.empty
     var occupied = Bitboard.empty
 
-    pieces.foreach { (s, p) =>
+    pieces.foreach: (s, p) =>
       val position = s.bb
       occupied |= position
       p.role match
@@ -202,5 +194,5 @@ object Board:
       p.color match
         case Color.White => white |= position
         case Color.Black => black |= position
-    }
+
     Board(occupied, ByColor(white, black), ByRole(pawns, knights, bishops, rooks, queens, kings))

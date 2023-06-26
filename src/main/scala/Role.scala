@@ -79,6 +79,15 @@ case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
     case Queen  => copy(queen = f(queen))
     case King   => copy(king = f(king))
 
+  def findRole(f: A => Boolean): Option[Role] =
+    if f(pawn) then Some(Pawn)
+    else if f(knight) then Some(Knight)
+    else if f(bishop) then Some(Bishop)
+    else if f(rook) then Some(Rook)
+    else if f(queen) then Some(Queen)
+    else if f(king) then Some(King)
+    else None
+
   def values: List[A] = List(pawn, knight, bishop, rook, queen, king)
 
 object ByRole:

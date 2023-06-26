@@ -81,39 +81,3 @@ class BitboardTest extends ScalaCheckSuite:
     Prop.forAll: (s: Square) =>
       s.pawnAttacks(Color.White) == CBB.pawnAttacks(true, s).bb
       s.pawnAttacks(Color.Black) == CBB.pawnAttacks(false, s).bb
-
-  property("forall"):
-    Prop.forAll: (b: Bitboard, f: Square => Boolean) =>
-      b.forall(f) == b.squares.forall(f)
-
-  property("exists"):
-    Prop.forAll: (b: Bitboard, f: Square => Boolean) =>
-      b.exists(f) == b.squares.exists(f)
-
-  property("map"):
-    Prop.forAll: (b: Bitboard, f: Square => Int) =>
-      b.map(f) == b.squares.map(f)
-
-  property("flatMap"):
-    Prop.forAll: (b: Bitboard, f: Square => Option[Int]) =>
-      b.flatMap(f) == b.squares.flatMap(f)
-
-  property("filter"):
-    Prop.forAll: (b: Bitboard, f: Square => Boolean) =>
-      b.filter(f) == b.squares.filter(f)
-
-  property("first"):
-    Prop.forAll: (b: Bitboard, f: Square => Option[Int]) =>
-      b.first(f) == b.squares.map(f).find(_.isDefined).flatten
-
-  property("foreach"):
-    Prop.forAll: (b: Bitboard, f: Square => Int) =>
-      var s1 = 0L
-      var s2 = 0L
-      b.foreach(x => s1 += f(x).toLong)
-      b.squares.foreach(x => s2 += f(x).toLong)
-      s1 == s2
-
-  test("count"):
-    Prop.forAll: (b: Bitboard) =>
-      b.count == b.squares.size

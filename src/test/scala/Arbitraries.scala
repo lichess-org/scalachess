@@ -20,6 +20,15 @@ object Arbitraries:
     yield Piece(color, role)
   )
 
+  given [A](using Arbitrary[A]): Arbitrary[ByColor[A]]      = Arbitrary(
+    for
+      w <- Arbitrary.arbitrary[A]
+      b  <- Arbitrary.arbitrary[A]
+    yield ByColor(w, b)
+  )
+
+
+
   given [A](using Arbitrary[A]): Arbitrary[Tree[A]]      = Arbitrary(Gen.oneOf(genNode, genVariation))
   given [A](using Arbitrary[A]): Arbitrary[Node[A]]      = Arbitrary(genNode)
   given [A](using Arbitrary[A]): Arbitrary[Variation[A]] = Arbitrary(genVariation)

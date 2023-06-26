@@ -3,7 +3,7 @@ package chess
 import scala.annotation.targetName
 
 import cats.Eq
-import cats.syntax.eq.*
+import cats.syntax.all.*
 import cats.derived.*
 
 enum Color(val name: String, val letter: Char) derives Eq:
@@ -77,7 +77,7 @@ case class ByColor[A](white: A, black: A):
 
   def map[B](f: A => B): ByColor[B] = map(f, f)
 
-  def all: List[A] = List(white, black)
+  val all: List[A] = List(white, black)
 
   def reduce[B](f: (A, A) => B): B = f(white, black)
 
@@ -88,13 +88,13 @@ case class ByColor[A](white: A, black: A):
   def exists(pred: A => Boolean) = pred(white) || pred(black)
 
   def findColor(pred: A => Boolean): Option[Color] =
-    if pred(white) then Some(White)
-    else if pred(black) then Some(Black)
+    if pred(white) then White.some
+    else if pred(black) then Black.some
     else None
 
   def find(pred: A => Boolean): Option[A] =
-    if pred(white) then Some(white)
-    else if pred(black) then Some(black)
+    if pred(white) then white.some
+    else if pred(black) then black.some
     else None
 
   def contains(a: A): Eq[A] ?=> Boolean =

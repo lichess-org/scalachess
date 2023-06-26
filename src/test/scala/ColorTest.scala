@@ -1,12 +1,11 @@
 package chess
 
-class ColorTest extends ChessTest:
+class ColorTest extends munit.FunSuite:
 
-  "Color" should:
-    "unary !" in:
-      "white" in { !White must_== Black }
-      "black" in { !Black must_== White }
+  test("unary !"):
+    assertEquals(!White, Black)
+    assertEquals(!Black, White)
 
-    "passablePawnRank" in:
-      "white" in { White.passablePawnRank == Rank.Fifth }
-      "black" in { Black.passablePawnRank == Rank.Fourth }
+  test("passablePawnRank"):
+    assertEquals(White.passablePawnRank, Rank.Fifth)
+    assertEquals(Black.passablePawnRank, Rank.Fourth)

@@ -47,14 +47,13 @@ class BitboardTest extends ScalaCheckSuite:
     yield assertEquals(result, expected.bb)
 
   property("slidingAttack check"):
-    Prop.forAll { (occupied: Bitboard, s: Square) =>
+    Prop.forAll: (occupied: Bitboard, s: Square) =>
       val result = for
         deltas <- allDeltas
         result   = Bitboard.slidingAttacks(s, occupied, deltas)
         expected = CBB.slidingAttacks(s, occupied, deltas)
       yield result == expected.bb
       result.forall(identity)
-    }
 
   test("init function"):
     assertEquals(Bitboard.KNIGHT_ATTACKS.toSeq, CBB.KNIGHT_ATTACKS.toSeq)
@@ -67,28 +66,54 @@ class BitboardTest extends ScalaCheckSuite:
     }
 
   property("bishop attacks"):
-    Prop.forAll { (occupied: Bitboard, s: Square) =>
+    Prop.forAll: (occupied: Bitboard, s: Square) =>
       s.bishopAttacks(occupied) == CBB.bishopAttacks(s, occupied).bb
-    }
 
   property("rook attacks"):
-    Prop.forAll { (occupied: Bitboard, s: Square) =>
+    Prop.forAll: (occupied: Bitboard, s: Square) =>
       s.rookAttacks(occupied) == CBB.rookAttacks(s, occupied).bb
-    }
 
   property("queen attacks"):
-    Prop.forAll { (occupied: Bitboard, s: Square) =>
+    Prop.forAll: (occupied: Bitboard, s: Square) =>
       s.queenAttacks(occupied) == CBB.queenAttacks(s, occupied).bb
-    }
 
   property("pawn attacks"):
-    Prop.forAll { (s: Square) =>
+    Prop.forAll: (s: Square) =>
       s.pawnAttacks(Color.White) == CBB.pawnAttacks(true, s).bb
       s.pawnAttacks(Color.Black) == CBB.pawnAttacks(false, s).bb
-    }
+
+  property("forall"):
+    Prop.forAll: (b: Bitboard, f: Square => Boolean) =>
+      b.forall(f) == b.squares.forall(f)
+
+  property("exists"):
+    Prop.forAll: (b: Bitboard, f: Square => Boolean) =>
+      b.exists(f) == b.squares.exists(f)
+
+  property("map"):
+    Prop.forAll: (b: Bitboard, f: Square => Int) =>
+      b.map(f) == b.squares.map(f)
+
+  property("flatMap"):
+    Prop.forAll: (b: Bitboard, f: Square => Option[Int]) =>
+      b.flatMap(f) == b.squares.flatMap(f)
+
+  property("filter"):
+    Prop.forAll: (b: Bitboard, f: Square => Boolean) =>
+      b.filter(f) == b.squares.filter(f)
+
+  property("first"):
+    Prop.forAll: (b: Bitboard, f: Square => Option[Int]) =>
+      b.first(f) == b.squares.map(f).find(_.isDefined).flatten
+
+  property("foreach"):
+    Prop.forAll: (b: Bitboard, f: Square => Int) =>
+      var s1 = 0L
+      var s2 = 0L
+      b.foreach(x => s1 += f(x).toLong)
+      b.squares.foreach(x => s2 += f(x).toLong)
+      s1 == s2
 
   test("count"):
-    assertEquals(1024L.bb.count, 1)
-    assertEquals(4264L.bb.count, 4)
-    assertEquals((1L.bb & Square.A1.bb).nonEmpty, true)
-    assertEquals(Castles(1L).can(White), true)
+    Prop.forAll: (b: Bitboard) =>
+      b.count == b.squares.size

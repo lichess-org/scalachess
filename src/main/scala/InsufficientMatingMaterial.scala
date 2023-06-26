@@ -10,7 +10,7 @@ object InsufficientMatingMaterial:
   // verify if there are at least two bishops of opposite color
   // no matter which sides they are on
   def bishopsOnOppositeColors(board: Board) =
-    board.bishops.squares.map(_.isLight).distinct.size == 2
+    board.bishops.map(_.isLight).distinct.size == 2
 
   /*
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn

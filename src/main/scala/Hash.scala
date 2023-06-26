@@ -97,7 +97,7 @@ object Hash extends OpaqueInt[Hash]:
 
     // Hash in special crazyhouse data.
     board.crazyData.fold(hchecks) { data =>
-      val hcrazypromotions: Long = data.promoted.squares
+      val hcrazypromotions: Long = data.promoted
         .map { p => table.crazyPromotionMasks(p.hashCode) }
         .fold(hchecks)(_ ^ _)
       Color.all

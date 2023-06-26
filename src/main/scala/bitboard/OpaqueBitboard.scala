@@ -44,7 +44,13 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
       else first
 
     def squares: List[Square] =
-      fold(List.empty)((xs, square) => square :: xs)
+      var b       = a.value
+      val builder = List.newBuilder[Square]
+      while b != 0L
+      do
+        builder += b.lsb.get
+        b &= (b - 1L)
+      builder.result
 
     // total non empty position
     def count: Int = java.lang.Long.bitCount(a)
@@ -85,12 +91,58 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
         b &= (b - 1L)
       result
 
+    def filter(f: Square => Boolean): List[Square] =
+      val builder = List.newBuilder[Square]
+      var b       = a.value
+      while b != 0L
+      do
+        if f(b.lsb.get) then builder += b.lsb.get
+        b &= (b - 1L)
+      builder.result
+
+    def withFilter(f: Square => Boolean): List[Square] =
+      filter(f)
+
+    def foreach[U](f: Square => U): Unit =
+      var b = a.value
+      while b != 0L
+      do
+        f(b.lsb.get)
+        b &= (b - 1L)
+
+    def forall[B](f: Square => Boolean): Boolean =
+      var b      = a.value
+      var result = true
+      while b != 0L && result
+      do
+        result = f(b.lsb.get)
+        b &= (b - 1L)
+      result
+
+    def exists[B](f: Square => Boolean): Boolean =
+      var b      = a.value
+      var result = false
+      while b != 0L && !result
+      do
+        result = f(b.lsb.get)
+        b &= (b - 1L)
+      result
+
     def flatMap[B](f: Square => IterableOnce[B]): List[B] =
       var b       = a.value
       val builder = List.newBuilder[B]
       while b != 0L
       do
         builder ++= f(b.lsb.get)
+        b &= (b - 1L)
+      builder.result
+
+    def map[B](f: Square => B): List[B] =
+      var b       = a.value
+      val builder = List.newBuilder[B]
+      while b != 0L
+      do
+        builder += f(b.lsb.get)
         b &= (b - 1L)
       builder.result
 

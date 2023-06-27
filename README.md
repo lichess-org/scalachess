@@ -35,6 +35,10 @@ To run quick benchmarks (results may be inaccurate):
 
     bench / Jmh / run -i 1 -wi 1 -f1 -t1
 
+To run benchmarks for a specific class:
+
+    bench / Jmh / run -rf json .*PlayBench.*
+
 Code formatting
 ---------------
 

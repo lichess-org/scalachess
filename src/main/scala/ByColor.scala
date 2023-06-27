@@ -27,6 +27,7 @@ case class ByColor[A](white: A, black: A):
   def reduce[B](f: (A, A) => B): B = f(white, black)
 
   def fold[B](init: B)(f: (B, A) => B): B = f(f(init, white), black)
+  def fold[B](init: B)(f: (B, Color, A) => B): B = f(f(init, White, white), Black, black)
 
   def foreach[U](f: A => U): Unit =
     f(white)

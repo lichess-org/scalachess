@@ -31,6 +31,17 @@ class ByColorTest extends ScalaCheckSuite:
     forAll: (bc: ByColor[Int], init: String, f: (String, Int) => String) =>
       bc.fold(init)(f) == bc.all.foldLeft(init)(f)
 
+  test("fold == fold ignore color"):
+    forAll: (bc: ByColor[Int], init: String, f: (String, Int) => String) =>
+      bc.fold(init)(f) == bc.fold(init)((acc, _, i) => f(acc, i))
+
+  test("foreach"):
+    forAll: (bc: ByColor[Int], f: Int => String) =>
+      var acc = ""
+      bc.foreach: i =>
+        acc ++= f(i)
+      acc == bc.map(f).reduce(_ ++ _)
+
   test("forall"):
     forAll: (bc: ByColor[Int], f: Int => Boolean) =>
       bc.forall(f) == bc.all.forall(f)

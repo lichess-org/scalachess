@@ -79,6 +79,21 @@ case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
     case Queen  => copy(queen = f(queen))
     case King   => copy(king = f(king))
 
+  def find(f: A => Boolean): Option[A] =
+    if f(pawn) then Some(pawn)
+    else if f(knight) then Some(knight)
+    else if f(bishop) then Some(bishop)
+    else if f(rook) then Some(rook)
+    else if f(queen) then Some(queen)
+    else if f(king) then Some(king)
+    else None
+
+  def fold[B](z: B)(f: (B, A) => B): B =
+    f(f(f(f(f(f(z, pawn), knight), bishop), rook), queen), king)
+
+  def fold[B](z: B)(f: (B, Role, A) => B): B =
+    f(f(f(f(f(f(z, Pawn, pawn), Knight, knight), Bishop, bishop), Rook, rook), Queen, queen), King, king)
+
   def findRole(f: A => Boolean): Option[Role] =
     if f(pawn) then Some(Pawn)
     else if f(knight) then Some(Knight)
@@ -91,7 +106,9 @@ case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
   def values: List[A] = List(pawn, knight, bishop, rook, queen, king)
 
 object ByRole:
+
   def apply[A](a: A): ByRole[A] = ByRole(a, a, a, a, a, a)
+
   given Functor[ByRole] with
     def map[A, B](byRole: ByRole[A])(f: A => B): ByRole[B] =
       ByRole(

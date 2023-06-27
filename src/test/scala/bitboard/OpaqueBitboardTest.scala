@@ -66,6 +66,12 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
     forAll: (bb: Bitboard, square: Square) =>
       !bb.contains(square) ==> assertEquals(bb.addSquare(square).removeSquare(square), bb)
 
+  test("move == addSquare. removeSquare"):
+    forAll: (bb: Bitboard, from: Square, to: Square) =>
+      from != to ==> {
+        bb.move(from, to) == bb.addSquare(to).removeSquare(from)
+      }
+
   test("apply(Set[square]).squares.toSet == Set[square]"):
     forAll: (xs: Set[Square]) =>
       val result = Bitboard(xs).squares.toSet

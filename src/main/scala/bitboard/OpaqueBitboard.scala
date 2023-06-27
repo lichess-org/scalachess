@@ -35,6 +35,9 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
     def addSquare(square: Square): A    = a | square.bb
     def removeSquare(square: Square): A = a & ~square.bb
 
+    def move(from: Square, to: Square): A =
+      a & ~from.bb | to.bb
+
     def moreThanOne: Boolean =
       (a.value & (a.value - 1L)) != 0L
 

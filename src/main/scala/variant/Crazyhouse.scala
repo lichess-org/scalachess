@@ -6,6 +6,7 @@ import cats.syntax.option.*
 import cats.data.Validated
 import chess.format.EpdFen
 import bitboard.Bitboard
+import monocle.syntax.all.*
 
 case object Crazyhouse
     extends Variant(
@@ -158,27 +159,22 @@ case object Crazyhouse
   ):
 
     def drop(piece: Piece): Option[Data] =
-      pockets take piece map { nps =>
-        copy(pockets = nps)
-      }
+      this.focus(_.pockets).modifyF(_.take(piece))
 
     def store(piece: Piece, from: Square): Data =
+      val storedPiece = if promoted.contains(from) then piece.color.pawn else piece
       copy(
-        pockets = pockets store {
-          if promoted.contains(from) then piece.color.pawn else piece
-        },
+        pockets = pockets.store(storedPiece),
         promoted = promoted.removeSquare(from)
       )
 
-    def promote(square: Square) = copy(promoted = promoted.addSquare(square))
+    def promote(square: Square): Data = copy(promoted = promoted.addSquare(square))
 
-    def move(orig: Square, dest: Square) =
-      copy(
-        promoted = if promoted.contains(orig) then promoted.removeSquare(orig).addSquare(dest) else promoted
-      )
+    def move(orig: Square, dest: Square): Data =
+      if promoted.contains(orig) then copy(promoted = promoted.move(orig, dest)) else this
 
-    def isEmpty = pockets.white.isEmpty && pockets.black.isEmpty
-    def size    = pockets.white.size + pockets.black.size
+    def isEmpty = pockets.forall(_.isEmpty)
+    def size    = pockets.reduce(_.size + _.size)
 
   object Data:
     val init = Data(ByColor(Pocket.empty), Bitboard.empty)
@@ -186,9 +182,7 @@ case object Crazyhouse
   extension (pockets: Pockets)
 
     def take(piece: Piece): Option[Pockets] =
-      pockets(piece.color).take(piece.role).map { np =>
-        pockets.update(piece.color, _ => np)
-      }
+      pockets.update(piece.color, _.take(piece.role))
 
     def store(piece: Piece): Pockets =
       pockets.update(!piece.color, _.store(piece.role))

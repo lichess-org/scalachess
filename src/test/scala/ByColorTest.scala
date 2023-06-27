@@ -50,3 +50,12 @@ class ByColorTest extends ScalaCheckSuite:
   test("find"):
     forAll: (bc: ByColor[Int], f: Int => Boolean) =>
       bc.find(f) == bc.all.find(f)
+
+
+  test("flip"):
+    forAll: (bc: ByColor[Int]) =>
+      bc.flip == ByColor(bc(Black), bc(White))
+
+  test("flip.flip == id"):
+    forAll: (bc: ByColor[Int]) =>
+      bc.flip.flip == bc

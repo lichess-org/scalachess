@@ -22,15 +22,21 @@ case class ByColor[A](white: A, black: A):
 
   def map[B](f: A => B): ByColor[B] = map(f, f)
 
-  val all: List[A] = List(white, black)
+  lazy val all: List[A] = List(white, black)
 
   def reduce[B](f: (A, A) => B): B = f(white, black)
 
   def fold[B](init: B)(f: (B, A) => B): B = f(f(init, white), black)
 
+  def foreach[U](f: A => U): Unit =
+    f(white)
+    f(black)
+
   def forall(pred: A => Boolean) = pred(white) && pred(black)
 
   def exists(pred: A => Boolean) = pred(white) || pred(black)
+
+  def flip: ByColor[A] = copy(white = black, black = white)
 
   def findColor(pred: A => Boolean): Option[Color] =
     if pred(white) then White.some

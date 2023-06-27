@@ -1,7 +1,7 @@
 package chess
 package bitboard
 
-import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.{ Arbitrary, Cogen, Gen }
 
 object Arbitraries:
 
@@ -10,3 +10,5 @@ object Arbitraries:
   given Arbitrary[Square] = Arbitrary(Gen.oneOf(Square.all))
 
   given Arbitrary[Bitboard] = Arbitrary(Gen.long.map(Bitboard(_)))
+
+  given Cogen[Square] = Cogen(_.value.toLong)

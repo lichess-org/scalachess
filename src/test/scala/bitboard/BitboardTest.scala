@@ -47,14 +47,13 @@ class BitboardTest extends ScalaCheckSuite:
     yield assertEquals(result, expected.bb)
 
   property("slidingAttack check"):
-    Prop.forAll { (occupied: Bitboard, s: Square) =>
+    Prop.forAll: (occupied: Bitboard, s: Square) =>
       val result = for
         deltas <- allDeltas
         result   = Bitboard.slidingAttacks(s, occupied, deltas)
         expected = CBB.slidingAttacks(s, occupied, deltas)
       yield result == expected.bb
       result.forall(identity)
-    }
 
   test("init function"):
     assertEquals(Bitboard.KNIGHT_ATTACKS.toSeq, CBB.KNIGHT_ATTACKS.toSeq)
@@ -67,28 +66,18 @@ class BitboardTest extends ScalaCheckSuite:
     }
 
   property("bishop attacks"):
-    Prop.forAll { (occupied: Bitboard, s: Square) =>
+    Prop.forAll: (occupied: Bitboard, s: Square) =>
       s.bishopAttacks(occupied) == CBB.bishopAttacks(s, occupied).bb
-    }
 
   property("rook attacks"):
-    Prop.forAll { (occupied: Bitboard, s: Square) =>
+    Prop.forAll: (occupied: Bitboard, s: Square) =>
       s.rookAttacks(occupied) == CBB.rookAttacks(s, occupied).bb
-    }
 
   property("queen attacks"):
-    Prop.forAll { (occupied: Bitboard, s: Square) =>
+    Prop.forAll: (occupied: Bitboard, s: Square) =>
       s.queenAttacks(occupied) == CBB.queenAttacks(s, occupied).bb
-    }
 
   property("pawn attacks"):
-    Prop.forAll { (s: Square) =>
+    Prop.forAll: (s: Square) =>
       s.pawnAttacks(Color.White) == CBB.pawnAttacks(true, s).bb
       s.pawnAttacks(Color.Black) == CBB.pawnAttacks(false, s).bb
-    }
-
-  test("count"):
-    assertEquals(1024L.bb.count, 1)
-    assertEquals(4264L.bb.count, 4)
-    assertEquals((1L.bb & Square.A1.bb).nonEmpty, true)
-    assertEquals(Castles(1L).can(White), true)

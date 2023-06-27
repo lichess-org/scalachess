@@ -13,7 +13,7 @@ case class Glyphs(
 
   def isEmpty = this == Glyphs.empty
 
-  def nonEmpty: Option[Glyphs] = if isEmpty then None else Option(this)
+  def nonEmpty: Option[Glyphs] = Option.when(!isEmpty)(this)
 
   def toggle(glyph: Glyph) =
     glyph match

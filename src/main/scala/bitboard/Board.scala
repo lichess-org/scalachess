@@ -90,11 +90,10 @@ case class Board(
       ourKing.rookAttacks(Bitboard.empty) & (rooks ^ queens) |
         ourKing.bishopAttacks(Bitboard.empty) & (bishops ^ queens)
     )
-    snipers.squares.foldLeft(Bitboard.empty) { case (blockers, sniper) =>
+    snipers.fold(Bitboard.empty): (blockers, sniper) =>
       val between = Bitboard.between(ourKing, sniper) & occupied
       if between.moreThanOne then blockers
       else blockers | between
-    }
 
   def discard(s: Square): Board =
     discard(s.bb)
@@ -164,7 +163,7 @@ case class Board(
   def pieces: List[Piece] = pieces(occupied)
 
   def pieces(occupied: Bitboard): List[Piece] =
-    occupied.squares.flatMap(pieceAt)
+    occupied.flatMap(pieceAt)
 
   def color(c: Color): Bitboard = c.fold(white, black)
 

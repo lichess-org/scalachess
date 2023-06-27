@@ -130,7 +130,7 @@ case object Crazyhouse
           for
             role <- List(Knight, Bishop, Rook, Queen)
             if pocket contains role
-            to <- targets.squares
+            to <- targets
             piece = Piece(situation.color, role)
             after = situation.board.place(piece, to).get // this is safe, we checked the target squares
             d2    = data.drop(piece).get                 // this is safe, we checked the pocket
@@ -138,7 +138,7 @@ case object Crazyhouse
         val dropWithPawn =
           if pocket contains Pawn then
             for
-              to <- (targets & ~Bitboard.firstRank & ~Bitboard.lastRank).squares
+              to <- targets & ~Bitboard.firstRank & ~Bitboard.lastRank
               piece = Piece(situation.color, Pawn)
               after = situation.board.place(piece, to).get // this is safe, we checked the target squares
               d2    = data.drop(piece).get                 // this is safe, we checked the pocket
@@ -228,7 +228,7 @@ case object Crazyhouse
         case King   => None
 
     def take(role: Role): Option[Pocket] =
-      update(role, (x => if x > 0 then Some(x - 1) else None))
+      update(role, (x => Option.when(x > 0)(x - 1)))
 
     def store(role: Role): Pocket = update(role, _ + 1)
 
@@ -251,6 +251,4 @@ case object Crazyhouse
   object Pocket:
     val empty = Pocket(0, 0, 0, 0, 0)
     def apply(roles: List[Role]): Pocket =
-      roles.foldLeft(empty) { (p, r) =>
-        p store r
-      }
+      roles.foldLeft(empty)(_ store _)

@@ -53,6 +53,9 @@ case class ByColor[A](white: A, black: A):
   def find[B](f: A => Option[B]): Option[B] =
     f(white).orElse(f(black))
 
+  def collect[B](f: PartialFunction[A, B]): Option[B] =
+    f.lift(white).orElse(f.lift(black))
+
   def contains(a: A): Eq[A] ?=> Boolean =
     exists(_ === a)
 

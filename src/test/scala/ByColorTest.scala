@@ -10,6 +10,26 @@ class ByColorTest extends ScalaCheckSuite:
     forAll: (bc: ByColor[Int], f: Int => String) =>
       bc.map(f) == bc.map(f, f)
 
+  test("mapList == all.map"):
+    forAll: (bc: ByColor[Int], f: Int => String) =>
+      bc.mapList(f) == bc.all.map(f)
+
+  test("mapReduce == map.reduce"):
+    forAll: (bc: ByColor[Int], f: Int => String) =>
+      bc.mapReduce(f)(_ + _) == bc.map(f).reduce(_ + _)
+
+  test("mapWithColor == zipColor.map"):
+    forAll: (bc: ByColor[Int], f: (Color, Int) => String) =>
+      bc.mapWithColor(f) == bc.zipColor.map(f.tupled)
+
+  test("zipColor.map(_._2) == identity"):
+    forAll: (bc: ByColor[Int]) =>
+      bc.zipColor.map(_._2) == bc
+
+  test("zip = zip(identity)"):
+    forAll: (bc: ByColor[Int], other: ByColor[String]) =>
+      bc.zip(other) == bc.zip(other, (a, b) => (a, b))
+
   test("apply"):
     forAll: (bc: ByColor[Int]) =>
       ByColor(bc(White), bc(Black)) == bc

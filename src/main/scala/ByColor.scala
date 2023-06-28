@@ -20,7 +20,16 @@ case class ByColor[A](white: A, black: A):
 
   def map[B](fw: A => B, fb: A => B) = copy(white = fw(white), black = fb(black))
 
-  def map[B](f: A => B): ByColor[B] = map(f, f)
+  def map[B](f: A => B): ByColor[B]                 = map(f, f)
+  def mapList[B](f: A => B): List[B]                = List(f(white), f(black))
+  def mapReduce[B, C](f: A => B)(r: (B, B) => C): C = r(f(white), f(black))
+
+  def mapWithColor[B](f: (Color, A) => B): ByColor[B] = ByColor(f(White, white), f(Black, black))
+
+  def zip[B](other: ByColor[B]): ByColor[(A, B)] = ByColor((white, other.white), (black, other.black))
+  def zip[B, C](other: ByColor[B], f: (A, B) => C): ByColor[C] =
+    ByColor(f(white, other.white), f(black, other.black))
+  def zipColor: ByColor[(Color, A)] = ByColor((White, white), (Black, black))
 
   lazy val all: List[A] = List(white, black)
 

@@ -1,6 +1,6 @@
 package chess
 
-import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.{ Arbitrary, Cogen, Gen }
 import cats.kernel.Eq
 
 object Arbitraries:
@@ -12,6 +12,7 @@ object Arbitraries:
   given Arbitrary[File]    = Arbitrary(Gen.oneOf(File.all))
   given Arbitrary[Rank]    = Arbitrary(Gen.oneOf(Rank.all))
   given Arbitrary[Square]  = Arbitrary(Gen.oneOf(Square.all))
+  given Cogen[Color]       = Cogen(x => if x == White then 0L else 1L)
 
   given Arbitrary[Piece] = Arbitrary(
     for

@@ -1,6 +1,6 @@
 package chess
 
-import cats.Eq
+import cats.{ Applicative, Eq }
 import cats.syntax.all.*
 import scala.annotation.targetName
 
@@ -30,6 +30,7 @@ case class ByColor[A](white: A, black: A):
   def zip[B, C](other: ByColor[B], f: (A, B) => C): ByColor[C] =
     ByColor(f(white, other.white), f(black, other.black))
   def zipColor: ByColor[(Color, A)] = ByColor((White, white), (Black, black))
+  def toPair: (A, A)                = (white, black)
 
   lazy val all: List[A] = List(white, black)
 
@@ -70,6 +71,9 @@ case class ByColor[A](white: A, black: A):
 
   def flatMap[B](f: A => IterableOnce[B]): List[B] =
     all.flatMap(f)
+
+  def traverse[F[_], B](f: A => F[B]): Applicative[F] ?=> F[ByColor[B]] =
+    (f(white), f(black)).mapN(ByColor(_, _))
 
 object ByColor:
   def apply[A](a: A): ByColor[A]          = ByColor(a, a)

@@ -1,5 +1,6 @@
 package chess
 
+import cats.syntax.all.*
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop.forAll
 import Arbitraries.given
@@ -29,6 +30,10 @@ class ByColorTest extends ScalaCheckSuite:
   test("zip = zip(identity)"):
     forAll: (bc: ByColor[Int], other: ByColor[String]) =>
       bc.zip(other) == bc.zip(other, (a, b) => (a, b))
+
+  test("toPair"):
+    forAll: (bc: ByColor[Int]) =>
+      bc.toPair == (bc(White), bc(Black))
 
   test("apply"):
     forAll: (bc: ByColor[Int]) =>
@@ -94,3 +99,7 @@ class ByColorTest extends ScalaCheckSuite:
   test("flip.flip == id"):
     forAll: (bc: ByColor[Int]) =>
       bc.flip.flip == bc
+
+  test("traverse"):
+    forAll: (bc: ByColor[Int], f: Int => Option[String]) =>
+      bc.traverse(f).map(_.all) == bc.all.traverse(f)

@@ -34,7 +34,7 @@ object Dumper:
 
         val disambiguation: String =
           if candidates.isEmpty then ""
-          else if !candidates.exists(_.onSameLine(orig)) then orig.file.char.toString
+          else if !candidates.exists(_.onSameFile(orig)) then orig.file.char.toString
           else if !candidates.exists(_.onSameRank(orig)) then orig.rank.char.toString
           else orig.key
 

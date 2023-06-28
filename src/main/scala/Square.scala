@@ -19,6 +19,8 @@ object Square extends OpaqueInt[Square]:
 
     inline def ?<(inline other: Square): Boolean = file < other.file
     inline def ?>(inline other: Square): Boolean = file > other.file
+    inline def ?+(inline other: Square): Boolean = rank < other.rank
+    inline def ?^(inline other: Square): Boolean = rank > other.rank
 
     inline def onSameFile(inline other: Square): Boolean = file == other.file
     inline def onSameRank(inline other: Square): Boolean = rank == other.rank

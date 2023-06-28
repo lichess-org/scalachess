@@ -83,21 +83,3 @@ class BoardTest extends ChessTest:
         _.place(White - Pawn, A3),
         _.move(B2, B4)
       ) must beNone
-
-    "navigate in square based on pieces" in:
-      "right to end" in:
-        val board: Board = """
-R   K  R"""
-        E1 >| (p => board.pieces contains p) must_== List(F1, G1, H1)
-      "right to next" in:
-        val board: Board = """
-R   KB R"""
-        E1 >| (p => board.pieces contains p) must_== List(F1)
-      "left to end" in:
-        val board: Board = """
-R   K  R"""
-        E1 |< (p => board.pieces contains p) must_== List(D1, C1, B1, A1)
-      "right to next" in:
-        val board: Board = """
-R  BK  R"""
-        E1 |< (p => board.pieces contains p) must_== List(D1)

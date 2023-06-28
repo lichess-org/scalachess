@@ -59,6 +59,8 @@ object Hash extends OpaqueInt[Hash]:
 
   private def get(situation: Situation, table: ZobristConstants): Long =
 
+    extension (xs: Iterable[Long]) def computeHash(seed: Long): Long = xs.fold(seed)(_ ^ _)
+
     def crazyPocketMask(role: Role, colorshift: Int, count: Int): Option[Long] =
       // There should be no kings and at most 16 pieces of any given type
       // in a pocket.
@@ -70,15 +72,14 @@ object Hash extends OpaqueInt[Hash]:
 
     val hpieces = board.pieces
       .map((square, piece) => table.actorMasks(pieceIndex(square, piece)))
-      .fold(hturn)(_ ^ _)
+      .computeHash(hturn)
 
     val hcastling =
       if board.variant.allowsCastling then
         (situation.history.castles.toSeq.view zip table.castlingMasks)
           .collect:
-            case (true, castlingMask) =>
-              castlingMask
-          .fold(hpieces)(_ ^ _)
+            case (true, castlingMask) => castlingMask
+          .computeHash(hpieces)
       else hpieces
 
     val hep = situation.enPassantSquare.fold(hcastling): square =>
@@ -98,14 +99,14 @@ object Hash extends OpaqueInt[Hash]:
 
       val hcrazypromotions: Long = data.promoted
         .map(s => table.crazyPromotionMasks(s.hashCode))
-        .fold(hchecks)(_ ^ _)
+        .computeHash(hchecks)
 
       data.pockets
         .mapWithColor: (color, pocket) =>
           val colorshift = color.fold(79, -1)
           pocket.map((role, size) => crazyPocketMask(role, colorshift, size))
         .flatten
-        .fold(hcrazypromotions)(_ ^ _)
+        .computeHash(hcrazypromotions)
 
   end get
 

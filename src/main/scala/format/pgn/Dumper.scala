@@ -33,16 +33,13 @@ object Dumper:
           )
 
         val disambiguation: String =
-          if (candidates.isEmpty)
-            ""
-          else if (!candidates.exists(_ ?| orig))
-            orig.file.char.toString
-          else if (!candidates.exists(_ ?- orig))
-            orig.rank.char.toString
-          else
-            orig.key
+          if candidates.isEmpty then ""
+          else if !candidates.exists(_.onSameLine(orig)) then orig.file.char.toString
+          else if !candidates.exists(_.onSameRank(orig)) then orig.rank.char.toString
+          else orig.key
 
-        s"${role.pgn}$disambiguation${if (captures) "x" else ""}${dest.key}"
+        val x = if captures then "x" else ""
+        s"${role.pgn}$disambiguation$x${dest.key}"
 
     SanStr(s"$base${checkOrWinnerSymbol(next)}")
 

@@ -1,10 +1,11 @@
 package chess
 
-import scala.math.{ abs, max, min }
+import scala.math.abs
+import chess.bitboard.Bitboard
 
 opaque type Square = Int
 object Square extends OpaqueInt[Square]:
-  extension (p: Square)
+  extension (s: Square)
     inline def down: Option[Square]      = Square.at(file.value, rank.value - 1)
     inline def left: Option[Square]      = Square.at(file.value - 1, rank.value)
     inline def downLeft: Option[Square]  = Square.at(file.value - 1, rank.value - 1)
@@ -14,50 +15,36 @@ object Square extends OpaqueInt[Square]:
     inline def upLeft: Option[Square]    = Square.at(file.value - 1, rank.value + 1)
     inline def upRight: Option[Square]   = Square.at(file.value + 1, rank.value + 1)
 
-    inline def prevRank(color: Color) = color.fold(p.down, p.up)
-
-    def >|(stop: Square => Boolean): List[Square] = |<>|(stop, _.right)
-    def |<(stop: Square => Boolean): List[Square] = |<>|(stop, _.left)
-    def |<>|(stop: Square => Boolean, dir: Direction): List[Square] =
-      dir(p) map { p =>
-        p :: (if (stop(p)) Nil else p.|<>|(stop, dir))
-      } getOrElse Nil
+    inline def prevRank(color: Color) = color.fold(s.down, s.up)
 
     inline def ?<(inline other: Square): Boolean = file < other.file
     inline def ?>(inline other: Square): Boolean = file > other.file
-    inline def ?+(inline other: Square): Boolean = rank < other.rank
-    inline def ?^(inline other: Square): Boolean = rank > other.rank
-    inline def ?|(inline other: Square): Boolean = file == other.file
-    inline def ?-(inline other: Square): Boolean = rank == other.rank
 
-    def <->(other: Square): Iterable[Square] =
-      min(file.value, other.file.value) to max(file.value, other.file.value) flatMap {
-        Square.at(_, rank.value)
-      }
-
-    inline def onSameDiagonal(other: Square): Boolean =
+    inline def onSameFile(inline other: Square): Boolean = file == other.file
+    inline def onSameRank(inline other: Square): Boolean = rank == other.rank
+    inline def onSameLine(inline other: Square): Boolean = onSameFile(other) || onSameRank(other)
+    inline def onSameDiagonal(inline other: Square): Boolean =
       file.value - rank.value == other.file.value - other.rank.value || file.value + rank.value == other.file.value + other.rank.value
-    inline def onSameLine(other: Square): Boolean = ?-(other) || ?|(other)
 
-    inline def xDist(inline other: Square): Int = abs(p.file.value - other.file.value)
-    inline def yDist(inline other: Square): Int = abs(p.rank.value - other.rank.value)
+    inline def xDist(inline other: Square): Int = abs(s.file.value - other.file.value)
+    inline def yDist(inline other: Square): Int = abs(s.rank.value - other.rank.value)
 
-    inline def isLight: Boolean = (file.value + rank.value) % 2 == 1
+    inline def isLight: Boolean = Bitboard.lightSquares.contains(s)
 
-    inline def file: File = File of p
-    inline def rank: Rank = Rank of p
+    inline def file: File = File of s
+    inline def rank: Rank = Rank of s
 
     def asChar: Char =
-      if (p <= 25) (97 + p).toChar      // a ...
-      else if (p <= 51) (39 + p).toChar // A ...
-      else if (p <= 61) (p - 4).toChar  // 0 ...
-      else if (p == 62) '!'
+      if (s <= 25) (97 + s).toChar      // a ...
+      else if (s <= 51) (39 + s).toChar // A ...
+      else if (s <= 61) (s - 4).toChar  // 0 ...
+      else if (s == 62) '!'
       else '?'
 
-    inline def key = s"${p.file.char}${p.rank.char}"
+    inline def key = s"${s.file.char}${s.rank.char}"
 
-    inline def withRank(inline r: Rank): Square = Square(p.file, r)
-    inline def withFile(inline f: File): Square = Square(f, p.rank)
+    inline def withRank(inline r: Rank): Square = Square(s.file, r)
+    inline def withFile(inline f: File): Square = Square(f, s.rank)
 
     inline def withRankOf(inline o: Square): Square = withRank(o.rank)
     inline def withFileOf(inline o: Square): Square = withFile(o.file)
@@ -66,13 +53,9 @@ object Square extends OpaqueInt[Square]:
 
   inline def apply(inline file: File, inline rank: Rank): Square = file.value + 8 * rank.value
 
-  inline def at(x: Int, y: Int): Option[Square] =
-    if (0 <= x && x < 8 && 0 <= y && y < 8) Some(x + 8 * y)
-    else None
+  inline def at(x: Int, y: Int): Option[Square] = Option.when(0 <= x && x < 8 && 0 <= y && y < 8)(x + 8 * y)
 
-  inline def at(index: Int): Option[Square] =
-    if (0 <= index && index < 64) Some(index)
-    else None
+  inline def at(index: Int): Option[Square] = Option.when(0 <= index && index < 64)(index)
 
   inline def fromKey(inline key: String): Option[Square] = allKeys get key
 
@@ -146,9 +129,6 @@ object Square extends OpaqueInt[Square]:
   val H8: Square = 63
 
   val all: List[Square] = Square from (0 to 63).toList
-
-  val whiteBackrank: List[Square] = (A1 <-> H1).toList
-  val blackBackrank: List[Square] = (A8 <-> H8).toList
 
   val allKeys: Map[String, Square] = all.mapBy(_.key)
   val charMap: Map[Char, Square]   = all.mapBy(square => Square(square).asChar)

@@ -49,9 +49,7 @@ object InsufficientMatingMaterial:
       !(bishopsOnOppositeColors(board) || (board(!color, Knight) | board(!color, Pawn)).nonEmpty)
     else false
 
-  inline def pawnDirOf(inline color: Color): Direction = color.fold(_.up, _.down)
-
   /** Determines the position one ahead of a pawn based on the color of the piece.
     * White pawns move up and black pawns move down.
     */
-  def posAheadOfPawn(square: Square, color: Color): Option[Square] = pawnDirOf(color)(square)
+  def posAheadOfPawn(square: Square, color: Color): Option[Square] = color.fold(square.up, square.down)

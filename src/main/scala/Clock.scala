@@ -120,7 +120,7 @@ case class Clock(
   def berserked(c: Color) = players(c).berserk
   def lag(c: Color)       = players(c).lag
 
-  def lagCompAvg = players map { ~_.lag.compAvg } reduce (_ avg _)
+  def lagCompAvg = players.mapReduce(~_.lag.compAvg)(_ avg _)
 
   // Lowball estimate of next move's lag comp for UI butter.
   def lagCompEstimate(c: Color) = players(c).lag.compEstimate
@@ -151,10 +151,7 @@ case class ClockPlayer(
 
 object ClockPlayer:
   def withConfig(config: Clock.Config) =
-    ClockPlayer(
-      config,
-      LagTracker.init(config)
-    )
+    ClockPlayer(config, LagTracker.init(config))
 
 object Clock:
   private val limitFormatter = DecimalFormat("#.##")

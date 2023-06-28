@@ -82,3 +82,6 @@ object ByColor:
   given [A: Eq]: Eq[ByColor[A]] with
     def eqv(x: ByColor[A], y: ByColor[A]) =
       x.white === y.white && x.black === y.black
+
+  extension [A](bc: ByColor[IterableOnce[A]])
+    def flatten: List[A] = bc.all.flatten

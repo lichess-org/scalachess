@@ -197,8 +197,6 @@ case object Crazyhouse
 
     def forsyth(role: Int, char: Char) = List.fill(role)(char).mkString
 
-    def values = List(Pawn -> pawn, Knight -> knight, Bishop -> bishop, Rook -> rook, Queen -> queen)
-
     def size       = pawn + knight + bishop + rook + queen
     def isEmpty    = size == 0
     def nonEmpty   = size > 0
@@ -241,6 +239,9 @@ case object Crazyhouse
       case Rook   => f(rook).map(x => copy(rook = x))
       case Queen  => f(queen).map(x => copy(queen = x))
       case King   => None
+
+    def map[B](f: (Role, Int) => Option[B]): List[B] =
+      List(f(Pawn, pawn), f(Knight, knight), f(Bishop, bishop), f(Rook, rook), f(Queen, queen)).flatten
 
   object Pocket:
     val empty = Pocket(0, 0, 0, 0, 0)

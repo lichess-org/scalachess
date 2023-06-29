@@ -9,6 +9,8 @@ sealed trait Role:
   lazy val forsythUpper: Char = forsyth.toUpper
   lazy val pgn: Char          = forsythUpper
   lazy val name               = toString.toLowerCase
+  inline def forsythBy(color: Color): Char =
+    if color.white then forsythUpper else forsyth
 
 sealed trait PromotableRole extends Role
 

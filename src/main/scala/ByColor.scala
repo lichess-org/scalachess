@@ -1,8 +1,9 @@
 package chess
 
-import cats.{ Applicative, Eq }
+import cats.{ Applicative, Eq, Functor, Monoid }
 import cats.syntax.all.*
 import scala.annotation.targetName
+import alleycats.Zero
 
 case class ByColor[A](white: A, black: A):
 
@@ -84,6 +85,17 @@ object ByColor:
   given [A: Eq]: Eq[ByColor[A]] with
     def eqv(x: ByColor[A], y: ByColor[A]) =
       x.white === y.white && x.black === y.black
+
+  given [A: Zero]: Zero[ByColor[A]] with
+    def zero = ByColor(Zero[A].zero)
+
+  given [A: Monoid]: Monoid[ByColor[A]] with
+    def empty = ByColor(Monoid[A].empty)
+    def combine(x: ByColor[A], y: ByColor[A]) =
+      ByColor(Monoid[A].combine(x.white, y.white), Monoid[A].combine(x.black, y.black))
+
+  given Functor[ByColor] with
+    def map[A, B](fa: ByColor[A])(f: A => B): ByColor[B] = fa.map(f)
 
   extension [A](bc: ByColor[IterableOnce[A]]) def flatten: List[A] = bc.all.flatten
 

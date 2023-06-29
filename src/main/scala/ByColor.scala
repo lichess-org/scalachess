@@ -78,9 +78,13 @@ case class ByColor[A](white: A, black: A):
 object ByColor:
   def apply[A](a: A): ByColor[A]          = ByColor(a, a)
   def apply[A](f: Color => A): ByColor[A] = ByColor(white = f(White), black = f(Black))
+  def apply[F[_], A](f: Color => F[A]): Applicative[F] ?=> F[ByColor[A]] =
+    (f(White), f(Black)).mapN(ByColor(_, _))
 
   given [A: Eq]: Eq[ByColor[A]] with
     def eqv(x: ByColor[A], y: ByColor[A]) =
       x.white === y.white && x.black === y.black
 
   extension [A](bc: ByColor[IterableOnce[A]]) def flatten: List[A] = bc.all.flatten
+
+  extension [A](p: (A, A)) def asByColor: ByColor[A] = ByColor(p._1, p._2)

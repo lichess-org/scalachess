@@ -16,7 +16,7 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
     "com.github.ornicar"  %% "scalalib"          % "9.5.5",
     "org.typelevel"       %% "cats-core"         % "2.9.0",
     "org.typelevel"       %% "alleycats-core"    % "2.9.0",
-    "org.typelevel"       %% "cats-parse"        % "0.3.9",
+    "org.typelevel"       %% "cats-parse"        % "0.3.10",
     "dev.optics"          %% "monocle-core"      % "3.2.0",
     "org.typelevel"       %% "kittens"           % "3.0.0"
   ),

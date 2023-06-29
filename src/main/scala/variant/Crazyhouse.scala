@@ -175,7 +175,7 @@ case object Crazyhouse
     def store(piece: Piece): Pockets =
       pockets.update(!piece.color, _.store(piece.role))
 
-    def forsyth = pockets.white.forsythUpper + pockets.black.forsyth
+    def forsyth = pockets.reduce(_.forsythUpper + _.forsyth)
 
   case class Pocket(pawn: Int, knight: Int, bishop: Int, rook: Int, queen: Int):
 
@@ -228,8 +228,11 @@ case object Crazyhouse
       case Queen  => f(queen).map(x => copy(queen = x))
       case King   => None
 
-    def map[B](f: (Role, Int) => Option[B]): List[B] =
+    def flatMap[B](f: (Role, Int) => IterableOnce[B]): List[B] =
       List(f(Pawn, pawn), f(Knight, knight), f(Bishop, bishop), f(Rook, rook), f(Queen, queen)).flatten
+
+    def map[B](f: (Role, Int) => B): List[B] =
+      List(f(Pawn, pawn), f(Knight, knight), f(Bishop, bishop), f(Rook, rook), f(Queen, queen))
 
   object Pocket:
     val empty = Pocket(0, 0, 0, 0, 0)

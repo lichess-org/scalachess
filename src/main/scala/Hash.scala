@@ -104,7 +104,7 @@ object Hash extends OpaqueInt[Hash]:
       data.pockets
         .mapWithColor: (color, pocket) =>
           val colorshift = color.fold(79, -1)
-          pocket.map((role, size) => crazyPocketMask(role, colorshift, size))
+          pocket.flatMap((role, size) => crazyPocketMask(role, colorshift, size))
         .flatten
         .computeHash(hcrazypromotions)
 

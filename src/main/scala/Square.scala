@@ -2,6 +2,7 @@ package chess
 
 import scala.math.abs
 import chess.bitboard.Bitboard
+import scala.annotation.targetName
 
 opaque type Square = Int
 object Square extends OpaqueInt[Square]:
@@ -17,9 +18,13 @@ object Square extends OpaqueInt[Square]:
 
     inline def prevRank(color: Color) = color.fold(s.down, s.up)
 
+    @targetName("onLeftOf")
     inline def ?<(inline other: Square): Boolean = file < other.file
+    @targetName("onRightOf")
     inline def ?>(inline other: Square): Boolean = file > other.file
+    @targetName("belowOf")
     inline def ?+(inline other: Square): Boolean = rank < other.rank
+    @targetName("aboveOf")
     inline def ?^(inline other: Square): Boolean = rank > other.rank
 
     inline def onSameFile(inline other: Square): Boolean = file == other.file

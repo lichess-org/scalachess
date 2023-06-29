@@ -22,12 +22,13 @@ class SquareTest extends ScalaCheckSuite:
     assertEquals(G8.asChar, '!')
     assertEquals(H8.asChar, '?')
 
-  test("chars.fromChar == some.identity"):
-    Square.all.foreach: square =>
-      assertEquals(Square.fromChar(square.asChar), square.some)
+  val allChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?"
+
+  test("Square.asChar"):
+    assertEquals(Square.all.map(_.asChar).mkString, allChars)
 
   test("chars are unique"):
-    Square.all.map(_.asChar).toSet.size == 64
+    assertEquals(allChars.toList.traverse(Square.fromChar(_)).get, Square.all)
 
   test("keys.fromKey == some.identity"):
     Square.all.foreach: square =>

@@ -125,28 +125,16 @@ case object Crazyhouse
     val targets = legalDropSquares(situation)
     if targets.isEmpty then Nil
     else
-      situation.board.crazyData.fold(List.empty[Drop]) { data =>
+      situation.board.crazyData.fold(Nil): data =>
         val pocket = data.pockets(situation.color)
-        val dropsWithoutPawn =
-          for
-            role <- List(Knight, Bishop, Rook, Queen)
-            if pocket contains role
-            to <- targets
-            piece = Piece(situation.color, role)
-            after = situation.board.place(piece, to).get // this is safe, we checked the target squares
-            d2    = data.drop(piece).get                 // this is safe, we checked the pocket
-          yield Drop(piece, to, situation, after withCrazyData d2)
-        val dropWithPawn =
-          if pocket contains Pawn then
-            for
-              to <- targets & ~Bitboard.firstRank & ~Bitboard.lastRank
-              piece = Piece(situation.color, Pawn)
-              after = situation.board.place(piece, to).get // this is safe, we checked the target squares
-              d2    = data.drop(piece).get                 // this is safe, we checked the pocket
-            yield Drop(piece, to, situation, after withCrazyData d2)
-          else Nil
-        dropsWithoutPawn ::: dropWithPawn
-      }
+        for
+          role <- List(Pawn, Knight, Bishop, Rook, Queen)
+          if pocket contains role
+          to <- if role == Pawn then targets & ~Bitboard.firstRank & ~Bitboard.lastRank else targets
+          piece = Piece(situation.color, role)
+          after <- situation.board.place(piece, to)
+          d2    <- data.drop(piece)
+        yield Drop(piece, to, situation, after withCrazyData d2)
 
   type Pockets = ByColor[Pocket]
   case class Data(

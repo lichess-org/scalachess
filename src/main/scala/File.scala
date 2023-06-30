@@ -2,18 +2,16 @@ package chess
 
 opaque type File = Int
 object File extends OpaqueInt[File]:
-  extension (a: File)
+  extension (a: File) inline def index: Int = a
 
-    inline def index: Int = a
+  inline def offset(delta: Int): Option[File] =
+    if (-8 < delta && delta < 8) atIndex(a + delta)
+    else None
 
-    inline def offset(delta: Int): Option[File] =
-      if (-8 < delta && delta < 8) atIndex(a + delta)
-      else None
+  inline def char: Char = (97 + a).toChar
 
-    inline def char: Char = (97 + a).toChar
-
-    inline def upperCaseChar: Char       = (65 + a).toChar
-    inline def toUpperCaseString: String = upperCaseChar.toString
+  inline def upperCaseChar: Char       = (65 + a).toChar
+  inline def toUpperCaseString: String = upperCaseChar.toString
   end extension
 
   inline def atIndex(index: Int): Option[File] =

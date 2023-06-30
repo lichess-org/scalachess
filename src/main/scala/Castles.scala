@@ -10,36 +10,35 @@ opaque type Castles = Long
 object Castles extends OpaqueBitboard[Castles]:
 
   extension (c: Castles)
+    inline def can(inline color: Color): Boolean         = c.intersects(Bitboard.rank(color.backRank))
+  inline def can(inline color: Color, inline side: Side) = c.contains(color.at(side))
 
-    inline def can(inline color: Color): Boolean           = c.intersects(Bitboard.rank(color.backRank))
-    inline def can(inline color: Color, inline side: Side) = c.contains(color.at(side))
+  def whiteKingSide: Boolean  = c.contains(H1)
+  def whiteQueenSide: Boolean = c.contains(A1)
+  def blackKingSide: Boolean  = c.contains(H8)
+  def blackQueenSide: Boolean = c.contains(A8)
 
-    def whiteKingSide: Boolean  = c.contains(H1)
-    def whiteQueenSide: Boolean = c.contains(A1)
-    def blackKingSide: Boolean  = c.contains(H8)
-    def blackQueenSide: Boolean = c.contains(A8)
+  def without(color: Color): Castles =
+    c & Bitboard.rank(color.lastRank)
 
-    def without(color: Color): Castles =
-      c & Bitboard.rank(color.lastRank)
+  def without(color: Color, side: Side): Castles =
+    c & ~color.at(side).bb
 
-    def without(color: Color, side: Side): Castles =
-      c & ~color.at(side).bb
+  def add(color: Color, side: Side): Castles =
+    c.addSquare(color.at(side))
 
-    def add(color: Color, side: Side): Castles =
-      c.addSquare(color.at(side))
+  def update(color: Color, kingSide: Boolean, queenSide: Boolean): Castles =
+    c.without(color) | kingSide.at(color.kingSide) | queenSide.at(color.queenSide)
 
-    def update(color: Color, kingSide: Boolean, queenSide: Boolean): Castles =
-      c.without(color) | kingSide.at(color.kingSide) | queenSide.at(color.queenSide)
+  def toFenString: String =
+    (if (whiteKingSide) "K" else "") +
+      (if (whiteQueenSide) "Q" else "") +
+      (if (blackKingSide) "k" else "") +
+      (if (blackQueenSide) "q" else "") match
+      case "" => "-"
+      case n  => n
 
-    def toFenString: String =
-      (if (whiteKingSide) "K" else "") +
-        (if (whiteQueenSide) "Q" else "") +
-        (if (blackKingSide) "k" else "") +
-        (if (blackQueenSide) "q" else "") match
-        case "" => "-"
-        case n  => n
-
-    def toSeq: Array[Boolean] = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
+  def toSeq: Array[Boolean] = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
 
   extension (b: Boolean) inline def at(square: Square) = if b then square.bb else empty
 

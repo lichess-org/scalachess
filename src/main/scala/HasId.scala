@@ -4,10 +4,9 @@ import cats.syntax.all.*
 import scala.annotation.tailrec
 
 trait HasId[A, Id]:
-  extension (a: A)
-    def id: Id
-    inline def sameId(other: A): Boolean = a.id == other.id
-    inline def hasId(id: Id): Boolean    = a.id == id
+  extension (a: A) def id: Id
+  inline def sameId(other: A): Boolean = a.id == other.id
+  inline def hasId(id: Id): Boolean    = a.id == id
 
   extension (xs: List[A])
     def remove(v: A): List[A] =
@@ -24,16 +23,15 @@ trait HasId[A, Id]:
 trait Mergeable[A]:
 
   extension (a: A)
-
     // laws
     // a1.sameId(a2) => Some
     // !a1.sameId(a2) => None
     // a1.merge(a2).flatMap(_.merge(a3)) == a2.merge(a3).flatMap(a1.merge(_))
     def merge(other: A): Option[A]
 
-    // laws
-    // canMerge == merge.isDefined
-    def canMerge[Id](other: A): HasId[A, Id] ?=> Boolean = a.sameId(other)
+  // laws
+  // canMerge == merge.isDefined
+  def canMerge[Id](other: A): HasId[A, Id] ?=> Boolean = a.sameId(other)
 
   extension (xs: List[A])
 

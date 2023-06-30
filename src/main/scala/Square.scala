@@ -6,55 +6,54 @@ import scala.annotation.targetName
 
 opaque type Square = Int
 object Square extends OpaqueInt[Square]:
-  extension (s: Square)
-    inline def down: Option[Square]      = Square.at(file.value, rank.value - 1)
-    inline def left: Option[Square]      = Square.at(file.value - 1, rank.value)
-    inline def downLeft: Option[Square]  = Square.at(file.value - 1, rank.value - 1)
-    inline def downRight: Option[Square] = Square.at(file.value + 1, rank.value - 1)
-    inline def up: Option[Square]        = Square.at(file.value, rank.value + 1)
-    inline def right: Option[Square]     = Square.at(file.value + 1, rank.value)
-    inline def upLeft: Option[Square]    = Square.at(file.value - 1, rank.value + 1)
-    inline def upRight: Option[Square]   = Square.at(file.value + 1, rank.value + 1)
+  extension (s: Square) inline def down: Option[Square] = Square.at(file.value, rank.value - 1)
+  inline def left: Option[Square]                       = Square.at(file.value - 1, rank.value)
+  inline def downLeft: Option[Square]                   = Square.at(file.value - 1, rank.value - 1)
+  inline def downRight: Option[Square]                  = Square.at(file.value + 1, rank.value - 1)
+  inline def up: Option[Square]                         = Square.at(file.value, rank.value + 1)
+  inline def right: Option[Square]                      = Square.at(file.value + 1, rank.value)
+  inline def upLeft: Option[Square]                     = Square.at(file.value - 1, rank.value + 1)
+  inline def upRight: Option[Square]                    = Square.at(file.value + 1, rank.value + 1)
 
-    inline def prevRank(color: Color) = color.fold(s.down, s.up)
+  inline def prevRank(color: Color) = color.fold(s.down, s.up)
 
-    @targetName("onLeftOf")
-    inline def ?<(inline other: Square): Boolean = file < other.file
-    @targetName("onRightOf")
-    inline def ?>(inline other: Square): Boolean = file > other.file
-    @targetName("belowOf")
-    inline def ?+(inline other: Square): Boolean = rank < other.rank
-    @targetName("aboveOf")
-    inline def ?^(inline other: Square): Boolean = rank > other.rank
+  @targetName("onLeftOf")
+  inline def ?<(inline other: Square): Boolean = file < other.file
+  @targetName("onRightOf")
+  inline def ?>(inline other: Square): Boolean = file > other.file
+  @targetName("belowOf")
+  inline def ?+(inline other: Square): Boolean = rank < other.rank
+  @targetName("aboveOf")
+  inline def ?^(inline other: Square): Boolean = rank > other.rank
 
-    inline def onSameFile(inline other: Square): Boolean = file == other.file
-    inline def onSameRank(inline other: Square): Boolean = rank == other.rank
-    inline def onSameLine(inline other: Square): Boolean = onSameFile(other) || onSameRank(other)
-    inline def onSameDiagonal(inline other: Square): Boolean =
-      file.value - rank.value == other.file.value - other.rank.value || file.value + rank.value == other.file.value + other.rank.value
+  inline def onSameFile(inline other: Square): Boolean = file == other.file
+  inline def onSameRank(inline other: Square): Boolean = rank == other.rank
+  inline def onSameLine(inline other: Square): Boolean = onSameFile(other) || onSameRank(other)
+  inline def onSameDiagonal(inline other: Square): Boolean =
+    file.value - rank.value == other.file.value - other.rank.value || file.value + rank.value == other.file.value + other.rank.value
 
-    inline def xDist(inline other: Square): Int = abs(s.file.value - other.file.value)
-    inline def yDist(inline other: Square): Int = abs(s.rank.value - other.rank.value)
+  inline def xDist(inline other: Square): Int = abs(s.file.value - other.file.value)
+  inline def yDist(inline other: Square): Int = abs(s.rank.value - other.rank.value)
 
-    inline def isLight: Boolean = Bitboard.lightSquares.contains(s)
+  inline def isLight: Boolean = Bitboard.lightSquares.contains(s)
 
-    inline def file: File = File of s
-    inline def rank: Rank = Rank of s
+  inline def file: File = File of s
+  inline def rank: Rank = Rank of s
 
-    def asChar: Char =
-      if (s <= 25) (97 + s).toChar      // a ...
-      else if (s <= 51) (39 + s).toChar // A ...
-      else if (s <= 61) (s - 4).toChar  // 0 ...
-      else if (s == 62) '!'
-      else '?'
+  def asChar: Char =
+    if (s <= 25) (97 + s).toChar      // a ...
+    else if (s <= 51) (39 + s).toChar // A ...
+    else if (s <= 61) (s - 4).toChar  // 0 ...
+    else if (s == 62) '!'
+    else '?'
 
-    inline def key = s"${s.file.char}${s.rank.char}"
+  inline def key = s"${s.file.char}${s.rank.char}"
 
-    inline def withRank(inline r: Rank): Square = Square(s.file, r)
-    inline def withFile(inline f: File): Square = Square(f, s.rank)
+  inline def withRank(inline r: Rank): Square = Square(s.file, r)
+  inline def withFile(inline f: File): Square = Square(f, s.rank)
 
-    inline def withRankOf(inline o: Square): Square = withRank(o.rank)
-    inline def withFileOf(inline o: Square): Square = withFile(o.file)
+  inline def withRankOf(inline o: Square): Square = withRank(o.rank)
+  inline def withFileOf(inline o: Square): Square = withFile(o.file)
 
   end extension
 

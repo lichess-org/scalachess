@@ -2,15 +2,13 @@ package chess
 
 opaque type Rank = Int
 object Rank extends OpaqueInt[Rank]:
-  extension (a: Rank)
+  extension (a: Rank) inline def index: Int = a
 
-    inline def index: Int = a
+  inline def offset(delta: Int): Option[Rank] =
+    if (-8 < delta && delta < 8) atIndex(a + delta)
+    else None
 
-    inline def offset(delta: Int): Option[Rank] =
-      if (-8 < delta && delta < 8) atIndex(a + delta)
-      else None
-
-    inline def char: Char = (49 + a).toChar
+  inline def char: Char = (49 + a).toChar
   end extension
 
   inline def atIndex(index: Int): Option[Rank] =

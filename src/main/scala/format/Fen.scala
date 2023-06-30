@@ -11,16 +11,15 @@ object Fen extends FenReader with FenWriter:
 // r1bqkbnr/pppp1Qpp/2n5/4p3/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 2+3 0 3 (winboards 3check)
 opaque type EpdFen = String
 object EpdFen extends OpaqueString[EpdFen]:
-  extension (a: EpdFen)
-    def color: Color              = SimpleFen color a
-    def castling: String          = SimpleFen castling a
-    def enpassant: Option[Square] = SimpleFen enpassant a
+  extension (a: EpdFen) def color: Color = SimpleFen color a
+  def castling: String                   = SimpleFen castling a
+  def enpassant: Option[Square]          = SimpleFen enpassant a
 
-    def isInitial: Boolean = a == initial
+  def isInitial: Boolean = a == initial
 
-    def simple: SimpleFen   = SimpleFen fromEpd a
-    def opening: OpeningFen = SimpleFen opening a
-    def board: BoardFen     = SimpleFen board a
+  def simple: SimpleFen   = SimpleFen fromEpd a
+  def opening: OpeningFen = SimpleFen opening a
+  def board: BoardFen     = SimpleFen board a
 
   val initial: EpdFen               = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
   def clean(source: String): EpdFen = EpdFen(source.replace("_", " ").trim)
@@ -30,11 +29,11 @@ object EpdFen extends OpaqueString[EpdFen]:
 opaque type SimpleFen = String
 object SimpleFen extends OpaqueString[SimpleFen]:
   extension (a: SimpleFen)
-    def color: Color     = a.split(' ').lift(1).flatMap(_.headOption).flatMap(Color.apply) | Color.white
-    def castling: String = a.split(' ').lift(2) | "-"
-    def enpassant: Option[Square] = a.split(' ').lift(3).flatMap(Square.fromKey(_))
-    def opening: OpeningFen       = OpeningFen.fromSimple(a)
-    def board: BoardFen           = a.takeWhile(_ != ' ')
+    def color: Color   = a.split(' ').lift(1).flatMap(_.headOption).flatMap(Color.apply) | Color.white
+  def castling: String = a.split(' ').lift(2) | "-"
+  def enpassant: Option[Square] = a.split(' ').lift(3).flatMap(Square.fromKey(_))
+  def opening: OpeningFen       = OpeningFen.fromSimple(a)
+  def board: BoardFen           = a.takeWhile(_ != ' ')
   def fromEpd(fen: EpdFen): OpeningFen =
     fen.value.split(' ').take(4) match
       case Array(board, turn, castle, ep) => SimpleFen(s"$board $turn $castle $ep")
@@ -59,9 +58,8 @@ object BoardAndColorFen extends OpaqueString[BoardAndColorFen]
 // r3k2r/p3n1pp/2q2p2/4n1B1/5Q2/5P2/PP3P1P/R4RK1
 opaque type BoardFen = String
 object BoardFen extends OpaqueString[BoardFen]:
-  extension (a: BoardFen)
-    def andColor(c: Color) = BoardAndColorFen(s"$a ${c.letter}")
-    def removePockets: BoardFen =
-      if (a.contains('[')) a.takeWhile('[' !=)
-      else if (a.count('/' == _) == 8) a.split('/').take(8).mkString("/")
-      else a
+  extension (a: BoardFen) def andColor(c: Color) = BoardAndColorFen(s"$a ${c.letter}")
+  def removePockets: BoardFen =
+    if (a.contains('[')) a.takeWhile('[' !=)
+    else if (a.count('/' == _) == 8) a.split('/').take(8).mkString("/")
+    else a

@@ -37,26 +37,25 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
     copy(tags = tags + Tag(_.Event, title))
 
 object PgnTree:
-  extension (tree: PgnTree)
-    def isLong = tree.value.isLong || tree.variations.nonEmpty
-    def _render: String =
-      val moveStr = tree.value.render
-      val varStr =
-        if tree.variations.isEmpty then ""
-        else tree.variations.map(x => s" (${x.render})").mkString
-      s"$moveStr$varStr"
+  extension (tree: PgnTree) def isLong = tree.value.isLong || tree.variations.nonEmpty
+  def _render: String =
+    val moveStr = tree.value.render
+    val varStr =
+      if tree.variations.isEmpty then ""
+      else tree.variations.map(x => s" (${x.render})").mkString
+    s"$moveStr$varStr"
 
-    def render: String =
-      render(!tree.value.ply.turn.black)
+  def render: String =
+    render(!tree.value.ply.turn.black)
 
-    def render(dot: Boolean): String =
-      val (d, str) =
-        if tree.value.ply.turn.black then (isLong, s"${tree.value.turnNumber}. $_render")
-        else
-          val number = if dot then s"${tree.value.turnNumber}... " else ""
-          (false, s"$number$_render")
-      val childStr = tree.child.fold("")(x => s" ${x.render(d)}")
-      s"$str$childStr"
+  def render(dot: Boolean): String =
+    val (d, str) =
+      if tree.value.ply.turn.black then (isLong, s"${tree.value.turnNumber}. $_render")
+      else
+        val number = if dot then s"${tree.value.turnNumber}... " else ""
+        (false, s"$number$_render")
+    val childStr = tree.child.fold("")(x => s" ${x.render(d)}")
+    s"$str$childStr"
 
   extension (v: Variation[Move])
     def _render: String =

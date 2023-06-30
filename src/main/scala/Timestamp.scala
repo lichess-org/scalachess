@@ -2,9 +2,8 @@ package chess
 
 opaque type Timestamp = Long
 object Timestamp extends OpaqueLong[Timestamp]:
-  extension (t: Timestamp)
-    def -(o: Timestamp): Centis = Centis.ofMillis(t - o.value)
-    def +(o: Centis): Timestamp = Timestamp(t + o.millis)
+  extension (t: Timestamp) def -(o: Timestamp): Centis = Centis.ofMillis(t - o.value)
+  def +(o: Centis): Timestamp                          = Timestamp(t + o.millis)
 
 trait Timestamper:
   def now: Timestamp

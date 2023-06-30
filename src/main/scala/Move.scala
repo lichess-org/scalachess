@@ -137,10 +137,9 @@ object Move:
   // ((king, kingTo), (rook, rookTo))
   opaque type Castle = ((Square, Square), (Square, Square))
   object Castle extends TotalWrapper[Castle, ((Square, Square), (Square, Square))]:
-    extension (e: Castle)
-      inline def king         = e._1._1
-      inline def kingTo       = e._1._2
-      inline def rook         = e._2._1
-      inline def rookTo       = e._2._2
-      def side: Side          = if kingTo.file == File.C then QueenSide else KingSide
-      def isStandard: Boolean = king.file == File.E && (rook.file == File.A || rook.file == File.H)
+    extension (e: Castle) inline def king = e._1._1
+    inline def kingTo                     = e._1._2
+    inline def rook                       = e._2._1
+    inline def rookTo                     = e._2._2
+    def side: Side                        = if kingTo.file == File.C then QueenSide else KingSide
+    def isStandard: Boolean = king.file == File.E && (rook.file == File.A || rook.file == File.H)

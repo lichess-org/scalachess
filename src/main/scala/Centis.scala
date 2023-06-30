@@ -9,25 +9,23 @@ import alleycats.Zero
 opaque type Centis = Int
 object Centis extends OpaqueInt[Centis]:
 
-  extension (centis: Centis)
+  extension (centis: Centis) inline def centis: Int = centis
 
-    inline def centis: Int = centis
+  inline def *(inline o: Int): Centis = centis * o
 
-    inline def *(inline o: Int): Centis = centis * o
+  def roundTenths: Int  = if (centis > 0) (centis + 5) / 10 else (centis - 4) / 10
+  def roundSeconds: Int = Math.round(centis * 0.01f)
 
-    def roundTenths: Int  = if (centis > 0) (centis + 5) / 10 else (centis - 4) / 10
-    def roundSeconds: Int = Math.round(centis * 0.01f)
+  inline def toSeconds: BigDecimal = java.math.BigDecimal.valueOf(centis, 2)
+  inline def millis: Long          = centis * 10L
+  def toDuration: FiniteDuration   = FiniteDuration(millis, MILLISECONDS)
 
-    inline def toSeconds: BigDecimal = java.math.BigDecimal.valueOf(centis, 2)
-    inline def millis: Long          = centis * 10L
-    def toDuration: FiniteDuration   = FiniteDuration(millis, MILLISECONDS)
+  def *~(scalar: Float): Centis   = ofFloat(scalar * centis)
+  def /(div: Int): Option[Centis] = div != 0 option (centis / div)
 
-    def *~(scalar: Float): Centis   = ofFloat(scalar * centis)
-    def /(div: Int): Option[Centis] = div != 0 option (centis / div)
+  def avg(other: Centis): Centis = (centis + other.value) >> 1
 
-    def avg(other: Centis): Centis = (centis + other.value) >> 1
-
-    inline def nonNeg: Centis = Math.max(centis, 0)
+  inline def nonNeg: Centis = Math.max(centis, 0)
 
   end extension
 

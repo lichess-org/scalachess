@@ -53,26 +53,21 @@ object Replay:
   ): (Game, List[(Game, Uci.WithSan)], Option[ErrorStr]) =
     val init       = makeGame(variant, initialFen.some)
     val emptyGames = List.empty[(Game, Uci.WithSan)]
-    Parser
-      .moves(sans)
-      .fold(
-        err => emptyGames -> err.some,
-        moves =>
-          moves.value.zip(sans).foldLeft((emptyGames, none[ErrorStr])) {
-            case ((games, None), (san, sanStr)) =>
-              val game = games.headOption.fold(init)(_._1)
-              san(game.situation).fold(
-                err => (games, err.some),
-                moveOrDrop => {
-                  val newGame = moveOrDrop.applyGame(game)
-                  val uci     = moveOrDrop.toUci
-                  ((newGame, Uci.WithSan(uci, sanStr)) :: games, None)
-                }
-              )
-            case (end, _) => end
-          }
-      ) match
-      case (games, err) => (init, games.reverse, err)
+    (for
+      moves <- Parser.moves(sans).leftMap(err => (init, emptyGames, err.some))
+      games <- moves.value
+        .zip(sans)
+        .foldM(emptyGames):
+          case (games, (san, sanStr)) =>
+            val game = games.headOption.fold(init)(_._1)
+            san(game.situation).bimap(
+              err => (init, games, err.some),
+              moveOrDrop =>
+                val newGame = moveOrDrop.applyGame(game)
+                val uci     = moveOrDrop.toUci
+                (newGame, Uci.WithSan(uci, sanStr)) :: games
+            )
+    yield (init, games.reverse, none)).merge
 
   private def computeSituations[M](
       sit: Situation,
@@ -116,7 +111,7 @@ object Replay:
     Parser
       .moves(sans)
       .flatMap: moves =>
-        computeSituations[San](sit, moves.value, _.apply)
+        computeSituations(sit, moves.value, _.apply)
 
   def boardsFromUci(
       moves: List[Uci],
@@ -129,7 +124,7 @@ object Replay:
       initialFen: Option[Fen.Epd],
       variant: Variant
   ): Either[ErrorStr, List[Situation]] =
-    computeSituations[Uci](initialFenToSituation(initialFen, variant), moves, _.apply)
+    computeSituations(initialFenToSituation(initialFen, variant), moves, _.apply)
 
   def apply(
       moves: List[Uci],
@@ -146,7 +141,6 @@ object Replay:
   ): Either[ErrorStr, Ply] =
     if Fen.read(variant, atFen).isEmpty then ErrorStr(s"Invalid Fen $atFen").asLeft
     else
-
       // we don't want to compare the full move number, to match transpositions
       def truncateFen(fen: Fen.Epd) = fen.value.split(' ').take(4) mkString " "
       val atFenTruncated            = truncateFen(atFen)

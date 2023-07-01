@@ -36,15 +36,14 @@ object Reader:
       .map: moves =>
         makeReplay(makeGame(tags), op(moves))
 
-  // TODO
   private def makeReplay(game: Game, sans: Sans): Result =
-    sans.value.foldLeft[Result](Result.Complete(Replay(game))):
-      case (Result.Complete(replay), san) =>
-        san(replay.state.situation).fold(
-          err => Result.Incomplete(replay, err),
-          move => Result.Complete(replay addMove move)
-        )
-      case (r: Result.Incomplete, _) => r
+    sans.value
+      .foldM(Replay(game)): (replay, san) =>
+        san(replay.state.situation)
+          .bimap((replay, _), replay addMove _)
+      .match
+        case Left(replay, err) => Result.Incomplete(replay, err)
+        case Right(replay)     => Result.Complete(replay)
 
   private def makeGame(tags: Tags) =
     Game(variantOption = tags.variant, fen = tags.fen).pipe(self =>

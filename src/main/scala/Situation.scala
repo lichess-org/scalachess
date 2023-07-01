@@ -1,6 +1,5 @@
 package chess
 
-import cats.data.Validated
 import cats.syntax.all.*
 
 import bitboard.Bitboard
@@ -60,14 +59,14 @@ case class Situation(board: Board, color: Color):
     else if autoDraw then Status.Draw.some
     else none
 
-  def move(from: Square, to: Square, promotion: Option[PromotableRole]): Validated[ErrorStr, Move] =
-    variant.move(this, from, to, promotion)
+  def move(from: Square, to: Square, promotion: Option[PromotableRole]): Either[ErrorStr, Move] =
+    variant.move(this, from, to, promotion).toEither
 
-  def move(uci: Uci.Move): Validated[ErrorStr, Move] =
-    variant.move(this, uci.orig, uci.dest, uci.promotion)
+  def move(uci: Uci.Move): Either[ErrorStr, Move] =
+    variant.move(this, uci.orig, uci.dest, uci.promotion).toEither
 
-  def drop(role: Role, square: Square): Validated[ErrorStr, Drop] =
-    variant.drop(this, role, square)
+  def drop(role: Role, square: Square): Either[ErrorStr, Drop] =
+    variant.drop(this, role, square).toEither
 
   def withHistory(history: History) =
     copy(board = board withHistory history)

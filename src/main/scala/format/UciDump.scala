@@ -1,8 +1,7 @@
 package chess
 package format
 
-import cats.data.Validated
-
+import cats.syntax.all.*
 import chess.variant.Variant
 
 object UciDump:
@@ -16,9 +15,9 @@ object UciDump:
       initialFen: Option[EpdFen],
       variant: Variant,
       force960Notation: Boolean = false
-  ): Validated[ErrorStr, List[String]] =
-    if moves.isEmpty then Validated.valid(Nil)
-    else Replay(moves, initialFen, variant) andThen (_.valid) map apply(force960Notation)
+  ): Either[ErrorStr, List[String]] =
+    if moves.isEmpty then Nil.asRight
+    else Replay(moves, initialFen, variant).flatMap(_.valid).map(apply(force960Notation))
 
   def move(variant: Variant, force960Notation: Boolean = false)(mod: MoveOrDrop): String =
     mod match

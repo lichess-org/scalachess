@@ -28,7 +28,7 @@ object Dumper:
         val candidates = (situation.board.byPiece(piece) ^ orig.bb)
           .filter(square =>
             piece.eyes(square, dest, situation.board.occupied) && {
-              situation.move(square, dest, None).isValid
+              situation.move(square, dest, None).isRight
             }
           )
 

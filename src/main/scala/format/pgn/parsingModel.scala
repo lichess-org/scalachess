@@ -42,7 +42,7 @@ case class Std(
       .first: square =>
         if compare(file, square.file.index + 1) &&
           compare(rank, square.rank.index + 1)
-        then situation.generateMovesAt(square) find { _.dest == dest }
+        then situation.generateMovesAt(square).find(_.dest == dest)
         else None
       .toRight(ErrorStr(s"No move found: $this\n$situation"))
       .flatMap(_.withPromotion(promotion).toRight(ErrorStr("Wrong promotion")))

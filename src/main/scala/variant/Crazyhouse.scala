@@ -1,10 +1,7 @@
 package chess
 package variant
 
-import chess.format.Uci
-import cats.syntax.option.*
-import cats.data.Validated
-import chess.format.EpdFen
+import chess.format.{ EpdFen, Uci }
 import bitboard.Bitboard
 import monocle.syntax.all.*
 
@@ -32,25 +29,25 @@ case object Crazyhouse
 
   private def canDropPawnOn(square: Square) = square.rank != Rank.First && square.rank != Rank.Eighth
 
-  override def drop(situation: Situation, role: Role, square: Square): Validated[ErrorStr, Drop] =
+  override def drop(situation: Situation, role: Role, square: Square): Either[ErrorStr, Drop] =
     for
-      d1 <- situation.board.crazyData toValid ErrorStr("Board has no crazyhouse data")
-      _ <-
-        if (role != Pawn || canDropPawnOn(square)) Validated.valid(d1)
-        else Validated.invalid(ErrorStr(s"Can't drop $role on $square"))
+      d1 <- situation.board.crazyData.toRight(ErrorStr("Board has no crazyhouse data"))
+      _  <- Either.cond((role != Pawn || canDropPawnOn(square)), d1, ErrorStr(s"Can't drop $role on $square"))
       piece = Piece(situation.color, role)
-      d2 <- d1.drop(piece) toValid ErrorStr(s"No $piece to drop on $square")
-      board1 <- situation.board.place(piece, square) toValid ErrorStr(
-        s"Can't drop $role on $square, it's occupied"
+      d2 <- d1.drop(piece).toRight(ErrorStr(s"No $piece to drop on $square"))
+      b1 <- situation.board
+        .place(piece, square)
+        .toRight(ErrorStr(s"Can't drop $role on $square, it's occupied"))
+      _ <- Either.cond(
+        b1.checkOf(situation.color).no,
+        b1,
+        ErrorStr(s"Dropping $role on $square doesn't uncheck the king")
       )
-      _ <-
-        if board1.checkOf(situation.color).no then Validated.valid(board1)
-        else Validated.invalid(ErrorStr(s"Dropping $role on $square doesn't uncheck the king"))
     yield Drop(
       piece = piece,
       square = square,
       situationBefore = situation,
-      after = board1 withCrazyData d2
+      after = b1 withCrazyData d2
     )
 
   override def fiftyMoves(history: History): Boolean = false

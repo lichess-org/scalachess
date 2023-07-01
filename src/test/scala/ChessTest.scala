@@ -1,8 +1,7 @@
 package chess
 
-import cats.data.Validated
 import cats.syntax.all.*
-import org.specs2.matcher.{ EitherMatchers, Matcher, ValidatedMatchers }
+import org.specs2.matcher.{ EitherMatchers, Matcher }
 import org.specs2.mutable.Specification
 import scala.language.implicitConversions
 
@@ -14,7 +13,7 @@ import cats.kernel.Monoid
 import chess.format.Uci
 import chess.variant.Chess960
 
-trait ChessTest extends Specification with ValidatedMatchers with EitherMatchers:
+trait ChessTest extends Specification with EitherMatchers:
 
   given Conversion[String, Board]  = Visual.<<
   given Conversion[String, PgnStr] = PgnStr(_)
@@ -96,13 +95,13 @@ trait ChessTest extends Specification with ValidatedMatchers with EitherMatchers
       Visual.addNewLines(Visual.>>|(board, Map(p -> 'x'))) must_== visual
     }
 
-  def beBoard(visual: String): Matcher[Validated[ErrorStr, Board]] =
-    beValid.like { case b =>
+  def beBoard(visual: String): Matcher[Either[ErrorStr, Board]] =
+    beRight.like { case b =>
       b.visual must_== (Visual << visual).visual
     }
 
-  def beSituation(visual: String): Matcher[Validated[ErrorStr, Situation]] =
-    beValid.like { case s =>
+  def beSituation(visual: String): Matcher[Either[ErrorStr, Situation]] =
+    beRight.like { case s =>
       s.board.visual must_== (Visual << visual).visual
     }
 

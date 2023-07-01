@@ -60,13 +60,13 @@ case class Situation(board: Board, color: Color):
     else none
 
   def move(from: Square, to: Square, promotion: Option[PromotableRole]): Either[ErrorStr, Move] =
-    variant.move(this, from, to, promotion).toEither
+    variant.move(this, from, to, promotion)
 
   def move(uci: Uci.Move): Either[ErrorStr, Move] =
-    variant.move(this, uci.orig, uci.dest, uci.promotion).toEither
+    variant.move(this, uci.orig, uci.dest, uci.promotion)
 
   def drop(role: Role, square: Square): Either[ErrorStr, Drop] =
-    variant.drop(this, role, square).toEither
+    variant.drop(this, role, square)
 
   def withHistory(history: History) =
     copy(board = board withHistory history)

@@ -60,13 +60,9 @@ object Replay:
         .foldM(emptyGames):
           case (games, (san, sanStr)) =>
             val game = games.headOption.fold(init)(_._1)
-            san(game.situation).bimap(
-              err => (init, games, err.some),
-              moveOrDrop =>
-                val newGame = moveOrDrop.applyGame(game)
-                val uci     = moveOrDrop.toUci
-                (newGame, Uci.WithSan(uci, sanStr)) :: games
-            )
+            san(game.situation)
+              .leftMap(err => (init, games, err.some))
+              .map(m => (m.applyGame(game), Uci.WithSan(m.toUci, sanStr)) :: games)
     yield (init, games.reverse, none)).merge
 
   private def computeSituations[M](
@@ -100,7 +96,8 @@ object Replay:
       sans: Iterable[SanStr],
       initialFen: Option[Fen.Epd],
       variant: Variant
-  ): Either[ErrorStr, List[Board]] = situations(sans, initialFen, variant) map (_ map (_.board))
+  ): Either[ErrorStr, List[Board]] =
+    situations(sans, initialFen, variant) map (_ map (_.board))
 
   def situations(
       sans: Iterable[SanStr],

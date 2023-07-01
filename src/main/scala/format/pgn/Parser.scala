@@ -25,10 +25,8 @@ object Parser:
   def moves(str: PgnMovesStr): Either[ErrorStr, Option[ParsedPgnTree]] =
     strMove.rep
       .parse(str.value)
-      .bimap(
-        err => showExpectations("Cannot parse moves", str.value, err),
-        (_, sans) => sans.foldLeft(none[ParsedPgnTree])((acc, x) => x.copy(child = acc).some)
-      )
+      .leftMap(err => showExpectations("Cannot parse moves", str.value, err))
+      .map((_, sans) => sans.foldLeft(none)((acc, x) => x.withChild(acc).some))
 
   def move(str: SanStr): Either[ErrorStr, ParsedPgnTree] =
     strMove.parse(str.value).bimap(err => showExpectations("Cannot parse move", str.value, err), _._2)

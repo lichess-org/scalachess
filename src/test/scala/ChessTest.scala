@@ -19,15 +19,6 @@ trait ChessTest extends Specification with EitherMatchers:
   given Conversion[String, PgnStr] = PgnStr(_)
   given Conversion[PgnStr, String] = _.value
 
-  extension (color: Color)
-    def -(role: Role) = Piece(color, role)
-    def pawn          = color - Pawn
-    def bishop        = color - Bishop
-    def knight        = color - Knight
-    def rook          = color - Rook
-    def queen         = color - Queen
-    def king          = color - King
-
   extension (str: String)
     def chess960: Board             = makeBoard(str, chess.variant.Chess960)
     def kingOfTheHill: Board        = makeBoard(str, chess.variant.KingOfTheHill)
@@ -60,14 +51,13 @@ trait ChessTest extends Specification with EitherMatchers:
     def withClock(c: Clock) = game.copy(clock = Option(c))
 
   def fenToGame(positionString: EpdFen, variant: Variant) =
-    val situation = Fen.read(variant, positionString)
-    situation map { sit =>
-      sit.color -> sit.withVariant(variant).board
-    } toRight "Could not construct situation from Fen" map { case (color, board) =>
-      Game(variant).copy(
-        situation = Situation(board, color)
-      )
-    }
+    Fen
+      .read(variant, positionString)
+      .map: sit =>
+        sit.color -> sit.withVariant(variant).board
+      .map: (color, board) =>
+        Game(variant).copy(situation = Situation(board, color))
+      .toRight("Could not construct situation from Fen")
 
   def makeBoard(pieces: (Square, Piece)*): Board =
     Board(BBoard.fromMap(pieces.toMap), defaultHistory(), chess.variant.Standard)

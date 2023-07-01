@@ -1,9 +1,8 @@
 package chess
 
 import cats.data.Validated
-import cats.syntax.option.*
-import org.specs2.matcher.Matcher
-import org.specs2.matcher.ValidatedMatchers
+import cats.syntax.all.*
+import org.specs2.matcher.{ EitherMatchers, Matcher, ValidatedMatchers }
 import org.specs2.mutable.Specification
 import scala.language.implicitConversions
 
@@ -15,7 +14,7 @@ import cats.kernel.Monoid
 import chess.format.Uci
 import chess.variant.Chess960
 
-trait ChessTest extends Specification with ValidatedMatchers:
+trait ChessTest extends Specification with ValidatedMatchers with EitherMatchers:
 
   given Conversion[String, Board]  = Visual.<<
   given Conversion[String, PgnStr] = PgnStr(_)
@@ -46,30 +45,18 @@ trait ChessTest extends Specification with ValidatedMatchers:
   extension (game: Game)
     def as(color: Color): Game = game.withPlayer(color)
 
-    def playMoves(moves: (Square, Square)*): Validated[ErrorStr, Game] = playMoveList(moves)
+    def playMoves(moves: (Square, Square)*): Either[ErrorStr, Game] = playMoveList(moves)
 
-    def playMoveList(moves: Iterable[(Square, Square)]): Validated[ErrorStr, Game] =
-      val vg = moves.foldLeft(Validated.valid(game): Validated[ErrorStr, Game]) { (vg, move) =>
-        // vg foreach { x =>
-        // println(s"------------------------ ${x.turns} = $move")
-        // }
-        // because possible moves are asked for player highlight
-        // before the move is played (on initial situation)
-        // val _ = vg map { _.situation.destinations }
-        val ng = vg flatMap { g =>
-          g(move._1, move._2) map (_._1)
-        }
-        ng
-      }
-      // vg foreach { x => println("========= PGN: " + x.pgnMoves) }
-      vg
+    def playMoveList(moves: Iterable[(Square, Square)]): Either[ErrorStr, Game] =
+      moves.toList.foldM(game):
+        case (game, (o, d)) => game.playMove(o, d)
 
     def playMove(
         orig: Square,
         dest: Square,
         promotion: Option[PromotableRole] = None
-    ): Validated[ErrorStr, Game] =
-      game.apply(orig, dest, promotion) map (_._1)
+    ): Either[ErrorStr, Game] =
+      game(orig, dest, promotion).map(_._1)
 
     def withClock(c: Clock) = game.copy(clock = Option(c))
 
@@ -77,7 +64,7 @@ trait ChessTest extends Specification with ValidatedMatchers:
     val situation = Fen.read(variant, positionString)
     situation map { sit =>
       sit.color -> sit.withVariant(variant).board
-    } toValid "Could not construct situation from Fen" map { case (color, board) =>
+    } toRight "Could not construct situation from Fen" map { case (color, board) =>
       Game(variant).copy(
         situation = Situation(board, color)
       )
@@ -119,8 +106,8 @@ trait ChessTest extends Specification with ValidatedMatchers:
       s.board.visual must_== (Visual << visual).visual
     }
 
-  def beGame(visual: String): Matcher[Validated[ErrorStr, Game]] =
-    beValid.like { case g =>
+  def beGame(visual: String): Matcher[Either[ErrorStr, Game]] =
+    beRight.like { case g =>
       g.board.visual must_== (Visual << visual).visual
     }
 

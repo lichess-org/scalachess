@@ -48,7 +48,7 @@ class CrazyhouseVariantTest extends ChessTest:
     "autodraw" in:
       "tons of pointless moves but shouldn't apply 50-moves" in:
         val moves = List.fill(30)(List(B1 -> C3, B8 -> C6, C3 -> B1, C6 -> B8))
-        Game(Crazyhouse).playMoves(moves.flatten*) must beValid.like { case g =>
+        Game(Crazyhouse).playMoves(moves.flatten*) must beRight.like { case g =>
           g.board.variant.fiftyMoves(g.board.history) must beFalse
           g.board.autoDraw must beTrue // fivefold repetition
         }
@@ -152,7 +152,7 @@ class CrazyhouseVariantTest extends ChessTest:
           F2 -> G2,
           H6 -> G6
         )
-        Game(Crazyhouse).playMoves(moves*) must beValid.like { case g =>
+        Game(Crazyhouse).playMoves(moves*) must beRight.like { case g =>
           g.board.history.threefoldRepetition must beTrue
         }
       "from prod with captures and drops should 3fold" in:
@@ -164,7 +164,7 @@ class CrazyhouseVariantTest extends ChessTest:
           ),
           initialFen = None,
           variant = Crazyhouse
-        ) must beValid.like { boards =>
+        ) must beRight.like { boards =>
           boards.last.history.threefoldRepetition must beTrue
         }
       "from prod should not 3fold" in:
@@ -261,7 +261,7 @@ class CrazyhouseVariantTest extends ChessTest:
           G2 -> F2,
           G6 -> H6
         )
-        Game(Crazyhouse).playMoves(moves*) must beValid.like { case g =>
+        Game(Crazyhouse).playMoves(moves*) must beRight.like { case g =>
           g.board.history.threefoldRepetition must beFalse
         }
       "not draw when only kings left" in:
@@ -315,7 +315,7 @@ class CrazyhouseVariantTest extends ChessTest:
             .toVector,
         initialFen = None,
         variant = Crazyhouse
-      ) must beValid
+      ) must beRight
 
     val dropTestCases: List[DropTestCase] = List(
       // Queen check in diagonal
@@ -360,7 +360,7 @@ class CrazyhouseVariantTest extends ChessTest:
     "possible drops" in:
       forall(dropTestCases) { case DropTestCase(fen, drops) =>
         val maybeGame = fenToGame(fen, Crazyhouse)
-        maybeGame must beValid.like { case game =>
+        maybeGame must beRight.like { case game =>
           Crazyhouse.possibleDrops(game.situation).map(_.toSet) must_== drops
         }
       }

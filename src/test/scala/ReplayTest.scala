@@ -23,7 +23,7 @@ class ReplayTest extends ChessTest:
         moves = List(Uci("e2e4"), Uci("e7e5"), Uci("e1e2")).flatten,
         initialFen = None,
         variant = variant.Standard
-      ) must beValid.like { situations =>
+      ) must beRight.like { situations =>
         situations.map(Fen.write) must_== List(
           EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"),
           EpdFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"),
@@ -38,7 +38,7 @@ class ReplayTest extends ChessTest:
         sans = SanStr.from("Be3 Ne4 Rg3 Nxe3 Rxe3" split " "),
         initialFen = None,
         variant = chess.variant.RacingKings
-      ) must beValid
+      ) must beRight
 
   "chess960 castlings" in:
     val sans: Vector[SanStr] =

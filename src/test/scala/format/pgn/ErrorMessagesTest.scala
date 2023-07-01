@@ -17,7 +17,7 @@ class ErrorMessagesTest extends ChessTest:
           |1. e4 { hello world } Nc6
           |2. bla
           |""".stripMargin
-      parser(e) must beValid
+      parser(e) must beRight
 
   "Null moves are not supported" should:
     "fail" in:
@@ -27,7 +27,7 @@ class ErrorMessagesTest extends ChessTest:
           |1. e4 { hello world } --
           |2. c6
           |""".stripMargin
-      parser(e) must beValid
+      parser(e) must beRight
 
   "too many glyphs" should:
     "fail" in:
@@ -37,7 +37,7 @@ class ErrorMessagesTest extends ChessTest:
           |1. e4 { hello world } c5????
           |2. c6
           |""".stripMargin
-      parser(e) must beInvalid
+      parser(e) must beLeft
 
   "invalid glyphs" should:
     "fail" in:
@@ -47,7 +47,7 @@ class ErrorMessagesTest extends ChessTest:
           |1. e4 { hello world } c5??@@
           |2. c6
           |""".stripMargin
-      parser(e) must beValid
+      parser(e) must beRight
 
   "bad comment" should:
     "fail" in:
@@ -57,7 +57,7 @@ class ErrorMessagesTest extends ChessTest:
           |1. e4 { hello world
           |2. c6
           |""".stripMargin
-      parser(e) must beValid
+      parser(e) must beRight
 
   "invalid tags 1" should:
     "failed" in:
@@ -67,7 +67,7 @@ class ErrorMessagesTest extends ChessTest:
            |1. e4 { hello world }  c5??
            |2. c6
            |""".stripMargin
-      parser(e) must beValid
+      parser(e) must beRight
 
   "invalid tags 2" should:
     "failed" in:
@@ -77,7 +77,7 @@ class ErrorMessagesTest extends ChessTest:
            |1. e4 { hello world }  c5??
            |2. c6
            |""".stripMargin
-      parser(e) must beValid
+      parser(e) must beRight
 
   "invalid promotion" should:
     "failed" in:
@@ -87,4 +87,4 @@ class ErrorMessagesTest extends ChessTest:
            |1. e4 h8=L
            |2. c6
            """.stripMargin
-      parser(e) must beValid
+      parser(e) must beRight

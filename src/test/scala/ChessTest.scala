@@ -28,9 +28,11 @@ trait ChessTest extends Specification with EitherMatchers:
   extension (board: Board)
     def visual = Visual >> board
     def destsFrom(from: Square): Option[List[Square]] =
-      board(from).map { piece =>
+      board(from).map: piece =>
         Situation(board, piece.color).generateMovesAt(from).map(_.dest)
-      }
+
+    def seq(actions: Board => Option[Board]*): Option[Board] =
+      actions.foldLeft(board.some)(_ flatMap _)
 
   extension (game: Game)
     def as(color: Color): Game = game.withPlayer(color)

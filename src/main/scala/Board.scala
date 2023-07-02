@@ -53,9 +53,6 @@ case class Board(
 
   def checkOf(c: Color): Check = variant.kingThreatened(this, c)
 
-  def seq(actions: Board => Option[Board]*): Option[Board] =
-    actions.foldLeft(Option(this): Option[Board])(_ flatMap _)
-
   def withBoard(b: BBoard): Board = copy(board = b)
 
   def place(piece: Piece, at: Square): Option[Board] =

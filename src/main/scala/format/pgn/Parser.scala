@@ -1,10 +1,8 @@
 package chess
 package format.pgn
 
-import cats.parse.{ LocationMap, Numbers as N, Parser as P, Parser0 as P0, Rfc5234 as R }
-import cats.data.Validated
-import cats.data.Validated.{ invalid, valid }
 import cats.syntax.all.*
+import cats.parse.{ LocationMap, Numbers as N, Parser as P, Parser0 as P0, Rfc5234 as R }
 import cats.parse.Parser.Expectation
 import cats.data.NonEmptyList
 
@@ -18,30 +16,23 @@ object Parser:
   // pgnComment with % or whitespaces
   val escape = pgnComment.? *> whitespace.rep0.?
 
-  def full(pgn: PgnStr): Validated[ErrorStr, ParsedPgn] =
-    pgnParser.parse(pgn.value) match
-      case Right((_, parsedResult)) =>
-        valid(parsedResult)
-      case Left(err) =>
-        invalid(showExpectations("Cannot parse pgn", pgn.value, err))
+  def full(pgn: PgnStr): Either[ErrorStr, ParsedPgn] =
+    pgnParser.parse(pgn.value).bimap(err => showExpectations("Cannot parse pgn", pgn.value, err), _._2)
 
-  def moves(strMoves: Iterable[SanStr]): Validated[ErrorStr, Sans] =
+  def moves(strMoves: Iterable[SanStr]): Either[ErrorStr, Sans] =
     strMoves.toList.traverse(sanOnly).map(Sans(_))
 
-  def moves(str: PgnMovesStr): Validated[ErrorStr, Option[ParsedPgnTree]] =
-    strMove.rep.parse(str.value) match
-      case Right((_, sans)) => valid(sans.foldLeft(none[ParsedPgnTree])((acc, x) => x.copy(child = acc).some))
-      case Left(err)        => invalid(showExpectations("Cannot parse moves", str.value, err))
+  def moves(str: PgnMovesStr): Either[ErrorStr, Option[ParsedPgnTree]] =
+    strMove.rep
+      .parse(str.value)
+      .leftMap(err => showExpectations("Cannot parse moves", str.value, err))
+      .map((_, sans) => sans.foldLeft(none)((acc, x) => x.withChild(acc).some))
 
-  def move(str: SanStr): Validated[ErrorStr, ParsedPgnTree] =
-    strMove.parse(str.value) match
-      case Right((_, san)) => valid(san)
-      case Left(err)       => invalid(showExpectations("Cannot parse move", str.value, err))
+  def move(str: SanStr): Either[ErrorStr, ParsedPgnTree] =
+    strMove.parse(str.value).bimap(err => showExpectations("Cannot parse move", str.value, err), _._2)
 
-  def sanOnly(str: SanStr): Validated[ErrorStr, San] =
-    sanOnly.parse(str.value) match
-      case Right((_, san)) => valid(san)
-      case Left(err)       => invalid(showExpectations("Cannot parse move", str.value, err))
+  def sanOnly(str: SanStr): Either[ErrorStr, San] =
+    sanOnly.parse(str.value).bimap(err => showExpectations("Cannot parse move", str.value, err), _._2)
 
   val blockComment  = P.until0(P.char('}')).with1.between(P.char('{'), P.char('}')).map(Comment(_))
   val inlineComment = P.char(';') *> P.until(R.lf).map(Comment(_))

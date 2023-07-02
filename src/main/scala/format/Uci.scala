@@ -1,7 +1,6 @@
 package chess
 package format
 
-import cats.data.Validated
 import cats.syntax.all.*
 
 sealed trait Uci:
@@ -11,7 +10,7 @@ sealed trait Uci:
 
   def origDest: (Square, Square)
 
-  def apply(situation: Situation): Validated[ErrorStr, MoveOrDrop]
+  def apply(situation: Situation): Either[ErrorStr, MoveOrDrop]
 
 object Uci:
 

@@ -26,7 +26,6 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
     // "-rewrite",
     "-source:future-migration",
     "-indent",
-    "-explaintypes",
     "-feature",
     "-language:postfixOps",
     "-Xtarget:12",

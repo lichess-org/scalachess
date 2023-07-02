@@ -31,7 +31,7 @@ class ClockTest extends ChessTest:
     "new game" in:
       game.clock map { _.color } must_== Option(White)
     "one move played" in:
-      game.playMoves(E2 -> E4) must beValid.like { case g: Game =>
+      game.playMoves(E2 -> E4) must beRight.like { case g: Game =>
         g.clock map { _.color } must_== Option(Black)
       }
   "create a clock" should:

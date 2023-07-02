@@ -29,7 +29,7 @@ class InsufficientMatingMaterialTest extends ChessTest:
     "return true" in:
       forall(trues) { fen =>
         val maybeGame = fenToGame(fen, Standard)
-        maybeGame must beValid.like { case game =>
+        maybeGame must beRight.like { case game =>
           bishopsOnOppositeColors(game.situation.board) must beTrue
         }
       }
@@ -37,7 +37,7 @@ class InsufficientMatingMaterialTest extends ChessTest:
     "return false" in:
       forall(falses) { fen =>
         val maybeGame = fenToGame(fen, Standard)
-        maybeGame must beValid.like { case game =>
+        maybeGame must beRight.like { case game =>
           bishopsOnOppositeColors(game.situation.board) must beFalse
         }
       }
@@ -70,7 +70,7 @@ class InsufficientMatingMaterialTest extends ChessTest:
     "return true" in:
       forall(trues) { fen =>
         val maybeGame = fenToGame(fen, Standard)
-        maybeGame must beValid.like { case game =>
+        maybeGame must beRight.like { case game =>
           apply(game.situation.board, !game.situation.color) must beTrue
         }
       }
@@ -78,7 +78,7 @@ class InsufficientMatingMaterialTest extends ChessTest:
     "return false" in:
       forall(falses) { fen =>
         val maybeGame = fenToGame(fen, Standard)
-        maybeGame must beValid.like { case game =>
+        maybeGame must beRight.like { case game =>
           apply(game.situation.board, !game.situation.color) must beFalse
         }
       }

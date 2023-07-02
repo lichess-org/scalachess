@@ -3,8 +3,7 @@ package benchmarks
 import org.openjdk.jmh.annotations._
 import java.util.concurrent.TimeUnit
 
-import cats.data.Validated
-import cats.syntax.option.*
+import cats.syntax.all.*
 
 import chess.Square.*
 import chess.format.pgn.Fixtures
@@ -74,20 +73,8 @@ class PlayBench:
   extension (game: Game)
     def as(color: Color): Game = game.withPlayer(color)
 
-    def playMoves(moves: (Square, Square)*): Validated[ErrorStr, Game] = playMoveList(moves)
+    def playMoves(moves: (Square, Square)*): Either[ErrorStr, Game] = playMoveList(moves)
 
-    def playMoveList(moves: Iterable[(Square, Square)]): Validated[ErrorStr, Game] =
-      val vg = moves.foldLeft(Validated.valid(game): Validated[ErrorStr, Game]) { (vg, move) =>
-        // vg foreach { x =>
-        // println(s"------------------------ ${x.turns} = $move")
-        // }
-        // because possible moves are asked for player highlight
-        // before the move is played (on initial situation)
-        val _ = vg map { _.situation.destinations }
-        val ng = vg flatMap { g =>
-          g(move._1, move._2) map (_._1)
-        }
-        ng
-      }
-      // vg foreach { x => println("========= PGN: " + x.pgnMoves) }
-      vg
+    def playMoveList(moves: Iterable[(Square, Square)]): Either[ErrorStr, Game] =
+      moves.toList.foldM(game):
+        case (game, (o, d)) => game(o, d).map(_._1)

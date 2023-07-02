@@ -14,11 +14,9 @@ import chess.format.pgn.Parser
 @Measurement(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
 @Warmup(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
 @Threads(value = 1)
-class ParserBench {
+class ParserBench:
 
   var games = Fixtures.gamesForPerfTest
   @Benchmark
   def pgnParser(): Boolean =
     games.traverse(Parser.full).isRight
-
-}

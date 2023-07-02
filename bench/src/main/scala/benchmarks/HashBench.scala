@@ -16,14 +16,12 @@ import chess.Hash
 @Measurement(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
 @Warmup(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
 @Threads(value = 1)
-class HashBench {
+class HashBench:
 
-  val games = Fixtures.gamesForPerfTest.traverse(Reader.full(_)).toOption.get.traverse(_.valid).toOption.get
+  var games = Fixtures.gamesForPerfTest.traverse(Reader.full(_)).toOption.get.traverse(_.valid).toOption.get
 
-  val situations = games.flatMap(_.moves).flatMap(_.move).map(_.situationAfter)
+  var situations = games.flatMap(_.moves).flatMap(_.move).map(_.situationAfter)
 
   @Benchmark
   def hashes() =
-    situations.foreach(Hash(_))
-
-}
+    situations.map(Hash(_))

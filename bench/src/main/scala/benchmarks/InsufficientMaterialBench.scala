@@ -17,7 +17,7 @@ import chess.variant.Horde
 @Measurement(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
 @Warmup(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
 @Threads(value = 1)
-class InsufficientMaterialBench {
+class InsufficientMaterialBench:
 
   var hordeGames = List(
     "k7/ppP5/brp5/8/8/8/8/8 b - -",
@@ -41,10 +41,8 @@ class InsufficientMaterialBench {
     "8/P1P5/8/8/8/8/bbnb4/k7 b - - 0 1",
     "8/6PP/8/8/8/8/5rrb/7k b - - 0 1"
   ).map(EpdFen(_)).map(Fen.read(Horde, _).get)
+
   @Benchmark
   def horde() =
-    hordeGames.foreach { situation =>
+    hordeGames.map: situation =>
       situation.variant.isInsufficientMaterial(situation.board)
-    }
-
-}

@@ -20,23 +20,21 @@ import chess.{ Mode => _, * }
 class PlayBench:
 
   var standard = Game(Board init chess.variant.Standard, White)
+  var moves      = Fixtures.fromProd2
+  var gameReplay = Replay.boards(SanStr from moves.split(' ').toList, None, Standard).toOption.get
 
   @Benchmark
   def divider() =
-    var moves      = Fixtures.fromProd2
-    val gameReplay = Replay.boards(SanStr from moves.split(' ').toList, None, Standard).toOption.get
     Divider(gameReplay)
+
+  var nb    = 50
+  var games = Fixtures.prod500standard
+  var gameMoves = games.take(nb).map(g => SanStr from g.split(' ').toList)
 
   @Benchmark
   def replay() =
-    var nb    = 500
-    var games = Fixtures.prod500standard
-    var gameMoves = (games take nb).map { g =>
-      SanStr from g.split(' ').toList
-    }
-    gameMoves foreach { moves =>
+    gameMoves.map: moves =>
       Replay.gameMoveWhileValid(moves, chess.format.Fen.initial, chess.variant.Standard)
-    }
 
   @Benchmark
   def play() =

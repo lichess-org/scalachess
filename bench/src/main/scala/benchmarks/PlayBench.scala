@@ -1,13 +1,12 @@
 package benchmarks
 
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
+import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 import cats.syntax.all.*
-
 import chess.Square.*
-import chess.format.pgn.Fixtures
-import chess.format.pgn.SanStr
+import chess.format.pgn.{ Fixtures, SanStr }
 import chess.variant.Standard
 import chess.{ Mode => _, * }
 
@@ -16,29 +15,51 @@ import chess.{ Mode => _, * }
 @OutputTimeUnit(TimeUnit.SECONDS)
 @Measurement(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
 @Warmup(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
+@Fork(value = 3)
 @Threads(value = 1)
 class PlayBench:
 
-  var standard = Game(Board init chess.variant.Standard, White)
-  var moves      = Fixtures.fromProd2
-  var gameReplay = Replay.boards(SanStr from moves.split(' ').toList, None, Standard).toOption.get
+  // the unit of CPU work per iteration
+  private[this] val Work: Long = 10
+
+  var dividerGames: List[List[Board]] = _
+  var gameMoves: List[List[SanStr]]   = _
+  var standard: Game                  = _
+
+  def gameReplay(sans: String) =
+    Replay.boards(SanStr.from(sans.split(' ')), None, Standard).toOption.get
+
+  @Setup
+  def setup() =
+    dividerGames = Fixtures.prod500standard.map(gameReplay)
+
+    var nb    = 50
+    var games = Fixtures.prod500standard
+    gameMoves = games.take(nb).map(g => SanStr from g.split(' ').toList)
+
+    standard = Game(Board init chess.variant.Standard, White)
 
   @Benchmark
-  def divider() =
-    Divider(gameReplay)
-
-  var nb    = 50
-  var games = Fixtures.prod500standard
-  var gameMoves = games.take(nb).map(g => SanStr from g.split(' ').toList)
+  def divider(bh: Blackhole) =
+    var result = dividerGames.map { x =>
+      Blackhole.consumeCPU(Work)
+      Divider(x)
+    }
+    bh.consume(result)
+    result
 
   @Benchmark
-  def replay() =
-    gameMoves.map: moves =>
+  def replay(bh: Blackhole) =
+    var result = gameMoves.map: moves =>
+      Blackhole.consumeCPU(Work)
       Replay.gameMoveWhileValid(moves, chess.format.Fen.initial, chess.variant.Standard)
+    bh.consume(result)
+    result
 
   @Benchmark
-  def play() =
-    standard.playMoves(
+  def play(bh: Blackhole) =
+    var result = standard.playMoves(
+      bh,
       E2 -> E4,
       D7 -> D5,
       E4 -> D5,
@@ -67,12 +88,20 @@ class PlayBench:
       B7 -> C6,
       E2 -> A6
     )
+    bh.consume(result)
+    result
 
   extension (game: Game)
     def as(color: Color): Game = game.withPlayer(color)
 
-    def playMoves(moves: (Square, Square)*): Either[ErrorStr, Game] = playMoveList(moves)
+    def playMoves(bh: Blackhole, moves: (Square, Square)*): Either[ErrorStr, Game] = playMoveList(bh, moves)
 
-    def playMoveList(moves: Iterable[(Square, Square)]): Either[ErrorStr, Game] =
+    def playMoveList(bh: Blackhole, moves: Iterable[(Square, Square)]): Either[ErrorStr, Game] =
       moves.toList.foldM(game):
-        case (game, (o, d)) => game(o, d).map(_._1)
+        case (game, (o, d)) =>
+          // because possible moves are asked for player highlight
+          // before the move is played (on initial situation)
+          Blackhole.consumeCPU(Work)
+          var result = game.situation.destinations
+          bh.consume(result)
+          game(o, d).map(_._1)

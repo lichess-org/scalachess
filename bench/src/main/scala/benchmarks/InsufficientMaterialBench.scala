@@ -1,14 +1,10 @@
 package benchmarks
 
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
 
 import cats.syntax.all.*
-
 import java.util.concurrent.TimeUnit
-import chess.format.pgn.Fixtures
-import chess.format.pgn.Parser
-import chess.format.EpdFen
-import chess.format.Fen
+import chess.format.{ EpdFen, Fen }
 import chess.variant.Horde
 
 @State(Scope.Thread)
@@ -16,6 +12,7 @@ import chess.variant.Horde
 @OutputTimeUnit(TimeUnit.SECONDS)
 @Measurement(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
 @Warmup(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
+@Fork(value = 3)
 @Threads(value = 1)
 class InsufficientMaterialBench:
 

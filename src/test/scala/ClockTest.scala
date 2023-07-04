@@ -9,21 +9,24 @@ class ClockTest extends ChessTest:
   given Conversion[Int, Clock.IncrementSeconds] = Clock.IncrementSeconds(_)
 
   val fakeClock60 = Clock(60, 0)
-    .copy(timestamper = new Timestamper {
-      val now = Timestamp(0)
-    })
+    .copy(timestamper =
+      new Timestamper:
+        val now = Timestamp(0)
+    )
     .start
 
   val fakeClock600 = Clock(600, 0)
-    .copy(timestamper = new Timestamper {
-      val now = Timestamp(0)
-    })
+    .copy(timestamper =
+      new Timestamper:
+        val now = Timestamp(0)
+    )
     .start
 
   def advance(c: Clock, t: Int) =
-    c.copy(timestamper = new Timestamper {
-      val now = c.timestamper.now + Centis(t)
-    })
+    c.copy(timestamper =
+      new Timestamper:
+        val now = c.timestamper.now + Centis(t)
+    )
 
   "play with a clock" should:
     val clock = Clock(5 * 60 * 1000, 0)

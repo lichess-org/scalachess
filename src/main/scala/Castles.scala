@@ -32,10 +32,10 @@ object Castles extends OpaqueBitboard[Castles]:
       c.without(color) | kingSide.at(color.kingSide) | queenSide.at(color.queenSide)
 
     def toFenString: String =
-      (if (whiteKingSide) "K" else "") +
-        (if (whiteQueenSide) "Q" else "") +
-        (if (blackKingSide) "k" else "") +
-        (if (blackQueenSide) "q" else "") match
+      (if whiteKingSide then "K" else "") +
+        (if whiteQueenSide then "Q" else "") +
+        (if blackKingSide then "k" else "") +
+        (if blackQueenSide then "q" else "") match
         case "" => "-"
         case n  => n
 

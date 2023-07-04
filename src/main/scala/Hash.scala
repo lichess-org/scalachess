@@ -14,11 +14,11 @@ object Hash extends OpaqueInt[Hash]:
   extension (size: Hash)
     def apply(situation: Situation): PositionHash = PositionHash:
       val l = Hash.get(situation, Hash.polyglotTable)
-      if (size <= 8) Array.tabulate(size)(i => (l >>> ((7 - i) * 8)).toByte)
+      if size <= 8 then Array.tabulate(size)(i => (l >>> ((7 - i) * 8)).toByte)
       else
         val m = Hash.get(situation, Hash.randomTable)
         Array.tabulate(size)(i =>
-          if (i < 8) (l >>> ((7 - i) * 8)).toByte
+          if i < 8 then (l >>> ((7 - i) * 8)).toByte
           else (m >>> ((15 - i) * 8)).toByte
         )
 
@@ -90,8 +90,8 @@ object Hash extends OpaqueInt[Hash]:
       case variant.ThreeCheck =>
         val blackCount   = math.min(situation.history.checkCount.black, 3)
         val whiteCount   = math.min(situation.history.checkCount.white, 3)
-        val hblackchecks = if (blackCount > 0) hep ^ table.threeCheckMasks(blackCount - 1) else hep
-        if (whiteCount > 0) hblackchecks ^ table.threeCheckMasks(whiteCount + 2) else hblackchecks
+        val hblackchecks = if blackCount > 0 then hep ^ table.threeCheckMasks(blackCount - 1) else hep
+        if whiteCount > 0 then hblackchecks ^ table.threeCheckMasks(whiteCount + 2) else hblackchecks
       case _ => hep
 
     // Hash in special crazyhouse data.

@@ -43,13 +43,13 @@ enum Color(val name: String, val letter: Char) derives Eq:
 object Color:
 
   def fromName(n: String): Option[Color] =
-    if (n == "white") Option(White)
-    else if (n == "black") Option(Black)
+    if n == "white" then Option(White)
+    else if n == "black" then Option(Black)
     else None
 
   def apply(c: Char): Option[Color] =
-    if (c == 'w') Option(White)
-    else if (c == 'b') Option(Black)
+    if c == 'w' then Option(White)
+    else if c == 'b' then Option(Black)
     else None
 
   val white: Color = White

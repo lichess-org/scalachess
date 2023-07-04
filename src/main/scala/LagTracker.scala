@@ -22,11 +22,10 @@ final case class LagTracker(
       comp,
       copy(
         quota = (quota + quotaGain - comp) atMost quotaMax,
-        uncompStats = {
+        uncompStats =
           // start recording after first uncomp.
-          if (uncomped == Centis(0) && uncompStats.samples == 0) uncompStats
-          else uncompStats record uncomped.centis.toFloat
-        },
+          if uncomped == Centis(0) && uncompStats.samples == 0 then uncompStats
+          else uncompStats record uncomped.centis.toFloat,
         lagStats = lagStats record (lag atMost Centis(2000)).centis.toFloat,
         compEstSqErr = compEstSqErr + ceDiff.centis * ceDiff.centis,
         compEstOvers = compEstOvers + ceDiff.nonNeg

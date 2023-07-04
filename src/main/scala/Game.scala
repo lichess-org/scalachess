@@ -75,11 +75,9 @@ case class Game(
       gameActive: => Boolean
   ): Option[Clock.WithCompensatedLag[Clock]] =
     clock.map { prev =>
-      {
-        val c1 = metrics.frameLag.fold(prev)(prev.withFrameLag)
-        val c2 = c1.step(metrics, gameActive)
-        if (ply - startedAtPly == Ply(1)) c2.map(_.start) else c2
-      }
+      val c1 = metrics.frameLag.fold(prev)(prev.withFrameLag)
+      val c2 = c1.step(metrics, gameActive)
+      if ply - startedAtPly == Ply(1) then c2.map(_.start) else c2
     }
 
   def apply(uci: Uci.Move): Either[ErrorStr, (Game, Move)] = apply(uci.orig, uci.dest, uci.promotion)

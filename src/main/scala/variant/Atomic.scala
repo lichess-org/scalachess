@@ -96,11 +96,11 @@ case object Atomic
 
     // Bishops of opposite color (no other pieces) endgames are dead drawn
     // except if either player has multiple bishops so a helpmate is possible
-    if (board.count(White) >= 2 && board.count(Black) >= 2)
+    if board.count(White) >= 2 && board.count(Black) >= 2 then
       board.kingsAndBishopsOnly && board.nbPieces <= 4 && bishopsOnOppositeColors
 
     // Queen, rook + any, bishop + any (same piece color), or 3 knights can mate
-    else if (board.kingsAndKnightsOnly) board.nbPieces <= 4
+    else if board.kingsAndKnightsOnly then board.nbPieces <= 4
     else board.kingsRooksAndMinorsOnly && !bishopsOnOppositeColors && board.nbPieces <= 3
 
   /*

@@ -20,10 +20,10 @@ case object Horde
   /** In Horde chess white advances against black with a horde of pawns.
     */
   lazy val pieces: Map[Square, Piece] =
-    val whitePawnsHorde = for {
+    val whitePawnsHorde = for
       x <- File.all
       y <- Rank.all.take(4)
-    } yield (Square(x, y) -> White.pawn)
+    yield (Square(x, y) -> White.pawn)
     val frontPawns  = List(Square.B5, Square.C5, Square.F5, Square.G5).map { _ -> White.pawn }
     val blackPawns  = File.all.map { Square(_, Rank.Seventh) -> Black.pawn }
     val blackPieces = File.all.map { x => Square(x, Rank.Eighth) -> (Black - backRank(x.index)) }

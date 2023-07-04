@@ -292,7 +292,7 @@ case class Situation(board: Board, color: Color):
   private def normalMove(orig: Square, dest: Square, role: Role, capture: Boolean): Option[Move] =
     val taken = if capture then Option(dest) else None
     val after =
-      if (capture) then board.taking(orig, dest, taken)
+      if capture then board.taking(orig, dest, taken)
       else board.move(orig, dest)
     after.map(board =>
       Move(

@@ -7,14 +7,14 @@ object Rank extends OpaqueInt[Rank]:
     inline def index: Int = a
 
     inline def offset(delta: Int): Option[Rank] =
-      if (-8 < delta && delta < 8) atIndex(a + delta)
+      if -8 < delta && delta < 8 then atIndex(a + delta)
       else None
 
     inline def char: Char = (49 + a).toChar
   end extension
 
   inline def atIndex(index: Int): Option[Rank] =
-    if (0 <= index && index < 8) Some(index)
+    if 0 <= index && index < 8 then Some(index)
     else None
 
   inline def of(inline square: Square): Rank = square.value >> 3

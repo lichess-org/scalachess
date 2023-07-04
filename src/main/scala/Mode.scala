@@ -19,7 +19,7 @@ object Mode:
 
   def apply(id: Int): Option[Mode] = byId get id
 
-  def apply(rated: Boolean) = if (rated) Rated else Casual
+  def apply(rated: Boolean) = if rated then Rated else Casual
 
   val default: Mode = Casual
 

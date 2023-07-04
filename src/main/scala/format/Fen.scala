@@ -62,6 +62,6 @@ object BoardFen extends OpaqueString[BoardFen]:
   extension (a: BoardFen)
     def andColor(c: Color) = BoardAndColorFen(s"$a ${c.letter}")
     def removePockets: BoardFen =
-      if (a.contains('[')) a.takeWhile('[' !=)
-      else if (a.count('/' == _) == 8) a.split('/').take(8).mkString("/")
+      if a.contains('[') then a.takeWhile('[' !=)
+      else if a.count('/' == _) == 8 then a.split('/').take(8).mkString("/")
       else a

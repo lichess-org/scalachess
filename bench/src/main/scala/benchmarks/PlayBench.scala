@@ -8,7 +8,7 @@ import cats.syntax.all.*
 import chess.Square.*
 import chess.format.pgn.{ Fixtures, SanStr }
 import chess.variant.Standard
-import chess.{ Mode => _, * }
+import chess.{ Mode as _, * }
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))

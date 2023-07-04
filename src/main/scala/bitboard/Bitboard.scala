@@ -48,8 +48,7 @@ object Bitboard extends OpaqueBitboard[Bitboard]:
         i += 1
         sq += delta
         val con = (sq < 0 || 64 <= sq || distance(sq, sq - delta) > 2)
-        if (!con)
-          attacks |= 1L << sq
+        if !con then attacks |= 1L << sq
 
         !(occupied.contains(Square(sq)) || con)
       do ()

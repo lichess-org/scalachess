@@ -9,12 +9,12 @@ object Dumper:
 
     val base = (promotion, piece.role) match
       case _ if castles =>
-        if (orig ?> dest) "O-O-O" else "O-O"
+        if orig ?> dest then "O-O-O" else "O-O"
 
       case _ if enpassant => s"${orig.file.char}x${dest.key}"
 
       case (promotion, Pawn) =>
-        (if (captures) s"${orig.file.char}x" else "") +
+        (if captures then s"${orig.file.char}x" else "") +
           promotion.fold(dest.key)(p => s"${dest.key}=${p.pgn}")
 
       case (_, role) =>

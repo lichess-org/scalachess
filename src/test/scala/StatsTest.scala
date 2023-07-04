@@ -13,19 +13,17 @@ class StatsTest extends Specification:
     } sum).toFloat / (elts.size - 1)
 
   def beApprox(comp: Float) =
-    (f: Float) => {
-      if (comp.isNaN) f.isNaN must beTrue
+    (f: Float) =>
+      if comp.isNaN then f.isNaN must beTrue
       else comp must beCloseTo(f +/- 0.001f * comp)
-    }
 
   def beLike(comp: Stats) =
-    (s: Stats) => {
+    (s: Stats) =>
       s.samples must_== comp.samples
       s.mean must beApprox(comp.mean)
       (s.variance, comp.variance) match
         case (Some(sv), Some(cv)) => sv must beApprox(cv)
         case (sv, cv)             => sv must_== cv
-    }
 
   "empty stats" should:
     "have good defaults" in:

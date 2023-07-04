@@ -35,7 +35,7 @@ case class Move(
           lastMove = Option(toUci),
           unmovedRooks = before.unmovedRooks,
           halfMoveClock =
-            if (piece.is(Pawn) || captures || promotes) HalfMoveClock.initial
+            if piece.is(Pawn) || captures || promotes then HalfMoveClock.initial
             else h1.halfMoveClock + 1
         )
 
@@ -88,10 +88,10 @@ case class Move(
     // castling rights and en-passant rights.
     board updateHistory { h =>
       lazy val positionHashesOfSituationBefore =
-        if (h.positionHashes.value.isEmpty) Hash(situationBefore) else h.positionHashes
+        if h.positionHashes.value.isEmpty then Hash(situationBefore) else h.positionHashes
       val resetsPositionHashes = board.variant.isIrreversible(this)
       val basePositionHashes =
-        if (resetsPositionHashes) Monoid[PositionHash].empty else positionHashesOfSituationBefore
+        if resetsPositionHashes then Monoid[PositionHash].empty else positionHashesOfSituationBefore
       h.copy(positionHashes =
         Monoid[PositionHash].combine(Hash(Situation(board, !piece.color)), basePositionHashes)
       )
@@ -117,10 +117,11 @@ case class Move(
     op.fold(this.some)(withPromotion)
 
   def withPromotion(p: PromotableRole): Option[Move] =
-    if (after.count(color.queen) > before.count(color.queen)) for {
-      b2 <- after take dest
-      b3 <- b2.place(color - p, dest)
-    } yield copy(after = b3, promotion = Option(p))
+    if after.count(color.queen) > before.count(color.queen) then
+      for
+        b2 <- after take dest
+        b3 <- b2.place(color - p, dest)
+      yield copy(after = b3, promotion = Option(p))
     else this.some
 
   inline def withAfter(newBoard: Board) = copy(after = newBoard)

@@ -7,7 +7,7 @@ object File extends OpaqueInt[File]:
     inline def index: Int = a
 
     inline def offset(delta: Int): Option[File] =
-      if (-8 < delta && delta < 8) atIndex(a + delta)
+      if -8 < delta && delta < 8 then atIndex(a + delta)
       else None
 
     inline def char: Char = (97 + a).toChar
@@ -17,7 +17,7 @@ object File extends OpaqueInt[File]:
   end extension
 
   inline def atIndex(index: Int): Option[File] =
-    if (0 <= index && index < 8) Some(index)
+    if 0 <= index && index < 8 then Some(index)
     else None
 
   inline def of(inline square: Square): File = square.value & 0x7

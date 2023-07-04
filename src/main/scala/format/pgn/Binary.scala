@@ -62,7 +62,7 @@ object Binary:
     // 1 drop
     // 1 nothing
     def simplePiece(b1: Int, b2: Int): String =
-      if (bitAt(b2, 2)) drop(b1, b2)
+      if bitAt(b2, 2) then drop(b1, b2)
       else
         pieceStrs(b2 >> 5) match
           case castle @ ("O-O" | "O-O-O") =>
@@ -70,7 +70,7 @@ object Binary:
             s"$castle$check"
           case piece =>
             val square  = squareString(right(b1, 6))
-            val capture = if (bitAt(b2, 3)) "x" else ""
+            val capture = if bitAt(b2, 3) then "x" else ""
             val check   = checkStrs(cut(b2, 5, 3))
             s"$piece$capture$square$check"
     def drop(b1: Int, b2: Int): String =
@@ -87,13 +87,13 @@ object Binary:
         case _ => ""
       val check     = checkStrs(cut(b2, 6, 4))
       val prom      = promotionStrs(cut(b2, 4, 1))
-      val promotion = if (prom.isEmpty) "" else s"=$prom"
+      val promotion = if prom.isEmpty then "" else s"=$prom"
       s"$fileCapture$square$promotion$check"
 
     def fullPiece(b1: Int, b2: Int, b3: Int): String =
       val square  = squareString(right(b1, 6))
       val piece   = pieceStrs(b2 >> 5)
-      val capture = if (bitAt(b2, 3)) "x" else ""
+      val capture = if bitAt(b2, 3) then "x" else ""
       val check   = checkStrs(cut(b2, 5, 3))
       val disamb = (b3 >> 6) match
         case 0 => fileChar(right(b3, 3)).toString
@@ -169,17 +169,17 @@ object Binary:
       )
 
     def disambTypeInt(orig: String): Int =
-      if (orig.length > 1) 2
-      else if (orig.head.toInt < 97) 1
+      if orig.length > 1 then 2
+      else if orig.head.toInt < 97 then 1
       else 0
 
     def disambiguationInt(orig: String): Int =
-      if (orig.length > 1) posInt(orig)
-      else if (orig.head.toInt < 97) rankInt(orig.head)
+      if orig.length > 1 then posInt(orig)
+      else if orig.head.toInt < 97 then rankInt(orig.head)
       else fileInt(orig.head)
 
-    def boolInt(s: String): Int  = if (s.nonEmpty) 1 else 0
-    def boolInt(b: Boolean): Int = if (b) 1 else 0
+    def boolInt(s: String): Int  = if s.nonEmpty then 1 else 0
+    def boolInt(b: Boolean): Int = if b then 1 else 0
 
     def posInt(square: String): Int = posInt(fileInt(square.head), rankInt(square(1)))
     def posInt(x: Int, y: Int): Int = (x << 3) + y
@@ -189,7 +189,7 @@ object Binary:
 
     def shiftOptionInt(fileOption: Option[String], square: String): Int =
       fileOption.fold(0) { file =>
-        if (file.head < square.head) 1 else 2
+        if file.head < square.head then 1 else 2
       }
 
     val pieceR       = "([KQRNB])"

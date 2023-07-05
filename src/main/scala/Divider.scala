@@ -51,7 +51,7 @@ object Divider:
     )
 
   private def majorsAndMinors(board: Board): Int =
-    (board.occupied & ~(board.kings | board.pawns)).count
+    (board.queens | board.rooks | board.bishops | board.knights).count
 
   // Sparse back-rank indicates that pieces have been developed
   private def backrankSparse(board: Board): Boolean =

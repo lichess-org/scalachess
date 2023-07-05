@@ -1,25 +1,17 @@
 package chess
 
-import cats.syntax.option.none
+import cats.syntax.all.*
 import bitboard.Bitboard
 import scala.annotation.switch
 
 case class Division(middle: Option[Ply], end: Option[Ply], plies: Ply):
 
-  def openingSize: Ply = middle | plies
-  def middleSize: Option[Ply] =
-    middle.map { m =>
-      (end | plies) - m
-    }
-  def endSize = end.map(plies - _)
-
-  def openingBounds = middle.map(0 -> _)
-  def middleBounds =
-    for
-      m <- middle
-      e <- end
-    yield m -> e
-  def endBounds = end.map(_ -> plies)
+  def openingSize: Ply        = middle | plies
+  def middleSize: Option[Ply] = middle.map((end | plies) - _)
+  def endSize                 = end.map(plies - _)
+  def openingBounds           = middle.map(0 -> _)
+  def middleBounds            = (middle, end).tupled
+  def endBounds               = end.map(_ -> plies)
 
 object Division:
   val empty = Division(None, None, Ply.initial)

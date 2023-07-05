@@ -55,8 +55,8 @@ object Divider:
 
   // Sparse back-rank indicates that pieces have been developed
   private def backrankSparse(board: Board): Boolean =
-    (board.occupied & Bitboard.rank(Rank.First) & board.white).count < 4 ||
-      (board.occupied & Bitboard.rank(Rank.Eighth) & board.black).count < 4
+    (Bitboard.rank(Rank.First) & board.white).count < 4 ||
+      (Bitboard.rank(Rank.Eighth) & board.black).count < 4
 
   private def score(white: Int, black: Int, y: Int): Int =
     ((white, black): @switch) match

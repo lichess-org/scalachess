@@ -2,6 +2,7 @@ package chess
 
 import cats.syntax.option.none
 import bitboard.Bitboard
+import scala.annotation.switch
 
 case class Division(middle: Option[Ply], end: Option[Ply], plies: Ply):
 
@@ -58,7 +59,7 @@ object Divider:
       (board.occupied & Bitboard.rank(Rank.Eighth) & board.black).count < 4
 
   private def score(white: Int, black: Int, y: Int): Int =
-    (white, black) match
+    ((white, black): @switch) match
       case (0, 0) => 0
 
       case (1, 0) => 1 + (8 - y)
@@ -106,5 +107,5 @@ object Divider:
           .colorAt(s)
           .foreach: v =>
             if v == White then white += 1
-            else black = 1
+            else black += 1
       mix + score(white, black, region.head.rank.index + 1)

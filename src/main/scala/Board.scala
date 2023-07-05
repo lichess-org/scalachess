@@ -20,6 +20,7 @@ case class Board(
     byPiece,
     byRole,
     byRoleOf,
+    colorAt,
     isCheck,
     isOccupied,
     kingOf,

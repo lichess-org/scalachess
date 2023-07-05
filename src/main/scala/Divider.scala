@@ -98,14 +98,13 @@ object Divider:
   }.toList
 
   private def mixedness(board: Board): Int =
-    mixednessRegions.foldLeft(0) { case (mix, region) =>
+    mixednessRegions.foldLeft(0): (mix, region) =>
       var white = 0
       var black = 0
-      region foreach { p =>
-        board(p) foreach { v =>
-          if v is White then white = white + 1
-          else black = black + 1
-        }
-      }
+      region.foreach: s =>
+        board
+          .colorAt(s)
+          .foreach: v =>
+            if v == White then white += 1
+            else black = 1
       mix + score(white, black, region.head.rank.index + 1)
-    }

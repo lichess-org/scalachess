@@ -41,7 +41,7 @@ object Hash extends OpaqueInt[Hash]:
   private val polyglotTable    = ZobristConstants(0)
   private lazy val randomTable = ZobristConstants(16)
 
-  private def roleIndex(role: Role) =
+  private inline def roleIndex(inline role: Role) =
     role match
       case Pawn   => 0
       case Knight => 1
@@ -49,13 +49,6 @@ object Hash extends OpaqueInt[Hash]:
       case Rook   => 3
       case Queen  => 4
       case King   => 5
-
-  private def pieceIndex(piece: Piece): Int =
-    roleIndex(piece.role) * 2 + piece.color.fold(1, 0)
-
-  // todo rename
-  private def pieceIndex(square: Square, piece: Piece): Int =
-    64 * pieceIndex(piece) + square.hashCode
 
   private def get(situation: Situation, table: ZobristConstants): Long =
 
@@ -67,12 +60,19 @@ object Hash extends OpaqueInt[Hash]:
       Option.when(0 < count && count <= 16 && role != King):
         table.crazyPocketMasks(16 * roleIndex(role) + count + colorshift)
 
-    val board = situation.board
+    import situation.board
     val hturn = situation.color.fold(table.whiteTurnMask, 0L)
 
-    val hpieces = board.pieces
-      .map((square, piece) => table.actorMasks(pieceIndex(square, piece)))
-      .computeHash(hturn)
+    val hpieces =
+      var m = hturn
+      board.byColor.foreach: (color, c) =>
+        board.byRole.foreach: (role, r) =>
+          val pi = 64 * (roleIndex(role) * 2 + color.fold(1, 0))
+          (c & r).foreach: s =>
+            val tm = table.actorMasks(pi + s.hashCode)
+            m ^= tm
+      m
+
 
     val hcastling =
       if board.variant.allowsCastling then

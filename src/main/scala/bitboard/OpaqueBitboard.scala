@@ -11,8 +11,8 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
   inline def apply(inline xs: Iterable[Square]): A = xs.foldLeft(empty)((b, p) => b | p.bb)
 
   extension (l: Long)
-    def bb: A                       = l.asInstanceOf[A]
-    private def lsb: Option[Square] = Square.at(java.lang.Long.numberOfTrailingZeros(l))
+    def bb: A               = l.asInstanceOf[A]
+    private def lsb: Square = Square(java.lang.Long.numberOfTrailingZeros(l))
 
   extension (s: Square) inline def bb: A = (1L << s.value).bb
 
@@ -51,7 +51,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
       val builder = List.newBuilder[Square]
       while b != 0L
       do
-        builder += b.lsb.get
+        builder += b.lsb
         b &= (b - 1L)
       builder.result
 
@@ -81,7 +81,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
       var result: Option[B] = None
       while b != 0L && result.isEmpty
       do
-        result = f(b.lsb.get)
+        result = f(b.lsb)
         b &= (b - 1L)
       result
 
@@ -90,7 +90,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
       var result = init
       while b != 0L
       do
-        result = f(result, b.lsb.get)
+        result = f(result, b.lsb)
         b &= (b - 1L)
       result
 
@@ -99,7 +99,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
       var b       = a.value
       while b != 0L
       do
-        if f(b.lsb.get) then builder += b.lsb.get
+        if f(b.lsb) then builder += b.lsb
         b &= (b - 1L)
       builder.result
 
@@ -110,7 +110,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
       var b = a.value
       while b != 0L
       do
-        f(b.lsb.get)
+        f(b.lsb)
         b &= (b - 1L)
 
     def forall[B](f: Square => Boolean): Boolean =
@@ -118,7 +118,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
       var result = true
       while b != 0L && result
       do
-        result = f(b.lsb.get)
+        result = f(b.lsb)
         b &= (b - 1L)
       result
 
@@ -127,7 +127,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
       var result = false
       while b != 0L && !result
       do
-        result = f(b.lsb.get)
+        result = f(b.lsb)
         b &= (b - 1L)
       result
 
@@ -136,7 +136,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
       val builder = List.newBuilder[B]
       while b != 0L
       do
-        builder ++= f(b.lsb.get)
+        builder ++= f(b.lsb)
         b &= (b - 1L)
       builder.result
 
@@ -145,7 +145,7 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
       val builder = List.newBuilder[B]
       while b != 0L
       do
-        builder += f(b.lsb.get)
+        builder += f(b.lsb)
         b &= (b - 1L)
       builder.result
 

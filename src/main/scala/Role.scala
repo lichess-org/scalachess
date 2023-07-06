@@ -96,6 +96,22 @@ case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
   def fold[B](z: B)(f: (B, Role, A) => B): B =
     f(f(f(f(f(f(z, Pawn, pawn), Knight, knight), Bishop, bishop), Rook, rook), Queen, queen), King, king)
 
+  def foreach[U](f: A => U): Unit =
+    f(pawn)
+    f(knight)
+    f(bishop)
+    f(rook)
+    f(queen)
+    f(king)
+
+  def foreach[U](f: (Role, A) => U): Unit =
+    f(Pawn, pawn)
+    f(Knight, knight)
+    f(Bishop, bishop)
+    f(Rook, rook)
+    f(Queen, queen)
+    f(King, king)
+
   def findRole(f: A => Boolean): Option[Role] =
     if f(pawn) then Some(Pawn)
     else if f(knight) then Some(Knight)

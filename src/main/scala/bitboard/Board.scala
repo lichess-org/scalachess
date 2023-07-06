@@ -145,9 +145,15 @@ case class Board(
   inline def isOccupied(inline p: Piece) =
     piece(p).nonEmpty
 
-  // TODO remove unsafe get
+  // benchmarked: https://github.com/lichess-org/scalachess/pull/438
   lazy val pieceMap: Map[Square, Piece] =
-    occupied.squares.view.map(s => (s, pieceAt(s).get)).toMap
+    val m = Map.newBuilder[Square, Piece]
+    byColor.foreach: (color, c) =>
+      byRole.foreach: (role, r) =>
+        val piece = color - role
+        (c & r).foreach: s =>
+          m += s -> piece
+    m.result
 
   def piecesOf(c: Color): Map[Square, Piece] =
     pieceMap.filter((_, p) => p.color == c)

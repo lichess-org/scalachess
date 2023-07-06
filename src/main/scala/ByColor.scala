@@ -44,6 +44,10 @@ case class ByColor[A](white: A, black: A):
     f(white)
     f(black)
 
+  def foreach[U](f: (Color, A) => U): Unit =
+    f(White, white)
+    f(Black, black)
+
   def forall(pred: A => Boolean) = pred(white) && pred(black)
 
   def exists(pred: A => Boolean) = pred(white) || pred(black)

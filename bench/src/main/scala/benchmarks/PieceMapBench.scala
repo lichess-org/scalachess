@@ -41,31 +41,31 @@ class PieceMapBench:
   def current =
     run(_.pieceMapImpl1)
 
-  @Benchmark
+  // @Benchmark
   def mapforSquaresViewMap =
     run(_.pieceMapImpl2)
 
-  @Benchmark
+  // @Benchmark
   def flatMap =
     run(_.pieceMapImpl3)
 
-  @Benchmark
+  // @Benchmark
   def byRole =
     run(_.pieceMapImpl4)
 
-  @Benchmark
+  // @Benchmark
   def byRoleWithoutInnerFunction =
     run(_.pieceMapImpl5)
 
-  @Benchmark
+  // @Benchmark
   def byRoleWithMutableMap =
     run(_.pieceMapImpl6)
 
-  @Benchmark
+  // @Benchmark
   def foreachWithMutableMap =
     run(_.pieceMapImpl7)
 
-  @Benchmark
+  // @Benchmark
   def foreachWithMutableMapAndNoGet =
     run(_.pieceMapImpl8)
 
@@ -73,9 +73,17 @@ class PieceMapBench:
   def foreachWithMapBuilder =
     run(_.pieceMapImpl9)
 
-  @Benchmark
+  // @Benchmark
   def foreachWithMapBuilderAndNoGet =
     run(_.pieceMapImpl10)
+
+  @Benchmark
+  def betterForeach =
+    run(_.pieceMapImpl11)
+
+  @Benchmark
+  def betterForeachWithMutableMap =
+    run(_.pieceMapImpl12)
 
 extension (b: Board)
   // implementation at 15.4.0
@@ -136,3 +144,22 @@ extension (b: Board)
     b.occupied.foreach:s =>
       m ++= b.pieceAt(s).map(s -> _)
     m.result
+
+  def pieceMapImpl11: Map[Square, Piece] =
+    val m = Map.newBuilder[Square, Piece]
+    b.byColor.foreach: (color, c) =>
+      b.byRole.foreach: (role, r) =>
+        val piece = color - role
+        (c & r).foreach: s =>
+          m += s -> piece
+    m.result
+
+  def pieceMapImpl12: Map[Square, Piece] =
+    val m = collection.mutable.Map.newBuilder[Square, Piece]
+    m.sizeHint(b.occupied.count)
+    b.byColor.foreach: (color, c) =>
+      b.byRole.foreach: (role, r) =>
+        val piece = color - role
+        (c & r).foreach: s =>
+          m += s -> piece
+    m.result.toMap

@@ -21,6 +21,8 @@ case class Board(
     byRole,
     byRoleOf,
     colorAt,
+    fold,
+    foreach,
     isCheck,
     isOccupied,
     kingOf,

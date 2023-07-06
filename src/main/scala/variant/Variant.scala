@@ -102,11 +102,11 @@ abstract class Variant private[variant] (
   /** Returns the material imbalance in pawns (overridden in Antichess)
     */
   def materialImbalance(board: Board): Int =
-    board.allPieces.foldLeft(0) { case (acc, Piece(color, role)) =>
-      Role.valueOf(role).fold(acc) { value =>
-        acc + value * color.fold(1, -1)
-      }
-    }
+    board.fold(0): (acc, color, role) =>
+      Role
+        .valueOf(role)
+        .fold(acc): value =>
+          acc + value * color.fold(1, -1)
 
   /** Returns true if neither player can win. The game should end immediately.
     */

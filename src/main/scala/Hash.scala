@@ -73,7 +73,6 @@ object Hash extends OpaqueInt[Hash]:
             m ^= tm
       m
 
-
     val hcastling =
       if board.variant.allowsCastling then
         (situation.history.castles.toSeq.view zip table.castlingMasks)

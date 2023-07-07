@@ -98,7 +98,6 @@ case class Board(
       byRole.map(_ & notMask)
     )
 
-  def roles: Role => Bitboard                  = byRole.apply
   def byRoleOf(color: Color): ByRole[Bitboard] = byRole.map(_ & byColor(color))
 
   // put a piece to an empty square

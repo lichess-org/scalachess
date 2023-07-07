@@ -73,7 +73,7 @@ case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
     case Queen  => queen
     case King   => king
 
-  def update(role: Role, f: A => A): ByRole[A] = role match
+  inline def update(role: Role, f: A => A): ByRole[A] = role match
     case Pawn   => copy(pawn = f(pawn))
     case Knight => copy(knight = f(knight))
     case Bishop => copy(bishop = f(bishop))
@@ -81,7 +81,7 @@ case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
     case Queen  => copy(queen = f(queen))
     case King   => copy(king = f(king))
 
-  def find(f: A => Boolean): Option[A] =
+  inline def find(f: A => Boolean): Option[A] =
     if f(pawn) then Some(pawn)
     else if f(knight) then Some(knight)
     else if f(bishop) then Some(bishop)
@@ -90,13 +90,13 @@ case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
     else if f(king) then Some(king)
     else None
 
-  def fold[B](z: B)(f: (B, A) => B): B =
+  inline def fold[B](z: B)(f: (B, A) => B): B =
     f(f(f(f(f(f(z, pawn), knight), bishop), rook), queen), king)
 
-  def fold[B](z: B)(f: (B, Role, A) => B): B =
+  inline def fold[B](z: B)(f: (B, Role, A) => B): B =
     f(f(f(f(f(f(z, Pawn, pawn), Knight, knight), Bishop, bishop), Rook, rook), Queen, queen), King, king)
 
-  def foreach[U](f: A => U): Unit =
+  inline def foreach[U](f: A => U): Unit =
     f(pawn)
     f(knight)
     f(bishop)
@@ -104,7 +104,7 @@ case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
     f(queen)
     f(king)
 
-  def foreach[U](f: (Role, A) => U): Unit =
+  inline def foreach[U](f: (Role, A) => U): Unit =
     f(Pawn, pawn)
     f(Knight, knight)
     f(Bishop, bishop)
@@ -112,7 +112,7 @@ case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
     f(Queen, queen)
     f(King, king)
 
-  def findRole(f: A => Boolean): Option[Role] =
+  inline def findRole(f: A => Boolean): Option[Role] =
     if f(pawn) then Some(Pawn)
     else if f(knight) then Some(Knight)
     else if f(bishop) then Some(Bishop)

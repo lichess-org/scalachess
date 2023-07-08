@@ -67,10 +67,13 @@ case class Tags(value: List[Tag]) extends AnyVal:
 
   def sorted =
     copy(
-      value = value.sortBy { tag =>
+      value = value.sortBy: tag =>
         Tags.tagIndex.getOrElse(tag.name, 999)
-      }
     )
+
+  def players = ByColor(apply(_.White), apply(_.Black))
+  def elos    = ByColor(apply(_.WhiteElo), apply(_.BlackElo)).map(_.flatMap(_.toIntOption))
+  def titles  = ByColor(apply(_.WhiteTitle), apply(_.BlackTitle))
 
   override def toString = sorted.value mkString "\n"
 

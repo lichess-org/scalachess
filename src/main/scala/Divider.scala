@@ -22,33 +22,33 @@ object Divider:
 
     val indexedBoards: List[(Board, Int)] = boards.zipWithIndex
 
-    val midGame = indexedBoards.collectFirst:
-      case (board, index)
-          if (majorsAndMinors(board) <= 10 ||
-            backrankSparse(board) ||
-            mixedness(board) > 150) =>
-        index
+    val midGame = indexedBoards.foldLeft(none[Int]):
+      case (None, (board, index)) =>
+        (majorsAndMinors(board) <= 10 ||
+          backrankSparse(board) ||
+          mixedness(board) > 150) option index
+      case (found, _) => found
 
     val endGame =
-      midGame.fold(none): midIndex =>
-        indexedBoards
-          .drop(midIndex)
-          .collectFirst:
-            case (board, index) if (majorsAndMinors(board) <= 6) => index
+      if midGame.isDefined then
+        indexedBoards.foldLeft(none[Int]):
+          case (found: Some[?], _) => found
+          case (_, (board, index)) => (majorsAndMinors(board) <= 6) option index
+      else None
 
     Division(
-      Ply from midGame,
+      Ply from midGame.filter(m => endGame.fold(true)(m < _)),
       Ply from endGame,
       Ply(boards.size)
     )
 
   private def majorsAndMinors(board: Board): Int =
-    (board.queens | board.rooks | board.bishops | board.knights).count
+    (board.occupied & ~(board.kings | board.pawns)).count
 
   // Sparse back-rank indicates that pieces have been developed
   private def backrankSparse(board: Board): Boolean =
-    (Bitboard.rank(Rank.First) & board.white).count < 4 ||
-      (Bitboard.rank(Rank.Eighth) & board.black).count < 4
+    (Bitboard.firstRank & board.white).count < 4 ||
+      (Bitboard.lastRank & board.black).count < 4
 
   private def score(white: Int, black: Int, y: Int): Int =
     ((white, black): @switch) match
@@ -95,9 +95,7 @@ object Divider:
       var white = 0
       var black = 0
       region.foreach: s =>
-        board
-          .colorAt(s)
-          .foreach: v =>
-            if v == White then white += 1
-            else black += 1
+        board(s).foreach: v =>
+          if v is White then white = white + 1
+          else black = black + 1
       mix + score(white, black, region.head.rank.index + 1)

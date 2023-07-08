@@ -7,19 +7,19 @@ import alleycats.Zero
 
 case class ByColor[A](white: A, black: A):
 
-  def apply(color: Color) = if color.white then white else black
+  inline def apply(inline color: Color) = if color.white then white else black
 
-  def apply[B](color: Color)(f: A => B): B = if color.white then f(white) else f(black)
+  inline def apply[B](inline color: Color)(f: A => B): B = if color.white then f(white) else f(black)
 
-  def update(color: Color, f: A => A): ByColor[A] =
+  inline def update(inline color: Color, f: A => A): ByColor[A] =
     if color.white then copy(white = f(white))
     else copy(black = f(black))
 
-  def update(color: Color, f: A => Option[A]): Option[ByColor[A]] =
+  inline def update(inline color: Color, f: A => Option[A]): Option[ByColor[A]] =
     if color.white then f(white).map(w => copy(white = w))
     else f(black).map(b => copy(black = b))
 
-  def map[B](fw: A => B, fb: A => B) = copy(white = fw(white), black = fb(black))
+  def map[B](fw: A => B, fb: A => B) = ByColor(fw(white), fb(black))
 
   def map[B](f: A => B): ByColor[B]                 = map(f, f)
   def mapList[B](f: A => B): List[B]                = List(f(white), f(black))
@@ -54,12 +54,12 @@ case class ByColor[A](white: A, black: A):
 
   def flip: ByColor[A] = copy(white = black, black = white)
 
-  def findColor(pred: A => Boolean): Option[Color] =
+  inline def findColor(pred: A => Boolean): Option[Color] =
     if pred(white) then White.some
     else if pred(black) then Black.some
     else None
 
-  def find(pred: A => Boolean): Option[A] =
+  inline def find(pred: A => Boolean): Option[A] =
     if pred(white) then white.some
     else if pred(black) then black.some
     else None

@@ -48,9 +48,8 @@ case object Antichess
 
   // In antichess, it is valuable for your opponent to have pieces.
   override def materialImbalance(board: Board): Int =
-    board.allPieces.foldLeft(0) { case (acc, Piece(color, _)) =>
+    board.fold(0): (acc, color, _) =>
       acc + color.fold(-2, 2)
-    }
 
   // In antichess, there is no checkmate condition therefore a player may only draw either by agreement,
   // blockade or stalemate. Only one player can win if the only remaining pieces are two knights

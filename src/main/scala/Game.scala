@@ -85,8 +85,6 @@ case class Game(
   def apply(uci: Uci): Either[ErrorStr, (Game, MoveOrDrop)] =
     apply(uci) map { case (g, m) => g -> m }
 
-  inline def isStandardInit = board.pieces == chess.variant.Standard.pieces
-
   inline def fullMoveNumber: FullMoveNumber = ply.fullMoveNumber
 
   inline def withBoard(inline b: Board) = copy(situation = situation.copy(board = b))

@@ -98,7 +98,6 @@ case class Board(
       byRole.map(_ & notMask)
     )
 
-  def roles: Role => Bitboard                  = byRole.apply
   def byRoleOf(color: Color): ByRole[Bitboard] = byRole.map(_ & byColor(color))
 
   // put a piece to an empty square
@@ -154,6 +153,28 @@ case class Board(
         (c & r).foreach: s =>
           m += s -> piece
     m.result
+
+  def fold[B](init: B)(f: (B, Color, Role) => B): B =
+    var m = init
+    byColor.foreach: (color, c) =>
+      byRole.foreach: (role, r) =>
+        (c & r).foreach: _ =>
+          m = f(m, color, role)
+    m
+
+  def fold[B](init: B)(f: (B, Color, Role, Square) => B): B =
+    var m = init
+    byColor.foreach: (color, c) =>
+      byRole.foreach: (role, r) =>
+        (c & r).foreach: s =>
+          m = f(m, color, role, s)
+    m
+
+  def foreach[U](f: (Color, Role, Square) => U): Unit =
+    byColor.foreach: (color, c) =>
+      byRole.foreach: (role, r) =>
+        (c & r).foreach: s =>
+          f(color, role, s)
 
   def piecesOf(c: Color): Map[Square, Piece] =
     pieceMap.filter((_, p) => p.color == c)

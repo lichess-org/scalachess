@@ -81,7 +81,7 @@ case class ByColor[A](white: A, black: A):
     (f(white), f(black)).mapN(ByColor(_, _))
 
 object ByColor:
-  inline def fill[A](a: A): ByColor[A] = ByColor(a, a)
+  inline def fill[A](a: A): ByColor[A]          = ByColor(a, a)
   inline def fromPair[A](p: (A, A)): ByColor[A] = ByColor(p._1, p._2)
 
   def apply[A](f: Color => A): ByColor[A] = ByColor(white = f(White), black = f(Black))

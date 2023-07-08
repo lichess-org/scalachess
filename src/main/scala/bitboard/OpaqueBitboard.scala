@@ -55,25 +55,25 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
         b &= (b - 1L)
       builder.result
 
-    // total non empty position
+    // total non empty squares
     def count: Int = java.lang.Long.bitCount(a)
 
-    // the first non empty position
+    // the first non empty square
     def first: Option[Square] = Square.at(java.lang.Long.numberOfTrailingZeros(a))
 
     // remove the first non empty position
     def removeFirst: A = (a.value & (a.value - 1L)).bb
 
-    def intersects(o: Long): Boolean =
+    inline def intersects(inline o: Long): Boolean =
       (a.value & o) != 0L
 
-    def intersects[B](o: B)(using sr: BitboardRuntime[B]): Boolean =
+    inline def intersects[B](inline o: B)(using sr: BitboardRuntime[B]): Boolean =
       (a & sr(o)).nonEmpty
 
-    def isDisjoint(o: Long): Boolean =
+    inline def isDisjoint(inline o: Long): Boolean =
       (a & o).isEmpty
 
-    def isDisjoint[B](o: B)(using sr: BitboardRuntime[B]): Boolean =
+    inline def isDisjoint[B](inline o: B)(using sr: BitboardRuntime[B]): Boolean =
       (a & sr(o)).isEmpty
 
     def first[B](f: Square => Option[B]): Option[B] =

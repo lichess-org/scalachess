@@ -192,7 +192,7 @@ object Board:
 
   val empty: Board = Board(
     Bitboard.empty,
-    ByColor(Bitboard.empty),
+    ByColor.fill(Bitboard.empty),
     ByRole(Bitboard.empty)
   )
 

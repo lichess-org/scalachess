@@ -92,13 +92,13 @@ class ByColorTest extends ScalaCheckSuite:
       val pf: PartialFunction[Int, String] = { case i if f(i).isDefined => f(i).get }
       bc.find(f) == bc.collect(pf)
 
-  test("flip"):
+  test("swap"):
     forAll: (bc: ByColor[Int]) =>
-      bc.flip == ByColor(bc(Black), bc(White))
+      bc.swap == ByColor(bc(Black), bc(White))
 
-  test("flip.flip == id"):
+  test("swap.swap == id"):
     forAll: (bc: ByColor[Int]) =>
-      bc.flip.flip == bc
+      bc.swap.swap == bc
 
   test("traverse"):
     forAll: (bc: ByColor[Int], f: Int => Option[String]) =>

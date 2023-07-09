@@ -5,7 +5,7 @@ import cats.syntax.all.*
 import scala.annotation.targetName
 import alleycats.Zero
 
-case class ByColor[A](white: A, black: A) extends ByColorSyntax:
+case class ByColor[A](white: A, black: A):
 
   inline def apply(inline color: Color) = if color.white then white else black
 
@@ -127,12 +127,13 @@ object ByColor:
     def ap[A, B](ff: ByColor[A => B])(fa: ByColor[A]): ByColor[B] =
       ByColor(ff.white(fa.white), ff.black(fa.black))
 
-trait ByColorSyntax:
-
   extension [F[_], A](bc: ByColor[F[A]])
 
-    def mapN[Z](f: (A, A) => Z)(using functor: Functor[F], semigroupal: Semigroupal[F]): F[Z] =
+    def mapN[Z](f: (A, A) => Z)(using Functor[F], Semigroupal[F]): F[Z] =
       Semigroupal.map2(bc.white, bc.black)(f)
 
     def flatMapN[Z](f: (A, A) => F[Z])(using flatMap: FlatMap[F]): F[Z] =
       flatMap.flatMap2(bc.white, bc.black)(f)
+
+    def tupled(using Applicative[F]): F[(A, A)] =
+      (bc.white, bc.black).tupled

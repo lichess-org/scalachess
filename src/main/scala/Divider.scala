@@ -2,7 +2,6 @@ package chess
 
 import cats.syntax.all.*
 import bitboard.Bitboard
-import bitboard.Bitboard.bb
 import scala.annotation.switch
 
 case class Division(middle: Option[Ply], end: Option[Ply], plies: Ply):
@@ -77,8 +76,8 @@ object Divider:
 
       case _ => 0
 
-  private val mixednessRegions: List[(Bitboard, Int)] = {
-    val smallSquare = 0x0303L.bb
+  private val mixednessRegions: List[(Long, Int)] = {
+    val smallSquare = 0x0303L
     for
       y <- 0 to 6
       x <- 0 to 6

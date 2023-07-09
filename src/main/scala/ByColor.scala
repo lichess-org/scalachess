@@ -77,7 +77,16 @@ case class ByColor[A](white: A, black: A):
     exists(_ === a)
 
   def flatMap[B](f: A => IterableOnce[B]): List[B] =
-    all.flatMap(f)
+    val b = List.newBuilder[B]
+    b ++= f(white)
+    b ++= f(black)
+    b.result()
+
+  def flatten[B](using toIterableOnce: A => IterableOnce[B]): List[B] =
+    val b = List.newBuilder[B]
+    b ++= toIterableOnce(white)
+    b ++= toIterableOnce(black)
+    b.result()
 
   def traverse[F[_], B](f: A => F[B]): Applicative[F] ?=> F[ByColor[B]] =
     (f(white), f(black)).mapN(ByColor(_, _))
@@ -116,7 +125,5 @@ object ByColor:
 
     def traverse[G[_]: Applicative, A, B](fa: ByColor[A])(f: A => G[B]): G[ByColor[B]] =
       fa.traverse(f)
-
-  extension [A](bc: ByColor[IterableOnce[A]]) def flatten: List[A] = bc.all.flatten
 
   extension [A](p: (A, A)) def asByColor: ByColor[A] = ByColor(p._1, p._2)

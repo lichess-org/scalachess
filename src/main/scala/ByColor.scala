@@ -1,11 +1,9 @@
 package chess
 
-import cats.{ Applicative, Eq, Functor, Monoid }
+import cats.{ Applicative, Eq, Eval, Functor, Monoid, Traverse }
 import cats.syntax.all.*
 import scala.annotation.targetName
 import alleycats.Zero
-import cats.Traverse
-import cats.Eval
 
 case class ByColor[A](white: A, black: A):
 

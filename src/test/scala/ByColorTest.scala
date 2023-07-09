@@ -56,6 +56,10 @@ class ByColorTest extends ScalaCheckSuite:
     forAll: (bc: ByColor[Option[Int]]) =>
       bc.flatten == bc.flatMap(identity)
 
+  test("flatMap == all.flatMap"):
+    forAll: (bc: ByColor[Int], f: Int => Option[String]) =>
+      bc.flatMap(f) == bc.all.flatMap(f(_))
+
   test("fold"):
     forAll: (bc: ByColor[Int], init: String, f: (String, Int) => String) =>
       bc.fold(init)(f) == bc.all.foldLeft(init)(f)

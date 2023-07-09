@@ -88,4 +88,4 @@ object Divider:
   private def mixedness(board: Board): Int =
     mixednessRegions.foldLeft(0):
       case (acc, (region, y)) =>
-        acc + board.byColor.map(c => (c & region).count).reduce(score(y))
+        acc + board.byColor.mapReduce(c => (c & region).count)(score(y))

@@ -4,6 +4,8 @@ import cats.{ Applicative, Eq, Functor, Monoid }
 import cats.syntax.all.*
 import scala.annotation.targetName
 import alleycats.Zero
+import cats.Traverse
+import cats.Eval
 
 case class ByColor[A](white: A, black: A):
 
@@ -103,6 +105,17 @@ object ByColor:
 
   given Functor[ByColor] with
     def map[A, B](fa: ByColor[A])(f: A => B): ByColor[B] = fa.map(f)
+
+  given Traverse[ByColor] with
+
+    override def foldLeft[A, B](fa: ByColor[A], b: B)(f: (B, A) => B): B =
+      fa.fold(b)(f)
+
+    override def foldRight[A, B](fa: ByColor[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
+      Eval.defer(f(fa.white, Eval.defer(f(fa.black, lb))))
+
+    def traverse[G[_]: Applicative, A, B](fa: ByColor[A])(f: A => G[B]): G[ByColor[B]] =
+      fa.traverse(f)
 
   extension [A](bc: ByColor[IterableOnce[A]]) def flatten: List[A] = bc.all.flatten
 

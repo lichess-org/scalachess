@@ -83,6 +83,10 @@ class ByColorTest extends ScalaCheckSuite:
     forAll: (bc: ByColor[Int], f: Int => Boolean) =>
       bc.exists(f) == bc.all.exists(f)
 
+  test("sequence"):
+    forAll: (bc: ByColor[Option[Int]]) =>
+      bc.sequence == (bc.white, bc.black).mapN(ByColor(_, _))
+
   test("findColor && exists"):
     forAll: (bc: ByColor[Int], f: Int => Boolean) =>
       bc.findColor(f).isDefined == bc.all.exists(f)

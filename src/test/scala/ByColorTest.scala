@@ -52,6 +52,14 @@ class ByColorTest extends ScalaCheckSuite:
     forAll: (bc: ByColor[Int], f: Int => Int) =>
       bc.update(White, f).update(Black, f) == bc.update(Black, f).update(White, f)
 
+  test("faltten == flatMap(identity)"):
+    forAll: (bc: ByColor[Option[Int]]) =>
+      bc.flatten == bc.flatMap(identity)
+
+  test("flatMap == all.flatMap"):
+    forAll: (bc: ByColor[Int], f: Int => Option[String]) =>
+      bc.flatMap(f) == bc.all.flatMap(f(_))
+
   test("fold"):
     forAll: (bc: ByColor[Int], init: String, f: (String, Int) => String) =>
       bc.fold(init)(f) == bc.all.foldLeft(init)(f)
@@ -74,6 +82,14 @@ class ByColorTest extends ScalaCheckSuite:
   test("exists"):
     forAll: (bc: ByColor[Int], f: Int => Boolean) =>
       bc.exists(f) == bc.all.exists(f)
+
+  test("sequence"):
+    forAll: (bc: ByColor[Option[Int]]) =>
+      bc.sequence == (bc.white, bc.black).mapN(ByColor(_, _))
+
+  test("tupled == mapN.identity"):
+    forAll: (bc: ByColor[Option[Int]]) =>
+      bc.mapN((_, _)) == bc.tupled
 
   test("findColor && exists"):
     forAll: (bc: ByColor[Int], f: Int => Boolean) =>

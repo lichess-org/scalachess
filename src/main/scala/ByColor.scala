@@ -1,11 +1,9 @@
 package chess
 
-import cats.{ Applicative, Eq, Functor, Monoid }
+import cats.{ Applicative, Eq, Eval, FlatMap, Functor, Monoid, Semigroupal, Traverse }
 import cats.syntax.all.*
 import scala.annotation.targetName
 import alleycats.Zero
-import cats.Traverse
-import cats.Eval
 
 case class ByColor[A](white: A, black: A):
 
@@ -77,7 +75,16 @@ case class ByColor[A](white: A, black: A):
     exists(_ === a)
 
   def flatMap[B](f: A => IterableOnce[B]): List[B] =
-    all.flatMap(f)
+    val b = List.newBuilder[B]
+    b ++= f(white)
+    b ++= f(black)
+    b.result()
+
+  def flatten[B](using toIterableOnce: A => IterableOnce[B]): List[B] =
+    val b = List.newBuilder[B]
+    b ++= toIterableOnce(white)
+    b ++= toIterableOnce(black)
+    b.result()
 
   def traverse[F[_], B](f: A => F[B]): Applicative[F] ?=> F[ByColor[B]] =
     (f(white), f(black)).mapN(ByColor(_, _))
@@ -103,10 +110,9 @@ object ByColor:
     def combine(x: ByColor[A], y: ByColor[A]) =
       ByColor(Monoid[A].combine(x.white, y.white), Monoid[A].combine(x.black, y.black))
 
-  given Functor[ByColor] with
-    def map[A, B](fa: ByColor[A])(f: A => B): ByColor[B] = fa.map(f)
+  given Functor[ByColor] with Applicative[ByColor] with Traverse[ByColor] with
 
-  given Traverse[ByColor] with
+    override def map[A, B](fa: ByColor[A])(f: A => B): ByColor[B] = fa.map(f)
 
     override def foldLeft[A, B](fa: ByColor[A], b: B)(f: (B, A) => B): B =
       fa.fold(b)(f)
@@ -117,6 +123,17 @@ object ByColor:
     def traverse[G[_]: Applicative, A, B](fa: ByColor[A])(f: A => G[B]): G[ByColor[B]] =
       fa.traverse(f)
 
-  extension [A](bc: ByColor[IterableOnce[A]]) def flatten: List[A] = bc.all.flatten
+    def pure[A](a: A): ByColor[A] = ByColor.fill(a)
+    def ap[A, B](ff: ByColor[A => B])(fa: ByColor[A]): ByColor[B] =
+      ByColor(ff.white(fa.white), ff.black(fa.black))
 
-  extension [A](p: (A, A)) def asByColor: ByColor[A] = ByColor(p._1, p._2)
+  extension [F[_], A](bc: ByColor[F[A]])
+
+    def mapN[Z](f: (A, A) => Z)(using Functor[F], Semigroupal[F]): F[Z] =
+      Semigroupal.map2(bc.white, bc.black)(f)
+
+    def flatMapN[Z](f: (A, A) => F[Z])(using flatMap: FlatMap[F]): F[Z] =
+      flatMap.flatMap2(bc.white, bc.black)(f)
+
+    def tupled(using Applicative[F]): F[(A, A)] =
+      (bc.white, bc.black).tupled

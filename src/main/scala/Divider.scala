@@ -77,16 +77,15 @@ object Divider:
 
       case _ => 0
 
-  private val mixednessRegions: List[Bitboard] = {
+  private val mixednessRegions: List[(Bitboard, Int)] = {
     val smallSquare = 0x0303L.bb
     for
       y <- 0 to 6
       x <- 0 to 6
-      region = smallSquare << (x + 8 * y)
-    yield region
+    yield (smallSquare << (x + 8 * y), y + 1)
   }.toList
 
   private def mixedness(board: Board): Int =
-    mixednessRegions.foldLeft(0): (acc, region) =>
-      val y = region.first.get.rank.index + 1
-      acc + board.byColor.map(c => (c & region).count).reduce(score(y))
+    mixednessRegions.foldLeft(0):
+      case (acc, (region, y)) =>
+        acc + board.byColor.map(c => (c & region).count).reduce(score(y))

@@ -50,7 +50,7 @@ object Divider:
     (Bitboard.firstRank & board.white).count < 4 ||
       (Bitboard.lastRank & board.black).count < 4
 
-  private def score(white: Int, black: Int, y: Int): Int =
+  private def score(y: Int)(white: Int, black: Int): Int =
     ((white, black): @switch) match
       case (0, 0) => 0
 
@@ -76,26 +76,15 @@ object Divider:
 
       case _ => 0
 
-  private val mixednessRegions: List[List[Square]] = {
+  private val mixednessRegions: List[(Long, Int)] = {
+    val smallSquare = 0x0303L
     for
-      y <- Rank.all.take(7)
-      x <- File.all.take(7)
-    yield {
-      for
-        dy   <- 0 to 1
-        dx   <- 0 to 1
-        file <- x.offset(dx)
-        rank <- y.offset(dy)
-      yield Square(file, rank)
-    }.toList
+      y <- 0 to 6
+      x <- 0 to 6
+    yield (smallSquare << (x + 8 * y), y + 1)
   }.toList
 
   private def mixedness(board: Board): Int =
-    mixednessRegions.foldLeft(0): (mix, region) =>
-      var white = 0
-      var black = 0
-      region.foreach: s =>
-        board(s).foreach: v =>
-          if v is White then white = white + 1
-          else black = black + 1
-      mix + score(white, black, region.head.rank.index + 1)
+    mixednessRegions.foldLeft(0):
+      case (acc, (region, y)) =>
+        acc + board.byColor.mapReduce(c => (c & region).count)(score(y))

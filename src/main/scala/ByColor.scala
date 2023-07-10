@@ -89,6 +89,9 @@ case class ByColor[A](white: A, black: A):
   def traverse[F[_], B](f: A => F[B]): Applicative[F] ?=> F[ByColor[B]] =
     (f(white), f(black)).mapN(ByColor(_, _))
 
+  def traverseReduce[F[_], B, C](f: A => F[B])(r: (B, B) => C): Applicative[F] ?=> F[C] =
+    (f(white), f(black)).mapN(r)
+
 object ByColor:
   inline def fill[A](a: A): ByColor[A]          = ByColor(a, a)
   inline def fromPair[A](p: (A, A)): ByColor[A] = ByColor(p._1, p._2)

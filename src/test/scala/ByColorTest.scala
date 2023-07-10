@@ -119,3 +119,7 @@ class ByColorTest extends ScalaCheckSuite:
   test("traverse"):
     forAll: (bc: ByColor[Int], f: Int => Option[String]) =>
       bc.traverse(f).map(_.all) == bc.all.traverse(f)
+
+  test("traverseReduce == traverse.map.reduce"):
+    forAll: (bc: ByColor[Int], f: Int => Option[String], r: (String, String) => Long) =>
+      bc.traverseReduce(f)(r) == bc.traverse(f).map(_.reduce(r))

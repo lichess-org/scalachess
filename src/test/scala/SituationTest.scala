@@ -124,31 +124,31 @@ K  r
         game.playable(true) must beFalse
         game.playable(false) must beFalse
 
-      "be playable" in:
-        "when previous move is a double pawn push and the only checker is the pushed pawn" in:
-          val game = Fen
-            .read(Standard, EpdFen("r1bqkbnr/1p1p1ppp/p7/2pP4/3KP3/8/PPP3PP/RNBQ1BNR w HAkq c6 0 4"))
-            .get
-          game.playable(true) must beTrue
-          game.playable(false) must beTrue
+    "be playable" in:
+      "when previous move is a double pawn push and the only checker is the pushed pawn" in:
+        val game = Fen
+          .read(Standard, EpdFen("r1bqkbnr/1p1p1ppp/p7/2pP4/3KP3/8/PPP3PP/RNBQ1BNR w HAkq c6 0 4"))
+          .get
+        game.playable(true) must beTrue
+        game.playable(false) must beTrue
 
-        "when two checkers are not on the same rank, file or diagonal" in:
-          val game = Fen
-            .read(Standard, EpdFen("rnbqk2r/1p1p1ppp/p1P5/3np1b1/4P3/4K3/PPP2PPP/RNBQ1BNR b HAkq - 0 4"))
-            .get
-          game.playable(true) must beTrue
-          game.playable(false) must beTrue
+      "when two checkers are not on the same rank, file or diagonal" in:
+        val game = Fen
+          .read(Standard, EpdFen("rnbqk2r/1p1p1ppp/p1P5/3np1b1/4P3/4K3/PPP2PPP/RNBQ1BNR b HAkq - 0 4"))
+          .get
+        game.playable(true) must beTrue
+        game.playable(false) must beTrue
 
-        "when previous move is a double pawn push and the only checker is a discovered rook check" in:
-          val game = Fen
-            .read(Standard, EpdFen("1kb2b1r/1r3K1p/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HAk c6 0 4"))
-            .get
-          game.playable(true) must beTrue
-          game.playable(false) must beTrue
+      "when previous move is a double pawn push and the only checker is a discovered rook check" in:
+        val game = Fen
+          .read(Standard, EpdFen("1kb2b1r/1r3K1p/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HAk c6 0 4"))
+          .get
+        game.playable(true) must beTrue
+        game.playable(false) must beTrue
 
-        "when previous move is a double pawn push and the only checker is a discovered bishop check" in:
-          val game = Fen
-            .read(Standard, EpdFen("1bb4r/kr5p/p7/2pP4/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4"))
-            .get
-          game.playable(true) must beTrue
-          game.playable(false) must beTrue
+      "when previous move is a double pawn push and the only checker is a discovered bishop check" in:
+        val game = Fen
+          .read(Standard, EpdFen("1bb4r/kr5p/p7/2pP4/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4"))
+          .get
+        game.playable(true) must beTrue
+        game.playable(false) must beTrue

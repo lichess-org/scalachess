@@ -3,11 +3,12 @@ package format.pgn
 
 import scala.language.implicitConversions
 
-class RoundtripTest extends ChessTest:
+class RoundtripTest extends munit.FunSuite:
 
-  "tags" should:
-    "roundtrip with special chars" in:
-      val value = "aä\\\"'$%/°á \t\b \"\\\\/"
-      Parser.full(Pgn(tags = Tags(List(Tag(_.Site, value))), Initial.empty, None).toString) must beValid.like:
-        case parsed =>
-          parsed.tags("Site") must_== Some(value)
+  test("roundtrip with special chars for tags"):
+    val value = "aä\\\"'$%/°á \t\b \"\\\\/"
+    val parsed = Parser
+      .full(Pgn(tags = Tags(List(Tag(_.Site, value))), InitialComments.empty, None).render)
+      .toOption
+      .get
+    assertEquals(parsed.tags("Site"), Some(value))

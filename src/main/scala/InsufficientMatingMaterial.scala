@@ -10,7 +10,7 @@ object InsufficientMatingMaterial:
   // verify if there are at least two bishops of opposite color
   // no matter which sides they are on
   def bishopsOnOppositeColors(board: Board) =
-    board.bishops.squares.map(_.isLight).distinct.size == 2
+    board.bishops.map(_.isLight).distinct.size == 2
 
   /*
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
@@ -49,9 +49,7 @@ object InsufficientMatingMaterial:
       !(bishopsOnOppositeColors(board) || (board(!color, Knight) | board(!color, Pawn)).nonEmpty)
     else false
 
-  inline def pawnDirOf(inline color: Color): Direction = color.fold(_.up, _.down)
-
   /** Determines the position one ahead of a pawn based on the color of the piece.
     * White pawns move up and black pawns move down.
     */
-  def posAheadOfPawn(square: Square, color: Color): Option[Square] = pawnDirOf(color)(square)
+  def posAheadOfPawn(square: Square, color: Color): Option[Square] = color.fold(square.up, square.down)

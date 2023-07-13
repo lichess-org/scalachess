@@ -62,13 +62,12 @@ trait FenReader:
           castles = castles,
           unmovedRooks = unmovedRooks
         )
-        val checkCount = variant.threeCheck.?? {
+        val checkCount = variant.threeCheck.so:
           val splitted = fen.value split ' '
           splitted
             .lift(4)
             .flatMap(readCheckCount)
             .orElse(splitted.lift(6).flatMap(readCheckCount))
-        }
         checkCount.foldLeft(history)(_ withCheckCount _)
     }
 
@@ -104,15 +103,15 @@ trait FenReader:
   private def readCheckCount(str: String): Option[CheckCount] =
     str.toList match
       case '+' :: w :: '+' :: b :: Nil =>
-        for {
+        for
           white <- w.toString.toIntOption if white <= 3
           black <- b.toString.toIntOption if black <= 3
-        } yield CheckCount(black, white)
+        yield CheckCount(black, white)
       case w :: '+' :: b :: Nil =>
-        for {
+        for
           white <- w.toString.toIntOption if white <= 3
           black <- b.toString.toIntOption if black <= 3
-        } yield CheckCount(3 - black, 3 - white)
+        yield CheckCount(3 - black, 3 - white)
       case _ => None
 
   // only cares about pieces positions on the board (first part of FEN string)
@@ -129,7 +128,7 @@ trait FenReader:
     else
       makePiecesWithCrazyPromoted(position.toList, 0, 7) map { (pieces, promoted) =>
         val board = Board(pieces, variant = variant)
-        if (promoted.isEmpty) board else board.withCrazyData(_.copy(promoted = promoted))
+        if promoted.isEmpty then board else board.withCrazyData(_.copy(promoted = promoted))
       } map { board =>
         pockets.fold(board) { str =>
           import chess.variant.Crazyhouse.Pocket
@@ -155,14 +154,14 @@ trait FenReader:
       case '/' :: rest                       => makePiecesWithCrazyPromoted(rest, 0, y - 1)
       case c :: rest if '1' <= c && c <= '8' => makePiecesWithCrazyPromoted(rest, x + (c - '0').toInt, y)
       case c :: '~' :: rest =>
-        for {
+        for
           square                     <- Square.at(x, y)
           piece                      <- Piece.fromChar(c)
           (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
-        } yield (square -> piece :: nextPieces, nextPromoted.addSquare(square))
+        yield (square -> piece :: nextPieces, nextPromoted.addSquare(square))
       case c :: rest =>
-        for {
+        for
           square                     <- Square.at(x, y)
           piece                      <- Piece.fromChar(c)
           (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
-        } yield (square -> piece :: nextPieces, nextPromoted)
+        yield (square -> piece :: nextPieces, nextPromoted)

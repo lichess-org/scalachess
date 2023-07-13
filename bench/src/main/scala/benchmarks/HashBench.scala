@@ -1,29 +1,39 @@
 package benchmarks
 
-import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.annotations.*
+import org.openjdk.jmh.infra.Blackhole
+import java.util.concurrent.TimeUnit
 
 import cats.syntax.all.*
-
-import java.util.concurrent.TimeUnit
-import chess.format.pgn.Fixtures
-import chess.format.pgn.Reader
-import chess.MoveOrDrop.move
-import chess.Hash
+import chess.format.pgn.{ Fixtures, Reader }
+import chess.MoveOrDrop.situationAfter
+import chess.{ Hash, Situation }
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
 @OutputTimeUnit(TimeUnit.SECONDS)
 @Measurement(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
 @Warmup(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
+@Fork(value = 3)
 @Threads(value = 1)
-class HashBench {
+class HashBench:
 
-  val games = Fixtures.gamesForPerfTest.traverse(Reader.full(_)).toOption.get.traverse(_.valid).toOption.get
+  // the unit of CPU work per iteration
+  private[this] val Work: Long = 10
 
-  val situations = games.flatMap(_.moves).flatMap(_.move).map(_.situationAfter)
+  var situations: List[Situation] = _
+
+  @Setup
+  def setup() =
+    var results = for
+      results <- Fixtures.gamesForPerfTest.traverse(Reader.full(_))
+      replays <- results.traverse(_.valid)
+    yield replays.flatMap(_.moves).map(_.situationAfter)
+    situations = results.toOption.get
 
   @Benchmark
-  def hashes() =
-    situations.foreach(Hash(_))
-
-}
+  def hashes(bh: Blackhole) =
+    var result = situations.map: x =>
+      Blackhole.consumeCPU(Work)
+      Hash(x)
+    bh.consume(result)

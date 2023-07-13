@@ -2,13 +2,12 @@ package chess
 
 import scala.language.implicitConversions
 import cats.syntax.option.*
-import org.specs2.matcher.ValidatedMatchers
 
 import chess.format.{ EpdFen, Fen }
 import chess.format.pgn.Reader
 import chess.variant.Antichess
 
-class AntichessVariantTest extends ChessTest with ValidatedMatchers:
+class AntichessVariantTest extends ChessTest:
 
   // Random PGN taken from FICS
   val fullGame =
@@ -57,7 +56,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       val startingPosition = Game(Antichess)
       val afterFirstMove   = startingPosition.playMove(Square.E2, Square.E4, None)
 
-      afterFirstMove must beValid.like { newGame =>
+      afterFirstMove must beRight.like { newGame =>
         val fen = Fen write newGame
         fen mustEqual EpdFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b - - 0 1")
       }
@@ -68,13 +67,13 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val invalidGame = gameAfterOpening flatMap (_.playMove(Square.H2, Square.H4))
 
-      invalidGame must beInvalid("Piece on h2 cannot move to h4")
+      invalidGame must beLeft("Piece on h2 cannot move to h4")
 
     "A situation in antichess should only present the capturing moves if the player can capture" in:
       val game             = Game(Antichess)
       val gameAfterOpening = game.playMoves((Square.E2, Square.E4), (Square.F7, Square.F5))
 
-      gameAfterOpening must beValid.like { case newGame =>
+      gameAfterOpening must beRight.like { case newGame =>
         newGame.situation.legalMoves.size must beEqualTo(1)
         newGame.situation.legalMoves.exists(_.captures == false) must beEqualTo(false)
       }
@@ -82,7 +81,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     "Allow a capturing move to be made" in:
       val game =
         Game(Antichess).playMoves((Square.E2, Square.E4), (Square.F7, Square.F5), (Square.E4, Square.F5))
-      game must beValid
+      game must beRight
 
     "Not permit a player to castle" in:
       // Castling is not allowed in antichess
@@ -95,9 +94,9 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       )
 
       val possibleDestinations =
-        game flatMap (_.board.destsFrom(Square.E1).toValid("king has no destinations"))
+        game flatMap (_.board.destsFrom(Square.E1).toRight("king has no destinations"))
 
-      possibleDestinations must beValid.like { case dests =>
+      possibleDestinations must beRight.like { case dests =>
         // G1 (to castle) should not be a valid destination
         dests must beEqualTo(List(Square.F1))
       }
@@ -109,7 +108,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         Square.D1 -> Square.H5
       )
 
-      game must beValid.like { newGame =>
+      game must beRight.like { newGame =>
         newGame.situation.check === Check.No
       }
 
@@ -122,7 +121,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         Square.H5 -> Square.E8
       )
 
-      game must beValid.like { case newGame =>
+      game must beRight.like { case newGame =>
         newGame.board.kingOf(Color.black).isEmpty
       }
 
@@ -134,7 +133,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         Square.D8 -> Square.H4
       )
 
-      game must beValid.like { case newGame =>
+      game must beRight.like { case newGame =>
         newGame.situation.checkMate must beFalse
       }
 
@@ -144,7 +143,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.apply(Square.F7, Square.F8, Option(King))) map (_._1)
 
-      newGame must beValid:
+      newGame must beRight:
         (_: Game).board(Square.F8).mustEqual(Option(White - King))
 
     "deal with 2 white kings" in:
@@ -159,7 +158,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.apply(Square.C7, Square.G3, None)) map (_._1)
 
-      newGame must beValid.like { case (drawnGame: Game) =>
+      newGame must beRight.like { case (drawnGame: Game) =>
         drawnGame.situation.end must beTrue
         drawnGame.situation.autoDraw must beTrue
         drawnGame.situation.winner must beNone
@@ -172,7 +171,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.apply(Square.G7, Square.G8, Bishop.some)) map (_._1)
 
-      newGame must beValid.like { case (drawnGame: Game) =>
+      newGame must beRight.like { case (drawnGame: Game) =>
         drawnGame.situation.end must beTrue
         drawnGame.situation.autoDraw must beTrue
         drawnGame.situation.winner must beNone
@@ -185,7 +184,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.apply(Square.F2, Square.B6, None)) map (_._1)
 
-      newGame must beValid.like { case nonDrawnGame =>
+      newGame must beRight.like { case nonDrawnGame =>
         nonDrawnGame.situation.end must beFalse
         nonDrawnGame.situation.autoDraw must beFalse
         nonDrawnGame.situation.winner must beNone
@@ -197,7 +196,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.apply(Square.C2, Square.C1, Option(Bishop))) map (_._1)
 
-      newGame must beValid.like { case (drawnGame: Game) =>
+      newGame must beRight.like { case (drawnGame: Game) =>
         drawnGame.situation.end must beTrue
         drawnGame.situation.autoDraw must beTrue
         drawnGame.situation.status must beSome(Status.Draw)
@@ -209,7 +208,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.apply(Square.D2, Square.D1, Option(Bishop))) map (_._1)
 
-      newGame must beValid.like { case nonDrawnGame =>
+      newGame must beRight.like { case nonDrawnGame =>
         nonDrawnGame.situation.end must beFalse
         nonDrawnGame.situation.autoDraw must beFalse
         nonDrawnGame.situation.status must beNone
@@ -221,7 +220,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.apply(Square.B7, Square.B8, Bishop.some)) map (_._1)
 
-      newGame must beValid.like { case nonDrawnGame =>
+      newGame must beRight.like { case nonDrawnGame =>
         nonDrawnGame.situation.end must beFalse
         nonDrawnGame.situation.autoDraw must beFalse
         nonDrawnGame.situation.status must beNone
@@ -233,7 +232,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.playMoves(Square.F6 -> Square.G7))
 
-      newGame must beValid.like { case nonDrawnGame =>
+      newGame must beRight.like { case nonDrawnGame =>
         nonDrawnGame.situation.end must beFalse
         nonDrawnGame.situation.autoDraw must beFalse
         nonDrawnGame.situation.status must beNone
@@ -245,7 +244,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.playMoves(Square.G6 -> Square.F4))
 
-      newGame must beValid.like:
+      newGame must beRight.like:
         _.situation.opponentHasInsufficientMaterial must beTrue
 
     "Opponent has sufficient material when there are only two remaining knights on opposite color squares" in:
@@ -254,14 +253,14 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val newGame = originalGame flatMap (_.playMoves(Square.A1 -> Square.B3))
 
-      newGame must beValid.like:
+      newGame must beRight.like:
         _.situation.opponentHasInsufficientMaterial must beFalse
 
     "Not be drawn on insufficient mating material" in:
       val position  = EpdFen("4K3/8/1b6/8/8/8/5B2/3k4 b - -")
       val maybeGame = fenToGame(position, Antichess)
 
-      maybeGame must beValid.like { case game =>
+      maybeGame must beRight.like { case game =>
         game.situation.end must beFalse
       }
 
@@ -274,14 +273,14 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val drawnGame = game.playMoveList(repeatedMoves)
 
-      drawnGame must beValid.like { case g =>
+      drawnGame must beRight.like { case g =>
         g.situation.threefoldRepetition must beTrue
       }
 
     "Successfully play through a full game until one player loses all their pieces" in:
       val game = Reader.full(fullGame)
 
-      game must beValid.like { case Reader.Result.Complete(replay) =>
+      game must beRight.like { case Reader.Result.Complete(replay) =>
         val game = replay.state
 
         game.situation.end must beTrue
@@ -296,7 +295,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val drawnGame = maybeGame flatMap (_.playMoves((Square.A5, Square.A6)))
 
-      drawnGame must beValid.like { case game =>
+      drawnGame must beRight.like { case game =>
         game.situation.end must beTrue
         game.situation.winner must beSome(Black)
       }
@@ -307,7 +306,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
       val drawnGame = maybeGame flatMap (_.playMoves((Square.C8, Square.A6)))
 
-      drawnGame must beValid.like { case game =>
+      drawnGame must beRight.like { case game =>
         game.situation.end must beTrue
         game.situation.status must beSome(Status.VariantEnd)
         game.situation.winner must beSome(Black)
@@ -339,7 +338,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       """
       val game = Reader.full(pgn)
 
-      game must beValid.like { case Reader.Result.Complete(replay) =>
+      game must beRight.like { case Reader.Result.Complete(replay) =>
         val game = replay.state
 
         game.situation.end must beFalse
@@ -349,7 +348,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     "fen with castles" in:
       val game = fenToGame(EpdFen("rnbqk2r/ppppppbp/5np1/8/8/5NP1/PPPPPPBP/RNBQK2R w KQkq - 4 4"), Antichess)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.board.history.castles must_== Castles.none
         game.situation.board.history.unmovedRooks must_== UnmovedRooks.none
       }

@@ -34,7 +34,7 @@ case class Drop(
 
     board updateHistory { h =>
       val basePositionHashes =
-        if (h.positionHashes.value.isEmpty) Hash(situationBefore) else h.positionHashes
+        if h.positionHashes.value.isEmpty then Hash(situationBefore) else h.positionHashes
       h.copy(positionHashes =
         Monoid[PositionHash].combine(Hash(Situation(board, !piece.color)), basePositionHashes)
       )

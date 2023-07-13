@@ -48,9 +48,8 @@ case object Antichess
 
   // In antichess, it is valuable for your opponent to have pieces.
   override def materialImbalance(board: Board): Int =
-    board.allPieces.foldLeft(0) { case (acc, Piece(color, _)) =>
+    board.fold(0): (acc, color, _) =>
       acc + color.fold(-2, 2)
-    }
 
   // In antichess, there is no checkmate condition therefore a player may only draw either by agreement,
   // blockade or stalemate. Only one player can win if the only remaining pieces are two knights
@@ -62,13 +61,13 @@ case object Antichess
       val blackKnights = situation.board.black.squares
 
       // We consider the case where a player has two knights
-      if (whiteKnights.size != 1 || blackKnights.size != 1) false
+      if whiteKnights.size != 1 || blackKnights.size != 1 then false
       else
         {
-          for {
+          for
             whiteKnight <- whiteKnights.headOption
             blackKnight <- blackKnights.headOption
-          } yield whiteKnight.isLight == blackKnight.isLight
+          yield whiteKnight.isLight == blackKnight.isLight
         } getOrElse false
     }
 
@@ -87,10 +86,10 @@ case object Antichess
       else
         val whitePawns = (board.white & board.pawns).squares
         val blackPawns = (board.black & board.pawns).squares
-        (for {
+        (for
           whiteBishopLight <- whiteBishops.headOption map (_.isLight)
           blackBishopLight <- blackBishops.headOption map (_.isLight)
-        } yield whiteBishopLight != blackBishopLight && whitePawns.forall(
+        yield whiteBishopLight != blackBishopLight && whitePawns.forall(
           pawnNotAttackable(_, blackBishopLight, board)
         ) && blackPawns.forall(pawnNotAttackable(_, whiteBishopLight, board)))
           .getOrElse(false)

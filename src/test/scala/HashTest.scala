@@ -167,6 +167,7 @@ class HashTest extends ChessTest:
       val hashAfter      = hash(situationAfter)
 
       hashAfterMove mustEqual hashAfter
+
     "prod 5 Three-Check games accumulate hash" in:
       val gameMoves = format.pgn.Fixtures.prod5threecheck.map { g =>
         SanStr from g.split(' ').toList

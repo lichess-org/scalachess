@@ -29,7 +29,7 @@ trait FenWriter:
         game.situation.enPassantSquare.fold("-")(_.key),
         game.halfMoveClock.toString,
         game.fullMoveNumber.toString
-      ) ::: (game.board.variant == variant.ThreeCheck) ?? List(writeCheckCount(game.board))
+      ) ::: (game.board.variant == variant.ThreeCheck).so(List(writeCheckCount(game.board)))
     } mkString " "
 
   def writeOpening(situation: Situation): OpeningFen = OpeningFen:
@@ -39,20 +39,20 @@ trait FenWriter:
   def writeBoard(board: Board): BoardFen =
     val fen   = scala.collection.mutable.StringBuilder(70)
     var empty = 0
-    for (y <- Rank.allReversed)
+    for y <- Rank.allReversed do
       empty = 0
-      for (x <- File.all)
+      for x <- File.all do
         board(x, y) match
           case None => empty = empty + 1
           case Some(piece) =>
-            if (empty == 0) fen append piece.forsyth.toString
+            if empty == 0 then fen append piece.forsyth.toString
             else
               fen append s"$empty${piece.forsyth}"
               empty = 0
-            if (piece.role != Pawn && board.crazyData.exists(_.promoted.contains(Square(x, y))))
+            if piece.role != Pawn && board.crazyData.exists(_.promoted.contains(Square(x, y))) then
               fen append '~'
-      if (empty > 0) fen append empty
-      if (y > Rank.First) fen append '/'
+      if empty > 0 then fen append empty
+      if y > Rank.First then fen append '/'
     BoardFen(fen.toString)
 
   def writeBoardAndColor(situation: Situation): BoardAndColorFen =

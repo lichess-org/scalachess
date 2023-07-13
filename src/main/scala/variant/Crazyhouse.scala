@@ -1,11 +1,9 @@
 package chess
 package variant
 
-import chess.format.Uci
-import cats.syntax.option.*
-import cats.data.Validated
-import chess.format.EpdFen
+import chess.format.{ EpdFen, Uci }
 import bitboard.Bitboard
+import monocle.syntax.all.*
 
 case object Crazyhouse
     extends Variant(
@@ -31,25 +29,25 @@ case object Crazyhouse
 
   private def canDropPawnOn(square: Square) = square.rank != Rank.First && square.rank != Rank.Eighth
 
-  override def drop(situation: Situation, role: Role, square: Square): Validated[ErrorStr, Drop] =
+  override def drop(situation: Situation, role: Role, square: Square): Either[ErrorStr, Drop] =
     for
-      d1 <- situation.board.crazyData toValid ErrorStr("Board has no crazyhouse data")
-      _ <-
-        if (role != Pawn || canDropPawnOn(square)) Validated.valid(d1)
-        else Validated.invalid(ErrorStr(s"Can't drop $role on $square"))
+      d1 <- situation.board.crazyData.toRight(ErrorStr("Board has no crazyhouse data"))
+      _  <- Either.cond((role != Pawn || canDropPawnOn(square)), d1, ErrorStr(s"Can't drop $role on $square"))
       piece = Piece(situation.color, role)
-      d2 <- d1.drop(piece) toValid ErrorStr(s"No $piece to drop on $square")
-      board1 <- situation.board.place(piece, square) toValid ErrorStr(
-        s"Can't drop $role on $square, it's occupied"
+      d2 <- d1.drop(piece).toRight(ErrorStr(s"No $piece to drop on $square"))
+      b1 <- situation.board
+        .place(piece, square)
+        .toRight(ErrorStr(s"Can't drop $role on $square, it's occupied"))
+      _ <- Either.cond(
+        b1.checkOf(situation.color).no,
+        b1,
+        ErrorStr(s"Dropping $role on $square doesn't uncheck the king")
       )
-      _ <-
-        if board1.checkOf(situation.color).no then Validated.valid(board1)
-        else Validated.invalid(ErrorStr(s"Dropping $role on $square doesn't uncheck the king"))
     yield Drop(
       piece = piece,
       square = square,
       situationBefore = situation,
-      after = board1 withCrazyData d2
+      after = b1 withCrazyData d2
     )
 
   override def fiftyMoves(history: History): Boolean = false
@@ -124,28 +122,16 @@ case object Crazyhouse
     val targets = legalDropSquares(situation)
     if targets.isEmpty then Nil
     else
-      situation.board.crazyData.fold(List.empty[Drop]) { data =>
+      situation.board.crazyData.fold(Nil): data =>
         val pocket = data.pockets(situation.color)
-        val dropsWithoutPawn =
-          for
-            role <- List(Knight, Bishop, Rook, Queen)
-            if pocket contains role
-            to <- targets.squares
-            piece = Piece(situation.color, role)
-            after = situation.board.place(piece, to).get // this is safe, we checked the target squares
-            d2    = data.drop(piece).get                 // this is safe, we checked the pocket
-          yield Drop(piece, to, situation, after withCrazyData d2)
-        val dropWithPawn =
-          if pocket contains Pawn then
-            for
-              to <- (targets & ~Bitboard.firstRank & ~Bitboard.lastRank).squares
-              piece = Piece(situation.color, Pawn)
-              after = situation.board.place(piece, to).get // this is safe, we checked the target squares
-              d2    = data.drop(piece).get                 // this is safe, we checked the pocket
-            yield Drop(piece, to, situation, after withCrazyData d2)
-          else Nil
-        dropsWithoutPawn ::: dropWithPawn
-      }
+        for
+          role <- List(Pawn, Knight, Bishop, Rook, Queen)
+          if pocket contains role
+          to <- if role == Pawn then targets & ~Bitboard.firstRank & ~Bitboard.lastRank else targets
+          piece = Piece(situation.color, role)
+          after <- situation.board.place(piece, to)
+          d2    <- data.drop(piece)
+        yield Drop(piece, to, situation, after withCrazyData d2)
 
   type Pockets = ByColor[Pocket]
   case class Data(
@@ -158,42 +144,35 @@ case object Crazyhouse
   ):
 
     def drop(piece: Piece): Option[Data] =
-      pockets take piece map { nps =>
-        copy(pockets = nps)
-      }
+      this.focus(_.pockets).modifyF(_.take(piece))
 
     def store(piece: Piece, from: Square): Data =
+      val storedPiece = if promoted.contains(from) then piece.color.pawn else piece
       copy(
-        pockets = pockets store {
-          if promoted.contains(from) then piece.color.pawn else piece
-        },
+        pockets = pockets.store(storedPiece),
         promoted = promoted.removeSquare(from)
       )
 
-    def promote(square: Square) = copy(promoted = promoted.addSquare(square))
+    def promote(square: Square): Data = copy(promoted = promoted.addSquare(square))
 
-    def move(orig: Square, dest: Square) =
-      copy(
-        promoted = if promoted.contains(orig) then promoted.removeSquare(orig).addSquare(dest) else promoted
-      )
+    def move(orig: Square, dest: Square): Data =
+      if promoted.contains(orig) then copy(promoted = promoted.move(orig, dest)) else this
 
-    def isEmpty = pockets.white.isEmpty && pockets.black.isEmpty
-    def size    = pockets.white.size + pockets.black.size
+    def isEmpty = pockets.forall(_.isEmpty)
+    def size    = pockets.reduce(_.size + _.size)
 
   object Data:
-    val init = Data(ByColor(Pocket.empty), Bitboard.empty)
+    val init = Data(ByColor.fill(Pocket.empty), Bitboard.empty)
 
   extension (pockets: Pockets)
 
     def take(piece: Piece): Option[Pockets] =
-      pockets(piece.color).take(piece.role).map { np =>
-        pockets.update(piece.color, _ => np)
-      }
+      pockets.update(piece.color, _.take(piece.role))
 
     def store(piece: Piece): Pockets =
       pockets.update(!piece.color, _.store(piece.role))
 
-    def forsyth = pockets.white.forsythUpper + pockets.black.forsyth
+    def forsyth = pockets.reduce(_.forsythUpper + _.forsyth)
 
   case class Pocket(pawn: Int, knight: Int, bishop: Int, rook: Int, queen: Int):
 
@@ -202,8 +181,6 @@ case object Crazyhouse
       forsyth(bishop, 'b') + forsyth(rook, 'r') + forsyth(queen, 'q')
 
     def forsyth(role: Int, char: Char) = List.fill(role)(char).mkString
-
-    def values = List(Pawn -> pawn, Knight -> knight, Bishop -> bishop, Rook -> rook, Queen -> queen)
 
     def size       = pawn + knight + bishop + rook + queen
     def isEmpty    = size == 0
@@ -228,7 +205,7 @@ case object Crazyhouse
         case King   => None
 
     def take(role: Role): Option[Pocket] =
-      update(role, (x => if x > 0 then Some(x - 1) else None))
+      update(role, (x => Option.when(x > 0)(x - 1)))
 
     def store(role: Role): Pocket = update(role, _ + 1)
 
@@ -248,9 +225,13 @@ case object Crazyhouse
       case Queen  => f(queen).map(x => copy(queen = x))
       case King   => None
 
+    def flatMap[B](f: (Role, Int) => IterableOnce[B]): List[B] =
+      List(f(Pawn, pawn), f(Knight, knight), f(Bishop, bishop), f(Rook, rook), f(Queen, queen)).flatten
+
+    def map[B](f: (Role, Int) => B): List[B] =
+      List(f(Pawn, pawn), f(Knight, knight), f(Bishop, bishop), f(Rook, rook), f(Queen, queen))
+
   object Pocket:
     val empty = Pocket(0, 0, 0, 0, 0)
     def apply(roles: List[Role]): Pocket =
-      roles.foldLeft(empty) { (p, r) =>
-        p store r
-      }
+      roles.foldLeft(empty)(_ store _)

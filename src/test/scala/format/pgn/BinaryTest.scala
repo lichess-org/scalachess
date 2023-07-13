@@ -183,7 +183,7 @@ object BinaryTestUtils:
     var i    = s.length - 1
     var sum  = 0
     var mult = 1
-    while (i >= 0)
+    while i >= 0 do
       s.charAt(i) match
         case '1' => sum += mult
         case '0' =>

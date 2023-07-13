@@ -36,6 +36,6 @@ object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
       else
         (ur & ~rook & Bitboard.rank(square.rank)).first match
           case Some(otherRook) =>
-            if (otherRook.file > square.file) then Some(Some(QueenSide))
+            if otherRook.file > square.file then Some(Some(QueenSide))
             else Some(Some(KingSide))
           case None => Some(None)

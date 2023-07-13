@@ -1,8 +1,8 @@
 package chess
 package variant
 
-import cats.data.Validated
-import cats.syntax.option.*
+import cats.Eq
+import cats.syntax.all.*
 
 import chess.format.EpdFen
 import chess.bitboard.Bitboard
@@ -66,25 +66,25 @@ abstract class Variant private[variant] (
       from: Square,
       to: Square,
       promotion: Option[PromotableRole]
-  ): Validated[ErrorStr, Move] =
+  ): Either[ErrorStr, Move] =
     // Find the move in the variant specific list of valid moves
     def findMove(from: Square, to: Square) =
       situation.generateMovesAt(from).find(_.dest == to)
 
     for
-      piece <- situation.board(from) toValid ErrorStr(s"No piece on ${from.key}")
-      _ <-
-        if (piece.color == situation.color) Validated.valid(piece)
-        else Validated.invalid(ErrorStr(s"Not my piece on ${from.key}"))
-      m1 <- findMove(from, to) toValid ErrorStr(s"Piece on ${from.key} cannot move to ${to.key}")
-      m2 <- m1 withPromotion promotion toValid ErrorStr(s"Piece on ${from.key} cannot promote to $promotion")
-      m3 <-
-        if isValidPromotion(promotion) then Validated.valid(m2)
-        else Validated.invalid(ErrorStr(s"Cannot promote to $promotion in this game mode"))
+      piece <- situation.board(from).toRight(ErrorStr(s"No piece on ${from.key}"))
+      _     <- Either.cond(piece.color == situation.color, piece, ErrorStr(s"Not my piece on ${from.key}"))
+      m1    <- findMove(from, to) toRight ErrorStr(s"Piece on ${from.key} cannot move to ${to.key}")
+      m2 <- m1 withPromotion promotion toRight ErrorStr(s"Piece on ${from.key} cannot promote to $promotion")
+      m3 <- Either.cond(
+        isValidPromotion(promotion),
+        m2,
+        ErrorStr(s"Cannot promote to $promotion in this game mode")
+      )
     yield m3
 
-  def drop(situation: Situation, role: Role, square: Square): Validated[ErrorStr, Drop] =
-    Validated.invalid(ErrorStr(s"$this variant cannot drop $situation $role $square"))
+  def drop(situation: Situation, role: Role, square: Square): Either[ErrorStr, Drop] =
+    ErrorStr(s"$this variant cannot drop $situation $role $square").asLeft
 
   def staleMate(situation: Situation): Boolean = situation.check.no && situation.legalMoves.isEmpty
 
@@ -102,11 +102,11 @@ abstract class Variant private[variant] (
   /** Returns the material imbalance in pawns (overridden in Antichess)
     */
   def materialImbalance(board: Board): Int =
-    board.allPieces.foldLeft(0) { case (acc, Piece(color, role)) =>
-      Role.valueOf(role).fold(acc) { value =>
-        acc + value * color.fold(1, -1)
-      }
-    }
+    board.fold(0): (acc, color, role) =>
+      Role
+        .valueOf(role)
+        .fold(acc): value =>
+          acc + value * color.fold(1, -1)
 
   /** Returns true if neither player can win. The game should end immediately.
     */
@@ -164,6 +164,8 @@ abstract class Variant private[variant] (
   override def hashCode: Int = id.value
 
 object Variant:
+
+  given Eq[Variant] = Eq.by(_.id)
 
   opaque type Id = Int
   object Id extends OpaqueInt[Id]

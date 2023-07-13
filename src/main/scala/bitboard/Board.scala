@@ -29,18 +29,10 @@ case class Board(
     byColor(piece.color) & byRole(piece.role)
 
   def roleAt(s: Square): Option[Role] =
-    if pawns.contains(s) then Some(Pawn)
-    else if knights.contains(s) then Some(Knight)
-    else if bishops.contains(s) then Some(Bishop)
-    else if rooks.contains(s) then Some(Rook)
-    else if queens.contains(s) then Some(Queen)
-    else if kings.contains(s) then Some(King)
-    else None
+    byRole.findRole(_.contains(s))
 
   def colorAt(s: Square): Option[Color] =
-    if white.contains(s) then Some(Color.White)
-    else if black.contains(s) then Some(Color.Black)
-    else None
+    byColor.findColor(_.contains(s))
 
   def pieceAt(s: Square): Option[Piece] =
     for
@@ -55,7 +47,7 @@ case class Board(
     black.contains(s)
 
   def kings(color: Color): List[Square] =
-    (kings & byColor(color)).squares
+    kingOf(color).squares
 
   def kingOf(c: Color): Bitboard          = kings & byColor(c)
   def kingPosOf(c: Color): Option[Square] = kingOf(c).singleSquare
@@ -90,11 +82,10 @@ case class Board(
       ourKing.rookAttacks(Bitboard.empty) & (rooks ^ queens) |
         ourKing.bishopAttacks(Bitboard.empty) & (bishops ^ queens)
     )
-    snipers.squares.foldLeft(Bitboard.empty) { case (blockers, sniper) =>
+    snipers.fold(Bitboard.empty): (blockers, sniper) =>
       val between = Bitboard.between(ourKing, sniper) & occupied
       if between.moreThanOne then blockers
       else blockers | between
-    }
 
   def discard(s: Square): Board =
     discard(s.bb)
@@ -107,7 +98,6 @@ case class Board(
       byRole.map(_ & notMask)
     )
 
-  def roles: Role => Bitboard                  = byRole.apply
   def byRoleOf(color: Color): ByRole[Bitboard] = byRole.map(_ & byColor(color))
 
   // put a piece to an empty square
@@ -154,9 +144,37 @@ case class Board(
   inline def isOccupied(inline p: Piece) =
     piece(p).nonEmpty
 
-  // TODO remove unsafe get
+  // benchmarked: https://github.com/lichess-org/scalachess/pull/438
   lazy val pieceMap: Map[Square, Piece] =
-    occupied.squares.view.map(s => (s, pieceAt(s).get)).toMap
+    val m = Map.newBuilder[Square, Piece]
+    byColor.foreach: (color, c) =>
+      byRole.foreach: (role, r) =>
+        val piece = color - role
+        (c & r).foreach: s =>
+          m += s -> piece
+    m.result
+
+  def fold[B](init: B)(f: (B, Color, Role) => B): B =
+    var m = init
+    byColor.foreach: (color, c) =>
+      byRole.foreach: (role, r) =>
+        (c & r).foreach: _ =>
+          m = f(m, color, role)
+    m
+
+  def fold[B](init: B)(f: (B, Color, Role, Square) => B): B =
+    var m = init
+    byColor.foreach: (color, c) =>
+      byRole.foreach: (role, r) =>
+        (c & r).foreach: s =>
+          m = f(m, color, role, s)
+    m
+
+  def foreach[U](f: (Color, Role, Square) => U): Unit =
+    byColor.foreach: (color, c) =>
+      byRole.foreach: (role, r) =>
+        (c & r).foreach: s =>
+          f(color, role, s)
 
   def piecesOf(c: Color): Map[Square, Piece] =
     pieceMap.filter((_, p) => p.color == c)
@@ -164,17 +182,17 @@ case class Board(
   def pieces: List[Piece] = pieces(occupied)
 
   def pieces(occupied: Bitboard): List[Piece] =
-    occupied.squares.flatMap(pieceAt)
+    occupied.flatMap(pieceAt)
 
-  def color(c: Color): Bitboard = c.fold(white, black)
+  def color(c: Color): Bitboard = byColor(c)
 
-  def piece(p: Piece): Bitboard = color(p.color) & byRole(p.role)
+  def piece(p: Piece): Bitboard = byColor(p.color) & byRole(p.role)
 
 object Board:
 
   val empty: Board = Board(
     Bitboard.empty,
-    ByColor(Bitboard.empty),
+    ByColor.fill(Bitboard.empty),
     ByRole(Bitboard.empty)
   )
 
@@ -189,7 +207,7 @@ object Board:
     var black    = Bitboard.empty
     var occupied = Bitboard.empty
 
-    pieces.foreach { (s, p) =>
+    pieces.foreach: (s, p) =>
       val position = s.bb
       occupied |= position
       p.role match
@@ -203,5 +221,5 @@ object Board:
       p.color match
         case Color.White => white |= position
         case Color.Black => black |= position
-    }
+
     Board(occupied, ByColor(white, black), ByRole(pawns, knights, bishops, rooks, queens, kings))

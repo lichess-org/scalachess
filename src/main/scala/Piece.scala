@@ -1,9 +1,12 @@
 package chess
 
+import cats.Eq
+import cats.derived.*
+
 import bitboard.Bitboard
 import bitboard.Bitboard.*
 
-case class Piece(color: Color, role: Role):
+case class Piece(color: Color, role: Role) derives Eq:
 
   def is(c: Color)   = c == color
   def is(r: Role)    = r == role

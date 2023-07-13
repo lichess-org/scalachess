@@ -1,6 +1,6 @@
 package chess
 
-import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.{ Arbitrary, Cogen, Gen }
 import cats.kernel.Eq
 
 object Arbitraries:
@@ -9,12 +9,23 @@ object Arbitraries:
   given Arbitrary[Color]   = Arbitrary(Gen.oneOf(Color.all))
   given Arbitrary[Side]    = Arbitrary(Gen.oneOf(Side.all))
   given Arbitrary[Role]    = Arbitrary(Gen.oneOf(Role.all))
+  given Arbitrary[File]    = Arbitrary(Gen.oneOf(File.all))
+  given Arbitrary[Rank]    = Arbitrary(Gen.oneOf(Rank.all))
+  given Arbitrary[Square]  = Arbitrary(Gen.oneOf(Square.all))
+  given Cogen[Color]       = Cogen(x => if x == White then 0L else 1L)
 
   given Arbitrary[Piece] = Arbitrary(
     for
       color <- Arbitrary.arbitrary[Color]
       role  <- Arbitrary.arbitrary[Role]
     yield Piece(color, role)
+  )
+
+  given [A](using Arbitrary[A]): Arbitrary[ByColor[A]] = Arbitrary(
+    for
+      w <- Arbitrary.arbitrary[A]
+      b <- Arbitrary.arbitrary[A]
+    yield ByColor(w, b)
   )
 
   given [A](using Arbitrary[A]): Arbitrary[Tree[A]]      = Arbitrary(Gen.oneOf(genNode, genVariation))
@@ -35,19 +46,24 @@ object Arbitraries:
     yield (node, path)
 
   def genPath[A](node: Node[A]): Gen[List[A]] =
-    genBool.flatMap:
-      case true => node.child.fold(Gen.const(Nil))(genPath(_)).map(node.value :: _)
-      case false =>
-        if node.variations.isEmpty
-        then Gen.const(Nil)
-        else
-          genBool.flatMap:
-            case true  => Gen.oneOf(node.variations).flatMap(v => genPath(v.toNode).map(v.value :: _))
-            case false => Gen.const(node.value :: Nil)
+    val prob = if node.variations.isEmpty then 0.90 else 0.6
+    Gen
+      .prob(prob)
+      .flatMap:
+        case true => node.child.fold(Gen.const(Nil))(genPath(_)).map(node.value :: _)
+        case false =>
+          if node.variations.isEmpty
+          then Gen.const(Nil)
+          else
+            Gen
+              .prob(0.95)
+              .flatMap:
+                case true  => Gen.oneOf(node.variations).flatMap(v => genPath(v.toNode))
+                case false => Gen.const(node.value :: Nil)
 
   def genNode[A](using Arbitrary[A]): Gen[Node[A]] =
     Gen.sized: size =>
-      val sqrt = Math.sqrt(size.toDouble).toInt
+      val sqrt = size / 2
       for
         a <- Arbitrary.arbitrary[A]
         c <- genChild[A](size)

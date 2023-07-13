@@ -30,8 +30,7 @@ enum Move(val from: Square, val to: Square, val role: Role):
   def uci: String =
     this match
       case Promotion(from, to, role, _) => s"${from.uci}${to.uci}${role.forsyth}"
-      case Castle(from, to) => {
+      case Castle(from, to) =>
         val k = from.withFile(if to < from then File.C else File.G)
         s"${from.uci}${k.uci}"
-      }
       case _ => s"${from.uci}${to.uci}"

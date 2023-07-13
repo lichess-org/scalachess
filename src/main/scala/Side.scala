@@ -1,6 +1,9 @@
 package chess
 
-enum Side:
+import cats.Eq
+import cats.derived.*
+
+enum Side derives Eq:
   case KingSide, QueenSide
 
   inline def fold[A](inline k: A, inline q: A): A = if isKingSide then k else q
@@ -16,7 +19,6 @@ object Side:
 
   val all = List(KingSide, QueenSide)
 
-  def kingRookSide(kingSquare: Square, rookSquare: Square): Option[Side] =
-    if (kingSquare ?- rookSquare)
-      Option(if (kingSquare ?> rookSquare) QueenSide else KingSide)
-    else None
+  def kingRookSide(king: Square, rook: Square): Option[Side] =
+    Option.when(king.onSameRank(rook)):
+      if king ?> rook then QueenSide else KingSide

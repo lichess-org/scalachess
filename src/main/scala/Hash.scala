@@ -1,6 +1,6 @@
 package chess
 
-import cats.kernel.Monoid
+import cats.Monoid
 import Castles.*
 
 opaque type PositionHash = Array[Byte]
@@ -14,11 +14,11 @@ object Hash extends OpaqueInt[Hash]:
   extension (size: Hash)
     def apply(situation: Situation): PositionHash = PositionHash:
       val l = Hash.get(situation, Hash.polyglotTable)
-      if (size <= 8) Array.tabulate(size)(i => (l >>> ((7 - i) * 8)).toByte)
+      if size <= 8 then Array.tabulate(size)(i => (l >>> ((7 - i) * 8)).toByte)
       else
         val m = Hash.get(situation, Hash.randomTable)
         Array.tabulate(size)(i =>
-          if (i < 8) (l >>> ((7 - i) * 8)).toByte
+          if i < 8 then (l >>> ((7 - i) * 8)).toByte
           else (m >>> ((15 - i) * 8)).toByte
         )
 
@@ -41,7 +41,7 @@ object Hash extends OpaqueInt[Hash]:
   private val polyglotTable    = ZobristConstants(0)
   private lazy val randomTable = ZobristConstants(16)
 
-  private def roleIndex(role: Role) =
+  private inline def roleIndex(inline role: Role) =
     role match
       case Pawn   => 0
       case Knight => 1
@@ -50,66 +50,64 @@ object Hash extends OpaqueInt[Hash]:
       case Queen  => 4
       case King   => 5
 
-  private def pieceIndex(piece: Piece): Int =
-    roleIndex(piece.role) * 2 + piece.color.fold(1, 0)
-
-  // todo rename
-  private def actorIndex(square: Square, piece: Piece): Int =
-    64 * pieceIndex(piece) + square.hashCode
-
   private def get(situation: Situation, table: ZobristConstants): Long =
+
+    extension (xs: Iterable[Long]) def computeHash(seed: Long): Long = xs.fold(seed)(_ ^ _)
 
     def crazyPocketMask(role: Role, colorshift: Int, count: Int): Option[Long] =
       // There should be no kings and at most 16 pieces of any given type
       // in a pocket.
-      if (0 < count && count <= 16 && roleIndex(role) < 5)
-        Option(table.crazyPocketMasks(16 * roleIndex(role) + count + colorshift))
-      else None
+      Option.when(0 < count && count <= 16 && role != King):
+        table.crazyPocketMasks(16 * roleIndex(role) + count + colorshift)
 
-    val board = situation.board
+    import situation.board
     val hturn = situation.color.fold(table.whiteTurnMask, 0L)
 
-    val hactors = board.pieces
-      .map((square, piece) => table.actorMasks(actorIndex(square, piece)))
-      .fold(hturn)(_ ^ _)
+    val hpieces =
+      var m = hturn
+      board.byColor.foreach: (color, c) =>
+        board.byRole.foreach: (role, r) =>
+          val pi = 64 * (roleIndex(role) * 2 + color.fold(1, 0))
+          (c & r).foreach: s =>
+            val tm = table.actorMasks(pi + s.hashCode)
+            m ^= tm
+      m
 
     val hcastling =
-      if (board.variant.allowsCastling)
+      if board.variant.allowsCastling then
         (situation.history.castles.toSeq.view zip table.castlingMasks)
-          .collect { case (true, castlingMask) =>
-            castlingMask
-          }
-          .fold(hactors)(_ ^ _)
-      else hactors
+          .collect:
+            case (true, castlingMask) => castlingMask
+          .computeHash(hpieces)
+      else hpieces
 
-    val hep = situation.enPassantSquare.fold(hcastling) { square =>
+    val hep = situation.enPassantSquare.fold(hcastling): square =>
       hcastling ^ table.enPassantMasks(square.file.index)
-    }
 
     // Hash in special three-check data.
     val hchecks = board.variant match
       case variant.ThreeCheck =>
         val blackCount   = math.min(situation.history.checkCount.black, 3)
         val whiteCount   = math.min(situation.history.checkCount.white, 3)
-        val hblackchecks = if (blackCount > 0) hep ^ table.threeCheckMasks(blackCount - 1) else hep
-        if (whiteCount > 0) hblackchecks ^ table.threeCheckMasks(whiteCount + 2) else hblackchecks
+        val hblackchecks = if blackCount > 0 then hep ^ table.threeCheckMasks(blackCount - 1) else hep
+        if whiteCount > 0 then hblackchecks ^ table.threeCheckMasks(whiteCount + 2) else hblackchecks
       case _ => hep
 
     // Hash in special crazyhouse data.
-    board.crazyData.fold(hchecks) { data =>
-      val hcrazypromotions: Long = data.promoted.squares
-        .map { p => table.crazyPromotionMasks(p.hashCode) }
-        .fold(hchecks)(_ ^ _)
-      Color.all
-        .flatMap { color =>
+    board.crazyData.fold(hchecks): data =>
+
+      val hcrazypromotions: Long = data.promoted
+        .map(s => table.crazyPromotionMasks(s.hashCode))
+        .computeHash(hchecks)
+
+      data.pockets
+        .mapWithColor: (color, pocket) =>
           val colorshift = color.fold(79, -1)
-          data
-            .pockets(color)
-            .values
-            .flatMap((role, size) => crazyPocketMask(role, colorshift, size))
-        }
-        .fold(hcrazypromotions)(_ ^ _)
-    }
+          pocket.flatMap((role, size) => crazyPocketMask(role, colorshift, size))
+        .flatten
+        .computeHash(hcrazypromotions)
+
+  end get
 
   private val h: Hash = size
 

@@ -1,7 +1,5 @@
 package chess
 
-import cats.data.Validated
-
 import chess.format.Fen
 import chess.format.{ pgn, Uci }
 import chess.format.pgn.SanStr
@@ -22,7 +20,7 @@ case class Game(
       dest: Square,
       promotion: Option[PromotableRole] = None,
       metrics: MoveMetrics = MoveMetrics.empty
-  ): Validated[ErrorStr, (Game, Move)] =
+  ): Either[ErrorStr, (Game, Move)] =
     moveWithCompensated(orig, dest, promotion, metrics).map { case (game, move) =>
       (game.value, move)
     }
@@ -32,7 +30,7 @@ case class Game(
       dest: Square,
       promotion: Option[PromotableRole] = None,
       metrics: MoveMetrics = MoveMetrics.empty
-  ): Validated[ErrorStr, (Clock.WithCompensatedLag[Game], Move)] =
+  ): Either[ErrorStr, (Clock.WithCompensatedLag[Game], Move)] =
     situation.move(orig, dest, promotion).map(_.normalizeCastle withMetrics metrics) map { move =>
       applyWithCompensated(move) -> move
     }
@@ -57,7 +55,7 @@ case class Game(
       role: Role,
       square: Square,
       metrics: MoveMetrics = MoveMetrics.empty
-  ): Validated[ErrorStr, (Game, Drop)] =
+  ): Either[ErrorStr, (Game, Drop)] =
     situation.drop(role, square).map(_ withMetrics metrics) map { drop =>
       applyDrop(drop) -> drop
     }
@@ -77,19 +75,15 @@ case class Game(
       gameActive: => Boolean
   ): Option[Clock.WithCompensatedLag[Clock]] =
     clock.map { prev =>
-      {
-        val c1 = metrics.frameLag.fold(prev)(prev.withFrameLag)
-        val c2 = c1.step(metrics, gameActive)
-        if (ply - startedAtPly == Ply(1)) c2.map(_.start) else c2
-      }
+      val c1 = metrics.frameLag.fold(prev)(prev.withFrameLag)
+      val c2 = c1.step(metrics, gameActive)
+      if ply - startedAtPly == Ply(1) then c2.map(_.start) else c2
     }
 
-  def apply(uci: Uci.Move): Validated[ErrorStr, (Game, Move)] = apply(uci.orig, uci.dest, uci.promotion)
-  def apply(uci: Uci.Drop): Validated[ErrorStr, (Game, Drop)] = drop(uci.role, uci.square)
-  def apply(uci: Uci): Validated[ErrorStr, (Game, MoveOrDrop)] =
+  def apply(uci: Uci.Move): Either[ErrorStr, (Game, Move)] = apply(uci.orig, uci.dest, uci.promotion)
+  def apply(uci: Uci.Drop): Either[ErrorStr, (Game, Drop)] = drop(uci.role, uci.square)
+  def apply(uci: Uci): Either[ErrorStr, (Game, MoveOrDrop)] =
     apply(uci) map { case (g, m) => g -> m }
-
-  inline def isStandardInit = board.pieces == chess.variant.Standard.pieces
 
   inline def fullMoveNumber: FullMoveNumber = ply.fullMoveNumber
 

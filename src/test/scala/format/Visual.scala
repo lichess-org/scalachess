@@ -19,14 +19,12 @@ object Visual:
       case n if n > 8 => lines.slice(1, 9)
       case n          => (List.fill(8 - n)("")) ::: lines
     val b = Board(
-      pieces = (for {
+      pieces = (for
         (l, y) <- (filtered zipWithIndex)
         (c, x) <- (l zipWithIndex)
         role   <- Role forsyth c.toLower
-      } yield {
-        Square.at(x, 7 - y) map { square =>
-          square -> (Color.fromWhite(c isUpper) - role)
-        }
+      yield Square.at(x, 7 - y) map { square =>
+        square -> (Color.fromWhite(c isUpper) - role)
       }) flatten,
       variant = chess.variant.Variant.default
     )

@@ -1,8 +1,6 @@
 package chess
 package format
 
-import chess.Square
-
 class UciPathTest extends munit.FunSuite:
 
   test("empty intersect"):
@@ -24,12 +22,6 @@ class UciPathTest extends munit.FunSuite:
     )
     assertEquals(p.depth, 57)
 
-  test("convert move to pair"):
-    assertEquals(UciCharPair(Uci.Move(Square.E2, Square.E4)).toString, "/?")
-
-  test("convert drop to pair"):
-    assertEquals(UciCharPair(Uci.Drop(Pawn, Square.C7)), UciCharPair('U', '\u008f'))
-    assertEquals(UciCharPair(Uci.Drop(Knight, Square.C7)), UciCharPair('U', '\u008e'))
-    assertEquals(UciCharPair(Uci.Drop(Bishop, Square.C7)), UciCharPair('U', '\u008d'))
-    assertEquals(UciCharPair(Uci.Drop(Rook, Square.C7)), UciCharPair('U', '\u008c'))
-    assertEquals(UciCharPair(Uci.Drop(Queen, Square.C7)), UciCharPair('U', '\u008b'))
+  test("debug"):
+    val debug = UciPath("/?UE)8\\M(DYQDMTM'*`Y('aR-5").debug
+    assertEquals(debug, "e2e4 c7c5 g1f3 b8c6 f1b5 g7g6 b5c6 b7c6 e1h1 f8g7 f1e1 g8h6 c2c3")

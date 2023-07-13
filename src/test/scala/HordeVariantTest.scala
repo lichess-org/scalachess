@@ -12,7 +12,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("k7/ppP5/brp5/8/8/8/8/8 b - -")
       val game     = fenToGame(position, Horde)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
 
@@ -20,7 +20,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("8/2k5/3q4/8/8/8/1P6/8 b - -")
       val game     = fenToGame(position, Horde)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.opponentHasInsufficientMaterial must beTrue
       }
 
@@ -28,7 +28,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("8/2k5/3q4/8/8/8/1P6/8 w - -")
       val game     = fenToGame(position, Horde)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
 
@@ -36,7 +36,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("r7/2Bb4/q3k3/8/8/3q4/8/5qqr b - -")
       val game     = fenToGame(position, Horde)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.autoDraw must beFalse
         game.situation.end must beFalse
         game.situation.opponentHasInsufficientMaterial must beTrue
@@ -46,7 +46,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("8/2k5/3q4/8/8/1Q6/8/8 b - -")
       val game     = fenToGame(position, Horde)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.opponentHasInsufficientMaterial must beTrue
       }
 
@@ -54,7 +54,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("8/2k5/3q4/8/8/1Q6/8/8 w - -")
       val game     = fenToGame(position, Horde)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
 
@@ -62,7 +62,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("8/2k5/3q4/8/8/1B2N3/8/8 b - -")
       val game     = fenToGame(position, Horde)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.opponentHasInsufficientMaterial must beTrue
       }
 
@@ -70,7 +70,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("8/2k5/3q4/8/8/1B2N3/8/8 w - -")
       val game     = fenToGame(position, Horde)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
 
@@ -78,7 +78,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("8/2k5/3q4/8/8/3B4/4NB2/8 b - -")
       val game     = fenToGame(position, Horde)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
 
@@ -86,7 +86,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("8/5k2/7q/7P/6rP/6P1/6P1/8 b - - 0 52")
       val game     = fenToGame(position, Horde)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.opponentHasInsufficientMaterial must beFalse
         game.situation.autoDraw must beFalse
       }
@@ -95,7 +95,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("8/p7/pk6/P7/P7/8/8/8 b - -")
       val game     = fenToGame(position, Horde)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.autoDraw must beTrue
         game.situation.opponentHasInsufficientMaterial must beTrue
       }
@@ -104,7 +104,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("QNBRRBNQ/PPpPPpPP/P1P2PkP/8/8/8/8/8 b - -")
       val game     = fenToGame(position, Horde)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.autoDraw must beTrue
         game.situation.opponentHasInsufficientMaterial must beTrue
       }
@@ -113,7 +113,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("b7/pk6/P7/P7/8/8/8/8 b - - 0 1")
       val game     = fenToGame(position, Horde)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.autoDraw must beTrue
         game.situation.opponentHasInsufficientMaterial must beTrue
       }
@@ -122,7 +122,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("8/1b5r/1P6/1Pk3q1/1PP5/r1P5/P1P5/2P5 b - - 0 52")
       val game     = fenToGame(position, Horde)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.autoDraw must beFalse
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
@@ -131,7 +131,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("8/8/8/7k/7P/7P/8/8 b - - 0 58")
       val game     = fenToGame(position, Horde)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.autoDraw must beFalse
         game.situation.end must beFalse
         game.situation.status must beNone
@@ -143,7 +143,7 @@ class HordeVariantTest extends ChessTest:
       val position = EpdFen("7B/6k1/8/8/8/8/8/8 b - -")
       val game     = fenToGame(position, Horde)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.autoDraw must beFalse
         game.situation.opponentHasInsufficientMaterial must beTrue
       }
@@ -151,17 +151,16 @@ class HordeVariantTest extends ChessTest:
     "Pawn on first rank should able to move two squares" in:
       val position = EpdFen("8/pp1k2q1/3P2p1/8/P3PP2/PPP2r2/PPP5/PPPP4 w - - 1 2")
       val game     = fenToGame(position, Horde)
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.legalMoves.exists(m => m.orig == Square.D1 && m.dest == Square.D3) must beTrue
       }
 
     "Cannot en passant a pawn from the first rank" in:
       val position = EpdFen("k7/5p2/4p2P/3p2P1/2p2P2/1p2P2P/p2P2P1/2P2P2 w - - 0 1")
-      val game     = fenToGame(position, Horde)
-      val newGame  = game.flatMap(_.apply(Square.C1, Square.C3))
-      newGame must beValid.like { case game =>
+      val game     = fenToGame(position, Horde).toOption.get
+      val newGame  = game(Square.C1, Square.C3)
+      newGame must beRight.like: game =>
         game._1.situation.legalMoves.exists(m => m.orig == Square.B3 && m.dest == Square.C2) must beFalse
-      }
 
     "Castle with one rook moved" in:
       val sans = SanStr from "a5 h5 a4 Nc6 a3 b6 a2 Bb7 d5 d6 d4 Rh6 cxd6 Qxd6 f6"
@@ -178,9 +177,8 @@ class HordeVariantTest extends ChessTest:
 
     "the h8 rooks move" in:
       val position = EpdFen("r3kbnr/p1pqppp1/1pnp3P/PPPP1P1P/PPP1PPP1/1PPP1PPP/PPPPPPPP/PPPPPPPP b kq - 0 7")
-      val game     = fenToGame(position, Horde)
-      val newGame  = game.flatMap(_.apply(Square.H8, Square.H6))
-      newGame must beValid.like { case game =>
+      val game     = fenToGame(position, Horde).toOption.get
+      val newGame  = game(Square.H8, Square.H6)
+      newGame must beRight.like: game =>
         game._1.situation.board.history.unmovedRooks must_== UnmovedRooks(Set(Square.A8))
         game._1.situation.board.history.castles must_== Castles("q")
-      }

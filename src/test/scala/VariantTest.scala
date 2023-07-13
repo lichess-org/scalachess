@@ -52,7 +52,7 @@ class VariantTest extends ChessTest:
       val position = EpdFen("krq5/bqqq4/qqr5/1qq5/8/8/8/3qB2K b - -")
       val game     = fenToGame(position, Standard)
 
-      game should beValid.like { case game =>
+      game should beRight.like { case game =>
         game.board.materialImbalance must_== -91
         game.situation.opponentHasInsufficientMaterial must beTrue
       }
@@ -61,7 +61,7 @@ class VariantTest extends ChessTest:
       val position = EpdFen("8/7B/K7/2b5/1k6/8/8/8 b - -")
       val game     = fenToGame(position, Standard)
 
-      game should beValid.like { case game =>
+      game should beRight.like { case game =>
         game.board.materialImbalance must_== 0
         game.situation.opponentHasInsufficientMaterial must beFalse
       }
@@ -70,7 +70,7 @@ class VariantTest extends ChessTest:
       val position = EpdFen("8/3k4/2q5/8/8/K1N5/8/8 b - -")
       val game     = fenToGame(position, Standard)
 
-      game should beValid.like { case game =>
+      game should beRight.like { case game =>
         game.board.materialImbalance must_== -6
         game.situation.opponentHasInsufficientMaterial must beTrue
       }
@@ -190,7 +190,7 @@ K  r
 
       val successGame = game flatMap (_.playMove(Square.H2, Square.H1, Knight.some))
 
-      successGame must beValid.like { case game =>
+      successGame must beRight.like { case game =>
         game.situation.end must beFalse
       }
 
@@ -198,7 +198,7 @@ K  r
       val position = EpdFen("8/6K1/8/8/8/8/k7/8 b - -")
       val game     = fenToGame(position, ThreeCheck)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.end must beTrue
         game.situation.status must beEqualTo(Status.Draw.some)
       }
@@ -211,7 +211,7 @@ K  r
       val position = EpdFen("8/8/8/8/3K4/8/1k6/b7 b - - 5 3")
       val game     = fenToGame(position, RacingKings)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.end must beTrue
         game.situation.staleMate must beTrue
       }
@@ -220,7 +220,7 @@ K  r
       val position = EpdFen("8/8/8/8/5K2/8/2k5/8 w - - 0 1")
       val game     = fenToGame(position, RacingKings)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.end must beFalse
         game.situation.staleMate must beFalse
       }
@@ -230,7 +230,7 @@ K  r
         val position = EpdFen("2K5/8/6k1/8/8/8/8/Q6q w - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
-        game must beValid { (game: Game) =>
+        game must beRight { (game: Game) =>
           game.situation.end must beTrue
           game.situation.winner must beSome { (_: Color) == White }
         }
@@ -239,7 +239,7 @@ K  r
         val position = EpdFen("6k1/8/8/8/8/2r5/1KB5/2B5 w - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
-        game must beValid { (game: Game) =>
+        game must beRight { (game: Game) =>
           game.situation.end must beTrue
           game.situation.winner must beSome { (_: Color) == Black }
         }
@@ -249,7 +249,7 @@ K  r
         val position = EpdFen("2K5/5k2/8/8/8/8/8/8 b - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
-        game must beValid.like { case game =>
+        game must beRight.like { case game =>
           game.situation.end must beFalse
         }
 
@@ -257,7 +257,7 @@ K  r
         val position = EpdFen("2K5/8/2n1nk2/8/8/8/8/4r3 b - - 0 1")
         val game     = fenToGame(position, RacingKings)
 
-        game must beValid { (game: Game) =>
+        game must beRight { (game: Game) =>
           game.situation.end must beTrue
           game.situation.winner must beSome:
             (_: Color) == White
@@ -267,7 +267,7 @@ K  r
       val position = EpdFen("2K2k2/8/8/8/8/1b6/1b6/8 w - - 0 1")
       val game     = fenToGame(position, RacingKings)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.end must beTrue
         game.situation.status must beEqualTo(Status.Draw.some)
       }
@@ -283,7 +283,7 @@ K  r
       val position = EpdFen("8/p7/8/8/2B5/b7/PPPK2PP/RNB3NR w - - 1 16")
       val game     = fenToGame(position, Antichess)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.board.materialImbalance must_== -20
       }
 

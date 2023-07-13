@@ -53,3 +53,8 @@ object MoveOrDrop:
       md match
         case m: Move => game(m)
         case d: Drop => game.applyDrop(d)
+
+    inline def color: Color =
+      md match
+        case m: Move => m.color
+        case d: Drop => d.color

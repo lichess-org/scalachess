@@ -15,7 +15,7 @@ object Centis extends OpaqueInt[Centis]:
 
     inline def *(inline o: Int): Centis = centis * o
 
-    def roundTenths: Int  = if (centis > 0) (centis + 5) / 10 else (centis - 4) / 10
+    def roundTenths: Int  = if centis > 0 then (centis + 5) / 10 else (centis - 4) / 10
     def roundSeconds: Int = Math.round(centis * 0.01f)
 
     inline def toSeconds: BigDecimal = java.math.BigDecimal.valueOf(centis, 2)
@@ -38,17 +38,17 @@ object Centis extends OpaqueInt[Centis]:
     val empty                           = 0
 
   def ofLong(l: Long): Centis =
-    if (l.toInt == l) l.toInt
-    else if (l > 0) Integer.MAX_VALUE
+    if l.toInt == l then l.toInt
+    else if l > 0 then Integer.MAX_VALUE
     else Integer.MIN_VALUE
 
   def apply(d: FiniteDuration): Centis =
     ofMillis:
-      if (d.unit eq MILLISECONDS) d.length
+      if d.unit eq MILLISECONDS then d.length
       else d.toMillis
 
   inline def ofFloat(f: Float): Centis   = Math.round(f)
   inline def ofDouble(d: Double): Centis = ofLong(Math.round(d))
 
   inline def ofSeconds(s: Int): Centis = 100 * s
-  inline def ofMillis(l: Long): Centis = ofLong(if (l > 0) l + 5 else l - 4) / 10
+  inline def ofMillis(l: Long): Centis = ofLong(if l > 0 then l + 5 else l - 4) / 10

@@ -1,6 +1,9 @@
 package chess
 
-enum Mode(val id: Int, val rated: Boolean):
+import cats.Eq
+import cats.derived.*
+
+enum Mode(val id: Int, val rated: Boolean) derives Eq:
 
   case Casual extends Mode(0, false)
   case Rated  extends Mode(1, true)
@@ -16,7 +19,7 @@ object Mode:
 
   def apply(id: Int): Option[Mode] = byId get id
 
-  def apply(rated: Boolean) = if (rated) Rated else Casual
+  def apply(rated: Boolean) = if rated then Rated else Casual
 
   val default: Mode = Casual
 

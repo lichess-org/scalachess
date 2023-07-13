@@ -1,6 +1,6 @@
 package chess
 
-import cats.syntax.option.*
+import cats.syntax.all.*
 
 import chess.variant.Atomic
 import chess.format.EpdFen
@@ -18,7 +18,7 @@ class AtomicVariantTest extends ChessTest:
 
       val explosionGame = maybeGame flatMap (_.playMoves((Square.B2, Square.H8)))
 
-      explosionGame must beValid.like { case game =>
+      explosionGame must beRight.like { case game =>
         explodedSquares.forall(square => game.situation.board(square).isEmpty) must beTrue
         intactPawns.forall(square => game.situation.board(square).isDefined) must beTrue
       }
@@ -29,9 +29,9 @@ class AtomicVariantTest extends ChessTest:
       val explodedSquares =
         List(Square.D5, Square.E5, Square.D6, Square.E6, Square.F6, Square.D7, Square.E7, Square.F7)
 
-      val explosionGame = maybeGame flatMap (_.playMoves((Square.H3, Square.E6)))
+      val explosionGame = maybeGame.flatMap(_.playMoves((Square.H3, Square.E6)))
 
-      explosionGame must beValid.like { case game =>
+      explosionGame must beRight.like { case game =>
         explodedSquares.forall(square => game.situation.board(square).isEmpty) must beTrue
       }
 
@@ -41,9 +41,9 @@ class AtomicVariantTest extends ChessTest:
       val explodedSquares =
         List(Square.F5, Square.E5, Square.D6, Square.E6, Square.F6, Square.D7, Square.E7, Square.F7)
 
-      val explosionGame = maybeGame flatMap (_.playMoves((Square.B3, Square.E6)))
+      val explosionGame = maybeGame.flatMap(_.playMoves((Square.B3, Square.E6)))
 
-      explosionGame must beValid.like { case game =>
+      explosionGame must beRight.like { case game =>
         explodedSquares.forall(square => game.situation.board(square).isEmpty) must beTrue
       }
 
@@ -51,17 +51,17 @@ class AtomicVariantTest extends ChessTest:
       val fenPosition = EpdFen("8/8/8/1k6/8/8/8/1Kr5 w - -")
       val maybeGame   = fenToGame(fenPosition, Atomic)
 
-      val errorGame = maybeGame flatMap (_.playMoves((Square.B1, Square.C1)))
+      val errorGame = maybeGame.flatMap(_.playMoves((Square.B1, Square.C1)))
 
-      errorGame must beInvalid("Piece on b1 cannot move to c1")
+      errorGame must beLeft("Piece on b1 cannot move to c1")
 
     "The game must end with the correct winner when a king explodes in the perimeter of a captured piece" in:
       val fenPosition = EpdFen("rnb1kbnr/ppp1pppp/8/3q4/8/7P/PPPP1PP1/RNBQKBNR b KQkq -")
       val maybeGame   = fenToGame(fenPosition, Atomic)
 
-      val gameWin = maybeGame flatMap (_.playMoves((Square.D5, Square.D2)))
+      val gameWin = maybeGame.flatMap(_.playMoves((Square.D5, Square.D2)))
 
-      gameWin must beValid.like { case winningGame =>
+      gameWin must beRight.like { case winningGame =>
         winningGame.situation.end must beTrue
         winningGame.situation.variantEnd must beTrue
         winningGame.situation.winner must beSome(Black)
@@ -73,7 +73,7 @@ class AtomicVariantTest extends ChessTest:
 
       val gameWin = maybeGame flatMap (_.playMoves((Square.H2, Square.H1)))
 
-      gameWin must beValid.like { case winningGame =>
+      gameWin must beRight.like { case winningGame =>
         winningGame.situation.end must beTrue
         winningGame.situation.variantEnd must beFalse
         winningGame.situation.winner must beSome(Black)
@@ -85,7 +85,7 @@ class AtomicVariantTest extends ChessTest:
 
       val gameWin = maybeGame flatMap (_.playMoves((Square.B6, Square.B7)))
 
-      gameWin must beValid.like { case game =>
+      gameWin must beRight.like { case game =>
         game.situation.end must beTrue
         game.situation.staleMate must beTrue
       }
@@ -94,7 +94,7 @@ class AtomicVariantTest extends ChessTest:
       val positionFen = EpdFen("4K3/8/2b5/8/8/8/5B2/3k4 b - -")
       val game        = fenToGame(positionFen, Atomic)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.end must beTrue
         game.situation.autoDraw must beTrue
         game.situation.winner must beNone
@@ -105,7 +105,7 @@ class AtomicVariantTest extends ChessTest:
       val positionFen    = EpdFen("k1K5/pp5R/8/8/3Q4/P7/1P6/2r5 w - -")
       val threatenedGame = fenToGame(positionFen, Atomic)
 
-      threatenedGame must beValid.like { case (game: Game) =>
+      threatenedGame must beRight.like { case (game: Game) =>
         game.situation.check.yes must beTrue
         game.situation.end must beFalse
         game.situation.winner must beNone
@@ -135,9 +135,9 @@ class AtomicVariantTest extends ChessTest:
       val positionFen = EpdFen("k1r5/pp5R/8/8/3Q4/8/PP6/K7 b - -")
       val game        = fenToGame(positionFen, Atomic)
 
-      val mateThreatedGame = game flatMap (_.playMoves((Square.C8, Square.C1)))
+      val mateThreatedGame = game.flatMap(_.playMoves((Square.C8, Square.C1)))
 
-      mateThreatedGame must beValid.like { case game =>
+      mateThreatedGame must beRight.like { case game =>
         game.situation.end must beFalse
         game.situation.winner must beNone
         game.situation.moves must haveKeys(Square.D4, Square.H7)
@@ -150,7 +150,7 @@ class AtomicVariantTest extends ChessTest:
 
       val successGame = game flatMap (_.playMoves((Square.D6, Square.D7)))
 
-      successGame must beValid.like { case game =>
+      successGame must beRight.like { case game =>
         game.situation.board(Square.D7) must beSome
         game.situation.check.yes must beFalse
       }
@@ -161,7 +161,7 @@ class AtomicVariantTest extends ChessTest:
 
       val successGame = game flatMap (_.playMoves((Square.H1, Square.E1)))
 
-      successGame must beValid { (game: Game) =>
+      successGame must beRight { (game: Game) =>
         game.situation.end must beTrue
         game.situation.status must beSome { (_: Status) == Status.Draw }
       }
@@ -172,7 +172,7 @@ class AtomicVariantTest extends ChessTest:
 
       val successGame = game flatMap (_.playMoves((Square.H1, Square.E1)))
 
-      successGame must beValid.like { case game =>
+      successGame must beRight.like { case game =>
         game.situation.end must beTrue
         game.situation.status must beSome { (_: Status) == Status.Draw }
       }
@@ -181,7 +181,7 @@ class AtomicVariantTest extends ChessTest:
       val position    = EpdFen("8/8/8/8/8/8/N4r2/5k1K b - -")
       val game        = fenToGame(position, Atomic)
       val successGame = game flatMap (_.playMoves((Square.F2, Square.A2)))
-      successGame must beValid.like { case game =>
+      successGame must beRight.like { case game =>
         game.situation.end must beTrue
         game.situation.status must beSome { (_: Status) == Status.Draw }
       }
@@ -191,7 +191,7 @@ class AtomicVariantTest extends ChessTest:
       val game        = fenToGame(position, Atomic)
       val successGame = game flatMap (_.playMoves((Square.G1, Square.G8)))
 
-      successGame must beValid.like { case game =>
+      successGame must beRight.like { case game =>
         game.situation.end must beTrue
         game.situation.status must beSome { (_: Status) == Status.Draw }
       }
@@ -201,18 +201,18 @@ class AtomicVariantTest extends ChessTest:
       val game        = fenToGame(position, Atomic)
       val failureGame = game flatMap (_.playMoves((Square.D8, Square.D7)))
 
-      failureGame must beInvalid("Piece on d8 cannot move to d7")
+      failureGame must beLeft("Piece on d8 cannot move to d7")
 
     "In an en-passant capture, the pieces surrounding the pawn's destination are exploded along with the pawn" in:
       val position  = EpdFen("4k3/2pppb1p/3r1r2/3P1b2/8/8/1K6/4NB2 b - -")
       val game      = fenToGame(position, Atomic)
       val validGame = game flatMap (_.playMoves((Square.E7, Square.E5), (Square.D5, Square.E6)))
 
-      validGame must beValid.like { case game =>
+      validGame must beRight.like { case game =>
         game.board(Square.E6) must beNone // The pawn that captures during en-passant should explode
         // Every piece surrounding the en-passant destination square that is not a pawn should be empty
         import bitboard.Bitboard.*
-        Square.E6.kingAttacks.squares
+        Square.E6.kingAttacks
           .forall(square =>
             game.board(square).isEmpty || square == Square.E7 || square == Square.D7
           ) must beTrue
@@ -224,7 +224,7 @@ class AtomicVariantTest extends ChessTest:
 
       val failureGame = game flatMap (_.playMoves((Square.E8, Square.D7)))
 
-      failureGame must beInvalid("Piece on e8 cannot move to d7")
+      failureGame must beLeft("Piece on e8 cannot move to d7")
 
     "Verify that a king can move into what would traditionally be check when touching the opponent king" in:
       val position = EpdFen("r1bq1bnr/pppp1ppp/5k2/4p3/4P1K1/8/PPPP1PPP/RNBQ1B1R b - - 5 6")
@@ -232,7 +232,7 @@ class AtomicVariantTest extends ChessTest:
 
       val successGame = game flatMap (_.playMoves((Square.F6, Square.F5)))
 
-      successGame must beValid
+      successGame must beRight
 
     "After kings have been touching, and one moves away, a king that was protected is under attack again" in:
       val position = EpdFen("r1bq1bnr/pppp1ppp/5k2/4p3/4P1K1/8/PPPP1PPP/RNBQ1B1R b - - 5 6")
@@ -240,7 +240,7 @@ class AtomicVariantTest extends ChessTest:
 
       val successGame = game flatMap (_.playMoves((Square.F6, Square.F5), (Square.G4, Square.H3)))
 
-      successGame must beValid.like { game =>
+      successGame must beRight.like { game =>
         game.situation.check === Check.Yes
       }
 
@@ -250,7 +250,7 @@ class AtomicVariantTest extends ChessTest:
 
       val successGame = game flatMap (_.playMoves((Square.D8, Square.D2)))
 
-      successGame must beValid.like { game =>
+      successGame must beRight.like { game =>
         game.situation.end must beTrue
         game.situation.winner must beSome { (_: Color) == Black }
       }
@@ -261,7 +261,7 @@ class AtomicVariantTest extends ChessTest:
 
       val successGame = game flatMap (_.playMoves((Square.B5, Square.D7)))
 
-      successGame must beValid.like { game =>
+      successGame must beRight.like { game =>
         game.situation.check === Check.No
       }
 
@@ -271,7 +271,7 @@ class AtomicVariantTest extends ChessTest:
 
       val failureGame = game flatMap (_.playMoves((Square.A4, Square.C2)))
 
-      failureGame must beInvalid("Piece on a4 cannot move to c2")
+      failureGame must beLeft("Piece on a4 cannot move to c2")
 
     "Game is not a draw when the last piece a player has other than their king is a pawn that is blocked by a mobile piece" in:
       val position = EpdFen("3Q4/2b2k2/5P2/8/8/8/6K1/8 b - - 0 57")
@@ -279,7 +279,7 @@ class AtomicVariantTest extends ChessTest:
 
       val successGame = game flatMap (_.playMoves((Square.C7, Square.D8)))
 
-      successGame must beValid.like { case game =>
+      successGame must beRight.like { case game =>
         game.situation.end must beFalse
       }
 
@@ -291,7 +291,7 @@ class AtomicVariantTest extends ChessTest:
       val position    = EpdFen("k1r5/pp5Q/8/8/8/8/PP6/2K5 w - -")
       val successGame = fenToGame(position, Atomic)
 
-      successGame must beValid { (game: Game) =>
+      successGame must beRight { (game: Game) =>
         val moves = game.situation.moves.get(Square.H7)
 
         moves must beSome { (queenMoves: List[Move]) =>
@@ -311,13 +311,13 @@ class AtomicVariantTest extends ChessTest:
           F1 -> B5,
           D8 -> D2
         ))
-        successGame must beValid.like { case game =>
+        successGame must beRight.like { case game =>
           game.situation.variantEnd must beTrue
         }
       "from position" in:
         val game = fenToGame(EpdFen("rnbqkbnr/ppp1pppp/8/1B6/8/8/PPPP1PPP/RNBQK2R b KQkq - 1 1"), Atomic)
         val successGame = game flatMap (_.playMoves(D8 -> D2))
-        successGame must beValid.like { case game =>
+        successGame must beRight.like { case game =>
           game.situation.variantEnd must beTrue
         }
 
@@ -329,19 +329,19 @@ class AtomicVariantTest extends ChessTest:
         Square.A7 -> Square.A6
       ))
 
-      newGame must beValid
+      newGame must beRight
 
     "Identify that a player does not have sufficient material to win when they only have a king" in:
       val position = EpdFen("8/8/8/8/7p/2k4q/2K3P1/8 w - - 19 54")
       val game     = fenToGame(position, Atomic)
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.end must beFalse
       }
 
       val drawGame = game flatMap (_.playMoves(Square.G2 -> Square.H3))
 
-      drawGame must beValid.like { case game =>
+      drawGame must beRight.like { case game =>
         game.situation.opponentHasInsufficientMaterial must beTrue
       }
 
@@ -351,7 +351,7 @@ class AtomicVariantTest extends ChessTest:
 
       val game = originalGame flatMap (_.playMoves(Square.G4 -> Square.G5))
 
-      game must beValid.like { case game =>
+      game must beRight.like { case game =>
         game.situation.autoDraw must beTrue
         game.situation.end must beTrue
       }
@@ -365,7 +365,7 @@ class AtomicVariantTest extends ChessTest:
         Bishop.some
       ))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.situation.end must beFalse
       }
 
@@ -378,7 +378,7 @@ class AtomicVariantTest extends ChessTest:
         Bishop.some
       ))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.situation.end must beFalse
       }
 
@@ -391,7 +391,7 @@ class AtomicVariantTest extends ChessTest:
         Knight.some
       ))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.situation.end must beFalse
       }
 
@@ -404,7 +404,7 @@ class AtomicVariantTest extends ChessTest:
         Bishop.some
       ))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.situation.end must beFalse
       }
 
@@ -417,7 +417,7 @@ class AtomicVariantTest extends ChessTest:
         Bishop.some
       ))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.situation.end must beFalse
       }
 
@@ -430,7 +430,7 @@ class AtomicVariantTest extends ChessTest:
         Bishop.some
       ))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.situation.end must beFalse
       }
 
@@ -443,7 +443,7 @@ class AtomicVariantTest extends ChessTest:
         Bishop.some
       ))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.situation.end must beFalse
       }
 
@@ -456,7 +456,7 @@ class AtomicVariantTest extends ChessTest:
         Bishop.some
       ))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.situation.end must beFalse
       }
 
@@ -469,7 +469,7 @@ class AtomicVariantTest extends ChessTest:
         Knight.some
       ))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.situation.end must beFalse
       }
 
@@ -482,7 +482,7 @@ class AtomicVariantTest extends ChessTest:
         Knight.some
       ))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.situation.end must beFalse
       }
 
@@ -495,7 +495,7 @@ class AtomicVariantTest extends ChessTest:
         Knight.some
       ))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.situation.end must beFalse
       }
 
@@ -504,7 +504,7 @@ class AtomicVariantTest extends ChessTest:
       val game     = fenToGame(position, Atomic)
       val newGame  = game flatMap (_.playMove(Square.E4, Square.E5))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.situation.autoDraw must beTrue
         game.situation.end must beTrue
       }
@@ -514,7 +514,7 @@ class AtomicVariantTest extends ChessTest:
       val game     = fenToGame(position, Atomic)
       val newGame  = game flatMap (_.playMove(Square.F3, Square.F4))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.situation.autoDraw must beFalse
         game.situation.end must beFalse
       }
@@ -524,7 +524,7 @@ class AtomicVariantTest extends ChessTest:
       val game     = fenToGame(position, Atomic)
       val newGame  = game flatMap (_.playMove(Square.H5, Square.H6))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.situation.autoDraw must beFalse
         game.situation.end must beFalse
       }
@@ -534,7 +534,7 @@ class AtomicVariantTest extends ChessTest:
       val game     = fenToGame(position, Atomic)
       val newGame  = game flatMap (_.playMove(Square.B3, Square.B4))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.situation.autoDraw must beFalse
         game.situation.end must beTrue
       }
@@ -555,7 +555,7 @@ class AtomicVariantTest extends ChessTest:
       val game     = fenToGame(position, Atomic)
       val newGame  = game flatMap (_.playMove(Square.E1, Square.C1))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.board(Square.C1) must beEqualTo(White.king.some)
         game.board(Square.D1) must beEqualTo(White.rook.some)
       }
@@ -566,7 +566,7 @@ class AtomicVariantTest extends ChessTest:
       val newGame =
         game flatMap (_.playMoves((Square.G8, Square.G6), (Square.F7, Square.E7), (Square.E8, Square.A8)))
 
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.board(Square.C8) must beEqualTo(Black.king.some)
         game.board(Square.D8) must beEqualTo(Black.rook.some)
       }
@@ -575,18 +575,18 @@ class AtomicVariantTest extends ChessTest:
       val position  = EpdFen("8/8/8/8/8/8/5k2/R3K2r w Q - 0 1")
       val game      = fenToGame(position, Atomic)
       val errorGame = game flatMap (_.playMove(Square.E1, Square.C1))
-      errorGame must beInvalid
+      errorGame must beLeft
 
     "Disallow castling into atomic check" in:
       val position  = EpdFen("4k3/8/8/8/8/8/8/rR2K3 w Q - 0 1")
       val game      = fenToGame(position, Atomic)
       val errorGame = game flatMap (_.playMove(Square.E1, Square.B1))
-      errorGame must beInvalid
+      errorGame must beLeft
 
     "Exploded rooks can't castle" in:
       val position = EpdFen("1r2k3/8/8/8/8/8/1P6/1R2K3 b Q - 0 1")
       val game     = fenToGame(position, Atomic)
       val newGame  = game flatMap (_.playMove(Square.B8, Square.B2))
-      newGame must beValid.like { case game =>
+      newGame must beRight.like { case game =>
         game.situation.legalMoves.filter(_.castles) must beEmpty
       }

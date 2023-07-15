@@ -58,3 +58,51 @@ case object Standard
         checkers.singleSquare.map(c => genNonKing(Bitboard.between(king, c) | checkers)).getOrElse(Nil)
       safeKings ++ blockers
     )
+
+  override def valid(situation: Situation, strict: Boolean): Boolean =
+    super.valid(situation, strict) && hasValidCheckers(situation, strict)
+
+  private def hasValidCheckers(situation: Situation, strict: Boolean): Boolean =
+    !strict || situation.checkers.fold(true) { checkers_ =>
+      situation.potentialEpSquare.fold(isValidChecksForMultipleCheckers(situation, checkers_)) {
+        enPassantSquare_ =>
+          isValidCheckersForEnPassant(
+            enPassantSquare_,
+            situation,
+            checkers_
+          )
+      }
+    }
+
+  private def isValidCheckersForEnPassant(
+      enPassantSquare: Square,
+      situation: Situation,
+      activeCheckers: Bitboard
+  ): Boolean =
+    val enPassantUp: Option[Square] = (!situation.color)
+      .fold(enPassantSquare.up, enPassantSquare.down)
+    val enPassantDown: Option[Square] = (!situation.color)
+      .fold(enPassantSquare.down, enPassantSquare.up)
+
+    enPassantUp.exists { enPassantUp_ =>
+      enPassantDown.exists { enPassantDown_ =>
+        activeCheckers.count == 1 && (
+          activeCheckers.first.contains(enPassantSquare) || situation.board
+            .move(enPassantUp_, enPassantDown_)
+            .exists(previousBoard =>
+              situation.ourKing.exists(previousBoard.attackers(_, !situation.color).isEmpty)
+            )
+        )
+      }
+    }
+
+  private def isValidChecksForMultipleCheckers(situation: Situation, activeCheckers: Bitboard): Boolean =
+    activeCheckers.count <= 1 || (activeCheckers.count == 2 && {
+      activeCheckers.first.exists { firstChecker =>
+        activeCheckers.squares.lastOption.exists { lastChecker =>
+          situation.ourKing.exists { ourKing_ =>
+            !Bitboard.aligned(firstChecker, lastChecker, ourKing_)
+          }
+        }
+      }
+    })

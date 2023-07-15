@@ -40,8 +40,10 @@ case object Horde
     if isWhiteTurn then genEnPassant(us & board.pawns) ++ genNonKing(~us & ~board.kings)
     else Standard.validMoves(situation)
 
-  override def valid(board: Board, strict: Boolean) =
-    board.kingOf(White).isEmpty && validSide(board, strict)(Black) && !pawnsOnPromotionRank(board, White)
+  override def valid(situation: Situation, strict: Boolean) =
+    situation.board.kingOf(White).isEmpty && validSide(situation.board, strict)(
+      Black
+    ) && !pawnsOnPromotionRank(situation.board, White)
 
   /** The game has a special end condition when black manages to capture all of white's pawns */
   override def specialEnd(situation: Situation) =

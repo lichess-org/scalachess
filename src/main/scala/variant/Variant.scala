@@ -3,7 +3,6 @@ package variant
 
 import cats.Eq
 import cats.syntax.all.*
-
 import chess.format.EpdFen
 import chess.bitboard.Bitboard
 
@@ -153,7 +152,7 @@ abstract class Variant private[variant] (
       !pawnsOnPromotionRank(board, color) &&
       !pawnsOnBackRank(board, color)
 
-  def valid(board: Board, strict: Boolean) = Color.all forall validSide(board, strict)
+  def valid(situation: Situation, strict: Boolean) = Color.all forall validSide(situation.board, strict)
 
   val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
 

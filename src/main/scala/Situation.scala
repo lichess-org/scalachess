@@ -49,35 +49,7 @@ case class Situation(board: Board, color: Color):
   inline def winner: Option[Color] = variant.winner(this)
 
   def playable(strict: Boolean): Boolean =
-    (board valid strict) && !end && copy(color = !color).check.no && hasValidCheckers
-
-  private def hasValidCheckers: Boolean =
-    variant != Standard ||
-      checkers.fold(true) { checkers_ =>
-        checkers_.squares.isEmpty || (isValidCheckersForEnPassant(
-          checkers_
-        ) && isValidChecksForMultipleCheckers(checkers_))
-      }
-
-  private def isValidCheckersForEnPassant(activeCheckers: Bitboard): Boolean =
-    val attackingSliders = board.sliders.squares.filter(slider_ => activeCheckers.squares.head == slider_)
-    potentialEpSquare.fold(true) { enPassantSquare_ =>
-      val enPassantOriginalSquare =
-        (!color).fold[Square](enPassantSquare_.down.get, enPassantSquare_.up.get)
-      val enPassantFinalSquare =
-        (!color).fold[Square](enPassantSquare_.up.get, enPassantSquare_.down.get)
-      activeCheckers.squares.size == 1 &&
-      (enPassantFinalSquare == activeCheckers.squares.head
-        || attackingSliders.size == 1 && between(
-          ourKing.get,
-          attackingSliders.head
-        ).squares.contains(enPassantOriginalSquare))
-    }
-
-  private def isValidChecksForMultipleCheckers(activeCheckers: Bitboard): Boolean =
-    activeCheckers.squares.size <= 1 || (activeCheckers.squares.size == 2 && {
-      !Bitboard.aligned(activeCheckers.squares.head, activeCheckers.squares.last, ourKing.get)
-    })
+    board.valid(this, strict) && !end && copy(color = !color).check.no
 
   lazy val status: Option[Status] =
     if checkMate then Status.Mate.some

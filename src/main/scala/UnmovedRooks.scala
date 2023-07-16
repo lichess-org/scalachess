@@ -24,6 +24,7 @@ object UnmovedRooks:
 
   extension (ur: UnmovedRooks)
     inline def bb: Bitboard  = Bitboard(ur)
+    def isEmpty              = ur == 0L
     def value: Long          = ur
     def toList: List[Square] = ur.bb.squares
 

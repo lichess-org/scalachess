@@ -104,5 +104,5 @@ object Castles:
     case 'Q' => Some(A1)
     case _   => None
 
-  val all: Castles  = 0x8100000000000081L
+  val init: Castles = 0x8100000000000081L
   val none: Castles = 0L

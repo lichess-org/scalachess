@@ -49,7 +49,7 @@ class BoardTest extends ChessTest:
       board.allPieces must not beEmpty
 
     "have castling rights by default" in:
-      board.history.castles == Castles.all
+      board.history.castles == Castles.init
 
     "allow a piece to be placed" in:
       board.place(White - Rook, E3) must beSome:

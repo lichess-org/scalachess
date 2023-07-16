@@ -81,7 +81,7 @@ class VariantTest extends ChessTest:
       Chess960.pieces must havePair(A2 -> (White - Pawn))
 
     "initialize the board with castling rights" in:
-      Board.init(Chess960).history.castles must_== Castles.all
+      Board.init(Chess960).history.castles must_== Castles.init
 
   "kingOfTheHill" should:
     "detect win" in:
@@ -118,7 +118,7 @@ PP
         sit.winner must beSome { (_: Color) == Black }
 
     "initialize the board with castling rights" in:
-      Board.init(KingOfTheHill).history.castles must_== Castles.all
+      Board.init(KingOfTheHill).history.castles must_== Castles.init
 
   "threeCheck" should:
     "detect win" in:
@@ -204,7 +204,7 @@ K  r
       }
 
     "initialize the board with castling rights" in:
-      Board.init(KingOfTheHill).history.castles must_== Castles.all
+      Board.init(KingOfTheHill).history.castles must_== Castles.init
 
   "racingKings" should:
     "call it stalemate when there is no legal move" in:

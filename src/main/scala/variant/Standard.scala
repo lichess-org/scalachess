@@ -63,9 +63,9 @@ case object Standard
     super.valid(situation, strict) && (!strict || hasValidCheckers(situation))
 
   private def hasValidCheckers(situation: Situation): Boolean =
-    situation.checkers.fold(true) { checkers_ =>
-      isValidChecksForMultipleCheckers(situation, checkers_) &&
-      isValidCheckersForEnPassant(situation, checkers_)
+    situation.checkers.fold(true) { checkers =>
+      isValidChecksForMultipleCheckers(situation, checkers) &&
+      isValidCheckersForEnPassant(situation, checkers)
     }
 
   private def isValidCheckersForEnPassant(situation: Situation, activeCheckers: Bitboard): Boolean =
@@ -80,11 +80,11 @@ case object Standard
         .exists(previousBoard =>
           situation.ourKing.exists(previousBoard.attackers(_, !situation.color).isEmpty)
         )
-    )).getOrElse(false)
+    )).getOrElse(true)
 
   private def isValidChecksForMultipleCheckers(situation: Situation, activeCheckers: Bitboard): Boolean =
     val checkerCount = activeCheckers.count
-    if checkerCount == 1 then true
+    if checkerCount <= 1 then true
     else if checkerCount >= 3 then false
     else
       (for

@@ -103,8 +103,6 @@ case class Board(
 
   inline def situationOf(inline color: Color) = Situation(this, color)
 
-  inline def valid(situation: Situation, inline strict: Boolean): Boolean = variant.valid(situation, strict)
-
   def materialImbalance: Int = variant.materialImbalance(this)
 
   def kingsAndBishopsOnly: Boolean =

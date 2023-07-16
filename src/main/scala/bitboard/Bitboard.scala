@@ -22,24 +22,19 @@ object Bitboard:
   val darkSquares: Bitboard = 0xaa55aa55aa55aa55L
 
   inline def file(inline f: File): Bitboard                        = FILES(f.value)
-  inline def ray(inline from: Square, inline to: Square): Bitboard = RAYS(from.value)(to.value)
   inline def rank(inline r: Rank): Bitboard                        = RANKS(r.value)
+  inline def ray(inline from: Square, inline to: Square): Bitboard = RAYS(from.value)(to.value)
 
-  def aligned(a: Square, b: Square, c: Square): Boolean =
-    ray(a, b).contains(c)
-
-  def between(a: Square, b: Square): Bitboard =
-    BETWEEN(a.value)(b.value)
+  def aligned(a: Square, b: Square, c: Square): Boolean = ray(a, b).contains(c)
+  def between(a: Square, b: Square): Bitboard           = BETWEEN(a.value)(b.value)
 
   extension (s: Square)
 
     def bishopAttacks(occupied: Bitboard): Bitboard =
-      val magic = Magic.BISHOP(s.value)
-      ATTACKS(magic.bitshopIndex(occupied))
+      ATTACKS(Magic.BISHOP(s.value).bitshopIndex(occupied))
 
     def rookAttacks(occupied: Bitboard): Bitboard =
-      val magic = Magic.ROOK(s.value)
-      ATTACKS(magic.rookIndex(occupied))
+      ATTACKS(Magic.ROOK(s.value).rookIndex(occupied))
 
     def queenAttacks(occupied: Bitboard): Bitboard =
       bishopAttacks(occupied) ^ rookAttacks(occupied)
@@ -47,11 +42,9 @@ object Bitboard:
     def pawnAttacks(color: Color): Bitboard =
       color.fold(WHITE_PAWN_ATTACKS(s.value), BLACK_PAWN_ATTACKS(s.value))
 
-    def kingAttacks: Bitboard =
-      KING_ATTACKS(s.value)
+    def kingAttacks: Bitboard = KING_ATTACKS(s.value)
 
-    def knightAttacks: Bitboard =
-      KNIGHT_ATTACKS(s.value)
+    def knightAttacks: Bitboard = KNIGHT_ATTACKS(s.value)
 
   extension (l: Long) private def lsb: Square = Square(java.lang.Long.numberOfTrailingZeros(l))
 
@@ -70,6 +63,9 @@ object Bitboard:
     @targetName("or")
     inline infix def |(o: Bitboard): Bitboard = (a | o)
 
+    def isEmpty: Boolean  = a == empty
+    def nonEmpty: Boolean = !isEmpty
+
     def contains(square: Square): Boolean =
       (a & (1L << square.value)) != 0L
 
@@ -86,15 +82,6 @@ object Bitboard:
     def singleSquare: Option[Square] =
       if moreThanOne then None
       else first
-
-    def squares: List[Square] =
-      var b       = a
-      val builder = List.newBuilder[Square]
-      while b != 0L
-      do
-        builder += b.lsb
-        b &= (b - 1L)
-      builder.result
 
     // total non empty squares
     def count: Int = java.lang.Long.bitCount(a)
@@ -121,6 +108,15 @@ object Bitboard:
     @targetName("isDisjointB")
     inline def isDisjoint(o: Bitboard): Boolean =
       (a & o).isEmpty
+
+    def squares: List[Square] =
+      var b       = a
+      val builder = List.newBuilder[Square]
+      while b != 0L
+      do
+        builder += b.lsb
+        b &= (b - 1L)
+      builder.result
 
     def first[B](f: Square => Option[B]): Option[B] =
       var b                 = a
@@ -194,6 +190,3 @@ object Bitboard:
         builder += f(b.lsb)
         b &= (b - 1L)
       builder.result
-
-    def isEmpty: Boolean  = a == empty
-    def nonEmpty: Boolean = !isEmpty

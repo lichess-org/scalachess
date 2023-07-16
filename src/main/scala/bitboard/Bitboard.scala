@@ -146,28 +146,24 @@ object Bitboard:
       KNIGHT_ATTACKS(s.value)
 
   private def distance(a: Int, b: Int): Int =
-    inline def file(p: Int) = p & 7
-    inline def rank(p: Int) = p >>> 3
+    inline def file(s: Int) = s & 7
+    inline def rank(s: Int) = s >>> 3
     Math.max(Math.abs(file(a) - file(b)), Math.abs(rank(a) - rank(b)))
 
   extension (a: Bitboard)
-    inline def value: Long                         = a
-    inline def unary_~ : Bitboard                  = (~a)
-    inline infix def &(inline o: Long): Bitboard   = (a & o)
-    inline infix def ^(inline o: Long): Bitboard   = (a ^ o)
-    inline infix def |(inline o: Long): Bitboard   = (a | o)
-    inline infix def <<(inline o: Long): Bitboard  = (a << o)
-    inline infix def >>>(inline o: Long): Bitboard = (a >>> o)
+    inline def value: Long                        = a
+    inline def unary_~ : Bitboard                 = (~a)
+    inline infix def &(inline o: Long): Bitboard  = (a & o)
+    inline infix def ^(inline o: Long): Bitboard  = (a ^ o)
+    inline infix def |(inline o: Long): Bitboard  = (a | o)
+    inline infix def <<(inline o: Int): Bitboard  = (a << o)
+    inline infix def >>>(inline o: Int): Bitboard = (a >>> o)
     @targetName("and")
     inline infix def &(o: Bitboard): Bitboard = (a & o)
     @targetName("xor")
     inline infix def ^(o: Bitboard): Bitboard = (a ^ o)
     @targetName("or")
     inline infix def |(o: Bitboard): Bitboard = (a | o)
-    @targetName("shiftLeft")
-    inline infix def <<(o: Bitboard): Bitboard = (a << o)
-    @targetName("shiftRight")
-    inline infix def >>>(o: Bitboard): Bitboard = (a >>> o)
 
     def contains(square: Square): Boolean =
       (a & (1L << square.value)) != 0L

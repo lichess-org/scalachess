@@ -49,13 +49,6 @@ object Castles:
     inline infix def ^(inline o: Long): Castles = c ^ o
     inline infix def |(inline o: Long): Castles = c | o
 
-    @targetName("and")
-    inline infix def &(o: Castles): Castles = c & o
-    @targetName("xor")
-    inline infix def ^(o: Castles): Castles = c ^ o
-    @targetName("or")
-    inline infix def |(o: Castles): Castles = c | o
-
     @targetName("andB")
     inline infix def &(o: Bitboard): Castles = c & o.value
     @targetName("xorB")
@@ -112,5 +105,4 @@ object Castles:
     case _   => None
 
   val all: Castles  = 0x8100000000000081L
-  val init: Castles = all
   val none: Castles = 0L

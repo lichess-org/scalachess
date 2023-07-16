@@ -22,7 +22,7 @@ trait FenReader:
       val situation = Situation(board, if variant.atomic then fen.color else board.checkColor | fen.color)
       // todo verify unmovedRooks vs board.rooks
       val (castles, unmovedRooks) =
-        if !variant.allowsCastling then (Castles.none -> UnmovedRooks.empty)
+        if !variant.allowsCastling then (Castles.none -> UnmovedRooks.none)
         else
           fen.castling
             .foldLeft(Castles.none -> UnmovedRooks.none) { case ((c, r), ch) =>

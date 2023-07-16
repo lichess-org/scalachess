@@ -80,8 +80,8 @@ case object Atomic
 
       val rooksToExploded = squaresToExplode & afterBoard.rooks
 
-      val castles      = afterBoard.castles & ~rooksToExploded.value
-      val unMovedRooks = afterBoard.unmovedRooks & ~rooksToExploded.value
+      val castles      = afterBoard.castles & ~rooksToExploded
+      val unMovedRooks = afterBoard.unmovedRooks & ~rooksToExploded
       val newBoard     = afterExplosions.updateHistory(_.copy(castles = castles, unmovedRooks = unMovedRooks))
       move withAfter newBoard
     else move

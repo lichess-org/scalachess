@@ -9,12 +9,11 @@ object UnmovedRooks:
   val default: UnmovedRooks = UnmovedRooks(Bitboard.rank(Rank.First) | Bitboard.rank(Rank.Eighth))
   val corners: UnmovedRooks = 0x8100000000000081L
   val none: UnmovedRooks    = 0L
-  val empty: UnmovedRooks   = 0L
 
   @targetName("applyUnmovedRooks")
   def apply(b: Bitboard): UnmovedRooks                        = b.value
   def apply(l: Long): UnmovedRooks                            = l
-  inline def apply(inline xs: Iterable[Square]): UnmovedRooks = xs.foldLeft(empty)((b, s) => b | s.bl)
+  inline def apply(inline xs: Iterable[Square]): UnmovedRooks = xs.foldLeft(none)((b, s) => b | s.bl)
 
   // guess unmovedRooks from board
   // we assume rooks are on their initial position
@@ -55,15 +54,8 @@ object UnmovedRooks:
     inline infix def |(inline o: Long): UnmovedRooks = ur | o
 
     @targetName("and")
-    inline infix def &(o: UnmovedRooks): UnmovedRooks = ur & o
-    @targetName("xor")
-    inline infix def ^(o: UnmovedRooks): UnmovedRooks = ur ^ o
-    @targetName("or")
-    inline infix def |(o: UnmovedRooks): UnmovedRooks = ur | o
-
-    @targetName("andB")
     inline infix def &(o: Bitboard): UnmovedRooks = ur & o.value
-    @targetName("xorB")
+    @targetName("xor")
     inline infix def ^(o: Bitboard): UnmovedRooks = ur ^ o.value
-    @targetName("orB")
+    @targetName("or")
     inline infix def |(o: Bitboard): UnmovedRooks = ur | o.value

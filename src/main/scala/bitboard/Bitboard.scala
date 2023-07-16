@@ -7,11 +7,11 @@ opaque type Bitboard = Long
 object Bitboard:
   import Attacks.*
 
-  def apply(l: Long): Bitboard    = l
+  def apply(l: Long): Bitboard                            = l
   inline def apply(inline xs: Iterable[Square]): Bitboard = xs.foldLeft(empty)((b, s) => b | s.bl)
 
-  val empty: Bitboard             = 0L
-  val all: Bitboard     = -1L
+  val empty: Bitboard = 0L
+  val all: Bitboard   = -1L
 
   val firstRank: Bitboard = 0xffL
   val lastRank: Bitboard  = 0xffL << 56
@@ -23,7 +23,7 @@ object Bitboard:
 
   inline def file(inline f: File): Bitboard                        = FILES(f.value)
   inline def ray(inline from: Square, inline to: Square): Bitboard = RAYS(from.value)(to.value)
-  inline def rank(inline r: Rank): Bitboard = RANKS(r.value)
+  inline def rank(inline r: Rank): Bitboard                        = RANKS(r.value)
 
   def aligned(a: Square, b: Square, c: Square): Boolean =
     ray(a, b).contains(c)
@@ -35,19 +35,17 @@ object Bitboard:
 
     def bishopAttacks(occupied: Bitboard): Bitboard =
       val magic = Magic.BISHOP(s.value)
-      ATTACKS(((magic.factor * (occupied & magic.mask) >>> (64 - 9)).toInt + magic.offset))
+      ATTACKS(magic.bitshopIndex(occupied))
 
     def rookAttacks(occupied: Bitboard): Bitboard =
       val magic = Magic.ROOK(s.value)
-      ATTACKS(((magic.factor * (occupied & magic.mask) >>> (64 - 12)).toInt + magic.offset))
+      ATTACKS(magic.rookIndex(occupied))
 
     def queenAttacks(occupied: Bitboard): Bitboard =
       bishopAttacks(occupied) ^ rookAttacks(occupied)
 
     def pawnAttacks(color: Color): Bitboard =
-      color match
-        case Color.White => WHITE_PAWN_ATTACKS(s.value)
-        case Color.Black => BLACK_PAWN_ATTACKS(s.value)
+      color.fold(WHITE_PAWN_ATTACKS(s.value), BLACK_PAWN_ATTACKS(s.value))
 
     def kingAttacks: Bitboard =
       KING_ATTACKS(s.value)
@@ -55,8 +53,7 @@ object Bitboard:
     def knightAttacks: Bitboard =
       KNIGHT_ATTACKS(s.value)
 
-  extension (l: Long)
-    private def lsb: Square = Square(java.lang.Long.numberOfTrailingZeros(l))
+  extension (l: Long) private def lsb: Square = Square(java.lang.Long.numberOfTrailingZeros(l))
 
   extension (a: Bitboard)
     inline def value: Long                        = a
@@ -109,20 +106,20 @@ object Bitboard:
     def last: Option[Square] = Square.at(63 - java.lang.Long.numberOfLeadingZeros(a))
 
     // remove the first non empty position
-    def removeFirst: Bitboard = (a & (a - 1L))
+    def removeFirst: Bitboard = a & (a - 1L)
 
     inline def intersects(inline o: Long): Boolean =
       (a & o) != 0L
 
     @targetName("intersectsB")
-    inline def intersects[B](o: Bitboard): Boolean =
+    inline def intersects(o: Bitboard): Boolean =
       (a & o).nonEmpty
 
     inline def isDisjoint(inline o: Long): Boolean =
       (a & o).isEmpty
 
     @targetName("isDisjointB")
-    inline def isDisjoint[B](o: Bitboard): Boolean =
+    inline def isDisjoint(o: Bitboard): Boolean =
       (a & o).isEmpty
 
     def first[B](f: Square => Option[B]): Option[B] =

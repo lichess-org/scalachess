@@ -58,8 +58,11 @@ trait OpaqueBitboard[A](using A =:= Long) extends TotalWrapper[A, Long]:
     // total non empty squares
     def count: Int = java.lang.Long.bitCount(a)
 
-    // the first non empty square
+    // the first non empty square (the least significant bit/ the rightmost bit)
     def first: Option[Square] = Square.at(java.lang.Long.numberOfTrailingZeros(a))
+
+    // the last non empty square (the most significant bit / the leftmost bit)
+    def last: Option[Square] = Square.at(63 - java.lang.Long.numberOfLeadingZeros(a))
 
     // remove the first non empty position
     def removeFirst: A = (a.value & (a.value - 1L)).bb

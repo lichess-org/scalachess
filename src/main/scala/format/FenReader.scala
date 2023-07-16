@@ -158,7 +158,7 @@ trait FenReader:
           square                     <- Square.at(x, y)
           piece                      <- Piece.fromChar(c)
           (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
-        yield (square -> piece :: nextPieces, nextPromoted.addSquare(square))
+        yield (square -> piece :: nextPieces, nextPromoted.add(square))
       case c :: rest =>
         for
           square                     <- Square.at(x, y)

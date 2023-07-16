@@ -75,7 +75,7 @@ case object Atomic
       val afterBoard = move.after
       // Pawns are immune (for some reason), but all pieces surrounding the captured piece and the capturing piece
       // itself explode
-      val squaresToExplode = (move.dest.kingAttacks & afterBoard.occupied & ~afterBoard.pawns) | move.dest.bb
+      val squaresToExplode = (move.dest.kingAttacks & afterBoard.occupied & ~afterBoard.pawns) | move.dest.bl
       val afterExplosions  = afterBoard.withBoard(afterBoard.board.discard(squaresToExplode))
 
       val rooksToExploded = squaresToExplode & afterBoard.rooks

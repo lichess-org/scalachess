@@ -69,11 +69,11 @@ object Bitboard:
     def contains(square: Square): Boolean =
       (a & (1L << square.value)) != 0L
 
-    def addSquare(square: Square): Bitboard    = a | square.bb
-    def removeSquare(square: Square): Bitboard = a & ~square.bb
+    def add(square: Square): Bitboard    = a | square.bl
+    def remove(square: Square): Bitboard = a & ~square.bl
 
     def move(from: Square, to: Square): Bitboard =
-      a & ~from.bb | to.bb
+      a & ~from.bl | to.bl
 
     def moreThanOne: Boolean =
       (a & (a - 1L)) != 0L

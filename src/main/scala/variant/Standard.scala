@@ -79,30 +79,26 @@ case object Standard
       situation: Situation,
       activeCheckers: Bitboard
   ): Boolean =
-    val enPassantUp: Option[Square] = (!situation.color)
-      .fold(enPassantSquare.up, enPassantSquare.down)
-    val enPassantDown: Option[Square] = (!situation.color)
-      .fold(enPassantSquare.down, enPassantSquare.up)
-
-    enPassantUp.exists { enPassantUp_ =>
-      enPassantDown.exists { enPassantDown_ =>
-        activeCheckers.count == 1 && (
-          activeCheckers.first.contains(enPassantSquare) || situation.board
-            .move(enPassantUp_, enPassantDown_)
-            .exists(previousBoard =>
-              situation.ourKing.exists(previousBoard.attackers(_, !situation.color).isEmpty)
-            )
+    (for
+      enPassantUp   <- situation.color.fold(enPassantSquare.down, enPassantSquare.up)
+      enPassantDown <- situation.color.fold(enPassantSquare.up, enPassantSquare.down)
+      ourKing       <- situation.ourKing
+    yield activeCheckers.count == 1 && (
+      activeCheckers.first.contains(enPassantSquare) || situation.board
+        .move(enPassantUp, enPassantDown)
+        .exists(previousBoard =>
+          situation.ourKing.exists(previousBoard.attackers(_, !situation.color).isEmpty)
         )
-      }
-    }
+    )).getOrElse(false)
 
   private def isValidChecksForMultipleCheckers(situation: Situation, activeCheckers: Bitboard): Boolean =
-    activeCheckers.count <= 1 || (activeCheckers.count == 2 && {
-      activeCheckers.first.exists { firstChecker =>
-        activeCheckers.squares.lastOption.exists { lastChecker =>
-          situation.ourKing.exists { ourKing_ =>
-            !Bitboard.aligned(firstChecker, lastChecker, ourKing_)
-          }
-        }
-      }
-    })
+    val checkerCount = activeCheckers.count
+    if checkerCount == 1 then true
+    else if checkerCount >= 3 then false
+    else
+      (for
+        firstChecker <- activeCheckers.first
+        lastChecker  <- activeCheckers.squares.lastOption
+        ourKing      <- situation.ourKing
+      yield !Bitboard.aligned(firstChecker, lastChecker, ourKing))
+        .getOrElse(false)

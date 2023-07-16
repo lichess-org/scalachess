@@ -70,7 +70,7 @@ object Castles extends OpaqueBitboard[Castles]:
     case _ =>
       str.toList
         .traverse(charToSquare)
-        .map(Bitboard(_).value)
+        .map(Castles(_))
         .getOrElse(empty)
 
   val charToSquare: (c: Char) => Option[Square] =

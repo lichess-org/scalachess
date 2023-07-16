@@ -1,16 +1,19 @@
 package chess
 
-import bitboard.OpaqueBitboard
 import bitboard.Bitboard
+import scala.annotation.targetName
 
 opaque type UnmovedRooks = Long
-object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
+object UnmovedRooks:
   // for lila testing only
   val default: UnmovedRooks = UnmovedRooks(Bitboard.rank(Rank.First) | Bitboard.rank(Rank.Eighth))
-  val corners: UnmovedRooks = CORNERS
-  val none: UnmovedRooks    = empty
+  val corners: UnmovedRooks = 0x8100000000000081L
+  val none: UnmovedRooks    = 0L
+  val empty: UnmovedRooks   = 0L
 
+  @targetName("applyUnmovedRooks")
   def apply(b: Bitboard): UnmovedRooks = b.value
+  def apply(l: Long): UnmovedRooks     = l
 
   // guess unmovedRooks from board
   // we assume rooks are on their initial position
@@ -20,7 +23,9 @@ object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
     UnmovedRooks(wr | br)
 
   extension (ur: UnmovedRooks)
-    def toList: List[Square] = ur.squares
+    inline def bb: Bitboard  = Bitboard(ur)
+    def value: Long          = ur
+    def toList: List[Square] = ur.bb.squares
 
     def without(color: Color): UnmovedRooks =
       ur & Bitboard.rank(color.lastRank).value
@@ -32,10 +37,29 @@ object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
     // If there are two rooks on the same rank, return the side of the rook
     def side(square: Square): Option[Option[Side]] =
       val rook = square.bb
-      if ur.isDisjoint(rook) then None
+      if rook.isDisjoint(ur) then None
       else
-        (ur & ~rook & Bitboard.rank(square.rank).value).first match
+        (Bitboard.rank(square.rank) & ~rook & ur.value).first match
           case Some(otherRook) =>
             if otherRook.file > square.file then Some(Some(QueenSide))
             else Some(Some(KingSide))
           case None => Some(None)
+
+    inline def unary_~ : UnmovedRooks                = ~ur
+    inline infix def &(inline o: Long): UnmovedRooks = ur & o
+    inline infix def ^(inline o: Long): UnmovedRooks = ur ^ o
+    inline infix def |(inline o: Long): UnmovedRooks = ur | o
+
+    @targetName("and")
+    inline infix def &(o: UnmovedRooks): UnmovedRooks = ur & o
+    @targetName("xor")
+    inline infix def ^(o: UnmovedRooks): UnmovedRooks = ur ^ o
+    @targetName("or")
+    inline infix def |(o: UnmovedRooks): UnmovedRooks = ur | o
+
+    @targetName("andB")
+    inline infix def &(o: Bitboard): UnmovedRooks = ur & o.value
+    @targetName("xorB")
+    inline infix def ^(o: Bitboard): UnmovedRooks = ur ^ o.value
+    @targetName("orB")
+    inline infix def |(o: Bitboard): UnmovedRooks = ur | o.value

@@ -100,7 +100,7 @@ case class Situation(board: Board, color: Color):
           val targets = ~us
           val bb      = square.bb
           piece.role match
-            case Pawn   => genEnPassant(us & bb) ++ genPawn(Bitboard(bb), targets)
+            case Pawn   => genEnPassant(us & bb) ++ genPawn(bb, targets)
             case Knight => genKnight(us & bb, targets)
             case Bishop => genBishop(us & bb, targets)
             case Rook   => genRook(us & bb, targets)
@@ -245,7 +245,7 @@ case class Situation(board: Board, color: Color):
     else
       val rooks = history.unmovedRooks & Bitboard.rank(color.backRank).value & board.rooks.value
       for
-        rook <- rooks
+        rook <- rooks.bb
         toKingFile = if rook < king then File.C else File.G
         toRookFile = if rook < king then File.D else File.F
         kingTo     = Square(toKingFile, king.rank)

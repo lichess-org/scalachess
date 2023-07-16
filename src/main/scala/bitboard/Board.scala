@@ -88,7 +88,7 @@ case class Board(
       else blockers | between
 
   def discard(s: Square): Board =
-    discard(Bitboard(s.bb))
+    discard(s.bb)
 
   def discard(mask: Bitboard): Board =
     val notMask = ~mask

@@ -33,6 +33,10 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
     forAll: (bb: Bitboard) =>
       assertEquals(bb.singleSquare.isDefined, bb.count == 1)
 
+  test("singleSquare <=> first == last"):
+    forAll: (bb: Bitboard) =>
+      assertEquals(bb.singleSquare.isDefined, bb.first == bb.last)
+
   test("fold removeFirst should return empty"):
     forAll: (bb: Bitboard) =>
       assertEquals(bb.fold(bb)((b, _) => b.removeFirst), Bitboard.empty)
@@ -80,10 +84,25 @@ class OpaqueBitboardTest extends ScalaCheckSuite:
   test("nonEmpty bitboard should have at least one square"):
     forAll: (bb: Bitboard) =>
       assertEquals(bb.nonEmpty, bb.first.isDefined)
+      assertEquals(bb.nonEmpty, bb.last.isDefined)
+
+  test("two bits bitboard should have first and last defined"):
+    forAll: (s1: Square, s2: Square) =>
+      s1 != s2 ==> {
+        val bb = s1.bb | s2.bb
+        bb.first.isDefined &&
+        bb.last.isDefined &&
+        bb.first != bb.last &&
+        List(bb.first, bb.last).flatten.toSet == Set(s1, s2)
+      }
 
   test("first should be the minimum of squares"):
     forAll: (bb: Bitboard) =>
       assertEquals(bb.first, bb.squares.minByOption(_.value))
+
+  test("last should be the max of squares"):
+    forAll: (bb: Bitboard) =>
+      assertEquals(bb.last, bb.squares.maxByOption(_.value))
 
   test("intersects should be true when the two bitboards have at least one common square"):
     forAll: (b1: Bitboard, b2: Bitboard, p: Square) =>

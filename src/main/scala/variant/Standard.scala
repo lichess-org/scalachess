@@ -89,7 +89,7 @@ case object Standard
     else
       (for
         firstChecker <- activeCheckers.first
-        lastChecker  <- activeCheckers.squares.lastOption
+        lastChecker  <- activeCheckers.last
         ourKing      <- situation.ourKing
       yield !Bitboard.aligned(firstChecker, lastChecker, ourKing))
         .getOrElse(false)

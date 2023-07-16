@@ -11,7 +11,7 @@ object Bitboard:
   protected val ALL: Bitboard     = -1L
   protected val CORNERS: Bitboard = 0x8100000000000081L
 
-  inline def apply(inline xs: Iterable[Square]): Bitboard = xs.foldLeft(empty)((b, p) => b | p.bb)
+  inline def apply(inline xs: Iterable[Square]): Bitboard = xs.foldLeft(empty)((b, s) => b | s.bl)
 
   extension (l: Long)
     def bb: Bitboard        = Bitboard(l)
@@ -151,7 +151,7 @@ object Bitboard:
     Math.max(Math.abs(file(a) - file(b)), Math.abs(rank(a) - rank(b)))
 
   extension (a: Bitboard)
-    inline def value: Long = a
+    inline def value: Long                         = a
     inline def unary_~ : Bitboard                  = (~a)
     inline infix def &(inline o: Long): Bitboard   = (a & o)
     inline infix def ^(inline o: Long): Bitboard   = (a ^ o)
@@ -168,7 +168,6 @@ object Bitboard:
     inline infix def <<(o: Bitboard): Bitboard = (a << o)
     @targetName("shiftRight")
     inline infix def >>>(o: Bitboard): Bitboard = (a >>> o)
-
 
     def contains(square: Square): Boolean =
       (a & (1L << square.value)) != 0L

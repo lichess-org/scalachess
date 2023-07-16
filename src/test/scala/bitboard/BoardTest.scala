@@ -25,7 +25,7 @@ class BoardTest extends FunSuite:
       king      = situation.ourKings.head
       result    = situation.board.sliderBlockers(king, situation.color)
       expected  = situation.cBoard.sliderBlockers(king)
-    yield assertEquals(result, expected.bb)
+    yield assertEquals(result, Bitboard(expected))
 
   test("generateMoves = generateMovesAt for all square"):
     for
@@ -53,7 +53,7 @@ class BoardTest extends FunSuite:
       color <- List(Color.White, Color.Black)
       result   = fen.board.attackers(sq, color)
       expected = fen.cBoard.attacksTo(sq, color.white)
-    yield assertEquals(result, expected.bb)
+    yield assertEquals(result, Bitboard(expected))
 
   test("discard an empty square returns the same board"):
     for

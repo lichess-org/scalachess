@@ -12,8 +12,9 @@ object UnmovedRooks:
   val empty: UnmovedRooks   = 0L
 
   @targetName("applyUnmovedRooks")
-  def apply(b: Bitboard): UnmovedRooks = b.value
-  def apply(l: Long): UnmovedRooks     = l
+  def apply(b: Bitboard): UnmovedRooks                        = b.value
+  def apply(l: Long): UnmovedRooks                            = l
+  inline def apply(inline xs: Iterable[Square]): UnmovedRooks = xs.foldLeft(empty)((b, s) => b | s.bl)
 
   // guess unmovedRooks from board
   // we assume rooks are on their initial position
@@ -44,6 +45,9 @@ object UnmovedRooks:
             if otherRook.file > square.file then Some(Some(QueenSide))
             else Some(Some(KingSide))
           case None => Some(None)
+
+    def contains(square: Square): Boolean =
+      (ur & (1L << square.value)) != 0L
 
     inline def unary_~ : UnmovedRooks                = ~ur
     inline infix def &(inline o: Long): UnmovedRooks = ur & o

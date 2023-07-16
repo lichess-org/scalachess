@@ -63,6 +63,7 @@ object Castles:
     @targetName("orB")
     inline infix def |(o: Bitboard): Castles = c | o.value
 
+    def value: Long = c
     def contains(square: Square): Boolean =
       (c & (1L << square.value)) != 0L
 
@@ -92,7 +93,8 @@ object Castles:
       blackKingSide.at(Black.kingSide) |
       blackQueenSide.at(Black.queenSide)
 
-  def apply(bb: Bitboard): Castles = bb.value
+  def apply(bb: Bitboard): Castles                       = bb.value
+  inline def apply(inline xs: Iterable[Square]): Castles = xs.foldLeft(none)((b, s) => b | s.bl)
 
   def apply(str: String): Castles = str match
     case "-" => none

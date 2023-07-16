@@ -64,25 +64,16 @@ case object Standard
 
   private def hasValidCheckers(situation: Situation): Boolean =
     situation.checkers.fold(true) { checkers_ =>
-      situation.potentialEpSquare.fold(isValidChecksForMultipleCheckers(situation, checkers_)) {
-        enPassantSquare_ =>
-          isValidCheckersForEnPassant(
-            enPassantSquare_,
-            situation,
-            checkers_
-          )
-      }
+      isValidChecksForMultipleCheckers(situation, checkers_) &&
+      isValidCheckersForEnPassant(situation, checkers_)
     }
 
-  private def isValidCheckersForEnPassant(
-      enPassantSquare: Square,
-      situation: Situation,
-      activeCheckers: Bitboard
-  ): Boolean =
+  private def isValidCheckersForEnPassant(situation: Situation, activeCheckers: Bitboard): Boolean =
     (for
-      enPassantUp   <- situation.color.fold(enPassantSquare.down, enPassantSquare.up)
-      enPassantDown <- situation.color.fold(enPassantSquare.up, enPassantSquare.down)
-      ourKing       <- situation.ourKing
+      enPassantSquare <- situation.potentialEpSquare
+      enPassantUp     <- situation.color.fold(enPassantSquare.down, enPassantSquare.up)
+      enPassantDown   <- situation.color.fold(enPassantSquare.up, enPassantSquare.down)
+      ourKing         <- situation.ourKing
     yield activeCheckers.count == 1 && (
       activeCheckers.first.contains(enPassantSquare) || situation.board
         .move(enPassantUp, enPassantDown)

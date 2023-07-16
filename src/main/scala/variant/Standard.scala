@@ -52,7 +52,7 @@ case object Standard
       // Checks by these sliding pieces can maybe be blocked.
       val sliders = checkers & (board.sliders)
       val attacked =
-        sliders.fold(Bitboard.empty)((a, s) => a | (s.bb ^ Bitboard.ray(king, s)))
+        sliders.fold(Bitboard.empty)((a, s) => a | (Bitboard.ray(king, s) ^ s.bb))
       val safeKings = genSafeKing(~us & ~attacked)
       val blockers =
         checkers.singleSquare.map(c => genNonKing(Bitboard.between(king, c) | checkers)).getOrElse(Nil)

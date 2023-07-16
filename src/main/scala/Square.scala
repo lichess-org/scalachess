@@ -55,6 +55,7 @@ object Square extends OpaqueInt[Square]:
 
     inline def withRankOf(inline o: Square): Square = withRank(o.rank)
     inline def withFileOf(inline o: Square): Square = withFile(o.file)
+    inline def bb: Long = 1L << s.value
 
   end extension
 

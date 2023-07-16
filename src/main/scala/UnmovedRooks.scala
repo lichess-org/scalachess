@@ -23,7 +23,7 @@ object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
     def toList: List[Square] = ur.squares
 
     def without(color: Color): UnmovedRooks =
-      ur & Bitboard.rank(color.lastRank)
+      ur & Bitboard.rank(color.lastRank).value
 
     // Try to guess the side of the rook at postion `square`
     // If the position is not a ummovedRook return None
@@ -34,7 +34,7 @@ object UnmovedRooks extends OpaqueBitboard[UnmovedRooks]:
       val rook = square.bb
       if ur.isDisjoint(rook) then None
       else
-        (ur & ~rook & Bitboard.rank(square.rank)).first match
+        (ur & ~rook & Bitboard.rank(square.rank).value).first match
           case Some(otherRook) =>
             if otherRook.file > square.file then Some(Some(QueenSide))
             else Some(Some(KingSide))

@@ -1,7 +1,6 @@
 package chess
 
 import chess.format.Uci
-import bitboard.Bitboard.*
 import cats.syntax.option.*
 import cats.kernel.Monoid
 import chess.bitboard.Bitboard

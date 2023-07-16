@@ -11,7 +11,7 @@ object Castles extends OpaqueBitboard[Castles]:
 
   extension (c: Castles)
 
-    inline def can(inline color: Color): Boolean           = c.intersects(Bitboard.rank(color.backRank))
+    inline def can(inline color: Color): Boolean           = c.intersects(Bitboard.rank(color.backRank).value)
     inline def can(inline color: Color, inline side: Side) = c.contains(color.at(side))
 
     def whiteKingSide: Boolean  = c.contains(H1)
@@ -20,7 +20,7 @@ object Castles extends OpaqueBitboard[Castles]:
     def blackQueenSide: Boolean = c.contains(A8)
 
     def without(color: Color): Castles =
-      c & Bitboard.rank(color.lastRank)
+      c & Bitboard.rank(color.lastRank).value
 
     def without(color: Color, side: Side): Castles =
       c & ~color.at(side).bb

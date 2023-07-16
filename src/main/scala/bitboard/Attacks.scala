@@ -86,7 +86,7 @@ object Attacks:
   initialize()
 
   extension (l: Long)
-    def contains(s: Int): Boolean =
+    private def contains(s: Int): Boolean =
       (l & (1L << s)) != 0L
 
   private def distance(a: Int, b: Int): Int =

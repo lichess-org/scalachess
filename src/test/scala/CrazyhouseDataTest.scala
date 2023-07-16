@@ -1,13 +1,12 @@
 package chess
 
 import cats.syntax.all.*
-import munit.ScalaCheckSuite
-import org.scalacheck.Prop.forAll
-import org.scalacheck.Prop.propBoolean
-import Arbitraries.given
-import chess.bitboard.Arbitraries.given
 import chess.variant.Crazyhouse.Data
 import chess.bitboard.Bitboard
+
+import munit.ScalaCheckSuite
+import org.scalacheck.Prop.{ forAll, propBoolean }
+import Arbitraries.given
 
 class CrazyhouseDataTest extends ScalaCheckSuite:
 

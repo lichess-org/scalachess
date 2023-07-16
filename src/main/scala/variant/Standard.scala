@@ -60,10 +60,10 @@ case object Standard
     )
 
   override def valid(situation: Situation, strict: Boolean): Boolean =
-    super.valid(situation, strict) && hasValidCheckers(situation, strict)
+    super.valid(situation, strict) && (!strict || hasValidCheckers(situation))
 
-  private def hasValidCheckers(situation: Situation, strict: Boolean): Boolean =
-    !strict || situation.checkers.fold(true) { checkers_ =>
+  private def hasValidCheckers(situation: Situation): Boolean =
+    situation.checkers.fold(true) { checkers_ =>
       situation.potentialEpSquare.fold(isValidChecksForMultipleCheckers(situation, checkers_)) {
         enPassantSquare_ =>
           isValidCheckersForEnPassant(

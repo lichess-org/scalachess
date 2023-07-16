@@ -30,11 +30,11 @@ case object Standard
           else genEvasions(king, situation, checkers) ::: enPassantMoves
         val sliderBlockers = board.sliderBlockers(king, color)
         if sliderBlockers.nonEmpty || enPassantMoves.nonEmpty then
-          candidates.filter(isSafe(situation, king, _, sliderBlockers))
+          candidates.filter(isSafe(situation, king, sliderBlockers))
         else candidates
 
   // Used for filtering candidate moves that would leave put the king in check.
-  def isSafe(situation: Situation, king: Square, move: Move, blockers: Bitboard): Boolean =
+  def isSafe(situation: Situation, king: Square, blockers: Bitboard)(move: Move): Boolean =
     import situation.{ board, us, them }
     if move.enpassant then
       val newOccupied = (board.occupied ^ move.orig.bl ^ move.dest.withRankOf(move.orig).bl) | move.dest.bl

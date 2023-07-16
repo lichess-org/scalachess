@@ -243,7 +243,7 @@ case class Situation(board: Board, color: Color):
     // can castle but which side?
     if !history.castles.can(color) || king.rank != color.backRank then Nil
     else
-      val rooks = history.unmovedRooks & Bitboard.rank(color.backRank) & board.rooks
+      val rooks = Bitboard.rank(color.backRank) & board.rooks & history.unmovedRooks.value
       for
         rook <- rooks
         toKingFile = if rook < king then File.C else File.G

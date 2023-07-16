@@ -19,7 +19,7 @@ case class CheckCount(white: Int = 0, black: Int = 0):
 case class History(
     lastMove: Option[Uci] = None,
     positionHashes: PositionHash = Monoid[PositionHash].empty,
-    castles: Castles = Castles.all,
+    castles: Castles = Castles.init,
     checkCount: CheckCount = CheckCount(0, 0),
     unmovedRooks: UnmovedRooks,
     halfMoveClock: HalfMoveClock = HalfMoveClock.initial
@@ -80,6 +80,6 @@ object History:
     )
 
   def castle(color: Color, kingSide: Boolean, queenSide: Boolean) =
-    History(castles = Castles.all.update(color, kingSide, queenSide), unmovedRooks = UnmovedRooks.corners)
+    History(castles = Castles.init.update(color, kingSide, queenSide), unmovedRooks = UnmovedRooks.corners)
 
   def noCastle = History(castles = Castles.none, unmovedRooks = UnmovedRooks.none)

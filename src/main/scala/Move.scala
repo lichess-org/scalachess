@@ -1,10 +1,8 @@
 package chess
 
 import chess.format.Uci
-import bitboard.Bitboard.*
 import cats.syntax.option.*
-import cats.kernel.Monoid
-import chess.bitboard.Bitboard
+import cats.Monoid
 
 case class Move(
     piece: Piece,
@@ -48,7 +46,7 @@ case class Move(
         if captures then
           unmovedRooks.side(dest) match
             case Some(result) =>
-              unmovedRooks = unmovedRooks & ~dest.bb
+              unmovedRooks = unmovedRooks & ~dest.bl
               result match
                 case Some(side) =>
                   castleRights = castleRights.without(!piece.color, side)
@@ -63,7 +61,7 @@ case class Move(
         if piece is Rook then
           unmovedRooks.side(orig) match
             case Some(result) =>
-              unmovedRooks = unmovedRooks & ~orig.bb
+              unmovedRooks = unmovedRooks & ~orig.bl
               result match
                 case Some(side) =>
                   castleRights = castleRights.without(piece.color, side)

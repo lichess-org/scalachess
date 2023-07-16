@@ -4,9 +4,9 @@ package format
 import cats.syntax.all.*
 import variant.{ Standard, Variant }
 import cats.kernel.Monoid
-import ornicar.scalalib.zeros.given_Zero_Option
+import ornicar.scalalib.zeros.given
 import bitboard.Bitboard
-import bitboard.Bitboard.{ bb, squares }
+import bitboard.Bitboard.squares
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *
@@ -22,10 +22,10 @@ trait FenReader:
       val situation = Situation(board, if variant.atomic then fen.color else board.checkColor | fen.color)
       // todo verify unmovedRooks vs board.rooks
       val (castles, unmovedRooks) =
-        if !variant.allowsCastling then (Castles.none -> UnmovedRooks.empty)
+        if !variant.allowsCastling then (Castles.none -> UnmovedRooks.none)
         else
           fen.castling
-            .foldLeft(Castles.none -> UnmovedRooks.empty) { case ((c, r), ch) =>
+            .foldLeft(Castles.none -> UnmovedRooks.none) { case ((c, r), ch) =>
               val color    = Color.fromWhite(ch.isUpper)
               val backRank = Bitboard.rank(color.backRank)
               val rooks = (board.rooks & board(color) & backRank).squares
@@ -38,7 +38,7 @@ trait FenReader:
                     case 'q'  => rooks.find(_ ?< kingSquare)
                     case file => rooks.find(_.file.char == file)
                   side <- Side.kingRookSide(kingSquare, rookSquare)
-                yield (c.add(color, side), r | rookSquare.bb)
+                yield (c.add(color, side), r | rookSquare.bl)
               }.getOrElse((c, r))
             }
 

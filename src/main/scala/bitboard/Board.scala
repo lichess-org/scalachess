@@ -9,7 +9,7 @@ import Bitboard.*
 case class Board(
     occupied: Bitboard,
     byColor: ByColor,
-    byRole: ByRole[Bitboard]
+    byRole: ByRole
 ):
   val white   = byColor.white
   val black   = byColor.black
@@ -98,7 +98,7 @@ case class Board(
       byRole.map(_ & notMask)
     )
 
-  def byRoleOf(color: Color): ByRole[Bitboard] = byRole.map(_ & byColor(color))
+  def byRoleOf(color: Color): chess.ByRole[Bitboard] = byRole.mapTo(_ & byColor(color))
 
   // put a piece to an empty square
   def put(piece: Piece, at: Square): Option[Board] =
@@ -193,7 +193,7 @@ object Board:
   val empty: Board = Board(
     Bitboard.empty,
     ByColor.fill(Bitboard.empty),
-    ByRole(Bitboard.empty)
+    ByRole.fill(Bitboard.empty)
   )
 
   def fromMap(pieces: PieceMap): Board =
@@ -224,7 +224,7 @@ object Board:
 
     Board(occupied, ByColor(white, black), ByRole(pawns, knights, bishops, rooks, queens, kings))
 
-case class ByColor(white: Bitboard, black: Bitboard):
+private case class ByColor(white: Bitboard, black: Bitboard):
 
   inline def apply(inline color: Color) = if color.white then white else black
 
@@ -233,11 +233,7 @@ case class ByColor(white: Bitboard, black: Bitboard):
     else if pred(black) then Black.some
     else None
 
-  def foreach[U](f: Bitboard => U): Unit =
-    f(white)
-    f(black)
-
-  def foreach[U](f: (Color, Bitboard) => U): Unit =
+  def foreach(f: (Color, Bitboard) => Unit): Unit =
     f(White, white)
     f(Black, black)
 
@@ -249,5 +245,72 @@ case class ByColor(white: Bitboard, black: Bitboard):
 
   def map(f: Bitboard => Bitboard): ByColor = ByColor(f(white), f(black))
 
-object ByColor:
-  inline def fill(a: Bitboard): ByColor = ByColor(a, a)
+private object ByColor:
+  inline def fill(inline a: Bitboard): ByColor = ByColor(a, a)
+
+private case class ByRole(
+    pawn: Bitboard,
+    knight: Bitboard,
+    bishop: Bitboard,
+    rook: Bitboard,
+    queen: Bitboard,
+    king: Bitboard
+):
+  def apply(role: Role): Bitboard = role match
+    case Pawn   => pawn
+    case Knight => knight
+    case Bishop => bishop
+    case Rook   => rook
+    case Queen  => queen
+    case King   => king
+
+  inline def update(role: Role, f: Bitboard => Bitboard): ByRole = role match
+    case Pawn   => copy(pawn = f(pawn))
+    case Knight => copy(knight = f(knight))
+    case Bishop => copy(bishop = f(bishop))
+    case Rook   => copy(rook = f(rook))
+    case Queen  => copy(queen = f(queen))
+    case King   => copy(king = f(king))
+
+  inline def find(f: Bitboard => Boolean): Option[Bitboard] =
+    if f(pawn) then Some(pawn)
+    else if f(knight) then Some(knight)
+    else if f(bishop) then Some(bishop)
+    else if f(rook) then Some(rook)
+    else if f(queen) then Some(queen)
+    else if f(king) then Some(king)
+    else None
+
+  inline def foreach(f: (Role, Bitboard) => Unit): Unit =
+    f(Pawn, pawn)
+    f(Knight, knight)
+    f(Bishop, bishop)
+    f(Rook, rook)
+    f(Queen, queen)
+    f(King, king)
+
+  inline def findRole(f: Bitboard => Boolean): Option[Role] =
+    if f(pawn) then Some(Pawn)
+    else if f(knight) then Some(Knight)
+    else if f(bishop) then Some(Bishop)
+    else if f(rook) then Some(Rook)
+    else if f(queen) then Some(Queen)
+    else if f(king) then Some(King)
+    else None
+
+  inline def map(f: Bitboard => Bitboard): ByRole =
+    ByRole(
+      f(pawn),
+      f(knight),
+      f(bishop),
+      f(rook),
+      f(queen),
+      f(king)
+    )
+
+  def mapTo[B](f: Bitboard => B): chess.ByRole[B] =
+    chess.ByRole(f(pawn), f(knight), f(bishop), f(rook), f(queen), f(king))
+
+private object ByRole:
+
+  inline def fill(inline a: Bitboard): ByRole = ByRole(a, a, a, a, a, a)

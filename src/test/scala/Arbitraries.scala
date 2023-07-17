@@ -2,17 +2,21 @@ package chess
 
 import org.scalacheck.{ Arbitrary, Cogen, Gen }
 import cats.kernel.Eq
+import chess.bitboard.Bitboard
 
 object Arbitraries:
 
-  given Arbitrary[Castles] = Arbitrary(castlesGen)
-  given Arbitrary[Color]   = Arbitrary(Gen.oneOf(Color.all))
-  given Arbitrary[Side]    = Arbitrary(Gen.oneOf(Side.all))
-  given Arbitrary[Role]    = Arbitrary(Gen.oneOf(Role.all))
-  given Arbitrary[File]    = Arbitrary(Gen.oneOf(File.all))
-  given Arbitrary[Rank]    = Arbitrary(Gen.oneOf(Rank.all))
-  given Arbitrary[Square]  = Arbitrary(Gen.oneOf(Square.all))
-  given Cogen[Color]       = Cogen(x => if x == White then 0L else 1L)
+  given Arbitrary[Castles]  = Arbitrary(castlesGen)
+  given Arbitrary[Color]    = Arbitrary(Gen.oneOf(Color.all))
+  given Arbitrary[Side]     = Arbitrary(Gen.oneOf(Side.all))
+  given Arbitrary[Role]     = Arbitrary(Gen.oneOf(Role.all))
+  given Arbitrary[File]     = Arbitrary(Gen.oneOf(File.all))
+  given Arbitrary[Rank]     = Arbitrary(Gen.oneOf(Rank.all))
+  given Arbitrary[Square]   = Arbitrary(Gen.oneOf(Square.all))
+  given Arbitrary[Bitboard] = Arbitrary(Gen.long.map(Bitboard(_)))
+
+  given Cogen[Color]  = Cogen(x => if x == White then 0L else 1L)
+  given Cogen[Square] = Cogen(_.value.toLong)
 
   given Arbitrary[Piece] = Arbitrary(
     for

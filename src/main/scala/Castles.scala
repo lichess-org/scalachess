@@ -23,10 +23,10 @@ object Castles:
     def blackQueenSide: Boolean = c.contains(A8)
 
     def without(color: Color): Castles =
-      c & Bitboard.rank(color.lastRank).value
+      c & Bitboard.rank(color.lastRank)
 
     def without(color: Color, side: Side): Castles =
-      c & ~color.at(side).bb
+      c & ~color.at(side).bl
 
     def add(color: Color, side: Side): Castles =
       c.addSquare(color.at(side))
@@ -60,7 +60,7 @@ object Castles:
     def contains(square: Square): Boolean =
       (c & (1L << square.value)) != 0L
 
-    def addSquare(square: Square): Castles = c | square.bb
+    def addSquare(square: Square): Castles = c | square.bl
 
   extension (b: Boolean) inline def at(square: Square) = if b then square.bl else none
 

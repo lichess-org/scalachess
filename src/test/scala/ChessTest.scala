@@ -112,7 +112,7 @@ trait ChessTest extends Specification with EitherMatchers:
   def defaultHistory(
       lastMove: Option[Uci] = None,
       positionHashes: PositionHash = Monoid[PositionHash].empty,
-      castles: Castles = Castles.all,
+      castles: Castles = Castles.init,
       checkCount: CheckCount = CheckCount(0, 0),
       unmovedRooks: UnmovedRooks = UnmovedRooks.corners,
       halfMoveClock: HalfMoveClock = HalfMoveClock.initial

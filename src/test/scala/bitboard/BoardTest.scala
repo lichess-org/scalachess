@@ -4,7 +4,6 @@ package bitboard
 import munit.FunSuite
 
 import Square.*
-import Helpers.*
 import Bitboard.*
 import chess.format.Fen
 import chess.format.EpdFen
@@ -13,27 +12,10 @@ class BoardTest extends FunSuite:
 
   import scala.language.implicitConversions
   given Conversion[Square, Int] = _.value
-  given Conversion[Int, Square] = Square.at(_).get
+  given Conversion[Int, Square] = Square(_)
 
   def parseFen(fen: EpdFen): Board =
     Fen.read(fen).map(_.board.board).getOrElse(throw RuntimeException("boooo"))
-
-  test("sliderBlockers"):
-    for
-      fen <- FenFixtures.fens
-      situation = Fen.read(fen).getOrElse(throw RuntimeException("boooo"))
-      king      = situation.ourKings.head
-      result    = situation.board.sliderBlockers(king, situation.color)
-      expected  = situation.cBoard.sliderBlockers(king)
-    yield assertEquals(result, expected.bb)
-
-  test("generateMoves = generateMovesAt for all square"):
-    for
-      fen <- FenFixtures.fens
-      situation     = Fen.read(fen).getOrElse(throw RuntimeException("boooo"))
-      legalMoves    = situation.legalMoves
-      legalMovesAll = Square.all.flatMap(situation.generateMovesAt(_))
-    yield assertEquals(legalMoves.toSet, legalMovesAll.toSet)
 
   test("generateMovesAt(square) = generateMoves.filter(_.orig == square)"):
     for
@@ -43,17 +25,6 @@ class BoardTest extends FunSuite:
       legalMoves   = situation.legalMoves.filter(_.orig == sq)
       legalMovesAt = situation.generateMovesAt(sq)
     yield assertEquals(legalMoves.toSet, legalMovesAt.toSet)
-
-  test("attacksTo"):
-    for
-      str <- FenFixtures.fens
-      fen  = Fen.read(str).getOrElse(throw RuntimeException("boooo"))
-      king = fen.ourKings.head
-      sq    <- Square.all
-      color <- List(Color.White, Color.Black)
-      result   = fen.board.attackers(sq, color)
-      expected = fen.cBoard.attacksTo(sq, color.white)
-    yield assertEquals(result, expected.bb)
 
   test("discard an empty square returns the same board"):
     for

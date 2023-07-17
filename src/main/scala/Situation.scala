@@ -230,19 +230,20 @@ case class Situation(board: Board, color: Color):
     (king.kingAttacks & mask).flatMap(to => normalMove(king, to, King, isOccupied(to)))
 
   def genSafeKing(mask: Bitboard): List[Move] =
-    ourKing.fold(Nil)(king =>
-      for
-        to <- king.kingAttacks & mask
-        if board.attackers(to, !color).isEmpty
-        move <- normalMove(king, to, King, isOccupied(to))
-      yield move
-    )
+    ourKing.fold(Nil)(genSafeKing(_, mask))
+
+  def genSafeKing(king: Square, mask: Bitboard): List[Move] =
+    for
+      to <- king.kingAttacks & mask
+      if board.attackers(to, !color).isEmpty
+      move <- normalMove(king, to, King, isOccupied(to))
+    yield move
 
   def genCastling(king: Square): List[Move] =
     // can castle but which side?
     if !history.castles.can(color) || king.rank != color.backRank then Nil
     else
-      val rooks = history.unmovedRooks & Bitboard.rank(color.backRank) & board.rooks
+      val rooks = Bitboard.rank(color.backRank) & board.rooks & history.unmovedRooks.value
       for
         rook <- rooks
         toKingFile = if rook < king then File.C else File.G
@@ -254,14 +255,14 @@ case class Situation(board: Board, color: Color):
           if variant.chess960 || variant.fromPosition
           then Bitboard.between(king, rook) | Bitboard.between(king, kingTo)
           else Bitboard.between(king, rook)
-        if (path & board.occupied & ~rook.bb).isEmpty
-        kingPath = Bitboard.between(king, kingTo) | king.bb
-        if kingPath.forall(variant.castleCheckSafeSquare(board, _, color, board.occupied ^ king.bb))
+        if (path & board.occupied & ~rook.bl).isEmpty
+        kingPath = Bitboard.between(king, kingTo) | king.bl
+        if kingPath.forall(variant.castleCheckSafeSquare(board, _, color, board.occupied ^ king.bl))
         if variant.castleCheckSafeSquare(
           board,
           kingTo,
           color,
-          board.occupied ^ king.bb ^ rook.bb ^ rookTo.bb
+          board.occupied ^ king.bl ^ rook.bl ^ rookTo.bl
         )
         moves <- castle(king, kingTo, rook, rookTo)
       yield moves

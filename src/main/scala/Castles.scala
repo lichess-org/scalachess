@@ -2,17 +2,20 @@ package chess
 
 import cats.syntax.all.*
 
-import bitboard.OpaqueBitboard
 import bitboard.Bitboard
 import Square.*
 
+import scala.annotation.targetName
+
 opaque type Castles = Long
-object Castles extends OpaqueBitboard[Castles]:
+object Castles:
 
   extension (c: Castles)
 
-    inline def can(inline color: Color): Boolean           = c.intersects(Bitboard.rank(color.backRank))
+    inline def can(inline color: Color): Boolean           = Bitboard.rank(color.backRank).intersects(c)
     inline def can(inline color: Color, inline side: Side) = c.contains(color.at(side))
+
+    def isEmpty = c == 0L
 
     def whiteKingSide: Boolean  = c.contains(H1)
     def whiteQueenSide: Boolean = c.contains(A1)
@@ -23,7 +26,7 @@ object Castles extends OpaqueBitboard[Castles]:
       c & Bitboard.rank(color.lastRank)
 
     def without(color: Color, side: Side): Castles =
-      c & ~color.at(side).bb
+      c & ~color.at(side).bl
 
     def add(color: Color, side: Side): Castles =
       c.addSquare(color.at(side))
@@ -41,7 +44,25 @@ object Castles extends OpaqueBitboard[Castles]:
 
     def toSeq: Array[Boolean] = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
 
-  extension (b: Boolean) inline def at(square: Square) = if b then square.bb else empty
+    inline def unary_~ : Castles                = ~c
+    inline infix def &(inline o: Long): Castles = c & o
+    inline infix def ^(inline o: Long): Castles = c ^ o
+    inline infix def |(inline o: Long): Castles = c | o
+
+    @targetName("andB")
+    inline infix def &(o: Bitboard): Castles = c & o.value
+    @targetName("xorB")
+    inline infix def ^(o: Bitboard): Castles = c ^ o.value
+    @targetName("orB")
+    inline infix def |(o: Bitboard): Castles = c | o.value
+
+    def value: Long = c
+    def contains(square: Square): Boolean =
+      (c & (1L << square.value)) != 0L
+
+    def addSquare(square: Square): Castles = c | square.bl
+
+  extension (b: Boolean) inline def at(square: Square) = if b then square.bl else none
 
   extension (color: Color)
     inline def at(side: Side): Square =
@@ -65,13 +86,16 @@ object Castles extends OpaqueBitboard[Castles]:
       blackKingSide.at(Black.kingSide) |
       blackQueenSide.at(Black.queenSide)
 
+  def apply(bb: Bitboard): Castles                       = bb.value
+  inline def apply(inline xs: Iterable[Square]): Castles = xs.foldLeft(none)((b, s) => b | s.bl)
+
   def apply(str: String): Castles = str match
-    case "-" => empty
+    case "-" => none
     case _ =>
       str.toList
-        .traverse(charToSquare)
-        .map(Bitboard(_).value)
-        .getOrElse(empty)
+        .foldM(none): (acc, c) =>
+          charToSquare(c).map(acc.addSquare)
+        .getOrElse(none)
 
   val charToSquare: (c: Char) => Option[Square] =
     case 'k' => Some(H8)
@@ -80,6 +104,5 @@ object Castles extends OpaqueBitboard[Castles]:
     case 'Q' => Some(A1)
     case _   => None
 
-  val all: Castles  = CORNERS
-  val init: Castles = all
-  val none: Castles = empty
+  val init: Castles = 0x8100000000000081L
+  val none: Castles = 0L

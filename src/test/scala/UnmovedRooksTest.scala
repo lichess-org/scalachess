@@ -8,7 +8,6 @@ import chess.format.Fen
 import cats.syntax.all.*
 
 import bitboard.Board as BBoard
-import bitboard.Bitboard.contains
 
 class UnmovedRooksTest extends ChessTest:
 

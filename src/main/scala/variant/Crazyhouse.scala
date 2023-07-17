@@ -150,10 +150,10 @@ case object Crazyhouse
       val storedPiece = if promoted.contains(from) then piece.color.pawn else piece
       copy(
         pockets = pockets.store(storedPiece),
-        promoted = promoted.removeSquare(from)
+        promoted = promoted.remove(from)
       )
 
-    def promote(square: Square): Data = copy(promoted = promoted.addSquare(square))
+    def promote(square: Square): Data = copy(promoted = promoted.add(square))
 
     def move(orig: Square, dest: Square): Data =
       if promoted.contains(orig) then copy(promoted = promoted.move(orig, dest)) else this

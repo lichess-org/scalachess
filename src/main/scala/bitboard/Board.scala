@@ -111,7 +111,7 @@ case class Board(
   // put a piece into the board
   def putOrReplace(s: Square, role: Role, color: Color): Board =
     val b = discard(s)
-    val m = s.bb
+    val m = s.bl
     Board(
       b.occupied | m,
       b.byColor.update(color, _ | m),

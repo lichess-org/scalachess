@@ -8,7 +8,7 @@ import Bitboard.*
 // Chess board representation
 case class Board(
     occupied: Bitboard,
-    byColor: ByColor[Bitboard],
+    byColor: ByColor,
     byRole: ByRole[Bitboard]
 ):
   val white   = byColor.white
@@ -223,3 +223,31 @@ object Board:
         case Color.Black => black |= position
 
     Board(occupied, ByColor(white, black), ByRole(pawns, knights, bishops, rooks, queens, kings))
+
+case class ByColor(white: Bitboard, black: Bitboard):
+
+  inline def apply(inline color: Color) = if color.white then white else black
+
+  inline def findColor(pred: Bitboard => Boolean): Option[Color] =
+    if pred(white) then White.some
+    else if pred(black) then Black.some
+    else None
+
+  def foreach[U](f: Bitboard => U): Unit =
+    f(white)
+    f(black)
+
+  def foreach[U](f: (Color, Bitboard) => U): Unit =
+    f(White, white)
+    f(Black, black)
+
+  inline def update(inline color: Color, f: Bitboard => Bitboard): ByColor =
+    if color.white then copy(white = f(white))
+    else copy(black = f(black))
+
+  def mapReduce[B, C](f: Bitboard => B)(r: (B, B) => C): C = r(f(white), f(black))
+
+  def map(f: Bitboard => Bitboard): ByColor = ByColor(f(white), f(black))
+
+object ByColor:
+  inline def fill(a: Bitboard): ByColor = ByColor(a, a)

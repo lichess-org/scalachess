@@ -23,9 +23,9 @@ case object Crazyhouse
   def validMoves(situation: Situation): List[Move] =
     Standard.validMoves(situation)
 
-  override def valid(board: Board, strict: Boolean) =
-    (Color.all forall validSide(board, false)) &&
-      (!strict || (board.board.byRole(Pawn).count <= 16 && board.nbPieces <= 32))
+  override def valid(situation: Situation, strict: Boolean) =
+    (Color.all forall validSide(situation.board, false)) &&
+      (!strict || (situation.board.board.byRole(Pawn).count <= 16 && situation.board.nbPieces <= 32))
 
   private def canDropPawnOn(square: Square) = square.rank != Rank.First && square.rank != Rank.Eighth
 

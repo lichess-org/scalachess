@@ -7,8 +7,7 @@ import bitboard.Bitboard.*
 
 import chess.format.Uci
 import Square.prevRank
-import chess.variant.Crazyhouse
-import chess.variant.Antichess
+import chess.variant.{ Antichess, Crazyhouse, Standard }
 
 case class Situation(board: Board, color: Color):
   export board.{ history, isOccupied, kingOf, variant }
@@ -50,7 +49,7 @@ case class Situation(board: Board, color: Color):
   inline def winner: Option[Color] = variant.winner(this)
 
   def playable(strict: Boolean): Boolean =
-    (board valid strict) && !end && copy(color = !color).check.no
+    board.variant.valid(this, strict) && !end && copy(color = !color).check.no
 
   lazy val status: Option[Status] =
     if checkMate then Status.Mate.some

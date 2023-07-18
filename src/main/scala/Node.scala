@@ -459,15 +459,21 @@ object Tree:
       case (Some(c1), Some(c2)) => Some(c1.mergeOrAddAsVariation(c2))
       case _                    => node.orElse(other)
 
+  def build[A](s: Seq[A]): Option[Node[A]] =
+    s.reverse.foldLeft(none)((acc, a) => Node(a, acc).some)
+
   def build[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
-    s.reverse.foldLeft(none[Node[B]])((acc, a) => Node(f(a), acc).some)
+    s.reverse.foldLeft(none)((acc, a) => Node(f(a), acc).some)
 
   def buildWithIndex[A, B](s: Seq[A], f: (A, Int) => B): Option[Node[B]] =
     build(s.zipWithIndex, f.tupled)
 
+  def buildWithNode[A](s: Seq[Node[A]]): Option[Node[A]] =
+    s.reverse.foldLeft(none)((acc, a) => a.withChild(acc).some)
+
   def buildWithNode[A, B](s: Seq[A], f: A => Node[B]): Option[Node[B]] =
     s.reverse match
-      case Nil     => none[Node[B]]
+      case Nil     => none
       case x :: xs => xs.foldLeft(f(x))((acc, a) => f(a).withChild(acc.some)).some
 
   given [A, Id](using HasId[A, Id]): HasId[Tree[A], Id] =

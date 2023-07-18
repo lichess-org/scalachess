@@ -4,7 +4,6 @@ package format.pgn
 import cats.syntax.all.*
 import cats.parse.{ LocationMap, Numbers as N, Parser as P, Parser0 as P0, Rfc5234 as R }
 import cats.parse.Parser.Expectation
-import cats.data.NonEmptyList
 
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 object Parser:
@@ -17,22 +16,21 @@ object Parser:
   val escape = pgnComment.? *> whitespace.rep0.?
 
   def full(pgn: PgnStr): Either[ErrorStr, ParsedPgn] =
-    pgnParser.parse(pgn.value).bimap(err => showExpectations("Cannot parse pgn", pgn.value, err), _._2)
+    pgnParser.parse(pgn.value, "Cannot parse pgn")
 
   def moves(strMoves: Iterable[SanStr]): Either[ErrorStr, Sans] =
     strMoves.toList.traverse(sanOnly).map(Sans(_))
 
   def moves(str: PgnMovesStr): Either[ErrorStr, Option[ParsedPgnTree]] =
-    strMove.rep
-      .parse(str.value)
-      .leftMap(err => showExpectations("Cannot parse moves", str.value, err))
-      .map((_, sans) => sans.foldLeft(none)((acc, x) => x.withChild(acc).some))
+    strMove.rep0
+      .parse(str.value, "Cannot parse moves")
+      .map(Tree.buildWithNode)
 
   def move(str: SanStr): Either[ErrorStr, ParsedPgnTree] =
-    strMove.parse(str.value).bimap(err => showExpectations("Cannot parse move", str.value, err), _._2)
+    strMove.parse(str.value, "Cannot parse move")
 
   def sanOnly(str: SanStr): Either[ErrorStr, San] =
-    sanOnly.parse(str.value).bimap(err => showExpectations("Cannot parse move", str.value, err), _._2)
+    sanOnly.parse(str.value, "Cannot parse move")
 
   val blockComment  = P.until0(P.char('}')).with1.between(P.char('{'), P.char('}')).map(Comment(_))
   val inlineComment = P.char(';') *> P.until(R.lf).map(Comment(_))
@@ -110,7 +108,7 @@ object Parser:
             sans match
               case Nil => None
               case x :: xs =>
-                val child = xs.reverse.foldLeft(none[ParsedPgnTree])((acc, x) => x.copy(child = acc).some)
+                val child = Tree.buildWithNode(xs)
                 Some(Variation(x.value.copy(variationComments = comments.cleanUp), child))
           )
 
@@ -123,8 +121,7 @@ object Parser:
   val strMoves: P0[(InitialComments, Option[ParsedPgnTree], Option[String])] =
     ((comment.rep0 ~ strMove.rep0) ~ (result <* escape).? <* comment.rep0).map:
       case ((comments, sans), res) =>
-        val node = sans.reverse.foldLeft(none[ParsedPgnTree])((acc, x) => x.copy(child = acc).some)
-        (InitialComments(comments.cleanUp), node, res)
+        (InitialComments(comments.cleanUp), Tree.buildWithNode(sans), res)
 
   private object MoveParser:
 
@@ -169,7 +166,7 @@ object Parser:
         Std(dest = de, role = ro, capture = ca)
 
     // B@g5
-    val drop: P[Drop] = ((role <* P.char('@')) ~ dest).map((role, square) => Drop(role, square))
+    val drop: P[Drop] = ((role <* P.char('@')) ~ dest).map(Drop(_, _))
 
     val pawnDrop: P[Drop] = (P.char('@') *> dest).map(Drop(Pawn, _))
 
@@ -214,16 +211,16 @@ object Parser:
 
     val tagName: P[String] = R.alpha.rep.string.withContext("Tag name can only contains alphabet characters")
     val escaped: P[String] = P.char('\\') *> (R.dquote | P.char('\\')).string
-    val valueChar: P[String]       = escaped | P.charWhere(_ != '"').string
-    val tagValue: P[String]        = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
-    val tagContent: P[Tag]         = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
-    val tag: P[Tag]                = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
-    val tags: P[NonEmptyList[Tag]] = tag.rep
+    val valueChar: P[String] = escaped | P.charWhere(_ != '"').string
+    val tagValue: P[String]  = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
+    val tagContent: P[Tag]   = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
+    val tag: P[Tag]          = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
+    val tags: P0[List[Tag]]  = tag.rep0
 
   private val tagsAndMovesParser: P0[ParsedPgn] =
-    (TagParser.tags.?.surroundedBy(escape) ~ strMoves.?).map:
+    (TagParser.tags.surroundedBy(escape) ~ strMoves.?).map:
       case (optionalTags, optionalMoves) =>
-        val preTags = Tags(optionalTags.map(_.toList).getOrElse(Nil))
+        val preTags = Tags(optionalTags)
         optionalMoves match
           case None => ParsedPgn(InitialComments.empty, preTags, None)
           case Some((init, tree, resultOption)) =>
@@ -232,9 +229,11 @@ object Parser:
             ParsedPgn(init, tags, tree)
 
   private val pgnParser: P0[ParsedPgn] =
-    escape *> P.string("[pgn]").? *> tagsAndMovesParser <* P
-      .string("[/pgn]")
-      .? <* escape
+    escape *> P.string("[pgn]").? *> tagsAndMovesParser <* P.string("[/pgn]").? <* escape
+
+  extension [A](p: P0[A])
+    def parse(str: String, context: String): Either[ErrorStr, A] =
+      p.parse(str).bimap(err => showExpectations(context, str, err), _._2)
 
   private def showExpectations(context: String, str: String, error: P.Error): ErrorStr =
     val lm  = LocationMap(str)

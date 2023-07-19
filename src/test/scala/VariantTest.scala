@@ -76,6 +76,11 @@ class VariantTest extends ChessTest:
 
     "validate situation correctly" in:
 
+      "two-step pawn advance with no check should be valid" in:
+        val position = EpdFen("2r3k1/p2Q1pp1/1p5p/3p4/P7/KP6/2r5/8 b - - 1 36")
+        val game     = fenToGame(position, Standard).flatMap(_.playMoves(A7 -> A5)).toOption.get
+        game.situation.playable(true) must beTrue
+
       "when previous move is a double pawn push and checker is not the pushed pawn or a sliding piece" in:
         val game1 = Fen
           .read(Standard, EpdFen("r1bqkbnr/1p1p1ppp/p7/2pPp3/4P3/5n2/PPP2PPP/RNBQKBNR w KQkq c6 0 4"))

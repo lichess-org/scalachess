@@ -57,9 +57,9 @@ case object Standard
     super.valid(situation, strict) && (!strict || hasValidCheckers(situation))
 
   private def hasValidCheckers(situation: Situation): Boolean =
-    situation.checkers.filter(_.nonEmpty).fold(true) { checkers =>
-      isValidChecksForMultipleCheckers(situation, checkers) &&
-      isValidCheckersForEnPassant(situation, checkers)
+    situation.checkers.isEmpty || {
+      isValidChecksForMultipleCheckers(situation, situation.checkers) &&
+      isValidCheckersForEnPassant(situation, situation.checkers)
     }
 
   private def isValidCheckersForEnPassant(situation: Situation, activeCheckers: Bitboard): Boolean =

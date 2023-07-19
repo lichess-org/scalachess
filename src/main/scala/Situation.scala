@@ -6,7 +6,6 @@ import bitboard.Bitboard
 import bitboard.Bitboard.*
 
 import chess.format.Uci
-import Square.prevRank
 import chess.variant.{ Antichess, Crazyhouse, Standard }
 
 case class Situation(board: Board, color: Color):
@@ -85,11 +84,11 @@ case class Situation(board: Board, color: Color):
   // alternative version of ourKing is used in Antichess only
   lazy val ourKings: List[Square] = board.kings(color)
   // alternative version of theirKing is used in Antichess only
-  lazy val theirKings: List[Square]   = board.kings(!color)
-  lazy val us: Bitboard               = board.byColor(color)
-  lazy val them: Bitboard             = board.byColor(!color)
-  lazy val checkers: Option[Bitboard] = ourKing.map(board.attackers(_, !color))
-  val isWhiteTurn: Boolean            = color.white
+  lazy val theirKings: List[Square] = board.kings(!color)
+  lazy val us: Bitboard             = board.byColor(color)
+  lazy val them: Bitboard           = board.byColor(!color)
+  lazy val checkers: Bitboard       = ourKing.fold(Bitboard.empty)(board.attackers(_, !color))
+  val isWhiteTurn: Boolean          = color.white
 
   def generateMovesAt(square: Square): List[Move] =
     def movesAt =
@@ -134,7 +133,7 @@ case class Situation(board: Board, color: Color):
     * the last move must have been a double pawn push
     * and not start from the back rank
     */
-  def potentialEpSquare: Option[Square] = history.lastMove.flatMap:
+  lazy val potentialEpSquare: Option[Square] = history.lastMove.flatMap:
     case Uci.Move(orig, dest, _) =>
       board(dest).flatMap { piece =>
         if piece.color == !color && piece.role == Pawn &&

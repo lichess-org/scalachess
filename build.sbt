@@ -22,17 +22,16 @@ lazy val scalachess = Project("scalachess", file(".")).settings(
   scalacOptions := Seq(
     "-encoding",
     "utf-8",
-    // "-rewrite",
     "-source:future-migration",
     "-indent",
     "-feature",
     "-language:postfixOps",
-    "-Xtarget:12",
-    "-Wunused:all"
+    "-Wunused:all",
     // "-Werror"
     // Warnings as errors!
     /* "-Xfatal-warnings" */
-  )
+  ),
+  scalacOptions ++= Seq("-java-output-version", "17")
 )
 
 ThisBuild / organization      := "org.lichess"

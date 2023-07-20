@@ -82,7 +82,7 @@ object Hash extends OpaqueInt[Hash]:
       else hpieces
 
     val hep = situation.enPassantSquare.fold(hcastling): square =>
-      hcastling ^ table.enPassantMasks(square.file.index)
+      hcastling ^ table.enPassantMasks(square.file.value)
 
     // Hash in special three-check data.
     val hchecks = board.variant match

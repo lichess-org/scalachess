@@ -40,8 +40,8 @@ case class Std(
     situation.board
       .byPiece(situation.color - role)
       .first: square =>
-        if compare(file, square.file.index) &&
-          compare(rank, square.rank.index)
+        if compare(file, square.file.value) &&
+          compare(rank, square.rank.value)
         then situation.generateMovesAt(square).find(_.dest == dest)
         else None
       .toRight(ErrorStr(s"No move found: $this\n$situation"))

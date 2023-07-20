@@ -185,13 +185,13 @@ case class Situation(board: Board, color: Color):
 
     val s2: List[Move] = for
       to   <- singleMoves & mask
-      from <- Square.at(to.value + (if isWhiteTurn then -8 else 8)).toList
+      from <- Square(to.value + (if isWhiteTurn then -8 else 8)).toList
       move <- genPawnMoves(from, to, false)
     yield move
 
     val s3: List[Move] = for
       to   <- doubleMoves & mask
-      from <- Square.at(to.value + (if isWhiteTurn then -16 else 16))
+      from <- Square(to.value + (if isWhiteTurn then -16 else 16))
       move <- normalMove(from, to, Pawn, false)
     yield move
 

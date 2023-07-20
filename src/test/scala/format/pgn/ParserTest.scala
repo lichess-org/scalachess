@@ -111,7 +111,7 @@ class ParserTest extends ChessTest:
 
     // TODO parsed result is off by one
     parseMove("Ne7g6+?!") must beRight.like: node =>
-      node.value.san === Std(Square.G6, Knight, false, Some(File.E), Some(Rank.Eighth))
+      node.value.san === Std(Square.G6, Knight, false, Some(File.E), Some(Rank.Seventh))
       node.value.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
 
     parseMove("P@e4?!") must beRight.like: node =>

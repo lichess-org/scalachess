@@ -29,8 +29,8 @@ object File:
   inline def of(inline square: Square): File = square.value & 0x7
 
   inline def fromChar(inline ch: Char): Option[File] = atIndex(ch.toInt - 97)
-  private[chess] def unsafe(value: Int): File = value
-  def apply(value: Int): Option[File] = Option.when(0 <= value && value < 8)(value)
+  private[chess] def unsafe(value: Int): File        = value
+  def apply(value: Int): Option[File]                = Option.when(0 <= value && value < 8)(value)
 
   val A = File.unsafe(0)
   val B = File.unsafe(1)

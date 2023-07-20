@@ -64,7 +64,7 @@ object Square:
   end extension
 
   inline def apply(inline file: File, inline rank: Rank): Square = file.value + 8 * rank.value
-  inline def apply(index: Int): Option[Square] = Option.when(0 <= index && index < 64)(index)
+  inline def apply(index: Int): Option[Square]  = Option.when(0 <= index && index < 64)(index)
   private[chess] def unsafe(index: Int): Square = index
 
   inline def at(index: Int): Option[Square] = Option.when(0 <= index && index < 64)(index)

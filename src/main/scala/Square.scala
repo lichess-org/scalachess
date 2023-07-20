@@ -68,8 +68,6 @@ object Square:
   inline def apply(index: Int): Option[Square]  = Option.when(0 <= index && index < 64)(index)
   private[chess] def unsafe(index: Int): Square = index
 
-  // inline def at(index: Int): Option[Square] = Option.when(0 <= index && index < 64)(index)
-
   inline def at(x: Int, y: Int): Option[Square] = Option.when(0 <= x && x < 8 && 0 <= y && y < 8)(x + 8 * y)
 
   inline def fromKey(inline key: String): Option[Square] = allKeys get key
@@ -143,7 +141,7 @@ object Square:
   val G8: Square = 62
   val H8: Square = 63
 
-  val all: List[Square] = (0 to 63).toList.map(unsafe)
+  val all: List[Square] = (0 to 63).toList
 
   val allKeys: Map[String, Square] = all.mapBy(_.key)
   val charMap: Map[Char, Square]   = all.mapBy(square => square.asChar)

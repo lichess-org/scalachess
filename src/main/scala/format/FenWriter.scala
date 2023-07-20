@@ -52,7 +52,7 @@ trait FenWriter:
             if piece.role != Pawn && board.crazyData.exists(_.promoted.contains(Square(x, y))) then
               fen append '~'
       if empty > 0 then fen append empty
-      if y > Rank.First then fen append '/'
+      if y.value > Rank.First.value then fen append '/'
     BoardFen(fen.toString)
 
   def writeBoardAndColor(situation: Situation): BoardAndColorFen =

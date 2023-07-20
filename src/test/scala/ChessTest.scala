@@ -52,6 +52,10 @@ trait ChessTest extends Specification with EitherMatchers:
 
     def withClock(c: Clock) = game.copy(clock = Option(c))
 
+  extension (sit: Situation)
+    def movesAt(s: Square): List[Move] =
+      sit.moves.getOrElse(s, Nil)
+
   def fenToGame(positionString: EpdFen, variant: Variant) =
     Fen
       .read(variant, positionString)

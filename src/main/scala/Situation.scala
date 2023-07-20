@@ -10,13 +10,12 @@ import chess.variant.{ Antichess, Crazyhouse, Standard }
 
 case class Situation(board: Board, color: Color):
   export board.{ history, isOccupied, kingOf, variant }
+  export color.white as isWhiteTurn
 
   lazy val legalMoves = variant.validMoves(this)
 
   lazy val moves: Map[Square, List[Move]] =
     legalMoves.groupBy(_.orig)
-
-  val movesAt: Square => List[Move] = moves.getOrElse(_, Nil)
 
   lazy val playerCanCapture: Boolean = legalMoves.exists(_.captures)
 
@@ -72,8 +71,8 @@ case class Situation(board: Board, color: Color):
   def withVariant(variant: chess.variant.Variant) =
     copy(board = board withVariant variant)
 
-  def enPassantSquare: Option[Square] =
-    potentialEpSquare.flatMap(_ => legalMoves.find(_.enpassant).map(_.dest))
+  lazy val enPassantSquare: Option[Square] =
+    potentialEpSquare >> legalMoves.find(_.enpassant).map(_.dest)
 
   def unary_! = copy(color = !color)
 
@@ -88,7 +87,6 @@ case class Situation(board: Board, color: Color):
   lazy val us: Bitboard             = board.byColor(color)
   lazy val them: Bitboard           = board.byColor(!color)
   lazy val checkers: Bitboard       = ourKing.fold(Bitboard.empty)(board.attackers(_, !color))
-  val isWhiteTurn: Boolean          = color.white
 
   def generateMovesAt(square: Square): List[Move] =
     def movesAt =

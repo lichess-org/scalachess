@@ -150,7 +150,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       val position     = EpdFen("K3k1nr/p2q2pp/p2p1p2/8/2PP4/8/PP4PP/RNBQK1NR w - - 0 11")
       val originalGame = fenToGame(position, Antichess).toOption.get
 
-      originalGame.situation.destinations === Map(Square.A8 -> List(Square.A7))
+      originalGame.situation.destinations === Map(Square.A8 -> Square.A7.bb)
 
     "Be drawn when there are only opposite colour bishops remaining" in:
       val position     = EpdFen("8/2b5/8/8/8/6Q1/4B3/8 b - -")

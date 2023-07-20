@@ -20,7 +20,7 @@ case class Situation(board: Board, color: Color):
 
   lazy val playerCanCapture: Boolean = legalMoves.exists(_.captures)
 
-  lazy val destinations: Map[Square, List[Square]] = moves.view.mapValues { _.map(_.dest) }.to(Map)
+  lazy val destinations: Map[Square, Bitboard] = legalMoves.groupMapReduce(_.orig)(_.dest.bb)(_ | _)
 
   def drops: Option[List[Square]] =
     variant match

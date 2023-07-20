@@ -245,8 +245,8 @@ case class Situation(board: Board, color: Color):
       val rooks = Bitboard.rank(color.backRank) & board.rooks & history.unmovedRooks.value
       for
         rook <- rooks
-        toKingFile = if rook < king then File.C else File.G
-        toRookFile = if rook < king then File.D else File.F
+        toKingFile = if rook.value < king.value then File.C else File.G
+        toRookFile = if rook.value < king.value then File.D else File.F
         kingTo     = Square(toKingFile, king.rank)
         rookTo     = Square(toRookFile, rook.rank)
         // calulate different path for standard vs chess960

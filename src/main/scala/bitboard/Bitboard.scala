@@ -46,7 +46,7 @@ object Bitboard:
 
     def knightAttacks: Bitboard = KNIGHT_ATTACKS(s.value)
 
-  extension (l: Long) private def lsb: Square = Square(java.lang.Long.numberOfTrailingZeros(l))
+  extension (l: Long) private def lsb: Square = Square.unsafe(java.lang.Long.numberOfTrailingZeros(l))
 
   extension (a: Bitboard)
     inline def value: Long                        = a

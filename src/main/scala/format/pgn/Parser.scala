@@ -125,10 +125,8 @@ object Parser:
 
   private object MoveParser:
 
-    def rangeToMap(r: Iterable[Char]) = r.zipWithIndex.toMap.view.mapValues(_ + 1).toMap
-
-    val fileMap = rangeToMap('a' to 'h')
-    val rankMap = rangeToMap('1' to '8')
+    val fileMap = File.all.mapBy(_.char)
+    val rankMap = Rank.all.mapBy(_.char)
 
     val castleQSide = List("O-O-O", "o-o-o", "0-0-0", "O‑O‑O", "o‑o‑o", "0‑0‑0", "O–O–O", "o–o–o", "0–0–0")
     val qCastle: P[Side] = P.stringIn(castleQSide).as(QueenSide)
@@ -147,9 +145,9 @@ object Parser:
 
     val role = mapParserChar(Role.allByPgn, "role")
 
-    val file = mapParserChar(fileMap, "file")
+    val file: P[File] = mapParserChar(fileMap, "file")
 
-    val rank = mapParserChar(rankMap, "rank")
+    val rank: P[Rank] = mapParserChar(rankMap, "rank")
 
     val dest: P[Square] = mapParser(Square.allKeys, "dest")
 
@@ -175,14 +173,8 @@ object Parser:
 
     // d7d5 d7xd5
     val disambiguatedPawn: P[Std] = (((file.? ~ rank.?) ~ x).with1 ~ dest <* optionalEnPassant).map:
-      case (((fi, ra), ca), de) =>
-        Std(
-          dest = de,
-          role = Pawn,
-          capture = ca,
-          file = fi.flatMap(f => File(f - 1)),
-          rank = ra.flatMap(r => Rank.atIndex(r - 1))
-        )
+      case (((file, rank), capture), dest) =>
+        Std(dest, Pawn, capture, file, rank)
 
     // only pawn can promote
     val pawn: P[Std] = ((disambiguatedPawn.backtrack | stdPawn) ~ promotion.?).map: (pawn, promo) =>
@@ -190,14 +182,8 @@ object Parser:
 
     // Bac3 Baxc3 B2c3 B2xc3 Ba2xc3
     val disambiguated: P[Std] = (role ~ file.? ~ rank.? ~ x ~ dest).map:
-      case ((((ro, fi), ra), ca), de) =>
-        Std(
-          dest = de,
-          role = ro,
-          capture = ca,
-          file = fi.flatMap(f => File(f - 1)),
-          rank = ra.flatMap(r => Rank.atIndex(r - 1))
-        )
+      case ((((role, file), rank), capture), dest) =>
+        Std(dest, role, capture, file, rank)
 
     val metas: P0[Metas] =
       (checkmate ~ check ~ (glyphs <* escape) ~ nagGlyphs ~ comment.rep0 ~ nagGlyphs)

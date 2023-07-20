@@ -176,7 +176,7 @@ object Parser:
     // d7d5 d7xd5
     val disambiguatedPawn: P[Std] = (((file.? ~ rank.?) ~ x).with1 ~ dest <* optionalEnPassant).map:
       case (((fi, ra), ca), de) =>
-        Std(dest = de, role = Pawn, capture = ca, file = File from fi, rank = Rank from ra)
+        Std(dest = de, role = Pawn, capture = ca, file = fi.flatMap(f => File(f - 1)), rank = Rank from ra)
 
     // only pawn can promote
     val pawn: P[Std] = ((disambiguatedPawn.backtrack | stdPawn) ~ promotion.?).map: (pawn, promo) =>
@@ -185,7 +185,7 @@ object Parser:
     // Bac3 Baxc3 B2c3 B2xc3 Ba2xc3
     val disambiguated: P[Std] = (role ~ file.? ~ rank.? ~ x ~ dest).map:
       case ((((ro, fi), ra), ca), de) =>
-        Std(dest = de, role = ro, capture = ca, file = File from fi, rank = Rank from ra)
+        Std(dest = de, role = ro, capture = ca, file = fi.flatMap(f => File(f - 1)), rank = Rank from ra)
 
     val metas: P0[Metas] =
       (checkmate ~ check ~ (glyphs <* escape) ~ nagGlyphs ~ comment.rep0 ~ nagGlyphs)

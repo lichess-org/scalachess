@@ -3,6 +3,7 @@ package format
 
 import cats.syntax.all.*
 import variant.{ Standard, Variant }
+import variant.Crazyhouse.Pockets
 import cats.kernel.Monoid
 import ornicar.scalalib.zeros.given
 import bitboard.Bitboard
@@ -127,18 +128,8 @@ trait FenReader:
     if pockets.isDefined && !variant.crazyhouse then None
     else
       makeBoardWithCrazyPromoted(position, variant).map: board =>
-        pockets.fold(board) { str =>
-          import chess.variant.Crazyhouse.Pocket
-          val (white, black) = str.toList.flatMap(Piece.fromChar).partition(_ is White)
-          board.withCrazyData(
-            _.copy(
-              pockets = ByColor(
-                white = Pocket(white.map(_.role)),
-                black = Pocket(black.map(_.role))
-              )
-            )
-          )
-        }
+        pockets.fold(board): str =>
+          board.withCrazyData(_.copy(pockets = Pockets(str.flatMap(Piece.fromChar))))
 
   private val numberSet = Set.from('1' to '8')
   def makeBoardWithCrazyPromoted(boardFen: String, variant: Variant): Option[Board] =

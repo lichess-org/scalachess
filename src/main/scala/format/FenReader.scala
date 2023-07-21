@@ -126,10 +126,7 @@ trait FenReader:
       case word => word -> None
     if pockets.isDefined && !variant.crazyhouse then None
     else
-      parseBoard(position) map { (bboard, promoted) =>
-        val board = Board(bboard, variant)
-        if promoted.isEmpty then board else board.withCrazyData(_.copy(promoted = promoted))
-      } map { board =>
+      makeBoardWithCrazyPromoted(position, variant).map: board =>
         pockets.fold(board) { str =>
           import chess.variant.Crazyhouse.Pocket
           val (white, black) = str.toList.flatMap(Piece.fromChar).partition(_ is White)
@@ -142,9 +139,9 @@ trait FenReader:
             )
           )
         }
-      }
 
-  def parseBoard(boardFen: String): Option[(BBoard, Bitboard)] =
+  private val numberSet = Set.from('1' to '8')
+  def makeBoardWithCrazyPromoted(boardFen: String, variant: Variant): Option[Board] =
     var promoted = Bitboard.empty
     var pawns    = Bitboard.empty
     var knights  = Bitboard.empty
@@ -156,20 +153,19 @@ trait FenReader:
     var black    = Bitboard.empty
     var occupied = Bitboard.empty
 
-    def addPieceAt(p: Piece, s: Square) =
-      val position = s.bb
-      occupied |= position
+    inline def addPieceAt(p: Piece, s: Long) =
+      occupied |= s
       p.role match
-        case Pawn   => pawns |= position
-        case Knight => knights |= position
-        case Bishop => bishops |= position
-        case Rook   => rooks |= position
-        case Queen  => queens |= position
-        case King   => kings |= position
+        case Pawn   => pawns |= s
+        case Knight => knights |= s
+        case Bishop => bishops |= s
+        case Rook   => rooks |= s
+        case Queen  => queens |= s
+        case King   => kings |= s
 
       p.color match
-        case Color.White => white |= position
-        case Color.Black => black |= position
+        case Color.White => white |= s
+        case Color.Black => black |= s
 
     var rank  = 7
     var file  = 0
@@ -182,31 +178,33 @@ trait FenReader:
           file = 0
           rank -= 1
           if rank < 0 then error = true
-        case ch if '1' to '8' contains ch =>
+        case ch if numberSet.contains(ch) =>
           file += (ch - '0')
           if file > 8 then error = true
         case ch =>
-          (Piece.fromChar(ch), Square.at(file, rank)).tupled.match
-            case Some((p, s)) =>
-              addPieceAt(p, s)
-              if iter.headOption == Some('~') then
-                promoted |= s.bl
-                iter.next
-            case None => error = true
+          Piece
+            .fromChar(ch)
+            .match
+              case Some(p) =>
+                val square = 1L << (file + 8 * rank)
+                addPieceAt(p, square)
+                if iter.headOption == Some('~') then
+                  promoted |= square
+                  iter.next
+              case None => error = true
           file += 1
     if error then None
     else
-      Some(
-        BBoard(
-          occupied = occupied,
-          white = white,
-          black = black,
-          pawns = pawns,
-          knights = knights,
-          bishops = bishops,
-          rooks = rooks,
-          queens = queens,
-          kings = kings
-        ),
-        promoted
+      val bboard = BBoard(
+        occupied = occupied,
+        white = white,
+        black = black,
+        pawns = pawns,
+        knights = knights,
+        bishops = bishops,
+        rooks = rooks,
+        queens = queens,
+        kings = kings
       )
+      val board = Board(bboard, variant)
+      if promoted.isEmpty then board.some else board.withCrazyData(_.copy(promoted = promoted)).some

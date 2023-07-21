@@ -34,6 +34,21 @@ case class Piece(color: Color, role: Role) derives Eq:
 
 object Piece:
 
+  private val allByFen: Map[Char, Piece] =
+    Map(
+      'P' -> Piece(White, Pawn),
+      'N' -> Piece(White, Knight),
+      'B' -> Piece(White, Bishop),
+      'R' -> Piece(White, Rook),
+      'Q' -> Piece(White, Queen),
+      'K' -> Piece(White, King),
+      'p' -> Piece(Black, Pawn),
+      'n' -> Piece(Black, Knight),
+      'b' -> Piece(Black, Bishop),
+      'r' -> Piece(Black, Rook),
+      'q' -> Piece(Black, Queen),
+      'k' -> Piece(Black, King)
+    )
+
   def fromChar(c: Char): Option[Piece] =
-    Role.allByPgn get c.toUpper map:
-      Piece(Color.fromWhite(c.isUpper), _)
+    allByFen.get(c)

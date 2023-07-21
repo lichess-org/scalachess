@@ -44,9 +44,8 @@ trait FenReader:
 
       import situation.color.{ fifthRank, sixthRank, seventhRank }
 
-      val enpassantSquare = fen.enpassant
       val enpassantMove = for
-        square <- enpassantSquare
+        square <- fen.enpassant
         if square.rank == sixthRank
         orig = square withRank seventhRank
         dest = square withRank fifthRank

@@ -19,7 +19,7 @@ import chess.variant.*
 @Threads(value = 1)
 class DestinationsBench:
 
-  private[this] val Work: Long = 10
+  private[this] val Work: Long = 5
 
   @Param(Array("100"))
   var games: Int = _
@@ -68,10 +68,19 @@ class DestinationsBench:
   def racingkings(bh: Blackhole) =
     bench(racingkingsInput)(bh)
 
+  @Benchmark
+  def chess960(bh: Blackhole) =
+    bench(randomInput)(bh)
+
+  @Benchmark
+  def tricky(bh: Blackhole) =
+    bench(trickyInput)(bh)
+
   private def bench(sits: List[Situation])(bh: Blackhole) =
-    sits.foreach: x =>
+    val x = sits.map: x =>
       Blackhole.consumeCPU(Work)
-      bh.consume(x.destinations)
+      x.destinations
+    bh.consume(x)
 
   private def makeSituations(perfts: List[Perft], variant: Variant, games: Int): List[Situation] =
     perfts

@@ -110,7 +110,7 @@ class VariantTest extends ChessTest:
 
       "when multiple checkers are aligned with the king" in:
         val game = Fen
-          .read(Standard, EpdFen("1nbqk3/1p1prppp/p1P5/8/4K3/8/PPP1rPPP/RNBQ1BNR b HA - 0 4"))
+          .read(Standard, EpdFen("1nbqk3/1p1prppp/p1P5/8/4K3/8/PPP1rPPP/RNBQ1BNR w HA - 0 4"))
           .get
         game.variant.valid(game, true) must beFalse
         game.variant.valid(game, false) must beTrue

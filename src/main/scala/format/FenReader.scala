@@ -19,7 +19,8 @@ trait FenReader:
     makeBoard(variant, fen) map { board =>
       // if a king is in check then we know whose turn it is to play, and we can ignore the manual turn flag.
       // Except in atomic where it's ok to be in check
-      val situation = Situation(board, if variant.atomic then fen.color else board.checkColor | fen.color)
+      val color     = fen.color.orElse(board.checkColor) | Color.White
+      val situation = Situation(board, color)
       // todo verify unmovedRooks vs board.rooks
       val (castles, unmovedRooks) =
         if !variant.allowsCastling then (Castles.none -> UnmovedRooks.none)
@@ -97,7 +98,7 @@ trait FenReader:
 
   def readPly(fen: EpdFen): Option[Ply] =
     val (_, fullMoveNumber) = readHalfMoveClockAndFullMoveNumber(fen)
-    fullMoveNumber.map(_.ply(fen.color))
+    fullMoveNumber.map(_.ply(fen.colorOrWhite))
 
   private def readCheckCount(str: String): Option[CheckCount] =
     str.toList match

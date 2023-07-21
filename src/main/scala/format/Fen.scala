@@ -12,7 +12,8 @@ object Fen extends FenReader with FenWriter:
 opaque type EpdFen = String
 object EpdFen extends OpaqueString[EpdFen]:
   extension (a: EpdFen)
-    def color: Color              = SimpleFen color a
+    def color: Option[Color]      = SimpleFen.color(a)
+    def colorOrWhite: Color       = SimpleFen.colorOrWhite(a)
     def castling: String          = SimpleFen castling a
     def enpassant: Option[Square] = SimpleFen enpassant a
 
@@ -30,8 +31,9 @@ object EpdFen extends OpaqueString[EpdFen]:
 opaque type SimpleFen = String
 object SimpleFen extends OpaqueString[SimpleFen]:
   extension (a: SimpleFen)
-    def color: Color     = a.split(' ').lift(1).flatMap(_.headOption).flatMap(Color.apply) | Color.white
-    def castling: String = a.split(' ').lift(2) | "-"
+    def color: Option[Color]      = a.split(' ').lift(1).flatMap(_.headOption).flatMap(Color.apply)
+    def colorOrWhite: Color       = color | Color.White
+    def castling: String          = a.split(' ').lift(2) | "-"
     def enpassant: Option[Square] = a.split(' ').lift(3).flatMap(Square.fromKey(_))
     def opening: OpeningFen       = OpeningFen.fromSimple(a)
     def board: BoardFen           = a.takeWhile(_ != ' ')

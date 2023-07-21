@@ -46,7 +46,7 @@ object Bitboard:
 
     def knightAttacks: Bitboard = KNIGHT_ATTACKS(s.value)
 
-  extension (l: Long) private def lsb: Square = Square(java.lang.Long.numberOfTrailingZeros(l))
+  extension (l: Long) private def lsb: Square = Square.unsafe(java.lang.Long.numberOfTrailingZeros(l))
 
   extension (a: Bitboard)
     inline def value: Long                        = a
@@ -87,10 +87,10 @@ object Bitboard:
     def count: Int = java.lang.Long.bitCount(a)
 
     // the first non empty square (the least significant bit/ the rightmost bit)
-    def first: Option[Square] = Square.at(java.lang.Long.numberOfTrailingZeros(a))
+    def first: Option[Square] = Square(java.lang.Long.numberOfTrailingZeros(a))
 
     // the last non empty square (the most significant bit / the leftmost bit)
-    def last: Option[Square] = Square.at(63 - java.lang.Long.numberOfLeadingZeros(a))
+    def last: Option[Square] = Square(63 - java.lang.Long.numberOfLeadingZeros(a))
 
     // remove the first non empty position
     def removeFirst: Bitboard = a & (a - 1L)

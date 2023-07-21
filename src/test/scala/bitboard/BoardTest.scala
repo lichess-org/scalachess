@@ -12,7 +12,7 @@ class BoardTest extends FunSuite:
 
   import scala.language.implicitConversions
   given Conversion[Square, Int] = _.value
-  given Conversion[Int, Square] = Square(_)
+  given Conversion[Int, Square] = Square.unsafe(_)
 
   def parseFen(fen: EpdFen): Board =
     Fen.read(fen).map(_.board.board).getOrElse(throw RuntimeException("boooo"))

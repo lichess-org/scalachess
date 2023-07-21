@@ -185,13 +185,13 @@ case class Situation(board: Board, color: Color):
 
     val s2: List[Move] = for
       to   <- singleMoves & mask
-      from <- Square.at(to.value + (if isWhiteTurn then -8 else 8)).toList
+      from <- Square(to.value + (if isWhiteTurn then -8 else 8)).toList
       move <- genPawnMoves(from, to, false)
     yield move
 
     val s3: List[Move] = for
       to   <- doubleMoves & mask
-      from <- Square.at(to.value + (if isWhiteTurn then -16 else 16))
+      from <- Square(to.value + (if isWhiteTurn then -16 else 16))
       move <- normalMove(from, to, Pawn, false)
     yield move
 
@@ -245,8 +245,8 @@ case class Situation(board: Board, color: Color):
       val rooks = Bitboard.rank(color.backRank) & board.rooks & history.unmovedRooks.value
       for
         rook <- rooks
-        toKingFile = if rook < king then File.C else File.G
-        toRookFile = if rook < king then File.D else File.F
+        toKingFile = if rook.value < king.value then File.C else File.G
+        toRookFile = if rook.value < king.value then File.D else File.F
         kingTo     = Square(toKingFile, king.rank)
         rookTo     = Square(toRookFile, rook.rank)
         // calulate different path for standard vs chess960

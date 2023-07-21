@@ -12,7 +12,7 @@ import ornicar.scalalib.zeros.given
   */
 trait FenWriter:
 
-  private given Ordering[File] = intOrdering[File]
+  private given Ordering[File] = Ordering.by[File, Int](_.value)
   given Ordering[Square]       = Ordering.by[Square, File](_.file)
 
   def write(situation: Situation): EpdFen = write(Situation.AndFullMoveNumber(situation, FullMoveNumber(1)))
@@ -52,7 +52,7 @@ trait FenWriter:
             if piece.role != Pawn && board.crazyData.exists(_.promoted.contains(Square(x, y))) then
               fen append '~'
       if empty > 0 then fen append empty
-      if y > Rank.First then fen append '/'
+      if y.value > Rank.First.value then fen append '/'
     BoardFen(fen.toString)
 
   def writeBoardAndColor(situation: Situation): BoardAndColorFen =

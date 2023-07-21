@@ -49,7 +49,7 @@ object UciCharPair:
     val promotion2charMap: Map[(File, PromotableRole), Char] = for
       (role, index) <- Role.allPromotable.zipWithIndex.toMap
       file          <- File.all
-    yield (file, role) -> (charShift + square2charMap.size + index * 8 + file.index).toChar
+    yield (file, role) -> (charShift + square2charMap.size + index * 8 + file.value).toChar
 
     lazy val char2promotionMap: Map[Char, (File, PromotableRole)] =
       promotion2charMap.map(_.swap)

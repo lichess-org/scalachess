@@ -26,7 +26,7 @@ case object Horde
     yield (Square(x, y) -> White.pawn)
     val frontPawns  = List(Square.B5, Square.C5, Square.F5, Square.G5).map { _ -> White.pawn }
     val blackPawns  = File.all.map { Square(_, Rank.Seventh) -> Black.pawn }
-    val blackPieces = File.all.map { x => Square(x, Rank.Eighth) -> (Black - backRank(x.index)) }
+    val blackPieces = File.all.map { x => Square(x, Rank.Eighth) -> (Black - backRank(x.value)) }
     whitePawnsHorde ++ frontPawns ++ blackPawns ++ blackPieces toMap
 
   override val castles = Castles("kq")

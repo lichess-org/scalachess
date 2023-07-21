@@ -43,7 +43,7 @@ object UciArbitraries:
       rank   <- Gen.oneOf(Rank.Second, Rank.Seventh)
       role   <- Gen.oneOf(Role.allPromotable)
       offset <- Gen.oneOf(-1, 1)
-      destFile = file.offset(offset).getOrElse(file)
+      destFile = File(file.value + offset).getOrElse(file)
       orig     = Square(file, rank)
       dest     = Square(destFile, UciCharPair.implementation.lastRank(orig))
     yield Uci.Move(orig, dest, Some(role))

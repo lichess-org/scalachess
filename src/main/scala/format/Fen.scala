@@ -12,10 +12,15 @@ object Fen extends FenReader with FenWriter:
 opaque type EpdFen = String
 object EpdFen extends OpaqueString[EpdFen]:
   extension (a: EpdFen)
-    def color: Option[Color]      = SimpleFen.color(a)
-    def colorOrWhite: Color       = SimpleFen.colorOrWhite(a)
-    def castling: String          = SimpleFen castling a
-    def enpassant: Option[Square] = SimpleFen enpassant a
+    def parts: (String, Option[Color], String, Option[Square]) =
+      val parts = a.split(' ')
+      (
+        a.takeWhile(_ != ' '),
+        parts.lift(1).flatMap(_.headOption).flatMap(Color.apply),
+        parts.lift(2).getOrElse("-"),
+        parts.lift(3).flatMap(Square.fromKey(_))
+      )
+    def colorOrWhite: Color = SimpleFen.colorOrWhite(a)
 
     def isInitial: Boolean = a == initial
 

@@ -17,17 +17,18 @@ import bitboard.Board as BBoard
   */
 trait FenReader:
   def read(variant: Variant, fen: EpdFen): Option[Situation] =
-    makeBoard(variant, fen) map { board =>
+    val (fBoard, fColor, fCastling, fEnpassant) = fen.parts
+    makeBoard(variant, fBoard) map { board =>
       // if a king is in check then we know whose turn it is to play, and we can ignore the manual turn flag.
       // Except in atomic where it's ok to be in check
-      val color     = fen.color.orElse(board.checkColor) | Color.White
+      val color     = fColor.orElse(board.checkColor) | Color.White
       val situation = Situation(board, color)
       // todo verify unmovedRooks vs board.rooks
       val (castles, unmovedRooks) =
         if !variant.allowsCastling then (Castles.none -> UnmovedRooks.none)
         else
-          fen.castling
-            .foldLeft(Castles.none -> UnmovedRooks.none) { case ((c, r), ch) =>
+          fCastling.foldLeft(Castles.none -> UnmovedRooks.none):
+            case ((c, r), ch) =>
               val color    = Color.fromWhite(ch.isUpper)
               val backRank = Bitboard.rank(color.backRank)
               val rooks    = board.rooks & board(color) & backRank
@@ -40,13 +41,12 @@ trait FenReader:
                     case file => rooks.find(_.file.char == file)
                   side <- Side.kingRookSide(kingSquare, rookSquare)
                 yield (c.add(color, side), r | rookSquare.bl)
-              }.getOrElse((c, r))
-            }
+              }.getOrElse(c -> r)
 
       import situation.color.{ fifthRank, sixthRank, seventhRank }
 
       val enpassantMove = for
-        square <- fen.enpassant
+        square <- fEnpassant
         if square.rank == sixthRank
         orig = square withRank seventhRank
         dest = square withRank fifthRank
@@ -63,7 +63,7 @@ trait FenReader:
           unmovedRooks = unmovedRooks
         )
         val checkCount = variant.threeCheck.so:
-          val splitted = fen.value split ' '
+          val splitted = fen.value.split(' ')
           splitted
             .lift(4)
             .flatMap(readCheckCount)
@@ -115,8 +115,8 @@ trait FenReader:
       case _ => None
 
   // only cares about pieces positions on the board (first part of FEN string)
-  def makeBoard(variant: Variant, fen: EpdFen): Option[Board] =
-    val (position, pockets) = fen.value.takeWhile(' ' !=) match
+  def makeBoard(variant: Variant, fen: String): Option[Board] =
+    val (position, pockets) = fen.takeWhile(' ' !=) match
       case word if word.count('/' ==) == 8 =>
         val splitted = word.split('/')
         splitted.take(8).mkString("/") -> splitted.lift(8)

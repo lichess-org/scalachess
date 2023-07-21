@@ -9,7 +9,7 @@ INSTALL
 
 Clone scalachess
 
-    git clone git://github.com/ornicar/scalachess
+    git clone https://github.com/lichess-org/scalachess
 
 Start [sbt](http://www.scala-sbt.org/download.html) in scalachess directory
 

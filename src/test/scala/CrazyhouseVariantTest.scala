@@ -300,11 +300,10 @@ class CrazyhouseVariantTest extends ChessTest:
         )
         .situation
         .destinations
-        .mapValues(_.toSet)
         .toMap must_== Map(
-        F2 -> Set(E3, E1),
-        G3 -> Set(G2),
-        F1 -> Set(G2)
+        F2 -> Bitboard(Set(E3, E1)),
+        G3 -> Bitboard(Set(G2)),
+        F1 -> Bitboard(Set(G2))
       )
 
     "replay ZH" in:

@@ -146,7 +146,6 @@ trait FenReader:
 
   def parseBoard(boardFen: String): Option[(BBoard, Bitboard)] =
     var promoted = Bitboard.empty
-
     var pawns    = Bitboard.empty
     var knights  = Bitboard.empty
     var bishops  = Bitboard.empty
@@ -187,7 +186,6 @@ trait FenReader:
           file += (ch - '0')
           if file > 8 then error = true
         case ch =>
-          // println(s"do $ch $file $rank")
           (Piece.fromChar(ch), Square.at(file, rank)).tupled.match
             case Some((p, s)) =>
               addPieceAt(p, s)

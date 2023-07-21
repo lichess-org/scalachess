@@ -73,11 +73,11 @@ trait ChessTest extends Specification with EitherMatchers:
 
   def makeBoard: Board = Board init chess.variant.Standard
 
-  def makeChess960Board(position: Int) = Board(Chess960.pieces(position), Chess960.castles, Chess960)
+  def makeChess960Board(position: Int) = Board(BBoard.fromMap(Chess960.pieces(position)), Chess960)
   def makeChess960Game(position: Int)  = Game(makeChess960Board(position))
   def chess960Boards                   = (0 to 959).map(makeChess960Board).toList
 
-  def makeEmptyBoard: Board = Board empty chess.variant.Standard
+  def makeEmptyBoard: Board = Board(BBoard.empty, chess.variant.Standard)
 
   def bePoss(poss: Square*) = // : Matcher[Option[Iterable[square]]] =
     beSome { (p: Iterable[Square]) =>

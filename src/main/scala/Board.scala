@@ -161,6 +161,15 @@ object Board:
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Board(board, History(castles = castles, unmovedRooks = unmovedRooks), variant, variantCrazyData(variant))
 
+  def apply(board: BBoard, variant: Variant): Board =
+    val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
+    Board(
+      board,
+      History(castles = variant.castles, unmovedRooks = unmovedRooks),
+      variant,
+      variantCrazyData(variant)
+    )
+
   def init(variant: Variant): Board = Board(variant.pieces, variant.castles, variant)
 
   def empty(variant: Variant): Board = Board(Nil, variant)

@@ -196,6 +196,19 @@ object Board:
     ByRole.fill(Bitboard.empty)
   )
 
+  def apply(
+      occupied: Bitboard,
+      white: Bitboard,
+      black: Bitboard,
+      pawns: Bitboard,
+      knights: Bitboard,
+      bishops: Bitboard,
+      rooks: Bitboard,
+      queens: Bitboard,
+      kings: Bitboard
+  ): Board =
+    Board(occupied, ByColor(white, black), ByRole(pawns, knights, bishops, rooks, queens, kings))
+
   def fromMap(pieces: PieceMap): Board =
     var pawns    = Bitboard.empty
     var knights  = Bitboard.empty

@@ -6,7 +6,7 @@ import variant.{ Standard, Variant }
 import cats.kernel.Monoid
 import ornicar.scalalib.zeros.given
 import bitboard.Bitboard
-import bitboard.Bitboard.squares
+import bitboard.Board as BBoard
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *
@@ -126,8 +126,8 @@ trait FenReader:
       case word => word -> None
     if pockets.isDefined && !variant.crazyhouse then None
     else
-      makePiecesWithCrazyPromoted(position.toList, 0, 7) map { (pieces, promoted) =>
-        val board = Board(pieces, variant = variant)
+      parseBoard(position) map { (bboard, promoted) =>
+        val board = Board(bboard, variant)
         if promoted.isEmpty then board else board.withCrazyData(_.copy(promoted = promoted))
       } map { board =>
         pockets.fold(board) { str =>
@@ -144,24 +144,71 @@ trait FenReader:
         }
       }
 
-  private def makePiecesWithCrazyPromoted(
-      chars: List[Char],
-      x: Int,
-      y: Int
-  ): Option[(List[(Square, Piece)], Bitboard)] =
-    chars match
-      case Nil                               => Option((Nil, Bitboard.empty))
-      case '/' :: rest                       => makePiecesWithCrazyPromoted(rest, 0, y - 1)
-      case c :: rest if '1' <= c && c <= '8' => makePiecesWithCrazyPromoted(rest, x + (c - '0').toInt, y)
-      case c :: '~' :: rest =>
-        for
-          square                     <- Square.at(x, y)
-          piece                      <- Piece.fromChar(c)
-          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
-        yield (square -> piece :: nextPieces, nextPromoted.add(square))
-      case c :: rest =>
-        for
-          square                     <- Square.at(x, y)
-          piece                      <- Piece.fromChar(c)
-          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
-        yield (square -> piece :: nextPieces, nextPromoted)
+  def parseBoard(boardFen: String): Option[(BBoard, Bitboard)] =
+    var promoted = Bitboard.empty
+
+    var pawns    = Bitboard.empty
+    var knights  = Bitboard.empty
+    var bishops  = Bitboard.empty
+    var rooks    = Bitboard.empty
+    var queens   = Bitboard.empty
+    var kings    = Bitboard.empty
+    var white    = Bitboard.empty
+    var black    = Bitboard.empty
+    var occupied = Bitboard.empty
+
+    def addPieceAt(p: Piece, s: Square) =
+      val position = s.bb
+      occupied |= position
+      p.role match
+        case Pawn   => pawns |= position
+        case Knight => knights |= position
+        case Bishop => bishops |= position
+        case Rook   => rooks |= position
+        case Queen  => queens |= position
+        case King   => kings |= position
+
+      p.color match
+        case Color.White => white |= position
+        case Color.Black => black |= position
+
+    var rank  = 7
+    var file  = 0
+    val iter  = boardFen.iterator.buffered
+    var error = false
+    while iter.hasNext && !error
+    do
+      iter.next match
+        case '/' if file == 8 =>
+          file = 0
+          rank -= 1
+          if rank < 0 then error = true
+        case ch if '1' to '8' contains ch =>
+          file += (ch - '0')
+          if file > 8 then error = true
+        case ch =>
+          // println(s"do $ch $file $rank")
+          (Piece.fromChar(ch), Square.at(file, rank)).tupled.match
+            case Some((p, s)) =>
+              addPieceAt(p, s)
+              if iter.headOption == Some('~') then
+                promoted |= s.bl
+                iter.next
+            case None => error = true
+          file += 1
+    if error then None
+    else
+      Some(
+        BBoard(
+          occupied = occupied,
+          white = white,
+          black = black,
+          pawns = pawns,
+          knights = knights,
+          bishops = bishops,
+          rooks = rooks,
+          queens = queens,
+          kings = kings
+        ),
+        promoted
+      )

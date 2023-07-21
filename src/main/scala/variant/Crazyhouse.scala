@@ -236,7 +236,7 @@ case object Crazyhouse
     val empty = Pocket(0, 0, 0, 0, 0)
 
     def apply(roles: Seq[Role]): Pocket =
-      var pawn  = 0
+      var pawn   = 0
       var knight = 0
       var bishop = 0
       var rook   = 0

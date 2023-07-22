@@ -127,6 +127,15 @@ object Bitboard:
         b &= (b - 1L)
       result
 
+    def find(f: Square => Boolean): Option[Square] =
+      var b                      = a
+      var result: Option[Square] = None
+      while b != 0L && result.isEmpty
+      do
+        if f(b.lsb) then result = Some(b.lsb)
+        b &= (b - 1L)
+      result
+
     def fold[B](init: B)(f: (B, Square) => B): B =
       var b      = a
       var result = init

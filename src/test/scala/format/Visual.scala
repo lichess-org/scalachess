@@ -1,6 +1,10 @@
 package chess
 package format
 
+import chess.bitboard.Board as BBoard
+import chess.variant.Variant
+import chess.variant.Crazyhouse
+
 /** r bqkb r
   * p ppp pp
   * pr
@@ -18,7 +22,7 @@ object Visual:
       case 8          => lines
       case n if n > 8 => lines.slice(1, 9)
       case n          => (List.fill(8 - n)("")) ::: lines
-    val b = Board(
+    val b = createBoard(
       pieces = (for
         (l, y) <- (filtered zipWithIndex)
         (c, x) <- (l zipWithIndex)
@@ -46,3 +50,13 @@ object Visual:
   } map { """\s*$""".r.replaceFirstIn(_, "") } mkString "\n"
 
   def addNewLines(str: String) = "\n" + str + "\n"
+
+  def createBoard(pieces: Iterable[(Square, Piece)], variant: Variant): Board =
+    val board        = BBoard.fromMap(pieces.toMap)
+    val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
+    Board(
+      board,
+      History(castles = variant.castles, unmovedRooks = unmovedRooks),
+      variant,
+      variant.crazyhouse option Crazyhouse.Data.init
+    )

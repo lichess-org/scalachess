@@ -2,7 +2,6 @@ package chess
 package format
 
 import cats.syntax.all.*
-import ornicar.scalalib.zeros.given
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *
@@ -21,16 +20,23 @@ trait FenWriter:
     write(Game(parsed.situation, ply = parsed.ply))
 
   def write(game: Game): EpdFen = EpdFen:
-    {
-      List[String](
-        s"${writeBoard(game.board)}${writeCrazyPocket(game.board)}",
-        game.player.letter.toString,
-        writeCastles(game.board),
-        game.situation.enPassantSquare.fold("-")(_.key),
-        game.halfMoveClock.toString,
-        game.fullMoveNumber.toString
-      ) ::: (game.board.variant == variant.ThreeCheck).so(List(writeCheckCount(game.board)))
-    } mkString " "
+    val builder = scala.collection.mutable.StringBuilder(80)
+    builder.append(writeBoard(game.board))
+    builder.append(writeCrazyPocket(game.board))
+    builder.addOne(' ')
+    builder.addOne(game.player.letter)
+    builder.addOne(' ')
+    builder.append(writeCastles(game.board))
+    builder.addOne(' ')
+    builder.append(game.situation.enPassantSquare.fold("-")(_.key))
+    builder.addOne(' ')
+    builder.append(game.halfMoveClock)
+    builder.addOne(' ')
+    builder.append(game.fullMoveNumber)
+    if game.board.variant == variant.ThreeCheck then
+      builder.addOne(' ')
+      builder.append(writeCheckCount(game.board))
+    builder.toString
 
   def writeOpening(situation: Situation): OpeningFen = OpeningFen:
     s"${writeBoard(situation.board)} ${situation.color.letter} ${writeCastles(situation.board)} ${situation.enPassantSquare

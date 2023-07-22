@@ -3,10 +3,11 @@ package format
 
 import cats.syntax.all.*
 import variant.{ Standard, Variant }
+import variant.Crazyhouse.Pockets
 import cats.kernel.Monoid
 import ornicar.scalalib.zeros.given
 import bitboard.Bitboard
-import bitboard.Bitboard.squares
+import bitboard.Board as BBoard
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *
@@ -16,36 +17,36 @@ import bitboard.Bitboard.squares
   */
 trait FenReader:
   def read(variant: Variant, fen: EpdFen): Option[Situation] =
-    makeBoard(variant, fen) map { board =>
-      // if a king is in check then we know whose turn it is to play, and we can ignore the manual turn flag.
-      // Except in atomic where it's ok to be in check
-      val situation = Situation(board, if variant.atomic then fen.color else board.checkColor | fen.color)
+    val (fBoard, fColor, fCastling, fEnpassant) = fen.parts
+    makeBoard(variant, fBoard) map { board =>
+      // We trust Fen's color to be correct, if there is no color we use the color of the king in check
+      // If there is no king in check we use white
+      val color     = fColor.orElse(board.checkColor) | Color.White
+      val situation = Situation(board, color)
       // todo verify unmovedRooks vs board.rooks
       val (castles, unmovedRooks) =
         if !variant.allowsCastling then (Castles.none -> UnmovedRooks.none)
         else
-          fen.castling
-            .foldLeft(Castles.none -> UnmovedRooks.none) { case ((c, r), ch) =>
+          fCastling.foldLeft(Castles.none -> UnmovedRooks.none):
+            case ((c, r), ch) =>
               val color    = Color.fromWhite(ch.isUpper)
               val backRank = Bitboard.rank(color.backRank)
-              val rooks = (board.rooks & board(color) & backRank).squares
-                .sortBy(_.file.value)
+              val rooks    = board.rooks & board(color) & backRank
               {
                 for
                   kingSquare <- (board.kingOf(color) & backRank).first
                   rookSquare <- ch.toLower match
-                    case 'k'  => rooks.reverse.find(_ ?> kingSquare)
+                    case 'k'  => rooks.find(_ ?> kingSquare)
                     case 'q'  => rooks.find(_ ?< kingSquare)
                     case file => rooks.find(_.file.char == file)
                   side <- Side.kingRookSide(kingSquare, rookSquare)
                 yield (c.add(color, side), r | rookSquare.bl)
-              }.getOrElse((c, r))
-            }
+              }.getOrElse(c -> r)
 
       import situation.color.{ fifthRank, sixthRank, seventhRank }
 
       val enpassantMove = for
-        square <- fen.enpassant
+        square <- fEnpassant
         if square.rank == sixthRank
         orig = square withRank seventhRank
         dest = square withRank fifthRank
@@ -62,7 +63,7 @@ trait FenReader:
           unmovedRooks = unmovedRooks
         )
         val checkCount = variant.threeCheck.so:
-          val splitted = fen.value split ' '
+          val splitted = fen.value.split(' ')
           splitted
             .lift(4)
             .flatMap(readCheckCount)
@@ -97,7 +98,7 @@ trait FenReader:
 
   def readPly(fen: EpdFen): Option[Ply] =
     val (_, fullMoveNumber) = readHalfMoveClockAndFullMoveNumber(fen)
-    fullMoveNumber.map(_.ply(fen.color))
+    fullMoveNumber.map(_.ply(fen.colorOrWhite))
 
   private def readCheckCount(str: String): Option[CheckCount] =
     str.toList match
@@ -114,8 +115,8 @@ trait FenReader:
       case _ => None
 
   // only cares about pieces positions on the board (first part of FEN string)
-  def makeBoard(variant: Variant, fen: EpdFen): Option[Board] =
-    val (position, pockets) = fen.value.takeWhile(' ' !=) match
+  def makeBoard(variant: Variant, fen: String): Option[Board] =
+    val (position, pockets) = fen.takeWhile(' ' !=) match
       case word if word.count('/' ==) == 8 =>
         val splitted = word.split('/')
         splitted.take(8).mkString("/") -> splitted.lift(8)
@@ -125,42 +126,75 @@ trait FenReader:
       case word => word -> None
     if pockets.isDefined && !variant.crazyhouse then None
     else
-      makePiecesWithCrazyPromoted(position.toList, 0, 7) map { (pieces, promoted) =>
-        val board = Board(pieces, variant = variant)
-        if promoted.isEmpty then board else board.withCrazyData(_.copy(promoted = promoted))
-      } map { board =>
-        pockets.fold(board) { str =>
-          import chess.variant.Crazyhouse.Pocket
-          val (white, black) = str.toList.flatMap(Piece.fromChar).partition(_ is White)
-          board.withCrazyData(
-            _.copy(
-              pockets = ByColor(
-                white = Pocket(white.map(_.role)),
-                black = Pocket(black.map(_.role))
-              )
-            )
-          )
-        }
-      }
+      makeBoardWithCrazyPromoted(position, variant).map: board =>
+        pockets.fold(board): str =>
+          board.withCrazyData(_.copy(pockets = Pockets(str.flatMap(Piece.fromChar))))
 
-  private def makePiecesWithCrazyPromoted(
-      chars: List[Char],
-      x: Int,
-      y: Int
-  ): Option[(List[(Square, Piece)], Bitboard)] =
-    chars match
-      case Nil                               => Option((Nil, Bitboard.empty))
-      case '/' :: rest                       => makePiecesWithCrazyPromoted(rest, 0, y - 1)
-      case c :: rest if '1' <= c && c <= '8' => makePiecesWithCrazyPromoted(rest, x + (c - '0').toInt, y)
-      case c :: '~' :: rest =>
-        for
-          square                     <- Square.at(x, y)
-          piece                      <- Piece.fromChar(c)
-          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
-        yield (square -> piece :: nextPieces, nextPromoted.add(square))
-      case c :: rest =>
-        for
-          square                     <- Square.at(x, y)
-          piece                      <- Piece.fromChar(c)
-          (nextPieces, nextPromoted) <- makePiecesWithCrazyPromoted(rest, x + 1, y)
-        yield (square -> piece :: nextPieces, nextPromoted)
+  private val numberSet = Set.from('1' to '8')
+  def makeBoardWithCrazyPromoted(boardFen: String, variant: Variant): Option[Board] =
+    var promoted = Bitboard.empty
+    var pawns    = Bitboard.empty
+    var knights  = Bitboard.empty
+    var bishops  = Bitboard.empty
+    var rooks    = Bitboard.empty
+    var queens   = Bitboard.empty
+    var kings    = Bitboard.empty
+    var white    = Bitboard.empty
+    var black    = Bitboard.empty
+    var occupied = Bitboard.empty
+
+    inline def addPieceAt(p: Piece, s: Long) =
+      occupied |= s
+      p.role match
+        case Pawn   => pawns |= s
+        case Knight => knights |= s
+        case Bishop => bishops |= s
+        case Rook   => rooks |= s
+        case Queen  => queens |= s
+        case King   => kings |= s
+
+      p.color match
+        case Color.White => white |= s
+        case Color.Black => black |= s
+
+    var rank  = 7
+    var file  = 0
+    val iter  = boardFen.iterator.buffered
+    var error = false
+    while iter.hasNext && !error
+    do
+      iter.next match
+        case '/' if file == 8 =>
+          file = 0
+          rank -= 1
+          if rank < 0 then error = true
+        case ch if numberSet.contains(ch) =>
+          file += (ch - '0')
+          if file > 8 then error = true
+        case ch =>
+          Piece
+            .fromChar(ch)
+            .match
+              case Some(p) =>
+                val square = 1L << (file + 8 * rank)
+                addPieceAt(p, square)
+                if iter.headOption == Some('~') then
+                  promoted |= square
+                  iter.next
+              case None => error = true
+          file += 1
+    if error then None
+    else
+      val bboard = BBoard(
+        occupied = occupied,
+        white = white,
+        black = black,
+        pawns = pawns,
+        knights = knights,
+        bishops = bishops,
+        rooks = rooks,
+        queens = queens,
+        kings = kings
+      )
+      val board = Board(bboard, variant)
+      if promoted.isEmpty then board.some else board.withCrazyData(_.copy(promoted = promoted)).some

@@ -134,6 +134,7 @@ case object Crazyhouse
         yield Drop(piece, to, situation, after withCrazyData d2)
 
   type Pockets = ByColor[Pocket]
+
   case class Data(
       pockets: Pockets,
       // in crazyhouse, a promoted piece becomes a pawn
@@ -233,5 +234,47 @@ case object Crazyhouse
 
   object Pocket:
     val empty = Pocket(0, 0, 0, 0, 0)
-    def apply(roles: List[Role]): Pocket =
-      roles.foldLeft(empty)(_ store _)
+
+    def apply(roles: Seq[Role]): Pocket =
+      var pawn   = 0
+      var knight = 0
+      var bishop = 0
+      var rook   = 0
+      var queen  = 0
+      roles.foreach:
+        case Pawn   => pawn += 1
+        case Knight => knight += 1
+        case Bishop => bishop += 1
+        case Rook   => rook += 1
+        case Queen  => queen += 1
+        case King   =>
+      Pocket(pawn, knight, bishop, rook, queen)
+
+  object Pockets:
+    inline def apply(pieces: Seq[Piece]): Pockets =
+      var whitePawn   = 0
+      var whiteKnight = 0
+      var whiteBishop = 0
+      var whiteRook   = 0
+      var whiteQueen  = 0
+      var blackPawn   = 0
+      var blackKnight = 0
+      var blackBishop = 0
+      var blackRook   = 0
+      var blackQueen  = 0
+      pieces.foreach:
+        case Piece(White, Pawn)   => whitePawn += 1
+        case Piece(White, Knight) => whiteKnight += 1
+        case Piece(White, Bishop) => whiteBishop += 1
+        case Piece(White, Rook)   => whiteRook += 1
+        case Piece(White, Queen)  => whiteQueen += 1
+        case Piece(Black, Pawn)   => blackPawn += 1
+        case Piece(Black, Knight) => blackKnight += 1
+        case Piece(Black, Bishop) => blackBishop += 1
+        case Piece(Black, Rook)   => blackRook += 1
+        case Piece(Black, Queen)  => blackQueen += 1
+        case Piece(_, King)       =>
+      ByColor(
+        Pocket(whitePawn, whiteKnight, whiteBishop, whiteRook, whiteQueen),
+        Pocket(blackPawn, blackKnight, blackBishop, blackRook, blackQueen)
+      )

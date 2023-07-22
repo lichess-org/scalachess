@@ -11,12 +11,13 @@ object Fen extends FenReader with FenWriter:
 // r1bqkbnr/pppp1Qpp/2n5/4p3/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 2+3 0 3 (winboards 3check)
 opaque type EpdFen = String
 object EpdFen extends OpaqueString[EpdFen]:
+
   extension (a: EpdFen)
     def parts: (String, Option[Color], String, Option[Square]) =
       val parts = a.split(' ')
       (
         a.takeWhile(_ != ' '),
-        parts.lift(1).flatMap(_.headOption).flatMap(Color.apply),
+        getColor(parts),
         parts.lift(2).getOrElse("-"),
         parts.lift(3).flatMap(Square.fromKey(_))
       )
@@ -30,6 +31,10 @@ object EpdFen extends OpaqueString[EpdFen]:
 
   val initial: EpdFen               = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
   def clean(source: String): EpdFen = EpdFen(source.replace("_", " ").trim)
+  def getColor(arr: Array[String]): Option[Color] =
+    if arr.length < 2 then None
+    else if arr(1).size != 1 then None
+    else Color(arr(1).head)
 
 // a.k.a. just FEN.
 // r3k2r/p3n1pp/2q2p2/4n1B1/5Q2/5P2/PP3P1P/R4RK1 b kq -

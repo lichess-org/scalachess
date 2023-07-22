@@ -19,8 +19,8 @@ trait FenReader:
   def read(variant: Variant, fen: EpdFen): Option[Situation] =
     val (fBoard, fColor, fCastling, fEnpassant) = fen.parts
     makeBoard(variant, fBoard) map { board =>
-      // if a king is in check then we know whose turn it is to play, and we can ignore the manual turn flag.
-      // Except in atomic where it's ok to be in check
+      // We trust Fen's color to be correct, if there is no color we use the color of the king in check
+      // If there is no king in check we use white
       val color     = fColor.orElse(board.checkColor) | Color.White
       val situation = Situation(board, color)
       // todo verify unmovedRooks vs board.rooks

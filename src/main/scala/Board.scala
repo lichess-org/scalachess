@@ -150,7 +150,23 @@ case class Board(
 
 object Board:
 
+  def apply(pieces: PieceMap, history: History, variant: Variant, crazyData: Option[Crazyhouse.Data]): Board =
+    Board(BBoard.fromMap(pieces), history, variant, crazyData)
+
   def apply(board: BBoard, variant: Variant): Board =
+    val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
+    Board(
+      board,
+      History(castles = variant.castles, unmovedRooks = unmovedRooks),
+      variant,
+      variant.crazyhouse option Crazyhouse.Data.init
+    )
+
+  def apply(pieces: Iterable[(Square, Piece)], variant: Variant): Board =
+    Board(pieces, variant.castles, variant)
+
+  def apply(pieces: Iterable[(Square, Piece)], castles: Castles, variant: Variant): Board =
+    val board        = BBoard.fromMap(pieces.toMap)
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Board(
       board,

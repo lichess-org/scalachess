@@ -21,6 +21,8 @@ case object ThreeCheck
   def validMoves(situation: Situation): List[Move] =
     Standard.validMoves(situation)
 
+  override def valid(situation: Situation, strict: Boolean) = Standard.valid(situation, strict)
+
   override def finalizeBoard(board: Board, uci: format.Uci, capture: Option[Piece]): Board =
     board updateHistory:
       _.withCheck(Color.White, board.checkWhite).withCheck(Color.Black, board.checkBlack)

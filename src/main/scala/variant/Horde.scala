@@ -65,8 +65,6 @@ case object Horde
         legalMoves.filter(_.piece.role == King).forall(move => validMoves(move.situationAfter).isEmpty)
     }
 
-  override protected def hasValidCheckers(situation: Situation): Boolean = true
-
   /** In horde chess, black can win unless a fortress stalemate is unavoidable.
     *  Auto-drawing the game should almost never happen, but it did in https://lichess.org/xQ2RsU8N#121
     */

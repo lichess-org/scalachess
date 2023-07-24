@@ -54,36 +54,4 @@ case object Standard
     safeKings ++ blockers
 
   override def valid(situation: Situation, strict: Boolean): Boolean =
-    super.valid(situation, strict) && (!strict || hasValidCheckers(situation))
-
-  private def hasValidCheckers(situation: Situation): Boolean =
-    situation.checkers.isEmpty || {
-      isValidChecksForMultipleCheckers(situation, situation.checkers) &&
-      isValidCheckersForEnPassant(situation, situation.checkers)
-    }
-
-  private def isValidCheckersForEnPassant(situation: Situation, activeCheckers: Bitboard): Boolean =
-    (for
-      enPassantSquare <- situation.potentialEpSquare
-      enPassantUp     <- situation.color.fold(enPassantSquare.down, enPassantSquare.up)
-      enPassantDown   <- situation.color.fold(enPassantSquare.up, enPassantSquare.down)
-      ourKing         <- situation.ourKing
-    yield activeCheckers.count == 1 && (
-      activeCheckers.first.contains(enPassantSquare) || situation.board
-        .move(enPassantUp, enPassantDown)
-        .exists(previousBoard =>
-          situation.ourKing.exists(previousBoard.attackers(_, !situation.color).isEmpty)
-        )
-    )).getOrElse(true)
-
-  private def isValidChecksForMultipleCheckers(situation: Situation, activeCheckers: Bitboard): Boolean =
-    val checkerCount = activeCheckers.count
-    if checkerCount <= 1 then true
-    else if checkerCount >= 3 then false
-    else
-      (for
-        firstChecker <- activeCheckers.first
-        lastChecker  <- activeCheckers.last
-        ourKing      <- situation.ourKing
-      yield !Bitboard.aligned(firstChecker, lastChecker, ourKing))
-        .getOrElse(false)
+    super.valid(situation, strict)

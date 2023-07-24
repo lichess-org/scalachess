@@ -25,6 +25,8 @@ case object Atomic
     val moves   = genNonKing(targets) ++ genKing(situation, targets) ++ genEnPassant(us & board.pawns)
     applyVariantEffect(moves).filter(kingSafety)
 
+  override protected def hasValidCheckers(situation: Situation): Boolean = true
+
   private def genKing(situation: Situation, mask: Bitboard) =
     import situation.{ genUnsafeKing, genCastling }
     situation.ourKing.fold(Nil) { king =>

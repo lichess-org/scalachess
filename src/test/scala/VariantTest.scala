@@ -10,71 +10,7 @@ class VariantTest extends ChessTest:
 
   val board = makeBoard
 
-  "standard" should:
-
-    "position pieces correctly" in:
-      Standard.pieces must havePairs(
-        A1 -> (White - Rook),
-        B1 -> (White - Knight),
-        C1 -> (White - Bishop),
-        D1 -> (White - Queen),
-        E1 -> (White - King),
-        F1 -> (White - Bishop),
-        G1 -> (White - Knight),
-        H1 -> (White - Rook),
-        A2 -> (White - Pawn),
-        B2 -> (White - Pawn),
-        C2 -> (White - Pawn),
-        D2 -> (White - Pawn),
-        E2 -> (White - Pawn),
-        F2 -> (White - Pawn),
-        G2 -> (White - Pawn),
-        H2 -> (White - Pawn),
-        A7 -> (Black - Pawn),
-        B7 -> (Black - Pawn),
-        C7 -> (Black - Pawn),
-        D7 -> (Black - Pawn),
-        E7 -> (Black - Pawn),
-        F7 -> (Black - Pawn),
-        G7 -> (Black - Pawn),
-        H7 -> (Black - Pawn),
-        A8 -> (Black - Rook),
-        B8 -> (Black - Knight),
-        C8 -> (Black - Bishop),
-        D8 -> (Black - Queen),
-        E8 -> (Black - King),
-        F8 -> (Black - Bishop),
-        G8 -> (Black - Knight),
-        H8 -> (Black - Rook)
-      )
-
-    "Identify insufficient mating material when called (bishop)." in:
-      val position = EpdFen("krq5/bqqq4/qqr5/1qq5/8/8/8/3qB2K b - -")
-      val game     = fenToGame(position, Standard)
-
-      game should beRight.like { case game =>
-        game.board.materialImbalance must_== -91
-        game.situation.opponentHasInsufficientMaterial must beTrue
-      }
-
-    "Identify sufficient mating material when called (bishop)." in:
-      val position = EpdFen("8/7B/K7/2b5/1k6/8/8/8 b - -")
-      val game     = fenToGame(position, Standard)
-
-      game should beRight.like { case game =>
-        game.board.materialImbalance must_== 0
-        game.situation.opponentHasInsufficientMaterial must beFalse
-      }
-
-    "Identify insufficient mating material when called (knight)." in:
-      val position = EpdFen("8/3k4/2q5/8/8/K1N5/8/8 b - -")
-      val game     = fenToGame(position, Standard)
-
-      game should beRight.like { case game =>
-        game.board.materialImbalance must_== -6
-        game.situation.opponentHasInsufficientMaterial must beTrue
-      }
-
+  "variants" should:
     "validate situation correctly" in:
       Fragment.foreach(List(Standard, Chess960, ThreeCheck, KingOfTheHill)) { variant =>
 
@@ -144,6 +80,71 @@ class VariantTest extends ChessTest:
             .get
           game.variant.valid(game, true) must beTrue
           game.variant.valid(game, false) must beTrue
+      }
+
+  "standard" should:
+
+    "position pieces correctly" in:
+      Standard.pieces must havePairs(
+        A1 -> (White - Rook),
+        B1 -> (White - Knight),
+        C1 -> (White - Bishop),
+        D1 -> (White - Queen),
+        E1 -> (White - King),
+        F1 -> (White - Bishop),
+        G1 -> (White - Knight),
+        H1 -> (White - Rook),
+        A2 -> (White - Pawn),
+        B2 -> (White - Pawn),
+        C2 -> (White - Pawn),
+        D2 -> (White - Pawn),
+        E2 -> (White - Pawn),
+        F2 -> (White - Pawn),
+        G2 -> (White - Pawn),
+        H2 -> (White - Pawn),
+        A7 -> (Black - Pawn),
+        B7 -> (Black - Pawn),
+        C7 -> (Black - Pawn),
+        D7 -> (Black - Pawn),
+        E7 -> (Black - Pawn),
+        F7 -> (Black - Pawn),
+        G7 -> (Black - Pawn),
+        H7 -> (Black - Pawn),
+        A8 -> (Black - Rook),
+        B8 -> (Black - Knight),
+        C8 -> (Black - Bishop),
+        D8 -> (Black - Queen),
+        E8 -> (Black - King),
+        F8 -> (Black - Bishop),
+        G8 -> (Black - Knight),
+        H8 -> (Black - Rook)
+      )
+
+    "Identify insufficient mating material when called (bishop)." in:
+      val position = EpdFen("krq5/bqqq4/qqr5/1qq5/8/8/8/3qB2K b - -")
+      val game     = fenToGame(position, Standard)
+
+      game should beRight.like { case game =>
+        game.board.materialImbalance must_== -91
+        game.situation.opponentHasInsufficientMaterial must beTrue
+      }
+
+    "Identify sufficient mating material when called (bishop)." in:
+      val position = EpdFen("8/7B/K7/2b5/1k6/8/8/8 b - -")
+      val game     = fenToGame(position, Standard)
+
+      game should beRight.like { case game =>
+        game.board.materialImbalance must_== 0
+        game.situation.opponentHasInsufficientMaterial must beFalse
+      }
+
+    "Identify insufficient mating material when called (knight)." in:
+      val position = EpdFen("8/3k4/2q5/8/8/K1N5/8/8 b - -")
+      val game     = fenToGame(position, Standard)
+
+      game should beRight.like { case game =>
+        game.board.materialImbalance must_== -6
+        game.situation.opponentHasInsufficientMaterial must beTrue
       }
 
   "chess960" should:
@@ -361,3 +362,17 @@ K  r
   "horde" should:
     "initialize the board with black castling rights" in:
       Board.init(Horde).history.castles must_== Castles("kq")
+
+  "racing kind" should:
+    "validate situation correctly" in:
+      "with any check at all for white" in:
+        val position = EpdFen("8/8/8/k5R1/8/8/1rbnNB1K/qrbnNBRQ b - - 0 1")
+        val game     = fenToGame(position, RacingKings).toOption.get
+        game.situation.playable(true) must beFalse
+        game.situation.playable(false) must beTrue
+
+      "with any check at all for black" in:
+        val position = EpdFen("8/8/8/k7/7r/8/2bnNBRK/qrbnNBRQ w - - 0 1")
+        val game     = fenToGame(position, RacingKings).toOption.get
+        game.situation.playable(true) must beFalse
+        game.situation.playable(false) must beTrue

@@ -1,17 +1,16 @@
 package chess
 
-import cats.Monoid
 import Castles.*
 
 opaque type PositionHash = Array[Byte]
 object PositionHash:
   def apply(value: Array[Byte]): PositionHash = value
-  given Monoid[PositionHash] with
-    def combine(p1: PositionHash, p2: PositionHash) = p1 ++ p2
-    val empty                                       = Array.empty
+  val empty: PositionHash                     = Array.empty
 
   extension (p: PositionHash)
-    def value: Array[Byte] = p
+    def value: Array[Byte]                                = p
+    inline def isEmpty: Boolean                           = p.length == 0
+    inline def combine(other: PositionHash): PositionHash = p ++ other
     def isRepetition(times: Int) =
       if times <= 1 then true
       else if p.length <= (times - 1) * 4 * Hash.size then false

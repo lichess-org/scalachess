@@ -1,8 +1,7 @@
 package chess
 
 import chess.format.Uci
-import cats.syntax.option.*
-import cats.Monoid
+import cats.syntax.all.*
 
 case class Move(
     piece: Piece,
@@ -86,13 +85,11 @@ case class Move(
     // castling rights and en-passant rights.
     board updateHistory { h =>
       lazy val positionHashesOfSituationBefore =
-        if h.positionHashes.value.isEmpty then Hash(situationBefore) else h.positionHashes
+        if h.positionHashes.isEmpty then Hash(situationBefore) else h.positionHashes
       val resetsPositionHashes = board.variant.isIrreversible(this)
       val basePositionHashes =
-        if resetsPositionHashes then Monoid[PositionHash].empty else positionHashesOfSituationBefore
-      h.copy(positionHashes =
-        Monoid[PositionHash].combine(Hash(Situation(board, !piece.color)), basePositionHashes)
-      )
+        if resetsPositionHashes then PositionHash.empty else positionHashesOfSituationBefore
+      h.copy(positionHashes = Hash(Situation(board, !piece.color)).combine(basePositionHashes))
     }
 
   def applyVariantEffect: Move = before.variant addVariantEffect this

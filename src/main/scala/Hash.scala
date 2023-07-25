@@ -10,7 +10,23 @@ object PositionHash:
     def combine(p1: PositionHash, p2: PositionHash) = p1 ++ p2
     val empty                                       = Array.empty
 
-  extension (p: PositionHash) def value: Array[Byte] = p
+  extension (p: PositionHash)
+    def value: Array[Byte] = p
+    def isRepetition(times: Int) =
+      if times <= 1 then true
+      else if p.length <= (times - 1) * 4 * Hash.size then false
+      else
+        // compare only hashes for positions with the same side to move
+        var i     = Hash.size * 2
+        var count = 0
+        val x     = p(0)
+        val y     = p(1)
+        val z     = p(2)
+        while i <= p.length - Hash.size && count < times - 1
+        do
+          if x == p(i) && y == p(i + 1) && z == p(i + 2) then count += 1
+          i += Hash.size * 2
+        count == times - 1
 
 opaque type Hash = Int
 object Hash:

@@ -27,22 +27,22 @@ case class History(
 
   def setHalfMoveClock(v: HalfMoveClock) = copy(halfMoveClock = v)
 
-  private def isRepetition(times: Int) =
-    positionHashes.value.length > (times - 1) * 4 * Hash.size && {
-      // compare only hashes for positions with the same side to move
-      val positions = positionHashes.value.sliding(Hash.size, 2 * Hash.size).toList
-      positions.headOption match
-        case Some(Array(x, y, z)) =>
-          (positions count {
-            case Array(x2, y2, z2) => x == x2 && y == y2 && z == z2
-            case _                 => false
-          }) >= times
-        case _ => times <= 1
-    }
+  // private def isRepetition(times: Int) =
+  //   positionHashes.value.length > (times - 1) * 4 * Hash.size && {
+  //     // compare only hashes for positions with the same side to move
+  //     val positions = positionHashes.value.sliding(Hash.size, 2 * Hash.size).toList
+  //     positions.headOption match
+  //       case Some(Array(x, y, z)) =>
+  //         (positions count {
+  //           case Array(x2, y2, z2) => x == x2 && y == y2 && z == z2
+  //           case _                 => false
+  //         }) >= times
+  //       case _ => times <= 1
+  //   }
 
-  inline def threefoldRepetition = isRepetition(3)
+  inline def threefoldRepetition = positionHashes.isRepetition(3)
 
-  inline def fivefoldRepetition = isRepetition(5)
+  inline def fivefoldRepetition = positionHashes.isRepetition(5)
 
   inline def canCastle(inline color: Color)                    = castles can color
   inline def canCastle(inline color: Color, inline side: Side) = castles.can(color, side)

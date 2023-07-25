@@ -17,6 +17,8 @@ case object KingOfTheHill
   def validMoves(situation: Situation): List[Move] =
     Standard.validMoves(situation)
 
+  override def valid(situation: Situation, strict: Boolean) = Standard.valid(situation, strict)
+
   // E4, D4, E5, D5
   private val center = 0x1818000000L
 

@@ -17,6 +17,8 @@ case object Chess960
   def validMoves(situation: Situation): List[Move] =
     Standard.validMoves(situation)
 
+  override def valid(situation: Situation, strict: Boolean) = Standard.valid(situation, strict)
+
   def pieces = pieces(scala.util.Random.nextInt(960))
 
   def pieces(position: Int) =

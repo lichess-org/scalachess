@@ -64,7 +64,7 @@ case class History(
 
   override def toString =
     val positions = (positionHashes.value grouped Hash.size).toList
-    s"${lastMove.fold("-")(_.uci)} ${PositionHash.from(positions).map(Hash.debug).mkString(" ")}"
+    s"${lastMove.fold("-")(_.uci)} ${positions.map(PositionHash.apply).map(Hash.debug).mkString(" ")}"
 
 object History:
 

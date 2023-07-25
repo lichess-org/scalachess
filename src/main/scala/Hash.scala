@@ -4,13 +4,17 @@ import cats.Monoid
 import Castles.*
 
 opaque type PositionHash = Array[Byte]
-object PositionHash extends TotalWrapper[PositionHash, Array[Byte]]:
+object PositionHash:
+  def apply(value: Array[Byte]): PositionHash = value
   given Monoid[PositionHash] with
     def combine(p1: PositionHash, p2: PositionHash) = p1 ++ p2
     val empty                                       = Array.empty
 
+  extension (p: PositionHash) def value: Array[Byte] = p
+
 opaque type Hash = Int
-object Hash extends OpaqueInt[Hash]:
+object Hash:
+  def apply(value: Int): Hash = value
   extension (size: Hash)
     def apply(situation: Situation): PositionHash = PositionHash:
       val l = Hash.get(situation, Hash.polyglotTable)
@@ -28,6 +32,7 @@ object Hash extends OpaqueInt[Hash]:
     def hexToLong(s: String): Long =
       (java.lang.Long.parseLong(s.substring(start, start + 8), 16) << 32) |
         java.lang.Long.parseLong(s.substring(start + 8, start + 16), 16)
+
     val whiteTurnMask       = hexToLong(ZobristTables.whiteTurnMask)
     val actorMasks          = ZobristTables.actorMasks.map(hexToLong)
     val castlingMasks       = ZobristTables.castlingMasks.map(hexToLong)

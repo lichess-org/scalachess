@@ -9,7 +9,6 @@ import chess.format.{ EpdFen, Fen, Visual }
 import chess.format.pgn.PgnStr
 import chess.variant.Variant
 import bitboard.Board as BBoard
-import cats.kernel.Monoid
 import chess.format.Uci
 import chess.variant.Chess960
 
@@ -115,7 +114,7 @@ trait ChessTest extends Specification with EitherMatchers:
 
   def defaultHistory(
       lastMove: Option[Uci] = None,
-      positionHashes: PositionHash = Monoid[PositionHash].empty,
+      positionHashes: PositionHash = PositionHash.empty,
       castles: Castles = Castles.init,
       checkCount: CheckCount = CheckCount(0, 0),
       unmovedRooks: UnmovedRooks = UnmovedRooks.corners,

@@ -1,9 +1,7 @@
 package chess
 
 import cats.syntax.option.none
-
 import chess.format.Uci
-import cats.kernel.Monoid
 
 case class Drop(
     piece: Piece,
@@ -35,9 +33,7 @@ case class Drop(
     board updateHistory { h =>
       val basePositionHashes =
         if h.positionHashes.value.isEmpty then Hash(situationBefore) else h.positionHashes
-      h.copy(positionHashes =
-        Monoid[PositionHash].combine(Hash(Situation(board, !piece.color)), basePositionHashes)
-      )
+      h.copy(positionHashes = Hash(Situation(board, !piece.color)).combine(basePositionHashes))
     }
 
   def afterWithLastMove =

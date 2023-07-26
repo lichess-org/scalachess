@@ -1,16 +1,35 @@
 package chess
 
-import cats.Monoid
 import Castles.*
 
 opaque type PositionHash = Array[Byte]
-object PositionHash extends TotalWrapper[PositionHash, Array[Byte]]:
-  given Monoid[PositionHash] with
-    def combine(p1: PositionHash, p2: PositionHash) = p1 ++ p2
-    val empty                                       = Array.empty
+object PositionHash:
+  def apply(value: Array[Byte]): PositionHash = value
+  val empty: PositionHash                     = Array.empty
+
+  extension (p: PositionHash)
+    def value: Array[Byte]                                = p
+    inline def isEmpty: Boolean                           = p.length == 0
+    inline def combine(other: PositionHash): PositionHash = p ++ other
+    def isRepetition(times: Int) =
+      if times <= 1 then true
+      else if p.length <= (times - 1) * 4 * Hash.size then false
+      else
+        // compare only hashes for positions with the same side to move
+        var i     = Hash.size * 2
+        var count = 0
+        val x     = p(0)
+        val y     = p(1)
+        val z     = p(2)
+        while i <= p.length - Hash.size && count < times - 1
+        do
+          if x == p(i) && y == p(i + 1) && z == p(i + 2) then count += 1
+          i += Hash.size * 2
+        count == times - 1
 
 opaque type Hash = Int
-object Hash extends OpaqueInt[Hash]:
+object Hash:
+  def apply(value: Int): Hash = value
   extension (size: Hash)
     def apply(situation: Situation): PositionHash = PositionHash:
       val l = Hash.get(situation, Hash.polyglotTable)
@@ -28,6 +47,7 @@ object Hash extends OpaqueInt[Hash]:
     def hexToLong(s: String): Long =
       (java.lang.Long.parseLong(s.substring(start, start + 8), 16) << 32) |
         java.lang.Long.parseLong(s.substring(start + 8, start + 16), 16)
+
     val whiteTurnMask       = hexToLong(ZobristTables.whiteTurnMask)
     val actorMasks          = ZobristTables.actorMasks.map(hexToLong)
     val castlingMasks       = ZobristTables.castlingMasks.map(hexToLong)

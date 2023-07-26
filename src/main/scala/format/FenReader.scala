@@ -4,7 +4,6 @@ package format
 import cats.syntax.all.*
 import variant.{ Standard, Variant }
 import variant.Crazyhouse.Pockets
-import cats.kernel.Monoid
 import ornicar.scalalib.zeros.given
 import bitboard.Bitboard
 import bitboard.Board as BBoard
@@ -58,7 +57,7 @@ trait FenReader:
       situation withHistory:
         val history = History(
           lastMove = enpassantMove,
-          positionHashes = Monoid[PositionHash].empty,
+          positionHashes = PositionHash.empty,
           castles = castles,
           unmovedRooks = unmovedRooks
         )

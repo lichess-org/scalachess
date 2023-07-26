@@ -1,14 +1,12 @@
 package chess
 
-import cats.kernel.Monoid
-
 class HistoryTest extends ChessTest:
 
   "threefold repetition" should:
     def toHash(a: Int) = PositionHash(Array(a.toByte, 0.toByte, 0.toByte))
     def makeHistory(positions: List[Int]) =
       (positions map toHash).foldLeft(defaultHistory()) { (history, hash) =>
-        history.copy(positionHashes = Monoid[PositionHash].combine(hash, history.positionHashes))
+        history.copy(positionHashes = hash.combine(history.positionHashes))
       }
     "empty history" in:
       defaultHistory().threefoldRepetition must_== false

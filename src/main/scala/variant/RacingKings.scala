@@ -49,8 +49,7 @@ case object RacingKings
     val moves   = genNonKingAndNonPawn(targets) ++ genSafeKing(targets)
     moves.filter(kingSafety)
 
-  override def valid(situation: Situation, strict: Boolean): Boolean =
-    super.valid(situation, strict) && (!strict || situation.check.no)
+  def hasValidCheckers(strict: Boolean, situation: Situation): Boolean = (!strict || situation.check.no)
 
   override def isInsufficientMaterial(board: Board)                  = false
   override def opponentHasInsufficientMaterial(situation: Situation) = false

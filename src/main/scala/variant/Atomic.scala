@@ -25,6 +25,12 @@ case object Atomic
     val moves   = genNonKing(targets) ++ genKing(situation, targets) ++ genEnPassant(us & board.pawns)
     applyVariantEffect(moves).filter(kingSafety)
 
+  override def hasValidCheckers(strict: Boolean, situation: Situation): Boolean =
+    !strict || kingsAreOnAdjacentSquares(situation.board, situation.color) || Standard.hasValidCheckers(
+      strict,
+      situation
+    )
+
   private def genKing(situation: Situation, mask: Bitboard) =
     import situation.{ genUnsafeKing, genCastling }
     situation.ourKing.fold(Nil) { king =>
@@ -48,6 +54,12 @@ case object Atomic
     kingPosOf(color).exists { k =>
       k.kingAttacks.isDisjoint(kingOf(!color)) &&
       attackersWithoutKing(board, occupied, k, !color).nonEmpty
+    }
+
+  private def kingsAreOnAdjacentSquares(board: Board, color: Color): Boolean =
+    import board.{ kingPosOf, kingOf }
+    kingPosOf(color).exists { k =>
+      k.kingAttacks.intersects(kingOf(!color))
     }
 
   private def attackersWithoutKing(board: Board, occupied: Bitboard, s: Square, attacker: Color) =

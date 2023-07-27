@@ -54,10 +54,10 @@ case object Standard
     safeKings ++ blockers
 
   override def valid(situation: Situation, strict: Boolean): Boolean =
-    super.valid(situation, strict) && (!strict || hasValidCheckers(situation))
+    super.valid(situation, strict) && hasValidCheckers(strict, situation)
 
-  private def hasValidCheckers(situation: Situation): Boolean =
-    situation.checkers.isEmpty || {
+  override def hasValidCheckers(strict: Boolean, situation: Situation): Boolean =
+    !strict || situation.checkers.isEmpty || {
       isValidChecksForMultipleCheckers(situation, situation.checkers) &&
       isValidCheckersForEnPassant(situation, situation.checkers)
     }

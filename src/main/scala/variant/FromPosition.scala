@@ -16,3 +16,6 @@ case object FromPosition
 
   def validMoves(situation: Situation): List[Move] =
     Standard.validMoves(situation)
+
+  override def hasValidCheckers(strict: Boolean, situation: Situation): Boolean =
+    Standard.hasValidCheckers(strict, situation)

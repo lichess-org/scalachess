@@ -1,7 +1,6 @@
 package chess
 
 import cats.syntax.all.*
-
 import bitboard.Bitboard
 import Square.*
 
@@ -86,8 +85,10 @@ object Castles:
       blackKingSide.at(Black.kingSide) |
       blackQueenSide.at(Black.queenSide)
 
-  def apply(bb: Bitboard): Castles                       = bb.value
-  inline def apply(inline xs: Iterable[Square]): Castles = xs.foldLeft(none)((b, s) => b | s.bl)
+  def apply(l: Long): Castles = init & l
+
+  @targetName("applyBitboard")
+  def apply(bb: Bitboard): Castles = init & bb.value
 
   def apply(str: String): Castles = str match
     case "-" => none

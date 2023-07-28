@@ -9,15 +9,15 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
 
   def render: PgnStr = PgnStr:
     import PgnTree.*
-    val initStr =
-      if initial.comments.nonEmpty then initial.comments.mkString("{ ", " } { ", " }\n")
-      else ""
-    val movesStr  = tree.fold("")(_.render)
-    val resultStr = tags(_.Result) | ""
-    val endStr =
-      if movesStr.nonEmpty then s" $resultStr"
-      else resultStr
-    s"$tags\n\n$initStr$movesStr$endStr".trim
+    val builder = new StringBuilder
+
+    if tags.value.nonEmpty then builder.append(tags).addOne('\n').addOne('\n')
+    if initial.comments.nonEmpty then builder.append(initial.comments.mkString("{ ", " } { ", " }\n"))
+    tree.foreach(_.render(builder))
+    builder.addOne(' ')
+    builder.append(tags(_.Result) | "")
+
+    builder.toString.trim
 
   def updatePly(ply: Ply, f: Move => Move): Option[Pgn] =
     this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, _.updateValue(f)))
@@ -37,39 +37,47 @@ object PgnTree:
 
   extension (tree: PgnTree)
 
-    def _render: String =
-      val moveStr = tree.value.render
-      val varStr =
-        if tree.variations.isEmpty then ""
-        else tree.variations.map(x => s" (${x.render})").mkString
-      s"$moveStr$varStr"
+    def _render(builder: StringBuilder) =
+      tree.value.render(builder)
+      if tree.variations.nonEmpty then
+        tree.variations.foreach: x =>
+          builder.addOne(' ').addOne('(')
+          x.render(builder)
+          builder.addOne(')')
 
-    def render: String =
-      render(!tree.value.ply.turn.black)
+    def render(builder: StringBuilder): Unit =
+      render(builder, !tree.value.ply.turn.black)
 
-    def render(dot: Boolean): String =
-      val (d, number) = tree.prefix(dot)
-      val childStr    = tree.child.fold("")(x => s" ${x.render(d)}")
-      s"$number$_render$childStr"
+    def render(builder: StringBuilder, dot: Boolean): Unit =
+      val d = tree.prefix(dot, builder)
+      _render(builder)
+      tree.child.foreach: x =>
+        builder.addOne(' ')
+        x.render(builder, d)
 
   extension (v: Variation[Move])
-    def _render: String =
-      v.value.render
 
-    def render: String =
-      render(!v.value.ply.turn.black)
+    def render(builder: StringBuilder): Unit =
+      render(builder, !v.value.ply.turn.black)
 
-    def render(dot: Boolean): String =
-      val (d, number)       = v.prefix(dot)
-      val childStr          = v.child.fold("")(x => s" ${x.render(d)}")
-      val variationComments = Move.render(v.value.variationComments)
-      s"$variationComments$number$_render$childStr"
+    def render(builder: StringBuilder, dot: Boolean): Unit =
+      builder.append(Move.render(v.value.variationComments))
+      val d = v.prefix(dot, builder)
+      v.value.render(builder)
+      v.child.foreach: x =>
+        builder.addOne(' ')
+        x.render(builder, d)
 
   extension (v: Tree[Move])
     def isLong = v.value.isLong || v.variations.nonEmpty
-    def prefix(dot: Boolean): (Boolean, String) =
-      if v.value.ply.turn.black then (v.isLong, s"${v.value.turnNumber}. ")
-      else (false, if dot then s"${v.value.turnNumber}... " else "")
+
+    def prefix(dot: Boolean, builder: StringBuilder): Boolean =
+      if v.value.ply.turn.black then
+        builder.append(v.value.turnNumber).append(". ")
+        v.isLong
+      else
+        if dot then builder.append(v.value.turnNumber).append("... ")
+        false
 
 private def glyphs(id: Int) =
   Glyph
@@ -96,6 +104,17 @@ case class Move(
 
   private def hasCommentsOrTime =
     comments.nonEmpty || secondsLeft.isDefined || opening.isDefined || result.isDefined
+
+  def render(builder: StringBuilder) =
+    builder.append(san)
+    glyphs.toList.foreach:
+      case glyph if glyph.id <= 6 => builder.append(glyph.symbol)
+      case glyph                  => builder.append(" $").append(glyph.id)
+
+    if hasCommentsOrTime then
+      List(clockString, opening, result).flatten
+        .:::(comments.map(_ map Move.noDoubleLineBreak))
+        .foreach(x => builder.append(" { ").append(x).append(" }"))
 
   def render =
     val glyphStr = glyphs.toList.map {

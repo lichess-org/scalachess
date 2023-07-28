@@ -155,7 +155,37 @@ abstract class Variant private[variant] (
   def valid(situation: Situation, strict: Boolean) =
     (Color.all forall validSide(situation.board, strict)) && hasValidCheckers(strict, situation)
 
-  protected def hasValidCheckers(strict: Boolean, situation: Situation): Boolean
+  protected def hasValidCheckers(strict: Boolean, situation: Situation): Boolean =
+    !strict || situation.checkers.isEmpty || {
+      isValidChecksForMultipleCheckers(situation, situation.checkers) &&
+      isValidCheckersForEnPassant(situation, situation.checkers)
+    }
+
+  private def isValidCheckersForEnPassant(situation: Situation, activeCheckers: Bitboard): Boolean =
+    (for
+      enPassantSquare <- situation.potentialEpSquare
+      enPassantUp     <- situation.color.fold(enPassantSquare.down, enPassantSquare.up)
+      enPassantDown   <- situation.color.fold(enPassantSquare.up, enPassantSquare.down)
+      ourKing         <- situation.ourKing
+    yield activeCheckers.count == 1 && (
+      activeCheckers.first.contains(enPassantSquare) || situation.board
+        .move(enPassantUp, enPassantDown)
+        .exists(previousBoard =>
+          situation.ourKing.exists(previousBoard.attackers(_, !situation.color).isEmpty)
+        )
+    )).getOrElse(true)
+
+  private def isValidChecksForMultipleCheckers(situation: Situation, activeCheckers: Bitboard): Boolean =
+    val checkerCount = activeCheckers.count
+    if checkerCount <= 1 then true
+    else if checkerCount >= 3 then false
+    else
+      (for
+        firstChecker <- activeCheckers.first
+        lastChecker  <- activeCheckers.last
+        ourKing      <- situation.ourKing
+      yield !Bitboard.aligned(firstChecker, lastChecker, ourKing))
+        .getOrElse(false)
 
   val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
 

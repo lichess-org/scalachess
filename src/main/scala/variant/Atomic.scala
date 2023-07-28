@@ -26,7 +26,7 @@ case object Atomic
     applyVariantEffect(moves).filter(kingSafety)
 
   override def hasValidCheckers(strict: Boolean, situation: Situation): Boolean =
-    !strict || kingsAreOnAdjacentSquares(situation.board, situation.color) || Standard.hasValidCheckers(
+    !strict || kingsAreOnAdjacentSquares(situation.board, situation.color) || super.hasValidCheckers(
       strict,
       situation
     )

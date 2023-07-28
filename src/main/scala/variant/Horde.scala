@@ -44,7 +44,7 @@ case object Horde
     situation.board.kingOf(White).isEmpty && validSide(situation.board, strict)(
       Black
     ) && !pawnsOnPromotionRank(situation.board, White) && hasValidCheckers(strict, situation)
-  
+
   /** The game has a special end condition when black manages to capture all of white's pawns */
   override def specialEnd(situation: Situation) =
     situation.board.white.isEmpty

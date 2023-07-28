@@ -5,7 +5,8 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 import cats.syntax.all.*
-import chess.format.pgn.{ Fixtures, Parser, PgnStr }
+import chess.format.pgn.{ Fixtures, Parser, Pgn, PgnStr }
+import chess.format.pgn.PgnHelper.*
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -14,22 +15,31 @@ import chess.format.pgn.{ Fixtures, Parser, PgnStr }
 @Warmup(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
 @Fork(value = 3)
 @Threads(value = 1)
-class ParserBench:
+class PgnBench:
 
   // the unit of CPU work per iteration
   private[this] val Work: Long = 10
 
-  var games: List[PgnStr] = _
+  var pgnStrs: List[PgnStr] = _
+  var pgns: List[Pgn] = _
 
   @Setup
   def setup() =
-    games = Fixtures.gamesForPerfTest
+    pgnStrs = Fixtures.gamesForPerfTest
+    pgns = pgnStrs.traverse(Parser.full).toOption.get.map(_.toPgn)
 
   @Benchmark
   def pgnParser(bh: Blackhole) =
-    var result = games.traverse { x =>
+    var result = pgnStrs.map: x =>
       Blackhole.consumeCPU(Work)
       Parser.full(x)
-    }
+    bh.consume(result)
+    result
+
+  @Benchmark
+  def pgnRender(bh: Blackhole) =
+    var result = pgns.map: x =>
+      Blackhole.consumeCPU(Work)
+      x.render
     bh.consume(result)
     result

@@ -123,7 +123,9 @@ object Move:
   val noDoubleLineBreakRegex = "(\r?\n){2,}".r
 
   def render(cm: List[Comment]): String =
-    cm.foldLeft("")((acc, x) => acc ++ s" { ${noDoubleLineBreak(x.value)} }")
+    val builder = new StringBuilder
+    cm.foreach(x => builder.append(" { ").append(x.value).append(" }"))
+    builder.toString
 
   def noDoubleLineBreak(txt: String) =
     noDoubleLineBreakRegex.replaceAllIn(txt, "\n")

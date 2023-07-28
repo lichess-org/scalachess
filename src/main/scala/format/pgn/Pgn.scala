@@ -14,8 +14,7 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
     if tags.value.nonEmpty then builder.append(tags).addOne('\n').addOne('\n')
     if initial.comments.nonEmpty then builder.append(initial.comments.mkString("{ ", " } { ", " }\n"))
     tree.foreach(_.render(builder))
-    builder.addOne(' ')
-    builder.append(tags(_.Result) | "")
+    tags(_.Result).foreach(builder.addOne(' ').append)
 
     builder.toString.trim
 
@@ -35,7 +34,16 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
 
 object PgnTree:
 
-  extension (tree: PgnTree)
+  extension (tree: Tree[Move])
+    def isLong = tree.value.isLong || tree.variations.nonEmpty
+
+    def prefix(dot: Boolean, builder: StringBuilder): Boolean =
+      if tree.value.ply.turn.black then
+        builder.append(tree.value.turnNumber).append(". ")
+        tree.isLong
+      else
+        if dot then builder.append(tree.value.turnNumber).append("... ")
+        false
 
     def _render(builder: StringBuilder) =
       tree.value.render(builder)
@@ -48,36 +56,16 @@ object PgnTree:
     def render(builder: StringBuilder): Unit =
       render(builder, !tree.value.ply.turn.black)
 
+    @annotation.tailrec
     def render(builder: StringBuilder, dot: Boolean): Unit =
+      if tree.isVariation then builder.append(Move.render(tree.value.variationComments))
       val d = tree.prefix(dot, builder)
       _render(builder)
-      tree.child.foreach: x =>
-        builder.addOne(' ')
-        x.render(builder, d)
-
-  extension (v: Variation[Move])
-
-    def render(builder: StringBuilder): Unit =
-      render(builder, !v.value.ply.turn.black)
-
-    def render(builder: StringBuilder, dot: Boolean): Unit =
-      builder.append(Move.render(v.value.variationComments))
-      val d = v.prefix(dot, builder)
-      v.value.render(builder)
-      v.child.foreach: x =>
-        builder.addOne(' ')
-        x.render(builder, d)
-
-  extension (v: Tree[Move])
-    def isLong = v.value.isLong || v.variations.nonEmpty
-
-    def prefix(dot: Boolean, builder: StringBuilder): Boolean =
-      if v.value.ply.turn.black then
-        builder.append(v.value.turnNumber).append(". ")
-        v.isLong
-      else
-        if dot then builder.append(v.value.turnNumber).append("... ")
-        false
+      tree.child match
+        case None => ()
+        case Some(x) =>
+          builder.addOne(' ')
+          x.render(builder, d)
 
 private def glyphs(id: Int) =
   Glyph
@@ -117,10 +105,11 @@ case class Move(
         .foreach(x => builder.append(" { ").append(x).append(" }"))
 
   def render =
-    val glyphStr = glyphs.toList.map {
-      case glyph if glyph.id <= 6 => glyph.symbol
-      case glyph                  => s" $$${glyph.id}"
-    }.mkString
+    val glyphStr = glyphs.toList
+      .map:
+        case glyph if glyph.id <= 6 => glyph.symbol
+        case glyph                  => s" $$${glyph.id}"
+      .mkString
     val commentsOrTime =
       if hasCommentsOrTime then
         List(clockString, opening, result).flatten

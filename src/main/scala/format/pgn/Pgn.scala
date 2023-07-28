@@ -14,9 +14,9 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
     if tags.value.nonEmpty then builder.append(tags).addOne('\n').addOne('\n')
     if initial.comments.nonEmpty then builder.append(initial.comments.mkString("{ ", " } { ", " }\n"))
     tree.foreach(_.render(builder))
-    tags(_.Result).foreach(builder.addOne(' ').append)
+    tags(_.Result).foreach(x => builder.addOne(' ').append(x))
 
-    builder.toString.trim
+    builder.toString
 
   def updatePly(ply: Ply, f: Move => Move): Option[Pgn] =
     this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, _.updateValue(f)))
@@ -27,7 +27,7 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
   def modifyInMainline(ply: Ply, f: Node[Move] => Node[Move]): Option[Pgn] =
     this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, f))
 
-  def moves: List[Move] = tree.fold(List.empty[Move])(_.mainlineValues)
+  def moves: List[Move] = tree.fold(Nil)(_.mainlineValues)
 
   def withEvent(title: String) =
     copy(tags = tags + Tag(_.Event, title))
@@ -37,6 +37,20 @@ object PgnTree:
   extension (tree: Tree[Move])
     def isLong = tree.value.isLong || tree.variations.nonEmpty
 
+    def render(builder: StringBuilder): Unit =
+      render(builder, !tree.value.ply.turn.black)
+
+    @annotation.tailrec
+    def render(builder: StringBuilder, dot: Boolean): Unit =
+      if tree.isVariation then builder.append(Move.render(tree.value.variationComments))
+      val d = tree.prefix(dot, builder)
+      renderValueAndVariations(builder)
+      tree.child match
+        case None => ()
+        case Some(x) =>
+          builder.addOne(' ')
+          x.render(builder, d)
+
     def prefix(dot: Boolean, builder: StringBuilder): Boolean =
       if tree.value.ply.turn.black then
         builder.append(tree.value.turnNumber).append(". ")
@@ -45,27 +59,12 @@ object PgnTree:
         if dot then builder.append(tree.value.turnNumber).append("... ")
         false
 
-    def _render(builder: StringBuilder) =
+    def renderValueAndVariations(builder: StringBuilder) =
       tree.value.render(builder)
-      if tree.variations.nonEmpty then
-        tree.variations.foreach: x =>
-          builder.addOne(' ').addOne('(')
-          x.render(builder)
-          builder.addOne(')')
-
-    def render(builder: StringBuilder): Unit =
-      render(builder, !tree.value.ply.turn.black)
-
-    @annotation.tailrec
-    def render(builder: StringBuilder, dot: Boolean): Unit =
-      if tree.isVariation then builder.append(Move.render(tree.value.variationComments))
-      val d = tree.prefix(dot, builder)
-      _render(builder)
-      tree.child match
-        case None => ()
-        case Some(x) =>
-          builder.addOne(' ')
-          x.render(builder, d)
+      tree.variations.foreach: x =>
+        builder.addOne(' ').addOne('(')
+        x.render(builder)
+        builder.addOne(')')
 
 private def glyphs(id: Int) =
   Glyph

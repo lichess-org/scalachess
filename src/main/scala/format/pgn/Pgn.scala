@@ -8,9 +8,6 @@ type PgnTree = Node[Move]
 case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
 
   def render: PgnStr = PgnStr:
-    toString
-
-  override def toString(): String =
     import PgnTree.*
     val initStr =
       if initial.comments.nonEmpty then initial.comments.mkString("{ ", " } { ", " }\n")
@@ -37,8 +34,9 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
     copy(tags = tags + Tag(_.Event, title))
 
 object PgnTree:
+
   extension (tree: PgnTree)
-    def isLong = tree.value.isLong || tree.variations.nonEmpty
+
     def _render: String =
       val moveStr = tree.value.render
       val varStr =
@@ -50,13 +48,9 @@ object PgnTree:
       render(!tree.value.ply.turn.black)
 
     def render(dot: Boolean): String =
-      val (d, str) =
-        if tree.value.ply.turn.black then (isLong, s"${tree.value.turnNumber}. $_render")
-        else
-          val number = if dot then s"${tree.value.turnNumber}... " else ""
-          (false, s"$number$_render")
-      val childStr = tree.child.fold("")(x => s" ${x.render(d)}")
-      s"$str$childStr"
+      val (d, number) = tree.prefix(dot)
+      val childStr    = tree.child.fold("")(x => s" ${x.render(d)}")
+      s"$number$_render$childStr"
 
   extension (v: Variation[Move])
     def _render: String =
@@ -66,19 +60,22 @@ object PgnTree:
       render(!v.value.ply.turn.black)
 
     def render(dot: Boolean): String =
-      val (d, str) =
-        if v.value.ply.turn.black then (v.value.isLong, s"${v.value.turnNumber}. $_render")
-        else
-          val number = if dot then s"${v.value.turnNumber}... " else ""
-          (false, s"$number$_render")
+      val (d, number)       = v.prefix(dot)
       val childStr          = v.child.fold("")(x => s" ${x.render(d)}")
       val variationComments = Move.render(v.value.variationComments)
-      s"$variationComments$str$childStr"
+      s"$variationComments$number$_render$childStr"
+
+  extension (v: Tree[Move])
+    def isLong = v.value.isLong || v.variations.nonEmpty
+    def prefix(dot: Boolean): (Boolean, String) =
+      if v.value.ply.turn.black then (v.isLong, s"${v.value.turnNumber}. ")
+      else (false, if dot then s"${v.value.turnNumber}... " else "")
 
 private def glyphs(id: Int) =
-  Glyph.find(id).fold(Glyphs.empty) { g =>
-    Glyphs fromList List(g)
-  }
+  Glyph
+    .find(id)
+    .fold(Glyphs.empty): g =>
+      Glyphs fromList List(g)
 
 case class Move(
     ply: Ply,

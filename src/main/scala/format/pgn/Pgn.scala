@@ -21,7 +21,6 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
 
     builder.toString
 
-
   def updatePly(ply: Ply, f: Move => Move): Option[Pgn] =
     this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, _.updateValue(f)))
 

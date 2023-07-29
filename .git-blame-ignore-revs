@@ -3,3 +3,6 @@
 
 # Reformat with scalafmt 3.7.6 & syntax rewrite
 2362192cfe132ef94467b2fc4eb87165a8e23668
+
+# Scala Steward: Reformat with scalafmt 3.7.11
+a0eab17cf6f5d23011b65c63277d10dd4d4cc840

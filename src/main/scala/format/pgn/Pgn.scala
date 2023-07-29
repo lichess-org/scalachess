@@ -8,6 +8,9 @@ type PgnTree = Node[Move]
 case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
 
   def render: PgnStr = PgnStr:
+    toString
+
+  override def toString(): String =
     import PgnTree.*
     val builder = new StringBuilder
 
@@ -17,6 +20,7 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
     tags(_.Result).foreach(x => builder.addOne(' ').append(x))
 
     builder.toString
+
 
   def updatePly(ply: Ply, f: Move => Move): Option[Pgn] =
     this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, _.updateValue(f)))

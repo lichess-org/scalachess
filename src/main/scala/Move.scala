@@ -2,6 +2,7 @@ package chess
 
 import chess.format.Uci
 import cats.syntax.all.*
+import chess.format.pgn.SanStr
 
 case class Move(
     piece: Piece,
@@ -15,17 +16,14 @@ case class Move(
     enpassant: Boolean,
     metrics: MoveMetrics = MoveMetrics.empty
 ):
-  inline def before = situationBefore.board
 
-  inline def situationAfter = Situation(finalizeAfter, !piece.color)
-
-  inline def withHistory(inline h: History) = copy(after = after withHistory h)
-
-  val isWhiteTurn: Boolean = piece.color.white
+  inline def before       = situationBefore.board
+  lazy val situationAfter = Situation(finalizeAfter, !piece.color)
+  lazy val san: SanStr    = format.pgn.Dumper(this)
 
   // TODO rethink about how handle castling
   // it's quite messy and error prone now
-  def finalizeAfter: Board =
+  lazy val finalizeAfter: Board =
     val board = after.variant.finalizeBoard(
       after updateHistory { h1 =>
         val h2 = h1.copy(
@@ -106,7 +104,10 @@ case class Move(
       copy(dest = rookOrig)
     }
 
-  inline def color = piece.color
+  val isWhiteTurn: Boolean = piece.color.white
+  inline def color         = piece.color
+
+  inline def withHistory(inline h: History) = copy(after = after withHistory h)
 
   def withPromotion(op: Option[PromotableRole]): Option[Move] =
     op.fold(this.some)(withPromotion)

@@ -2,6 +2,7 @@ package chess
 
 import cats.syntax.option.none
 import chess.format.Uci
+import chess.format.pgn.SanStr
 
 case class Drop(
     piece: Piece,
@@ -11,13 +12,11 @@ case class Drop(
     metrics: MoveMetrics = MoveMetrics.empty
 ):
 
-  inline def before = situationBefore.board
+  inline def before       = situationBefore.board
+  lazy val situationAfter = Situation(finalizeAfter, !piece.color)
+  lazy val san: SanStr    = format.pgn.Dumper(this)
 
-  inline def situationAfter = Situation(finalizeAfter, !piece.color)
-
-  inline def withHistory(inline h: History) = copy(after = after withHistory h)
-
-  def finalizeAfter: Board =
+  lazy val finalizeAfter: Board =
     val board = after.variant.finalizeBoard(
       after updateHistory { h =>
         h.copy(
@@ -36,7 +35,9 @@ case class Drop(
       h.copy(positionHashes = Hash(Situation(board, !piece.color)).combine(basePositionHashes))
     }
 
-  def afterWithLastMove =
+  inline def withHistory(inline h: History) = copy(after = after withHistory h)
+
+  def afterWithLastMove: Board =
     after.variant.finalizeBoard(
       after.copy(history = after.history.withLastMove(toUci)),
       toUci,

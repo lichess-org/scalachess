@@ -21,9 +21,7 @@ case class Game(
       promotion: Option[PromotableRole] = None,
       metrics: MoveMetrics = MoveMetrics.empty
   ): Either[ErrorStr, (Game, Move)] =
-    moveWithCompensated(orig, dest, promotion, metrics).map { case (game, move) =>
-      (game.value, move)
-    }
+    moveWithCompensated(orig, dest, promotion, metrics).map((game, move) => (game.value, move))
 
   def moveWithCompensated(
       orig: Square,
@@ -31,9 +29,10 @@ case class Game(
       promotion: Option[PromotableRole] = None,
       metrics: MoveMetrics = MoveMetrics.empty
   ): Either[ErrorStr, (Clock.WithCompensatedLag[Game], Move)] =
-    situation.move(orig, dest, promotion).map(_.normalizeCastle withMetrics metrics) map { move =>
-      applyWithCompensated(move) -> move
-    }
+    situation
+      .move(orig, dest, promotion)
+      .map(_.normalizeCastle withMetrics metrics)
+      .map(move => applyWithCompensated(move) -> move)
 
   def apply(move: Move): Game = applyWithCompensated(move).value
 
@@ -56,13 +55,10 @@ case class Game(
       square: Square,
       metrics: MoveMetrics = MoveMetrics.empty
   ): Either[ErrorStr, (Game, Drop)] =
-    situation.drop(role, square).map(_ withMetrics metrics) map { drop =>
-      applyDrop(drop) -> drop
-    }
+    situation.drop(role, square).map(_ withMetrics metrics).map(drop => applyDrop(drop) -> drop)
 
   def applyDrop(drop: Drop): Game =
-    val newSituation = drop situationAfter
-
+    val newSituation = drop.situationAfter
     copy(
       situation = newSituation,
       ply = ply + 1,
@@ -74,16 +70,17 @@ case class Game(
       metrics: MoveMetrics,
       gameActive: => Boolean
   ): Option[Clock.WithCompensatedLag[Clock]] =
-    clock.map { prev =>
+    clock.map: prev =>
       val c1 = metrics.frameLag.fold(prev)(prev.withFrameLag)
       val c2 = c1.step(metrics, gameActive)
       if ply - startedAtPly == Ply(1) then c2.map(_.start) else c2
-    }
 
   def apply(uci: Uci.Move): Either[ErrorStr, (Game, Move)] = apply(uci.orig, uci.dest, uci.promotion)
   def apply(uci: Uci.Drop): Either[ErrorStr, (Game, Drop)] = drop(uci.role, uci.square)
   def apply(uci: Uci): Either[ErrorStr, (Game, MoveOrDrop)] =
-    apply(uci) map { case (g, m) => g -> m }
+    uci match
+      case uci: Uci.Move => apply(uci)
+      case uci: Uci.Drop => apply(uci)
 
   inline def fullMoveNumber: FullMoveNumber = ply.fullMoveNumber
 
@@ -110,7 +107,7 @@ object Game:
     fen
       .flatMap:
         format.Fen.readWithMoveNumber(variant, _)
-      .fold(g) { parsed =>
+      .fold(g): parsed =>
         g.copy(
           situation = Situation(
             board = parsed.situation.board withVariant g.board.variant withCrazyData {
@@ -121,4 +118,3 @@ object Game:
           ply = parsed.ply,
           startedAtPly = parsed.ply
         )
-      }

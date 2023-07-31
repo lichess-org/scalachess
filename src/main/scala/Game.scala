@@ -44,7 +44,7 @@ case class Game(
       copy(
         situation = newSituation,
         ply = ply + 1,
-        sans = sans :+ pgn.Dumper(situation, move, newSituation),
+        sans = sans :+ move.san,
         clock = newClock.map(_.value)
       ),
       newClock.flatMap(_.compensated)
@@ -62,7 +62,7 @@ case class Game(
     copy(
       situation = newSituation,
       ply = ply + 1,
-      sans = sans :+ pgn.Dumper(drop, newSituation),
+      sans = sans :+ drop.san,
       clock = applyClock(drop.metrics, newSituation.status.isEmpty).map(_.value)
     )
 

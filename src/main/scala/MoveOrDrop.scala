@@ -2,7 +2,6 @@ package chess
 
 import chess.format.Uci
 import chess.format.pgn.SanStr
-import chess.format.pgn.Dumper
 
 type MoveOrDrop = Move | Drop
 
@@ -46,8 +45,8 @@ object MoveOrDrop:
 
     inline def toSanStr: SanStr =
       md match
-        case m: Move => Dumper(m.situationBefore, m, m.situationAfter)
-        case d: Drop => Dumper(d, d.situationAfter)
+        case m: Move => m.san
+        case d: Drop => d.san
 
     inline def applyGame(game: Game): Game =
       md match

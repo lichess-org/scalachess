@@ -13,11 +13,13 @@ case class Drop(
 
   inline def before = situationBefore.board
 
-  inline def situationAfter = Situation(finalizeAfter, !piece.color)
+  lazy val situationAfter = Situation(finalizeAfter, !piece.color)
+
+  lazy val san = format.pgn.Dumper(this)
 
   inline def withHistory(inline h: History) = copy(after = after withHistory h)
 
-  def finalizeAfter: Board =
+  lazy val finalizeAfter: Board =
     val board = after.variant.finalizeBoard(
       after updateHistory { h =>
         h.copy(

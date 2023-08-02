@@ -157,6 +157,7 @@ Opening("B02", "Alekhine Defense: The Squirrel", "rnbqkb1r/pppppppp/8/4P3/2P2n2/
 Opening("B02", "Alekhine Defense: Two Pawns Attack", "rnbqkb1r/pppppppp/8/3nP3/2P5/8/PP1P1PPP/RNBQKBNR b KQkq -", "e2e4 g8f6 e4e5 f6d5 c2c4", "1. e4 Nf6 2. e5 Nd5 3. c4"),
 Opening("B02", "Alekhine Defense: Two Pawns Attack, Lasker Variation", "rnbqkb1r/pppppppp/1n6/2P1P3/8/8/PP1P1PPP/RNBQKBNR b KQkq -", "e2e4 g8f6 e4e5 f6d5 c2c4 d5b6 c4c5", "1. e4 Nf6 2. e5 Nd5 3. c4 Nb6 4. c5"),
 Opening("B02", "Alekhine Defense: Two Pawns Attack, Mikenas Variation", "rnbqkb1r/ppp2ppp/3pp3/2PnP3/2B5/2N5/PP1P1PPP/R1BQK1NR w KQkq -", "e2e4 g8f6 e4e5 f6d5 c2c4 d5b6 c4c5 b6d5 f1c4 e7e6 b1c3 d7d6", "1. e4 Nf6 2. e5 Nd5 3. c4 Nb6 4. c5 Nd5 5. Bc4 e6 6. Nc3 d6"),
+Opening("B02", "Alekhine Defense: Two Pawns Attack, Tate Variation", "rnbqkb1r/pppppppp/1n6/4P3/P1P5/8/1P1P1PPP/RNBQKBNR b KQkq -", "e2e4 g8f6 e4e5 f6d5 c2c4 d5b6 a2a4", "1. e4 Nf6 2. e5 Nd5 3. c4 Nb6 4. a4"),
 Opening("B02", "Alekhine Defense: Welling Variation", "rnbqkb1r/pppppppp/8/3nP3/8/1P6/P1PP1PPP/RNBQKBNR b KQkq -", "e2e4 g8f6 e4e5 f6d5 b2b3", "1. e4 Nf6 2. e5 Nd5 3. b3"),
 Opening("B03", "Alekhine Defense", "rnbqkb1r/pppppppp/8/3nP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq -", "e2e4 g8f6 e4e5 f6d5 d2d4", "1. e4 Nf6 2. e5 Nd5 3. d4"),
 Opening("B03", "Alekhine Defense", "rnbqkb1r/ppp1pppp/3p4/3nP3/3P4/8/PPP2PPP/RNBQKBNR w KQkq -", "e2e4 g8f6 e4e5 f6d5 d2d4 d7d6", "1. e4 Nf6 2. e5 Nd5 3. d4 d6"),

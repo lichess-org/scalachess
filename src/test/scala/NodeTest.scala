@@ -259,7 +259,7 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (node: Node[Int], init: Int, f: (Int, Int) => (Int, Int)) =>
       node.mapAccuml_(init)(f).some == node.mapAccumlOption_(init)((s, a) => f(s, a).map(Some(_)))
 
-  test("mapAccuml is the different thatn mapAccumulate if variation is exist"):
+  test("mapAccuml is the different than mapAccumulate if variation is exist"):
     forAll: (node: Node[Int], n: Int, f: (Int, Int) => (Int, Int)) =>
       val x = node.mapAccuml(n)(f)
       val y = node.mapAccumulate(n)(f)

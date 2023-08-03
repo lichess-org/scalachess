@@ -29,6 +29,9 @@ case object Crazyhouse
         .byRole(Pawn)
         .count <= 16 && situation.board.nbPieces <= 32)) && hasValidCheckers(strict, situation)
 
+  override def hasValidCheckers(strict: Boolean, situation: Situation): Boolean =
+    Standard.hasValidCheckers(strict, situation)
+
   private def canDropPawnOn(square: Square) = square.rank != Rank.First && square.rank != Rank.Eighth
 
   override def drop(situation: Situation, role: Role, square: Square): Either[ErrorStr, Drop] =

@@ -4,7 +4,7 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Prop.forAll
 
 import cats.syntax.all.*
-import SituationArbitraries.given
+import TreeArbitraries.given
 
 class StudyTreeTest extends ScalaCheckSuite:
 

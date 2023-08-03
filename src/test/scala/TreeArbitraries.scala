@@ -4,14 +4,18 @@ import cats.syntax.all.*
 import org.scalacheck.{ Arbitrary, Gen }
 import chess.variant.Variant
 import chess.variant.Standard
+import chess.format.pgn.{ Pgn, PgnTree, Tags }
+import chess.format.pgn.Move as PgnMove
+import chess.format.pgn.InitialComments
 
-case class GameTree(init: Situation, startWith: Ply, tree: Option[Node[Move]])
+case class GameTree(init: Situation, ply: Ply, tree: Option[Node[Move]])
 
-object SituationArbitraries:
+object TreeArbitraries:
 
   given Arbitrary[Variant]                                 = Arbitrary(Gen.oneOf(Variant.list.all))
   given standardSitutationTree: Arbitrary[Node[Situation]] = Arbitrary(genNode(Situation(Standard)))
   given standardTree: Arbitrary[GameTree]                  = Arbitrary(genTree(Situation(Standard)))
+  given standardPgn: Arbitrary[Pgn]                        = Arbitrary(genPgn(Situation(Standard)))
 
   def genSituations(seed: Situation): Gen[LazyList[Situation]] =
     if seed.end then Gen.const(LazyList(seed))
@@ -27,6 +31,17 @@ object SituationArbitraries:
 
   def genMainline(seed: Situation): Gen[Node[Situation]] =
     genSituations(seed).map(Tree.build(_).get)
+
+  def genPgn(seed: Situation): Gen[Pgn] =
+    for
+      tree <- genTree(seed)
+      pgnTree = tree.tree.map(toPgn(_, tree.ply.next))
+      pgn     = Pgn(Tags.empty, InitialComments.empty, pgnTree)
+    yield pgn
+
+  def toPgn(tree: Node[Move], startingPly: Ply): PgnTree =
+    tree.mapAccuml_(startingPly): (ply, move) =>
+      (ply.next, PgnMove(ply, move.san))
 
   def genTree(seed: Situation): Gen[GameTree] =
     val treeGen =
@@ -84,11 +99,11 @@ object SituationArbitraries:
         yield Variation(value, c)
 
   def genChild[A: Generator](value: A, variations: List[A], size: Int): Gen[Option[Node[A]]] =
-    if size == 0 then Gen.const(None)
+    if size <= 0 then Gen.const(None)
     else Gen.resize(size - 1, genNode(value, variations).map(Some(_)))
 
   def sequence[A](xs: List[Gen[A]]): Gen[List[A]] =
     xs.foldRight(Gen.const(Nil: List[A]))((x, acc) => x.flatMap(a => acc.map(a :: _)))
 
   def pickSome[A](seeds: List[A]): Gen[List[A]] =
-    Gen.choose(0, seeds.size / 10).flatMap(Gen.pick(_, seeds).map(_.toList))
+    Gen.choose(0, seeds.size / 8).flatMap(Gen.pick(_, seeds).map(_.toList))

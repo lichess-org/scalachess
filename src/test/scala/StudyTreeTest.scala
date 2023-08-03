@@ -12,3 +12,7 @@ class StudyTreeTest extends ScalaCheckSuite:
     forAll: (tree: Node[Situation]) =>
       tree.mainline.size.pp
       tree.size.pp > 0
+
+  test("GameTree"):
+    forAll: (tree: GameTree) =>
+      tree.tree.forall(_.size.pp > 0)

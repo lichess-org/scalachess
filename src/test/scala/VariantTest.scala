@@ -375,11 +375,11 @@ K  r
         )
       ) { fen =>
         s"for fen $fen" in:
-            val game = Fen
-              .read(Antichess, EpdFen(fen))
-              .get
-            game.variant.valid(game, true) must beTrue
-            game.variant.valid(game, false) must beTrue
+          val game = Fen
+            .read(Antichess, EpdFen(fen))
+            .get
+          game.variant.valid(game, true) must beTrue
+          game.variant.valid(game, false) must beTrue
       }
   "horde" should:
     "initialize the board with black castling rights" in:

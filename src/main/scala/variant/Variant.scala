@@ -154,7 +154,7 @@ abstract class Variant private[variant] (
 
   def valid(situation: Situation, strict: Boolean) =
     (Color.all forall validSide(situation.board, strict)) && hasValidCheckers(strict, situation)
-    
+
   protected def hasValidCheckers(strict: Boolean, situation: Situation): Boolean
 
   val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)

@@ -7,6 +7,8 @@ import chess.variant.Standard
 
 object SituationArbitraries:
 
+  case class GameTree(init: Situation, startWith: Ply, tree: Option[Node[Move]])
+
   given Arbitrary[Variant]                       = Arbitrary(Gen.oneOf(Variant.list.all))
   given standardTree: Arbitrary[Node[Situation]] = Arbitrary(genNode(Situation(Standard)))
 
@@ -28,36 +30,35 @@ object SituationArbitraries:
   def genTree(seed: Situation): Gen[Node[Situation]] =
     genSituations(seed).map(Tree.build(_).get)
 
-  def genNode(seed: Situation, variations: List[Situation] = Nil): Gen[Node[Situation]] =
-    val nextSeeds = seed.legalMoves.map(_.situationAfter)
-    if nextSeeds.isEmpty then Gen.const(Node(seed, None, Nil))
+  trait Generator[A]:
+    extension (a: A) def next: List[A]
+
+  given Generator[Situation] with
+    extension (situation: Situation) def next: List[Situation] = situation.legalMoves.map(_.situationAfter)
+
+  def genNode[A: Generator](value: A, variations: List[A] = Nil): Gen[Node[A]] =
+    val nextSeeds = value.next
+    if nextSeeds.isEmpty then Gen.const(Node(value, None, Nil))
     else
       Gen.sized: size =>
         for
-          a <- Gen.oneOf(nextSeeds)
-          childVariations = nextSeeds.filter(_ != a)
-          c <- genChild(seed, childVariations, size)
+          nextChild <- Gen.oneOf(nextSeeds)
+          childVariations = nextSeeds.filter(_ != nextChild)
+          c <- genChild(nextChild, childVariations, size)
           v <- genVariations(variations)
-        yield Node(seed, c, v)
+        yield Node(value, c, v)
 
-  def sequence[A](xs: List[Gen[A]]): Gen[List[A]] =
-    xs.foldRight(Gen.const(Nil: List[A]))((x, acc) => x.flatMap(a => acc.map(a :: _)))
-
-  def pick[A](seeds: List[A]): Gen[List[A]] =
-    Gen.choose(0, seeds.size / 8).flatMap(Gen.pick(_, seeds).map(_.toList))
-
-  def genVariations(seeds: List[Situation]): Gen[List[Variation[Situation]]] =
+  def genVariations[A: Generator](seeds: List[A]): Gen[List[Variation[A]]] =
     if seeds.isEmpty then Gen.const(Nil)
     else
-      Gen.sized: size =>
-        for
-          ss <- pick(seeds)
-          vg = ss.map(genVariation)
-          vs <- sequence(vg)
-        yield vs
+      for
+        ss <- pick(seeds)
+        vg = ss.map(genVariation)
+        vs <- sequence(vg)
+      yield vs
 
-  def genVariation(value: Situation): Gen[Variation[Situation]] =
-    val nextSeeds = value.legalMoves.map(_.situationAfter)
+  def genVariation[A: Generator](value: A): Gen[Variation[A]] =
+    val nextSeeds = value.next
     if nextSeeds.isEmpty then Gen.const(Variation(value, None))
     else
       Gen.sized: size =>
@@ -68,6 +69,12 @@ object SituationArbitraries:
           c <- genChild(seed, variations, sqrt)
         yield Variation(value, c)
 
-  def genChild(value: Situation, variations: List[Situation], size: Int): Gen[Option[Node[Situation]]] =
+  def genChild[A: Generator](value: A, variations: List[A], size: Int): Gen[Option[Node[A]]] =
     if size == 0 then Gen.const(None)
     else Gen.resize(size - 1, genNode(value, variations).map(Some(_)))
+
+  def sequence[A](xs: List[Gen[A]]): Gen[List[A]] =
+    xs.foldRight(Gen.const(Nil: List[A]))((x, acc) => x.flatMap(a => acc.map(a :: _)))
+
+  def pick[A](seeds: List[A]): Gen[List[A]] =
+    Gen.choose(0, seeds.size / 10).flatMap(Gen.pick(_, seeds).map(_.toList))

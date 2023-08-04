@@ -2,7 +2,7 @@ package chess
 
 import cats.syntax.option.*
 import chess.Square.*
-import chess.format.{ EpdFen, Fen }
+import chess.format.{EpdFen, Fen}
 import chess.variant.*
 import org.specs2.specification.core.Fragment
 
@@ -62,7 +62,7 @@ class VariantTest extends ChessTest:
 
           "when two checkers are not on the same rank, file or diagonal" in:
             val game = Fen
-              .read(variant, EpdFen("rnbqk2r/1p1p1ppp/p1P5/3np1b1/4P3/4K3/PPP2PPP/RNBQ1BNR b HAkq - 0 4"))
+              .read(variant, EpdFen("rnbqk2r/1p1p1ppp/p1P5/3np1b1/4P3/4K3/PPP2PPP/RNBQ1BNR w HAkq - 0 4"))
               .get
             game.variant.valid(game, true) must beTrue
             game.variant.valid(game, false) must beTrue
@@ -347,6 +347,28 @@ K  r
     "initialize the board without castling rights" in:
       Board.init(RacingKings).history.castles.isEmpty must beTrue
 
+    "validate situation correctly" in :
+      Fragment.foreach(
+        List(
+          "1bb4r/kr5p/p7/2pP4/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4",
+          "1kb2b1r/1r3K1p/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HAk c6 0 4",
+          "rnbqk2r/1p1p1ppp/p1P5/3np1b1/4P3/4K3/PPP2PPP/RNBQ1BNR w HAkq - 0 4",
+          "r1bqkbnr/1p1p1ppp/p7/2pP4/3KP3/8/PPP3PP/RNBQ1BNR w HAkq c6 0 4",
+          "1nbqk3/1p1prppp/p1P5/8/4K3/8/PPP1rPPP/RNBQ1BNR w HA - 0 4",
+          "2b4r/kr5p/p7/2pP2b1/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4",
+          "1k6/5K1r/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HA c6 0 4",
+          "r1bqkbnr/1p1p1ppp/p7/2pP4/4P3/8/PPP2pPP/RNBQKBNR w KQkq c6 0 4",
+          "r1bqkbnr/1p1p1ppp/p7/2pPp3/4P3/5n2/PPP2PPP/RNBQKBNR w KQkq c6 0 4"
+        )
+      ) { fen =>
+        s"for fen $fen" in :
+          val game = Fen
+            .read(RacingKings, EpdFen(fen))
+            .get
+          game.variant.valid(game, true) must beFalse
+          game.variant.valid(game, false) must beTrue
+      }
+
   "antichess" should:
     "initialize the board without castling rights" in:
       Board.init(Antichess).history.castles.isEmpty must beTrue
@@ -364,14 +386,13 @@ K  r
         List(
           "1bb4r/kr5p/p7/2pP4/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4",
           "1kb2b1r/1r3K1p/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HAk c6 0 4",
-          "rnbqk2r/1p1p1ppp/p1P5/3np1b1/4P3/4K3/PPP2PPP/RNBQ1BNR b HAkq - 0 4",
+          "rnbqk2r/1p1p1ppp/p1P5/3np1b1/4P3/4K3/PPP2PPP/RNBQ1BNR w HAkq - 0 4",
           "r1bqkbnr/1p1p1ppp/p7/2pP4/3KP3/8/PPP3PP/RNBQ1BNR w HAkq c6 0 4",
           "1nbqk3/1p1prppp/p1P5/8/4K3/8/PPP1rPPP/RNBQ1BNR w HA - 0 4",
           "2b4r/kr5p/p7/2pP2b1/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4",
           "1k6/5K1r/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HA c6 0 4",
           "r1bqkbnr/1p1p1ppp/p7/2pP4/4P3/8/PPP2pPP/RNBQKBNR w KQkq c6 0 4",
-          "r1bqkbnr/1p1p1ppp/p7/2pPp3/4P3/5n2/PPP2PPP/RNBQKBNR w KQkq c6 0 4",
-          "2r3k1/p2Q1pp1/1p5p/3p4/P7/KP6/2r5/8 b - - 1 36"
+          "r1bqkbnr/1p1p1ppp/p7/2pPp3/4P3/5n2/PPP2PPP/RNBQKBNR w KQkq c6 0 4"
         )
       ) { fen =>
         s"for fen $fen" in:

@@ -2,7 +2,7 @@ package chess
 
 import cats.syntax.option.*
 import chess.Square.*
-import chess.format.{EpdFen, Fen}
+import chess.format.{ EpdFen, Fen }
 import chess.variant.*
 import org.specs2.specification.core.Fragment
 
@@ -347,7 +347,7 @@ K  r
     "initialize the board without castling rights" in:
       Board.init(RacingKings).history.castles.isEmpty must beTrue
 
-    "validate situation correctly" in :
+    "validate situation correctly" in:
       Fragment.foreach(
         List(
           "1bb4r/kr5p/p7/2pP4/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4",
@@ -361,7 +361,7 @@ K  r
           "r1bqkbnr/1p1p1ppp/p7/2pPp3/4P3/5n2/PPP2PPP/RNBQKBNR w KQkq c6 0 4"
         )
       ) { fen =>
-        s"for fen $fen" in :
+        s"for fen $fen" in:
           val game = Fen
             .read(RacingKings, EpdFen(fen))
             .get

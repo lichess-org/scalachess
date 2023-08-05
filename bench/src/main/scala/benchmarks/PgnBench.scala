@@ -21,7 +21,7 @@ class PgnBench:
   private[this] val Work: Long = 10
 
   var pgnStrs: List[PgnStr] = _
-  var pgns: List[Pgn] = _
+  var pgns: List[Pgn]       = _
 
   @Setup
   def setup() =

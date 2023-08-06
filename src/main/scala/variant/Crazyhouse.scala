@@ -27,7 +27,7 @@ case object Crazyhouse
     (Color.all forall validSide(situation.board, false)) &&
       (!strict || (situation.board.board
         .byRole(Pawn)
-        .count <= 16 && situation.board.nbPieces <= 32)) && Standard.hasValidCheckers(strict, situation)
+        .count <= 16 && situation.board.nbPieces <= 32 && Standard.hasValidCheckers(situation)))
 
   private def canDropPawnOn(square: Square) = square.rank != Rank.First && square.rank != Rank.Eighth
 

@@ -29,10 +29,7 @@ case object Atomic
     super.valid(situation, strict) && hasValidCheckers(strict, situation)
 
   private def hasValidCheckers(strict: Boolean, situation: Situation): Boolean =
-    !strict || kingsAreConnected(situation.board, situation.color) || Standard.hasValidCheckers(
-      strict,
-      situation
-    )
+    !strict || kingsAreConnected(situation.board, situation.color) || Standard.hasValidCheckers(situation)
 
   private def genKing(situation: Situation, mask: Bitboard) =
     import situation.{ genUnsafeKing, genCastling }

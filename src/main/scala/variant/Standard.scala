@@ -33,11 +33,31 @@ case object Standard
           candidates.filter(isSafe(situation, king, sliderBlockers))
         else candidates
 
-  override def valid(situation: Situation, strict: Boolean): Boolean =
-    super.valid(situation, strict) && hasValidCheckers(strict, situation)
+  // Used for filtering candidate moves that would leave put the king in check.
+  def isSafe(situation: Situation, king: Square, blockers: Bitboard)(move: Move): Boolean =
+    import situation.{ board, us, them }
+    if move.enpassant then
+      val newOccupied = (board.occupied ^ move.orig.bl ^ move.dest.withRankOf(move.orig).bl) | move.dest.bl
+      (king.rookAttacks(newOccupied) & them & (board.rooks ^ board.queens)).isEmpty &&
+      (king.bishopAttacks(newOccupied) & them & (board.bishops ^ board.queens)).isEmpty
+    else if !move.castles || !move.promotes then
+      !(us & blockers).contains(move.orig) || Bitboard.aligned(move.orig, move.dest, king)
+    else true
 
-  def hasValidCheckers(strict: Boolean, situation: Situation): Boolean =
-    !strict || situation.checkers.isEmpty || {
+  private def genEvasions(king: Square, situation: Situation, checkers: Bitboard): List[Move] =
+    import situation.{ genNonKing, genSafeKing, us, board }
+    // Checks by these sliding pieces can maybe be blocked.
+    val sliders   = checkers & board.sliders
+    val attacked  = sliders.fold(Bitboard.empty)((a, s) => a | (Bitboard.ray(king, s) ^ s.bl))
+    val safeKings = genSafeKing(king, ~us & ~attacked)
+    val blockers  = checkers.singleSquare.fold(Nil)(c => genNonKing(Bitboard.between(king, c) | checkers))
+    safeKings ++ blockers
+
+  override def valid(situation: Situation, strict: Boolean): Boolean =
+    super.valid(situation, strict) && (!strict || hasValidCheckers(situation))
+
+  def hasValidCheckers(situation: Situation): Boolean =
+    situation.checkers.isEmpty || {
       isValidChecksForMultipleCheckers(situation, situation.checkers) &&
       isValidCheckersForEnPassant(situation, situation.checkers)
     }
@@ -67,23 +87,3 @@ case object Standard
         ourKing      <- situation.ourKing
       yield !Bitboard.aligned(firstChecker, lastChecker, ourKing))
         .getOrElse(false)
-
-  // Used for filtering candidate moves that would leave put the king in check.
-  def isSafe(situation: Situation, king: Square, blockers: Bitboard)(move: Move): Boolean =
-    import situation.{ board, us, them }
-    if move.enpassant then
-      val newOccupied = (board.occupied ^ move.orig.bl ^ move.dest.withRankOf(move.orig).bl) | move.dest.bl
-      (king.rookAttacks(newOccupied) & them & (board.rooks ^ board.queens)).isEmpty &&
-      (king.bishopAttacks(newOccupied) & them & (board.bishops ^ board.queens)).isEmpty
-    else if !move.castles || !move.promotes then
-      !(us & blockers).contains(move.orig) || Bitboard.aligned(move.orig, move.dest, king)
-    else true
-
-  private def genEvasions(king: Square, situation: Situation, checkers: Bitboard): List[Move] =
-    import situation.{ genNonKing, genSafeKing, us, board }
-    // Checks by these sliding pieces can maybe be blocked.
-    val sliders   = checkers & board.sliders
-    val attacked  = sliders.fold(Bitboard.empty)((a, s) => a | (Bitboard.ray(king, s) ^ s.bl))
-    val safeKings = genSafeKing(king, ~us & ~attacked)
-    val blockers  = checkers.singleSquare.fold(Nil)(c => genNonKing(Bitboard.between(king, c) | checkers))
-    safeKings ++ blockers

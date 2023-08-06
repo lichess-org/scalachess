@@ -26,10 +26,10 @@ case object Atomic
     applyVariantEffect(moves).filter(kingSafety)
 
   override def valid(situation: Situation, strict: Boolean): Boolean =
-    super.valid(situation, strict) && (!strict || hasValidCheckers(strict, situation))
+    super.valid(situation, strict) && hasValidCheckers(strict, situation)
 
-  private def hasValidCheckers(situation: Situation): Boolean =
-    kingsAreConnected(situation.board, situation.color) || Standard.hasValidCheckers(
+  private def hasValidCheckers(strict: Boolean, situation: Situation): Boolean =
+    !strict || kingsAreConnected(situation.board, situation.color) || Standard.hasValidCheckers(
       strict,
       situation
     )

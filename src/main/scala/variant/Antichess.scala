@@ -37,9 +37,7 @@ case object Antichess
 
   override def valid(situation: Situation, strict: Boolean) =
     situation.board.nbPieces >= 2 && situation.board.nbPieces <= 32
-
-  override def hasValidCheckers(strict: Boolean, situation: Situation) = true
-
+  
   // In antichess, there is no checkmate condition, and the winner is the current player if they have no legal moves
   override def winner(situation: Situation): Option[Color] =
     specialEnd(situation) option situation.color

@@ -25,8 +25,11 @@ case object Atomic
     val moves   = genNonKing(targets) ++ genKing(situation, targets) ++ genEnPassant(us & board.pawns)
     applyVariantEffect(moves).filter(kingSafety)
 
-  override def hasValidCheckers(strict: Boolean, situation: Situation): Boolean =
-    !strict || kingsAreOnAdjacentSquares(situation.board, situation.color) || Standard.hasValidCheckers(
+  override def valid(situation: Situation, strict: Boolean): Boolean =
+    super.valid(situation, strict) && (!strict || hasValidCheckers(strict, situation))
+
+  private def hasValidCheckers(situation: Situation): Boolean =
+    kingsAreConnected(situation.board, situation.color) || Standard.hasValidCheckers(
       strict,
       situation
     )
@@ -56,11 +59,9 @@ case object Atomic
       attackersWithoutKing(board, occupied, k, !color).nonEmpty
     }
 
-  private def kingsAreOnAdjacentSquares(board: Board, color: Color): Boolean =
+  private def kingsAreConnected(board: Board, color: Color): Boolean =
     import board.{ kingPosOf, kingOf }
-    kingPosOf(color).exists { k =>
-      k.kingAttacks.intersects(kingOf(!color))
-    }
+    kingPosOf(White).exists(_.kingAttacks.intersects(kingOf(Black)))
 
   private def attackersWithoutKing(board: Board, occupied: Bitboard, s: Square, attacker: Color) =
     import board.board.{ byColor, rooks, queens, bishops, knights, pawns }

@@ -33,7 +33,10 @@ case object Standard
           candidates.filter(isSafe(situation, king, sliderBlockers))
         else candidates
 
-  override def hasValidCheckers(strict: Boolean, situation: Situation): Boolean =
+  override def valid(situation: Situation, strict: Boolean): Boolean =
+    super.valid(situation, strict) && hasValidCheckers(strict, situation)
+
+  def hasValidCheckers(strict: Boolean, situation: Situation): Boolean =
     !strict || situation.checkers.isEmpty || {
       isValidChecksForMultipleCheckers(situation, situation.checkers) &&
       isValidCheckersForEnPassant(situation, situation.checkers)

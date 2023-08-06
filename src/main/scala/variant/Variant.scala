@@ -153,10 +153,8 @@ abstract class Variant private[variant] (
       !pawnsOnBackRank(board, color)
 
   def valid(situation: Situation, strict: Boolean) =
-    (Color.all forall validSide(situation.board, strict)) && hasValidCheckers(strict, situation)
-
-  protected def hasValidCheckers(strict: Boolean, situation: Situation): Boolean
-
+    Color.all forall validSide(situation.board, strict)
+  
   val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
 
   override def toString = s"Variant($name)"

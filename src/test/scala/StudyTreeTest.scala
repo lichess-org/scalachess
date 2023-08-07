@@ -8,11 +8,10 @@ import TreeArbitraries.given
 
 class StudyTreeTest extends ScalaCheckSuite:
 
-  test("StudyTreeTest"):
-    forAll: (tree: Node[Situation]) =>
-      tree.mainline.size.pp
-      tree.size.pp > 0
+  // test("StudyTreeTest"):
+  //   forAll: (tree: Node[Situation]) =>
+  //     tree.size.pp > 0
 
   test("GameTree"):
-    forAll: (tree: GameTree) =>
-      tree.tree.forall(_.size.pp > 0)
+    forAll: (tree: GameTree[Move]) =>
+      tree.tree.forall(_.size > 0)

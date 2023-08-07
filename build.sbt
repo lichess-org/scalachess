@@ -1,8 +1,8 @@
 lazy val scalachess = Project("scalachess", file(".")).settings(
   name := "scalachess",
   libraryDependencies ++= List(
-    "org.specs2"          %% "specs2-core"       % "4.20.0"   % Test,
-    "org.specs2"          %% "specs2-cats"       % "4.20.0"   % Test,
+    "org.specs2"          %% "specs2-core"       % "4.20.1"   % Test,
+    "org.specs2"          %% "specs2-cats"       % "4.20.1"   % Test,
     "org.scalameta"       %% "munit"             % "1.0.0-M8" % Test,
     "org.scalacheck"      %% "scalacheck"        % "1.17.0"   % Test,
     "org.scalameta"       %% "munit-scalacheck"  % "1.0.0-M8" % Test,

@@ -2,13 +2,9 @@ package chess
 
 import cats.syntax.all.*
 import org.scalacheck.{ Arbitrary, Gen }
-import chess.variant.Variant
-import chess.variant.Standard
-import chess.format.pgn.{ Pgn, PgnTree, Tags }
+import chess.variant.{ Standard, Variant }
+import chess.format.pgn.{ Comment, Glyphs, InitialComments, Pgn, Tags }
 import chess.format.pgn.Move as PgnMove
-import chess.format.pgn.InitialComments
-import chess.format.pgn.Comment
-import chess.format.pgn.Glyphs
 
 case class GameTree[A](init: Situation, ply: Ply, tree: Option[Node[A]])
 case class MoveWithExtras(move: Move, pgn: PgnMove)
@@ -18,7 +14,14 @@ object TreeArbitraries:
   given Arbitrary[Variant]                                 = Arbitrary(Gen.oneOf(Variant.list.all))
   given standardSitutationTree: Arbitrary[Node[Situation]] = Arbitrary(genNode(Situation(Standard)))
   given standardTree: Arbitrary[GameTree[Move]]            = Arbitrary(genTree(Situation(Standard)))
-  given standardPgn: Arbitrary[Pgn]                        = Arbitrary(genPgn2(Situation(Standard)))
+  given standardPgn: Arbitrary[Pgn]                        = Arbitrary(genPgn(Situation(Standard)))
+
+  def genComments(size: Int) =
+    for
+      commentSize <- Gen.choose(0, size)
+      xs          <- Gen.listOfN(commentSize, Gen.alphaStr)
+      comments = xs.collect { case s if s.nonEmpty => Comment(s) }
+    yield comments
 
   def genSituations(seed: Situation): Gen[LazyList[Situation]] =
     if seed.end then Gen.const(LazyList(seed))
@@ -37,21 +40,11 @@ object TreeArbitraries:
 
   def genPgn(seed: Situation): Gen[Pgn] =
     for
-      tree <- genTree(seed)
-      pgnTree = tree.tree.map(toPgn(_, tree.ply.next))
-      pgn     = Pgn(Tags.empty, InitialComments.empty, pgnTree)
-    yield pgn
-
-  def genPgn2(seed: Situation): Gen[Pgn] =
-    for
       tree <- genPgnTree(seed)
       pgnTree = tree.tree.map(_.map(_.pgn))
-      pgn     = Pgn(Tags.empty, InitialComments.empty, pgnTree)
+      comments <- genComments(5)
+      pgn = Pgn(Tags.empty, InitialComments(comments), pgnTree)
     yield pgn
-
-  def toPgn(tree: Node[Move], startingPly: Ply): PgnTree =
-    tree.mapAccuml_(startingPly): (ply, move) =>
-      (ply.next, PgnMove(ply, move.san))
 
   def genPgnTree(seed: Situation): Gen[GameTree[MoveWithExtras]] =
     val treeGen =
@@ -83,11 +76,10 @@ object TreeArbitraries:
     extension (a: A) def next: Gen[List[A]]
 
   given Generator[Situation] with
-    extension (situation: Situation)
-      def next: Gen[List[Situation]] = Gen.const(situation.legalMoves.map(_.situationAfter))
+    extension (situation: Situation) def next = pickSome(situation.legalMoves.map(_.situationAfter))
 
   given Generator[Move] with
-    extension (move: Move) def next: Gen[List[Move]] = Gen.const(move.situationAfter.legalMoves)
+    extension (move: Move) def next = pickSome(move.situationAfter.legalMoves)
 
   given Generator[MoveWithExtras] with
     extension (move: MoveWithExtras)
@@ -99,11 +91,9 @@ object TreeArbitraries:
 
   def genExtra(move: Move, ply: Ply): Gen[MoveWithExtras] =
     for
-      commentSize <- Gen.choose(0, 5)
-      xs          <- Gen.listOfN(commentSize, Gen.alphaNumStr)
-      comments = xs.collect { case s if s.nonEmpty => Comment(s) }
-      glyphs <- Gen.someOf(Glyphs.all).map(xs => Glyphs.fromList(xs.toList))
-      clock  <- Gen.posNum[Int]
+      comments <- genComments(5)
+      glyphs   <- Gen.someOf(Glyphs.all).map(xs => Glyphs.fromList(xs.toList))
+      clock    <- Gen.posNum[Int]
     yield MoveWithExtras(move, PgnMove(ply.next, move.san, comments, glyphs, None, None, clock.some, Nil))
 
   def genNode[A: Generator](value: A, variations: List[A] = Nil): Gen[Node[A]] =
@@ -115,16 +105,8 @@ object TreeArbitraries:
             nextChild <- Gen.oneOf(nextSeeds)
             childVariations = nextSeeds.filter(_ != nextChild)
             c <- genChild(nextChild, childVariations, size)
-            v <- genVariations(variations)
+            v <- variations.traverse(genVariation(_))
           yield Node(value, c, v)
-
-  def genVariations[A: Generator](seeds: List[A]): Gen[List[Variation[A]]] =
-    if seeds.isEmpty then Gen.const(Nil)
-    else
-      for
-        ss <- pickSome(seeds)
-        vs <- ss.traverse(genVariation)
-      yield vs
 
   def genVariation[A: Generator](value: A): Gen[Variation[A]] =
     value.next.flatMap: nextSeeds =>

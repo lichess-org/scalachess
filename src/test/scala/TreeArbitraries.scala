@@ -31,10 +31,6 @@ object TreeArbitraries:
         situations <- genSituations(situation)
       yield situation #:: situations
 
-  def genNextSituation(seed: Situation): Gen[Option[Situation]] =
-    if seed.end then Gen.const(None)
-    else Gen.oneOf(seed.legalMoves.map(_.situationAfter)).map(_.some)
-
   def genMainline(seed: Situation): Gen[Node[Situation]] =
     genSituations(seed).map(Tree.build(_).get)
 
@@ -47,7 +43,7 @@ object TreeArbitraries:
     yield pgn
 
   def genPgnTree(seed: Situation): Gen[GameTree[MoveWithExtras]] =
-    val treeGen =
+    val tree =
       if seed.end then Gen.const(None)
       else
         val nextSeeds = seed.legalMoves
@@ -57,7 +53,7 @@ object TreeArbitraries:
           variations <- nextSeeds.filter(_ != value).traverse(genExtra(_, Ply.initial))
           node       <- genNode(move, variations)
         yield node.some
-    treeGen.map(GameTree(seed, Ply.initial, _))
+    tree.map(GameTree(seed, Ply.initial, _))
 
   def genTree(seed: Situation): Gen[GameTree[Move]] =
     val treeGen =
@@ -128,7 +124,10 @@ object TreeArbitraries:
     xs.foldRight(Gen.const(Nil: List[A]))((x, acc) => x.flatMap(a => acc.map(a :: _)))
 
   def pickSome[A](seeds: List[A], part: Int = 8): Gen[List[A]] =
-    Gen.choose(0, seeds.size / part).flatMap(Gen.pick(_, seeds).map(_.toList))
+    if seeds.isEmpty then Gen.const(Nil)
+    else
+      val max = Math.max(1, seeds.size / part)
+      Gen.choose(1, max).flatMap(Gen.pick(_, seeds).map(_.toList))
 
   extension [A](xs: List[A])
     def traverse[B](f: A => Gen[B]): Gen[List[B]] =

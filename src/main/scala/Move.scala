@@ -17,9 +17,9 @@ case class Move(
     metrics: MoveMetrics = MoveMetrics.empty
 ):
 
-  inline def before       = situationBefore.board
-  lazy val situationAfter = Situation(finalizeAfter, !piece.color)
-  lazy val san: SanStr    = format.pgn.Dumper(this)
+  inline def before    = situationBefore.board
+  def situationAfter   = Situation(finalizeAfter, !piece.color)
+  lazy val san: SanStr = format.pgn.Dumper(this)
 
   // TODO rethink about how handle castling
   // it's quite messy and error prone now

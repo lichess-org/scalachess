@@ -12,9 +12,9 @@ case class Drop(
     metrics: MoveMetrics = MoveMetrics.empty
 ):
 
-  inline def before       = situationBefore.board
-  lazy val situationAfter = Situation(finalizeAfter, !piece.color)
-  lazy val san: SanStr    = format.pgn.Dumper(this)
+  inline def before    = situationBefore.board
+  def situationAfter   = Situation(finalizeAfter, !piece.color)
+  lazy val san: SanStr = format.pgn.Dumper(this)
 
   lazy val finalizeAfter: Board =
     val board = after.variant.finalizeBoard(

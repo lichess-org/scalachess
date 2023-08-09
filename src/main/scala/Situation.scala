@@ -134,7 +134,7 @@ case class Situation(board: Board, color: Color):
   lazy val potentialEpSquare: Option[Square] = history.lastMove.flatMap:
     case Uci.Move(orig, dest, _) =>
       board(dest).flatMap { piece =>
-        if piece.color == !color && piece.role == Pawn &&
+        if piece.color != color && piece.role == Pawn &&
           orig.yDist(dest) == 2 && orig.rank != piece.color.backRank
         then dest.prevRank(!color)
         else None

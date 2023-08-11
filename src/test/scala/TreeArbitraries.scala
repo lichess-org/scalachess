@@ -7,7 +7,7 @@ import chess.format.pgn.{ Comment, Glyphs, InitialComments, Pgn, Tags }
 import chess.format.pgn.Move as PgnMove
 
 case class GameTree[A](init: Situation, ply: Ply, tree: Option[Node[A]])
-case class MoveWithExtras(move: Move, pgn: PgnMove)
+case class WithMove[A](move: Move, data: A)
 
 object TreeArbitraries:
 
@@ -37,23 +37,30 @@ object TreeArbitraries:
   def genPgn(seed: Situation): Gen[Pgn] =
     for
       tree <- genPgnTree(seed)
-      pgnTree = tree.tree.map(_.map(_.pgn))
+      pgnTree = tree.tree.map(_.map(_.data))
       comments <- genComments(5)
       pgn = Pgn(Tags.empty, InitialComments(comments), pgnTree)
     yield pgn
 
-  def genPgnTree(seed: Situation): Gen[GameTree[MoveWithExtras]] =
+  def genPgnTree(seed: Situation): Gen[GameTree[WithMove[PgnMove]]] =
     val tree =
       if seed.end then Gen.const(None)
       else
         val nextSeeds = seed.legalMoves
         for
           value      <- Gen.oneOf(nextSeeds)
-          move       <- genExtra(value, Ply.initial)
-          variations <- nextSeeds.filter(_ != value).traverse(genExtra(_, Ply.initial))
+          move       <- genPgnMove(value, Ply.initial)
+          variations <- nextSeeds.filter(_ != value).traverse(genPgnMove(_, Ply.initial))
           node       <- genNode(move, variations)
         yield node.some
     tree.map(GameTree(seed, Ply.initial, _))
+
+  def genPgnMove(move: Move, ply: Ply): Gen[WithMove[PgnMove]] =
+    for
+      comments <- genComments(5)
+      glyphs   <- Gen.someOf(Glyphs.all).map(xs => Glyphs.fromList(xs.toList))
+      clock    <- Gen.posNum[Int]
+    yield WithMove(move, PgnMove(ply.next, move.san, comments, glyphs, None, None, clock.some, Nil))
 
   def genTree(seed: Situation): Gen[GameTree[Move]] =
     val treeGen =
@@ -71,26 +78,31 @@ object TreeArbitraries:
   trait Generator[A]:
     extension (a: A) def next: Gen[List[A]]
 
+  trait FromMove[A]:
+    extension (move: Move) def next(a: A): Gen[WithMove[A]]
+
   given Generator[Situation] with
     extension (situation: Situation) def next = pickSome(situation.legalMoves.map(_.situationAfter))
 
   given Generator[Move] with
     extension (move: Move) def next = pickSome(move.situationAfter.legalMoves)
 
-  given Generator[MoveWithExtras] with
-    extension (move: MoveWithExtras)
-      def next: Gen[List[MoveWithExtras]] =
+  given [A](using fm: FromMove[A]): Generator[WithMove[A]] with
+    extension (move: WithMove[A])
+      def next: Gen[List[WithMove[A]]] =
         for
           variations <- pickSome(move.move.situationAfter.legalMoves)
-          nextMoves  <- variations.traverse(genExtra(_, move.pgn.ply))
+          nextMoves  <- variations.traverse(_.next(move.data))
         yield nextMoves
 
-  def genExtra(move: Move, ply: Ply): Gen[MoveWithExtras] =
-    for
-      comments <- genComments(5)
-      glyphs   <- Gen.someOf(Glyphs.all).map(xs => Glyphs.fromList(xs.toList))
-      clock    <- Gen.posNum[Int]
-    yield MoveWithExtras(move, PgnMove(ply.next, move.san, comments, glyphs, None, None, clock.some, Nil))
+  given FromMove[PgnMove] with
+    extension (move: Move)
+      def next(data: PgnMove): Gen[WithMove[PgnMove]] =
+        for
+          comments <- genComments(5)
+          glyphs   <- Gen.someOf(Glyphs.all).map(xs => Glyphs.fromList(xs.toList))
+          clock    <- Gen.posNum[Int]
+        yield WithMove(move, PgnMove(data.ply.next, move.san, comments, glyphs, None, None, clock.some, Nil))
 
   def genNode[A: Generator](value: A, variations: List[A] = Nil): Gen[Node[A]] =
     value.next.flatMap: nextSeeds =>

@@ -67,6 +67,6 @@ object UciCharPair:
     lazy val char2dropRoleMap: Map[Char, Role] = dropRole2charMap.map(_.swap)
     export char2dropRoleMap.apply as unsafeCharToDropRole
 
-    private[format] def lastRank(from: Square): Rank =
+    private[chess] def lastRank(from: Square): Rank =
       if from.rank == Rank.Second then Rank.First
       else Rank.Eighth

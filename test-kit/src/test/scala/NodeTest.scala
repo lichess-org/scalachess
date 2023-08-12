@@ -4,7 +4,7 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Prop.forAll
 
 import cats.syntax.all.*
-import Arbitraries.{ *, given }
+import NodeArbitraries.{ *, given }
 import org.scalacheck.Prop.propBoolean
 import scala.util.Random
 

@@ -2,7 +2,7 @@ package chess
 
 import munit.DisciplineSuite
 import org.scalacheck.*
-import Arbitraries.given
+import CoreArbitraries.given
 import cats.laws.discipline.{ ApplicativeTests, FunctorTests, TraverseTests }
 
 class ByColorLawsTest extends DisciplineSuite:

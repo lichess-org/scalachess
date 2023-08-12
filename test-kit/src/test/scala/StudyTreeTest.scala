@@ -4,7 +4,7 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Prop.forAll
 
 import cats.syntax.all.*
-import TreeArbitraries.*
+import ChessTreeArbitraries.*
 import chess.variant.Standard
 
 class StudyTreeTest extends ScalaCheckSuite:

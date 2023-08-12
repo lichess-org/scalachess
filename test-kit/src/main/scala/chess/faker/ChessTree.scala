@@ -15,7 +15,7 @@ trait Generator[A]:
 trait FromMove[A]:
   extension (move: Move) def next(a: A): Gen[WithMove[A]]
 
-object TreeArbitraries:
+object ChessTreeArbitraries:
 
   given Arbitrary[Variant] = Arbitrary(Gen.oneOf(Variant.list.all))
 

@@ -4,7 +4,7 @@ package format.pgn
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop.forAll
 
-import TreeArbitraries.*
+import ChessTreeArbitraries.*
 import PgnHelper.*
 import chess.variant.Standard
 

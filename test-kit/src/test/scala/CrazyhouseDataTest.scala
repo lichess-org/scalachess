@@ -6,7 +6,7 @@ import chess.bitboard.Bitboard
 
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop.{ forAll, propBoolean }
-import Arbitraries.given
+import CoreArbitraries.given
 
 class CrazyhouseDataTest extends ScalaCheckSuite:
 

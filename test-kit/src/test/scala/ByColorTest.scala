@@ -3,7 +3,7 @@ package chess
 import cats.syntax.all.*
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop.forAll
-import Arbitraries.given
+import CoreArbitraries.given
 
 class ByColorTest extends ScalaCheckSuite:
 

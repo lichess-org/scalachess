@@ -12,7 +12,7 @@ class VariantTest extends ChessTest:
 
   "variants" should:
     "validate situation correctly" in:
-      Fragment.foreach(List(Standard, Chess960, ThreeCheck, KingOfTheHill, Crazyhouse, Atomic)) { variant =>
+      Fragment.foreach(List(Standard, Chess960, ThreeCheck, KingOfTheHill, Crazyhouse)) { variant =>
         s"for variant $variant" in:
           "two-step pawn advance with no check should be valid" in:
             val position = EpdFen("2r3k1/p2Q1pp1/1p5p/3p4/P7/KP6/2r5/8 b - - 1 36")
@@ -420,13 +420,6 @@ K  r
         game.situation.playable(true) must beFalse
         game.situation.playable(false) must beTrue
 
-  "atomic chess" should:
-    "validate situation correctly" in:
-      "kings next to each other and there multiple checkers" in:
-        val position = EpdFen("8/8/4N3/1Rk4p/1B1K4/8/8/8 b - - 1 6")
-        val game     = fenToGame(position, Atomic).toOption.get
-        game.situation.playable(true) must beTrue
-        game.situation.playable(false) must beTrue
 
   "horde" should:
     "validate situation correctly" in:

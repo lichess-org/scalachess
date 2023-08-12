@@ -420,7 +420,6 @@ K  r
         game.situation.playable(true) must beFalse
         game.situation.playable(false) must beTrue
 
-
   "horde" should:
     "validate situation correctly" in:
       "two-step pawn advance with no check should be valid" in:

@@ -2,19 +2,22 @@ package chess
 
 import cats.syntax.all.*
 import org.scalacheck.{ Arbitrary, Gen }
-import chess.variant.{ Standard, Variant }
+import chess.variant.Variant
 import chess.format.pgn.{ Comment, Glyphs, InitialComments, Pgn, Tags }
 import chess.format.pgn.Move as PgnMove
 
 case class GameTree[A](init: Situation, ply: Ply, tree: Option[Node[A]])
 case class WithMove[A](move: Move, data: A)
 
+trait Generator[A]:
+  extension (a: A) def next: Gen[List[A]]
+
+trait FromMove[A]:
+  extension (move: Move) def next(a: A): Gen[WithMove[A]]
+
 object TreeArbitraries:
 
-  given Arbitrary[Variant]                                 = Arbitrary(Gen.oneOf(Variant.list.all))
-  given standardSitutationTree: Arbitrary[Node[Situation]] = Arbitrary(genNode(Situation(Standard)))
-  given standardTree: Arbitrary[GameTree[Move]]            = Arbitrary(genTree(Situation(Standard)))
-  given standardPgn: Arbitrary[Pgn]                        = Arbitrary(genPgn(Situation(Standard)))
+  given Arbitrary[Variant] = Arbitrary(Gen.oneOf(Variant.list.all))
 
   def genComments(size: Int) =
     for
@@ -74,12 +77,6 @@ object TreeArbitraries:
           node       <- genNode(value, variations)
         yield node.some
     treeGen.map(GameTree(seed, Ply.initial, _))
-
-  trait Generator[A]:
-    extension (a: A) def next: Gen[List[A]]
-
-  trait FromMove[A]:
-    extension (move: Move) def next(a: A): Gen[WithMove[A]]
 
   given Generator[Situation] with
     extension (situation: Situation) def next = pickSome(situation.legalMoves.map(_.situationAfter))

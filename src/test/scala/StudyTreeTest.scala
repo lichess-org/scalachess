@@ -4,7 +4,8 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Prop.forAll
 
 import cats.syntax.all.*
-import TreeArbitraries.given
+import TreeArbitraries.*
+import chess.variant.Standard
 
 class StudyTreeTest extends ScalaCheckSuite:
 
@@ -13,5 +14,5 @@ class StudyTreeTest extends ScalaCheckSuite:
   //     tree.size.pp > 0
 
   test("GameTree"):
-    forAll: (tree: GameTree[Move]) =>
+    forAll(genTree(Situation(Standard))): tree =>
       tree.tree.forall(_.size > 0)

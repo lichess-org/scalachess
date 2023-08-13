@@ -56,7 +56,7 @@ case object Standard
   override def valid(situation: Situation, strict: Boolean): Boolean =
     super.valid(situation, strict) && (!strict || hasValidCheckers(situation))
 
-  private def hasValidCheckers(situation: Situation): Boolean =
+  def hasValidCheckers(situation: Situation): Boolean =
     situation.checkers.isEmpty || {
       isValidChecksForMultipleCheckers(situation, situation.checkers) &&
       isValidCheckersForEnPassant(situation, situation.checkers)

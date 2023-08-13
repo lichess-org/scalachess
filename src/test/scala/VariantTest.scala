@@ -12,74 +12,74 @@ class VariantTest extends ChessTest:
 
   "variants" should:
     "validate situation correctly" in:
-      Fragment.foreach(List(Standard, Chess960, ThreeCheck, KingOfTheHill)) { variant =>
+      Fragment.foreach(List(Standard, Chess960, ThreeCheck, KingOfTheHill, Crazyhouse)) { variant =>
+        s"for variant $variant" in:
+          "two-step pawn advance with no check should be valid" in:
+            val position = EpdFen("2r3k1/p2Q1pp1/1p5p/3p4/P7/KP6/2r5/8 b - - 1 36")
+            val game     = fenToGame(position, variant).flatMap(_.playMoves(A7 -> A5)).toOption.get
+            game.situation.playable(true) must beTrue
 
-        "two-step pawn advance with no check should be valid" in:
-          val position = EpdFen("2r3k1/p2Q1pp1/1p5p/3p4/P7/KP6/2r5/8 b - - 1 36")
-          val game     = fenToGame(position, variant).flatMap(_.playMoves(A7 -> A5)).toOption.get
-          game.situation.playable(true) must beTrue
+          "when previous move is a double pawn push and checker is not the pushed pawn or a sliding piece" in:
+            val game1 = Fen
+              .read(variant, EpdFen("r1bqkbnr/1p1p1ppp/p7/2pPp3/4P3/5n2/PPP2PPP/RNBQKBNR w KQkq c6 0 4"))
+              .get
+            val game2 = Fen
+              .read(variant, EpdFen("r1bqkbnr/1p1p1ppp/p7/2pP4/4P3/8/PPP2pPP/RNBQKBNR w KQkq c6 0 4"))
+              .get
 
-        "when previous move is a double pawn push and checker is not the pushed pawn or a sliding piece" in:
-          val game1 = Fen
-            .read(variant, EpdFen("r1bqkbnr/1p1p1ppp/p7/2pPp3/4P3/5n2/PPP2PPP/RNBQKBNR w KQkq c6 0 4"))
-            .get
-          val game2 = Fen
-            .read(variant, EpdFen("r1bqkbnr/1p1p1ppp/p7/2pP4/4P3/8/PPP2pPP/RNBQKBNR w KQkq c6 0 4"))
-            .get
+            game1.variant.valid(game1, true) must beFalse
+            game1.variant.valid(game1, false) must beTrue
+            game2.variant.valid(game2, true) must beFalse
+            game2.variant.valid(game2, false) must beTrue
 
-          game1.variant.valid(game1, true) must beFalse
-          game2.variant.valid(game2, false) must beTrue
-          game1.variant.valid(game1, true) must beFalse
-          game2.variant.valid(game2, false) must beTrue
+          "when previous move is a double pawn push and the only checker is a rook but not discovered check" in:
+            val game = Fen
+              .read(variant, EpdFen("1k6/5K1r/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HA c6 0 4"))
+              .get
+            game.variant.valid(game, true) must beFalse
+            game.variant.valid(game, false) must beTrue
 
-        "when previous move is a double pawn push and the only checker is a rook but not discovered check" in:
-          val game = Fen
-            .read(variant, EpdFen("1k6/5K1r/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HA c6 0 4"))
-            .get
-          game.variant.valid(game, true) must beFalse
-          game.variant.valid(game, false) must beTrue
+          "when previous move is a double pawn push and the only checker is a bishop but not discovered check" in:
+            val game = Fen
+              .read(variant, EpdFen("2b4r/kr5p/p7/2pP2b1/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4"))
+              .get
+            game.variant.valid(game, true) must beFalse
+            game.variant.valid(game, false) must beTrue
 
-        "when previous move is a double pawn push and the only checker is a bishop but not discovered check" in:
-          val game = Fen
-            .read(variant, EpdFen("2b4r/kr5p/p7/2pP2b1/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4"))
-            .get
-          game.variant.valid(game, true) must beFalse
-          game.variant.valid(game, false) must beTrue
+          "when multiple checkers are aligned with the king" in:
+            val game = Fen
+              .read(variant, EpdFen("1nbqk3/1p1prppp/p1P5/8/4K3/8/PPP1rPPP/RNBQ1BNR w HA - 0 4"))
+              .get
+            game.variant.valid(game, true) must beFalse
+            game.variant.valid(game, false) must beTrue
 
-        "when multiple checkers are aligned with the king" in:
-          val game = Fen
-            .read(variant, EpdFen("1nbqk3/1p1prppp/p1P5/8/4K3/8/PPP1rPPP/RNBQ1BNR w HA - 0 4"))
-            .get
-          game.variant.valid(game, true) must beFalse
-          game.variant.valid(game, false) must beTrue
+          "when previous move is a double pawn push and the only checker is the pushed pawn" in:
+            val game = Fen
+              .read(variant, EpdFen("r1bqkbnr/1p1p1ppp/p7/2pP4/3KP3/8/PPP3PP/RNBQ1BNR w HAkq c6 0 4"))
+              .get
+            game.variant.valid(game, true) must beTrue
+            game.variant.valid(game, false) must beTrue
 
-        "when previous move is a double pawn push and the only checker is the pushed pawn" in:
-          val game = Fen
-            .read(variant, EpdFen("r1bqkbnr/1p1p1ppp/p7/2pP4/3KP3/8/PPP3PP/RNBQ1BNR w HAkq c6 0 4"))
-            .get
-          game.variant.valid(game, true) must beTrue
-          game.variant.valid(game, false) must beTrue
+          "when two checkers are not on the same rank, file or diagonal" in:
+            val game = Fen
+              .read(variant, EpdFen("rnbqk2r/1p1p1ppp/p1P5/3np1b1/4P3/4K3/PPP2PPP/RNBQ1BNR w HAkq - 0 4"))
+              .get
+            game.variant.valid(game, true) must beTrue
+            game.variant.valid(game, false) must beTrue
 
-        "when two checkers are not on the same rank, file or diagonal" in:
-          val game = Fen
-            .read(variant, EpdFen("rnbqk2r/1p1p1ppp/p1P5/3np1b1/4P3/4K3/PPP2PPP/RNBQ1BNR b HAkq - 0 4"))
-            .get
-          game.variant.valid(game, true) must beTrue
-          game.variant.valid(game, false) must beTrue
+          "when previous move is a double pawn push and the only checker is a discovered rook check" in:
+            val game = Fen
+              .read(variant, EpdFen("1kb2b1r/1r3K1p/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HAk c6 0 4"))
+              .get
+            game.variant.valid(game, true) must beTrue
+            game.variant.valid(game, false) must beTrue
 
-        "when previous move is a double pawn push and the only checker is a discovered rook check" in:
-          val game = Fen
-            .read(variant, EpdFen("1kb2b1r/1r3K1p/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HAk c6 0 4"))
-            .get
-          game.variant.valid(game, true) must beTrue
-          game.variant.valid(game, false) must beTrue
-
-        "when previous move is a double pawn push and the only checker is a discovered bishop check" in:
-          val game = Fen
-            .read(variant, EpdFen("1bb4r/kr5p/p7/2pP4/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4"))
-            .get
-          game.variant.valid(game, true) must beTrue
-          game.variant.valid(game, false) must beTrue
+          "when previous move is a double pawn push and the only checker is a discovered bishop check" in:
+            val game = Fen
+              .read(variant, EpdFen("1bb4r/kr5p/p7/2pP4/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4"))
+              .get
+            game.variant.valid(game, true) must beTrue
+            game.variant.valid(game, false) must beTrue
       }
 
   "standard" should:
@@ -347,6 +347,28 @@ K  r
     "initialize the board without castling rights" in:
       Board.init(RacingKings).history.castles.isEmpty must beTrue
 
+    "validate situation correctly" in:
+      Fragment.foreach(
+        List(
+          "1bb4r/kr5p/p7/2pP4/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4",
+          "1kb2b1r/1r3K1p/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HAk c6 0 4",
+          "rnbqk2r/1p1p1ppp/p1P5/3np1b1/4P3/4K3/PPP2PPP/RNBQ1BNR w HAkq - 0 4",
+          "r1bqkbnr/1p1p1ppp/p7/2pP4/3KP3/8/PPP3PP/RNBQ1BNR w HAkq c6 0 4",
+          "1nbqk3/1p1prppp/p1P5/8/4K3/8/PPP1rPPP/RNBQ1BNR w HA - 0 4",
+          "2b4r/kr5p/p7/2pP2b1/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4",
+          "1k6/5K1r/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HA c6 0 4",
+          "r1bqkbnr/1p1p1ppp/p7/2pP4/4P3/8/PPP2pPP/RNBQKBNR w KQkq c6 0 4",
+          "r1bqkbnr/1p1p1ppp/p7/2pPp3/4P3/5n2/PPP2PPP/RNBQKBNR w KQkq c6 0 4"
+        )
+      ) { fen =>
+        s"for fen $fen" in:
+          val game = Fen
+            .read(RacingKings, EpdFen(fen))
+            .get
+          game.variant.valid(game, true) must beFalse
+          game.variant.valid(game, false) must beTrue
+      }
+
   "antichess" should:
     "initialize the board without castling rights" in:
       Board.init(Antichess).history.castles.isEmpty must beTrue
@@ -359,11 +381,32 @@ K  r
         game.situation.board.materialImbalance must_== -20
       }
 
+    "validate situation correctly" in:
+      Fragment.foreach(
+        List(
+          "1bb4r/kr5p/p7/2pP4/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4",
+          "1kb2b1r/1r3K1p/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HAk c6 0 4",
+          "rnbqk2r/1p1p1ppp/p1P5/3np1b1/4P3/4K3/PPP2PPP/RNBQ1BNR w HAkq - 0 4",
+          "r1bqkbnr/1p1p1ppp/p7/2pP4/3KP3/8/PPP3PP/RNBQ1BNR w HAkq c6 0 4",
+          "1nbqk3/1p1prppp/p1P5/8/4K3/8/PPP1rPPP/RNBQ1BNR w HA - 0 4",
+          "2b4r/kr5p/p7/2pP2b1/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4",
+          "1k6/5K1r/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HA c6 0 4",
+          "r1bqkbnr/1p1p1ppp/p7/2pP4/4P3/8/PPP2pPP/RNBQKBNR w KQkq c6 0 4",
+          "r1bqkbnr/1p1p1ppp/p7/2pPp3/4P3/5n2/PPP2PPP/RNBQKBNR w KQkq c6 0 4"
+        )
+      ) { fen =>
+        s"for fen $fen" in:
+          val game = Fen
+            .read(Antichess, EpdFen(fen))
+            .get
+          game.variant.valid(game, true) must beTrue
+          game.variant.valid(game, false) must beTrue
+      }
   "horde" should:
     "initialize the board with black castling rights" in:
       Board.init(Horde).history.castles must_== Castles("kq")
 
-  "racing kind" should:
+  "racing king" should:
     "validate situation correctly" in:
       "with any check at all for white" in:
         val position = EpdFen("8/8/8/k5R1/8/8/1rbnNB1K/qrbnNBRQ b - - 0 1")
@@ -376,3 +419,69 @@ K  r
         val game     = fenToGame(position, RacingKings).toOption.get
         game.situation.playable(true) must beFalse
         game.situation.playable(false) must beTrue
+
+  "horde" should:
+    "validate situation correctly" in:
+      "two-step pawn advance with no check should be valid" in:
+        val position = EpdFen("2r3k1/p2P1pp1/1p5p/3p4/P7/PP6/2P3P1/8 b - - 1 36")
+        val game     = fenToGame(position, Horde).flatMap(_.playMoves(A7 -> A5)).toOption.get
+        game.situation.playable(true) must beTrue
+
+      "when previous move is a double pawn push and checker is not the pushed pawn or a sliding piece" in:
+        val game = Fen
+          .read(Horde, EpdFen("1r6/6q1/8/3k4/2pPP3/8/PPP2PPP/PPPPPPPP b - d3 0 1"))
+          .get
+        game.variant.valid(game, false) must beTrue
+        game.variant.valid(game, true) must beFalse
+
+      "when previous move is a double pawn push and the only checker is a rook but not discovered check" in:
+        val game = Fen
+          .read(
+            Horde,
+            EpdFen("5r2/8/4k2R/8/3pP3/8/PPPP1PPP/2PPPPP1 b - e3 0 1")
+          )
+          .get
+        game.variant.valid(game, true) must beFalse
+        game.variant.valid(game, false) must beTrue
+
+      "when previous move is a double pawn push and the only checker is a bishop but not discovered check" in:
+        val game = Fen
+          .read(Horde, EpdFen("5r2/8/4k3/8/3pP1B1/8/PPPP1PPP/2PPPPP1 b - e3 0 1"))
+          .get
+        game.variant.valid(game, true) must beFalse
+        game.variant.valid(game, false) must beTrue
+
+      "when multiple checkers are aligned with the king" in:
+        val game = Fen
+          .read(Horde, EpdFen("1q6/8/R2k1R2/8/8/8/8/8 b - - 0 1"))
+          .get
+        game.variant.valid(game, true) must beFalse
+        game.variant.valid(game, false) must beTrue
+
+      "when previous move is a double pawn push and the only checker is the pushed pawn" in:
+        val game = Fen
+          .read(Horde, EpdFen("1r6/6q1/8/4k3/2pP4/2P5/PP3PPP/PPPPPPPP b - d3 0 3"))
+          .get
+        game.variant.valid(game, true) must beTrue
+        game.variant.valid(game, false) must beTrue
+
+      "when two checkers are not on the same rank, file or diagonal" in:
+        val game = Fen
+          .read(Horde, EpdFen("7r/3k4/8/1B2N2q/1B6/8/PPPPPPPP/PPPPPPPP w - - 0 1"))
+          .get
+        game.variant.valid(game, true) must beTrue
+        game.variant.valid(game, false) must beTrue
+
+      "when previous move is a double pawn push and the only checker is a discovered rook check" in:
+        val game = Fen
+          .read(Horde, EpdFen("8/8/8/8/3Pp3/8/k5R1/8 b - d3 0 2"))
+          .get
+        game.variant.valid(game, true) must beTrue
+        game.variant.valid(game, false) must beTrue
+
+      "when previous move is a double pawn push and the only checker is a discovered bishop check" in:
+        val game = Fen
+          .read(Horde, EpdFen("8/8/8/8/1k1Pp3/8/8/4B3 b - d3 0 2"))
+          .get
+        game.variant.valid(game, true) must beTrue
+        game.variant.valid(game, false) must beTrue

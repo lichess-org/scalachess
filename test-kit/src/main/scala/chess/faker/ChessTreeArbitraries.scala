@@ -17,8 +17,6 @@ trait FromMove[A]:
 
 object ChessTreeArbitraries:
 
-  given Arbitrary[Variant] = Arbitrary(Gen.oneOf(Variant.list.all))
-
   def genComments(size: Int) =
     for
       commentSize <- Gen.choose(0, size)

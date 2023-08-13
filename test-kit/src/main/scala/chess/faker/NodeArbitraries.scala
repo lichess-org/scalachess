@@ -1,6 +1,6 @@
 package chess
 
-import org.scalacheck.{ Arbitrary, Cogen, Gen }
+import org.scalacheck.{ Arbitrary, Gen }
 import cats.kernel.Eq
 
 object NodeArbitraries:

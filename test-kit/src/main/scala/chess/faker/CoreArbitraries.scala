@@ -1,6 +1,6 @@
 package chess
 
-import cats.kernel.Eq
+import chess.variant.Variant
 import chess.bitboard.Bitboard
 import chess.format.{ Uci, UciCharPair }
 
@@ -13,6 +13,8 @@ object CoreArbitraries:
   given Arbitrary[File]   = Arbitrary(Gen.oneOf(File.all))
   given Arbitrary[Rank]   = Arbitrary(Gen.oneOf(Rank.all))
   given Arbitrary[Square] = Arbitrary(Gen.oneOf(Square.all))
+  given Arbitrary[Variant] = Arbitrary(Gen.oneOf(Variant.list.all))
+
 
   given Arbitrary[Piece] = Arbitrary:
     for
@@ -58,7 +60,7 @@ object CoreArbitraries:
       role <- Gen.oneOf(Pawn, Knight, Bishop, Rook, Queen)
     yield Uci.Drop(role, dest)
 
-  private val genBool  = Gen.prob(0.5)
+  private val genBool = Gen.prob(0.5)
   private val castlesGen =
     for
       wks <- genBool

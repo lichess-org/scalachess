@@ -25,7 +25,7 @@ jobs:
           cache: sbt
 
       - name: Build project
-        run: sbt test
+        run: sbt testKit/test
 
       - name: Check Formatting
         run: sbt scalafmtCheckAll

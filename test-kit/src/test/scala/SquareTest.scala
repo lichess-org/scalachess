@@ -3,7 +3,7 @@ package chess
 import cats.syntax.all.*
 import Square.*
 import munit.ScalaCheckSuite
-import Arbitraries.given
+import CoreArbitraries.given
 import org.scalacheck.Prop.forAll
 
 class SquareTest extends ScalaCheckSuite:

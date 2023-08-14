@@ -3,7 +3,7 @@ package chess
 import munit.ScalaCheckSuite
 
 import org.scalacheck.Prop
-import Arbitraries.given
+import CoreArbitraries.given
 
 import Square.*
 import Castles.*

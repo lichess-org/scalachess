@@ -3,7 +3,7 @@ package format
 
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop
-import UciArbitraries.given
+import CoreArbitraries.given
 
 class UciChairPairTest extends ScalaCheckSuite:
 
@@ -25,33 +25,3 @@ class UciChairPairTest extends ScalaCheckSuite:
     Prop.forAll: (xs: List[Uci]) =>
       val str = UciPath.fromIds(xs.map(UciCharPair(_))).debug
       assertEquals(str.split(" ").toList.map(Uci.apply).flatten, xs)
-
-object UciArbitraries:
-
-  import org.scalacheck.{ Arbitrary, Gen }
-  import Arbitraries.given
-
-  def normalUciMoveGen =
-    for
-      orig <- Arbitrary.arbitrary[Square]
-      dest <- Arbitrary.arbitrary[Square]
-    yield Uci.Move(orig, dest)
-
-  def promotionUciMoveGen =
-    for
-      file   <- Arbitrary.arbitrary[File]
-      rank   <- Gen.oneOf(Rank.Second, Rank.Seventh)
-      role   <- Gen.oneOf(Role.allPromotable)
-      offset <- Gen.oneOf(-1, 1)
-      destFile = File(file.value + offset).getOrElse(file)
-      orig     = Square(file, rank)
-      dest     = Square(destFile, UciCharPair.implementation.lastRank(orig))
-    yield Uci.Move(orig, dest, Some(role))
-
-  def dropUciMoveGen =
-    for
-      dest <- Arbitrary.arbitrary[Square]
-      role <- Gen.oneOf(Pawn, Knight, Bishop, Rook, Queen)
-    yield Uci.Drop(role, dest)
-
-  given Arbitrary[Uci] = Arbitrary(Gen.oneOf(normalUciMoveGen, promotionUciMoveGen, dropUciMoveGen))

@@ -9,6 +9,9 @@ on:
 jobs:
   openjdk17:
     runs-on: ubuntu-latest
+    env:
+      JAVA_OPTS: "-Xmx6G -XX:+UseG1GC"
+      SBT_OPTS: "-Dsbt.ci=true"
     steps:
 
       - name: Checkout current branch

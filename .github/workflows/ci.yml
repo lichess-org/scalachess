@@ -24,8 +24,11 @@ jobs:
           java-version: 17
           cache: sbt
 
-      - name: Build project
+      - name: Test
         run: sbt testKit/test
 
       - name: Check Formatting
-        run: sbt scalafmtCheckAll
+        run: |
+          sbt scalachess/scalafmtCheckAll
+          sbt bench/scalafmtCheckAll
+          sbt testKit/scalafmtCheckAll

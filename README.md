@@ -21,7 +21,7 @@ In the sbt shell, to compile scalachess, run
 
 To run the tests
 
-    test
+    testKit / test
 
 To run benchmarks (takes more than 1 hour to finish):
 

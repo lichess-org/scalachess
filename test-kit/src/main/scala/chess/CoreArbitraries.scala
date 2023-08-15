@@ -7,14 +7,13 @@ import chess.format.{ Uci, UciCharPair }
 import org.scalacheck.{ Arbitrary, Cogen, Gen }
 
 object CoreArbitraries:
-  given Arbitrary[Color]  = Arbitrary(Gen.oneOf(Color.all))
-  given Arbitrary[Side]   = Arbitrary(Gen.oneOf(Side.all))
-  given Arbitrary[Role]   = Arbitrary(Gen.oneOf(Role.all))
-  given Arbitrary[File]   = Arbitrary(Gen.oneOf(File.all))
-  given Arbitrary[Rank]   = Arbitrary(Gen.oneOf(Rank.all))
-  given Arbitrary[Square] = Arbitrary(Gen.oneOf(Square.all))
+  given Arbitrary[Color]   = Arbitrary(Gen.oneOf(Color.all))
+  given Arbitrary[Side]    = Arbitrary(Gen.oneOf(Side.all))
+  given Arbitrary[Role]    = Arbitrary(Gen.oneOf(Role.all))
+  given Arbitrary[File]    = Arbitrary(Gen.oneOf(File.all))
+  given Arbitrary[Rank]    = Arbitrary(Gen.oneOf(Rank.all))
+  given Arbitrary[Square]  = Arbitrary(Gen.oneOf(Square.all))
   given Arbitrary[Variant] = Arbitrary(Gen.oneOf(Variant.list.all))
-
 
   given Arbitrary[Piece] = Arbitrary:
     for

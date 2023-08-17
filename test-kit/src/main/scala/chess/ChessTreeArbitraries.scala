@@ -50,6 +50,18 @@ object ChessTreeArbitraries:
         node       <- genNode(withMove, variations)
       yield node.some
 
+  def genNodeWithPath[A](seed: Situation)(using fm: FromMove[A]): Gen[(Option[Node[WithMove[A]]], List[A])] =
+    if seed.end then Gen.const((None, Nil))
+    else
+      val nextSeeds = seed.legalMoves
+      for
+        value      <- Gen.oneOf(nextSeeds)
+        withMove   <- value.next(Ply.initial.next)
+        variations <- nextSeeds.filter(_ != value).traverse(_.next(Ply.initial.next))
+        node       <- genNode(withMove, variations)
+        path       <- NodeArbitraries.genPath(node).map(_.map(_.data))
+      yield (node.some, path)
+
   def genComments(size: Int) =
     for
       commentSize <- Gen.choose(0, size)

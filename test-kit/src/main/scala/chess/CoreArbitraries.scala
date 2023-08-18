@@ -5,6 +5,7 @@ import chess.bitboard.Bitboard
 import chess.format.{ Uci, UciCharPair }
 
 import org.scalacheck.{ Arbitrary, Cogen, Gen }
+import chess.format.pgn.{ Glyph, Glyphs }
 
 object CoreArbitraries:
   given Arbitrary[Color]   = Arbitrary(Gen.oneOf(Color.all))
@@ -14,6 +15,9 @@ object CoreArbitraries:
   given Arbitrary[Rank]    = Arbitrary(Gen.oneOf(Rank.all))
   given Arbitrary[Square]  = Arbitrary(Gen.oneOf(Square.all))
   given Arbitrary[Variant] = Arbitrary(Gen.oneOf(Variant.list.all))
+  given Arbitrary[Glyph]   = Arbitrary(Gen.oneOf(Glyphs.all))
+  given Arbitrary[Glyphs] = Arbitrary:
+    Gen.listOf(Arbitrary.arbitrary[Glyph]).map(Glyphs.fromList)
 
   given Arbitrary[Piece] = Arbitrary:
     for

@@ -1,10 +1,10 @@
 ThisBuild / organization      := "org.lichess"
-ThisBuild / version           := "15.6.5"
+ThisBuild / version           := "15.6.6"
 ThisBuild / scalaVersion      := "3.3.0"
 ThisBuild / licenses += "MIT" -> url("https://opensource.org/licenses/MIT")
 
-resolvers += "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-maven/master"
-publishTo := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", ""))))
+ThisBuild / resolvers += "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-maven/master"
+ThisBuild / publishTo := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", ""))))
 
 val commonSettings = Seq(
   scalacOptions := Seq(

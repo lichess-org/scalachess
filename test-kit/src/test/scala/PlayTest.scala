@@ -2,10 +2,49 @@ package chess
 
 import chess.format.Visual.addNewLines
 import chess.Square.*
+import chess.format.{ EpdFen, Fen }
+import chess.variant.Standard
 
 class PlayTest extends ChessTest:
 
   "playing a game" should:
+    "preserve castling rights" in:
+      "only kingside rights" in:
+        val game = fenToGame(
+          EpdFen("4k2r/8/8/6R1/6r1/3K4/8/8 b k - 3 4"),
+          Standard
+        )
+        game must beRight.like { game =>
+          game.playMoves(
+            G4 -> G2,
+            G5 -> G8,
+            G2 -> G8,
+            D3 -> E3,
+            G8 -> G5
+          ) must beRight.like { game =>
+            val fen = Fen write game
+            fen must_== "4k2r/8/8/6r1/8/4K3/8/8 w k - 2 3"
+          }
+        }
+
+      "kingside and queenside rights" in:
+        val game = fenToGame(
+          EpdFen("r3k2r/8/8/6R1/6r1/3K4/8/8 b kq - 3 4"),
+          Standard
+        )
+        game must beRight.like { game =>
+          game.playMoves(
+            G4 -> G2,
+            G5 -> G8,
+            G2 -> G8,
+            D3 -> E3,
+            G8 -> G5
+          ) must beRight.like { game =>
+            val fen = Fen write game
+            fen must_== "r3k2r/8/8/6r1/8/4K3/8/8 w kq - 2 3"
+          }
+        }
+
     "opening one" in:
       val game =
         makeGame.playMoves(E2 -> E4, E7 -> E5, F1 -> C4, G8 -> F6, D2 -> D3, C7 -> C6, C1 -> G5, H7 -> H6)

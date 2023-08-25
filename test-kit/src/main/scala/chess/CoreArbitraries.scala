@@ -18,6 +18,7 @@ object CoreArbitraries:
   given Arbitrary[Glyph]   = Arbitrary(Gen.oneOf(Glyphs.all))
   given Arbitrary[Glyphs] = Arbitrary:
     Gen.listOf(Arbitrary.arbitrary[Glyph]).map(Glyphs.fromList)
+  given Arbitrary[Centis] = Arbitrary(Gen.posNum[Int].map(Centis(_)))
 
   given Arbitrary[Piece] = Arbitrary:
     for

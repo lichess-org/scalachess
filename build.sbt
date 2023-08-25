@@ -1,5 +1,5 @@
 ThisBuild / organization      := "org.lichess"
-ThisBuild / version           := "15.6.6"
+ThisBuild / version           := "15.6.7"
 ThisBuild / scalaVersion      := "3.3.0"
 ThisBuild / licenses += "MIT" -> url("https://opensource.org/licenses/MIT")
 

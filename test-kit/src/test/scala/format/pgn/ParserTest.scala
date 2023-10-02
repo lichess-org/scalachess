@@ -371,6 +371,12 @@ class ParserTest extends ChessTest:
   "example with tags & comments without moves 2" in:
     parse(tagsCommentsWithoutMoves2) must beRight
 
+  "empty spaces in tags value should be removed" in:
+    parse(completeTagsWithSpaces) must beRight.like { a =>
+      a.tags(_.Variant) must_== Some("Standard")
+      a.tags(_.Event) must_== Some("Мат в 1 ход [1-63] - Дорофеева: Мат в 1 ход - 43")
+    }
+
   "game with comments" in:
     parse(gameWithComments) must beRight.like { a =>
       a.mainline.size must_== 106

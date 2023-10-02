@@ -32,10 +32,10 @@ class ClockTest extends ChessTest:
     val clock = Clock(5 * 60 * 1000, 0)
     val game  = makeGame withClock clock.start
     "new game" in:
-      game.clock map { _.color } must_== Option(White)
+      game.clock map { _.color } must_== Some(White)
     "one move played" in:
       game.playMoves(E2 -> E4) must beRight.like { case g: Game =>
-        g.clock map { _.color } must_== Option(Black)
+        g.clock map { _.color } must_== Some(Black)
       }
   "create a clock" should:
     "with time" in:
@@ -47,7 +47,7 @@ class ClockTest extends ChessTest:
     "with 30 seconds" in:
       Clock(30, 0).limitInMinutes must_== 0.5
   "lag compensation" should:
-    def durOf(lag: Int) = MoveMetrics(clientLag = Option(Centis(lag)))
+    def durOf(lag: Int) = MoveMetrics(clientLag = Some(Centis(lag)))
 
     def clockStep(clock: Clock, wait: Int, lags: Int*) =
       (lags.foldLeft(clock) { (clk, lag) =>

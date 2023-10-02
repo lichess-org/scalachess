@@ -47,13 +47,13 @@ class ParserTest extends ChessTest:
     "as a queen" in:
       parse("b8=Q ") must beRight.like: parsed =>
         parsed.mainline.headOption must beSome { (san: San) =>
-          san === Std(Square.B8, Pawn, promotion = Option(Queen))
+          san === Std(Square.B8, Pawn, promotion = Some(Queen))
         }
 
     "as a rook" in:
       parse("b8=R ") must beRight { (parsed: ParsedPgn) =>
         parsed.mainline.headOption must beSome { (san: San) =>
-          san.asInstanceOf[Std].promotion must_== Option(Rook)
+          san.asInstanceOf[Std].promotion must_== Some(Rook)
         }
       }
 
@@ -97,7 +97,7 @@ class ParserTest extends ChessTest:
   "glyphs" in:
 
     parseMove("b8=B ") must beRight.like: node =>
-      node.value.san === Std(Square.B8, Pawn, promotion = Option(Bishop))
+      node.value.san === Std(Square.B8, Pawn, promotion = Some(Bishop))
 
     parseMove("1. e4") must beRight.like: node =>
       node.value.san must_== Std(Square.E4, Pawn)
@@ -121,15 +121,15 @@ class ParserTest extends ChessTest:
     parse(withNag) must beRight
 
     parse("Ne7g6+! $13") must beRight.like: parsed =>
-      parsed.metas.glyphs.move must_== Option(Glyph.MoveAssessment.good)
-      parsed.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
+      parsed.metas.glyphs.move must_== Some(Glyph.MoveAssessment.good)
+      parsed.metas.glyphs.position must_== Some(Glyph.PositionAssessment.unclear)
 
   "non-nags" in:
     parse(withGlyphAnnotations) must beRight
 
     parse("Bxd3?? ∞") must beRight.like { parsed =>
-      parsed.tree.firstMove.metas.glyphs.move must_== Option(Glyph.MoveAssessment.blunder)
-      parsed.tree.firstMove.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
+      parsed.tree.firstMove.metas.glyphs.move must_== Some(Glyph.MoveAssessment.blunder)
+      parsed.tree.firstMove.metas.glyphs.position must_== Some(Glyph.PositionAssessment.unclear)
     }
 
   "comments" in:
@@ -347,16 +347,16 @@ class ParserTest extends ChessTest:
   "year" in:
     "full date" in:
       parse(recentChessCom) must beRight.like { parsed =>
-        parsed.tags.year must_== Option(2016)
+        parsed.tags.year must_== Some(2016)
       }
     "only year" in:
       parse(explorerPartialDate) must beRight.like { parsed =>
-        parsed.tags.year must_== Option(1978)
+        parsed.tags.year must_== Some(1978)
       }
 
   "weird variant names" in:
     parse(stLouisFischerandom) must beRight.like { parsed =>
-      parsed.tags.variant must_== Option(variant.Chess960)
+      parsed.tags.variant must_== Some(variant.Chess960)
     }
 
   "example from chessgames.com with weird comments" in:

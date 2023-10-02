@@ -27,7 +27,7 @@ case class Move(
     val board = after.variant.finalizeBoard(
       after updateHistory { h1 =>
         val h2 = h1.copy(
-          lastMove = Option(toUci),
+          lastMove = Some(toUci),
           unmovedRooks = before.unmovedRooks,
           halfMoveClock =
             if piece.is(Pawn) || captures || promotes then HalfMoveClock.initial
@@ -117,7 +117,7 @@ case class Move(
       for
         b2 <- after take dest
         b3 <- b2.place(color - p, dest)
-      yield copy(after = b3, promotion = Option(p))
+      yield copy(after = b3, promotion = Some(p))
     else this.some
 
   inline def withAfter(newBoard: Board) = copy(after = newBoard)

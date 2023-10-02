@@ -40,4 +40,4 @@ class TagTest extends ChessTest:
 
   "test" should:
     "beSome" in:
-      Option(3) must beSome((_: Int) == 3)
+      Some(3) must beSome((_: Int) == 3)

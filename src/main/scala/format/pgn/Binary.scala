@@ -124,7 +124,7 @@ object Binary:
         case SimplePieceR(piece, capture, square, check) =>
           simplePiece(piece, square, capture, check)
         case FullPawnR(file, square, promotion, check) =>
-          fullPawn(Option(file), square, check, Option(promotion))
+          fullPawn(Some(file), square, check, Some(promotion))
         case FullPieceR(piece, orig, capture, square, check) =>
           fullPiece(piece, orig, square, capture, check)
         case DropR(role, square, check) => drop(role, square, check)

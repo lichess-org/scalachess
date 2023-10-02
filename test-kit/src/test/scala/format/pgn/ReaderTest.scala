@@ -64,7 +64,7 @@ class ReaderTest extends ChessTest:
     "promoting to a rook" in:
       Reader.full(fromLichessBadPromotion) must beRight.like { case Complete(replay) =>
         replay.chronoMoves lift 10 must beSome:
-          (_: MoveOrDrop).fold(_.promotion, _ => None) must_== Option(Rook)
+          (_: MoveOrDrop).fold(_.promotion, _ => None) must_== Some(Rook)
       }
     "chessbase arrows" in:
       Reader.full(chessbaseArrows) must beRight

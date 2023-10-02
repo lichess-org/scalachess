@@ -36,7 +36,7 @@ final case class LagTracker(
     val e = lagEstimator.record((lag atMost quotaMax).centis.toFloat)
     copy(
       lagEstimator = e,
-      compEstimate = Option(Centis.ofFloat(e.mean - .8f * e.deviation).nonNeg atMost quota)
+      compEstimate = Some(Centis.ofFloat(e.mean - .8f * e.deviation).nonNeg atMost quota)
     )
 
   def moves = lagStats.samples

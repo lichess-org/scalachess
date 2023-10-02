@@ -69,29 +69,29 @@ class PawnTest extends ChessTest:
           board destsFrom D5 must bePoss(D6)
         "with irrelevant history" in:
           board withHistory defaultHistory(
-            lastMove = Option(Uci.Move(A2, A4))
+            lastMove = Some(Uci.Move(A2, A4))
           ) destsFrom D5 must bePoss(D6)
         "with relevant history on the left" in:
           board withHistory defaultHistory(
-            lastMove = Option(Uci.Move(C7, C5))
+            lastMove = Some(Uci.Move(C7, C5))
           ) destsFrom D5 must bePoss(D6, C6)
         "with relevant history on the right" in:
           board withHistory defaultHistory(
-            lastMove = Option(Uci.Move(E7, E5))
+            lastMove = Some(Uci.Move(E7, E5))
           ) destsFrom D5 must bePoss(D6, E6)
       "enemy not-a-pawn" in:
         makeBoard(
           D5 -> White.pawn,
           E5 -> Black.rook
         ) withHistory defaultHistory(
-          lastMove = Option(Uci.Move(E7, E5))
+          lastMove = Some(Uci.Move(E7, E5))
         ) destsFrom D5 must bePoss(D6)
       "friend pawn (?!)" in:
         makeBoard(
           D5 -> White.pawn,
           E5 -> White.pawn
         ) withHistory defaultHistory(
-          lastMove = Option(Uci.Move(E7, E5))
+          lastMove = Some(Uci.Move(E7, E5))
         ) destsFrom D5 must bePoss(D6)
 
   "a black pawn" should:
@@ -158,12 +158,12 @@ class PawnTest extends ChessTest:
           board destsFrom D4 must bePoss(D3)
         "with relevant history on the left" in:
           board withHistory defaultHistory(
-            lastMove = Option(Uci.Move(C2, C4))
+            lastMove = Some(Uci.Move(C2, C4))
           ) destsFrom D4 must bePoss(D3, C3)
       "enemy not-a-pawn" in:
         makeBoard(
           D4 -> Black.pawn,
           E4 -> White.rook
         ) withHistory defaultHistory(
-          lastMove = Option(Uci.Move(E2, E4))
+          lastMove = Some(Uci.Move(E2, E4))
         ) destsFrom D4 must bePoss(D3)

@@ -86,7 +86,7 @@ case class Board(
     if v == Crazyhouse then copy(variant = v).ensureCrazyData
     else copy(variant = v)
 
-  def withCrazyData(data: Crazyhouse.Data)         = copy(crazyData = Option(data))
+  def withCrazyData(data: Crazyhouse.Data)         = copy(crazyData = Some(data))
   def withCrazyData(data: Option[Crazyhouse.Data]) = copy(crazyData = data)
   def withCrazyData(f: Crazyhouse.Data => Crazyhouse.Data): Board =
     withCrazyData(f(crazyData | Crazyhouse.Data.init))

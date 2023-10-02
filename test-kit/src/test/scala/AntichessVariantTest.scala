@@ -141,10 +141,10 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       val position     = EpdFen("8/5P2/8/2b5/8/8/4B3/8 w - -")
       val originalGame = fenToGame(position, Antichess)
 
-      val newGame = originalGame flatMap (_.apply(Square.F7, Square.F8, Option(King))) map (_._1)
+      val newGame = originalGame flatMap (_.apply(Square.F7, Square.F8, Some(King))) map (_._1)
 
       newGame must beRight:
-        (_: Game).board(Square.F8).mustEqual(Option(White - King))
+        (_: Game).board(Square.F8).mustEqual(Some(White - King))
 
     "deal with 2 white kings" in:
       val position     = EpdFen("K3k1nr/p2q2pp/p2p1p2/8/2PP4/8/PP4PP/RNBQK1NR w - - 0 11")
@@ -194,7 +194,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       val position     = EpdFen("8/6p1/4B1P1/4p3/4P3/8/2p5/8 b - - 1 28")
       val originalGame = fenToGame(position, Antichess)
 
-      val newGame = originalGame flatMap (_.apply(Square.C2, Square.C1, Option(Bishop))) map (_._1)
+      val newGame = originalGame flatMap (_.apply(Square.C2, Square.C1, Some(Bishop))) map (_._1)
 
       newGame must beRight.like { case (drawnGame: Game) =>
         drawnGame.situation.end must beTrue
@@ -206,7 +206,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       val position     = EpdFen("8/6p1/1B4P1/4p3/4P3/8/3p4/8 b - -")
       val originalGame = fenToGame(position, Antichess)
 
-      val newGame = originalGame flatMap (_.apply(Square.D2, Square.D1, Option(Bishop))) map (_._1)
+      val newGame = originalGame flatMap (_.apply(Square.D2, Square.D1, Some(Bishop))) map (_._1)
 
       newGame must beRight.like { case nonDrawnGame =>
         nonDrawnGame.situation.end must beFalse

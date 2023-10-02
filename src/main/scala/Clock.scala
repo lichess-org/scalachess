@@ -42,7 +42,7 @@ case class Clock(
 
   def isRunning = timer.isDefined
 
-  def start = if isRunning then this else copy(timer = Option(now))
+  def start = if isRunning then this else copy(timer = Some(now))
 
   def stop =
     timer.fold(this) { t =>

@@ -17,37 +17,37 @@ class RacingKingsVariantTest extends ChessTest:
       val fenPosition = EpdFen("4krn1/K2b4/8/8/8/8/8/8 w - - 4 3")
       val game        = fenToGame(fenPosition, RacingKings).toOption.get
       game.situation.end must beTrue
-      game.situation.winner mustEqual Option(Black)
+      game.situation.winner mustEqual Some(Black)
 
     "game end to black 2" in:
       val fenPosition = EpdFen("4brk1/8/5n2/K7/8/8/8/8 w - - 6 4")
       val game        = fenToGame(fenPosition, RacingKings).toOption.get
       game.situation.end must beTrue
-      game.situation.winner mustEqual Option(Black)
+      game.situation.winner mustEqual Some(Black)
 
     "game end to black 3" in:
       val fenPosition = EpdFen("3kbrn1/8/8/K7/8/8/8/8 w - - 4 3")
       val game        = fenToGame(fenPosition, RacingKings).toOption.get
       game.situation.end must beTrue
-      game.situation.winner mustEqual Option(Black)
+      game.situation.winner mustEqual Some(Black)
 
     "game end to black 4" in:
       val fenPosition = EpdFen("4brk1/4n3/8/K7/8/8/8/8 w - - 4 3")
       val game        = fenToGame(fenPosition, RacingKings).toOption.get
       game.situation.end must beTrue
-      game.situation.winner mustEqual Option(Black)
+      game.situation.winner mustEqual Some(Black)
 
     "game end to white" in:
       val fenPosition = EpdFen("K3br2/5k2/8/8/6n1/8/8/8 w - - 4 3")
       val game        = fenToGame(fenPosition, RacingKings).toOption.get
       game.situation.end must beTrue
-      game.situation.winner mustEqual Option(White)
+      game.situation.winner mustEqual Some(White)
 
     "game end to white 2" in:
       val fenPosition = EpdFen("K3b2r/5k2/5n2/8/8/8/8/8 w - - 4 3")
       val game        = fenToGame(fenPosition, RacingKings).toOption.get
       game.situation.end must beTrue
-      game.situation.winner mustEqual Option(White)
+      game.situation.winner mustEqual Some(White)
 
     "game is draw if both kings are in 8th rank" in:
       val fenPosition = EpdFen("K3brk1/8/5n2/8/8/8/8/8 w - - 4 3")

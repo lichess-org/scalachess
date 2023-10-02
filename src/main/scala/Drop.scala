@@ -20,7 +20,7 @@ case class Drop(
     val board = after.variant.finalizeBoard(
       after updateHistory { h =>
         h.copy(
-          lastMove = Option(Uci.Drop(piece.role, square)),
+          lastMove = Some(Uci.Drop(piece.role, square)),
           unmovedRooks = before.unmovedRooks,
           halfMoveClock = if piece.is(Pawn) then HalfMoveClock.initial else h.halfMoveClock + 1
         )

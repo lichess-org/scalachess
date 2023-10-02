@@ -49,7 +49,7 @@ trait ChessTest extends Specification with EitherMatchers:
     ): Either[ErrorStr, Game] =
       game(orig, dest, promotion).map(_._1)
 
-    def withClock(c: Clock) = game.copy(clock = Option(c))
+    def withClock(c: Clock) = game.copy(clock = Some(c))
 
   extension (sit: Situation)
     def movesAt(s: Square): List[Move] =

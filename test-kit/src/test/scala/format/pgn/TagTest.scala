@@ -38,6 +38,11 @@ class TagTest extends ChessTest:
         Tag.BlackRatingDiff
       )
 
-  "test" should:
-    "beSome" in:
-      Option(3) must beSome((_: Int) == 3)
+    "be trimmed" in:
+      List(
+        Tag(_.Site, "  https://lichess.org/QuCzSfxw "),
+        Tag(_.Black, " penguingim1  ")
+      ) must_== List(
+        Tag(_.Site, "https://lichess.org/QuCzSfxw"),
+        Tag(_.Black, "penguingim1")
+      )

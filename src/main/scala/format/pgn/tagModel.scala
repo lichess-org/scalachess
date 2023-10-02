@@ -168,12 +168,12 @@ object Tag:
 
   def apply(name: String, value: Any): Tag = Tag(
     name = tagType(name),
-    value = value.toString
+    value = value.toString.trim
   )
 
   def apply(name: Tag.type => TagType, value: Any): Tag = Tag(
     name = name(this),
-    value = value.toString
+    value = value.toString.trim
   )
 
   def tagType(name: String) =

@@ -9,11 +9,20 @@ import chess.format.pgn.Fixtures
 class ReplayTest extends ChessTest:
 
   "from prod" in:
+
     "replay from position close chess" in:
       val fen   = EpdFen("""8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1""")
       val moves = SanStr from """d4 d5 Nf4 Nf5 g4 g5 gxf5 exf5""".split(' ').toList
       Replay.gameMoveWhileValid(moves, fen, variant.FromPosition) must beLike { case (_, games, None) =>
         games.size must_== 8
+        games(1)._2._2 === "d5"
+      }
+
+    "replay errors should keep order" in:
+      val fen   = EpdFen("""8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1""")
+      val moves = SanStr from """d4 d5 Nf3""".split(' ').toList
+      Replay.gameMoveWhileValid(moves, fen, variant.FromPosition) must beLike { case (_, games, Some(_)) =>
+        games.size must_== 2
         games(1)._2._2 === "d5"
       }
 

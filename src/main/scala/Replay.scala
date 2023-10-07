@@ -53,17 +53,18 @@ object Replay:
   ): (Game, List[(Game, Uci.WithSan)], Option[ErrorStr]) =
     val init       = makeGame(variant, initialFen.some)
     val emptyGames = List.empty[(Game, Uci.WithSan)]
-    (for
-      moves <- Parser.moves(sans).leftMap(err => (init, emptyGames, err.some))
-      games <- moves.value
-        .zip(sans)
-        .foldM(emptyGames):
-          case (games, (san, sanStr)) =>
-            val game = games.headOption.fold(init)(_._1)
-            san(game.situation)
-              .leftMap(err => (init, games, err.some))
-              .map(m => (m.applyGame(game), Uci.WithSan(m.toUci, sanStr)) :: games)
-    yield (init, games.reverse, none)).merge
+    sans
+      .foldM(emptyGames):
+        case (games, str) =>
+          Parser
+            .sanOnly(str)
+            .flatMap: san =>
+              val game = games.headOption.fold(init)(_._1)
+              san(game.situation)
+                .map(m => (m.applyGame(game), Uci.WithSan(m.toUci, str)) :: games)
+            .leftMap(err => (init, games.reverse, err.some))
+      .map(gs => (init, gs.reverse, none))
+      .merge
 
   private def computeSituations[M](
       sit: Situation,

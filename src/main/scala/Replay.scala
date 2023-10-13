@@ -46,7 +46,7 @@ object Replay:
         )
       )
 
-  def gameMoveWhileValid(
+  def gameMoveWhileValidReverse(
       sans: Seq[SanStr],
       initialFen: Fen.Epd,
       variant: Variant
@@ -63,9 +63,17 @@ object Replay:
                 .map: move =>
                   val newGame = move.applyGame(head)
                   (newGame, (newGame, Uci.WithSan(move.toUci, str)) :: games)
-            .leftMap(err => (init, games.reverse, err.some))
-      .map(gs => (init, gs._2.reverse, none))
+            .leftMap(err => (init, games, err.some))
+      .map(gs => (init, gs._2, none))
       .merge
+
+  def gameMoveWhileValid(
+      sans: Seq[SanStr],
+      initialFen: Fen.Epd,
+      variant: Variant
+  ): (Game, List[(Game, Uci.WithSan)], Option[ErrorStr]) =
+    gameMoveWhileValidReverse(sans, initialFen, variant) match
+      case (game, gs, err) => (game, gs.reverse, err)
 
   private def computeSituations[M](
       sit: Situation,

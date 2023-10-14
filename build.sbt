@@ -14,12 +14,12 @@ val commonSettings = Seq(
     "-indent",
     "-feature",
     "-language:postfixOps",
-    "-Wunused:all"
+    "-Wunused:all",
+    "-release:17"
     // "-Werror"
     // Warnings as errors!
     /* "-Xfatal-warnings" */
-  ),
-  scalacOptions ++= Seq("-java-output-version", "17")
+  )
 )
 
 lazy val scalachess: Project = Project("scalachess", file(".")).settings(

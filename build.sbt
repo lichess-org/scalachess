@@ -37,7 +37,7 @@ lazy val scalachess: Project = Project("scalachess", file(".")).settings(
 
 lazy val bench = project
   .enablePlugins(JmhPlugin)
-  .settings(name := "bench")
+  .settings(commonSettings, name := "bench")
   .dependsOn(scalachess, testKit, testKit % "compile->test")
 
 lazy val testKit = project

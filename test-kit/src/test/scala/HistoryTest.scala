@@ -1,6 +1,6 @@
 package chess
 
-class HistoryTest extends ChessTest:
+class HistoryTest extends ChessSpecs:
 
   "threefold repetition" should:
     def toHash(a: Int) = PositionHash(Array(a.toByte, 0.toByte, 0.toByte))

@@ -1,6 +1,6 @@
 package chess
 
-class ColorTest extends munit.FunSuite:
+class ColorTest extends ChessTest:
 
   test("unary !"):
     assertEquals(!White, Black)

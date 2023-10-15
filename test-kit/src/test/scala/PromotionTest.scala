@@ -6,7 +6,7 @@ import chess.format.EpdFen
 import chess.Square.*
 import chess.variant.Standard
 
-class PromotionTest extends ChessTest:
+class PromotionTest extends ChessSpecs:
 
   "Not allow promotion to a king in a standard game " in:
     val fen  = EpdFen("8/1P6/8/8/8/8/7k/1K6 w - -")

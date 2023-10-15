@@ -5,7 +5,7 @@ import cats.syntax.option.*
 import scala.language.implicitConversions
 import Sans.*
 
-class ParserTest extends ChessTest:
+class ParserTest extends ChessSpecs:
 
   import Fixtures.*
 

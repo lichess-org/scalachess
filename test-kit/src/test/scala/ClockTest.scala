@@ -3,7 +3,7 @@ package chess
 import scala.language.implicitConversions
 import Square.*
 
-class ClockTest extends ChessTest:
+class ClockTest extends ChessSpecs:
 
   given Conversion[Int, Clock.LimitSeconds]     = Clock.LimitSeconds(_)
   given Conversion[Int, Clock.IncrementSeconds] = Clock.IncrementSeconds(_)

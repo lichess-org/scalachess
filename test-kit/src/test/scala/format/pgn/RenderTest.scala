@@ -5,11 +5,9 @@ import scala.language.implicitConversions
 
 import PgnHelper.*
 
-class RenderTest extends munit.FunSuite:
+class RenderTest extends ChessTest:
 
   given Conversion[String, SanStr]  = SanStr(_)
-  given Conversion[String, PgnStr]  = PgnStr(_)
-  given Conversion[PgnStr, String]  = _.value
   given Conversion[String, Comment] = Comment(_)
 
   import Fixtures.*

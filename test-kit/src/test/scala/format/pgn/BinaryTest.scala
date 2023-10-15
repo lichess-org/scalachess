@@ -4,7 +4,7 @@ package format.pgn
 import chess.format.pgn.SanStr
 import scala.language.implicitConversions
 
-class BinaryTest extends ChessTest:
+class BinaryTest extends ChessSpecs:
 
   import BinaryTestData.*
   import BinaryTestUtils.*

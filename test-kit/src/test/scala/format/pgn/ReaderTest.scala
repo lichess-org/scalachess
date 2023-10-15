@@ -4,7 +4,7 @@ package format.pgn
 import scala.language.implicitConversions
 import MoveOrDrop.*
 
-class ReaderTest extends ChessTest:
+class ReaderTest extends ChessSpecs:
 
   import Fixtures.*
   import Reader.Result.*

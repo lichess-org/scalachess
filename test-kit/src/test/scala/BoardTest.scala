@@ -3,7 +3,7 @@ package chess
 import scala.language.implicitConversions
 import Square.*
 
-class BoardTest extends ChessTest:
+class BoardTest extends ChessSpecs:
 
   val board = makeBoard
 

@@ -1,7 +1,7 @@
 package chess
 package format
 
-class UciPathTest extends munit.FunSuite:
+class UciPathTest extends ChessTest:
 
   test("empty intersect"):
     assertEquals(UciPath("/?UE)8\\M(DYQDMTM'*`Y('aR-5").intersect(UciPath(")8VN")), UciPath.root)

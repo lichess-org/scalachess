@@ -2,7 +2,7 @@ package chess
 
 import scala.language.implicitConversions
 
-class BerserkTest extends ChessTest:
+class BerserkTest extends ChessSpecs:
 
   def whiteBerserk(minutes: Int, seconds: Int) =
     Clock(minutes * 60, seconds).goBerserk(White).remainingTime(White).centis * .01

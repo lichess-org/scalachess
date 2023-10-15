@@ -3,7 +3,7 @@ package chess
 import scala.language.implicitConversions
 import Square.*
 
-class KingSafetyTest extends ChessTest:
+class KingSafetyTest extends ChessSpecs:
 
   "in order to save the king" should:
     "the king" in:

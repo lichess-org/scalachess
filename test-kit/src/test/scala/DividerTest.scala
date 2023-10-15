@@ -3,7 +3,7 @@ package chess
 import scala.language.implicitConversions
 import MoveOrDrop.*
 
-class DividerTest extends ChessTest:
+class DividerTest extends ChessSpecs:
 
   def makeReplay(moves: String) =
     format.pgn.Reader.full(moves).toOption.get match

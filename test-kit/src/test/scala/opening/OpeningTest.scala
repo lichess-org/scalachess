@@ -4,7 +4,7 @@ package opening
 import format.EpdFen
 import format.pgn.SanStr
 
-class OpeningTest extends munit.FunSuite:
+class OpeningTest extends ChessTest:
 
   def searchStr(str: String): Option[Opening] =
     OpeningDb search SanStr.from(str.split(' ').toList) map (_.opening)

@@ -5,7 +5,7 @@ import Square.*
 import variant.Standard
 import chess.format.EpdFen
 
-class AutodrawTest extends ChessTest:
+class AutodrawTest extends ChessSpecs:
 
   "detect automatic draw" should:
     "by lack of pieces" in:

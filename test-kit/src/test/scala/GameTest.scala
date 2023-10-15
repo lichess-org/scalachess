@@ -3,7 +3,7 @@ package chess
 import scala.language.implicitConversions
 import Square.*
 
-class GameTest extends ChessTest:
+class GameTest extends ChessSpecs:
 
   "prevent castle by capturing a rook" should:
     val game = Game(

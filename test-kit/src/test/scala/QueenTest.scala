@@ -3,7 +3,7 @@ package chess
 import scala.language.implicitConversions
 import Square.*
 
-class QueenTest extends ChessTest:
+class QueenTest extends ChessSpecs:
 
   "a queen" should:
 

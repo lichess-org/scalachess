@@ -3,7 +3,7 @@ package chess
 import scala.language.implicitConversions
 import Square.*
 
-class BishopTest extends ChessTest:
+class BishopTest extends ChessSpecs:
 
   "a bishop" should:
 

@@ -5,7 +5,7 @@ import variant.{ Antichess, Atomic, Crazyhouse, Standard, ThreeCheck }
 import chess.format.{ EpdFen, Fen, Uci }
 import chess.format.pgn.SanStr
 
-class HashTest extends ChessTest:
+class HashTest extends ChessSpecs:
   def hexToBytes(str: String) =
     str.grouped(2).map(cc => Integer.parseInt(cc, 16).toByte).toArray
 

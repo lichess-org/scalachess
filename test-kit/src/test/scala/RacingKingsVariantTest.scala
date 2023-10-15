@@ -4,7 +4,7 @@ import variant.RacingKings
 
 import chess.format.EpdFen
 
-class RacingKingsVariantTest extends ChessTest:
+class RacingKingsVariantTest extends ChessSpecs:
 
   "Racing Kings" should:
 

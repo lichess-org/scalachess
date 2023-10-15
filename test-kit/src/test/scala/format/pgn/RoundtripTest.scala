@@ -3,7 +3,7 @@ package format.pgn
 
 import scala.language.implicitConversions
 
-class RoundtripTest extends munit.FunSuite:
+class RoundtripTest extends ChessTest:
 
   test("roundtrip with special chars for tags"):
     val value = "aä\\\"'$%/°á \t\b \"\\\\/"

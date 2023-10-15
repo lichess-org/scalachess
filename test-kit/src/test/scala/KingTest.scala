@@ -3,7 +3,7 @@ package chess
 import scala.language.implicitConversions
 import Square.*
 
-class KingTest extends ChessTest:
+class KingTest extends ChessSpecs:
 
   "a king" should:
 

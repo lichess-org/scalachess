@@ -6,7 +6,7 @@ import chess.format.pgn.SanStr
 import chess.variant.Chess960
 import chess.format.pgn.Fixtures
 
-class ReplayTest extends ChessTest:
+class ReplayTest extends ChessSpecs:
 
   "from prod" in:
 

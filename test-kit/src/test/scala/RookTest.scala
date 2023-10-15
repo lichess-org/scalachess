@@ -3,7 +3,7 @@ package chess
 import scala.language.implicitConversions
 import Square.*
 
-class RookTest extends ChessTest:
+class RookTest extends ChessSpecs:
 
   "a rook" should:
 

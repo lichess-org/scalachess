@@ -3,7 +3,7 @@ package format
 
 import scala.language.implicitConversions
 
-class FenTest extends ChessTest:
+class FenTest extends ChessSpecs:
 
   import pgn.Reader
   import Square.*

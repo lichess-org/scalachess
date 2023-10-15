@@ -1,6 +1,6 @@
 package chess
 
-class SituationTest extends ChessTest:
+class SituationTest extends ChessSpecs:
 
   "a game" should:
     "detect check" should:

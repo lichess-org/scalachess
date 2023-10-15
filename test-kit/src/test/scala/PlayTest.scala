@@ -5,7 +5,7 @@ import chess.Square.*
 import chess.format.{ EpdFen, Fen }
 import chess.variant.Standard
 
-class PlayTest extends ChessTest:
+class PlayTest extends ChessSpecs:
 
   "playing a game" should:
     "preserve castling rights" in:

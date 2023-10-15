@@ -1,14 +1,12 @@
 package chess
 package bitboard
 
-import munit.FunSuite
-
 import Square.*
 import Bitboard.*
 import chess.format.Fen
 import chess.format.EpdFen
 
-class BoardTest extends FunSuite:
+class BoardTest extends ChessTest:
 
   import scala.language.implicitConversions
   given Conversion[Square, Int] = _.value

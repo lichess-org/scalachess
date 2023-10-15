@@ -5,7 +5,7 @@ import variant.Chess960
 import chess.format.pgn.Reader
 import chess.format.EpdFen
 
-class Chess960Test extends ChessTest:
+class Chess960Test extends ChessSpecs:
 
   "Chess960 chess" should:
 

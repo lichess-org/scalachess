@@ -3,7 +3,7 @@ package format.pgn
 
 import ornicar.scalalib.time.*
 
-class TimeFormatTest extends ChessTest:
+class TimeFormatTest extends ChessSpecs:
 
   "format seconds" should:
     "look good" in:

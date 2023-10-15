@@ -7,7 +7,7 @@ import chess.format.{ EpdFen, Fen }
 import chess.format.pgn.Reader
 import chess.variant.Antichess
 
-class AntichessVariantTest extends ChessTest:
+class AntichessVariantTest extends ChessSpecs:
 
   // Random PGN taken from FICS
   val fullGame =

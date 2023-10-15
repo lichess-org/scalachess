@@ -3,7 +3,7 @@ package chess
 import Square.*
 import format.Uci
 
-class PawnTest extends ChessTest:
+class PawnTest extends ChessSpecs:
 
   "a white pawn" should:
 

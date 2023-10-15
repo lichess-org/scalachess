@@ -12,7 +12,7 @@ import bitboard.Board as BBoard
 import chess.format.Uci
 import chess.variant.Chess960
 
-trait ChessTest extends Specification with EitherMatchers:
+trait ChessTestCommon:
 
   given Conversion[String, Board]  = Visual.<<
   given Conversion[String, PgnStr] = PgnStr(_)
@@ -78,37 +78,12 @@ trait ChessTest extends Specification with EitherMatchers:
 
   def makeEmptyBoard: Board = Board(BBoard.empty, chess.variant.Standard)
 
-  def bePoss(poss: Square*) = // : Matcher[Option[Iterable[square]]] =
-    beSome { (p: Iterable[Square]) =>
-      sortPoss(p.toList).map(_.key) must_== sortPoss(poss.toList).map(_.key)
-    }
-
   def makeGame: Game = Game(makeBoard, White)
-
-  def bePoss(board: Board, visual: String) = // : Matcher[Option[Iterable[square]]] =
-    beSome { (p: Iterable[Square]) =>
-      Visual.addNewLines(Visual.>>|(board, Map(p -> 'x'))) must_== visual
-    }
-
-  def beBoard(visual: String): Matcher[Either[ErrorStr, Board]] =
-    beRight.like { case b =>
-      b.visual must_== (Visual << visual).visual
-    }
-
-  def beSituation(visual: String): Matcher[Either[ErrorStr, Situation]] =
-    beRight.like { case s =>
-      s.board.visual must_== (Visual << visual).visual
-    }
-
-  def beGame(visual: String): Matcher[Either[ErrorStr, Game]] =
-    beRight.like { case g =>
-      g.board.visual must_== (Visual << visual).visual
-    }
 
   def sortPoss(poss: Seq[Square]): Seq[Square] = poss.sortBy(_.key)
 
   def pieceMoves(piece: Piece, square: Square): Option[List[Square]] =
-    (makeEmptyBoard place (piece, square)) map { b =>
+    makeEmptyBoard.place(piece, square).map { b =>
       Situation(b, piece.color).movesAt(square).map(_.dest)
     }
 
@@ -127,3 +102,29 @@ trait ChessTest extends Specification with EitherMatchers:
     unmovedRooks = unmovedRooks,
     halfMoveClock = halfMoveClock
   )
+
+trait ChessTest extends munit.FunSuite with ChessTestCommon:
+
+end ChessTest
+
+trait ChessSpecs extends Specification with EitherMatchers with ChessTestCommon:
+
+  def bePoss(poss: Square*) = // : Matcher[Option[Iterable[square]]] =
+    beSome: (p: Iterable[Square]) =>
+      sortPoss(p.toList).map(_.key) must_== sortPoss(poss.toList).map(_.key)
+
+  def bePoss(board: Board, visual: String) = // : Matcher[Option[Iterable[square]]] =
+    beSome: (p: Iterable[Square]) =>
+      Visual.addNewLines(Visual.>>|(board, Map(p -> 'x'))) must_== visual
+
+  def beBoard(visual: String): Matcher[Either[ErrorStr, Board]] =
+    beRight.like:
+      _.visual must_== (Visual << visual).visual
+
+  def beSituation(visual: String): Matcher[Either[ErrorStr, Situation]] =
+    beRight.like:
+      _.board.visual must_== (Visual << visual).visual
+
+  def beGame(visual: String): Matcher[Either[ErrorStr, Game]] =
+    beRight.like:
+      _.board.visual must_== (Visual << visual).visual

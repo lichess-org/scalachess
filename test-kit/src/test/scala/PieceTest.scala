@@ -1,6 +1,6 @@
 package chess
 
-class PieceTest extends ChessTest:
+class PieceTest extends ChessSpecs:
 
   "Piece" should:
     "compare" in:

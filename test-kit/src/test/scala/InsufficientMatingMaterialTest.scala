@@ -4,7 +4,7 @@ import InsufficientMatingMaterial.*
 import chess.format.EpdFen
 import chess.variant.Standard
 
-class InsufficientMatingMaterialTest extends ChessTest:
+class InsufficientMatingMaterialTest extends ChessSpecs:
 
   "bishops on Opposite colors" should:
 

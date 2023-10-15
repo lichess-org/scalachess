@@ -6,7 +6,7 @@ import variant.FromPosition
 import variant.Chess960
 import format.EpdFen
 
-class CastlingTest extends ChessTest:
+class CastlingTest extends ChessSpecs:
 
   "king side" should:
     val goodHist = """

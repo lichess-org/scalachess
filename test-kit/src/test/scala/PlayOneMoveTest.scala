@@ -2,7 +2,7 @@ package chess
 
 import Square.*
 
-class PlayOneMoveTest extends ChessTest:
+class PlayOneMoveTest extends ChessSpecs:
 
   "playing a move" should:
     "only process things once" in:

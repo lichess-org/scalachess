@@ -6,7 +6,7 @@ import chess.variant.Atomic
 import chess.format.EpdFen
 import chess.format.pgn.SanStr
 
-class AtomicVariantTest extends ChessTest:
+class AtomicVariantTest extends ChessSpecs:
 
   "Atomic chess" should:
 

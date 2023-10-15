@@ -7,7 +7,7 @@ import Square.*
 
 import chess.variant.ThreeCheck
 
-class DumperTest extends ChessTest:
+class DumperTest extends ChessSpecs:
 
   given Conversion[String, SanStr] = SanStr(_)
 

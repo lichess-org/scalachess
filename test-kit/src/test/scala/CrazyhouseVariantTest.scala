@@ -8,7 +8,7 @@ import chess.format.pgn.SanStr
 import chess.Square.*
 import chess.bitboard.Bitboard
 
-class CrazyhouseVariantTest extends ChessTest:
+class CrazyhouseVariantTest extends ChessSpecs:
 
   "Crazyhouse" should:
 

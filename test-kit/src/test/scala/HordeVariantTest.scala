@@ -4,7 +4,7 @@ import variant.Horde
 import chess.format.EpdFen
 import chess.format.pgn.SanStr
 
-class HordeVariantTest extends ChessTest:
+class HordeVariantTest extends ChessSpecs:
 
   "Horde chess" should:
 

@@ -6,7 +6,7 @@ import chess.format.{ EpdFen, Fen }
 import chess.variant.*
 import org.specs2.specification.core.Fragment
 
-class VariantTest extends ChessTest:
+class VariantTest extends ChessSpecs:
 
   val board = makeBoard
 

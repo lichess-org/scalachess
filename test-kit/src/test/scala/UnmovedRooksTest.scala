@@ -9,7 +9,7 @@ import cats.syntax.all.*
 
 import bitboard.Board as BBoard
 
-class UnmovedRooksTest extends ChessTest:
+class UnmovedRooksTest extends ChessSpecs:
 
   "UnmovedRooks with 960 initial fen" in:
     Fen

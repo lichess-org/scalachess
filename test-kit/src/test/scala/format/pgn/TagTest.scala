@@ -1,7 +1,7 @@
 package chess
 package format.pgn
 
-class TagTest extends ChessTest:
+class TagTest extends ChessSpecs:
 
   "Tags" should:
     // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm#c8.1.1

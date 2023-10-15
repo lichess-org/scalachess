@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.infra.Blackhole
 import chess.Situation
 import chess.format.*
-import chess.bitboard.{ Bitboard, FenFixtures }
 import chess.perft.Perft
 import chess.variant.*
 

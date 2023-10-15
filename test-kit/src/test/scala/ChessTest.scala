@@ -105,6 +105,26 @@ trait ChessTestCommon:
 
 trait ChessTest extends munit.FunSuite with ChessTestCommon:
 
+  import alleycats.Zero
+
+  def assertMatch[A](a: A)(f: PartialFunction[A, Boolean]) =
+    assert(f.lift(a) | false, s"$a does not match expectations")
+
+  def assertCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T]) =
+    assert(isCloseTo(a, b, delta), s"$a is not close to $b by $delta")
+
+  private def isCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T]) =
+    (n.toDouble(a) - n.toDouble(b)).abs <= delta
+
+  extension [A](a: A)
+    def matchZero[B: Zero](f: PartialFunction[A, B]): B =
+      f.lift(a) | Zero[B].zero
+
+  extension [E, A](v: Either[E, A])
+    def assertRight(f: A => Any): Any = v match
+      case Right(r) => f(r)
+      case Left(e)  => fail(s"Expected Right but received $v")
+
 end ChessTest
 
 trait ChessSpecs extends Specification with EitherMatchers with ChessTestCommon:

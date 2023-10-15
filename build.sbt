@@ -48,16 +48,16 @@ lazy val testKit = project
     name := "scalachess-test-kit",
     libraryDependencies ++= List(
       "org.scalacheck"      %% "scalacheck"        % "1.17.0",
-      "org.specs2"          %% "specs2-core"       % "4.20.2"   % Test,
-      "org.specs2"          %% "specs2-cats"       % "4.20.2"   % Test,
-      "org.scalameta"       %% "munit"             % "1.0.0-M8" % Test,
-      "org.scalameta"       %% "munit-scalacheck"  % "1.0.0-M8" % Test,
-      "com.disneystreaming" %% "weaver-cats"       % "0.8.3"    % Test,
-      "com.disneystreaming" %% "weaver-scalacheck" % "0.8.3"    % Test,
-      "co.fs2"              %% "fs2-core"          % "3.8.0"    % Test,
-      "co.fs2"              %% "fs2-io"            % "3.8.0"    % Test,
-      "org.typelevel"       %% "discipline-munit"  % "1.0.9"    % Test,
-      "org.typelevel"       %% "cats-laws"         % "2.9.0"    % Test
+      "org.specs2"          %% "specs2-core"       % "4.20.2"    % Test,
+      "org.specs2"          %% "specs2-cats"       % "4.20.2"    % Test,
+      "org.scalameta"       %% "munit"             % "1.0.0-M10" % Test,
+      "org.scalameta"       %% "munit-scalacheck"  % "1.0.0-M10" % Test,
+      "com.disneystreaming" %% "weaver-cats"       % "0.8.3"     % Test,
+      "com.disneystreaming" %% "weaver-scalacheck" % "0.8.3"     % Test,
+      "co.fs2"              %% "fs2-core"          % "3.8.0"     % Test,
+      "co.fs2"              %% "fs2-io"            % "3.8.0"     % Test,
+      "org.typelevel"       %% "discipline-munit"  % "1.0.9"     % Test,
+      "org.typelevel"       %% "cats-laws"         % "2.9.0"     % Test
     ),
     testFrameworks += new TestFramework("weaver.framework.CatsEffect")
   )

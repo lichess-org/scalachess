@@ -125,6 +125,9 @@ trait ChessTest extends munit.FunSuite with ChessTestCommon:
       case Right(r) => f(r)
       case Left(e)  => fail(s"Expected Right but received $v")
 
+  given [A, B](using sr: SameRuntime[B, A]): munit.Compare[A, B] = new:
+    def isEqual(obtained: A, expected: B): Boolean = obtained == sr(expected)
+
 end ChessTest
 
 trait ChessSpecs extends Specification with EitherMatchers with ChessTestCommon:

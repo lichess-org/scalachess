@@ -106,27 +106,38 @@ trait ChessTestCommon:
 trait ChessTest extends munit.FunSuite with ChessTestCommon:
 
   import alleycats.Zero
+  import munit.Location
 
-  def assertMatch[A](a: A)(f: PartialFunction[A, Boolean])(using munit.Location) =
+  def assertNot(cond: => Boolean, clue: => Any = "assertion failed")(using Location): Unit =
+    assert(!cond, clue)
+
+  def assertMatch[A](a: A)(f: PartialFunction[A, Boolean])(using Location) =
     assert(f.lift(a) | false, s"$a does not match expectations")
 
-  def assertCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T])(using munit.Location) =
+  def assertCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T])(using Location) =
     assert(isCloseTo(a, b, delta), s"$a is not close to $b by $delta")
 
-  private def isCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T])(using munit.Location) =
+  private def isCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T])(using Location) =
     (n.toDouble(a) - n.toDouble(b)).abs <= delta
 
   extension [A](a: A)
-    def matchZero[B: Zero](f: PartialFunction[A, B])(using munit.Location): B =
+    def matchZero[B: Zero](f: PartialFunction[A, B])(using Location): B =
       f.lift(a) | Zero[B].zero
 
   extension [E, A](v: Either[E, A])
-    def assertRight(f: A => Any)(using munit.Location): Any = v match
+    def assertRight(f: A => Any)(using Location): Any = v match
       case Right(r) => f(r)
+      case Left(e)  => fail(s"Expected Right but received $v")
+    def get: A = v match
+      case Right(r) => r
       case Left(e)  => fail(s"Expected Right but received $v")
 
   given [A, B](using sr: SameRuntime[B, A]): munit.Compare[A, B] = new:
     def isEqual(obtained: A, expected: B): Boolean = obtained == sr(expected)
+
+  object clockConv:
+    given Conversion[Int, Clock.LimitSeconds]     = Clock.LimitSeconds(_)
+    given Conversion[Int, Clock.IncrementSeconds] = Clock.IncrementSeconds(_)
 
 end ChessTest
 

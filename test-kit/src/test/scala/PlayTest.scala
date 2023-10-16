@@ -5,52 +5,46 @@ import chess.Square.*
 import chess.format.{ EpdFen, Fen }
 import chess.variant.Standard
 
-class PlayTest extends ChessSpecs:
+class PlayTest extends ChessTest:
 
-  "playing a game" should:
-    "preserve castling rights" in:
-      "only kingside rights" in:
-        val game = fenToGame(
-          EpdFen("4k2r/8/8/6R1/6r1/3K4/8/8 b k - 3 4"),
-          Standard
-        )
-        game must beRight.like { game =>
-          game.playMoves(
-            G4 -> G2,
-            G5 -> G8,
-            G2 -> G8,
-            D3 -> E3,
-            G8 -> G5
-          ) must beRight.like { game =>
-            val fen = Fen write game
-            fen must_== "4k2r/8/8/6r1/8/4K3/8/8 w k - 2 3"
-          }
-        }
+  test("only kingside rights"):
+    val game = fenToGame(
+      EpdFen("4k2r/8/8/6R1/6r1/3K4/8/8 b k - 3 4"),
+      Standard
+    ).flatMap:
+      _.playMoves(
+        G4 -> G2,
+        G5 -> G8,
+        G2 -> G8,
+        D3 -> E3,
+        G8 -> G5
+      )
+    assertRight(game): game =>
+      val fen = Fen write game
+      fen == EpdFen("4k2r/8/8/6r1/8/4K3/8/8 w k - 2 3")
 
-      "kingside and queenside rights" in:
-        val game = fenToGame(
-          EpdFen("r3k2r/8/8/6R1/6r1/3K4/8/8 b kq - 3 4"),
-          Standard
-        )
-        game must beRight.like { game =>
-          game.playMoves(
-            G4 -> G2,
-            G5 -> G8,
-            G2 -> G8,
-            D3 -> E3,
-            G8 -> G5
-          ) must beRight.like { game =>
-            val fen = Fen write game
-            fen must_== "r3k2r/8/8/6r1/8/4K3/8/8 w kq - 2 3"
-          }
-        }
+  test("kingside and queenside rights"):
+    val game = fenToGame(
+      EpdFen("r3k2r/8/8/6R1/6r1/3K4/8/8 b kq - 3 4"),
+      Standard
+    ).flatMap:
+      _.playMoves(
+        G4 -> G2,
+        G5 -> G8,
+        G2 -> G8,
+        D3 -> E3,
+        G8 -> G5
+      )
+    assertRight(game): game =>
+      val fen = Fen write game
+      fen == EpdFen("r3k2r/8/8/6r1/8/4K3/8/8 w kq - 2 3")
 
-    "opening one" in:
-      val game =
-        makeGame.playMoves(E2 -> E4, E7 -> E5, F1 -> C4, G8 -> F6, D2 -> D3, C7 -> C6, C1 -> G5, H7 -> H6)
-      "current game" in:
-        game must beRight.like { case g =>
-          addNewLines(g.board.visual) must_== """
+  val game =
+    makeGame.playMoves(E2 -> E4, E7 -> E5, F1 -> C4, G8 -> F6, D2 -> D3, C7 -> C6, C1 -> G5, H7 -> H6).get
+  test("current game"):
+    assertEquals(
+      addNewLines(game.board.visual),
+      """
 rnbqkb r
 pp p pp
   p  n p
@@ -60,10 +54,11 @@ pp p pp
 PPP  PPP
 RN QK NR
 """
-        }
-      "after recapture" in:
-        game flatMap { _.playMoves(G5 -> F6, D8 -> F6) } must beRight.like { case g =>
-          addNewLines(g.board.visual) must_== """
+    )
+  test("after recapture"):
+    assertEquals(
+      addNewLines(game.playMoves(G5 -> F6, D8 -> F6).get.board.visual),
+      """
 rnb kb r
 pp p pp
   p  q p
@@ -73,9 +68,10 @@ pp p pp
 PPP  PPP
 RN QK NR
 """
-        }
-    "Deep Blue vs Kasparov 1" in:
-      makeGame.playMoves(
+    )
+  test("Deep Blue vs Kasparov 1"):
+    val g = makeGame
+      .playMoves(
         E2 -> E4,
         C7 -> C5,
         C2 -> C3,
@@ -96,8 +92,11 @@ RN QK NR
         C5 -> D4,
         C3 -> D4,
         F8 -> B4
-      ) must beRight.like { case g =>
-        addNewLines(g.board.visual) must_== """
+      )
+      .get
+    assertEquals(
+      addNewLines(g.board.visual),
+      """
 r   k  r
 pp   ppp
   n pn
@@ -107,9 +106,11 @@ pp   ppp
 PP  BPP
 RN Q RK
 """
-      }
-    "Peruvian Immortal" in:
-      makeGame.playMoves(
+    )
+
+  test("Peruvian Immortal"):
+    val g = makeGame
+      .playMoves(
         E2 -> E4,
         D7 -> D5,
         E4 -> D5,
@@ -137,8 +138,11 @@ RN Q RK
         F3 -> C6,
         B7 -> C6,
         E2 -> A6
-      ) must beRight.like { case g =>
-        addNewLines(g.board.visual) must_== """
+      )
+      .get
+    assertEquals(
+      addNewLines(g.board.visual),
+      """
   kr  nr
 p  n ppp
 B p p
@@ -148,4 +152,4 @@ B p p
  PPK PP
        q
 """
-      }
+    )

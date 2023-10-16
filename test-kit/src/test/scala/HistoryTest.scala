@@ -17,7 +17,7 @@ class ThreefoldRepetitionTest extends ChessTest:
     assert(!history.threefoldRepetition)
   test("positive"):
     val history = makeHistory(List(1, 2, 3, 4, 5, 2, 5, 6, 23, 2))
-    assert(!history.threefoldRepetition)
+    assert(history.threefoldRepetition)
 
 class HalfMoveClockTest extends ChessTest:
 

@@ -7,29 +7,29 @@ class SituationTest extends ChessSpecs:
       "by rook" in:
         ("""
 K  r
-""" as White).check === Check.Yes
+""" as White).check must_== Check.Yes
       "by knight" in:
         ("""
   n
 K
-""" as White).check === Check.Yes
+""" as White).check must_== Check.Yes
       "by bishop" in:
         ("""
   b
 
 
      K
-""" as White).check === Check.Yes
+""" as White).check must_== Check.Yes
       "by pawn" in:
         ("""
     p
      K
-""" as White).check === Check.Yes
+""" as White).check must_== Check.Yes
       "not" in:
         ("""
    n
 K
-""" as White).check === Check.No
+""" as White).check must_== Check.No
     "detect check mate" in:
       "by rook" in:
         ("""

@@ -20,51 +20,51 @@ class HashTest extends ChessSpecs:
     "match on the starting position" in:
       val fen  = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
       val game = fenToGame(fen, Standard).toOption.get
-      hash(game.situation) mustEqual hexToBytes("463b96181691fc9c")
+      hash(game.situation) must_==  hexToBytes("463b96181691fc9c")
 
     "match after 1. e4" in:
       val fen  = EpdFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1")
       val game = fenToGame(fen, Standard).toOption.get
-      hash(game.situation) mustEqual hexToBytes("823c9b50fd114196")
+      hash(game.situation) must_==  hexToBytes("823c9b50fd114196")
 
     "match after 1. e4 d5" in:
       val fen  = EpdFen("rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
       val game = fenToGame(fen, Standard).toOption.get
-      hash(game.situation) mustEqual hexToBytes("0756b94461c50fb0")
+      hash(game.situation) must_==  hexToBytes("0756b94461c50fb0")
 
     "match after 1. e4 d5 2. e5" in:
       val fen  = EpdFen("rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 2")
       val game = fenToGame(fen, Standard).toOption.get
-      hash(game.situation) mustEqual hexToBytes("662fafb965db29d4")
+      hash(game.situation) must_==  hexToBytes("662fafb965db29d4")
 
     "match after 1. e4 d5 2. e5 f5" in:
       // note that en-passant matters
       val fen  = EpdFen("rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3")
       val game = fenToGame(fen, Standard).toOption.get
-      hash(game.situation) mustEqual hexToBytes("22a48b5a8e47ff78")
+      hash(game.situation) must_==  hexToBytes("22a48b5a8e47ff78")
 
     "match after 1. e4 d5 2. e5 f5 3. Ke2" in:
       // 3. Ke2 forfeits castling rights
       val fen  = EpdFen("rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPPKPPP/RNBQ1BNR b kq - 1 3")
       val game = fenToGame(fen, Standard).toOption.get
-      hash(game.situation) mustEqual hexToBytes("652a607ca3f242c1")
+      hash(game.situation) must_==  hexToBytes("652a607ca3f242c1")
 
     "match after 1. e4 d5 2. e5 f5 3. Ke2 Kf7" in:
       val fen  = EpdFen("rnbq1bnr/ppp1pkpp/8/3pPp2/8/8/PPPPKPPP/RNBQ1BNR w - - 2 4")
       val game = fenToGame(fen, Standard).toOption.get
-      hash(game.situation) mustEqual hexToBytes("00fdd303c946bdd9")
+      hash(game.situation) must_==  hexToBytes("00fdd303c946bdd9")
 
     "match after 1. a4 b5 2. h4 b4 3. c4" in:
       // again, note en-passant matters
       val fen  = EpdFen("rnbqkbnr/p1pppppp/8/8/PpP4P/8/1P1PPPP1/RNBQKBNR b KQkq c3 0 3")
       val game = fenToGame(fen, Standard).toOption.get
-      hash(game.situation) mustEqual hexToBytes("3c8123ea7b067637")
+      hash(game.situation) must_==  hexToBytes("3c8123ea7b067637")
 
     "match after 1. a4 b5 2. h4 b4 3. c4 bxc3 4. Ra3" in:
       // 4. Ra3 partially forfeits castling rights
       val fen  = EpdFen("rnbqkbnr/p1pppppp/8/8/P6P/R1p5/1P1PPPP1/1NBQKBNR b Kkq - 1 4")
       val game = fenToGame(fen, Standard).toOption.get
-      hash(game.situation) mustEqual hexToBytes("5c3f9b829b279560")
+      hash(game.situation) must_==  hexToBytes("5c3f9b829b279560")
 
   "Hasher" should:
 
@@ -140,7 +140,7 @@ class HashTest extends ChessSpecs:
       val situationAfter = Fen.read(Crazyhouse, fenAfter).get
       val hashAfter      = hash(situationAfter)
 
-      hashAfterMove mustEqual hashAfter
+      hashAfterMove must_==  hashAfter
 
     "be consistent when king is captured in antichess" in:
       val fen           = EpdFen("rnbqkb1r/ppp1pppp/3p1n2/1B6/8/4P3/PPPP1PPP/RNBQK1NR w KQkq - 2 3")
@@ -153,7 +153,7 @@ class HashTest extends ChessSpecs:
       val situationAfter = Fen.read(Antichess, fenAfter).get
       val hashAfter      = hash(situationAfter)
 
-      hashAfterMove mustEqual hashAfter
+      hashAfterMove must_==  hashAfter
 
     "be consistent when rook is exploded in atomic" in:
       val fen           = EpdFen("rnbqkb1r/ppppp1pp/5p1n/6N1/8/8/PPPPPPPP/RNBQKB1R w KQkq - 2 3")
@@ -166,7 +166,7 @@ class HashTest extends ChessSpecs:
       val situationAfter = Fen.read(Atomic, fenAfter).get
       val hashAfter      = hash(situationAfter)
 
-      hashAfterMove mustEqual hashAfter
+      hashAfterMove must_==  hashAfter
 
     "prod 5 Three-Check games accumulate hash" in:
       val gameMoves = format.pgn.Fixtures.prod5threecheck.map { g =>

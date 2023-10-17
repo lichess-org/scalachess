@@ -55,7 +55,7 @@ trait ChessTestCommon:
     def movesAt(s: Square): List[Move] =
       sit.moves.getOrElse(s, Nil)
 
-  def fenToGame(positionString: EpdFen, variant: Variant) =
+  def fenToGameEither(positionString: EpdFen, variant: Variant): Either[String, Game] =
     Fen
       .read(variant, positionString)
       .map: sit =>
@@ -117,6 +117,9 @@ trait ChessTest extends munit.FunSuite with ChessTestCommon:
   def assertCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T])(using Location) =
     assert(isCloseTo(a, b, delta), s"$a is not close to $b by $delta")
 
+  def fenToGame(positionString: EpdFen, variant: Variant)(using Location): Game =
+    fenToGameEither(positionString, variant).get
+
   private def isCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T])(using Location) =
     (n.toDouble(a) - n.toDouble(b)).abs <= delta
 
@@ -142,6 +145,9 @@ trait ChessTest extends munit.FunSuite with ChessTestCommon:
 end ChessTest
 
 trait ChessSpecs extends Specification with EitherMatchers with ChessTestCommon:
+
+  def fenToGame(positionString: EpdFen, variant: Variant): Either[String, Game] =
+    fenToGameEither(positionString, variant)
 
   def bePoss(poss: Square*) = // : Matcher[Option[Iterable[square]]] =
     beSome: (p: Iterable[Square]) =>

@@ -53,7 +53,7 @@ class BoardTest extends ChessSpecs:
 
     "allow a piece to be placed" in:
       board.place(White - Rook, E3) must beSome:
-        (_: Board)(E3) mustEqual Option(White - Rook)
+        (_: Board)(E3) must_==  Option(White - Rook)
 
     "allow a piece to be taken" in:
       board take A1 must beSome:
@@ -61,7 +61,7 @@ class BoardTest extends ChessSpecs:
 
     "allow a piece to move" in:
       board.move(E2, E4) must beSome:
-        (_: Board)(E4) mustEqual Option(White - Pawn)
+        (_: Board)(E4) must_==  Option(White - Pawn)
 
     "not allow an empty position to move" in:
       board.move(E5, E6) must beNone
@@ -75,7 +75,7 @@ class BoardTest extends ChessSpecs:
         _.place(White - Pawn, A3),
         _.move(A2, A4)
       ) must beSome:
-        (_: Board)(A4) mustEqual Option(White - Pawn)
+        (_: Board)(A4) must_==  Option(White - Pawn)
 
     "fail on bad actions chain" in:
       makeEmptyBoard.seq(

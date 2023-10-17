@@ -241,7 +241,7 @@ class AtomicVariantTest extends ChessSpecs:
       val successGame = game flatMap (_.playMoves((Square.F6, Square.F5), (Square.G4, Square.H3)))
 
       successGame must beRight.like { game =>
-        game.situation.check === Check.Yes
+        game.situation.check must_== Check.Yes
       }
 
     "Can move into discovered check in order to explode the opponent's king" in:
@@ -262,7 +262,7 @@ class AtomicVariantTest extends ChessSpecs:
       val successGame = game flatMap (_.playMoves((Square.B5, Square.D7)))
 
       successGame must beRight.like { game =>
-        game.situation.check === Check.No
+        game.situation.check must_== Check.No
       }
 
     "It should not be possible to explode a piece, exploding a piece next to it which would result in a check" in:
@@ -546,7 +546,7 @@ class AtomicVariantTest extends ChessSpecs:
           .toVector
       val (game, steps, error) = chess.Replay.gameMoveWhileValid(sans, Atomic.initialFen, Atomic)
       error must beNone
-      steps.size === sans.size
+      steps.size must_== sans.size
 
   "castlings" should:
 

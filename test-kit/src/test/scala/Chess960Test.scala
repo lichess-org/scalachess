@@ -39,7 +39,7 @@ class Chess960Test extends ChessSpecs:
       """
 
       Reader.full(pgn) must beRight.like { case Reader.Result.Complete(replay) =>
-        replay.state.situation.legalMoves.find(_.castles).map(_.toUci) === Some(
+        replay.state.situation.legalMoves.find(_.castles).map(_.toUci) must_== Some(
           format.Uci.Move(Square.E1, Square.B1)
         )
       }

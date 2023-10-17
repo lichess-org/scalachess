@@ -15,7 +15,7 @@ class ReplayTest extends ChessSpecs:
       val moves = SanStr from """d4 d5 Nf4 Nf5 g4 g5 gxf5 exf5""".split(' ').toList
       Replay.gameMoveWhileValid(moves, fen, variant.FromPosition) must beLike { case (_, games, None) =>
         games.size must_== 8
-        games(1)._2._2 === "d5"
+        games(1)._2._2 must_== "d5"
       }
 
     "replay errors should keep order" in:
@@ -23,7 +23,7 @@ class ReplayTest extends ChessSpecs:
       val moves = SanStr from """d4 d5 Nf3""".split(' ').toList
       Replay.gameMoveWhileValid(moves, fen, variant.FromPosition) must beLike { case (_, games, Some(_)) =>
         games.size must_== 2
-        games(1)._2._2 === "d5"
+        games(1)._2._2 must_== "d5"
       }
 
   "castle rights" in:
@@ -60,7 +60,7 @@ class ReplayTest extends ChessSpecs:
       Chess960
     )
     error must beNone
-    steps.size === sans.size
+    steps.size must_== sans.size
 
   "castling always 960 notation" in:
     val sans: Vector[SanStr] =

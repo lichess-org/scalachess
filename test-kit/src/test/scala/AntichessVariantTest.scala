@@ -191,72 +191,47 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     "Opponent has sufficient material when there are only two remaining knights on opposite color squares"
   ):
     val position = EpdFen("7n/8/8/8/8/8/8/N7 w - -")
-    val game     = fenToGame(position, Antichess)
-
-    val newGame = game flatMap (_.playMoves(Square.A1 -> Square.B3))
-
-    newGame must beRight.like:
-      _.situation.opponentHasInsufficientMaterial must beFalse
+    val game     = fenToGame(position, Antichess).playMoves(Square.A1 -> Square.B3).get
+    assertNot(game.situation.opponentHasInsufficientMaterial)
 
   test("Not be drawn on insufficient mating material"):
-    val position  = EpdFen("4K3/8/1b6/8/8/8/5B2/3k4 b - -")
-    val maybeGame = fenToGame(position, Antichess)
-
-    maybeGame must beRight.like { case game =>
-      game.situation.end must beFalse
-    }
+    val position = EpdFen("4K3/8/1b6/8/8/8/5B2/3k4 b - -")
+    val game     = fenToGame(position, Antichess)
+    assertNot(game.situation.end)
 
   test("Be drawn on a three move repetition"):
     val game = Game(Antichess)
-
     val moves =
       List((Square.G1, Square.F3), (Square.G8, Square.F6), (Square.F3, Square.G1), (Square.F6, Square.G8))
     val repeatedMoves: List[(Square, Square)] = List.fill(3)(moves).flatten
-
-    val drawnGame = game.playMoveList(repeatedMoves)
-
-    drawnGame must beRight.like { case g =>
-      g.situation.threefoldRepetition must beTrue
-    }
+    val g                                     = game.playMoveList(repeatedMoves).get
+    assert(g.situation.threefoldRepetition)
 
   test("Successfully play through a full game until one player loses all their pieces"):
-    val game = Reader.full(fullGame)
-
-    game must beRight.like { case Reader.Result.Complete(replay) =>
-      val game = replay.state
-
-      game.situation.end must beTrue
-
-      // In antichess, the player who has just lost all their pieces is the winner
-      game.situation.winner must beSome(Black)
-    }
+    Reader
+      .full(fullGame)
+      .assertRight:
+        case Reader.Result.Complete(replay) =>
+          val game = replay.state
+          assert(game.situation.end)
+          // In antichess, the player who has just lost all their pieces is the winner
+          assertEquals(game.situation.winner, Some(Black))
 
   test("Win on a traditional stalemate where the player has no valid moves"):
-    val position  = EpdFen("8/p7/8/P7/8/8/8/8 w - -")
-    val maybeGame = fenToGame(position, Antichess)
-
-    val drawnGame = maybeGame flatMap (_.playMoves((Square.A5, Square.A6)))
-
-    drawnGame must beRight.like { case game =>
-      game.situation.end must beTrue
-      game.situation.winner must beSome(Black)
-    }
+    val position = EpdFen("8/p7/8/P7/8/8/8/8 w - -")
+    val game     = fenToGame(position, Antichess).playMoves(Square.A5 -> Square.A6).get
+    assert(game.situation.end)
+    assertEquals(game.situation.winner, Some(Black))
 
   test("Stalemate is a win - second test"):
-    val fen       = EpdFen("2Q5/8/p7/8/8/8/6PR/8 w - -")
-    val maybeGame = fenToGame(fen, Antichess)
-
-    val drawnGame = maybeGame flatMap (_.playMoves((Square.C8, Square.A6)))
-
-    drawnGame must beRight.like { case game =>
-      game.situation.end must beTrue
-      game.situation.status must beSome(Status.VariantEnd)
-      game.situation.winner must beSome(Black)
-    }
+    val fen  = EpdFen("2Q5/8/p7/8/8/8/6PR/8 w - -")
+    val game = fenToGame(fen, Antichess).playMoves(Square.C8 -> Square.A6).get
+    assert(game.situation.end)
+    assertEquals(game.situation.status, Some(Status.VariantEnd))
+    assertEquals(game.situation.winner, Some(Black))
 
   test("two kings on replay"):
-
-    val pgn  = """
+    val pgn = """
 [Event "Rated Antichess game"]
 [Site "https://lichess.org/60a0EiZh"]
 [Date "2023.01.16"]
@@ -278,19 +253,15 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
 1. e3 b5 2. Bxb5 Bb7 3. Bxd7 Bxg2 4. Bxe8 Bxh1 5. Bxf7 Qxd2 6. Bxg8 Qxc2 7. Bxh7 Rxh7 8. Qxc2 Rxh2 9. Qxc7 Rxf2 10. Qxe7 Bxe7 11. Kxf2 Ba3 12. bxa3 Bf3 13. Nxf3 Nc6 14. Ne5 Nxe5 15. Kf3 Nxf3 16. Bd2 Nxd2 17. Nxd2 Rh8 18. Rh1 Rxh1 19. Nf1 Rxf1 20. a4 g6 21. e4 Rb1 22. a5 a6 23. a4 Rb6 24. axb6 g5 25. b7 g4 26. b8=R g3 27. a5 g2 28. Rb5 axb5 29. e5 g1=R 30. e6 b4 31. e7 Rg3 32. e8=K b3 33. a6 b2 34. a7 b1=R 35. a8=K Rb8 36. Kxb8 Rg6 37. Kc8 Ra6 38. Kf8 Rh6 39. Ke8 Rg6 40. Kcd8 Rb6 41. Kf8 Rh6 42. Kfe8 Rb6 43. Kf8 Rh6 44. Kfe8 Rb6 { The game is a draw. } 1/2-1/2
     """
-    val game = Reader.full(pgn)
-
-    game must beRight.like { case Reader.Result.Complete(replay) =>
-      val game = replay.state
-
-      game.situation.end must beFalse
-      game.situation.winner must beNone
-    }
+    Reader
+      .full(pgn)
+      .assertRight:
+        case Reader.Result.Complete(replay) =>
+          val game = replay.state
+          assertNot(game.situation.end)
+          assertEquals(game.situation.winner, None)
 
   test("fen with castles"):
     val game = fenToGame(EpdFen("rnbqk2r/ppppppbp/5np1/8/8/5NP1/PPPPPPBP/RNBQK2R w KQkq - 4 4"), Antichess)
-
-    game must beRight.like { case game =>
-      assertEquals(game.situation.board.history.castles, Castles.none)
-      assertEquals(game.situation.board.history.unmovedRooks, UnmovedRooks.none)
-    }
+    assertEquals(game.situation.board.history.castles, Castles.none)
+    assertEquals(game.situation.board.history.unmovedRooks, UnmovedRooks.none)

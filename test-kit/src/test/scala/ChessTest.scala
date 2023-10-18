@@ -128,8 +128,8 @@ trait ChessTest extends munit.FunSuite with ChessTestCommon:
       f.lift(a) | Zero[B].zero
 
   extension [E, A](v: Either[E, A])
-    def assertRight(f: A => Any)(using Location): Any = v match
-      case Right(r) => f(r)
+    def assertRight(f: PartialFunction[A, Any])(using Location): Any = v match
+      case Right(r) => f.lift(r) getOrElse fail(s"Unexpected Right value: $r")
       case Left(e)  => fail(s"Expected Right but received $v")
     def get: A = v match
       case Right(r) => r

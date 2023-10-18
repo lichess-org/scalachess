@@ -11,14 +11,13 @@ class PlayTest extends ChessTest:
     val game = fenToGame(
       EpdFen("4k2r/8/8/6R1/6r1/3K4/8/8 b k - 3 4"),
       Standard
-    ).flatMap:
-      _.playMoves(
-        G4 -> G2,
-        G5 -> G8,
-        G2 -> G8,
-        D3 -> E3,
-        G8 -> G5
-      )
+    ).playMoves(
+      G4 -> G2,
+      G5 -> G8,
+      G2 -> G8,
+      D3 -> E3,
+      G8 -> G5
+    )
     assertRight(game): game =>
       val fen = Fen write game
       fen == EpdFen("4k2r/8/8/6r1/8/4K3/8/8 w k - 2 3")
@@ -27,14 +26,13 @@ class PlayTest extends ChessTest:
     val game = fenToGame(
       EpdFen("r3k2r/8/8/6R1/6r1/3K4/8/8 b kq - 3 4"),
       Standard
-    ).flatMap:
-      _.playMoves(
-        G4 -> G2,
-        G5 -> G8,
-        G2 -> G8,
-        D3 -> E3,
-        G8 -> G5
-      )
+    ).playMoves(
+      G4 -> G2,
+      G5 -> G8,
+      G2 -> G8,
+      D3 -> E3,
+      G8 -> G5
+    )
     assertRight(game): game =>
       val fen = Fen write game
       fen == EpdFen("r3k2r/8/8/6r1/8/4K3/8/8 w kq - 2 3")

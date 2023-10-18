@@ -103,8 +103,7 @@ trait ChessTestCommon:
     halfMoveClock = halfMoveClock
   )
 
-trait ChessTest extends munit.FunSuite with ChessTestCommon:
-
+trait MunitExtensions extends munit.FunSuite:
   import alleycats.Zero
   import munit.Location
 
@@ -117,15 +116,17 @@ trait ChessTest extends munit.FunSuite with ChessTestCommon:
   def assertCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T])(using Location) =
     assert(isCloseTo(a, b, delta), s"$a is not close to $b by $delta")
 
-  def fenToGame(positionString: EpdFen, variant: Variant)(using Location): Game =
-    fenToGameEither(positionString, variant).get
-
   private def isCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T])(using Location) =
     (n.toDouble(a) - n.toDouble(b)).abs <= delta
 
   extension [A](a: A)
     def matchZero[B: Zero](f: PartialFunction[A, B])(using Location): B =
       f.lift(a) | Zero[B].zero
+
+  extension [A](v: Option[A])
+    def assertSome(f: PartialFunction[A, Any])(using Location): Any = v match
+      case Some(a) => f.lift(a) getOrElse fail(s"Unexpected Some value: $a")
+      case None    => fail(s"Expected Some but received None")
 
   extension [E, A](v: Either[E, A])
     def assertRight(f: PartialFunction[A, Any])(using Location): Any = v match
@@ -138,11 +139,15 @@ trait ChessTest extends munit.FunSuite with ChessTestCommon:
   given [A, B](using sr: SameRuntime[B, A]): munit.Compare[A, B] = new:
     def isEqual(obtained: A, expected: B): Boolean = obtained == sr(expected)
 
+trait ChessTest extends munit.FunSuite with ChessTestCommon with MunitExtensions:
+  import munit.Location
+
   object clockConv:
     given Conversion[Int, Clock.LimitSeconds]     = Clock.LimitSeconds(_)
     given Conversion[Int, Clock.IncrementSeconds] = Clock.IncrementSeconds(_)
 
-end ChessTest
+  def fenToGame(positionString: EpdFen, variant: Variant)(using Location): Game =
+    fenToGameEither(positionString, variant).get
 
 trait ChessSpecs extends Specification with EitherMatchers with ChessTestCommon:
 

@@ -1,11 +1,11 @@
 package chess
 package perft
 
-import cats.syntax.all.*
+// import cats.syntax.all.*
 import weaver.*
 
-import chess.variant.*
-import cats.effect.IO
+// import chess.variant.*
+// import cats.effect.IO
 import cats.kernel.Monoid
 
 object FullPerftTest extends SimpleIOSuite:

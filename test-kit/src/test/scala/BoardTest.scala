@@ -3,14 +3,14 @@ package chess
 import scala.language.implicitConversions
 import Square.*
 
-class BoardTest extends ChessSpecs:
+class BoardTest extends ChessTest:
 
   val board = makeBoard
 
-  "a board" should:
-
-    "position pieces correctly" in:
-      board.pieces must havePairs(
+  test("position pieces correctly"):
+    assertEquals(
+      board.pieces,
+      Map(
         A1 -> (White - Rook),
         B1 -> (White - Knight),
         C1 -> (White - Bishop),
@@ -44,42 +44,47 @@ class BoardTest extends ChessSpecs:
         G8 -> (Black - Knight),
         H8 -> (Black - Rook)
       )
+    )
 
-    "have pieces by default" in:
-      board.allPieces must not beEmpty
+  test("have pieces by default"):
+    assertNot(board.allPieces.isEmpty)
 
-    "have castling rights by default" in:
-      board.history.castles == Castles.init
+  test("have castling rights by default"):
+    assertEquals(board.history.castles, Castles.init)
 
-    "allow a piece to be placed" in:
-      board.place(White - Rook, E3) must beSome:
-        (_: Board)(E3) must_==  Option(White - Rook)
+  test("allow a piece to be placed"):
+    assertEquals(board.place(White - Rook, E3).get.apply(E3), Option(White - Rook))
 
-    "allow a piece to be taken" in:
-      board take A1 must beSome:
-        (_: Board)(A1) must beNone
+  test("allow a piece to be taken"):
+    board take A1 assertSome: b =>
+      assertEquals(b(A1), None)
 
-    "allow a piece to move" in:
-      board.move(E2, E4) must beSome:
-        (_: Board)(E4) must_==  Option(White - Pawn)
+  test("allow a piece to move"):
+    board.move(E2, E4) assertSome: b =>
+      assertEquals(b(E4), Option(White - Pawn))
 
-    "not allow an empty position to move" in:
-      board.move(E5, E6) must beNone
+  test("not allow an empty position to move"):
+    assertEquals(board.move(E5, E6), None)
 
-    "not allow a piece to move to an occupied position" in:
-      board.move(A1, A2) must beNone
+  test("not allow a piece to move to an occupied position"):
+    assertEquals(board.move(A1, A2), None)
 
-    "allow chaining actions" in:
-      makeEmptyBoard.seq(
+  test("allow chaining actions"):
+    makeEmptyBoard
+      .seq(
         _.place(White - Pawn, A2),
         _.place(White - Pawn, A3),
         _.move(A2, A4)
-      ) must beSome:
-        (_: Board)(A4) must_==  Option(White - Pawn)
+      )
+      .assertSome: b =>
+        assertEquals(b(A4), Option(White - Pawn))
 
-    "fail on bad actions chain" in:
+  test("fail on bad actions chain"):
+    assertEquals(
       makeEmptyBoard.seq(
         _.place(White - Pawn, A2),
         _.place(White - Pawn, A3),
         _.move(B2, B4)
-      ) must beNone
+      ),
+      None
+    )

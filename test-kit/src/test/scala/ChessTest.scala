@@ -146,8 +146,20 @@ trait ChessTest extends munit.FunSuite with ChessTestCommon with MunitExtensions
     given Conversion[Int, Clock.LimitSeconds]     = Clock.LimitSeconds(_)
     given Conversion[Int, Clock.IncrementSeconds] = Clock.IncrementSeconds(_)
 
+  object compare:
+    given dests: munit.Compare[Option[List[Square]], Set[Square]] = new:
+      def isEqual(obtained: Option[List[Square]], expected: Set[Square]): Boolean =
+        obtained.fold(Set.empty)(_.toSet) == expected
+
   def fenToGame(positionString: EpdFen, variant: Variant)(using Location): Game =
     fenToGameEither(positionString, variant).get
+
+  def visualDests(board: Board, p: Iterable[Square]): String =
+    Visual.addNewLines(Visual.>>|(board, Map(p -> 'x')))
+  def visualDests(board: Board, p: Option[Iterable[Square]]): String = visualDests(board, p | Nil)
+
+  def assertGame(game: Game, visual: String)(using Location) =
+    assertEquals(game.board.visual, (Visual << visual).visual)
 
 trait ChessSpecs extends Specification with EitherMatchers with ChessTestCommon:
 

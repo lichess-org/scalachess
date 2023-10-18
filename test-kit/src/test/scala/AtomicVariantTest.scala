@@ -65,7 +65,7 @@ class AtomicVariantTest extends ChessTest:
       .playMoves((Square.H2, Square.H1))
       .assertRight: g =>
         assert(g.situation.end)
-        assert(g.situation.variantEnd)
+        assertNot(g.situation.variantEnd)
         assertEquals(g.situation.winner, Some(Black))
 
   test("Must be a stalemate if a king could usually take a piece, but can't because it would explode"):

@@ -116,6 +116,10 @@ trait MunitExtensions extends munit.FunSuite:
   def assertCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T])(using Location) =
     assert(isCloseTo(a, b, delta), s"$a is not close to $b by $delta")
 
+  def assertBetween[T](v: T, min: T, max: T)(using n: Numeric[T])(using Location) =
+    assert(n.gteq(v, min))
+    assert(n.lteq(v, max))
+
   private def isCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T])(using Location) =
     (n.toDouble(a) - n.toDouble(b)).abs <= delta
 

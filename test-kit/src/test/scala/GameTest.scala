@@ -3,35 +3,27 @@ package chess
 import scala.language.implicitConversions
 import Square.*
 
-class GameTest extends ChessSpecs:
+class GameTest extends ChessTest:
 
-  "prevent castle by capturing a rook" should:
-    val game = Game(
-      """
+  val game = Game(
+    """
     k
  b
 R   K""",
-      Black
-    )
-    "can castle queenside" in:
-      game.board.history.canCastle(White, QueenSide) must_== true
-    "can still castle queenside" in:
-      game.playMoves(B2 -> A3) must beRight.like { case g =>
-        g.board.history.canCastle(White, QueenSide) must_== true
-      }
-    "can not castle queenside anymore" in:
-      game.playMoves(B2 -> A1) must beRight.like { case g =>
-        g.board.history canCastle (White, QueenSide) must_== false
-      }
+    Black
+  )
+  test("prevent castle by capturing a rook: can castle queenside"):
+    assert(game.board.history.canCastle(White, QueenSide))
+  test("prevent castle by capturing a rook: can still castle queenside"):
+    assert(game.playMoves(B2 -> A3).get.board.history.canCastle(White, QueenSide))
+  test("prevent castle by capturing a rook: can not castle queenside anymore"):
+    assertNot(game.playMoves(B2 -> A1).get.board.history canCastle (White, QueenSide), false)
 
-  "update half move clock" should:
-    "start at 0" in:
-      Game(variant.Standard).halfMoveClock must_== 0
-    "increment" in:
-      Game(variant.Standard)(G1, F3) must beRight.like { case (game, _) =>
-        game.halfMoveClock must_== 1
-      }
-    "not increment" in:
-      Game(variant.Standard)(E2, E4) must beRight.like { case (game, _) =>
-        game.halfMoveClock must_== 0
-      }
+  test("update half move clock: start at 0"):
+    assertEquals(Game(variant.Standard).halfMoveClock, 0)
+  test("update half move clock: increment"):
+    Game(variant.Standard)(G1, F3).assertRight: (game, _) =>
+      assertEquals(game.halfMoveClock, 1)
+  test("update half move clock: not increment"):
+    Game(variant.Standard)(E2, E4).assertRight: (game, _) =>
+      assertEquals(game.halfMoveClock, 0)

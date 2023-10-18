@@ -3,86 +3,113 @@ package chess
 import scala.language.implicitConversions
 import Square.*
 
-class KingSafetyTest extends ChessSpecs:
+class KingSafetyTest extends ChessTest:
 
-  "in order to save the king" should:
-    "the king" in:
-      "not commit suicide" in:
-        """
+  import compare.dests
+
+  test("not commit suicide"):
+    assertEquals(
+      """
     P n
 PPPP   P
-RNBQK  R""" destsFrom E1 must bePoss(F2)
-      "not commit suicide even if immobilized" in:
-        """
+RNBQK  R""" destsFrom E1,
+      Set(F2)
+    )
+  test("not commit suicide even if immobilized"):
+    assertEquals(
+      """
     b n
 PPPP   P
-RNBQK  R""" destsFrom E1 must bePoss()
-      "escape from danger" in:
-        """
+RNBQK  R""" destsFrom E1,
+      Set()
+    )
+  test("escape from danger"):
+    assertEquals(
+      """
     r
 
 PPPP   P
-RNBQK  R""" destsFrom E1 must bePoss(F1, F2)
-    "pieces" in:
-      "move to defend" in:
-        "queen" in:
-          """
+RNBQK  R""" destsFrom E1,
+      Set(F1, F2)
+    )
+  test("move to defend"):
+    assertEquals(
+      """
     r
 
 PPPP   P
-RNBQK  R""" destsFrom D1 must bePoss(E2)
-        "knight" in:
-          """
+RNBQK  R""" destsFrom D1,
+      Set(E2)
+    )
+    assertEquals(
+      """
     r
 
 PPPP   P
-RNBQK NR""" destsFrom G1 must bePoss(E2)
-        "pawn" in:
-          """
-  K    r
+RNBQK NR""" destsFrom G1,
+      Set(E2)
+    )
+    assertEquals(
+      """
+K    r
 PPPP   P
-RNBQ  NR""" destsFrom D2 must bePoss(D3)
-        "pawn double square" in:
-          """
-  K    r
+RNBQ  NR""" destsFrom D2,
+      Set(D3)
+    )
+    assertEquals(
+      """
+K    r
 
 PPPP   P
-RNBQ  NR""" destsFrom D2 must bePoss(D4)
-        "pawn double square h2" in:
-          """
-  K    r
+RNBQ  NR""" destsFrom D2,
+      Set(D4)
+    )
+    assertEquals(
+      """
+K    r
 
 PPPP   P
-RNBQ  NR""" destsFrom H2 must bePoss()
-      "eat to defend" in:
-        "queen" in:
-          """
+RNBQ  NR""" destsFrom H2,
+      Set()
+    )
+  assertEquals(
+    """
     r
 
 PPPPK Q
-RNB    R""" destsFrom G2 must bePoss(E4)
-        "queen defender" in:
-          """
+RNB    R""" destsFrom G2,
+    Set(E4)
+  )
+  assertEquals(
+    """
     r
 
 PPPPQ
-RNB K  R""" destsFrom E2 must bePoss(E3, E4)
-        "pawn" in:
-          """
+RNB K  R""" destsFrom E2,
+    Set(E3, E4)
+  )
+  assertEquals(
+    """
     r
      P
 PPPP
-RNB K  R""" destsFrom F3 must bePoss(E4)
-      "stay to defend" in:
-        "bishop" in:
-          """
+RNB K  R""" destsFrom F3,
+    Set(E4)
+  )
+  test("stay to defend"):
+    assertEquals(
+      """
     r
 
 PPPPB
-RNB K  R""" destsFrom E2 must bePoss()
-        "pawn" in:
-          """
+RNB K  R""" destsFrom E2,
+      Set()
+    )
+    assertEquals(
+      """
 
- K P  r
+K P  r
 PPP
-RNB    R""" destsFrom D3 must bePoss()
+RNB    R""" destsFrom D3,
+      Set()
+    )

@@ -4,9 +4,9 @@ import InsufficientMatingMaterial.*
 import chess.format.EpdFen
 import chess.variant.Standard
 
-class InsufficientMatingMaterialTest extends ChessSpecs:
+class InsufficientMatingMaterialTest extends ChessTest:
 
-  "bishops on Opposite colors" should:
+  test("bishops on Opposite colors"):
 
     val trues = List(
       "8/4b3/8/8/8/8/4B3/8 w - - 0 1",
@@ -26,24 +26,14 @@ class InsufficientMatingMaterialTest extends ChessSpecs:
       "5b2/8/8/8/8/3R4/1K2Q3/8 w - - 0 1"
     ).map(EpdFen(_))
 
-    "return true" in:
-      forall(trues) { fen =>
-        val maybeGame = fenToGame(fen, Standard)
-        maybeGame must beRight.like { case game =>
-          bishopsOnOppositeColors(game.situation.board) must beTrue
-        }
-      }
+    trues.foreach: fen =>
+      assert(bishopsOnOppositeColors(fenToGame(fen, Standard).situation.board))
 
-    "return false" in:
-      forall(falses) { fen =>
-        val maybeGame = fenToGame(fen, Standard)
-        maybeGame must beRight.like { case game =>
-          bishopsOnOppositeColors(game.situation.board) must beFalse
-        }
-      }
+    falses.foreach: fen =>
+      assertNot(bishopsOnOppositeColors(fenToGame(fen, Standard).situation.board))
 
   // Determines whether a color does not have mating material.
-  "apply with board and color" should:
+  test("apply with board and color"):
     val trues = List(
       "8/6R1/K7/2NNN3/5NN1/4KN2/8/k7 w - - 0 1",
       "8/8/K7/8/1k6/8/8/8 w - - 0 1",
@@ -67,18 +57,10 @@ class InsufficientMatingMaterialTest extends ChessSpecs:
       "7k/6N1/8/8/3K4/8/1n6/8 w - - 0 1"
     ).map(EpdFen(_))
 
-    "return true" in:
-      forall(trues) { fen =>
-        val maybeGame = fenToGame(fen, Standard)
-        maybeGame must beRight.like { case game =>
-          apply(game.situation.board, !game.situation.color) must beTrue
-        }
-      }
+    trues.foreach: fen =>
+      val sit = fenToGame(fen, Standard).situation
+      assert(apply(sit.board, !sit.color))
 
-    "return false" in:
-      forall(falses) { fen =>
-        val maybeGame = fenToGame(fen, Standard)
-        maybeGame must beRight.like { case game =>
-          apply(game.situation.board, !game.situation.color) must beFalse
-        }
-      }
+    falses.foreach: fen =>
+      val sit = fenToGame(fen, Standard).situation
+      assertNot(apply(sit.board), !sit.color)

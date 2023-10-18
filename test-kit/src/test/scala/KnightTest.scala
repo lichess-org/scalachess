@@ -3,12 +3,10 @@ package chess
 import scala.language.implicitConversions
 import Square.*
 
-class KnightTest extends ChessSpecs:
+class KnightTest extends ChessTest:
 
-  "a knight" should:
-
-    "not move to positions that are occupied by the same colour" in:
-      val board = """
+  test("not move to positions that are occupied by the same colour"):
+    val board = """
 k B
 
    B
@@ -18,9 +16,9 @@ k B
 PPP  PPP
  NBQKBNR
 """
-      board destsFrom C4 must bePoss(
-        board,
-        """
+    assertEquals(
+      visualDests(board, board destsFrom C4),
+      """
 k B
 
  x B
@@ -30,10 +28,10 @@ x   P
 PPPx PPP
  NBQKBNR
 """
-      )
+    )
 
-    "capture opponent pieces" in:
-      val board = """
+  test("capture opponent pieces"):
+    val board = """
 k B
 
  b B
@@ -43,9 +41,9 @@ n
 PPP  PPP
  NBQKBNR
 """
-      board destsFrom C4 must bePoss(
-        board,
-        """
+    assertEquals(
+      visualDests(board, board destsFrom C4),
+      """
 k B
 
  x B
@@ -55,4 +53,4 @@ x   x
 PPPx PPP
  NBQKBNR
 """
-      )
+    )

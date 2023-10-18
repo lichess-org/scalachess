@@ -2,8 +2,7 @@ package chess
 
 import Square.*
 
-class PlayOneMoveTest extends ChessSpecs:
+class PlayOneMoveTest extends ChessTest:
 
-  "playing a move" should:
-    "only process things once" in:
-      makeGame.playMoves(E2 -> E4) must beRight
+  test("only process things once"):
+    assert(makeGame.playMoves(E2 -> E4).isRight)

@@ -110,8 +110,8 @@ trait MunitExtensions extends munit.FunSuite:
   def assertNot(cond: => Boolean, clue: => Any = "assertion failed")(using Location): Unit =
     assert(!cond, clue)
 
-  def assertMatch[A](a: A)(f: PartialFunction[A, Boolean])(using Location) =
-    assert(f.lift(a) | false, s"$a does not match expectations")
+  def assertMatch[A](a: A)(f: PartialFunction[A, Unit])(using Location) =
+    f.lift(a) getOrElse fail(s"$a does not match expectations")
 
   def assertCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T])(using Location) =
     assert(isCloseTo(a, b, delta), s"$a is not close to $b by $delta")
@@ -140,7 +140,7 @@ trait MunitExtensions extends munit.FunSuite:
       case Right(r) => r
       case Left(e)  => fail(s"Expected Right but received $v")
 
-  given [A, B](using sr: SameRuntime[B, A]): munit.Compare[A, B] = new:
+  given [A, B](using sr: SameRuntime[B, A]): munit.Compare[A, B] with
     def isEqual(obtained: A, expected: B): Boolean = obtained == sr(expected)
 
 trait ChessTest extends munit.FunSuite with ChessTestCommon with MunitExtensions:
@@ -151,7 +151,7 @@ trait ChessTest extends munit.FunSuite with ChessTestCommon with MunitExtensions
     given Conversion[Int, Clock.IncrementSeconds] = Clock.IncrementSeconds(_)
 
   object compare:
-    given dests: munit.Compare[Option[List[Square]], Set[Square]] = new:
+    given dests: munit.Compare[Option[List[Square]], Set[Square]] with
       def isEqual(obtained: Option[List[Square]], expected: Set[Square]): Boolean =
         obtained.fold(Set.empty)(_.toSet) == expected
 

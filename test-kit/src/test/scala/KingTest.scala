@@ -3,34 +3,37 @@ package chess
 import scala.language.implicitConversions
 import Square.*
 
-class KingTest extends ChessSpecs:
+class KingTest extends ChessTest:
 
-  "a king" should:
+  import compare.dests
 
-    val king = White - King
+  val king = White - King
 
-    "move 1 position in any direction" in:
-      pieceMoves(king, D4) must bePoss(D3, C3, C4, C5, D5, E5, E4, E3)
+  test("move 1 position in any direction"):
+    assertEquals(pieceMoves(king, D4), Set(D3, C3, C4, C5, D5, E5, E4, E3))
 
-    "move 1 position in any direction, even from the edges" in:
-      pieceMoves(king, H8) must bePoss(H7, G7, G8)
+  test("move 1 position in any direction, even from the edges"):
+    assertEquals(pieceMoves(king, H8), Set(H7, G7, G8))
 
-    "move behind pawn barrier" in:
+  test("move behind pawn barrier"):
+    assertEquals(
       """
 PPPPPPPP
-R  QK NR""" destsFrom E1 must bePoss(F1)
+R  QK NR""" destsFrom E1,
+      Set(F1)
+    )
 
-    "not move to positions that are occupied by the same colour" in:
-      val board = """
+  test("not move to positions that are occupied by the same colour"):
+    val board = """
    P
 NPKP   P
 
 PPPPPPPP
  NBQQBNN
 """
-      board destsFrom C4 must bePoss(
-        board,
-        """
+    assertEquals(
+      visualDests(board, board destsFrom C4),
+      """
 
 
 
@@ -40,18 +43,18 @@ NPKP   P
 PPPPPPPP
  NBQQBNN
 """
-      )
+    )
 
-    "capture hanging opponent pieces" in:
-      val board = """
+  test("capture hanging opponent pieces"):
+    val board = """
  bpp   k
   Kp
  p
 
 """
-      board destsFrom C3 must bePoss(
-        board,
-        """
+    assertEquals(
+      visualDests(board, board destsFrom C3),
+      """
 
 
 
@@ -61,9 +64,12 @@ PPPPPPPP
  x
 
 """
-      )
-    "not move near from the other king" in:
+    )
+  test("not move near from the other king"):
+    assertEquals(
       """
    k
  K
-""" destsFrom B1 must bePoss(A1, A2, B2)
+""" destsFrom B1,
+      Set(A1, A2, B2)
+    )

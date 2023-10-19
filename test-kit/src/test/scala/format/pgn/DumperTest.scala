@@ -7,16 +7,15 @@ import Square.*
 
 import chess.variant.ThreeCheck
 
-class DumperTest extends ChessSpecs:
+class DumperTest extends ChessTest:
 
   given Conversion[String, SanStr] = SanStr(_)
 
-  "Check with pawn" should:
-    "not be checkmate if pawn can be taken en passant" in:
-      val game = Fen.readWithMoveNumber(EpdFen("8/3b4/6R1/1P2kp2/6pp/2N1P3/4KPPP/8 w - -")).get match
-        case s: Situation.AndFullMoveNumber => Game(s.situation, ply = s.ply)
-      val move = game(Square.F2, Square.F4).toOption.get._2
-      Dumper(move) must_== "f4+"
+  test("Check with pawn not be checkmate if pawn can be taken en passant"):
+    val game = Fen.readWithMoveNumber(EpdFen("8/3b4/6R1/1P2kp2/6pp/2N1P3/4KPPP/8 w - -")).get match
+      case s: Situation.AndFullMoveNumber => Game(s.situation, ply = s.ply)
+    val move = game(Square.F2, Square.F4).toOption.get._2
+    assertEquals(Dumper(move), "f4+")
 
   val gioachineGreco = makeGame.playMoves(
     D2 -> D4,
@@ -74,30 +73,29 @@ class DumperTest extends ChessSpecs:
     H5 -> G6
   )
 
-  "standard game" should:
-    "move list" in:
-      "Gioachine Greco" in:
-        gioachineGreco map (_.sans) must beRight.like { case ms =>
-          ms must_== "d4 d5 c4 dxc4 e3 b5 a4 c6 axb5 cxb5 Qf3".split(' ').toList
-        }
-      "Peruvian Immortal" in:
-        peruvianImmortal map (_.sans) must beRight.like { case ms =>
-          ms must_== "e4 d5 exd5 Qxd5 Nc3 Qa5 d4 c6 Nf3 Bg4 Bf4 e6 h3 Bxf3 Qxf3 Bb4 Be2 Nd7 a3 O-O-O axb4 Qxa1+ Kd2 Qxh1 Qxc6+ bxc6 Ba6#"
+  test("standard game"):
+    gioachineGreco
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, SanStr from "d4 d5 c4 dxc4 e3 b5 a4 c6 axb5 cxb5 Qf3".split(' ').toVector)
+    peruvianImmortal
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(
+          ms,
+          SanStr from "e4 d5 exd5 Qxd5 Nc3 Qa5 d4 c6 Nf3 Bg4 Bf4 e6 h3 Bxf3 Qxf3 Bb4 Be2 Nd7 a3 O-O-O axb4 Qxa1+ Kd2 Qxh1 Qxc6+ bxc6 Ba6#"
             .split(' ')
-            .toList
-        }
+            .toVector
+        )
 
-  "three check variant" should:
-    "move list" in:
-      threeCheck map (_.sans) must beRight.like { case ms =>
-        ms must_== "e4 c5 Bc4 Nc6 Bxf7+ Kxf7 Qh5+ g6 Qxg6#"
-          .split(' ')
-          .toList
-      }
+  test("three check variant"):
+    threeCheck
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, SanStr from "e4 c5 Bc4 Nc6 Bxf7+ Kxf7 Qh5+ g6 Qxg6#".split(' ').toVector)
 
-  "dump a promotion move" should:
-    "without check" in:
-      val game = Game("""
+  test("without check"):
+    val game = Game("""
 
 P    k
 
@@ -107,12 +105,14 @@ P    k
 PP   PPP
 KNBQ BNR
 """)
-      game.playMoves(A7 -> A8) map (_.sans) must beRight.like { case ms =>
-        ms must_== List("a8=Q")
-      }
-    "with check" in:
-      val game = Game("""
-    k
+    game
+      .playMoves(A7 -> A8)
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, Vector(SanStr("a8=Q")))
+  test("with check"):
+    val game = Game("""
+  k
 P
 
 
@@ -121,11 +121,13 @@ P
 PP   PPP
 KNBQ BNR
 """)
-      game.playMoves(A7 -> A8) map (_.sans) must beRight.like { case ms =>
-        ms must_== List("a8=Q+")
-      }
-    "with checkmate" in:
-      val game = Game("""
+    game
+      .playMoves(A7 -> A8)
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, Vector(SanStr("a8=Q+")))
+  test("with checkmate"):
+    val game = Game("""
     k
 P  ppp
 
@@ -135,27 +137,30 @@ P  ppp
 PP   PPP
 KNBQ BNR
 """)
-      game.playMoves(A7 -> A8) map (_.sans) must beRight.like { case ms =>
-        ms must_== List("a8=Q#")
-      }
-    "castle kingside" in:
-      Game("""
+    game
+      .playMoves(A7 -> A8)
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, Vector(SanStr("a8=Q#")))
+  test("castle kingside"):
+    Game("""
 PP   PPP
 R   K  R
-""").playMoves(E1 -> G1) map (_.sans) must beRight.like { case ms =>
-        ms must_== List("O-O")
-      }
-    "castle queenside" in:
-      Game("""
+""").playMoves(E1 -> G1)
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, Vector(SanStr("O-O")))
+  test("castle queenside"):
+    Game("""
 PP   PPP
 R   K  R
-""").playMoves(E1 -> C1) map (_.sans) must beRight.like { case ms =>
-        ms must_== List("O-O-O")
-      }
+""").playMoves(E1 -> C1)
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, Vector(SanStr("O-O-O")))
 
-  "ambiguous moves" should:
-    "ambiguous file only" in:
-      val game = Game("""
+  test("ambiguous file only"):
+    val game = Game("""
 k
 
 
@@ -165,11 +170,13 @@ k
 P   K  P
 R      R
 """)
-      game.playMoves(H1 -> B1) map (_.sans) must beRight.like { case ms =>
-        ms must_== List("Rhb1")
-      }
-    "ambiguous rank only" in:
-      val game = Game("""
+    game
+      .playMoves(H1 -> B1)
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, Vector(SanStr("Rhb1")))
+  test("ambiguous rank only"):
+    val game = Game("""
 k
 
 
@@ -179,11 +186,13 @@ k
     K  P
  N
 """)
-      game.playMoves(B5 -> C3) map (_.sans) must beRight.like { case ms =>
-        ms must_== List("N5c3")
-      }
-    "ambiguous file and rank" in:
-      val game = Game("""
+    game
+      .playMoves(B5 -> C3)
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, Vector(SanStr("N5c3")))
+  test("ambiguous file and rank"):
+    val game = Game("""
 
 
   QQ
@@ -193,11 +202,13 @@ k
     K
 k
 """)
-      game.playMoves(C6 -> D5) map (_.sans) must beRight.like { case ms =>
-        ms must_== List("Qc6d5")
-      }
-    "unambiguous file" in:
-      val game = Game("""
+    game
+      .playMoves(C6 -> D5)
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, Vector(SanStr("Qc6d5")))
+  test("unambiguous file"):
+    val game = Game("""
 k
 
 
@@ -207,11 +218,13 @@ k
 P      P
 R   K  R
 """)
-      game.playMoves(H1 -> F1) map (_.sans) must beRight.like { case ms =>
-        ms must_== List("Rf1")
-      }
-    "unambiguous rank" in:
-      val game = Game("""
+    game
+      .playMoves(H1 -> F1)
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, Vector(SanStr("Rf1")))
+  test("unambiguous rank"):
+    val game = Game("""
 k
 
    KRq
@@ -221,39 +234,42 @@ k
 
 
 """)
-      game.playMoves(E4 -> E5) map (_.sans) must beRight.like { case ms =>
-        ms must_== List("Re5")
-      }
+    game
+      .playMoves(E4 -> E5)
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, Vector(SanStr("Re5")))
 
-  "chess960" should:
-    "castle queenside as white" in:
-      Game(
-        makeBoard(
-          """
+  test("chess960 castle queenside as white"):
+    Game(
+      makeBoard(
+        """
 PPPPPPPP
 NRK RQBB
 """,
-          variant.Chess960
-        )
-      ).playMoves(C1 -> B1) map (_.sans) must beRight.like { case ms =>
-        ms must_== List("O-O-O")
-      }
-    "castle kingside as white" in:
-      Game(
-        makeBoard(
-          """
+        variant.Chess960
+      )
+    ).playMoves(C1 -> B1)
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, Vector(SanStr("O-O-O")))
+  test("chess960 castle kingside as white"):
+    Game(
+      makeBoard(
+        """
 PP PPPPP
 NRK R  B
 """,
-          variant.Chess960
-        )
-      ).playMoves(C1 -> E1) map (_.sans) must beRight.like { case ms =>
-        ms must_== List("O-O")
-      }
-    "castle queenside as black" in:
-      Game(
-        makeBoard(
-          """
+        variant.Chess960
+      )
+    ).playMoves(C1 -> E1)
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, Vector(SanStr("O-O")))
+  test("chess960 castle queenside as black"):
+    Game(
+      makeBoard(
+        """
 nrk rqbb
 pppppppp
 
@@ -263,15 +279,17 @@ pppppppp
 PPPPPPPP
 NRK RQBB
 """,
-          variant.Chess960
-        )
-      ).withPlayer(Black).playMoves(C8 -> B8) map (_.sans) must beRight.like { case ms =>
-        ms must_== List("O-O-O")
-      }
-    "castle kingside as black" in:
-      Game(
-        makeBoard(
-          """
+        variant.Chess960
+      )
+    ).withPlayer(Black)
+      .playMoves(C8 -> B8)
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, Vector(SanStr("O-O-O")))
+  test("chess960 castle kingside as black"):
+    Game(
+      makeBoard(
+        """
 nrk r  b
 pppppppp
 
@@ -281,16 +299,18 @@ pppppppp
 PPPPPPPP
 NRK RQBB
 """,
-          variant.Chess960
-        )
-      ).withPlayer(Black).playMoves(C8 -> E8) map (_.sans) must beRight.like { case ms =>
-        ms must_== List("O-O")
-      }
+        variant.Chess960
+      )
+    ).withPlayer(Black)
+      .playMoves(C8 -> E8)
+      .map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, Vector(SanStr("O-O")))
 
-    "opening with castles" in:
-      Game(
-        makeBoard(
-          """
+  test("chess960 opening with castles"):
+    Game(
+      makeBoard(
+        """
 nrknrqbb
 pppppppp
 
@@ -300,23 +320,23 @@ pppppppp
 PPPPPPPP
 NRKNRQBB
 """,
-          variant.Chess960
-        )
-      ).playMoves(
-        F2 -> F4,
-        D8 -> C6,
-        D1 -> C3,
-        G7 -> G6,
-        C3 -> B5,
-        C8 -> B8,
-        C1 -> B1
-      ) map (_.sans) must beRight.like { case ms =>
-        ms must_== "f4 Nc6 Nc3 g6 Nb5 O-O-O O-O-O".split(' ').toList
-      }
+        variant.Chess960
+      )
+    ).playMoves(
+      F2 -> F4,
+      D8 -> C6,
+      D1 -> C3,
+      G7 -> G6,
+      C3 -> B5,
+      C8 -> B8,
+      C1 -> B1
+    ).map(_.sans)
+      .assertRight: ms =>
+        assertEquals(ms, SanStr from "f4 Nc6 Nc3 g6 Nb5 O-O-O O-O-O".split(' ').toVector)
 
-    "tricky rook disambiguation" in:
-      val fen           = EpdFen("r5k1/1b5p/N3p1p1/Q4p2/4r3/2P1q3/1PK2RP1/5R2 w - - 1 38")
-      val sit           = Fen.read(fen).get
-      val game1         = Game(sit.board, sit.color)
-      val (game2, move) = game1(Square.F2, Square.F3).toOption.get
-      Dumper(game1.situation, move, game2.situation) must_== "Rf3"
+  test("chess960 tricky rook disambiguation"):
+    val fen           = EpdFen("r5k1/1b5p/N3p1p1/Q4p2/4r3/2P1q3/1PK2RP1/5R2 w - - 1 38")
+    val sit           = Fen.read(fen).get
+    val game1         = Game(sit.board, sit.color)
+    val (game2, move) = game1(Square.F2, Square.F3).toOption.get
+    assertEquals(Dumper(game1.situation, move, game2.situation), "Rf3")

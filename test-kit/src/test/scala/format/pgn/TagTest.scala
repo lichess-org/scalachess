@@ -1,11 +1,11 @@
 package chess
 package format.pgn
 
-class TagTest extends ChessSpecs:
+class TagTest extends ChessTest:
 
-  "Tags" should:
-    // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm#c8.1.1
-    "be sorted" in:
+  // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm#c8.1.1
+  test("be sorted"):
+    assertEquals(
       Tags(
         List(
           Tag(Tag.Site, "https://lichess.org/QuCzSfxw"),
@@ -22,7 +22,8 @@ class TagTest extends ChessSpecs:
           Tag(Tag.BlackRatingDiff, "-7"),
           Tag(Tag.Event, "Titled Arena 5")
         )
-      ).sorted.value.map(_.name) must_== List(
+      ).sorted.value.map(_.name),
+      List(
         Tag.Event,
         Tag.Site,
         Tag.Date,
@@ -37,12 +38,16 @@ class TagTest extends ChessSpecs:
         Tag.WhiteRatingDiff,
         Tag.BlackRatingDiff
       )
+    )
 
-    "be trimmed" in:
+  test("be trimmed"):
+    assertEquals(
       List(
         Tag(_.Site, "  https://lichess.org/QuCzSfxw "),
         Tag(_.Black, " penguingim1  ")
-      ) must_== List(
+      ),
+      List(
         Tag(_.Site, "https://lichess.org/QuCzSfxw"),
         Tag(_.Black, "penguingim1")
       )
+    )

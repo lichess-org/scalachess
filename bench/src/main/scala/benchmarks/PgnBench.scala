@@ -30,7 +30,7 @@ class PgnBench:
 
   @Benchmark
   def pgnParser(bh: Blackhole) =
-    var result = pgnStrs.map: x =>
+    val result = pgnStrs.map: x =>
       Blackhole.consumeCPU(Work)
       Parser.full(x)
     bh.consume(result)
@@ -38,7 +38,7 @@ class PgnBench:
 
   @Benchmark
   def pgnRender(bh: Blackhole) =
-    var result = pgns.map: x =>
+    val result = pgns.map: x =>
       Blackhole.consumeCPU(Work)
       x.render
     bh.consume(result)

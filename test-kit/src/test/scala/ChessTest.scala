@@ -1,16 +1,11 @@
 package chess
 
 import cats.syntax.all.*
-import org.specs2.matcher.{ EitherMatchers, Matcher }
-import org.specs2.mutable.Specification
 import scala.language.implicitConversions
-
-import chess.format.{ EpdFen, Fen, Visual }
-import chess.format.pgn.PgnStr
-import chess.variant.Variant
+import format.{ EpdFen, Fen, Uci, Visual }
+import format.pgn.PgnStr
+import variant.{ Chess960, Variant }
 import bitboard.Board as BBoard
-import chess.format.Uci
-import chess.variant.Chess960
 
 trait ChessTestCommon:
 
@@ -174,28 +169,3 @@ trait ChessTest extends munit.FunSuite with ChessTestCommon with MunitExtensions
 
   def assertGame(game: Game, visual: String)(using Location) =
     assertEquals(game.board.visual, (Visual << visual).visual)
-
-trait ChessSpecs extends Specification with EitherMatchers with ChessTestCommon:
-
-  def fenToGame(positionString: EpdFen, variant: Variant): Either[String, Game] =
-    fenToGameEither(positionString, variant)
-
-  def bePoss(poss: Square*) = // : Matcher[Option[Iterable[square]]] =
-    beSome: (p: Iterable[Square]) =>
-      sortPoss(p.toList).map(_.key) must_== sortPoss(poss.toList).map(_.key)
-
-  def bePoss(board: Board, visual: String) = // : Matcher[Option[Iterable[square]]] =
-    beSome: (p: Iterable[Square]) =>
-      Visual.addNewLines(Visual.>>|(board, Map(p -> 'x'))) must_== visual
-
-  def beBoard(visual: String): Matcher[Either[ErrorStr, Board]] =
-    beRight.like:
-      _.visual must_== (Visual << visual).visual
-
-  def beSituation(visual: String): Matcher[Either[ErrorStr, Situation]] =
-    beRight.like:
-      _.board.visual must_== (Visual << visual).visual
-
-  def beGame(visual: String): Matcher[Either[ErrorStr, Game]] =
-    beRight.like:
-      _.board.visual must_== (Visual << visual).visual

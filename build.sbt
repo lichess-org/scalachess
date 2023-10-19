@@ -48,8 +48,6 @@ lazy val testKit = project
     name := "scalachess-test-kit",
     libraryDependencies ++= List(
       "org.scalacheck"      %% "scalacheck"        % "1.17.0",
-      "org.specs2"          %% "specs2-core"       % "4.20.2"   % Test,
-      "org.specs2"          %% "specs2-cats"       % "4.20.2"   % Test,
       "org.scalameta"       %% "munit"             % "1.0.0-M8" % Test,
       "org.scalameta"       %% "munit-scalacheck"  % "1.0.0-M8" % Test,
       "com.disneystreaming" %% "weaver-cats"       % "0.8.3"    % Test,

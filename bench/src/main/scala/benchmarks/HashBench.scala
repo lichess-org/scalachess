@@ -25,7 +25,7 @@ class HashBench:
 
   @Setup
   def setup() =
-    var results = for
+    val results = for
       results <- Fixtures.gamesForPerfTest.traverse(Reader.full(_))
       replays <- results.traverse(_.valid)
     yield replays.flatMap(_.moves).map(_.situationAfter)
@@ -33,21 +33,21 @@ class HashBench:
 
   @Benchmark
   def hashes(bh: Blackhole) =
-    var result = situations.map: x =>
+    val result = situations.map: x =>
       Blackhole.consumeCPU(Work)
       Hash(x)
     bh.consume(result)
 
   @Benchmark
   def repetition5(bh: Blackhole) =
-    var result = situations.map: x =>
+    val result = situations.map: x =>
       Blackhole.consumeCPU(Work)
       x.board.history.fivefoldRepetition
     bh.consume(result)
 
   @Benchmark
   def repetition3(bh: Blackhole) =
-    var result = situations.map: x =>
+    val result = situations.map: x =>
       Blackhole.consumeCPU(Work)
       x.board.history.threefoldRepetition
     bh.consume(result)

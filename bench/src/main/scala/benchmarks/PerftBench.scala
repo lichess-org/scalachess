@@ -82,7 +82,7 @@ class PerftBench:
     perfts.take(games).map(_.withLimit(nodes))
 
   private def bench(perfts: List[Perft], variant: Variant)(bh: Blackhole) =
-    var x = perfts.map:
+    val x = perfts.map:
       Blackhole.consumeCPU(Work)
       _.calculate(variant)
     bh.consume(x)

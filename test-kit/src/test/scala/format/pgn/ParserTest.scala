@@ -5,385 +5,329 @@ import cats.syntax.option.*
 import scala.language.implicitConversions
 import Sans.*
 
-class ParserTest extends ChessSpecs:
+class ParserTest extends ChessTest:
 
   import Fixtures.*
 
-  given Conversion[SanStr, String] = _.value
-  given Conversion[String, SanStr] = SanStr(_)
+  given Conversion[SanStr, String]                                   = _.value
+  given Conversion[String, SanStr]                                   = SanStr(_)
+  extension (tree: Option[ParsedPgnTree]) def firstMove: PgnNodeData = tree.get.mainline.head.value
+  extension (parsed: ParsedPgn) def metas                            = parsed.tree.get.value.metas
 
   import Parser.{ full as parse, move as parseMove }
 
-  extension (tree: Option[ParsedPgnTree]) def firstMove: PgnNodeData = tree.get.mainline.head.value
+  test("bom header should be ignored"):
+    // "with tags" in:
+    parse("\uFEFF[Event \"Some event\"]\n1. e4 e5").assertRight: parsed =>
+      assertEquals(parsed.tags(_.Event), Some("Some event"))
+      assertEquals(parsed.mainline.size, 2)
 
-  extension (parsed: ParsedPgn) def metas = parsed.tree.get.value.metas
+    // "without tags" in:
+    parse("\uFEFF1. e4 e5 3. Nf3").assertRight: parsed =>
+      assertEquals(parsed.mainline.size, 3)
 
-  "bom header" should:
-    "be ignored" in:
-      "with tags" in:
-        parse("\uFEFF[Event \"Some event\"]\n1. e4 e5") must beRight.like: parsed =>
-          parsed.tags(_.Event) must_== Some("Some event")
-          parsed.mainline.size must_== 2
+    // "lowercase" in:
+    parse("\ufeff1. e4 e5 3. Nf3").assertRight: parsed =>
+      assertEquals(parsed.mainline.size, 3)
 
-      "without tags" in:
-        parse("\uFEFF1. e4 e5 3. Nf3") must beRight.like: parsed =>
-          parsed.mainline.size must_== 3
+    // "in the middle of the string" in:
+    parse("\ufeff1. e4 \ufeff e5 3. Nf3").assertRight: parsed =>
+      assertEquals(parsed.mainline.size, 3)
 
-      "lowercase" in:
-        parse("\ufeff1. e4 e5 3. Nf3") must beRight.like: parsed =>
-          parsed.mainline.size must_== 3
+  test("parse valid comment"):
+    assert(Parser.pgnComment.parse("% comment").isRight)
+  test("parse invalid comment"):
+    assert(Parser.pgnComment.parse("  %comment").isLeft)
 
-      "in the middle of the string" in:
-        parse("\ufeff1. e4 \ufeff e5 3. Nf3") must beRight.like: parsed =>
-          parsed.mainline.size must_== 3
+  test("promotion check as a queen"):
+    parse("b8=Q ").assertRight: parsed =>
+      parsed.mainline.headOption.assertSome: san =>
+        assertEquals(san, Std(Square.B8, Pawn, promotion = Option(Queen)))
 
-  "pgnComment" should:
-    "parse valid comment" in:
-      Parser.pgnComment.parse("% comment") must beRight
-    "parse invalid comment" in:
-      Parser.pgnComment.parse("  %comment") must beLeft
+  test("promotion check as a rook"):
+    parse("b8=R ").assertRight: parsed =>
+      parsed.mainline.headOption.assertSome: san =>
+        assertEquals(san.asInstanceOf[Std].promotion, Option(Rook))
 
-  "promotion check" should:
-    "as a queen" in:
-      parse("b8=Q ") must beRight.like: parsed =>
-        parsed.mainline.headOption must beSome { (san: San) =>
-          san === Std(Square.B8, Pawn, promotion = Option(Queen))
-        }
+  test("carriage return"):
+    // "none" in:
+    parse("1. e4 c6\n2. d4 d5").assertRight: parsed =>
+      assertEquals(parsed.mainline.size, 4)
+    // "one" in:
+    parse("1. e4 c6\r\n2. d4 d5").assertRight: parsed =>
+      assertEquals(parsed.mainline.size, 4)
+    // "two" in:
+    parse("1. e4 c6\r\r\n2. d4 d5").assertRight: parsed =>
+      assertEquals(parsed.mainline.size, 4)
+    // "between tags" in:
+    parse("[White \"carriage\"]\r\n[Black \"return\"]\r\n\r\n1. a3 a6\r\n").assertRight: parsed =>
+      assertEquals(parsed.tags(_.White), Some("carriage"))
+      assertEquals(parsed.tags(_.Black), Some("return"))
+      assertEquals(parsed.mainline.size, 2)
 
-    "as a rook" in:
-      parse("b8=R ") must beRight { (parsed: ParsedPgn) =>
-        parsed.mainline.headOption must beSome { (san: San) =>
-          san.asInstanceOf[Std].promotion must_== Option(Rook)
-        }
-      }
+  test("result no tag but inline result"):
+    parse(noTagButResult).assertRight: parsed =>
+      assertEquals(parsed.tags("Result"), Option("1-0"))
+  test("result in tags"):
+    parse(whiteResignsInTags).assertRight: parsed =>
+      assertEquals(parsed.tags("Result"), Option("0-1"))
+  test("result in moves"):
+    parse(whiteResignsInMoves).assertRight: parsed =>
+      assertEquals(parsed.tags("Result"), Option("0-1"))
+  test("result in tags and moves"):
+    parse(whiteResignsInTagsAndMoves).assertRight: parsed =>
+      assertEquals(parsed.tags("Result"), Option("0-1"))
 
-  "carriage return" in:
-    "none" in:
-      parse("1. e4 c6\n2. d4 d5") must beRight.like { parsed =>
-        parsed.mainline.size must_== 4
-      }
-    "one" in:
-      parse("1. e4 c6\r\n2. d4 d5") must beRight.like { parsed =>
-        parsed.mainline.size must_== 4
-      }
-    "two" in:
-      parse("1. e4 c6\r\r\n2. d4 d5") must beRight.like { parsed =>
-        parsed.mainline.size must_== 4
-      }
-    "between tags" in:
-      parse("[White \"carriage\"]\r\n[Black \"return\"]\r\n\r\n1. a3 a6\r\n") must beRight.like: parsed =>
-        parsed.tags(_.White) must_== Some("carriage")
-        parsed.tags(_.Black) must_== Some("return")
-        parsed.mainline.size must_== 2
+  test("glyphs"):
 
-  "result" in:
-    "no tag but inline result" in:
-      parse(noTagButResult) must beRight.like { parsed =>
-        parsed.tags("Result") must_== Option("1-0")
-      }
-    "in tags" in:
-      parse(whiteResignsInTags) must beRight.like { parsed =>
-        parsed.tags("Result") must_== Option("0-1")
-      }
-    "in moves" in:
-      parse(whiteResignsInMoves) must beRight.like { parsed =>
-        parsed.tags("Result") must_== Option("0-1")
-      }
-    "in tags and moves" in:
-      parse(whiteResignsInTagsAndMoves) must beRight.like { parsed =>
-        parsed.tags("Result") must_== Option("0-1")
-      }
+    parseMove("b8=B ").assertRight: node =>
+      assertEquals(node.value.san, Std(Square.B8, Pawn, promotion = Option(Bishop)))
 
-  "glyphs" in:
+    parseMove("1. e4").assertRight: node =>
+      assertEquals(node.value.san, Std(Square.E4, Pawn))
 
-    parseMove("b8=B ") must beRight.like: node =>
-      node.value.san === Std(Square.B8, Pawn, promotion = Option(Bishop))
+    parseMove("e4").assertRight: node =>
+      assertEquals(node.value.san, Std(Square.E4, Pawn))
 
-    parseMove("1. e4") must beRight.like: node =>
-      node.value.san must_== Std(Square.E4, Pawn)
+    parseMove("e4!").assertRight: node =>
+      assertEquals(node.value.san, Std(Square.E4, Pawn))
+      assertEquals(node.value.metas.glyphs, Glyphs(Glyph.MoveAssessment.good.some, None, Nil))
 
-    parseMove("e4") must beRight.like: node =>
-      node.value.san must_== Std(Square.E4, Pawn)
+    parseMove("Ne7g6+?!").assertRight: node =>
+      assertEquals(node.value.san, Std(Square.G6, Knight, false, Some(File.E), Some(Rank.Seventh)))
+      assertEquals(node.value.metas.glyphs, Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil))
 
-    parseMove("e4!") must beRight.like: node =>
-      node.value.san === Std(Square.E4, Pawn)
-      node.value.metas.glyphs === Glyphs(Glyph.MoveAssessment.good.some, None, Nil)
+    parseMove("P@e4?!").assertRight: node =>
+      assertEquals(node.value.san, Drop(Pawn, Square.E4))
+      assertEquals(node.value.metas.glyphs, Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil))
 
-    parseMove("Ne7g6+?!") must beRight.like: node =>
-      node.value.san === Std(Square.G6, Knight, false, Some(File.E), Some(Rank.Seventh))
-      node.value.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
+  test("nags"):
+    assert(parse(withNag).isRight)
 
-    parseMove("P@e4?!") must beRight.like: node =>
-      node.value.san === Drop(Pawn, Square.E4)
-      node.value.metas.glyphs === Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil)
+    parse("Ne7g6+! $13").assertRight: parsed =>
+      assertEquals(parsed.metas.glyphs.move, Option(Glyph.MoveAssessment.good))
+      assertEquals(parsed.metas.glyphs.position, Option(Glyph.PositionAssessment.unclear))
 
-  "nags" in:
-    parse(withNag) must beRight
+  test("non-nags"):
+    assert(parse(withGlyphAnnotations).isRight)
 
-    parse("Ne7g6+! $13") must beRight.like: parsed =>
-      parsed.metas.glyphs.move must_== Option(Glyph.MoveAssessment.good)
-      parsed.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
-
-  "non-nags" in:
-    parse(withGlyphAnnotations) must beRight
-
-    parse("Bxd3?? ∞") must beRight.like { parsed =>
-      parsed.tree.firstMove.metas.glyphs.move must_== Option(Glyph.MoveAssessment.blunder)
-      parsed.tree.firstMove.metas.glyphs.position must_== Option(Glyph.PositionAssessment.unclear)
+    parse("Bxd3?? ∞").assertRight { parsed =>
+      assertEquals(parsed.tree.firstMove.metas.glyphs.move, Option(Glyph.MoveAssessment.blunder))
+      assertEquals(parsed.tree.firstMove.metas.glyphs.position, Option(Glyph.PositionAssessment.unclear))
     }
 
-  "comments" in:
-    parse("Ne7g6+! {such a neat comment}") must beRight.like { parsed =>
-      parsed.tree.firstMove.metas.comments must_== List("such a neat comment")
-    }
+  test("comments"):
+    parse("Ne7g6+! {such a neat comment}").assertRight: parsed =>
+      assertEquals(parsed.tree.firstMove.metas.comments, List("such a neat comment"))
 
-  "variations" in:
-    parse("Ne7g6+! {such a neat comment} (e4 Ng6)") must beRight.like: parsed =>
-      parsed.tree.get.variations.headOption must beSome:
-        (_: Variation[PgnNodeData]).mainlineValues must haveSize(2)
+  test("variations"):
+    parse("Ne7g6+! {such a neat comment} (e4 Ng6)").assertRight: parsed =>
+      parsed.tree.get.variations.headOption.assertSome: variation =>
+        assertEquals(variation.mainlineValues.size, 2)
 
-  "first move variation" in:
-    parse("1. e4 (1. d4)") must beRight.like: parsed =>
-      parsed.tree.get.variations.headOption must beSome:
-        (_: Variation[PgnNodeData]).mainlineValues must haveSize(1)
+  test("first move variation"):
+    parse("1. e4 (1. d4)").assertRight: parsed =>
+      parsed.tree.get.variations.headOption.assertSome: variation =>
+        assertEquals(variation.mainlineValues.size, 1)
 
-  raws foreach { sans =>
+  raws.foreach: sans =>
     val size = sans.split(' ').length
-    "sans only size: " + size in:
-      parse(sans) must beRight.like { a =>
-        a.mainline.size must_== size
-      }
-  }
+    test(s"sans only size: $size"):
+      parse(sans).assertRight: a =>
+        assertEquals(a.mainline.size, size)
 
-  (shortCastles ++ longCastles ++ annotatedCastles) foreach { sans =>
+  (shortCastles ++ longCastles ++ annotatedCastles).foreach: sans =>
     val size = sans.split(' ').length
-    "sans only size: " + size in:
-      parse(sans) must beRight.like: a =>
-        a.mainline.size must_== size
-  }
+    test(s"sans only size: $size"):
+      parse(sans).assertRight: a =>
+        assertEquals(a.mainline.size, size)
 
-  "disambiguated" in:
-    parse(disambiguated) must beRight.like { a =>
-      a.mainline.size must_== 3
-    }
+  test("disambiguated"):
+    parse(disambiguated).assertRight: a =>
+      assertEquals(a.mainline.size, 3)
 
   List(fromProd1, fromProd2, castleCheck1, castleCheck2) foreach { sans =>
     val size = sans.split(' ').length
-    "sans only from prod size: " + size in:
-      parse(sans) must beRight.like { a =>
-        a.mainline.size must_== size
-      }
+    test(s"sans only from prod size: $size"):
+      parse(sans).assertRight: a =>
+        assertEquals(a.mainline.size, size)
   }
 
-  "variations" in:
-    parse(variations) must beRight.like { a =>
-      a.mainline.size must_== 20
-    }
+  test("variations"):
+    parse(variations).assertRight: a =>
+      assertEquals(a.mainline.size, 20)
 
-  "inline tags" in:
-    parse(inlineTags) must beRight.like { a =>
-      a.tags.value must contain { (tag: Tag) =>
-        tag.name == Tag.White && tag.value == "Blazquez, Denis"
-      }
-    }
+  test("inline tags"):
+    parse(inlineTags).assertRight: a =>
+      assert:
+        a.tags.value.exists: tag =>
+          tag.name == Tag.White && tag.value == "Blazquez, Denis"
 
-  "tag with nested quotes" in:
-    parse("""[Black "Schwarzenegger, Arnold \"The Terminator\""]""") must beRight.like { a =>
-      a.tags.value must contain { (tag: Tag) =>
-        tag.name == Tag.Black && tag.value == """Schwarzenegger, Arnold "The Terminator""""
-      }
-    }
+  test("tag with nested quotes"):
+    parse("""[Black "Schwarzenegger, Arnold \"The Terminator\""]""").assertRight: a =>
+      assert:
+        a.tags.value.exists: tag =>
+          tag.name == Tag.Black && tag.value == """Schwarzenegger, Arnold "The Terminator""""
 
-  "tag with inner brackets" in:
-    parse("""[Black "[=0040.34h5a4]"]""") must beRight.like { a =>
-      a.tags.value must contain { (tag: Tag) =>
+  test("tag with inner brackets"):
+    parse("""[Black "[=0040.34h5a4]"]""").assertRight: a =>
+      a.tags.value.exists: tag =>
         tag.name == Tag.Black && tag.value == "[=0040.34h5a4]"
-      }
-    }
 
-  "game from wikipedia" in:
-    parse(fromWikipedia) must beRight.like { a =>
-      a.mainline.size must_== 85
-    }
+  test("game from wikipedia"):
+    parse(fromWikipedia).assertRight: a =>
+      assertEquals(a.mainline.size, 85)
 
-  "game from crafty" in:
-    parse(fromCrafty) must beRight.like { a =>
-      a.mainline.size must_== 68
-    }
+  test("game from crafty"):
+    parse(fromCrafty).assertRight: a =>
+      assertEquals(a.mainline.size, 68)
 
-  "inline comments" in:
-    parse(inlineComments) must beRight.like { a =>
-      a.mainline.size must_== 85
-    }
+  test("inline comments"):
+    parse(inlineComments).assertRight: a =>
+      assertEquals(a.mainline.size, 85)
 
-  "block comment in variation root" in:
-    parse(rootCommentInVariation) must beRight.like: parsed =>
-      parsed.tree.get.variations.head.value.variationComments must_==
-        List("This other move:")
+  test("block comment in variation root"):
+    parse(rootCommentInVariation).assertRight: parsed =>
+      assertEquals(parsed.tree.get.variations.head.value.variationComments, List("This other move:"))
 
-  "inline comment in variation root" in:
-    parse(rootCommentInVariation) must beRight.like: parsed =>
-      parsed.tree.get.variations.tail.head.value.variationComments must_==
-        List("Neither does :")
+  test("inline comment in variation root"):
+    parse(rootCommentInVariation).assertRight: parsed =>
+      assertEquals(parsed.tree.get.variations.tail.head.value.variationComments, List("Neither does :"))
 
-  "block comments in variation root" in:
-    parse(multipleRootCommentsInVariation) must beRight.like: parsed =>
-      parsed.tree.get.variations.head.value.variationComments must_==
+  test("block comments in variation root"):
+    parse(multipleRootCommentsInVariation).assertRight: parsed =>
+      assertEquals(
+        parsed.tree.get.variations.head.value.variationComments,
         List("This other move:", "looks pretty")
-
-  "no block comment in variation root" in:
-    parse(variations) must beRight.like: parsed =>
-      parsed.tree.get.variations.head.value.variationComments must_== Nil
-
-  "multiple comments in variation root" in:
-    parse(multipleRootCommentsInVariation) must beRight.like: parsed =>
-      parsed.tree.get.variations.tail.head.value.variationComments must_==
-        List("Neither does :", "this or that", "or whatever")
-
-  "comments and variations" in:
-    parse(commentsAndVariations) must beRight.like: parsed =>
-      parsed.mainline.size must_== 103
-
-  "comments and lines by smartchess" in:
-    parse(bySmartChess) must beRight.like { a =>
-      a.mainline.size must_== 65
-    }
-
-  "complete 960" in:
-    parse(complete960) must beRight.like { a =>
-      a.mainline.size must_== 42
-    }
-
-  "TCEC" in:
-    parse(fromTcec) must beRight.like { a =>
-      a.mainline.size must_== 142
-    }
-
-  "TCEC with engine output" in:
-    parse(fromTcecWithEngineOutput) must beRight.like { a =>
-      a.mainline.size must_== 165
-    }
-
-  "chesskids iphone" in:
-    parse(chesskids) must beRight.like { a =>
-      a.mainline.size must_== 135
-    }
-
-  "handwritten" in:
-    parse(handwritten) must beRight.like { a =>
-      a.mainline.size must_== 139
-    }
-
-  "chess by post" in:
-    parse(chessByPost) must beRight.like { a =>
-      a.mainline.size must_== 100
-    }
-
-  "Android device" in:
-    parse(android) must beRight.like { a =>
-      a.mainline.size must_== 69
-    }
-
-  "weird dashes" in:
-    parse(weirdDashes) must beRight.like { a =>
-      a.mainline.size must_== 74
-    }
-
-  "lichobile" in:
-    parse(lichobile) must beRight.like { a =>
-      a.mainline.size must_== 68
-    }
-
-  "overflow" in:
-    parse(overflow) must beRight.like { a =>
-      a.mainline.size must_== 67
-    }
-  "overflow 2" in:
-    parse(stackOverflow) must beRight.like { a =>
-      a.mainline.size must_== 8
-    }
-  "overflow 3" in:
-    parse(overflow3) must beRight.like { a =>
-      a.mainline.size must_== 343
-    }
-  "overflow 3: tags" in:
-    parse(overflow3) must beRight.like { a =>
-      a.tags.value.size must_== 9
-    }
-  "chessbase arrows" in:
-    parse(chessbaseArrows) must beRight.like { a =>
-      a.initialPosition.comments must_== List(
-        "[%csl Gb4,Yd5,Rf6][%cal Ge2e4,Ye2d4,Re2g4]"
       )
-    }
-  "multiple initial comments with empty" in:
-    parse(multipleInitalCommentsWithEmpty) must beRight.like { a =>
-      a.initialPosition must_== List("this", "that")
-    }
-  "chessbase weird" in:
-    parse(chessbaseWeird) must beRight.like { a =>
-      a.mainline.size must_== 115
-    }
-  "crazyhouse from prod" in:
-    parse(crazyhouseFromProd) must beRight.like { a =>
-      a.mainline.size must_== 49
-    }
-  "crazyhouse from chess.com" in:
-    parse(chessComCrazyhouse) must beRight.like { a =>
-      a.mainline.size must_== 42
-    }
 
-  "en passant e.p. notation" in:
-    parse(enpassantEP) must beRight.like: a =>
-      a.mainline.size must_== 36
+  test("no block comment in variation root"):
+    parse(variations).assertRight: parsed =>
+      assertEquals(parsed.tree.get.variations.head.value.variationComments, Nil)
 
-    parse(enpassantEP2) must beRight.like: a =>
-      a.mainline.size must_== 36
+  test("multiple comments in variation root"):
+    parse(multipleRootCommentsInVariation).assertRight: parsed =>
+      assertEquals(
+        parsed.tree.get.variations.tail.head.value.variationComments,
+        List("Neither does :", "this or that", "or whatever")
+      )
 
-  "en passant ep notation" in:
-    parse(enpassantEP3) must beRight.like: a =>
-      a.mainline.size must_== 5
+  test("comments and variations"):
+    parse(commentsAndVariations).assertRight: parsed =>
+      assertEquals(parsed.mainline.size, 103)
 
-  "year" in:
-    "full date" in:
-      parse(recentChessCom) must beRight.like { parsed =>
-        parsed.tags.year must_== Option(2016)
-      }
-    "only year" in:
-      parse(explorerPartialDate) must beRight.like { parsed =>
-        parsed.tags.year must_== Option(1978)
-      }
+  test("comments and lines by smartchess"):
+    parse(bySmartChess).assertRight: a =>
+      assertEquals(a.mainline.size, 65)
 
-  "weird variant names" in:
-    parse(stLouisFischerandom) must beRight.like { parsed =>
-      parsed.tags.variant must_== Option(variant.Chess960)
-    }
+  test("complete 960"):
+    parse(complete960).assertRight: a =>
+      assertEquals(a.mainline.size, 42)
 
-  "example from chessgames.com with weird comments" in:
-    parse(chessgamesWeirdComments) must beRight
+  test("TCEC"):
+    parse(fromTcec).assertRight: a =>
+      assertEquals(a.mainline.size, 142)
 
-  "exotic notation from clono.no" in:
-    parse(clonoNoExoticNotation) must beRight
+  test("TCEC with engine output"):
+    parse(fromTcecWithEngineOutput).assertRight: a =>
+      assertEquals(a.mainline.size, 165)
 
-  "example with tags & comments without moves 1" in:
-    parse(tagsCommentsWithoutMoves1) must beRight
+  test("chesskids iphone"):
+    parse(chesskids).assertRight: a =>
+      assertEquals(a.mainline.size, 135)
 
-  "example with tags & comments without moves 2" in:
-    parse(tagsCommentsWithoutMoves2) must beRight
+  test("handwritten"):
+    parse(handwritten).assertRight: a =>
+      assertEquals(a.mainline.size, 139)
 
-  "empty spaces in tags value should be removed" in:
-    parse(completeTagsWithSpaces) must beRight.like { a =>
-      a.tags(_.Variant) must_== Some("Standard")
-      a.tags(_.Event) must_== Some("Мат в 1 ход [1-63] - Дорофеева: Мат в 1 ход - 43")
-    }
+  test("chess by post"):
+    parse(chessByPost).assertRight: a =>
+      assertEquals(a.mainline.size, 100)
 
-  "game with comments" in:
-    parse(gameWithComments) must beRight.like { a =>
-      a.mainline.size must_== 106
-    }
+  test("Android device"):
+    parse(android).assertRight: a =>
+      assertEquals(a.mainline.size, 69)
 
-  "none break space" in:
+  test("weird dashes"):
+    parse(weirdDashes).assertRight: a =>
+      assertEquals(a.mainline.size, 74)
+
+  test("lichobile"):
+    parse(lichobile).assertRight: a =>
+      assertEquals(a.mainline.size, 68)
+
+  test("overflow"):
+    parse(overflow).assertRight: a =>
+      assertEquals(a.mainline.size, 67)
+  test("overflow 2"):
+    parse(stackOverflow).assertRight: a =>
+      assertEquals(a.mainline.size, 8)
+  test("overflow 3"):
+    parse(overflow3).assertRight: a =>
+      assertEquals(a.mainline.size, 343)
+  test("overflow 3: tags"):
+    parse(overflow3).assertRight: a =>
+      assertEquals(a.tags.value.size, 9)
+  test("chessbase arrows"):
+    parse(chessbaseArrows).assertRight: a =>
+      assertEquals(a.initialPosition.comments, List("[%csl Gb4,Yd5,Rf6][%cal Ge2e4,Ye2d4,Re2g4]"))
+  test("multiple initial comments with empty"):
+    parse(multipleInitalCommentsWithEmpty).assertRight: a =>
+      assertEquals(a.initialPosition.comments, List("this", "that"))
+  test("chessbase weird"):
+    parse(chessbaseWeird).assertRight: a =>
+      assertEquals(a.mainline.size, 115)
+  test("crazyhouse from prod"):
+    parse(crazyhouseFromProd).assertRight: a =>
+      assertEquals(a.mainline.size, 49)
+  test("crazyhouse from chess.com"):
+    parse(chessComCrazyhouse).assertRight: a =>
+      assertEquals(a.mainline.size, 42)
+
+  test("en passant e.p. notation"):
+    parse(enpassantEP).assertRight: a =>
+      assertEquals(a.mainline.size, 36)
+
+    parse(enpassantEP2).assertRight: a =>
+      assertEquals(a.mainline.size, 36)
+
+  test("en passant ep notation"):
+    parse(enpassantEP3).assertRight: a =>
+      assertEquals(a.mainline.size, 5)
+
+  test("year: full date"):
+    parse(recentChessCom).assertRight: parsed =>
+      assertEquals(parsed.tags.year, Option(2016))
+  test("year: only year"):
+    parse(explorerPartialDate).assertRight: parsed =>
+      assertEquals(parsed.tags.year, Option(1978))
+
+  test("weird variant names"):
+    parse(stLouisFischerandom).assertRight: parsed =>
+      assertEquals(parsed.tags.variant, Option(variant.Chess960))
+
+  test("example from chessgames.com with weird comments"):
+    assert(parse(chessgamesWeirdComments).isRight)
+
+  test("exotic notation from clono.no"):
+    assert(parse(clonoNoExoticNotation).isRight)
+
+  test("example with tags & comments without moves 1"):
+    assert(parse(tagsCommentsWithoutMoves1).isRight)
+
+  test("example with tags & comments without moves 2"):
+    assert(parse(tagsCommentsWithoutMoves2).isRight)
+
+  test("empty spaces in tags value should be removed"):
+    parse(completeTagsWithSpaces).assertRight: a =>
+      assertEquals(a.tags(_.Variant), Some("Standard"))
+      assertEquals(a.tags(_.Event), Some("Мат в 1 ход [1-63] - Дорофеева: Мат в 1 ход - 43"))
+
+  test("game with comments"):
+    parse(gameWithComments).assertRight: a =>
+      assertEquals(a.mainline.size, 106)
+
+  test("none break space"):
     val nbsp = "1.  e4 e5"
-    parse(nbsp) must beRight.like { a =>
-      a.mainline.size must_== 2
-    }
+    parse(nbsp).assertRight: a =>
+      assertEquals(a.mainline.size, 2)

@@ -1,88 +1,91 @@
 package chess
 
-class SituationTest extends ChessSpecs:
+class SituationTest extends ChessTest:
 
-  "a game" should:
-    "detect check" should:
-      "by rook" in:
-        ("""
-K  r
-""" as White).check must_== Check.Yes
-      "by knight" in:
-        ("""
+  test("detect check: by rook"):
+    assert:
+      """
+  K  r
+  """.as(White).check.yes
+  test("detect check: by knight"):
+    assert:
+      ("""
   n
 K
-""" as White).check must_== Check.Yes
-      "by bishop" in:
-        ("""
+""" as White).check.yes
+  test("detect check: by bishop"):
+    assert:
+      ("""
   b
 
 
      K
-""" as White).check must_== Check.Yes
-      "by pawn" in:
-        ("""
+""" as White).check.yes
+  test("detect check: by pawn"):
+    assert:
+      ("""
     p
      K
-""" as White).check must_== Check.Yes
-      "not" in:
-        ("""
+""" as White).check.yes
+  test("detect check: not"):
+    assert:
+      ("""
    n
 K
-""" as White).check must_== Check.No
-    "detect check mate" in:
-      "by rook" in:
-        ("""
+""" as White).check.no
+  test("detect check mate: by rook"):
+    assert:
+      ("""
 PP
 K  r
-""" as White).checkMate must beTrue
-      "by knight" in:
-        ("""
+""" as White).checkMate
+  test("detect check mate: by knight"):
+    assert:
+      ("""
 PPn
 KR
-""" as White).checkMate must beTrue
-      "not" in:
-        ("""
+""" as White).checkMate
+  test("detect check mate: not"):
+    assertNot:
+      ("""
   n
 K
-""" as White).checkMate must beFalse
-    "stale mate" in:
-      "stuck in a corner" in:
-        ("""
+""" as White).checkMate
+  test("stale mate: stuck in a corner"):
+    assert:
+      ("""
 prr
 K
-""" as White).staleMate must beTrue
-      "not" in:
-        ("""
+""" as White).staleMate
+  test("stale mate: not"):
+    assertNot:
+      ("""
   b
 K
-""" as White).staleMate must beFalse
+""" as White).staleMate
 
-    "Give the correct winner for a game" in:
-      val game =
-        """
+  test("Give the correct winner for a game"):
+    val game =
+      """
 PP
 K  r
 """ as White
+    assert(game.checkMate)
+    assertEquals(game.winner, Some(Black))
 
-      game.checkMate must beTrue
-      game.winner must beSome { (_: Color) == Black }
+  test("Not give a winner if the game is still in progress"):
+    val game = """
+      p
+      K
+      """ as White
+    assertEquals(game.winner, None)
 
-    "Not give a winner if the game is still in progress" in:
-      val game = """
-    p
-     K
-    """ as White
+  test("not be playable: with touching kings"):
+    val game = "kK BN" as Black
+    assertNot(game.playable(true))
+    assertNot(game.playable(false))
 
-      game.winner must beNone
-
-    "not be playable" in:
-      "with touching kings" in:
-        val game = "kK BN" as Black
-        game.playable(true) must beFalse
-        game.playable(false) must beFalse
-
-      "with other side in check" in:
-        val game = "k Q K" as White
-        game.playable(true) must beFalse
-        game.playable(false) must beFalse
+  test("not be playable: with other side in check"):
+    val game = "k Q K" as White
+    assertNot(game.playable(true))
+    assertNot(game.playable(false))

@@ -123,25 +123,35 @@ trait MunitExtensions extends munit.FunSuite:
   private def isCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T])(using Location) =
     (n.toDouble(a) - n.toDouble(b)).abs <= delta
 
+  given [A, B](using sr: SameRuntime[B, A]): munit.Compare[A, B] with
+    def isEqual(obtained: A, expected: B): Boolean = obtained == sr(expected)
+
+  given [A, B](using comp: munit.Compare[A, B]): munit.Compare[Option[A], Option[B]] with
+    def isEqual(obtained: Option[A], expected: Option[B]): Boolean = (obtained, expected) match
+      case (Some(o), Some(e)) => comp.isEqual(o, e)
+      case (None, None)       => true
+      case _                  => false
+
+  given [A, B](using sr: SameRuntime[B, A]): munit.Compare[List[A], List[B]] with
+    def isEqual(obtained: List[A], expected: List[B]): Boolean =
+      obtained.sameElements(expected.map(sr(_)))
+
   extension [A](a: A)
     def matchZero[B: Zero](f: PartialFunction[A, B])(using Location): B =
       f.lift(a) | Zero[B].zero
 
   extension [A](v: Option[A])
-    def assertSome(f: PartialFunction[A, Any])(using Location): Any = v match
+    def assertSome(f: PartialFunction[A, Unit])(using Location): Any = v match
       case Some(a) => f.lift(a) getOrElse fail(s"Unexpected Some value: $a")
       case None    => fail(s"Expected Some but received None")
 
   extension [E, A](v: Either[E, A])
-    def assertRight(f: PartialFunction[A, Any])(using Location): Any = v match
+    def assertRight(f: PartialFunction[A, Unit])(using Location): Any = v match
       case Right(r) => f.lift(r) getOrElse fail(s"Unexpected Right value: $r")
       case Left(e)  => fail(s"Expected Right but received $v")
     def get: A = v match
       case Right(r) => r
       case Left(e)  => fail(s"Expected Right but received $v")
-
-  given [A, B](using sr: SameRuntime[B, A]): munit.Compare[A, B] with
-    def isEqual(obtained: A, expected: B): Boolean = obtained == sr(expected)
 
 trait ChessTest extends munit.FunSuite with ChessTestCommon with MunitExtensions:
   import munit.Location

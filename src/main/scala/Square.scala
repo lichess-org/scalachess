@@ -144,4 +144,4 @@ object Square:
   val all: List[Square] = (0 to 63).toList
 
   val allKeys: Map[String, Square] = all.mapBy(_.key)
-  val charMap: Map[Char, Square]   = all.mapBy(square => square.asChar)
+  val charMap: Map[Char, Square]   = all.mapBy(_.asChar)

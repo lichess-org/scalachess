@@ -32,21 +32,21 @@ class RenderTest extends ChessTest:
 
   test("pgn round trip tests compare ParsedPgn"):
     (pgns ++ wcc2023).foreach: x =>
-      val pgn    = Parser.full(x).toOption.get
-      val output = Parser.full(pgn.toPgn.render).toOption.get
+      val pgn    = Parser.full(x).get
+      val output = Parser.full(pgn.toPgn.render).get
       assertEquals(output.cleanTags, pgn.cleanTags)
 
   test("pgn round trip tests compare Pgn"):
     List(pgn1, pgn3).foreach: x =>
-      val result = Parser.full(x).toOption.get.toPgn.render
+      val result = Parser.full(x).get.toPgn.render
       assertEquals(result.value, x)
 
   test("pgn round trip tests compare ouput"):
-    val results = pgns.map(Parser.full(_).toOption.get.toPgn.render).mkString("\n\n")
+    val results = pgns.map(Parser.full(_).get.toPgn.render).mkString("\n\n")
     assertEquals(results, ouput)
 
   test("wcc2023 study round trip tests"):
-    val results = wcc2023.map(Parser.full(_).toOption.get.toPgn.render).mkString("\n\n")
+    val results = wcc2023.map(Parser.full(_).get.toPgn.render).mkString("\n\n")
     assertEquals(results, ouput2)
 
   val pgn1 = """

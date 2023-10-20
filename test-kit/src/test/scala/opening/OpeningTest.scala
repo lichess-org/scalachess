@@ -46,7 +46,7 @@ class OpeningTest extends ChessTest:
     assertEquals(searchStr("d4 c5 d5 e5").get.name, OpeningName("Benoni Defense: Old Benoni"))
 
   test("search should find by replay in d4"):
-    val replay = Replay(List(SanStr("d4")), None, variant.Standard).toOption.get.valid.toOption.get
+    val replay = Replay(List(SanStr("d4")), None, variant.Standard).get.valid.get
     val op     = OpeningDb.search(replay).get
     assertEquals(op.opening.name, OpeningName("Queen's Pawn Game"))
     assertEquals(op.ply, Ply(1))
@@ -58,7 +58,7 @@ class OpeningTest extends ChessTest:
         .toList,
       None,
       variant.Standard
-    ).toOption.get.valid.toOption.get
+    ).get.valid.get
     val op = OpeningDb.search(replay).get
     assertEquals(op.opening.name, OpeningName("King's Gambit Accepted: Muzio Gambit, Holloway Defense"))
     assertEquals(op.ply, Ply(12))

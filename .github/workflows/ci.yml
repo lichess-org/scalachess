@@ -7,7 +7,7 @@ on:
     branches: ['**']
 
 jobs:
-  openjdk17:
+  openjdk21:
     runs-on: ubuntu-latest
     env:
       JAVA_OPTS: "-Xmx6G -XX:+UseG1GC"
@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
           cache: sbt
 
       - name: Test

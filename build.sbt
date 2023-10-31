@@ -15,7 +15,7 @@ val commonSettings = Seq(
     "-feature",
     "-language:postfixOps",
     "-Wunused:all",
-    "-release:17"
+    "-release:21"
     // "-Werror"
     // Warnings as errors!
     /* "-Xfatal-warnings" */

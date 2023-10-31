@@ -41,10 +41,9 @@ class PlayBench:
 
   @Benchmark
   def divider(bh: Blackhole) =
-    var result = dividerGames.map { x =>
+    var result = dividerGames.map: x =>
       Blackhole.consumeCPU(Work)
       Divider(x)
-    }
     bh.consume(result)
     result
 

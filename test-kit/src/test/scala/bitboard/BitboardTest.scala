@@ -11,7 +11,7 @@ class BitboardTest extends ScalaCheckSuite:
 
   test("the result of add should contain the added square"):
     forAll: (bb: Bitboard, square: Square) =>
-      assertEquals((bb.add(square).contains(square)), true)
+      assertEquals(bb.add(square).contains(square), true)
 
   test("Square.bb.singleSquare == Some(square)"):
     forAll: (square: Square) =>
@@ -121,7 +121,7 @@ class BitboardTest extends ScalaCheckSuite:
 
   test("isDisjoint and intersects always return the opposite value"):
     forAll: (b1: Bitboard, b2: Bitboard) =>
-      b1.isDisjoint(b2) == !b1.intersects(b2)
+      b1.isDisjoint(b2) != b1.intersects(b2)
 
   property("forall"):
     forAll: (b: Bitboard, f: Square => Boolean) =>

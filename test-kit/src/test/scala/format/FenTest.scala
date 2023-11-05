@@ -70,3 +70,15 @@ class FenTest extends ChessTest:
     assertEquals(situation.history.unmovedRooks, UnmovedRooks(Square.A1.bl))
     assertEquals(situation.history.castles, Castles(Square.A1.bl))
     assertEquals(situation.legalMoves.filter(_.castles), Nil)
+
+  test("castling rights with 2 rooks on the same side"):
+    val f1 = Fen.Epd("4k3/8/8/8/8/8/8/4K1RR w G -")
+    val f2 = Fen.Epd("4k3/8/8/8/8/8/8/4K1RR w K -")
+    val f3 = Fen.Epd("4k3/8/8/8/8/8/8/RR2K3 w B -")
+    val f4 = Fen.Epd("4k3/8/8/8/8/8/8/RR2K3 w Q -")
+    val f5 = Fen.Epd("rr2k3/8/8/8/8/8/8/4K3 w b -")
+    val f6 = Fen.Epd("rr2k3/8/8/8/8/8/8/4K3 w q -")
+    val f7 = Fen.Epd("4k1rr/8/8/8/8/8/8/4K3 w g -")
+    val f8 = Fen.Epd("4k1rr/8/8/8/8/8/8/4K3 w k -")
+    List(f1, f2, f3, f4, f5, f6, f7, f8).foreach: fen =>
+      assertEquals(Fen.writeOpening(Fen.read(fen).get), fen)

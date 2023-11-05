@@ -31,7 +31,7 @@ trait FenReader:
               val color    = Color.fromWhite(ch.isUpper)
               val backRank = Bitboard.rank(color.backRank)
               // rooks that can be used for castling
-              val rooks    = board.rooks & board(color) & backRank
+              val rooks = board.rooks & board(color) & backRank
               {
                 for
                   kingSquare <- (board.kingOf(color) & backRank).first

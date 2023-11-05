@@ -56,14 +56,3 @@ class CastlesTest extends ScalaCheckSuite:
       updated.can(color, QueenSide) == queenSide &&
       updated.can(!color) == c.can(!color)
     }
-
-  test("toFenString.apply == identity"):
-    Prop.forAll { (c: Castles) =>
-      Castles(c.toFenString) == c
-    }
-
-  test("apply(fenString).toFenString == fenString"):
-    Prop.forAll { (c: Castles) =>
-      val fenString = c.toFenString
-      Castles(fenString).toFenString == fenString
-    }

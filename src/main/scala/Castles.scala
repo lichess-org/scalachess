@@ -33,14 +33,6 @@ object Castles:
     def update(color: Color, kingSide: Boolean, queenSide: Boolean): Castles =
       c.without(color) | kingSide.at(color.kingSide) | queenSide.at(color.queenSide)
 
-    def toFenString: String =
-      (if whiteKingSide then "K" else "") +
-        (if whiteQueenSide then "Q" else "") +
-        (if blackKingSide then "k" else "") +
-        (if blackQueenSide then "q" else "") match
-        case "" => "-"
-        case n  => n
-
     def toSeq: Array[Boolean] = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
 
     inline def unary_~ : Castles                = ~c
@@ -98,6 +90,7 @@ object Castles:
           charToSquare(c).map(acc.addSquare)
         .getOrElse(none)
 
+  // consider x-fen notation
   val charToSquare: (c: Char) => Option[Square] =
     case 'k' => Some(H8)
     case 'q' => Some(A8)

@@ -46,7 +46,9 @@ object Bitboard:
 
     def knightAttacks: Bitboard = KNIGHT_ATTACKS(s.value)
 
-  extension (l: Long) private def lsb: Square = Square.unsafe(java.lang.Long.numberOfTrailingZeros(l))
+  extension (l: Long)
+    private def lsb: Square = Square.unsafe(java.lang.Long.numberOfTrailingZeros(l))
+    private def msb: Square = Square.unsafe(63 - java.lang.Long.numberOfLeadingZeros(l))
 
   extension (a: Bitboard)
     inline def value: Long                        = a
@@ -109,6 +111,7 @@ object Bitboard:
     inline def isDisjoint(o: Bitboard): Boolean =
       (a & o).isEmpty
 
+    // return list of square that sorted ascendingly
     def squares: List[Square] =
       var b       = a
       val builder = List.newBuilder[Square]
@@ -127,6 +130,15 @@ object Bitboard:
         b &= (b - 1L)
       result
 
+    def last[B](f: Square => Option[B]): Option[B] =
+      var b                 = a
+      var result: Option[B] = None
+      while b != 0L && result.isEmpty
+      do
+        result = f(b.msb)
+        b &= ~b.msb.bl
+      result
+
     def find(f: Square => Boolean): Option[Square] =
       var b                      = a
       var result: Option[Square] = None
@@ -134,6 +146,15 @@ object Bitboard:
       do
         if f(b.lsb) then result = Some(b.lsb)
         b &= (b - 1L)
+      result
+
+    def findLast(f: Square => Boolean): Option[Square] =
+      var b                      = a
+      var result: Option[Square] = None
+      while b != 0L && result.isEmpty
+      do
+        if f(b.msb) then result = Some(b.msb)
+        b &= ~b.msb.bl
       result
 
     def fold[B](init: B)(f: (B, Square) => B): B =

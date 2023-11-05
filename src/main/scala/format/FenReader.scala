@@ -30,12 +30,13 @@ trait FenReader:
             case ((c, r), ch) =>
               val color    = Color.fromWhite(ch.isUpper)
               val backRank = Bitboard.rank(color.backRank)
-              val rooks    = board.rooks & board(color) & backRank
+              // rooks that can be used for castling
+              val rooks = board.rooks & board(color) & backRank
               {
                 for
                   kingSquare <- (board.kingOf(color) & backRank).first
                   rookSquare <- ch.toLower match
-                    case 'k'  => rooks.find(_ ?> kingSquare)
+                    case 'k'  => rooks.findLast(_ ?> kingSquare)
                     case 'q'  => rooks.find(_ ?< kingSquare)
                     case file => rooks.find(_.file.char == file)
                   side <- Side.kingRookSide(kingSquare, rookSquare)

@@ -54,6 +54,27 @@ class BitboardTest extends ScalaCheckSuite:
       def f = (p: Square) => if p == x then Some(p) else None
       Bitboard(xs + x).first(f) == Some(x)
 
+  test("last with a function that always return None should return None"):
+    forAll: (bb: Bitboard) =>
+      assertEquals(bb.last(_ => None), None)
+
+  test("last with a function that always return Some should return the last square"):
+    forAll: (bb: Bitboard) =>
+      assertEquals(bb.last(Some(_)), bb.last)
+
+  test("last returns the correct square"):
+    forAll: (xs: Set[Square], x: Square) =>
+      def f = (p: Square) => if p == x then Some(p) else None
+      Bitboard(xs + x).last(f) == Some(x)
+
+  test("find"):
+    forAll: (bb: Bitboard, f: Square => Boolean) =>
+      bb.find(f) == bb.squares.find(f)
+
+  test("findLast"):
+    forAll: (bb: Bitboard, f: Square => Boolean) =>
+      bb.findLast(f) == bb.squares.reverse.find(f)
+
   test("bitboard created by set of square should contains and only contains those square"):
     forAll: (xs: Set[Square]) =>
       val bb = Bitboard(xs)
@@ -146,6 +167,10 @@ class BitboardTest extends ScalaCheckSuite:
   property("first"):
     forAll: (b: Bitboard, f: Square => Option[Int]) =>
       b.first(f) == b.squares.map(f).find(_.isDefined).flatten
+
+  property("last"):
+    forAll: (b: Bitboard, f: Square => Option[Int]) =>
+      b.last(f) == b.squares.map(f).findLast(_.isDefined).flatten
 
   property("foreach"):
     forAll: (b: Bitboard, f: Square => Int) =>

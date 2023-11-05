@@ -46,7 +46,9 @@ object Bitboard:
 
     def knightAttacks: Bitboard = KNIGHT_ATTACKS(s.value)
 
-  extension (l: Long) private def lsb: Square = Square.unsafe(java.lang.Long.numberOfTrailingZeros(l))
+  extension (l: Long)
+    private def lsb: Square = Square.unsafe(java.lang.Long.numberOfTrailingZeros(l))
+    private def msb: Square = Square.unsafe(63 - java.lang.Long.numberOfLeadingZeros(l))
 
   extension (a: Bitboard)
     inline def value: Long                        = a
@@ -133,6 +135,16 @@ object Bitboard:
       while b != 0L && result.isEmpty
       do
         if f(b.lsb) then result = Some(b.lsb)
+        b &= (b - 1L)
+      result
+
+    // tests
+    def findLast(f: Square => Boolean): Option[Square] =
+      var b                      = a
+      var result: Option[Square] = None
+      while b != 0L && result.isEmpty
+      do
+        if f(b.msb) then result = Some(b.msb)
         b &= (b - 1L)
       result
 

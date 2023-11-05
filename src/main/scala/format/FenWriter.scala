@@ -2,6 +2,7 @@ package chess
 package format
 
 import cats.syntax.all.*
+import chess.bitboard.Bitboard
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *
@@ -78,4 +79,29 @@ trait FenWriter:
       case _ => ""
 
   private[chess] def writeCastles(board: Board): String =
-    board.castles.toFenString
+    val wr  = board.rooks & board.white & Bitboard.rank(White.backRank)
+    val br  = board.rooks & board.black & Bitboard.rank(Black.backRank)
+    val wur = board.unmovedRooks.without(Black).bb
+    val bur = board.unmovedRooks.without(White).bb
+    (if board.castles.whiteKingSide then
+       wur.last
+         .map(sq => if wr.last.contains(sq) then "K" else sq.file.toUpperCaseString)
+         .getOrElse("K")
+     else "") +
+      (if board.castles.whiteQueenSide then
+         wur.first
+           .map(sq => if wr.first.contains(sq) then "Q" else sq.file.toUpperCaseString)
+           .getOrElse("Q")
+       else "") +
+      (if board.castles.blackKingSide then
+         bur.last
+           .map(sq => if br.last.contains(sq) then "k" else sq.file.char.toString)
+           .getOrElse("k")
+       else "") +
+      (if board.castles.blackQueenSide then
+         bur.first
+           .map(sq => if br.first.contains(sq) then "q" else sq.file.char.toString)
+           .getOrElse("q")
+       else "") match
+      case "" => "-"
+      case s  => s

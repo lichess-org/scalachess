@@ -1,6 +1,5 @@
 package chess
 
-import cats.syntax.all.*
 import bitboard.Bitboard
 import Square.*
 
@@ -32,14 +31,6 @@ object Castles:
 
     def update(color: Color, kingSide: Boolean, queenSide: Boolean): Castles =
       c.without(color) | kingSide.at(color.kingSide) | queenSide.at(color.queenSide)
-
-    def toFenString: String =
-      (if whiteKingSide then "K" else "") +
-        (if whiteQueenSide then "Q" else "") +
-        (if blackKingSide then "k" else "") +
-        (if blackQueenSide then "q" else "") match
-        case "" => "-"
-        case n  => n
 
     def toSeq: Array[Boolean] = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
 
@@ -90,14 +81,7 @@ object Castles:
   @targetName("applyBitboard")
   def apply(bb: Bitboard): Castles = init & bb.value
 
-  def apply(str: String): Castles = str match
-    case "-" => none
-    case _ =>
-      str.toList
-        .foldM(none): (acc, c) =>
-          charToSquare(c).map(acc.addSquare)
-        .getOrElse(none)
-
+  // consider x-fen notation
   val charToSquare: (c: Char) => Option[Square] =
     case 'k' => Some(H8)
     case 'q' => Some(A8)
@@ -105,5 +89,6 @@ object Castles:
     case 'Q' => Some(A1)
     case _   => None
 
-  val init: Castles = 0x8100000000000081L
-  val none: Castles = 0L
+  val init: Castles  = 0x8100000000000081L
+  val none: Castles  = 0L
+  val black: Castles = 0x8100000000000000L

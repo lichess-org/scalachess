@@ -111,6 +111,7 @@ object Bitboard:
     inline def isDisjoint(o: Bitboard): Boolean =
       (a & o).isEmpty
 
+    // return list of square that sorted ascendingly
     def squares: List[Square] =
       var b       = a
       val builder = List.newBuilder[Square]
@@ -129,6 +130,15 @@ object Bitboard:
         b &= (b - 1L)
       result
 
+    def last[B](f: Square => Option[B]): Option[B] =
+      var b                 = a
+      var result: Option[B] = None
+      while b != 0L && result.isEmpty
+      do
+        result = f(b.msb)
+        b &= ~b.msb.bl
+      result
+
     def find(f: Square => Boolean): Option[Square] =
       var b                      = a
       var result: Option[Square] = None
@@ -138,14 +148,13 @@ object Bitboard:
         b &= (b - 1L)
       result
 
-    // tests
     def findLast(f: Square => Boolean): Option[Square] =
       var b                      = a
       var result: Option[Square] = None
       while b != 0L && result.isEmpty
       do
         if f(b.msb) then result = Some(b.msb)
-        b &= (b - 1L)
+        b &= ~b.msb.bl
       result
 
     def fold[B](init: B)(f: (B, Square) => B): B =

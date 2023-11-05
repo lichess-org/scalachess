@@ -53,18 +53,5 @@ case class History(
 
 object History:
 
-  def make(
-      lastMove: Option[String], // a2a4
-      castles: String
-  ): History =
-    History(
-      lastMove = lastMove flatMap Uci.apply,
-      castles = Castles(castles),
-      unmovedRooks = UnmovedRooks.corners,
-      positionHashes = PositionHash.empty
-    )
-
   def castle(color: Color, kingSide: Boolean, queenSide: Boolean) =
     History(castles = Castles.init.update(color, kingSide, queenSide), unmovedRooks = UnmovedRooks.corners)
-
-  def noCastle = History(castles = Castles.none, unmovedRooks = UnmovedRooks.none)

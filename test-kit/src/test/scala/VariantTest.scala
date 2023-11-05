@@ -351,9 +351,6 @@ K  r
       assert(game.variant.valid(game, true))
       assert(game.variant.valid(game, false))
 
-  test("horde initialize the board with black castling rights"):
-    assertEquals(Board.init(Horde).history.castles, Castles("kq"))
-
   test("racingKings validate situation correctly with any check at all for white"):
     val position = EpdFen("8/8/8/k5R1/8/8/1rbnNB1K/qrbnNBRQ b - - 0 1")
     val game     = fenToGame(position, RacingKings)

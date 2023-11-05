@@ -29,7 +29,7 @@ case object Horde
     val blackPieces = File.all.map { x => Square(x, Rank.Eighth) -> (Black - backRank(x.value)) }
     whitePawnsHorde ++ frontPawns ++ blackPawns ++ blackPieces toMap
 
-  override val castles = Castles("kq")
+  override val castles = Castles.black
 
   override val initialFen = EpdFen(
     "rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1"

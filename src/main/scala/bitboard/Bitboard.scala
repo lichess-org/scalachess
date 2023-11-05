@@ -121,6 +121,7 @@ object Bitboard:
         b &= (b - 1L)
       builder.result
 
+    // min square in the bitboard if it is not empty
     def first[B](f: Square => Option[B]): Option[B] =
       var b                 = a
       var result: Option[B] = None
@@ -130,6 +131,7 @@ object Bitboard:
         b &= (b - 1L)
       result
 
+    // max square in the bitboard if it is not empty
     def last[B](f: Square => Option[B]): Option[B] =
       var b                 = a
       var result: Option[B] = None

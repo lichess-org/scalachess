@@ -151,6 +151,7 @@ Opening("A01", "Nimzo-Larsen Attack: Indian Variation", "rnbqkb1r/pppppppp/5n2/8
 Opening("A01", "Nimzo-Larsen Attack: Modern Variation", "rnbqkbnr/pppp1ppp/8/4p3/8/1P6/P1PPPPPP/RNBQKBNR w KQkq -", "b2b3 e7e5", "1. b3 e5"),
 Opening("A01", "Nimzo-Larsen Attack: Modern Variation", "r1bqkbnr/pppp1ppp/2n5/4p3/8/1P6/PBPPPPPP/RN1QKBNR w KQkq -", "b2b3 e7e5 c1b2 b8c6", "1. b3 e5 2. Bb2 Nc6"),
 Opening("A01", "Nimzo-Larsen Attack: Modern Variation", "r1bqkbnr/pppp1ppp/2n5/4p3/8/1P2P3/PBPP1PPP/RN1QKBNR b KQkq -", "b2b3 e7e5 c1b2 b8c6 e2e3", "1. b3 e5 2. Bb2 Nc6 3. e3"),
+Opening("A01", "Nimzo-Larsen Attack: Modern Variation", "r1bqkb1r/pppp1ppp/2n2n2/4p3/2P5/1P6/PB1PPPPP/RN1QKBNR w KQkq -", "b2b3 e7e5 c1b2 b8c6 c2c4 g8f6", "1. b3 e5 2. Bb2 Nc6 3. c4 Nf6"),
 Opening("A01", "Nimzo-Larsen Attack: Pachman Gambit", "r1bqkbnr/pppp1ppp/2n5/4p3/5P2/1P6/PBPPP1PP/RN1QKBNR b KQkq -", "b2b3 e7e5 c1b2 b8c6 f2f4", "1. b3 e5 2. Bb2 Nc6 3. f4"),
 Opening("A01", "Nimzo-Larsen Attack: Polish Variation", "rnbqkbnr/p1pppppp/8/1p6/8/1P6/P1PPPPPP/RNBQKBNR w KQkq -", "b2b3 b7b5", "1. b3 b5"),
 Opening("A01", "Nimzo-Larsen Attack: Ringelbach Gambit", "rnbqkbnr/pppp2pp/4p3/5p2/4P3/1P6/PBPP1PPP/RN1QKBNR b KQkq -", "b2b3 f7f5 c1b2 e7e6 e2e4", "1. b3 f5 2. Bb2 e6 3. e4"),

@@ -37,9 +37,43 @@ class BitboardTest extends ScalaCheckSuite:
     forAll: (bb: Bitboard) =>
       assertEquals(bb.singleSquare.isDefined, bb.first == bb.last)
 
+  property("fold removeFirst should return empty"):
+    forAll: (bb: Bitboard) =>
+      bb.fold(bb)((b, _) => b.removeFirst).isEmpty
+
+  property("fold removeFirst.add(first) == identity"):
+    forAll: (bb: Bitboard) =>
+      bb.nonEmpty ==> {
+        bb.removeFirst.add(bb.first.get) == bb
+      }
+
+  property("bb.removeFirst == bb <=> bb.isEmpty"):
+    forAll: (bb: Bitboard) =>
+      if bb.isEmpty then bb.removeFirst == bb
+      else bb.removeFirst != bb
+
   test("fold removeFirst should return empty"):
     forAll: (bb: Bitboard) =>
       assertEquals(bb.fold(bb)((b, _) => b.removeFirst), Bitboard.empty)
+
+  property("fold removeLast should return empty"):
+    forAll: (bb: Bitboard) =>
+      bb.fold(bb)((b, _) => b.removeLast).isEmpty
+
+  property("fold removeLast.add(last) == identity"):
+    forAll: (bb: Bitboard) =>
+      bb.nonEmpty ==> {
+        bb.removeLast.add(bb.last.get) == bb
+      }
+
+  property("bb.removeLast == bb <=> bb.isEmpty"):
+    forAll: (bb: Bitboard) =>
+      if bb.isEmpty then bb.removeLast == bb
+      else bb.removeLast != bb
+
+  property("removeFirst == removeLast <=> bb.count <= 1"):
+    forAll: (bb: Bitboard) =>
+      bb.removeFirst == bb.removeLast == (bb.count <= 1)
 
   test("first with a function that always return None should return None"):
     forAll: (bb: Bitboard) =>

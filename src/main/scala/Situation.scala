@@ -237,12 +237,13 @@ case class Situation(board: Board, color: Color):
     yield move
 
   def genCastling(king: Square): List[Move] =
-    // can castle but which side?
     if !history.castles.can(color) || king.rank != color.backRank then Nil
     else
       val rooks = Bitboard.rank(color.backRank) & board.rooks & history.unmovedRooks.value
       for
         rook <- rooks
+        if (rook.value < king.value && history.castles.can(color, QueenSide))
+          || (rook.value > king.value && history.castles.can(color, KingSide))
         toKingFile = if rook.value < king.value then File.C else File.G
         toRookFile = if rook.value < king.value then File.D else File.F
         kingTo     = Square(toKingFile, king.rank)

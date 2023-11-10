@@ -94,8 +94,11 @@ object Bitboard:
     // the last non empty square (the most significant bit / the leftmost bit)
     def last: Option[Square] = Square(63 - java.lang.Long.numberOfLeadingZeros(a))
 
-    // remove the first non empty position
+    // remove the first/smallest non empty square
     def removeFirst: Bitboard = a & (a - 1L)
+
+    // remove the last/largest non empty square
+    def removeLast: Bitboard = a & ~a.msb.bl
 
     inline def intersects(inline o: Long): Boolean =
       (a & o) != 0L

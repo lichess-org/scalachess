@@ -165,7 +165,7 @@ object Clock:
   opaque type IncrementSeconds = Int
   object IncrementSeconds extends OpaqueInt[IncrementSeconds]
 
-  // All unspecified durations are expressed in seconds
+  // All unspecified durations are expressed in centi-seconds
   case class Config(limitSeconds: LimitSeconds, incrementSeconds: IncrementSeconds):
 
     def berserkable = incrementSeconds == 0 || limitSeconds > 0

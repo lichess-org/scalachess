@@ -1,13 +1,13 @@
 package chess
 package opening
 
-import chess.format.{ OpeningFen, Uci }
+import chess.format.{ StandardFen, Uci }
 import chess.format.pgn.PgnMovesStr
 
 final class Opening(
     val eco: Eco,
     val name: OpeningName,
-    val fen: OpeningFen,
+    val fen: StandardFen,
     val uci: UcisStr,
     val pgn: PgnMovesStr
 ):
@@ -28,7 +28,7 @@ final class Opening(
 object Opening:
 
   private[opening] def apply(eco: String, name: String, fen: String, uci: String, pgn: String): Opening =
-    new Opening(Eco(eco), OpeningName(name), OpeningFen(fen), UcisStr(uci), PgnMovesStr(pgn))
+    new Opening(Eco(eco), OpeningName(name), StandardFen(fen), UcisStr(uci), PgnMovesStr(pgn))
 
   case class AtPly(opening: Opening, ply: Ply)
 

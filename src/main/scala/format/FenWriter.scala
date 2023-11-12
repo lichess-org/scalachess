@@ -39,7 +39,7 @@ trait FenWriter:
       builder.append(writeCheckCount(game.board))
     builder.toString
 
-  def writeOpening(situation: Situation): OpeningFen = OpeningFen:
+  def writeOpening(situation: Situation): StandardFen = StandardFen:
     s"${writeBoard(situation.board)} ${situation.color.letter} ${writeCastles(situation.board)} ${situation.enPassantSquare
         .fold("-")(_.key)}"
 

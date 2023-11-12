@@ -3,7 +3,7 @@ package opening
 
 import cats.syntax.option.*
 
-import chess.format.{ EpdFen, OpeningFen }
+import chess.format.{ EpdFen, StandardFen }
 import chess.format.pgn.SanStr
 
 object OpeningDb:
@@ -11,7 +11,7 @@ object OpeningDb:
   lazy val all: Vector[Opening] =
     openingDbPartA ++ openingDbPartB ++ openingDbPartC ++ openingDbPartD ++ openingDbPartE
 
-  private lazy val byFen: collection.Map[OpeningFen, Opening] = all.mapBy(_.fen)
+  private lazy val byFen: collection.Map[StandardFen, Opening] = all.mapBy(_.fen)
 
   lazy val families: Set[OpeningFamily] = byFen.values.map(_.family).toSet
 
@@ -25,9 +25,9 @@ object OpeningDb:
 
   def isShortest(op: Opening) = shortestLines get op.key contains op
 
-  def findByEpdFen(fen: EpdFen): Option[Opening] = findByOpeningFen(fen.opening)
+  def findByEpdFen(fen: EpdFen): Option[Opening] = findByStandardFen(fen.opening)
 
-  def findByOpeningFen(fen: OpeningFen): Option[Opening] = byFen get fen
+  def findByStandardFen(fen: StandardFen): Option[Opening] = byFen get fen
 
   val SEARCH_MAX_PLIES  = 40
   val SEARCH_MIN_PIECES = 20
@@ -64,7 +64,7 @@ object OpeningDb:
         case ((situation, ply), None) => byFen.get(format.Fen.writeOpening(situation)).map(_ atPly Ply(ply))
         case (_, found)               => found
 
-  def searchInFens(fens: Iterable[OpeningFen]): Option[Opening] =
+  def searchInFens(fens: Iterable[StandardFen]): Option[Opening] =
     fens.foldRight(none[Opening]):
-      case (fen, None) => findByOpeningFen(fen)
+      case (fen, None) => findByStandardFen(fen)
       case (_, found)  => found

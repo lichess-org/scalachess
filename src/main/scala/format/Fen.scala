@@ -2,7 +2,7 @@ package chess
 package format
 
 object Fen extends FenReader with FenWriter:
-  export format.{ BoardFen as Board, EpdFen as Epd, SimpleFen as Simple, StandardFen as Opening }
+  export format.{ BoardFen as Board, EpdFen as Epd, SimpleFen as Simple }
   export EpdFen.initial
 
 // https://www.chessprogramming.org/Extended_Position_Description

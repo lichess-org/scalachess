@@ -313,6 +313,14 @@ class NodeTest extends ScalaCheckSuite:
       val intersected = vs.map(_.id).toSet.intersect(xs.map(_.id).toSet)
       added.map(_.id).toSet.size == vs.map(_.id).toSet.size + xs.map(_.id).toSet.size - intersected.size
 
+  test("Tree.build(xs).mainlineValues == xs"):
+    forAll: (xs: List[Foo]) =>
+      Tree.build(xs).fold(Nil)(_.mainlineValues) == xs
+
+  test("Tree.buildReverse(xs).mainlineValues == xs.reverse"):
+    forAll: (xs: List[Foo]) =>
+      Tree.buildReverse(xs).fold(Nil)(_.mainlineValues) == xs.reverse
+
   extension [A](node: Node[A])
     def variationsCount: Long =
       node.child.foldLeft(node.variations.foldMap(_.size))((acc, v) => acc + v.variationsCount)

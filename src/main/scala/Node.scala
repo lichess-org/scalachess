@@ -460,10 +460,16 @@ object Tree:
       case _                    => node.orElse(other)
 
   def build[A](s: Seq[A]): Option[Node[A]] =
-    s.reverse.foldLeft(none)((acc, a) => Node(a, acc).some)
+    buildReverse(s.reverse)
+
+  def buildReverse[A](s: Seq[A]): Option[Node[A]] =
+    s.foldLeft(none)((acc, a) => Node(a, acc).some)
 
   def build[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
-    s.reverse.foldLeft(none)((acc, a) => Node(f(a), acc).some)
+    buildReverse(s.reverse, f)
+
+  def buildReverse[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
+    s.foldLeft(none)((acc, a) => Node(f(a), acc).some)
 
   def buildWithIndex[A, B](s: Seq[A], f: (A, Int) => B): Option[Node[B]] =
     build(s.zipWithIndex, f.tupled)

@@ -319,6 +319,7 @@ Opening("B12", "Caro-Kann Defense: Mieses Gambit", "rnbqkbnr/pp2pppp/2p5/3p4/3PP
 Opening("B12", "Caro-Kann Defense: Modern Variation", "rnbqkbnr/pp2pppp/2p5/3p4/3PP3/8/PPPN1PPP/R1BQKBNR b KQkq -", "e2e4 c7c6 d2d4 d7d5 b1d2", "1. e4 c6 2. d4 d5 3. Nd2"),
 Opening("B12", "Caro-Kann Defense: Ulysses Gambit", "rnbqkbnr/pp2pppp/2p5/6N1/3Pp3/8/PPP2PPP/RNBQKB1R b KQkq -", "e2e4 c7c6 d2d4 d7d5 g1f3 d5e4 f3g5", "1. e4 c6 2. d4 d5 3. Nf3 dxe4 4. Ng5"),
 Opening("B13", "Caro-Kann Defense: Exchange Variation", "rnbqkbnr/pp2pppp/2p5/3P4/3P4/8/PPP2PPP/RNBQKBNR b KQkq -", "e2e4 c7c6 d2d4 d7d5 e4d5", "1. e4 c6 2. d4 d5 3. exd5"),
+Opening("B13", "Caro-Kann Defense: Exchange Variation", "r1bqkbnr/pp2pppp/2n5/3p4/3P4/5N2/PPP2PPP/RNBQKB1R w KQkq -", "e2e4 c7c6 d2d4 d7d5 e4d5 c6d5 g1f3 b8c6", "1. e4 c6 2. d4 d5 3. exd5 cxd5 4. Nf3 Nc6"),
 Opening("B13", "Caro-Kann Defense: Exchange Variation, Bulla Attack", "rnbqkbnr/pp2pppp/8/3p4/3P2P1/8/PPP2P1P/RNBQKBNR b KQkq -", "e2e4 c7c6 d2d4 d7d5 e4d5 c6d5 g2g4", "1. e4 c6 2. d4 d5 3. exd5 cxd5 4. g4"),
 Opening("B13", "Caro-Kann Defense: Exchange Variation, Rubinstein Variation", "r1bqkb1r/pp2pppp/2n2n2/3p4/3P1B2/2PB4/PP3PPP/RN1QK1NR b KQkq -", "e2e4 c7c6 d2d4 d7d5 e4d5 c6d5 f1d3 b8c6 c2c3 g8f6 c1f4", "1. e4 c6 2. d4 d5 3. exd5 cxd5 4. Bd3 Nc6 5. c3 Nf6 6. Bf4"),
 Opening("B13", "Caro-Kann Defense: Panov Attack", "rnbqkbnr/pp2pppp/8/3p4/2PP4/8/PP3PPP/RNBQKBNR b KQkq -", "e2e4 c7c6 d2d4 d7d5 e4d5 c6d5 c2c4", "1. e4 c6 2. d4 d5 3. exd5 cxd5 4. c4"),

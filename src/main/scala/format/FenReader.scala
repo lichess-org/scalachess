@@ -131,9 +131,11 @@ trait FenReader:
           board.withCrazyData(_.copy(pockets = Pockets(str.flatMap(Piece.fromChar))))
 
   private val numberSet = Set.from('1' to '8')
+
   def makeBoardOptionWithCrazyPromoted(boardFen: String, variant: Variant): Option[Board] =
     val (board, error) = makeBoardWithCrazyPromoted(boardFen, variant)
     error.fold(board.some)(_ => none)
+
   def makeBoardWithCrazyPromoted(boardFen: String, variant: Variant): (Board, Option[String]) =
     var promoted = Bitboard.empty
     var pawns    = Bitboard.empty
@@ -169,23 +171,25 @@ trait FenReader:
       if file >= 8 then
         file = 0
         rank -= 1
-      iter.next match
-        case '/' => // ignored, optional. Rank switch is automatic
-        case ch if numberSet.contains(ch) =>
-          file += (ch - '0')
-          if file > 8 then error = Some(s"file = $file")
-        case ch =>
-          Piece
-            .fromChar(ch)
-            .match
-              case Some(p) =>
-                val square = 1L << (file + 8 * rank)
-                addPieceAt(p, square)
-                if iter.headOption == Some('~') then
-                  promoted |= square
-                  iter.next
-              case None => error = Some(s"invalid piece $ch")
-          file += 1
+      if rank < 0 then error = Some("too many ranks")
+      else
+        iter.next match
+          case '/' => // ignored, optional. Rank switch is automatic
+          case ch if numberSet.contains(ch) =>
+            file += (ch - '0')
+            if file > 8 then error = Some(s"file = $file")
+          case ch =>
+            Piece
+              .fromChar(ch)
+              .match
+                case Some(p) =>
+                  val square = 1L << (file + 8 * rank)
+                  addPieceAt(p, square)
+                  if iter.headOption == Some('~') then
+                    promoted |= square
+                    iter.next
+                case None => error = Some(s"invalid piece $ch")
+            file += 1
     val bboard = BBoard(
       occupied = occupied,
       white = white,

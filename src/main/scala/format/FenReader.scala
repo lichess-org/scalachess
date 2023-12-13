@@ -126,12 +126,15 @@ trait FenReader:
       case word => word -> None
     if pockets.isDefined && !variant.crazyhouse then None
     else
-      makeBoardWithCrazyPromoted(position, variant).map: board =>
+      makeBoardOptionWithCrazyPromoted(position, variant).map: board =>
         pockets.fold(board): str =>
           board.withCrazyData(_.copy(pockets = Pockets(str.flatMap(Piece.fromChar))))
 
   private val numberSet = Set.from('1' to '8')
-  def makeBoardWithCrazyPromoted(boardFen: String, variant: Variant): Option[Board] =
+  def makeBoardOptionWithCrazyPromoted(boardFen: String, variant: Variant): Option[Board] =
+    val (board, error) = makeBoardWithCrazyPromoted(boardFen, variant)
+    error.fold(board.some)(_ => none)
+  def makeBoardWithCrazyPromoted(boardFen: String, variant: Variant): (Board, Option[String]) =
     var promoted = Bitboard.empty
     var pawns    = Bitboard.empty
     var knights  = Bitboard.empty
@@ -160,8 +163,8 @@ trait FenReader:
     var rank  = 7
     var file  = 0
     val iter  = boardFen.iterator.buffered
-    var error = false
-    while iter.hasNext && !error
+    var error = none[String]
+    while iter.hasNext && error.isEmpty
     do
       iter.next match
         case '/' if file == 8 =>
@@ -170,7 +173,7 @@ trait FenReader:
           if rank < 0 then error = true
         case ch if numberSet.contains(ch) =>
           file += (ch - '0')
-          if file > 8 then error = true
+          if file > 8 then error = Some(s"file = $file")
         case ch =>
           Piece
             .fromChar(ch)
@@ -181,20 +184,20 @@ trait FenReader:
                 if iter.headOption == Some('~') then
                   promoted |= square
                   iter.next
-              case None => error = true
+              case None => error = Some(s"invalid piece $ch")
           file += 1
-    if error then None
-    else
-      val bboard = BBoard(
-        occupied = occupied,
-        white = white,
-        black = black,
-        pawns = pawns,
-        knights = knights,
-        bishops = bishops,
-        rooks = rooks,
-        queens = queens,
-        kings = kings
-      )
-      val board = Board(bboard, variant)
-      if promoted.isEmpty then board.some else board.withCrazyData(_.copy(promoted = promoted)).some
+    val bboard = BBoard(
+      occupied = occupied,
+      white = white,
+      black = black,
+      pawns = pawns,
+      knights = knights,
+      bishops = bishops,
+      rooks = rooks,
+      queens = queens,
+      kings = kings
+    )
+    val board = Board(bboard, variant)
+    if promoted.isEmpty
+    then (board, error)
+    else (board.withCrazyData(_.copy(promoted = promoted)), error)

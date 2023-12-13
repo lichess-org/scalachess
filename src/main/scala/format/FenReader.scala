@@ -166,11 +166,11 @@ trait FenReader:
     var error = none[String]
     while iter.hasNext && error.isEmpty
     do
+      if file >= 8 then
+        file = 0
+        rank -= 1
       iter.next match
-        case '/' if file == 8 =>
-          file = 0
-          rank -= 1
-          if rank < 0 then error = true
+        case '/' => // ignored, optional. Rank switch is automatic
         case ch if numberSet.contains(ch) =>
           file += (ch - '0')
           if file > 8 then error = Some(s"file = $file")

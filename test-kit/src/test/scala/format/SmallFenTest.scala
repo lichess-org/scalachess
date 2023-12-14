@@ -13,16 +13,27 @@ class SmallFenTest extends ChessTest:
       SmallFen.make(Standard, Fen.Simple("rnbqkb1r/ppp1pppp/3p4/3nP3/3P4/5N2/PPP2PPP/RNBQKB1R b KQkq -")),
       SmallFen("rnbqkb1rppp1pppp3p43nP33P45N2PPP2PPPRNBQKB1RbKQkq")
     )
+
+  test("standard, skip w, b6 en passant"):
+    assertEquals(
+      SmallFen
+        .make(Standard, Fen.Simple("8/8/p1k2nB1/Pp1np3/1PK4P/8/3B4/8 w - b6"))
+        .garbageInefficientReadBackIntoFen,
+      SimpleFen("8/8/p1k2nB1/Pp1np3/1PK4P/8/3B4/8 w - b6")
+    )
+
   test("make standard correct, skip w"):
     assertEquals(
       SmallFen.make(Standard, Fen.Simple("rnbqkb1r/ppp1pppp/3p4/3nP3/3P4/5N2/PPP2PPP/RNBQKB1R w KQkq -")),
       SmallFen("rnbqkb1rppp1pppp3p43nP33P45N2PPP2PPPRNBQKB1RKQkq")
     )
+
   test("make standard correct, non-initial castling"):
     assertEquals(
       SmallFen.make(Standard, Fen.Simple("rnbqkb1r/ppp1pppp/3p4/3nP3/3P4/5N2/PPP2PPP/RNBQKB1R w Qq -")),
       SmallFen("rnbqkb1rppp1pppp3p43nP33P45N2PPP2PPPRNBQKB1RQq")
     )
+
   test("make standard correct, en passant"):
     assertEquals(
       SmallFen

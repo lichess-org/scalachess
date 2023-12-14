@@ -92,7 +92,7 @@ object SmallFen extends OpaqueString[SmallFen]:
       val (board, error)     = Fen.makeBoardWithCrazyPromoted(e, chess.variant.Standard)
       val boardStr           = Fen.writeBoard(board)
       val boardSize          = boardStr.value.count(_ != '/')
-      val isBlackTurn        = e.lift(boardSize).exists(_ == 'b')
+      val isBlackTurn        = e.lift(boardSize).exists(_ == 'b') && !e.lift(boardSize + 1).exists(_.isDigit)
       val turnSize           = if isBlackTurn then 1 else 0
       val castlingStr        = e.drop(boardSize + turnSize).takeWhile(Set('K', 'Q', 'k', 'q').contains)
       val enpassantStr       = e.drop(boardSize + turnSize + castlingStr.size)
@@ -108,5 +108,6 @@ object SmallFen extends OpaqueString[SmallFen]:
     if variant == chess.variant.ThreeCheck
     then fen.value.split(' ').lift(6).foldLeft(base)(_ + _)
     else base
+
   def validate(variant: Variant, fen: Fen.Epd): Option[SmallFen] =
     Fen.read(variant, fen).exists(_ playable false) option make(variant, fen.simple)

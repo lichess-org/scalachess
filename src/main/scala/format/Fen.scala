@@ -99,7 +99,7 @@ object SmallFen extends OpaqueString[SmallFen]:
       val colorChar          = if isBlackTurn then 'b' else 'w'
       def orNot(str: String) = if str.isEmpty then "-" else str
       SimpleFen:
-        s"${Fen.writeBoard(board)} $colorChar ${orNot(castlingStr)} ${orNot(enpassantStr)}"
+        s"$boardStr $colorChar ${orNot(castlingStr)} ${orNot(enpassantStr)}"
 
   def make(variant: Variant, fen: Fen.Simple): SmallFen =
     val base = fen.value.split(' ').take(4).mkString("").filter { c =>

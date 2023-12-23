@@ -64,6 +64,18 @@ object Fixtures:
 
  +--"""
 
+  val unicodeResultDraw = """[Result "½-½"]
+
+½-½"""
+
+  val unicodeResultWeirdDashDraw = """[Result "1/2–1/2"]
+
+1/2–1/2"""
+
+  val unicodeResultWeirdDashWin = """[Result "1–0"]
+
+1–0"""
+
   val recentChessCom = """[Event "Live Chess"]
 [Site "Chess.com"]
 [Date "2016.05.10"]

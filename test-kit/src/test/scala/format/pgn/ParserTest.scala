@@ -332,7 +332,22 @@ class ParserTest extends ChessTest:
     parse(nbsp).assertRight: a =>
       assertEquals(a.mainline.size, 2)
 
+  test("unicode result"):
+    parse(unicodeResultDraw)
+      .assertRight: a =>
+        assertEquals(a.tags(_.Result), Some("½-½"))
+        assertEquals(a.tags.outcome, Some(Outcome(None)))
+    parse(unicodeResultWeirdDashDraw)
+      .assertRight: a =>
+        assertEquals(a.tags(_.Result), Some("1/2–1/2"))
+        assertEquals(a.tags.outcome, Some(Outcome(None)))
+    parse(unicodeResultWeirdDashWin)
+      .assertRight: a =>
+        assertEquals(a.tags(_.Result), Some("1–0"))
+        assertEquals(a.tags.outcome, Some(Outcome(Some(White))))
+
   test("absent result"):
     parse(blackAbsentResult)
       .assertRight: a =>
-        assertEquals(a.tags.outcome, Some(Outcome(Some(Black))))
+        assertEquals(a.tags(_.Result), Some("+--"))
+        assertEquals(a.tags.outcome, Some(Outcome(Some(White))))

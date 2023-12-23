@@ -36,39 +36,9 @@ object Parser:
   val inlineComment = P.char(';') *> P.until(R.lf).map(Comment(_))
   val comment       = (blockComment | inlineComment).withContext("Invalid comment") <* escape
 
-  val resultList = List(
-    "*",
-    "1/2-1/2",
-    "½-½",
-    "0-1",
-    "1-0",
-    "1/2‑1/2",
-    "½‑½",
-    "0‑1",
-    "1‑0",
-    "1/2–1/2",
-    "½–½",
-    "0–1",
-    "1–0"
-  )
+  def mapResult(result: String): String = Outcome.fromResult(result).fold(result)(_.toString)
 
-  def mapResult(result: String): String = result match
-    case "½-½"     => "1/2-1/2"
-    case "1/2‑1/2" => "1/2-1/2"
-    case "½‑½"     => "1/2-1/2"
-    case "1/2–1/2" => "1/2-1/2"
-    case "½–½"     => "1/2-1/2"
-    case "0‑1"     => "0-1"
-    case "0–1"     => "0-1"
-    case "1‑0"     => "1-0"
-    case "1–0"     => "1-0"
-    case "+--"     => "1-0"
-    case "+:-"     => "1-0"
-    case "--+"     => "0-1"
-    case "-:+"     => "0-1"
-    case x         => x
-
-  val result: P[String] = P.stringIn(resultList).map(mapResult)
+  val result: P[String] = P.stringIn(Outcome.knownResultStrings).map(mapResult)
 
   val nagGlyphsRE = P.stringIn(Glyph.PositionAssessment.all.map(_.symbol))
 

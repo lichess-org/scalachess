@@ -40,6 +40,11 @@ object PgnTree:
   extension (tree: Tree[Move])
     def isLong = tree.value.isLong || tree.variations.nonEmpty
 
+    def render: String =
+      val builder = new StringBuilder
+      render(builder)
+      builder.toString
+
     private[pgn] def render(builder: StringBuilder): Unit =
       render(builder, !tree.value.ply.turn.black)
 

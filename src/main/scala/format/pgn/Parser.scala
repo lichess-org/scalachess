@@ -62,6 +62,10 @@ object Parser:
     case "0–1"     => "0-1"
     case "1‑0"     => "1-0"
     case "1–0"     => "1-0"
+    case "+--"     => "1-0"
+    case "+:-"     => "1-0"
+    case "--+"     => "0-1"
+    case "-:+"     => "0-1"
     case x         => x
 
   val result: P[String] = P.stringIn(resultList).map(mapResult)

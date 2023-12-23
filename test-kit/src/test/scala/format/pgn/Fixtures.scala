@@ -41,6 +41,29 @@ object Fixtures:
 """
   val enpassantEP3 = """1.e4 d5 2.e5 f5 3.exf6ep *"""
 
+  /* If a check-in time is set for a tournament and the opponent does not show up,
+   * the opponent who is not there loses.
+   * However, since no game was played here, this is indicated with + and -.
+   * If it says +:-, for example, it means that white has won but has not played.
+   * With -:+ it is the other way around. Black gets the point but has not played.
+   * If neither player comes, the game is rated -:-.
+   * However, I have only experienced this once before at a major chess tournament.
+   * https://github.com/lichess-org/lila/issues/14249
+   */
+  val blackAbsentResult = """[Event "Ilmenauer Vereinsmeisterschaft 2023"]
+[Site "Ilmenauer SV"]
+[Date "2023.11.15"]
+[Round "6.3"]
+[White "Schenk, Stefan"]
+[Black "Greul, Simon"]
+[Result "+--"]
+[WhiteElo "1902"]
+[PlyCount "0"]
+[EventDate "2023.??.??"]
+[WhiteTeam "Ilmenauer SV"]
+
+ +--"""
+
   val recentChessCom = """[Event "Live Chess"]
 [Site "Chess.com"]
 [Date "2016.05.10"]

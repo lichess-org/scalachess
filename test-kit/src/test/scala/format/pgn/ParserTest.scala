@@ -331,3 +331,8 @@ class ParserTest extends ChessTest:
     val nbsp = "1.  e4 e5"
     parse(nbsp).assertRight: a =>
       assertEquals(a.mainline.size, 2)
+
+  test("absent result"):
+    parse(blackAbsentResult)
+      .assertRight: a =>
+        assertEquals(a.tags.outcome, Some(Outcome(Some(Black))))

@@ -39,12 +39,6 @@ To run benchmarks for a specific class:
 
     bench / Jmh / run -rf json .*PlayBench.*
 
-Code formatting
----------------
+To run [scalafmt](https://scalameta.org/scalafmt/docs/installation.html):
 
-This repository uses [scalafmt](https://scalameta.org/scalafmt/).
-
-Please [install it for your code editor](https://scalameta.org/scalafmt/docs/installation.html)
-if you're going to contribute to this project.
-
-If you don't install it, please run `scalafmtAll` in the sbt console before committing.
+    sbt fmt

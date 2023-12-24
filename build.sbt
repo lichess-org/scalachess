@@ -60,3 +60,7 @@ lazy val testKit = project
     testFrameworks += new TestFramework("weaver.framework.CatsEffect")
   )
   .dependsOn(scalachess % "compile->compile")
+
+addCommandAlias("fmtCheck", "all scalachess/scalafmtCheckAll bench/scalafmtCheckAll testKit/scalafmtCheckAll")
+addCommandAlias("fmt", "all scalachess/scalafmtAll bench/scalafmtAll testKit/scalafmtAll")
+

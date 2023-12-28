@@ -44,4 +44,10 @@ object Outcome:
       allWins.map(_ -> Outcome(Some(White))) :::
       allLosses.map(_ -> Outcome(Some(Black)))
 
-    pairs.toMap
+    val lccResults = Map(
+      "WHITEWIN" -> Outcome(Some(White)),
+      "BLACKWIN" -> Outcome(Some(Black)),
+      "DRAW"     -> Outcome(None) // ? not sure
+    )
+
+    pairs.toMap ++ lccResults

@@ -13,6 +13,10 @@ object Outcome:
   def fromResult(result: String): Option[Outcome] =
     normalizationMap.get(result)
 
+  val white = Outcome(Some(White))
+  val black = Outcome(Some(Black))
+  val draw  = Outcome(None)
+
   lazy val knownResultStrings = "*" :: normalizationMap.keys.toList
 
   private val normalizationMap: Map[String, Outcome] =
@@ -40,14 +44,14 @@ object Outcome:
       loss      <- losses
     yield s"$loss$separator$win"
 
-    val pairs = allDraws.map(_ -> Outcome(None)) :::
-      allWins.map(_ -> Outcome(Some(White))) :::
-      allLosses.map(_ -> Outcome(Some(Black)))
+    val pairs = allDraws.map(_ -> draw) :::
+      allWins.map(_ -> white) :::
+      allLosses.map(_ -> black)
 
     val lccResults = Map(
-      "WHITEWIN" -> Outcome(Some(White)),
-      "BLACKWIN" -> Outcome(Some(Black)),
-      "DRAW"     -> Outcome(None) // ? not sure
+      "WHITEWIN" -> white,
+      "BLACKWIN" -> black,
+      "DRAW"     -> draw // ? not sure
     )
 
     pairs.toMap ++ lccResults

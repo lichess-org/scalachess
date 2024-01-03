@@ -59,7 +59,7 @@ object Glyph:
   object MoveAssessment:
     val good        = new Glyph(1, "!", "Good move") with MoveAssessment
     val mistake     = new Glyph(2, "?", "Mistake") with MoveAssessment
-    val brilliant    = new Glyph(3, "!!", "Brilliant move") with MoveAssessment
+    val brilliant   = new Glyph(3, "!!", "Brilliant move") with MoveAssessment
     val blunder     = new Glyph(4, "??", "Blunder") with MoveAssessment
     val interesting = new Glyph(5, "!?", "Interesting move") with MoveAssessment
     val dubious     = new Glyph(6, "?!", "Dubious move") with MoveAssessment

@@ -289,6 +289,7 @@ Opening("B10", "Caro-Kann Defense: Labahn Attack, Polish Variation", "rnbqkbnr/p
 Opening("B10", "Caro-Kann Defense: Scorpion-Horus Gambit", "rnbqkbnr/pp2pppp/2p5/6B1/4p3/2NP4/PPP2PPP/R2QKBNR b KQkq -", "e2e4 c7c6 b1c3 d7d5 d2d3 d5e4 c1g5", "1. e4 c6 2. Nc3 d5 3. d3 dxe4 4. Bg5"),
 Opening("B10", "Caro-Kann Defense: Spike Variation", "rnbqkbnr/pp1ppppp/2p5/8/4P1P1/8/PPPP1P1P/RNBQKBNR b KQkq -", "e2e4 c7c6 g2g4", "1. e4 c6 2. g4"),
 Opening("B10", "Caro-Kann Defense: Spike Variation, Scorpion-Grob Gambit", "rnbqkbnr/pp2pppp/2p5/8/4p1P1/2NP4/PPP2P1P/R1BQKBNR b KQkq -", "e2e4 c7c6 g2g4 d7d5 b1c3 d5e4 d2d3", "1. e4 c6 2. g4 d5 3. Nc3 dxe4 4. d3"),
+Opening("B10", "Caro-Kann Defense: St. Patrick's Attack", "rnbqkbnr/pp2pppp/2p5/3p4/4P3/2N4P/PPPP1PP1/R1BQKBNR b KQkq -", "e2e4 c7c6 b1c3 d7d5 h2h3", "1. e4 c6 2. Nc3 d5 3. h3"),
 Opening("B10", "Caro-Kann Defense: Toikkanen Gambit", "rnbqkbnr/pp2pppp/2p5/3pP3/2P5/8/PP1P1PPP/RNBQKBNR b KQkq -", "e2e4 c7c6 c2c4 d7d5 e4e5", "1. e4 c6 2. c4 d5 3. e5"),
 Opening("B10", "Caro-Kann Defense: Two Knights Attack", "rnbqkbnr/pp2pppp/2p5/3p4/4P3/2N2N2/PPPP1PPP/R1BQKB1R b KQkq -", "e2e4 c7c6 b1c3 d7d5 g1f3", "1. e4 c6 2. Nc3 d5 3. Nf3"),
 Opening("B11", "Caro-Kann Defense: Two Knights Attack, Mindeno Variation", "rn1qkbnr/pp2pppp/2p5/3p4/4P1b1/2N2N2/PPPP1PPP/R1BQKB1R w KQkq -", "e2e4 c7c6 b1c3 d7d5 g1f3 c8g4", "1. e4 c6 2. Nc3 d5 3. Nf3 Bg4"),

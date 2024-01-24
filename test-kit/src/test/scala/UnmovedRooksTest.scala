@@ -2,7 +2,7 @@ package chess
 
 import scala.language.implicitConversions
 import Square.*
-import variant.Chess960
+import variant.{ Atomic, Chess960 }
 import format.EpdFen
 import chess.format.Fen
 import cats.syntax.all.*
@@ -82,6 +82,21 @@ class UnmovedRooksTest extends ChessTest:
         assertNot(g.board.history.unmovedRooks.contains(G1))
         assert(g.board.history.unmovedRooks.contains(G8))
         assertEquals(g.board.castles, Castles(false, true, true, true))
+
+  test("Atomic: explode an unmovedRook"):
+    fenToGame(
+      EpdFen("rnbqk1nr/p1p3pp/4pp1B/1p1p4/3PP3/b1N5/PPP2PPP/R2QKBNR w KQkq - 2 6"),
+      Atomic
+    ).playMoves(H6 -> G7)
+      .assertRight: g =>
+        assert(g.board.history.unmovedRooks.contains(A1))
+        assert(g.board.history.unmovedRooks.contains(H1))
+        assert(g.board.history.unmovedRooks.contains(A8))
+        assertNot(g.board.history.unmovedRooks.contains(H8))
+        assertEquals(
+          g.board.castles,
+          Castles(whiteKingSide = true, whiteQueenSide = true, blackKingSide = false, blackQueenSide = true)
+        )
 
   test("An unmovedRooks moves, white"):
     fenToGame(EpdFen("qrnbkrbn/ppppp1pp/8/5p2/5P2/8/PPPPP1PP/QRNBKRBN w KQkq - 0 2"), Chess960)

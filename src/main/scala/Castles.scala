@@ -46,7 +46,8 @@ object Castles:
     @targetName("orB")
     inline infix def |(o: Bitboard): Castles = c | o.value
 
-    def value: Long = c
+    def value: Long     = c
+    def display: String = Bitboard(c).display // TODO: override tostring if possible
     def contains(square: Square): Boolean =
       (c & (1L << square.value)) != 0L
 

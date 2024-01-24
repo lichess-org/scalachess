@@ -225,3 +225,16 @@ object Bitboard:
         builder += f(b.lsb)
         b &= (b - 1L)
       builder.result
+
+    // TODO: nice to have, faster.
+    // but should only be used for debug
+    // TODO: override toString?
+    def display: String =
+      val builder = StringBuilder()
+      Rank.allReversed.foreach: r =>
+        File.all.foreach: f =>
+          val s = Square(f, r)
+          builder ++= (if contains(s) then "1" else ".")
+          if f != File.H then builder ++= " "
+          else if s != Square.H1 then builder ++= "\n"
+      builder.result

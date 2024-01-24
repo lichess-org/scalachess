@@ -3,7 +3,7 @@ package chess
 import cats.syntax.all.*
 
 import chess.variant.Atomic
-import chess.format.EpdFen
+import chess.format.{ EpdFen, Fen }
 import chess.format.pgn.SanStr
 
 class AtomicVariantTest extends ChessTest:
@@ -452,3 +452,12 @@ class AtomicVariantTest extends ChessTest:
       .playMove(Square.B8, Square.B2)
       .assertRight: game =>
         assert(game.situation.legalMoves.filter(_.castles).isEmpty)
+
+  test("Unmoved rooks correctly updated after explosion, lila issue-14544"):
+    val sans: Vector[SanStr] =
+      SanStr from "e4 d5 d4 e6 Nc3 b5 Bg5 f6 Bh6 Ba3 Bxg7 h5 bxa3 c5 Qc1 Qe7 Qh6 Qg7 Qh8+ Qxh8 Rb1 cxd4 Bxb5 Nd7 Rb7 Kf8 Rxd7 Rb8 Ne2 Rb1+ Nc1 d4 O-O"
+        .split(' ')
+        .toVector
+    val (game, steps, error) = chess.Replay.gameMoveWhileValid(sans, Atomic.initialFen, Atomic)
+    assertEquals(error, None)
+    assertEquals(steps.size, sans.size)

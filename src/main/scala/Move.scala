@@ -28,14 +28,13 @@ case class Move(
       after updateHistory { h1 =>
         val h2 = h1.copy(
           lastMove = Option(toUci),
-          unmovedRooks = before.unmovedRooks,
           halfMoveClock =
             if piece.is(Pawn) || captures || promotes then HalfMoveClock.initial
             else h1.halfMoveClock + 1
         )
 
-        var castleRights: Castles      = h2.castles
-        var unmovedRooks: UnmovedRooks = h2.unmovedRooks
+        var castleRights: Castles      = h1.castles
+        var unmovedRooks: UnmovedRooks = h1.unmovedRooks
 
         // If the rook is captured
         // remove the captured rook from unmovedRooks

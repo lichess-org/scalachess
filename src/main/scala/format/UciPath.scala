@@ -15,11 +15,11 @@ object UciPath extends OpaqueString[UciPath]:
 
     def head: Option[UciCharPair] = strToId(e)
 
-    def parent: UciPath = e dropRight 2
+    def parent: UciPath = e.dropRight(2)
 
     def split: Option[(UciCharPair, UciPath)] = head.map(_ -> e.drop(2))
 
-    def isEmpty = e.isEmpty
+    def isEmpty: Boolean = e.isEmpty
 
     def lastId: Option[UciCharPair] = strToId(e.takeRight(2))
 

@@ -74,6 +74,8 @@ case class Tags(value: List[Tag]) extends AnyVal:
   def players = ByColor(apply(_.White), apply(_.Black))
   def elos    = ByColor(apply(_.WhiteElo), apply(_.BlackElo)).map(_.flatMap(_.toIntOption))
   def titles  = ByColor(apply(_.WhiteTitle), apply(_.BlackTitle))
+  def teams   = ByColor(apply(_.WhiteTeam), apply(_.BlackTeam))
+  def clocks  = ByColor(apply(_.WhiteClock), apply(_.BlackClock))
 
   override def toString = sorted.value mkString "\n"
 
@@ -175,6 +177,8 @@ object Tag:
     name = name(this),
     value = value.toString.trim
   )
+
+  def apply(fen: EpdFen): Tag = Tag(Tag.FEN, fen.value)
 
   def tagType(name: String) =
     tagTypesByLowercase.getOrElse(name.toLowerCase, Unknown(name))

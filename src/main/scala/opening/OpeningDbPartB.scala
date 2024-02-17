@@ -339,6 +339,7 @@ Opening("B14", "Caro-Kann Defense: Panov Attack, Main Line", "rnbqk2r/pp3ppp/4pn
 Opening("B15", "Caro-Kann Defense", "rnbqkbnr/pp2pppp/2p5/3p4/3PP3/2N5/PPP2PPP/R1BQKBNR b KQkq -", "e2e4 c7c6 d2d4 d7d5 b1c3", "1. e4 c6 2. d4 d5 3. Nc3"),
 Opening("B15", "Caro-Kann Defense", "rnbqkbnr/pp2pppp/2p5/8/3Pp3/2N5/PPP2PPP/R1BQKBNR w KQkq -", "e2e4 c7c6 d2d4 d7d5 b1c3 d5e4", "1. e4 c6 2. d4 d5 3. Nc3 dxe4"),
 Opening("B15", "Caro-Kann Defense: Alekhine Gambit", "rnbqkb1r/pp2pppp/2p2n2/8/3PN3/3B4/PPP2PPP/R1BQK1NR b KQkq -", "e2e4 c7c6 d2d4 d7d5 b1c3 d5e4 c3e4 g8f6 f1d3", "1. e4 c6 2. d4 d5 3. Nc3 dxe4 4. Nxe4 Nf6 5. Bd3"),
+Opening("B15", "Caro-Kann Defense: Alien Gambit", "rnbqkb1r/pp2pNp1/2p2n1p/8/3P4/8/PPP2PPP/R1BQKBNR b KQkq -", "e2e4 c7c6 d2d4 d7d5 b1c3 d5e4 c3e4 g8f6 e4g5 h7h6 g5f7", "1. e4 c6 2. d4 d5 3. Nc3 dxe4 4. Nxe4 Nf6 5. Ng5 h6 6. Nxf7"),
 Opening("B15", "Caro-Kann Defense: Campomanes Attack", "rnbqkb1r/pp2pppp/2p2n2/3p4/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq -", "e2e4 c7c6 d2d4 d7d5 b1c3 g8f6", "1. e4 c6 2. d4 d5 3. Nc3 Nf6"),
 Opening("B15", "Caro-Kann Defense: Forgacs Variation", "rnbqkb1r/pp3ppp/2p2p2/8/2BP4/8/PPP2PPP/R1BQK1NR b KQkq -", "e2e4 c7c6 d2d4 d7d5 b1c3 d5e4 c3e4 g8f6 e4f6 e7f6 f1c4", "1. e4 c6 2. d4 d5 3. Nc3 dxe4 4. Nxe4 Nf6 5. Nxf6+ exf6 6. Bc4"),
 Opening("B15", "Caro-Kann Defense: Gurgenidze Counterattack", "rnbqkbnr/p3pppp/2p5/1p1p4/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq -", "e2e4 c7c6 d2d4 d7d5 b1c3 b7b5", "1. e4 c6 2. d4 d5 3. Nc3 b5"),

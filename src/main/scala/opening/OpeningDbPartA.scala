@@ -3,10 +3,9 @@ package chess.opening
 // Generated from https://github.com/lichess-org/chess-openings
 // format: off
 private[opening] def openingDbPartA: Vector[Opening] = Vector(
-Opening("A00", "Amar Gambit", "rn1qkbnr/ppp2ppp/8/3p4/5p2/6PB/PPPPP2P/RNBQK2R w KQkq -", "g1h3 d7d5 g2g3 e7e5 f2f4 c8h3 f1h3 e5f4", "1. Nh3 d5 2. g3 e5 3. f4 Bxh3 4. Bxh3 exf4"),
 Opening("A00", "Amar Opening", "rnbqkbnr/pppppppp/8/8/8/7N/PPPPPPPP/RNBQKB1R b KQkq -", "g1h3", "1. Nh3"),
-Opening("A00", "Amar Opening: Gent Gambit", "rn1qkbnr/ppp2ppp/8/3p4/8/6PB/PPPPP3/RNBQ1RK1 b kq -", "g1h3 d7d5 g2g3 e7e5 f2f4 c8h3 f1h3 e5f4 e1g1 f4g3 h2g3", "1. Nh3 d5 2. g3 e5 3. f4 Bxh3 4. Bxh3 exf4 5. O-O fxg3 6. hxg3"),
 Opening("A00", "Amar Opening: Paris Gambit", "rnbqkbnr/ppp2ppp/8/3pp3/5P2/6PN/PPPPP2P/RNBQKB1R b KQkq -", "g1h3 d7d5 g2g3 e7e5 f2f4", "1. Nh3 d5 2. g3 e5 3. f4"),
+Opening("A00", "Amar Opening: Paris Gambit, Gent Gambit", "rn1qkbnr/ppp2ppp/8/3p4/8/6PB/PPPPP3/RNBQ1RK1 b kq -", "g1h3 d7d5 g2g3 e7e5 f2f4 c8h3 f1h3 e5f4 e1g1 f4g3 h2g3", "1. Nh3 d5 2. g3 e5 3. f4 Bxh3 4. Bxh3 exf4 5. O-O fxg3 6. hxg3"),
 Opening("A00", "Amsterdam Attack", "r1bqkb1r/ppp2ppp/2np1n2/4p3/2P5/1PN1P3/P2P1PPP/R1BQKBNR w KQkq -", "e2e3 e7e5 c2c4 d7d6 b1c3 b8c6 b2b3 g8f6", "1. e3 e5 2. c4 d6 3. Nc3 Nc6 4. b3 Nf6"),
 Opening("A00", "Anderssen's Opening", "rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq -", "a2a3", "1. a3"),
 Opening("A00", "Anderssen's Opening: Polish Gambit", "rnbqkbnr/1ppppppp/8/p7/1P6/P7/2PPPPPP/RNBQKBNR b KQkq -", "a2a3 a7a5 b2b4", "1. a3 a5 2. b4"),

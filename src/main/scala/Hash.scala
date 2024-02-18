@@ -77,8 +77,9 @@ object Hash:
     def crazyPocketMask(role: Role, colorshift: Int, count: Int): Option[Long] =
       // There should be no kings and at most 16 pieces of any given type
       // in a pocket.
-      Option.when(0 < count && count <= 16 && role != King):
-        table.crazyPocketMasks(16 * roleIndex(role) + count + colorshift)
+      val index = 16 * roleIndex(role) + count + colorshift
+      Option.when(0 < count && count <= 16 && role != King && index < table.crazyPocketMasks.length):
+        table.crazyPocketMasks(index)
 
     import situation.board
     val hturn = situation.color.fold(table.whiteTurnMask, 0L)

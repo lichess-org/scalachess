@@ -175,3 +175,8 @@ class HashTest extends ChessTest:
       val h   = Hash(16)
       g.foreach(_._2.foreach(x => m16.update(PositionHash value h(x._1.situation))))
       assertEquals(hex(m16.digest), "21281304d25ccf9c1dfd640775800087")
+
+  test("Index out of bounds when hashing pockets"):
+    val fenPosition = EpdFen("2q1k1nr/B3bbrb/8/8/8/8/3qN1RB/1Q2KB1R/RRRQQQQQQrrrqqq w Kk - 0 11")
+    val game        = fenToGame(fenPosition, Crazyhouse)
+    assert(game.apply(E1, D2).isRight)

@@ -73,6 +73,14 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (node: Node[Int]) =>
       node.take(node.mainline.size) == node
 
+  test("takeMainlineWhile"):
+    forAll: (node: Node[Int]) =>
+      node.takeMainlineWhile(_ % 2 == 0).fold(true)(_.mainlineValues.forall(_ % 2 == 0))
+
+  test("takeMainlineWhile == identity when all mainline values satisfy the predicate"):
+    forAll: (node: Node[Int]) =>
+      node.takeMainlineWhile(_ => true) == node.some
+
   test("apply(n) return None if n >= node.mainline.size"):
     forAll: (node: Node[Int]) =>
       node(node.mainline.size).isEmpty

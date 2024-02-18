@@ -149,12 +149,15 @@ final case class Node[A](
   import Tree.given
 
   final def mainline: List[Node[A]] =
+    mainlineReverse.reverse
+
+  final def mainlineReverse: List[Node[A]] =
     @tailrec
     def loop(tree: Node[A], acc: List[Node[A]]): List[Node[A]] =
       tree.child match
         case Some(child) => loop(child, tree :: acc)
         case None        => tree :: acc
-    loop(this, Nil).reverse
+    loop(this, Nil)
 
   // take the first n nodes in the mainline
   // keep all variations
@@ -167,8 +170,20 @@ final case class Node[A](
         node.child match
           case None        => node :: acc
           case Some(child) => loop(n - 1, child, node.withoutChild :: acc)
-    if n == 0 then this
-    else loop(n, this, Nil).foldLeft(none[Node[A]])((acc, node) => node.withChild(acc).some).getOrElse(this)
+    if n <= 0 then this
+    else Tree.buildWithNodeReverse(loop(n, this, Nil)).getOrElse(this)
+
+  // take nodes while mainline nodes satisfy the predicate
+  // keep all variations
+  def takeMainlineWhile(f: A => Boolean): Option[Node[A]] =
+    @tailrec
+    def loop(node: Node[A], acc: List[Node[A]]): List[Node[A]] =
+      if !f(node.value) then acc
+      else
+        node.child match
+          case None        => node :: acc
+          case Some(child) => loop(child, node.withoutChild :: acc)
+    Tree.buildWithNodeReverse(loop(this, Nil))
 
   // get the nth node of in the mainline
   def apply(n: Int): Option[Node[A]] =
@@ -475,7 +490,10 @@ object Tree:
     build(s.zipWithIndex, f.tupled)
 
   def buildWithNode[A](s: Seq[Node[A]]): Option[Node[A]] =
-    s.reverse.foldLeft(none)((acc, a) => a.withChild(acc).some)
+    buildWithNodeReverse(s.reverse)
+
+  def buildWithNodeReverse[A](s: Seq[Node[A]]): Option[Node[A]] =
+    s.foldLeft(none)((acc, a) => a.withChild(acc).some)
 
   def buildWithNode[A, B](s: Seq[A], f: A => Node[B]): Option[Node[B]] =
     s.reverse match

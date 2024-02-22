@@ -32,3 +32,6 @@ object Check extends YesNo[Check]
 opaque type ErrorStr = String
 object ErrorStr extends OpaqueString[ErrorStr]:
   given Semigroup[ErrorStr] = Semigroup.instance[ErrorStr]((a, b) => s"$a\n$b")
+
+opaque type FideId = Int
+object FideId extends OpaqueInt[FideId]

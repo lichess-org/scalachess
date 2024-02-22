@@ -71,11 +71,15 @@ case class Tags(value: List[Tag]) extends AnyVal:
         Tags.tagIndex.getOrElse(tag.name, 999)
     )
 
-  def players = ByColor(apply(_.White), apply(_.Black))
-  def elos    = ByColor(apply(_.WhiteElo), apply(_.BlackElo)).map(_.flatMap(_.toIntOption))
-  def titles  = ByColor(apply(_.WhiteTitle), apply(_.BlackTitle))
-  def teams   = ByColor(apply(_.WhiteTeam), apply(_.BlackTeam))
-  def clocks  = ByColor(apply(_.WhiteClock), apply(_.BlackClock))
+  def names  = ByColor(apply(_.White), apply(_.Black))
+  def elos   = ByColor(apply(_.WhiteElo), apply(_.BlackElo)).map(_.flatMap(_.toIntOption))
+  def titles = ByColor(apply(_.WhiteTitle), apply(_.BlackTitle))
+  def fideIds = ByColor(
+    FideId from apply(_.WhiteFideId).flatMap(_.toIntOption),
+    FideId from apply(_.BlackFideId).flatMap(_.toIntOption)
+  )
+  def teams  = ByColor(apply(_.WhiteTeam), apply(_.BlackTeam))
+  def clocks = ByColor(apply(_.WhiteClock), apply(_.BlackClock))
 
   override def toString = sorted.value mkString "\n"
 
@@ -135,6 +139,13 @@ object Tag:
     override def toString  = n
     override val isUnknown = true
 
+  val names   = ByColor(White, Black)
+  val elos    = ByColor(WhiteElo, BlackElo)
+  val titles  = ByColor(WhiteTitle, BlackTitle)
+  val fideIds = ByColor(WhiteFideId, BlackFideId)
+  val teams   = ByColor(WhiteTeam, BlackTeam)
+  val clocks  = ByColor(WhiteClock, BlackClock)
+
   val tagTypes = List(
     Event,
     Site,
@@ -185,7 +196,6 @@ object Tag:
 
   def timeControl(clock: Option[Clock.Config]) = Tag(
     TimeControl,
-    clock.fold("-") { c =>
+    clock.fold("-"): c =>
       s"${c.limit.roundSeconds}+${c.increment.roundSeconds}"
-    }
   )

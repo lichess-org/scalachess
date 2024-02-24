@@ -1,19 +1,18 @@
 package chess
 
-opaque type PositionHashes = List[Int]
+opaque type PositionHashes = Array[Int]
 object PositionHashes:
-  def apply(single: Hash): PositionHashes = List(single)
+  def apply(single: Hash): PositionHashes = Array(single)
   def deserialize(bytes: Array[Byte]): PositionHashes =
-    bytes.grouped(3).map(g => ((g(0) & 0xff) << 16) | ((g(1) & 0xff) << 8) | (g(2) & 0xff)).toList
-  val empty: PositionHashes = List.empty
+    bytes.grouped(3).map(g => ((g(0) & 0xff) << 16) | ((g(1) & 0xff) << 8) | (g(2) & 0xff)).toArray
+  val empty: PositionHashes = Array.empty
 
   extension (p: PositionHashes)
     def serialize: Array[Byte] =
       p.flatMap: h =>
-        List((h >>> 16).toByte, (h >>> 8).toByte, h.toByte)
-      .toArray
+        Array((h >>> 16).toByte, (h >>> 8).toByte, h.toByte)
     inline def isEmpty: Boolean                      = p.length == 0
-    inline def prepend(single: Hash): PositionHashes = single :: p
+    inline def prepend(single: Hash): PositionHashes = single +: p
     def isRepetition(times: Int) =
       if times <= 1 then true
       else if p.length <= (times - 1) * 4 then false

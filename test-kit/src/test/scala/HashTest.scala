@@ -6,68 +6,58 @@ import chess.format.{ EpdFen, Fen, Uci }
 
 class HashTest extends ChessTest:
 
-  def hexToBytes(str: String) =
-    str.grouped(2).map(cc => Integer.parseInt(cc, 16).toByte).take(Hash.size).toArray
-
-  given munit.Compare[PositionHash, Array[Byte]] with
-    def isEqual(obtained: PositionHash, expected: Array[Byte]): Boolean =
-      obtained.value.toSeq == expected.toSeq
-  given munit.Compare[PositionHash, PositionHash] with
-    def isEqual(obtained: PositionHash, expected: PositionHash): Boolean =
-      obtained.value.toSeq == expected.value.toSeq
-
-    // Reference values available at:
-    // http://hardy.uhasselt.be/Toga/book_format.html
-    // https://web.archive.org/web/20191216195456/http://hardy.uhasselt.be:80/Toga/book_format.html
+  test("Roundtrip"):
+    val h = PositionHashes.empty.prepend(Hash(0x12345678)).prepend(Hash(0xa1a2a3a4)).prepend(Hash(0))
+    assertEquals(h, PositionHashes.deserialize(h.serialize))
 
   test("Polyglot hasher: match on the starting position"):
     val fen  = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.situation), hexToBytes("463b96181691fc9c"))
+    assertEquals(Hash(game.situation), Hash(0x463b_9618))
 
   test("Polyglot hasher: match after 1. e4"):
     val fen  = EpdFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.situation), hexToBytes("823c9b50fd114196"))
+    assertEquals(Hash(game.situation), Hash(0x823c_9b50))
 
   test("Polyglot hasher: match after 1. e4 d5"):
     val fen  = EpdFen("rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.situation), hexToBytes("0756b94461c50fb0"))
+    assertEquals(Hash(game.situation), Hash(0x0756_b944))
 
   test("Polyglot hasher: match after 1. e4 d5 2. e5"):
     val fen  = EpdFen("rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 2")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.situation), hexToBytes("662fafb965db29d4"))
+    assertEquals(Hash(game.situation), Hash(0x662f_afb9))
 
   test("Polyglot hasher: match after 1. e4 d5 2. e5 f5"):
     // note that en-passant matters
     val fen  = EpdFen("rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.situation), hexToBytes("22a48b5a8e47ff78"))
+    assertEquals(Hash(game.situation), Hash(0x22a4_8b5a))
 
   test("Polyglot hasher: match after 1. e4 d5 2. e5 f5 3. Ke2"):
     // 3. Ke2 forfeits castling rights
     val fen  = EpdFen("rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPPKPPP/RNBQ1BNR b kq - 1 3")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.situation), hexToBytes("652a607ca3f242c1"))
+    assertEquals(Hash(game.situation), Hash(0x652a_607c))
 
   test("Polyglot hasher: match after 1. e4 d5 2. e5 f5 3. Ke2 Kf7"):
     val fen  = EpdFen("rnbq1bnr/ppp1pkpp/8/3pPp2/8/8/PPPPKPPP/RNBQ1BNR w - - 2 4")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.situation), hexToBytes("00fdd303c946bdd9"))
+    assertEquals(Hash(game.situation), Hash(0x00fd_d303))
 
   test("Polyglot hasher: match after 1. a4 b5 2. h4 b4 3. c4"):
     // again, note en-passant matters
     val fen  = EpdFen("rnbqkbnr/p1pppppp/8/8/PpP4P/8/1P1PPPP1/RNBQKBNR b KQkq c3 0 3")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.situation), hexToBytes("3c8123ea7b067637"))
+    assertEquals(Hash(game.situation), Hash(0x3c81_23ea))
 
   test("Polyglot hasher: match after 1. a4 b5 2. h4 b4 3. c4 bxc3 4. Ra3"):
     // 4. Ra3 partially forfeits castling rights
     val fen  = EpdFen("rnbqkbnr/p1pppppp/8/8/P6P/R1p5/1P1PPPP1/1NBQKBNR b Kkq - 1 4")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.situation), hexToBytes("5c3f9b829b279560"))
+    assertEquals(Hash(game.situation), Hash(0x5c3f_9b82))
 
   // Variants
 

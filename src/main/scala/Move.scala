@@ -82,11 +82,11 @@ case class Move(
     // castling rights and en-passant rights.
     board updateHistory { h =>
       lazy val positionHashesOfSituationBefore =
-        if h.positionHashes.isEmpty then Hash(situationBefore) else h.positionHashes
+        if h.positionHashes.isEmpty then PositionHashes(Hash(situationBefore)) else h.positionHashes
       val resetsPositionHashes = board.variant.isIrreversible(this)
       val basePositionHashes =
-        if resetsPositionHashes then PositionHash.empty else positionHashesOfSituationBefore
-      h.copy(positionHashes = Hash(Situation(board, !piece.color)).combine(basePositionHashes))
+        if resetsPositionHashes then PositionHashes.empty else positionHashesOfSituationBefore
+      h.copy(positionHashes = basePositionHashes.prepend(Hash(Situation(board, !piece.color))))
     }
 
   def applyVariantEffect: Move = before.variant addVariantEffect this

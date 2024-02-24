@@ -58,7 +58,7 @@ trait FenReader:
       situation withHistory:
         val history = History(
           lastMove = enpassantMove,
-          positionHashes = PositionHash.empty,
+          positionHashes = PositionHashes.empty,
           castles = castles,
           unmovedRooks = unmovedRooks
         )

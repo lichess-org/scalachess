@@ -1,43 +1,40 @@
 package chess
 
-import Castles.*
+opaque type PositionHashes = List[Int]
+object PositionHashes:
+  def apply(single: Hash): PositionHashes = List(single)
+  def deserialize(bytes: Array[Byte]): PositionHashes =
+    bytes.grouped(3).map(g => ((g(0) & 0xff) << 16) | ((g(1) & 0xff) << 8) | (g(2) & 0xff)).toList
+  val empty: PositionHashes = List.empty
 
-opaque type PositionHash = Array[Byte]
-object PositionHash:
-  def apply(value: Array[Byte]): PositionHash = value
-  val empty: PositionHash                     = Array.empty
-
-  extension (p: PositionHash)
-    def value: Array[Byte]                                = p
-    inline def isEmpty: Boolean                           = p.length == 0
-    inline def combine(other: PositionHash): PositionHash = p ++ other
+  extension (p: PositionHashes)
+    def serialize: Array[Byte] =
+      p.flatMap: h =>
+        List((h >>> 16).toByte, (h >>> 8).toByte, h.toByte)
+      .toArray
+    inline def isEmpty: Boolean                      = p.length == 0
+    inline def prepend(single: Hash): PositionHashes = single :: p
     def isRepetition(times: Int) =
       if times <= 1 then true
-      else if p.length <= (times - 1) * 4 * Hash.size then false
+      else if p.length <= (times - 1) * 4 then false
       else
         // compare only hashes for positions with the same side to move
-        var i     = Hash.size * 2
+        var i     = 2
         var count = 0
-        val x     = p(0)
-        val y     = p(1)
-        val z     = p(2)
-        while i <= p.length - Hash.size && count < times - 1
+        val current = p(0)
+        while i < p.length && count < times - 1
         do
-          if x == p(i) && y == p(i + 1) && z == p(i + 2) then count += 1
-          i += Hash.size * 2
+          if current == p(i) then count += 1
+          i += 2
         count == times - 1
 
 opaque type Hash = Int
 object Hash:
   val size = 3
 
-  def apply(value: Int): Hash = value
+  def apply(value: Int): Hash = value & 0x00ff_ffff
 
-  def apply(situation: Situation): PositionHash = PositionHash:
-    val v = hashSituation(situation)
-    Array.tabulate(size)(i => (v >>> ((7 - i) * 8)).toByte)
-
-  def debug(hashes: PositionHash) = hashes.map(_.toInt).sum.toString
+  def apply(situation: Situation): Hash = hashSituation(situation) & 0x00ff_ffff
 
   private def hashSituation(situation: Situation): Int =
     import situation.board
@@ -70,7 +67,7 @@ object Hash:
       case _ => 0
 
     val hCrazy = board.crazyData.fold(0): data =>
-      var m = hChecks
+      var m = 0
       data.promoted.foreach: s =>
         m ^= ZobristTables.crazyPromotionMasks(s.hashCode)
       data.pockets.foreach: (color, pocket) =>
@@ -84,17 +81,17 @@ object Hash:
   private def hashThreeCheck(color: Color, count: Int): Int =
     val subTable = ZobristTables.threeCheckMasks(color)
     ((count & 1) * subTable(0)) ^
-      (((count >> 1) & 1) * subTable(1))
+      (((count >>> 1) & 1) * subTable(1))
 
   private def hashCrazyPocket(color: Color, role: Role, count: Int): Int =
     val subTable = ZobristTables.crazyPocketMasks(color)(role)
     (count & 1) * subTable(0) ^
-      ((count >> 1) & 1) * subTable(1) ^
-      ((count >> 2) & 1) * subTable(2) ^
-      ((count >> 3) & 1) * subTable(3) ^
-      ((count >> 4) & 1) * subTable(4) ^
-      ((count >> 5) & 1) * subTable(5) ^
-      ((count >> 6) & 1) * subTable(6)
+      ((count >>> 1) & 1) * subTable(1) ^
+      ((count >>> 2) & 1) * subTable(2) ^
+      ((count >>> 3) & 1) * subTable(3) ^
+      ((count >>> 4) & 1) * subTable(4) ^
+      ((count >>> 5) & 1) * subTable(5) ^
+      ((count >>> 6) & 1) * subTable(6)
 
 private object ZobristTables:
   val actorMasks = ByColor(

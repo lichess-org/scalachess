@@ -17,7 +17,7 @@ case class CheckCount(white: Int = 0, black: Int = 0):
 
 case class History(
     lastMove: Option[Uci] = None,
-    positionHashes: PositionHash = PositionHash.empty,
+    positionHashes: PositionHashes = PositionHashes.empty,
     castles: Castles = Castles.init,
     checkCount: CheckCount = CheckCount(0, 0),
     unmovedRooks: UnmovedRooks,
@@ -46,10 +46,6 @@ case class History(
     if check.yes then copy(checkCount = checkCount add color) else this
 
   def withCheckCount(cc: CheckCount) = copy(checkCount = cc)
-
-  override def toString =
-    val positions = (positionHashes.value grouped Hash.size).toList
-    s"${lastMove.fold("-")(_.uci)} ${positions.map(PositionHash.apply).map(Hash.debug).mkString(" ")}"
 
 object History:
 

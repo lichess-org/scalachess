@@ -84,7 +84,7 @@ trait ChessTestCommon:
 
   def defaultHistory(
       lastMove: Option[Uci] = None,
-      positionHashes: PositionHashes = PositionHashes.empty,
+      positionHashes: PositionHash = PositionHash.empty,
       castles: Castles = Castles.init,
       checkCount: CheckCount = CheckCount(0, 0),
       unmovedRooks: UnmovedRooks = UnmovedRooks.corners,

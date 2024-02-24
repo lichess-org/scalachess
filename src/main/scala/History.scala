@@ -17,7 +17,7 @@ case class CheckCount(white: Int = 0, black: Int = 0):
 
 case class History(
     lastMove: Option[Uci] = None,
-    positionHashes: PositionHashes = PositionHashes.empty,
+    positionHashes: PositionHash = PositionHash.empty,
     castles: Castles = Castles.init,
     checkCount: CheckCount = CheckCount(0, 0),
     unmovedRooks: UnmovedRooks,

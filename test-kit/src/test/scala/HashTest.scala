@@ -6,10 +6,6 @@ import chess.format.{ EpdFen, Fen, Uci }
 
 class HashTest extends ChessTest:
 
-  test("Roundtrip"):
-    val h = PositionHashes.empty.prepend(Hash(0x12345678)).prepend(Hash(0xa1a2a3a4)).prepend(Hash(0))
-    assertEquals(h, PositionHashes.deserialize(h.serialize))
-
   test("Polyglot hasher: match on the starting position"):
     val fen  = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     val game = fenToGame(fen, Standard)

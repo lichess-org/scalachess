@@ -2,10 +2,10 @@ package chess
 
 class ThreefoldRepetitionTest extends ChessTest:
 
-  def toHash(a: Int) = Hash(a)
+  def toHash(a: Int) = PositionHash(Hash(a))
   def makeHistory(positions: List[Int]) =
     (positions map toHash).foldLeft(defaultHistory()): (history, hash) =>
-      history.copy(positionHashes = history.positionHashes.prepend(hash))
+      history.copy(positionHashes = hash.combine(history.positionHashes))
 
   test("empty history"):
     assert(!defaultHistory().threefoldRepetition)

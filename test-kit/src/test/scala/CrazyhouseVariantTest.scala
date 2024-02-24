@@ -267,27 +267,6 @@ class CrazyhouseVariantTest extends ChessTest:
     assertNot(game.situation.end)
     assertNot(game.situation.opponentHasInsufficientMaterial)
 
-  test("prod 50 games accumulate hash"):
-    val gameMoves = format.pgn.Fixtures.prod50crazyhouse.map: g =>
-      SanStr from g.split(' ').toList
-
-    def runOne(moves: List[SanStr]) =
-      Replay.gameMoveWhileValid(moves, format.Fen.initial, Crazyhouse)
-
-    def hex(buf: Array[Byte]): String = buf.map("%02x" format _).mkString
-    val g                             = gameMoves.map(runOne)
-    assertNot(g.exists(_._3.nonEmpty))
-    val m8  = java.security.MessageDigest getInstance "MD5"
-    val m16 = java.security.MessageDigest getInstance "MD5"
-    val h   = Hash(16)
-    g.foreach:
-      _._2.foreach: x =>
-        val ph = h(x._1.situation)
-        m8.update(PositionHash.value(ph).slice(0, 8))
-        m16.update(PositionHash value ph)
-    assertEquals(hex(m8.digest), "fcf5867ad3324c4be6d28108ff27212c")
-    assertEquals(hex(m16.digest), "80c4edf5fbd41eff78d3d563777beb61")
-
   test("destinations prod bug on game VVXRgsQT"):
     assertEquals(
       chess

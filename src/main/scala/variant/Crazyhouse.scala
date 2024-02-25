@@ -235,6 +235,13 @@ case object Crazyhouse
     def map[B](f: (Role, Int) => B): List[B] =
       List(f(Pawn, pawn), f(Knight, knight), f(Bishop, bishop), f(Rook, rook), f(Queen, queen))
 
+    def foreach[U](f: (Role, Int) => U): Unit =
+      f(Pawn, pawn)
+      f(Knight, knight)
+      f(Bishop, bishop)
+      f(Rook, rook)
+      f(Queen, queen)
+
   object Pocket:
     val empty = Pocket(0, 0, 0, 0, 0)
 

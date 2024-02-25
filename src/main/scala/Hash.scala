@@ -2,9 +2,9 @@ package chess
 
 opaque type PositionHash = Array[Byte]
 object PositionHash:
-  def empty: PositionHash                     = Array.empty
   def apply(value: Array[Byte]): PositionHash = value
   def apply(h: Hash): PositionHash            = Array((h >>> 16).toByte, (h >>> 8).toByte, h.toByte)
+  val empty: PositionHash                     = Array.empty
 
   extension (p: PositionHash)
     def value: Array[Byte]                                = p

@@ -1,6 +1,6 @@
 ThisBuild / organization      := "org.lichess"
 ThisBuild / version           := "15.7.11"
-ThisBuild / scalaVersion      := "3.3.1"
+ThisBuild / scalaVersion      := "3.3.3"
 ThisBuild / licenses += "MIT" -> url("https://opensource.org/licenses/MIT")
 
 ThisBuild / resolvers += "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-maven/master"
@@ -50,12 +50,12 @@ lazy val testKit = project
       "org.scalacheck"      %% "scalacheck"        % "1.17.0",
       "org.scalameta"       %% "munit"             % "1.0.0-M11" % Test,
       "org.scalameta"       %% "munit-scalacheck"  % "1.0.0-M11" % Test,
-      "com.disneystreaming" %% "weaver-cats"       % "0.8.3"    % Test,
-      "com.disneystreaming" %% "weaver-scalacheck" % "0.8.3"    % Test,
-      "co.fs2"              %% "fs2-core"          % "3.8.0"    % Test,
-      "co.fs2"              %% "fs2-io"            % "3.8.0"    % Test,
-      "org.typelevel"       %% "discipline-munit"  % "1.0.9"    % Test,
-      "org.typelevel"       %% "cats-laws"         % "2.9.0"    % Test
+      "com.disneystreaming" %% "weaver-cats"       % "0.8.3"     % Test,
+      "com.disneystreaming" %% "weaver-scalacheck" % "0.8.3"     % Test,
+      "co.fs2"              %% "fs2-core"          % "3.8.0"     % Test,
+      "co.fs2"              %% "fs2-io"            % "3.8.0"     % Test,
+      "org.typelevel"       %% "discipline-munit"  % "1.0.9"     % Test,
+      "org.typelevel"       %% "cats-laws"         % "2.9.0"     % Test
     ),
     testFrameworks += new TestFramework("weaver.framework.CatsEffect")
   )

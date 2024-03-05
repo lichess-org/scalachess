@@ -71,13 +71,13 @@ case class Tags(value: List[Tag]) extends AnyVal:
         Tags.tagIndex.getOrElse(tag.name, 999)
     )
 
-  def names  = ByColor(apply(_.White), apply(_.Black))
-  def elos   = ByColor(apply(_.WhiteElo), apply(_.BlackElo)).map(_.flatMap(_.toIntOption))
-  def titles = ByColor(apply(_.WhiteTitle), apply(_.BlackTitle))
-  def fideIds = ByColor(
-    FideId from apply(_.WhiteFideId).flatMap(_.toIntOption),
-    FideId from apply(_.BlackFideId).flatMap(_.toIntOption)
-  )
+  def names: ByColor[Option[PlayerName]] = ByColor(apply(_.White), apply(_.Black)).map(PlayerName.from(_))
+  def elos: ByColor[Option[Elo]] = ByColor(apply(_.WhiteElo), apply(_.BlackElo)).map: elo =>
+    Elo from elo.flatMap(_.toIntOption)
+  def titles: ByColor[Option[PlayerTitle]] =
+    ByColor(apply(_.WhiteTitle), apply(_.BlackTitle)).map(_.flatMap(PlayerTitle.get))
+  def fideIds: ByColor[Option[FideId]] = ByColor(apply(_.WhiteFideId), apply(_.BlackFideId)).map: id =>
+    FideId from id.flatMap(_.toIntOption)
   def teams  = ByColor(apply(_.WhiteTeam), apply(_.BlackTeam))
   def clocks = ByColor(apply(_.WhiteClock), apply(_.BlackClock))
 

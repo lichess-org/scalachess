@@ -35,3 +35,9 @@ object ErrorStr extends OpaqueString[ErrorStr]:
 
 opaque type FideId = Int
 object FideId extends OpaqueInt[FideId]
+
+opaque type Elo = Int
+object Elo extends OpaqueInt[Elo]
+
+opaque type PlayerName = String
+object PlayerName extends OpaqueString[PlayerName]

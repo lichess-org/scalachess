@@ -1,5 +1,5 @@
 ThisBuild / organization      := "org.lichess"
-ThisBuild / version           := "15.8.0"
+ThisBuild / version           := "15.8.1"
 ThisBuild / scalaVersion      := "3.3.3"
 ThisBuild / licenses += "MIT" -> url("https://opensource.org/licenses/MIT")
 
@@ -26,7 +26,7 @@ lazy val scalachess: Project = Project("scalachess", file(".")).settings(
   commonSettings,
   name := "scalachess",
   libraryDependencies ++= List(
-    "com.github.ornicar" %% "scalalib"       % "9.5.7",
+    "com.github.ornicar" %% "scalalib"       % "9.5.8",
     "org.typelevel"      %% "cats-core"      % "2.10.0",
     "org.typelevel"      %% "alleycats-core" % "2.10.0",
     "org.typelevel"      %% "cats-parse"     % "1.0.0",

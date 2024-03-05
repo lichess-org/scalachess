@@ -1,6 +1,6 @@
 package chess
 
-import cats.Show
+import ornicar.scalalib.Render
 
 opaque type PlayerTitle = String
 
@@ -15,7 +15,7 @@ object PlayerTitle:
     def isLichess: Boolean    = t == "LM" || t == "BOT"
     def isFederation: Boolean = !isLichess
 
-  given Show[PlayerTitle] = Show.show(_.value)
+  given Render[PlayerTitle] = _.value
 
   val GM: PlayerTitle  = "GM"
   val WGM: PlayerTitle = "WGM"

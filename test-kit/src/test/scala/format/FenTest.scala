@@ -2,6 +2,7 @@ package chess
 package format
 
 import scala.language.implicitConversions
+
 import variant.Standard
 
 class FenTest extends ChessTest:

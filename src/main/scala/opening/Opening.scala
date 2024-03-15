@@ -1,8 +1,8 @@
 package chess
 package opening
 
-import chess.format.{ StandardFen, Uci }
 import chess.format.pgn.PgnMovesStr
+import chess.format.{ StandardFen, Uci }
 
 final class Opening(
     val eco: Eco,

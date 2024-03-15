@@ -1,10 +1,10 @@
 package chess
 
-import scala.annotation.targetName
-
 import cats.Eq
-import cats.syntax.all.*
 import cats.derived.*
+import cats.syntax.all.*
+
+import scala.annotation.targetName
 
 enum Color(val name: String, val letter: Char) derives Eq:
 

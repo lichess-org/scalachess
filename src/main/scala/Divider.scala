@@ -1,8 +1,10 @@
 package chess
 
 import cats.syntax.all.*
-import bitboard.Bitboard
+
 import scala.annotation.switch
+
+import bitboard.Bitboard
 
 case class Division(middle: Option[Ply], end: Option[Ply], plies: Ply):
 

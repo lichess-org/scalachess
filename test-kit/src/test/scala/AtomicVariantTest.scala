@@ -1,10 +1,9 @@
 package chess
 
 import cats.syntax.all.*
-
-import chess.variant.Atomic
-import chess.format.{ EpdFen, Fen }
 import chess.format.pgn.SanStr
+import chess.format.{ EpdFen, Fen }
+import chess.variant.Atomic
 
 class AtomicVariantTest extends ChessTest:
 

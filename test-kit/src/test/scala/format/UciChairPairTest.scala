@@ -3,6 +3,7 @@ package format
 
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop
+
 import CoreArbitraries.given
 
 class UciChairPairTest extends ScalaCheckSuite:

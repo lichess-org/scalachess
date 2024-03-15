@@ -2,8 +2,7 @@ package chess
 package format
 
 import chess.bitboard.Board as BBoard
-import chess.variant.Variant
-import chess.variant.Crazyhouse
+import chess.variant.{ Crazyhouse, Variant }
 
 /** r bqkb r
   * p ppp pp
@@ -24,8 +23,8 @@ object Visual:
       case n          => (List.fill(8 - n)("")) ::: lines
     val b = createBoard(
       pieces = (for
-        (l, y) <- (filtered zipWithIndex)
-        (c, x) <- (l zipWithIndex)
+        (l, y) <- filtered.zipWithIndex
+        (c, x) <- l.zipWithIndex
         role   <- Role.forsyth(c.toLower)
       yield Square.at(x, 7 - y).map { square =>
         square -> (Color.fromWhite(c isUpper) - role)

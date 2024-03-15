@@ -1,7 +1,7 @@
 package chess
 
-import chess.format.Uci
 import cats.syntax.all.*
+import chess.format.Uci
 import chess.format.pgn.SanStr
 
 case class Move(

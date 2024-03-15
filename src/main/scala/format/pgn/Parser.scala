@@ -1,9 +1,9 @@
 package chess
 package format.pgn
 
-import cats.syntax.all.*
-import cats.parse.{ LocationMap, Numbers as N, Parser as P, Parser0 as P0, Rfc5234 as R }
 import cats.parse.Parser.Expectation
+import cats.parse.{ LocationMap, Numbers as N, Parser as P, Parser0 as P0, Rfc5234 as R }
+import cats.syntax.all.*
 
 // http://www.saremba.de/chessgml/standards/pgn/pgn-complete.htm
 object Parser:

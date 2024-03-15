@@ -2,6 +2,7 @@ package chess
 package variant
 
 import chess.format.EpdFen
+
 import bitboard.Bitboard
 
 case object RacingKings

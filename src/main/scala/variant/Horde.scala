@@ -1,10 +1,10 @@
 package chess
 package variant
 
-import chess.format.EpdFen
+import cats.syntax.all.*
 import chess.bitboard.Bitboard
 import chess.bitboard.Bitboard.*
-import cats.syntax.all.*
+import chess.format.EpdFen
 
 case object Horde
     extends Variant(

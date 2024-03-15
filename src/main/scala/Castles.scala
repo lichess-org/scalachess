@@ -1,9 +1,9 @@
 package chess
 
+import scala.annotation.targetName
+
 import bitboard.Bitboard
 import Square.*
-
-import scala.annotation.targetName
 
 opaque type Castles = Long
 object Castles:

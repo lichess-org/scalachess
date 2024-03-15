@@ -1,12 +1,12 @@
 package chess
 package format.pgn
 
+import chess.variant.Standard
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop.forAll
 
 import ChessTreeArbitraries.*
 import PgnHelper.*
-import chess.variant.Standard
 
 class ParserCheck extends ScalaCheckSuite:
 

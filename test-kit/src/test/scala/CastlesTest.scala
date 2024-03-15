@@ -1,10 +1,9 @@
 package chess
 
 import munit.ScalaCheckSuite
-
 import org.scalacheck.Prop
-import CoreArbitraries.given
 
+import CoreArbitraries.given
 import Square.*
 import Castles.*
 

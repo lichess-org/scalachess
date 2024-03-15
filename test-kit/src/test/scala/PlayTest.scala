@@ -1,7 +1,7 @@
 package chess
 
-import chess.format.Visual.addNewLines
 import chess.Square.*
+import chess.format.Visual.addNewLines
 import chess.format.{ EpdFen, Fen }
 import chess.variant.Standard
 

@@ -1,12 +1,12 @@
 package chess
 
-import munit.ScalaCheckSuite
-import org.scalacheck.Prop.forAll
-
 import cats.syntax.all.*
-import NodeArbitraries.{ *, given }
-import org.scalacheck.Prop.propBoolean
+import munit.ScalaCheckSuite
+import org.scalacheck.Prop.{ forAll, propBoolean }
+
 import scala.util.Random
+
+import NodeArbitraries.{ *, given }
 
 class NodeTest extends ScalaCheckSuite:
 

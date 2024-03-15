@@ -1,7 +1,8 @@
 package chess
 
-import bitboard.Bitboard
 import scala.annotation.targetName
+
+import bitboard.Bitboard
 
 opaque type UnmovedRooks = Long
 object UnmovedRooks:

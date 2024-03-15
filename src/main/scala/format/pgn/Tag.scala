@@ -1,11 +1,11 @@
 package chess
 package format.pgn
 
-import cats.syntax.option.*
 import cats.Eq
-import java.time.format.DateTimeFormatter
-
+import cats.syntax.option.*
 import chess.format.EpdFen
+
+import java.time.format.DateTimeFormatter
 
 case class Tag(name: TagType, value: String):
 

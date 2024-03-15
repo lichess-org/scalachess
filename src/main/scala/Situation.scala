@@ -1,12 +1,11 @@
 package chess
 
 import cats.syntax.all.*
+import chess.format.Uci
+import chess.variant.{ Antichess, Crazyhouse, Standard }
 
 import bitboard.Bitboard
 import bitboard.Bitboard.*
-
-import chess.format.Uci
-import chess.variant.{ Antichess, Crazyhouse, Standard }
 
 case class Situation(board: Board, color: Color):
   export board.{ history, isOccupied, kingOf, variant }

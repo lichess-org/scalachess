@@ -2,6 +2,7 @@ package chess
 package format.pgn
 
 import cats.syntax.all.*
+
 import util.chaining.scalaUtilChainingOps
 
 object Reader:

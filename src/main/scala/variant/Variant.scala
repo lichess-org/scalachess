@@ -3,8 +3,8 @@ package variant
 
 import cats.Eq
 import cats.syntax.all.*
-import chess.format.EpdFen
 import chess.bitboard.Bitboard
+import chess.format.EpdFen
 
 // Correctness depends on singletons for each variant ID
 abstract class Variant private[variant] (

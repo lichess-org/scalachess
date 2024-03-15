@@ -25,7 +25,7 @@ case class Move(
   // it's quite messy and error prone now
   lazy val finalizeAfter: Board =
     val board = after.variant.finalizeBoard(
-      after updateHistory { h1 =>
+      after.updateHistory { h1 =>
         val h2 = h1.copy(
           lastMove = Option(toUci),
           halfMoveClock =
@@ -54,7 +54,7 @@ case class Move(
         // If a Rook is moved
         // Remove that rook from unmovedRooks.
         // check the captured rook's side and remove it from castlingRights
-        if (piece is Rook) && unmovedRooks.contains(orig) then
+        if piece.is(Rook) && unmovedRooks.contains(orig) then
           unmovedRooks.side(orig) match
             case Some(result) =>
               unmovedRooks = unmovedRooks & ~orig.bl
@@ -68,19 +68,19 @@ case class Move(
 
         // If the King is moved
         // remove castlingRights and unmovedRooks for the moving side
-        else if piece is King then
+        else if piece.is(King) then
           unmovedRooks = unmovedRooks.without(piece.color)
           castleRights = castleRights.without(piece.color)
 
         h2.withCastles(castleRights).copy(unmovedRooks = unmovedRooks)
       },
       toUci,
-      capture flatMap { before(_) }
+      capture.flatMap { before(_) }
     )
 
     // Update position hashes last, only after updating the board,
     // castling rights and en-passant rights.
-    board updateHistory { h =>
+    board.updateHistory { h =>
       lazy val positionHashesOfSituationBefore =
         if h.positionHashes.isEmpty then PositionHash(Hash(situationBefore)) else h.positionHashes
       val resetsPositionHashes = board.variant.isIrreversible(this)
@@ -89,7 +89,7 @@ case class Move(
       h.copy(positionHashes = PositionHash(Hash(Situation(board, !piece.color))).combine(basePositionHashes))
     }
 
-  def applyVariantEffect: Move = before.variant addVariantEffect this
+  def applyVariantEffect: Move = before.variant.addVariantEffect(this)
 
   // does this move capture an opponent piece?
   inline def captures = capture.isDefined
@@ -106,7 +106,7 @@ case class Move(
   val isWhiteTurn: Boolean = piece.color.white
   inline def color         = piece.color
 
-  inline def withHistory(inline h: History) = copy(after = after withHistory h)
+  inline def withHistory(inline h: History) = copy(after = after.withHistory(h))
 
   def withPromotion(op: Option[PromotableRole]): Option[Move] =
     op.fold(this.some)(withPromotion)
@@ -114,7 +114,7 @@ case class Move(
   def withPromotion(p: PromotableRole): Option[Move] =
     if after.count(color.queen) > before.count(color.queen) then
       for
-        b2 <- after take dest
+        b2 <- after.take(dest)
         b3 <- b2.place(color - p, dest)
       yield copy(after = b3, promotion = Option(p))
     else this.some

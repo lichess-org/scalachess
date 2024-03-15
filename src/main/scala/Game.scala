@@ -31,7 +31,7 @@ case class Game(
   ): Either[ErrorStr, (Clock.WithCompensatedLag[Game], Move)] =
     situation
       .move(orig, dest, promotion)
-      .map(_.normalizeCastle withMetrics metrics)
+      .map(_.normalizeCastle.withMetrics(metrics))
       .map(move => applyWithCompensated(move) -> move)
 
   def apply(move: Move): Game = applyWithCompensated(move).value
@@ -55,7 +55,7 @@ case class Game(
       square: Square,
       metrics: MoveMetrics = MoveMetrics.empty
   ): Either[ErrorStr, (Game, Drop)] =
-    situation.drop(role, square).map(_ withMetrics metrics).map(drop => applyDrop(drop) -> drop)
+    situation.drop(role, square).map(_.withMetrics(metrics)).map(drop => applyDrop(drop) -> drop)
 
   def applyDrop(drop: Drop): Game =
     val newSituation = drop.situationAfter
@@ -95,7 +95,7 @@ case class Game(
 object Game:
 
   def apply(variant: chess.variant.Variant): Game =
-    Game(Situation(Board init variant, White))
+    Game(Situation(Board.init(variant), White))
 
   def apply(board: Board): Game = apply(board, White)
 
@@ -110,8 +110,8 @@ object Game:
       .fold(g): parsed =>
         g.copy(
           situation = Situation(
-            board = parsed.situation.board withVariant g.board.variant withCrazyData {
-              parsed.situation.board.crazyData orElse g.board.crazyData
+            board = parsed.situation.board.withVariant(g.board.variant).withCrazyData {
+              parsed.situation.board.crazyData.orElse(g.board.crazyData)
             },
             color = parsed.situation.color
           ),

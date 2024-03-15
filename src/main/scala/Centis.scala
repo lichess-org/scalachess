@@ -23,7 +23,7 @@ object Centis extends OpaqueInt[Centis]:
     def toDuration: FiniteDuration   = FiniteDuration(millis, MILLISECONDS)
 
     def *~(scalar: Float): Centis   = ofFloat(scalar * centis)
-    def /(div: Int): Option[Centis] = div != 0 option (centis / div)
+    def /(div: Int): Option[Centis] = (div != 0).option(centis / div)
 
     def avg(other: Centis): Centis = (centis + other.value) >> 1
 

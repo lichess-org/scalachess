@@ -14,37 +14,37 @@ final case class LagTracker(
 ):
 
   def onMove(lag: Centis) =
-    val comp     = lag atMost quota
+    val comp     = lag.atMost(quota)
     val uncomped = lag - comp
     val ceDiff   = compEstimate.getOrElse(Centis(1)) - comp
 
     (
       comp,
       copy(
-        quota = (quota + quotaGain - comp) atMost quotaMax,
+        quota = (quota + quotaGain - comp).atMost(quotaMax),
         uncompStats =
           // start recording after first uncomp.
           if uncomped == Centis(0) && uncompStats.samples == 0 then uncompStats
-          else uncompStats record uncomped.centis.toFloat,
-        lagStats = lagStats record (lag atMost Centis(2000)).centis.toFloat,
+          else uncompStats.record(uncomped.centis.toFloat),
+        lagStats = lagStats.record((lag.atMost(Centis(2000))).centis.toFloat),
         compEstSqErr = compEstSqErr + ceDiff.centis * ceDiff.centis,
         compEstOvers = compEstOvers + ceDiff.nonNeg
       ).recordLag(lag)
     )
 
   def recordLag(lag: Centis) =
-    val e = lagEstimator.record((lag atMost quotaMax).centis.toFloat)
+    val e = lagEstimator.record((lag.atMost(quotaMax)).centis.toFloat)
     copy(
       lagEstimator = e,
-      compEstimate = Option(Centis.ofFloat(e.mean - .8f * e.deviation).nonNeg atMost quota)
+      compEstimate = Option(Centis.ofFloat(e.mean - .8f * e.deviation).nonNeg.atMost(quota))
     )
 
   def moves = lagStats.samples
 
-  def lagMean: Option[Centis] = moves > 0 option Centis.ofFloat(lagStats.mean)
+  def lagMean: Option[Centis] = (moves > 0).option(Centis.ofFloat(lagStats.mean))
 
   def compEstStdErr: Option[Float] =
-    moves > 2 option Math.sqrt(compEstSqErr).toFloat / (moves - 2)
+    (moves > 2).option(Math.sqrt(compEstSqErr).toFloat / (moves - 2))
 
   def compAvg: Option[Centis] = totalComp / moves
 

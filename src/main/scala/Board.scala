@@ -49,7 +49,7 @@ case class Board(
   inline def apply(inline at: Square): Option[Piece]     = board.pieceAt(at)
   inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Square(file, rank))
 
-  def checkColor: Option[Color] = checkWhite.yes.option(White) orElse checkBlack.yes.option(Black)
+  def checkColor: Option[Color] = checkWhite.yes.option(White).orElse(checkBlack.yes.option(Black))
 
   lazy val checkWhite: Check = checkOf(White)
   lazy val checkBlack: Check = checkOf(Black)
@@ -78,7 +78,7 @@ case class Board(
 
   def withHistory(h: History): Board = copy(history = h)
 
-  def withCastles(c: Castles) = withHistory(history withCastles c)
+  def withCastles(c: Castles) = withHistory(history.withCastles(c))
 
   def withPieces(newPieces: PieceMap) = copy(board = BBoard.fromMap(newPieces))
 
@@ -159,7 +159,7 @@ object Board:
       board,
       History(castles = variant.castles, unmovedRooks = unmovedRooks),
       variant,
-      variant.crazyhouse option Crazyhouse.Data.init
+      variant.crazyhouse.option(Crazyhouse.Data.init)
     )
 
   def apply(pieces: Iterable[(Square, Piece)], variant: Variant): Board =
@@ -172,7 +172,7 @@ object Board:
       board,
       History(castles = variant.castles, unmovedRooks = unmovedRooks),
       variant,
-      variant.crazyhouse option Crazyhouse.Data.init
+      variant.crazyhouse.option(Crazyhouse.Data.init)
     )
 
   def init(variant: Variant): Board = Board(BBoard.fromMap(variant.pieces), variant)

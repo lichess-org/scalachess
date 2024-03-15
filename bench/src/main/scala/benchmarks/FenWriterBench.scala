@@ -18,19 +18,19 @@ import chess.format.Fen
 @Threads(value = 1)
 class FenWriterBench:
 
-  private[this] val Work: Long = 5
+  private val Work: Long = 5
 
   @Param(Array("100"))
-  var games: Int = _
+  var games: Int = scala.compiletime.uninitialized
 
-  var threecheckInput: List[Game]  = _
-  var antichessInput: List[Game]   = _
-  var atomicInput: List[Game]      = _
-  var crazyhouseInput: List[Game]  = _
-  var racingkingsInput: List[Game] = _
-  var hordeInput: List[Game]       = _
-  var randomInput: List[Game]      = _
-  var trickyInput: List[Game]      = _
+  var threecheckInput: List[Game]  = scala.compiletime.uninitialized
+  var antichessInput: List[Game]   = scala.compiletime.uninitialized
+  var atomicInput: List[Game]      = scala.compiletime.uninitialized
+  var crazyhouseInput: List[Game]  = scala.compiletime.uninitialized
+  var racingkingsInput: List[Game] = scala.compiletime.uninitialized
+  var hordeInput: List[Game]       = scala.compiletime.uninitialized
+  var randomInput: List[Game]      = scala.compiletime.uninitialized
+  var trickyInput: List[Game]      = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =

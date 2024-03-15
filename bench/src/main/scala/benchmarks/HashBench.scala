@@ -19,9 +19,9 @@ import chess.{ Hash, Situation }
 class HashBench:
 
   // the unit of CPU work per iteration
-  private[this] val Work: Long = 10
+  private val Work: Long = 10
 
-  var situations: List[Situation] = _
+  var situations: List[Situation] = scala.compiletime.uninitialized
 
   @Setup
   def setup() =

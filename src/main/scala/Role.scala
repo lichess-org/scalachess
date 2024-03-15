@@ -44,16 +44,16 @@ object Role:
   val allPromotableByForsyth: Map[Char, PromotableRole] = allPromotable.mapBy(_.forsyth)
   val allPromotableByPgn: Map[Char, PromotableRole]     = allPromotable.mapBy(_.pgn)
 
-  def forsyth(c: Char): Option[Role] = allByForsyth get c
+  def forsyth(c: Char): Option[Role] = allByForsyth.get(c)
 
   def promotable(c: Char): Option[PromotableRole] =
-    allPromotableByForsyth get c
+    allPromotableByForsyth.get(c)
 
   def promotable(name: String): Option[PromotableRole] =
-    allPromotableByName get name.capitalize
+    allPromotableByName.get(name.capitalize)
 
   def promotable(name: Option[String]): Option[PromotableRole] =
-    name flatMap promotable
+    name.flatMap(promotable)
 
   def valueOf(r: Role): Option[Int] =
     r match

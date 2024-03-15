@@ -8,10 +8,10 @@ class ClockTest extends ChessTest:
   import clockConv.given
 
   val clock = Clock(5 * 60 * 1000, 0)
-  val game  = makeGame withClock clock.start
+  val game  = makeGame.withClock(clock.start)
 
   test("play with a clock: new game"):
-    assertEquals(game.clock map { _.color }, Option(White))
+    assertEquals(game.clock.map { _.color }, Option(White))
   test("play with a clock: one move played"):
     assertEquals(game.playMoves(E2 -> E4).get.clock.map(_.color), Option(Black))
   test("create a clock: with time"):
@@ -50,16 +50,19 @@ class ClockLagCompTest extends ChessTest:
   def durOf(lag: Int) = MoveMetrics(clientLag = Option(Centis(lag)))
 
   def clockStep(clock: Clock, wait: Int, lags: Int*) =
-    (lags.foldLeft(clock) { (clk, lag) =>
-      advance(clk.step().value, wait + lag) step durOf(lag) value
-    } remainingTime Black).centis
+    (lags
+      .foldLeft(clock) { (clk, lag) =>
+        advance(clk.step().value, wait + lag).step(durOf(lag)) value
+      }
+      .remainingTime(Black))
+      .centis
 
   def clockStep60(w: Int, l: Int*)  = clockStep(fakeClock60, w, l*)
   def clockStep600(w: Int, l: Int*) = clockStep(fakeClock600, w, l*)
 
   def clockStart(lag: Int) =
     val clock = fakeClock60.step()
-    ((clock.value step durOf(lag)).value remainingTime White).centis
+    ((clock.value.step(durOf(lag))).value.remainingTime(White)).centis
 
   test("start: no lag"):
     assertEquals(clockStart(0), 60 * 100)

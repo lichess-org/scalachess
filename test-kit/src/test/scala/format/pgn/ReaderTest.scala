@@ -87,8 +87,10 @@ class ReaderTest extends ChessTest:
       .full(crazyhouse1)
       .assertRight:
         case Complete(replay) =>
-          replay.chronoMoves lift 11 assertSome: m =>
-            assertEquals(m.toUci.uci, "P@c6")
+          replay.chronoMoves
+            .lift(11)
+            .assertSome: m =>
+              assertEquals(m.toUci.uci, "P@c6")
   test("crazyhouse 2"):
     Reader
       .full(crazyhouse2)
@@ -140,5 +142,7 @@ class ReaderTest extends ChessTest:
       .full(clonoNoExoticNotation)
       .assertRight:
         case Complete(replay) =>
-          replay.chronoMoves lift 42 assertSome: m =>
-            assertEquals(m.toUci.uci, "e7f8q")
+          replay.chronoMoves
+            .lift(42)
+            .assertSome: m =>
+              assertEquals(m.toUci.uci, "e7f8q")

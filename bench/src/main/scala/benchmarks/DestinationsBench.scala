@@ -18,19 +18,19 @@ import chess.variant.*
 @Threads(value = 1)
 class DestinationsBench:
 
-  private[this] val Work: Long = 5
+  private val Work: Long = 5
 
   @Param(Array("100"))
-  var games: Int = _
+  var games: Int = scala.compiletime.uninitialized
 
-  var threecheckInput: List[Situation]  = _
-  var antichessInput: List[Situation]   = _
-  var atomicInput: List[Situation]      = _
-  var crazyhouseInput: List[Situation]  = _
-  var racingkingsInput: List[Situation] = _
-  var hordeInput: List[Situation]       = _
-  var randomInput: List[Situation]      = _
-  var trickyInput: List[Situation]      = _
+  var threecheckInput: List[Situation]  = scala.compiletime.uninitialized
+  var antichessInput: List[Situation]   = scala.compiletime.uninitialized
+  var atomicInput: List[Situation]      = scala.compiletime.uninitialized
+  var crazyhouseInput: List[Situation]  = scala.compiletime.uninitialized
+  var racingkingsInput: List[Situation] = scala.compiletime.uninitialized
+  var hordeInput: List[Situation]       = scala.compiletime.uninitialized
+  var randomInput: List[Situation]      = scala.compiletime.uninitialized
+  var trickyInput: List[Situation]      = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =

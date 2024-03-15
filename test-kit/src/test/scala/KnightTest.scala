@@ -17,7 +17,7 @@ PPP  PPP
  NBQKBNR
 """
     assertEquals(
-      visualDests(board, board destsFrom C4),
+      visualDests(board, board.destsFrom(C4)),
       """
 k B
 
@@ -42,7 +42,7 @@ PPP  PPP
  NBQKBNR
 """
     assertEquals(
-      visualDests(board, board destsFrom C4),
+      visualDests(board, board.destsFrom(C4)),
       """
 k B
 

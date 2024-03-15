@@ -37,21 +37,21 @@ object Uci:
   object Move:
 
     def apply(move: String): Option[Move] = for
-      orig <- Square.fromKey(move take 2)
+      orig <- Square.fromKey(move.take(2))
       dest <- Square.fromKey(move.slice(2, 4))
-      promotion = move lift 4 flatMap Role.promotable
+      promotion = move.lift(4).flatMap(Role.promotable)
     yield Move(orig, dest, promotion)
 
     def fromChars(move: String) = for
-      orig <- move.headOption flatMap { Square.fromChar(_) }
-      dest <- move lift 1 flatMap { Square.fromChar(_) }
-      promotion = move lift 2 flatMap { Role.promotable(_) }
+      orig <- move.headOption.flatMap { Square.fromChar(_) }
+      dest <- move.lift(1).flatMap { Square.fromChar(_) }
+      promotion = move.lift(2).flatMap { Role.promotable(_) }
     yield Move(orig, dest, promotion)
 
     def fromStrings(origS: String, destS: String, promS: Option[String]) = for
       orig <- Square.fromKey(origS)
       dest <- Square.fromKey(destS)
-      promotion = Role promotable promS
+      promotion = Role.promotable(promS)
     yield Move(orig, dest, promotion)
 
   case class Drop(role: Role, square: Square) extends Uci:
@@ -67,12 +67,12 @@ object Uci:
   object Drop:
 
     def fromChars(move: String) = for
-      role   <- move.headOption flatMap Role.allByPgn.get
-      square <- move lift 2 flatMap { Square.fromChar(_) }
+      role   <- move.headOption.flatMap(Role.allByPgn.get)
+      square <- move.lift(2).flatMap { Square.fromChar(_) }
     yield Uci.Drop(role, square)
 
     def fromStrings(roleS: String, posS: String) = for
-      role   <- Role.allByName get roleS
+      role   <- Role.allByName.get(roleS)
       square <- Square.fromKey(posS)
     yield Drop(role, square)
 
@@ -83,25 +83,25 @@ object Uci:
   def apply(drop: chess.Drop) = Uci.Drop(drop.piece.role, drop.square)
 
   def apply(move: String): Option[Uci] =
-    if move lift 1 contains '@' then
+    if move.lift(1) contains '@' then
       for
-        role   <- move.headOption flatMap Role.allByPgn.get
+        role   <- move.headOption.flatMap(Role.allByPgn.get)
         square <- Square.fromKey(move.slice(2, 4))
       yield Uci.Drop(role, square)
     else Uci.Move(move)
 
   def fromChars(move: String): Option[Uci] =
-    if move lift 1 contains '@' then Uci.Drop.fromChars(move)
+    if move.lift(1) contains '@' then Uci.Drop.fromChars(move)
     else Uci.Move.fromChars(move)
 
   def readList(moves: String): Option[List[Uci]] =
     moves.split(' ').toList.traverse(apply)
 
   def writeList(moves: List[Uci]): String =
-    moves.map(_.uci) mkString " "
+    moves.map(_.uci).mkString(" ")
 
   def readListChars(moves: String): Option[List[Uci]] =
     moves.split(' ').toList.traverse(fromChars)
 
   def writeListChars(moves: List[Uci]): String =
-    moves.map(_.chars) mkString " "
+    moves.map(_.chars).mkString(" ")

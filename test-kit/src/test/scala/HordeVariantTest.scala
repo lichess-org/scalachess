@@ -109,9 +109,11 @@ class HordeVariantTest extends ChessTest:
     assertNot(game._1.situation.legalMoves.exists(m => m.orig == Square.B3 && m.dest == Square.C2))
 
   test("Castle with one rook moved"):
-    val sans = SanStr from "a5 h5 a4 Nc6 a3 b6 a2 Bb7 d5 d6 d4 Rh6 cxd6 Qxd6 f6"
-      .split(' ')
-      .toVector
+    val sans = SanStr.from(
+      "a5 h5 a4 Nc6 a3 b6 a2 Bb7 d5 d6 d4 Rh6 cxd6 Qxd6 f6"
+        .split(' ')
+        .toVector
+    )
     val (game, steps, error) = chess.Replay.gameMoveWhileValid(sans, Horde.initialFen, Horde)
     assertEquals(error, None)
     assertEquals(steps.last._1.situation.legalMoves.exists(_.castles), true)

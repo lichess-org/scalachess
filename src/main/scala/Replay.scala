@@ -36,10 +36,10 @@ object Replay:
         sans,
         Tags(
           List(
-            initialFen map { fen =>
+            initialFen.map { fen =>
               Tag(_.FEN, fen.value)
             },
-            variant.some.filterNot(_.standard) map { v =>
+            variant.some.filterNot(_.standard).map { v =>
               Tag(_.Variant, v.name)
             }
           ).flatten
@@ -100,14 +100,14 @@ object Replay:
       variant: Variant
   ): Situation = {
     initialFen.flatMap(Fen.read) | Situation(variant)
-  } withVariant variant
+  }.withVariant(variant)
 
   def boards(
       sans: Iterable[SanStr],
       initialFen: Option[Fen.Epd],
       variant: Variant
   ): Either[ErrorStr, List[Board]] =
-    situations(sans, initialFen, variant) map (_ map (_.board))
+    situations(sans, initialFen, variant).map(_.map(_.board))
 
   def situations(
       sans: Iterable[SanStr],
@@ -124,7 +124,7 @@ object Replay:
       moves: List[Uci],
       initialFen: Option[Fen.Epd],
       variant: Variant
-  ): Either[ErrorStr, List[Board]] = situationsFromUci(moves, initialFen, variant) map (_ map (_.board))
+  ): Either[ErrorStr, List[Board]] = situationsFromUci(moves, initialFen, variant).map(_.map(_.board))
 
   def situationsFromUci(
       moves: List[Uci],
@@ -149,7 +149,7 @@ object Replay:
     if Fen.read(variant, atFen).isEmpty then ErrorStr(s"Invalid Fen $atFen").asLeft
     else
       // we don't want to compare the full move number, to match transpositions
-      def truncateFen(fen: Fen.Epd) = fen.value.split(' ').take(4) mkString " "
+      def truncateFen(fen: Fen.Epd) = fen.value.split(' ').take(4).mkString(" ")
       val atFenTruncated            = truncateFen(atFen)
       def compareFen(fen: Fen.Epd)  = truncateFen(fen) == atFenTruncated
 
@@ -162,7 +162,7 @@ object Replay:
               case Left(err) => err.asLeft
               case Right(moveOrDrop) =>
                 val after = moveOrDrop.finalizeAfter
-                val fen   = Fen write Game(Situation(after, ply.turn), ply = ply)
+                val fen   = Fen.write(Game(Situation(after, ply.turn), ply = ply))
                 if compareFen(fen) then ply.asRight
                 else recursivePlyAtFen(Situation(after, !sit.color), rest, ply + 1)
 

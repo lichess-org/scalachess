@@ -9,7 +9,7 @@ class RacingKingsVariantTest extends ChessTest:
   test("disallow discovered check"):
     val fenPosition = EpdFen("1r6/8/5qRK/8/7Q/8/2knNn2/2b2B2 b - - 11 11")
     val game        = fenToGame(fenPosition, RacingKings)
-    assertEquals(game.situation.destinations get Square.D2, None)
+    assertEquals(game.situation.destinations.get(Square.D2), None)
 
   test("game end to black"):
     val fenPosition = EpdFen("4krn1/K2b4/8/8/8/8/8/8 w - - 4 3")

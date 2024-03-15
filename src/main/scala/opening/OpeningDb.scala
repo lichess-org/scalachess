@@ -23,11 +23,11 @@ object OpeningDb:
         case _                                                     => op.some
     }
 
-  def isShortest(op: Opening) = shortestLines get op.key contains op
+  def isShortest(op: Opening) = shortestLines.get(op.key) contains op
 
   def findByEpdFen(fen: EpdFen): Option[Opening] = findByStandardFen(fen.opening)
 
-  def findByStandardFen(fen: StandardFen): Option[Opening] = byFen get fen
+  def findByStandardFen(fen: StandardFen): Option[Opening] = byFen.get(fen)
 
   val SEARCH_MAX_PLIES  = 40
   val SEARCH_MIN_PIECES = 20
@@ -61,7 +61,7 @@ object OpeningDb:
       .zipWithIndex
       .drop(1)
       .foldRight(none[Opening.AtPly]):
-        case ((situation, ply), None) => byFen.get(format.Fen.writeOpening(situation)).map(_ atPly Ply(ply))
+        case ((situation, ply), None) => byFen.get(format.Fen.writeOpening(situation)).map(_.atPly(Ply(ply)))
         case (_, found)               => found
 
   def searchInFens(fens: Iterable[StandardFen]): Option[Opening] =

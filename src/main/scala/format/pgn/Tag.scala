@@ -22,7 +22,7 @@ trait TagType:
 case class Tags(value: List[Tag]) extends AnyVal:
 
   def apply(name: String): Option[String] =
-    val tagType = Tag tagType name
+    val tagType = Tag.tagType(name)
     value.find(_.name == tagType).map(_.value)
 
   def apply(which: Tag.type => TagType): Option[String] =
@@ -30,9 +30,11 @@ case class Tags(value: List[Tag]) extends AnyVal:
     value.find(_.name == name).map(_.value)
 
   def clockConfig: Option[Clock.Config] =
-    value.collectFirst { case Tag(Tag.TimeControl, str) =>
-      str
-    } flatMap Clock.readPgnConfig
+    value
+      .collectFirst { case Tag(Tag.TimeControl, str) =>
+        str
+      }
+      .flatMap(Clock.readPgnConfig)
 
   def variant: Option[chess.variant.Variant] =
     apply(_.Variant)
@@ -40,26 +42,26 @@ case class Tags(value: List[Tag]) extends AnyVal:
       .flatMap:
         case "chess 960" | "fischerandom" | "fischerrandom" => chess.variant.Chess960.some
         case "3 check" | "3-check"                          => chess.variant.ThreeCheck.some
-        case name                                           => chess.variant.Variant byName name
+        case name                                           => chess.variant.Variant.byName(name)
 
-  def anyDate: Option[String] = apply(_.UTCDate) orElse apply(_.Date)
+  def anyDate: Option[String] = apply(_.UTCDate).orElse(apply(_.Date))
 
   def year: Option[Int] =
-    anyDate flatMap:
+    anyDate.flatMap:
       case Tags.DateRegex(y, _, _) => y.toIntOption
       case _                       => None
 
-  def fen: Option[EpdFen] = EpdFen from apply(_.FEN)
+  def fen: Option[EpdFen] = EpdFen.from(apply(_.FEN))
 
   def exists(which: Tag.type => TagType): Boolean =
     val name = which(Tag)
     value.exists(_.name == name)
   def exists(name: String): Boolean =
-    val tagType = Tag tagType name
+    val tagType = Tag.tagType(name)
     value.exists(_.name == tagType)
 
   def outcome: Option[Outcome] =
-    apply(_.Result) flatMap Outcome.fromResult
+    apply(_.Result).flatMap(Outcome.fromResult)
 
   def ++(tags: Tags) = tags.value.foldLeft(this)(_ + _)
 
@@ -73,15 +75,15 @@ case class Tags(value: List[Tag]) extends AnyVal:
 
   def names: ByColor[Option[PlayerName]] = ByColor(apply(_.White), apply(_.Black)).map(PlayerName.from(_))
   def elos: ByColor[Option[Elo]] = ByColor(apply(_.WhiteElo), apply(_.BlackElo)).map: elo =>
-    Elo from elo.flatMap(_.toIntOption)
+    Elo.from(elo.flatMap(_.toIntOption))
   def titles: ByColor[Option[PlayerTitle]] =
     ByColor(apply(_.WhiteTitle), apply(_.BlackTitle)).map(_.flatMap(PlayerTitle.get))
   def fideIds: ByColor[Option[FideId]] = ByColor(apply(_.WhiteFideId), apply(_.BlackFideId)).map: id =>
-    FideId from id.flatMap(_.toIntOption)
+    FideId.from(id.flatMap(_.toIntOption))
   def teams  = ByColor(apply(_.WhiteTeam), apply(_.BlackTeam))
   def clocks = ByColor(apply(_.WhiteClock), apply(_.BlackClock))
 
-  override def toString = sorted.value mkString "\n"
+  override def toString = sorted.value.mkString("\n")
 
 object Tags:
   val empty = Tags(Nil)

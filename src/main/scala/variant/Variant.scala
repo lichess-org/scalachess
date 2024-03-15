@@ -73,8 +73,10 @@ abstract class Variant private[variant] (
     for
       piece <- situation.board(from).toRight(ErrorStr(s"No piece on ${from.key}"))
       _     <- Either.cond(piece.color == situation.color, piece, ErrorStr(s"Not my piece on ${from.key}"))
-      m1    <- findMove(from, to) toRight ErrorStr(s"Piece on ${from.key} cannot move to ${to.key}")
-      m2 <- m1 withPromotion promotion toRight ErrorStr(s"Piece on ${from.key} cannot promote to $promotion")
+      m1    <- findMove(from, to).toRight(ErrorStr(s"Piece on ${from.key} cannot move to ${to.key}"))
+      m2 <- m1
+        .withPromotion(promotion)
+        .toRight(ErrorStr(s"Piece on ${from.key} cannot promote to $promotion"))
       m3 <- Either.cond(
         isValidPromotion(promotion),
         m2,
@@ -134,7 +136,7 @@ abstract class Variant private[variant] (
   def fiftyMoves(history: History): Boolean = history.halfMoveClock >= 100
 
   def isIrreversible(move: Move): Boolean =
-    (move.piece is Pawn) || move.captures || move.promotes || move.castles
+    (move.piece.is(Pawn)) || move.captures || move.promotes || move.castles
 
   /** Once a move has been decided upon from the available legal moves, the board is finalized
     */
@@ -152,7 +154,7 @@ abstract class Variant private[variant] (
       !pawnsOnPromotionRank(board, color) &&
       !pawnsOnBackRank(board, color)
 
-  def valid(situation: Situation, strict: Boolean) = Color.all forall validSide(situation.board, strict)
+  def valid(situation: Situation, strict: Boolean) = Color.all.forall(validSide(situation.board, strict))
 
   val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
 
@@ -207,8 +209,8 @@ object Variant:
 
   inline def default: Variant = Standard
 
-  inline def apply(inline id: Id): Option[Variant]       = list.byId get id
-  inline def apply(inline key: LilaKey): Option[Variant] = list.byKey get key
+  inline def apply(inline id: Id): Option[Variant]       = list.byId.get(id)
+  inline def apply(inline key: LilaKey): Option[Variant] = list.byKey.get(key)
   def orDefault(id: Id): Variant                         = apply(id) | default
   def orDefault(key: LilaKey): Variant                   = apply(key) | default
   def idOrDefault(id: Option[Id]): Variant               = id.flatMap(apply(_)) | default

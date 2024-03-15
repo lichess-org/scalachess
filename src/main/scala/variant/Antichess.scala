@@ -40,7 +40,7 @@ case object Antichess
 
   // In antichess, there is no checkmate condition, and the winner is the current player if they have no legal moves
   override def winner(situation: Situation): Option[Color] =
-    specialEnd(situation) option situation.color
+    specialEnd(situation).option(situation.color)
 
   override def specialEnd(situation: Situation) =
     // The game ends with a win when one player manages to lose all their pieces or is in stalemate
@@ -68,7 +68,7 @@ case object Antichess
             whiteKnight <- whiteKnights.headOption
             blackKnight <- blackKnights.headOption
           yield whiteKnight.isLight == blackKnight.isLight
-        } getOrElse false
+        }.getOrElse(false)
     }
 
   // No player can win if the only remaining pieces are opposing bishops on different coloured
@@ -87,8 +87,8 @@ case object Antichess
         val whitePawns = (board.white & board.pawns).squares
         val blackPawns = (board.black & board.pawns).squares
         (for
-          whiteBishopLight <- whiteBishops.headOption map (_.isLight)
-          blackBishopLight <- blackBishops.headOption map (_.isLight)
+          whiteBishopLight <- whiteBishops.headOption.map(_.isLight)
+          blackBishopLight <- blackBishops.headOption.map(_.isLight)
         yield whiteBishopLight != blackBishopLight && whitePawns.forall(
           pawnNotAttackable(_, blackBishopLight, board)
         ) && blackPawns.forall(pawnNotAttackable(_, whiteBishopLight, board)))

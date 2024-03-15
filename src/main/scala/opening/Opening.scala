@@ -19,7 +19,7 @@ final class Opening(
 
   lazy val nbMoves: Int              = uci.value.count(' ' ==) + 1
   lazy val lastUci: Option[Uci.Move] = uci.value.split(' ').lastOption.flatMap(Uci.Move.apply)
-  lazy val key: OpeningKey           = Opening nameToKey name
+  lazy val key: OpeningKey           = Opening.nameToKey(name)
 
   override def toString = name.value
 

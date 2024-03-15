@@ -10,7 +10,7 @@ class ReplayTest extends ChessTest:
 
   test("replay from position close chess"):
     val fen   = EpdFen("""8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1""")
-    val moves = SanStr from """d4 d5 Nf4 Nf5 g4 g5 gxf5 exf5""".split(' ').toList
+    val moves = SanStr.from("""d4 d5 Nf4 Nf5 g4 g5 gxf5 exf5""".split(' ').toList)
     assertMatch(Replay.gameMoveWhileValid(moves, fen, variant.FromPosition)):
       case (_, games, None) =>
         assertEquals(games.size, 8)
@@ -18,7 +18,7 @@ class ReplayTest extends ChessTest:
 
   test("replay errors should keep order"):
     val fen   = EpdFen("""8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1""")
-    val moves = SanStr from """d4 d5 Nf3""".split(' ').toList
+    val moves = SanStr.from("""d4 d5 Nf3""".split(' ').toList)
     assertMatch(Replay.gameMoveWhileValid(moves, fen, variant.FromPosition)):
       case (_, games, Some(_)) =>
         assertEquals(games.size, 2)
@@ -46,7 +46,7 @@ class ReplayTest extends ChessTest:
     assert:
       Replay
         .situations(
-          sans = SanStr.from("Be3 Ne4 Rg3 Nxe3 Rxe3" split " "),
+          sans = SanStr.from("Be3 Ne4 Rg3 Nxe3 Rxe3".split(" ")),
           initialFen = None,
           variant = chess.variant.RacingKings
         )
@@ -54,9 +54,11 @@ class ReplayTest extends ChessTest:
 
   test("chess960 castlings"):
     val sans: Vector[SanStr] =
-      SanStr from "e4 e5 Ne3 f6 Nb3 Nb6 O-O-O Ne6 Ba6 O-O-O Nd5 Nxd5 Bxb7+ Kb8"
-        .split(' ')
-        .toVector
+      SanStr.from(
+        "e4 e5 Ne3 f6 Nb3 Nb6 O-O-O Ne6 Ba6 O-O-O Nd5 Nxd5 Bxb7+ Kb8"
+          .split(' ')
+          .toVector
+      )
     val (game, steps, error) = chess.Replay.gameMoveWhileValid(
       sans,
       Fen.Epd("nrknbbqr/pppppppp/8/8/8/8/PPPPPPPP/NRKNBBQR w KQkq - 0 1"),
@@ -67,9 +69,11 @@ class ReplayTest extends ChessTest:
 
   test("castling always 960 notation"):
     val sans: Vector[SanStr] =
-      SanStr from "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3 e5 d5 Nh5 Qd2 Qh4+ g3 Qe7 O-O-O"
-        .split(' ')
-        .toVector
+      SanStr.from(
+        "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3 e5 d5 Nh5 Qd2 Qh4+ g3 Qe7 O-O-O"
+          .split(' ')
+          .toVector
+      )
     val (game, steps, error) = chess.Replay.gameMoveWhileValid(
       sans,
       Fen.Epd.initial,
@@ -82,7 +86,7 @@ class ReplayTest extends ChessTest:
 
   test("replay from fen then castle"):
     val fen                  = Fen.Epd("2bqkb1r/1pp1ppp1/7r/pN2p2p/3PP3/P3P3/1PP1B1PP/R2Q1RK1 w k - 3 13")
-    val moves                = SanStr from "dxe5 Qxd1 Raxd1 Rc6 Rd2 e6 Rfd1 Be7 Na7 O-O".split(" ")
+    val moves                = SanStr.from("dxe5 Qxd1 Raxd1 Rc6 Rd2 e6 Rfd1 Be7 Na7 O-O".split(" "))
     val (game, steps, error) = chess.Replay.gameMoveWhileValid(moves, fen, variant.Standard)
     assertEquals(error, None)
     assertEquals(steps.size, moves.size)
@@ -108,9 +112,10 @@ class ReplayTest extends ChessTest:
   test("replay from standard positions"):
     val nb    = 500
     val games = Fixtures.prod500standard
-    (games take nb)
+    (games
+      .take(nb))
       .map: g =>
-        SanStr from g.split(' ').toList
+        SanStr.from(g.split(' ').toList)
       .foreach: moves =>
         assertMatch(Replay.gameMoveWhileValid(moves, chess.format.Fen.initial, chess.variant.Standard)):
           case (_, games, None) => assertEquals(games.size, moves.size)

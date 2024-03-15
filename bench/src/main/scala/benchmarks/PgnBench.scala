@@ -18,10 +18,10 @@ import chess.format.pgn.PgnHelper.*
 class PgnBench:
 
   // the unit of CPU work per iteration
-  private[this] val Work: Long = 10
+  private val Work: Long = 10
 
-  var pgnStrs: List[PgnStr] = _
-  var pgns: List[Pgn]       = _
+  var pgnStrs: List[PgnStr] = scala.compiletime.uninitialized
+  var pgns: List[Pgn]       = scala.compiletime.uninitialized
 
   @Setup
   def setup() =

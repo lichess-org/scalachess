@@ -32,7 +32,7 @@ object Status:
 
   given Ordering[Status] = Ordering.by(_.id)
 
-  val finishedNotCheated = all filter { s =>
+  val finishedNotCheated = all.filter { s =>
     s.id >= Mate.id && s.id != Cheat.id
   }
 
@@ -40,4 +40,4 @@ object Status:
 
   val byId = all.mapBy(_.id)
 
-  def apply(id: Int): Option[Status] = byId get id
+  def apply(id: Int): Option[Status] = byId.get(id)

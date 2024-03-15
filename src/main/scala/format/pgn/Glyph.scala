@@ -17,8 +17,8 @@ case class Glyphs(
 
   def toggle(glyph: Glyph) =
     glyph match
-      case g: Glyph.MoveAssessment     => copy(move = !move.contains(g) option g)
-      case g: Glyph.PositionAssessment => copy(position = !position.contains(g) option g)
+      case g: Glyph.MoveAssessment     => copy(move = (!move.contains(g)).option(g))
+      case g: Glyph.PositionAssessment => copy(position = (!position.contains(g)).option(g))
       case g: Glyph.Observation =>
         copy(observations =
           if observations contains g then observations.filter(g !=)
@@ -31,8 +31,8 @@ case class Glyphs(
     else if g.isEmpty then this
     else
       Glyphs(
-        g.move orElse move,
-        g.position orElse position,
+        g.move.orElse(move),
+        g.position.orElse(position),
         (g.observations ::: observations).distinct
       )
 
@@ -115,9 +115,7 @@ object Glyph:
     def display = all
 
   def find(id: Int): Option[Glyph] =
-    MoveAssessment.byId.get(id) orElse
-      PositionAssessment.byId.get(id) orElse
-      Observation.byId.get(id)
+    MoveAssessment.byId.get(id).orElse(PositionAssessment.byId.get(id)).orElse(Observation.byId.get(id))
 
   def find(s: String): Option[Glyph] =
     if s.startsWith("$") then s.drop(1).toIntOption.flatMap(Glyph.find)

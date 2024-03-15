@@ -19,19 +19,19 @@ import chess.format.Fen
 @Threads(value = 1)
 class FenReaderBench:
 
-  private[this] val Work: Long = 5
+  private val Work: Long = 5
 
   @Param(Array("100"))
-  var games: Int = _
+  var games: Int = scala.compiletime.uninitialized
 
-  var threecheckInput: List[(Variant, EpdFen)]  = _
-  var antichessInput: List[(Variant, EpdFen)]   = _
-  var atomicInput: List[(Variant, EpdFen)]      = _
-  var crazyhouseInput: List[(Variant, EpdFen)]  = _
-  var racingkingsInput: List[(Variant, EpdFen)] = _
-  var hordeInput: List[(Variant, EpdFen)]       = _
-  var randomInput: List[(Variant, EpdFen)]      = _
-  var trickyInput: List[(Variant, EpdFen)]      = _
+  var threecheckInput: List[(Variant, EpdFen)]  = scala.compiletime.uninitialized
+  var antichessInput: List[(Variant, EpdFen)]   = scala.compiletime.uninitialized
+  var atomicInput: List[(Variant, EpdFen)]      = scala.compiletime.uninitialized
+  var crazyhouseInput: List[(Variant, EpdFen)]  = scala.compiletime.uninitialized
+  var racingkingsInput: List[(Variant, EpdFen)] = scala.compiletime.uninitialized
+  var hordeInput: List[(Variant, EpdFen)]       = scala.compiletime.uninitialized
+  var randomInput: List[(Variant, EpdFen)]      = scala.compiletime.uninitialized
+  var trickyInput: List[(Variant, EpdFen)]      = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =

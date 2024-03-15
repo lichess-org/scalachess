@@ -63,9 +63,9 @@ trait ChessTestCommon:
     Board(BBoard.fromMap(pieces.toMap), defaultHistory(), chess.variant.Standard)
 
   def makeBoard(str: String, variant: Variant) =
-    Visual << str withVariant variant
+    (Visual << str).withVariant(variant)
 
-  def makeBoard: Board = Board init chess.variant.Standard
+  def makeBoard: Board = Board.init(chess.variant.Standard)
 
   def makeChess960Board(position: Int) = Board(BBoard.fromMap(Chess960.pieces(position)), Chess960)
   def makeChess960Game(position: Int)  = Game(makeChess960Board(position))
@@ -106,7 +106,7 @@ trait MunitExtensions extends munit.FunSuite:
     assert(!cond, clue)
 
   def assertMatch[A](a: A)(f: PartialFunction[A, Unit])(using Location) =
-    f.lift(a) getOrElse fail(s"$a does not match expectations")
+    f.lift(a).getOrElse(fail(s"$a does not match expectations"))
 
   def assertCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T])(using Location) =
     assert(isCloseTo(a, b, delta), s"$a is not close to $b by $delta")
@@ -137,12 +137,12 @@ trait MunitExtensions extends munit.FunSuite:
 
   extension [A](v: Option[A])
     def assertSome(f: PartialFunction[A, Unit])(using Location): Any = v match
-      case Some(a) => f.lift(a) getOrElse fail(s"Unexpected Some value: $a")
+      case Some(a) => f.lift(a).getOrElse(fail(s"Unexpected Some value: $a"))
       case None    => fail(s"Expected Some but received None")
 
   extension [E, A](v: Either[E, A])
     def assertRight(f: PartialFunction[A, Unit])(using Location): Any = v match
-      case Right(r) => f.lift(r) getOrElse fail(s"Unexpected Right value: $r")
+      case Right(r) => f.lift(r).getOrElse(fail(s"Unexpected Right value: $r"))
       case Left(e)  => fail(s"Expected Right but received $v")
     def get: A = v match
       case Right(r) => r

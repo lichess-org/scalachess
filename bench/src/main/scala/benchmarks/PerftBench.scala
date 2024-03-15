@@ -18,22 +18,22 @@ import chess.variant.*
 class PerftBench:
 
   // the unit of CPU work per iteration
-  private[this] val Work: Long = 10
+  private val Work: Long = 10
 
   @Param(Array("50"))
-  var games: Int = _
+  var games: Int = scala.compiletime.uninitialized
 
   @Param(Array("10000"))
-  var nodes: Long = _
+  var nodes: Long = scala.compiletime.uninitialized
 
-  var threecheckPerfts: List[Perft]  = _
-  var antichessPerfts: List[Perft]   = _
-  var atomicPerfts: List[Perft]      = _
-  var crazyhousePerfts: List[Perft]  = _
-  var racingkingsPerfts: List[Perft] = _
-  var hordePerfts: List[Perft]       = _
-  var randomPerfts: List[Perft]      = _
-  var trickyPerfts: List[Perft]      = _
+  var threecheckPerfts: List[Perft]  = scala.compiletime.uninitialized
+  var antichessPerfts: List[Perft]   = scala.compiletime.uninitialized
+  var atomicPerfts: List[Perft]      = scala.compiletime.uninitialized
+  var crazyhousePerfts: List[Perft]  = scala.compiletime.uninitialized
+  var racingkingsPerfts: List[Perft] = scala.compiletime.uninitialized
+  var hordePerfts: List[Perft]       = scala.compiletime.uninitialized
+  var randomPerfts: List[Perft]      = scala.compiletime.uninitialized
+  var trickyPerfts: List[Perft]      = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =

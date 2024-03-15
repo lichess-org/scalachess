@@ -5,10 +5,10 @@ import scala.util.Try
 
 object Binary:
 
-  def writeMove(m: SanStr)             = Try(Writer move m)
-  def writeMoves(ms: Iterable[SanStr]) = Try(Writer moves ms)
+  def writeMove(m: SanStr)             = Try(Writer.move(m))
+  def writeMoves(ms: Iterable[SanStr]) = Try(Writer.moves(ms))
 
-  def readMoves(bs: List[Byte])          = Try(Reader moves bs)
+  def readMoves(bs: List[Byte])          = Try(Reader.moves(bs))
   def readMoves(bs: List[Byte], nb: Int) = Try(Reader.moves(bs, nb))
 
   private object MoveType:
@@ -20,13 +20,13 @@ object Binary:
   private object Encoding:
     val pieceInts: Map[String, Int] =
       Map("K" -> 1, "Q" -> 2, "R" -> 3, "N" -> 4, "B" -> 5, "O-O" -> 6, "O-O-O" -> 7)
-    val pieceStrs: Map[Int, String]     = pieceInts map { case (k, v) => v -> k }
+    val pieceStrs: Map[Int, String]     = pieceInts.map { case (k, v) => v -> k }
     val dropPieceInts: Map[String, Int] = Map("P" -> 1, "Q" -> 2, "R" -> 3, "N" -> 4, "B" -> 5)
-    val dropPieceStrs: Map[Int, String] = dropPieceInts map { case (k, v) => v -> k }
+    val dropPieceStrs: Map[Int, String] = dropPieceInts.map { case (k, v) => v -> k }
     val promotionInts: Map[String, Int] = Map("" -> 0, "Q" -> 1, "R" -> 2, "N" -> 3, "B" -> 4, "K" -> 6)
-    val promotionStrs: Map[Int, String] = promotionInts map { case (k, v) => v -> k }
+    val promotionStrs: Map[Int, String] = promotionInts.map { case (k, v) => v -> k }
     val checkInts: Map[String, Int]     = Map("" -> 0, "+" -> 1, "#" -> 2)
-    val checkStrs: Map[Int, String]     = checkInts map { case (k, v) => v -> k }
+    val checkStrs: Map[Int, String]     = checkInts.map { case (k, v) => v -> k }
 
   private object Reader:
 
@@ -35,7 +35,7 @@ object Binary:
     private val maxPlies = 600
 
     def moves(bs: List[Byte]): List[SanStr]          = moves(bs, maxPlies)
-    def moves(bs: List[Byte], nb: Int): List[SanStr] = SanStr from intMoves(bs.map(Binary.toInt(_)), nb)
+    def moves(bs: List[Byte], nb: Int): List[SanStr] = SanStr.from(intMoves(bs.map(Binary.toInt(_)), nb))
 
     def intMoves(bs: List[Int], pliesToGo: Int): List[String] =
       bs match
@@ -49,7 +49,7 @@ object Binary:
           fullPawn(b1, b2) :: intMoves(rest, pliesToGo - 1)
         case b1 :: b2 :: b3 :: rest if moveType(b1) == MoveType.FullPiece =>
           fullPiece(b1, b2, b3) :: intMoves(rest, pliesToGo - 1)
-        case x => !!(x map showByte mkString ",")
+        case x => !!(x.map(showByte).mkString(","))
 
     def simplePawn(i: Int): String = squareString(right(i, 6))
 
@@ -128,7 +128,7 @@ object Binary:
         case FullPieceR(piece, orig, capture, square, check) =>
           fullPiece(piece, orig, square, capture, check)
         case DropR(role, square, check) => drop(role, square, check)
-      ) map (_.toByte)
+      ).map(_.toByte)
 
     def moves(strs: Iterable[SanStr]): Array[Byte] = strs.flatMap(move).to(Array)
 
@@ -206,4 +206,4 @@ object Binary:
     val DropR        = s"^([QRNBP])@$posR$checkR$$".r
 
   private inline def toInt(b: Byte): Int = b & 0xff
-  private def showByte(b: Int): String   = "%08d" format (b.toBinaryString.toInt)
+  private def showByte(b: Int): String   = "%08d".format(b.toBinaryString.toInt)

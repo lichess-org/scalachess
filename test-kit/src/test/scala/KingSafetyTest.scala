@@ -12,7 +12,7 @@ class KingSafetyTest extends ChessTest:
       """
     P n
 PPPP   P
-RNBQK  R""" destsFrom E1,
+RNBQK  R""".destsFrom(E1),
       Set(F2)
     )
   test("not commit suicide even if immobilized"):
@@ -20,7 +20,7 @@ RNBQK  R""" destsFrom E1,
       """
     b n
 PPPP   P
-RNBQK  R""" destsFrom E1,
+RNBQK  R""".destsFrom(E1),
       Set()
     )
   test("escape from danger"):
@@ -29,7 +29,7 @@ RNBQK  R""" destsFrom E1,
     r
 
 PPPP   P
-RNBQK  R""" destsFrom E1,
+RNBQK  R""".destsFrom(E1),
       Set(F1, F2)
     )
   test("move to defend"):
@@ -38,7 +38,7 @@ RNBQK  R""" destsFrom E1,
     r
 
 PPPP   P
-RNBQK  R""" destsFrom D1,
+RNBQK  R""".destsFrom(D1),
       Set(E2)
     )
     assertEquals(
@@ -46,14 +46,14 @@ RNBQK  R""" destsFrom D1,
     r
 
 PPPP   P
-RNBQK NR""" destsFrom G1,
+RNBQK NR""".destsFrom(G1),
       Set(E2)
     )
     assertEquals(
       """
 K    r
 PPPP   P
-RNBQ  NR""" destsFrom D2,
+RNBQ  NR""".destsFrom(D2),
       Set(D3)
     )
     assertEquals(
@@ -61,7 +61,7 @@ RNBQ  NR""" destsFrom D2,
 K    r
 
 PPPP   P
-RNBQ  NR""" destsFrom D2,
+RNBQ  NR""".destsFrom(D2),
       Set(D4)
     )
     assertEquals(
@@ -69,7 +69,7 @@ RNBQ  NR""" destsFrom D2,
 K    r
 
 PPPP   P
-RNBQ  NR""" destsFrom H2,
+RNBQ  NR""".destsFrom(H2),
       Set()
     )
   assertEquals(
@@ -77,7 +77,7 @@ RNBQ  NR""" destsFrom H2,
     r
 
 PPPPK Q
-RNB    R""" destsFrom G2,
+RNB    R""".destsFrom(G2),
     Set(E4)
   )
   assertEquals(
@@ -85,7 +85,7 @@ RNB    R""" destsFrom G2,
     r
 
 PPPPQ
-RNB K  R""" destsFrom E2,
+RNB K  R""".destsFrom(E2),
     Set(E3, E4)
   )
   assertEquals(
@@ -93,7 +93,7 @@ RNB K  R""" destsFrom E2,
     r
      P
 PPPP
-RNB K  R""" destsFrom F3,
+RNB K  R""".destsFrom(F3),
     Set(E4)
   )
   test("stay to defend"):
@@ -102,7 +102,7 @@ RNB K  R""" destsFrom F3,
     r
 
 PPPPB
-RNB K  R""" destsFrom E2,
+RNB K  R""".destsFrom(E2),
       Set()
     )
     assertEquals(
@@ -110,6 +110,6 @@ RNB K  R""" destsFrom E2,
 
 K P  r
 PPP
-RNB    R""" destsFrom D3,
+RNB    R""".destsFrom(D3),
       Set()
     )

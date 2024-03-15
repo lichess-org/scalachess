@@ -1,6 +1,6 @@
 ThisBuild / organization      := "org.lichess"
 ThisBuild / version           := "15.8.1"
-ThisBuild / scalaVersion      := "3.3.3"
+ThisBuild / scalaVersion      := "3.4.0"
 ThisBuild / licenses += "MIT" -> url("https://opensource.org/licenses/MIT")
 
 ThisBuild / resolvers += "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-maven/master"
@@ -10,7 +10,7 @@ val commonSettings = Seq(
   scalacOptions := Seq(
     "-encoding",
     "utf-8",
-    "-source:future-migration",
+    "-source:3.4-migration",
     "-indent",
     "-feature",
     "-language:postfixOps",

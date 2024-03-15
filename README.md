@@ -39,6 +39,6 @@ To run benchmarks for a specific class:
 
     bench / Jmh / run -rf json .*PlayBench.*
 
-To run [scalafmt](https://scalameta.org/scalafmt/docs/installation.html):
+To run [scalafmt](https://scalameta.org/scalafmt/docs/installation.html) and [scalafix](https://scalacenter.github.io/scalafix):
 
-    sbt fmt
+    sbt prepare

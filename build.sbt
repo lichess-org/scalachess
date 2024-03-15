@@ -65,3 +65,9 @@ lazy val testKit = project
 
 addCommandAlias("fmtCheck", "all scalachess/scalafmtCheckAll bench/scalafmtCheckAll testKit/scalafmtCheckAll")
 addCommandAlias("fmt", "all scalachess/scalafmtAll bench/scalafmtAll testKit/scalafmtAll")
+
+addCommandAlias("scalafixCheck", "; scalafixAll --check ; testKit/scalafixAll --check")
+addCommandAlias("scalafixCheck", "; scalafixAll --check ; testKit/scalafixAll --check")
+
+addCommandAlias("prepare", "scalafixAll; testKit/scalafixAll; fmt")
+addCommandAlias("check", "; scalafixCheck; fmtCheck")

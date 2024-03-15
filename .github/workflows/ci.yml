@@ -7,7 +7,7 @@ on:
     branches: ['**']
 
 jobs:
-  openjdk21:
+  test:
     runs-on: ubuntu-latest
     env:
       JAVA_OPTS: "-Xmx6G -XX:+UseG1GC"
@@ -27,5 +27,21 @@ jobs:
       - name: Test
         run: sbt testKit/test
 
+  format:
+    runs-on: ubuntu-latest
+    env:
+      SBT_OPTS: "-Dsbt.ci=true"
+    steps:
+
+      - name: Checkout current branch
+        uses: actions/checkout@v3
+
+      - name: Setup JVM
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: sbt
+
       - name: Check Formatting
-        run: sbt fmtCheck
+        run: sbt check

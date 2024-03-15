@@ -1,7 +1,9 @@
 package chess
 
 import cats.syntax.all.*
+
 import scala.language.implicitConversions
+
 import format.{ EpdFen, Fen, Uci, Visual }
 import format.pgn.PgnStr
 import variant.{ Chess960, Variant }

@@ -2,9 +2,10 @@ package chess
 package format
 
 import cats.syntax.all.*
+import ornicar.scalalib.zeros.given
+
 import variant.{ Standard, Variant }
 import variant.Crazyhouse.Pockets
-import ornicar.scalalib.zeros.given
 import bitboard.Bitboard
 import bitboard.Board as BBoard
 

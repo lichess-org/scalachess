@@ -4,7 +4,8 @@ ThisBuild / scalaVersion      := "3.4.0"
 ThisBuild / licenses += "MIT" -> url("https://opensource.org/licenses/MIT")
 
 ThisBuild / resolvers += "lila-maven".at("https://raw.githubusercontent.com/ornicar/lila-maven/master")
-ThisBuild / publishTo := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", ""))))
+ThisBuild / publishTo         := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", ""))))
+ThisBuild / semanticdbEnabled := true // for scalafix
 
 val commonSettings = Seq(
   scalacOptions := Seq(
@@ -64,3 +65,9 @@ lazy val testKit = project
 
 addCommandAlias("fmtCheck", "all scalachess/scalafmtCheckAll bench/scalafmtCheckAll testKit/scalafmtCheckAll")
 addCommandAlias("fmt", "all scalachess/scalafmtAll bench/scalafmtAll testKit/scalafmtAll")
+
+addCommandAlias("scalafixCheck", "; scalafixAll --check ; testKit/scalafixAll --check")
+addCommandAlias("scalafixCheck", "; scalafixAll --check ; testKit/scalafixAll --check")
+
+addCommandAlias("prepare", "scalafixAll; testKit/scalafixAll; fmt")
+addCommandAlias("check", "; scalafixCheck; fmtCheck")

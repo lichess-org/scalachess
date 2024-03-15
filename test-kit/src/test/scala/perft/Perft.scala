@@ -1,12 +1,10 @@
 package chess
 package perft
 
-import chess.format.EpdFen
-import chess.variant.Chess960
-import chess.variant.Variant
-import chess.variant.Crazyhouse
+import chess.format.{ EpdFen, Fen }
+import chess.variant.{ Chess960, Crazyhouse, Variant }
+
 import MoveOrDrop.*
-import chess.format.Fen
 
 case class Perft(id: String, epd: EpdFen, cases: List[TestCase]):
   import Perft.*

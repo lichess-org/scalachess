@@ -1,7 +1,7 @@
 package chess
 
-import org.scalacheck.{ Arbitrary, Gen }
 import cats.kernel.Eq
+import org.scalacheck.{ Arbitrary, Gen }
 
 object NodeArbitraries:
 

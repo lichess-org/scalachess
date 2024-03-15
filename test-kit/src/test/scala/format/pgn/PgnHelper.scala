@@ -2,6 +2,7 @@ package chess
 package format.pgn
 
 import cats.syntax.all.*
+
 import MoveOrDrop.*
 
 object PgnHelper:

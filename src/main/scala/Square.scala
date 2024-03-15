@@ -1,7 +1,8 @@
 package chess
 
-import java.lang.Math.abs
 import chess.bitboard.Bitboard
+
+import java.lang.Math.abs
 import scala.annotation.targetName
 
 opaque type Square = Int

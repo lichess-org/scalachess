@@ -1,9 +1,10 @@
 package chess
 
+import cats.laws.discipline.{ ApplicativeTests, FunctorTests, TraverseTests }
 import munit.DisciplineSuite
 import org.scalacheck.*
+
 import CoreArbitraries.given
-import cats.laws.discipline.{ ApplicativeTests, FunctorTests, TraverseTests }
 
 class ByColorLawsTest extends DisciplineSuite:
   checkAll("ByColor.FunctorLaws", FunctorTests[ByColor].functor[Int, Int, String])

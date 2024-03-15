@@ -3,6 +3,7 @@ package chess
 import cats.*
 import cats.derived.*
 import cats.syntax.all.*
+
 import scala.annotation.tailrec
 
 sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives Functor, Traverse:

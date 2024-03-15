@@ -1,16 +1,13 @@
 package chess
 
 import cats.effect.IO
+import cats.kernel.Monoid
 import cats.syntax.all.*
+import chess.format.{ EpdFen, Fen }
+import chess.variant.*
 import fs2.*
 import fs2.io.file.Files
-
 import weaver.*
-
-import chess.format.Fen
-import chess.format.EpdFen
-import chess.variant.*
-import cats.kernel.Monoid
 
 object InsufficientMaterialTest extends SimpleIOSuite:
 

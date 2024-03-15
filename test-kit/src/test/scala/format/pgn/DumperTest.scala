@@ -1,11 +1,12 @@
 package chess
 package format.pgn
 
-import scala.language.implicitConversions
 import chess.format.{ EpdFen, Fen }
-import Square.*
-
 import chess.variant.ThreeCheck
+
+import scala.language.implicitConversions
+
+import Square.*
 
 class DumperTest extends ChessTest:
 

@@ -1,10 +1,10 @@
 package chess
 
 import cats.syntax.option.*
-import format.{ EpdFen, Fen, Uci }
-import chess.format.pgn.SanStr
+import chess.format.pgn.{ Fixtures, SanStr }
 import chess.variant.Chess960
-import chess.format.pgn.Fixtures
+
+import format.{ EpdFen, Fen, Uci }
 
 class ReplayTest extends ChessTest:
 

@@ -1,9 +1,8 @@
 package chess
 package perft
 
-import cats.syntax.all.*
 import cats.parse.{ Numbers as N, Parser as P, Parser0 as P0, Rfc5234 as R }
-
+import cats.syntax.all.*
 import chess.format.EpdFen
 
 /**

@@ -1,10 +1,11 @@
 package chess
 
 import cats.syntax.all.*
-import Square.*
 import munit.ScalaCheckSuite
-import CoreArbitraries.given
 import org.scalacheck.Prop.forAll
+
+import Square.*
+import CoreArbitraries.given
 
 class SquareTest extends ScalaCheckSuite:
 

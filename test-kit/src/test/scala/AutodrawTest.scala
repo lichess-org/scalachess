@@ -1,9 +1,11 @@
 package chess
 
+import chess.format.EpdFen
+
 import scala.language.implicitConversions
+
 import Square.*
 import variant.Standard
-import chess.format.EpdFen
 
 class AutodrawTest extends ChessTest:
 

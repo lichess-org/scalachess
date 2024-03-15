@@ -1,11 +1,13 @@
 package chess
 
+import cats.syntax.all.*
+import chess.format.Fen
+
 import scala.language.implicitConversions
+
 import Square.*
 import variant.{ Atomic, Chess960 }
 import format.EpdFen
-import chess.format.Fen
-import cats.syntax.all.*
 import bitboard.Board as BBoard
 import bitboard.Bitboard
 

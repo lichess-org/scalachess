@@ -1,10 +1,12 @@
 package chess
 
-import scala.language.implicitConversions
-import Square.*
 import chess.format.Fen
 import chess.variant.Standard
 import monocle.syntax.all.*
+
+import scala.language.implicitConversions
+
+import Square.*
 
 class CastlingTest extends ChessTest:
 

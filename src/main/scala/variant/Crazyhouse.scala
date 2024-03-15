@@ -2,8 +2,9 @@ package chess
 package variant
 
 import chess.format.{ EpdFen, Uci }
-import bitboard.Bitboard
 import monocle.syntax.all.*
+
+import bitboard.Bitboard
 
 case object Crazyhouse
     extends Variant(

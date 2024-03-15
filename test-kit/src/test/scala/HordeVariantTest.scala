@@ -1,8 +1,9 @@
 package chess
 
-import variant.Horde
 import chess.format.EpdFen
 import chess.format.pgn.SanStr
+
+import variant.Horde
 
 class HordeVariantTest extends ChessTest:
 

@@ -1,10 +1,10 @@
 package chess
 package bitboard
 
+import chess.format.{ EpdFen, Fen }
+
 import Square.*
 import Bitboard.*
-import chess.format.Fen
-import chess.format.EpdFen
 
 class BoardTest extends ChessTest:
 

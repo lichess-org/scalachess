@@ -1,8 +1,8 @@
 package chess
 
-import variant.RacingKings
-
 import chess.format.EpdFen
+
+import variant.RacingKings
 
 class RacingKingsVariantTest extends ChessTest:
 

@@ -1,11 +1,11 @@
 package chess
 
-import scala.language.implicitConversions
 import cats.syntax.option.*
-
-import chess.format.{ EpdFen, Fen }
 import chess.format.pgn.Reader
+import chess.format.{ EpdFen, Fen }
 import chess.variant.Antichess
+
+import scala.language.implicitConversions
 
 class AntichessVariantTest extends ChessTest:
 

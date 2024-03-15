@@ -1,9 +1,9 @@
 package chess
 
 import cats.syntax.option.none
-import java.text.DecimalFormat
-
 import chess.Clock.Config
+
+import java.text.DecimalFormat
 
 // All unspecified durations are expressed in seconds
 case class Clock(

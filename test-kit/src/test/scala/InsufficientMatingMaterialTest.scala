@@ -1,8 +1,9 @@
 package chess
 
-import InsufficientMatingMaterial.*
 import chess.format.EpdFen
 import chess.variant.Standard
+
+import InsufficientMatingMaterial.*
 
 class InsufficientMatingMaterialTest extends ChessTest:
 

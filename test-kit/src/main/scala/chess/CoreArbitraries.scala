@@ -1,11 +1,10 @@
 package chess
 
-import chess.variant.Variant
 import chess.bitboard.Bitboard
-import chess.format.{ Uci, UciCharPair }
-
-import org.scalacheck.{ Arbitrary, Cogen, Gen }
 import chess.format.pgn.{ Glyph, Glyphs }
+import chess.format.{ Uci, UciCharPair }
+import chess.variant.Variant
+import org.scalacheck.{ Arbitrary, Cogen, Gen }
 
 object CoreArbitraries:
   given Arbitrary[Color]   = Arbitrary(Gen.oneOf(Color.all))

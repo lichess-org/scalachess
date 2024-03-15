@@ -2,6 +2,7 @@ package chess
 
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop.forAll
+
 import Foo.{ *, given }
 
 class MergeableTest extends ScalaCheckSuite:

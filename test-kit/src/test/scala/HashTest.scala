@@ -1,8 +1,9 @@
 package chess
 
+import chess.format.{ EpdFen, Fen, Uci }
+
 import Square.*
 import variant.{ Antichess, Atomic, Crazyhouse, Standard, ThreeCheck }
-import chess.format.{ EpdFen, Fen, Uci }
 
 class HashTest extends ChessTest:
 

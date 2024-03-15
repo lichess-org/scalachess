@@ -1,9 +1,8 @@
 package chess
 
 import cats.syntax.all.*
+import chess.format.pgn.{ Comment, Glyphs, InitialComments, Move as PgnMove, Pgn, Tags }
 import org.scalacheck.Gen
-import chess.format.pgn.{ Comment, Glyphs, InitialComments, Pgn, Tags }
-import chess.format.pgn.Move as PgnMove
 
 case class GameTree[A](init: Situation, ply: Ply, tree: Option[Node[A]])
 case class WithMove[A](move: Move, data: A)

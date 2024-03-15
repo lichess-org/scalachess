@@ -1,10 +1,10 @@
 package chess
 
-import scala.language.implicitConversions
-
-import chess.format.EpdFen
 import chess.Square.*
+import chess.format.EpdFen
 import chess.variant.Standard
+
+import scala.language.implicitConversions
 
 class PromotionTest extends ChessTest:
 

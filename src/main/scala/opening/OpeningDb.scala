@@ -2,9 +2,8 @@ package chess
 package opening
 
 import cats.syntax.option.*
-
-import chess.format.{ EpdFen, StandardFen }
 import chess.format.pgn.SanStr
+import chess.format.{ EpdFen, StandardFen }
 
 object OpeningDb:
 

@@ -3,7 +3,7 @@ ThisBuild / version           := "15.8.1"
 ThisBuild / scalaVersion      := "3.4.0"
 ThisBuild / licenses += "MIT" -> url("https://opensource.org/licenses/MIT")
 
-ThisBuild / resolvers += "lila-maven" at "https://raw.githubusercontent.com/ornicar/lila-maven/master"
+ThisBuild / resolvers += "lila-maven".at("https://raw.githubusercontent.com/ornicar/lila-maven/master")
 ThisBuild / publishTo := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", ""))))
 
 val commonSettings = Seq(
@@ -38,7 +38,7 @@ lazy val scalachess: Project = Project("scalachess", file(".")).settings(
 
 lazy val bench = project
   .enablePlugins(JmhPlugin)
-  .settings(commonSettings, name := "bench")
+  .settings(commonSettings, scalacOptions -= "-Wunused:all", name := "bench")
   .dependsOn(scalachess, testKit, testKit % "compile->test")
 
 lazy val testKit = project

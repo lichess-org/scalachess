@@ -17,7 +17,7 @@ class DecayingStatsTest extends ChessTest:
       .toFloat / (elts.size - 1)
 
   val randoms: Array[Float] = Array.fill(1000) { random.nextGaussian.toFloat }
-  val data10: Array[Float]  = randoms map { _ + 10 }
+  val data10: Array[Float]  = randoms.map { _ + 10 }
 
   val stats10  = DS(10, 100, .9f).record(data10)
   val stats10d = DS(10, 100, 0.99f).record(data10)

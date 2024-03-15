@@ -102,11 +102,11 @@ case class Board(
 
   // put a piece to an empty square
   def put(piece: Piece, at: Square): Option[Board] =
-    !isOccupied(at) option putOrReplace(piece, at)
+    !isOccupied(at).option(putOrReplace(piece, at))
 
   // put a piece to an occupied square
   def replace(piece: Piece, at: Square): Option[Board] =
-    isOccupied(at) option putOrReplace(piece, at)
+    isOccupied(at).option(putOrReplace(piece, at))
 
   // put a piece into the board
   def putOrReplace(s: Square, role: Role, color: Color): Board =
@@ -124,7 +124,7 @@ case class Board(
     putOrReplace(s, p.role, p.color)
 
   def take(at: Square): Option[Board] =
-    isOccupied(at) option discard(at)
+    isOccupied(at).option(discard(at))
 
   // move without capture
   def move(orig: Square, dest: Square): Option[Board] =
@@ -134,7 +134,7 @@ case class Board(
   def taking(orig: Square, dest: Square, taking: Option[Square] = None): Option[Board] =
     for
       piece <- pieceAt(orig)
-      takenSquare = taking getOrElse dest
+      takenSquare = taking.getOrElse(dest)
       if isOccupied(takenSquare)
     yield discard(orig).discard(takenSquare).putOrReplace(piece, dest)
 

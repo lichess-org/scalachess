@@ -19,7 +19,7 @@ class PlayTest extends ChessTest:
       G8 -> G5
     )
     assertRight(game): game =>
-      val fen = Fen `write` game
+      val fen = Fen.write(game)
       fen == EpdFen("4k2r/8/8/6r1/8/4K3/8/8 w k - 2 3")
 
   test("kingside and queenside rights"):
@@ -34,7 +34,7 @@ class PlayTest extends ChessTest:
       G8 -> G5
     )
     assertRight(game): game =>
-      val fen = Fen `write` game
+      val fen = Fen.write(game)
       fen == EpdFen("r3k2r/8/8/6r1/8/4K3/8/8 w kq - 2 3")
 
   val game =

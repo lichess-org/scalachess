@@ -11,8 +11,8 @@ class BinaryTest extends ChessTest:
   given Conversion[String, SanStr] = SanStr(_)
 
   def compareStrAndBin(pgn: String)(using munit.Location) =
-    val bin = (Binary `writeMoves` SanStr.from(pgn.split(' ').toList)).get.toList
-    assertEquals(((Binary `readMoves` bin).get mkString " "), pgn)
+    val bin = (Binary.writeMoves(SanStr.from(pgn.split(' ').toList))).get.toList
+    assertEquals(((Binary.readMoves(bin)).get.mkString(" ")), pgn)
     assert(bin.size <= pgn.length)
 
   test("util test"):
@@ -86,7 +86,7 @@ class BinaryTest extends ChessTest:
     assertEquals(writeMove("K8xa1+"), "11000000,00101100,01000111")
   test("write many moves"):
     pgn200.foreach: pgn =>
-      val bin = (Binary `writeMoves` SanStr.from(pgn.split(' ').toList)).get
+      val bin = (Binary.writeMoves(SanStr.from(pgn.split(' ').toList))).get
       assert(bin.length <= pgn.length)
   test("simple pawn"):
     assertEquals(readMove("00000000"), "a1")
@@ -156,23 +156,23 @@ class BinaryTest extends ChessTest:
     // "for one" in:
     compareStrAndBin(pgn200.head)
     // "for all" in:
-    pgn200 foreach compareStrAndBin
+    pgn200.foreach(compareStrAndBin)
 
 object BinaryTestUtils:
 
   def showByte(b: Byte): String =
-    "%08d" format {
+    "%08d".format({
       b & 0xff
-    }.toBinaryString.toInt
+    }.toBinaryString.toInt)
 
   def writeMove(m: SanStr): String =
-    (Binary `writeMove` m).get map showByte mkString ","
+    (Binary.writeMove(m)).get.map(showByte).mkString(",")
 
   def readMove(m: String): SanStr =
     readMoves(m).head
 
   def readMoves(m: String): List[SanStr] =
-    (Binary `readMoves` m.split(',').toList.map(parseBinary)).get
+    (Binary.readMoves(m.split(',').toList.map(parseBinary))).get
 
   def parseBinary(s: String): Byte =
     var i    = s.length - 1
@@ -182,7 +182,7 @@ object BinaryTestUtils:
       s.charAt(i) match
         case '1' => sum += mult
         case '0' =>
-        case x   => sys error s"invalid binary literal: $x in $s"
+        case x   => sys.error(s"invalid binary literal: $x in $s")
       mult *= 2
       i -= 1
     sum.toByte

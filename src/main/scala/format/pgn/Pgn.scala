@@ -78,7 +78,7 @@ private def glyphs(id: Int) =
   Glyph
     .find(id)
     .fold(Glyphs.empty): g =>
-      Glyphs `fromList` List(g)
+      Glyphs.fromList(List(g))
 
 case class Move(
     ply: Ply,
@@ -107,7 +107,7 @@ case class Move(
       case glyph                  => builder.append(" $").append(glyph.id)
     if hasCommentsOrTime then
       List(clockString, opening, result).flatten
-        .:::(comments.map(_ map Move.noDoubleLineBreak))
+        .:::(comments.map(_.map(Move.noDoubleLineBreak)))
         .foreach(x => builder.append(" { ").append(x).append(" }"))
 
   def render =
@@ -119,7 +119,7 @@ case class Move(
     val commentsOrTime =
       if hasCommentsOrTime then
         List(clockString, opening, result).flatten
-          .:::(comments.map(_ map Move.noDoubleLineBreak))
+          .:::(comments.map(_.map(Move.noDoubleLineBreak)))
           .map(x => s" { $x }")
           .mkString
       else ""

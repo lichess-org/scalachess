@@ -17,7 +17,7 @@ import bitboard.Board as BBoard
 trait FenReader:
   def read(variant: Variant, fen: EpdFen): Option[Situation] =
     val (fBoard, fColor, fCastling, fEnpassant) = fen.parts
-    makeBoard(variant, fBoard) map { board =>
+    makeBoard(variant, fBoard).map { board =>
       // We trust Fen's color to be correct, if there is no color we use the color of the king in check
       // If there is no king in check we use white
       val color     = fColor.orElse(board.checkColor) | Color.White
@@ -48,14 +48,14 @@ trait FenReader:
       val enpassantMove = for
         square <- fEnpassant
         if square.rank == sixthRank
-        orig = square `withRank` seventhRank
-        dest = square `withRank` fifthRank
+        orig = square.withRank(seventhRank)
+        dest = square.withRank(fifthRank)
         if situation.board(dest).contains(Piece(!situation.color, Pawn)) &&
           situation.board(square.file, sixthRank).isEmpty &&
           situation.board(orig).isEmpty
       yield Uci.Move(orig, dest)
 
-      situation withHistory:
+      situation.withHistory:
         val history = History(
           lastMove = enpassantMove,
           positionHashes = PositionHash.empty,
@@ -68,13 +68,13 @@ trait FenReader:
             .lift(4)
             .flatMap(readCheckCount)
             .orElse(splitted.lift(6).flatMap(readCheckCount))
-        checkCount.foldLeft(history)(_ `withCheckCount` _)
+        checkCount.foldLeft(history)(_.withCheckCount(_))
     }
 
   def read(fen: EpdFen): Option[Situation] = read(Standard, fen)
 
   def readWithMoveNumber(variant: Variant, fen: EpdFen): Option[Situation.AndFullMoveNumber] =
-    read(variant, fen) map { sit =>
+    read(variant, fen).map { sit =>
       val (halfMoveClock, fullMoveNumber) = readHalfMoveClockAndFullMoveNumber(fen)
       Situation.AndFullMoveNumber(
         halfMoveClock.map(sit.history.setHalfMoveClock).fold(sit)(sit.withHistory),
@@ -90,10 +90,10 @@ trait FenReader:
     val halfMoveClock =
       HalfMoveClock
         .from(splitted.lift(0).flatMap(_.toIntOption))
-        .map(_ atLeast HalfMoveClock.initial atMost 100)
+        .map(_.atLeast(HalfMoveClock.initial).atMost(100))
     val fullMoveNumber = FullMoveNumber
       .from(splitted.lift(1).flatMap(_.toIntOption))
-      .map(_ atLeast FullMoveNumber.initial atMost 500)
+      .map(_.atLeast(FullMoveNumber.initial).atMost(500))
     (halfMoveClock, fullMoveNumber)
 
   def readPly(fen: EpdFen): Option[Ply] =

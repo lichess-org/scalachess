@@ -50,7 +50,7 @@ case object Crazyhouse
       piece = piece,
       square = square,
       situationBefore = situation,
-      after = b1 `withCrazyData` d2
+      after = b1.withCrazyData(d2)
     )
 
   override def fiftyMoves(history: History): Boolean = false
@@ -63,9 +63,9 @@ case object Crazyhouse
         board.crazyData.fold(board) { data =>
           val d1 = capture.fold(data) { data.store(_, dest) }
           val d2 = promOption.fold(d1.move(orig, dest)) { _ =>
-            d1 `promote` dest
+            d1.promote(dest)
           }
-          board `withCrazyData` d2
+          board.withCrazyData(d2)
         }
       case _ => board
 
@@ -129,12 +129,12 @@ case object Crazyhouse
         val pocket = data.pockets(situation.color)
         for
           role <- List(Pawn, Knight, Bishop, Rook, Queen)
-          if pocket `contains` role
+          if pocket.contains(role)
           to <- if role == Pawn then targets & ~Bitboard.firstRank & ~Bitboard.lastRank else targets
           piece = Piece(situation.color, role)
           after <- situation.board.place(piece, to)
           d2    <- data.drop(piece)
-        yield Drop(piece, to, situation, after `withCrazyData` d2)
+        yield Drop(piece, to, situation, after.withCrazyData(d2))
 
   type Pockets = ByColor[Pocket]
 

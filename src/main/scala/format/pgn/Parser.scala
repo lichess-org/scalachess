@@ -44,7 +44,7 @@ object Parser:
 
   val nag = (P.char('$') ~ R.digit.rep).string | nagGlyphsRE
 
-  val nagGlyphs: P0[Glyphs] = (nag <* escape).rep0.map(nags => Glyphs `fromList` nags.flatMap(Glyph.find(_)))
+  val nagGlyphs: P0[Glyphs] = (nag <* escape).rep0.map(nags => Glyphs.fromList(nags.flatMap(Glyph.find(_))))
 
   val moveExtras = comment.void
 
@@ -162,7 +162,7 @@ object Parser:
     val metas: P0[Metas] =
       (checkmate ~ check ~ (glyphs <* escape) ~ nagGlyphs ~ comment.rep0 ~ nagGlyphs)
         .map { case (((((checkmate, check), glyphs1), glyphs2), comments), glyphs3) =>
-          val glyphs = glyphs1 `merge` glyphs2 `merge` glyphs3
+          val glyphs = glyphs1.merge(glyphs2.merge(glyphs3))
           Metas(Check(check), checkmate, comments.cleanUp, glyphs)
         }
 

@@ -8,7 +8,7 @@ object UciDump:
 
   // a2a4, b8c6
   def apply(force960Notation: Boolean)(replay: Replay): List[String] =
-    replay.chronoMoves map move(replay.setup.board.variant, force960Notation)
+    replay.chronoMoves.map(move(replay.setup.board.variant, force960Notation))
 
   def apply(
       moves: Seq[pgn.SanStr],

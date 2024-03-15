@@ -59,7 +59,7 @@ class HashTest extends ChessTest:
 
   test("Hasher: account for checks in three-check"):
     // 2 ... Bb4+
-    val gameA = Game(Board `init` ThreeCheck)
+    val gameA = Game(Board.init(ThreeCheck))
       .playMoves(
         E2 -> E4,
         E7 -> E6,

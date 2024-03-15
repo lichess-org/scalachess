@@ -150,7 +150,7 @@ class BoardTest extends ChessTest:
       board = parseFen(str)
       s <- Square.all
       result = board.putOrReplace(White.king, s)
-      expected <- board.put(White.king, s) orElse board.replace(White.king, s)
+      expected <- board.put(White.king, s).orElse(board.replace(White.king, s))
     yield assertEquals(result, expected)
 
   test("pieceMap . fromMap == identity"):

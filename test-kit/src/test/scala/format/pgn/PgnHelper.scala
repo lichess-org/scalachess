@@ -48,10 +48,10 @@ object PgnHelper:
 
   private def makeGame(tags: Tags) =
     val g = Game(
-      variantOption = tags(_.Variant) flatMap chess.variant.Variant.byName,
+      variantOption = tags(_.Variant).flatMap(chess.variant.Variant.byName),
       fen = tags.fen
     )
     g.copy(
       startedAtPly = g.ply,
-      clock = tags.clockConfig map Clock.apply
+      clock = tags.clockConfig.map(Clock.apply)
     )

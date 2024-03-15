@@ -24,7 +24,7 @@ case object ThreeCheck
   override def valid(situation: Situation, strict: Boolean): Boolean = Standard.valid(situation, strict)
 
   override def finalizeBoard(board: Board, uci: format.Uci, capture: Option[Piece]): Board =
-    board `updateHistory`:
+    board.updateHistory:
       _.withCheck(Color.White, board.checkWhite).withCheck(Color.Black, board.checkBlack)
 
   override def specialEnd(situation: Situation) =

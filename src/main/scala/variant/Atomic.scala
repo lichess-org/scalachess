@@ -83,7 +83,7 @@ case object Atomic
       val castles      = afterBoard.castles & ~rooksToExploded
       val unMovedRooks = afterBoard.unmovedRooks & ~rooksToExploded
       val newBoard     = afterExplosions.updateHistory(_.copy(castles = castles, unmovedRooks = unMovedRooks))
-      move `withAfter` newBoard
+      move.withAfter(newBoard)
     else move
 
   override def addVariantEffect(move: Move): Move = explodeSurroundingPieces(move)

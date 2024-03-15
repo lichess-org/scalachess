@@ -38,7 +38,7 @@ trait Mergeable[A]:
   extension (xs: List[A])
 
     def add(ys: List[A]): List[A] =
-      ys.foldLeft(xs)(_ `add` _)
+      ys.foldLeft(xs)(_.add(_))
 
     def add(v: A): List[A] =
       @tailrec

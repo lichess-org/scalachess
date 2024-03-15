@@ -118,7 +118,7 @@ class BitboardTest extends ScalaCheckSuite:
   test("apply set of square should be the same as using add"):
     forAll: (xs: Set[Square]) =>
       val bb  = Bitboard(xs)
-      val bb2 = xs.foldLeft(Bitboard.empty)(_ `add` _)
+      val bb2 = xs.foldLeft(Bitboard.empty)(_.add(_))
       assertEquals(bb, bb2)
 
   test("add andThen remove should be the same as identity"):
@@ -167,7 +167,7 @@ class BitboardTest extends ScalaCheckSuite:
     forAll: (s1: Set[Square], s2: Set[Square]) =>
       val b1 = Bitboard(s1)
       val b2 = Bitboard(s2)
-      val s  = s1 intersect s2
+      val s  = s1.intersect(s2)
       b1.intersects(b2) == s.nonEmpty
 
   test("isDisjoint should be false when the two bitboards have at least common square"):

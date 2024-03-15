@@ -415,9 +415,11 @@ class AtomicVariantTest extends ChessTest:
 
   test("Replay an entire game"):
     val sans: Vector[SanStr] =
-      SanStr from "Nf3 f6 e3 d5 Ng5 fxg5 Qh5+ g6 Qe5 Be6 Bb5+ c6 Qc7 Qxc7 b3 d4 Nc3 dxc3 Bc4 O-O-O O-O h5 Ba3 c5 Bd5 b5 Bb7+ Kb8 c4 h4 d4 Nf6 h3 Ng4 hxg4 h3 g4 h2+ Kh1 Bg7 Rad1 b4 Bb2 Bf5 f3 Bd3 Rxd3 Rh3 d5 Rg3 Be5+ Bxe5 d6 Rg1#"
-        .split(' ')
-        .toVector
+      SanStr.from(
+        "Nf3 f6 e3 d5 Ng5 fxg5 Qh5+ g6 Qe5 Be6 Bb5+ c6 Qc7 Qxc7 b3 d4 Nc3 dxc3 Bc4 O-O-O O-O h5 Ba3 c5 Bd5 b5 Bb7+ Kb8 c4 h4 d4 Nf6 h3 Ng4 hxg4 h3 g4 h2+ Kh1 Bg7 Rad1 b4 Bb2 Bf5 f3 Bd3 Rxd3 Rh3 d5 Rg3 Be5+ Bxe5 d6 Rg1#"
+          .split(' ')
+          .toVector
+      )
     val (game, steps, error) = chess.Replay.gameMoveWhileValid(sans, Atomic.initialFen, Atomic)
     assertEquals(error, None)
     assertEquals(steps.size, sans.size)
@@ -455,9 +457,11 @@ class AtomicVariantTest extends ChessTest:
 
   test("Unmoved rooks correctly updated after explosion, lila issue-14544"):
     val sans: Vector[SanStr] =
-      SanStr from "e4 d5 d4 e6 Nc3 b5 Bg5 f6 Bh6 Ba3 Bxg7 h5 bxa3 c5 Qc1 Qe7 Qh6 Qg7 Qh8+ Qxh8 Rb1 cxd4 Bxb5 Nd7 Rb7 Kf8 Rxd7 Rb8 Ne2 Rb1+ Nc1 d4 O-O"
-        .split(' ')
-        .toVector
+      SanStr.from(
+        "e4 d5 d4 e6 Nc3 b5 Bg5 f6 Bh6 Ba3 Bxg7 h5 bxa3 c5 Qc1 Qe7 Qh6 Qg7 Qh8+ Qxh8 Rb1 cxd4 Bxb5 Nd7 Rb7 Kf8 Rxd7 Rb8 Ne2 Rb1+ Nc1 d4 O-O"
+          .split(' ')
+          .toVector
+      )
     val (game, steps, error) = chess.Replay.gameMoveWhileValid(sans, Atomic.initialFen, Atomic)
     assertEquals(error, None)
     assertEquals(steps.size, sans.size)

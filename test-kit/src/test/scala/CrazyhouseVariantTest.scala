@@ -288,10 +288,11 @@ class CrazyhouseVariantTest extends ChessTest:
     assert(
       chess.Replay
         .boards(
-          sans =
-            SanStr from "e4 c5 Na3 d6 Nf3 Bg4 Bc4 Bxf3 Qxf3 N@b4 Bxf7+ Kd7 P@d5 Nf6 O-O Nxc2 Nb5 P@c4 Be6+ Ke8 B@f7#"
+          sans = SanStr.from(
+            "e4 c5 Na3 d6 Nf3 Bg4 Bc4 Bxf3 Qxf3 N@b4 Bxf7+ Kd7 P@d5 Nf6 O-O Nxc2 Nb5 P@c4 Be6+ Ke8 B@f7#"
               .split(' ')
-              .toVector,
+              .toVector
+          ),
           initialFen = None,
           variant = Crazyhouse
         )

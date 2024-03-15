@@ -17,7 +17,7 @@ R   K""",
   test("prevent castle by capturing a rook: can still castle queenside"):
     assert(game.playMoves(B2 -> A3).get.board.history.canCastle(White, QueenSide))
   test("prevent castle by capturing a rook: can not castle queenside anymore"):
-    assertNot(game.playMoves(B2 -> A1).get.board.history `canCastle` (White, QueenSide), false)
+    assertNot(game.playMoves(B2 -> A1).get.board.history.canCastle(White, QueenSide), false)
 
   test("update half move clock: start at 0"):
     assertEquals(Game(variant.Standard).halfMoveClock, 0)

@@ -53,7 +53,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
   test("Allow an opening move for white taking into account a player may move without taking if possible"):
     val startingPosition = Game(Antichess)
     val newGame          = startingPosition.playMove(Square.E2, Square.E4, None).get
-    val fen              = Fen `write` newGame
+    val fen              = Fen.write(newGame)
     assertEquals(fen, EpdFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b - - 0 1"))
 
   test("Not allow a player to make a non capturing move if a capturing move is available"):

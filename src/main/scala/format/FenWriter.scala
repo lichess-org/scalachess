@@ -52,14 +52,14 @@ trait FenWriter:
         board(x, y) match
           case None => empty = empty + 1
           case Some(piece) =>
-            if empty == 0 then fen append piece.forsyth.toString
+            if empty == 0 then fen.append(piece.forsyth.toString)
             else
-              fen append s"$empty${piece.forsyth}"
+              fen.append(s"$empty${piece.forsyth}")
               empty = 0
             if piece.role != Pawn && board.crazyData.exists(_.promoted.contains(Square(x, y))) then
-              fen append '~'
-      if empty > 0 then fen append empty
-      if y.value > Rank.First.value then fen append '/'
+              fen.append('~')
+      if empty > 0 then fen.append(empty)
+      if y.value > Rank.First.value then fen.append('/')
     BoardFen(fen.toString)
 
   def writeBoardAndColor(situation: Situation): BoardAndColorFen =

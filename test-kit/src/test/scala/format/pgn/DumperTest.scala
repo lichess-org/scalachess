@@ -61,7 +61,7 @@ class DumperTest extends ChessTest:
     E2 -> A6
   )
 
-  val threeCheck = Game(Board `init` ThreeCheck).playMoves(
+  val threeCheck = Game(Board.init(ThreeCheck)).playMoves(
     E2 -> E4,
     C7 -> C5,
     F1 -> C4,
@@ -77,22 +77,24 @@ class DumperTest extends ChessTest:
     gioachineGreco
       .map(_.sans)
       .assertRight: ms =>
-        assertEquals(ms, SanStr from "d4 d5 c4 dxc4 e3 b5 a4 c6 axb5 cxb5 Qf3".split(' ').toVector)
+        assertEquals(ms, SanStr.from("d4 d5 c4 dxc4 e3 b5 a4 c6 axb5 cxb5 Qf3".split(' ').toVector))
     peruvianImmortal
       .map(_.sans)
       .assertRight: ms =>
         assertEquals(
           ms,
-          SanStr from "e4 d5 exd5 Qxd5 Nc3 Qa5 d4 c6 Nf3 Bg4 Bf4 e6 h3 Bxf3 Qxf3 Bb4 Be2 Nd7 a3 O-O-O axb4 Qxa1+ Kd2 Qxh1 Qxc6+ bxc6 Ba6#"
-            .split(' ')
-            .toVector
+          SanStr.from(
+            "e4 d5 exd5 Qxd5 Nc3 Qa5 d4 c6 Nf3 Bg4 Bf4 e6 h3 Bxf3 Qxf3 Bb4 Be2 Nd7 a3 O-O-O axb4 Qxa1+ Kd2 Qxh1 Qxc6+ bxc6 Ba6#"
+              .split(' ')
+              .toVector
+          )
         )
 
   test("three check variant"):
     threeCheck
       .map(_.sans)
       .assertRight: ms =>
-        assertEquals(ms, SanStr from "e4 c5 Bc4 Nc6 Bxf7+ Kxf7 Qh5+ g6 Qxg6#".split(' ').toVector)
+        assertEquals(ms, SanStr.from("e4 c5 Bc4 Nc6 Bxf7+ Kxf7 Qh5+ g6 Qxg6#".split(' ').toVector))
 
   test("without check"):
     val game = Game("""
@@ -332,7 +334,7 @@ NRKNRQBB
       C1 -> B1
     ).map(_.sans)
       .assertRight: ms =>
-        assertEquals(ms, SanStr from "f4 Nc6 Nc3 g6 Nb5 O-O-O O-O-O".split(' ').toVector)
+        assertEquals(ms, SanStr.from("f4 Nc6 Nc3 g6 Nb5 O-O-O O-O-O".split(' ').toVector))
 
   test("chess960 tricky rook disambiguation"):
     val fen           = EpdFen("r5k1/1b5p/N3p1p1/Q4p2/4r3/2P1q3/1PK2RP1/5R2 w - - 1 38")

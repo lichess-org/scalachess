@@ -102,7 +102,7 @@ case class Board(
 
   // put a piece to an empty square
   def put(piece: Piece, at: Square): Option[Board] =
-    !isOccupied(at).option(putOrReplace(piece, at))
+    (!isOccupied(at)).option(putOrReplace(piece, at))
 
   // put a piece to an occupied square
   def replace(piece: Piece, at: Square): Option[Board] =

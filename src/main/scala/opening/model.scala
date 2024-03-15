@@ -16,7 +16,7 @@ object OpeningKey extends OpaqueString[OpeningKey]:
   export Opening.nameToKey as fromName
 
 case class OpeningFamily(name: OpeningName):
-  lazy val key = Opening nameToKey name
+  lazy val key = Opening.nameToKey(name)
 
 opaque type OpeningVariation = String
 object OpeningVariation extends OpaqueString[OpeningVariation]

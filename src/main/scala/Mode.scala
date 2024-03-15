@@ -17,7 +17,7 @@ object Mode:
 
   val byId = all.mapBy(_.id)
 
-  def apply(id: Int): Option[Mode] = byId get id
+  def apply(id: Int): Option[Mode] = byId.get(id)
 
   def apply(rated: Boolean) = if rated then Rated else Casual
 

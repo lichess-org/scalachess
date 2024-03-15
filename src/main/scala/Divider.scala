@@ -26,19 +26,19 @@ object Divider:
       case (None, (board, index)) =>
         (majorsAndMinors(board) <= 10 ||
           backrankSparse(board) ||
-          mixedness(board) > 150) option index
+          mixedness(board) > 150).option(index)
       case (found, _) => found
 
     val endGame =
       if midGame.isDefined then
         indexedBoards.foldLeft(none[Int]):
           case (found: Some[?], _) => found
-          case (_, (board, index)) => (majorsAndMinors(board) <= 6) option index
+          case (_, (board, index)) => (majorsAndMinors(board) <= 6).option(index)
       else None
 
     Division(
-      Ply from midGame.filter(m => endGame.fold(true)(m < _)),
-      Ply from endGame,
+      Ply.from(midGame.filter(m => endGame.fold(true)(m < _))),
+      Ply.from(endGame),
       Ply(boards.size)
     )
 

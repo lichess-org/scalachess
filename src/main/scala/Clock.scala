@@ -34,7 +34,7 @@ case class Clock(
   def outOfTime(c: Color, withGrace: Boolean) =
     players(c).remaining <=
       timerFor(c).fold(Centis(0)) { t =>
-        if withGrace then (toNow(t) - (players(c).lag.quota atMost Centis(200))).nonNeg
+        if withGrace then (toNow(t) - (players(c).lag.quota.atMost(Centis(200)))).nonNeg
         else toNow(t)
       }
 
@@ -63,7 +63,7 @@ case class Clock(
       timer = timer.map(_ => now)
     )
 
-  def withFrameLag(frameLag: Centis) = updatePlayer(color)(_ withFrameLag frameLag)
+  def withFrameLag(frameLag: Centis) = updatePlayer(color)(_.withFrameLag(frameLag))
 
   def step(
       metrics: MoveMetrics = MoveMetrics.empty,
@@ -89,7 +89,7 @@ case class Clock(
         val moveTime = (elapsed - lagComp) nonNeg
 
         val clockActive = gameActive && moveTime < player.remaining
-        val inc         = clockActive so player.increment
+        val inc         = clockActive.so(player.increment)
 
         val newC = updatePlayer(color):
           _.takeTime(moveTime - inc)
@@ -204,7 +204,7 @@ object Clock:
       else Centis(limitSeconds * (100 / 2))
 
     def initTime: Centis =
-      if limitSeconds == 0 then increment atLeast Centis(300)
+      if limitSeconds == 0 then increment.atLeast(Centis(300))
       else limit
 
   // [TimeControl "600+2"] -> 10+2

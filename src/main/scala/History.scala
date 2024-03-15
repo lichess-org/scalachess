@@ -29,10 +29,10 @@ case class History(
   inline def threefoldRepetition = positionHashes.isRepetition(3)
   inline def fivefoldRepetition  = positionHashes.isRepetition(5)
 
-  inline def canCastle(inline color: Color)                    = castles can color
+  inline def canCastle(inline color: Color)                    = castles.can(color)
   inline def canCastle(inline color: Color, inline side: Side) = castles.can(color, side)
 
-  inline def withoutCastles(inline color: Color) = copy(castles = castles without color)
+  inline def withoutCastles(inline color: Color) = copy(castles = castles.without(color))
 
   inline def withoutAnyCastles = copy(castles = Castles.none)
 
@@ -43,7 +43,7 @@ case class History(
   inline def withLastMove(inline m: Uci) = copy(lastMove = Option(m))
 
   def withCheck(color: Color, check: Check) =
-    if check.yes then copy(checkCount = checkCount add color) else this
+    if check.yes then copy(checkCount = checkCount.add(color)) else this
 
   def withCheckCount(cc: CheckCount) = copy(checkCount = cc)
 

@@ -18,7 +18,7 @@ case class Drop(
 
   lazy val finalizeAfter: Board =
     val board = after.variant.finalizeBoard(
-      after updateHistory { h =>
+      after.updateHistory { h =>
         h.copy(
           lastMove = Option(Uci.Drop(piece.role, square)),
           unmovedRooks = before.unmovedRooks,
@@ -29,13 +29,13 @@ case class Drop(
       none
     )
 
-    board updateHistory { h =>
+    board.updateHistory { h =>
       val basePositionHashes =
         if h.positionHashes.value.isEmpty then PositionHash(Hash(situationBefore)) else h.positionHashes
       h.copy(positionHashes = PositionHash(Hash(Situation(board, !piece.color))).combine(basePositionHashes))
     }
 
-  inline def withHistory(inline h: History) = copy(after = after withHistory h)
+  inline def withHistory(inline h: History) = copy(after = after.withHistory(h))
 
   def afterWithLastMove: Board =
     after.variant.finalizeBoard(

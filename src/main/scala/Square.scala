@@ -40,8 +40,8 @@ object Square:
 
     inline def isLight: Boolean = Bitboard.lightSquares.contains(s)
 
-    inline def file: File = File of s
-    inline def rank: Rank = Rank of s
+    inline def file: File = File.of(s)
+    inline def rank: Rank = Rank.of(s)
 
     def asChar: Char =
       if s <= 25 then (97 + s).toChar      // a ...
@@ -70,9 +70,9 @@ object Square:
 
   inline def at(x: Int, y: Int): Option[Square] = Option.when(0 <= x && x < 8 && 0 <= y && y < 8)(x + 8 * y)
 
-  inline def fromKey(inline key: String): Option[Square] = allKeys get key
+  inline def fromKey(inline key: String): Option[Square] = allKeys.get(key)
 
-  inline def fromChar(inline c: Char): Option[Square] = charMap get c
+  inline def fromChar(inline c: Char): Option[Square] = charMap.get(c)
 
   inline def keyToChar(inline key: String) = fromKey(key).map(_.asChar)
 

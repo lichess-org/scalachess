@@ -23,16 +23,16 @@ case class Situation(board: Board, color: Color):
 
   def drops: Option[List[Square]] =
     variant match
-      case v: Crazyhouse.type => v possibleDrops this
+      case v: Crazyhouse.type => v.possibleDrops(this)
       case _                  => None
 
-  lazy val check: Check = board checkOf color
+  lazy val check: Check = board.checkOf(color)
 
   def checkSquare = if check.yes then ourKing else None
 
-  inline def checkMate: Boolean = variant checkmate this
+  inline def checkMate: Boolean = variant.checkmate(this)
 
-  inline def staleMate: Boolean = variant staleMate this
+  inline def staleMate: Boolean = variant.staleMate(this)
 
   inline def autoDraw: Boolean = board.autoDraw || variant.specialDraw(this)
 
@@ -40,7 +40,7 @@ case class Situation(board: Board, color: Color):
 
   lazy val threefoldRepetition: Boolean = history.threefoldRepetition
 
-  inline def variantEnd = variant specialEnd this
+  inline def variantEnd = variant.specialEnd(this)
 
   inline def end: Boolean = checkMate || staleMate || autoDraw || variantEnd
 
@@ -66,10 +66,10 @@ case class Situation(board: Board, color: Color):
     variant.drop(this, role, square)
 
   def withHistory(history: History) =
-    copy(board = board withHistory history)
+    copy(board = board.withHistory(history))
 
   def withVariant(variant: chess.variant.Variant) =
-    copy(board = board withVariant variant)
+    copy(board = board.withVariant(variant))
 
   lazy val enPassantSquare: Option[Square] =
     potentialEpSquare >> legalMoves.find(_.enpassant).map(_.dest)
@@ -371,7 +371,7 @@ case class Situation(board: Board, color: Color):
 
 object Situation:
 
-  def apply(variant: chess.variant.Variant): Situation = Situation(Board init variant, White)
+  def apply(variant: chess.variant.Variant): Situation = Situation(Board.init(variant), White)
 
   case class AndFullMoveNumber(situation: Situation, fullMoveNumber: FullMoveNumber):
     def ply = fullMoveNumber.ply(situation.color)

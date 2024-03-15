@@ -17,7 +17,7 @@ case class DecayingStats(
 
   def record[T](values: Iterable[T])(using n: Numeric[T]): DecayingStats =
     values.foldLeft(this) { (s, v) =>
-      s record n.toFloat(v)
+      s.record(n.toFloat(v))
     }
 
 object DecayingStats:

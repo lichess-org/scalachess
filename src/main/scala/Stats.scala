@@ -17,10 +17,10 @@ final case class Stats(samples: Int, mean: Float, sn: Float):
 
   def record[T](values: Iterable[T])(using n: Numeric[T]): Stats =
     values.foldLeft(this) { (s, v) =>
-      s record n.toFloat(v)
+      s.record(n.toFloat(v))
     }
 
-  def variance = (samples > 1) option sn / (samples - 1)
+  def variance = (samples > 1).option(sn / (samples - 1))
 
   def stdDev = variance.map { Math.sqrt(_).toFloat }
 
@@ -28,5 +28,5 @@ final case class Stats(samples: Int, mean: Float, sn: Float):
 
 object Stats:
   val empty: Stats                                  = Stats(0, 0, 0)
-  def apply(value: Float): Stats                    = empty record value
-  def apply[T: Numeric](values: Iterable[T]): Stats = empty record values
+  def apply(value: Float): Stats                    = empty.record(value)
+  def apply[T: Numeric](values: Iterable[T]): Stats = empty.record(values)

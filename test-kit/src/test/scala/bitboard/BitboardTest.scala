@@ -118,7 +118,7 @@ class BitboardTest extends ScalaCheckSuite:
   test("apply set of square should be the same as using add"):
     forAll: (xs: Set[Square]) =>
       val bb  = Bitboard(xs)
-      val bb2 = xs.foldLeft(Bitboard.empty)(_ add _)
+      val bb2 = xs.foldLeft(Bitboard.empty)(_ `add` _)
       assertEquals(bb, bb2)
 
   test("add andThen remove should be the same as identity"):

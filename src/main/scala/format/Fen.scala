@@ -25,9 +25,9 @@ object EpdFen extends OpaqueString[EpdFen]:
 
     def isInitial: Boolean = a == initial
 
-    def simple: SimpleFen    = SimpleFen fromEpd a
-    def opening: StandardFen = SimpleFen opening a
-    def board: BoardFen      = SimpleFen board a
+    def simple: SimpleFen    = SimpleFen `fromEpd` a
+    def opening: StandardFen = SimpleFen `opening` a
+    def board: BoardFen      = SimpleFen `board` a
 
   val initial: EpdFen               = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
   def clean(source: String): EpdFen = EpdFen(source.replace("_", " ").trim)
@@ -56,7 +56,7 @@ object SimpleFen extends OpaqueString[SimpleFen]:
 opaque type StandardFen = String
 object StandardFen extends OpaqueString[StandardFen]:
   extension (a: StandardFen) def board: BoardFen = a.value.takeWhile(_ != ' ')
-  def fromEpd(fen: EpdFen): StandardFen          = fromSimple(EpdFen simple fen)
+  def fromEpd(fen: EpdFen): StandardFen          = fromSimple(EpdFen `simple` fen)
   def fromSimple(fen: SimpleFen): StandardFen =
     fen.value.split(' ').take(4) match
       case Array(board, turn, castle, ep) =>
@@ -110,4 +110,4 @@ object SmallFen extends OpaqueString[SmallFen]:
     else base
 
   def validate(variant: Variant, fen: Fen.Epd): Option[SmallFen] =
-    Fen.read(variant, fen).exists(_ playable false) option make(variant, fen.simple)
+    Fen.read(variant, fen).exists(_ `playable` false) option make(variant, fen.simple)

@@ -11,8 +11,8 @@ class BinaryTest extends ChessTest:
   given Conversion[String, SanStr] = SanStr(_)
 
   def compareStrAndBin(pgn: String)(using munit.Location) =
-    val bin = (Binary writeMoves SanStr.from(pgn.split(' ').toList)).get.toList
-    assertEquals(((Binary readMoves bin).get mkString " "), pgn)
+    val bin = (Binary `writeMoves` SanStr.from(pgn.split(' ').toList)).get.toList
+    assertEquals(((Binary `readMoves` bin).get mkString " "), pgn)
     assert(bin.size <= pgn.length)
 
   test("util test"):
@@ -86,7 +86,7 @@ class BinaryTest extends ChessTest:
     assertEquals(writeMove("K8xa1+"), "11000000,00101100,01000111")
   test("write many moves"):
     pgn200.foreach: pgn =>
-      val bin = (Binary writeMoves SanStr.from(pgn.split(' ').toList)).get
+      val bin = (Binary `writeMoves` SanStr.from(pgn.split(' ').toList)).get
       assert(bin.length <= pgn.length)
   test("simple pawn"):
     assertEquals(readMove("00000000"), "a1")
@@ -166,13 +166,13 @@ object BinaryTestUtils:
     }.toBinaryString.toInt
 
   def writeMove(m: SanStr): String =
-    (Binary writeMove m).get map showByte mkString ","
+    (Binary `writeMove` m).get map showByte mkString ","
 
   def readMove(m: String): SanStr =
     readMoves(m).head
 
   def readMoves(m: String): List[SanStr] =
-    (Binary readMoves m.split(',').toList.map(parseBinary)).get
+    (Binary `readMoves` m.split(',').toList.map(parseBinary)).get
 
   def parseBinary(s: String): Byte =
     var i    = s.length - 1

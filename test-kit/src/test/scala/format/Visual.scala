@@ -26,7 +26,7 @@ object Visual:
       pieces = (for
         (l, y) <- (filtered zipWithIndex)
         (c, x) <- (l zipWithIndex)
-        role   <- Role forsyth c.toLower
+        role   <- Role `forsyth` c.toLower
       yield Square.at(x, 7 - y) map { square =>
         square -> (Color.fromWhite(c isUpper) - role)
       }) flatten,

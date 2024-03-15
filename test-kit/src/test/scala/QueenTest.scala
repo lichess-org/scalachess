@@ -17,7 +17,7 @@ PPPPPPPP
  NBQKBNR
 """
     assertEquals(
-      visualDests(board, board destsFrom C4),
+      visualDests(board, board `destsFrom` C4),
       """
 k B   x
   x  x
@@ -42,7 +42,7 @@ PPPPPPPP
  NBQKBNR
 """
     assertEquals(
-      visualDests(board, board destsFrom C4),
+      visualDests(board, board `destsFrom` C4),
       """
 k B
   x  x

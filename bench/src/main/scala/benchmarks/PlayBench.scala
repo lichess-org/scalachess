@@ -20,11 +20,11 @@ import chess.{ Mode as _, * }
 class PlayBench:
 
   // the unit of CPU work per iteration
-  private[this] val Work: Long = 10
+  private val Work: Long = 10
 
-  var dividerGames: List[List[Board]] = _
-  var gameMoves: List[List[SanStr]]   = _
-  var standard: Game                  = _
+  var dividerGames: List[List[Board]] = scala.compiletime.uninitialized
+  var gameMoves: List[List[SanStr]]   = scala.compiletime.uninitialized
+  var standard: Game                  = scala.compiletime.uninitialized
 
   def gameReplay(sans: String) =
     Replay.boards(SanStr.from(sans.split(' ')), None, Standard).toOption.get
@@ -37,7 +37,7 @@ class PlayBench:
     var games = Fixtures.prod500standard
     gameMoves = games.take(nb).map(g => SanStr from g.split(' ').toList)
 
-    standard = Game(Board init chess.variant.Standard, White)
+    standard = Game(Board `init` chess.variant.Standard, White)
 
   @Benchmark
   def divider(bh: Blackhole) =

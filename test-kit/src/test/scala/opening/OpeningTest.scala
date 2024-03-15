@@ -7,7 +7,7 @@ import format.pgn.SanStr
 class OpeningTest extends ChessTest:
 
   def searchStr(str: String): Option[Opening] =
-    OpeningDb search SanStr.from(str.split(' ').toList) map (_.opening)
+    OpeningDb `search` SanStr.from(str.split(' ').toList) map (_.opening)
 
   test("search should find nothing on invalid PGN"):
     assert(searchStr("e4 c5 Nf3 cxd4 d4 cxd4 Nxd4 e5 Nb5 d6 c4 a6 N5c3 Nf6 Be2 Be7").isEmpty)
@@ -65,21 +65,21 @@ class OpeningTest extends ChessTest:
 
   test("find by fen should consider en passant"):
     assert(
-      (OpeningDb findByEpdFen EpdFen("rnbqkbnr/pp1p1ppp/8/2pPp3/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 3")).isEmpty
+      (OpeningDb `findByEpdFen` EpdFen("rnbqkbnr/pp1p1ppp/8/2pPp3/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 3")).isEmpty
     )
     assert(
-      (OpeningDb findByEpdFen EpdFen(
+      (OpeningDb `findByEpdFen` EpdFen(
         "rnbqkbnr/pp1p1ppp/8/2pPp3/8/8/PPP1PPPP/RNBQKBNR w KQkq e6 0 3"
       )).nonEmpty
     )
 
   test("find by fen should ignore empty crazyhouse pocket"):
     assertEquals(
-      (OpeningDb findByEpdFen EpdFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR/ b KQkq - 0 1")).get.name,
+      (OpeningDb `findByEpdFen` EpdFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR/ b KQkq - 0 1")).get.name,
       OpeningName("King's Pawn Game")
     )
     assertEquals(
-      (OpeningDb findByEpdFen EpdFen(
+      (OpeningDb `findByEpdFen` EpdFen(
         "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR[] b KQkq - 0 1"
       )).get.name,
       OpeningName("King's Pawn Game")
@@ -87,13 +87,13 @@ class OpeningTest extends ChessTest:
 
   test("find by fen should ignore crazyhouse pocket"):
     assertEquals(
-      (OpeningDb findByEpdFen EpdFen(
+      (OpeningDb `findByEpdFen` EpdFen(
         "rn2kb1r/ppp1pppp/5n2/q4b2/3P4/2N2N2/PPP2PPP/R1BQKB1R/Pp w KQkq - 3 6"
       )).get.name,
       OpeningName("Scandinavian Defense: Classical Variation")
     )
     assertEquals(
-      (OpeningDb findByEpdFen EpdFen(
+      (OpeningDb `findByEpdFen` EpdFen(
         "rn2kb1r/ppp1pppp/5n2/q4b2/3P4/2N2N2/PPP2PPP/R1BQKB1R[Pp] w KQkq - 3 6"
       )).get.name,
       OpeningName("Scandinavian Defense: Classical Variation")

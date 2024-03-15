@@ -78,7 +78,7 @@ private def glyphs(id: Int) =
   Glyph
     .find(id)
     .fold(Glyphs.empty): g =>
-      Glyphs fromList List(g)
+      Glyphs `fromList` List(g)
 
 case class Move(
     ply: Ply,

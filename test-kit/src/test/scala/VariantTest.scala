@@ -208,7 +208,7 @@ K  r
     assert(game.situation.end)
     assertEquals(game.situation.winner, Some(Black))
   test("threeCheck 1 check"):
-    val game = Game(Board init ThreeCheck)
+    val game = Game(Board `init` ThreeCheck)
       .playMoves(
         E2 -> E4,
         E7 -> E6,
@@ -218,7 +218,7 @@ K  r
       .get
     assertNot(game.situation.end)
   test("threeCheck 2 checks"):
-    val game = Game(Board init ThreeCheck)
+    val game = Game(Board `init` ThreeCheck)
       .playMoves(
         E2 -> E4,
         E7 -> E6,
@@ -230,7 +230,7 @@ K  r
       .get
     assertNot(game.situation.end)
   test("threeCheck 3 checks"):
-    val game = Game(Board init ThreeCheck)
+    val game = Game(Board `init` ThreeCheck)
       .playMoves(
         E2 -> E4,
         E7 -> E6,

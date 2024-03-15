@@ -11,19 +11,19 @@ class CastlingKingSideTest extends ChessTest:
   val goodHist = """
 PPPPPPPP
 R  QK  R"""
-  val badHist  = goodHist updateHistory (_ withoutCastles White)
+  val badHist  = goodHist `updateHistory` (_ `withoutCastles` White)
   test("impossible"):
-    assertEquals(goodHist.place(White.bishop, F1).flatMap(_ destsFrom E1), Set())
-    assertEquals(goodHist.place(White.knight, G1).flatMap(_ destsFrom E1), Set(F1))
-    assertEquals(badHist destsFrom E1, Set(F1))
+    assertEquals(goodHist.place(White.bishop, F1).flatMap(_ `destsFrom` E1), Set())
+    assertEquals(goodHist.place(White.knight, G1).flatMap(_ `destsFrom` E1), Set(F1))
+    assertEquals(badHist `destsFrom` E1, Set(F1))
     val board960 = """
 PPPPPPPP
-RQK   R """.chess960 withHistory History.castle(White, kingSide = true, queenSide = true)
-    assertEquals(board960.place(White.bishop, D1).flatMap(_ destsFrom C1), Set())
-    assertEquals(board960.place(White.knight, F1).flatMap(_ destsFrom C1), Set(D1))
+RQK   R """.chess960 `withHistory` History.castle(White, kingSide = true, queenSide = true)
+    assertEquals(board960.place(White.bishop, D1).flatMap(_ `destsFrom` C1), Set())
+    assertEquals(board960.place(White.knight, F1).flatMap(_ `destsFrom` C1), Set(D1))
   test("possible"):
     val game = Game(goodHist, White)
-    assertEquals(game.board destsFrom E1, Set(F1, G1, H1))
+    assertEquals(game.board `destsFrom` E1, Set(F1, G1, H1))
     assertGame(
       game.playMove(E1, G1).get,
       """
@@ -34,7 +34,7 @@ R  Q RK """
    PPPPP
 B     KR""".chess960
     val g2 = Game(board, White)
-    assertEquals(board destsFrom G1, Set(F1, H1))
+    assertEquals(board `destsFrom` G1, Set(F1, H1))
     assertGame(
       g2.playMove(G1, H1).get,
       """
@@ -45,13 +45,13 @@ B    RK """
     val board: Board = """
 PPPPPPPP
 RKRBB   """.chess960
-    assertEquals(board destsFrom B1, Set())
+    assertEquals(board `destsFrom` B1, Set())
   test("chess960 close queenside"):
     val board: Board = """
 PPPPPPPP
 RK     B""".chess960
     val game = Game(board, White)
-    assertEquals(board destsFrom B1, Set(A1, C1))
+    assertEquals(board `destsFrom` B1, Set(A1, C1))
     assertGame(
       game.playMove(B1, A1).get,
       """
@@ -71,7 +71,7 @@ p pppppp
  K""".chess960,
       Black
     )
-    assertEquals(game.board destsFrom E8, Set(D8, F8))
+    assertEquals(game.board `destsFrom` E8, Set(D8, F8))
     assertGame(
       game.playMove(E8, D8).get,
       """
@@ -99,4 +99,4 @@ KNQRB""",
       ),
       Black
     )
-    assertEquals(game.board destsFrom B8, Set(A8, C8, E8))
+    assertEquals(game.board `destsFrom` B8, Set(A8, C8, E8))

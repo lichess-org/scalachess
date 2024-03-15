@@ -41,7 +41,7 @@ class StatsTest extends ChessTest:
     val data         = base map { _ + 1e5f }
     val shuffledData = base.sortWith(_ % 8 > _ % 8) map { _ + 1e5f }
 
-    val statsN = Stats.empty record shuffledData
+    val statsN = Stats.empty `record` shuffledData
     beApprox(statsN.mean, realMean(data))
     beApprox(statsN.variance.get, realVar(data))
     assertEquals(statsN.samples, 400)

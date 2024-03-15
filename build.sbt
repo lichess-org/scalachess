@@ -10,8 +10,9 @@ val commonSettings = Seq(
   scalacOptions := Seq(
     "-encoding",
     "utf-8",
+    "-rewrite",
     "-source:3.4-migration",
-    "-indent",
+    // "-indent",
     "-feature",
     "-language:postfixOps",
     "-Wunused:all",

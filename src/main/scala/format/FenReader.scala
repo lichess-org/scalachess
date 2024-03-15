@@ -48,8 +48,8 @@ trait FenReader:
       val enpassantMove = for
         square <- fEnpassant
         if square.rank == sixthRank
-        orig = square withRank seventhRank
-        dest = square withRank fifthRank
+        orig = square `withRank` seventhRank
+        dest = square `withRank` fifthRank
         if situation.board(dest).contains(Piece(!situation.color, Pawn)) &&
           situation.board(square.file, sixthRank).isEmpty &&
           situation.board(orig).isEmpty
@@ -68,7 +68,7 @@ trait FenReader:
             .lift(4)
             .flatMap(readCheckCount)
             .orElse(splitted.lift(6).flatMap(readCheckCount))
-        checkCount.foldLeft(history)(_ withCheckCount _)
+        checkCount.foldLeft(history)(_ `withCheckCount` _)
     }
 
   def read(fen: EpdFen): Option[Situation] = read(Standard, fen)

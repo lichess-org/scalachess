@@ -22,7 +22,7 @@ trait TagType:
 case class Tags(value: List[Tag]) extends AnyVal:
 
   def apply(name: String): Option[String] =
-    val tagType = Tag tagType name
+    val tagType = Tag `tagType` name
     value.find(_.name == tagType).map(_.value)
 
   def apply(which: Tag.type => TagType): Option[String] =
@@ -40,7 +40,7 @@ case class Tags(value: List[Tag]) extends AnyVal:
       .flatMap:
         case "chess 960" | "fischerandom" | "fischerrandom" => chess.variant.Chess960.some
         case "3 check" | "3-check"                          => chess.variant.ThreeCheck.some
-        case name                                           => chess.variant.Variant byName name
+        case name                                           => chess.variant.Variant `byName` name
 
   def anyDate: Option[String] = apply(_.UTCDate) orElse apply(_.Date)
 
@@ -55,7 +55,7 @@ case class Tags(value: List[Tag]) extends AnyVal:
     val name = which(Tag)
     value.exists(_.name == name)
   def exists(name: String): Boolean =
-    val tagType = Tag tagType name
+    val tagType = Tag `tagType` name
     value.exists(_.name == tagType)
 
   def outcome: Option[Outcome] =

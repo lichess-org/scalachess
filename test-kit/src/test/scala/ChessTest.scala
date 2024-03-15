@@ -63,9 +63,9 @@ trait ChessTestCommon:
     Board(BBoard.fromMap(pieces.toMap), defaultHistory(), chess.variant.Standard)
 
   def makeBoard(str: String, variant: Variant) =
-    Visual << str withVariant variant
+    Visual << str `withVariant` variant
 
-  def makeBoard: Board = Board init chess.variant.Standard
+  def makeBoard: Board = Board `init` chess.variant.Standard
 
   def makeChess960Board(position: Int) = Board(BBoard.fromMap(Chess960.pieces(position)), Chess960)
   def makeChess960Game(position: Int)  = Game(makeChess960Board(position))

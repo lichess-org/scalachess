@@ -5,10 +5,10 @@ import scala.util.Try
 
 object Binary:
 
-  def writeMove(m: SanStr)             = Try(Writer move m)
-  def writeMoves(ms: Iterable[SanStr]) = Try(Writer moves ms)
+  def writeMove(m: SanStr)             = Try(Writer `move` m)
+  def writeMoves(ms: Iterable[SanStr]) = Try(Writer `moves` ms)
 
-  def readMoves(bs: List[Byte])          = Try(Reader moves bs)
+  def readMoves(bs: List[Byte])          = Try(Reader `moves` bs)
   def readMoves(bs: List[Byte], nb: Int) = Try(Reader.moves(bs, nb))
 
   private object MoveType:

@@ -46,7 +46,7 @@ class ReplayTest extends ChessTest:
     assert:
       Replay
         .situations(
-          sans = SanStr.from("Be3 Ne4 Rg3 Nxe3 Rxe3" split " "),
+          sans = SanStr.from("Be3 Ne4 Rg3 Nxe3 Rxe3" `split` " "),
           initialFen = None,
           variant = chess.variant.RacingKings
         )

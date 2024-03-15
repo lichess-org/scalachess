@@ -74,7 +74,7 @@ abstract class Variant private[variant] (
       piece <- situation.board(from).toRight(ErrorStr(s"No piece on ${from.key}"))
       _     <- Either.cond(piece.color == situation.color, piece, ErrorStr(s"Not my piece on ${from.key}"))
       m1    <- findMove(from, to) toRight ErrorStr(s"Piece on ${from.key} cannot move to ${to.key}")
-      m2 <- m1 withPromotion promotion toRight ErrorStr(s"Piece on ${from.key} cannot promote to $promotion")
+      m2 <- m1 `withPromotion` promotion toRight ErrorStr(s"Piece on ${from.key} cannot promote to $promotion")
       m3 <- Either.cond(
         isValidPromotion(promotion),
         m2,
@@ -134,7 +134,7 @@ abstract class Variant private[variant] (
   def fiftyMoves(history: History): Boolean = history.halfMoveClock >= 100
 
   def isIrreversible(move: Move): Boolean =
-    (move.piece is Pawn) || move.captures || move.promotes || move.castles
+    (move.piece `is` Pawn) || move.captures || move.promotes || move.castles
 
   /** Once a move has been decided upon from the available legal moves, the board is finalized
     */

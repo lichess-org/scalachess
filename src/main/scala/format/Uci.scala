@@ -83,7 +83,7 @@ object Uci:
   def apply(drop: chess.Drop) = Uci.Drop(drop.piece.role, drop.square)
 
   def apply(move: String): Option[Uci] =
-    if move.lift(1) contains '@' then
+    if move.lift(1).contains('@') then
       for
         role   <- move.headOption.flatMap(Role.allByPgn.get)
         square <- Square.fromKey(move.slice(2, 4))
@@ -91,7 +91,7 @@ object Uci:
     else Uci.Move(move)
 
   def fromChars(move: String): Option[Uci] =
-    if move.lift(1) contains '@' then Uci.Drop.fromChars(move)
+    if move.lift(1).contains('@') then Uci.Drop.fromChars(move)
     else Uci.Move.fromChars(move)
 
   def readList(moves: String): Option[List[Uci]] =

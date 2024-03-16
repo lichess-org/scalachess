@@ -16,13 +16,13 @@ object OpeningDb:
 
   // Keep only one opening per unique key: the shortest one
   lazy val shortestLines: Map[OpeningKey, Opening] = OpeningDb.all
-    .foldLeft(Map.empty[OpeningKey, Opening]) { case (acc, op) =>
+    .foldLeft(Map.empty) { case (acc, op) =>
       acc.updatedWith(op.key):
         case Some(prev) if prev.uci.value.size < op.uci.value.size => prev.some
         case _                                                     => op.some
     }
 
-  def isShortest(op: Opening) = shortestLines.get(op.key) contains op
+  def isShortest(op: Opening) = shortestLines.get(op.key).contains(op)
 
   def findByEpdFen(fen: EpdFen): Option[Opening] = findByStandardFen(fen.opening)
 

@@ -19,7 +19,8 @@ object UciPath extends OpaqueString[UciPath]:
 
     def split: Option[(UciCharPair, UciPath)] = head.map(_ -> e.drop(2))
 
-    def isEmpty: Boolean = e.isEmpty
+    inline def isEmpty: Boolean  = e.isEmpty
+    inline def nonEmpty: Boolean = !isEmpty
 
     def lastId: Option[UciCharPair] = strToId(e.takeRight(2))
 
@@ -37,9 +38,10 @@ object UciPath extends OpaqueString[UciPath]:
 
     def debug: String = e.computeIds.map(_.toUci.uci).mkString(" ").trim
 
-  private inline def strToId(inline str: String): Option[UciCharPair] = for
-    a <- str.headOption
-    b <- str.lift(1)
-  yield UciCharPair(a, b)
+  private inline def strToId(inline str: String): Option[UciCharPair] =
+    for
+      a <- str.headOption
+      b <- str.lift(1)
+    yield UciCharPair(a, b)
 
   val root: UciPath = ""

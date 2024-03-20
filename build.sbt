@@ -58,8 +58,7 @@ lazy val testKit = project
       "co.fs2"              %% "fs2-io"            % "3.8.0"     % Test,
       "org.typelevel"       %% "discipline-munit"  % "1.0.9"     % Test,
       "org.typelevel"       %% "cats-laws"         % "2.9.0"     % Test
-    ),
-    testFrameworks += new TestFramework("weaver.framework.CatsEffect")
+    )
   )
   .dependsOn(scalachess % "compile->compile")
 

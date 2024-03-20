@@ -13,9 +13,7 @@ object Rank:
     inline def char: Char = (49 + a).toChar
   end extension
 
-  inline def apply(index: Int): Option[Rank] =
-    if 0 <= index && index < 8 then Some(index)
-    else None
+  inline def apply(index: Int): Option[Rank] = Option.when(0 <= index && index < 8)(index)
 
   inline def of(inline square: Square): Rank = square.value >> 3
 

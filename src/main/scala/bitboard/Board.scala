@@ -20,10 +20,10 @@ case class Board(
   val queens  = byRole.queen
   val kings   = byRole.king
 
-  def sliders                        = bishops ^ rooks ^ queens
+  def sliders: Bitboard              = bishops ^ rooks ^ queens
   def isOccupied(s: Square): Boolean = occupied.contains(s)
 
-  lazy val nbPieces = occupied.count
+  lazy val nbPieces: Int = occupied.count
 
   def byPiece(piece: Piece): Bitboard =
     byColor(piece.color) & byRole(piece.role)
@@ -49,8 +49,11 @@ case class Board(
   def kings(color: Color): List[Square] =
     kingOf(color).squares
 
-  def kingOf(c: Color): Bitboard          = kings & byColor(c)
-  def kingPosOf(c: Color): Option[Square] = kingOf(c).singleSquare
+  def kingOf(c: Color): Bitboard =
+    kings & byColor(c)
+
+  def kingPosOf(c: Color): Option[Square] =
+    kingOf(c).singleSquare
 
   def attackers(s: Square, attacker: Color): Bitboard =
     attackers(s, attacker, occupied)
@@ -98,15 +101,16 @@ case class Board(
       byRole.map(_ & notMask)
     )
 
-  def byRoleOf(color: Color): chess.ByRole[Bitboard] = byRole.mapTo(_ & byColor(color))
+  def byRoleOf(color: Color): chess.ByRole[Bitboard] =
+    byRole.mapTo(_ & byColor(color))
 
   // put a piece to an empty square
   def put(piece: Piece, at: Square): Option[Board] =
-    (!isOccupied(at)).option(putOrReplace(piece, at))
+    Option.unless(isOccupied(at))(putOrReplace(piece, at))
 
   // put a piece to an occupied square
   def replace(piece: Piece, at: Square): Option[Board] =
-    isOccupied(at).option(putOrReplace(piece, at))
+    Option.when(isOccupied(at))(putOrReplace(piece, at))
 
   // put a piece into the board
   def putOrReplace(s: Square, role: Role, color: Color): Board =

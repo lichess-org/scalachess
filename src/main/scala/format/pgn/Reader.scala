@@ -34,8 +34,7 @@ object Reader:
   def movesWithSans(sans: Iterable[SanStr], op: Sans => Sans, tags: Tags): Either[ErrorStr, Result] =
     Parser
       .moves(sans)
-      .map: moves =>
-        makeReplay(makeGame(tags), op(moves))
+      .map(moves => makeReplay(makeGame(tags), op(moves)))
 
   private def makeReplay(game: Game, sans: Sans): Result =
     sans.value
@@ -47,6 +46,5 @@ object Reader:
         case Right(replay)     => Result.Complete(replay)
 
   private def makeGame(tags: Tags) =
-    Game(variantOption = tags.variant, fen = tags.fen).pipe(self =>
+    Game(variantOption = tags.variant, fen = tags.fen).pipe: self =>
       self.copy(startedAtPly = self.ply, clock = tags.clockConfig.map(Clock.apply))
-    )

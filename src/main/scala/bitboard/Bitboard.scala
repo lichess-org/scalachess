@@ -12,6 +12,8 @@ object Bitboard:
 
   val empty: Bitboard = 0L
   val all: Bitboard   = -1L
+  // E4, D4, E5, D5
+  val center = 0x1818000000L
 
   val firstRank: Bitboard = 0xffL
   val lastRank: Bitboard  = 0xffL << 56

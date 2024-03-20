@@ -40,8 +40,7 @@ case class Std(
     situation.board
       .byPiece(situation.color - role)
       .first: square =>
-        if compare(file, square.file) &&
-          compare(rank, square.rank)
+        if compare(file, square.file) && compare(rank, square.rank)
         then situation.generateMovesAt(square).find(_.dest == dest)
         else None
       .toRight(ErrorStr(s"No move found: $this\n$situation"))
@@ -78,12 +77,7 @@ case class Castle(side: Side) extends San:
 opaque type Sans = List[San]
 object Sans extends TotalWrapper[Sans, List[San]]
 
-case class Metas(
-    check: Check,
-    checkmate: Boolean,
-    comments: List[Comment],
-    glyphs: Glyphs
-)
+case class Metas(check: Check, checkmate: Boolean, comments: List[Comment], glyphs: Glyphs)
 
 object Metas:
   val empty = Metas(Check.No, checkmate = false, Nil, Glyphs.empty)

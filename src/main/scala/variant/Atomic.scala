@@ -27,9 +27,8 @@ case object Atomic
 
   private def genKing(situation: Situation, mask: Bitboard) =
     import situation.{ genUnsafeKing, genCastling }
-    situation.ourKing.fold(Nil) { king =>
+    situation.ourKing.fold(Nil): king =>
       genCastling(king) ++ genUnsafeKing(king, mask)
-    }
 
   /** Move threatens to explode the opponent's king */
   private def explodesOpponentKing(situation: Situation)(move: Move): Boolean =
@@ -45,10 +44,9 @@ case object Atomic
     */
   override def kingThreatened(board: Board, color: Color): Check = Check:
     import board.{ kingPosOf, kingOf, occupied }
-    kingPosOf(color).exists { k =>
+    kingPosOf(color).exists: k =>
       k.kingAttacks.isDisjoint(kingOf(!color)) &&
-      attackersWithoutKing(board, occupied, k, !color).nonEmpty
-    }
+        attackersWithoutKing(board, occupied, k, !color).nonEmpty
 
   private def attackersWithoutKing(board: Board, occupied: Bitboard, s: Square, attacker: Color) =
     import board.board.{ byColor, rooks, queens, bishops, knights, pawns }

@@ -26,11 +26,7 @@ object UciCharPair:
     uci match
       case Uci.Move(orig, dest, None)       => UciCharPair(toChar(orig), toChar(dest))
       case Uci.Move(orig, dest, Some(role)) => UciCharPair(toChar(orig), toChar(dest.file, role))
-      case Uci.Drop(role, square) =>
-        UciCharPair(
-          toChar(square),
-          dropRole2charMap.getOrElse(role, voidChar)
-        )
+      case Uci.Drop(role, square) => UciCharPair(toChar(square), dropRole2charMap.getOrElse(role, voidChar))
 
   object implementation:
 
@@ -68,5 +64,6 @@ object UciCharPair:
     export char2dropRoleMap.apply as unsafeCharToDropRole
 
     private[chess] def lastRank(from: Square): Rank =
-      if from.rank == Rank.Second then Rank.First
+      if from.rank == Rank.Second
+      then Rank.First
       else Rank.Eighth

@@ -19,11 +19,8 @@ case object KingOfTheHill
 
   override def valid(situation: Situation, strict: Boolean): Boolean = Standard.valid(situation, strict)
 
-  // E4, D4, E5, D5
-  private val center = 0x1818000000L
-
   override def specialEnd(situation: Situation) =
-    situation.kingOf(!situation.color).intersects(center)
+    situation.kingOf(!situation.color).intersects(bitboard.Bitboard.center)
 
   /** You only need a king to be able to win in this variant
     */

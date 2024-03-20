@@ -20,18 +20,17 @@ case object Standard
   def validMoves(situation: Situation): List[Move] =
     import situation.{ genNonKing, genSafeKing, genCastling, color, board, ourKing }
     val enPassantMoves = situation.genEnPassant(situation.us & board.pawns)
-    ourKing
-      .fold(Nil): king =>
-        val checkers = board.attackers(king, !situation.color)
-        val candidates =
-          if checkers.isEmpty then
-            val targets = ~situation.us
-            genNonKing(targets) ::: genSafeKing(king, targets) ::: genCastling(king) ::: enPassantMoves
-          else genEvasions(king, situation, checkers) ::: enPassantMoves
-        val sliderBlockers = board.sliderBlockers(king, color)
-        if sliderBlockers.nonEmpty || enPassantMoves.nonEmpty then
-          candidates.filter(isSafe(situation, king, sliderBlockers))
-        else candidates
+    ourKing.fold(Nil): king =>
+      val checkers = board.attackers(king, !situation.color)
+      val candidates =
+        if checkers.isEmpty then
+          val targets = ~situation.us
+          genNonKing(targets) ::: genSafeKing(king, targets) ::: genCastling(king) ::: enPassantMoves
+        else genEvasions(king, situation, checkers) ::: enPassantMoves
+      val sliderBlockers = board.sliderBlockers(king, color)
+      if sliderBlockers.nonEmpty || enPassantMoves.nonEmpty then
+        candidates.filter(isSafe(situation, king, sliderBlockers))
+      else candidates
 
   // Used for filtering candidate moves that would leave put the king in check.
   def isSafe(situation: Situation, king: Square, blockers: Bitboard)(move: Move): Boolean =

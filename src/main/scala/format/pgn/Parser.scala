@@ -111,9 +111,9 @@ object Parser:
     val glyph: P[Glyph] = mapParser(Glyph.MoveAssessment.all.mapBy(_.symbol), "glyph")
     val glyphs          = glyph.rep0.map(Glyphs.fromList)
 
-    val x = P.char('x').?.map(_.isDefined)
+    val capture = P.char('x').?.map(_.isDefined)
 
-    val check = P.char('+').?.map(_.isDefined)
+    val check = P.char('+').?.map(o => Check(o.isDefined))
 
     val checkmate = (P.char('#') | P.string("++")).?.map(_.isDefined)
 
@@ -133,7 +133,7 @@ object Parser:
     val stdPawn: P[Std] = dest.map(Std(_, Pawn))
 
     // Bg5
-    val ambigous: P[Std] = (role ~ x ~ dest).map:
+    val ambigous: P[Std] = (role ~ capture ~ dest).map:
       case ((ro, ca), de) =>
         Std(dest = de, role = ro, capture = ca)
 
@@ -146,7 +146,7 @@ object Parser:
     val optionalEnPassant = (R.wsp.rep0.soft ~ P.stringIn(List("e.p.", "ep"))).void.?
 
     // d7d5 d7xd5
-    val disambiguatedPawn: P[Std] = (((file.? ~ rank.?) ~ x).with1 ~ dest <* optionalEnPassant).map:
+    val disambiguatedPawn: P[Std] = (((file.? ~ rank.?) ~ capture).with1 ~ dest <* optionalEnPassant).map:
       case (((file, rank), capture), dest) =>
         Std(dest, Pawn, capture, file, rank)
 
@@ -155,16 +155,15 @@ object Parser:
       pawn.copy(promotion = promo)
 
     // Bac3 Baxc3 B2c3 B2xc3 Ba2xc3
-    val disambiguated: P[Std] = (role ~ file.? ~ rank.? ~ x ~ dest).map:
+    val disambiguated: P[Std] = (role ~ file.? ~ rank.? ~ capture ~ dest).map:
       case ((((role, file), rank), capture), dest) =>
         Std(dest, role, capture, file, rank)
 
     val metas: P0[Metas] =
-      (checkmate ~ check ~ (glyphs <* escape) ~ nagGlyphs ~ comment.rep0 ~ nagGlyphs)
-        .map { case (((((checkmate, check), glyphs1), glyphs2), comments), glyphs3) =>
+      (checkmate, check, (glyphs <* escape), nagGlyphs, comment.rep0, nagGlyphs)
+        .mapN: (checkmate, check, glyphs1, glyphs2, comments, glyphs3) =>
           val glyphs = glyphs1.merge(glyphs2.merge(glyphs3))
-          Metas(Check(check), checkmate, comments.cleanUp, glyphs)
-        }
+          Metas(check, checkmate, comments.cleanUp, glyphs)
 
     val castle: P[San] = (qCastle | kCastle).map(Castle(_))
 
@@ -190,15 +189,13 @@ object Parser:
     val tags: P0[List[Tag]]  = tag.rep0
 
   private val tagsAndMovesParser: P0[ParsedPgn] =
-    (TagParser.tags.surroundedBy(escape) ~ strMoves.?).map:
-      case (optionalTags, optionalMoves) =>
-        val preTags = Tags(optionalTags)
-        optionalMoves match
-          case None => ParsedPgn(InitialComments.empty, preTags, None)
-          case Some((init, tree, resultOption)) =>
-            val tags =
-              resultOption.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
-            ParsedPgn(init, tags, tree)
+    (TagParser.tags.surroundedBy(escape) ~ strMoves.?).map: (optionalTags, optionalMoves) =>
+      val preTags = Tags(optionalTags)
+      optionalMoves match
+        case None => ParsedPgn(InitialComments.empty, preTags, None)
+        case Some((init, tree, result)) =>
+          val tags = result.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
+          ParsedPgn(init, tags, tree)
 
   private val pgnParser: P0[ParsedPgn] =
     escape *> P.string("[pgn]").? *> tagsAndMovesParser <* P.string("[/pgn]").? <* escape

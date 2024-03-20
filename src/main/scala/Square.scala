@@ -19,7 +19,7 @@ object Square:
     inline def upLeft: Option[Square]    = Square.at(file.value - 1, rank.value + 1)
     inline def upRight: Option[Square]   = Square.at(file.value + 1, rank.value + 1)
 
-    inline def prevRank(color: Color) = color.fold(s.down, s.up)
+    inline def prevRank(color: Color): Option[Square] = color.fold(s.down, s.up)
 
     @targetName("onLeftOf")
     inline def ?<(inline other: Square): Boolean = file < other.file

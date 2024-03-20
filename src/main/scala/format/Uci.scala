@@ -43,9 +43,9 @@ object Uci:
     yield Move(orig, dest, promotion)
 
     def fromChars(move: String) = for
-      orig <- move.headOption.flatMap { Square.fromChar(_) }
-      dest <- move.lift(1).flatMap { Square.fromChar(_) }
-      promotion = move.lift(2).flatMap { Role.promotable(_) }
+      orig <- move.headOption.flatMap(Square.fromChar)
+      dest <- move.lift(1).flatMap(Square.fromChar)
+      promotion = move.lift(2).flatMap(Role.promotable)
     yield Move(orig, dest, promotion)
 
     def fromStrings(origS: String, destS: String, promS: Option[String]) = for
@@ -68,7 +68,7 @@ object Uci:
 
     def fromChars(move: String) = for
       role   <- move.headOption.flatMap(Role.allByPgn.get)
-      square <- move.lift(2).flatMap { Square.fromChar(_) }
+      square <- move.lift(2).flatMap(Square.fromChar)
     yield Uci.Drop(role, square)
 
     def fromStrings(roleS: String, posS: String) = for

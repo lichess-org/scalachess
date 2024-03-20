@@ -68,12 +68,11 @@ case class Castle(side: Side) extends San:
     if !variant.allowsCastling then error.asLeft
     else
       ourKing
-        .flatMap(k =>
+        .flatMap: k =>
           variant
             .applyVariantEffect(genCastling(k))
             .filter(variant.kingSafety)
             .find(_.castle.exists(_.side == side))
-        )
         .toRight(error)
 
 opaque type Sans = List[San]

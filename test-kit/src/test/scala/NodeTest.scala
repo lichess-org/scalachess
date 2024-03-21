@@ -119,10 +119,9 @@ class NodeTest extends ScalaCheckSuite:
       def modifyChild(node: Tree[Int]) =
         node.withChild(node.child.map(c => c.withValue(f(c.value)))).some
 
-      !node.find(path).flatMap(_.child).isDefined || node.modifyAt(path, modifyChild) == node.modifyChildAt(
-        path,
-        _.updateValue(f).some
-      )
+      node.find(path).flatMap(_.child).isDefined ==> {
+        node.modifyAt(path, modifyChild) == node.modifyChildAt(path, _.updateValue(f).some)
+      }
 
   test("mergeOrAddAsVariation size"):
     forAll: (node: Node[Foo], other: Node[Foo]) =>

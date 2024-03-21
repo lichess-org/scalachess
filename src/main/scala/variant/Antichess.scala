@@ -61,8 +61,8 @@ case object Antichess
       val blackKnights = situation.board.black.squares
 
       // We consider the case where a player has two knights
-      if whiteKnights.size != 1 || blackKnights.size != 1 then false
-      else whiteKnights.forall(_.isLight) == blackKnights.forall(_.isLight)
+      whiteKnights.size == 1 && blackKnights.size == 1 && whiteKnights.forall(_.isLight) == blackKnights
+        .forall(_.isLight)
     }
 
   // No player can win if the only remaining pieces are opposing bishops on different coloured

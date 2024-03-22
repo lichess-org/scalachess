@@ -32,6 +32,7 @@ object CoreArbitraries:
 
   given Cogen[Color]  = Cogen(x => if x == White then 0L else 1L)
   given Cogen[Square] = Cogen(_.value.toLong)
+  given Cogen[Centis] = Cogen(_.value.toLong)
 
   given [A](using Arbitrary[A]): Arbitrary[ByColor[A]] = Arbitrary(
     for

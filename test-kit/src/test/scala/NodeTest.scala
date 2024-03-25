@@ -132,8 +132,11 @@ class NodeTest extends ScalaCheckSuite:
   // to remove duplicated variations from the node
   test("After mergeOrAddAsVariation should have no value duplication"):
     forAll: (node: Node[Foo], other: Node[Foo]) =>
-      val values = node.mergeOrAddAsVariation(other).valueAndVariations
-      values == values.distinct
+      val values = node.withoutVariations
+        .mergeOrAddAsVariation(node.variations)
+        .mergeOrAddAsVariation(other)
+        .valueAndVariations
+      values.distinct == values
 
   test("addChild size"):
     forAll: (node: Node[Foo], other: Node[Foo]) =>

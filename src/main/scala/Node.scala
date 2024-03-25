@@ -31,6 +31,9 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
 
   final def isVariation: Boolean = !this.isNode
 
+  // list of mainline and it's variations's values
+  def valueAndVariations: List[A] = value :: variations.map(_.value)
+
   // child and it's variations
   def childAndVariations: List[Tree[A]] = child.toList ++ variations
 

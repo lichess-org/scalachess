@@ -31,6 +31,9 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
 
   final def isVariation: Boolean = !this.isNode
 
+  // list of mainline and it's variations's values
+  def valueAndVariations: List[A] = value :: variations.map(_.value)
+
   // child and it's variations
   def childAndVariations: List[Tree[A]] = child.toList ++ variations
 
@@ -370,18 +373,21 @@ final case class Node[A](
   // merge two nodes
   // if they have same id, merge values and child, and variations
   // else add as variation
-  def mergeOrAddAsVariation[Id](other: Node[A])(using Mergeable[A]): Node[A] =
-    value.merge(other.value) match
-      case Some(newValue) =>
-        val newChild = Tree.merge(child, other.child)
-        Node(newValue, newChild, variations.add(other.variations))
-      case _ =>
-        addVariations(other.toVariations)
+  def mergeOrAddAsVariation(other: Node[A])(using Mergeable[A]): Node[A] =
+    mergeOrAddAsVariation(other.toVariations)
 
-  def addVariation[Id](v: Variation[A])(using Mergeable[A]): Node[A] =
+  def mergeOrAddAsVariation(v: Variation[A])(using Mergeable[A]): Node[A] =
+    value.merge(v.value) match
+      case Some(newValue) => Node(newValue, Tree.merge(child, v.child), variations)
+      case _              => addVariation(v)
+
+  def mergeOrAddAsVariation(vs: List[Variation[A]])(using Mergeable[A]): Node[A] =
+    vs.foldLeft(this)(_.mergeOrAddAsVariation(_))
+
+  def addVariation(v: Variation[A])(using Mergeable[A]): Node[A] =
     withVariations(variations.add(v))
 
-  def addVariations[Id](vs: List[Variation[A]])(using Mergeable[A]): Node[A] =
+  def addVariations(vs: List[Variation[A]])(using Mergeable[A]): Node[A] =
     withVariations(variations.add(vs))
 
   def withVariations(variations: List[Variation[A]]): Node[A] =

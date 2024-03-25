@@ -477,9 +477,7 @@ object Tree:
   extension [A](tm: TreeMapper[A]) def toOption: TreeMapOption[A] = x => tm(x).some
 
   def merge[A](node: Option[Node[A]], other: Option[Node[A]]): Mergeable[A] ?=> Option[Node[A]] =
-    (node, other) match
-      case (Some(c1), Some(c2)) => Some(c1.mergeOrAddAsVariation(c2))
-      case _                    => node.orElse(other)
+    (node, other).mapN(_.mergeOrAddAsVariation(_)).orElse(node).orElse(other)
 
   def build[A](s: Seq[A]): Option[Node[A]] =
     buildReverse(s.reverse)

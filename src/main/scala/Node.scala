@@ -479,29 +479,29 @@ object Tree:
   def merge[A](node: Option[Node[A]], other: Option[Node[A]]): Mergeable[A] ?=> Option[Node[A]] =
     (node, other).mapN(_.mergeOrAddAsVariation(_)).orElse(node).orElse(other)
 
-  def build[A](s: Seq[A]): Option[Node[A]] =
-    buildReverse(s.reverse)
-
   def buildReverse[A](s: Seq[A]): Option[Node[A]] =
     s.foldLeft(none)((acc, a) => Node(a, acc).some)
 
-  def build[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
-    buildReverse(s.reverse, f)
+  def build[A](s: Seq[A]): Option[Node[A]] =
+    buildReverse(s.reverse)
 
   def buildReverse[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
     s.foldLeft(none)((acc, a) => Node(f(a), acc).some)
 
+  def build[A, B](s: Seq[A], f: A => B): Option[Node[B]] =
+    buildReverse(s.reverse, f)
+
   def buildWithIndex[A, B](s: Seq[A], f: (A, Int) => B): Option[Node[B]] =
     build(s.zipWithIndex, f.tupled)
-
-  def buildWithNode[A](s: Seq[Node[A]]): Option[Node[A]] =
-    buildWithNodeReverse(s.reverse)
 
   def buildWithNodeReverse[A](s: Seq[Node[A]]): Option[Node[A]] =
     s.foldLeft(none)((acc, a) => a.withChild(acc).some)
 
-  def buildWithNode[A, B](s: Seq[A], f: A => Node[B]): Option[Node[B]] =
-    s.reverse match
+  def buildWithNode[A](s: Seq[Node[A]]): Option[Node[A]] =
+    buildWithNodeReverse(s.reverse)
+
+  def buildWithNodeReverse[A, B](s: Seq[A], f: A => Node[B]): Option[Node[B]] =
+    s match
       case Nil     => none
       case x :: xs => xs.foldLeft(f(x))((acc, a) => f(a).withChild(acc.some)).some
 

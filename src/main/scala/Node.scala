@@ -505,6 +505,29 @@ object Tree:
       case Nil     => none
       case x :: xs => xs.foldLeft(f(x))((acc, a) => f(a).withChild(acc.some)).some
 
+  def buildWithNode[A, B](s: Seq[A], f: A => Node[B]): Option[Node[B]] =
+    buildWithNodeReverse(s.reverse, f)
+
+  def buildWithNode[A, B, F[_]: Monad](s: Seq[A], f: A => F[Node[B]]): F[Option[Node[B]]] =
+    s.reverse.foldM(none[Node[B]])((acc, a) => f(a).map(_.withChild(acc).some))
+
+  def buildAccumulate[A, B, G](s: Seq[A], init: G, f: (G, A) => (G, Node[B])): Option[Node[B]] =
+    val (_, nodes) = s.foldLeft(init -> List.empty[Node[B]]):
+      case ((g, acc), a) =>
+        val (g1, b) = f(g, a)
+        g1 -> (b :: acc)
+    buildWithNodeReverse(nodes)
+
+  def buildAccumulate[A, B, G, F[_]: Monad](
+      s: Seq[A],
+      init: G,
+      f: (G, A) => F[(G, Node[B])]
+  ): F[Option[Node[B]]] =
+    s.foldM(init -> List.empty[Node[B]]):
+      case ((g, acc), a) =>
+        f(g, a).map((g, b) => g -> (b :: acc))
+    .map(x => buildWithNodeReverse(x._2))
+
   given [A, Id](using HasId[A, Id]): HasId[Tree[A], Id] =
     _.value.id
 

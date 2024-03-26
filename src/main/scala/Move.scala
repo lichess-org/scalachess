@@ -75,7 +75,7 @@ case class Move(
         h2.withCastles(castleRights).copy(unmovedRooks = unmovedRooks)
       },
       toUci,
-      capture.flatMap { before(_) }
+      capture.flatMap(before(_))
     )
 
     // Update position hashes last, only after updating the board,

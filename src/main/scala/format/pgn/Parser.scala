@@ -24,7 +24,7 @@ object Parser:
   def moves(str: PgnMovesStr): Either[ErrorStr, Option[ParsedPgnTree]] =
     strMove.rep0
       .parse(str.value, "Cannot parse moves")
-      .map(Tree.buildWithNode)
+      .map(Tree.build)
 
   def move(str: SanStr): Either[ErrorStr, ParsedPgnTree] =
     strMove.parse(str.value, "Cannot parse move")
@@ -82,8 +82,7 @@ object Parser:
             sans match
               case Nil => None
               case x :: xs =>
-                val child = Tree.buildWithNode(xs)
-                Some(Variation(x.value.copy(variationComments = comments.cleanUp), child))
+                Variation(x.value.copy(variationComments = comments.cleanUp), Tree.build(xs)).some
           )
 
       preMoveEscape.with1 *> ((moveAndMetas ~ variation.rep0) <* postMoveEscape).map:
@@ -95,7 +94,7 @@ object Parser:
   val strMoves: P0[(InitialComments, Option[ParsedPgnTree], Option[String])] =
     ((comment.rep0 ~ strMove.rep0) ~ (result <* escape).? <* comment.rep0).map:
       case ((comments, sans), res) =>
-        (InitialComments(comments.cleanUp), Tree.buildWithNode(sans), res)
+        (InitialComments(comments.cleanUp), Tree.build(sans), res)
 
   private object MoveParser:
 

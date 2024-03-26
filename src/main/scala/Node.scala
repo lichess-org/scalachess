@@ -4,7 +4,7 @@ import cats.*
 import cats.derived.*
 import cats.syntax.all.*
 
-import scala.annotation.tailrec
+import scala.annotation.{ tailrec, targetName }
 
 sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives Functor, Traverse:
 
@@ -175,7 +175,7 @@ final case class Node[A](
           case None        => node :: acc
           case Some(child) => loop(n - 1, child, node.withoutChild :: acc)
     if n <= 0 then this
-    else Tree.buildWithNodeReverse(loop(n, this, Nil)).getOrElse(this)
+    else Tree.buildReverse(loop(n, this, Nil)).getOrElse(this)
 
   // take nodes while mainline nodes satisfy the predicate
   // keep all variations
@@ -187,7 +187,7 @@ final case class Node[A](
         node.child match
           case None        => node :: acc
           case Some(child) => loop(child, node.withoutChild :: acc)
-    Tree.buildWithNodeReverse(loop(this, Nil))
+    Tree.buildReverse(loop(this, Nil))
 
   // get the nth node of in the mainline
   def apply(n: Int): Option[Node[A]] =
@@ -494,21 +494,26 @@ object Tree:
   def buildWithIndex[A, B](s: Seq[A], f: (A, Int) => B): Option[Node[B]] =
     build(s.zipWithIndex, f.tupled)
 
-  def buildWithNodeReverse[A](s: Seq[Node[A]]): Option[Node[A]] =
+  @targetName("buildWithNodeReverse")
+  def buildReverse[A](s: Seq[Node[A]]): Option[Node[A]] =
     s.foldLeft(none)((acc, a) => a.withChild(acc).some)
 
-  def buildWithNode[A](s: Seq[Node[A]]): Option[Node[A]] =
-    buildWithNodeReverse(s.reverse)
+  @targetName("buildWithNode")
+  def build[A](s: Seq[Node[A]]): Option[Node[A]] =
+    buildReverse(s.reverse)
 
-  def buildWithNodeReverse[A, B](s: Seq[A], f: A => Node[B]): Option[Node[B]] =
+  @targetName("buildWithNodeReverse")
+  def buildReverse[A, B](s: Seq[A], f: A => Node[B]): Option[Node[B]] =
     s match
       case Nil     => none
       case x :: xs => xs.foldLeft(f(x))((acc, a) => f(a).withChild(acc.some)).some
 
-  def buildWithNode[A, B](s: Seq[A], f: A => Node[B]): Option[Node[B]] =
-    buildWithNodeReverse(s.reverse, f)
+  @targetName("buildWithNode")
+  def build[A, B](s: Seq[A], f: A => Node[B]): Option[Node[B]] =
+    buildReverse(s.reverse, f)
 
-  def buildWithNode[A, B, F[_]: Monad](s: Seq[A], f: A => F[Node[B]]): F[Option[Node[B]]] =
+  @targetName("buildWithNode")
+  def build[A, B, F[_]: Monad](s: Seq[A], f: A => F[Node[B]]): F[Option[Node[B]]] =
     s.reverse.foldM(none[Node[B]])((acc, a) => f(a).map(_.withChild(acc).some))
 
   def buildAccumulate[A, B, G](s: Seq[A], init: G, f: (G, A) => (G, Node[B])): Option[Node[B]] =
@@ -516,7 +521,7 @@ object Tree:
       case ((g, acc), a) =>
         val (g1, b) = f(g, a)
         g1 -> (b :: acc)
-    buildWithNodeReverse(nodes)
+    buildReverse(nodes)
 
   def buildAccumulate[A, B, G, F[_]: Monad](
       s: Seq[A],
@@ -526,7 +531,7 @@ object Tree:
     s.foldM(init -> List.empty[Node[B]]):
       case ((g, acc), a) =>
         f(g, a).map((g, b) => g -> (b :: acc))
-    .map(x => buildWithNodeReverse(x._2))
+    .map(x => buildReverse(x._2))
 
   given [A, Id](using HasId[A, Id]): HasId[Tree[A], Id] =
     _.value.id

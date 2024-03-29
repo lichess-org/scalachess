@@ -1,6 +1,6 @@
 ThisBuild / organization      := "org.lichess"
 ThisBuild / version           := "15.9.2"
-ThisBuild / scalaVersion      := "3.4.0"
+ThisBuild / scalaVersion      := "3.4.1"
 ThisBuild / licenses += "MIT" -> url("https://opensource.org/licenses/MIT")
 
 ThisBuild / resolvers += "lila-maven".at("https://raw.githubusercontent.com/ornicar/lila-maven/master")

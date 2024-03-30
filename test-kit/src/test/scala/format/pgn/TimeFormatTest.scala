@@ -1,7 +1,7 @@
 package chess
 package format.pgn
 
-import ornicar.scalalib.time.*
+import scalalib.time.*
 
 class TimeFormatTest extends ChessTest:
 

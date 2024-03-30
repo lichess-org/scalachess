@@ -2,7 +2,7 @@ package chess
 package format
 
 import cats.syntax.all.*
-import ornicar.scalalib.zeros.given
+import scalalib.zeros.given
 
 import variant.{ Standard, Variant }
 import variant.Crazyhouse.Pockets

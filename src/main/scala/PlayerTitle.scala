@@ -1,6 +1,6 @@
 package chess
 
-import ornicar.scalalib.Render
+import scalalib.Render
 
 opaque type PlayerTitle = String
 

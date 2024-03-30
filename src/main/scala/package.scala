@@ -1,8 +1,8 @@
 package chess
 
-export ornicar.scalalib.newtypes.*
-export ornicar.scalalib.zeros.*
-export ornicar.scalalib.extensions.*
+export scalalib.newtypes.*
+export scalalib.zeros.*
+export scalalib.extensions.*
 
 export Color.{ Black, White }
 export Side.{ KingSide, QueenSide }

@@ -15,12 +15,12 @@ trait FenWriter:
   private given Ordering[File] = Ordering.by[File, Int](_.value)
   given Ordering[Square]       = Ordering.by[Square, File](_.file)
 
-  def write(situation: Situation): EpdFen = write(Situation.AndFullMoveNumber(situation, FullMoveNumber(1)))
+  def write(situation: Situation): FullFen = write(Situation.AndFullMoveNumber(situation, FullMoveNumber(1)))
 
-  def write(parsed: Situation.AndFullMoveNumber): EpdFen =
+  def write(parsed: Situation.AndFullMoveNumber): FullFen =
     write(Game(parsed.situation, ply = parsed.ply))
 
-  def write(game: Game): EpdFen = EpdFen:
+  def write(game: Game): FullFen = FullFen:
     val builder = scala.collection.mutable.StringBuilder(80)
     builder.append(writeBoard(game.board))
     builder.append(writeCrazyPocket(game.board))

@@ -1,7 +1,7 @@
 package chess
 package bitboard
 
-import chess.format.EpdFen
+import chess.format.FullFen
 
 object FenFixtures:
   val fens = List(
@@ -12,4 +12,4 @@ object FenFixtures:
     "r2qk1nr/ppp2ppp/2nb4/3p4/3P2b1/2PB1N2/PP3PPP/RNBQK2R w KQkq - 3 7",
     "r2qk1nr/ppp2ppp/3b4/3p4/3P2b1/2PB1Nn1/PP3PPP/RNBQK2R w KQkq - 3 7",
     "r3k1nr/ppp2ppp/q2b1n2/3p4/3PB1b1/2P2N2/PP3PPP/RNBQK2R w KQkq - 3 7"
-  ).map(EpdFen(_))
+  ).map(FullFen(_))

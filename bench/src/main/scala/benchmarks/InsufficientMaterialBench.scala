@@ -4,7 +4,7 @@ import org.openjdk.jmh.annotations.*
 
 import cats.syntax.all.*
 import java.util.concurrent.TimeUnit
-import chess.format.{ EpdFen, Fen }
+import chess.format.{ FullFen, Fen }
 import chess.variant.Horde
 
 @State(Scope.Thread)
@@ -37,7 +37,7 @@ class InsufficientMaterialBench:
     "8/6PP/8/8/8/8/3npqrn/7k b - - 0 1",
     "8/P1P5/8/8/8/8/bbnb4/k7 b - - 0 1",
     "8/6PP/8/8/8/8/5rrb/7k b - - 0 1"
-  ).map(EpdFen(_)).map(Fen.read(Horde, _).get)
+  ).map(FullFen(_)).map(Fen.read(Horde, _).get)
 
   @Benchmark
   def horde() =

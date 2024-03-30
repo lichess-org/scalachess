@@ -4,7 +4,7 @@ package variant
 import cats.syntax.all.*
 import chess.bitboard.Bitboard
 import chess.bitboard.Bitboard.*
-import chess.format.EpdFen
+import chess.format.FullFen
 
 case object Horde
     extends Variant(
@@ -31,7 +31,7 @@ case object Horde
 
   override val castles = Castles.black
 
-  override val initialFen = EpdFen(
+  override val initialFen = FullFen(
     "rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1"
   )
 

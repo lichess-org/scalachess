@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import chess.format.EpdFen
+import chess.format.FullFen
 
 case object ThreeCheck
     extends Variant(
@@ -16,7 +16,7 @@ case object ThreeCheck
 
   def pieces = Standard.pieces
 
-  override val initialFen = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 +0+0")
+  override val initialFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 +0+0")
 
   def validMoves(situation: Situation): List[Move] =
     Standard.validMoves(situation)

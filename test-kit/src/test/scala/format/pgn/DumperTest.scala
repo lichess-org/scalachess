@@ -1,7 +1,7 @@
 package chess
 package format.pgn
 
-import chess.format.{ EpdFen, Fen }
+import chess.format.{ Fen, FullFen }
 import chess.variant.ThreeCheck
 
 import scala.language.implicitConversions
@@ -13,7 +13,7 @@ class DumperTest extends ChessTest:
   given Conversion[String, SanStr] = SanStr(_)
 
   test("Check with pawn not be checkmate if pawn can be taken en passant"):
-    val game = Fen.readWithMoveNumber(EpdFen("8/3b4/6R1/1P2kp2/6pp/2N1P3/4KPPP/8 w - -")).get match
+    val game = Fen.readWithMoveNumber(FullFen("8/3b4/6R1/1P2kp2/6pp/2N1P3/4KPPP/8 w - -")).get match
       case s: Situation.AndFullMoveNumber => Game(s.situation, ply = s.ply)
     val move = game(Square.F2, Square.F4).get._2
     assertEquals(Dumper(move), "f4+")
@@ -338,7 +338,7 @@ NRKNRQBB
         assertEquals(ms, SanStr.from("f4 Nc6 Nc3 g6 Nb5 O-O-O O-O-O".split(' ').toVector))
 
   test("chess960 tricky rook disambiguation"):
-    val fen           = EpdFen("r5k1/1b5p/N3p1p1/Q4p2/4r3/2P1q3/1PK2RP1/5R2 w - - 1 38")
+    val fen           = FullFen("r5k1/1b5p/N3p1p1/Q4p2/4r3/2P1q3/1PK2RP1/5R2 w - - 1 38")
     val sit           = Fen.read(fen).get
     val game1         = Game(sit.board, sit.color)
     val (game2, move) = game1(Square.F2, Square.F3).get

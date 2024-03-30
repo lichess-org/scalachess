@@ -12,7 +12,7 @@ object UciDump:
 
   def apply(
       moves: Seq[pgn.SanStr],
-      initialFen: Option[EpdFen],
+      initialFen: Option[FullFen],
       variant: Variant,
       force960Notation: Boolean = false
   ): Either[ErrorStr, List[String]] =

@@ -38,7 +38,7 @@ abstract class Variant private[variant] (
 
   def castles: Castles = Castles.init
 
-  val initialFen: Fen.Epd = Fen.Epd.initial
+  val initialFen: Fen.Full = Fen.Full.initial
 
   def isValidPromotion(promotion: Option[PromotableRole]) =
     promotion match
@@ -227,7 +227,7 @@ object Variant:
       File.all.map(Square(_, Rank.Seventh) -> Black.pawn) ++
       File.all.zip(rank).map((x, role) => Square(x, Rank.Eighth) -> (Black - role)) toMap
 
-  def isValidInitialFen(variant: Variant, fen: Option[Fen.Epd], strict: Boolean = false) =
+  def isValidInitialFen(variant: Variant, fen: Option[Fen.Full], strict: Boolean = false) =
     if variant.chess960
     then fen.forall(f => Chess960.positionNumber(f).isDefined)
     else if variant.fromPosition then

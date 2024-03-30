@@ -2,17 +2,17 @@ package chess
 package format
 
 object Fen extends FenReader with FenWriter:
-  export format.{ BoardFen as Board, EpdFen as Epd, SimpleFen as Simple, StandardFen as Standard }
-  export EpdFen.initial
+  export format.{ BoardFen as Board, FullFen as Full, SimpleFen as Simple, StandardFen as Standard }
+  export FullFen.initial
 
 // https://www.chessprogramming.org/Extended_Position_Description
 // r3k2r/p3n1pp/2q2p2/4n1B1/5Q2/5P2/PP3P1P/R4RK1 b kq - 6 20
 // rnbqkbnr/ppp1pppp/8/1B1p4/4P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2 +1+0 (3check)
 // r1bqkbnr/pppp1Qpp/2n5/4p3/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 2+3 0 3 (winboards 3check)
-opaque type EpdFen = String
-object EpdFen extends OpaqueString[EpdFen]:
+opaque type FullFen = String
+object FullFen extends OpaqueString[FullFen]:
 
-  extension (a: EpdFen)
+  extension (a: FullFen)
     def parts: (String, Option[Color], String, Option[Square]) =
       val parts = a.split(' ')
       (
@@ -25,12 +25,12 @@ object EpdFen extends OpaqueString[EpdFen]:
 
     def isInitial: Boolean = a == initial
 
-    def simple: SimpleFen    = SimpleFen.fromEpd(a)
+    def simple: SimpleFen    = SimpleFen.fromFull(a)
     def opening: StandardFen = SimpleFen.opening(a)
     def board: BoardFen      = SimpleFen.board(a)
 
-  val initial: EpdFen               = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-  def clean(source: String): EpdFen = EpdFen(source.replace("_", " ").trim)
+  val initial: FullFen               = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+  def clean(source: String): FullFen = FullFen(source.replace("_", " ").trim)
   def getColor(arr: Array[String]): Option[Color] =
     if arr.length < 2 then None
     else if arr(1).size != 1 then None
@@ -47,7 +47,7 @@ object SimpleFen extends OpaqueString[SimpleFen]:
     def enpassant: Option[Square] = a.split(' ').lift(3).flatMap(Square.fromKey(_))
     def opening: StandardFen      = StandardFen.fromSimple(a)
     def board: BoardFen           = a.takeWhile(_ != ' ')
-  def fromEpd(fen: EpdFen): StandardFen =
+  def fromFull(fen: FullFen): StandardFen =
     fen.value.split(' ').take(4) match
       case Array(board, turn, castle, ep) => SimpleFen(s"$board $turn $castle $ep")
       case _                              => fen.into(SimpleFen)
@@ -56,13 +56,13 @@ object SimpleFen extends OpaqueString[SimpleFen]:
 opaque type StandardFen = String
 object StandardFen extends OpaqueString[StandardFen]:
   extension (a: StandardFen) def board: BoardFen = a.value.takeWhile(_ != ' ')
-  def fromEpd(fen: EpdFen): StandardFen          = fromSimple(EpdFen.simple(fen))
+  def fromFull(fen: FullFen): StandardFen        = fromSimple(FullFen.simple(fen))
   def fromSimple(fen: SimpleFen): StandardFen =
     fen.value.split(' ').take(4) match
       case Array(board, turn, castle, ep) =>
         StandardFen(s"${BoardFen(board).removePockets} $turn $castle $ep")
       case _ => fen.into(StandardFen)
-  val initial: StandardFen = EpdFen.initial.opening
+  val initial: StandardFen = FullFen.initial.opening
 
 // r3k2r/p3n1pp/2q2p2/4n1B1/5Q2/5P2/PP3P1P/R4RK1 b
 opaque type BoardAndColorFen = String
@@ -109,5 +109,5 @@ object SmallFen extends OpaqueString[SmallFen]:
     then fen.value.split(' ').lift(6).foldLeft(base)(_ + _)
     else base
 
-  def validate(variant: Variant, fen: Fen.Epd): Option[SmallFen] =
+  def validate(variant: Variant, fen: Fen.Full): Option[SmallFen] =
     Fen.read(variant, fen).exists(_.playable(false)).option(make(variant, fen.simple))

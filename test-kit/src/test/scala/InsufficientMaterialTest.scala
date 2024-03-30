@@ -3,7 +3,7 @@ package chess
 import cats.effect.IO
 import cats.kernel.Monoid
 import cats.syntax.all.*
-import chess.format.{ EpdFen, Fen }
+import chess.format.{ Fen, FullFen }
 import chess.variant.*
 import fs2.*
 import fs2.io.file.Files
@@ -38,9 +38,9 @@ object InsufficientMaterialTest extends SimpleIOSuite:
       .map(_.split(',').toList)
 
   private def parseSample(sample: List[String]): Case =
-    Case(EpdFen(sample(0)), sample(1).toBoolean, sample.get(2))
+    Case(FullFen(sample(0)), sample(1).toBoolean, sample.get(2))
 
-private case class Case(fen: EpdFen, expected: Boolean, comment: Option[String]):
+private case class Case(fen: FullFen, expected: Boolean, comment: Option[String]):
   def run(variant: Variant): Boolean =
     val situation = Fen.read(variant, fen).get
     Horde.hasInsufficientMaterial(situation.board, !situation.color) == expected

@@ -113,7 +113,6 @@ object BinaryFen:
       else CheckCount()
 
       val crazyData = if variant.crazyhouse then
-        val promoted = readLong(reader)
         val (wp, bp) = readNibbles(reader)
         val (wn, bn) = readNibbles(reader)
         val (wb, bb) = readNibbles(reader)
@@ -125,7 +124,7 @@ object BinaryFen:
               white = Crazyhouse.Pocket(pawn = wp, knight = wn, bishop = wb, rook = wr, queen = wq),
               black = Crazyhouse.Pocket(pawn = bp, knight = bn, bishop = bb, rook = br, queen = bq)
             ),
-            promoted = Bitboard(promoted)
+            promoted = Bitboard(readLong(reader))
           )
         )
       else None
@@ -163,12 +162,14 @@ object BinaryFen:
 
     val sit      = input.situation
     val occupied = sit.board.occupied
-    addLong(builder, occupied.value)
+    writeLong(builder, occupied.value)
 
     val pawnPushedTo: Option[Square] = sit.enPassantSquare.map(_.xor(Square.A2))
 
     def packPiece(sq: Square): Byte =
       sit.board(sq) match
+        // Encoding from
+        // https://github.com/official-stockfish/nnue-pytorch/blob/2db3787d2e36f7142ea4d0e307b502dda4095cd9/lib/nnue_training_data_formats.h#L4607
         case Some(Piece(_, Pawn)) if pawnPushedTo.contains(sq) => 12
         case Some(Piece(White, Pawn))                          => 0
         case Some(Piece(Black, Pawn))                          => 1
@@ -186,7 +187,7 @@ object BinaryFen:
 
     val it = occupied.iterator
     while it.hasNext
-    do addNibbles(builder, packPiece(it.next), if it.hasNext then packPiece(it.next) else 0)
+    do writeNibbles(builder, packPiece(it.next), if it.hasNext then packPiece(it.next) else 0)
 
     val halfMoveClock = sit.history.halfMoveClock.value
     val ply           = input.fullMoveNumber.ply(sit.color).value
@@ -201,29 +202,29 @@ object BinaryFen:
       case Crazyhouse                         => 6
 
     if halfMoveClock > 0 || ply > 1 || brokenTurn || variantHeader != 0
-    then addLeb128(builder, sit.history.halfMoveClock.value)
+    then writeLeb128(builder, sit.history.halfMoveClock.value)
 
     if ply > 1 || brokenTurn || variantHeader != 0
-    then addLeb128(builder, ply)
+    then writeLeb128(builder, ply)
 
     if variantHeader != 0
     then
       builder.addOne(variantHeader.toByte)
       if sit.variant.threeCheck then
-        addNibbles(builder, sit.history.checkCount.white, sit.history.checkCount.black)
+        writeNibbles(builder, sit.history.checkCount.white, sit.history.checkCount.black)
       else if sit.variant.crazyhouse then
         val crazyData = sit.board.crazyData.getOrElse(Crazyhouse.Data.init)
-        addLong(builder, crazyData.promoted.value)
-        val pockets = crazyData.pockets
-        addNibbles(builder, pockets.white.pawn, pockets.black.pawn)
-        addNibbles(builder, pockets.white.knight, pockets.black.knight)
-        addNibbles(builder, pockets.white.bishop, pockets.black.bishop)
-        addNibbles(builder, pockets.white.rook, pockets.black.rook)
-        addNibbles(builder, pockets.white.queen, pockets.black.queen)
+        val pockets   = crazyData.pockets
+        writeNibbles(builder, pockets.white.pawn, pockets.black.pawn)
+        writeNibbles(builder, pockets.white.knight, pockets.black.knight)
+        writeNibbles(builder, pockets.white.bishop, pockets.black.bishop)
+        writeNibbles(builder, pockets.white.rook, pockets.black.rook)
+        writeNibbles(builder, pockets.white.queen, pockets.black.queen)
+        writeLong(builder, crazyData.promoted.value)
 
     builder.result
 
-  private def addLong(builder: ArrayBuilder[Byte], v: Long) =
+  private def writeLong(builder: ArrayBuilder[Byte], v: Long) =
     builder.addOne((v >>> 56).toByte)
     builder.addOne((v >>> 48).toByte)
     builder.addOne((v >>> 40).toByte)
@@ -243,7 +244,7 @@ object BinaryFen:
       (reader.next.toLong << 8) |
       reader.next.toLong
 
-  private def addLeb128(builder: ArrayBuilder[Byte], v: Int) =
+  private def writeLeb128(builder: ArrayBuilder[Byte], v: Int) =
     var n = v
     while n > 127
     do
@@ -262,7 +263,7 @@ object BinaryFen:
     do ()
     n
 
-  private def addNibbles(builder: ArrayBuilder[Byte], lo: Int, hi: Int) =
+  private def writeNibbles(builder: ArrayBuilder[Byte], lo: Int, hi: Int) =
     builder.addOne((lo | (hi << 4)).toByte)
 
   private def readNibbles(reader: Iterator[Byte]): (Int, Int) =

@@ -228,6 +228,14 @@ object Bitboard:
         b &= (b - 1L)
       builder.result
 
+    def iterator: Iterator[Square] = new Iterator[Square]:
+      private var b                 = a
+      override def hasNext: Boolean = b != 0L
+      override def next: Square =
+        val result = b.lsb
+        b &= (b - 1L)
+        result
+
     // TODO: nice to have, faster.
     // but should only be used for debug
     // TODO: override toString?

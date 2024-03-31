@@ -10,6 +10,8 @@ opaque type BinaryFen = Array[Byte]
 
 object BinaryFen:
   extension (bf: BinaryFen)
+    def value: Array[Byte] = bf
+
     def read: Situation.AndFullMoveNumber =
       val reader = new Iterator[Byte]:
         val inner                            = bf.iterator
@@ -87,6 +89,7 @@ object BinaryFen:
             kings |= bb
             black |= bb
             turn = Black
+          case _ =>
 
       val it = occupied.iterator
       while it.hasNext
@@ -239,14 +242,14 @@ object BinaryFen:
     builder.addOne(v.toByte)
 
   private def readLong(reader: Iterator[Byte]): Long =
-    (reader.next.toLong << 56) |
-      (reader.next.toLong << 48) |
-      (reader.next.toLong << 40) |
-      (reader.next.toLong << 32) |
-      (reader.next.toLong << 24) |
-      (reader.next.toLong << 16) |
-      (reader.next.toLong << 8) |
-      reader.next.toLong
+    ((reader.next & 0xffL) << 56) |
+      ((reader.next & 0xffL) << 48) |
+      ((reader.next & 0xffL) << 40) |
+      ((reader.next & 0xffL) << 32) |
+      ((reader.next & 0xffL) << 24) |
+      ((reader.next & 0xffL) << 16) |
+      ((reader.next & 0xffL) << 8) |
+      (reader.next & 0xffL)
 
   private def writeLeb128(builder: ArrayBuilder[Byte], v: Int) =
     var n = v
@@ -272,7 +275,7 @@ object BinaryFen:
 
   private def readNibbles(reader: Iterator[Byte]): (Int, Int) =
     val b = reader.next
-    ((b & 0xf), (b >> 4))
+    ((b & 0xf), (b >>> 4) & 0xf)
 
   private def minimumUnmovedRooks(board: Board): UnmovedRooks =
     val white   = board.history.unmovedRooks.bb & board.white & Bitboard.firstRank
@@ -293,15 +296,11 @@ object BinaryFen:
   ): Castles =
     val whiteRooks = unmovedRooks.bb & white & Bitboard.firstRank
     val blackRooks = unmovedRooks.bb & black & Bitboard.lastRank
-    val whiteKings = white & kings & Bitboard.firstRank
-    val blackKings = black & kings & Bitboard.lastRank
+    val whiteKing  = (white & kings & Bitboard.firstRank).first.getOrElse(Square.E1)
+    val blackKing  = (black & kings & Bitboard.lastRank).first.getOrElse(Square.E8)
     Castles(
-      whiteKingSide =
-        whiteRooks.nonEmpty && whiteKings.nonEmpty && whiteRooks.isolateLast.value > whiteKings.value,
-      whiteQueenSide =
-        whiteRooks.nonEmpty && whiteKings.nonEmpty && whiteRooks.isolateFirst.value < whiteKings.value,
-      blackKingSide =
-        blackRooks.nonEmpty && blackKings.nonEmpty && blackRooks.isolateLast.value > blackKings.value,
-      blackQueenSide =
-        blackRooks.nonEmpty && blackKings.nonEmpty && blackRooks.isolateFirst.value < blackKings.value
+      whiteKingSide = whiteRooks.last.exists(r => r.value > whiteKing.value),
+      whiteQueenSide = whiteRooks.first.exists(r => r.value < whiteKing.value),
+      blackKingSide = blackRooks.last.exists(r => r.value > blackKing.value),
+      blackQueenSide = blackRooks.first.exists(r => r.value < blackKing.value)
     )

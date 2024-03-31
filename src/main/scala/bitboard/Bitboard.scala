@@ -102,6 +102,10 @@ object Bitboard:
     // remove the last/largest non empty square
     def removeLast: Bitboard = a & ~a.msb.bl
 
+    def isolateFirst: Bitboard = Bitboard(a & -a)
+
+    def isolateLast: Bitboard = last.map(_.bb).getOrElse(0)
+
     inline def intersects(inline o: Long): Boolean =
       (a & o) != 0L
 

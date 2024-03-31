@@ -27,7 +27,7 @@ object BinaryFen:
       var black   = Bitboard.empty
 
       var turn                     = White
-      var unmovedRooks             = Bitboard.empty
+      var unmovedRooks             = UnmovedRooks(Bitboard.empty)
       var epMove: Option[Uci.Move] = None
 
       def unpackPiece(sq: Square, nibble: Int) =
@@ -146,7 +146,9 @@ object BinaryFen:
             History(
               lastMove = epMove,
               checkCount = checkCount,
-              unmovedRooks = UnmovedRooks(unmovedRooks),
+              castles =
+                maximumCastles(unmovedRooks = unmovedRooks, white = white, black = black, kings = kings),
+              unmovedRooks = unmovedRooks,
               halfMoveClock = halfMoveClock
             ),
             variant,
@@ -164,6 +166,7 @@ object BinaryFen:
     val occupied = sit.board.occupied
     writeLong(builder, occupied.value)
 
+    val unmovedRooks                 = minimumUnmovedRooks(sit.board)
     val pawnPushedTo: Option[Square] = sit.enPassantSquare.map(_.xor(Square.A2))
 
     def packPiece(sq: Square): Byte =
@@ -177,13 +180,13 @@ object BinaryFen:
         case Some(Piece(Black, Knight))                        => 3
         case Some(Piece(White, Bishop))                        => 4
         case Some(Piece(Black, Bishop))                        => 5
-        case Some(Piece(White, Rook))  => if sit.history.unmovedRooks.contains(sq) then 13 else 6
-        case Some(Piece(Black, Rook))  => if sit.history.unmovedRooks.contains(sq) then 14 else 7
-        case Some(Piece(White, Queen)) => 8
-        case Some(Piece(Black, Queen)) => 9
-        case Some(Piece(White, King))  => 10
-        case Some(Piece(Black, King))  => if sit.color.white then 11 else 15
-        case None                      => 0 // unreachable
+        case Some(Piece(White, Rook))                          => if unmovedRooks.contains(sq) then 13 else 6
+        case Some(Piece(Black, Rook))                          => if unmovedRooks.contains(sq) then 14 else 7
+        case Some(Piece(White, Queen))                         => 8
+        case Some(Piece(Black, Queen))                         => 9
+        case Some(Piece(White, King))                          => 10
+        case Some(Piece(Black, King))                          => if sit.color.white then 11 else 15
+        case None                                              => 0 // unreachable
 
     val it = occupied.iterator
     while it.hasNext
@@ -269,3 +272,35 @@ object BinaryFen:
   private def readNibbles(reader: Iterator[Byte]): (Int, Int) =
     val b = reader.next
     ((b & 0xf), (b >> 4))
+
+  private def minimumUnmovedRooks(board: Board): UnmovedRooks =
+    val white   = board.history.unmovedRooks.bb & board.white & Bitboard.firstRank
+    val black   = board.history.unmovedRooks.bb & board.black & Bitboard.lastRank
+    val castles = board.history.castles
+    UnmovedRooks(
+      (if castles.whiteKingSide then white.isolateLast else Bitboard.empty) |
+        (if castles.whiteQueenSide then white.isolateFirst else Bitboard.empty) |
+        (if castles.blackKingSide then black.isolateLast else Bitboard.empty) |
+        (if castles.blackQueenSide then black.isolateFirst else Bitboard.empty)
+    )
+
+  private def maximumCastles(
+      unmovedRooks: UnmovedRooks,
+      white: Bitboard,
+      black: Bitboard,
+      kings: Bitboard
+  ): Castles =
+    val whiteRooks = unmovedRooks.bb & white & Bitboard.firstRank
+    val blackRooks = unmovedRooks.bb & black & Bitboard.lastRank
+    val whiteKings = white & kings & Bitboard.firstRank
+    val blackKings = black & kings & Bitboard.lastRank
+    Castles(
+      whiteKingSide =
+        whiteRooks.nonEmpty && whiteKings.nonEmpty && whiteRooks.isolateLast.value > whiteKings.value,
+      whiteQueenSide =
+        whiteRooks.nonEmpty && whiteKings.nonEmpty && whiteRooks.isolateFirst.value < whiteKings.value,
+      blackKingSide =
+        blackRooks.nonEmpty && blackKings.nonEmpty && blackRooks.isolateLast.value > blackKings.value,
+      blackQueenSide =
+        blackRooks.nonEmpty && blackKings.nonEmpty && blackRooks.isolateFirst.value < blackKings.value
+    )

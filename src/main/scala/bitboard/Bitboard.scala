@@ -229,9 +229,9 @@ object Bitboard:
       builder.result
 
     def iterator: Iterator[Square] = new Iterator[Square]:
-      private var b                 = a
-      override def hasNext: Boolean = b != 0L
-      override def next: Square =
+      private var b                        = a
+      override inline def hasNext: Boolean = b != 0L
+      override inline def next: Square =
         val result = b.lsb
         b &= (b - 1L)
         result

@@ -11,21 +11,24 @@ object BinaryFen:
   extension (bf: BinaryFen)
     def read: Situation.AndFullMoveNumber =
       val reader = new Iterator[Byte]:
-        val inner                   = bf.iterator
-        inline def hasNext: Boolean = inner.hasNext
-        inline def next: Byte       = if hasNext then inner.next else 0.toByte
+        val inner                            = bf.iterator
+        override inline def hasNext: Boolean = inner.hasNext
+        override inline def next: Byte       = if hasNext then inner.next else 0.toByte
 
-      val occupied     = Bitboard(readLong(reader))
-      var pawns        = Bitboard.empty
-      var knights      = Bitboard.empty
-      var bishops      = Bitboard.empty
-      var rooks        = Bitboard.empty
-      var queens       = Bitboard.empty
-      var kings        = Bitboard.empty
-      var white        = Bitboard.empty
-      var black        = Bitboard.empty
-      var unmovedRooks = Bitboard.empty
-      var turn         = White
+      val occupied = Bitboard(readLong(reader))
+
+      var pawns   = Bitboard.empty
+      var knights = Bitboard.empty
+      var bishops = Bitboard.empty
+      var rooks   = Bitboard.empty
+      var queens  = Bitboard.empty
+      var kings   = Bitboard.empty
+      var white   = Bitboard.empty
+      var black   = Bitboard.empty
+
+      var turn                     = White
+      var unmovedRooks             = Bitboard.empty
+      var epMove: Option[Uci.Move] = None
 
       def unpackPiece(sq: Square, nibble: Int) =
         val bb = sq.bb
@@ -68,7 +71,9 @@ object BinaryFen:
             black |= bb
           case 12 =>
             pawns |= bb
-          // TODO: color, ep
+            epMove = Some(Uci.Move(sq.xor(Square.A3), sq))
+            if sq.rank.value < 4 then white |= bb
+            else black |= bb
           case 13 =>
             rooks |= bb
             white |= bb
@@ -140,6 +145,8 @@ object BinaryFen:
               kings = kings
             ),
             History(
+              lastMove = epMove,
+              checkCount = checkCount,
               unmovedRooks = UnmovedRooks(unmovedRooks),
               halfMoveClock = halfMoveClock
             ),

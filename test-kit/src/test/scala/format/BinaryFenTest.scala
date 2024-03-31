@@ -58,8 +58,69 @@ class BinaryFenTest extends ChessTest:
   test("fen fixtures"):
     for fen <- FenFixtures.fens do assertRoundtrip(Standard, fen)
 
+  test("persistence"):
+    assertPersistence(Standard, EpdFen("8/8/8/8/8/8/8/8 w - - 0 1"), "0000000000000000")
+    assertPersistence(Standard, EpdFen("8/8/8/8/8/8/8/8 b - - 0 1"), "00000000000000000001")
+    assertPersistence(Standard, EpdFen("8/8/8/8/8/8/8/8 b - - 100 432"), "000000000000000064df06")
+    assertPersistence(
+      Standard,
+      EpdFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"),
+      "ffff00001000efff2d844ad200000000111111113e955fe3"
+    )
+    assertPersistence(Standard, EpdFen("5k2/6p1/8/1Pp5/6P1/8/8/3K4 w - c6 0 1"), "20400006400000080ac0b1")
+    assertPersistence(Standard, EpdFen("4k3/8/8/8/3pP3/8/6N1/7K b - e3 0 1"), "10000000180040802ac10f")
+    assertPersistence(
+      Standard,
+      EpdFen("4rrk1/pbbp2p1/1ppnp3/3n1pqp/3N1PQP/1PPNP3/PBBP2P1/4RRK1 w Ff - 0 3"),
+      "704f1ee8e81e4f70d60a44000002020813191113511571be0004"
+    )
+    assertPersistence(Standard, EpdFen("8/8/8/1k6/3Pp3/8/8/4KQ2 b - d3 3 1"), "00000002180000308a1c0f03")
+    assertPersistence(
+      Standard,
+      EpdFen("r2r3k/p7/3p4/8/8/P6P/8/R3K2R b KQq - 0 4"),
+      "8901080000810091ad0d10e1f70007"
+    )
+
+    assertPersistence(
+      KingOfTheHill,
+      EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"),
+      "ffff00000000ffff2d844ad200000000111111113e955be3000007"
+    )
+    assertPersistence(
+      ThreeCheck,
+      EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 99 1 +0+1"),
+      "ffff00000000ffff2d844ad200000000111111113e955be363000101"
+    )
+    assertPersistence(Antichess, EpdFen("8/7p/8/8/8/8/3K4/8 b - - 0 1"), "00800000000008001a000102")
+    assertPersistence(
+      Atomic,
+      EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 2 3"),
+      "ffff00000000ffff2d844ad200000000111111113e955be3020403"
+    )
+    assertPersistence(
+      Horde,
+      EpdFen("rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1"),
+      "ffff0066ffffffff000000000000000000000000000000000000111111113e955be3000004"
+    )
+    assertPersistence(
+      RacingKings,
+      EpdFen("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1"),
+      "000000000000ffff793542867b3542a6000005"
+    )
+    assertPersistence(
+      Crazyhouse,
+      EpdFen("r~n~b~q~kb~n~r~/pppppppp/8/8/8/8/PPPPPPPP/RN~BQ~KB~NR/ w KQkq - 0 499"),
+      "ffff00000000ffff2d844ad200000000111111113e955be300e407060000000000ef0000000000002a"
+    )
+
   private def assertRoundtrip(variant: Variant, fen: EpdFen) =
-    val situation    = Fen.readWithMoveNumber(variant, fen).get
-    val bytes        = BinaryFen.write(situation)
+    val situation = Fen.readWithMoveNumber(variant, fen).get
+    val bytes     = BinaryFen.write(situation)
+    println(bytes.value.map("%02x" format _).mkString)
     val roundtripped = BinaryFen.read(bytes)
     assertEquals(Fen.write(roundtripped), fen)
+
+  private def assertPersistence(variant: Variant, fen: EpdFen, hex: String) =
+    val situation = Fen.readWithMoveNumber(variant, fen).get
+    val bytes     = BinaryFen.write(situation)
+    assertEquals(bytes.value.map("%02x" format _).mkString, hex)

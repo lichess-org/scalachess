@@ -107,6 +107,7 @@ object BinaryFen:
         case 4 => Horde
         case 5 => RacingKings
         case 6 => Crazyhouse
+        case 7 => KingOfTheHill
         case _ => Standard
 
       if ply.turn.black then turn = Black
@@ -207,6 +208,7 @@ object BinaryFen:
       case Horde                              => 4
       case RacingKings                        => 5
       case Crazyhouse                         => 6
+      case KingOfTheHill                      => 7
 
     if halfMoveClock > 0 || ply > 1 || brokenTurn || variantHeader != 0
     then writeLeb128(builder, sit.history.halfMoveClock.value)

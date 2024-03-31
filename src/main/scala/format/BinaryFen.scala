@@ -1,9 +1,10 @@
 package chess
 package format
 
-import scala.collection.mutable.ArrayBuilder
-import chess.variant.*
 import chess.bitboard.{ Bitboard, Board as BBoard }
+import chess.variant.*
+
+import scala.collection.mutable.ArrayBuilder
 
 opaque type BinaryFen = Array[Byte]
 

@@ -9,6 +9,8 @@ import scala.collection.mutable.ArrayBuilder
 opaque type BinaryFen = Array[Byte]
 
 object BinaryFen:
+  def apply(value: Array[Byte]): BinaryFen = value
+
   extension (bf: BinaryFen)
     def value: Array[Byte] = bf
 

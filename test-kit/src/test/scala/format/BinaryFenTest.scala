@@ -48,6 +48,12 @@ class BinaryFenTest extends ChessTest:
       Crazyhouse,
       EpdFen("1r3Q1n/p1kp3p/1p2ppq1/2p2b2/8/3P2P1/PPP1PPBP/R4RK1/NRpnnbb w - - 2 28")
     )
+    assertRoundtrip(Crazyhouse, EpdFen("b2nkbnQ~/p1pppp1p/pP1q2p1/r7/8/R5PR/P1PP1P1P/1NBQ1BNK/R w - - 1 2"))
+    assertRoundtrip(Crazyhouse, EpdFen("8/8/8/8/8/8/8/8/ w - - 0 1"))
+    assertRoundtrip(
+      Crazyhouse,
+      EpdFen("r~n~b~q~kb~n~r~/pppppppp/8/8/8/8/PPPPPPPP/RN~BQ~KB~NR/ w KQkq - 0 1")
+    )
 
   test("fen fixtures"):
     for fen <- FenFixtures.fens do assertRoundtrip(Standard, fen)

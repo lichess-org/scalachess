@@ -27,7 +27,60 @@ object BinaryFen:
       var unmovedRooks = Bitboard.empty
       var turn         = White
 
-      def unpackPiece(sq: Square, nibble: Int) = ???
+      def unpackPiece(sq: Square, nibble: Int) =
+        val bb = sq.bb
+        nibble match
+          case 0 =>
+            pawns |= bb
+            white |= bb
+          case 1 =>
+            pawns |= bb
+            black |= bb
+          case 2 =>
+            knights |= bb
+            white |= bb
+          case 3 =>
+            knights |= bb
+            black |= bb
+          case 4 =>
+            bishops |= bb
+            white |= bb
+          case 5 =>
+            bishops |= bb
+            black |= bb
+          case 6 =>
+            rooks |= bb
+            white |= bb
+          case 7 =>
+            rooks |= bb
+            black |= bb
+          case 8 =>
+            queens |= bb
+            white |= bb
+          case 9 =>
+            queens |= bb
+            black |= bb
+          case 10 =>
+            kings |= bb
+            white |= bb
+          case 11 =>
+            kings |= bb
+            black |= bb
+          case 12 =>
+            pawns |= bb
+          // TODO: color, ep
+          case 13 =>
+            rooks |= bb
+            white |= bb
+            unmovedRooks |= bb
+          case 14 =>
+            rooks |= bb
+            black |= bb
+            unmovedRooks |= bb
+          case 15 =>
+            kings |= bb
+            black |= bb
+            turn = Black
 
       val it = occupied.iterator
       while it.hasNext
@@ -36,13 +89,9 @@ object BinaryFen:
         unpackPiece(it.next, lo)
         if it.hasNext then unpackPiece(it.next, hi)
 
-      val halfMoves     = readLeb128(reader)
+      val halfMoveClock = HalfMoveClock(readLeb128(reader))
       var ply           = Ply(readLeb128(reader))
-      val variantHeader = reader.next
-
-      if ply.turn.black then turn = Black
-
-      val variant = variantHeader match
+      val variant = reader.next match
         case 1 => ThreeCheck
         case 2 => Antichess
         case 3 => Atomic
@@ -51,9 +100,11 @@ object BinaryFen:
         case 6 => Crazyhouse
         case _ => Standard
 
+      if ply.turn.black then turn = Black
+
       val checkCount = if variant.threeCheck then
         val (lo, hi) = readNibbles(reader)
-        CheckCount(lo, hi)
+        CheckCount(white = lo, black = hi)
       else CheckCount()
 
       val crazyData = if variant.crazyhouse then
@@ -65,11 +116,11 @@ object BinaryFen:
         val (wq, bq) = readNibbles(reader)
         Some(
           Crazyhouse.Data(
-            ByColor(
+            pockets = ByColor(
               white = Crazyhouse.Pocket(pawn = wp, knight = wn, bishop = wb, rook = wr, queen = wq),
               black = Crazyhouse.Pocket(pawn = bp, knight = bn, bishop = bb, rook = br, queen = bq)
             ),
-            Bitboard(promoted)
+            promoted = Bitboard(promoted)
           )
         )
       else None
@@ -88,7 +139,10 @@ object BinaryFen:
               queens = queens,
               kings = kings
             ),
-            History(unmovedRooks = UnmovedRooks(unmovedRooks)),
+            History(
+              unmovedRooks = UnmovedRooks(unmovedRooks),
+              halfMoveClock = halfMoveClock
+            ),
             variant,
             crazyData
           ),
@@ -127,9 +181,9 @@ object BinaryFen:
     while it.hasNext
     do addNibbles(builder, packPiece(it.next), if it.hasNext then packPiece(it.next) else 0)
 
-    val halfMoves  = sit.history.halfMoveClock.value
-    val ply        = input.fullMoveNumber.ply(sit.color).value
-    val brokenTurn = sit.color.black && sit.board(Black, King).isEmpty
+    val halfMoveClock = sit.history.halfMoveClock.value
+    val ply           = input.fullMoveNumber.ply(sit.color).value
+    val brokenTurn    = sit.color.black && sit.board(Black, King).isEmpty
     val variantHeader = sit.variant match
       case Standard | Chess960 | FromPosition => 0
       case ThreeCheck                         => 1
@@ -139,7 +193,7 @@ object BinaryFen:
       case RacingKings                        => 5
       case Crazyhouse                         => 6
 
-    if halfMoves > 0 || ply > 1 || brokenTurn || variantHeader != 0
+    if halfMoveClock > 0 || ply > 1 || brokenTurn || variantHeader != 0
     then addLeb128(builder, sit.history.halfMoveClock.value)
 
     if ply > 1 || brokenTurn || variantHeader != 0

@@ -232,7 +232,7 @@ object Bitboard:
         b &= (b - 1L)
       builder.result
 
-    def iterator: Iterator[Square] = new Iterator[Square]:
+    def iterator: Iterator[Square] = new:
       private var b                        = a
       override inline def hasNext: Boolean = b != 0L
       override inline def next: Square =

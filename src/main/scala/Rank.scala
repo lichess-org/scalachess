@@ -5,10 +5,10 @@ object Rank:
   extension (a: Rank)
     inline def value: Int = a
 
-    inline infix def >(inline o: Rank): Boolean  = a > o
-    inline infix def <(inline o: Rank): Boolean  = a < o
-    inline infix def >=(inline o: Rank): Boolean = a >= o
-    inline infix def <=(inline o: Rank): Boolean = a <= o
+    inline infix def >(inline o: Rank): Boolean  = value > o.value
+    inline infix def <(inline o: Rank): Boolean  = value < o.value
+    inline infix def >=(inline o: Rank): Boolean = value >= o.value
+    inline infix def <=(inline o: Rank): Boolean = value <= o.value
 
     inline def char: Char = (49 + a).toChar
   end extension

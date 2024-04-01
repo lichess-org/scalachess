@@ -77,7 +77,7 @@ object BinaryFen:
           case 12 =>
             pawns |= bb
             epMove = Some(Uci.Move(sq.xor(Square.A3), sq))
-            if sq.rank.value < 4 then white |= bb
+            if sq.rank <= Rank.Fourth then white |= bb
             else black |= bb
           case 13 =>
             rooks |= bb

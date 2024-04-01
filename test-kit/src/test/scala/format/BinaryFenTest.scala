@@ -27,6 +27,8 @@ class BinaryFenTest extends ChessTest:
 
     assertRoundtrip(Chess960, EpdFen("rn2k1r1/ppp1pp1p/3p2p1/5bn1/P7/2N2B2/1PPPPP2/2BNK1RR w Gkq - 4 11"))
 
+    assertRoundtrip(FromPosition, EpdFen("8/8/8/8/8/8/2Rk4/1K6 w - - 0 1"))
+
     assertRoundtrip(
       Horde,
       EpdFen("rn1qkb1r/3bn1p1/2p3P1/pPP2P2/P1PPP1P1/P1PP1PPP/PPPPPPPP/PPPPPPPP w kq a6 0 12")
@@ -70,11 +72,15 @@ class BinaryFenTest extends ChessTest:
     assertPersistence(Standard, EpdFen("5k2/6p1/8/1Pp5/6P1/8/8/3K4 w - c6 0 1"), "20400006400000080ac0b1")
     assertPersistence(Standard, EpdFen("4k3/8/8/8/3pP3/8/6N1/7K b - e3 0 1"), "10000000180040802ac10f")
     assertPersistence(
-      Standard,
+      Chess960,
       EpdFen("4rrk1/pbbp2p1/1ppnp3/3n1pqp/3N1PQP/1PPNP3/PBBP2P1/4RRK1 w Ff - 0 3"),
-      "704f1ee8e81e4f70d60a44000002020813191113511571be0004"
+      "704f1ee8e81e4f70d60a44000002020813191113511571be000402"
     )
-    assertPersistence(Standard, EpdFen("8/8/8/1k6/3Pp3/8/8/4KQ2 b - d3 3 1"), "00000002180000308a1c0f03")
+    assertPersistence(
+      FromPosition,
+      EpdFen("8/8/8/1k6/3Pp3/8/8/4KQ2 b - d3 3 1"),
+      "00000002180000308a1c0f030103"
+    )
     assertPersistence(
       Standard,
       EpdFen("r2r3k/p7/3p4/8/8/P6P/8/R3K2R b KQq - 0 4"),
@@ -84,38 +90,38 @@ class BinaryFenTest extends ChessTest:
     assertPersistence(
       KingOfTheHill,
       EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"),
-      "ffff00000000ffff2d844ad200000000111111113e955be3000007"
+      "ffff00000000ffff2d844ad200000000111111113e955be3000004"
     )
     assertPersistence(
       ThreeCheck,
       EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 99 1 +0+1"),
-      "ffff00000000ffff2d844ad200000000111111113e955be363000101"
+      "ffff00000000ffff2d844ad200000000111111113e955be363000501"
     )
-    assertPersistence(Antichess, EpdFen("8/7p/8/8/8/8/3K4/8 b - - 0 1"), "00800000000008001a000102")
+    assertPersistence(Antichess, EpdFen("8/7p/8/8/8/8/3K4/8 b - - 0 1"), "00800000000008001a000106")
     assertPersistence(
       Atomic,
       EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 2 3"),
-      "ffff00000000ffff2d844ad200000000111111113e955be3020403"
+      "ffff00000000ffff2d844ad200000000111111113e955be3020407"
     )
     assertPersistence(
       Horde,
       EpdFen("rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1"),
-      "ffff0066ffffffff000000000000000000000000000000000000111111113e955be3000004"
+      "ffff0066ffffffff000000000000000000000000000000000000111111113e955be3000008"
     )
     assertPersistence(
       RacingKings,
       EpdFen("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1"),
-      "000000000000ffff793542867b3542a6000005"
+      "000000000000ffff793542867b3542a6000009"
     )
     assertPersistence(
       Crazyhouse,
       EpdFen("r~n~b~q~kb~n~r~/pppppppp/8/8/8/8/PPPPPPPP/RN~BQ~KB~NR/ w KQkq - 0 499"),
-      "ffff00000000ffff2d844ad200000000111111113e955be300e407060000000000ef0000000000002a"
+      "ffff00000000ffff2d844ad200000000111111113e955be300e407010000000000ef0000000000002a"
     )
     assertPersistence(
       Crazyhouse,
       EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1"),
-      "ffff00000000ffff2d844ad200000000111111113e955be30000060000000000"
+      "ffff00000000ffff2d844ad200000000111111113e955be30000010000000000"
     )
 
   private def assertRoundtrip(variant: Variant, fen: EpdFen) =

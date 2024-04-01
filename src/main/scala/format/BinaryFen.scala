@@ -103,13 +103,16 @@ object BinaryFen:
       val halfMoveClock = HalfMoveClock(readLeb128(reader))
       var ply           = Ply(readLeb128(reader))
       val variant = reader.next match
-        case 1 => ThreeCheck
-        case 2 => Antichess
-        case 3 => Atomic
-        case 4 => Horde
-        case 5 => RacingKings
-        case 6 => Crazyhouse
-        case 7 => KingOfTheHill
+        case 0 => Standard
+        case 1 => Crazyhouse
+        case 2 => Chess960
+        case 3 => FromPosition
+        case 4 => KingOfTheHill
+        case 5 => ThreeCheck
+        case 6 => Antichess
+        case 7 => Atomic
+        case 8 => Horde
+        case 9 => RacingKings
         case _ => Standard
 
       if ply.turn.black then turn = Black
@@ -203,14 +206,16 @@ object BinaryFen:
     val ply           = input.fullMoveNumber.ply(sit.color).value
     val brokenTurn    = sit.color.black && sit.board(Black, King).isEmpty
     val variantHeader = sit.variant match
-      case Standard | Chess960 | FromPosition => 0
-      case ThreeCheck                         => 1
-      case Antichess                          => 2
-      case Atomic                             => 3
-      case Horde                              => 4
-      case RacingKings                        => 5
-      case Crazyhouse                         => 6
-      case KingOfTheHill                      => 7
+      case Standard      => 0
+      case Crazyhouse    => 1
+      case Chess960      => 2
+      case FromPosition  => 3
+      case KingOfTheHill => 4
+      case ThreeCheck    => 5
+      case Antichess     => 6
+      case Atomic        => 7
+      case Horde         => 8
+      case RacingKings   => 9
 
     if halfMoveClock > 0 || ply > 1 || brokenTurn || variantHeader != 0
     then writeLeb128(builder, sit.history.halfMoveClock.value)

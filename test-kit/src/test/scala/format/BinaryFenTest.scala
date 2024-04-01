@@ -112,11 +112,15 @@ class BinaryFenTest extends ChessTest:
       EpdFen("r~n~b~q~kb~n~r~/pppppppp/8/8/8/8/PPPPPPPP/RN~BQ~KB~NR/ w KQkq - 0 499"),
       "ffff00000000ffff2d844ad200000000111111113e955be300e407060000000000ef0000000000002a"
     )
+    assertPersistence(
+      Crazyhouse,
+      EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1"),
+      "ffff00000000ffff2d844ad200000000111111113e955be30000060000000000"
+    )
 
   private def assertRoundtrip(variant: Variant, fen: EpdFen) =
-    val situation = Fen.readWithMoveNumber(variant, fen).get
-    val bytes     = BinaryFen.write(situation)
-    println(bytes.value.map("%02x" format _).mkString)
+    val situation    = Fen.readWithMoveNumber(variant, fen).get
+    val bytes        = BinaryFen.write(situation)
     val roundtripped = BinaryFen.read(bytes)
     assertEquals(Fen.write(roundtripped), fen)
 

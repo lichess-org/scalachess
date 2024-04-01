@@ -231,7 +231,7 @@ object BinaryFen:
         writeNibbles(builder, pockets.white.bishop, pockets.black.bishop)
         writeNibbles(builder, pockets.white.rook, pockets.black.rook)
         writeNibbles(builder, pockets.white.queen, pockets.black.queen)
-        writeLong(builder, crazyData.promoted.value)
+        if crazyData.promoted.nonEmpty then writeLong(builder, crazyData.promoted.value)
 
     builder.result
 

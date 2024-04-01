@@ -104,7 +104,7 @@ object Bitboard:
 
     def isolateFirst: Bitboard = Bitboard(a & -a)
 
-    def isolateLast: Bitboard = last.map(_.bb).getOrElse(0L)
+    def isolateLast: Bitboard = last.fold(empty)(_.bl)
 
     inline def intersects(inline o: Long): Boolean =
       (a & o) != 0L

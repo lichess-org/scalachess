@@ -218,7 +218,7 @@ object BinaryFen:
       case RacingKings   => 9
 
     if halfMoveClock > 0 || ply > 1 || brokenTurn || variantHeader != 0
-    then writeLeb128(builder, sit.history.halfMoveClock.value)
+    then writeLeb128(builder, halfMoveClock)
 
     if ply > 1 || brokenTurn || variantHeader != 0
     then writeLeb128(builder, ply)

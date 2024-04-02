@@ -3,9 +3,40 @@ package format
 
 import chess.bitboard.FenFixtures
 import chess.variant.*
+import munit.ScalaCheckSuite
+import org.scalacheck.Gen
+import org.scalacheck.Prop.forAll
 
-class BinaryFenTest extends ChessTest:
-  test("handpicked roundtrip"):
+import scala.collection.mutable.ArrayBuilder
+
+class BinaryFenTest extends ScalaCheckSuite:
+
+  test("long roundtrip"):
+    forAll: (v: Long) =>
+      val builder = ArrayBuilder.ofByte()
+      BinaryFen.implementation.writeLong(builder, v)
+      assertEquals(BinaryFen.implementation.readLong(builder.result.iterator), v)
+
+  test("leb128 roundtrip"):
+    forAll(Gen.posNum[Int]): (v: Int) =>
+      val builder = ArrayBuilder.ofByte()
+      BinaryFen.implementation.writeLeb128(builder, v)
+      assertEquals(BinaryFen.implementation.readLeb128(builder.result.iterator), v)
+
+  private val genNibble = Gen.chooseNum[Int](0, 15)
+
+  test("nibbles roundtrip"):
+    forAll(genNibble, genNibble): (lo: Int, hi: Int) =>
+      val builder = ArrayBuilder.ofByte()
+      BinaryFen.implementation.writeNibbles(builder, lo, hi)
+      assertEquals(BinaryFen.implementation.readNibbles(builder.result.iterator), (lo, hi))
+
+  test("rewrite fixpoint"):
+    forAll: (bytes: Array[Byte]) =>
+      val rewritten = BinaryFen.write(BinaryFen.read(BinaryFen(bytes)))
+      assertEquals(BinaryFen.write(BinaryFen.read(rewritten)).value.toSeq, rewritten.value.toSeq)
+
+  test("handpicked fens roundtrip"):
     assertRoundtrip(Standard, FullFen("8/8/8/8/8/8/8/8 w - - 0 1"))
     assertRoundtrip(Standard, FullFen("8/8/8/8/8/8/8/8 b - - 0 1"))
     assertRoundtrip(Standard, FullFen("8/8/8/8/8/8/8/8 w - - 0 2"))
@@ -64,10 +95,10 @@ class BinaryFenTest extends ChessTest:
       FullFen("r~n~b~q~kb~n~r~/pppppppp/8/8/8/8/PPPPPPPP/RN~BQ~KB~NR/ w KQkq - 0 1")
     )
 
-  test("fen fixtures"):
+  test("fen fixtures roundtrip"):
     for fen <- FenFixtures.fens do assertRoundtrip(Standard, fen)
 
-  test("persistence"):
+  test("binary format is stable"):
     assertPersistence(Standard, FullFen("8/8/8/8/8/8/8/8 w - - 0 1"), "0000000000000000")
     assertPersistence(Standard, FullFen("8/8/8/8/8/8/8/8 b - - 0 1"), "00000000000000000001")
     assertPersistence(Standard, FullFen("8/8/8/8/8/8/8/8 b - - 100 432"), "000000000000000064df06")

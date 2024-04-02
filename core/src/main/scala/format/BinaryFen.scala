@@ -11,6 +11,8 @@ opaque type BinaryFen = Array[Byte]
 object BinaryFen:
   def apply(value: Array[Byte]): BinaryFen = value
 
+  import implementation.*
+
   extension (bf: BinaryFen)
     def value: Array[Byte] = bf
 
@@ -240,80 +242,82 @@ object BinaryFen:
 
     builder.result
 
-  private def writeLong(builder: ArrayBuilder[Byte], v: Long) =
-    builder.addAll(
-      Array(
-        (v >>> 56).toByte,
-        (v >>> 48).toByte,
-        (v >>> 40).toByte,
-        (v >>> 32).toByte,
-        (v >>> 24).toByte,
-        (v >>> 16).toByte,
-        (v >>> 8).toByte,
-        v.toByte
+  object implementation:
+
+    def writeLong(builder: ArrayBuilder[Byte], v: Long) =
+      builder.addAll(
+        Array(
+          (v >>> 56).toByte,
+          (v >>> 48).toByte,
+          (v >>> 40).toByte,
+          (v >>> 32).toByte,
+          (v >>> 24).toByte,
+          (v >>> 16).toByte,
+          (v >>> 8).toByte,
+          v.toByte
+        )
       )
-    )
 
-  private def readLong(reader: Iterator[Byte]): Long =
-    ((reader.next & 0xffL) << 56) |
-      ((reader.next & 0xffL) << 48) |
-      ((reader.next & 0xffL) << 40) |
-      ((reader.next & 0xffL) << 32) |
-      ((reader.next & 0xffL) << 24) |
-      ((reader.next & 0xffL) << 16) |
-      ((reader.next & 0xffL) << 8) |
-      (reader.next & 0xffL)
+    def readLong(reader: Iterator[Byte]): Long =
+      ((reader.next & 0xffL) << 56) |
+        ((reader.next & 0xffL) << 48) |
+        ((reader.next & 0xffL) << 40) |
+        ((reader.next & 0xffL) << 32) |
+        ((reader.next & 0xffL) << 24) |
+        ((reader.next & 0xffL) << 16) |
+        ((reader.next & 0xffL) << 8) |
+        (reader.next & 0xffL)
 
-  private def writeLeb128(builder: ArrayBuilder[Byte], v: Int) =
-    var n = v
-    while n > 127
-    do
-      builder.addOne((n | 128).toByte)
-      n = n >>> 7
-    builder.addOne(n.toByte)
+    def writeLeb128(builder: ArrayBuilder[Byte], v: Int) =
+      var n = v
+      while n > 127
+      do
+        builder.addOne((n | 128).toByte)
+        n = n >>> 7
+      builder.addOne(n.toByte)
 
-  private def readLeb128(reader: Iterator[Byte]): Int =
-    var n     = 0
-    var shift = 0
-    while
+    def readLeb128(reader: Iterator[Byte]): Int =
+      var n     = 0
+      var shift = 0
+      while
+        val b = reader.next
+        n |= (b & 127) << shift
+        shift += 7
+        (b & 128) != 0
+      do ()
+      n
+
+    def writeNibbles(builder: ArrayBuilder[Byte], lo: Int, hi: Int) =
+      builder.addOne((lo | (hi << 4)).toByte)
+
+    def readNibbles(reader: Iterator[Byte]): (Int, Int) =
       val b = reader.next
-      n |= (b & 127) << shift
-      shift += 7
-      (b & 128) != 0
-    do ()
-    n
+      ((b & 0xf), (b >>> 4) & 0xf)
 
-  private def writeNibbles(builder: ArrayBuilder[Byte], lo: Int, hi: Int) =
-    builder.addOne((lo | (hi << 4)).toByte)
+    def minimumUnmovedRooks(board: Board): UnmovedRooks =
+      val white   = board.history.unmovedRooks.bb & board.white & Bitboard.firstRank
+      val black   = board.history.unmovedRooks.bb & board.black & Bitboard.lastRank
+      val castles = board.history.castles
+      UnmovedRooks(
+        (if castles.whiteKingSide then white.isolateLast else Bitboard.empty) |
+          (if castles.whiteQueenSide then white.isolateFirst else Bitboard.empty) |
+          (if castles.blackKingSide then black.isolateLast else Bitboard.empty) |
+          (if castles.blackQueenSide then black.isolateFirst else Bitboard.empty)
+      )
 
-  private def readNibbles(reader: Iterator[Byte]): (Int, Int) =
-    val b = reader.next
-    ((b & 0xf), (b >>> 4) & 0xf)
-
-  private def minimumUnmovedRooks(board: Board): UnmovedRooks =
-    val white   = board.history.unmovedRooks.bb & board.white & Bitboard.firstRank
-    val black   = board.history.unmovedRooks.bb & board.black & Bitboard.lastRank
-    val castles = board.history.castles
-    UnmovedRooks(
-      (if castles.whiteKingSide then white.isolateLast else Bitboard.empty) |
-        (if castles.whiteQueenSide then white.isolateFirst else Bitboard.empty) |
-        (if castles.blackKingSide then black.isolateLast else Bitboard.empty) |
-        (if castles.blackQueenSide then black.isolateFirst else Bitboard.empty)
-    )
-
-  private def maximumCastles(
-      unmovedRooks: UnmovedRooks,
-      white: Bitboard,
-      black: Bitboard,
-      kings: Bitboard
-  ): Castles =
-    val whiteRooks = unmovedRooks.bb & white & Bitboard.firstRank
-    val blackRooks = unmovedRooks.bb & black & Bitboard.lastRank
-    val whiteKing  = (white & kings & Bitboard.firstRank).first.getOrElse(Square.E1)
-    val blackKing  = (black & kings & Bitboard.lastRank).first.getOrElse(Square.E8)
-    Castles(
-      whiteKingSide = whiteRooks.last.exists(r => r.value > whiteKing.value),
-      whiteQueenSide = whiteRooks.first.exists(r => r.value < whiteKing.value),
-      blackKingSide = blackRooks.last.exists(r => r.value > blackKing.value),
-      blackQueenSide = blackRooks.first.exists(r => r.value < blackKing.value)
-    )
+    def maximumCastles(
+        unmovedRooks: UnmovedRooks,
+        white: Bitboard,
+        black: Bitboard,
+        kings: Bitboard
+    ): Castles =
+      val whiteRooks = unmovedRooks.bb & white & Bitboard.firstRank
+      val blackRooks = unmovedRooks.bb & black & Bitboard.lastRank
+      val whiteKing  = (white & kings & Bitboard.firstRank).first.getOrElse(Square.E1)
+      val blackKing  = (black & kings & Bitboard.lastRank).first.getOrElse(Square.E8)
+      Castles(
+        whiteKingSide = whiteRooks.last.exists(r => r.value > whiteKing.value),
+        whiteQueenSide = whiteRooks.first.exists(r => r.value < whiteKing.value),
+        blackKingSide = blackRooks.last.exists(r => r.value > blackKing.value),
+        blackQueenSide = blackRooks.first.exists(r => r.value < blackKing.value)
+      )

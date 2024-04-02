@@ -38,5 +38,5 @@ if __name__ == "__main__":
         sync(
             abcde,
             os.path.join(os.path.dirname(__file__), "..", "chess-openings", f"{abcde}.tsv"),
-            os.path.join(os.path.dirname(__file__), "src", "main", "scala", "opening", f"OpeningDbPart{abcde.upper()}.scala")
+            os.path.join(os.path.dirname(__file__), "core", "src", "main", "scala", "opening", f"OpeningDbPart{abcde.upper()}.scala")
         )

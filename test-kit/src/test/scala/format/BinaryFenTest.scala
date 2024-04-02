@@ -35,6 +35,10 @@ class BinaryFenTest extends ChessTest:
     )
 
     assertRoundtrip(Antichess, EpdFen("8/2p1p2p/2Q1N2B/8/p7/N7/PPP1P1PP/R4B1R b - - 0 13"))
+    assertRoundtrip(Antichess, EpdFen("8/p6p/4p3/1P4P1/Pp4p1/3P4/7P/8 b - a3 0 1"))
+    assertRoundtrip(Antichess, EpdFen("8/p6p/4p3/1P4P1/1p4pP/3P4/P7/8 b - h3 0 1"))
+    assertRoundtrip(Antichess, EpdFen("8/7p/4p3/pP4P1/1p1P2p1/8/P6P/8 w - a6 0 2"))
+    assertRoundtrip(Antichess, EpdFen("8/p7/4p3/1P4Pp/1p1P2p1/8/P6P/8 w - h6 0 2"))
 
     assertRoundtrip(Atomic, EpdFen("rnbq3r/ppp1p1pp/5p2/3p4/8/8/PPPPPPPP/RNBQKB1R b KQ - 0 4"))
     assertRoundtrip(Atomic, EpdFen("8/6pp/2p2p1n/3p4/4P3/B6P/3P1PP1/1r2K2R b K - 0 17"))

@@ -76,7 +76,7 @@ object BinaryFen:
             black |= bb
           case 12 =>
             pawns |= bb
-            epMove = Some(Uci.Move(sq.xor(Square.A3), sq))
+            epMove = Some(Uci.Move(Square.unsafe(sq.value ^ 0x10), sq))
             if sq.rank <= Rank.Fourth then white |= bb
             else black |= bb
           case 13 =>
@@ -176,8 +176,8 @@ object BinaryFen:
     val occupied = sit.board.occupied
     writeLong(builder, occupied.value)
 
-    val unmovedRooks                 = minimumUnmovedRooks(sit.board)
-    val pawnPushedTo: Option[Square] = sit.enPassantSquare.map(_.xor(Square.A2))
+    val unmovedRooks = minimumUnmovedRooks(sit.board)
+    val pawnPushedTo = sit.enPassantSquare.flatMap(_.prevRank(sit.color))
 
     def packPiece(sq: Square): Byte =
       sit.board(sq) match

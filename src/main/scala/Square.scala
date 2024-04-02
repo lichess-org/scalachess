@@ -44,11 +44,6 @@ object Square:
     inline def file: File = File.of(s)
     inline def rank: Rank = Rank.of(s)
 
-    inline def xor(inline other: Square): Square =
-      // this is guaranteed to stay in bounds, and for some operands a
-      // useful geometric transformation
-      s.value ^ other.value
-
     def asChar: Char =
       if s <= 25 then (97 + s).toChar      // a ...
       else if s <= 51 then (39 + s).toChar // A ...

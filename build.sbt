@@ -28,7 +28,7 @@ lazy val scalachess: Project = Project("scalachess", file(".")).settings(
   commonSettings,
   name := "scalachess",
   libraryDependencies ++= List(
-    "lichess.std"   %% "core"           % "11.0.0",
+    "org.lichess"   %% "scalalib-core"  % "11.0.0",
     "org.typelevel" %% "cats-core"      % "2.10.0",
     "org.typelevel" %% "alleycats-core" % "2.10.0",
     "org.typelevel" %% "cats-parse"     % "1.0.0",

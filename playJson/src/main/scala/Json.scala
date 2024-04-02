@@ -1,23 +1,19 @@
 package chess
 package json
 
-import chess.format.Uci
-import chess.variant.Crazyhouse
+import format.Uci
 import play.api.libs.json.{ Json as PlayJson, * }
-import scalalib.json.Json
-import scalalib.json.Json.*
+import scalalib.json.Json as ScalaJson
+import variant.Crazyhouse
 
 object Json:
 
-  given Writes[chess.Color] = writeAs(_.name)
+  given Writes[chess.Color] = ScalaJson.writeAs(_.name)
 
-  given Reads[Uci] = Reads
-    .of[String]
-    .flatMapResult: str =>
-      JsResult.fromTry(Uci(str).toTry(s"Invalid UCI: $str"))
-  given Writes[Uci] = writeAs(_.uci)
+  given Reads[Uci] = ScalaJson.optRead(Uci.apply)
+  given Writes[Uci] = ScalaJson.writeAs(_.uci)
 
-  given NoJsonHandler[Square] with {}
+  given ScalaJson.NoJsonHandler[Square] with {}
 
   given OWrites[Crazyhouse.Pocket] = OWrites: p =>
     JsObject:

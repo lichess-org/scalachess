@@ -81,7 +81,7 @@ lazy val testKit = project
 lazy val root = project
   .in(file("."))
   .settings(commonSettings)
-  .aggregate(scalachess, playJson, bench, testKit)
+  .aggregate(scalachess, playJson, testKit)
 
 addCommandAlias("fmtCheck", "all scalachess/scalafmtCheckAll bench/scalafmtCheckAll testKit/scalafmtCheckAll")
 addCommandAlias("fmt", "all scalachess/scalafmtAll bench/scalafmtAll testKit/scalafmtAll")

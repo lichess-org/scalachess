@@ -1,11 +1,13 @@
-ThisBuild / organization      := "org.lichess"
-ThisBuild / version           := "15.10.0"
-ThisBuild / scalaVersion      := "3.4.1"
-ThisBuild / licenses += "MIT" -> url("https://opensource.org/licenses/MIT")
-
-ThisBuild / resolvers += "lila-maven".at("https://raw.githubusercontent.com/ornicar/lila-maven/master")
-ThisBuild / publishTo         := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", ""))))
-ThisBuild / semanticdbEnabled := true // for scalafix
+inThisBuild(
+  Seq(
+    scalaVersion       := "3.4.1",
+    version            := "15.10.0",
+    organization       := "org.lichess",
+    licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
+    publishTo          := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", "")))),
+    semanticdbEnabled  := true // for scalafix
+  )
+)
 
 val commonSettings = Seq(
   scalacOptions := Seq(
@@ -24,7 +26,7 @@ val commonSettings = Seq(
   )
 )
 
-lazy val scalachess: Project = Project("scalachess", file(".")).settings(
+lazy val scalachess: Project = Project("scalachess", file("core")).settings(
   commonSettings,
   name := "scalachess",
   libraryDependencies ++= List(
@@ -34,7 +36,8 @@ lazy val scalachess: Project = Project("scalachess", file(".")).settings(
     "org.typelevel" %% "cats-parse"     % "1.0.0",
     "dev.optics"    %% "monocle-core"   % "3.2.0",
     "org.typelevel" %% "kittens"        % "3.3.0"
-  )
+  ),
+  resolvers += "lila-maven".at("https://raw.githubusercontent.com/ornicar/lila-maven/master")
 )
 
 lazy val bench = project
@@ -61,6 +64,11 @@ lazy val testKit = project
     )
   )
   .dependsOn(scalachess % "compile->compile")
+
+lazy val root = project
+  .in(file("."))
+  .settings(commonSettings)
+  .aggregate(scalachess, bench, testKit)
 
 addCommandAlias("fmtCheck", "all scalachess/scalafmtCheckAll bench/scalafmtCheckAll testKit/scalafmtCheckAll")
 addCommandAlias("fmt", "all scalachess/scalafmtAll bench/scalafmtAll testKit/scalafmtAll")

@@ -102,6 +102,10 @@ object Bitboard:
     // remove the last/largest non empty square
     def removeLast: Bitboard = a & ~a.msb.bl
 
+    def isolateFirst: Bitboard = Bitboard(a & -a)
+
+    def isolateLast: Bitboard = last.fold(empty)(_.bl)
+
     inline def intersects(inline o: Long): Boolean =
       (a & o) != 0L
 
@@ -227,6 +231,14 @@ object Bitboard:
         builder += f(b.lsb)
         b &= (b - 1L)
       builder.result
+
+    def iterator: Iterator[Square] = new:
+      private var b                        = a
+      override inline def hasNext: Boolean = b != 0L
+      override inline def next: Square =
+        val result = b.lsb
+        b &= (b - 1L)
+        result
 
     // TODO: nice to have, faster.
     // but should only be used for debug

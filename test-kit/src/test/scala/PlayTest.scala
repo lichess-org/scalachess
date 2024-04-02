@@ -2,14 +2,14 @@ package chess
 
 import chess.Square.*
 import chess.format.Visual.addNewLines
-import chess.format.{ EpdFen, Fen }
+import chess.format.{ Fen, FullFen }
 import chess.variant.Standard
 
 class PlayTest extends ChessTest:
 
   test("only kingside rights"):
     val game = fenToGame(
-      EpdFen("4k2r/8/8/6R1/6r1/3K4/8/8 b k - 3 4"),
+      FullFen("4k2r/8/8/6R1/6r1/3K4/8/8 b k - 3 4"),
       Standard
     ).playMoves(
       G4 -> G2,
@@ -20,11 +20,11 @@ class PlayTest extends ChessTest:
     )
     assertRight(game): game =>
       val fen = Fen.write(game)
-      fen == EpdFen("4k2r/8/8/6r1/8/4K3/8/8 w k - 2 3")
+      fen == FullFen("4k2r/8/8/6r1/8/4K3/8/8 w k - 2 3")
 
   test("kingside and queenside rights"):
     val game = fenToGame(
-      EpdFen("r3k2r/8/8/6R1/6r1/3K4/8/8 b kq - 3 4"),
+      FullFen("r3k2r/8/8/6R1/6r1/3K4/8/8 b kq - 3 4"),
       Standard
     ).playMoves(
       G4 -> G2,
@@ -35,7 +35,7 @@ class PlayTest extends ChessTest:
     )
     assertRight(game): game =>
       val fen = Fen.write(game)
-      fen == EpdFen("r3k2r/8/8/6r1/8/4K3/8/8 w kq - 2 3")
+      fen == FullFen("r3k2r/8/8/6r1/8/4K3/8/8 w kq - 2 3")
 
   val game =
     makeGame.playMoves(E2 -> E4, E7 -> E5, F1 -> C4, G8 -> F6, D2 -> D3, C7 -> C6, C1 -> G5, H7 -> H6).get

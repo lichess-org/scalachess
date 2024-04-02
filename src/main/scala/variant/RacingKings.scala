@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import chess.format.EpdFen
+import chess.format.FullFen
 
 import bitboard.Bitboard
 
@@ -42,7 +42,7 @@ case object RacingKings
 
   override val castles = Castles.none
 
-  override val initialFen = EpdFen("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
+  override val initialFen = FullFen("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
 
   def validMoves(situation: Situation): List[Move] =
     import situation.{ genSafeKing, genNonKingAndNonPawn, us }

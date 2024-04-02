@@ -27,7 +27,7 @@ object Replay:
 
   def apply(
       sans: Iterable[SanStr],
-      initialFen: Option[Fen.Epd],
+      initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, Reader.Result] =
     if sans.isEmpty then ErrorStr("[replay] pgn is empty").asLeft
@@ -48,7 +48,7 @@ object Replay:
 
   def gameMoveWhileValidReverse(
       sans: Seq[SanStr],
-      initialFen: Fen.Epd,
+      initialFen: Fen.Full,
       variant: Variant
   ): (Game, List[(Game, Uci.WithSan)], Option[ErrorStr]) =
     val init       = makeGame(variant, initialFen.some)
@@ -69,7 +69,7 @@ object Replay:
 
   def gameMoveWhileValid(
       sans: Seq[SanStr],
-      initialFen: Fen.Epd,
+      initialFen: Fen.Full,
       variant: Variant
   ): (Game, List[(Game, Uci.WithSan)], Option[ErrorStr]) =
     gameMoveWhileValidReverse(sans, initialFen, variant) match
@@ -96,7 +96,7 @@ object Replay:
           case Right(md) => computeReplay(replay.addMove(md), rest)
 
   private def initialFenToSituation(
-      initialFen: Option[Fen.Epd],
+      initialFen: Option[Fen.Full],
       variant: Variant
   ): Situation = {
     initialFen.flatMap(Fen.read) | Situation(variant)
@@ -104,14 +104,14 @@ object Replay:
 
   def boards(
       sans: Iterable[SanStr],
-      initialFen: Option[Fen.Epd],
+      initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, List[Board]] =
     situations(sans, initialFen, variant).map(_.map(_.board))
 
   def situations(
       sans: Iterable[SanStr],
-      initialFen: Option[Fen.Epd],
+      initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, List[Situation]] =
     val sit = initialFenToSituation(initialFen, variant)
@@ -122,36 +122,36 @@ object Replay:
 
   def boardsFromUci(
       moves: List[Uci],
-      initialFen: Option[Fen.Epd],
+      initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, List[Board]] = situationsFromUci(moves, initialFen, variant).map(_.map(_.board))
 
   def situationsFromUci(
       moves: List[Uci],
-      initialFen: Option[Fen.Epd],
+      initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, List[Situation]] =
     computeSituations(initialFenToSituation(initialFen, variant), moves, _.apply)
 
   def apply(
       moves: List[Uci],
-      initialFen: Option[Fen.Epd],
+      initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, Replay] =
     computeReplay(Replay(makeGame(variant, initialFen)), moves)
 
   def plyAtFen(
       sans: Iterable[SanStr],
-      initialFen: Option[Fen.Epd],
+      initialFen: Option[Fen.Full],
       variant: Variant,
-      atFen: Fen.Epd
+      atFen: Fen.Full
   ): Either[ErrorStr, Ply] =
     if Fen.read(variant, atFen).isEmpty then ErrorStr(s"Invalid Fen $atFen").asLeft
     else
       // we don't want to compare the full move number, to match transpositions
-      def truncateFen(fen: Fen.Epd) = fen.value.split(' ').take(4).mkString(" ")
-      val atFenTruncated            = truncateFen(atFen)
-      def compareFen(fen: Fen.Epd)  = truncateFen(fen) == atFenTruncated
+      def truncateFen(fen: Fen.Full) = fen.value.split(' ').take(4).mkString(" ")
+      val atFenTruncated             = truncateFen(atFen)
+      def compareFen(fen: Fen.Full)  = truncateFen(fen) == atFenTruncated
 
       @scala.annotation.tailrec
       def recursivePlyAtFen(sit: Situation, sans: List[San], ply: Ply): Either[ErrorStr, Ply] =
@@ -173,6 +173,6 @@ object Replay:
         .flatMap: moves =>
           recursivePlyAtFen(sit, moves.value, Ply(1))
 
-  private def makeGame(variant: Variant, initialFen: Option[Fen.Epd]): Game =
+  private def makeGame(variant: Variant, initialFen: Option[Fen.Full]): Game =
     val g = Game(variant.some, initialFen)
     g.copy(startedAtPly = g.ply)

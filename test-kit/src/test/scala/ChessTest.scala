@@ -4,7 +4,7 @@ import cats.syntax.all.*
 
 import scala.language.implicitConversions
 
-import format.{ EpdFen, Fen, Uci, Visual }
+import format.{ FullFen, Fen, Uci, Visual }
 import format.pgn.PgnStr
 import variant.{ Chess960, Variant }
 import bitboard.Board as BBoard
@@ -52,7 +52,7 @@ trait ChessTestCommon:
     def movesAt(s: Square): List[Move] =
       sit.moves.getOrElse(s, Nil)
 
-  def fenToGameEither(positionString: EpdFen, variant: Variant): Either[String, Game] =
+  def fenToGameEither(positionString: FullFen, variant: Variant): Either[String, Game] =
     Fen
       .read(variant, positionString)
       .map: sit =>
@@ -162,7 +162,7 @@ trait ChessTest extends munit.FunSuite with ChessTestCommon with MunitExtensions
       def isEqual(obtained: Option[List[Square]], expected: Set[Square]): Boolean =
         obtained.fold(Set.empty)(_.toSet) == expected
 
-  def fenToGame(positionString: EpdFen, variant: Variant)(using Location): Game =
+  def fenToGame(positionString: FullFen, variant: Variant)(using Location): Game =
     fenToGameEither(positionString, variant).get
 
   def visualDests(board: Board, p: Iterable[Square]): String =

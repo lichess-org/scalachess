@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import chess.format.EpdFen
+import chess.format.FullFen
 
 case object Chess960
     extends Variant(
@@ -25,7 +25,7 @@ case object Chess960
     Variant.symmetricRank:
       positions(position).flatMap(Role.allByForsyth.get)
 
-  def positionNumber(fen: EpdFen): Option[Int] =
+  def positionNumber(fen: FullFen): Option[Int] =
     fen.value.split(' ') match
       case Array(board, "w", "KQkq", "-", "0", "1") =>
         board.split('/') match
@@ -38,8 +38,8 @@ case object Chess960
           case _ => None
       case _ => None
 
-  def positionToFen(position: Int): Option[EpdFen] =
-    EpdFen.from(
+  def positionToFen(position: Int): Option[FullFen] =
+    FullFen.from(
       positions
         .lift(position)
         .map: rank8 =>

@@ -3,7 +3,7 @@ package format.pgn
 
 import cats.Eq
 import cats.syntax.option.*
-import chess.format.EpdFen
+import chess.format.FullFen
 
 import java.time.format.DateTimeFormatter
 
@@ -51,7 +51,7 @@ case class Tags(value: List[Tag]) extends AnyVal:
       case Tags.DateRegex(y, _, _) => y.toIntOption
       case _                       => None
 
-  def fen: Option[EpdFen] = EpdFen.from(apply(_.FEN))
+  def fen: Option[FullFen] = FullFen.from(apply(_.FEN))
 
   def exists(which: Tag.type => TagType): Boolean =
     val name = which(Tag)
@@ -191,7 +191,7 @@ object Tag:
     value = value.toString.trim
   )
 
-  def apply(fen: EpdFen): Tag = Tag(Tag.FEN, fen.value)
+  def apply(fen: FullFen): Tag = Tag(Tag.FEN, fen.value)
 
   def tagType(name: String) =
     tagTypesByLowercase.getOrElse(name.toLowerCase, Unknown(name))

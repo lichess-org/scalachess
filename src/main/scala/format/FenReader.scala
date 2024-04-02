@@ -16,7 +16,7 @@ import bitboard.Board as BBoard
   * http://scidb.sourceforge.net/help/en/FEN.html#ThreeCheck
   */
 trait FenReader:
-  def read(variant: Variant, fen: EpdFen): Option[Situation] =
+  def read(variant: Variant, fen: FullFen): Option[Situation] =
     val (fBoard, fColor, fCastling, fEnpassant) = fen.parts
     makeBoard(variant, fBoard).map { board =>
       // We trust Fen's color to be correct, if there is no color we use the color of the king in check
@@ -72,9 +72,9 @@ trait FenReader:
         checkCount.foldLeft(history)(_.withCheckCount(_))
     }
 
-  def read(fen: EpdFen): Option[Situation] = read(Standard, fen)
+  def read(fen: FullFen): Option[Situation] = read(Standard, fen)
 
-  def readWithMoveNumber(variant: Variant, fen: EpdFen): Option[Situation.AndFullMoveNumber] =
+  def readWithMoveNumber(variant: Variant, fen: FullFen): Option[Situation.AndFullMoveNumber] =
     read(variant, fen).map { sit =>
       val (halfMoveClock, fullMoveNumber) = readHalfMoveClockAndFullMoveNumber(fen)
       Situation.AndFullMoveNumber(
@@ -83,10 +83,10 @@ trait FenReader:
       )
     }
 
-  def readWithMoveNumber(fen: EpdFen): Option[Situation.AndFullMoveNumber] =
+  def readWithMoveNumber(fen: FullFen): Option[Situation.AndFullMoveNumber] =
     readWithMoveNumber(Standard, fen)
 
-  def readHalfMoveClockAndFullMoveNumber(fen: EpdFen): (Option[HalfMoveClock], Option[FullMoveNumber]) =
+  def readHalfMoveClockAndFullMoveNumber(fen: FullFen): (Option[HalfMoveClock], Option[FullMoveNumber]) =
     val splitted = fen.value.split(' ').drop(4).dropWhile(_.contains('+')) // skip winboards 3check notation
     val halfMoveClock =
       HalfMoveClock
@@ -97,7 +97,7 @@ trait FenReader:
       .map(_.atLeast(FullMoveNumber.initial).atMost(500))
     (halfMoveClock, fullMoveNumber)
 
-  def readPly(fen: EpdFen): Option[Ply] =
+  def readPly(fen: FullFen): Option[Ply] =
     val (_, fullMoveNumber) = readHalfMoveClockAndFullMoveNumber(fen)
     fullMoveNumber.map(_.ply(fen.colorOrWhite))
 

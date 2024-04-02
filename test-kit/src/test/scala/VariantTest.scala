@@ -2,7 +2,7 @@ package chess
 
 import cats.syntax.option.*
 import chess.Square.*
-import chess.format.{ EpdFen, Fen }
+import chess.format.{ Fen, FullFen }
 import chess.variant.*
 
 class VariantTest extends ChessTest:
@@ -11,7 +11,7 @@ class VariantTest extends ChessTest:
 
   List(Standard, Chess960, ThreeCheck, KingOfTheHill, Crazyhouse).foreach: variant =>
     test(s"$variant two-step pawn advance with no check should be valid"):
-      val position = EpdFen("2r3k1/p2Q1pp1/1p5p/3p4/P7/KP6/2r5/8 b - - 1 36")
+      val position = FullFen("2r3k1/p2Q1pp1/1p5p/3p4/P7/KP6/2r5/8 b - - 1 36")
       val game     = fenToGame(position, variant).playMoves(A7 -> A5).get
       assert(game.situation.playable(true))
 
@@ -19,10 +19,10 @@ class VariantTest extends ChessTest:
       s"$variant when previous move is a double pawn push and checker is not the pushed pawn or a sliding piece"
     ):
       val game1 = Fen
-        .read(variant, EpdFen("r1bqkbnr/1p1p1ppp/p7/2pPp3/4P3/5n2/PPP2PPP/RNBQKBNR w KQkq c6 0 4"))
+        .read(variant, FullFen("r1bqkbnr/1p1p1ppp/p7/2pPp3/4P3/5n2/PPP2PPP/RNBQKBNR w KQkq c6 0 4"))
         .get
       val game2 = Fen
-        .read(variant, EpdFen("r1bqkbnr/1p1p1ppp/p7/2pP4/4P3/8/PPP2pPP/RNBQKBNR w KQkq c6 0 4"))
+        .read(variant, FullFen("r1bqkbnr/1p1p1ppp/p7/2pP4/4P3/8/PPP2pPP/RNBQKBNR w KQkq c6 0 4"))
         .get
 
       assertNot(game1.variant.valid(game1, true))
@@ -34,7 +34,7 @@ class VariantTest extends ChessTest:
       s"$variant when previous move is a double pawn push and the only checker is a rook but not discovered check"
     ):
       val game = Fen
-        .read(variant, EpdFen("1k6/5K1r/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HA c6 0 4"))
+        .read(variant, FullFen("1k6/5K1r/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HA c6 0 4"))
         .get
       assertNot(game.variant.valid(game, true))
       assert(game.variant.valid(game, false))
@@ -43,28 +43,28 @@ class VariantTest extends ChessTest:
       s"$variant when previous move is a double pawn push and the only checker is a bishop but not discovered check"
     ):
       val game = Fen
-        .read(variant, EpdFen("2b4r/kr5p/p7/2pP2b1/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4"))
+        .read(variant, FullFen("2b4r/kr5p/p7/2pP2b1/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4"))
         .get
       assertNot(game.variant.valid(game, true))
       assert(game.variant.valid(game, false))
 
     test(s"$variant when multiple checkers are aligned with the king"):
       val game = Fen
-        .read(variant, EpdFen("1nbqk3/1p1prppp/p1P5/8/4K3/8/PPP1rPPP/RNBQ1BNR w HA - 0 4"))
+        .read(variant, FullFen("1nbqk3/1p1prppp/p1P5/8/4K3/8/PPP1rPPP/RNBQ1BNR w HA - 0 4"))
         .get
       assertNot(game.variant.valid(game, true))
       assert(game.variant.valid(game, false))
 
     test(s"$variant when previous move is a double pawn push and the only checker is the pushed pawn"):
       val game = Fen
-        .read(variant, EpdFen("r1bqkbnr/1p1p1ppp/p7/2pP4/3KP3/8/PPP3PP/RNBQ1BNR w HAkq c6 0 4"))
+        .read(variant, FullFen("r1bqkbnr/1p1p1ppp/p7/2pP4/3KP3/8/PPP3PP/RNBQ1BNR w HAkq c6 0 4"))
         .get
       assert(game.variant.valid(game, true))
       assert(game.variant.valid(game, false))
 
     test(s"$variant when two checkers are not on the same rank, file or diagonal"):
       val game = Fen
-        .read(variant, EpdFen("rnbqk2r/1p1p1ppp/p1P5/3np1b1/4P3/4K3/PPP2PPP/RNBQ1BNR w HAkq - 0 4"))
+        .read(variant, FullFen("rnbqk2r/1p1p1ppp/p1P5/3np1b1/4P3/4K3/PPP2PPP/RNBQ1BNR w HAkq - 0 4"))
         .get
       assert(game.variant.valid(game, true))
       assert(game.variant.valid(game, false))
@@ -73,7 +73,7 @@ class VariantTest extends ChessTest:
       s"$variant when previous move is a double pawn push and the only checker is a discovered rook check"
     ):
       val game = Fen
-        .read(variant, EpdFen("1kb2b1r/1r3K1p/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HAk c6 0 4"))
+        .read(variant, FullFen("1kb2b1r/1r3K1p/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HAk c6 0 4"))
         .get
       assert(game.variant.valid(game, true))
       assert(game.variant.valid(game, false))
@@ -82,7 +82,7 @@ class VariantTest extends ChessTest:
       s"$variant when previous move is a double pawn push and the only checker is a discovered bishop check"
     ):
       val game = Fen
-        .read(variant, EpdFen("1bb4r/kr5p/p7/2pP4/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4"))
+        .read(variant, FullFen("1bb4r/kr5p/p7/2pP4/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4"))
         .get
       assert(game.variant.valid(game, true))
       assert(game.variant.valid(game, false))
@@ -127,19 +127,19 @@ class VariantTest extends ChessTest:
     )
 
   test("standard Identify insufficient mating material when called (bishop)."):
-    val position = EpdFen("krq5/bqqq4/qqr5/1qq5/8/8/8/3qB2K b - -")
+    val position = FullFen("krq5/bqqq4/qqr5/1qq5/8/8/8/3qB2K b - -")
     val game     = fenToGame(position, Standard)
     assertEquals(game.board.materialImbalance, -91)
     assert(game.situation.opponentHasInsufficientMaterial)
 
   test("standard Identify sufficient mating material when called (bishop)."):
-    val position = EpdFen("8/7B/K7/2b5/1k6/8/8/8 b - -")
+    val position = FullFen("8/7B/K7/2b5/1k6/8/8/8 b - -")
     val game     = fenToGame(position, Standard)
     assertEquals(game.board.materialImbalance, 0)
     assertNot(game.situation.opponentHasInsufficientMaterial)
 
   test("standard Identify insufficient mating material when called (knight)."):
-    val position = EpdFen("8/3k4/2q5/8/8/K1N5/8/8 b - -")
+    val position = FullFen("8/3k4/2q5/8/8/K1N5/8/8 b - -")
     val game     = fenToGame(position, Standard)
     assertEquals(game.board.materialImbalance, -6)
     assert(game.situation.opponentHasInsufficientMaterial)
@@ -248,14 +248,14 @@ K  r
     assertEquals(game.situation.winner, Some(Black))
 
   test("threeCheck Not force a draw when there is insufficient mating material"):
-    val position = EpdFen("8/6K1/8/8/8/8/k6p/8 b - - 1 39")
+    val position = FullFen("8/6K1/8/8/8/8/k6p/8 b - - 1 39")
     fenToGame(position, ThreeCheck)
       .playMove(Square.H2, Square.H1, Knight.some)
       .assertRight: game =>
         assertNot(game.situation.end)
 
   test("threeCheck Force a draw when there are only kings remaining"):
-    val position = EpdFen("8/6K1/8/8/8/8/k7/8 b - -")
+    val position = FullFen("8/6K1/8/8/8/8/k7/8 b - -")
     val game     = fenToGame(position, ThreeCheck)
     assert(game.situation.end)
     assertEquals(game.situation.status, Status.Draw.some)
@@ -264,42 +264,42 @@ K  r
     assertEquals(Board.init(KingOfTheHill).history.castles, Castles.init)
 
   test("racingKings call it stalemate when there is no legal move"):
-    val position = EpdFen("8/8/8/8/3K4/8/1k6/b7 b - - 5 3")
+    val position = FullFen("8/8/8/8/3K4/8/1k6/b7 b - - 5 3")
     val game     = fenToGame(position, RacingKings)
     assert(game.situation.end)
     assert(game.situation.staleMate)
 
   test("racingKings should not draw because of insufficient material"):
-    val position = EpdFen("8/8/8/8/5K2/8/2k5/8 w - - 0 1")
+    val position = FullFen("8/8/8/8/5K2/8/2k5/8 w - - 0 1")
     val game     = fenToGame(position, RacingKings)
     assertNot(game.situation.end)
     assertNot(game.situation.staleMate)
 
   test("racingKings should recognize a king in the goal"):
-    val position = EpdFen("2K5/8/6k1/8/8/8/8/Q6q w - - 0 1")
+    val position = FullFen("2K5/8/6k1/8/8/8/8/Q6q w - - 0 1")
     val game     = fenToGame(position, RacingKings)
     assert(game.situation.end)
     assertEquals(game.situation.winner, Some(White))
 
   test("racingKings should recognize a king in the goal - black"):
-    val position = EpdFen("6k1/8/8/8/8/2r5/1KB5/2B5 w - - 0 1")
+    val position = FullFen("6k1/8/8/8/8/2r5/1KB5/2B5 w - - 0 1")
     val game     = fenToGame(position, RacingKings)
     assert(game.situation.end)
     assertEquals(game.situation.winner, Some(Black))
 
   test("racingKings should give black one more move when white is in the goal"):
-    val position = EpdFen("2K5/5k2/8/8/8/8/8/8 b - - 0 1")
+    val position = FullFen("2K5/5k2/8/8/8/8/8/8 b - - 0 1")
     val game     = fenToGame(position, RacingKings)
     assertNot(game.situation.end)
 
   test("racingKings should give black one more move but not if it does not matter anyway"):
-    val position = EpdFen("2K5/8/2n1nk2/8/8/8/8/4r3 b - - 0 1")
+    val position = FullFen("2K5/8/2n1nk2/8/8/8/8/4r3 b - - 0 1")
     val game     = fenToGame(position, RacingKings)
     assert(game.situation.end)
     assertEquals(game.situation.winner, Some(White))
 
   test("racingKings should call it a draw with both kings in the goal"):
-    val position = EpdFen("2K2k2/8/8/8/8/1b6/1b6/8 w - - 0 1")
+    val position = FullFen("2K2k2/8/8/8/8/1b6/1b6/8 w - - 0 1")
     val game     = fenToGame(position, RacingKings)
     assert(game.situation.end)
     assertEquals(game.situation.status, Status.Draw.some)
@@ -320,7 +320,7 @@ K  r
   ).foreach: fen =>
     test(s"racingKings validate situation correctly $fen"):
       val game = Fen
-        .read(RacingKings, EpdFen(fen))
+        .read(RacingKings, FullFen(fen))
         .get
       assertNot(game.variant.valid(game, true))
       assert(game.variant.valid(game, false))
@@ -329,7 +329,7 @@ K  r
     assert(Board.init(Antichess).history.castles.isEmpty)
 
   test("antichess calculate material imbalance"):
-    val position = EpdFen("8/p7/8/8/2B5/b7/PPPK2PP/RNB3NR w - - 1 16")
+    val position = FullFen("8/p7/8/8/2B5/b7/PPPK2PP/RNB3NR w - - 1 16")
     val game     = fenToGame(position, Antichess)
     assertEquals(game.situation.board.materialImbalance, -20)
 
@@ -346,25 +346,25 @@ K  r
   ).foreach: fen =>
     test(s"antichess validate situation correctly $fen"):
       val game = Fen
-        .read(Antichess, EpdFen(fen))
+        .read(Antichess, FullFen(fen))
         .get
       assert(game.variant.valid(game, true))
       assert(game.variant.valid(game, false))
 
   test("racingKings validate situation correctly with any check at all for white"):
-    val position = EpdFen("8/8/8/k5R1/8/8/1rbnNB1K/qrbnNBRQ b - - 0 1")
+    val position = FullFen("8/8/8/k5R1/8/8/1rbnNB1K/qrbnNBRQ b - - 0 1")
     val game     = fenToGame(position, RacingKings)
     assertNot(game.situation.playable(true))
     assert(game.situation.playable(false))
 
   test("racingKings validate situation correctly with any check at all for black"):
-    val position = EpdFen("8/8/8/k7/7r/8/2bnNBRK/qrbnNBRQ w - - 0 1")
+    val position = FullFen("8/8/8/k7/7r/8/2bnNBRK/qrbnNBRQ w - - 0 1")
     val game     = fenToGame(position, RacingKings)
     assertNot(game.situation.playable(true))
     assert(game.situation.playable(false))
 
   test("horde validate situation correctly: two-step pawn advance with no check should be valid"):
-    val position = EpdFen("2r3k1/p2P1pp1/1p5p/3p4/P7/PP6/2P3P1/8 b - - 1 36")
+    val position = FullFen("2r3k1/p2P1pp1/1p5p/3p4/P7/PP6/2P3P1/8 b - - 1 36")
     val game     = fenToGame(position, Horde).playMoves(A7 -> A5).get
     assert(game.situation.playable(true))
 
@@ -372,7 +372,7 @@ K  r
     "horde validate situation correctly: when previous move is a double pawn push and checker is not the pushed pawn or a sliding piece"
   ):
     val game = Fen
-      .read(Horde, EpdFen("1r6/6q1/8/3k4/2pPP3/8/PPP2PPP/PPPPPPPP b - d3 0 1"))
+      .read(Horde, FullFen("1r6/6q1/8/3k4/2pPP3/8/PPP2PPP/PPPPPPPP b - d3 0 1"))
       .get
     assert(game.variant.valid(game, false))
     assertNot(game.variant.valid(game, true))
@@ -383,7 +383,7 @@ K  r
     val game = Fen
       .read(
         Horde,
-        EpdFen("5r2/8/4k2R/8/3pP3/8/PPPP1PPP/2PPPPP1 b - e3 0 1")
+        FullFen("5r2/8/4k2R/8/3pP3/8/PPPP1PPP/2PPPPP1 b - e3 0 1")
       )
       .get
     assertNot(game.variant.valid(game, true))
@@ -393,14 +393,14 @@ K  r
     "horde validate situation correctly: when previous move is a double pawn push and the only checker is a bishop but not discovered check"
   ):
     val game = Fen
-      .read(Horde, EpdFen("5r2/8/4k3/8/3pP1B1/8/PPPP1PPP/2PPPPP1 b - e3 0 1"))
+      .read(Horde, FullFen("5r2/8/4k3/8/3pP1B1/8/PPPP1PPP/2PPPPP1 b - e3 0 1"))
       .get
     assertNot(game.variant.valid(game, true))
     assert(game.variant.valid(game, false))
 
   test("horde validate situation correctly: when multiple checkers are aligned with the king"):
     val game = Fen
-      .read(Horde, EpdFen("1q6/8/R2k1R2/8/8/8/8/8 b - - 0 1"))
+      .read(Horde, FullFen("1q6/8/R2k1R2/8/8/8/8/8 b - - 0 1"))
       .get
     assertNot(game.variant.valid(game, true))
     assert(game.variant.valid(game, false))
@@ -409,14 +409,14 @@ K  r
     "horde validate situation correctly: when previous move is a double pawn push and the only checker is the pushed pawn"
   ):
     val game = Fen
-      .read(Horde, EpdFen("1r6/6q1/8/4k3/2pP4/2P5/PP3PPP/PPPPPPPP b - d3 0 3"))
+      .read(Horde, FullFen("1r6/6q1/8/4k3/2pP4/2P5/PP3PPP/PPPPPPPP b - d3 0 3"))
       .get
     assert(game.variant.valid(game, true))
     assert(game.variant.valid(game, false))
 
   test("horde validate situation correctly: when two checkers are not on the same rank, file or diagonal"):
     val game = Fen
-      .read(Horde, EpdFen("7r/3k4/8/1B2N2q/1B6/8/PPPPPPPP/PPPPPPPP w - - 0 1"))
+      .read(Horde, FullFen("7r/3k4/8/1B2N2q/1B6/8/PPPPPPPP/PPPPPPPP w - - 0 1"))
       .get
     assert(game.variant.valid(game, true))
     assert(game.variant.valid(game, false))
@@ -425,7 +425,7 @@ K  r
     "horde validate situation correctly: when previous move is a double pawn push and the only checker is a discovered rook check"
   ):
     val game = Fen
-      .read(Horde, EpdFen("8/8/8/8/3Pp3/8/k5R1/8 b - d3 0 2"))
+      .read(Horde, FullFen("8/8/8/8/3Pp3/8/k5R1/8 b - d3 0 2"))
       .get
     assert(game.variant.valid(game, true))
     assert(game.variant.valid(game, false))
@@ -434,7 +434,7 @@ K  r
     "horde validate situation correctly: when previous move is a double pawn push and the only checker is a discovered bishop check"
   ):
     val game = Fen
-      .read(Horde, EpdFen("8/8/8/8/1k1Pp3/8/8/4B3 b - d3 0 2"))
+      .read(Horde, FullFen("8/8/8/8/1k1Pp3/8/8/4B3 b - d3 0 2"))
       .get
     assert(game.variant.valid(game, true))
     assert(game.variant.valid(game, false))

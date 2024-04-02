@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 
 import chess.variant.*
 import chess.{ Mode as _, * }
-import chess.format.EpdFen
+import chess.format.FullFen
 import chess.perft.Perft
 import chess.format.Fen
 
@@ -24,14 +24,14 @@ class FenReaderBench:
   @Param(Array("100"))
   var games: Int = scala.compiletime.uninitialized
 
-  var threecheckInput: List[(Variant, EpdFen)]  = scala.compiletime.uninitialized
-  var antichessInput: List[(Variant, EpdFen)]   = scala.compiletime.uninitialized
-  var atomicInput: List[(Variant, EpdFen)]      = scala.compiletime.uninitialized
-  var crazyhouseInput: List[(Variant, EpdFen)]  = scala.compiletime.uninitialized
-  var racingkingsInput: List[(Variant, EpdFen)] = scala.compiletime.uninitialized
-  var hordeInput: List[(Variant, EpdFen)]       = scala.compiletime.uninitialized
-  var randomInput: List[(Variant, EpdFen)]      = scala.compiletime.uninitialized
-  var trickyInput: List[(Variant, EpdFen)]      = scala.compiletime.uninitialized
+  var threecheckInput: List[(Variant, FullFen)]  = scala.compiletime.uninitialized
+  var antichessInput: List[(Variant, FullFen)]   = scala.compiletime.uninitialized
+  var atomicInput: List[(Variant, FullFen)]      = scala.compiletime.uninitialized
+  var crazyhouseInput: List[(Variant, FullFen)]  = scala.compiletime.uninitialized
+  var racingkingsInput: List[(Variant, FullFen)] = scala.compiletime.uninitialized
+  var hordeInput: List[(Variant, FullFen)]       = scala.compiletime.uninitialized
+  var randomInput: List[(Variant, FullFen)]      = scala.compiletime.uninitialized
+  var trickyInput: List[(Variant, FullFen)]      = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =
@@ -76,13 +76,13 @@ class FenReaderBench:
   def tricky(bh: Blackhole) =
     bench(trickyInput)(bh)
 
-  private def bench(sits: List[(Variant, EpdFen)])(bh: Blackhole) =
+  private def bench(sits: List[(Variant, FullFen)])(bh: Blackhole) =
     val x = sits.map: x =>
       Blackhole.consumeCPU(Work)
       Fen.read(x._1, x._2)
     bh.consume(x)
 
-  private def makeFens(perfts: List[Perft], variant: Variant, games: Int): List[(Variant, EpdFen)] =
+  private def makeFens(perfts: List[Perft], variant: Variant, games: Int): List[(Variant, FullFen)] =
     perfts
       .take(games)
       .map(p => variant -> p.epd)

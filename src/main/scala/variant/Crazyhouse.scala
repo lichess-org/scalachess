@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import chess.format.{ EpdFen, Uci }
+import chess.format.{ FullFen, Uci }
 import monocle.syntax.all.*
 
 import bitboard.Bitboard
@@ -19,7 +19,7 @@ case object Crazyhouse
 
   def pieces = Standard.pieces
 
-  override val initialFen = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1")
+  override val initialFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1")
 
   def validMoves(situation: Situation): List[Move] =
     Standard.validMoves(situation)

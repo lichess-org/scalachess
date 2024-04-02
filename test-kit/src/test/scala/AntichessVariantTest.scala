@@ -2,7 +2,7 @@ package chess
 
 import cats.syntax.option.*
 import chess.format.pgn.Reader
-import chess.format.{ EpdFen, Fen }
+import chess.format.{ Fen, FullFen }
 import chess.variant.Antichess
 
 import scala.language.implicitConversions
@@ -54,7 +54,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     val startingPosition = Game(Antichess)
     val newGame          = startingPosition.playMove(Square.E2, Square.E4, None).get
     val fen              = Fen.write(newGame)
-    assertEquals(fen, EpdFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b - - 0 1"))
+    assertEquals(fen, FullFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b - - 0 1"))
 
   test("Not allow a player to make a non capturing move if a capturing move is available"):
     val game             = Game(Antichess)
@@ -119,18 +119,18 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     assertNot(game.situation.checkMate)
 
   test("Allow a pawn to be promoted to a king"):
-    val position = EpdFen("8/5P2/8/2b5/8/8/4B3/8 w - -")
+    val position = FullFen("8/5P2/8/2b5/8/8/4B3/8 w - -")
     val game     = fenToGame(position, Antichess)
     val newGame  = game(Square.F7, Square.F8, Option(King)).get._1
     assertEquals(newGame.board(Square.F8), Option(White - King))
 
   test("deal with 2 white kings"):
-    val position = EpdFen("K3k1nr/p2q2pp/p2p1p2/8/2PP4/8/PP4PP/RNBQK1NR w - - 0 11")
+    val position = FullFen("K3k1nr/p2q2pp/p2p1p2/8/2PP4/8/PP4PP/RNBQK1NR w - - 0 11")
     val game     = fenToGame(position, Antichess)
     assertEquals(game.situation.destinations, Map(Square.A8 -> Square.A7.bb))
 
   test("Be drawn when there are only opposite colour bishops remaining"):
-    val position = EpdFen("8/2b5/8/8/8/6Q1/4B3/8 b - -")
+    val position = FullFen("8/2b5/8/8/8/6Q1/4B3/8 b - -")
     val game     = fenToGame(position, Antichess)(Square.C7, Square.G3, None).get._1
     assert(game.situation.end)
     assert(game.situation.autoDraw)
@@ -138,7 +138,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     assertEquals(game.situation.status, Some(Status.Draw))
 
   test("Be drawn on multiple bishops on the opposite color"):
-    val position = EpdFen("8/6P1/8/8/1b6/8/8/5B2 w - -")
+    val position = FullFen("8/6P1/8/8/1b6/8/8/5B2 w - -")
     val game     = fenToGame(position, Antichess)(Square.G7, Square.G8, Bishop.some).get._1
     assert(game.situation.end)
     assert(game.situation.autoDraw)
@@ -146,7 +146,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     assertEquals(game.situation.status, Some(Status.Draw))
 
   test("Not be drawn when the black and white bishops are on the same coloured squares "):
-    val position = EpdFen("7b/8/1p6/8/8/8/5B2/8 w - -")
+    val position = FullFen("7b/8/1p6/8/8/8/5B2/8 w - -")
     val game     = fenToGame(position, Antichess)(Square.F2, Square.B6, None).get._1
     assertNot(game.situation.end)
     assertNot(game.situation.autoDraw)
@@ -155,47 +155,47 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
   test(
     "Be drawn when there are only opposite colour bishops and pawns which could not attack those bishops remaining"
   ):
-    val position = EpdFen("8/6p1/4B1P1/4p3/4P3/8/2p5/8 b - - 1 28")
+    val position = FullFen("8/6p1/4B1P1/4p3/4P3/8/2p5/8 b - - 1 28")
     val game     = fenToGame(position, Antichess)(Square.C2, Square.C1, Option(Bishop)).get._1
     assert(game.situation.end)
     assert(game.situation.autoDraw)
     assertEquals(game.situation.status, Some(Status.Draw))
 
   test("Not be drawn on opposite color bishops but with pawns that could be forced to attack a bishop"):
-    val position = EpdFen("8/6p1/1B4P1/4p3/4P3/8/3p4/8 b - -")
+    val position = FullFen("8/6p1/1B4P1/4p3/4P3/8/3p4/8 b - -")
     val game     = fenToGame(position, Antichess)(Square.D2, Square.D1, Option(Bishop)).get._1
     assertNot(game.situation.end)
     assertNot(game.situation.autoDraw)
     assertEquals(game.situation.winner, None)
 
   test("Not be drawn where a white bishop can attack a black pawn in an almost closed position"):
-    val position = EpdFen("5b2/1P4p1/4B1P1/4p3/4P3/8/8/8 w - -")
+    val position = FullFen("5b2/1P4p1/4B1P1/4p3/4P3/8/8/8 w - -")
     val game     = fenToGame(position, Antichess)(Square.B7, Square.B8, Bishop.some).get._1
     assertNot(game.situation.end)
     assertNot(game.situation.autoDraw)
     assertEquals(game.situation.winner, None)
 
   test("Not be drawn where a pawn is unattackable, but is blocked by a bishop, not a pawn"):
-    val position = EpdFen("8/8/4BbP1/4p3/4P3/8/8/8 b - -")
+    val position = FullFen("8/8/4BbP1/4p3/4P3/8/8/8 b - -")
     val game     = fenToGame(position, Antichess).playMoves(Square.F6 -> Square.G7).get
     assertNot(game.situation.end)
     assertNot(game.situation.autoDraw)
     assertEquals(game.situation.status, None)
 
   test("Opponent has insufficient material when there are only two remaining knights on same color squares"):
-    val position = EpdFen("8/8/3n2N1/8/8/8/8/8 w - -")
+    val position = FullFen("8/8/3n2N1/8/8/8/8/8 w - -")
     val game     = fenToGame(position, Antichess).playMoves(Square.G6 -> Square.F4).get
     assert(game.situation.opponentHasInsufficientMaterial)
 
   test(
     "Opponent has sufficient material when there are only two remaining knights on opposite color squares"
   ):
-    val position = EpdFen("7n/8/8/8/8/8/8/N7 w - -")
+    val position = FullFen("7n/8/8/8/8/8/8/N7 w - -")
     val game     = fenToGame(position, Antichess).playMoves(Square.A1 -> Square.B3).get
     assertNot(game.situation.opponentHasInsufficientMaterial)
 
   test("Not be drawn on insufficient mating material"):
-    val position = EpdFen("4K3/8/1b6/8/8/8/5B2/3k4 b - -")
+    val position = FullFen("4K3/8/1b6/8/8/8/5B2/3k4 b - -")
     val game     = fenToGame(position, Antichess)
     assertNot(game.situation.end)
 
@@ -218,13 +218,13 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
           assertEquals(game.situation.winner, Some(Black))
 
   test("Win on a traditional stalemate where the player has no valid moves"):
-    val position = EpdFen("8/p7/8/P7/8/8/8/8 w - -")
+    val position = FullFen("8/p7/8/P7/8/8/8/8 w - -")
     val game     = fenToGame(position, Antichess).playMoves(Square.A5 -> Square.A6).get
     assert(game.situation.end)
     assertEquals(game.situation.winner, Some(Black))
 
   test("Stalemate is a win - second test"):
-    val fen  = EpdFen("2Q5/8/p7/8/8/8/6PR/8 w - -")
+    val fen  = FullFen("2Q5/8/p7/8/8/8/6PR/8 w - -")
     val game = fenToGame(fen, Antichess).playMoves(Square.C8 -> Square.A6).get
     assert(game.situation.end)
     assertEquals(game.situation.status, Some(Status.VariantEnd))
@@ -262,6 +262,6 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
           assertEquals(game.situation.winner, None)
 
   test("fen with castles"):
-    val game = fenToGame(EpdFen("rnbqk2r/ppppppbp/5np1/8/8/5NP1/PPPPPPBP/RNBQK2R w KQkq - 4 4"), Antichess)
+    val game = fenToGame(FullFen("rnbqk2r/ppppppbp/5np1/8/8/5NP1/PPPPPPBP/RNBQK2R w KQkq - 4 4"), Antichess)
     assertEquals(game.situation.board.history.castles, Castles.none)
     assertEquals(game.situation.board.history.unmovedRooks, UnmovedRooks.none)

@@ -1,6 +1,6 @@
 package chess
 
-import chess.format.EpdFen
+import chess.format.FullFen
 
 import scala.language.implicitConversions
 
@@ -376,13 +376,13 @@ K   bB""".autoDraw
       makeGame.playMoves(moves.dropRight(1)*).get.situation.autoDraw
 
   test("do not detect insufficient material: on two knights"):
-    val position = EpdFen("1n2k1n1/8/8/8/8/8/8/4K3 w - - 0 1")
+    val position = FullFen("1n2k1n1/8/8/8/8/8/8/4K3 w - - 0 1")
     val game     = fenToGame(position, Standard)
     assertNot(game.situation.autoDraw)
     assertNot(game.situation.end)
     assertNot(game.situation.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on knight versus pawn"):
-    val position = EpdFen("7K/5k2/7P/6n1/8/8/8/8 b - - 0 40")
+    val position = FullFen("7K/5k2/7P/6n1/8/8/8/8 b - - 0 40")
     fenToGame(position, Standard)
       .playMove(Square.F7, Square.F8)
       .assertRight: game =>
@@ -390,7 +390,7 @@ K   bB""".autoDraw
         assertNot(game.situation.end)
         assertNot(game.situation.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on bishops versus pawn"):
-    val position = EpdFen("1b1b3K/8/5k1P/8/8/8/8/8 b - - 0 40")
+    val position = FullFen("1b1b3K/8/5k1P/8/8/8/8/8 b - - 0 40")
     fenToGame(position, Standard)
       .playMove(Square.B8, Square.E5)
       .assertRight: game =>
@@ -398,7 +398,7 @@ K   bB""".autoDraw
         assertNot(game.situation.end)
         assertNot(game.situation.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on bishops versus queen"):
-    val position = EpdFen("b2b3K/8/5k1Q/8/8/8/8/8 b - -")
+    val position = FullFen("b2b3K/8/5k1Q/8/8/8/8/8 b - -")
     fenToGame(position, Standard)
       .playMove(Square.F6, Square.E5)
       .assertRight: game =>
@@ -406,7 +406,7 @@ K   bB""".autoDraw
         assertNot(game.situation.end)
         assertNot(game.situation.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on bishops versus queen"):
-    val position = EpdFen("1b1b3K/8/5k1Q/8/8/8/8/8 b - -")
+    val position = FullFen("1b1b3K/8/5k1Q/8/8/8/8/8 b - -")
     fenToGame(position, Standard)
       .playMove(Square.F6, Square.E5)
       .assertRight: game =>
@@ -414,7 +414,7 @@ K   bB""".autoDraw
         assertNot(game.situation.end)
         assert(game.situation.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on knight versus pawns"):
-    val position = EpdFen("8/8/5N2/8/6p1/8/5K1p/7k w - - 0 37")
+    val position = FullFen("8/8/5N2/8/6p1/8/5K1p/7k w - - 0 37")
     fenToGame(position, Standard)
       .playMove(Square.F6, Square.E4)
       .assertRight: game =>
@@ -422,7 +422,7 @@ K   bB""".autoDraw
         assertNot(game.situation.end)
         assertNot(game.situation.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on knight versus pieces"):
-    val position = EpdFen("8/8/8/4N3/4k1p1/6K1/8/3b4 w - - 5 59")
+    val position = FullFen("8/8/8/4N3/4k1p1/6K1/8/3b4 w - - 5 59")
     fenToGame(position, Standard)
       .playMove(Square.E5, Square.F7)
       .assertRight: game =>
@@ -430,7 +430,7 @@ K   bB""".autoDraw
         assertNot(game.situation.end)
         assertNot(game.situation.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on opposite bishops with queen"):
-    val position = EpdFen("8/8/3Q4/2bK4/B7/8/8/k7 b - - 0 67")
+    val position = FullFen("8/8/3Q4/2bK4/B7/8/8/k7 b - - 0 67")
     fenToGame(position, Standard)
       .playMove(Square.A1, Square.B2)
       .assertRight: game =>
@@ -438,7 +438,7 @@ K   bB""".autoDraw
         assertNot(game.situation.end)
         assertNot(game.situation.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on same-color bishops on both sides"):
-    val position = EpdFen("5K2/8/8/1B6/8/k7/6b1/8 w - - 0 39")
+    val position = FullFen("5K2/8/8/1B6/8/k7/6b1/8 w - - 0 39")
     val game     = fenToGame(position, Standard)
     assert(game.situation.autoDraw)
     assert(game.situation.end)

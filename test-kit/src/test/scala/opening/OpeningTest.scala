@@ -1,7 +1,7 @@
 package chess
 package opening
 
-import format.EpdFen
+import format.FullFen
 import format.pgn.SanStr
 
 class OpeningTest extends ChessTest:
@@ -68,13 +68,13 @@ class OpeningTest extends ChessTest:
   test("find by fen should consider en passant"):
     assert(
       (OpeningDb
-        .findByEpdFen(EpdFen("rnbqkbnr/pp1p1ppp/8/2pPp3/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 3")))
+        .findByFullFen(FullFen("rnbqkbnr/pp1p1ppp/8/2pPp3/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 3")))
         .isEmpty
     )
     assert(
       (OpeningDb
-        .findByEpdFen(
-          EpdFen(
+        .findByFullFen(
+          FullFen(
             "rnbqkbnr/pp1p1ppp/8/2pPp3/8/8/PPP1PPPP/RNBQKBNR w KQkq e6 0 3"
           )
         ))
@@ -84,15 +84,15 @@ class OpeningTest extends ChessTest:
   test("find by fen should ignore empty crazyhouse pocket"):
     assertEquals(
       (OpeningDb
-        .findByEpdFen(EpdFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR/ b KQkq - 0 1")))
+        .findByFullFen(FullFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR/ b KQkq - 0 1")))
         .get
         .name,
       OpeningName("King's Pawn Game")
     )
     assertEquals(
       (OpeningDb
-        .findByEpdFen(
-          EpdFen(
+        .findByFullFen(
+          FullFen(
             "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR[] b KQkq - 0 1"
           )
         ))
@@ -104,8 +104,8 @@ class OpeningTest extends ChessTest:
   test("find by fen should ignore crazyhouse pocket"):
     assertEquals(
       (OpeningDb
-        .findByEpdFen(
-          EpdFen(
+        .findByFullFen(
+          FullFen(
             "rn2kb1r/ppp1pppp/5n2/q4b2/3P4/2N2N2/PPP2PPP/R1BQKB1R/Pp w KQkq - 3 6"
           )
         ))
@@ -115,8 +115,8 @@ class OpeningTest extends ChessTest:
     )
     assertEquals(
       (OpeningDb
-        .findByEpdFen(
-          EpdFen(
+        .findByFullFen(
+          FullFen(
             "rn2kb1r/ppp1pppp/5n2/q4b2/3P4/2N2N2/PPP2PPP/R1BQKB1R[Pp] w KQkq - 3 6"
           )
         ))

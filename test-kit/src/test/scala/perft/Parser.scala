@@ -3,7 +3,7 @@ package perft
 
 import cats.parse.{ Numbers as N, Parser as P, Parser0 as P0, Rfc5234 as R }
 import cats.syntax.all.*
-import chess.format.EpdFen
+import chess.format.FullFen
 
 /**
   * Perft parser specification
@@ -12,7 +12,7 @@ import chess.format.EpdFen
   *
   * perft -> id "\n" epd "\n" case* "\n"
   * id -> "id " STRING
-  * epd -> "epd " EpdFen
+  * epd -> "epd " FullFen
   * case -> "perft " INT LONG "\n"
   *
   * -- only support comment at the begining of the line
@@ -30,8 +30,8 @@ object Parser:
   private val comment = (P.caret.filter(_.col == 0) *> P.char('#')).endWith(R.lf)
   private val ignored = (comment | blank).void
 
-  private val id: P[String]  = "id".prefix
-  private val epd: P[EpdFen] = "epd".prefix.map(EpdFen.clean)
+  private val id: P[String]   = "id".prefix
+  private val epd: P[FullFen] = "epd".prefix.map(FullFen.clean)
   private val testCase: P[TestCase] =
     ((nonNegative.map(_.toInt) <* P.char(' ')) ~ nonNegative.map(_.toLong)).map(TestCase.apply)
   private val oneTestCase: P[TestCase] = P.string("perft ") *> testCase <* R.lf.?

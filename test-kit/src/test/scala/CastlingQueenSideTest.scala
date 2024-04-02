@@ -4,7 +4,7 @@ import scala.language.implicitConversions
 
 import Square.*
 import variant.Chess960
-import format.EpdFen
+import format.FullFen
 
 class CastlingQueenSideTest extends ChessTest:
 
@@ -101,13 +101,13 @@ PPPPPPPP
     assertEquals(g3.board.destsFrom(E1), Set(D1, F1))
 
   test("chess960"):
-    val fenPosition = EpdFen("r3k2r/8/8/8/8/8/8/1R2K2R b KQk - 1 1")
+    val fenPosition = FullFen("r3k2r/8/8/8/8/8/8/1R2K2R b KQk - 1 1")
     val init        = fenToGame(fenPosition, Chess960)
     val game        = init.playMoves((A8, A1), (H1, H2), (A1, A7)).get
     assert(game.situation.legalMoves.exists(_.castles))
 
   test("test games"):
-    val fenPosition = EpdFen("1rnk1bqr/pppp1bpp/1n2p3/5p2/5P2/1N1N4/PPPPPBPP/1R1K1BQR w KQkq - 0 5")
+    val fenPosition = FullFen("1rnk1bqr/pppp1bpp/1n2p3/5p2/5P2/1N1N4/PPPPPBPP/1R1K1BQR w KQkq - 0 5")
     val init        = fenToGame(fenPosition, Chess960)
     assert(init.situation.legalMoves.exists(_.castles))
     assert(init.situation.legalMoves.exists(_.castle.exists(_.side == QueenSide)))

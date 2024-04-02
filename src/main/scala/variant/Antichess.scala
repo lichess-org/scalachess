@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import chess.format.EpdFen
+import chess.format.FullFen
 
 case object Antichess
     extends Variant(
@@ -18,7 +18,7 @@ case object Antichess
 
   // In antichess, it is not permitted to castle
   override val castles    = Castles.none
-  override val initialFen = EpdFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1")
+  override val initialFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1")
 
   // In antichess, the king can't be put into check so we always return false
   override def kingSafety(m: Move): Boolean = true

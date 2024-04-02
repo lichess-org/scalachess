@@ -44,7 +44,7 @@ class SmallFenTest extends ChessTest:
 
   test("validate standard incorrect"):
     assertEquals(
-      SmallFen.validate(Standard, Fen.Epd("this is not a pipe")),
+      SmallFen.validate(Standard, Fen.Full("this is not a pipe")),
       None
     )
 

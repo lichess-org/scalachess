@@ -1,7 +1,7 @@
 package chess
 package bitboard
 
-import chess.format.{ EpdFen, Fen }
+import chess.format.{ Fen, FullFen }
 
 import Square.*
 import Bitboard.*
@@ -12,7 +12,7 @@ class BoardTest extends ChessTest:
   given Conversion[Square, Int] = _.value
   given Conversion[Int, Square] = Square.unsafe(_)
 
-  def parseFen(fen: EpdFen): Board =
+  def parseFen(fen: FullFen): Board =
     Fen.read(fen).map(_.board.board).getOrElse(throw RuntimeException("boooo"))
 
   test("generateMovesAt(square) = generateMoves.filter(_.orig == square)"):

@@ -3,7 +3,7 @@ package opening
 
 import cats.syntax.option.*
 import chess.format.pgn.SanStr
-import chess.format.{ EpdFen, StandardFen }
+import chess.format.{ FullFen, StandardFen }
 
 object OpeningDb:
 
@@ -24,7 +24,7 @@ object OpeningDb:
 
   def isShortest(op: Opening) = shortestLines.get(op.key).contains(op)
 
-  def findByEpdFen(fen: EpdFen): Option[Opening] = findByStandardFen(fen.opening)
+  def findByFullFen(fen: FullFen): Option[Opening] = findByStandardFen(fen.opening)
 
   def findByStandardFen(fen: StandardFen): Option[Opening] = byFen.get(fen)
 

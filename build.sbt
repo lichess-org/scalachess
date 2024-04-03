@@ -82,7 +82,6 @@ lazy val testKit = project
 
 lazy val root = project
   .in(file("."))
-  .settings(commonSettings)
   .settings(publish := {}, publish / skip := true)
   .aggregate(scalachess, playJson, testKit)
 

@@ -22,7 +22,7 @@ class BinaryFenBench:
   private val Work: Long = 10
 
   private val binary = BinaryFen(
-    Array(
+    List(
       0xff.toByte,
       0xff.toByte,
       0x00.toByte,
@@ -53,7 +53,7 @@ class BinaryFenBench:
   @Benchmark
   def read(bh: Blackhole) =
     Blackhole.consumeCPU(Work)
-    bh.consume(BinaryFen.read(binary))
+    bh.consume(binary.read)
 
   private val situation = Situation.AndFullMoveNumber(Situation(Standard), FullMoveNumber(1))
 

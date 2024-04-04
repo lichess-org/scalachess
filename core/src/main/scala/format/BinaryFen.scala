@@ -4,17 +4,17 @@ package format
 import chess.bitboard.{ Bitboard, Board as BBoard }
 import chess.variant.*
 
-import scala.collection.mutable.ArrayBuilder
+import scala.collection.mutable.ListBuffer
 
-opaque type BinaryFen = Array[Byte]
+opaque type BinaryFen = List[Byte]
 
 object BinaryFen:
-  def apply(value: Array[Byte]): BinaryFen = value
+  def apply(value: List[Byte]): BinaryFen = value
 
   import implementation.*
 
   extension (bf: BinaryFen)
-    def value: Array[Byte] = bf
+    def value: List[Byte] = bf
 
     def read: Situation.AndFullMoveNumber =
       val reader = new Iterator[Byte]:
@@ -172,7 +172,7 @@ object BinaryFen:
       )
 
   def write(input: Situation.AndFullMoveNumber): BinaryFen =
-    val builder = ArrayBuilder.ofByte()
+    val builder = new ListBuffer[Byte]()
 
     val sit      = input.situation
     val occupied = sit.board.occupied
@@ -240,13 +240,13 @@ object BinaryFen:
         writeNibbles(builder, pockets.white.queen, pockets.black.queen)
         if crazyData.promoted.nonEmpty then writeLong(builder, crazyData.promoted.value)
 
-    builder.result
+    builder.result.toList
 
   object implementation:
 
-    def writeLong(builder: ArrayBuilder[Byte], v: Long) =
+    def writeLong(builder: ListBuffer[Byte], v: Long) =
       builder.addAll(
-        Array(
+        List(
           (v >>> 56).toByte,
           (v >>> 48).toByte,
           (v >>> 40).toByte,
@@ -268,7 +268,7 @@ object BinaryFen:
         ((reader.next & 0xffL) << 8) |
         (reader.next & 0xffL)
 
-    def writeLeb128(builder: ArrayBuilder[Byte], v: Int) =
+    def writeLeb128(builder: ListBuffer[Byte], v: Int) =
       var n = v
       while n > 127
       do
@@ -285,9 +285,9 @@ object BinaryFen:
         shift += 7
         (b & 128) != 0
       do ()
-      n
+      n & 0x7fff_ffff
 
-    def writeNibbles(builder: ArrayBuilder[Byte], lo: Int, hi: Int) =
+    def writeNibbles(builder: ListBuffer[Byte], lo: Int, hi: Int) =
       builder.addOne((lo | (hi << 4)).toByte)
 
     def readNibbles(reader: Iterator[Byte]): (Int, Int) =

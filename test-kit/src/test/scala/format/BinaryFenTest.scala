@@ -7,19 +7,18 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Gen
 import org.scalacheck.Prop.forAll
 
-import scala.collection.mutable.ArrayBuilder
+import scala.collection.mutable.ListBuffer
 
 class BinaryFenTest extends ScalaCheckSuite:
-
   test("long roundtrip"):
     forAll: (v: Long) =>
-      val builder = ArrayBuilder.ofByte()
+      val builder = new ListBuffer[Byte]()
       BinaryFen.implementation.writeLong(builder, v)
       assertEquals(BinaryFen.implementation.readLong(builder.result.iterator), v)
 
   test("leb128 roundtrip"):
     forAll(Gen.posNum[Int]): (v: Int) =>
-      val builder = ArrayBuilder.ofByte()
+      val builder = new ListBuffer[Byte]()
       BinaryFen.implementation.writeLeb128(builder, v)
       assertEquals(BinaryFen.implementation.readLeb128(builder.result.iterator), v)
 
@@ -27,14 +26,14 @@ class BinaryFenTest extends ScalaCheckSuite:
 
   test("nibbles roundtrip"):
     forAll(genNibble, genNibble): (lo: Int, hi: Int) =>
-      val builder = ArrayBuilder.ofByte()
+      val builder = new ListBuffer[Byte]()
       BinaryFen.implementation.writeNibbles(builder, lo, hi)
       assertEquals(BinaryFen.implementation.readNibbles(builder.result.iterator), (lo, hi))
 
   test("rewrite fixpoint"):
-    forAll: (bytes: Array[Byte]) =>
-      val rewritten = BinaryFen.write(BinaryFen.read(BinaryFen(bytes)))
-      assertEquals(BinaryFen.write(BinaryFen.read(rewritten)).value.toSeq, rewritten.value.toSeq)
+    forAll: (bytes: List[Byte]) =>
+      val rewritten = BinaryFen.write(BinaryFen(bytes).read)
+      assertEquals(BinaryFen.write(rewritten.read), rewritten)
 
   test("handpicked fens roundtrip"):
     assertRoundtrip(Standard, FullFen("8/8/8/8/8/8/8/8 w - - 0 1"))
@@ -165,7 +164,7 @@ class BinaryFenTest extends ScalaCheckSuite:
   private def assertRoundtrip(variant: Variant, fen: FullFen) =
     val situation    = Fen.readWithMoveNumber(variant, fen).get
     val bytes        = BinaryFen.write(situation)
-    val roundtripped = BinaryFen.read(bytes)
+    val roundtripped = bytes.read
     assertEquals(Fen.write(roundtripped), fen)
 
   private def assertPersistence(variant: Variant, fen: FullFen, hex: String) =

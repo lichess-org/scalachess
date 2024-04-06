@@ -7,7 +7,7 @@ class PawnTest extends ChessTest:
 
   import compare.dests
 
-  test("move towards rank by 1 square"):
+  test("move towards rank by 1 square (white pawn)"):
     assertEquals(
       makeBoard(
         A4 -> White.pawn
@@ -15,7 +15,7 @@ class PawnTest extends ChessTest:
       Set(A5)
     )
 
-  test("not move to positions that are occupied by the same color"):
+  test("not move to positions that are occupied by the same color (white pawn)"):
     assertEquals(
       makeBoard(
         A4 -> White.pawn,
@@ -24,7 +24,7 @@ class PawnTest extends ChessTest:
       Set()
     )
 
-  test("capture in diagonal"):
+  test("capture in diagonal (white pawn)"):
     assertEquals(
       makeBoard(
         D4 -> White.pawn,
@@ -34,7 +34,7 @@ class PawnTest extends ChessTest:
       Set(C5, D5, E5)
     )
 
-  test("require a capture to move in diagonal"):
+  test("require a capture to move in diagonal (white pawn)"):
     assertEquals(
       makeBoard(
         A4 -> White.pawn,
@@ -43,7 +43,7 @@ class PawnTest extends ChessTest:
       Set(A5)
     )
 
-  test("move towards rank by 2 squares"):
+  test("move towards rank by 2 squares (white pawn)"):
     // "if the path is free" in:
     assertEquals(
       makeBoard(
@@ -85,7 +85,7 @@ class PawnTest extends ChessTest:
       ).destsFrom(A2),
       Set(A3)
     )
-  test("capture en passant"):
+  test("capture en passant (white pawn)"):
     // "with proper position" in:
     val board = makeBoard(
       D5 -> White.pawn,
@@ -152,7 +152,7 @@ class PawnTest extends ChessTest:
       Set(D6)
     )
 
-  test("move towards rank by 1 square"):
+  test("move towards rank by 1 square (black pawn)"):
     assertEquals(
       makeBoard(
         A4 -> Black.pawn
@@ -160,7 +160,7 @@ class PawnTest extends ChessTest:
       Set(A3)
     )
 
-  test("not move to positions that are occupied by the same color"):
+  test("not move to positions that are occupied by the same color (black pawn)"):
     assertEquals(
       makeBoard(
         A4 -> Black.pawn,
@@ -169,7 +169,7 @@ class PawnTest extends ChessTest:
       Set()
     )
 
-  test("capture in diagonal"):
+  test("capture in diagonal (black pawn)"):
     assertEquals(
       makeBoard(
         D4 -> Black.pawn,
@@ -179,7 +179,7 @@ class PawnTest extends ChessTest:
       Set(C3, D3, E3)
     )
 
-  test("require a capture to move in diagonal"):
+  test("require a capture to move in diagonal (black pawn)"):
     assertEquals(
       makeBoard(
         A4 -> Black.pawn,
@@ -188,7 +188,7 @@ class PawnTest extends ChessTest:
       Set(A3)
     )
 
-  test("move towards rank by 2 squares"):
+  test("move towards rank by 2 squares (black pawn)"):
     // "if the path is free" in:
     assertEquals(
       makeBoard(
@@ -230,7 +230,7 @@ class PawnTest extends ChessTest:
       ).destsFrom(A7),
       Set(A6)
     )
-  test("capture en passant"):
+  test("capture en passant (black pawn)"):
     // "with proper position" in:
     val board = makeBoard(
       D4 -> Black.pawn,

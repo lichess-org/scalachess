@@ -42,7 +42,7 @@ class CastlingTest extends ChessTest:
     val board: Board = """R  QK  R"""
     assertEquals(board.place(Black.rook, H3).flatMap(_.destsFrom(E1)), Set(D2, E2, F1, F2, G1, H1))
 
-  test("threat on rook does not prevent castling king side"):
+  test("threat on rook does not prevent castling queen side"):
     val board: Board = """R   KB R"""
     assertEquals(board.place(Black.rook, A3).flatMap(_.destsFrom(E1)), Set(A1, C1, D1, D2, E2, F2))
 

@@ -171,6 +171,19 @@ object BinaryFen:
         ply.fullMoveNumber
       )
 
+  def writeNormalized(situation: Situation): BinaryFen =
+    write(
+      Situation.AndFullMoveNumber(
+        situation
+          .withHistory(situation.history.setHalfMoveClock(HalfMoveClock.initial))
+          .withVariant(situation.variant match
+            case Standard | Chess960 | FromPosition => Standard
+            case other                              => other
+          ),
+        FullMoveNumber.initial
+      )
+    )
+
   def write(input: Situation.AndFullMoveNumber): BinaryFen =
     val builder = new ListBuffer[Byte]()
 

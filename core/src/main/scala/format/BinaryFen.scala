@@ -171,6 +171,7 @@ case class BinaryFen(value: Array[Byte]):
     case _                  => false
 
 object BinaryFen:
+
   import BinaryFen.implementation.*
 
   def writeNormalized(situation: Situation): BinaryFen =
@@ -188,6 +189,7 @@ object BinaryFen:
 
   def write(input: Situation.AndFullMoveNumber) = BinaryFen:
     val builder = ArrayBuilder.ofByte()
+    builder.sizeHint(8 + 32)
 
     val sit      = input.situation
     val occupied = sit.board.occupied
@@ -260,18 +262,14 @@ object BinaryFen:
   object implementation:
 
     def writeLong(builder: ArrayBuilder[Byte], v: Long) =
-      builder.addAll(
-        Array(
-          (v >>> 56).toByte,
-          (v >>> 48).toByte,
-          (v >>> 40).toByte,
-          (v >>> 32).toByte,
-          (v >>> 24).toByte,
-          (v >>> 16).toByte,
-          (v >>> 8).toByte,
-          v.toByte
-        )
-      )
+      builder.addOne((v >>> 56).toByte)
+      builder.addOne((v >>> 48).toByte)
+      builder.addOne((v >>> 40).toByte)
+      builder.addOne((v >>> 32).toByte)
+      builder.addOne((v >>> 24).toByte)
+      builder.addOne((v >>> 16).toByte)
+      builder.addOne((v >>> 8).toByte)
+      builder.addOne(v.toByte)
 
     def readLong(reader: Iterator[Byte]): Long =
       ((reader.next & 0xffL) << 56) |

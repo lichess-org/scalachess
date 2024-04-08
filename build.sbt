@@ -75,7 +75,7 @@ lazy val testKit = project
       "co.fs2"              %% "fs2-core"          % "3.8.0"     % Test,
       "co.fs2"              %% "fs2-io"            % "3.8.0"     % Test,
       "org.typelevel"       %% "discipline-munit"  % "1.0.9"     % Test,
-      "org.typelevel"       %% "cats-laws"         % "2.9.0"     % Test
+      "org.typelevel"       %% "cats-laws"         % "2.10.0"    % Test
     )
   )
   .dependsOn(scalachess % "compile->compile")

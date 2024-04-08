@@ -70,12 +70,12 @@ lazy val testKit = project
       "org.scalacheck"      %% "scalacheck"        % "1.17.0",
       "org.scalameta"       %% "munit"             % "1.0.0-M11" % Test,
       "org.scalameta"       %% "munit-scalacheck"  % "1.0.0-M11" % Test,
-      "com.disneystreaming" %% "weaver-cats"       % "0.8.3"     % Test,
-      "com.disneystreaming" %% "weaver-scalacheck" % "0.8.3"     % Test,
+      "com.disneystreaming" %% "weaver-cats"       % "0.8.4"     % Test,
+      "com.disneystreaming" %% "weaver-scalacheck" % "0.8.4"     % Test,
       "co.fs2"              %% "fs2-core"          % "3.10.2"    % Test,
       "co.fs2"              %% "fs2-io"            % "3.10.2"    % Test,
       "org.typelevel"       %% "discipline-munit"  % "1.0.9"     % Test,
-      "org.typelevel"       %% "cats-laws"         % "2.9.0"     % Test
+      "org.typelevel"       %% "cats-laws"         % "2.10.0"    % Test
     )
   )
   .dependsOn(scalachess % "compile->compile")

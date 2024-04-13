@@ -35,10 +35,12 @@ class BinaryFenTest extends ScalaCheckSuite:
       val rewritten = BinaryFen.write(BinaryFen(bytes).read)
       assertEquals(BinaryFen.write(rewritten.read), rewritten)
 
-  test("equals are sensiable"):
+  test("equals is sensible"):
     forAll: (bytes: Array[Byte]) =>
       val anotherByes = bytes.clone()
+      assertEquals(BinaryFen(bytes).hashCode, BinaryFen(anotherByes).hashCode)
       assertEquals(BinaryFen(bytes), BinaryFen(anotherByes))
+
   test("handpicked fens roundtrip"):
     assertRoundtrip(Standard, FullFen("8/8/8/8/8/8/8/8 w - - 0 1"))
     assertRoundtrip(Standard, FullFen("8/8/8/8/8/8/8/8 b - - 0 1"))

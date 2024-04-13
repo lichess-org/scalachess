@@ -6,7 +6,7 @@ import chess.variant.*
 
 import scala.collection.mutable.ArrayBuilder
 
-case class BinaryFen(value: Array[Byte]):
+case class BinaryFen(value: Array[Byte]) extends AnyVal:
 
   import BinaryFen.implementation.*
 

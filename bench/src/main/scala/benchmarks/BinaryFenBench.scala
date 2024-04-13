@@ -22,7 +22,7 @@ class BinaryFenBench:
   private val Work: Long = 10
 
   private val binary = BinaryFen(
-    List(
+    Array(
       0xff.toByte,
       0xff.toByte,
       0x00.toByte,

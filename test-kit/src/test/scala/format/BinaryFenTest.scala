@@ -7,18 +7,18 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Gen
 import org.scalacheck.Prop.forAll
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.ArrayBuilder
 
 class BinaryFenTest extends ScalaCheckSuite:
   test("long roundtrip"):
     forAll: (v: Long) =>
-      val builder = new ListBuffer[Byte]()
+      val builder = ArrayBuilder.ofByte()
       BinaryFen.implementation.writeLong(builder, v)
       assertEquals(BinaryFen.implementation.readLong(builder.result.iterator), v)
 
   test("leb128 roundtrip"):
     forAll(Gen.posNum[Int]): (v: Int) =>
-      val builder = new ListBuffer[Byte]()
+      val builder = ArrayBuilder.ofByte()
       BinaryFen.implementation.writeLeb128(builder, v)
       assertEquals(BinaryFen.implementation.readLeb128(builder.result.iterator), v)
 
@@ -26,14 +26,20 @@ class BinaryFenTest extends ScalaCheckSuite:
 
   test("nibbles roundtrip"):
     forAll(genNibble, genNibble): (lo: Int, hi: Int) =>
-      val builder = new ListBuffer[Byte]()
+      val builder = ArrayBuilder.ofByte()
       BinaryFen.implementation.writeNibbles(builder, lo, hi)
       assertEquals(BinaryFen.implementation.readNibbles(builder.result.iterator), (lo, hi))
 
   test("rewrite fixpoint"):
-    forAll: (bytes: List[Byte]) =>
+    forAll: (bytes: Array[Byte]) =>
       val rewritten = BinaryFen.write(BinaryFen(bytes).read)
       assertEquals(BinaryFen.write(rewritten.read), rewritten)
+
+  test("equals is sensible"):
+    forAll: (bytes: Array[Byte]) =>
+      val anotherByes = bytes.clone()
+      assertEquals(BinaryFen(bytes).hashCode, BinaryFen(anotherByes).hashCode)
+      assertEquals(BinaryFen(bytes), BinaryFen(anotherByes))
 
   test("handpicked fens roundtrip"):
     assertRoundtrip(Standard, FullFen("8/8/8/8/8/8/8/8 w - - 0 1"))

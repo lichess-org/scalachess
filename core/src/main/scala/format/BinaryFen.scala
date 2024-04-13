@@ -4,172 +4,175 @@ package format
 import chess.bitboard.{ Bitboard, Board as BBoard }
 import chess.variant.*
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.ArrayBuilder
 
-opaque type BinaryFen = List[Byte]
+case class BinaryFen(value: Array[Byte]) extends AnyVal:
+
+  import BinaryFen.implementation.*
+
+  def read: Situation.AndFullMoveNumber =
+    val reader = new Iterator[Byte]:
+      val inner                            = value.iterator
+      override inline def hasNext: Boolean = inner.hasNext
+      override inline def next: Byte       = if hasNext then inner.next else 0.toByte
+
+    val occupied = Bitboard(readLong(reader))
+
+    var pawns   = Bitboard.empty
+    var knights = Bitboard.empty
+    var bishops = Bitboard.empty
+    var rooks   = Bitboard.empty
+    var queens  = Bitboard.empty
+    var kings   = Bitboard.empty
+    var white   = Bitboard.empty
+    var black   = Bitboard.empty
+
+    var turn                     = White
+    var unmovedRooks             = UnmovedRooks(Bitboard.empty)
+    var epMove: Option[Uci.Move] = None
+
+    def unpackPiece(sq: Square, nibble: Int) =
+      val bb = sq.bb
+      nibble match
+        case 0 =>
+          pawns |= bb
+          white |= bb
+        case 1 =>
+          pawns |= bb
+          black |= bb
+        case 2 =>
+          knights |= bb
+          white |= bb
+        case 3 =>
+          knights |= bb
+          black |= bb
+        case 4 =>
+          bishops |= bb
+          white |= bb
+        case 5 =>
+          bishops |= bb
+          black |= bb
+        case 6 =>
+          rooks |= bb
+          white |= bb
+        case 7 =>
+          rooks |= bb
+          black |= bb
+        case 8 =>
+          queens |= bb
+          white |= bb
+        case 9 =>
+          queens |= bb
+          black |= bb
+        case 10 =>
+          kings |= bb
+          white |= bb
+        case 11 =>
+          kings |= bb
+          black |= bb
+        case 12 =>
+          pawns |= bb
+          epMove = Some(Uci.Move(Square.unsafe(sq.value ^ 0x10), sq))
+          if sq.rank <= Rank.Fourth then white |= bb
+          else black |= bb
+        case 13 =>
+          rooks |= bb
+          white |= bb
+          unmovedRooks |= bb
+        case 14 =>
+          rooks |= bb
+          black |= bb
+          unmovedRooks |= bb
+        case 15 =>
+          kings |= bb
+          black |= bb
+          turn = Black
+        case _ =>
+
+    val it = occupied.iterator
+    while it.hasNext
+    do
+      val (lo, hi) = readNibbles(reader)
+      unpackPiece(it.next, lo)
+      if it.hasNext then unpackPiece(it.next, hi)
+
+    val halfMoveClock = HalfMoveClock(readLeb128(reader))
+    val ply           = Ply(readLeb128(reader))
+    val variant = reader.next match
+      case 0 => Standard
+      case 1 => Crazyhouse
+      case 2 => Chess960
+      case 3 => FromPosition
+      case 4 => KingOfTheHill
+      case 5 => ThreeCheck
+      case 6 => Antichess
+      case 7 => Atomic
+      case 8 => Horde
+      case 9 => RacingKings
+      case _ => Standard
+
+    if ply.turn.black then turn = Black
+
+    val checkCount = if variant.threeCheck then
+      val (lo, hi) = readNibbles(reader)
+      CheckCount(white = lo, black = hi)
+    else CheckCount()
+
+    val crazyData = if variant.crazyhouse then
+      val (wp, bp) = readNibbles(reader)
+      val (wn, bn) = readNibbles(reader)
+      val (wb, bb) = readNibbles(reader)
+      val (wr, br) = readNibbles(reader)
+      val (wq, bq) = readNibbles(reader)
+      Some(
+        Crazyhouse.Data(
+          pockets = ByColor(
+            white = Crazyhouse.Pocket(pawn = wp, knight = wn, bishop = wb, rook = wr, queen = wq),
+            black = Crazyhouse.Pocket(pawn = bp, knight = bn, bishop = bb, rook = br, queen = bq)
+          ),
+          promoted = Bitboard(readLong(reader))
+        )
+      )
+    else None
+
+    Situation.AndFullMoveNumber(
+      Situation(
+        Board(
+          BBoard(
+            occupied = occupied,
+            white = white,
+            black = black,
+            pawns = pawns,
+            knights = knights,
+            bishops = bishops,
+            rooks = rooks,
+            queens = queens,
+            kings = kings
+          ),
+          History(
+            lastMove = epMove,
+            checkCount = checkCount,
+            castles =
+              maximumCastles(unmovedRooks = unmovedRooks, white = white, black = black, kings = kings),
+            unmovedRooks = unmovedRooks,
+            halfMoveClock = halfMoveClock
+          ),
+          variant,
+          crazyData
+        ),
+        color = turn
+      ),
+      ply.fullMoveNumber
+    )
+
+  override def hashCode: Int = value.toSeq.hashCode
+  override def equals(that: Any): Boolean = that match
+    case thatFen: BinaryFen => value.toSeq.equals(thatFen.value.toSeq)
+    case _                  => false
 
 object BinaryFen:
-  def apply(value: List[Byte]): BinaryFen = value
 
-  import implementation.*
-
-  extension (bf: BinaryFen)
-    def value: List[Byte] = bf
-
-    def read: Situation.AndFullMoveNumber =
-      val reader = new Iterator[Byte]:
-        val inner                            = bf.iterator
-        override inline def hasNext: Boolean = inner.hasNext
-        override inline def next: Byte       = if hasNext then inner.next else 0.toByte
-
-      val occupied = Bitboard(readLong(reader))
-
-      var pawns   = Bitboard.empty
-      var knights = Bitboard.empty
-      var bishops = Bitboard.empty
-      var rooks   = Bitboard.empty
-      var queens  = Bitboard.empty
-      var kings   = Bitboard.empty
-      var white   = Bitboard.empty
-      var black   = Bitboard.empty
-
-      var turn                     = White
-      var unmovedRooks             = UnmovedRooks(Bitboard.empty)
-      var epMove: Option[Uci.Move] = None
-
-      def unpackPiece(sq: Square, nibble: Int) =
-        val bb = sq.bb
-        nibble match
-          case 0 =>
-            pawns |= bb
-            white |= bb
-          case 1 =>
-            pawns |= bb
-            black |= bb
-          case 2 =>
-            knights |= bb
-            white |= bb
-          case 3 =>
-            knights |= bb
-            black |= bb
-          case 4 =>
-            bishops |= bb
-            white |= bb
-          case 5 =>
-            bishops |= bb
-            black |= bb
-          case 6 =>
-            rooks |= bb
-            white |= bb
-          case 7 =>
-            rooks |= bb
-            black |= bb
-          case 8 =>
-            queens |= bb
-            white |= bb
-          case 9 =>
-            queens |= bb
-            black |= bb
-          case 10 =>
-            kings |= bb
-            white |= bb
-          case 11 =>
-            kings |= bb
-            black |= bb
-          case 12 =>
-            pawns |= bb
-            epMove = Some(Uci.Move(Square.unsafe(sq.value ^ 0x10), sq))
-            if sq.rank <= Rank.Fourth then white |= bb
-            else black |= bb
-          case 13 =>
-            rooks |= bb
-            white |= bb
-            unmovedRooks |= bb
-          case 14 =>
-            rooks |= bb
-            black |= bb
-            unmovedRooks |= bb
-          case 15 =>
-            kings |= bb
-            black |= bb
-            turn = Black
-          case _ =>
-
-      val it = occupied.iterator
-      while it.hasNext
-      do
-        val (lo, hi) = readNibbles(reader)
-        unpackPiece(it.next, lo)
-        if it.hasNext then unpackPiece(it.next, hi)
-
-      val halfMoveClock = HalfMoveClock(readLeb128(reader))
-      var ply           = Ply(readLeb128(reader))
-      val variant = reader.next match
-        case 0 => Standard
-        case 1 => Crazyhouse
-        case 2 => Chess960
-        case 3 => FromPosition
-        case 4 => KingOfTheHill
-        case 5 => ThreeCheck
-        case 6 => Antichess
-        case 7 => Atomic
-        case 8 => Horde
-        case 9 => RacingKings
-        case _ => Standard
-
-      if ply.turn.black then turn = Black
-
-      val checkCount = if variant.threeCheck then
-        val (lo, hi) = readNibbles(reader)
-        CheckCount(white = lo, black = hi)
-      else CheckCount()
-
-      val crazyData = if variant.crazyhouse then
-        val (wp, bp) = readNibbles(reader)
-        val (wn, bn) = readNibbles(reader)
-        val (wb, bb) = readNibbles(reader)
-        val (wr, br) = readNibbles(reader)
-        val (wq, bq) = readNibbles(reader)
-        Some(
-          Crazyhouse.Data(
-            pockets = ByColor(
-              white = Crazyhouse.Pocket(pawn = wp, knight = wn, bishop = wb, rook = wr, queen = wq),
-              black = Crazyhouse.Pocket(pawn = bp, knight = bn, bishop = bb, rook = br, queen = bq)
-            ),
-            promoted = Bitboard(readLong(reader))
-          )
-        )
-      else None
-
-      Situation.AndFullMoveNumber(
-        Situation(
-          Board(
-            BBoard(
-              occupied = occupied,
-              white = white,
-              black = black,
-              pawns = pawns,
-              knights = knights,
-              bishops = bishops,
-              rooks = rooks,
-              queens = queens,
-              kings = kings
-            ),
-            History(
-              lastMove = epMove,
-              checkCount = checkCount,
-              castles =
-                maximumCastles(unmovedRooks = unmovedRooks, white = white, black = black, kings = kings),
-              unmovedRooks = unmovedRooks,
-              halfMoveClock = halfMoveClock
-            ),
-            variant,
-            crazyData
-          ),
-          color = turn
-        ),
-        ply.fullMoveNumber
-      )
+  import BinaryFen.implementation.*
 
   def writeNormalized(situation: Situation): BinaryFen =
     write(
@@ -184,8 +187,9 @@ object BinaryFen:
       )
     )
 
-  def write(input: Situation.AndFullMoveNumber): BinaryFen =
-    val builder = new ListBuffer[Byte]()
+  def write(input: Situation.AndFullMoveNumber) = BinaryFen:
+    val builder = ArrayBuilder.ofByte()
+    builder.sizeHint(8 + 32)
 
     val sit      = input.situation
     val occupied = sit.board.occupied
@@ -253,23 +257,19 @@ object BinaryFen:
         writeNibbles(builder, pockets.white.queen, pockets.black.queen)
         if crazyData.promoted.nonEmpty then writeLong(builder, crazyData.promoted.value)
 
-    builder.result.toList
+    builder.result
 
   object implementation:
 
-    def writeLong(builder: ListBuffer[Byte], v: Long) =
-      builder.addAll(
-        List(
-          (v >>> 56).toByte,
-          (v >>> 48).toByte,
-          (v >>> 40).toByte,
-          (v >>> 32).toByte,
-          (v >>> 24).toByte,
-          (v >>> 16).toByte,
-          (v >>> 8).toByte,
-          v.toByte
-        )
-      )
+    def writeLong(builder: ArrayBuilder[Byte], v: Long) =
+      builder.addOne((v >>> 56).toByte)
+      builder.addOne((v >>> 48).toByte)
+      builder.addOne((v >>> 40).toByte)
+      builder.addOne((v >>> 32).toByte)
+      builder.addOne((v >>> 24).toByte)
+      builder.addOne((v >>> 16).toByte)
+      builder.addOne((v >>> 8).toByte)
+      builder.addOne(v.toByte)
 
     def readLong(reader: Iterator[Byte]): Long =
       ((reader.next & 0xffL) << 56) |
@@ -281,7 +281,7 @@ object BinaryFen:
         ((reader.next & 0xffL) << 8) |
         (reader.next & 0xffL)
 
-    def writeLeb128(builder: ListBuffer[Byte], v: Int) =
+    def writeLeb128(builder: ArrayBuilder[Byte], v: Int) =
       var n = v
       while n > 127
       do
@@ -300,7 +300,7 @@ object BinaryFen:
       do ()
       n & 0x7fff_ffff
 
-    def writeNibbles(builder: ListBuffer[Byte], lo: Int, hi: Int) =
+    def writeNibbles(builder: ArrayBuilder[Byte], lo: Int, hi: Int) =
       builder.addOne((lo | (hi << 4)).toByte)
 
     def readNibbles(reader: Iterator[Byte]): (Int, Int) =

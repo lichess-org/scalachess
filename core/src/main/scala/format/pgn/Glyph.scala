@@ -1,6 +1,8 @@
 package chess
 package format.pgn
 
+import alleycats.Zero
+
 case class Glyph(id: Int, symbol: String, name: String):
 
   override def toString = s"$symbol ($$$id $name)"
@@ -40,6 +42,9 @@ case class Glyphs(
 
 object Glyphs:
   val empty = Glyphs(None, None, Nil)
+
+  given Zero[Glyphs] = new:
+    def zero = empty
 
   def fromList(glyphs: List[Glyph]) =
     Glyphs(

@@ -43,6 +43,12 @@ object Json:
   given Writes[Map[Square, Bitboard]] with
     def writes(dests: Map[Square, Bitboard]) = JsString(destString(dests))
 
+  given OWrites[Division] = OWrites: o =>
+    Json
+      .obj()
+      .add("middle" -> o.middle)
+      .add("end" -> o.end)
+
   def destString(dests: Map[Square, Bitboard]): String =
     val sb    = new java.lang.StringBuilder(80)
     var first = true

@@ -44,10 +44,8 @@ object Json:
     def writes(dests: Map[Square, Bitboard]) = JsString(destString(dests))
 
   given OWrites[Division] = OWrites: o =>
-    Json
-      .obj()
-      .add("middle" -> o.middle)
-      .add("end" -> o.end)
+    o.middle.fold(PlayJson.obj())(m => PlayJson.obj("middle" -> m)) ++
+      o.end.fold(PlayJson.obj())(e => PlayJson.obj("end" -> e))
 
   def destString(dests: Map[Square, Bitboard]): String =
     val sb    = new java.lang.StringBuilder(80)

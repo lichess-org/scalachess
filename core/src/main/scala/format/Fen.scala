@@ -77,37 +77,3 @@ object BoardFen extends OpaqueString[BoardFen]:
       if a.contains('[') then a.takeWhile('[' !=)
       else if a.count('/' == _) == 8 then a.split('/').take(8).mkString("/")
       else a
-
-// 6k17p6r18887P5BRKb
-// Silly compression used to store cloud evals
-opaque type SmallFen = String
-object SmallFen extends OpaqueString[SmallFen]:
-  import chess.variant.Variant
-  extension (e: SmallFen)
-    // The SmallFen notation was never intended to be read back into FEN.
-    // This is inefficient and fragile. Only used by the cloud eval export for database.lichess.org.
-    // Do not use it for anything else.
-    // Untested with variants.
-    def garbageInefficientReadBackIntoFen: SimpleFen =
-      val (board, error)     = Fen.makeBoardWithCrazyPromoted(e, chess.variant.Standard)
-      val boardStr           = Fen.writeBoard(board)
-      val boardSize          = boardStr.value.count(_ != '/')
-      val isBlackTurn        = e.lift(boardSize).exists(_ == 'b') && !e.lift(boardSize + 1).exists(_.isDigit)
-      val turnSize           = if isBlackTurn then 1 else 0
-      val castlingStr        = e.drop(boardSize + turnSize).takeWhile(Set('K', 'Q', 'k', 'q').contains)
-      val enpassantStr       = e.drop(boardSize + turnSize + castlingStr.size)
-      val colorChar          = if isBlackTurn then 'b' else 'w'
-      def orNot(str: String) = if str.isEmpty then "-" else str
-      SimpleFen:
-        s"$boardStr $colorChar ${orNot(castlingStr)} ${orNot(enpassantStr)}"
-
-  def make(variant: Variant, fen: Fen.Simple): SmallFen =
-    val base = fen.value.split(' ').take(4).mkString("").filter { c =>
-      c != '/' && c != '-' && c != 'w'
-    }
-    if variant == chess.variant.ThreeCheck
-    then fen.value.split(' ').lift(6).foldLeft(base)(_ + _)
-    else base
-
-  def validate(variant: Variant, fen: Fen.Full): Option[SmallFen] =
-    Fen.read(variant, fen).exists(_.playable(false)).option(make(variant, fen.simple))

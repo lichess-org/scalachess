@@ -47,6 +47,21 @@ object Json:
     o.middle.fold(PlayJson.obj())(m => PlayJson.obj("middle" -> m)) ++
       o.end.fold(PlayJson.obj())(e => PlayJson.obj("end" -> e))
 
+  given OWrites[CorrespondenceClock] = OWrites: c =>
+    PlayJson.obj(
+      "daysPerTurn" -> c.daysPerTurn,
+      "increment"   -> c.increment,
+      "white"       -> c.whiteTime,
+      "black"       -> c.blackTime
+    )
+
+  given OWrites[chess.opening.Opening.AtPly] = OWrites: o =>
+    PlayJson.obj(
+      "eco"  -> o.opening.eco,
+      "name" -> o.opening.name,
+      "ply"  -> o.ply
+    )
+
   def destString(dests: Map[Square, Bitboard]): String =
     val sb    = new java.lang.StringBuilder(80)
     var first = true

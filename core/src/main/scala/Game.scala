@@ -11,7 +11,7 @@ case class Game(
     startedAtPly: Ply = Ply.initial
 ):
 
-  export situation.{ board, color as player }
+  export situation.{ board, color as player, variant, history }
   export situation.board.history.halfMoveClock
 
   def apply(

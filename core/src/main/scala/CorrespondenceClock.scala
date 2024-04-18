@@ -1,7 +1,8 @@
 package chess
 
+import scalalib.time.{ nowSeconds, toSeconds }
+
 import java.time.Instant
-import scalalib.time.{ toSeconds, nowSeconds }
 
 // times are expressed in seconds
 case class CorrespondenceClock(

@@ -69,7 +69,7 @@ lazy val testKit = project
     libraryDependencies ++= List(
       "org.scalacheck"      %% "scalacheck"        % "1.18.0",
       "org.scalameta"       %% "munit"             % "1.0.0-RC1" % Test,
-      "org.scalameta"       %% "munit-scalacheck"  % "1.0.0-M12" % Test,
+      "org.scalameta"       %% "munit-scalacheck"  % "1.0.0-RC1" % Test,
       "com.disneystreaming" %% "weaver-cats"       % "0.8.4"     % Test,
       "com.disneystreaming" %% "weaver-scalacheck" % "0.8.4"     % Test,
       "co.fs2"              %% "fs2-core"          % "3.10.2"    % Test,

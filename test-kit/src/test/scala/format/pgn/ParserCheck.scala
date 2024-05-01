@@ -6,7 +6,6 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Prop.forAll
 
 import ChessTreeArbitraries.*
-import PgnHelper.*
 
 class ParserCheck extends ScalaCheckSuite:
 

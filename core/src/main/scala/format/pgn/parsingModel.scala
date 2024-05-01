@@ -2,6 +2,9 @@ package chess
 package format.pgn
 
 import cats.syntax.all.*
+import chess.format.Fen
+
+import MoveOrDrop.*
 
 // We don't support variation without move now,
 // but we can in the future when we support null move
@@ -16,10 +19,48 @@ case class PgnNodeData(
 ):
   export metas.*
 
+  def toMove(context: Situation.AndFullMoveNumber): Option[(Situation, Move)] =
+    san(context.situation).toOption
+      .map(x =>
+        (
+          x.situationAfter,
+          Move(
+            ply = context.ply,
+            san = x.toSanStr,
+            comments = comments,
+            glyphs = glyphs,
+            opening = None,
+            result = None,
+            secondsLeft = None,
+            variationComments = variationComments
+          )
+        )
+      )
+
 type ParsedPgnTree = Node[PgnNodeData]
+
+object ParsedPgnTree:
+  extension (tree: ParsedPgnTree)
+    def toPgn(context: Situation.AndFullMoveNumber): Option[PgnTree] =
+      tree.mapAccumlOption_(context): (ctx, d) =>
+        d.toMove(ctx) match
+          case Some((sit, m)) => (Situation.AndFullMoveNumber(sit, ctx.fullMoveNumber.next), m.some)
+          case None           => (ctx, None)
 
 case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[ParsedPgnTree]):
   def mainline = tree.fold(List.empty[San])(_.mainline.map(_.value.san))
+
+  def toPgn: Pgn =
+    import ParsedPgnTree.*
+    Pgn(tags, initialPosition, tree.flatMap(_.toPgn(init(tags))))
+
+  private def init(tags: Tags): Situation.AndFullMoveNumber =
+    val variant = tags.variant | chess.variant.Standard
+    def default = Situation.AndFullMoveNumber(Situation(Board.init(variant), White), FullMoveNumber.initial)
+
+    tags.fen
+      .flatMap(Fen.readWithMoveNumber(variant, _))
+      .getOrElse(default)
 
 // Standard Algebraic Notation
 sealed trait San:

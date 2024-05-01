@@ -3,14 +3,16 @@ package format.pgn
 
 import scala.language.implicitConversions
 
-import PgnHelper.*
-
 class RenderTest extends ChessTest:
+
+  import Fixtures.*
 
   given Conversion[String, SanStr]  = SanStr(_)
   given Conversion[String, Comment] = Comment(_)
 
-  import Fixtures.*
+  extension (pgn: ParsedPgn)
+    def cleanTags: ParsedPgn =
+      pgn.copy(tags = Tags.empty)
 
   lazy val pgns = List(
     pgn2,

@@ -54,6 +54,13 @@ lazy val playJson: Project = Project("playJson", file("playJson"))
   )
   .dependsOn(scalachess)
 
+lazy val motif: Project = Project("motif", file("motif"))
+  .settings(
+    commonSettings,
+    name := "scalachess-motif"
+  )
+  .dependsOn(scalachess)
+
 lazy val bench = project
   .enablePlugins(JmhPlugin)
   .settings(commonSettings, scalacOptions -= "-Wunused:all", name := "bench")

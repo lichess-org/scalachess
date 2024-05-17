@@ -1,6 +1,6 @@
 inThisBuild(
   Seq(
-    scalaVersion       := "3.4.1",
+    scalaVersion       := "3.4.2",
     version            := "16.0.6",
     organization       := "org.lichess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),

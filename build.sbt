@@ -74,7 +74,7 @@ lazy val testKit = project
       "com.disneystreaming" %% "weaver-scalacheck" % "0.8.4"     % Test,
       "co.fs2"              %% "fs2-core"          % "3.10.2"    % Test,
       "co.fs2"              %% "fs2-io"            % "3.10.2"    % Test,
-      "org.typelevel"       %% "discipline-munit"  % "1.0.9"     % Test,
+      "org.typelevel"       %% "discipline-munit"  % "2.0.0"     % Test,
       "org.typelevel"       %% "cats-laws"         % "2.10.0"    % Test
     )
   )

@@ -15,12 +15,10 @@ trait HasId[A, Id]:
       xs.removeById(v.id)
 
     def removeById(id: Id): List[A] =
-      xs.foldLeft((false, List.empty[A])) { (acc, v) =>
-        if acc._1 then (acc._1, v :: acc._2)
-        else if v.hasId(id) then (true, acc._2)
-        else (false, v :: acc._2)
-      }._2
-        .reverse
+      xs match
+        case (v :: vs) if v.hasId(id) => vs
+        case (v :: vs) => v :: vs.removeById(id)
+        case Nil => Nil
 
 trait Mergeable[A]:
 

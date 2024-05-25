@@ -17,8 +17,8 @@ trait HasId[A, Id]:
     def removeById(id: Id): List[A] =
       xs match
         case (v :: vs) if v.hasId(id) => vs
-        case (v :: vs) => v :: vs.removeById(id)
-        case Nil => Nil
+        case (v :: vs)                => v :: vs.removeById(id)
+        case Nil                      => Nil
 
 trait Mergeable[A]:
 

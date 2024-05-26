@@ -20,11 +20,11 @@ trait HasId[A, Id]:
     // We should change it after We finally migrate it to this new tree
     final def removeById(id: Id): List[A] =
       @tailrec
-      def loop (acc: List[A], rest: List[A]): List[A] =
+      def loop(acc: List[A], rest: List[A]): List[A] =
         rest match
-          case Nil => acc
           case (v :: vs) if v.hasId(id) => acc ++ vs
-          case (v :: vs) => loop(acc :+ v, vs)
+          case (v :: vs)                => loop(acc :+ v, vs)
+          case Nil                      => acc
       loop(Nil, xs)
 
 trait Mergeable[A]:

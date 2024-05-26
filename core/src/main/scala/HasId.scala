@@ -11,16 +11,21 @@ trait HasId[A, Id]:
     inline def hasId(id: Id): Boolean    = a.id == id
 
   extension (xs: List[A])
-    def remove(v: A): List[A] =
+    final def remove(v: A): List[A] =
       xs.removeById(v.id)
 
-    def removeById(id: Id): List[A] =
-      xs.foldLeft((false, List.empty[A])) { (acc, v) =>
-        if acc._1 then (acc._1, v :: acc._2)
-        else if v.hasId(id) then (true, acc._2)
-        else (false, v :: acc._2)
-      }._2
-        .reverse
+    // Remove first item with the given id
+    // if there is no match return the original list
+    // This behavior is to accomodate the lila study tree current implementation
+    // We should change it after We finally migrate it to this new tree
+    final def removeById(id: Id): List[A] =
+      @tailrec
+      def loop(acc: List[A], rest: List[A]): List[A] =
+        rest match
+          case (v :: vs) if v.hasId(id) => acc ++ vs
+          case (v :: vs)                => loop(acc :+ v, vs)
+          case Nil                      => acc
+      loop(Nil, xs)
 
 trait Mergeable[A]:
 

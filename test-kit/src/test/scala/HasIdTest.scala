@@ -25,5 +25,5 @@ class HasIdTest extends ScalaCheckSuite:
       removed == removed.sorted
 
   test("removeById only remove first items"):
-    val xs = List(1, 1)
-    xs.removeById(1) == List(1)
+    val xs = List(1, 2, 1)
+    xs.removeById(1) == List(2, 1)

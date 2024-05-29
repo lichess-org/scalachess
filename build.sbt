@@ -34,8 +34,8 @@ lazy val scalachess: Project = Project("scalachess", file("core")).settings(
   name := "scalachess",
   libraryDependencies ++= List(
     "org.lichess"   %% "scalalib-core"  % scalalibVersion,
-    "org.typelevel" %% "cats-core"      % "2.10.0",
-    "org.typelevel" %% "alleycats-core" % "2.10.0",
+    "org.typelevel" %% "cats-core"      % "2.12.0",
+    "org.typelevel" %% "alleycats-core" % "2.12.0",
     "org.typelevel" %% "cats-parse"     % "1.0.0",
     "dev.optics"    %% "monocle-core"   % "3.2.0",
     "org.typelevel" %% "kittens"        % "3.3.0"
@@ -75,7 +75,7 @@ lazy val testKit = project
       "co.fs2"              %% "fs2-core"          % "3.10.2" % Test,
       "co.fs2"              %% "fs2-io"            % "3.10.2" % Test,
       "org.typelevel"       %% "discipline-munit"  % "2.0.0"  % Test,
-      "org.typelevel"       %% "cats-laws"         % "2.10.0" % Test
+      "org.typelevel"       %% "cats-laws"         % "2.12.0" % Test
     )
   )
   .dependsOn(scalachess % "compile->compile")

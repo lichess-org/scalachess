@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit
 
 import cats.syntax.all.*
 import chess.format.pgn.{ Fixtures, Parser, Pgn, PgnStr }
-import chess.format.pgn.PgnHelper.*
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))

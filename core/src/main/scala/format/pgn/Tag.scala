@@ -31,9 +31,7 @@ case class Tags(value: List[Tag]) extends AnyVal:
 
   def clockConfig: Option[Clock.Config] =
     value
-      .collectFirst { case Tag(Tag.TimeControl, str) =>
-        str
-      }
+      .collectFirst { case Tag(Tag.TimeControl, str) => str }
       .flatMap(Clock.readPgnConfig)
 
   def variant: Option[chess.variant.Variant] =
@@ -72,6 +70,14 @@ case class Tags(value: List[Tag]) extends AnyVal:
       value = value.sortBy: tag =>
         Tags.tagIndex.getOrElse(tag.name, 999)
     )
+
+  def boardNumber: Option[Int] =
+    apply(_.Board)
+      .flatMap(_.toIntOption)
+      .orElse: // Round 1.x is sometimes used for board x
+        apply(_.Round)
+          .flatMap(_.split('.').lift(1))
+          .flatMap(_.toIntOption)
 
   def names: ByColor[Option[PlayerName]] = ByColor(apply(_.White), apply(_.Black)).map(PlayerName.from(_))
   def elos: ByColor[Option[Elo]] = ByColor(apply(_.WhiteElo), apply(_.BlackElo)).map: elo =>

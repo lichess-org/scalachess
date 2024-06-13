@@ -71,10 +71,14 @@ case class Tags(value: List[Tag]) extends AnyVal:
         Tags.tagIndex.getOrElse(tag.name, 999)
     )
 
+  def roundNumber: Option[Int] =
+    // Round x.y is sometimes used for round x
+    apply(_.Round).map(_.takeWhile(_.isDigit)).flatMap(_.toIntOption)
+
   def boardNumber: Option[Int] =
     apply(_.Board)
       .flatMap(_.toIntOption)
-      .orElse: // Round 1.x is sometimes used for board x
+      .orElse: // Round x.y is sometimes used for board y
         apply(_.Round)
           .flatMap(_.split('.').lift(1))
           .flatMap(_.toIntOption)

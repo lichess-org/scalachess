@@ -1,11 +1,11 @@
 inThisBuild(
   Seq(
-    scalaVersion       := "3.4.2",
-    version            := "16.0.8",
-    organization       := "org.lichess",
+    scalaVersion      := "3.4.2",
+    version           := "16.0.8",
+    organization      := "org.lichess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
-    publishTo          := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", "")))),
-    semanticdbEnabled  := true, // for scalafix
+    publishTo         := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", "")))),
+    semanticdbEnabled := true, // for scalafix
     Compile / packageDoc / publishArtifact := false
   )
 )

@@ -675,7 +675,7 @@ Opening("A80", "Dutch Defense: Spielmann Gambit", "rnbqkb1r/ppppp1pp/5n2/5p2/3P2
 Opening("A80", "Queen's Pawn Game: Veresov Attack, Dutch System", "rnbqkbnr/ppp1p1pp/8/3p1p2/3P4/2N5/PPP1PPPP/R1BQKBNR w KQkq -", "d2d4 f7f5 b1c3 d7d5", "1. d4 f5 2. Nc3 d5"),
 Opening("A81", "Dutch Defense: Blackburne Variation", "rnbqkb1r/pppp2pp/4pn2/5p2/3P4/6PN/PPP1PPBP/RNBQK2R b KQkq -", "d2d4 f7f5 g2g3 g8f6 f1g2 e7e6 g1h3", "1. d4 f5 2. g3 Nf6 3. Bg2 e6 4. Nh3"),
 Opening("A81", "Dutch Defense: Fianchetto Attack", "rnbqkbnr/ppppp1pp/8/5p2/3P4/6P1/PPP1PP1P/RNBQKBNR b KQkq -", "d2d4 f7f5 g2g3", "1. d4 f5 2. g3"),
-Opening("A81", "Dutch Defense: Leningrad Variation, Karlsbad Variation", "rnbqk1nr/ppppp1bp/6p1/5p2/3P4/6PN/PPP1PPBP/RNBQK2R b KQkq -", "d2d4 f7f5 g2g3 g7g6 f1g2 f8g7 g1h3", "1. d4 f5 2. g3 g6 3. Bg2 Bg7 4. Nh3"),
+Opening("A81", "Dutch Defense: Leningrad Variation, Carlsbad Variation", "rnbqk1nr/ppppp1bp/6p1/5p2/3P4/6PN/PPP1PPBP/RNBQK2R b KQkq -", "d2d4 f7f5 g2g3 g7g6 f1g2 f8g7 g1h3", "1. d4 f5 2. g3 g6 3. Bg2 Bg7 4. Nh3"),
 Opening("A81", "Dutch Defense: Leningrad, Basman System", "rnbqk2r/pp1pp1bp/2p3pn/5p2/3P4/5NP1/PPP1PPBP/RNBQ1RK1 w kq -", "d2d4 f7f5 g2g3 c7c6 f1g2 g7g6 g1f3 f8g7 e1g1 g8h6", "1. d4 f5 2. g3 c6 3. Bg2 g6 4. Nf3 Bg7 5. O-O Nh6"),
 Opening("A81", "Dutch Defense: Semi-Leningrad Variation", "rnbqkb1r/ppppp2p/5np1/5p2/3P4/6P1/PPP1PPBP/RNBQK1NR w KQkq -", "d2d4 f7f5 g2g3 g8f6 f1g2 g7g6", "1. d4 f5 2. g3 Nf6 3. Bg2 g6"),
 Opening("A82", "Dutch Defense: Blackmar's Second Gambit", "rnbqkb1r/ppppp1pp/5n2/8/3Pp3/2N2P2/PPP3PP/R1BQKBNR b KQkq -", "d2d4 f7f5 e2e4 f5e4 b1c3 g8f6 f2f3", "1. d4 f5 2. e4 fxe4 3. Nc3 Nf6 4. f3"),

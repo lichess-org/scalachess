@@ -146,9 +146,7 @@ final case class Node[A](
     override val value: A,
     override val child: Option[Node[A]] = None,
     override val variations: List[Variation[A]] = Nil
-) extends Tree[A](value, child)
-    derives Functor,
-      Traverse:
+) extends Tree[A](value, child) derives Functor, Traverse:
 
   import Tree.given
 

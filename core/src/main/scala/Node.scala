@@ -6,7 +6,7 @@ import cats.syntax.all.*
 
 import scala.annotation.{ tailrec, targetName }
 
-sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives Functor, Traverse:
+sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives Traverse:
 
   final def withValue(value: A): TreeSelector[A, this.type] = this match
     case n: Node[A]      => n.copy(value = value)
@@ -146,7 +146,7 @@ final case class Node[A](
     override val value: A,
     override val child: Option[Node[A]] = None,
     override val variations: List[Variation[A]] = Nil
-) extends Tree[A](value, child) derives Functor, Traverse:
+) extends Tree[A](value, child) derives Traverse:
 
   import Tree.given
 
@@ -406,7 +406,7 @@ final case class Node[A](
     copy(child = None, variations = Nil)
 
 final case class Variation[A](override val value: A, override val child: Option[Node[A]] = None)
-    extends Tree[A](value, child) derives Functor, Traverse:
+    extends Tree[A](value, child) derives Traverse:
 
   def modifyChildAt[Id](
       path: List[Id],

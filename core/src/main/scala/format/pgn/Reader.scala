@@ -3,8 +3,6 @@ package format.pgn
 
 import cats.syntax.all.*
 
-import util.chaining.scalaUtilChainingOps
-
 object Reader:
 
   sealed trait Result:
@@ -46,5 +44,6 @@ object Reader:
         case Right(replay)     => Result.Complete(replay)
 
   private def makeGame(tags: Tags) =
-    Game(variantOption = tags.variant, fen = tags.fen).pipe: self =>
-      self.copy(startedAtPly = self.ply, clock = tags.clockConfig.map(Clock.apply))
+    Game(variantOption = tags.variant, fen = tags.fen).match
+      case self =>
+        self.copy(startedAtPly = self.ply, clock = tags.clockConfig.map(Clock.apply))

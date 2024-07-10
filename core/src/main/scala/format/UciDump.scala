@@ -22,11 +22,9 @@ object UciDump:
   def move(variant: Variant, force960Notation: Boolean = false)(mod: MoveOrDrop): String =
     mod match
       case m: Move =>
-        Move.Castle
-          .raw(m.castle)
-          .fold(m.toUci.uci):
-            case ((kf, kt), (rf, _))
-                if force960Notation || kf == kt || variant.chess960 || variant.fromPosition =>
-              kf.key + rf.key
-            case ((kf, kt), _) => kf.key + kt.key
+        m.castle
+          .fold(m.toUci.uci): c =>
+            if force960Notation || c.king == c.kingTo || variant.chess960 || variant.fromPosition then
+              c.king.key + c.rook.key
+            else c.king.key + c.kingTo.key
       case d: Drop => d.toUci.uci

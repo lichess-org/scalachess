@@ -362,7 +362,7 @@ case class Situation(board: Board, color: Color):
       situationBefore = this,
       after = a,
       capture = None,
-      castle = Move.Castle((king, kingTo), (rook, rookTo)).some,
+      castle = Move.Castle(king, kingTo, rook, rookTo).some,
       promotion = None,
       enpassant = false
     )

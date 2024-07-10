@@ -99,9 +99,7 @@ case class Move(
   inline def castles = castle.isDefined
 
   inline def normalizeCastle =
-    Move.Castle.raw(castle).fold(this) { case (_, (rookOrig, _)) =>
-      copy(dest = rookOrig)
-    }
+    castle.fold(this)(x => copy(dest = x.rook))
 
   val isWhiteTurn: Boolean = piece.color.white
   inline def color         = piece.color
@@ -130,13 +128,6 @@ end Move
 
 object Move:
 
-  // ((king, kingTo), (rook, rookTo))
-  opaque type Castle = ((Square, Square), (Square, Square))
-  object Castle extends TotalWrapper[Castle, ((Square, Square), (Square, Square))]:
-    extension (e: Castle)
-      inline def king         = e._1._1
-      inline def kingTo       = e._1._2
-      inline def rook         = e._2._1
-      inline def rookTo       = e._2._2
-      def side: Side          = if kingTo.file == File.C then QueenSide else KingSide
-      def isStandard: Boolean = king.file == File.E && (rook.file == File.A || rook.file == File.H)
+  case class Castle(king: Square, kingTo: Square, rook: Square, rookTo: Square):
+    def side: Side          = if kingTo.file == File.C then QueenSide else KingSide
+    def isStandard: Boolean = king.file == File.E && (rook.file == File.A || rook.file == File.H)

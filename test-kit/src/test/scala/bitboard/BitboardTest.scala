@@ -115,10 +115,16 @@ class BitboardTest extends ScalaCheckSuite:
       assertEquals(xs.forall(bb.contains), true)
       assertEquals(xs.size, bb.count)
 
-  test("apply set of square should be the same as using add"):
-    forAll: (xs: Set[Square]) =>
+  test("apply list of square should be the same as using add"):
+    forAll: (xs: List[Square]) =>
       val bb  = Bitboard(xs)
       val bb2 = xs.foldLeft(Bitboard.empty)(_.add(_))
+      assertEquals(bb, bb2)
+
+  test("apply varargs of square should be the same as apply with list"):
+    forAll: (xs: List[Square]) =>
+      val bb  = Bitboard(xs)
+      val bb2 = Bitboard(xs*)
       assertEquals(bb, bb2)
 
   test("add andThen remove should be the same as identity"):

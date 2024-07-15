@@ -1,7 +1,5 @@
 package chess
 
-import cats.syntax.all.*
-
 import scala.annotation.tailrec
 
 trait HasId[A, Id]:

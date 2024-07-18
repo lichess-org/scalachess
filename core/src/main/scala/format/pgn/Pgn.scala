@@ -3,14 +3,9 @@ package format.pgn
 
 import monocle.syntax.all.*
 
-type PgnTree = Node[Move]
+case class Pgn[A](tags: Tags, initial: InitialComments, tree: Option[Node[A]]):
 
-case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
-
-  def render: PgnStr = PgnStr:
-    toString
-
-  override def toString(): String =
+  def render: SanEncoder[A] ?=> PgnStr = PgnStr:
     import SanEncoder.*
     val builder = new StringBuilder
 
@@ -21,16 +16,16 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
 
     builder.toString
 
-  def updatePly(ply: Ply, f: Move => Move): Option[Pgn] =
+  def updatePly(ply: Ply, f: A => A): SanEncoder[A] ?=> Option[Pgn[A]] =
     this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, _.updateValue(f)))
 
-  def updateLastPly(f: Move => Move): Pgn =
+  def updateLastPly(f: A => A): Pgn[A] =
     this.focus(_.tree.some).modify(_.modifyLastMainlineNode(_.updateValue(f)))
 
-  def modifyInMainline(ply: Ply, f: Node[Move] => Node[Move]): Option[Pgn] =
+  def modifyInMainline(ply: Ply, f: Node[A] => Node[A]): SanEncoder[A] ?=> Option[Pgn[A]] =
     this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, f))
 
-  def moves: List[Move] = tree.fold(Nil)(_.mainlineValues)
+  def moves: List[A] = tree.fold(Nil)(_.mainlineValues)
 
   def withEvent(title: String) =
     copy(tags = tags + Tag(_.Event, title))
@@ -74,10 +69,11 @@ object Move:
   given SanEncoder[Move] with
     extension (m: Move)
       def render(builder: StringBuilder) = m.render(builder)
-      def isBlack = m.ply.turn.black
-      def preComment = Move.render(m.variationComments)
+      def isBlack                        = m.ply.turn.black
+      def preComment                     = Move.render(m.variationComments)
       def turnNumber = if m.ply.turn.black then m.ply.fullMoveNumber else m.ply.fullMoveNumber - 1
       def isLong     = m.comments.nonEmpty || m.secondsLeft.isDefined
+      def ply        = m.ply
 
   def render(cm: List[Comment]): String =
     val builder = new StringBuilder
@@ -89,6 +85,6 @@ object Move:
   private def noDoubleLineBreak(txt: String) =
     noDoubleLineBreakRegex.replaceAllIn(txt, "\n")
 
-  private def formatPgnSeconds(t: Int): String =
+  def formatPgnSeconds(t: Int): String =
     val d = java.time.Duration.ofSeconds(t)
     f"${d.toHours}:${d.toMinutesPart}%02d:${d.toSecondsPart}%02d"

@@ -43,7 +43,7 @@ type ParsedPgnTree = Node[PgnNodeData]
 
 object ParsedPgnTree:
   extension (tree: ParsedPgnTree)
-    def toPgn(context: MappingContext): Option[PgnTree] =
+    def toPgn(context: MappingContext): Option[Node[Move]] =
       tree.mapAccumlOption_(context): (ctx, d) =>
         d.toMove(ctx) match
           case Some(sit, m) =>
@@ -53,7 +53,7 @@ object ParsedPgnTree:
 case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[ParsedPgnTree]):
   def mainline = tree.fold(List.empty[San])(_.mainline.map(_.value.san))
 
-  def toPgn: Pgn =
+  def toPgn: Pgn[Move] =
     import ParsedPgnTree.*
     Pgn(tags, initialPosition, tree.flatMap(_.toPgn(init(tags))))
 

@@ -27,7 +27,7 @@ object ChessTreeArbitraries:
   def genMainline(seed: Situation): Gen[Node[Situation]] =
     genSituations(seed).map(Tree.build(_).get)
 
-  def genPgn(seed: Situation): Gen[Pgn] =
+  def genPgn(seed: Situation): Gen[Pgn[chess.format.pgn.Move]] =
     for
       tree <- genTree(seed)
       pgnTree = tree.tree.map(_.map(_.data))

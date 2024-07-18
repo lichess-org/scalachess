@@ -8,10 +8,11 @@ trait SanEncoder[A]:
     def isBlack: Boolean
     def preComment: String
     def turnNumber: FullMoveNumber
+    def ply: Ply
 
 object SanEncoder:
 
-  extension [A: SanEncoder] (tree: Tree[A])
+  extension [A: SanEncoder](tree: Tree[A])
 
     def isLong = tree.value.isLong || tree.variations.nonEmpty
 

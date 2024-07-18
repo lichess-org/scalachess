@@ -1,8 +1,8 @@
 package chess
 
 import cats.syntax.all.*
+import chess.format.FullFen
 import chess.format.pgn.SanStr
-import chess.format.{ Fen, FullFen }
 import chess.variant.Atomic
 
 class AtomicVariantTest extends ChessTest:

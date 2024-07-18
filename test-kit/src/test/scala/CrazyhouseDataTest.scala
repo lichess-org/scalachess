@@ -1,6 +1,4 @@
 package chess
-
-import cats.syntax.all.*
 import chess.bitboard.Bitboard
 import chess.variant.Crazyhouse.Data
 import munit.ScalaCheckSuite

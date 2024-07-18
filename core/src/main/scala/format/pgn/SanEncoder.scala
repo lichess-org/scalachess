@@ -6,7 +6,7 @@ trait SanEncoder[A]:
     def render(builder: StringBuilder): Unit
     def isLong: Boolean
     def isBlack: Boolean
-    def preComment: String
+    def renderVariationComment(builder: StringBuilder): Unit
     def turnNumber: FullMoveNumber
     def ply: Ply
 
@@ -26,7 +26,7 @@ object SanEncoder:
 
     @annotation.tailrec
     private def render(builder: StringBuilder, dot: Boolean): Unit =
-      if tree.isVariation then builder.append(tree.value.preComment)
+      if tree.isVariation then tree.value.renderVariationComment(builder)
       val d = tree.prefix(dot, builder)
       renderValueAndVariations(builder)
       tree.child match

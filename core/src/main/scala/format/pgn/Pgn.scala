@@ -70,15 +70,11 @@ object Move:
     extension (m: Move)
       def render(builder: StringBuilder) = m.render(builder)
       def isBlack                        = m.ply.turn.black
-      def preComment                     = Move.render(m.variationComments)
+      def renderVariationComment(builder: StringBuilder) =
+        m.variationComments.foreach(x => builder.append(" { ").append(x.value).append(" }"))
       def turnNumber = if m.ply.turn.black then m.ply.fullMoveNumber else m.ply.fullMoveNumber - 1
       def isLong     = m.comments.nonEmpty || m.secondsLeft.isDefined
       def ply        = m.ply
-
-  def render(cm: List[Comment]): String =
-    val builder = new StringBuilder
-    cm.foreach(x => builder.append(" { ").append(x.value).append(" }"))
-    builder.toString
 
   private val noDoubleLineBreakRegex = "(\r?\n){2,}".r
 

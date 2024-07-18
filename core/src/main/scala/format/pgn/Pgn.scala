@@ -110,21 +110,6 @@ case class Move(
         .:::(comments.map(_.map(Move.noDoubleLineBreak)))
         .foreach(x => builder.append(" { ").append(x).append(" }"))
 
-  def render =
-    val glyphStr = glyphs.toList
-      .map:
-        case glyph if glyph.id <= 6 => glyph.symbol
-        case glyph                  => s" $$${glyph.id}"
-      .mkString
-    val commentsOrTime =
-      if hasCommentsOrTime then
-        List(clockString, opening, result).flatten
-          .:::(comments.map(_.map(Move.noDoubleLineBreak)))
-          .map(x => s" { $x }")
-          .mkString
-      else ""
-    s"$san$glyphStr$commentsOrTime"
-
 object Move:
 
   val noDoubleLineBreakRegex = "(\r?\n){2,}".r

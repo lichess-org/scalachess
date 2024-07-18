@@ -11,7 +11,7 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
     toString
 
   override def toString(): String =
-    import PgnTree.*
+    import SanEncoder.*
     val builder = new StringBuilder
 
     if tags.value.nonEmpty then builder.append(tags).addOne('\n').addOne('\n')
@@ -35,45 +35,6 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
   def withEvent(title: String) =
     copy(tags = tags + Tag(_.Event, title))
 
-object PgnTree:
-
-  extension (tree: Tree[Move])
-    def isLong = tree.value.isLong || tree.variations.nonEmpty
-
-    def render: String =
-      val builder = new StringBuilder
-      render(builder)
-      builder.toString
-
-    private[pgn] def render(builder: StringBuilder): Unit =
-      render(builder, !tree.value.ply.turn.black)
-
-    @annotation.tailrec
-    private def render(builder: StringBuilder, dot: Boolean): Unit =
-      if tree.isVariation then builder.append(Move.render(tree.value.variationComments))
-      val d = tree.prefix(dot, builder)
-      renderValueAndVariations(builder)
-      tree.child match
-        case None => ()
-        case Some(x) =>
-          builder.addOne(' ')
-          x.render(builder, d)
-
-    private def prefix(dot: Boolean, builder: StringBuilder): Boolean =
-      if tree.value.ply.turn.black then
-        builder.append(tree.value.turnNumber).append(". ")
-        tree.isLong
-      else
-        if dot then builder.append(tree.value.turnNumber).append("... ")
-        false
-
-    private def renderValueAndVariations(builder: StringBuilder) =
-      tree.value.render(builder)
-      tree.variations.foreach: x =>
-        builder.addOne(' ').addOne('(')
-        x.render(builder)
-        builder.addOne(')')
-
 private def glyphs(id: Int) =
   Glyph
     .find(id)
@@ -91,8 +52,6 @@ case class Move(
     secondsLeft: Option[Int] = None,
     variationComments: List[Comment] = Nil
 ):
-  def turnNumber = if ply.turn.black then ply.fullMoveNumber else ply.fullMoveNumber - 1
-  def isLong     = comments.nonEmpty || secondsLeft.isDefined
 
   private def clockString: Option[String] =
     secondsLeft.map(seconds => "[%clk " + Move.formatPgnSeconds(seconds) + "]")
@@ -101,7 +60,7 @@ case class Move(
     comments.nonEmpty || secondsLeft.isDefined || opening.isDefined || result.isDefined
 
   def render(builder: StringBuilder) =
-    builder.append(san)
+    builder.append(san.value)
     glyphs.toList.foreach:
       case glyph if glyph.id <= 6 => builder.append(glyph.symbol)
       case glyph                  => builder.append(" $").append(glyph.id)
@@ -112,16 +71,24 @@ case class Move(
 
 object Move:
 
-  val noDoubleLineBreakRegex = "(\r?\n){2,}".r
+  given SanEncoder[Move] with
+    extension (m: Move)
+      def render(builder: StringBuilder) = m.render(builder)
+      def isBlack = m.ply.turn.black
+      def preComment = Move.render(m.variationComments)
+      def turnNumber = if m.ply.turn.black then m.ply.fullMoveNumber else m.ply.fullMoveNumber - 1
+      def isLong     = m.comments.nonEmpty || m.secondsLeft.isDefined
 
   def render(cm: List[Comment]): String =
     val builder = new StringBuilder
     cm.foreach(x => builder.append(" { ").append(x.value).append(" }"))
     builder.toString
 
-  def noDoubleLineBreak(txt: String) =
+  private val noDoubleLineBreakRegex = "(\r?\n){2,}".r
+
+  private def noDoubleLineBreak(txt: String) =
     noDoubleLineBreakRegex.replaceAllIn(txt, "\n")
 
-  def formatPgnSeconds(t: Int): String =
+  private def formatPgnSeconds(t: Int): String =
     val d = java.time.Duration.ofSeconds(t)
     f"${d.toHours}:${d.toMinutesPart}%02d:${d.toSecondsPart}%02d"

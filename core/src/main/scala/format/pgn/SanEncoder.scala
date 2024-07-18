@@ -4,25 +4,27 @@ package format.pgn
 trait SanEncoder[A]:
   extension (a: A)
     def render(builder: StringBuilder): Unit
-    def isLong: Boolean
-    def isBlack: Boolean
     def renderVariationComment(builder: StringBuilder): Unit
-    def turnNumber: FullMoveNumber
+    def requiredPrefix: Boolean
     def ply: Ply
+    def isWhite: Boolean =
+      ply.turn.black
+    def turnNumber: FullMoveNumber =
+      if ply.turn.black then ply.fullMoveNumber else ply.fullMoveNumber - 1
 
 object SanEncoder:
 
   extension [A: SanEncoder](tree: Tree[A])
-
-    def isLong = tree.value.isLong || tree.variations.nonEmpty
 
     def render: String =
       val builder = new StringBuilder
       render(builder)
       builder.toString
 
-    private[pgn] def render(builder: StringBuilder): Unit =
-      render(builder, !tree.value.isBlack)
+    def render(builder: StringBuilder): Unit =
+      render(builder, !tree.value.isWhite)
+
+    private def requiredPrefix = tree.value.requiredPrefix || tree.variations.nonEmpty
 
     @annotation.tailrec
     private def render(builder: StringBuilder, dot: Boolean): Unit =
@@ -36,9 +38,9 @@ object SanEncoder:
           x.render(builder, d)
 
     private def prefix(dot: Boolean, builder: StringBuilder): Boolean =
-      if tree.value.isBlack then
+      if tree.value.isWhite then
         builder.append(tree.value.turnNumber).append(". ")
-        tree.isLong
+        tree.requiredPrefix
       else
         if dot then builder.append(tree.value.turnNumber).append("... ")
         false

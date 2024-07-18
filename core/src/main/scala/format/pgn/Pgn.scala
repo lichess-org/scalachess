@@ -69,12 +69,10 @@ object Move:
   given SanEncoder[Move] with
     extension (m: Move)
       def render(builder: StringBuilder) = m.render(builder)
-      def isBlack                        = m.ply.turn.black
       def renderVariationComment(builder: StringBuilder) =
         m.variationComments.foreach(x => builder.append(" { ").append(x.value).append(" }"))
-      def turnNumber = if m.ply.turn.black then m.ply.fullMoveNumber else m.ply.fullMoveNumber - 1
-      def isLong     = m.comments.nonEmpty || m.secondsLeft.isDefined
-      def ply        = m.ply
+      def requiredPrefix = m.comments.nonEmpty || m.secondsLeft.isDefined
+      def ply            = m.ply
 
   private val noDoubleLineBreakRegex = "(\r?\n){2,}".r
 

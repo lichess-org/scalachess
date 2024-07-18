@@ -5,7 +5,8 @@ trait SanEncoder[A]:
   extension (a: A)
     def render(builder: StringBuilder): Unit
     def renderVariationComment(builder: StringBuilder): Unit
-    def requiredPrefix: Boolean
+    // Returns true if the this renders at least a pgn comment
+    def hasComment: Boolean
     def ply: Ply
     def isWhite: Boolean =
       ply.turn.black
@@ -24,14 +25,14 @@ object SanEncoder:
     def render(builder: StringBuilder): Unit =
       render(builder, !tree.value.isWhite)
 
-    private def requiredPrefix = tree.value.requiredPrefix || tree.variations.nonEmpty
+    private def requiredPrefix = tree.value.hasComment || tree.variations.nonEmpty
 
     @annotation.tailrec
     private def render(builder: StringBuilder, dot: Boolean): Unit =
       if tree.isVariation then tree.value.renderVariationComment(builder)
       val d = tree.prefix(dot, builder)
       renderValueAndVariations(builder)
-      tree.child match
+      tree.child.match
         case None => ()
         case Some(x) =>
           builder.addOne(' ')

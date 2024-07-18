@@ -51,7 +51,7 @@ case class Move(
   private def clockString: Option[String] =
     secondsLeft.map(seconds => "[%clk " + Move.formatPgnSeconds(seconds) + "]")
 
-  private def hasCommentsOrTime =
+  def hasComment =
     comments.nonEmpty || secondsLeft.isDefined || opening.isDefined || result.isDefined
 
   def render(builder: StringBuilder) =
@@ -59,7 +59,7 @@ case class Move(
     glyphs.toList.foreach:
       case glyph if glyph.id <= 6 => builder.append(glyph.symbol)
       case glyph                  => builder.append(" $").append(glyph.id)
-    if hasCommentsOrTime then
+    if hasComment then
       List(clockString, opening, result).flatten
         .:::(comments.map(_.map(Move.noDoubleLineBreak)))
         .foreach(x => builder.append(" { ").append(x).append(" }"))
@@ -71,8 +71,8 @@ object Move:
       def render(builder: StringBuilder) = m.render(builder)
       def renderVariationComment(builder: StringBuilder) =
         m.variationComments.foreach(x => builder.append(" { ").append(x.value).append(" }"))
-      def requiredPrefix = m.comments.nonEmpty || m.secondsLeft.isDefined
-      def ply            = m.ply
+      def hasComment = m.hasComment
+      def ply        = m.ply
 
   private val noDoubleLineBreakRegex = "(\r?\n){2,}".r
 

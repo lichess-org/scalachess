@@ -41,23 +41,20 @@ case class PgnNodeData(
 
 type ParsedPgnTree = Node[PgnNodeData]
 
-object ParsedPgnTree:
-  extension (tree: ParsedPgnTree)
-    def toPgn(context: MappingContext): Option[Node[Move]] =
-      tree.mapAccumlOption_(context): (ctx, d) =>
-        d.toMove(ctx) match
-          case Some(sit, m) =>
-            MappingContext(sit, ctx.ply.next) -> m.some
-          case None => ctx -> None
+extension (tree: ParsedPgnTree)
+  private def toPgn(context: MappingContext): Option[Node[Move]] =
+    tree.mapAccumlOption_(context): (ctx, d) =>
+      d.toMove(ctx)
+        .fold(ctx -> None): (sit, m) =>
+          MappingContext(sit, ctx.ply.next) -> m.some
 
 case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[ParsedPgnTree]):
   def mainline = tree.fold(List.empty[San])(_.mainline.map(_.value.san))
 
   def toPgn: Pgn[Move] =
-    import ParsedPgnTree.*
-    Pgn(tags, initialPosition, tree.flatMap(_.toPgn(init(tags))))
+    Pgn(tags, initialPosition, tree.flatMap(_.toPgn(initContext(tags))))
 
-  private def init(tags: Tags): MappingContext =
+  private def initContext(tags: Tags): MappingContext =
     val variant = tags.variant | chess.variant.Standard
     def default = Situation.AndFullMoveNumber(Situation(Board.init(variant), White), FullMoveNumber.initial)
 

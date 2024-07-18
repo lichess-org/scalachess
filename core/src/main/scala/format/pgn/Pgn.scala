@@ -3,9 +3,13 @@ package format.pgn
 
 import monocle.syntax.all.*
 
-case class Pgn[A](tags: Tags, initial: InitialComments, tree: Option[Node[A]]):
+type PgnTree = Node[Move]
+case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
 
-  def render: SanEncoder[A] ?=> PgnStr = PgnStr:
+  def render: PgnStr = PgnStr:
+    toString
+
+  override def toString: String =
     import SanEncoder.*
     val builder = new StringBuilder
 
@@ -16,16 +20,16 @@ case class Pgn[A](tags: Tags, initial: InitialComments, tree: Option[Node[A]]):
 
     builder.toString
 
-  def updatePly(ply: Ply, f: A => A): SanEncoder[A] ?=> Option[Pgn[A]] =
+  def updatePly(ply: Ply, f: Move => Move): Option[Pgn] =
     this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, _.updateValue(f)))
 
-  def updateLastPly(f: A => A): Pgn[A] =
+  def updateLastPly(f: Move => Move): Pgn =
     this.focus(_.tree.some).modify(_.modifyLastMainlineNode(_.updateValue(f)))
 
-  def modifyInMainline(ply: Ply, f: Node[A] => Node[A]): SanEncoder[A] ?=> Option[Pgn[A]] =
+  def modifyInMainline(ply: Ply, f: PgnTree => PgnTree): Option[Pgn] =
     this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, f))
 
-  def moves: List[A] = tree.fold(Nil)(_.mainlineValues)
+  def moves: List[Move] = tree.fold(Nil)(_.mainlineValues)
 
   def withEvent(title: String) =
     copy(tags = tags + Tag(_.Event, title))

@@ -51,7 +51,7 @@ extension (tree: ParsedPgnTree)
 case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[ParsedPgnTree]):
   def mainline = tree.fold(List.empty[San])(_.mainline.map(_.value.san))
 
-  def toPgn: Pgn[Move] =
+  def toPgn: Pgn =
     Pgn(tags, initialPosition, tree.flatMap(_.toPgn(initContext(tags))))
 
   private def initContext(tags: Tags): MappingContext =

@@ -39,7 +39,7 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (node: Node[Int]) =>
       node.mainlineValues == node.mainlinePath
 
-  test("findPath with subset of mainline returns Some"):
+  test("findPath with subset of mainline return Some"):
     forAll: (node: Node[Int]) =>
       node.mainlineValues.size >= 2 ==> {
         val size = Random.nextInt(node.mainlineValues.size - 1) + 1
@@ -212,8 +212,8 @@ class NodeTest extends ScalaCheckSuite:
   test("promote will never change node.size"):
     forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
-      val ouput        = node.promote(path)
-      ouput.isEmpty || ouput.get.size == node.size
+      val output       = node.promote(path)
+      output.isEmpty || output.get.size == node.size
 
   test("promote success reduce mainline nodes count in the path"):
     def nodesInPath(node: Node[Int], path: List[Int]) =
@@ -221,9 +221,9 @@ class NodeTest extends ScalaCheckSuite:
 
     forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
-      val ouput        = node.promote(path)
-      ouput.isEmpty || {
-        nodesInPath(ouput.get, path) == nodesInPath(node, path) + 1
+      val output       = node.promote(path)
+      output.isEmpty || {
+        nodesInPath(output.get, path) == nodesInPath(node, path) + 1
       }
 
   test("findPath.isEmpty => promote.isEmpty"):
@@ -245,14 +245,14 @@ class NodeTest extends ScalaCheckSuite:
   test("promoteToMainline will never change node.size"):
     forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
-      val ouput        = node.promoteToMainline(path)
-      ouput.isEmpty || ouput.get.size == node.size
+      val output       = node.promoteToMainline(path)
+      output.isEmpty || output.get.size == node.size
 
   test("promoteToMainline => path is a subset of mainlineValues"):
     forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
-      val ouput        = node.promoteToMainline(path)
-      ouput.isEmpty || ouput.get.mainlineValues.startsWith(path)
+      val output       = node.promoteToMainline(path)
+      output.isEmpty || output.get.mainlineValues.startsWith(path)
 
   test("findPath.isEmpty => promoteToMainline.isEmpty"):
     forAll: (p: NodeWithPath[Int]) =>

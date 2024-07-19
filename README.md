@@ -27,7 +27,7 @@ To run benchmarks (takes more than 1 hour to finish):
 
     bench / Jmh / run
 
-Or to ouput a json file
+Or to output a json file
 
     bench / Jmh / run -rf json
 

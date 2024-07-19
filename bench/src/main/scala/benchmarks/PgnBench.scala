@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit
 
 import cats.syntax.all.*
 import chess.format.pgn.{ Fixtures, Parser, Pgn, PgnStr }
+import chess.format.pgn.ParsedPgn
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -19,12 +20,14 @@ class PgnBench:
   // the unit of CPU work per iteration
   private val Work: Long = 10
 
-  var pgnStrs: List[PgnStr] = scala.compiletime.uninitialized
-  var pgns: List[Pgn]       = scala.compiletime.uninitialized
+  var pgnStrs: List[PgnStr]      = scala.compiletime.uninitialized
+  var pgns: List[Pgn]            = scala.compiletime.uninitialized
+  var parsedPgn: List[ParsedPgn] = scala.compiletime.uninitialized
 
   @Setup
   def setup() =
-    pgnStrs = Fixtures.gamesForPerfTest
+    pgnStrs = Fixtures.gamesForPerfTest ++ Fixtures.wcc2023.map(PgnStr.apply)
+    parsedPgn = pgnStrs.traverse(Parser.full).toOption.get
     pgns = pgnStrs.traverse(Parser.full).toOption.get.map(_.toPgn)
 
   @Benchmark
@@ -40,5 +43,14 @@ class PgnBench:
     val result = pgns.map: x =>
       Blackhole.consumeCPU(Work)
       x.render
+    bh.consume(result)
+    result
+
+  @Benchmark
+  def pgnBuildAndRender(bh: Blackhole) =
+    val result =
+      parsedPgn.map: x =>
+        Blackhole.consumeCPU(Work)
+        x.toPgn.render
     bh.consume(result)
     result

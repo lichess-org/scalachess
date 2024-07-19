@@ -1,6 +1,11 @@
 package chess
 package format.pgn
 
+/**
+ * PgnNodeEncoder,
+ * Provide encoding of a node to a string, which is used to render a PGN string
+ * from a chess.Tree[A]
+ */
 trait PgnNodeEncoder[A]:
   extension (a: A)
     def render(builder: StringBuilder): Unit
@@ -16,11 +21,18 @@ object PgnNodeEncoder:
 
   extension [A](tree: Tree[A])(using PgnNodeEncoder[A])
 
-    def render: String =
-      val builder = new StringBuilder
-      render(builder)
-      builder.toString
+    /**
+     * render a tree to a PgnStr
+     */
+    def render: PgnStr =
+      PgnStr:
+        val builder = new StringBuilder
+        render(builder)
+        builder.toString
 
+    /**
+     * append the rendred PgnStr to the builder
+     */
     def render(builder: StringBuilder): Unit =
       render(builder, !tree.value.isWhiteTurn)
 

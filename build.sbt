@@ -57,6 +57,7 @@ lazy val playJson: Project = Project("playJson", file("playJson"))
 lazy val bench = project
   .enablePlugins(JmhPlugin)
   .settings(commonSettings, scalacOptions -= "-Wunused:all", name := "bench")
+  .settings(publish := {}, publish / skip := true)
   .disablePlugins(ScalafixPlugin)
   .dependsOn(scalachess, testKit, testKit % "compile->test")
 
@@ -83,7 +84,7 @@ lazy val testKit = project
 lazy val root = project
   .in(file("."))
   .settings(publish := {}, publish / skip := true)
-  .aggregate(scalachess, playJson, testKit)
+  .aggregate(scalachess, playJson, testKit, bench)
 
 addCommandAlias("prepare", "scalafixAll; scalafmtAll")
 addCommandAlias("check", "; scalafixAll --check; scalafmtCheckAll")

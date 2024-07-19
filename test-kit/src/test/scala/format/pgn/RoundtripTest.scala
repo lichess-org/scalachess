@@ -1,8 +1,6 @@
 package chess
 package format.pgn
 
-import scala.language.implicitConversions
-
 class RoundtripTest extends ChessTest:
 
   test("roundtrip with special chars for tags"):

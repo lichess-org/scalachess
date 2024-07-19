@@ -4,13 +4,14 @@ package format.pgn
 import monocle.syntax.all.*
 
 type PgnTree = Node[Move]
+
 case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
 
   def render: PgnStr = PgnStr:
     toString
 
   override def toString: String =
-    import SanEncoder.*
+    import PgnNodeEncoder.*
     val builder = new StringBuilder
 
     if tags.value.nonEmpty then builder.append(tags).addOne('\n').addOne('\n')
@@ -70,7 +71,7 @@ case class Move(
 
 object Move:
 
-  given SanEncoder[Move] with
+  given PgnNodeEncoder[Move] with
     extension (m: Move)
       def render(builder: StringBuilder) = m.render(builder)
       def renderVariationComment(builder: StringBuilder) =

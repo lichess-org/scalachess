@@ -16,7 +16,7 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
 
     if tags.value.nonEmpty then builder.append(tags).addOne('\n').addOne('\n')
     if initial.comments.nonEmpty then builder.append(initial.comments.mkString("{ ", " } { ", " }\n"))
-    tree.foreach(_.render(builder))
+    tree.foreach(_.appendPgnStr(builder))
     tags(_.Result).foreach(x => builder.addOne(' ').append(x))
 
     builder.toString

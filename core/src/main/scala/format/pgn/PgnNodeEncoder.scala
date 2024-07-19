@@ -24,16 +24,16 @@ object PgnNodeEncoder:
     /**
      * render a tree to a PgnStr
      */
-    def render: PgnStr =
+    def toPgnStr: PgnStr =
       PgnStr:
         val builder = new StringBuilder
-        render(builder)
+        appendPgnStr(builder)
         builder.toString
 
     /**
      * append the rendred PgnStr to the builder
      */
-    def render(builder: StringBuilder): Unit =
+    def appendPgnStr(builder: StringBuilder): Unit =
       render(builder, !tree.value.isWhiteTurn)
 
     // We force to render turn number for the next black turn when the current value
@@ -67,5 +67,5 @@ object PgnNodeEncoder:
       tree.value.render(builder)
       tree.variations.foreach: x =>
         builder.addOne(' ').addOne('(')
-        x.render(builder)
+        x.appendPgnStr(builder)
         builder.addOne(')')

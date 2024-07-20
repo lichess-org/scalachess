@@ -11,61 +11,62 @@ trait PgnNodeEncoder[A]:
     def render(builder: StringBuilder): Unit
     def renderVariationComment(builder: StringBuilder): Unit
     def hasComment: Boolean
-    def ply: Ply
-    def isWhiteTurn: Boolean =
-      ply.turn.black
-    def turnNumber: FullMoveNumber =
-      if ply.turn.black then ply.fullMoveNumber else ply.fullMoveNumber - 1
 
 object PgnNodeEncoder:
+
+  extension (ply: Ply)
+    private def isWhiteTurn: Boolean =
+      ply.turn.black
+    private def turnNumber: FullMoveNumber = // calculate turn number directly
+      if ply.turn.black then ply.fullMoveNumber else ply.fullMoveNumber - 1
 
   extension [A](tree: Tree[A])(using PgnNodeEncoder[A])
 
     /**
      * render a tree to a PgnStr
      */
-    def toPgnStr: PgnStr =
+    def toPgnStr(startPly: Ply): PgnStr =
       PgnStr:
         val builder = new StringBuilder
-        appendPgnStr(builder)
+        appendPgnStr(builder, startPly)
         builder.toString
 
     /**
      * append the rendred PgnStr to the builder
      */
-    def appendPgnStr(builder: StringBuilder): Unit =
-      render(builder, !tree.value.isWhiteTurn)
+    def appendPgnStr(builder: StringBuilder, ply: Ply): Unit =
+      render(builder, !ply.isWhiteTurn, ply)
 
     // We force to render turn number for the next black turn when the current value
     // has comment(s) or variation(s) or the rendered string of this value is not compact
     // so, this returns true if the current value is black
     // or the current value is white and has comment(s) or variation(s)
-    private def forceTurnNumber =
-      !tree.value.isWhiteTurn || (tree.value.hasComment || tree.variations.nonEmpty)
+    private def forceTurnNumber(ply: Ply) =
+      !ply.isWhiteTurn || (tree.value.hasComment || tree.variations.nonEmpty)
 
     @annotation.tailrec
-    private def render(builder: StringBuilder, forceTurnNumber: Boolean): Unit =
+    private def render(builder: StringBuilder, forceTurnNumber: Boolean, ply: Ply): Unit =
       if tree.isVariation then tree.value.renderVariationComment(builder)
-      tree.addTurnNumberPrefix(forceTurnNumber, builder)
-      renderValueAndVariations(builder)
+      tree.addTurnNumberPrefix(forceTurnNumber, builder, ply)
+      renderValueAndVariations(builder, ply)
       tree.child.match
         case None => ()
         case Some(x) =>
           builder.addOne(' ')
-          x.render(builder, tree.forceTurnNumber)
+          x.render(builder, tree.forceTurnNumber(ply), ply.next)
 
     // Add turn number prefix to the builder if needed
     // if the current value is white, We ignore forceTurnNumber value as
     // it always renders with a turn number and a dot for example: `1. e4`
     // if the current value is black and forceTurnNumber is true it needs to
     // render with a turn number and 3 dots for example: `1... e5`
-    private def addTurnNumberPrefix(forceTurnNumber: Boolean, builder: StringBuilder): Unit =
-      if tree.value.isWhiteTurn then builder.append(tree.value.turnNumber).append(". ")
-      else if forceTurnNumber then builder.append(tree.value.turnNumber).append("... ")
+    private def addTurnNumberPrefix(forceTurnNumber: Boolean, builder: StringBuilder, ply: Ply): Unit =
+      if ply.isWhiteTurn then builder.append(ply.turnNumber).append(". ")
+      else if forceTurnNumber then builder.append(ply.turnNumber).append("... ")
 
-    private def renderValueAndVariations(builder: StringBuilder) =
+    private def renderValueAndVariations(builder: StringBuilder, ply: Ply) =
       tree.value.render(builder)
       tree.variations.foreach: x =>
         builder.addOne(' ').addOne('(')
-        x.appendPgnStr(builder)
+        x.appendPgnStr(builder, ply)
         builder.addOne(')')

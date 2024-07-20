@@ -5,7 +5,7 @@ import monocle.syntax.all.*
 
 type PgnTree = Node[Move]
 
-case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
+case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree], startPly: Ply):
 
   def render: PgnStr = PgnStr:
     toString
@@ -16,19 +16,19 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree]):
 
     if tags.value.nonEmpty then builder.append(tags).addOne('\n').addOne('\n')
     if initial.comments.nonEmpty then builder.append(initial.comments.mkString("{ ", " } { ", " }\n"))
-    tree.foreach(_.appendPgnStr(builder))
+    tree.foreach(_.appendPgnStr(builder, startPly))
     tags(_.Result).foreach(x => builder.addOne(' ').append(x))
 
     builder.toString
 
   def updatePly(ply: Ply, f: Move => Move): Option[Pgn] =
-    this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, _.updateValue(f)))
+    this.focus(_.tree.some).modifyA(_.modifyInMainlineAt((ply - startPly).value, _.updateValue(f)))
 
   def updateLastPly(f: Move => Move): Pgn =
     this.focus(_.tree.some).modify(_.modifyLastMainlineNode(_.updateValue(f)))
 
   def modifyInMainline(ply: Ply, f: PgnTree => PgnTree): Option[Pgn] =
-    this.focus(_.tree.some).modifyA(_.modifyInMainline(_.ply == ply, f))
+    this.focus(_.tree.some).modifyA(_.modifyInMainlineAt((ply - startPly).value, f))
 
   def moves: List[Move] = tree.fold(Nil)(_.mainlineValues)
 
@@ -42,7 +42,6 @@ private def glyphs(id: Int) =
       Glyphs.fromList(List(g))
 
 case class Move(
-    ply: Ply,
     san: SanStr,
     comments: List[Comment] = Nil,
     glyphs: Glyphs = Glyphs.empty,
@@ -77,7 +76,6 @@ object Move:
       def renderVariationComment(builder: StringBuilder) =
         m.variationComments.foreach(x => builder.append(" { ").append(x.value).append(" }"))
       def hasComment = m.hasComment
-      def ply        = m.ply
 
   private val noDoubleLineBreakRegex = "(\r?\n){2,}".r
 

@@ -5,8 +5,7 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 import cats.syntax.all.*
-import chess.format.pgn.{ Fixtures, Parser, Pgn, PgnStr }
-import chess.format.pgn.ParsedPgn
+import chess.format.pgn.{ Fixtures, ParsedPgn, Parser, Pgn, PgnStr }
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))

@@ -19,7 +19,7 @@ case class PgnNodeData(
 ):
   export metas.*
 
-  def toMove(context: Situation): Option[(Situation, Move)] =
+  private[pgn] def toMove(context: Situation): Option[(Situation, Move)] =
     san(context).toOption
       .map(x =>
         (
@@ -38,19 +38,12 @@ case class PgnNodeData(
 
 type ParsedPgnTree = Node[PgnNodeData]
 
-extension (tree: ParsedPgnTree)
-  private def toPgn(context: Situation): Option[Node[Move]] =
-    tree.mapAccumlOption_(context): (ctx, d) =>
-      d.toMove(ctx)
-        .fold(ctx -> None): (sit, m) =>
-          sit -> m.some
-
 case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[ParsedPgnTree]):
   def mainline = tree.fold(List.empty[San])(_.mainline.map(_.value.san))
 
   def toPgn: Pgn =
     val sitWithMove = initContext(tags)
-    Pgn(tags, initialPosition, tree.flatMap(_.toPgn(sitWithMove.situation)), sitWithMove.ply.next)
+    Pgn(tags, initialPosition, treeToPgn(sitWithMove.situation), sitWithMove.ply.next)
 
   private def initContext(tags: Tags) =
     val variant = tags.variant | chess.variant.Standard
@@ -59,6 +52,12 @@ case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[
     tags.fen
       .flatMap(Fen.readWithMoveNumber(variant, _))
       .getOrElse(default)
+
+  private def treeToPgn(context: Situation): Option[Node[Move]] =
+    tree.flatMap:
+      _.mapAccumlOption_(context): (ctx, d) =>
+          d.toMove(ctx)
+            .fold(ctx -> None)(_ -> _.some)
 
 // Standard Algebraic Notation
 sealed trait San:

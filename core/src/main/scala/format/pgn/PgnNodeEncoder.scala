@@ -14,12 +14,6 @@ trait PgnNodeEncoder[A]:
 
 object PgnNodeEncoder:
 
-  extension (ply: Ply)
-    private def isWhiteTurn: Boolean =
-      ply.turn.black
-    private def turnNumber: FullMoveNumber = // calculate turn number directly
-      if ply.turn.black then ply.fullMoveNumber else ply.fullMoveNumber - 1
-
   extension [A](tree: Tree[A])(using PgnNodeEncoder[A])
 
     /**
@@ -70,3 +64,9 @@ object PgnNodeEncoder:
         builder.addOne(' ').addOne('(')
         x.appendPgnStr(builder, ply)
         builder.addOne(')')
+
+  extension (ply: Ply)
+    private def isWhiteTurn: Boolean =
+      ply.isOdd
+    private def turnNumber: FullMoveNumber =
+      ply.fullMoveNumber + ply.value % 2 - 1

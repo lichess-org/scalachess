@@ -56,8 +56,8 @@ case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[
   private def treeToPgn(context: Situation): Option[Node[Move]] =
     tree.flatMap:
       _.mapAccumlOption_(context): (ctx, d) =>
-          d.toMove(ctx)
-            .fold(ctx -> None)(_ -> _.some)
+        d.toMove(ctx)
+          .fold(ctx -> None)(_ -> _.some)
 
 // Standard Algebraic Notation
 sealed trait San:

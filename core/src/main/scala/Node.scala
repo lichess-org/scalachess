@@ -150,7 +150,7 @@ final case class Node[A](
 
   import Tree.given
 
-  final def mainline: List[Node[A]] =
+  lazy val mainline: List[Node[A]] =
     mainlineReverse.reverse
 
   final def mainlineReverse: List[Node[A]] =
@@ -161,10 +161,12 @@ final case class Node[A](
         case None        => tree :: acc
     loop(this, Nil)
 
-  // take the first n nodes in the mainline
-  // keep all variations
-  // n > 0
-  def take(n: Int): Node[A] =
+  /**
+   * take the first n nodes in the mainline
+   * keep all variations
+   * return none if n <= 0
+   */
+  def take(n: Int): Option[Node[A]] =
     @tailrec
     def loop(n: Int, node: Node[A], acc: List[Node[A]]): List[Node[A]] =
       if n <= 0 then acc
@@ -172,8 +174,7 @@ final case class Node[A](
         node.child match
           case None        => node :: acc
           case Some(child) => loop(n - 1, child, node.withoutChild :: acc)
-    if n <= 0 then this
-    else Tree.buildReverse(loop(n, this, Nil)).getOrElse(this)
+    Option.when(n > 0)(Tree.buildReverse(loop(n, this, Nil)).getOrElse(this))
 
   // take nodes while mainline nodes satisfy the predicate
   // keep all variations

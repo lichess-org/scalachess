@@ -340,10 +340,27 @@ final case class Node[A](
 
   def modifyInMainline(predicate: A => Boolean, f: Node[A] => Node[A]): Option[Node[A]] =
     if predicate(value) then f(this).some
+    else child.flatMap(_.modifyInMainline(predicate, f)).map(c => withChild(c.some))
+
+  def modifyInMainlineAt(n: Int, f: Node[A] => Node[A]): Option[Node[A]] =
+    if n < 0 || n >= mainline.size then none
+    else if n == 0 then f(this).some
+    else child.flatMap(_.modifyInMainlineAt(n - 1, f)).map(c => withChild(c.some))
+
+  /**
+      * get node at nth in mainline
+      *
+      * @param n
+      * @return
+      */
+  @tailrec
+  def getMainlineNodeAt(n: Int): Option[Node[A]] =
+    if n < 0 || n >= mainline.size then none
+    else if n == 0 then this.some
     else
-      child.flatMap(_.modifyInMainline(predicate, f)) match
-        case Some(c) => withChild(c.some).some
-        case None    => None
+      child.match
+        case None    => none
+        case Some(c) => c.getMainlineNodeAt(n - 1)
 
   @tailrec
   def lastMainlineNode: Node[A] =

@@ -57,21 +57,17 @@ class NodeTest extends ScalaCheckSuite:
 
   test("with 0 < n <= node.mainline.size => take(n).mainline size == n"):
     forAll: (node: Node[Int]) =>
-      val n = Random.nextInt(node.mainline.size)
-      n > 0 ==> {
-        node.take(n).mainline.size == n
-      }
+      val n = node.randomBetweenOneAndMainlineSize
+      node.take(n).get.mainline.size == n
 
   test("findPath.take(n).mainlineValues isDefined"):
     forAll: (node: Node[Int]) =>
-      val n = Random.nextInt(node.mainline.size)
-      n > 0 ==> {
-        node.findPath(node.take(n).mainlineValues).isDefined
-      }
+      val n = node.randomBetweenOneAndMainlineSize
+      node.findPath(node.take(n).get.mainlineValues).isDefined
 
   test("take(node.mainline.size) == node"):
     forAll: (node: Node[Int]) =>
-      node.take(node.mainline.size) == node
+      node.take(node.mainline.size).get == node
 
   test("takeMainlineWhile"):
     forAll: (node: Node[Int]) =>
@@ -96,12 +92,10 @@ class NodeTest extends ScalaCheckSuite:
 
   test("take(n).size + apply(n).size == node.size"):
     forAll: (node: Node[Int]) =>
-      val n = Random.nextInt(node.mainline.size)
-      n > 0 ==> {
-        node.take(n).size + node(n).map(_.size).getOrElse(0L) == node.size
-      }
+      val n = node.randomBetweenOneAndMainlineSize
+      node.take(n).get.size + node(n).map(_.size).getOrElse(0L) == node.size
 
-  test("modifyAt with mainline == modifyLastMainlineNode"):
+  test("modifyAt with mainlineValues == modifyLastMainlineNode"):
     forAll: (node: Node[Int], f: Int => Int) =>
       node
         .modifyAt(node.mainlineValues, Tree.liftOption(f)) == node
@@ -188,6 +182,34 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (p: (Node[Int], List[Int])) =>
       val (node, path) = p
       node.deleteAt(path).isDefined == node.modifyAt(path, Tree.liftOption(identity)).isDefined
+
+  test("modifyInMainlineAt return none when n is out of range"):
+    forAll: (node: Node[Int], f: Int => Int) =>
+      node.modifyInMainlineAt(-1, _.updateValue(f)) == none
+      node.modifyInMainlineAt(node.mainline.size, _.updateValue(f)) == none
+
+  test("modifyInMainlineAt return none when n is out of range"):
+    forAll: (node: Node[Int], f: Int => Int) =>
+      node.modifyInMainlineAt(-1, _.updateValue(f)) == none
+      node.modifyInMainlineAt(node.mainline.size, _.updateValue(f)) == none
+
+  test("modifyInMainlineAt with updateValue return have the same size"):
+    forAll: (node: Node[Int], f: Int => Int) =>
+      val n      = Random.nextInt(node.mainline.size)
+      val output = node.modifyInMainlineAt(n, _.updateValue(f))
+      output.get.size == node.size && output.get.mainline.size == node.mainline.size
+
+  test("take n doesn't impact by modifyInMainlineAt n"):
+    forAll: (node: Node[Int], s: Short, newNode: Node[Int]) =>
+      val n      = s.toInt
+      val output = node.modifyInMainlineAt(n, _ => newNode)
+      n >= node.mainline.size || output.flatMap(_.take(n)) == node.take(n)
+
+  override def scalaCheckInitialSeed = "z_ejR8Ve8lZWkWpnrN7gBGfK1bta0yof-THAkg8qgjK="
+  test("modifyInMainlineAt(n)(node) . get(n) == node"):
+    forAll: (node: Node[Int], newNode: Node[Int]) =>
+      val n = Random.nextInt(node.mainline.size)
+      node.modifyInMainlineAt(n, _ => newNode).get.getMainlineNodeAt(n) == newNode.some
 
   test("clearVariations.size == mainline.size"):
     forAll: (node: Node[Int]) =>
@@ -338,6 +360,10 @@ class NodeTest extends ScalaCheckSuite:
 
     def variationIsEmpty: Boolean =
       node.child.foldLeft(node.variations.isEmpty)((acc, v) => acc || v.variationIsEmpty)
+
+    def randomBetweenOneAndMainlineSize: Int =
+      if node.mainline.size == 1 then 1
+      else Random.between(1, node.mainline.size)
 
 case class Foo(id: Int, name: String)
 

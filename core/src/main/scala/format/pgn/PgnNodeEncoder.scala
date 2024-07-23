@@ -14,12 +14,12 @@ trait PgnNodeEncoder[A]:
 
 object PgnNodeEncoder:
 
-  extension [A](tree: Tree[A])(using PgnNodeEncoder[A])
+  extension [A](tree: Tree[A])
 
     /**
      * render a tree to a PgnStr
      */
-    def toPgnStr(startPly: Ply): PgnStr =
+    def toPgnStr(startPly: Ply): PgnNodeEncoder[A] ?=> PgnStr =
       PgnStr:
         val builder = new StringBuilder
         appendPgnStr(builder, startPly)
@@ -28,18 +28,22 @@ object PgnNodeEncoder:
     /**
      * append the rendred PgnStr to the builder
      */
-    def appendPgnStr(builder: StringBuilder, ply: Ply): Unit =
+    def appendPgnStr(builder: StringBuilder, ply: Ply): PgnNodeEncoder[A] ?=> Unit =
       render(builder, !ply.isWhiteTurn, ply)
 
     // We force to render turn number for the next black turn when the current value
     // has comment(s) or variation(s) or the rendered string of this value is not compact
     // so, this returns true if the current value is black
     // or the current value is white and has comment(s) or variation(s)
-    private def forceTurnNumber(ply: Ply) =
+    private def forceTurnNumber(ply: Ply): PgnNodeEncoder[A] ?=> Boolean =
       !ply.isWhiteTurn || (tree.value.hasComment || tree.variations.nonEmpty)
 
     @annotation.tailrec
-    private def render(builder: StringBuilder, forceTurnNumber: Boolean, ply: Ply): Unit =
+    private def render(
+        builder: StringBuilder,
+        forceTurnNumber: Boolean,
+        ply: Ply
+    ): PgnNodeEncoder[A] ?=> Unit =
       if tree.isVariation then tree.value.appendVariationComment(builder)
       tree.addTurnNumberPrefix(forceTurnNumber, builder, ply)
       renderValueAndVariations(builder, ply)
@@ -58,7 +62,7 @@ object PgnNodeEncoder:
       if ply.isWhiteTurn then builder.append(ply.turnNumber).append(". ")
       else if forceTurnNumber then builder.append(ply.turnNumber).append("... ")
 
-    private def renderValueAndVariations(builder: StringBuilder, ply: Ply) =
+    private def renderValueAndVariations(builder: StringBuilder, ply: Ply): PgnNodeEncoder[A] ?=> Unit =
       tree.value.appendSanStr(builder)
       tree.variations.foreach: x =>
         builder.addOne(' ').addOne('(')

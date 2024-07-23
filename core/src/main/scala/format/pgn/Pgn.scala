@@ -58,7 +58,7 @@ case class Move(
   def hasComment =
     comments.nonEmpty || secondsLeft.isDefined || opening.isDefined || result.isDefined
 
-  def render(builder: StringBuilder) =
+  private def appendSanStr(builder: StringBuilder): Unit =
     builder.append(san.value)
     glyphs.toList.foreach:
       case glyph if glyph.id <= 6 => builder.append(glyph.symbol)
@@ -68,12 +68,17 @@ case class Move(
         .:::(comments.map(_.map(Move.noDoubleLineBreak)))
         .foreach(x => builder.append(" { ").append(x).append(" }"))
 
+  def render: String =
+    val builder = new StringBuilder
+    appendSanStr(builder)
+    builder.toString
+
 object Move:
 
   given PgnNodeEncoder[Move] with
     extension (m: Move)
-      def render(builder: StringBuilder) = m.render(builder)
-      def renderVariationComment(builder: StringBuilder) =
+      def appendSanStr(builder: StringBuilder) = m.appendSanStr(builder)
+      def appendVariationComment(builder: StringBuilder) =
         m.variationComments.foreach(x => builder.append(" { ").append(x.value).append(" }"))
       def hasComment = m.hasComment
 

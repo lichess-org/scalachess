@@ -8,8 +8,8 @@ package format.pgn
  */
 trait PgnNodeEncoder[A]:
   extension (a: A)
-    def render(builder: StringBuilder): Unit
-    def renderVariationComment(builder: StringBuilder): Unit
+    def appendSanStr(builder: StringBuilder): Unit
+    def appendVariationComment(builder: StringBuilder): Unit
     def hasComment: Boolean
 
 object PgnNodeEncoder:
@@ -40,7 +40,7 @@ object PgnNodeEncoder:
 
     @annotation.tailrec
     private def render(builder: StringBuilder, forceTurnNumber: Boolean, ply: Ply): Unit =
-      if tree.isVariation then tree.value.renderVariationComment(builder)
+      if tree.isVariation then tree.value.appendVariationComment(builder)
       tree.addTurnNumberPrefix(forceTurnNumber, builder, ply)
       renderValueAndVariations(builder, ply)
       tree.child.match
@@ -59,7 +59,7 @@ object PgnNodeEncoder:
       else if forceTurnNumber then builder.append(ply.turnNumber).append("... ")
 
     private def renderValueAndVariations(builder: StringBuilder, ply: Ply) =
-      tree.value.render(builder)
+      tree.value.appendSanStr(builder)
       tree.variations.foreach: x =>
         builder.addOne(' ').addOne('(')
         x.appendPgnStr(builder, ply)

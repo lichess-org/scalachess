@@ -1,6 +1,8 @@
 package chess
 package format.pgn
 
+import cats.syntax.all.*
+
 /**
  * PgnNodeEncoder,
  * Provide encoding of a node to a string, which is used to render a PGN string
@@ -13,6 +15,17 @@ trait PgnNodeEncoder[A]:
     def hasComment: Boolean
 
 object PgnNodeEncoder:
+
+  extension [A](tree: Node[A])
+    def toPgn[B, C](
+        context: C,
+        f: (C, A) => Option[(C, B)],
+        startPly: Ply
+    ): PgnNodeEncoder[B] ?=> Option[PgnStr] =
+      tree
+        .mapAccumlOption_(context): (context, a) =>
+          f(context, a).fold(context -> none)(_ -> _.some)
+        .map(_.toPgnStr(startPly))
 
   extension [A](tree: Tree[A])
 

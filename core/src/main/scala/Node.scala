@@ -471,7 +471,7 @@ final case class Variation[A](override val value: A, override val child: Option[
       case None    => (s1, Variation(b, None))
       case Some(s) => (s._1, Variation(b, s._2.some))
 
-  // Akin to mapAccuml, return an Option[Node[B]]
+  // Akin to mapAccuml, return an Option[Variation[B]]
   // when a node from mainline returns None, we stop traverse down that line
   // when a variation node returns None, we just ignore it and continue to traverse next variations
   // TODO: now if the f(value) is None, the whole tree is None

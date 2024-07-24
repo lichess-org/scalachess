@@ -5,6 +5,14 @@ import monocle.syntax.all.*
 
 type PgnTree = Node[Move]
 
+object PgnTree:
+  extension (tree: PgnTree)
+    def render(ply: Ply) =
+      import PgnNodeEncoder.*
+      val builder = new StringBuilder
+      tree.appendPgnStr(builder, ply)
+      builder.toString
+
 case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree], startPly: Ply):
 
   def render: PgnStr = PgnStr:
@@ -56,6 +64,9 @@ case class Move(
     secondsLeft.map(seconds => "[%clk " + Move.formatPgnSeconds(seconds) + "]")
 
   def hasComment =
+    comments.nonEmpty || secondsLeft.isDefined
+
+  private def nonEmpty =
     comments.nonEmpty || secondsLeft.isDefined || opening.isDefined || result.isDefined
 
   private def appendSanStr(builder: StringBuilder): Unit =
@@ -63,7 +74,7 @@ case class Move(
     glyphs.toList.foreach:
       case glyph if glyph.id <= 6 => builder.append(glyph.symbol)
       case glyph                  => builder.append(" $").append(glyph.id)
-    if hasComment then
+    if nonEmpty then
       List(clockString, opening, result).flatten
         .:::(comments.map(_.map(Move.noDoubleLineBreak)))
         .foreach(x => builder.append(" { ").append(x).append(" }"))

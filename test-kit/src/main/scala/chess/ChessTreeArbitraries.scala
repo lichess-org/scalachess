@@ -11,8 +11,7 @@ trait Generator[A]:
   extension (a: A) def next: Gen[List[A]]
 
 trait FromMove[A]:
-  def ply(a: A): Ply
-  extension (move: Move) def next(ply: Ply): Gen[WithMove[A]]
+  extension (move: Move) def next: Gen[WithMove[A]]
 
 object ChessTreeArbitraries:
 
@@ -32,7 +31,7 @@ object ChessTreeArbitraries:
       tree <- genTree(seed)
       pgnTree = tree.tree.map(_.map(_.data))
       comments <- genComments(5)
-      pgn = Pgn(Tags.empty, InitialComments(comments), pgnTree)
+      pgn = Pgn(Tags.empty, InitialComments(comments), pgnTree, tree.ply.next)
     yield pgn
 
   def genTree[A](seed: Situation)(using fm: FromMove[A]): Gen[GameTree[WithMove[A]]] =
@@ -44,8 +43,8 @@ object ChessTreeArbitraries:
       val nextSeeds = seed.legalMoves
       for
         value      <- Gen.oneOf(nextSeeds)
-        withMove   <- value.next(Ply.initial.next)
-        variations <- nextSeeds.filter(_ != value).traverse(_.next(Ply.initial.next))
+        withMove   <- value.next
+        variations <- nextSeeds.filter(_ != value).traverse(_.next)
         node       <- genNode(withMove, variations)
       yield node.some
 
@@ -55,8 +54,8 @@ object ChessTreeArbitraries:
       val nextSeeds = seed.legalMoves
       for
         value      <- Gen.oneOf(nextSeeds)
-        withMove   <- value.next(Ply.initial.next)
-        variations <- nextSeeds.filter(_ != value).traverse(_.next(Ply.initial.next))
+        withMove   <- value.next
+        variations <- nextSeeds.filter(_ != value).traverse(_.next)
         node       <- genNode(withMove, variations)
         path       <- NodeArbitraries.genPath(node).map(_.map(_.data))
       yield (node.some, path)
@@ -79,18 +78,17 @@ object ChessTreeArbitraries:
       def next: Gen[List[WithMove[A]]] =
         for
           variations <- pickSome(move.move.situationAfter.legalMoves)
-          nextMoves  <- variations.traverse(_.next(fm.ply(move.data).next))
+          nextMoves  <- variations.traverse(_.next)
         yield nextMoves
 
   given FromMove[PgnMove] with
-    override def ply(a: PgnMove): Ply = a.ply
     extension (move: Move)
-      def next(ply: Ply): Gen[WithMove[PgnMove]] =
+      def next: Gen[WithMove[PgnMove]] =
         for
           comments <- genComments(5)
           glyphs   <- Gen.someOf(Glyphs.all).map(xs => Glyphs.fromList(xs.toList))
           clock    <- Gen.posNum[Int]
-        yield WithMove(move, PgnMove(ply, move.san, comments, glyphs, None, None, clock.some, Nil))
+        yield WithMove(move, PgnMove(move.san, comments, glyphs, None, None, clock.some, Nil))
 
   def genNode[A: Generator](value: A, variations: List[A] = Nil): Gen[Node[A]] =
     value.next.flatMap: nextSeeds =>

@@ -6,8 +6,6 @@ import chess.format.Fen
 
 import MoveOrDrop.*
 
-private case class MappingContext(situation: Situation, ply: Ply)
-
 // We don't support variation without move now,
 // but we can in the future when we support null move
 case class PgnNodeData(
@@ -21,13 +19,12 @@ case class PgnNodeData(
 ):
   export metas.*
 
-  def toMove(context: MappingContext): Option[(Situation, Move)] =
-    san(context.situation).toOption
+  private[pgn] def toMove(context: Situation): Option[(Situation, Move)] =
+    san(context).toOption
       .map(x =>
         (
           x.situationAfter,
           Move(
-            ply = context.ply.next,
             san = x.toSanStr,
             comments = comments,
             glyphs = glyphs,
@@ -41,28 +38,26 @@ case class PgnNodeData(
 
 type ParsedPgnTree = Node[PgnNodeData]
 
-extension (tree: ParsedPgnTree)
-  private def toPgn(context: MappingContext): Option[Node[Move]] =
-    tree.mapAccumlOption_(context): (ctx, d) =>
-      d.toMove(ctx)
-        .fold(ctx -> None): (sit, m) =>
-          MappingContext(sit, ctx.ply.next) -> m.some
-
 case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[ParsedPgnTree]):
   def mainline = tree.fold(List.empty[San])(_.mainline.map(_.value.san))
 
   def toPgn: Pgn =
-    Pgn(tags, initialPosition, tree.flatMap(_.toPgn(initContext(tags))))
+    val sitWithMove = initContext(tags)
+    Pgn(tags, initialPosition, treeToPgn(sitWithMove.situation), sitWithMove.ply.next)
 
-  private def initContext(tags: Tags): MappingContext =
+  private def initContext(tags: Tags) =
     val variant = tags.variant | chess.variant.Standard
     def default = Situation.AndFullMoveNumber(Situation(Board.init(variant), White), FullMoveNumber.initial)
 
-    val sitWithMoves = tags.fen
+    tags.fen
       .flatMap(Fen.readWithMoveNumber(variant, _))
       .getOrElse(default)
 
-    MappingContext(sitWithMoves.situation, sitWithMoves.ply)
+  private def treeToPgn(context: Situation): Option[Node[Move]] =
+    tree.flatMap:
+      _.mapAccumlOption_(context): (ctx, d) =>
+        d.toMove(ctx)
+          .fold(ctx -> None)(_ -> _.some)
 
 // Standard Algebraic Notation
 sealed trait San:

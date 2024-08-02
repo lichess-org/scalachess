@@ -11,7 +11,7 @@ trait Generator[A]:
   extension (a: A) def next: Gen[List[A]]
 
 trait FromMove[A]:
-  extension (move: Move) def next: Gen[WithMove[A]]
+  extension (move: Move) def next(a: Option[A]): Gen[WithMove[A]]
 
 object ChessTreeArbitraries:
 
@@ -34,28 +34,28 @@ object ChessTreeArbitraries:
       pgn = Pgn(Tags.empty, InitialComments(comments), pgnTree, tree.ply.next)
     yield pgn
 
-  def genTree[A](seed: Situation)(using fm: FromMove[A]): Gen[GameTree[WithMove[A]]] =
+  def genTree[A](seed: Situation)(using FromMove[A]): Gen[GameTree[WithMove[A]]] =
     genNode(seed).map(GameTree(seed, Ply.initial, _))
 
-  def genNode[A](seed: Situation)(using fm: FromMove[A]): Gen[Option[Node[WithMove[A]]]] =
+  def genNode[A](seed: Situation)(using FromMove[A]): Gen[Option[Node[WithMove[A]]]] =
     if seed.end then Gen.const(None)
     else
       val nextSeeds = seed.legalMoves
       for
         value      <- Gen.oneOf(nextSeeds)
-        withMove   <- value.next
-        variations <- nextSeeds.filter(_ != value).traverse(_.next)
+        withMove   <- value.next(none)
+        variations <- nextSeeds.filter(_ != value).traverse(_.next(none))
         node       <- genNode(withMove, variations)
       yield node.some
 
-  def genNodeWithPath[A](seed: Situation)(using fm: FromMove[A]): Gen[(Option[Node[WithMove[A]]], List[A])] =
+  def genNodeWithPath[A](seed: Situation)(using FromMove[A]): Gen[(Option[Node[WithMove[A]]], List[A])] =
     if seed.end then Gen.const((None, Nil))
     else
       val nextSeeds = seed.legalMoves
       for
         value      <- Gen.oneOf(nextSeeds)
-        withMove   <- value.next
-        variations <- nextSeeds.filter(_ != value).traverse(_.next)
+        withMove   <- value.next(none)
+        variations <- nextSeeds.filter(_ != value).traverse(_.next(none))
         node       <- genNode(withMove, variations)
         path       <- NodeArbitraries.genPath(node).map(_.map(_.data))
       yield (node.some, path)
@@ -73,17 +73,17 @@ object ChessTreeArbitraries:
   given Generator[Move] with
     extension (move: Move) def next = pickSome(move.situationAfter.legalMoves)
 
-  given [A](using fm: FromMove[A]): Generator[WithMove[A]] with
+  given [A](using FromMove[A]): Generator[WithMove[A]] with
     extension (move: WithMove[A])
       def next: Gen[List[WithMove[A]]] =
         for
           variations <- pickSome(move.move.situationAfter.legalMoves)
-          nextMoves  <- variations.traverse(_.next)
+          nextMoves  <- variations.traverse(_.next(move.data.some))
         yield nextMoves
 
   given FromMove[PgnMove] with
     extension (move: Move)
-      def next: Gen[WithMove[PgnMove]] =
+      def next(m: Option[PgnMove]): Gen[WithMove[PgnMove]] =
         for
           comments <- genComments(5)
           glyphs   <- Gen.someOf(Glyphs.all).map(xs => Glyphs.fromList(xs.toList))

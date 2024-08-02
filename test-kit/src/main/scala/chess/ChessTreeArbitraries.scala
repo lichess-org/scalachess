@@ -11,7 +11,7 @@ trait Generator[A]:
   extension (a: A) def next: Gen[List[A]]
 
 trait FromMove[A]:
-  extension (move: Move) def next: Gen[WithMove[A]]
+  extension (move: Move) def next(a: Option[A]): Gen[WithMove[A]]
 
 object ChessTreeArbitraries:
 
@@ -43,8 +43,8 @@ object ChessTreeArbitraries:
       val nextSeeds = seed.legalMoves
       for
         value      <- Gen.oneOf(nextSeeds)
-        withMove   <- value.next
-        variations <- nextSeeds.filter(_ != value).traverse(_.next)
+        withMove   <- value.next(none)
+        variations <- nextSeeds.filter(_ != value).traverse(_.next(none))
         node       <- genNode(withMove, variations)
       yield node.some
 
@@ -54,8 +54,8 @@ object ChessTreeArbitraries:
       val nextSeeds = seed.legalMoves
       for
         value      <- Gen.oneOf(nextSeeds)
-        withMove   <- value.next
-        variations <- nextSeeds.filter(_ != value).traverse(_.next)
+        withMove   <- value.next(none)
+        variations <- nextSeeds.filter(_ != value).traverse(_.next(none))
         node       <- genNode(withMove, variations)
         path       <- NodeArbitraries.genPath(node).map(_.map(_.data))
       yield (node.some, path)
@@ -78,12 +78,12 @@ object ChessTreeArbitraries:
       def next: Gen[List[WithMove[A]]] =
         for
           variations <- pickSome(move.move.situationAfter.legalMoves)
-          nextMoves  <- variations.traverse(_.next)
+          nextMoves  <- variations.traverse(_.next(move.data.some))
         yield nextMoves
 
   given FromMove[PgnMove] with
     extension (move: Move)
-      def next: Gen[WithMove[PgnMove]] =
+      def next(m: Option[PgnMove]): Gen[WithMove[PgnMove]] =
         for
           comments <- genComments(5)
           glyphs   <- Gen.someOf(Glyphs.all).map(xs => Glyphs.fromList(xs.toList))

@@ -34,10 +34,10 @@ object ChessTreeArbitraries:
       pgn = Pgn(Tags.empty, InitialComments(comments), pgnTree, tree.ply.next)
     yield pgn
 
-  def genTree[A](seed: Situation)(using fm: FromMove[A]): Gen[GameTree[WithMove[A]]] =
+  def genTree[A](seed: Situation)(using FromMove[A]): Gen[GameTree[WithMove[A]]] =
     genNode(seed).map(GameTree(seed, Ply.initial, _))
 
-  def genNode[A](seed: Situation)(using fm: FromMove[A]): Gen[Option[Node[WithMove[A]]]] =
+  def genNode[A](seed: Situation)(using FromMove[A]): Gen[Option[Node[WithMove[A]]]] =
     if seed.end then Gen.const(None)
     else
       val nextSeeds = seed.legalMoves
@@ -48,7 +48,7 @@ object ChessTreeArbitraries:
         node       <- genNode(withMove, variations)
       yield node.some
 
-  def genNodeWithPath[A](seed: Situation)(using fm: FromMove[A]): Gen[(Option[Node[WithMove[A]]], List[A])] =
+  def genNodeWithPath[A](seed: Situation)(using FromMove[A]): Gen[(Option[Node[WithMove[A]]], List[A])] =
     if seed.end then Gen.const((None, Nil))
     else
       val nextSeeds = seed.legalMoves
@@ -73,7 +73,7 @@ object ChessTreeArbitraries:
   given Generator[Move] with
     extension (move: Move) def next = pickSome(move.situationAfter.legalMoves)
 
-  given [A](using fm: FromMove[A]): Generator[WithMove[A]] with
+  given [A](using FromMove[A]): Generator[WithMove[A]] with
     extension (move: WithMove[A])
       def next: Gen[List[WithMove[A]]] =
         for

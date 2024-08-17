@@ -3,13 +3,9 @@ package chess
 class EloTest extends ChessTest:
 
   private def newRating(r: Int, k: Int, winOpt: Option[Boolean], opRating: Int): Int =
-    val player = new Elo.Player:
-      def rating  = Elo(r)
-      def kFactor = KFactor(k)
-    val game = new Elo.Game:
-      def win            = winOpt
-      def opponentRating = Elo(opRating)
-    Elo.computeNewEloRating(player, List(game)).value
+    val player = Elo.Player(Elo(r), KFactor(k))
+    val game   = Elo.Game(winOpt, Elo(opRating))
+    Elo.computeNewRating(player, List(game)).value
 
   test("new rating calculation"):
     List(

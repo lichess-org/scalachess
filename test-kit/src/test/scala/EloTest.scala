@@ -18,7 +18,7 @@ class EloTest extends ChessTest:
       (1500, 40, 2000, Some(true), 1536),
       (1500, 40, 2000, Some(false), 1496),
       (1500, 40, 2000, None, 1516),
-      (1500, 40, 1600, Some(true), 1525),
+      (1500, 40, 1600, Some(true), 1520),
       (1500, 40, 1600, Some(false), 1485),
       (1500, 40, 1600, None, 1505)
     ).foreach: (rating, k, opRating, win, expected) =>

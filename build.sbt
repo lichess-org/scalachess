@@ -1,6 +1,6 @@
 inThisBuild(
   Seq(
-    scalaVersion      := "3.5.0-RC7",
+    scalaVersion      := "3.5.0",
     version           := "16.2.3",
     organization      := "org.lichess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
@@ -10,7 +10,7 @@ inThisBuild(
   )
 )
 
-val scalalibVersion = "11.1.5"
+val scalalibVersion = "11.2.5"
 
 val commonSettings = Seq(
   scalacOptions := Seq(

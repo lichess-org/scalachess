@@ -34,3 +34,11 @@ object Elo extends OpaqueInt[Elo]:
 
   def computeRatingDiff(player: Player, games: Seq[Game]): Int =
     computeNewRating(player, games) - player.rating
+
+  def computePerformanceRating(games: Seq[Game]): Option[Elo] =
+    val winBonus = 400
+    games.nonEmpty.option:
+      val ratings = games.map(_.opponentRating).sum
+      val points = games.foldLeft(0): (bonus, game) =>
+        bonus + game.win.fold(0)(if _ then 1 else -1)
+      (ratings + points * winBonus) / games.size

@@ -1,5 +1,7 @@
 package chess
 
+import cats.syntax.all.*
+
 opaque type Elo = Int
 
 opaque type KFactor = Int
@@ -23,11 +25,11 @@ object Elo extends OpaqueInt[Elo]:
 
   // https://en.wikipedia.org/wiki/Elo_rating_system#Mathematical_details
   def computeNewRating(player: Player, games: Seq[Game]): Elo =
-    val expectedScore = games.foldLeft(0d): (score, game) =>
+    val expectedScore = games.foldMap: game =>
       val prd = playersRatingDiff(player.rating, game.opponentRating)
-      score + 1 / (1 + Math.pow(10, prd / 400d))
-    val achievedScore = games.foldLeft(0d): (score, game) =>
-      score + game.win.fold(0.5d)(if _ then 1d else 0d)
+      1 / (1 + Math.pow(10, prd / 400d))
+    val achievedScore = games.foldMap:
+      _.win.fold(0.5d)(if _ then 1d else 0d)
     val ratingDiff =
       Math.round(player.kFactor * (achievedScore - expectedScore)).toInt
     player.rating + ratingDiff
@@ -39,6 +41,6 @@ object Elo extends OpaqueInt[Elo]:
     val winBonus = 400
     games.nonEmpty.option:
       val ratings = games.map(_.opponentRating).sum
-      val points = games.foldLeft(0): (bonus, game) =>
-        bonus + game.win.fold(0)(if _ then 1 else -1)
+      val points = games.foldMap:
+        _.win.fold(0)(if _ then 1 else -1)
       (ratings + points * winBonus) / games.size

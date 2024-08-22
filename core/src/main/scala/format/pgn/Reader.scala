@@ -44,6 +44,5 @@ object Reader:
         case Right(replay)     => Result.Complete(replay)
 
   private def makeGame(tags: Tags) =
-    Game(variantOption = tags.variant, fen = tags.fen).match
-      case self =>
-        self.copy(startedAtPly = self.ply, clock = tags.clockConfig.map(Clock.apply))
+    val g = Game(variantOption = tags.variant, fen = tags.fen)
+    g.copy(startedAtPly = g.ply, clock = tags.clockConfig.map(Clock.apply))

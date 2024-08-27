@@ -73,8 +73,8 @@ lazy val testKit = project
       "org.scalameta"       %% "munit-scalacheck"  % "1.0.0"  % Test,
       "com.disneystreaming" %% "weaver-cats"       % "0.8.4"  % Test,
       "com.disneystreaming" %% "weaver-scalacheck" % "0.8.4"  % Test,
-      "co.fs2"              %% "fs2-core"          % "3.10.2" % Test,
-      "co.fs2"              %% "fs2-io"            % "3.10.2" % Test,
+      "co.fs2"              %% "fs2-core"          % "3.11.0" % Test,
+      "co.fs2"              %% "fs2-io"            % "3.11.0" % Test,
       "org.typelevel"       %% "discipline-munit"  % "2.0.0"  % Test,
       "org.typelevel"       %% "cats-laws"         % "2.12.0" % Test
     )

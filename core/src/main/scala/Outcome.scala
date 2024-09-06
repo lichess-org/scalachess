@@ -7,11 +7,12 @@ case class Outcome(winner: Option[Color]):
     case None        => "1/2-1/2"
 
 object Outcome:
+
   def showResult(outcome: Option[Outcome]): String =
     outcome.fold("*")(_.toString)
 
   def fromResult(result: String): Option[Outcome] =
-    normalizationMap.get(result)
+    normalizationMap.get(result).flatMap(fromPoints)
 
   val white = Outcome(Some(White))
   val black = Outcome(Some(Black))
@@ -19,7 +20,18 @@ object Outcome:
 
   lazy val knownResultStrings = "*" :: normalizationMap.keys.toList
 
-  private val normalizationMap: Map[String, Outcome] =
+  type Points = 0 | 0.5 | 1
+
+  def fromPoints(points: ByColor[Points]): Option[Outcome] = points match
+    case ByColor(1, 0)     => Some(white)
+    case ByColor(0, 1)     => Some(black)
+    case ByColor(0.5, 0.5) => Some(draw)
+    case _                 => None
+
+  def pointsFromResult(result: String): Option[ByColor[Points]] =
+    normalizationMap.get(result)
+
+  private val normalizationMap: Map[String, ByColor[Points]] =
     val hyphen     = "-"
     val enDash     = "–"
     val emDash     = "—"
@@ -43,15 +55,32 @@ object Outcome:
       win       <- wins
       loss      <- losses
     yield s"$loss$separator$win"
+    val allCancels = for
+      separator <- separators
+      loss      <- losses
+    yield s"$loss$separator$loss"
+    val allHalfWins = for
+      separator <- separators
+      loss      <- losses
+      draw      <- draws
+    yield s"$draw$separator$loss"
+    val allHalfLosses = for
+      separator <- separators
+      loss      <- losses
+      draw      <- draws
+    yield s"$loss$separator$draw"
 
-    val pairs = allDraws.map(_ -> draw) :::
-      allWins.map(_ -> white) :::
-      allLosses.map(_ -> black)
+    val pairs = allDraws.map(_ -> ByColor[Points](0.5, 0.5)) :::
+      allWins.map(_ -> ByColor[Points](1, 0)) :::
+      allLosses.map(_ -> ByColor[Points](0, 1)) :::
+      allCancels.map(_ -> ByColor[Points](0, 0)) :::
+      allHalfWins.map(_ -> ByColor[Points](0.5, 0)) :::
+      allHalfLosses.map(_ -> ByColor[Points](0, 0.5))
 
     val lccResults = Map(
-      "WHITEWIN" -> white,
-      "BLACKWIN" -> black,
-      "DRAW"     -> draw // ? not sure
+      "WHITEWIN" -> ByColor[Points](1, 0),
+      "BLACKWIN" -> ByColor[Points](0, 1),
+      "DRAW"     -> ByColor[Points](0.5, 0.5) // ? not sure
     )
 
     pairs.toMap ++ lccResults

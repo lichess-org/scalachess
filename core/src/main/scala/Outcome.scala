@@ -20,7 +20,8 @@ object Outcome:
 
   lazy val knownResultStrings = "*" :: normalizationMap.keys.toList
 
-  type Points = 0 | 0.5 | 1
+  type Points     = 0 | 0.5 | 1
+  type GamePoints = ByColor[Points]
 
   def fromPoints(points: ByColor[Points]): Option[Outcome] = points match
     case ByColor(1, 0)     => Some(white)
@@ -28,10 +29,10 @@ object Outcome:
     case ByColor(0.5, 0.5) => Some(draw)
     case _                 => None
 
-  def pointsFromResult(result: String): Option[ByColor[Points]] =
+  def pointsFromResult(result: String): Option[GamePoints] =
     normalizationMap.get(result)
 
-  private val normalizationMap: Map[String, ByColor[Points]] =
+  private val normalizationMap: Map[String, GamePoints] =
     val hyphen     = "-"
     val enDash     = "–"
     val emDash     = "—"

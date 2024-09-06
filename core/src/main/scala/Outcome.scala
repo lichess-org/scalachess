@@ -34,6 +34,11 @@ object Outcome:
   def pointsFromResult(result: String): Option[GamePoints] =
     normalizationMap.get(result)
 
+  def outcomeToPoints(outcome: Outcome): GamePoints = outcome match
+    case Outcome(Some(White)) => ByColor(One, Zero)
+    case Outcome(Some(Black)) => ByColor(Zero, One)
+    case Outcome(None)        => ByColor(Half, Half)
+
   def showPoints(points: Option[GamePoints]): String =
     points.fold("*"): ps =>
       ps.mapList: p =>

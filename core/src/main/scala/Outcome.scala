@@ -47,6 +47,18 @@ object Outcome:
         else "1/2"
       .mkString("-")
 
+  def guessPointsFromStatusAndPosition(status: Status, positionWinner: Option[Color]): Option[GamePoints] =
+    import Status.*
+    status match
+      case Created | Started         => None
+      case Aborted | Cheat | NoStart => Some(ByColor(Zero, Zero))
+      case Stalemate | Draw          => Some(ByColor(Half, Half))
+      case Mate | Resign | Timeout | Outoftime | UnknownFinish | VariantEnd =>
+        positionWinner match
+          case Some(White) => Some(ByColor(One, Zero))
+          case Some(Black) => Some(ByColor(Zero, One))
+          case None        => Some(ByColor(Half, Half))
+
   private val normalizationMap: Map[String, GamePoints] =
     val hyphen     = "-"
     val enDash     = "–"

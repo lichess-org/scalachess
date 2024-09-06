@@ -18,8 +18,9 @@ class OutcomeTest extends ScalaCheckSuite:
     assertEquals(fromResult("WHITEWIN"), Some(white))
 
   test("points"):
-    assertEquals(pointsFromResult("1-0"), Some(ByColor[Points](1, 0)))
-    assertEquals(pointsFromResult("0-1"), Some(ByColor[Points](0, 1)))
-    assertEquals(pointsFromResult("—:—"), Some(ByColor[Points](0, 0)))
-    assertEquals(pointsFromResult("1/2_0"), Some(ByColor[Points](0.5, 0)))
-    assertEquals(pointsFromResult("0-½"), Some(ByColor[Points](0, 0.5)))
+    def normalize(s: String) = showPoints(pointsFromResult(s))
+    assertEquals(normalize("1-0"), "1-0")
+    assertEquals(normalize("0-1"), "0-1")
+    assertEquals(normalize("—:—"), "0-0")
+    assertEquals(normalize("1/2_0"), "1/2-0")
+    assertEquals(normalize("0-½"), "0-1/2")

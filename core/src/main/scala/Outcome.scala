@@ -20,17 +20,27 @@ object Outcome:
 
   lazy val knownResultStrings = "*" :: normalizationMap.keys.toList
 
-  type Points     = 0 | 0.5 | 1
+  enum Points:
+    case Zero, Half, One
+  import Points.*
   type GamePoints = ByColor[Points]
 
   def fromPoints(points: ByColor[Points]): Option[Outcome] = points match
-    case ByColor(1, 0)     => Some(white)
-    case ByColor(0, 1)     => Some(black)
-    case ByColor(0.5, 0.5) => Some(draw)
-    case _                 => None
+    case ByColor(One, Zero)  => Some(white)
+    case ByColor(Zero, One)  => Some(black)
+    case ByColor(Half, Half) => Some(draw)
+    case _                   => None
 
   def pointsFromResult(result: String): Option[GamePoints] =
     normalizationMap.get(result)
+
+  def showPoints(points: Option[GamePoints]): String =
+    points.fold("*"): ps =>
+      ps.mapList: p =>
+        if p == Zero then "0"
+        else if p == One then "1"
+        else "1/2"
+      .mkString("-")
 
   private val normalizationMap: Map[String, GamePoints] =
     val hyphen     = "-"
@@ -71,17 +81,17 @@ object Outcome:
       draw      <- draws
     yield s"$loss$separator$draw"
 
-    val pairs = allDraws.map(_ -> ByColor[Points](0.5, 0.5)) :::
-      allWins.map(_ -> ByColor[Points](1, 0)) :::
-      allLosses.map(_ -> ByColor[Points](0, 1)) :::
-      allCancels.map(_ -> ByColor[Points](0, 0)) :::
-      allHalfWins.map(_ -> ByColor[Points](0.5, 0)) :::
-      allHalfLosses.map(_ -> ByColor[Points](0, 0.5))
+    val pairs = allDraws.map(_ -> ByColor[Points](Half, Half)) :::
+      allWins.map(_ -> ByColor[Points](One, Zero)) :::
+      allLosses.map(_ -> ByColor[Points](Zero, One)) :::
+      allCancels.map(_ -> ByColor[Points](Zero, Zero)) :::
+      allHalfWins.map(_ -> ByColor[Points](Half, Zero)) :::
+      allHalfLosses.map(_ -> ByColor[Points](Zero, Half))
 
     val lccResults = Map(
-      "WHITEWIN" -> ByColor[Points](1, 0),
-      "BLACKWIN" -> ByColor[Points](0, 1),
-      "DRAW"     -> ByColor[Points](0.5, 0.5) // ? not sure
+      "WHITEWIN" -> ByColor[Points](One, Zero),
+      "BLACKWIN" -> ByColor[Points](Zero, One),
+      "DRAW"     -> ByColor[Points](Half, Half) // ? not sure
     )
 
     pairs.toMap ++ lccResults

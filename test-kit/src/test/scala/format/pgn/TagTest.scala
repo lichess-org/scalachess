@@ -51,3 +51,14 @@ class TagTest extends ChessTest:
         Tag(_.Black, "penguingim1")
       )
     )
+
+  test("sanitize contents"):
+    assertEquals(Tags.sanitize(List(Tag(Tag.TimeControl, "5+3"))).value, List(Tag(Tag.TimeControl, "5+3")))
+    assertEquals(
+      Tags.sanitize(List(Tag(Tag.TimeControl, "5400/40+30:1800+30\""))).value,
+      List(Tag(Tag.TimeControl, "5400/40+30:1800+30"))
+    )
+    assertEquals(
+      Tags.sanitize(List(Tag(Tag.White, "Schwarzenegger, Arnold \"The Terminator\""))).value,
+      List(Tag(Tag.White, "Schwarzenegger, Arnold \"The Terminator\""))
+    )

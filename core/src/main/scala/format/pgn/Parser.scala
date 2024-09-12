@@ -189,7 +189,7 @@ object Parser:
 
   private val tagsAndMovesParser: P0[ParsedPgn] =
     (TagParser.tags.surroundedBy(escape) ~ strMoves.?).map: (optionalTags, optionalMoves) =>
-      val preTags = Tags(optionalTags)
+      val preTags = Tags.sanitize(optionalTags)
       optionalMoves match
         case None => ParsedPgn(InitialComments.empty, preTags, None)
         case Some((init, tree, result)) =>

@@ -171,6 +171,11 @@ class ParserTest extends ChessTest:
         a.tags.value.exists: tag =>
           tag.name == Tag.Black && tag.value == """Schwarzenegger, Arnold "The Terminator""""
 
+  test("time control tag with nested quote"):
+    // yep, got that from https://pgnfiles.fide.com/budapest2024/women/round-1/women_r1_6.pgn
+    parse("""[TimeControl "5400/40+30:1800+30\""]""").assertRight: a =>
+      assertEquals(a.tags.value.headOption.map(_.value), """5400/40+30:1800+30""".some)
+
   test("tag with inner brackets"):
     parse("""[Black "[=0040.34h5a4]"]""").assertRight: a =>
       a.tags.value.exists: tag =>

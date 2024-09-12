@@ -113,6 +113,14 @@ object Tags:
   )
   val tagIndex: Map[TagType, Int] = sevenTagRoster.zipWithIndex.toMap
 
+  object sanitize:
+    private val ignoreTags =
+      Set(Tag.Event, Tag.Site, Tag.White, Tag.Black, Tag.WhiteTeam, Tag.BlackTeam, Tag.Opening)
+    def apply(tags: List[Tag]) = Tags:
+      tags.map: tag =>
+        if ignoreTags(tag.name) then tag
+        else tag.copy(value = tag.value.replace("\"", "").trim)
+
   private val DateRegex = """(\d{4}|\?{4})\.(\d\d|\?\?)\.(\d\d|\?\?)""".r
 
 object Tag:

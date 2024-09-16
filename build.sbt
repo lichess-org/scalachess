@@ -10,7 +10,7 @@ inThisBuild(
   )
 )
 
-val scalalibVersion = "11.2.5"
+val scalalibVersion = "11.2.9"
 
 val commonSettings = Seq(
   scalacOptions := Seq(

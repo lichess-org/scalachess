@@ -72,7 +72,7 @@ object Outcome:
     val emDash     = "—"
     val dashes     = List(hyphen, enDash, emDash)
     val separators = dashes ::: List("_", ":")
-    val draws      = List("½", "1/2")
+    val draws      = List("½", "1/2", "0.5")
     val wins       = List("1", "+")
     val losses     = "0" :: dashes
 

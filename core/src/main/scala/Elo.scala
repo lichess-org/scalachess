@@ -15,7 +15,7 @@ object KFactor extends OpaqueInt[KFactor]:
 object Elo extends OpaqueInt[Elo]:
 
   final class Player(val rating: Elo, val kFactor: KFactor)
-  final class Game(val win: Option[Boolean], val opponentRating: Elo)
+  final class Game(val points: Outcome.Points, val opponentRating: Elo)
 
   /* 8.3.1
    * For each game played against a rated player, determine the difference in rating between the player and their opponent.
@@ -28,8 +28,7 @@ object Elo extends OpaqueInt[Elo]:
     val expectedScore = games.foldMap: game =>
       val prd = playersRatingDiff(player.rating, game.opponentRating)
       1 / (1 + Math.pow(10, prd / 400d))
-    val achievedScore = games.foldMap:
-      _.win.fold(0.5d)(if _ then 1d else 0d)
+    val achievedScore = games.foldMap(_.points.value)
     val ratingDiff =
       Math.round(player.kFactor * (achievedScore - expectedScore)).toInt
     player.rating + ratingDiff
@@ -42,5 +41,8 @@ object Elo extends OpaqueInt[Elo]:
     games.nonEmpty.option:
       val ratings = games.map(_.opponentRating).sum
       val points = games.foldMap:
-        _.win.fold(0)(if _ then 1 else -1)
+        _.points.match
+          case Outcome.Points.Zero => -1
+          case Outcome.Points.Half => 0
+          case Outcome.Points.One  => 1
       (ratings + points * winBonus) / games.size

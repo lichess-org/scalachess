@@ -54,7 +54,7 @@ object Parser:
   val numberSuffix = (P.char('.') | whitespace).rep0.void
 
   // 10. or 10... but not 0 or 1-0 or 1/2
-  val number = (positiveIntString <* !P.charIn('‑', '–', '-', '/') ~ numberSuffix).string
+  val number = (positiveIntString <* !P.charIn('‑', '–', '-', '/', '½') ~ numberSuffix).string
 
   val forbidNullMove = P
     .stringIn(List("--", "Z0", "null", "pass", "@@@@"))

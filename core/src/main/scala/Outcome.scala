@@ -4,7 +4,7 @@ case class Outcome(winner: Option[Color]):
   override def toString = winner match
     case Some(White) => "1-0"
     case Some(Black) => "0-1"
-    case None        => "1/2-1/2"
+    case None        => "½-½"
 
 object Outcome:
 
@@ -28,6 +28,10 @@ object Outcome:
         case Zero => 0f
         case Half => 0.5f
         case One  => 1f
+      def show: String = p match
+        case Zero => "0"
+        case Half => "½"
+        case One  => "1"
 
   import Points.*
   type GamePoints = ByColor[Points]
@@ -47,12 +51,8 @@ object Outcome:
     case Outcome(None)        => ByColor(Half, Half)
 
   def showPoints(points: Option[GamePoints]): String =
-    points.fold("*"): ps =>
-      ps.mapList: p =>
-        if p == Zero then "0"
-        else if p == One then "1"
-        else "1/2"
-      .mkString("-")
+    points.fold("*"):
+      _.mapList(_.show).mkString("-")
 
   def guessPointsFromStatusAndPosition(status: Status, positionWinner: Option[Color]): Option[GamePoints] =
     import Status.*

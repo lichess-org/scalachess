@@ -4,7 +4,7 @@ case class Outcome(winner: Option[Color]):
   override def toString = winner match
     case Some(White) => "1-0"
     case Some(Black) => "0-1"
-    case None        => "½-½"
+    case None        => "1/2-1/2"
 
 object Outcome:
 
@@ -30,7 +30,7 @@ object Outcome:
         case One  => 1f
       def show: String = p match
         case Zero => "0"
-        case Half => "½"
+        case Half => "1/2"
         case One  => "1"
 
   import Points.*

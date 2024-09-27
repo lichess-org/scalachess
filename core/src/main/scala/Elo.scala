@@ -23,7 +23,7 @@ object Elo extends OpaqueInt[Elo]:
       getExpectedScore(prd)
     val achievedScore = games.foldMap(_.points.value)
     val ratingDiff =
-      Math.round(player.kFactor * (achievedScore - expectedScore)).toInt
+      Math.round(player.kFactor * (achievedScore - expectedScore.doubleValue)).toInt
     player.rating + ratingDiff
 
   /* 8.3.1
@@ -32,7 +32,7 @@ object Elo extends OpaqueInt[Elo]:
   def playersRatingDiff(a: Elo, b: Elo): Int =
     Math.min(400, Math.max(-400, b - a))
 
-  def getExpectedScore(ratingDiff: Int): Double =
+  def getExpectedScore(ratingDiff: Int): BigDecimal =
     val absRatingDiff = ratingDiff.abs
     val expectedScore = conversionTableFIDE
       .collectFirst {
@@ -60,7 +60,7 @@ object Elo extends OpaqueInt[Elo]:
   final class Game(val points: Outcome.Points, val opponentRating: Elo)
 
 // 8.1.2 FIDE table
-val conversionTableFIDE: Map[Range.Inclusive, Double] = Map(
+val conversionTableFIDE: Map[Range.Inclusive, BigDecimal] = Map(
   (0 to 3)              -> 0.50,
   (4 to 10)             -> 0.51,
   (11 to 17)            -> 0.52,

@@ -39,7 +39,9 @@ object Elo extends OpaqueInt[Elo]:
     val absRatingDiff = ratingDiff.abs
     val expectedScore = conversionTableFIDE.collectFirst {
       case (range, pd) if range.contains(absRatingDiff) => pd
-    }.get
+    }.getOrElse {
+      throw new IllegalArgumentException(s"Invalid rating difference: $ratingDiff")
+    }
 
     if ratingDiff <= 0 then expectedScore else 1.0 - expectedScore
 
@@ -55,7 +57,7 @@ object Elo extends OpaqueInt[Elo]:
       (ratings + points * winBonus) / games.size
 
   // 8.1.2 FIDE table
-  val conversionTableFIDE: List[(Range, Double)] = List(
+  val conversionTableFIDE: Map[Range.Inclusive, Double] = Map(
     (0 to 3)              -> 0.50,
     (4 to 10)             -> 0.51,
     (11 to 17)            -> 0.52,

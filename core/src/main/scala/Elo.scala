@@ -54,7 +54,7 @@ object Elo extends OpaqueInt[Elo]:
           case Outcome.Points.One  => 1
       (ratings + points * winBonus) / games.size
 
-  // 8.2.1 FIDE table
+  // 8.1.2 FIDE table
   val conversionTableFIDE: List[(Range, Double)] = List(
     (0 to 3)              -> 0.50,
     (4 to 10)             -> 0.51,

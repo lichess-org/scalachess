@@ -24,6 +24,15 @@ class EloTest extends ChessTest:
     ratingDiff(1500, 40, 1600, One, 26)
     ratingDiff(1500, 40, 1600, Zero, -14)
     ratingDiff(1500, 40, 1600, Half, 6)
+    ratingDiff(2000, 40, 1600, One, 3)
+    ratingDiff(2000, 40, 1600, Zero, -37)
+    ratingDiff(2000, 40, 1600, Half, -17)
+    ratingDiff(2000, 40, 1000, One, 3)
+    ratingDiff(2000, 40, 1000, Zero, -37)
+    ratingDiff(2000, 40, 1000, Half, -17)
+    ratingDiff(2000, 40, 1900, One, 14)
+    ratingDiff(2000, 40, 1900, Zero, -26)
+    ratingDiff(2000, 40, 1900, Half, -6)
 
   private def perfRating(games: Seq[Elo.Game], expected: Int)(using munit.Location) =
     assertEquals(Elo.computePerformanceRating(games), Some(Elo(expected)))

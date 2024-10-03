@@ -14,3 +14,6 @@ target
 .metals/
 # docker sbt
 /?
+
+# VS Code workspace files
+*.code-workspace

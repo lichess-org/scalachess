@@ -42,3 +42,8 @@ To run benchmarks for a specific class:
 To run [scalafmt](https://scalameta.org/scalafmt/docs/installation.html) and [scalafix](https://scalacenter.github.io/scalafix):
 
     sbt prepare
+
+
+Install (python)
+-------
+For python code, [install pipenv](https://pipenv.pypa.io/en/latest/installation.html#installing-pipenv), and run `$ pipenv install` from project root.

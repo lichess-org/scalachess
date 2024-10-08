@@ -102,3 +102,6 @@ object Elo extends OpaqueInt[Elo]:
         (low to up).view.map(_ -> value).toMap
       (up + 1) -> newTable
   ._2
+  // the hardcoded List above is not really necessary,
+  // but it mirrors the reference table on
+  // https://handbook.fide.com/chapter/B022022 8.1.2

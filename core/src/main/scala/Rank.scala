@@ -1,5 +1,7 @@
 package chess
 
+import chess.bitboard.Bitboard
+
 opaque type Rank = Int
 object Rank:
   extension (a: Rank)
@@ -11,6 +13,9 @@ object Rank:
     inline infix def <=(inline o: Rank): Boolean = value <= o.value
 
     inline def char: Char = (49 + a).toChar
+
+    // the bitboard of the rank
+    def bb: Bitboard = Bitboard.rank(value)
   end extension
 
   inline def apply(index: Int): Option[Rank] = Option.when(0 <= index && index < 8)(index)

@@ -3,7 +3,7 @@ package chess
 import chess.bitboard.Bitboard
 import chess.format.pgn.{ Glyph, Glyphs }
 import chess.format.{ Uci, UciCharPair }
-import chess.variant.Variant
+import chess.variant.{ Crazyhouse, Variant }
 import org.scalacheck.{ Arbitrary, Cogen, Gen }
 
 object CoreArbitraries:
@@ -28,6 +28,8 @@ object CoreArbitraries:
   given Arbitrary[Castles]  = Arbitrary(castlesGen)
   given Arbitrary[Bitboard] = Arbitrary(Gen.long.map(Bitboard(_)))
 
+  given Arbitrary[PromotableRole] = Arbitrary(Gen.oneOf(Rook, Knight, Bishop, Queen))
+
   given Arbitrary[Uci] = Arbitrary(Gen.oneOf(normalUciMoveGen, promotionUciMoveGen, dropUciMoveGen))
 
   given Cogen[Color]  = Cogen.cogenBoolean.contramap(_.white)
@@ -39,6 +41,21 @@ object CoreArbitraries:
       w <- Arbitrary.arbitrary[A]
       b <- Arbitrary.arbitrary[A]
     yield ByColor(w, b)
+
+  given Arbitrary[Crazyhouse.Pocket] = Arbitrary:
+    for
+      pawn   <- Gen.oneOf(0 to 8)
+      knight <- Gen.oneOf(0 to 2)
+      bishop <- Gen.oneOf(0 to 2)
+      rook   <- Gen.oneOf(0 to 2)
+      queen  <- Gen.oneOf(0 to 2)
+    yield Crazyhouse.Pocket(pawn, knight, bishop, rook, queen)
+
+  given Arbitrary[Crazyhouse.Data] = Arbitrary:
+    for
+      pockets  <- Arbitrary.arbitrary[ByColor[Crazyhouse.Pocket]]
+      promoted <- Arbitrary.arbitrary[Bitboard]
+    yield Crazyhouse.Data(pockets, promoted)
 
   def normalUciMoveGen =
     for
@@ -71,3 +88,26 @@ object CoreArbitraries:
       bks <- genBool
       bqs <- genBool
     yield Castles(wks, wqs, bks, bqs)
+
+  private def squareFromBitboardGen(bb: Bitboard): Gen[Square] =
+    Gen.oneOf(bb.squares)
+
+  private def corner(side: Side, color: Color): Square =
+    side.fold(
+      color.fold(Square.H1, Square.H8),
+      color.fold(Square.A1, Square.A8)
+    )
+
+  def castleGen(color: Color): Gen[Move.Castle] =
+    import File.*
+    for
+      side <- Arbitrary.arbitrary[Side]
+      kingTo = Square(side.castledKingFile, color.backRank)
+      rookTo = Square(side.castledRookFile, color.backRank)
+      king <- squareFromBitboardGen(color.backRank.bb & (~kingTo.bb & ~H.bb & ~A.bb))
+      cornerSquare = corner(side, color)
+      rook <- squareFromBitboardGen(Bitboard.ray(king, cornerSquare))
+    yield Move.Castle(king, kingTo, rook, rookTo)
+
+  given Arbitrary[Move.Castle] = Arbitrary:
+    Arbitrary.arbitrary[Color].flatMap(castleGen)

@@ -71,3 +71,26 @@ object CoreArbitraries:
       bks <- genBool
       bqs <- genBool
     yield Castles(wks, wqs, bks, bqs)
+
+  private def squareFromBitboardGen(bb: Bitboard): Gen[Square] =
+    Gen.oneOf(bb.squares)
+
+  private def corner(side: Side, color: Color): Square =
+    side.fold(
+      color.fold(Square.H1, Square.H8),
+      color.fold(Square.A1, Square.A8)
+    )
+
+  def castleGen(color: Color): Gen[Move.Castle] =
+    import File.*
+    for
+      side <- Arbitrary.arbitrary[Side]
+      kingTo = Square(side.castledKingFile, color.backRank)
+      rookTo = Square(side.castledRookFile, color.backRank)
+      king <- squareFromBitboardGen(color.backRank.bb & (~kingTo.bb & ~H.bb & ~A.bb))
+      cornerSquare = corner(side, color)
+      rook <- squareFromBitboardGen(Bitboard.ray(king, cornerSquare))
+    yield Move.Castle(king, kingTo, rook, rookTo)
+
+  given Arbitrary[Move.Castle] = Arbitrary:
+    Arbitrary.arbitrary[Color].flatMap(castleGen)

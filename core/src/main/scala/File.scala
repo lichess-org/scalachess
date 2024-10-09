@@ -1,5 +1,7 @@
 package chess
 
+import chess.bitboard.Bitboard
+
 opaque type File = Int
 object File:
 
@@ -15,6 +17,9 @@ object File:
 
     inline def upperCaseChar: Char       = (65 + a).toChar
     inline def toUpperCaseString: String = upperCaseChar.toString
+
+    // the bitboard of the file
+    def bb: Bitboard = Bitboard.file(value)
   end extension
 
   inline def of(inline square: Square): File = square.value & 0x7

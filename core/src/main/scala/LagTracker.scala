@@ -62,7 +62,7 @@ final case class LagTracker(
 
 object LagTracker:
 
-  private val estimatedCpuLag = Centis(4)
+  private val estimatedCpuLag = Centis(14)
 
   // https://github.com/lichess-org/lila/issues/12097
   private def maxQuotaGainFor(config: Clock.Config) =

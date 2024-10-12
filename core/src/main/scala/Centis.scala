@@ -6,29 +6,38 @@ import cats.kernel.Monoid
 import scala.concurrent.duration.*
 
 // maximum centis = Int.MaxValue / 100 / 60 / 60 / 24 = 248 days
-opaque type Centis = Int
-object Centis extends OpaqueInt[Centis]:
+type Centis = Centis.Centis
+object Centis:
+  opaque type Centis = Int
+  extension (c: Centis)
 
-  extension (centis: Centis)
+    inline def centis: Int = c
 
-    inline def centis: Int = centis
+    inline def *(inline o: Int): Centis = c * o
 
-    inline def *(inline o: Int): Centis = centis * o
+    def roundTenths: Int  = (if c > 0 then c + 5 else c - 4) / 10
+    def roundSeconds: Int = Math.round(c * 0.01f)
 
-    def roundTenths: Int  = (if centis > 0 then centis + 5 else centis - 4) / 10
-    def roundSeconds: Int = Math.round(centis * 0.01f)
-
-    inline def toSeconds: BigDecimal = java.math.BigDecimal.valueOf(centis, 2)
-    inline def millis: Long          = centis * 10L
+    inline def toSeconds: BigDecimal = java.math.BigDecimal.valueOf(c, 2)
+    inline def millis: Long          = c * 10L
     def toDuration: FiniteDuration   = FiniteDuration(millis, MILLISECONDS)
 
-    def *~(scalar: Float): Centis   = ofFloat(scalar * centis)
-    def /(div: Int): Option[Centis] = (div != 0).option(centis / div)
+    def *~(scalar: Float): Centis   = Centis.ofFloat(scalar * c)
+    def /(div: Int): Option[Centis] = (div != 0).option(c / div)
 
-    def avg(other: Centis): Centis = (centis + other.value) >> 1
+    def avg(other: Centis): Centis = (c + other) >> 1
 
-    inline def nonNeg: Centis = Math.max(centis, 0)
+    inline def nonNeg: Centis = Math.max(c, 0)
 
+    inline def unary_-(): Centis                   = -c
+    inline infix def >(inline o: Centis): Boolean  = >(o)
+    inline infix def <(inline o: Centis): Boolean  = <(o)
+    inline infix def >=(inline o: Centis): Boolean = >=(o)
+    inline infix def <=(inline o: Centis): Boolean = <=(o)
+    inline infix def +(inline o: Centis): Centis   = c + o
+    inline infix def -(inline o: Centis): Centis   = c - o
+    inline def atLeast(inline bot: Centis): Centis = Math.max(c, bot)
+    inline def atMost(inline top: Centis): Centis  = Math.min(c, top)
   end extension
 
   given Zero[Centis] = Zero(0)
@@ -43,6 +52,8 @@ object Centis extends OpaqueInt[Centis]:
       case _: ArithmeticException =>
         if l > 0 then Integer.MAX_VALUE
         else Integer.MIN_VALUE
+
+  inline def apply(inline i: Int): Centis = i
 
   def apply(d: FiniteDuration): Centis =
     ofMillis:

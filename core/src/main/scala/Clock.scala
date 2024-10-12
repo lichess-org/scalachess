@@ -38,7 +38,7 @@ case class Clock(
         else toNow(t)
       }
 
-  def moretimeable(c: Color) = players(c).remaining < 100 * 60 * 60 * 2
+  def moretimeable(c: Color) = players(c).remaining < Centis(100 * 60 * 60 * 2)
 
   def isRunning = timer.isDefined
 

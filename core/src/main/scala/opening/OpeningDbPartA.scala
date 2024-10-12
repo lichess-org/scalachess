@@ -241,6 +241,7 @@ Opening("A06", "Zukertort Opening: Regina-Nu Gambit", "rnbqkbnr/pp2pppp/8/2p5/2p
 Opening("A06", "Zukertort Opening: Reversed Mexican Defense", "rnbqkbnr/ppp1pppp/8/3p4/8/2N2N2/PPPPPPPP/R1BQKB1R b KQkq -", "g1f3 d7d5 b1c3", "1. Nf3 d5 2. Nc3"),
 Opening("A06", "Zukertort Opening: Santasiere's Folly", "rnbqkbnr/ppp1pppp/8/3p4/1P6/5N2/P1PPPPPP/RNBQKB1R b KQkq -", "b2b4 d7d5 g1f3", "1. b4 d5 2. Nf3"),
 Opening("A06", "Zukertort Opening: Tennison Gambit", "rnbqkbnr/ppp1pppp/8/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq -", "e2e4 d7d5 g1f3", "1. e4 d5 2. Nf3"),
+Opening("A06", "Zukertort Opening: Tennison Gambit, Brigg's Trap", "rn2kb1r/ppp1pppp/5n2/5bN1/3qp3/2N5/PPPPQPPP/R1B1KB1R w KQkq -", "e2e4 d7d5 g1f3 d5e4 f3g5 g8f6 b1c3 c8f5 d1e2 d8d4", "1. e4 d5 2. Nf3 dxe4 3. Ng5 Nf6 4. Nc3 Bf5 5. Qe2 Qd4"),
 Opening("A06", "Zukertort Opening: The Potato", "rnbqkbnr/ppp1pppp/8/3p4/P7/5N2/1PPPPPPP/RNBQKB1R b KQkq -", "g1f3 d7d5 a2a4", "1. Nf3 d5 2. a4"),
 Opening("A07", "Hungarian Opening: Wiedenhagen-Beta Gambit", "rnbqkbnr/ppp1pp1p/8/3p2p1/8/5NP1/PPPPPP1P/RNBQKB1R w KQkq -", "g2g3 d7d5 g1f3 g7g5", "1. g3 d5 2. Nf3 g5"),
 Opening("A07", "King's Indian Attack", "rnbqkbnr/ppp1pppp/8/3p4/8/5NP1/PPPPPP1P/RNBQKB1R b KQkq -", "g1f3 d7d5 g2g3", "1. Nf3 d5 2. g3"),

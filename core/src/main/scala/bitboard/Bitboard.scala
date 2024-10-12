@@ -7,7 +7,7 @@ opaque type Bitboard = Long
 object Bitboard:
   import Attacks.*
 
-  def apply(l: Long): Bitboard                            = l
+  inline def apply(inline l: Long): Bitboard              = l
   inline def apply(inline xs: Iterable[Square]): Bitboard = xs.foldLeft(empty)((b, s) => b | s.bl)
   inline def apply(xs: Square*): Bitboard                 = apply(xs.toList)
 

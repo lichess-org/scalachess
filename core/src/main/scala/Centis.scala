@@ -7,7 +7,7 @@ import scala.concurrent.duration.*
 
 // maximum centis = Int.MaxValue / 100 / 60 / 60 / 24 = 248 days
 opaque type Centis = Int
-object Centis extends OpaqueInt[Centis]:
+object Centis extends RichOpaqueInt[Centis]:
 
   extension (centis: Centis)
 

@@ -12,7 +12,7 @@ object KFactor extends OpaqueInt[KFactor]:
  * https://handbook.fide.com/chapter/B022022
  * https://ratings.fide.com/calc.phtml
  * */
-object Elo extends OpaqueInt[Elo]:
+object Elo extends RelaxedOpaqueInt[Elo]:
 
   def computeRatingDiff(player: Player, games: Seq[Game]): Int =
     computeNewRating(player, games) - player.rating

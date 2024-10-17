@@ -38,7 +38,7 @@ case class Clock(
         else toNow(t)
       }
 
-  def moretimeable(c: Color) = players(c).remaining < 100 * 60 * 60 * 2
+  def moretimeable(c: Color) = players(c).remaining < Centis(100 * 60 * 60 * 2)
 
   def isRunning = timer.isDefined
 
@@ -157,13 +157,13 @@ object Clock:
   private val limitFormatter = DecimalFormat("#.##")
 
   opaque type LimitSeconds = Int
-  object LimitSeconds extends OpaqueInt[LimitSeconds]
+  object LimitSeconds extends RelaxedOpaqueInt[LimitSeconds]
 
   opaque type LimitMinutes = Int
-  object LimitMinutes extends OpaqueInt[LimitMinutes]
+  object LimitMinutes extends RelaxedOpaqueInt[LimitMinutes]
 
   opaque type IncrementSeconds = Int
-  object IncrementSeconds extends OpaqueInt[IncrementSeconds]
+  object IncrementSeconds extends RelaxedOpaqueInt[IncrementSeconds]
 
   // All unspecified durations are expressed in centi-seconds
   case class Config(limitSeconds: LimitSeconds, incrementSeconds: IncrementSeconds):

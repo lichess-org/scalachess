@@ -86,4 +86,4 @@ object PgnNodeEncoder:
     private def isWhiteTurn: Boolean =
       ply.isOdd
     private def turnNumber: FullMoveNumber =
-      ply.fullMoveNumber + ply.value % 2 - 1
+      ply.fullMoveNumber.map(_ + ply.value % 2 - 1)

@@ -5,7 +5,7 @@ import cats.kernel.Semigroup
 /** Fullmove number: The number of the full move.
   * It starts at 1, and is incremented after Black's move. */
 opaque type FullMoveNumber = Int
-object FullMoveNumber extends RelaxedOpaqueInt[FullMoveNumber]:
+object FullMoveNumber extends RichOpaqueInt[FullMoveNumber]:
   val initial: FullMoveNumber = 1
   extension (e: FullMoveNumber)
     def ply(turn: Color)     = Ply(e * 2 - turn.fold(2, 1))
@@ -25,7 +25,7 @@ object Ply extends RelaxedOpaqueInt[Ply]:
 /* The halfmove clock specifies a decimal number of half moves with respect to the 50 move draw rule.
  * It is reset to zero after a capture or a pawn move and incremented otherwise. */
 opaque type HalfMoveClock = Int
-object HalfMoveClock extends RelaxedOpaqueInt[HalfMoveClock]:
+object HalfMoveClock extends RichOpaqueInt[HalfMoveClock]:
   val initial: HalfMoveClock = 0
 
 opaque type Check = Boolean
@@ -36,7 +36,7 @@ object ErrorStr extends OpaqueString[ErrorStr]:
   given Semigroup[ErrorStr] = Semigroup.instance[ErrorStr]((a, b) => s"$a\n$b")
 
 opaque type FideId = Int
-object FideId extends RelaxedOpaqueInt[FideId]
+object FideId extends OpaqueInt[FideId]
 
 opaque type PlayerName = String
 object PlayerName extends OpaqueString[PlayerName]

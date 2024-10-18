@@ -22,7 +22,7 @@ case class Drop(
         h.copy(
           lastMove = Option(Uci.Drop(piece.role, square)),
           unmovedRooks = before.unmovedRooks,
-          halfMoveClock = if piece.is(Pawn) then HalfMoveClock.initial else h.halfMoveClock + 1
+          halfMoveClock = if piece.is(Pawn) then HalfMoveClock.initial else h.halfMoveClock.map(_ + 1)
         )
       },
       toUci,

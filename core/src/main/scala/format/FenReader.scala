@@ -91,10 +91,10 @@ trait FenReader:
     val halfMoveClock =
       HalfMoveClock
         .from(splitted.lift(0).flatMap(_.toIntOption))
-        .map(_.atLeast(HalfMoveClock.initial).atMost(100))
+        .map(_.atLeast(HalfMoveClock.initial).atMost(HalfMoveClock(100)))
     val fullMoveNumber = FullMoveNumber
       .from(splitted.lift(1).flatMap(_.toIntOption))
-      .map(_.atLeast(FullMoveNumber.initial).atMost(500))
+      .map(_.atLeast(FullMoveNumber.initial).atMost(FullMoveNumber(500)))
     (halfMoveClock, fullMoveNumber)
 
   def readPly(fen: FullFen): Option[Ply] =

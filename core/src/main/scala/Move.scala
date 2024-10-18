@@ -30,7 +30,7 @@ case class Move(
           lastMove = Option(toUci),
           halfMoveClock =
             if piece.is(Pawn) || captures || promotes then HalfMoveClock.initial
-            else h1.halfMoveClock + 1
+            else h1.halfMoveClock.map(_ + 1)
         )
 
         var castleRights: Castles      = h1.castles

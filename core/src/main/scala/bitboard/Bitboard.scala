@@ -9,7 +9,7 @@ object Bitboard:
 
   inline def apply(inline l: Long): Bitboard              = l
   inline def apply(inline xs: Iterable[Square]): Bitboard = xs.foldLeft(empty)((b, s) => b | s.bl)
-  inline def apply(xs: Square*): Bitboard                 = apply(xs.toList)
+  inline def apply(inline xs: Square*): Bitboard          = apply(xs.toList)
 
   val empty: Bitboard = 0L
   val all: Bitboard   = -1L

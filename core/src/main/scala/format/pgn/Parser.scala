@@ -208,8 +208,7 @@ object Parser:
     val idx = error.failedAtOffset
     val caret = lm
       .toCaret(idx)
-      .getOrElse:
-        throw RuntimeException("This is impossible")
+      .getOrElse(throw RuntimeException("This is impossible"))
     val line         = lm.getLine(caret.line).getOrElse("")
     val errorLine    = line ++ "\n" ++ " ".*(caret.col) ++ "^"
     val errorMessage = s"$context: [${caret.line + 1}.${caret.col + 1}]: ${expToString(error.expected.head)}"

@@ -22,16 +22,16 @@ object Outcome:
 
   enum Points:
     case Zero, Half, One
-  object Points:
-    extension (p: Points)
-      def value: Float = p match
-        case Zero => 0f
-        case Half => 0.5f
-        case One  => 1f
-      def show: String = p match
-        case Zero => "0"
-        case Half => "1/2"
-        case One  => "1"
+
+    def value: Float = this match
+      case Zero => 0f
+      case Half => 0.5f
+      case One  => 1f
+
+    def show: String = this match
+      case Zero => "0"
+      case Half => "1/2"
+      case One  => "1"
 
   import Points.*
   type GamePoints = ByColor[Points]

@@ -1,8 +1,8 @@
 package chess
-package format.pgn
 
 import cats.syntax.all.*
 import org.typelevel.literally.Literally
+import chess.format.pgn.*
 
 object macros:
   extension (inline ctx: StringContext)

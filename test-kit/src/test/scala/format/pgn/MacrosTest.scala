@@ -1,5 +1,4 @@
 package chess
-package format.pgn
 
 class MacrosTest extends munit.FunSuite:
 

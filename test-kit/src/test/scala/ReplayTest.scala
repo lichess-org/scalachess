@@ -5,6 +5,7 @@ import chess.format.pgn.{ Fixtures, SanStr }
 import chess.variant.Chess960
 
 import format.{ FullFen, Fen, Uci }
+import macros.uci
 
 class ReplayTest extends ChessTest:
 
@@ -27,7 +28,7 @@ class ReplayTest extends ChessTest:
   test("bongcloud attack"):
     Replay
       .situationsFromUci(
-        moves = List(Uci("e2e4"), Uci("e7e5"), Uci("e1e2")).flatten,
+        moves = List(uci"e2e4", uci"e7e5", uci"e1e2"),
         initialFen = None,
         variant = variant.Standard
       )

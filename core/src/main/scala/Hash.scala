@@ -30,7 +30,7 @@ opaque type Hash = Int
 object Hash:
   val size                              = 3
   def apply(value: Int): Hash           = value & 0x00ff_ffff
-  def apply(situation: Situation): Hash = hashSituation(situation) & 0x00ff_ffff
+  def apply(situation: Situation): Hash = hashSituation(situation) >>> 8
 
   private def hashSituation(situation: Situation): Int =
     import situation.board

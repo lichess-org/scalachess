@@ -38,15 +38,10 @@ object Elo extends RelaxedOpaqueInt[Elo]:
     if ratingDiff <= 0 then expectedScore else 1.0f - expectedScore
 
   def computePerformanceRating(games: Seq[Game]): Option[Elo] =
-    val winBonus = 400
     games.nonEmpty.option:
-      val ratings = games.map(_.opponentRating).sum
-      val points = games.foldMap:
-        _.points.match
-          case Outcome.Points.Zero => -1
-          case Outcome.Points.Half => 0
-          case Outcome.Points.One  => 1
-      (ratings + points * winBonus) / games.size
+      val averageOpponentRating = games.map(_.opponentRating).sum / games.size
+      val percentageScore       = Math.round(games.map(_.points.value).sum * 100 / games.size)
+      averageOpponentRating + performanceRatingTableFIDE.getOrElse(percentageScore, 0)
 
   final class Player(val rating: Elo, val kFactor: KFactor)
 
@@ -105,3 +100,108 @@ object Elo extends RelaxedOpaqueInt[Elo]:
   // the hardcoded List above is not really necessary,
   // but it mirrors the reference table on
   // https://handbook.fide.com/chapter/B022022 8.1.2
+
+  // 1.4.9 FIDE table
+  val performanceRatingTableFIDE: Map[Int, Int] = Map(
+    0   -> -800,
+    1   -> -677,
+    2   -> -589,
+    3   -> -538,
+    4   -> -501,
+    5   -> -470,
+    6   -> -444,
+    7   -> -422,
+    8   -> -401,
+    9   -> -383,
+    10  -> -366,
+    11  -> -351,
+    12  -> -336,
+    13  -> -322,
+    14  -> -309,
+    15  -> -296,
+    16  -> -284,
+    17  -> -273,
+    18  -> -262,
+    19  -> -251,
+    20  -> -240,
+    21  -> -230,
+    22  -> -220,
+    23  -> -211,
+    24  -> -202,
+    25  -> -193,
+    26  -> -184,
+    27  -> -175,
+    28  -> -166,
+    29  -> -158,
+    30  -> -149,
+    31  -> -141,
+    32  -> -133,
+    33  -> -125,
+    34  -> -117,
+    35  -> -110,
+    36  -> -102,
+    37  -> -95,
+    38  -> -87,
+    39  -> -80,
+    40  -> -72,
+    41  -> -65,
+    42  -> -57,
+    43  -> -50,
+    44  -> -43,
+    45  -> -36,
+    46  -> -29,
+    47  -> -21,
+    48  -> -14,
+    49  -> -7,
+    50  -> 0,
+    51  -> 7,
+    52  -> 14,
+    53  -> 21,
+    54  -> 29,
+    55  -> 36,
+    56  -> 43,
+    57  -> 50,
+    58  -> 57,
+    59  -> 65,
+    60  -> 72,
+    61  -> 80,
+    62  -> 87,
+    63  -> 95,
+    64  -> 102,
+    65  -> 110,
+    66  -> 117,
+    67  -> 125,
+    68  -> 133,
+    69  -> 141,
+    70  -> 149,
+    71  -> 158,
+    72  -> 166,
+    73  -> 175,
+    74  -> 184,
+    75  -> 193,
+    76  -> 202,
+    77  -> 211,
+    78  -> 220,
+    79  -> 230,
+    80  -> 240,
+    81  -> 251,
+    82  -> 262,
+    83  -> 273,
+    84  -> 284,
+    85  -> 296,
+    86  -> 309,
+    87  -> 322,
+    88  -> 336,
+    89  -> 351,
+    90  -> 366,
+    91  -> 383,
+    92  -> 401,
+    93  -> 422,
+    94  -> 444,
+    95  -> 470,
+    96  -> 501,
+    97  -> 538,
+    98  -> 589,
+    99  -> 677,
+    100 -> 800
+  )

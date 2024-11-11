@@ -1,7 +1,7 @@
 inThisBuild(
   Seq(
     scalaVersion      := "3.5.2",
-    version           := "16.3.3",
+    version           := "16.3.4",
     organization      := "org.lichess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
     publishTo         := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", "")))),
@@ -10,7 +10,7 @@ inThisBuild(
   )
 )
 
-val scalalibVersion = "11.3.1"
+val scalalibVersion = "11.3.2"
 
 val commonSettings = Seq(
   scalacOptions := Seq(

@@ -40,7 +40,8 @@ object Elo extends RelaxedOpaqueInt[Elo]:
   def computePerformanceRating(games: Seq[Game]): Option[Elo] =
     games.nonEmpty.option:
       val averageOpponentRating = games.map(_.opponentRating).sum / games.size
-      val percentageScore = BigDecimal(games.map(_.points.value).sum / games.size).setScale(2, BigDecimal.RoundingMode.HALF_UP)
+      val percentageScore =
+        BigDecimal(games.map(_.points.value).sum / games.size).setScale(2, BigDecimal.RoundingMode.HALF_UP)
       averageOpponentRating + performanceRatingTableFIDE.getOrElse(percentageScore, 0)
 
   final class Player(val rating: Elo, val kFactor: KFactor)
@@ -100,7 +101,6 @@ object Elo extends RelaxedOpaqueInt[Elo]:
   // the hardcoded List above is not really necessary,
   // but it mirrors the reference table on
   // https://handbook.fide.com/chapter/B022022 8.1.2
-
 
   // 1.4.9 FIDE table
   val performanceRatingTableFIDE: Map[BigDecimal, Int] = Map(
@@ -206,5 +206,3 @@ object Elo extends RelaxedOpaqueInt[Elo]:
     BigDecimal("0.99") -> 677,
     BigDecimal("1.00") -> 800
   )
-
-

@@ -5,6 +5,7 @@ import cats.syntax.all.*
 import cats.{ Applicative, Eq, Eval, FlatMap, Functor, Monoid, Semigroupal, Traverse }
 
 import scala.annotation.targetName
+import scala.util.NotGiven
 
 case class ByColor[A](white: A, black: A):
 
@@ -97,7 +98,8 @@ object ByColor:
   inline def fill[A](a: A): ByColor[A]          = ByColor(a, a)
   inline def fromPair[A](p: (A, A)): ByColor[A] = ByColor(p._1, p._2)
 
-  def apply[A](f: Color => A): ByColor[A] = ByColor(white = f(White), black = f(Black))
+  def apply[A](f: Color => A)(using NotGiven[f.type <:< PartialFunction[Color, A]]): ByColor[A] =
+    ByColor(white = f(White), black = f(Black))
 
   def apply[F[_], A](f: Color => F[A]): Applicative[F] ?=> F[ByColor[A]] =
     (f(White), f(Black)).mapN(ByColor(_, _))

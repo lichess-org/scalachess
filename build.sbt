@@ -63,7 +63,6 @@ lazy val bench = project
 
 lazy val testKit = project
   .in(file("./test-kit"))
-  .enablePlugins(JmhPlugin)
   .settings(
     commonSettings,
     name := "scalachess-test-kit",

@@ -9,7 +9,7 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
   // Chosen so a typical player's RD goes from 60 -> 110 in 1 year
   val ratingPeriodsPerDay = RatingPeriodsPerDay(0.21436d)
 
-  val system = RatingCalculator(Tau.default, ratingPeriodsPerDay)
+  val calculator = RatingCalculator(Tau.default, ratingPeriodsPerDay)
 
   def updateRatings(wRating: Rating, bRating: Rating, outcome: Outcome) =
     val results = GameRatingPeriodResults:
@@ -18,7 +18,7 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
           case None        => GameResult(wRating, bRating, true)
           case Some(White) => GameResult(wRating, bRating, false)
           case Some(Black) => GameResult(bRating, wRating, false)
-    system.updateRatings(results, true)
+    calculator.updateRatings(results, true)
 
   def defaultRating = Rating(
     rating = 1500d,
@@ -28,7 +28,7 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
     lastRatingPeriodEnd = None
   )
 
-  test("default deviation: white wins") {
+  test("default deviation: white wins"):
     val wr = defaultRating
     val br = defaultRating
     updateRatings(wr, br, Outcome.white)
@@ -38,8 +38,7 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
     assertCloseTo(br.ratingDeviation, 396d, 1d)
     assertCloseTo(wr.volatility, 0.0899983, 0.00000001d)
     assertCloseTo(br.volatility, 0.0899983, 0.0000001d)
-  }
-  test("default deviation: black wins") {
+  test("default deviation: black wins"):
     val wr = defaultRating
     val br = defaultRating
     updateRatings(wr, br, Outcome.black)
@@ -49,8 +48,7 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
     assertCloseTo(br.ratingDeviation, 396d, 1d)
     assertCloseTo(wr.volatility, 0.0899983, 0.00000001d)
     assertCloseTo(br.volatility, 0.0899983, 0.0000001d)
-  }
-  test("default deviation: draw") {
+  test("default deviation: draw"):
     val wr = defaultRating
     val br = defaultRating
     updateRatings(wr, br, Outcome.draw)
@@ -60,7 +58,6 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
     assertCloseTo(br.ratingDeviation, 396d, 1d)
     assertCloseTo(wr.volatility, 0.0899954, 0.0000001d)
     assertCloseTo(br.volatility, 0.0899954, 0.0000001d)
-  }
 
   def oldRating = Rating(
     rating = 1500d,
@@ -69,7 +66,7 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
     numberOfResults = 0,
     lastRatingPeriodEnd = None
   )
-  test("low deviation: white wins") {
+  test("low deviation: white wins"):
     val wr = oldRating
     val br = oldRating
     updateRatings(wr, br, Outcome.white)
@@ -79,8 +76,7 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
     assertCloseTo(br.ratingDeviation, 78d, 1d)
     assertCloseTo(wr.volatility, 0.06, 0.00001d)
     assertCloseTo(br.volatility, 0.06, 0.00001d)
-  }
-  test("low deviation: black wins") {
+  test("low deviation: black wins"):
     val wr = oldRating
     val br = oldRating
     updateRatings(wr, br, Outcome.black)
@@ -90,8 +86,7 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
     assertCloseTo(br.ratingDeviation, 78d, 1d)
     assertCloseTo(wr.volatility, 0.06, 0.00001d)
     assertCloseTo(br.volatility, 0.06, 0.00001d)
-  }
-  test("low deviation: draw") {
+  test("low deviation: draw"):
     val wr = oldRating
     val br = oldRating
     updateRatings(wr, br, Outcome.draw)
@@ -101,7 +96,6 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
     assertCloseTo(br.ratingDeviation, 78d, 1d)
     assertCloseTo(wr.volatility, 0.06, 0.00001d)
     assertCloseTo(br.volatility, 0.06, 0.00001d)
-  }
   {
     def whiteRating = Rating(
       rating = 1400d,
@@ -117,7 +111,7 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
       numberOfResults = 0,
       lastRatingPeriodEnd = None
     )
-    test("mixed ratings and deviations: white wins") {
+    test("mixed ratings and deviations: white wins"):
       val wr = whiteRating
       val br = blackRating
       updateRatings(wr, br, Outcome.white)
@@ -127,8 +121,7 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
       assertCloseTo(br.ratingDeviation, 105d, 1d)
       assertCloseTo(wr.volatility, 0.06, 0.00001d)
       assertCloseTo(br.volatility, 0.065, 0.00001d)
-    }
-    test("mixed ratings and deviations: black wins") {
+    test("mixed ratings and deviations: black wins"):
       val wr = whiteRating
       val br = blackRating
       updateRatings(wr, br, Outcome.black)
@@ -138,8 +131,7 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
       assertCloseTo(br.ratingDeviation, 105d, 1d)
       assertCloseTo(wr.volatility, 0.06, 0.00001d)
       assertCloseTo(br.volatility, 0.065, 0.00001d)
-    }
-    test("mixed ratings and deviations: draw") {
+    test("mixed ratings and deviations: draw"):
       val wr = whiteRating
       val br = blackRating
       updateRatings(wr, br, Outcome.draw)
@@ -149,7 +141,6 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
       assertCloseTo(br.ratingDeviation, 105.87d, 0.01d)
       assertCloseTo(wr.volatility, 0.06, 0.00001d)
       assertCloseTo(br.volatility, 0.065, 0.00001d)
-    }
   }
   {
     def whiteRating = Rating(
@@ -166,7 +157,7 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
       numberOfResults = 0,
       lastRatingPeriodEnd = None
     )
-    test("more mixed ratings and deviations: white wins") {
+    test("more mixed ratings and deviations: white wins"):
       val wr = whiteRating
       val br = blackRating
       updateRatings(wr, br, Outcome.white)
@@ -176,8 +167,7 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
       assertCloseTo(br.ratingDeviation, 196.9d, 0.1d)
       assertCloseTo(wr.volatility, 0.053013, 0.000001d)
       assertCloseTo(br.volatility, 0.062028, 0.000001d)
-    }
-    test("more mixed ratings and deviations: black wins") {
+    test("more mixed ratings and deviations: black wins"):
       val wr = whiteRating
       val br = blackRating
       updateRatings(wr, br, Outcome.black)
@@ -187,8 +177,7 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
       assertCloseTo(br.ratingDeviation, 196.9d, 0.1d)
       assertCloseTo(wr.volatility, 0.052999, 0.000001d)
       assertCloseTo(br.volatility, 0.061999, 0.000001d)
-    }
-    test("more mixed ratings and deviations: draw") {
+    test("more mixed ratings and deviations: draw"):
       val wr = whiteRating
       val br = blackRating
       updateRatings(wr, br, Outcome.draw)
@@ -198,5 +187,4 @@ class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
       assertCloseTo(br.ratingDeviation, 196.98729, 0.1d)
       assertCloseTo(wr.volatility, 0.053002, 0.000001d)
       assertCloseTo(br.volatility, 0.062006, 0.000001d)
-    }
   }

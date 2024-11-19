@@ -45,7 +45,7 @@ final class Rating(
     workingRating = 0d
     workingVolatility = 0d
 
-  override def toString = s"$rating / $ratingDeviation / $volatility / $numberOfResults"
+  override def toString = f"Rating($rating%1.2f, $ratingDeviation%1.2f, $volatility%1.2f, $numberOfResults)"
 
   def incrementNumberOfResults(increment: Int) =
     numberOfResults = numberOfResults + increment

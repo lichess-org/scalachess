@@ -13,7 +13,6 @@ opaque type RatingPeriodsPerDay = Double
 object RatingPeriodsPerDay extends OpaqueDouble[RatingPeriodsPerDay]:
   val default: RatingPeriodsPerDay = 0d
 
-// rewrite from java https://github.com/goochjs/glicko2
 object RatingCalculator:
 
   private val MULTIPLIER: Double = 173.7178

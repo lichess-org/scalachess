@@ -9,6 +9,13 @@ case class Glicko(
     deviation: Double,
     volatility: Double
 ):
+  def intRating: IntRating = IntRating(rating.toInt)
+  def intDeviation         = deviation.toInt
+  def provisional          = RatingProvisional(deviation >= Glicko.provisionalDeviation)
+  def established          = provisional.no
+  def establishedIntRating = Option.when(established)(intRating)
+  def clueless             = deviation >= Glicko.cluelessDeviation
+  def display              = s"$intRating${if provisional.yes then "?" else ""}"
   def average(other: Glicko, weight: Float = 0.5f): Glicko =
     if weight >= 1 then other
     else if weight <= 0 then this
@@ -18,7 +25,11 @@ case class Glicko(
         deviation = deviation * (1 - weight) + other.deviation * weight,
         volatility = volatility * (1 - weight) + other.volatility * weight
       )
-  override def toString = f"${rating.toInt}/${deviation.toInt}/${volatility}%.3f"
+  override def toString = f"$intRating/$intDeviation/${volatility}%.3f"
+
+object Glicko:
+  val provisionalDeviation = 110
+  val cluelessDeviation    = 230
 
 case class Player(
     glicko: Glicko,

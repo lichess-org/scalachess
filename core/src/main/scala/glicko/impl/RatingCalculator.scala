@@ -1,7 +1,8 @@
 package chess.glicko.impl
 
-import scalalib.newtypes.OpaqueDouble
 import scalalib.extensions.ifTrue
+import scalalib.newtypes.OpaqueDouble
+
 import java.time.Instant
 
 opaque type Tau = Double

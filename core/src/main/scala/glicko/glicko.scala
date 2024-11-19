@@ -4,13 +4,28 @@ package glicko
 import java.time.Instant
 import scala.util.Try
 
-case class Player(
+case class Glicko(
     rating: Double,
-    ratingDeviation: Double,
-    volatility: Double,
+    deviation: Double,
+    volatility: Double
+):
+  def average(other: Glicko, weight: Float = 0.5f): Glicko =
+    if weight >= 1 then other
+    else if weight <= 0 then this
+    else
+      Glicko(
+        rating = rating * (1 - weight) + other.rating * weight,
+        deviation = deviation * (1 - weight) + other.deviation * weight,
+        volatility = volatility * (1 - weight) + other.volatility * weight
+      )
+  override def toString = f"${rating.toInt}/${deviation.toInt}/${volatility}%.3f"
+
+case class Player(
+    glicko: Glicko,
     numberOfResults: Int,
     lastRatingPeriodEnd: Option[Instant] = None
-)
+):
+  export glicko.*
 
 case class Game(players: ByColor[Player], outcome: Outcome)
 
@@ -70,16 +85,18 @@ final class GlickoCalculator(config: Config) extends GlickoCalculatorApi:
 
     def toRating(player: Player) = impl.Rating(
       rating = player.rating,
-      ratingDeviation = player.ratingDeviation,
+      ratingDeviation = player.deviation,
       volatility = player.volatility,
       numberOfResults = player.numberOfResults,
       lastRatingPeriodEnd = player.lastRatingPeriodEnd
     )
 
     def toPlayer(rating: Rating) = Player(
-      rating = rating.rating,
-      ratingDeviation = rating.ratingDeviation,
-      volatility = rating.volatility,
+      glicko = Glicko(
+        rating = rating.rating,
+        deviation = rating.ratingDeviation,
+        volatility = rating.volatility
+      ),
       numberOfResults = rating.numberOfResults,
       lastRatingPeriodEnd = rating.lastRatingPeriodEnd
     )

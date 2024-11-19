@@ -2,6 +2,7 @@ package chess
 package glicko
 
 import java.time.Instant
+import scala.util.Try
 
 case class Player(
     rating: Double,
@@ -31,23 +32,27 @@ trait GlickoCalculatorApi:
   // ): List[Player]
 
   // Simpler use case: a single game
-  def computeGame(game: Game, skipDeviationIncrease: Boolean = false): ByColor[Player]
+  def computeGame(game: Game, skipDeviationIncrease: Boolean = false): Try[ByColor[Player]]
 
   /** This is the formula defined in step 6. It is also used for players who have not competed during the rating period.
     */
-  // def previewDeviation(player: Player, ratingPeriodEndDate: Instant, reverse: Boolean): Double
+  def previewDeviation(player: Player, ratingPeriodEndDate: Instant, reverse: Boolean): Double
 
 final class GlickoCalculator(config: Config) extends GlickoCalculatorApi:
 
   private val calculator = chess.glicko.impl.RatingCalculator(config.tau, config.ratingPeriodsPerDay)
 
   // Simpler use case: a single game
-  def computeGame(game: Game, skipDeviationIncrease: Boolean = false): ByColor[Player] =
+  def computeGame(game: Game, skipDeviationIncrease: Boolean = false): Try[ByColor[Player]] =
     val ratings       = game.players.map(conversions.toRating)
     val gameResult    = conversions.toGameResult(ratings, game.outcome)
     val periodResults = impl.GameRatingPeriodResults(List(gameResult))
-    calculator.updateRatings(periodResults, skipDeviationIncrease)
-    ratings.map(conversions.toPlayer)
+    Try:
+      calculator.updateRatings(periodResults, skipDeviationIncrease)
+      ratings.map(conversions.toPlayer)
+
+  def previewDeviation(player: Player, ratingPeriodEndDate: Instant, reverse: Boolean): Double =
+    calculator.previewDeviation(conversions.toRating(player), ratingPeriodEndDate, reverse)
 
   private object conversions:
 

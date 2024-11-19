@@ -11,7 +11,7 @@ class GlickoCalculatorTest extends ScalaCheckSuite with MunitExtensions:
     )
 
   def computeGame(players: ByColor[Player], outcome: Outcome) =
-    calc.computeGame(Game(players, outcome), skipDeviationIncrease = true).toPair
+    calc.computeGame(Game(players, outcome), skipDeviationIncrease = true).get.toPair
 
   {
     val players = ByColor.fill:

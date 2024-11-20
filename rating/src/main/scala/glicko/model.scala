@@ -1,7 +1,7 @@
 package chess.rating
 package glicko
 
-import chess.{ByColor, IntRating, Outcome}
+import chess.{ ByColor, IntRating, Outcome }
 import scalalib.newtypes.OpaqueDouble
 
 import java.time.Instant

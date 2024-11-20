@@ -1,7 +1,7 @@
 package chess.rating
 package glicko
 
-import chess.{Black, ByColor, Outcome, White}
+import chess.{ Black, ByColor, Outcome, White }
 
 import java.time.Instant
 import scala.util.Try

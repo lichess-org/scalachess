@@ -1,8 +1,9 @@
 package chess.rating.glicko
 package impl
 
-import java.time.Instant
 import scalalib.extensions.ifTrue
+
+import java.time.Instant
 
 private object RatingCalculator:
 

@@ -1,8 +1,9 @@
 package chess.rating
 package glicko
 
+import chess.{Black, ByColor, Outcome, White}
+
 import java.time.Instant
-import chess.{ ByColor, Outcome, White, Black }
 import scala.util.Try
 
 /* Purely functional interface hiding the mutable implementation */

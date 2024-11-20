@@ -1,8 +1,7 @@
 package chess.rating.glicko
 
-import munit.ScalaCheckSuite
-
 import chess.{ ByColor, Outcome }
+import munit.ScalaCheckSuite
 
 class GlickoCalculatorTest extends ScalaCheckSuite with chess.MunitExtensions:
 

@@ -48,3 +48,10 @@ object Tau extends OpaqueDouble[Tau]:
 opaque type RatingPeriodsPerDay = Double
 object RatingPeriodsPerDay extends OpaqueDouble[RatingPeriodsPerDay]:
   val default: RatingPeriodsPerDay = 0d
+
+opaque type ColorAdvantage = Double
+object ColorAdvantage extends OpaqueDouble[ColorAdvantage]:
+  val zero: ColorAdvantage                                 = 0d
+  val standard: ColorAdvantage                             = 7.786d
+  val crazyhouse: ColorAdvantage                           = 15.171d
+  extension (c: ColorAdvantage) def negate: ColorAdvantage = -c

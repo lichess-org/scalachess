@@ -7,7 +7,7 @@ import chess.{ ByColor, Outcome }
 class GlickoCalculatorTest extends ScalaCheckSuite with chess.MunitExtensions:
 
   val calc = GlickoCalculator(
-    ratingPeriodsPerDay = impl.RatingPeriodsPerDay(0.21436d)
+    ratingPeriodsPerDay = RatingPeriodsPerDay(0.21436d)
   )
 
   def computeGame(players: ByColor[Player], outcome: Outcome) =

@@ -1,19 +1,10 @@
-package chess.rating.glicko.impl
-
-import scalalib.extensions.ifTrue
-import scalalib.newtypes.OpaqueDouble
+package chess.rating.glicko
+package impl
 
 import java.time.Instant
+import scalalib.extensions.ifTrue
 
-opaque type Tau = Double
-object Tau extends OpaqueDouble[Tau]:
-  val default: Tau = 0.75d
-
-opaque type RatingPeriodsPerDay = Double
-object RatingPeriodsPerDay extends OpaqueDouble[RatingPeriodsPerDay]:
-  val default: RatingPeriodsPerDay = 0d
-
-object RatingCalculator:
+private object RatingCalculator:
 
   private val MULTIPLIER: Double = 173.7178
   val DEFAULT_RATING: Double     = 1500.0
@@ -30,7 +21,7 @@ object RatingCalculator:
   def convertRatingDeviationToGlicko2Scale(ratingDeviation: Double): Double =
     (ratingDeviation / MULTIPLIER)
 
-final class RatingCalculator(
+final private[glicko] class RatingCalculator(
     tau: Tau = Tau.default,
     ratingPeriodsPerDay: RatingPeriodsPerDay = RatingPeriodsPerDay.default
 ):

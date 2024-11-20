@@ -1,6 +1,7 @@
-package chess.rating.glicko.impl
+package chess.rating.glicko
+package impl
 
-final class Rating(
+final private[glicko] class Rating(
     var rating: Double,
     var ratingDeviation: Double,
     var volatility: Double,

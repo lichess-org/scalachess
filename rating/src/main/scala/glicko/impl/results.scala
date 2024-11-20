@@ -1,6 +1,7 @@
-package chess.rating.glicko.impl
+package chess.rating.glicko
+package impl
 
-trait Result:
+private[glicko] trait Result:
 
   def getScore(player: Rating): Double
 
@@ -11,7 +12,7 @@ trait Result:
   def players: List[Rating]
 
 // score from 0 (opponent wins) to 1 (player wins)
-class FloatingResult(player: Rating, opponent: Rating, score: Float) extends Result:
+final private[glicko] class FloatingResult(player: Rating, opponent: Rating, score: Float) extends Result:
 
   def getScore(p: Rating) = if p == player then score else 1 - score
 
@@ -21,7 +22,7 @@ class FloatingResult(player: Rating, opponent: Rating, score: Float) extends Res
 
   def players = List(player, opponent)
 
-final class GameResult(winner: Rating, loser: Rating, isDraw: Boolean) extends Result:
+final private[glicko] class GameResult(winner: Rating, loser: Rating, isDraw: Boolean) extends Result:
   private val POINTS_FOR_WIN  = 1.0d
   private val POINTS_FOR_LOSS = 0.0d
   private val POINTS_FOR_DRAW = 0.5d
@@ -50,12 +51,13 @@ final class GameResult(winner: Rating, loser: Rating, isDraw: Boolean) extends R
 
   override def toString = s"$winner vs $loser = $isDraw"
 
-trait RatingPeriodResults[R <: Result]():
+private[glicko] trait RatingPeriodResults[R <: Result]():
   val results: List[R]
   def getResults(player: Rating): List[R] = results.filter(_.participated(player))
   def getParticipants: Set[Rating]        = results.flatMap(_.players).toSet
 
-class GameRatingPeriodResults(val results: List[GameResult]) extends RatingPeriodResults[GameResult]
+final private[glicko] class GameRatingPeriodResults(val results: List[GameResult])
+    extends RatingPeriodResults[GameResult]
 
-class FloatingRatingPeriodResults(val results: List[FloatingResult])
+final private[glicko] class FloatingRatingPeriodResults(val results: List[FloatingResult])
     extends RatingPeriodResults[FloatingResult]

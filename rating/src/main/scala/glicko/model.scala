@@ -3,6 +3,7 @@ package glicko
 
 import chess.{ IntRating, ByColor, Outcome }
 import java.time.Instant
+import scalalib.newtypes.OpaqueDouble
 
 case class Glicko(
     rating: Double,
@@ -11,10 +12,10 @@ case class Glicko(
 ):
   def intRating: IntRating = IntRating(rating.toInt)
   def intDeviation         = deviation.toInt
-  def provisional          = RatingProvisional(deviation >= Glicko.provisionalDeviation)
+  def provisional          = RatingProvisional(deviation >= provisionalDeviation)
   def established          = provisional.no
   def establishedIntRating = Option.when(established)(intRating)
-  def clueless             = deviation >= Glicko.cluelessDeviation
+  def clueless             = deviation >= cluelessDeviation
   def display              = s"$intRating${if provisional.yes then "?" else ""}"
   def average(other: Glicko, weight: Float = 0.5f): Glicko =
     if weight >= 1 then other
@@ -27,9 +28,8 @@ case class Glicko(
       )
   override def toString = f"$intRating/$intDeviation/${volatility}%.3f"
 
-object Glicko:
-  val provisionalDeviation = 110
-  val cluelessDeviation    = 230
+val provisionalDeviation = 110
+val cluelessDeviation    = 230
 
 case class Player(
     glicko: Glicko,
@@ -39,3 +39,11 @@ case class Player(
   export glicko.*
 
 case class Game(players: ByColor[Player], outcome: Outcome)
+
+opaque type Tau = Double
+object Tau extends OpaqueDouble[Tau]:
+  val default: Tau = 0.75d
+
+opaque type RatingPeriodsPerDay = Double
+object RatingPeriodsPerDay extends OpaqueDouble[RatingPeriodsPerDay]:
+  val default: RatingPeriodsPerDay = 0d

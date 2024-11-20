@@ -7,11 +7,11 @@ import scala.util.Try
 
 /* Purely functional interface hiding the mutable implementation */
 final class GlickoCalculator(
-    tau: impl.Tau = impl.Tau.default,
-    ratingPeriodsPerDay: impl.RatingPeriodsPerDay = impl.RatingPeriodsPerDay.default
+    tau: Tau = Tau.default,
+    ratingPeriodsPerDay: RatingPeriodsPerDay = RatingPeriodsPerDay.default
 ):
 
-  private val calculator = impl.RatingCalculator(tau, ratingPeriodsPerDay)
+  private val calculator = new impl.RatingCalculator(tau, ratingPeriodsPerDay)
 
   // Simpler use case: a single game
   def computeGame(game: Game, skipDeviationIncrease: Boolean = false): Try[ByColor[Player]] =

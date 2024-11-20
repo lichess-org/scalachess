@@ -85,7 +85,7 @@ final private[glicko] class RatingCalculator(
     * @param results
     * @param elapsedRatingPeriods
     */
-  def calculateNewRating(player: Rating, results: List[Result], elapsedRatingPeriods: Double): Unit =
+  private def calculateNewRating(player: Rating, results: List[Result], elapsedRatingPeriods: Double): Unit =
     val phi   = player.getGlicko2RatingDeviation
     val sigma = player.volatility
     val a     = Math.log(Math.pow(sigma, 2))

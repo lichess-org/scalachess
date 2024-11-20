@@ -1,11 +1,7 @@
-package chess
-package glicko // todo move to chess.rating?
+package chess.rating
 
 import alleycats.Zero
-
-opaque type IntRating = Int
-object IntRating extends RichOpaqueInt[IntRating]:
-  extension (r: IntRating) def applyDiff(diff: IntRatingDiff): IntRating = r + diff.value
+import scalalib.newtypes.*
 
 opaque type IntRatingDiff = Int
 object IntRatingDiff extends RichOpaqueInt[IntRatingDiff]:

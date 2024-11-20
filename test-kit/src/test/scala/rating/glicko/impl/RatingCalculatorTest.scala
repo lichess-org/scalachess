@@ -1,10 +1,11 @@
-package chess
-package glicko.impl
+package chess.rating.glicko.impl
 
 import munit.ScalaCheckSuite
 import cats.syntax.all.*
 
-class RatingCalculatorTest extends ScalaCheckSuite with MunitExtensions:
+import chess.{ Outcome, White, Black }
+
+class RatingCalculatorTest extends ScalaCheckSuite with chess.MunitExtensions:
 
   // Chosen so a typical player's RD goes from 60 -> 110 in 1 year
   val ratingPeriodsPerDay = RatingPeriodsPerDay(0.21436d)

@@ -1,6 +1,8 @@
-package chess
+package chess.rating
 
 import cats.syntax.all.*
+import scalalib.newtypes.*
+import scalalib.extensions.*
 
 opaque type Elo = Int
 
@@ -12,10 +14,10 @@ object KFactor extends OpaqueInt[KFactor]:
  * https://handbook.fide.com/chapter/B022022
  * https://ratings.fide.com/calc.phtml
  * */
-object Elo extends RelaxedOpaqueInt[Elo]:
+object Elo extends RichOpaqueInt[Elo]:
 
-  def computeRatingDiff(player: Player, games: Seq[Game]): Int =
-    computeNewRating(player, games) - player.rating
+  def computeRatingDiff(player: Player, games: Seq[Game]): IntRatingDiff =
+    IntRatingDiff(computeNewRating(player, games) - player.rating)
 
   def computeNewRating(player: Player, games: Seq[Game]): Elo =
     val expectedScore = games.foldMap: game =>
@@ -45,7 +47,7 @@ object Elo extends RelaxedOpaqueInt[Elo]:
 
   final class Player(val rating: Elo, val kFactor: KFactor)
 
-  final class Game(val points: Outcome.Points, val opponentRating: Elo)
+  final class Game(val points: chess.Outcome.Points, val opponentRating: Elo)
 
   // 8.1.2 FIDE table
   val conversionTableFIDE: Map[Int, Float] = List(

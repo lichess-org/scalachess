@@ -1,4 +1,5 @@
 package chess
+
 package format.pgn
 
 import cats.Eq
@@ -87,8 +88,8 @@ case class Tags(value: List[Tag]) extends AnyVal:
           .flatMap(_.toIntOption)
 
   def names: ByColor[Option[PlayerName]] = ByColor(apply(_.White), apply(_.Black)).map(PlayerName.from(_))
-  def elos: ByColor[Option[Elo]] = ByColor(apply(_.WhiteElo), apply(_.BlackElo)).map: elo =>
-    Elo.from(elo.flatMap(_.toIntOption))
+  def ratings: ByColor[Option[IntRating]] = ByColor(apply(_.WhiteElo), apply(_.BlackElo)).map: r =>
+    IntRating.from(r.flatMap(_.toIntOption))
   def titles: ByColor[Option[PlayerTitle]] =
     ByColor(apply(_.WhiteTitle), apply(_.BlackTitle)).map(_.flatMap(PlayerTitle.get))
   def fideIds: ByColor[Option[FideId]] = ByColor(apply(_.WhiteFideId), apply(_.BlackFideId)).map: id =>

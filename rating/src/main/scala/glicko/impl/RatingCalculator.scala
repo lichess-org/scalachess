@@ -1,4 +1,4 @@
-package chess.glicko.impl
+package chess.rating.glicko.impl
 
 import scalalib.extensions.ifTrue
 import scalalib.newtypes.OpaqueDouble

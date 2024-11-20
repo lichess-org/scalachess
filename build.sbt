@@ -1,7 +1,7 @@
 inThisBuild(
   Seq(
     scalaVersion      := "3.5.2",
-    version           := "16.4.1",
+    version           := "16.5.0",
     organization      := "org.lichess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
     publishTo         := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", "")))),
@@ -54,6 +54,13 @@ lazy val playJson: Project = Project("playJson", file("playJson"))
   )
   .dependsOn(scalachess)
 
+lazy val rating: Project = Project("rating", file("rating"))
+  .settings(
+    commonSettings,
+    name := "scalachess-rating"
+  )
+  .dependsOn(scalachess)
+
 lazy val bench = project
   .enablePlugins(JmhPlugin)
   .settings(commonSettings, scalacOptions -= "-Wunused:all", name := "bench")
@@ -79,12 +86,12 @@ lazy val testKit = project
       "org.typelevel"       %% "cats-laws"         % "2.12.0" % Test
     )
   )
-  .dependsOn(scalachess % "compile->compile")
+  .dependsOn(scalachess % "compile->compile", rating % "compile->compile")
 
 lazy val root = project
   .in(file("."))
   .settings(publish := {}, publish / skip := true)
-  .aggregate(scalachess, playJson, testKit, bench)
+  .aggregate(scalachess, rating, playJson, testKit, bench)
 
 addCommandAlias("prepare", "scalafixAll; scalafmtAll")
 addCommandAlias("check", "; scalafixAll --check; scalafmtCheckAll")

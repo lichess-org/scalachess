@@ -1,4 +1,4 @@
-package chess.glicko.impl
+package chess.rating.glicko.impl
 
 final class Rating(
     var rating: Double,

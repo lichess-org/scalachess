@@ -1,14 +1,14 @@
-package chess
-package glicko
+package chess.rating.glicko
 
 import munit.ScalaCheckSuite
 
-class GlickoCalculatorTest extends ScalaCheckSuite with MunitExtensions:
+import chess.{ ByColor, Outcome }
 
-  val calc = GlickoCalculator:
-    Config(
-      ratingPeriodsPerDay = impl.RatingPeriodsPerDay(0.21436d)
-    )
+class GlickoCalculatorTest extends ScalaCheckSuite with chess.MunitExtensions:
+
+  val calc = GlickoCalculator(
+    ratingPeriodsPerDay = impl.RatingPeriodsPerDay(0.21436d)
+  )
 
   def computeGame(players: ByColor[Player], outcome: Outcome) =
     calc.computeGame(Game(players, outcome), skipDeviationIncrease = true).get.toPair

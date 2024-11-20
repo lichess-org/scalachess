@@ -1,4 +1,5 @@
 package chess
+package rating
 
 class EloTest extends ChessTest:
 

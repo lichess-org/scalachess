@@ -40,3 +40,6 @@ object FideId extends OpaqueInt[FideId]
 
 opaque type PlayerName = String
 object PlayerName extends OpaqueString[PlayerName]
+
+opaque type IntRating = Int
+object IntRating extends RichOpaqueInt[IntRating]

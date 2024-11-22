@@ -58,7 +58,7 @@ final private[glicko] class RatingCalculator(
     }
 
     // now iterate through the participants and confirm their new ratings
-    players.foreach { _.finaliseRating() }
+    players.foreach(_.finaliseRating())
 
   /** This is the formula defined in step 6. It is also used for players who have not competed during the
     * rating period.

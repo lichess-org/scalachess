@@ -183,7 +183,7 @@ object Parser:
     val escaped: P[String] = P.char('\\') *> (R.dquote | P.char('\\')).string
     val valueChar: P[String] = escaped | P.charWhere(_ != '"').string
     val tagValue: P[String]  = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
-    val tagContent: P[Tag]   = ((tagName <* R.wsp.rep) ~ tagValue).map(p => Tag(p._1, p._2))
+    val tagContent: P[Tag]   = ((tagName <* R.wsp.rep) ~ tagValue).map(Tag(_, _))
     val tag: P[Tag]          = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
     val tags: P0[List[Tag]]  = tag.rep0
 

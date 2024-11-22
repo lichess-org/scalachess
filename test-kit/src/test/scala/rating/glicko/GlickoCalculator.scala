@@ -4,6 +4,11 @@ import chess.{ ByColor, Outcome }
 import munit.ScalaCheckSuite
 
 class GlickoCalculatorTest extends ScalaCheckSuite with chess.MunitExtensions:
+  // Validate results with reference implementations
+  // http://www.glicko.net/glicko/glicko2.pdf
+  val R: Double = 1500d
+  val RD: Double = 350d
+  val V: Double = 0.06d
 
   val calc = GlickoCalculator(
     ratingPeriodsPerDay = RatingPeriodsPerDay(0.21436d)
@@ -15,9 +20,7 @@ class GlickoCalculatorTest extends ScalaCheckSuite with chess.MunitExtensions:
   {
     val players = ByColor.fill:
       Player(
-        Glicko(rating = 1500d, deviation = 500d, volatility = 0.09d),
-        numberOfResults = 0,
-        lastRatingPeriodEnd = None
+        Glicko(rating = R, deviation = RD, volatility = V)
       )
     test("default deviation: white wins"):
       val (w, b) = computeGame(players, Outcome.white)

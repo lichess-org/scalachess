@@ -3,7 +3,7 @@ package chess.rating.glicko
 import chess.{ ByColor, Outcome }
 import munit.ScalaCheckSuite
 
-class GlickoCalculatorTest extends ScalaCheckSuite with chess.MunitExtensions:
+class GlickoCalculatorWithColorAdvantageTest extends ScalaCheckSuite with chess.MunitExtensions:
   // Validate results with reference implementations
   // http://www.glicko.net/glicko/glicko2.pdf
   val R: Double = 1500d

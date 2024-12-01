@@ -34,7 +34,7 @@ val cluelessDeviation    = 230
 
 case class Player(
     glicko: Glicko,
-    numberOfResults: Int,
+    numberOfResults: Int = 0,
     lastRatingPeriodEnd: Option[Instant] = None
 ):
   export glicko.*

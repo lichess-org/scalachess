@@ -11,7 +11,8 @@ class GlickoCalculatorWithColorAdvantageTest extends ScalaCheckSuite with chess.
   val V: Double  = 0.06d
 
   val calc = GlickoCalculator(
-    ratingPeriodsPerDay = RatingPeriodsPerDay(0.21436d)
+    ratingPeriodsPerDay = RatingPeriodsPerDay(0.21436d),
+    colorAdvantage = ColorAdvantage.zero
   )
 
   val calcWithAdvantage = GlickoCalculator(

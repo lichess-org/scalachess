@@ -161,6 +161,7 @@ Opening("D10", "Slav Defense: Winawer Countergambit, Anti-Winawer Gambit", "rnbq
 Opening("D11", "Slav Defense: Bonet Gambit", "rnbqkb1r/pp2pppp/2p2n2/3p2B1/2PP4/5N2/PP2PPPP/RN1QKB1R b KQkq -", "d2d4 d7d5 c2c4 c7c6 g1f3 g8f6 c1g5", "1. d4 d5 2. c4 c6 3. Nf3 Nf6 4. Bg5"),
 Opening("D11", "Slav Defense: Breyer Variation", "rnbqkb1r/pp2pppp/2p2n2/3p4/2PP4/5N2/PP1NPPPP/R1BQKB1R b KQkq -", "d2d4 d7d5 c2c4 c7c6 g1f3 g8f6 b1d2", "1. d4 d5 2. c4 c6 3. Nf3 Nf6 4. Nbd2"),
 Opening("D11", "Slav Defense: Modern Line", "rnbqkbnr/pp2pppp/2p5/3p4/2PP4/5N2/PP2PPPP/RNBQKB1R b KQkq -", "d2d4 d7d5 c2c4 c7c6 g1f3", "1. d4 d5 2. c4 c6 3. Nf3"),
+Opening("D11", "Slav Defense: Modern Line", "rnbqkb1r/pp2pp1p/2p2np1/8/2pP4/5NP1/PP2PPBP/RNBQK2R w KQkq -", "d2d4 d7d5 c2c4 c7c6 g1f3 g8f6 g2g3 d5c4 f1g2 g7g6", "1. d4 d5 2. c4 c6 3. Nf3 Nf6 4. g3 dxc4 5. Bg2 g6"),
 Opening("D11", "Slav Defense: Quiet Variation", "rnbqkb1r/pp2pppp/2p2n2/3p4/2PP4/4PN2/PP3PPP/RNBQKB1R b KQkq -", "d2d4 d7d5 c2c4 c7c6 g1f3 g8f6 e2e3", "1. d4 d5 2. c4 c6 3. Nf3 Nf6 4. e3"),
 Opening("D11", "Slav Defense: Quiet Variation, Pin Defense", "rn1qkb1r/pp2pppp/2p2n2/3p4/2PP2b1/4PN2/PP3PPP/RNBQKB1R w KQkq -", "d2d4 d7d5 c2c4 c7c6 g1f3 g8f6 e2e3 c8g4", "1. d4 d5 2. c4 c6 3. Nf3 Nf6 4. e3 Bg4"),
 Opening("D12", "Slav Defense: Quiet Variation, Amsterdam Variation", "rn1qkb1r/pp1n1ppp/4p3/3pNb2/3P4/2N1P3/PP3PPP/R1BQKB1R w KQkq -", "d2d4 d7d5 c2c4 c7c6 g1f3 g8f6 e2e3 c8f5 c4d5 c6d5 b1c3 e7e6 f3e5 f6d7", "1. d4 d5 2. c4 c6 3. Nf3 Nf6 4. e3 Bf5 5. cxd5 cxd5 6. Nc3 e6 7. Ne5 Nfd7"),

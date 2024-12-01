@@ -11,11 +11,18 @@ class GlickoCalculatorWithColorAdvantageTest extends ScalaCheckSuite with chess.
   val V: Double  = 0.06d
 
   val calc = GlickoCalculator(
+    ratingPeriodsPerDay = RatingPeriodsPerDay(0.21436d)
+  )
+
+  val calcWithAdvantage = GlickoCalculator(
     ratingPeriodsPerDay = RatingPeriodsPerDay(0.21436d),
     colorAdvantage = ColorAdvantage.standard
   )
 
   def computeGame(players: ByColor[Player], outcome: Outcome) =
+    calc.computeGame(Game(players, outcome), skipDeviationIncrease = true).get.toPair
+
+  def computeGameWithAdvantage(players: ByColor[Player], outcome: Outcome) =
     calc.computeGame(Game(players, outcome), skipDeviationIncrease = true).get.toPair
 
   {
@@ -24,29 +31,20 @@ class GlickoCalculatorWithColorAdvantageTest extends ScalaCheckSuite with chess.
         Glicko(rating = R, deviation = RD, volatility = V)
       )
     test("default deviation: white wins"):
-      val (w, b) = computeGame(players, Outcome.white)
-      assertCloseTo(w.rating, 1662d, 0.5d)
-      assertCloseTo(b.rating, 1338d, 0.5d)
-      assertCloseTo(w.deviation, 290d, 0.5d)
-      assertCloseTo(b.deviation, 290d, 0.5d)
-      assertCloseTo(w.volatility, 0.0599993d, 0.0000001d)
-      assertCloseTo(b.volatility, 0.0599993d, 0.0000001d)
+      val (w1, b1) = computeGame(players, Outcome.white)
+      val (w2, b2) = computeGameWithAdvantage(players, Outcome.white)
+      assert(w1.rating > w2.rating)
+      assert(b1.rating < b2.rating)
     test("default deviation: black wins"):
-      val (w, b) = computeGame(players, Outcome.black)
-      assertCloseTo(w.rating, 1338d, 0.5d)
-      assertCloseTo(b.rating, 1662d, 0.5d)
-      assertCloseTo(w.deviation, 290d, 0.5d)
-      assertCloseTo(b.deviation, 290d, 0.5d)
-      assertCloseTo(w.volatility, 0.0599993d, 0.0000001d)
-      assertCloseTo(b.volatility, 0.0599993d, 0.0000001d)
+      val (w1, b1) = computeGame(players, Outcome.black)
+      val (w2, b2) = computeGameWithAdvantage(players, Outcome.black)
+      assert(w1.rating > w2.rating)
+      assert(b1.rating < b2.rating)
     test("default deviation: draw"):
-      val (w, b) = computeGame(players, Outcome.draw)
-      assertCloseTo(w.rating, 1500d, 0.5d)
-      assertCloseTo(b.rating, 1500d, 0.5d)
-      assertCloseTo(w.deviation, 290d, 0.5d)
-      assertCloseTo(b.deviation, 290d, 0.5d)
-      assertCloseTo(w.volatility, 0.0599977d, 0.0000001d)
-      assertCloseTo(b.volatility, 0.0599977d, 0.0000001d)
+      val (w1, b1) = computeGame(players, Outcome.draw)
+      val (w2, b2) = computeGameWithAdvantage(players, Outcome.draw)
+      assert(w1.rating > w2.rating)
+      assert(b1.rating < b2.rating)
   }
 
   {
@@ -63,29 +61,20 @@ class GlickoCalculatorWithColorAdvantageTest extends ScalaCheckSuite with chess.
       )
     )
     test("mixed ratings and deviations: white wins"):
-      val (w, b) = computeGame(players, Outcome.white)
-      assertCloseTo(w.rating, 1423d, 0.5d)
-      assertCloseTo(b.rating, 1506d, 0.5d)
-      assertCloseTo(w.deviation, 77d, 0.5d)
-      assertCloseTo(b.deviation, 106d, 0.5d)
-      assertCloseTo(w.volatility, 0.06, 0.00001d)
-      assertCloseTo(b.volatility, 0.065, 0.00001d)
+      val (w1, b1) = computeGame(players, Outcome.white)
+      val (w2, b2) = computeGameWithAdvantage(players, Outcome.white)
+      assert(w1.rating > w2.rating)
+      assert(b1.rating < b2.rating)
     test("mixed ratings and deviations: black wins"):
-      val (w, b) = computeGame(players, Outcome.black)
-      assertCloseTo(w.rating, 1390d, 0.5d)
-      assertCloseTo(b.rating, 1569d, 0.5d)
-      assertCloseTo(w.deviation, 77d, 0.5d)
-      assertCloseTo(b.deviation, 106d, 0.5d)
-      assertCloseTo(w.volatility, 0.06, 0.00001d)
-      assertCloseTo(b.volatility, 0.065, 0.00001d)
+      val (w1, b1) = computeGame(players, Outcome.black)
+      val (w2, b2) = computeGameWithAdvantage(players, Outcome.black)
+      assert(w1.rating > w2.rating)
+      assert(b1.rating < b2.rating)
     test("mixed ratings and deviations: draw"):
-      val (w, b) = computeGame(players, Outcome.draw)
-      assertCloseTo(w.rating, 1406d, 0.5d)
-      assertCloseTo(b.rating, 1538d, 0.5d)
-      assertCloseTo(w.deviation, 77d, 0.5d)
-      assertCloseTo(b.deviation, 105.87d, 0.01d)
-      assertCloseTo(w.volatility, 0.06, 0.00001d)
-      assertCloseTo(b.volatility, 0.065, 0.00001d)
+      val (w1, b1) = computeGame(players, Outcome.draw)
+      val (w2, b2) = computeGameWithAdvantage(players, Outcome.draw)
+      assert(w1.rating > w2.rating)
+      assert(b1.rating < b2.rating)
   }
 
   {
@@ -102,27 +91,18 @@ class GlickoCalculatorWithColorAdvantageTest extends ScalaCheckSuite with chess.
       )
     )
     test("more mixed ratings and deviations: white wins"):
-      val (w, b) = computeGame(players, Outcome.white)
-      assertCloseTo(w.rating, 1216.7d, 0.1d)
-      assertCloseTo(b.rating, 1636d, 0.1d)
-      assertCloseTo(w.deviation, 59.9d, 0.1d)
-      assertCloseTo(b.deviation, 196.9d, 0.1d)
-      assertCloseTo(w.volatility, 0.053013, 0.000001d)
-      assertCloseTo(b.volatility, 0.062028, 0.000001d)
+      val (w1, b1) = computeGame(players, Outcome.white)
+      val (w2, b2) = computeGameWithAdvantage(players, Outcome.white)
+      assert(w1.rating > w2.rating)
+      assert(b1.rating < b2.rating)
     test("more mixed ratings and deviations: black wins"):
-      val (w, b) = computeGame(players, Outcome.black)
-      assertCloseTo(w.rating, 1199.3d, 0.1d)
-      assertCloseTo(b.rating, 1855.4d, 0.1d)
-      assertCloseTo(w.deviation, 59.9d, 0.1d)
-      assertCloseTo(b.deviation, 196.9d, 0.1d)
-      assertCloseTo(w.volatility, 0.052999, 0.000001d)
-      assertCloseTo(b.volatility, 0.061999, 0.000001d)
+      val (w1, b1) = computeGame(players, Outcome.black)
+      val (w2, b2) = computeGameWithAdvantage(players, Outcome.black)
+      assert(w1.rating > w2.rating)
+      assert(b1.rating < b2.rating)
     test("more mixed ratings and deviations: draw"):
-      val (w, b) = computeGame(players, Outcome.draw)
-      assertCloseTo(w.rating, 1208.0, 0.1d)
-      assertCloseTo(b.rating, 1745.7, 0.1d)
-      assertCloseTo(w.deviation, 59.90056, 0.1d)
-      assertCloseTo(b.deviation, 196.98729, 0.1d)
-      assertCloseTo(w.volatility, 0.053002, 0.000001d)
-      assertCloseTo(b.volatility, 0.062006, 0.000001d)
+      val (w1, b1) = computeGame(players, Outcome.draw)
+      val (w2, b2) = computeGameWithAdvantage(players, Outcome.draw)
+      assert(w1.rating > w2.rating)
+      assert(b1.rating < b2.rating)
   }

@@ -41,7 +41,7 @@ object Perft:
   private def read(file: String): List[Perft] =
     import cats.implicits.toShow
     val str = io.Source.fromResource(file).mkString
-    Parser.parse(str).fold(ex => throw RuntimeException(s"Parsing error: $file: ${ex.show}"), identity)
+    Parser.parseAll(str).fold(ex => throw RuntimeException(s"Parsing error: $file: ${ex.show}"), identity)
 
   def printResult(results: List[DivideResult]) =
     val builder = StringBuilder()

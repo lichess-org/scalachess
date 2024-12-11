@@ -36,7 +36,7 @@ lazy val scalachess: Project = Project("scalachess", file("core")).settings(
     "org.lichess"   %% "scalalib-core"  % scalalibVersion,
     "org.typelevel" %% "cats-core"      % "2.12.0",
     "org.typelevel" %% "alleycats-core" % "2.12.0",
-    "org.typelevel" %% "cats-parse"     % "1.0.0",
+    "org.typelevel" %% "cats-parse"     % "1.1.0",
     "dev.optics"    %% "monocle-core"   % "3.3.0",
     "org.typelevel" %% "kittens"        % "3.4.0"
   ),

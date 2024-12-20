@@ -142,6 +142,7 @@ object Tag:
   case object TimeControl     extends TagType
   case object WhiteClock      extends TagType
   case object BlackClock      extends TagType
+  case object ReferenceTime   extends TagType
   case object WhiteElo        extends TagType
   case object BlackElo        extends TagType
   case object WhiteRatingDiff extends TagType
@@ -183,6 +184,7 @@ object Tag:
     TimeControl,
     WhiteClock,
     BlackClock,
+    ReferenceTime,
     WhiteElo,
     BlackElo,
     WhiteRatingDiff,

@@ -3,7 +3,7 @@ package chess
 package format.pgn
 
 import cats.Eq
-import cats.syntax.option.*
+import cats.syntax.all.*
 import chess.format.FullFen
 
 import java.time.format.DateTimeFormatter
@@ -98,19 +98,15 @@ case class Tags(value: List[Tag]) extends AnyVal:
 
   def clocks: ByColor[Option[Centis]] = ByColor(apply(_.WhiteClock), apply(_.BlackClock)).map:
     _.flatMap: s =>
-      val seconds = s.split(':').toList match
-        case List(h, m, s) =>
-          for
-            hours   <- h.toIntOption
-            minutes <- m.toIntOption
-            seconds <- s.toIntOption
-          yield hours * 3600 + minutes * 60 + seconds
-        case List(m, s) =>
-          for
-            minutes <- m.toIntOption
-            seconds <- s.toIntOption
-          yield minutes * 60 + seconds
-        case _ => None
+      val seconds = s.toIntOption.orElse:
+        def readMinutesAndSeconds(m: String, s: String) = for
+          minutes <- m.toIntOption
+          seconds <- s.toIntOption
+        yield minutes * 60 + seconds
+        s.split(':').toList match
+          case List(h, m, s) => (h.toIntOption, readMinutesAndSeconds(m, s)).mapN(_ * 3600 + _)
+          case List(m, s)    => readMinutesAndSeconds(m, s)
+          case _             => None
       seconds.map(Centis.ofSeconds)
 
   override def toString = sorted.value.mkString("\n")

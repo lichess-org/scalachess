@@ -94,8 +94,24 @@ case class Tags(value: List[Tag]) extends AnyVal:
     ByColor(apply(_.WhiteTitle), apply(_.BlackTitle)).map(_.flatMap(PlayerTitle.get))
   def fideIds: ByColor[Option[FideId]] = ByColor(apply(_.WhiteFideId), apply(_.BlackFideId)).map: id =>
     FideId.from(id.flatMap(_.toIntOption))
-  def teams  = ByColor(apply(_.WhiteTeam), apply(_.BlackTeam))
-  def clocks = ByColor(apply(_.WhiteClock), apply(_.BlackClock))
+  def teams = ByColor(apply(_.WhiteTeam), apply(_.BlackTeam))
+
+  def clocks: ByColor[Option[Centis]] = ByColor(apply(_.WhiteClock), apply(_.BlackClock)).map:
+    _.flatMap: s =>
+      val seconds = s.split(':').toList match
+        case List(h, m, s) =>
+          for
+            hours   <- h.toIntOption
+            minutes <- m.toIntOption
+            seconds <- s.toIntOption
+          yield hours * 3600 + minutes * 60 + seconds
+        case List(m, s) =>
+          for
+            minutes <- m.toIntOption
+            seconds <- s.toIntOption
+          yield minutes * 60 + seconds
+        case _ => None
+      seconds.map(Centis.ofSeconds)
 
   override def toString = sorted.value.mkString("\n")
 

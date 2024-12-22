@@ -1,7 +1,7 @@
 inThisBuild(
   Seq(
     scalaVersion      := "3.6.2",
-    version           := "16.5.3",
+    version           := "16.6.0",
     organization      := "org.lichess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
     publishTo         := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", "")))),
@@ -10,7 +10,7 @@ inThisBuild(
   )
 )
 
-val scalalibVersion = "11.5.3"
+val scalalibVersion = "11.5.4"
 
 val commonSettings = Seq(
   scalacOptions := Seq(
@@ -34,6 +34,7 @@ lazy val scalachess: Project = Project("scalachess", file("core")).settings(
   name := "scalachess",
   libraryDependencies ++= List(
     "org.lichess"   %% "scalalib-core"  % scalalibVersion,
+    "org.lichess"   %% "scalalib-model" % scalalibVersion,
     "org.typelevel" %% "cats-core"      % "2.12.0",
     "org.typelevel" %% "alleycats-core" % "2.12.0",
     "org.typelevel" %% "cats-parse"     % "1.1.0",

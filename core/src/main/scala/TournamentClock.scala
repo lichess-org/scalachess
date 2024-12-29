@@ -16,10 +16,10 @@ object TournamentClock:
       TournamentClock(limit, IncrementSeconds(b))
 
     def apply(str: String): Option[TournamentClock] =
-      val clean = cleanRegex.replaceAllIn(str.toLowerCase, "").replace(" ", "")
-      clean.toIntOption
-        .map(make(_, 0))
-        .orElse:
-          clean.split('+') match
-            case Array(a, b) => (a.toIntOption, b.toIntOption).mapN(make)
-            case _           => none
+      cleanRegex
+        .replaceAllIn(str.toLowerCase, "")
+        .replace(" ", "")
+        .split('+') match
+        case Array(a)    => a.toIntOption.map(make(_, 0))
+        case Array(a, b) => (a.toIntOption, b.toIntOption).mapN(make)
+        case _           => none

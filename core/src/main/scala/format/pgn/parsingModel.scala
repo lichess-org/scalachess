@@ -28,9 +28,6 @@ case class PgnNodeData(
             san = x.toSanStr,
             comments = comments,
             glyphs = glyphs,
-            opening = None,
-            result = None,
-            secondsLeft = None,
             variationComments = variationComments
           )
         )

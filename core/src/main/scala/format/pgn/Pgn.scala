@@ -2,6 +2,7 @@ package chess
 package format.pgn
 
 import monocle.syntax.all.*
+import cats.syntax.all.*
 
 type PgnTree = Node[Move]
 
@@ -55,19 +56,19 @@ case class Move(
     glyphs: Glyphs = Glyphs.empty,
     opening: Option[String] = None,
     result: Option[String] = None,
-    // time left for the user who made the move, after he made it
-    secondsLeft: Option[Int] = None,
+    secondsLeft: Option[Int] = None, // %clk clock in seconds for the move player, after the move
+    moveTime: Option[Int] = None,    // %emt estimated move time in seconds
     variationComments: List[Comment] = Nil
 ):
 
-  private def clockString: Option[String] =
-    secondsLeft.map(seconds => "[%clk " + Move.formatPgnSeconds(seconds) + "]")
+  private def clockString: Option[String] = List(
+    secondsLeft.map(seconds => "[%clk " + Move.formatPgnSeconds(seconds) + "]"),
+    moveTime.map(seconds => "[%emt " + Move.formatPgnSeconds(seconds) + "]")
+  ).flatten.some.filter(_.nonEmpty).map(_.mkString(" "))
 
-  def hasComment =
-    comments.nonEmpty || secondsLeft.isDefined
+  def hasComment = comments.nonEmpty || secondsLeft.isDefined || moveTime.isDefined
 
-  private def nonEmpty =
-    comments.nonEmpty || secondsLeft.isDefined || opening.isDefined || result.isDefined
+  private def nonEmpty = hasComment || opening.isDefined || result.isDefined
 
   private def appendSanStr(builder: StringBuilder): Unit =
     builder.append(san.value)

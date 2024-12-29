@@ -88,7 +88,7 @@ object ChessTreeArbitraries:
           comments <- genComments(5)
           glyphs   <- Gen.someOf(Glyphs.all).map(xs => Glyphs.fromList(xs.toList))
           clock    <- Gen.posNum[Int]
-        yield WithMove(move, PgnMove(move.san, comments, glyphs, None, None, clock.some, Nil))
+        yield WithMove(move, PgnMove(move.san, comments, glyphs, secondsLeft = clock.some))
 
   def genNode[A: Generator](value: A, variations: List[A] = Nil): Gen[Node[A]] =
     value.next.flatMap: nextSeeds =>

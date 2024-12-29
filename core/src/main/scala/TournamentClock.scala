@@ -1,6 +1,7 @@
 package chess
 
 import cats.syntax.all.*
+
 import Clock.{ LimitSeconds, IncrementSeconds }
 
 case class TournamentClock(limitSeconds: LimitSeconds, incrementSeconds: IncrementSeconds)

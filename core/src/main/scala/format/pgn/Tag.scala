@@ -232,6 +232,8 @@ object Tag:
   def tagType(name: String) =
     tagTypesByLowercase.getOrElse(name.toLowerCase, Unknown(name))
 
+  def timeControl(clock: TournamentClock) = Tag(TimeControl, clock.toString)
+
   def timeControl(clock: Option[Clock.Config]) = Tag(
     TimeControl,
     clock.fold("-"): c =>

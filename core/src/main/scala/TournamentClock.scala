@@ -4,7 +4,10 @@ import cats.syntax.all.*
 
 import Clock.{ LimitSeconds, IncrementSeconds }
 
-case class TournamentClock(limitSeconds: LimitSeconds, incrementSeconds: IncrementSeconds)
+case class TournamentClock(limitSeconds: LimitSeconds, incrementSeconds: IncrementSeconds):
+
+  def toClockConfig: Option[Clock.Config] =
+    Clock.Config(limitSeconds, incrementSeconds).some
 
 object TournamentClock:
 

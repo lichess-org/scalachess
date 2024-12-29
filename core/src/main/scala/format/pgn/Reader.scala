@@ -45,4 +45,4 @@ object Reader:
 
   private def makeGame(tags: Tags) =
     val g = Game(variantOption = tags.variant, fen = tags.fen)
-    g.copy(startedAtPly = g.ply, clock = tags.clockConfig.map(Clock.apply))
+    g.copy(startedAtPly = g.ply, clock = tags.clockConfig.flatMap(_.toClockConfig).map(Clock.apply))

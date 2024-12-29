@@ -30,7 +30,7 @@ case class Tags(value: List[Tag]) extends AnyVal:
     val name = which(Tag)
     value.find(_.name == name).map(_.value)
 
-  def clockConfig: Option[TournamentClock] =
+  def timeControl: Option[TournamentClock] =
     value
       .collectFirst { case Tag(Tag.TimeControl, str) => str }
       .flatMap(TournamentClock.parse.apply)

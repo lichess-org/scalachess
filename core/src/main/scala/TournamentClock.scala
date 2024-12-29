@@ -9,6 +9,8 @@ case class TournamentClock(limitSeconds: LimitSeconds, incrementSeconds: Increme
   def limit: Centis     = Centis.ofSeconds(limitSeconds.value)
   def increment: Centis = Centis.ofSeconds(incrementSeconds.value)
 
+  def incrementAtPly(ply: Ply): Centis = increment
+
   def limitMinutes = LimitMinutes(limitSeconds.value / 60)
 
   def toClockConfig: Option[Clock.Config] = Clock.Config(limitSeconds, incrementSeconds).some

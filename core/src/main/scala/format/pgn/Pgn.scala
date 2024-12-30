@@ -1,8 +1,8 @@
 package chess
 package format.pgn
 
-import monocle.syntax.all.*
 import cats.syntax.all.*
+import monocle.syntax.all.*
 
 type PgnTree = Node[Move]
 

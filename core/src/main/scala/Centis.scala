@@ -18,8 +18,9 @@ object Centis extends RichOpaqueInt[Centis]:
     def roundTenths: Int      = (if centis > 0 then centis + 5 else centis - 4) / 10
     def roundSeconds: Seconds = Seconds(Math.round(centis * 0.01f))
 
-    inline def millis: Long        = centis * 10L
-    def toDuration: FiniteDuration = FiniteDuration(millis, MILLISECONDS)
+    inline def toSeconds: BigDecimal = java.math.BigDecimal.valueOf(centis, 2)
+    inline def millis: Long          = centis * 10L
+    def toDuration: FiniteDuration   = FiniteDuration(millis, MILLISECONDS)
 
     def *~(scalar: Float): Centis   = ofFloat(scalar * centis)
     def /(div: Int): Option[Centis] = (div != 0).option(centis / div)

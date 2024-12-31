@@ -21,7 +21,7 @@ object TournamentClock:
 
   object parse:
 
-    private val cleanRegex = "(move|minutes|minute|min|m|seconds|second|sec|s|'|\"|/)".r
+    private val cleanRegex = "(/move|minutes|minute|min|m|seconds|second|sec|s|'|\")".r
 
     private def make(a: Int, b: Int) =
       val limit = LimitSeconds(if a > 180 then a else a * 60)
@@ -29,9 +29,9 @@ object TournamentClock:
 
     def apply(str: String): Option[TournamentClock] =
       cleanRegex
-        .replaceAllIn(str.toLowerCase, "")
-        .replace(" ", "")
-        .split('+') match
-        case Array(a)    => a.toIntOption.map(make(_, 0))
-        case Array(a, b) => (a.toIntOption, b.toIntOption).mapN(make)
-        case _           => none
+        .replaceAllIn(str.toLowerCase.replace(" ", ""), "")
+        .split('+')
+        .match
+          case Array(a)    => a.toIntOption.map(make(_, 0))
+          case Array(a, b) => (a.toIntOption, b.toIntOption).mapN(make)
+          case _           => none

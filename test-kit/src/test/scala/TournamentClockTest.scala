@@ -43,5 +43,7 @@ class TournamentClockTest extends ChessTest:
     assertEquals(parse("180"), someClock(180, 0))
     assertEquals(parse("240"), someClock(4, 0))
 
+    assertEquals(parse("120 min / 40 moves + 30 min"), None)
+
     // we're not there yet
     // assertEquals(parse("90 min / 40 moves + 30 min + 30 sec / move"), ???)

@@ -2,8 +2,9 @@ package chess
 
 import alleycats.Zero
 import cats.kernel.Monoid
-import scala.concurrent.duration.*
 import scalalib.model.Seconds
+
+import scala.concurrent.duration.*
 
 // maximum centis = Int.MaxValue / 100 / 60 / 60 / 24 = 248 days
 opaque type Centis = Int

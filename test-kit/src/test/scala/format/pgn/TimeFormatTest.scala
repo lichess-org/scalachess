@@ -1,8 +1,8 @@
 package chess
 package format.pgn
 
-import scalalib.time.*
 import scalalib.model.Seconds
+import scalalib.time.*
 
 class TimeFormatTest extends ChessTest:
 

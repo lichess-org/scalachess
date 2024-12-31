@@ -3,6 +3,7 @@ package format.pgn
 
 import cats.syntax.all.*
 import monocle.syntax.all.*
+import scalalib.model.Seconds
 
 type PgnTree = Node[Move]
 
@@ -56,17 +57,17 @@ case class Move(
     glyphs: Glyphs = Glyphs.empty,
     opening: Option[String] = None,
     result: Option[String] = None,
-    secondsLeft: Option[Int] = None, // %clk clock in seconds for the move player, after the move
-    moveTime: Option[Int] = None,    // %emt estimated move time in seconds
+    timeLeft: Option[Seconds] = None, // %clk clock in seconds for the move player, after the move
+    moveTime: Option[Seconds] = None, // %emt estimated move time in seconds
     variationComments: List[Comment] = Nil
 ):
 
   private def clockString: Option[String] = List(
-    secondsLeft.map(seconds => "[%clk " + Move.formatPgnSeconds(seconds) + "]"),
+    timeLeft.map(seconds => "[%clk " + Move.formatPgnSeconds(seconds) + "]"),
     moveTime.map(seconds => "[%emt " + Move.formatPgnSeconds(seconds) + "]")
   ).flatten.some.filter(_.nonEmpty).map(_.mkString(" "))
 
-  def hasComment = comments.nonEmpty || secondsLeft.isDefined || moveTime.isDefined
+  def hasComment = comments.nonEmpty || timeLeft.isDefined || moveTime.isDefined
 
   private def nonEmpty = hasComment || opening.isDefined || result.isDefined
 
@@ -99,6 +100,6 @@ object Move:
   private def noDoubleLineBreak(txt: String) =
     noDoubleLineBreakRegex.replaceAllIn(txt, "\n")
 
-  def formatPgnSeconds(t: Int): String =
-    val d = java.time.Duration.ofSeconds(t)
+  def formatPgnSeconds(t: Seconds): String =
+    val d = java.time.Duration.ofSeconds(t.value)
     f"${d.toHours}:${d.toMinutesPart}%02d:${d.toSecondsPart}%02d"

@@ -1,7 +1,7 @@
 package chess.rating
 package glicko
 
-import chess.{ Black, ByColor, Outcome, White }
+import chess.{ ByColor, Outcome }
 
 import java.time.Instant
 import scala.util.Try
@@ -39,10 +39,7 @@ final class GlickoCalculator(
     import impl.*
 
     def toGameResult(ratings: ByColor[Rating], outcome: Outcome): GameResult =
-      outcome.winner match
-        case None        => GameResult(ratings.white, ratings.black, true)
-        case Some(White) => GameResult(ratings.white, ratings.black, false)
-        case Some(Black) => GameResult(ratings.black, ratings.white, false)
+      GameResult(ratings.white, ratings.black, outcome)
 
     def toRating(player: Player) = impl.Rating(
       rating = player.rating,

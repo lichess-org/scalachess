@@ -2,7 +2,7 @@ package chess.rating.glicko
 package impl
 
 import cats.syntax.all.*
-import chess.{ Black, Outcome, White }
+import chess.Outcome
 import munit.ScalaCheckSuite
 
 class RatingCalculatorTest extends ScalaCheckSuite with chess.MunitExtensions:
@@ -15,10 +15,7 @@ class RatingCalculatorTest extends ScalaCheckSuite with chess.MunitExtensions:
   def updateRatings(wRating: Rating, bRating: Rating, outcome: Outcome) =
     val results = GameRatingPeriodResults:
       List:
-        outcome.winner match
-          case None        => GameResult(wRating, bRating, true)
-          case Some(White) => GameResult(wRating, bRating, false)
-          case Some(Black) => GameResult(bRating, wRating, false)
+        GameResult(wRating, bRating, outcome)
     calculator.updateRatings(results, true)
 
   def defaultRating = Rating(

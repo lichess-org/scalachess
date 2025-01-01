@@ -24,7 +24,7 @@ class GlickoCalculatorWithColorAdvantageTest extends ScalaCheckSuite with chess.
     calc.computeGame(Game(players, outcome), skipDeviationIncrease = true).get.toPair
 
   def computeGameWithAdvantage(players: ByColor[Player], outcome: Outcome) =
-    calc.computeGame(Game(players, outcome), skipDeviationIncrease = true).get.toPair
+    calcWithAdvantage.computeGame(Game(players, outcome), skipDeviationIncrease = true).get.toPair
 
   {
     val players = ByColor.fill:

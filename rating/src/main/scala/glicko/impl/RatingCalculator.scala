@@ -170,13 +170,17 @@ final private[glicko] class RatingCalculator(
     for result <- results do
       v = v + ((Math.pow(g(result.getOpponent(player).getGlicko2RatingDeviation), 2))
         * E(
-          player.getGlicko2Rating,
-          result.getOpponent(player).getGlicko2Rating,
+          player.getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, player)),
+          result
+            .getOpponent(player)
+            .getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, result.getOpponent(player))),
           result.getOpponent(player).getGlicko2RatingDeviation
         )
         * (1.0 - E(
-          player.getGlicko2Rating,
-          result.getOpponent(player).getGlicko2Rating,
+          player.getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, player)),
+          result
+            .getOpponent(player)
+            .getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, result.getOpponent(player))),
           result.getOpponent(player).getGlicko2RatingDeviation
         )))
     1 / v
@@ -197,8 +201,10 @@ final private[glicko] class RatingCalculator(
       outcomeBasedRating = outcomeBasedRating
         + (g(result.getOpponent(player).getGlicko2RatingDeviation)
           * (result.getScore(player) - E(
-            player.getGlicko2Rating,
-            result.getOpponent(player).getGlicko2Rating,
+            player.getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, player)),
+            result
+              .getOpponent(player)
+              .getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, result.getOpponent(player))),
             result.getOpponent(player).getGlicko2RatingDeviation
           )))
     outcomeBasedRating

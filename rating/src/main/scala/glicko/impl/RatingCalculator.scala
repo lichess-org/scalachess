@@ -36,10 +36,10 @@ final private[glicko] class RatingCalculator(
 
   private val ratingPeriodsPerMilli: Double = ratingPeriodsPerDay.value * DAYS_PER_MILLI
 
-  /** <p>Run through all players within a resultset and calculate their new ratings.</p> <p>Players within the
-    * resultset who did not compete during the rating period will have see their deviation increase (in line
-    * with Prof Glickman's paper).</p> <p>Note that this method will clear the results held in the association
-    * resultset.</p>
+  /** Run through all players within a resultset and calculate their new ratings.
+    * Players within the resultset who did not compete during the rating period
+    * will have see their deviation increase (in line with Prof Glickman's paper).
+    * Note that this method will clear the results held in the association resultset.
     *
     * @param results
     */
@@ -168,20 +168,17 @@ final private[glicko] class RatingCalculator(
   private def vOf(player: Rating, results: List[Result]) =
     var v = 0.0d
     for result <- results do
-      v = v + ((Math.pow(g(result.getOpponent(player).getGlicko2RatingDeviation), 2))
+      val opponent = result.getOpponent(player)
+      v = v + ((Math.pow(g(opponent.getGlicko2RatingDeviation), 2))
         * E(
           player.getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, player)),
-          result
-            .getOpponent(player)
-            .getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, result.getOpponent(player))),
-          result.getOpponent(player).getGlicko2RatingDeviation
+          opponent.getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, opponent)),
+          opponent.getGlicko2RatingDeviation
         )
         * (1.0 - E(
           player.getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, player)),
-          result
-            .getOpponent(player)
-            .getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, result.getOpponent(player))),
-          result.getOpponent(player).getGlicko2RatingDeviation
+          opponent.getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, opponent)),
+          opponent.getGlicko2RatingDeviation
         )))
     1 / v
 
@@ -198,14 +195,13 @@ final private[glicko] class RatingCalculator(
   private def outcomeBasedRating(player: Rating, results: List[Result]) =
     var outcomeBasedRating = 0d
     for result <- results do
+      val opponent = result.getOpponent(player)
       outcomeBasedRating = outcomeBasedRating
-        + (g(result.getOpponent(player).getGlicko2RatingDeviation)
+        + (g(opponent.getGlicko2RatingDeviation)
           * (result.getScore(player) - E(
             player.getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, player)),
-            result
-              .getOpponent(player)
-              .getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, result.getOpponent(player))),
-            result.getOpponent(player).getGlicko2RatingDeviation
+            opponent.getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, opponent)),
+            opponent.getGlicko2RatingDeviation
           )))
     outcomeBasedRating
 

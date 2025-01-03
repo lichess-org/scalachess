@@ -20,11 +20,19 @@ class GlickoCalculatorWithColorAdvantageTest extends ScalaCheckSuite with chess.
     colorAdvantage = ColorAdvantage.standard
   )
 
+  val calcWithMoreAdvantage = GlickoCalculator(
+    ratingPeriodsPerDay = RatingPeriodsPerDay(0.21436d),
+    colorAdvantage = ColorAdvantage.crazyhouse
+  )
+
   def computeGame(players: ByColor[Player], outcome: Outcome) =
     calc.computeGame(Game(players, outcome), skipDeviationIncrease = true).get.toPair
 
   def computeGameWithAdvantage(players: ByColor[Player], outcome: Outcome) =
     calcWithAdvantage.computeGame(Game(players, outcome), skipDeviationIncrease = true).get.toPair
+
+  def computeGameWithMoreAdvantage(players: ByColor[Player], outcome: Outcome) =
+    calcWithMoreAdvantage.computeGame(Game(players, outcome), skipDeviationIncrease = true).get.toPair
 
   {
     val players = ByColor.fill:
@@ -34,18 +42,27 @@ class GlickoCalculatorWithColorAdvantageTest extends ScalaCheckSuite with chess.
     test("default deviation: white wins"):
       val (w1, b1) = computeGame(players, Outcome.white)
       val (w2, b2) = computeGameWithAdvantage(players, Outcome.white)
+      val (w3, b3) = computeGameWithMoreAdvantage(players, Outcome.white)
       assert(w1.rating > w2.rating)
       assert(b1.rating < b2.rating)
+      assert(w2.rating > w3.rating)
+      assert(b2.rating < b3.rating)
     test("default deviation: black wins"):
       val (w1, b1) = computeGame(players, Outcome.black)
       val (w2, b2) = computeGameWithAdvantage(players, Outcome.black)
+      val (w3, b3) = computeGameWithMoreAdvantage(players, Outcome.black)
       assert(w1.rating > w2.rating)
       assert(b1.rating < b2.rating)
+      assert(w2.rating > w3.rating)
+      assert(b2.rating < b3.rating)
     test("default deviation: draw"):
       val (w1, b1) = computeGame(players, Outcome.draw)
       val (w2, b2) = computeGameWithAdvantage(players, Outcome.draw)
+      val (w3, b3) = computeGameWithMoreAdvantage(players, Outcome.draw)
       assert(w1.rating > w2.rating)
       assert(b1.rating < b2.rating)
+      assert(w2.rating > w3.rating)
+      assert(b2.rating < b3.rating)
   }
 
   {
@@ -64,18 +81,27 @@ class GlickoCalculatorWithColorAdvantageTest extends ScalaCheckSuite with chess.
     test("mixed ratings and deviations: white wins"):
       val (w1, b1) = computeGame(players, Outcome.white)
       val (w2, b2) = computeGameWithAdvantage(players, Outcome.white)
+      val (w3, b3) = computeGameWithMoreAdvantage(players, Outcome.white)
       assert(w1.rating > w2.rating)
       assert(b1.rating < b2.rating)
+      assert(w2.rating > w3.rating)
+      assert(b2.rating < b3.rating)
     test("mixed ratings and deviations: black wins"):
       val (w1, b1) = computeGame(players, Outcome.black)
       val (w2, b2) = computeGameWithAdvantage(players, Outcome.black)
+      val (w3, b3) = computeGameWithMoreAdvantage(players, Outcome.black)
       assert(w1.rating > w2.rating)
       assert(b1.rating < b2.rating)
+      assert(w2.rating > w3.rating)
+      assert(b2.rating < b3.rating)
     test("mixed ratings and deviations: draw"):
       val (w1, b1) = computeGame(players, Outcome.draw)
       val (w2, b2) = computeGameWithAdvantage(players, Outcome.draw)
+      val (w3, b3) = computeGameWithMoreAdvantage(players, Outcome.draw)
       assert(w1.rating > w2.rating)
       assert(b1.rating < b2.rating)
+      assert(w2.rating > w3.rating)
+      assert(b2.rating < b3.rating)
   }
 
   {
@@ -94,16 +120,25 @@ class GlickoCalculatorWithColorAdvantageTest extends ScalaCheckSuite with chess.
     test("more mixed ratings and deviations: white wins"):
       val (w1, b1) = computeGame(players, Outcome.white)
       val (w2, b2) = computeGameWithAdvantage(players, Outcome.white)
+      val (w3, b3) = computeGameWithMoreAdvantage(players, Outcome.white)
       assert(w1.rating > w2.rating)
       assert(b1.rating < b2.rating)
+      assert(w2.rating > w3.rating)
+      assert(b2.rating < b3.rating)
     test("more mixed ratings and deviations: black wins"):
       val (w1, b1) = computeGame(players, Outcome.black)
       val (w2, b2) = computeGameWithAdvantage(players, Outcome.black)
+      val (w3, b3) = computeGameWithMoreAdvantage(players, Outcome.black)
       assert(w1.rating > w2.rating)
       assert(b1.rating < b2.rating)
+      assert(w2.rating > w3.rating)
+      assert(b2.rating < b3.rating)
     test("more mixed ratings and deviations: draw"):
       val (w1, b1) = computeGame(players, Outcome.draw)
       val (w2, b2) = computeGameWithAdvantage(players, Outcome.draw)
+      val (w3, b3) = computeGameWithMoreAdvantage(players, Outcome.draw)
       assert(w1.rating > w2.rating)
       assert(b1.rating < b2.rating)
+      assert(w2.rating > w3.rating)
+      assert(b2.rating < b3.rating)
   }

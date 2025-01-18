@@ -80,12 +80,12 @@ case class Clock(
         )
       case Some(t) =>
         val elapsed = toNow(t)
-        val lag     = ~metrics.reportedLag(elapsed) nonNeg
+        val lag     = ~metrics.reportedLag(elapsed).nonNeg
 
         val player              = players(color)
         val (lagComp, lagTrack) = player.lag.onMove(lag)
 
-        val moveTime = (elapsed - lagComp) nonNeg
+        val moveTime = (elapsed - lagComp).nonNeg
 
         val clockActive = gameActive && moveTime < player.remaining
         val inc         = clockActive.so(player.increment)

@@ -24,6 +24,9 @@ jobs:
           java-version: 21
           cache: sbt
 
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
+        
       - name: Test
         run: sbt testKit/test
 
@@ -44,6 +47,9 @@ jobs:
           java-version: 21
           cache: sbt
 
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
+        
       - name: compile
         run: sbt compile
 
@@ -63,5 +69,8 @@ jobs:
           java-version: 21
           cache: sbt
 
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
+        
       - name: Check Formatting
         run: sbt check

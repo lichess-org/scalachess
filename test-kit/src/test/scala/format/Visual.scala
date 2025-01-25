@@ -27,8 +27,8 @@ object Visual:
         (c, x) <- l.zipWithIndex
         role   <- Role.forsyth(c.toLower)
       yield Square.at(x, 7 - y).map { square =>
-        square -> (Color.fromWhite(c isUpper) - role)
-      }) flatten,
+        square -> (Color.fromWhite(c.isUpper) - role)
+      }).flatten,
       variant = chess.variant.Variant.default
     )
     b.withHistory(History(unmovedRooks = UnmovedRooks.from(b)))
@@ -44,8 +44,8 @@ object Visual:
     for (y <- Rank.allReversed) yield {
       for (x <- File.all) yield
         val square = Square(x, y)
-        markedPoss.get(square).getOrElse(board(square).fold(' ')(_ forsyth))
-    } mkString
+        markedPoss.get(square).getOrElse(board(square).fold(' ')(_.forsyth))
+    }.mkString
   }.map { """\s*$""".r.replaceFirstIn(_, "") }.mkString("\n")
 
   def addNewLines(str: String) = "\n" + str + "\n"

@@ -11,10 +11,7 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
   import BinaryFen.implementation.*
 
   def read: Situation.AndFullMoveNumber =
-    val reader = new Iterator[Byte]:
-      val inner                            = value.iterator
-      override inline def hasNext: Boolean = inner.hasNext
-      override inline def next: Byte       = if hasNext then inner.next else 0.toByte
+    val reader = ByteIterator(value)
 
     val occupied = Bitboard(readLong(reader))
 
@@ -260,6 +257,23 @@ object BinaryFen:
 
   object implementation:
 
+    // specialized simply iterator
+    type ByteIterator = IteratorOfByte
+    object ByteIterator:
+      inline def apply(inline ary: Array[Byte]): ByteIterator = IteratorOfByte(ary)
+      extension (inline ary: Array[Byte]) inline def iterator = apply(ary)
+
+    class IteratorOfByte(ary: Array[Byte]):
+      val len     = ary.length
+      var idx     = 0
+      def hasNext = idx < len
+      def next: Byte =
+        if idx >= len then 0.toByte
+        else
+          val b = ary(idx)
+          idx += 1
+          b
+
     def writeLong(builder: ArrayBuilder[Byte], v: Long) =
       builder.addOne((v >>> 56).toByte)
       builder.addOne((v >>> 48).toByte)
@@ -270,7 +284,7 @@ object BinaryFen:
       builder.addOne((v >>> 8).toByte)
       builder.addOne(v.toByte)
 
-    def readLong(reader: Iterator[Byte]): Long =
+    def readLong(reader: ByteIterator): Long =
       ((reader.next & 0xffL) << 56) |
         ((reader.next & 0xffL) << 48) |
         ((reader.next & 0xffL) << 40) |
@@ -288,7 +302,7 @@ object BinaryFen:
         n = n >>> 7
       builder.addOne(n.toByte)
 
-    def readLeb128(reader: Iterator[Byte]): Int =
+    def readLeb128(reader: ByteIterator): Int =
       var n     = 0
       var shift = 0
       while
@@ -302,7 +316,7 @@ object BinaryFen:
     def writeNibbles(builder: ArrayBuilder[Byte], lo: Int, hi: Int) =
       builder.addOne((lo | (hi << 4)).toByte)
 
-    def readNibbles(reader: Iterator[Byte]): (Int, Int) =
+    def readNibbles(reader: ByteIterator): (Int, Int) =
       val b = reader.next
       ((b & 0xf), (b >>> 4) & 0xf)
 

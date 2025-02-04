@@ -9,6 +9,8 @@ import org.scalacheck.Prop.forAll
 
 import scala.collection.mutable.ArrayBuilder
 
+import BinaryFen.implementation.ByteIterator.*
+
 class BinaryFenTest extends ScalaCheckSuite:
   test("long roundtrip"):
     forAll: (v: Long) =>

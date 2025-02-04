@@ -1,7 +1,7 @@
 package chess
 
 import chess.format.pgn.SanStr
-import chess.format.{ Fen, Uci, pgn }
+import chess.format.{ Fen, Uci }
 
 case class Game(
     situation: Situation,

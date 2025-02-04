@@ -2,7 +2,6 @@ package chess
 
 import cats.laws.discipline.{ ApplicativeTests, FunctorTests, TraverseTests }
 import munit.DisciplineSuite
-import org.scalacheck.*
 
 import CoreArbitraries.given
 

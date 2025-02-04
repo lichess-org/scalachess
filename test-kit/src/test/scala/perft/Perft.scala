@@ -2,7 +2,7 @@ package chess
 package perft
 
 import chess.format.{ Fen, FullFen }
-import chess.variant.{ Chess960, Crazyhouse, Variant }
+import chess.variant.{ Crazyhouse, Variant }
 
 import MoveOrDrop.*
 

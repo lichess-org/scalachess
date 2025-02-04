@@ -2,7 +2,7 @@ package chess
 
 import cats.syntax.all.*
 import chess.format.Uci
-import chess.variant.{ Antichess, Crazyhouse, Standard }
+import chess.variant.{ Antichess, Crazyhouse }
 
 import bitboard.Bitboard
 import bitboard.Bitboard.*

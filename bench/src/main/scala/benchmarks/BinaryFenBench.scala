@@ -50,14 +50,43 @@ class BinaryFenBench:
     )
   )
 
-  @Benchmark
-  def read(bh: Blackhole) =
-    Blackhole.consumeCPU(Work)
-    bh.consume(binary.read)
+  import chess.variant.*
+  import chess.{ Mode as _, * }
+  import chess.format.FullFen
+  import chess.perft.Perft
+  import chess.format.Fen
 
-  private val situation = Situation.AndFullMoveNumber(Situation(Standard), FullMoveNumber(1))
+  @Param(Array("10", "100", "1000"))
+  var games: Int                              = scala.compiletime.uninitialized
+  var sits: List[Situation.AndFullMoveNumber] = scala.compiletime.uninitialized
+  var fens: List[BinaryFen]                   = scala.compiletime.uninitialized
+
+  @Setup
+  def setup(): Unit =
+    sits = makeSituations(Perft.randomPerfts, games)
+    fens = sits.map(BinaryFen.write)
+
+  private def makeSituations(perfts: List[Perft], games: Int): List[Situation.AndFullMoveNumber] =
+    perfts
+      .take(games)
+      .flatMap(x => Fen.read(Chess960, x.epd))
+      .map(Situation.AndFullMoveNumber(_, FullMoveNumber(1)))
 
   @Benchmark
   def write(bh: Blackhole) =
-    Blackhole.consumeCPU(Work)
-    bh.consume(BinaryFen.write(situation))
+    val games = this.sits
+    var i     = 0
+    while i < games.size do
+      val game = games(i)
+      Blackhole.consumeCPU(Work)
+      bh.consume(BinaryFen.write(game))
+
+  @Benchmark
+  def read(bh: Blackhole) =
+    val games = this.fens
+    var i     = 0
+    while i < games.size do
+      val fen = games(i)
+      Blackhole.consumeCPU(Work)
+      bh.consume(fen.read)
+      i += 1

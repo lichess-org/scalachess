@@ -31,9 +31,10 @@ case class Tags(value: List[Tag]) extends AnyVal:
     value.find(_.name == name).map(_.value)
 
   def timeControl: Option[TournamentClock] =
+    val strict = exists(_.GameId) // lichess games use proper PGN specification
     value
       .collectFirst { case Tag(Tag.TimeControl, str) => str }
-      .flatMap(TournamentClock.parse.apply)
+      .flatMap(TournamentClock.parse(strict))
 
   def variant: Option[chess.variant.Variant] =
     apply(_.Variant)

@@ -4,7 +4,8 @@ import Clock.*
 
 class TournamentClockTest extends ChessTest:
 
-  import TournamentClock.parse
+  val parse       = TournamentClock.parse(false)
+  val parseStrict = TournamentClock.parse(true)
 
   def someClock(seconds: Int, inc: Int) = Some:
     TournamentClock(LimitSeconds(seconds), IncrementSeconds(inc))
@@ -22,6 +23,10 @@ class TournamentClockTest extends ChessTest:
     assertEquals(parse("3+2"), someClock(3 * 60, 2))
     assertEquals(parse("60+30"), someClock(60 * 60, 30))
     assertEquals(parse("180+30"), someClock(180 * 60, 30))
+
+  test("parse strict"):
+    assertEquals(parseStrict("60+0"), someClock(60, 0))
+    assertEquals(parseStrict("120+1"), someClock(120, 2))
 
   test("parse weird shit"):
     assertEquals(parse("15m + 10s"), someClock(15 * 60, 10))

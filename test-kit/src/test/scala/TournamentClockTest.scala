@@ -26,7 +26,7 @@ class TournamentClockTest extends ChessTest:
 
   test("parse strict"):
     assertEquals(parseStrict("60+0"), someClock(60, 0))
-    assertEquals(parseStrict("120+1"), someClock(120, 2))
+    assertEquals(parseStrict("120+1"), someClock(120, 1))
 
   test("parse weird shit"):
     assertEquals(parse("15m + 10s"), someClock(15 * 60, 10))

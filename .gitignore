@@ -9,6 +9,7 @@ target
 /.settings/
 
 .idea
+.vscode
 .bsp
 .bloop/
 .metals/

@@ -82,16 +82,9 @@ class PerftBench:
     perfts.take(games).map(_.withLimit(nodes))
 
   private def bench(perfts: List[Perft], variant: Variant)(bh: Blackhole) =
-    val x = perfts.map:
+    var i = 0
+    while i < perfts.size do
+      val game = perfts(i)
       Blackhole.consumeCPU(Work)
-      _.calculate(variant)
-    bh.consume(x)
-    x
-
-  extension (perft: Perft)
-    def bench(variant: Variant): List[Result] =
-      var situation = Fen.read(variant, perft.epd).get
-      perft.cases.map: c =>
-        import Perft.*
-        Blackhole.consumeCPU(Work)
-        Result(c.depth, situation.perft(c.depth), c.result)
+      bh.consume(game.calculate(variant))
+      i += 1

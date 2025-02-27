@@ -9,7 +9,7 @@ type PgnTree = Node[Move]
 
 object PgnTree:
   extension (tree: PgnTree)
-    def render(ply: Ply) =
+    def render(ply: Ply): String =
       import PgnNodeEncoder.*
       val builder = new StringBuilder
       tree.appendPgnStr(builder, ply)
@@ -17,17 +17,18 @@ object PgnTree:
 
 case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree], startPly: Ply):
 
-  def render: PgnStr = PgnStr:
-    toString
+  def render: PgnStr = PgnStr(toString)
 
   override def toString: String =
     import PgnNodeEncoder.*
     val builder = new StringBuilder
 
-    if tags.value.nonEmpty then builder.append(tags).addOne('\n').addOne('\n')
-    if initial.comments.nonEmpty then builder.append(initial.comments.mkString("{ ", " } { ", " }\n"))
+    if tags.value.nonEmpty then builder.append(tags).append("\n\n")
+    if initial.comments.nonEmpty then 
+      builder.append(initial.comments.mkString("{ ", " } { ", " }\n"))
+
     tree.foreach(_.appendPgnStr(builder, startPly))
-    tags(_.Result).foreach(x => builder.addOne(' ').append(x))
+    tags(_.Result).foreach(x => builder.append(" ").append(x))
 
     builder.toString
 
@@ -42,14 +43,13 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree], star
 
   def moves: List[Move] = tree.fold(Nil)(_.mainlineValues)
 
-  def withEvent(title: String) =
+  def withEvent(title: String): Pgn =
     copy(tags = tags + Tag(_.Event, title))
 
-private def glyphs(id: Int) =
+private def glyphs(id: Int): Glyphs =
   Glyph
     .find(id)
-    .fold(Glyphs.empty): g =>
-      Glyphs.fromList(List(g))
+    .fold(Glyphs.empty)(g => Glyphs.fromList(List(g)))
 
 case class Move(
     san: SanStr,
@@ -57,25 +57,27 @@ case class Move(
     glyphs: Glyphs = Glyphs.empty,
     opening: Option[String] = None,
     result: Option[String] = None,
-    timeLeft: Option[Seconds] = None, // %clk clock in seconds for the move player, after the move
-    moveTime: Option[Seconds] = None, // %emt estimated move time in seconds
+    timeLeft: Option[Seconds] = None,
+    moveTime: Option[Seconds] = None,
     variationComments: List[Comment] = Nil
 ):
 
-  private def clockString: Option[String] = List(
-    timeLeft.map(seconds => "[%clk " + Move.formatPgnSeconds(seconds) + "]"),
-    moveTime.map(seconds => "[%emt " + Move.formatPgnSeconds(seconds) + "]")
-  ).flatten.some.filter(_.nonEmpty).map(_.mkString(" "))
+  private def clockString: Option[String] =
+    List(
+      timeLeft.map(seconds => s"[%clk ${Move.formatPgnSeconds(seconds)}]"),
+      moveTime.map(seconds => s"[%emt ${Move.formatPgnSeconds(seconds)}]")
+    ).flatten.some.filter(_.nonEmpty).map(_.mkString(" "))
 
-  def hasComment = comments.nonEmpty || timeLeft.isDefined || moveTime.isDefined
+  def hasComment: Boolean = comments.nonEmpty || timeLeft.isDefined || moveTime.isDefined
 
-  private def nonEmpty = hasComment || opening.isDefined || result.isDefined
+  private def nonEmpty: Boolean = hasComment || opening.isDefined || result.isDefined
 
   private def appendSanStr(builder: StringBuilder): Unit =
     builder.append(san.value)
-    glyphs.toList.foreach:
+    glyphs.toList.foreach {
       case glyph if glyph.id <= 6 => builder.append(glyph.symbol)
-      case glyph                  => builder.append(" $").append(glyph.id)
+      case glyph                  => builder.append(s" $${glyph.id}")
+    }
     if nonEmpty then
       List(clockString, opening, result).flatten
         .:::(comments.map(_.map(Move.noDoubleLineBreak)))
@@ -90,14 +92,14 @@ object Move:
 
   given PgnNodeEncoder[Move] with
     extension (m: Move)
-      def appendSanStr(builder: StringBuilder) = m.appendSanStr(builder)
-      def appendVariationComment(builder: StringBuilder) =
+      def appendSanStr(builder: StringBuilder): Unit = m.appendSanStr(builder)
+      def appendVariationComment(builder: StringBuilder): Unit =
         m.variationComments.foreach(x => builder.append(" { ").append(x.value).append(" }"))
-      def hasComment = m.hasComment
+      def hasComment: Boolean = m.hasComment
 
   private val noDoubleLineBreakRegex = "(\r?\n){2,}".r
 
-  private def noDoubleLineBreak(txt: String) =
+  private def noDoubleLineBreak(txt: String): String =
     noDoubleLineBreakRegex.replaceAllIn(txt, "\n")
 
   def formatPgnSeconds(t: Seconds): String =

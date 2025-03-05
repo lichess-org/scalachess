@@ -39,7 +39,7 @@ lazy val scalachess: Project = Project("scalachess", file("core")).settings(
     "org.typelevel" %% "alleycats-core" % "2.13.0",
     "org.typelevel" %% "cats-parse"     % "1.1.0",
     "dev.optics"    %% "monocle-core"   % "3.3.0",
-    "org.typelevel" %% "kittens"        % "3.4.0"
+    "org.typelevel" %% "kittens"        % "3.5.0"
   ),
   resolvers += "lila-maven".at("https://raw.githubusercontent.com/ornicar/lila-maven/master")
 )

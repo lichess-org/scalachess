@@ -34,7 +34,7 @@ object Bitboard:
   extension (s: Square)
 
     def bishopAttacks(occupied: Bitboard): Bitboard =
-      ATTACKS(Magic.BISHOP(s.value).bitshopIndex(occupied))
+      ATTACKS(Magic.BISHOP(s.value).bishopIndex(occupied))
 
     def rookAttacks(occupied: Bitboard): Bitboard =
       ATTACKS(Magic.ROOK(s.value).rookIndex(occupied))

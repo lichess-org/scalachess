@@ -153,6 +153,10 @@ final case class Node[A](
   lazy val mainline: List[Node[A]] =
     mainlineReverse.reverse
 
+  /*
+   * Return all nodes in the mainline but in reverse order
+   * Could be useful as a building block for other operations
+   */
   final def mainlineReverse: List[Node[A]] =
     @tailrec
     def loop(tree: Node[A], acc: List[Node[A]]): List[Node[A]] =
@@ -176,8 +180,10 @@ final case class Node[A](
           case Some(child) => loop(n - 1, child, node.withoutChild :: acc)
     Option.when(n > 0)(Tree.buildReverse(loop(n, this, Nil)).getOrElse(this))
 
-  // take nodes while mainline nodes satisfy the predicate
-  // keep all variations
+  /**
+   *  take nodes while mainline nodes satisfy the predicate
+    * keep all variations
+    */
   def takeMainlineWhile(f: A => Boolean): Option[Node[A]] =
     @tailrec
     def loop(node: Node[A], acc: List[Node[A]]): List[Node[A]] =
@@ -188,7 +194,7 @@ final case class Node[A](
           case Some(child) => loop(child, node.withoutChild :: acc)
     Tree.buildReverse(loop(this, Nil))
 
-  // get the nth node of in the mainline
+  /** get the nth node of in the mainline */
   def apply(n: Int): Option[Node[A]] =
     @tailrec
     def loop(tree: Option[Node[A]], n: Int): Option[Node[A]] =

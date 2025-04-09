@@ -36,7 +36,7 @@ case class PgnNodeData(
 type ParsedPgnTree = Node[PgnNodeData]
 
 case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[ParsedPgnTree]):
-  def mainline = tree.fold(List.empty[San])(_.mainline.map(_.value.san))
+  def mainline: List[San] = tree.fold(List.empty[San])(_.mainline.map(_.value.san))
 
   def toPgn: Pgn =
     val sitWithMove = initContext(tags)

@@ -348,6 +348,9 @@ final case class Node[A](
     if predicate(value) then f(this).some
     else child.flatMap(_.modifyInMainline(predicate, f)).map(c => withChild(c.some))
 
+  def modifyInMainline(f: A => A): Node[A] =
+    copy(value = f(value), child = child.map(_.modifyInMainline(f)))
+
   def modifyInMainlineAt(n: Int, f: Node[A] => Node[A]): Option[Node[A]] =
     if n < 0 || n >= mainline.size then none
     else if n == 0 then f(this).some

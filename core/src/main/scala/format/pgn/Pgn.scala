@@ -67,7 +67,7 @@ case class Move(
     moveTime.map(seconds => "[%emt " + Move.formatPgnSeconds(seconds) + "]")
   ).flatten.some.filter(_.nonEmpty).map(_.mkString(" "))
 
-  def hasComment = comments.nonEmpty || timeLeft.isDefined || moveTime.isDefined
+  def hasComment: Boolean = comments.nonEmpty || timeLeft.isDefined || moveTime.isDefined
 
   private def nonEmpty = hasComment || opening.isDefined || result.isDefined
 

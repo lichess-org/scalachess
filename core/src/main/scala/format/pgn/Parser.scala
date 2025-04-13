@@ -19,12 +19,11 @@ object Parser:
     pgnParser.parse(pgn.value, "Cannot parse pgn")
 
   /**
-    * Parse the mainline of a PGN file.
-    * ignoring variations
+    * Parse the mainline of a PGN file ignoring variations
     *
     */
   def mainline(pgn: PgnStr): Either[ErrorStr, ParsedMainline] =
-    mainlineParser.parse(pgn.value, "Cannot parse pgn")
+    pgnMainlineParser.parse(pgn.value, "Cannot parse pgn")
 
   def moves(strMoves: Iterable[SanStr]): Either[ErrorStr, Sans] =
     strMoves.toList.traverse(sanOnly).map(Sans(_))
@@ -76,15 +75,20 @@ object Parser:
   private val preMoveEscape    = ((number.backtrack | comment).rep0 ~ forbidNullMove).void
   private val moveAndMetas     = SanParser.san ~ SanParser.metas
   private val postMoveEscape   = moveExtras.rep0.void <* escape
-  private val escapeVariations = (P.char('(').endWith(P.char(')'))).void.rep0.void
+  private val escapeVariations = (P.char('(').endWith(P.char(')')).void ~ escape).void.rep0.void
 
   private val sanOnly: P[San] =
     preMoveEscape.with1 *> SanParser.san <* (SanParser.metas.void ~ escapeVariations ~ postMoveEscape.void)
 
   private val sanAndMetasOnly: P[SanWithMetas] =
-    preMoveEscape.with1 *> (SanParser.san ~ SanParser.metas).map(
-      SanWithMetas.apply
-    ) <* (escapeVariations ~ postMoveEscape.void)
+    P.recursive[SanWithMetas] { recuse =>
+
+      val variation: P[Unit] =
+        (P.char('(') *> comment.rep0.surroundedBy(escape) *> recuse.rep0 *> P.char(')') *> escape).void
+
+      (preMoveEscape.with1 *> (moveAndMetas <* variation.rep0) <* postMoveEscape)
+        .map(SanWithMetas.apply)
+    }
 
   private val moveParser: P[Node[PgnNodeData]] =
     P.recursive[Node[PgnNodeData]] { recuse =>
@@ -224,8 +228,11 @@ object Parser:
           val tags = result.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
           ParsedMainline(tags, sans)
 
-  private val pgnParser: P0[ParsedPgn] =
-    escape *> P.string("[pgn]").? *> tagsAndMovesParser <* P.string("[/pgn]").? <* escape
+  def escapePgnTag[A](p: P0[A]): P0[A] =
+    escape *> P.string("[pgn]").? *> p <* P.string("[/pgn]").? <* escape
+
+  private val pgnParser: P0[ParsedPgn]              = escapePgnTag(tagsAndMovesParser)
+  private val pgnMainlineParser: P0[ParsedMainline] = escapePgnTag(mainlineParser)
 
   extension [A](p: P0[A])
     def parse(str: String, context: String): Either[ErrorStr, A] =

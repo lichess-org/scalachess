@@ -9,11 +9,11 @@ import cats.syntax.all.*
 object Parser:
 
   // https://unicode-explorer.com/c/00A0
-  val nbsp       = P.char('\u00A0')
-  val whitespace = R.cr | R.lf | R.wsp | nbsp | P.char('\uFEFF')
-  val pgnComment = P.caret.filter(_.col == 0) *> P.char('%') *> P.until(P.char('\n')).void
+  private val nbsp       = P.char('\u00A0')
+  private val whitespace = R.cr | R.lf | R.wsp | nbsp | P.char('\uFEFF')
+  private val pgnComment = P.caret.filter(_.col == 0) *> P.char('%') *> P.until(P.char('\n')).void
   // pgnComment with % or whitespaces
-  val escape = pgnComment.? *> whitespace.rep0.?
+  private val escape = pgnComment.? *> whitespace.rep0.?
 
   def full(pgn: PgnStr): Either[ErrorStr, ParsedPgn] =
     pgnParser.parse(pgn.value, "Cannot parse pgn")
@@ -22,23 +22,23 @@ object Parser:
     strMoves.toList.traverse(sanOnly).map(Sans(_))
 
   def moves(str: PgnMovesStr): Either[ErrorStr, Option[ParsedPgnTree]] =
-    strMove.rep0
+    moveParser.rep0
       .parse(str.value, "Cannot parse moves")
       .map(Tree.build)
 
   def move(str: SanStr): Either[ErrorStr, ParsedPgnTree] =
-    strMove.parse(str.value, "Cannot parse move")
+    moveParser.parse(str.value, "Cannot parse move")
 
   def sanOnly(str: SanStr): Either[ErrorStr, San] =
     sanOnly.parse(str.value, "Cannot parse move")
 
-  val blockComment  = P.until0(P.char('}')).with1.between(P.char('{'), P.char('}')).map(Comment(_))
-  val inlineComment = P.char(';') *> P.until(R.lf).map(Comment(_))
-  val comment       = (blockComment | inlineComment).withContext("Invalid comment") <* escape
+  private val blockComment  = P.until0(P.char('}')).with1.between(P.char('{'), P.char('}')).map(Comment(_))
+  private val inlineComment = P.char(';') *> P.until(R.lf).map(Comment(_))
+  private val comment       = (blockComment | inlineComment).withContext("Invalid comment") <* escape
 
-  def mapResult(result: String): String = Outcome.fromResult(result).fold(result)(_.toString)
+  private def mapResult(result: String): String = Outcome.fromResult(result).fold(result)(_.toString)
 
-  val result: P[String] = P.stringIn(Outcome.knownResultStrings).map(mapResult)
+  private val result: P[String] = P.stringIn(Outcome.knownResultStrings).map(mapResult)
 
   private val nagGlyphsRE = P.stringIn(Glyph.PositionAssessment.all.map(_.symbol))
 
@@ -57,7 +57,7 @@ object Parser:
   // 10. or 10... but not 0 or 1-0 or 1/2
   private val number = (positiveIntString <* !P.charIn('‑', '–', '-', '/', '½') ~ numberSuffix).string
 
-  val forbidNullMove = P
+  private val forbidNullMove = P
     .stringIn(List("--", "Z0", "null", "pass", "@@@@"))
     .?
     .flatMap(o => o.fold(P.unit)(_ => P.failWith("Null moves are not supported").void))
@@ -65,16 +65,16 @@ object Parser:
   extension (p: P0[Any])
     private def endWith(p1: P[Any]): P[String] = p.with1 *> (p1.string | (P.until(p1) <* p1))
 
-  private val preMoveEscape  = ((number.backtrack | comment).rep0 ~ forbidNullMove).void
-  private val moveAndMetas   = MoveParser.san ~ MoveParser.metas
-  private val postMoveEscape = moveExtras.rep0.void <* escape
+  private val preMoveEscape    = ((number.backtrack | comment).rep0 ~ forbidNullMove).void
+  private val moveAndMetas     = MoveParser.san ~ MoveParser.metas
+  private val postMoveEscape   = moveExtras.rep0.void <* escape
+  private val escapeVariations = (P.char('(').endWith(P.char(')'))).void.rep0.void
 
   private val sanOnly: P[San] =
-    val variation = (P.char('(').endWith(P.char(')'))).void
-    preMoveEscape.with1 *> MoveParser.san <* (MoveParser.metas.void ~ variation.rep0.void ~ postMoveEscape.void)
+    preMoveEscape.with1 *> MoveParser.san <* (MoveParser.metas.void ~ escapeVariations ~ postMoveEscape.void)
 
-  private val strMove: P[ParsedPgnTree] = P
-    .recursive[ParsedPgnTree] { recuse =>
+  private val moveParser: P[Node[PgnNodeData]] =
+    P.recursive[Node[PgnNodeData]] { recuse =>
       // TODO: if a variation only contains comments, we ignore it
       // Will fix it after support null move
       val variation: P[Option[Variation[PgnNodeData]]] =
@@ -92,8 +92,8 @@ object Parser:
           Node(data, None, vs.flatten)
     }
 
-  private val strMoves: P0[(InitialComments, Option[ParsedPgnTree], Option[String])] =
-    ((comment.rep0 ~ strMove.rep0) ~ (result <* escape).? <* comment.rep0).map:
+  private val fullMovesParser: P0[(InitialComments, Option[ParsedPgnTree], Option[String])] =
+    ((comment.rep0 ~ moveParser.rep0) ~ (result <* escape).? <* comment.rep0).map:
       case ((comments, sans), res) =>
         (InitialComments(comments.cleanUp), Tree.build(sans), res)
 
@@ -189,7 +189,7 @@ object Parser:
     val tags: P0[List[Tag]]  = tag.rep0
 
   private val tagsAndMovesParser: P0[ParsedPgn] =
-    (TagParser.tags.surroundedBy(escape) ~ strMoves.?).map: (optionalTags, optionalMoves) =>
+    (TagParser.tags.surroundedBy(escape) ~ fullMovesParser.?).map: (optionalTags, optionalMoves) =>
       val preTags = Tags.sanitize(optionalTags)
       optionalMoves match
         case None => ParsedPgn(InitialComments.empty, preTags, None)

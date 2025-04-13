@@ -30,12 +30,24 @@ class PgnBench:
     pgns = pgnStrs.traverse(Parser.full).toOption.get.map(_.toPgn)
 
   @Benchmark
-  def pgnParser(bh: Blackhole) =
-    val result = pgnStrs.map: x =>
+  def pgnFullParser(bh: Blackhole) =
+    var games = this.pgnStrs
+    var i     = 0
+    while i < games.size do
+      val game = games(i)
       Blackhole.consumeCPU(Work)
-      Parser.full(x)
-    bh.consume(result)
-    result
+      bh.consume(Parser.full(game))
+      i += 1
+
+  @Benchmark
+  def pgnMainlineParser(bh: Blackhole) =
+    var games = this.pgnStrs
+    var i     = 0
+    while i < games.size do
+      val game = games(i)
+      Blackhole.consumeCPU(Work)
+      bh.consume(Parser.mainline(game))
+      i += 1
 
   @Benchmark
   def pgnRender(bh: Blackhole) =

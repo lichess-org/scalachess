@@ -1,7 +1,7 @@
 package chess
 package format.pgn
 
-import cats.syntax.option.*
+import cats.syntax.all.*
 
 import scala.language.implicitConversions
 
@@ -16,7 +16,7 @@ class ParserTest extends ChessTest:
   extension (tree: Option[ParsedPgnTree]) def firstMove: PgnNodeData = tree.get.mainline.head.value
   extension (parsed: ParsedPgn) def metas                            = parsed.tree.get.value.metas
 
-  import Parser.{ full as parse, move as parseMove }
+  import Parser.{ full as parse, move as parseMove, mainline as parseMainline }
 
   test("bom header should be ignored"):
     // "with tags" in:
@@ -137,6 +137,21 @@ class ParserTest extends ChessTest:
     test(s"sans only size: $size"):
       parse(sans).assertRight: a =>
         assertEquals(a.mainline.size, size)
+
+  test("mainline == full.mainline"):
+    verifyMainlineParser(raws)
+    verifyMainlineParser(shortCastles)
+    verifyMainlineParser(longCastles)
+    verifyMainlineParser(annotatedCastles)
+    verifyMainlineParser(wcc2023)
+    verifyMainlineParser(
+      List(fromProd1, fromProd2, castleCheck1, castleCheck2, fromCrafty, fromWikipedia, fromTcec)
+    )
+
+  def verifyMainlineParser(pgns: List[String]) =
+    val expected = pgns.map(PgnStr(_)).traverse(parse).toOption.get.map(_.mainlineWithMetas)
+    val mainline = pgns.map(PgnStr(_)).traverse(parseMainline).toOption.get.map(_.sans)
+    assertEquals(mainline, expected)
 
   (shortCastles ++ longCastles ++ annotatedCastles).foreach: sans =>
     val size = sans.split(' ').length

@@ -152,7 +152,7 @@ class ParserTest extends ChessTest:
   test("sanOnly with nested variations"):
     val sanStr = SanStr("1. e4 (1... e5 (2. Nf3))")
     Parser
-      .sanOnly(sanStr)
+      .san(sanStr)
       .assertRight: san =>
         assertEquals(san, Std(Square.E4, Pawn))
 

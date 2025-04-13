@@ -40,21 +40,22 @@ object Parser:
 
   val result: P[String] = P.stringIn(Outcome.knownResultStrings).map(mapResult)
 
-  val nagGlyphsRE = P.stringIn(Glyph.PositionAssessment.all.map(_.symbol))
+  private val nagGlyphsRE = P.stringIn(Glyph.PositionAssessment.all.map(_.symbol))
 
-  val nag = (P.char('$') ~ R.digit.rep).string | nagGlyphsRE
+  private val nag = (P.char('$') ~ R.digit.rep).string | nagGlyphsRE
 
-  val nagGlyphs: P0[Glyphs] = (nag <* escape).rep0.map(nags => Glyphs.fromList(nags.flatMap(Glyph.find(_))))
+  private val nagGlyphs: P0[Glyphs] =
+    (nag <* escape).rep0.map(nags => Glyphs.fromList(nags.flatMap(Glyph.find(_))))
 
-  val moveExtras = comment.void
+  private val moveExtras = comment.void
 
-  val positiveIntString: P[String] = (N.nonZeroDigit ~ N.digits0).string
+  private val positiveIntString: P[String] = (N.nonZeroDigit ~ N.digits0).string
 
   // '. ' or '... ' or '. ... '
-  val numberSuffix = (P.char('.') | whitespace).rep0.void
+  private val numberSuffix = (P.char('.') | whitespace).rep0.void
 
   // 10. or 10... but not 0 or 1-0 or 1/2
-  val number = (positiveIntString <* !P.charIn('‑', '–', '-', '/', '½') ~ numberSuffix).string
+  private val number = (positiveIntString <* !P.charIn('‑', '–', '-', '/', '½') ~ numberSuffix).string
 
   val forbidNullMove = P
     .stringIn(List("--", "Z0", "null", "pass", "@@@@"))
@@ -68,11 +69,11 @@ object Parser:
   private val moveAndMetas   = MoveParser.san ~ MoveParser.metas
   private val postMoveEscape = moveExtras.rep0.void <* escape
 
-  val sanOnly: P[San] =
+  private val sanOnly: P[San] =
     val variation = (P.char('(').endWith(P.char(')'))).void
     preMoveEscape.with1 *> MoveParser.san <* (MoveParser.metas.void ~ variation.rep0.void ~ postMoveEscape.void)
 
-  val strMove: P[ParsedPgnTree] = P
+  private val strMove: P[ParsedPgnTree] = P
     .recursive[ParsedPgnTree] { recuse =>
       // TODO: if a variation only contains comments, we ignore it
       // Will fix it after support null move
@@ -91,7 +92,7 @@ object Parser:
           Node(data, None, vs.flatten)
     }
 
-  val strMoves: P0[(InitialComments, Option[ParsedPgnTree], Option[String])] =
+  private val strMoves: P0[(InitialComments, Option[ParsedPgnTree], Option[String])] =
     ((comment.rep0 ~ strMove.rep0) ~ (result <* escape).? <* comment.rep0).map:
       case ((comments, sans), res) =>
         (InitialComments(comments.cleanUp), Tree.build(sans), res)

@@ -11,7 +11,7 @@ case class Situation(board: Board, color: Color):
   export board.{ history, isOccupied, kingOf, variant }
   export color.white as isWhiteTurn
 
-  lazy val legalMoves = variant.validMoves(this)
+  lazy val legalMoves: List[Move] = variant.validMoves(this)
 
   lazy val moves: Map[Square, List[Move]] =
     legalMoves.groupBy(_.orig)
@@ -27,7 +27,7 @@ case class Situation(board: Board, color: Color):
 
   lazy val check: Check = board.checkOf(color)
 
-  def checkSquare = if check.yes then ourKing else None
+  def checkSquare: Option[Square] = if check.yes then ourKing else None
 
   inline def checkMate: Boolean = variant.checkmate(this)
 
@@ -39,7 +39,7 @@ case class Situation(board: Board, color: Color):
 
   lazy val threefoldRepetition: Boolean = history.threefoldRepetition
 
-  inline def variantEnd = variant.specialEnd(this)
+  inline def variantEnd: Boolean = variant.specialEnd(this)
 
   inline def end: Boolean = checkMate || staleMate || autoDraw || variantEnd
 
@@ -64,21 +64,21 @@ case class Situation(board: Board, color: Color):
   def drop(role: Role, square: Square): Either[ErrorStr, Drop] =
     variant.drop(this, role, square)
 
-  def withHistory(history: History) =
+  def withHistory(history: History): Situation =
     copy(board = board.withHistory(history))
 
-  def withVariant(variant: chess.variant.Variant) =
+  def withVariant(variant: chess.variant.Variant): Situation =
     copy(board = board.withVariant(variant))
 
   lazy val enPassantSquare: Option[Square] =
     potentialEpSquare >> legalMoves.find(_.enpassant).map(_.dest)
 
-  def unary_! = copy(color = !color)
+  def unary_! : Situation = copy(color = !color)
 
   // ========================bitboard===========================
 
-  lazy val ourKing   = board.kingPosOf(color)
-  lazy val theirKing = board.kingPosOf(!color)
+  lazy val ourKing: Option[Square]   = board.kingPosOf(color)
+  lazy val theirKing: Option[Square] = board.kingPosOf(!color)
   // alternative version of ourKing is used in Antichess only
   lazy val ourKings: List[Square] = board.kings(color)
   // alternative version of theirKing is used in Antichess only

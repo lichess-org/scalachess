@@ -2,6 +2,7 @@ package chess
 
 import alleycats.Zero
 import cats.kernel.Monoid
+import scalalib.model.Seconds
 
 import scala.concurrent.duration.*
 
@@ -15,8 +16,8 @@ object Centis extends RichOpaqueInt[Centis]:
 
     inline def *(inline o: Int): Centis = centis * o
 
-    def roundTenths: Int  = (if centis > 0 then centis + 5 else centis - 4) / 10
-    def roundSeconds: Int = Math.round(centis * 0.01f)
+    def roundTenths: Int      = (if centis > 0 then centis + 5 else centis - 4) / 10
+    def roundSeconds: Seconds = Seconds(Math.round(centis * 0.01f))
 
     inline def toSeconds: BigDecimal = java.math.BigDecimal.valueOf(centis, 2)
     inline def millis: Long          = centis * 10L

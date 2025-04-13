@@ -1,6 +1,5 @@
 package chess
 
-import cats.syntax.option.none
 import chess.Clock.Config
 
 import java.text.DecimalFormat
@@ -81,12 +80,12 @@ case class Clock(
         )
       case Some(t) =>
         val elapsed = toNow(t)
-        val lag     = ~metrics.reportedLag(elapsed) nonNeg
+        val lag     = (~metrics.reportedLag(elapsed)).nonNeg
 
         val player              = players(color)
         val (lagComp, lagTrack) = player.lag.onMove(lag)
 
-        val moveTime = (elapsed - lagComp) nonNeg
+        val moveTime = (elapsed - lagComp).nonNeg
 
         val clockActive = gameActive && moveTime < player.remaining
         val inc         = clockActive.so(player.increment)
@@ -206,16 +205,6 @@ object Clock:
     def initTime: Centis =
       if limitSeconds == 0 then increment.atLeast(Centis(300))
       else limit
-
-  // [TimeControl "600+2"] -> 10+2
-  def readPgnConfig(str: String): Option[Config] =
-    str.split('+') match
-      case Array(initStr, incStr) =>
-        for
-          init <- initStr.toIntOption
-          inc  <- incStr.toIntOption
-        yield Config(init, inc)
-      case _ => none
 
   def apply(limit: LimitSeconds, increment: IncrementSeconds): Clock = apply(Config(limit, increment))
 

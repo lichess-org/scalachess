@@ -27,7 +27,7 @@ case object Horde
     val frontPawns  = List(Square.B5, Square.C5, Square.F5, Square.G5).map { _ -> White.pawn }
     val blackPawns  = File.all.map { Square(_, Rank.Seventh) -> Black.pawn }
     val blackPieces = File.all.map { x => Square(x, Rank.Eighth) -> (Black - backRank(x.value)) }
-    whitePawnsHorde ++ frontPawns ++ blackPawns ++ blackPieces toMap
+    (whitePawnsHorde ++ frontPawns ++ blackPawns ++ blackPieces).toMap
 
   override val castles = Castles.black
 
@@ -226,17 +226,17 @@ case object Horde
             || pieces.pawn >= 2)
       // hordeNum == 3
       else
-      // A king in the corner is mated by two knights and a bishop or three
-      // knights or the bishop pair and a knight/bishop.
-      if (horde.knight == 2 && horde.bishop == 1)
-        || horde.knight == 3
-        || board.hasBishopPair(White)
-      then false
-      // White has two same color bishops and a knight.
-      // A king on A1 is mated by a bishop on B2, a bishop on C1 and a
-      // knight on C3, as long as there is another black piece to waste
-      // a tempo.
-      else piecesNum == 1
+        // A king in the corner is mated by two knights and a bishop or three
+        // knights or the bishop pair and a knight/bishop.
+        if (horde.knight == 2 && horde.bishop == 1)
+          || horde.knight == 3
+          || board.hasBishopPair(White)
+        then false
+        // White has two same color bishops and a knight.
+        // A king on A1 is mated by a bishop on B2, a bishop on C1 and a
+        // knight on C3, as long as there is another black piece to waste
+        // a tempo.
+        else piecesNum == 1
 
 enum SquareColor:
   case Light

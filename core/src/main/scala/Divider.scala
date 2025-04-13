@@ -24,18 +24,17 @@ object Divider:
 
     val indexedBoards: List[(Board, Int)] = boards.zipWithIndex
 
-    val midGame = indexedBoards.foldLeft(none[Int]):
-      case (None, (board, index)) =>
-        (majorsAndMinors(board) <= 10 ||
-          backrankSparse(board) ||
-          mixedness(board) > 150).option(index)
-      case (found, _) => found
+    val midGame = indexedBoards.collectFirst:
+      case (board, index)
+          if (majorsAndMinors(board) <= 10 ||
+            backrankSparse(board) ||
+            mixedness(board) > 150) =>
+        index
 
     val endGame =
       if midGame.isDefined then
-        indexedBoards.foldLeft(none[Int]):
-          case (found: Some[?], _) => found
-          case (_, (board, index)) => (majorsAndMinors(board) <= 6).option(index)
+        indexedBoards.collectFirst:
+          case (board, index) if majorsAndMinors(board) <= 6 => index
       else None
 
     Division(

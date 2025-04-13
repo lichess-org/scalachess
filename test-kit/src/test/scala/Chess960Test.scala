@@ -10,7 +10,7 @@ import variant.Chess960
 class Chess960Test extends ChessTest:
 
   test("recognize position numbers"):
-    import Chess960.{ positionNumber as pn }
+    import Chess960.positionNumber as pn
     assertEquals(pn(FullFen("k7/ppP5/brp5/8/8/8/8/8 b - -")), None)
 
     assertEquals(pn(FullFen("rnqbbknr/pppppppp/8/8/8/8/PPPPPPPP/RNQBBKNR w KQkq - 0 1")), Some(521))

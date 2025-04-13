@@ -1,7 +1,7 @@
 package chess
 package perft
 
-import cats.parse.{ Numbers as N, Parser as P, Parser0 as P0, Rfc5234 as R }
+import cats.parse.{ DefaultParser0, Numbers as N, Parser as P, Parser0 as P0, Rfc5234 as R }
 import cats.syntax.all.*
 import chess.format.FullFen
 
@@ -20,8 +20,7 @@ import chess.format.FullFen
   *
   */
 
-object Parser:
-  def parse: String => Either[P.Error, List[Perft]] = perfts.parseAll
+object Parser extends DefaultParser0[List[Perft]]:
 
   private val whitespace  = R.cr | R.lf | R.wsp
   private val blank       = P.until(!whitespace)
@@ -37,7 +36,7 @@ object Parser:
   private val oneTestCase: P[TestCase] = P.string("perft ") *> testCase <* R.lf.?
   private val cases: P[List[TestCase]] = oneTestCase.rep.map(_.toList) <* (ignored.rep | R.lf.rep0)
   private val perft: P[Perft]          = (id, epd, cases).mapN(Perft.apply) <* R.lf.?
-  private val perfts: P0[List[Perft]]  = ignored.rep0 *> perft.rep.map(_.toList)
+  def parser0: P0[List[Perft]]         = ignored.rep0 *> perft.rep.map(_.toList)
 
   extension (p: P0[Any])
     private def endWith(p1: P[Any]): P[String] = p.with1 *> (p1.string | (P.until(p1) <* p1))

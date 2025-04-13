@@ -3,6 +3,7 @@ package chess
 import cats.syntax.all.*
 import chess.format.pgn.{ Comment, Glyphs, InitialComments, Move as PgnMove, Pgn, Tags }
 import org.scalacheck.Gen
+import scalalib.model.Seconds
 
 case class GameTree[A](init: Situation, ply: Ply, tree: Option[Node[A]])
 case class WithMove[A](move: Move, data: A)
@@ -88,7 +89,7 @@ object ChessTreeArbitraries:
           comments <- genComments(5)
           glyphs   <- Gen.someOf(Glyphs.all).map(xs => Glyphs.fromList(xs.toList))
           clock    <- Gen.posNum[Int]
-        yield WithMove(move, PgnMove(move.san, comments, glyphs, None, None, clock.some, Nil))
+        yield WithMove(move, PgnMove(move.san, comments, glyphs, timeLeft = Seconds(clock).some))
 
   def genNode[A: Generator](value: A, variations: List[A] = Nil): Gen[Node[A]] =
     value.next.flatMap: nextSeeds =>

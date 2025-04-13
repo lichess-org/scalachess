@@ -8,7 +8,7 @@ import scala.annotation.targetName
 opaque type Square = Int
 object Square:
   extension (s: Square)
-    def value: Int = s
+    inline def value: Int = s
 
     inline def down: Option[Square]      = Square.at(file.value, rank.value - 1)
     inline def left: Option[Square]      = Square.at(file.value - 1, rank.value)

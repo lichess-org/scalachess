@@ -32,6 +32,15 @@ class UnmovedRooksTest extends ChessTest:
     chess960Boards.map: board =>
       assertEquals(board.history.unmovedRooks, BBoard.fromMap(board.pieces).rooks)
 
+  test("At the start, both sides should have two unmoved rooks"):
+    chess960Boards.map: board =>
+      board.rooks.squares
+        .traverse: square =>
+          board.history.unmovedRooks.side(square).flatten
+        .assertSome: sides =>
+          assertEquals(sides.count(_ == QueenSide), 2)
+          assertEquals(sides.count(_ == KingSide), 2)
+
   test("side 1"):
     Fen
       .read(Chess960, FullFen("rkrnnqbb/pppppppp/8/8/8/8/PPPPPPPP/RKRNNQBB w KQkq - 0 1"))
@@ -41,15 +50,6 @@ class UnmovedRooksTest extends ChessTest:
         assertEquals(ur.side(C1).flatten, Some(KingSide))
         assertEquals(ur.side(A8).flatten, Some(QueenSide))
         assertEquals(ur.side(C8).flatten, Some(KingSide))
-
-  chess960Boards.mapWithIndex: (board, n) =>
-    test(s"unmovedRooks at position number: $n"):
-      board.rooks.squares
-        .traverse: square =>
-          board.history.unmovedRooks.side(square).flatten
-        .assertSome: sides =>
-          assertEquals(sides.count(_ == QueenSide), 2)
-          assertEquals(sides.count(_ == KingSide), 2)
 
   test("rook capture rook"):
     fenToGame(

@@ -12,7 +12,7 @@ case class Replay(setup: Game, moves: List[MoveOrDrop], state: Game):
 
   lazy val chronoMoves: List[MoveOrDrop] = moves.reverse
 
-  def addMove(moveOrDrop: MoveOrDrop) =
+  def addMove(moveOrDrop: MoveOrDrop): Replay =
     copy(
       moves = moveOrDrop.applyVariantEffect :: moves,
       state = moveOrDrop.applyGame(state)
@@ -23,7 +23,7 @@ case class Replay(setup: Game, moves: List[MoveOrDrop], state: Game):
 
 object Replay:
 
-  def apply(game: Game) = new Replay(game, Nil, game)
+  def apply(game: Game): Replay = Replay(game, Nil, game)
 
   def apply(
       sans: Iterable[SanStr],

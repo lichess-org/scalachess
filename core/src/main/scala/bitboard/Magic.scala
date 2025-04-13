@@ -1,11 +1,14 @@
 package chess
 package bitboard
 
-case class Magic(mask: Long, factor: Long, offset: Int):
-  def bitshopIndex(occupied: Long): Int = (factor * (occupied & mask) >>> (64 - 9)).toInt + offset
-  def rookIndex(occupied: Long): Int    = (factor * (occupied & mask) >>> (64 - 12)).toInt + offset
+import scala.annotation.static
+
+class Magic(val mask: Long, val factor: Long, val offset: Int):
+  def bishopIndex(occupied: Long): Int = (factor * (occupied & mask) >>> (64 - 9)).toInt + offset
+  def rookIndex(occupied: Long): Int   = (factor * (occupied & mask) >>> (64 - 12)).toInt + offset
 
 object Magic:
+  @static
   private[bitboard] val ROOK = Array[Magic](
     Magic(0x000101010101017eL, 0x00280077ffebfffeL, 26304),
     Magic(0x000202020202027cL, 0x2004010201097fffL, 35520),
@@ -73,6 +76,7 @@ object Magic:
     Magic(0x7e80808080808000L, 0x0001ffff9dffa333L, 14826)
   )
 
+  @static
   private[bitboard] val BISHOP = Array[Magic](
     Magic(0x0040201008040200L, 0x007fbfbfbfbfbfffL, 5378),
     Magic(0x0000402010080400L, 0x0000a060401007fcL, 4093),

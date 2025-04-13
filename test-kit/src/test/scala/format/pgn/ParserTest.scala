@@ -138,6 +138,12 @@ class ParserTest extends ChessTest:
       parse(sans).assertRight: a =>
         assertEquals(a.mainline.size, size)
 
+  test("raws with moves"):
+    raws.foreach: sans =>
+      val result   = Parser.moves(sans.split(' ').toList.map(SanStr(_))).toOption.get
+      val expected = parse(sans).toOption.get.mainline
+      assertEquals(result, expected)
+
   test("mainline == full.mainline"):
     verifyMainlineParser(raws)
     verifyMainlineParser(shortCastles)

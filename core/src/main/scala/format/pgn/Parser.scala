@@ -69,25 +69,21 @@ object Parser:
     .?
     .flatMap(o => o.fold(P.unit)(_ => P.failWith("Null moves are not supported").void))
 
-  extension (p: P0[Any])
-    private def endWith(p1: P[Any]): P[String] = p.with1 *> (p1.string | (P.until(p1) <* p1))
-
-  private val preMoveEscape    = ((number.backtrack | comment).rep0 ~ forbidNullMove).void
-  private val moveAndMetas     = SanParser.san ~ SanParser.metas
-  private val postMoveEscape   = moveExtras.rep0.void <* escape
-  private val escapeVariations = (P.char('(').endWith(P.char(')')).void ~ escape).void.rep0.void
+  private val preMoveEscape  = ((number.backtrack | comment).rep0 ~ forbidNullMove).void
+  private val moveAndMetas   = SanParser.san ~ SanParser.metas
+  private val postMoveEscape = moveExtras.rep0.void <* escape
 
   private val sanOnly: P[San] =
-    preMoveEscape.with1 *> SanParser.san <* (SanParser.metas.void ~ escapeVariations ~ postMoveEscape.void)
+    escapeVariations(SanParser.san)
 
   private val sanAndMetasOnly: P[SanWithMetas] =
-    P.recursive[SanWithMetas] { recuse =>
+    escapeVariations(moveAndMetas.map(SanWithMetas.apply))
 
+  private def escapeVariations[A](p: P[A]): P[A] =
+    P.recursive[A] { recuse =>
       val variation: P[Unit] =
         (P.char('(') *> comment.rep0.surroundedBy(escape) *> recuse.rep0 *> P.char(')') *> escape).void
-
-      (preMoveEscape.with1 *> (moveAndMetas <* variation.rep0) <* postMoveEscape)
-        .map(SanWithMetas.apply)
+      (preMoveEscape.with1 *> (p <* variation.rep0) <* postMoveEscape)
     }
 
   private val moveParser: P[Node[PgnNodeData]] =

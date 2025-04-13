@@ -144,6 +144,13 @@ class ParserTest extends ChessTest:
       val expected = parse(sans).toOption.get.mainline
       assertEquals(result, expected)
 
+  test("sanOnly with nested variations"):
+    val sanStr = SanStr("1. e4 (1... e5 (2. Nf3))")
+    Parser
+      .sanOnly(sanStr)
+      .assertRight: san =>
+        assertEquals(san, Std(Square.E4, Pawn))
+
   test("mainline == full.mainline"):
     verifyMainlineParser(raws)
     verifyMainlineParser(shortCastles)

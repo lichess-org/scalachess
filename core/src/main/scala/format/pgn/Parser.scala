@@ -74,7 +74,7 @@ object Parser:
   private val postMoveEscape = moveExtras.rep0.void <* escape
 
   private val sanOnly: P[San] =
-    escapeVariations(SanParser.san)
+    preMoveEscape.with1 *> SanParser.san
 
   private val sanAndMetasOnly: P[SanWithMetas] =
     escapeVariations(moveAndMetas.map(SanWithMetas.apply))

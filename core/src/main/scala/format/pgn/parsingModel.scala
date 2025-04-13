@@ -116,7 +116,7 @@ object Sans extends TotalWrapper[Sans, List[San]]
 
 case class Metas(check: Check, checkmate: Boolean, comments: List[Comment], glyphs: Glyphs)
 
-case class ParsedMainline(tags: Tags, sans: List[SanWithMetas])
+case class ParsedMainline[A](tags: Tags, sans: List[A])
 
 case class SanWithMetas(san: San, metas: Metas):
   export metas.*

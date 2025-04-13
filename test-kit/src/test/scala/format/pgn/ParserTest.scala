@@ -16,7 +16,12 @@ class ParserTest extends ChessTest:
   extension (tree: Option[ParsedPgnTree]) def firstMove: PgnNodeData = tree.get.mainline.head.value
   extension (parsed: ParsedPgn) def metas                            = parsed.tree.get.value.metas
 
-  import Parser.{ full as parse, move as parseMove, mainline as parseMainline }
+  import Parser.{
+    full as parse,
+    move as parseMove,
+    mainlineWithMetas as parseMainlineWithMetas,
+    mainline as parseMainline
+  }
 
   test("bom header should be ignored"):
     // "with tags" in:
@@ -151,18 +156,33 @@ class ParserTest extends ChessTest:
       .assertRight: san =>
         assertEquals(san, Std(Square.E4, Pawn))
 
-  test("mainline == full.mainline"):
-    verifyMainlineParser(raws)
-    verifyMainlineParser(shortCastles)
-    verifyMainlineParser(longCastles)
-    verifyMainlineParser(annotatedCastles)
-    verifyMainlineParser(wcc2023)
-    verifyMainlineParser(
+  test("mainlineWithMetas == full.mainlineWithMetas"):
+    verifyMainlineWithMetas(raws)
+    verifyMainlineWithMetas(shortCastles)
+    verifyMainlineWithMetas(longCastles)
+    verifyMainlineWithMetas(annotatedCastles)
+    verifyMainlineWithMetas(wcc2023)
+    verifyMainlineWithMetas(
       List(fromProd1, fromProd2, castleCheck1, castleCheck2, fromCrafty, fromWikipedia, fromTcec)
     )
 
-  def verifyMainlineParser(pgns: List[String]) =
+  def verifyMainlineWithMetas(pgns: List[String]) =
     val expected = pgns.map(PgnStr(_)).traverse(parse).toOption.get.map(_.mainlineWithMetas)
+    val mainline = pgns.map(PgnStr(_)).traverse(parseMainlineWithMetas).toOption.get.map(_.sans)
+    assertEquals(mainline, expected)
+
+  test("mainline == full.mainline"):
+    verifyMainline(raws)
+    verifyMainline(shortCastles)
+    verifyMainline(longCastles)
+    verifyMainline(annotatedCastles)
+    verifyMainline(wcc2023)
+    verifyMainline(
+      List(fromProd1, fromProd2, castleCheck1, castleCheck2, fromCrafty, fromWikipedia, fromTcec)
+    )
+
+  def verifyMainline(pgns: List[String]) =
+    val expected = pgns.map(PgnStr(_)).traverse(parse).toOption.get.map(_.mainline)
     val mainline = pgns.map(PgnStr(_)).traverse(parseMainline).toOption.get.map(_.sans)
     assertEquals(mainline, expected)
 

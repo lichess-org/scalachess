@@ -40,6 +40,16 @@ class PgnBench:
       i += 1
 
   @Benchmark
+  def pgnMainlineWithMetasParser(bh: Blackhole) =
+    var games = this.pgnStrs
+    var i     = 0
+    while i < games.size do
+      val game = games(i)
+      Blackhole.consumeCPU(Work)
+      bh.consume(Parser.mainlineWithMetas(game))
+      i += 1
+
+  @Benchmark
   def pgnMainlineParser(bh: Blackhole) =
     var games = this.pgnStrs
     var i     = 0

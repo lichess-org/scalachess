@@ -20,10 +20,16 @@ object Parser:
 
   /**
     * Parse the mainline of a PGN file ignoring variations
-    *
+    * similar to the [[mainline]] but with metas
     */
-  def mainline(pgn: PgnStr): Either[ErrorStr, ParsedMainline] =
+  def mainlineWithMetas(pgn: PgnStr): Either[ErrorStr, ParsedMainline[SanWithMetas]] =
     pgnMainlineParser.parse(pgn.value, "Cannot parse pgn")
+
+  /**
+    * Parse the mainline with san moves and ignoring variations
+    */
+  def mainline(pgn: PgnStr): Either[ErrorStr, ParsedMainline[San]] =
+    pgnSansParser.parse(pgn.value, "Cannot parse pgn")
 
   def moves(strMoves: Iterable[SanStr]): Either[ErrorStr, Sans] =
     strMoves.toList.traverse(sanOnly).map(Sans(_))
@@ -37,7 +43,7 @@ object Parser:
     moveParser.parse(str.value, "Cannot parse move")
 
   def sanOnly(str: SanStr): Either[ErrorStr, San] =
-    sanOnly.parse(str.value, "Cannot parse move")
+    simpleSan.parse(str.value, "Cannot parse move")
 
   private val blockComment  = P.until0(P.char('}')).with1.between(P.char('{'), P.char('}')).map(Comment(_))
   private val inlineComment = P.char(';') *> P.until(R.lf).map(Comment(_))
@@ -73,8 +79,11 @@ object Parser:
   private val moveAndMetas   = SanParser.san ~ SanParser.metas
   private val postMoveEscape = moveExtras.rep0.void <* escape
 
-  private val sanOnly: P[San] =
+  private val simpleSan: P[San] =
     preMoveEscape.with1 *> SanParser.san
+
+  private val sanOnly: P[San] =
+    escapeVariations(simpleSan <* SanParser.metas)
 
   private val sanAndMetasOnly: P[SanWithMetas] =
     escapeVariations(moveAndMetas.map(SanWithMetas.apply))
@@ -112,6 +121,11 @@ object Parser:
 
   private val fullSanAndMetasParser: P0[(InitialComments, List[SanWithMetas], Option[String])] =
     ((comment.rep0 ~ sanAndMetasOnly.rep0) ~ (result <* escape).? <* comment.rep0).map:
+      case ((comments, sans), res) =>
+        (InitialComments(comments.cleanUp), sans, res)
+
+  private val fullSanParser: P0[(InitialComments, List[San], Option[String])] =
+    ((comment.rep0 ~ sanOnly.rep0) ~ (result <* escape).? <* comment.rep0).map:
       case ((comments, sans), res) =>
         (InitialComments(comments.cleanUp), sans, res)
 
@@ -215,8 +229,10 @@ object Parser:
           val tags = result.filterNot(_ => preTags.exists(_.Result)).foldLeft(preTags)(_ + Tag(_.Result, _))
           ParsedPgn(init, tags, tree)
 
-  private val mainlineParser: P0[ParsedMainline] =
-    (TagParser.tags.surroundedBy(escape) ~ fullSanAndMetasParser.?).map: (optionalTags, optionalMoves) =>
+  private def tagsAndMainlineParser[A](
+      p: P0[(InitialComments, List[A], Option[String])]
+  ): P0[ParsedMainline[A]] =
+    (TagParser.tags.surroundedBy(escape) ~ p.?).map: (optionalTags, optionalMoves) =>
       val preTags = Tags.sanitize(optionalTags)
       optionalMoves match
         case None => ParsedMainline(preTags, Nil)
@@ -227,8 +243,13 @@ object Parser:
   def escapePgnTag[A](p: P0[A]): P0[A] =
     escape *> P.string("[pgn]").? *> p <* P.string("[/pgn]").? <* escape
 
-  private val pgnParser: P0[ParsedPgn]              = escapePgnTag(tagsAndMovesParser)
-  private val pgnMainlineParser: P0[ParsedMainline] = escapePgnTag(mainlineParser)
+  private val pgnParser: P0[ParsedPgn] = escapePgnTag(tagsAndMovesParser)
+  private val pgnMainlineParser: P0[ParsedMainline[SanWithMetas]] = escapePgnTag(
+    tagsAndMainlineParser(fullSanAndMetasParser)
+  )
+  private val pgnSansParser: P0[ParsedMainline[San]] = escapePgnTag(
+    tagsAndMainlineParser(fullSanParser)
+  )
 
   extension [A](p: P0[A])
     def parse(str: String, context: String): Either[ErrorStr, A] =

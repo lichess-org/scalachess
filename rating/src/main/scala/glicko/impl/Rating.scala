@@ -16,10 +16,13 @@ final private[glicko] class Rating(
   private[impl] var workingRatingDeviation: Double = scala.compiletime.uninitialized
   private[impl] var workingVolatility: Double      = scala.compiletime.uninitialized
 
-  /** Return the average skill value of the player scaled down to the scale used by the algorithm's internal
-    * workings.
-    */
+  /** Return the average skill value of the player 
+   *  scaled down to the scale used by the algorithm's internal workings.
+   */
   private[impl] def getGlicko2Rating: Double = convertRatingToGlicko2Scale(this.rating)
+
+  private[impl] def getGlicko2RatingWithAdvantage(advantage: ColorAdvantage): Double =
+    convertRatingToGlicko2Scale(this.rating + advantage.value)
 
   /** Set the average skill value, taking in a value in Glicko2 scale.
     */

@@ -89,18 +89,18 @@ object Parser:
     escapeVariations(moveAndMetas.map(SanWithMetas.apply))
 
   private def escapeVariations[A](p: P[A]): P[A] =
-    P.recursive[A] { recuse =>
+    P.recursive[A] { recurse =>
       val variation: P[Unit] =
-        (P.char('(') *> comment.rep0.surroundedBy(escape) *> recuse.rep0 *> P.char(')') *> escape).void
+        (P.char('(') *> comment.rep0.surroundedBy(escape) *> recurse.rep0 *> P.char(')') *> escape).void
       (preMoveEscape.with1 *> (p <* variation.rep0) <* postMoveEscape)
     }
 
   private val moveParser: P[Node[PgnNodeData]] =
-    P.recursive[Node[PgnNodeData]] { recuse =>
+    P.recursive[Node[PgnNodeData]] { recurse =>
       // TODO: if a variation only contains comments, we ignore it
       // Will fix it after support null move
       val variation: P[Option[Variation[PgnNodeData]]] =
-        (P.char('(') *> comment.rep0.surroundedBy(escape) ~ recuse.rep0 <* (P.char(')') ~ escape))
+        (P.char('(') *> comment.rep0.surroundedBy(escape) ~ recurse.rep0 <* (P.char(')') ~ escape))
           .map((comments, sans) =>
             sans match
               case Nil => None

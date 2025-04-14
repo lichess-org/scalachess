@@ -2,6 +2,7 @@ package chess
 package format.pgn
 
 import cats.syntax.all.*
+import chess.Situation.AndFullMoveNumber
 import chess.format.Fen
 
 import MoveOrDrop.*
@@ -44,7 +45,7 @@ case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[
     val sitWithMove = initContext(tags)
     Pgn(tags, initialPosition, treeToPgn(sitWithMove.situation), sitWithMove.ply.next)
 
-  private def initContext(tags: Tags) =
+  private def initContext(tags: Tags): AndFullMoveNumber =
     val variant = tags.variant | chess.variant.Standard
     def default = Situation.AndFullMoveNumber(Situation(Board.init(variant), White), FullMoveNumber.initial)
 
@@ -57,6 +58,8 @@ case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[
       _.mapAccumlOption_(context): (ctx, d) =>
         d.toMove(ctx)
           .fold(ctx -> None)(_ -> _.some)
+
+case class ParsedMainline[A](initialPosition: InitialComments, tags: Tags, sans: List[A])
 
 // Standard Algebraic Notation
 sealed trait San:
@@ -115,8 +118,6 @@ opaque type Sans = List[San]
 object Sans extends TotalWrapper[Sans, List[San]]
 
 case class Metas(check: Check, checkmate: Boolean, comments: List[Comment], glyphs: Glyphs)
-
-case class ParsedMainline[A](tags: Tags, sans: List[A])
 
 case class SanWithMetas(san: San, metas: Metas):
   export metas.*

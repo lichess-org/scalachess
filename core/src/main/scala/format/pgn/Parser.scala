@@ -226,9 +226,9 @@ object Parser:
     (TagParser.tags.surroundedBy(escape) ~ p.?).map: (optionalTags, optionalMoves) =>
       val preTags = Tags.sanitize(optionalTags)
       optionalMoves match
-        case None => ParsedMainline(preTags, Nil)
-        case Some((_, sans, result)) =>
-          ParsedMainline(updateTagsWithResult(preTags, result), sans)
+        case None => ParsedMainline(InitialComments.empty, preTags, Nil)
+        case Some((init, sans, result)) =>
+          ParsedMainline(init, updateTagsWithResult(preTags, result), sans)
 
   private inline def updateTagsWithResult(tags: Tags, result: Option[String]): Tags =
     result.filterNot(_ => tags.exists(_.Result)).foldLeft(tags)(_ + Tag(_.Result, _))

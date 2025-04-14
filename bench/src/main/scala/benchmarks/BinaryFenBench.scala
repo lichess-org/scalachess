@@ -47,6 +47,7 @@ class BinaryFenBench:
       val game = games(i)
       Blackhole.consumeCPU(Work)
       bh.consume(BinaryFen.write(game))
+      i += 1
 
   @Benchmark
   def read(bh: Blackhole) =

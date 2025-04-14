@@ -1,7 +1,7 @@
 package chess
 package format.pgn
 
-import cats.syntax.option.*
+import cats.syntax.all.*
 
 import scala.language.implicitConversions
 
@@ -16,7 +16,12 @@ class ParserTest extends ChessTest:
   extension (tree: Option[ParsedPgnTree]) def firstMove: PgnNodeData = tree.get.mainline.head.value
   extension (parsed: ParsedPgn) def metas                            = parsed.tree.get.value.metas
 
-  import Parser.{ full as parse, move as parseMove }
+  import Parser.{
+    full as parse,
+    move as parseMove,
+    mainlineWithMetas as parseMainlineWithMetas,
+    mainline as parseMainline
+  }
 
   test("bom header should be ignored"):
     // "with tags" in:
@@ -137,6 +142,49 @@ class ParserTest extends ChessTest:
     test(s"sans only size: $size"):
       parse(sans).assertRight: a =>
         assertEquals(a.mainline.size, size)
+
+  test("raws with moves"):
+    raws.foreach: sans =>
+      val result   = Parser.moves(sans.split(' ').toList.map(SanStr(_))).toOption.get
+      val expected = parse(sans).toOption.get.mainline
+      assertEquals(result, expected)
+
+  test("sanOnly with nested variations"):
+    val sanStr = SanStr("1. e4 (1... e5 (2. Nf3))")
+    Parser
+      .san(sanStr)
+      .assertRight: san =>
+        assertEquals(san, Std(Square.E4, Pawn))
+
+  test("mainlineWithMetas == full.mainlineWithMetas"):
+    verifyMainlineWithMetas(raws)
+    verifyMainlineWithMetas(shortCastles)
+    verifyMainlineWithMetas(longCastles)
+    verifyMainlineWithMetas(annotatedCastles)
+    verifyMainlineWithMetas(wcc2023)
+    verifyMainlineWithMetas(
+      List(fromProd1, fromProd2, castleCheck1, castleCheck2, fromCrafty, fromWikipedia, fromTcec)
+    )
+
+  def verifyMainlineWithMetas(pgns: List[String]) =
+    val expected = pgns.map(PgnStr(_)).traverse(parse).toOption.get.map(_.mainlineWithMetas)
+    val mainline = pgns.map(PgnStr(_)).traverse(parseMainlineWithMetas).toOption.get.map(_.sans)
+    assertEquals(mainline, expected)
+
+  test("mainline == full.mainline"):
+    verifyMainline(raws)
+    verifyMainline(shortCastles)
+    verifyMainline(longCastles)
+    verifyMainline(annotatedCastles)
+    verifyMainline(wcc2023)
+    verifyMainline(
+      List(fromProd1, fromProd2, castleCheck1, castleCheck2, fromCrafty, fromWikipedia, fromTcec)
+    )
+
+  def verifyMainline(pgns: List[String]) =
+    val expected = pgns.map(PgnStr(_)).traverse(parse).toOption.get.map(_.mainline)
+    val mainline = pgns.map(PgnStr(_)).traverse(parseMainline).toOption.get.map(_.sans)
+    assertEquals(mainline, expected)
 
   (shortCastles ++ longCastles ++ annotatedCastles).foreach: sans =>
     val size = sans.split(' ').length

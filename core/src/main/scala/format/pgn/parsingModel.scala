@@ -2,6 +2,7 @@ package chess
 package format.pgn
 
 import cats.syntax.all.*
+import chess.Situation.AndFullMoveNumber
 import chess.format.Fen
 
 import MoveOrDrop.*
@@ -11,9 +12,9 @@ import MoveOrDrop.*
 case class PgnNodeData(
     san: San,
     metas: Metas, // describes the position after the move `san` is played
-    /* `variationComments` are comments before the first move of a variation. Example:
+    /** `variationComments` are comments before the first move of a variation. Example:
      * `1.d4 {the best move} ( { on the other hand } 1.e4 { is not as good } )`
-     * => PgnNodeData(1.d4, Metas.empty, List(Node(1.e4, Metas(Comment("is not as good"), List("on the other hand")))
+     * => PgnNodeData(1.d4, Metas.empty, List(Node(1.e4, Metas(Comment("is not as good"), List("on the other hand")))))
      */
     variationComments: List[Comment]
 ):
@@ -37,12 +38,14 @@ type ParsedPgnTree = Node[PgnNodeData]
 
 case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[ParsedPgnTree]):
   def mainline: List[San] = tree.fold(List.empty[San])(_.mainline.map(_.value.san))
+  def mainlineWithMetas: List[SanWithMetas] =
+    tree.fold(List.empty[SanWithMetas])(_.mainline.map(x => SanWithMetas(x.value.san, x.value.metas)))
 
   def toPgn: Pgn =
     val sitWithMove = initContext(tags)
     Pgn(tags, initialPosition, treeToPgn(sitWithMove.situation), sitWithMove.ply.next)
 
-  private def initContext(tags: Tags) =
+  private def initContext(tags: Tags): AndFullMoveNumber =
     val variant = tags.variant | chess.variant.Standard
     def default = Situation.AndFullMoveNumber(Situation(Board.init(variant), White), FullMoveNumber.initial)
 
@@ -55,6 +58,8 @@ case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[
       _.mapAccumlOption_(context): (ctx, d) =>
         d.toMove(ctx)
           .fold(ctx -> None)(_ -> _.some)
+
+case class ParsedMainline[A](initialPosition: InitialComments, tags: Tags, sans: List[A])
 
 // Standard Algebraic Notation
 sealed trait San:
@@ -114,5 +119,9 @@ object Sans extends TotalWrapper[Sans, List[San]]
 
 case class Metas(check: Check, checkmate: Boolean, comments: List[Comment], glyphs: Glyphs)
 
+case class SanWithMetas(san: San, metas: Metas):
+  export metas.*
+  export san.*
+
 object Metas:
-  val empty = Metas(Check.No, checkmate = false, Nil, Glyphs.empty)
+  val empty: Metas = Metas(Check.No, false, Nil, Glyphs.empty)

@@ -57,7 +57,7 @@ object Replay:
       .foldM((init, emptyGames)):
         case ((head, games), str) =>
           Parser
-            .sanOnly(str)
+            .san(str)
             .flatMap: san =>
               san(head.situation)
                 .map: move =>

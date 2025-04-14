@@ -181,6 +181,11 @@ class ParserTest extends ChessTest:
       List(fromProd1, fromProd2, castleCheck1, castleCheck2, fromCrafty, fromWikipedia, fromTcec)
     )
 
+  test("tags = full.tags"):
+    val expected = wcc2023.map(PgnStr(_)).traverse(parse).toOption.get.map(_.tags)
+    val tags     = wcc2023.map(PgnStr(_)).traverse(Parser.tags).toOption.get
+    assertEquals(tags, expected)
+
   def verifyMainline(pgns: List[String]) =
     val expected = pgns.map(PgnStr(_)).traverse(parse).toOption.get.map(_.mainline)
     val mainline = pgns.map(PgnStr(_)).traverse(parseMainline).toOption.get.map(_.sans)

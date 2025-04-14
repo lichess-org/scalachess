@@ -31,6 +31,9 @@ object Parser:
   def mainlineWithMetas(pgn: PgnStr): Either[ErrorStr, ParsedMainline[SanWithMetas]] =
     pgnMainlineParser.parse(pgn.value, "Cannot parse pgn")
 
+  def tags(pgn: PgnStr): Either[ErrorStr, Tags] =
+    tagsParser.parse(pgn.value, "Cannot parse tags").map(Tags(_))
+
   def moves(strMoves: Iterable[SanStr]): Either[ErrorStr, Sans] =
     strMoves.toList.traverse(san).map(Sans(_))
 
@@ -236,6 +239,7 @@ object Parser:
   private inline def escapePgnTag[A](p: P0[A]): P0[A] =
     escape *> P.string("[pgn]").? *> p <* P.string("[/pgn]").? <* escape
 
+  private val tagsParser               = TagParser.tags.surroundedBy(escape)
   private val pgnParser: P0[ParsedPgn] = escapePgnTag(tagsAndMovesParser)
 
   private val pgnMainlineParser: P0[ParsedMainline[SanWithMetas]] =

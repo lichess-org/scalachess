@@ -28,6 +28,9 @@ case class Board(
   def byPiece(piece: Piece): Bitboard =
     byColor(piece.color) & byRole(piece.role)
 
+  def byPiece(color: Color, role: Role): Bitboard =
+    byColor(color) & byRole(role)
+
   def roleAt(s: Square): Option[Role] =
     byRole.findRole(_.contains(s))
 

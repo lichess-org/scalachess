@@ -76,7 +76,7 @@ case class Std(
 
   def apply(situation: Situation): Either[ErrorStr, chess.Move] =
     situation.board
-      .byPiece(situation.color - role)
+      .byPiece(situation.color, role)
       .first: square =>
         if compare(file, square.file) && compare(rank, square.rank)
         then situation.generateMovesAt(square).find(_.dest == dest)

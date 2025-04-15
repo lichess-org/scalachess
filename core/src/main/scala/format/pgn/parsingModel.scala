@@ -81,7 +81,7 @@ case class Std(
         if compare(file, square.file) && compare(rank, square.rank)
         then situation.generateMovesAt(square).find(_.dest == dest)
         else None
-      .toRight(ErrorStr(s"No move found: $this"))
+      .toRight(ErrorStr(s"Cannot play $this"))
       .flatMap(_.withPromotion(promotion).toRight(ErrorStr("Wrong promotion")))
 
   override def toString = s"$role ${dest.key}"
@@ -98,8 +98,7 @@ case class Castle(side: Side) extends San:
   def apply(situation: Situation): Either[ErrorStr, chess.Move] =
 
     import situation.{ genCastling, ourKing, variant }
-    def error: ErrorStr = ErrorStr(s"Cannot castle / variant is $variant")
-    if !variant.allowsCastling then error.asLeft
+    if !variant.allowsCastling then ErrorStr(s"Cannot castle in $variant").asLeft
     else
       ourKing
         .flatMap: k =>
@@ -107,7 +106,7 @@ case class Castle(side: Side) extends San:
             .applyVariantEffect(genCastling(k))
             .filter(variant.kingSafety)
             .find(_.castle.exists(_.side == side))
-        .toRight(error)
+        .toRight(ErrorStr(s"Cannot castle ${side.fold("kingside", "queenside")}"))
 
 opaque type Sans = List[San]
 object Sans extends TotalWrapper[Sans, List[San]]

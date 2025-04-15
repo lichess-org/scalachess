@@ -34,7 +34,7 @@ object Parser:
     pgnMainlineParser.parse(pgn.value, pgnContext)
 
   def tags(pgn: PgnStr): Either[ErrorStr, Tags] =
-    tagsParser.parse(pgn.value, "Cannot parse tags").map(Tags(_))
+    tagsParser.parse(pgn.value, "Error parsing tags").map(Tags(_))
 
   def moves(strMoves: Iterable[SanStr]): Either[ErrorStr, Sans] =
     strMoves.toList.traverse(san).map(Sans(_))

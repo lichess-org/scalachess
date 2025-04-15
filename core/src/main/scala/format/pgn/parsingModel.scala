@@ -83,7 +83,7 @@ case class Std(
         if compare(file, square.file) && compare(rank, square.rank)
         then situation.generateMovesAt(square).find(_.dest == dest)
         else None
-      .toRight(ErrorStr(s"No move found: $this\n$situation"))
+      .toRight(ErrorStr(s"No move found: $this"))
       .flatMap(_.withPromotion(promotion).toRight(ErrorStr("Wrong promotion")))
 
   override def toString = s"$role ${dest.key}"

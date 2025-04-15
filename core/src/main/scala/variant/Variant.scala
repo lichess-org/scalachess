@@ -85,7 +85,7 @@ abstract class Variant private[variant] (
     yield m3
 
   def drop(situation: Situation, role: Role, square: Square): Either[ErrorStr, Drop] =
-    ErrorStr(s"$this variant cannot drop $situation $role $square").asLeft
+    ErrorStr(s"$this variant cannot drop $role $square").asLeft
 
   def staleMate(situation: Situation): Boolean = situation.check.no && situation.legalMoves.isEmpty
 

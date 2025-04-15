@@ -36,12 +36,8 @@ object Replay:
         sans,
         Tags(
           List(
-            initialFen.map { fen =>
-              Tag(_.FEN, fen.value)
-            },
-            variant.some.filterNot(_.standard).map { v =>
-              Tag(_.Variant, v.name)
-            }
+            initialFen.map(fen => Tag(_.FEN, fen.value)),
+            variant.some.filterNot(_.standard).map(v => Tag(_.Variant, v.name))
           ).flatten
         )
       )

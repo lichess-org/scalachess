@@ -74,9 +74,7 @@ case class Std(
     promotion: Option[PromotableRole] = None
 ) extends San:
 
-  def apply(situation: Situation) = move(situation)
-
-  def move(situation: Situation): Either[ErrorStr, chess.Move] =
+  def apply(situation: Situation): Either[ErrorStr, chess.Move] =
     situation.board
       .byPiece(situation.color - role)
       .first: square =>
@@ -92,16 +90,13 @@ case class Std(
 
 case class Drop(role: Role, square: Square) extends San:
 
-  def apply(situation: Situation) = drop(situation)
-
-  def drop(situation: Situation): Either[ErrorStr, chess.Drop] =
+  def apply(situation: Situation): Either[ErrorStr, chess.Drop] =
     situation.drop(role, square)
 
 case class Castle(side: Side) extends San:
 
-  def apply(situation: Situation) = move(situation)
+  def apply(situation: Situation): Either[ErrorStr, chess.Move] =
 
-  def move(situation: Situation): Either[ErrorStr, chess.Move] =
     import situation.{ genCastling, ourKing, variant }
     def error: ErrorStr = ErrorStr(s"Cannot castle / variant is $variant")
     if !variant.allowsCastling then error.asLeft

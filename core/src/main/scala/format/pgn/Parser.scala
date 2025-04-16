@@ -15,38 +15,40 @@ object Parser:
   // pgnComment with % or whitespaces
   private val escape = pgnComment.? *> whitespace.rep0.?
 
+  final val pgnContext = "Error parsing PGN"
+
   def full(pgn: PgnStr): Either[ErrorStr, ParsedPgn] =
-    pgnParser.parse(pgn.value, "Cannot parse pgn")
+    pgnParser.parse(pgn.value, pgnContext)
 
   /**
     * Parse the mainline with san moves and ignoring variations
     */
   def mainline(pgn: PgnStr): Either[ErrorStr, ParsedMainline[San]] =
-    pgnSansParser.parse(pgn.value, "Cannot parse pgn")
+    pgnSansParser.parse(pgn.value, pgnContext)
 
   /**
     * Parse the mainline of a PGN file ignoring variations
     * similar to the [[mainline]] but with metas
     */
   def mainlineWithMetas(pgn: PgnStr): Either[ErrorStr, ParsedMainline[SanWithMetas]] =
-    pgnMainlineParser.parse(pgn.value, "Cannot parse pgn")
+    pgnMainlineParser.parse(pgn.value, pgnContext)
 
   def tags(pgn: PgnStr): Either[ErrorStr, Tags] =
-    tagsParser.parse(pgn.value, "Cannot parse tags").map(Tags(_))
+    tagsParser.parse(pgn.value, "Error parsing tags").map(Tags(_))
 
   def moves(strMoves: Iterable[SanStr]): Either[ErrorStr, Sans] =
     strMoves.toList.traverse(san).map(Sans(_))
 
   def moves(str: PgnMovesStr): Either[ErrorStr, Option[ParsedPgnTree]] =
     moveParser.rep0
-      .parse(str.value, "Cannot parse moves")
+      .parse(str.value, "Error parsing moves")
       .map(Tree.build)
 
   def move(str: SanStr): Either[ErrorStr, ParsedPgnTree] =
-    moveParser.parse(str.value, "Cannot parse move")
+    moveParser.parse(str.value, "Error parsing move")
 
   def san(str: SanStr): Either[ErrorStr, San] =
-    simpleSan.parse(str.value, "Cannot parse move")
+    simpleSan.parse(str.value, "Error parsing move")
 
   private val blockComment  = P.until0(P.char('}')).with1.between(P.char('{'), P.char('}')).map(Comment(_))
   private val inlineComment = P.char(';') *> P.until(R.lf).map(Comment(_))
@@ -249,19 +251,15 @@ object Parser:
     escapePgnTag(tagsAndMainlineParser(fullBody(sanOnly)))
 
   extension [A](p: P0[A])
-    inline def parse(str: String, context: String): Either[ErrorStr, A] =
-      p.parse(str).bimap(err => showExpectations(context, str, err), _._2)
+    private inline def parse(str: String, context: String): Either[ErrorStr, A] =
+      p.parse(str).bimap(showExpectations(context, str), _._2)
 
-  private def showExpectations(context: String, str: String, error: P.Error): ErrorStr =
-    val lm  = LocationMap(str)
-    val idx = error.failedAtOffset
-    val caret = lm
-      .toCaret(idx)
-      .getOrElse(throw RuntimeException("This is impossible"))
-    val line         = lm.getLine(caret.line).getOrElse("")
-    val errorLine    = line ++ "\n" ++ " ".*(caret.col) ++ "^"
-    val errorMessage = s"$context: [${caret.line + 1}.${caret.col + 1}]: ${expToString(error.expected.head)}"
-    ErrorStr(s"$errorMessage\n\n$errorLine\n$str")
+  private def showExpectations(context: String, str: String)(error: P.Error): ErrorStr =
+    val lm    = LocationMap(str)
+    val idx   = error.failedAtOffset
+    val caret = lm.toCaret(idx).getOrElse(throw RuntimeException("This is impossible"))
+    ErrorStr:
+      s"$context: ${expToString(error.expected.head)} at line ${caret.line + 1}, column ${caret.col + 1}"
 
   private def expToString(expectation: Expectation): String =
     expectation match

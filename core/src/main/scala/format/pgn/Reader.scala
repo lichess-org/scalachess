@@ -36,8 +36,7 @@ object Reader:
   private def makeReplay(game: Game, sans: Sans): Result =
     sans.value
       .foldM(Replay(game)): (replay, san) =>
-        san(replay.state.situation)
-          .bimap((replay, _), replay.addMove(_))
+        san(replay.state.situation).bimap((replay, _), replay.addMove(_))
       .match
         case Left(replay, err) => Result.Incomplete(replay, err)
         case Right(replay)     => Result.Complete(replay)

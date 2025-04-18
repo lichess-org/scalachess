@@ -130,12 +130,6 @@ object Parser:
     val fileMap = File.all.mapBy(_.char)
     val rankMap = Rank.all.mapBy(_.char)
 
-    val castleQSide = List("O-O-O", "o-o-o", "0-0-0", "O‑O‑O", "o‑o‑o", "0‑0‑0", "O–O–O", "o–o–o", "0–0–0")
-    val qCastle: P[Side] = P.stringIn(castleQSide).as(QueenSide)
-
-    val castleKSide      = List("O-O", "o-o", "0-0", "O‑O", "o‑o", "0‑0", "O–O", "o–o", "0–0")
-    val kCastle: P[Side] = P.stringIn(castleKSide).as(KingSide)
-
     val glyph: P[Glyph] = mapParser(Glyph.MoveAssessment.all.mapBy(_.symbol), "glyph")
     val glyphs          = glyph.rep0.map(Glyphs.fromList)
 
@@ -165,11 +159,6 @@ object Parser:
       case ((ro, ca), de) =>
         Std(dest = de, role = ro, capture = ca)
 
-    // B@g5
-    val drop: P[Drop] = ((role <* P.char('@')) ~ dest).map(Drop(_, _))
-
-    val pawnDrop: P[Drop] = (P.char('@') *> dest).map(Drop(Pawn, _))
-
     // optional e.p.
     val optionalEnPassant = (R.wsp.rep0.soft ~ P.stringIn(List("e.p.", "ep"))).void.?
 
@@ -193,12 +182,26 @@ object Parser:
           val glyphs = glyphs1.merge(glyphs2.merge(glyphs3))
           Metas(check, checkmate, comments.cleanUp, glyphs)
 
+    val standard: P[Std] =
+      P.oneOf((pawn :: disambiguated :: ambigous :: Nil).map(_.backtrack))
+
+    val castleQSide = List("O-O-O", "o-o-o", "0-0-0", "O‑O‑O", "o‑o‑o", "0‑0‑0", "O–O–O", "o–o–o", "0–0–0")
+    val qCastle: P[Side] = P.stringIn(castleQSide).as(QueenSide)
+
+    val castleKSide      = List("O-O", "o-o", "0-0", "O‑O", "o‑o", "0‑0", "O–O", "o–o", "0–0")
+    val kCastle: P[Side] = P.stringIn(castleKSide).as(KingSide)
+
     val castle: P[San] = (qCastle | kCastle).map(Castle(_))
 
-    val standard: P[San] =
-      P.oneOf((pawn :: disambiguated :: ambigous :: drop :: pawnDrop :: Nil).map(_.backtrack))
+    // B@g5
+    val pieceDrop: P[Drop] = ((role <* P.char('@')) ~ dest).map(Drop(_, _))
 
-    val san: P[San] = (castle | standard).withContext("Invalid chess move")
+    val pawnDrop: P[Drop] = (P.char('@') *> dest).map(Drop(Pawn, _))
+
+    val drop: P[Drop] =
+      P.oneOf((pieceDrop :: pawnDrop :: Nil).map(_.backtrack))
+
+    val san: P[San] = (castle | standard | drop).withContext("Invalid chess move")
 
     def mapParser[A](pairMap: Map[String, A], name: String): P[A] =
       P.stringIn(pairMap.keySet).map(pairMap.apply) | P.failWith(name + " not found")

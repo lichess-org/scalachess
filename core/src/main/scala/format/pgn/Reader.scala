@@ -34,12 +34,19 @@ object Reader:
       .map(moves => makeReplay(makeGame(tags), op(moves)))
 
   private def makeReplay(game: Game, sans: Sans): Result =
-    sans.value
-      .foldM(Replay(game)): (replay, san) =>
-        san(replay.state.situation).bimap((replay, _), replay.addMove(_))
+    sans.value.zipWithIndex
+      .foldM(Replay(game)) { case (replay, (san, index)) =>
+        san(replay.state.situation).bimap(_ => (replay, makeError(index, game.ply, san)), replay.addMove(_))
+      }
       .match
         case Left(replay, err) => Result.Incomplete(replay, err)
         case Right(replay)     => Result.Complete(replay)
+
+  inline def makeError(index: Int, startedPly: Ply, san: San): ErrorStr =
+    val ply    = startedPly + index
+    val moveAt = ply.fullMoveNumber.value
+    val move   = san.rawString.getOrElse(san.toString)
+    ErrorStr(s"Cannot play $move at move $moveAt by ${ply.turn.name}")
 
   private def makeGame(tags: Tags) =
     val g = Game(variantOption = tags.variant, fen = tags.fen)

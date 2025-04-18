@@ -64,6 +64,7 @@ case class ParsedMainline[A](initialPosition: InitialComments, tags: Tags, sans:
 // Standard Algebraic Notation
 sealed trait San:
   def apply(situation: Situation): Either[ErrorStr, MoveOrDrop]
+  def rawString: Option[String] = None
 
 case class Std(
     dest: Square,
@@ -71,7 +72,8 @@ case class Std(
     capture: Boolean = false,
     file: Option[File] = None,
     rank: Option[Rank] = None,
-    promotion: Option[PromotableRole] = None
+    promotion: Option[PromotableRole] = None,
+    override val rawString: Option[String] = None
 ) extends San:
 
   def apply(situation: Situation): Either[ErrorStr, chess.Move] =
@@ -88,12 +90,12 @@ case class Std(
 
   private inline def compare[A](a: Option[A], b: A) = a.fold(true)(b ==)
 
-case class Drop(role: Role, square: Square) extends San:
+case class Drop(role: Role, square: Square, override val rawString: Option[String] = None) extends San:
 
   def apply(situation: Situation): Either[ErrorStr, chess.Drop] =
     situation.drop(role, square)
 
-case class Castle(side: Side) extends San:
+case class Castle(side: Side, override val rawString: Option[String] = None) extends San:
 
   def apply(situation: Situation): Either[ErrorStr, chess.Move] =
 

@@ -43,10 +43,10 @@ object Reader:
         case Right(replay)     => Result.Complete(replay)
 
   inline def makeError(index: Int, startedPly: Ply, san: San): ErrorStr =
-    val ply    = (startedPly + index).next
+    val ply    = startedPly + index
     val moveAt = ply.fullMoveNumber.value
     val move   = san.rawString.getOrElse(san.toString)
-    ErrorStr(s"Cannot play $move at move $moveAt, ply $ply")
+    ErrorStr(s"Cannot play $move at move $moveAt by ${ply.turn.name}")
 
   private def makeGame(tags: Tags) =
     val g = Game(variantOption = tags.variant, fen = tags.fen)

@@ -156,14 +156,14 @@ class ReaderTest extends ChessTest:
       .full(pgn)
       .assertRight:
         case Incomplete(replay, error) =>
-          assertEquals(error, ErrorStr("Cannot play e6 at move 1, ply 1"))
+          assertEquals(error, ErrorStr("Cannot play e6 at move 1 by white"))
 
   test("more complicated error message"):
     val pgn = PgnStr(
-      "e3 Nc6 d4 Nf6 c3 e5 dxe5 Nxe5 Bb5 a6 Ba4 b5 Bb3 d5 e4 dxe4 f4 Qxd1+ Kxd1 Nd3 Be3 Ng4 Bd4 Ngf2+ Bxf2 Nxf2+ Ke1 Nxh1 Bd5 Ra7 Bc6+ Kd8 Bxe4 Bd6 g3 Re8 Nd2 f5 Ne2 fxe4 Kf1 e3 Kg2 exd2 Rxh1 Bb7+ Kf2 Bc5+ Kf3 d1=Q#"
+      "e3 Nc6 d4 Nf6 c3 e5 dxe5 Nxe5 Bb5 a6 Ba4 b5 Bb3 d5 e4 dxe4 f4 Qxd1+ Kxd1 Nd3 Be3 Ng4 Bd4 Ngf2+ Bxf2 Nxf2+ Ke1 Nxh1 Bd5 Ra7 Bc6+ Kd8 Bxe4 Bd6 g3 Re8 Nd2 f5 Ne2 fxe4 Kf1 e3 Kg2 exd2 Rxh1 Bb7+ Kf2 Bg3+ Kf3 d1=Q#"
     )
     Reader
       .full(pgn)
       .assertRight:
         case Incomplete(replay, error) =>
-          assertEquals(error, ErrorStr("Cannot play Kf3 at move 25, ply 49"))
+          assertEquals(error, ErrorStr("Cannot play Bg3 at move 24 by black"))

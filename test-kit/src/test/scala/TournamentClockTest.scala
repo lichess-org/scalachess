@@ -8,7 +8,7 @@ class TournamentClockTest extends ChessTest:
   val parseStrict = TournamentClock.parse(true)
 
   def someClock(seconds: Int, inc: Int) = Some:
-    TournamentClock(LimitSeconds(seconds), IncrementSeconds(inc))
+    TournamentClock.Single(LimitSeconds(seconds), IncrementSeconds(inc))
 
   test("parse empty"):
     assertEquals(parse(""), None)

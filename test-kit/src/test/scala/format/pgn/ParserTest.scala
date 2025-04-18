@@ -49,7 +49,7 @@ class ParserTest extends ChessTest:
   test("promotion check as a queen"):
     parse("b8=Q ").assertRight: parsed =>
       parsed.mainline.headOption.assertSome: san =>
-        assertEquals(san, Std(Square.B8, Pawn, promotion = Option(Queen)))
+        assertEquals(san, Std(Square.B8, Pawn, promotion = Option(Queen), rawString = "b8=Q".some))
 
   test("promotion check as a rook"):
     parse("b8=R ").assertRight: parsed =>
@@ -88,24 +88,27 @@ class ParserTest extends ChessTest:
   test("glyphs"):
 
     parseMove("b8=B ").assertRight: node =>
-      assertEquals(node.value.san, Std(Square.B8, Pawn, promotion = Option(Bishop)))
+      assertEquals(node.value.san, Std(Square.B8, Pawn, promotion = Option(Bishop), rawString = "b8=B".some))
 
     parseMove("1. e4").assertRight: node =>
-      assertEquals(node.value.san, Std(Square.E4, Pawn))
+      assertEquals(node.value.san, Std(Square.E4, Pawn, rawString = "e4".some))
 
     parseMove("e4").assertRight: node =>
-      assertEquals(node.value.san, Std(Square.E4, Pawn))
+      assertEquals(node.value.san, Std(Square.E4, Pawn, rawString = "e4".some))
 
     parseMove("e4!").assertRight: node =>
-      assertEquals(node.value.san, Std(Square.E4, Pawn))
+      assertEquals(node.value.san, Std(Square.E4, Pawn, rawString = "e4".some))
       assertEquals(node.value.metas.glyphs, Glyphs(Glyph.MoveAssessment.good.some, None, Nil))
 
     parseMove("Ne7g6+?!").assertRight: node =>
-      assertEquals(node.value.san, Std(Square.G6, Knight, false, Some(File.E), Some(Rank.Seventh)))
+      assertEquals(
+        node.value.san,
+        Std(Square.G6, Knight, false, Some(File.E), Some(Rank.Seventh), rawString = "Ne7g6".some)
+      )
       assertEquals(node.value.metas.glyphs, Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil))
 
     parseMove("P@e4?!").assertRight: node =>
-      assertEquals(node.value.san, Drop(Pawn, Square.E4))
+      assertEquals(node.value.san, Drop(Pawn, Square.E4, rawString = "P@e4".some))
       assertEquals(node.value.metas.glyphs, Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil))
 
   test("nags"):
@@ -154,7 +157,7 @@ class ParserTest extends ChessTest:
     Parser
       .san(sanStr)
       .assertRight: san =>
-        assertEquals(san, Std(Square.E4, Pawn))
+        assertEquals(san, Std(Square.E4, Pawn, rawString = "e4".some))
 
   test("mainlineWithMetas == full.mainlineWithMetas"):
     verifyMainlineWithMetas(raws)

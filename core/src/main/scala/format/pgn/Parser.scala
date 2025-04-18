@@ -183,7 +183,9 @@ object Parser:
           Metas(check, checkmate, comments.cleanUp, glyphs)
 
     val standard: P[Std] =
-      P.oneOf((pawn :: disambiguated :: ambigous :: Nil).map(_.backtrack))
+      P.oneOf:
+        (pawn :: disambiguated :: ambigous :: Nil).map:
+          _.backtrack.withString.map((san, raw) => san.copy(rawString = raw.some))
 
     val castleQSide = List("O-O-O", "o-o-o", "0-0-0", "O‑O‑O", "o‑o‑o", "0‑0‑0", "O–O–O", "o–o–o", "0–0–0")
     val qCastle: P[Side] = P.stringIn(castleQSide).as(QueenSide)
@@ -191,7 +193,7 @@ object Parser:
     val castleKSide      = List("O-O", "o-o", "0-0", "O‑O", "o‑o", "0‑0", "O–O", "o–o", "0–0")
     val kCastle: P[Side] = P.stringIn(castleKSide).as(KingSide)
 
-    val castle: P[San] = (qCastle | kCastle).map(Castle(_))
+    val castle: P[San] = (qCastle | kCastle).withString.map((side, raw) => Castle(side, raw.some))
 
     // B@g5
     val pieceDrop: P[Drop] = ((role <* P.char('@')) ~ dest).map(Drop(_, _))
@@ -199,7 +201,9 @@ object Parser:
     val pawnDrop: P[Drop] = (P.char('@') *> dest).map(Drop(Pawn, _))
 
     val drop: P[Drop] =
-      P.oneOf((pieceDrop :: pawnDrop :: Nil).map(_.backtrack))
+      P.oneOf:
+        (pieceDrop :: pawnDrop :: Nil).map:
+          _.backtrack.withString.map((san, raw) => san.copy(rawString = raw.some))
 
     val san: P[San] = (castle | standard | drop).withContext("Invalid chess move")
 

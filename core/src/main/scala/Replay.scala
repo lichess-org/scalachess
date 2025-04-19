@@ -164,14 +164,13 @@ object Replay:
                 val after = moveOrDrop.finalizeAfter
                 val fen   = Fen.write(Game(Situation(after, ply.turn), ply = ply))
                 if compareFen(fen) then ply.asRight
-                else recursivePlyAtFen(Situation(after, !sit.color), rest, ply + 1)
+                else recursivePlyAtFen(Situation(after, !sit.color), rest, ply.next)
 
-      val sit = initialFen.flatMap { Fen.read(variant, _) } | Situation(variant)
+      val sit = initialFen.flatMap(Fen.read(variant, _)) | Situation(variant)
 
       Parser
         .moves(sans)
-        .flatMap: moves =>
-          recursivePlyAtFen(sit, moves.value, Ply(1))
+        .flatMap(moves => recursivePlyAtFen(sit, moves.value, Ply.firstMove))
 
   private def makeGame(variant: Variant, initialFen: Option[Fen.Full]): Game =
     val g = Game(variant.some, initialFen)

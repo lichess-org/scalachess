@@ -15,28 +15,32 @@ trait FenWriter:
   private given Ordering[File] = Ordering.by[File, Int](_.value)
   given Ordering[Square]       = Ordering.by[Square, File](_.file)
 
-  def write(situation: Situation): FullFen = write(Situation.AndFullMoveNumber(situation, FullMoveNumber(1)))
+  def write(situation: Situation): FullFen =
+    write(situation, FullMoveNumber(1))
 
   def write(parsed: Situation.AndFullMoveNumber): FullFen =
-    write(Game(parsed.situation, ply = parsed.ply))
+    write(parsed.situation, parsed.fullMoveNumber)
 
-  def write(game: Game): FullFen = FullFen:
+  def write(game: Game): FullFen =
+    write(game.situation, game.ply.fullMoveNumber)
+
+  def write(situation: Situation, fullMoveNumber: FullMoveNumber): FullFen = FullFen:
     val builder = scala.collection.mutable.StringBuilder(80)
-    builder.append(writeBoard(game.board))
-    builder.append(writeCrazyPocket(game.board))
+    builder.append(writeBoard(situation.board))
+    builder.append(writeCrazyPocket(situation.board))
     builder.addOne(' ')
-    builder.addOne(game.player.letter)
+    builder.addOne(situation.color.letter)
     builder.addOne(' ')
-    builder.append(writeCastles(game.board))
+    builder.append(writeCastles(situation.board))
     builder.addOne(' ')
-    builder.append(game.situation.enPassantSquare.fold("-")(_.key))
+    builder.append(situation.enPassantSquare.fold("-")(_.key))
     builder.addOne(' ')
-    builder.append(game.halfMoveClock)
+    builder.append(situation.history.halfMoveClock)
     builder.addOne(' ')
-    builder.append(game.fullMoveNumber)
-    if game.board.variant == variant.ThreeCheck then
+    builder.append(fullMoveNumber)
+    if situation.board.variant == variant.ThreeCheck then
       builder.addOne(' ')
-      builder.append(writeCheckCount(game.board))
+      builder.append(writeCheckCount(situation.board))
     builder.toString
 
   def writeOpening(situation: Situation): StandardFen = StandardFen:

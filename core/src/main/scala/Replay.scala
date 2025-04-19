@@ -75,16 +75,19 @@ object Replay:
     gameMoveWhileValidReverse(sans, initialFen, variant) match
       case (game, gs, err) => (game, gs.reverse, err)
 
-  private def computeSituations[M](
+  private def computeSituations[M, S](
       sit: Situation,
       moves: List[M],
-      play: M => Situation => Either[ErrorStr, MoveOrDrop]
-  ): Either[ErrorStr, List[Situation]] =
+      play: M => Situation => Either[ErrorStr, MoveOrDrop],
+      transform: Situation => S
+  ): Either[ErrorStr, List[S]] =
     moves
-      .foldM(List(sit)): (sits, move) =>
-        val current = sits.head
-        play(move)(current).map(md => Situation(md.finalizeAfter, !current.color) :: sits)
-      .map(_.reverse)
+      .foldM((sit, List(transform(sit)))) { case ((current, acc), move) =>
+        play(move)(current).map: md =>
+          val nextSit = Situation(md.finalizeAfter, !current.color)
+          (nextSit, transform(nextSit) :: acc)
+      }
+      .map(_._2.reverse)
 
   @scala.annotation.tailrec
   private def computeReplay(replay: Replay, ucis: List[Uci]): Either[ErrorStr, Replay] =
@@ -95,12 +98,8 @@ object Replay:
           case Left(err) => err.asLeft
           case Right(md) => computeReplay(replay.addMove(md), rest)
 
-  private def initialFenToSituation(
-      initialFen: Option[Fen.Full],
-      variant: Variant
-  ): Situation = {
-    initialFen.flatMap(Fen.read) | Situation(variant)
-  }.withVariant(variant)
+  private def initialFenToSituation(initialFen: Option[Fen.Full], variant: Variant): Situation =
+    (initialFen.flatMap(Fen.read) | Situation(variant)).withVariant(variant)
 
   def boards(
       sans: Iterable[SanStr],
@@ -118,20 +117,21 @@ object Replay:
     Parser
       .moves(sans)
       .flatMap: moves =>
-        computeSituations(sit, moves.value, _.apply)
+        computeSituations(sit, moves.value, _.apply, identity)
 
   def boardsFromUci(
       moves: List[Uci],
       initialFen: Option[Fen.Full],
       variant: Variant
-  ): Either[ErrorStr, List[Board]] = situationsFromUci(moves, initialFen, variant).map(_.map(_.board))
+  ): Either[ErrorStr, List[Board]] =
+    computeSituations(initialFenToSituation(initialFen, variant), moves, _.apply, _.board)
 
   def situationsFromUci(
       moves: List[Uci],
       initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, List[Situation]] =
-    computeSituations(initialFenToSituation(initialFen, variant), moves, _.apply)
+    computeSituations(initialFenToSituation(initialFen, variant), moves, _.apply, identity)
 
   def apply(
       moves: List[Uci],

@@ -49,16 +49,20 @@ object Replay:
   ): (Game, List[(Game, Uci.WithSan)], Option[ErrorStr]) =
     val init       = makeGame(variant, initialFen.some)
     val emptyGames = List.empty[(Game, Uci.WithSan)]
-    sans
+    sans.zipWithIndex
       .foldM((init, emptyGames)):
-        case ((head, games), str) =>
+        case ((head, games), (str, index)) =>
           Parser
             .san(str)
             .flatMap: san =>
               san(head.situation)
-                .map: move =>
-                  val newGame = move.applyGame(head)
-                  (newGame, (newGame, Uci.WithSan(move.toUci, str)) :: games)
+                .bimap(
+                  _ => Reader.makeError(init.ply + index, san),
+                  { move =>
+                    val newGame = move.applyGame(head)
+                    (newGame, (newGame, Uci.WithSan(move.toUci, str)) :: games)
+                  }
+                )
             .leftMap(err => (init, games, err.some))
       .map(gs => (init, gs._2, none))
       .merge
@@ -160,14 +164,13 @@ object Replay:
                 val after = moveOrDrop.finalizeAfter
                 val fen   = Fen.write(Game(Situation(after, ply.turn), ply = ply))
                 if compareFen(fen) then ply.asRight
-                else recursivePlyAtFen(Situation(after, !sit.color), rest, ply + 1)
+                else recursivePlyAtFen(Situation(after, !sit.color), rest, ply.next)
 
-      val sit = initialFen.flatMap { Fen.read(variant, _) } | Situation(variant)
+      val sit = initialFen.flatMap(Fen.read(variant, _)) | Situation(variant)
 
       Parser
         .moves(sans)
-        .flatMap: moves =>
-          recursivePlyAtFen(sit, moves.value, Ply(1))
+        .flatMap(moves => recursivePlyAtFen(sit, moves.value, Ply.firstMove))
 
   private def makeGame(variant: Variant, initialFen: Option[Fen.Full]): Game =
     val g = Game(variant.some, initialFen)

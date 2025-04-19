@@ -36,17 +36,16 @@ object Reader:
   private def makeReplay(game: Game, sans: Sans): Result =
     sans.value.zipWithIndex
       .foldM(Replay(game)) { case (replay, (san, index)) =>
-        san(replay.state.situation).bimap(_ => (replay, makeError(index, game.ply, san)), replay.addMove(_))
+        san(replay.state.situation).bimap(_ => (replay, makeError(game.ply + index, san)), replay.addMove(_))
       }
       .match
         case Left(replay, err) => Result.Incomplete(replay, err)
         case Right(replay)     => Result.Complete(replay)
 
-  inline def makeError(index: Int, startedPly: Ply, san: San): ErrorStr =
-    val ply    = startedPly + index
-    val moveAt = ply.fullMoveNumber.value
+  inline def makeError(currentPly: Ply, san: San): ErrorStr =
+    val moveAt = currentPly.fullMoveNumber.value
     val move   = san.rawString.getOrElse(san.toString)
-    ErrorStr(s"Cannot play $move at move $moveAt by ${ply.turn.name}")
+    ErrorStr(s"Cannot play $move at move $moveAt by ${currentPly.turn.name}")
 
   private def makeGame(tags: Tags) =
     val g = Game(variantOption = tags.variant, fen = tags.fen)

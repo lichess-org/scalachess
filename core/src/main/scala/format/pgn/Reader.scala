@@ -5,14 +5,9 @@ import cats.syntax.all.*
 
 object Reader:
 
-  sealed trait Result:
-    def valid: Either[ErrorStr, Replay]
-
-  object Result:
-    case class Complete(replay: Replay) extends Result:
-      def valid = replay.asRight
-    case class Incomplete(replay: Replay, failure: ErrorStr) extends Result:
-      def valid = failure.asLeft
+  case class Result(replay: Replay, failure: Option[ErrorStr]):
+    def valid: Either[ErrorStr, Replay] =
+      failure.fold(replay.asRight)(_.asLeft)
 
   def full(pgn: PgnStr, tags: Tags = Tags.empty): Either[ErrorStr, Result] =
     fullWithSans(pgn, identity, tags)
@@ -39,8 +34,8 @@ object Reader:
         san(replay.state.situation).bimap(_ => (replay, makeError(game.ply + index, san)), replay.addMove(_))
       }
       .match
-        case Left(replay, err) => Result.Incomplete(replay, err)
-        case Right(replay)     => Result.Complete(replay)
+        case Left(replay, err) => Result(replay, err.some)
+        case Right(replay)     => Result(replay, none)
 
   inline def makeError(currentPly: Ply, san: San): ErrorStr =
     val moveAt = currentPly.fullMoveNumber.value

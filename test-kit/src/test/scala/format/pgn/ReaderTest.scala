@@ -8,7 +8,7 @@ import MoveOrDrop.*
 class ReaderTest extends ChessTest:
 
   import Fixtures.*
-  import Reader.Result.*
+  import Reader.*
 
   // "only raw moves" should:
   test("many games"):
@@ -16,7 +16,7 @@ class ReaderTest extends ChessTest:
       Reader
         .full(c)
         .assertRight:
-          case Complete(replay) => assertEquals(replay.moves.size, c.split(' ').length)
+          case Result(replay, None) => assertEquals(replay.moves.size, c.split(' ').length)
   test("example from prod 1"):
     assert(Reader.full(fromProd1).isRight)
   test("example from prod 2"):
@@ -31,12 +31,12 @@ class ReaderTest extends ChessTest:
     Reader
       .full(withDelimiters)
       .assertRight:
-        case Complete(replay) => assertEquals(replay.moves.size, 33)
+        case Result(replay, None) => assertEquals(replay.moves.size, 33)
   test("and delimiters on new lines"):
     Reader
       .full(withDelimitersOnNewLines)
       .assertRight:
-        case Complete(replay) => assertEquals(replay.moves.size, 33)
+        case Result(replay, None) => assertEquals(replay.moves.size, 33)
   // "tags and moves" should:
   test("chess960"):
     assert(Reader.full(complete960).isRight)
@@ -64,13 +64,13 @@ class ReaderTest extends ChessTest:
     Reader
       .full(invalidVariant)
       .assertRight:
-        case Complete(replay) =>
+        case Result(replay, None) =>
           assertEquals(replay.setup.board.variant, variant.Standard)
   test("promoting to a rook"):
     Reader
       .full(fromLichessBadPromotion)
       .assertRight:
-        case Complete(replay) =>
+        case Result(replay, None) =>
           replay.chronoMoves
             .lift(10)
             .assertSome: m =>
@@ -87,7 +87,7 @@ class ReaderTest extends ChessTest:
     Reader
       .full(crazyhouse1)
       .assertRight:
-        case Complete(replay) =>
+        case Result(replay, None) =>
           replay.chronoMoves
             .lift(11)
             .assertSome: m =>
@@ -96,12 +96,12 @@ class ReaderTest extends ChessTest:
     Reader
       .full(crazyhouse2)
       .assertRight:
-        case Complete(replay) => assertEquals(replay.chronoMoves.size, 111)
+        case Result(replay, None) => assertEquals(replay.chronoMoves.size, 111)
   test("crazyhouse without variant tag"):
     Reader
       .full(crazyhouseNoVariantTag)
       .assertRight:
-        case Incomplete(replay, _) =>
+        case Result(replay, _) =>
           assertEquals(replay.chronoMoves.size, 8)
   test("crazyhouse from chess.com"):
     assert(Reader.full(chessComCrazyhouse).isRight)
@@ -111,38 +111,38 @@ class ReaderTest extends ChessTest:
     Reader
       .full(fromPosProdCloseChess)
       .assertRight:
-        case Complete(replay) =>
+        case Result(replay, None) =>
           assertEquals(replay.chronoMoves.size, 152)
   test("from position empty FEN"):
     Reader
       .full(fromPositionEmptyFen)
       .assertRight:
-        case Complete(replay) =>
+        case Result(replay, None) =>
           assertEquals(replay.chronoMoves.size, 164)
   test("preserves initial ply"):
     Reader
       .full(caissa)
       .assertRight:
-        case Complete(replay) =>
+        case Result(replay, None) =>
           assertEquals(replay.setup.startedAtPly, 43)
 
   test("partial from broadcast"):
     Reader
       .full(festivalFigueira)
       .assertRight:
-        case Incomplete(replay, _) =>
+        case Result(replay, _) =>
           assertEquals(replay.chronoMoves.size, 113)
   test("invisible char"):
     Reader
       .full(invisibleChar)
       .assertRight:
-        case Complete(replay) =>
+        case Result(replay, None) =>
           assertEquals(replay.chronoMoves.size, 19)
   test("exotic notation from clono.no"):
     Reader
       .full(clonoNoExoticNotation)
       .assertRight:
-        case Complete(replay) =>
+        case Result(replay, None) =>
           replay.chronoMoves
             .lift(42)
             .assertSome: m =>
@@ -155,7 +155,7 @@ class ReaderTest extends ChessTest:
     Reader
       .full(pgn)
       .assertRight:
-        case Incomplete(replay, error) =>
+        case Result(replay, Some(error)) =>
           assertEquals(error, ErrorStr("Cannot play e6 at move 1 by white"))
 
   test("error message by black"):
@@ -163,7 +163,7 @@ class ReaderTest extends ChessTest:
     Reader
       .full(pgn)
       .assertRight:
-        case Incomplete(replay, error) =>
+        case Result(replay, Some(error)) =>
           assertEquals(error, ErrorStr("Cannot play e4 at move 1 by black"))
 
   test("more error message"):
@@ -173,5 +173,5 @@ class ReaderTest extends ChessTest:
     Reader
       .full(pgn)
       .assertRight:
-        case Incomplete(replay, error) =>
+        case Result(replay, Some(error)) =>
           assertEquals(error, ErrorStr("Cannot play Bg3 at move 24 by black"))

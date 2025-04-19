@@ -36,7 +36,7 @@ class Chess960Test extends ChessTest:
     Reader
       .full(pgn)
       .assertRight:
-        case Reader.Result.Complete(replay) =>
+        case Reader.Result(replay, None) =>
           assertEquals(
             replay.state.situation.legalMoves.find(_.castles).map(_.toUci),
             Some(format.Uci.Move(Square.E1, Square.B1))

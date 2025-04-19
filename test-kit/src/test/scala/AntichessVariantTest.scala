@@ -211,7 +211,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     Reader
       .full(fullGame)
       .assertRight:
-        case Reader.Result.Complete(replay) =>
+        case Reader.Result(replay, None) =>
           val game = replay.state
           assert(game.situation.end)
           // In antichess, the player who has just lost all their pieces is the winner
@@ -256,7 +256,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     Reader
       .full(pgn)
       .assertRight:
-        case Reader.Result.Complete(replay) =>
+        case Reader.Result(replay, None) =>
           val game = replay.state
           assertNot(game.situation.end)
           assertEquals(game.situation.winner, None)

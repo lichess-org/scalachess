@@ -36,12 +36,8 @@ object Replay:
         sans,
         Tags(
           List(
-            initialFen.map { fen =>
-              Tag(_.FEN, fen.value)
-            },
-            variant.some.filterNot(_.standard).map { v =>
-              Tag(_.Variant, v.name)
-            }
+            initialFen.map(fen => Tag(_.FEN, fen.value)),
+            variant.some.filterNot(_.standard).map(v => Tag(_.Variant, v.name))
           ).flatten
         )
       )
@@ -53,16 +49,20 @@ object Replay:
   ): (Game, List[(Game, Uci.WithSan)], Option[ErrorStr]) =
     val init       = makeGame(variant, initialFen.some)
     val emptyGames = List.empty[(Game, Uci.WithSan)]
-    sans
+    sans.zipWithIndex
       .foldM((init, emptyGames)):
-        case ((head, games), str) =>
+        case ((head, games), (str, index)) =>
           Parser
-            .sanOnly(str)
+            .san(str)
             .flatMap: san =>
               san(head.situation)
-                .map: move =>
-                  val newGame = move.applyGame(head)
-                  (newGame, (newGame, Uci.WithSan(move.toUci, str)) :: games)
+                .bimap(
+                  _ => Reader.makeError(init.ply + index, san),
+                  { move =>
+                    val newGame = move.applyGame(head)
+                    (newGame, (newGame, Uci.WithSan(move.toUci, str)) :: games)
+                  }
+                )
             .leftMap(err => (init, games, err.some))
       .map(gs => (init, gs._2, none))
       .merge
@@ -75,16 +75,19 @@ object Replay:
     gameMoveWhileValidReverse(sans, initialFen, variant) match
       case (game, gs, err) => (game, gs.reverse, err)
 
-  private def computeSituations[M](
+  private def computeSituations[M, S](
       sit: Situation,
       moves: List[M],
-      play: M => Situation => Either[ErrorStr, MoveOrDrop]
-  ): Either[ErrorStr, List[Situation]] =
+      play: M => Situation => Either[ErrorStr, MoveOrDrop],
+      transform: Situation => S
+  ): Either[ErrorStr, List[S]] =
     moves
-      .foldM(List(sit)): (sits, move) =>
-        val current = sits.head
-        play(move)(current).map(md => Situation(md.finalizeAfter, !current.color) :: sits)
-      .map(_.reverse)
+      .foldM((sit, List(transform(sit)))) { case ((current, acc), move) =>
+        play(move)(current).map: md =>
+          val nextSit = Situation(md.finalizeAfter, !current.color)
+          (nextSit, transform(nextSit) :: acc)
+      }
+      .map(_._2.reverse)
 
   @scala.annotation.tailrec
   private def computeReplay(replay: Replay, ucis: List[Uci]): Either[ErrorStr, Replay] =
@@ -95,12 +98,8 @@ object Replay:
           case Left(err) => err.asLeft
           case Right(md) => computeReplay(replay.addMove(md), rest)
 
-  private def initialFenToSituation(
-      initialFen: Option[Fen.Full],
-      variant: Variant
-  ): Situation = {
-    initialFen.flatMap(Fen.read) | Situation(variant)
-  }.withVariant(variant)
+  private def initialFenToSituation(initialFen: Option[Fen.Full], variant: Variant): Situation =
+    (initialFen.flatMap(Fen.read) | Situation(variant)).withVariant(variant)
 
   def boards(
       sans: Iterable[SanStr],
@@ -118,20 +117,21 @@ object Replay:
     Parser
       .moves(sans)
       .flatMap: moves =>
-        computeSituations(sit, moves.value, _.apply)
+        computeSituations(sit, moves.value, _.apply, identity)
 
   def boardsFromUci(
       moves: List[Uci],
       initialFen: Option[Fen.Full],
       variant: Variant
-  ): Either[ErrorStr, List[Board]] = situationsFromUci(moves, initialFen, variant).map(_.map(_.board))
+  ): Either[ErrorStr, List[Board]] =
+    computeSituations(initialFenToSituation(initialFen, variant), moves, _.apply, _.board)
 
   def situationsFromUci(
       moves: List[Uci],
       initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, List[Situation]] =
-    computeSituations(initialFenToSituation(initialFen, variant), moves, _.apply)
+    computeSituations(initialFenToSituation(initialFen, variant), moves, _.apply, identity)
 
   def apply(
       moves: List[Uci],
@@ -164,14 +164,13 @@ object Replay:
                 val after = moveOrDrop.finalizeAfter
                 val fen   = Fen.write(Game(Situation(after, ply.turn), ply = ply))
                 if compareFen(fen) then ply.asRight
-                else recursivePlyAtFen(Situation(after, !sit.color), rest, ply + 1)
+                else recursivePlyAtFen(Situation(after, !sit.color), rest, ply.next)
 
-      val sit = initialFen.flatMap { Fen.read(variant, _) } | Situation(variant)
+      val sit = initialFen.flatMap(Fen.read(variant, _)) | Situation(variant)
 
       Parser
         .moves(sans)
-        .flatMap: moves =>
-          recursivePlyAtFen(sit, moves.value, Ply(1))
+        .flatMap(moves => recursivePlyAtFen(sit, moves.value, Ply.firstMove))
 
   private def makeGame(variant: Variant, initialFen: Option[Fen.Full]): Game =
     val g = Game(variant.some, initialFen)

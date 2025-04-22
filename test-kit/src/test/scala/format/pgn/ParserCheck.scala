@@ -9,8 +9,22 @@ import ChessTreeArbitraries.*
 
 class ParserCheck extends ScalaCheckSuite:
 
-  test("ParserCheck"):
+  test("parse >>= render == identity"):
     forAll(genPgn(Situation(Standard))): pgn =>
       val str    = pgn.render
       val result = Parser.full(str).toOption.get.toPgn.render
       assertEquals(result, str)
+
+  test("mainline == full.mainlineWithMetas"):
+    forAll(genPgn(Situation(Standard))): pgn =>
+      val str      = pgn.render
+      val expected = Parser.full(str).toOption.map(_.mainlineWithMetas)
+      val mainline = Parser.mainlineWithMetas(str).toOption.map(_.sans)
+      assertEquals(mainline, expected)
+
+  test("mainlineWithSan == full.mainline"):
+    forAll(genPgn(Situation(Standard))): pgn =>
+      val str      = pgn.render
+      val expected = Parser.full(str).toOption.map(_.mainline)
+      val mainline = Parser.mainline(str).toOption.map(_.sans)
+      assertEquals(mainline, expected)

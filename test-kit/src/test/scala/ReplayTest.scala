@@ -2,7 +2,7 @@ package chess
 
 import cats.syntax.option.*
 import chess.format.pgn.{ Fixtures, SanStr }
-import chess.variant.Chess960
+import chess.variant.{ Chess960, Standard }
 
 import format.{ FullFen, Fen, Uci }
 import macros.uci
@@ -120,3 +120,17 @@ class ReplayTest extends ChessTest:
       .foreach: moves =>
         assertMatch(Replay.gameMoveWhileValid(moves, chess.format.Fen.initial, chess.variant.Standard)):
           case (_, games, None) => assertEquals(games.size, moves.size)
+
+  /*============== Error Messages ==============*/
+
+  test("error message for white"):
+    val sans = List(SanStr("Nf7"))
+    Replay.gameMoveWhileValid(sans, Standard.initialFen, Standard) match
+      case (_, _, error) =>
+        assertEquals(error, ErrorStr("Cannot play Nf7 at move 1 by white").some)
+
+  test("error message for black"):
+    val sans = List("e4", "e4").map(SanStr(_))
+    Replay.gameMoveWhileValid(sans, Standard.initialFen, Standard) match
+      case (_, _, error) =>
+        assertEquals(error, ErrorStr("Cannot play e4 at move 1 by black").some)

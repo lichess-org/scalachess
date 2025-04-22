@@ -5,11 +5,11 @@ import scala.util.Try
 
 object Binary:
 
-  def writeMove(m: SanStr)             = Try(Writer.move(m))
-  def writeMoves(ms: Iterable[SanStr]) = Try(Writer.moves(ms))
+  def writeMove(m: SanStr): Try[List[Byte]]              = Try(Writer.move(m))
+  def writeMoves(ms: Iterable[SanStr]): Try[Array[Byte]] = Try(Writer.moves(ms))
 
-  def readMoves(bs: List[Byte])          = Try(Reader.moves(bs))
-  def readMoves(bs: List[Byte], nb: Int) = Try(Reader.moves(bs, nb))
+  def readMoves(bs: List[Byte]): Try[List[SanStr]]          = Try(Reader.moves(bs))
+  def readMoves(bs: List[Byte], nb: Int): Try[List[SanStr]] = Try(Reader.moves(bs, nb))
 
   private object MoveType:
     val SimplePawn  = 0

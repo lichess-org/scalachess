@@ -1,26 +1,45 @@
 package chess
 package bitboard
 
+import scala.annotation.static
+
+class Attacks
 object Attacks:
+  @static
   private val all = -1L
 
-  private[bitboard] val RANKS   = Array.fill(8)(0L)
-  private[bitboard] val FILES   = Array.fill(8)(0L)
+  @static
+  private[bitboard] val RANKS = Array.fill(8)(0L)
+  @static
+  private[bitboard] val FILES = Array.fill(8)(0L)
+  @static
   private[bitboard] val BETWEEN = Array.ofDim[Long](64, 64)
-  private[bitboard] val RAYS    = Array.ofDim[Long](64, 64)
+  @static
+  private[bitboard] val RAYS = Array.ofDim[Long](64, 64)
 
   // Large overlapping attack table indexed using magic multiplication.
-  private[bitboard] val ATTACKS            = Array.fill(88772)(0L)
-  private[bitboard] val KNIGHT_ATTACKS     = Array.fill(64)(0L)
-  private[bitboard] val KING_ATTACKS       = Array.fill(64)(0L)
+  @static
+  private[bitboard] val ATTACKS = Array.fill(88772)(0L)
+  @static
+  private[bitboard] val KNIGHT_ATTACKS = Array.fill(64)(0L)
+  @static
+  private[bitboard] val KING_ATTACKS = Array.fill(64)(0L)
+  @static
   private[bitboard] val WHITE_PAWN_ATTACKS = Array.fill(64)(0L)
+  @static
   private[bitboard] val BLACK_PAWN_ATTACKS = Array.fill(64)(0L)
 
-  private val KNIGHT_DELTAS     = Array[Int](17, 15, 10, 6, -17, -15, -10, -6)
-  private val BISHOP_DELTAS     = Array[Int](7, -7, 9, -9)
-  private val ROOK_DELTAS       = Array[Int](1, -1, 8, -8)
-  private val KING_DELTAS       = Array[Int](1, 7, 8, 9, -1, -7, -8, -9)
+  @static
+  private val KNIGHT_DELTAS = Array[Int](17, 15, 10, 6, -17, -15, -10, -6)
+  @static
+  private val BISHOP_DELTAS = Array[Int](7, -7, 9, -9)
+  @static
+  private val ROOK_DELTAS = Array[Int](1, -1, 8, -8)
+  @static
+  private val KING_DELTAS = Array[Int](1, 7, 8, 9, -1, -7, -8, -9)
+  @static
   private val WHITE_PAWN_DELTAS = Array[Int](7, 9)
+  @static
   private val BLACK_PAWN_DELTAS = Array[Int](-7, -9)
 
   /** Slow attack set generation. Used only to bootstrap the attack tables.

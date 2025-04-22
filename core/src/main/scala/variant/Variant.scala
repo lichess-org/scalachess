@@ -85,7 +85,7 @@ abstract class Variant private[variant] (
     yield m3
 
   def drop(situation: Situation, role: Role, square: Square): Either[ErrorStr, Drop] =
-    ErrorStr(s"$this variant cannot drop $situation $role $square").asLeft
+    ErrorStr(s"$this variant cannot drop $role $square").asLeft
 
   def staleMate(situation: Situation): Boolean = situation.check.no && situation.legalMoves.isEmpty
 
@@ -222,10 +222,10 @@ object Variant:
   def exists(id: Id): Boolean = list.byId.contains(id)
 
   private[variant] def symmetricRank(rank: IndexedSeq[Role]): Map[Square, Piece] =
-    File.all.zip(rank).map((x, role) => Square(x, Rank.First) -> (White - role)) ++
+    (File.all.zip(rank).map((x, role) => Square(x, Rank.First) -> (White - role)) ++
       File.all.map(Square(_, Rank.Second) -> White.pawn) ++
       File.all.map(Square(_, Rank.Seventh) -> Black.pawn) ++
-      File.all.zip(rank).map((x, role) => Square(x, Rank.Eighth) -> (Black - role)) toMap
+      File.all.zip(rank).map((x, role) => Square(x, Rank.Eighth) -> (Black - role))).toMap
 
   def isValidInitialFen(variant: Variant, fen: Option[Fen.Full], strict: Boolean = false) =
     if variant.chess960

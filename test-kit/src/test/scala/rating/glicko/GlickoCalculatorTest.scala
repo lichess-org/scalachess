@@ -4,6 +4,11 @@ import chess.{ ByColor, Outcome }
 import munit.ScalaCheckSuite
 
 class GlickoCalculatorTest extends ScalaCheckSuite with chess.MunitExtensions:
+  // Validate results with reference implementations
+  // http://www.glicko.net/glicko/glicko2.pdf
+  val R: Double  = 1500d
+  val RD: Double = 350d
+  val V: Double  = 0.06d
 
   val calc = GlickoCalculator(
     ratingPeriodsPerDay = RatingPeriodsPerDay(0.21436d)
@@ -15,34 +20,32 @@ class GlickoCalculatorTest extends ScalaCheckSuite with chess.MunitExtensions:
   {
     val players = ByColor.fill:
       Player(
-        Glicko(rating = 1500d, deviation = 500d, volatility = 0.09d),
-        numberOfResults = 0,
-        lastRatingPeriodEnd = None
+        Glicko(rating = R, deviation = RD, volatility = V)
       )
     test("default deviation: white wins"):
       val (w, b) = computeGame(players, Outcome.white)
-      assertCloseTo(w.rating, 1741d, 1d)
-      assertCloseTo(b.rating, 1258d, 1d)
-      assertCloseTo(w.deviation, 396d, 1d)
-      assertCloseTo(b.deviation, 396d, 1d)
-      assertCloseTo(w.volatility, 0.0899983, 0.00000001d)
-      assertCloseTo(b.volatility, 0.0899983, 0.0000001d)
+      assertCloseTo(w.rating, 1662.21d, 0.005d)
+      assertCloseTo(b.rating, 1337.79d, 0.005d)
+      assertCloseTo(w.deviation, 290.23d, 0.005d)
+      assertCloseTo(b.deviation, 290.23d, 0.005d)
+      assertCloseTo(w.volatility, 0.0599993d, 0.0000001d)
+      assertCloseTo(b.volatility, 0.0599993d, 0.0000001d)
     test("default deviation: black wins"):
       val (w, b) = computeGame(players, Outcome.black)
-      assertCloseTo(w.rating, 1258d, 1d)
-      assertCloseTo(b.rating, 1741d, 1d)
-      assertCloseTo(w.deviation, 396d, 1d)
-      assertCloseTo(b.deviation, 396d, 1d)
-      assertCloseTo(w.volatility, 0.0899983, 0.00000001d)
-      assertCloseTo(b.volatility, 0.0899983, 0.0000001d)
+      assertCloseTo(w.rating, 1337.79d, 0.005d)
+      assertCloseTo(b.rating, 1662.21d, 0.005d)
+      assertCloseTo(w.deviation, 290.23d, 0.005d)
+      assertCloseTo(b.deviation, 290.23d, 0.005d)
+      assertCloseTo(w.volatility, 0.0599993d, 0.0000001d)
+      assertCloseTo(b.volatility, 0.0599993d, 0.0000001d)
     test("default deviation: draw"):
       val (w, b) = computeGame(players, Outcome.draw)
-      assertCloseTo(w.rating, 1500d, 1d)
-      assertCloseTo(b.rating, 1500d, 1d)
-      assertCloseTo(w.deviation, 396d, 1d)
-      assertCloseTo(b.deviation, 396d, 1d)
-      assertCloseTo(w.volatility, 0.0899954, 0.0000001d)
-      assertCloseTo(b.volatility, 0.0899954, 0.0000001d)
+      assertCloseTo(w.rating, 1500d, 0.005d)
+      assertCloseTo(b.rating, 1500d, 0.005d)
+      assertCloseTo(w.deviation, 290.23d, 0.005d)
+      assertCloseTo(b.deviation, 290.23d, 0.005d)
+      assertCloseTo(w.volatility, 0.0599977d, 0.0000001d)
+      assertCloseTo(b.volatility, 0.0599977d, 0.0000001d)
   }
 
   {
@@ -60,26 +63,26 @@ class GlickoCalculatorTest extends ScalaCheckSuite with chess.MunitExtensions:
     )
     test("mixed ratings and deviations: white wins"):
       val (w, b) = computeGame(players, Outcome.white)
-      assertCloseTo(w.rating, 1422d, 1d)
-      assertCloseTo(b.rating, 1506d, 1d)
-      assertCloseTo(w.deviation, 77d, 1d)
-      assertCloseTo(b.deviation, 105d, 1d)
+      assertCloseTo(w.rating, 1422.63d, 0.005d)
+      assertCloseTo(b.rating, 1506.32d, 0.005d)
+      assertCloseTo(w.deviation, 77.50d, 0.005d)
+      assertCloseTo(b.deviation, 105.87d, 0.005d)
       assertCloseTo(w.volatility, 0.06, 0.00001d)
       assertCloseTo(b.volatility, 0.065, 0.00001d)
     test("mixed ratings and deviations: black wins"):
       val (w, b) = computeGame(players, Outcome.black)
-      assertCloseTo(w.rating, 1389d, 1d)
-      assertCloseTo(b.rating, 1568d, 1d)
-      assertCloseTo(w.deviation, 78d, 1d)
-      assertCloseTo(b.deviation, 105d, 1d)
+      assertCloseTo(w.rating, 1389.99d, 0.005d)
+      assertCloseTo(b.rating, 1568.90d, 0.005d)
+      assertCloseTo(w.deviation, 77.50d, 0.005d)
+      assertCloseTo(b.deviation, 105.87d, 0.005d)
       assertCloseTo(w.volatility, 0.06, 0.00001d)
       assertCloseTo(b.volatility, 0.065, 0.00001d)
     test("mixed ratings and deviations: draw"):
       val (w, b) = computeGame(players, Outcome.draw)
-      assertCloseTo(w.rating, 1406d, 1d)
-      assertCloseTo(b.rating, 1537d, 1d)
-      assertCloseTo(w.deviation, 78d, 1d)
-      assertCloseTo(b.deviation, 105.87d, 0.01d)
+      assertCloseTo(w.rating, 1406.31d, 0.005d)
+      assertCloseTo(b.rating, 1537.61d, 0.005d)
+      assertCloseTo(w.deviation, 77.50d, 0.005d)
+      assertCloseTo(b.deviation, 105.87d, 0.005d)
       assertCloseTo(w.volatility, 0.06, 0.00001d)
       assertCloseTo(b.volatility, 0.065, 0.00001d)
   }
@@ -99,26 +102,26 @@ class GlickoCalculatorTest extends ScalaCheckSuite with chess.MunitExtensions:
     )
     test("more mixed ratings and deviations: white wins"):
       val (w, b) = computeGame(players, Outcome.white)
-      assertCloseTo(w.rating, 1216.7d, 0.1d)
-      assertCloseTo(b.rating, 1636d, 0.1d)
-      assertCloseTo(w.deviation, 59.9d, 0.1d)
-      assertCloseTo(b.deviation, 196.9d, 0.1d)
+      assertCloseTo(w.rating, 1216.73d, 0.005d)
+      assertCloseTo(b.rating, 1635.99d, 0.005d)
+      assertCloseTo(w.deviation, 59.90d, 0.005d)
+      assertCloseTo(b.deviation, 196.99d, 0.005d)
       assertCloseTo(w.volatility, 0.053013, 0.000001d)
       assertCloseTo(b.volatility, 0.062028, 0.000001d)
     test("more mixed ratings and deviations: black wins"):
       val (w, b) = computeGame(players, Outcome.black)
-      assertCloseTo(w.rating, 1199.3d, 0.1d)
-      assertCloseTo(b.rating, 1855.4d, 0.1d)
-      assertCloseTo(w.deviation, 59.9d, 0.1d)
-      assertCloseTo(b.deviation, 196.9d, 0.1d)
+      assertCloseTo(w.rating, 1199.29d, 0.005d)
+      assertCloseTo(b.rating, 1855.42d, 0.005d)
+      assertCloseTo(w.deviation, 59.90d, 0.005d)
+      assertCloseTo(b.deviation, 196.99d, 0.005d)
       assertCloseTo(w.volatility, 0.052999, 0.000001d)
       assertCloseTo(b.volatility, 0.061999, 0.000001d)
     test("more mixed ratings and deviations: draw"):
       val (w, b) = computeGame(players, Outcome.draw)
-      assertCloseTo(w.rating, 1208.0, 0.1d)
-      assertCloseTo(b.rating, 1745.7, 0.1d)
-      assertCloseTo(w.deviation, 59.90056, 0.1d)
-      assertCloseTo(b.deviation, 196.98729, 0.1d)
+      assertCloseTo(w.rating, 1208.01d, 0.005d)
+      assertCloseTo(b.rating, 1745.71d, 0.005d)
+      assertCloseTo(w.deviation, 59.90056, 0.005d)
+      assertCloseTo(b.deviation, 196.98729, 0.005d)
       assertCloseTo(w.volatility, 0.053002, 0.000001d)
       assertCloseTo(b.volatility, 0.062006, 0.000001d)
   }

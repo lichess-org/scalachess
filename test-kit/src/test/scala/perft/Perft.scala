@@ -4,7 +4,6 @@ package perft
 import chess.format.{ Fen, FullFen }
 import chess.variant.{ Chess960, Crazyhouse, Variant }
 
-
 case class Perft(id: String, epd: FullFen, cases: List[TestCase]):
   import Perft.*
   def calculate(variant: Variant): List[Result] =

@@ -1,21 +1,20 @@
 package chess
 
+import cats.syntax.all.*
 import chess.format.Uci
 import chess.format.pgn.SanStr
-import cats.syntax.all.*
 
 sealed trait MoveOrDrop:
 
-  def isMove = this.isInstanceOf[Move]
-  def isDrop = this.isInstanceOf[Drop]
-
-  def fold[A](move: Move => A, drop: Drop => A): A =
+  inline def fold[A](move: Move => A, drop: Drop => A): A =
     this match
       case m: Move => move(m)
       case d: Drop => drop(d)
 
   def move: Option[Move] = this.fold(Some(_), _ => None)
   def drop: Option[Drop] = this.fold(_ => None, Some(_))
+
+  def color: Color
 
   def applyVariantEffect: MoveOrDrop
 
@@ -27,17 +26,12 @@ sealed trait MoveOrDrop:
 
   def toUci: Uci
 
-  def toSanStr: SanStr =
-    this match
-      case m: Move => m.san
-      case d: Drop => d.san
+  def toSanStr: SanStr
 
   inline def applyGame(game: Game): Game =
     this match
       case m: Move => game(m)
       case d: Drop => game.applyDrop(d)
-
-  def color: Color
 
 case class Move(
     piece: Piece,
@@ -52,9 +46,9 @@ case class Move(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  inline def before    = situationBefore.board
-  def situationAfter   = Situation(finalizeAfter, !piece.color)
-  lazy val san: SanStr = format.pgn.Dumper(this)
+  inline def before         = situationBefore.board
+  def situationAfter        = Situation(finalizeAfter, !piece.color)
+  lazy val toSanStr: SanStr = format.pgn.Dumper(this)
 
   // TODO rethink about how handle castling
   // it's quite messy and error prone now
@@ -156,7 +150,7 @@ case class Move(
 
   inline def withMetrics(m: MoveMetrics) = copy(metrics = m)
 
-  inline def toUci = Uci.Move(orig, dest, promotion)
+  inline def toUci: Uci.Move = Uci.Move(orig, dest, promotion)
 
   override def toString = s"$piece ${toUci.uci}"
 end Move
@@ -175,9 +169,9 @@ case class Drop(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  inline def before    = situationBefore.board
-  def situationAfter   = Situation(finalizeAfter, !piece.color)
-  lazy val san: SanStr = format.pgn.Dumper(this)
+  inline def before         = situationBefore.board
+  def situationAfter        = Situation(finalizeAfter, !piece.color)
+  lazy val toSanStr: SanStr = format.pgn.Dumper(this)
 
   lazy val finalizeAfter: Board =
     val board = after.variant.finalizeBoard(
@@ -215,6 +209,6 @@ case class Drop(
 
   inline def withMetrics(m: MoveMetrics) = copy(metrics = m)
 
-  inline def toUci = Uci.Drop(piece.role, square)
+  inline def toUci: Uci.Drop = Uci.Drop(piece.role, square)
 
   override def toString = toUci.uci

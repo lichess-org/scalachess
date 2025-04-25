@@ -2,7 +2,7 @@ package chess
 
 import cats.syntax.all.*
 import chess.format.Uci
-import chess.variant.{ Antichess, Crazyhouse, Standard }
+import chess.variant.{ Antichess, Atomic, Crazyhouse, Standard }
 
 import bitboard.Bitboard
 import bitboard.Bitboard.*
@@ -102,7 +102,9 @@ case class Situation(board: Board, color: Color):
             case Queen  => genQueen(us & bb, targets)
             case King   => genKingAt(targets, square)
       }
-      variant.applyVariantEffect(moves).filter(variant.kingSafety)
+
+      if variant.atomic then moves.map(Atomic.explodeSurroundingPieces).filter(variant.kingSafety)
+      else moves.filter(variant.kingSafety)
 
     // in antichess, if there are capture moves, only capture moves are allowed
     // so, we have to find all captures first,

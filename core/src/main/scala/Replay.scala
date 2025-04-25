@@ -12,7 +12,7 @@ case class Replay(setup: Game, moves: List[MoveOrDrop], state: Game):
 
   def addMove(moveOrDrop: MoveOrDrop): Replay =
     copy(
-      moves = moveOrDrop.applyVariantEffect :: moves,
+      moves = moveOrDrop :: moves,
       state = moveOrDrop.applyGame(state)
     )
 

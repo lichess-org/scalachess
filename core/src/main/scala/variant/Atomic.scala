@@ -17,13 +17,11 @@ case object Atomic
 
   def pieces = Standard.pieces
 
-  override def hasMoveEffects = true
-
   def validMoves(situation: Situation): List[Move] =
     import situation.{ genNonKing, genEnPassant, us, board }
     val targets = ~us
     val moves   = genNonKing(targets) ++ genKing(situation, targets) ++ genEnPassant(us & board.pawns)
-    applyVariantEffect(moves).filter(kingSafety)
+    moves.map(explodeSurroundingPieces).filter(kingSafety)
 
   private def genKing(situation: Situation, mask: Bitboard) =
     import situation.{ genUnsafeKing, genCastling }
@@ -68,7 +66,7 @@ case object Atomic
       attackersWithoutKing(board, occupied, king, !color).isEmpty
 
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
-  private def explodeSurroundingPieces(move: Move): Move =
+  def explodeSurroundingPieces(move: Move): Move =
     if move.captures then
       val afterBoard = move.after
       // Pawns are immune (for some reason), but all pieces surrounding the captured piece and the capturing piece
@@ -83,8 +81,6 @@ case object Atomic
       val newBoard     = afterExplosions.updateHistory(_.copy(castles = castles, unmovedRooks = unMovedRooks))
       move.withAfter(newBoard)
     else move
-
-  override def addVariantEffect(move: Move): Move = explodeSurroundingPieces(move)
 
   /** Since kings cannot confine each other, if either player has only a king
     * then either a queen or multiple pieces are required for checkmate.

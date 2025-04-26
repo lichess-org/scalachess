@@ -43,7 +43,7 @@ case object Crazyhouse
         .place(piece, square)
         .toRight(ErrorStr(s"Can't drop $role on $square, it's occupied"))
       _ <- Either.cond(
-        b1.checkOf(situation.color).no,
+        kingThreatened(b1, situation.color).no,
         b1,
         ErrorStr(s"Dropping $role on $square doesn't uncheck the king")
       )

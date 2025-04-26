@@ -1,17 +1,14 @@
 package chess
 
+import cats.syntax.all.*
+
 import variant.{ Crazyhouse, Variant }
 import bitboard.Board as BBoard
 import bitboard.Bitboard
 
-case class Board(
-    board: BBoard,
-    history: History,
-    variant: Variant,
-    crazyData: Option[Crazyhouse.Data] = None
-):
+case class Board(board: BBoard, history: History, variant: Variant):
 
-  export history.{ castles, unmovedRooks }
+  export history.{ castles, unmovedRooks, crazyData }
   export board.{
     attackers,
     bishops,
@@ -49,13 +46,6 @@ case class Board(
   inline def apply(inline at: Square): Option[Piece]     = board.pieceAt(at)
   inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Square(file, rank))
 
-  def checkColor: Option[Color] = checkWhite.yes.option(White).orElse(checkBlack.yes.option(Black))
-
-  lazy val checkWhite: Check = checkOf(White)
-  lazy val checkBlack: Check = checkOf(Black)
-
-  def checkOf(c: Color): Check = variant.kingThreatened(this, c)
-
   def withBoard(b: BBoard): Board = copy(board = b)
 
   def place(piece: Piece, at: Square): Option[Board] =
@@ -76,9 +66,7 @@ case class Board(
   def promote(orig: Square, dest: Square, piece: Piece): Option[Board] =
     board.promote(orig, dest, piece).map(withBoard)
 
-  def withHistory(h: History): Board = copy(history = h)
-
-  def withCastles(c: Castles) = withHistory(history.withCastles(c))
+  def withCastles(c: Castles) = updateHistory(_.withCastles(c))
 
   def withPieces(newPieces: PieceMap) = copy(board = BBoard.fromMap(newPieces))
 
@@ -86,8 +74,8 @@ case class Board(
     if v == Crazyhouse then copy(variant = v).ensureCrazyData
     else copy(variant = v)
 
-  def withCrazyData(data: Crazyhouse.Data)         = copy(crazyData = Option(data))
-  def withCrazyData(data: Option[Crazyhouse.Data]) = copy(crazyData = data)
+  def withCrazyData(data: Crazyhouse.Data): Board         = updateHistory(_.copy(crazyData = data.some))
+  def withCrazyData(data: Option[Crazyhouse.Data]): Board = updateHistory(_.copy(crazyData = data))
   def withCrazyData(f: Crazyhouse.Data => Crazyhouse.Data): Board =
     withCrazyData(f(crazyData | Crazyhouse.Data.init))
 
@@ -150,16 +138,19 @@ case class Board(
 
 object Board:
 
-  def apply(pieces: PieceMap, history: History, variant: Variant, crazyData: Option[Crazyhouse.Data]): Board =
-    Board(BBoard.fromMap(pieces), history, variant, crazyData)
+  def apply(pieces: PieceMap, history: History, variant: Variant, crazyData: Option[Crazyhouse.Data]) =
+    new Board(BBoard.fromMap(pieces), history.copy(crazyData = crazyData), variant)
 
   def apply(board: BBoard, variant: Variant): Board =
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Board(
       board,
-      History(castles = variant.castles, unmovedRooks = unmovedRooks),
-      variant,
-      variant.crazyhouse.option(Crazyhouse.Data.init)
+      History(
+        castles = variant.castles,
+        unmovedRooks = unmovedRooks,
+        crazyData = variant.crazyhouse.option(Crazyhouse.Data.init)
+      ),
+      variant
     )
 
   def apply(pieces: Iterable[(Square, Piece)], variant: Variant): Board =
@@ -170,9 +161,12 @@ object Board:
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Board(
       board,
-      History(castles = variant.castles, unmovedRooks = unmovedRooks),
-      variant,
-      variant.crazyhouse.option(Crazyhouse.Data.init)
+      History(
+        castles = variant.castles,
+        unmovedRooks = unmovedRooks,
+        crazyData = variant.crazyhouse.option(Crazyhouse.Data.init)
+      ),
+      variant
     )
 
   def init(variant: Variant): Board = Board(BBoard.fromMap(variant.pieces), variant)

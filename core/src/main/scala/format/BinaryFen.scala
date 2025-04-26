@@ -155,10 +155,10 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
             castles =
               maximumCastles(unmovedRooks = unmovedRooks, white = white, black = black, kings = kings),
             unmovedRooks = unmovedRooks,
-            halfMoveClock = halfMoveClock
+            halfMoveClock = halfMoveClock,
+            crazyData = crazyData
           ),
-          variant,
-          crazyData
+          variant
         ),
         color = turn
       ),
@@ -178,7 +178,7 @@ object BinaryFen:
     write(
       Situation.AndFullMoveNumber(
         situation
-          .withHistory(situation.history.setHalfMoveClock(HalfMoveClock.initial))
+          .updateHistory(_.setHalfMoveClock(HalfMoveClock.initial))
           .withVariant(situation.variant match
             case Standard | Chess960 | FromPosition => Standard
             case other                              => other),

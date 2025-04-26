@@ -1,6 +1,7 @@
 package chess
 
 import cats.syntax.all.*
+import chess.variant.Crazyhouse
 
 import scala.language.implicitConversions
 
@@ -52,6 +53,10 @@ trait ChessTestCommon:
     def movesAt(s: Square): List[Move] =
       sit.moves.getOrElse(s, Nil)
 
+  def castleHistory(color: Color, kingSide: Boolean, queenSide: Boolean): History =
+    val castles = Castles.init.update(color, kingSide, queenSide)
+    History(castles = castles, unmovedRooks = UnmovedRooks.corners, crazyData = None)
+
   def fenToGameEither(positionString: FullFen, variant: Variant): Either[String, Game] =
     Fen
       .read(variant, positionString)
@@ -90,14 +95,16 @@ trait ChessTestCommon:
       castles: Castles = Castles.init,
       checkCount: CheckCount = CheckCount(0, 0),
       unmovedRooks: UnmovedRooks = UnmovedRooks.corners,
-      halfMoveClock: HalfMoveClock = HalfMoveClock.initial
+      halfMoveClock: HalfMoveClock = HalfMoveClock.initial,
+      crazyData: Option[Crazyhouse.Data] = None
   ) = History(
     lastMove = lastMove,
     positionHashes = positionHashes,
     castles = castles,
     checkCount = checkCount,
     unmovedRooks = unmovedRooks,
-    halfMoveClock = halfMoveClock
+    halfMoveClock = halfMoveClock,
+    crazyData = crazyData
   )
 
 trait MunitExtensions extends munit.FunSuite:

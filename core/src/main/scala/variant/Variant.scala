@@ -54,6 +54,12 @@ abstract class Variant private[variant] (
   def kingThreatened(board: Board, color: Color): Check =
     board.isCheck(color)
 
+  def checkWhite(board: Board): Check = kingThreatened(board, White)
+  def checkBlack(board: Board): Check = kingThreatened(board, Black)
+
+  def checkColor(board: Board): Option[Color] =
+    checkWhite(board).yes.option(White).orElse(checkBlack(board).yes.option(Black))
+
   def kingSafety(m: Move): Boolean =
     kingThreatened(m.after, m.color).no
 

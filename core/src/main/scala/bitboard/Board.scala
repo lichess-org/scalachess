@@ -6,11 +6,8 @@ import cats.syntax.all.*
 import Bitboard.*
 
 // Chess board representation
-case class Board(
-    occupied: Bitboard,
-    byColor: ByColor,
-    byRole: ByRole
-):
+case class Board(occupied: Bitboard, byColor: ByColor, byRole: ByRole):
+
   val white   = byColor.white
   val black   = byColor.black
   val pawns   = byRole.pawn

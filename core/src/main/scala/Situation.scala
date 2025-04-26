@@ -25,7 +25,8 @@ case class Situation(board: Board, color: Color):
       case v: Crazyhouse.type => v.possibleDrops(this)
       case _                  => None
 
-  lazy val check: Check = board.checkOf(color)
+  lazy val check: Check               = checkOf(color)
+  inline def checkOf(c: Color): Check = variant.kingThreatened(board, c)
 
   def checkSquare: Option[Square] = if check.yes then ourKing else None
 
@@ -64,8 +65,8 @@ case class Situation(board: Board, color: Color):
   def drop(role: Role, square: Square): Either[ErrorStr, Drop] =
     variant.drop(this, role, square)
 
-  def withHistory(history: History): Situation =
-    copy(board = board.withHistory(history))
+  inline def updateHistory(inline f: History => History) =
+    copy(board = board.updateHistory(f))
 
   def withVariant(variant: chess.variant.Variant): Situation =
     copy(board = board.withVariant(variant))

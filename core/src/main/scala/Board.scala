@@ -77,9 +77,7 @@ case class Board(
   def promote(orig: Square, dest: Square, piece: Piece): Option[Board] =
     board.promote(orig, dest, piece).map(withBoard)
 
-  def withHistory(h: History): Board = copy(history = h)
-
-  def withCastles(c: Castles) = withHistory(history.withCastles(c))
+  def withCastles(c: Castles) = updateHistory(_.withCastles(c))
 
   def withPieces(newPieces: PieceMap) = copy(board = BBoard.fromMap(newPieces))
 

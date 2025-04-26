@@ -56,8 +56,8 @@ trait FenReader:
           situation.board(orig).isEmpty
       yield Uci.Move(orig, dest)
 
-      situation.withHistory:
-        val history = situation.history.copy(
+      situation.updateHistory: original =>
+        val history = original.copy(
           lastMove = enpassantMove,
           positionHashes = PositionHash.empty,
           castles = castles,
@@ -78,7 +78,7 @@ trait FenReader:
     read(variant, fen).map { sit =>
       val (halfMoveClock, fullMoveNumber) = readHalfMoveClockAndFullMoveNumber(fen)
       Situation.AndFullMoveNumber(
-        halfMoveClock.map(sit.history.setHalfMoveClock).fold(sit)(sit.withHistory),
+        halfMoveClock.map(sit.history.setHalfMoveClock).fold(sit)(x => sit.updateHistory(_ => x)),
         fullMoveNumber | FullMoveNumber(1)
       )
     }

@@ -129,8 +129,6 @@ case class Move(
   val isWhiteTurn: Boolean = piece.color.white
   inline def color         = piece.color
 
-  inline def withHistory(inline h: History) = copy(after = after.withHistory(h))
-
   def withPromotion(op: Option[PromotableRole]): Option[Move] =
     op.fold(this.some)(withPromotion)
 
@@ -187,8 +185,6 @@ case class Drop(
         if h.positionHashes.value.isEmpty then PositionHash(Hash(situationBefore)) else h.positionHashes
       h.copy(positionHashes = PositionHash(Hash(Situation(board, !piece.color))).combine(basePositionHashes))
     }
-
-  inline def withHistory(inline h: History) = copy(after = after.withHistory(h))
 
   def afterWithLastMove: Board =
     after.variant.finalizeBoard(

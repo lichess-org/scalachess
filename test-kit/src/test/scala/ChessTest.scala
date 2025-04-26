@@ -53,6 +53,10 @@ trait ChessTestCommon:
     def movesAt(s: Square): List[Move] =
       sit.moves.getOrElse(s, Nil)
 
+  def castleHistory(color: Color, kingSide: Boolean, queenSide: Boolean): History =
+    val castles = Castles.init.update(color, kingSide, queenSide)
+    History(castles = castles, unmovedRooks = UnmovedRooks.corners, crazyData = None)
+
   def fenToGameEither(positionString: FullFen, variant: Variant): Either[String, Game] =
     Fen
       .read(variant, positionString)

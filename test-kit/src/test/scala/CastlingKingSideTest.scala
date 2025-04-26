@@ -19,7 +19,7 @@ R  QK  R"""
     assertEquals(badHist.destsFrom(E1), Set(F1))
     val board960 = """
 PPPPPPPP
-RQK   R """.chess960.updateHistory(_ => History.castle(White, kingSide = true, queenSide = true))
+RQK   R """.chess960.updateHistory(_ => castleHistory(White, kingSide = true, queenSide = true))
     assertEquals(board960.place(White.bishop, D1).flatMap(_.destsFrom(C1)), Set())
     assertEquals(board960.place(White.knight, F1).flatMap(_.destsFrom(C1)), Set(D1))
   test("possible"):

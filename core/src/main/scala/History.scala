@@ -49,12 +49,3 @@ case class History(
     if check.yes then copy(checkCount = checkCount.add(color)) else this
 
   def withCheckCount(cc: CheckCount) = copy(checkCount = cc)
-
-object History:
-
-  def castle(color: Color, kingSide: Boolean, queenSide: Boolean) =
-    History(
-      castles = Castles.init.update(color, kingSide, queenSide),
-      unmovedRooks = UnmovedRooks.corners,
-      crazyData = None
-    )

@@ -36,7 +36,7 @@ PPPPPPPP
 
   val board = """
 PPPPPPPP
-R   K  R""".updateHistory(_ => History.castle(White, kingSide = true, queenSide = true))
+R   K  R""".updateHistory(_ => castleHistory(White, kingSide = true, queenSide = true))
   test("impact history: if king castles kingside"):
     val game = Game(board, White)
     val g2   = game.playMove(E1, G1).get

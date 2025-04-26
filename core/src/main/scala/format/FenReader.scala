@@ -57,7 +57,7 @@ trait FenReader:
       yield Uci.Move(orig, dest)
 
       situation.withHistory:
-        val history = History(
+        val history = situation.history.copy(
           lastMove = enpassantMove,
           positionHashes = PositionHash.empty,
           castles = castles,

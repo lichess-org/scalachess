@@ -55,7 +55,10 @@ object Visual:
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Board(
       board,
-      History(castles = variant.castles, unmovedRooks = unmovedRooks),
-      variant,
-      variant.crazyhouse.option(Crazyhouse.Data.init)
+      History(
+        castles = variant.castles,
+        unmovedRooks = unmovedRooks,
+        crazyData = variant.crazyhouse.option(Crazyhouse.Data.init)
+      ),
+      variant
     )

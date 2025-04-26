@@ -155,10 +155,10 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
             castles =
               maximumCastles(unmovedRooks = unmovedRooks, white = white, black = black, kings = kings),
             unmovedRooks = unmovedRooks,
-            halfMoveClock = halfMoveClock
+            halfMoveClock = halfMoveClock,
+            crazyData = crazyData
           ),
-          variant,
-          crazyData
+          variant
         ),
         color = turn
       ),

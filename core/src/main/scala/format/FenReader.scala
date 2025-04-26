@@ -21,7 +21,7 @@ trait FenReader:
     makeBoard(variant, fBoard).map { board =>
       // We trust Fen's color to be correct, if there is no color we use the color of the king in check
       // If there is no king in check we use white
-      val color     = fColor.orElse(board.checkColor) | Color.White
+      val color     = fColor.orElse(variant.checkColor(board)) | Color.White
       val situation = Situation(board, color)
       // todo verify unmovedRooks vs board.rooks
       val (castles, unmovedRooks) =

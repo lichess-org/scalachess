@@ -25,7 +25,8 @@ case class Situation(board: Board, color: Color):
       case v: Crazyhouse.type => v.possibleDrops(this)
       case _                  => None
 
-  lazy val check: Check = board.checkOf(color)
+  lazy val check: Check               = checkOf(color)
+  inline def checkOf(c: Color): Check = variant.kingThreatened(board, c)
 
   def checkSquare: Option[Square] = if check.yes then ourKing else None
 

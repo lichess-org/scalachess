@@ -46,13 +46,6 @@ case class Board(board: BBoard, history: History, variant: Variant):
   inline def apply(inline at: Square): Option[Piece]     = board.pieceAt(at)
   inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Square(file, rank))
 
-  def checkColor: Option[Color] = checkWhite.yes.option(White).orElse(checkBlack.yes.option(Black))
-
-  lazy val checkWhite: Check = checkOf(White)
-  lazy val checkBlack: Check = checkOf(Black)
-
-  def checkOf(c: Color): Check = variant.kingThreatened(this, c)
-
   def withBoard(b: BBoard): Board = copy(board = b)
 
   def place(piece: Piece, at: Square): Option[Board] =

@@ -117,13 +117,13 @@ case class Move(
     }
 
   // does this move capture an opponent piece?
-  inline def captures = capture.isDefined
+  inline def captures: Boolean = capture.isDefined
 
-  inline def promotes = promotion.isDefined
+  inline def promotes: Boolean = promotion.isDefined
 
-  inline def castles = castle.isDefined
+  inline def castles: Boolean = castle.isDefined
 
-  inline def normalizeCastle =
+  inline def normalizeCastle: Move =
     castle.fold(this)(x => copy(dest = x.rook))
 
   val isWhiteTurn: Boolean = piece.color.white
@@ -140,9 +140,9 @@ case class Move(
       yield copy(after = b3, promotion = Option(p))
     else this.some
 
-  inline def withAfter(newBoard: Board) = copy(after = newBoard)
+  inline def withAfter(newBoard: Board): Move = copy(after = newBoard)
 
-  inline def withMetrics(m: MoveMetrics) = copy(metrics = m)
+  inline def withMetrics(m: MoveMetrics): Move = copy(metrics = m)
 
   inline def toUci: Uci.Move = Uci.Move(orig, dest, promotion)
 
@@ -193,11 +193,11 @@ case class Drop(
       none
     )
 
-  inline def color = piece.color
+  inline def color: Color = piece.color
 
-  inline def withAfter(newBoard: Board) = copy(after = newBoard)
+  inline def withAfter(newBoard: Board): Drop = copy(after = newBoard)
 
-  inline def withMetrics(m: MoveMetrics) = copy(metrics = m)
+  inline def withMetrics(m: MoveMetrics): Drop = copy(metrics = m)
 
   inline def toUci: Uci.Drop = Uci.Drop(piece.role, square)
 

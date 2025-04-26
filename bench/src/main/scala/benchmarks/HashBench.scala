@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit
 
 import cats.syntax.all.*
 import chess.format.pgn.{ Fixtures, Reader }
-import chess.MoveOrDrop.situationAfter
 import chess.{ Hash, Situation }
 
 @State(Scope.Thread)

@@ -2,8 +2,6 @@ package chess
 
 import scala.language.implicitConversions
 
-import MoveOrDrop.*
-
 class DividerTest extends ChessTest:
 
   def makeReplay(moves: String) =

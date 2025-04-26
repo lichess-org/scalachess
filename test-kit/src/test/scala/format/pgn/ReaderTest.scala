@@ -3,8 +3,6 @@ package format.pgn
 
 import scala.language.implicitConversions
 
-import MoveOrDrop.*
-
 class ReaderTest extends ChessTest:
 
   import Fixtures.*

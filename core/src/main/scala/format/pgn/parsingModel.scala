@@ -5,8 +5,6 @@ import cats.syntax.all.*
 import chess.Situation.AndFullMoveNumber
 import chess.format.Fen
 
-import MoveOrDrop.*
-
 // We don't support variation without move now,
 // but we can in the future when we support null move
 case class PgnNodeData(

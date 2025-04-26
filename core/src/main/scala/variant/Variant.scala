@@ -106,6 +106,9 @@ abstract class Variant private[variant] (
 
   def specialDraw(situation: Situation) = false
 
+  def autoDraw(board: Board): Boolean =
+    fiftyMoves(board.history) || isInsufficientMaterial(board) || board.history.fivefoldRepetition
+
   /** Returns the material imbalance in pawns (overridden in Antichess)
     */
   def materialImbalance(board: Board): Int =

@@ -13,6 +13,7 @@ class AutodrawTest extends ChessTest:
     assert(makeEmptyBoard.autoDraw)
   test("by lack of pieces: new"):
     assertNot(makeBoard.autoDraw)
+
   test("by lack of pieces: opened"):
     assertEquals(
       makeGame

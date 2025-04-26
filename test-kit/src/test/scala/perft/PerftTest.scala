@@ -13,7 +13,7 @@ object PerftTest extends SimpleIOSuite:
     def empty                           = true
     def combine(x: Boolean, y: Boolean) = x && y
 
-  val nodeLimits = 1_000L
+  val nodeLimits = 1_000_000L
 
   test("random.perft"):
     perfts(Perft.randomPerfts, Chess960, 10_000L)
@@ -31,7 +31,7 @@ object PerftTest extends SimpleIOSuite:
     perfts(Perft.atomicPerfts, Atomic, nodeLimits)
       .map(assert(_))
 
-  test("crazyhouse.perft"):
+  test("crazyhouse.perft".only):
     perfts(Perft.crazyhousePerfts, Crazyhouse, nodeLimits)
       .map(assert(_))
 

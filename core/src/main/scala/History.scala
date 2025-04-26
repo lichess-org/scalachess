@@ -1,5 +1,7 @@
 package chess
 
+import chess.variant.Crazyhouse
+
 import format.Uci
 
 // Checks received by the respective side.
@@ -21,7 +23,8 @@ case class History(
     castles: Castles = Castles.init,
     checkCount: CheckCount = CheckCount(0, 0),
     unmovedRooks: UnmovedRooks,
-    halfMoveClock: HalfMoveClock = HalfMoveClock.initial
+    halfMoveClock: HalfMoveClock = HalfMoveClock.initial,
+    crazyData: Option[Crazyhouse.Data]
 ):
 
   def setHalfMoveClock(v: HalfMoveClock) = copy(halfMoveClock = v)
@@ -50,4 +53,8 @@ case class History(
 object History:
 
   def castle(color: Color, kingSide: Boolean, queenSide: Boolean) =
-    History(castles = Castles.init.update(color, kingSide, queenSide), unmovedRooks = UnmovedRooks.corners)
+    History(
+      castles = Castles.init.update(color, kingSide, queenSide),
+      unmovedRooks = UnmovedRooks.corners,
+      crazyData = None
+    )

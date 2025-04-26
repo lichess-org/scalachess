@@ -1,6 +1,7 @@
 package chess
 
 import cats.syntax.all.*
+import chess.variant.Crazyhouse
 
 import scala.language.implicitConversions
 
@@ -90,14 +91,16 @@ trait ChessTestCommon:
       castles: Castles = Castles.init,
       checkCount: CheckCount = CheckCount(0, 0),
       unmovedRooks: UnmovedRooks = UnmovedRooks.corners,
-      halfMoveClock: HalfMoveClock = HalfMoveClock.initial
+      halfMoveClock: HalfMoveClock = HalfMoveClock.initial,
+      crazyData: Option[Crazyhouse.Data] = None
   ) = History(
     lastMove = lastMove,
     positionHashes = positionHashes,
     castles = castles,
     checkCount = checkCount,
     unmovedRooks = unmovedRooks,
-    halfMoveClock = halfMoveClock
+    halfMoveClock = halfMoveClock,
+    crazyData = crazyData
   )
 
 trait MunitExtensions extends munit.FunSuite:

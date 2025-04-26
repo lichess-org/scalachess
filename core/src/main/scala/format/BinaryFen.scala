@@ -178,7 +178,7 @@ object BinaryFen:
     write(
       Situation.AndFullMoveNumber(
         situation
-          .withHistory(situation.history.setHalfMoveClock(HalfMoveClock.initial))
+          .updateHistory(_.setHalfMoveClock(HalfMoveClock.initial))
           .withVariant(situation.variant match
             case Standard | Chess960 | FromPosition => Standard
             case other                              => other),

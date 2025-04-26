@@ -64,8 +64,8 @@ case class Situation(board: Board, color: Color):
   def drop(role: Role, square: Square): Either[ErrorStr, Drop] =
     variant.drop(this, role, square)
 
-  def withHistory(history: History): Situation =
-    copy(board = board.withHistory(history))
+  inline def updateHistory(inline f: History => History) =
+    copy(board = board.updateHistory(f))
 
   def withVariant(variant: chess.variant.Variant): Situation =
     copy(board = board.withVariant(variant))

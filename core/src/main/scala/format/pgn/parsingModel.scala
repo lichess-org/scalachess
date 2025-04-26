@@ -102,8 +102,7 @@ case class Castle(side: Side, override val rawString: Option[String] = None) ext
     else
       ourKing
         .flatMap: k =>
-          variant
-            .applyVariantEffect(genCastling(k))
+          genCastling(k)
             .filter(variant.kingSafety)
             .find(_.castle.exists(_.side == side))
         .toRight(ErrorStr(s"Cannot castle ${side.fold("kingside", "queenside")}"))

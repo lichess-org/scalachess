@@ -16,8 +16,6 @@ sealed trait MoveOrDrop:
 
   def color: Color
 
-  def applyVariantEffect: MoveOrDrop
-
   def finalizeAfter: Board
 
   def situationBefore: Situation
@@ -118,8 +116,6 @@ case class Move(
       h.copy(positionHashes = PositionHash(Hash(Situation(board, !piece.color))).combine(basePositionHashes))
     }
 
-  def applyVariantEffect: Move = before.variant.addVariantEffect(this)
-
   // does this move capture an opponent piece?
   inline def captures = capture.isDefined
 
@@ -193,8 +189,6 @@ case class Drop(
     }
 
   inline def withHistory(inline h: History) = copy(after = after.withHistory(h))
-
-  def applyVariantEffect: Drop = this
 
   def afterWithLastMove: Board =
     after.variant.finalizeBoard(

@@ -120,19 +120,6 @@ abstract class Variant private[variant] (
   def opponentHasInsufficientMaterial(situation: Situation) =
     InsufficientMatingMaterial(situation.board, !situation.color)
 
-  // Some variants have an extra effect on the board on a move. For example, in Atomic, some
-  // pieces surrounding a capture explode
-  def hasMoveEffects = false
-
-  /** Applies a variant specific effect to the move. This helps decide whether a king is endangered by a move, for
-    * example
-    */
-  def addVariantEffect(move: Move): Move = move
-
-  // TODO remove this implementation
-  def applyVariantEffect(moves: List[Move]): List[Move] =
-    if hasMoveEffects then moves.map(addVariantEffect) else moves
-
   def fiftyMoves(history: History): Boolean = history.halfMoveClock >= HalfMoveClock(100)
 
   def isIrreversible(move: Move): Boolean =

@@ -158,7 +158,8 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
             halfMoveClock = halfMoveClock,
             crazyData = crazyData
           ),
-          variant
+          variant,
+          turn
         ),
         color = turn
       ),

@@ -2,6 +2,7 @@ package chess
 package format
 
 import cats.syntax.all.*
+import chess.variant.Crazyhouse
 import scalalib.zeros.given
 
 import variant.{ Standard, Variant }
@@ -18,11 +19,19 @@ import bitboard.Board as BBoard
 trait FenReader:
   def read(variant: Variant, fen: FullFen): Option[Situation] =
     val (fBoard, fColor, fCastling, fEnpassant) = fen.parts
-    makeBoard(variant, fBoard).map { board =>
+    makeBoard(variant, fBoard).map { (bboard, crazyData) =>
       // We trust Fen's color to be correct, if there is no color we use the color of the king in check
       // If there is no king in check we use white
-      val color     = fColor.orElse(variant.checkColor(board)) | Color.White
-      val situation = Situation(board, color)
+      val color = fColor.orElse(variant.checkColor(bboard)) | Color.White
+      val board: Board = new Board(
+        bboard,
+        History(
+          unmovedRooks = variant.makeUnmovedRooks(bboard.rooks),
+          crazyData = variant.crazyhouse.so(crazyData)
+        ),
+        variant,
+        color
+      )
       // todo verify unmovedRooks vs board.rooks
       val (castles, unmovedRooks) =
         if !variant.allowsCastling then (Castles.none -> UnmovedRooks.none)
@@ -44,32 +53,34 @@ trait FenReader:
                 yield (c.add(color, side), r | rookSquare.bl)
               }.getOrElse(c -> r)
 
-      import situation.color.{ fifthRank, sixthRank, seventhRank }
+      import board.color.{ fifthRank, sixthRank, seventhRank }
 
       val enpassantMove = for
         square <- fEnpassant
         if square.rank == sixthRank
         orig = square.withRank(seventhRank)
         dest = square.withRank(fifthRank)
-        if situation.board(dest).contains(Piece(!situation.color, Pawn)) &&
-          situation.board(square.file, sixthRank).isEmpty &&
-          situation.board(orig).isEmpty
+        if board(dest).contains(Piece(!board.color, Pawn)) &&
+          board(square.file, sixthRank).isEmpty &&
+          board(orig).isEmpty
       yield Uci.Move(orig, dest)
 
-      situation.updateHistory: original =>
-        val history = original.copy(
-          lastMove = enpassantMove,
-          positionHashes = PositionHash.empty,
-          castles = castles,
-          unmovedRooks = unmovedRooks
-        )
-        val checkCount = variant.threeCheck.so:
-          val splitted = fen.value.split(' ')
-          splitted
-            .lift(4)
-            .flatMap(readCheckCount)
-            .orElse(splitted.lift(6).flatMap(readCheckCount))
-        checkCount.foldLeft(history)(_.withCheckCount(_))
+      board
+        .updateHistory: original =>
+          val history = original.copy(
+            lastMove = enpassantMove,
+            positionHashes = PositionHash.empty,
+            castles = castles,
+            unmovedRooks = unmovedRooks
+          )
+          val checkCount = variant.threeCheck.so:
+            val splitted = fen.value.split(' ')
+            splitted
+              .lift(4)
+              .flatMap(readCheckCount)
+              .orElse(splitted.lift(6).flatMap(readCheckCount))
+          checkCount.foldLeft(history)(_.withCheckCount(_))
+        .toSituation
     }
 
   def read(fen: FullFen): Option[Situation] = read(Standard, fen)
@@ -116,8 +127,8 @@ trait FenReader:
       case _ => None
 
   // only cares about pieces positions on the board (first part of FEN string)
-  def makeBoard(variant: Variant, fen: String): Option[Board] =
-    val (position, pockets) = fen.takeWhile(' ' !=) match
+  def makeBoard(variant: Variant, fen: String): Option[(BBoard, Option[Crazyhouse.Data])] =
+    val (position, pocketsStr) = fen.takeWhile(' ' !=) match
       case word if word.count('/' ==) == 8 =>
         val splitted = word.split('/')
         splitted.take(8).mkString("/") -> splitted.lift(8)
@@ -125,19 +136,24 @@ trait FenReader:
         word.span('[' !=) match
           case (position, pockets) => position -> pockets.stripPrefix("[").stripSuffix("]").some
       case word => word -> None
-    if pockets.isDefined && !variant.crazyhouse then None
+    if pocketsStr.isDefined && !variant.crazyhouse then None
     else
-      makeBoardOptionWithCrazyPromoted(position, variant).map: board =>
-        pockets.fold(board): str =>
-          board.withCrazyData(_.copy(pockets = Pockets(str.flatMap(Piece.fromChar))))
+      makeBoardOptionWithCrazyPromoted(position, variant).map: (board, promoted) =>
+        val pockets = pocketsStr.fold(Pockets.empty)(Pockets.apply)
+        board -> Crazyhouse.Data(pockets, promoted).some
 
   private val numberSet = Set.from('1' to '8')
 
-  def makeBoardOptionWithCrazyPromoted(boardFen: String, variant: Variant): Option[Board] =
+  type BoardWithCrazyPromoted = (BBoard, Bitboard)
+
+  def makeBoardOptionWithCrazyPromoted(boardFen: String, variant: Variant): Option[BoardWithCrazyPromoted] =
     val (board, error) = makeBoardWithCrazyPromoted(boardFen, variant)
     error.fold(board.some)(_ => none)
 
-  def makeBoardWithCrazyPromoted(boardFen: String, variant: Variant): (Board, Option[String]) =
+  def makeBoardWithCrazyPromoted(
+      boardFen: String,
+      variant: Variant
+  ): (BoardWithCrazyPromoted, Option[String]) =
     var promoted = Bitboard.empty
     var pawns    = Bitboard.empty
     var knights  = Bitboard.empty
@@ -202,7 +218,4 @@ trait FenReader:
       queens = queens,
       kings = kings
     )
-    val board = Board(bboard, variant)
-    if promoted.isEmpty
-    then (board, error)
-    else (board.withCrazyData(_.copy(promoted = promoted)), error)
+    (bboard -> promoted, error)

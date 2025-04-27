@@ -1,6 +1,7 @@
 package chess
 package variant
 
+import chess.bitboard.Board as BBoard
 import chess.format.FullFen
 
 case object Antichess
@@ -23,7 +24,7 @@ case object Antichess
   // In antichess, the king can't be put into check so we always return false
   override def kingSafety(m: Move): Boolean = true
 
-  override def kingThreatened(board: Board, color: Color) = Check.No
+  override def kingThreatened(board: BBoard, color: Color) = Check.No
 
   def validMoves(situation: Situation) =
     import situation.{ genNonKing, board, genUnsafeKing, ourKings }

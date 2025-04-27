@@ -6,7 +6,7 @@ import variant.{ Crazyhouse, Variant }
 import bitboard.Board as BBoard
 import bitboard.Bitboard
 
-case class Board(board: BBoard, history: History, variant: Variant):
+case class Board(board: BBoard, history: History, variant: Variant, color: Color):
 
   export history.{ castles, unmovedRooks, crazyData }
   export board.{
@@ -45,6 +45,8 @@ case class Board(board: BBoard, history: History, variant: Variant):
 
   inline def apply(inline at: Square): Option[Piece]     = board.pieceAt(at)
   inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Square(file, rank))
+
+  def toSituation: Situation = Situation(this, color)
 
   def withBoard(b: BBoard): Board = copy(board = b)
 
@@ -137,10 +139,16 @@ case class Board(board: BBoard, history: History, variant: Variant):
 
 object Board:
 
-  def apply(pieces: PieceMap, history: History, variant: Variant, crazyData: Option[Crazyhouse.Data]) =
-    new Board(BBoard.fromMap(pieces), history.copy(crazyData = crazyData), variant)
+  def apply(
+      pieces: PieceMap,
+      history: History,
+      variant: Variant,
+      crazyData: Option[Crazyhouse.Data],
+      color: Option[Color]
+  ) =
+    new Board(BBoard.fromMap(pieces), history.copy(crazyData = crazyData), variant, color.getOrElse(White))
 
-  def apply(board: BBoard, variant: Variant): Board =
+  def apply(board: BBoard, variant: Variant, color: Option[Color]): Board =
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Board(
       board,
@@ -149,13 +157,19 @@ object Board:
         unmovedRooks = unmovedRooks,
         crazyData = variant.crazyhouse.option(Crazyhouse.Data.init)
       ),
-      variant
+      variant,
+      color.getOrElse(White)
     )
 
-  def apply(pieces: Iterable[(Square, Piece)], variant: Variant): Board =
-    Board(pieces, variant.castles, variant)
+  def apply(pieces: Iterable[(Square, Piece)], variant: Variant, color: Option[Color]): Board =
+    Board(pieces, variant.castles, variant, color)
 
-  def apply(pieces: Iterable[(Square, Piece)], castles: Castles, variant: Variant): Board =
+  def apply(
+      pieces: Iterable[(Square, Piece)],
+      castles: Castles,
+      variant: Variant,
+      color: Option[Color]
+  ): Board =
     val board        = BBoard.fromMap(pieces.toMap)
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Board(
@@ -165,7 +179,8 @@ object Board:
         unmovedRooks = unmovedRooks,
         crazyData = variant.crazyhouse.option(Crazyhouse.Data.init)
       ),
-      variant
+      variant,
+      color.getOrElse(White)
     )
 
-  def init(variant: Variant): Board = Board(BBoard.fromMap(variant.pieces), variant)
+  def init(variant: Variant): Board = Board(BBoard.fromMap(variant.pieces), variant, White.some)

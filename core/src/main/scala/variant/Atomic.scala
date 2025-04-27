@@ -2,6 +2,7 @@ package chess
 package variant
 
 import bitboard.Bitboard
+import bitboard.Board as BBoard
 import bitboard.Bitboard.*
 
 case object Atomic
@@ -40,14 +41,14 @@ case object Atomic
     * to capture it, their own king would explode. This effectively makes a king invincible while connected with another
     * king.
     */
-  override def kingThreatened(board: Board, color: Color): Check = Check:
+  override def kingThreatened(board: BBoard, color: Color): Check = Check:
     import board.{ kingPosOf, kingOf, occupied }
     kingPosOf(color).exists: k =>
       k.kingAttacks.isDisjoint(kingOf(!color)) &&
         attackersWithoutKing(board, occupied, k, !color).nonEmpty
 
-  private def attackersWithoutKing(board: Board, occupied: Bitboard, s: Square, attacker: Color) =
-    import board.board.{ byColor, rooks, queens, bishops, knights, pawns }
+  private def attackersWithoutKing(board: BBoard, occupied: Bitboard, s: Square, attacker: Color) =
+    import board.{ byColor, rooks, queens, bishops, knights, pawns }
     byColor(attacker) & (
       s.rookAttacks(occupied) & (rooks ^ queens) |
         s.bishopAttacks(occupied) & (bishops ^ queens) |
@@ -57,13 +58,13 @@ case object Atomic
 
   // moves exploding opponent king are always playable
   override def kingSafety(m: Move): Boolean =
-    (kingThreatened(m.after, m.color).no ||
+    (kingThreatened(m.after.board, m.color).no ||
       explodesOpponentKing(m.situationBefore)(m))
       && !explodesOwnKing(m.situationBefore)(m)
 
   override def castleCheckSafeSquare(board: Board, king: Square, color: Color, occupied: Bitboard): Boolean =
     king.kingAttacks.intersects(board.kingOf(!color)) ||
-      attackersWithoutKing(board, occupied, king, !color).isEmpty
+      attackersWithoutKing(board.board, occupied, king, !color).isEmpty
 
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
   def explodeSurroundingPieces(move: Move): Move =

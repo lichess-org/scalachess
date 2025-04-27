@@ -67,18 +67,27 @@ trait ChessTestCommon:
       .toRight("Could not construct situation from Fen")
 
   def makeBoard(pieces: (Square, Piece)*): Board =
-    Board(BBoard.fromMap(pieces.toMap), defaultHistory(), chess.variant.Standard)
+    makeBoard(pieces.toMap, defaultHistory(), chess.variant.Standard, None, None)
+
+  def makeBoard(
+      pieces: PieceMap,
+      history: History,
+      variant: Variant,
+      crazyData: Option[Crazyhouse.Data],
+      color: Option[Color]
+  ): Board =
+    new Board(BBoard.fromMap(pieces), history.copy(crazyData = crazyData), variant, color.getOrElse(White))
 
   def makeBoard(str: String, variant: Variant) =
     (Visual << str).withVariant(variant)
 
   def makeBoard: Board = Board.init(chess.variant.Standard)
 
-  def makeChess960Board(position: Int) = Board(BBoard.fromMap(Chess960.pieces(position)), Chess960)
+  def makeChess960Board(position: Int) = Board(BBoard.fromMap(Chess960.pieces(position)), Chess960, None)
   def makeChess960Game(position: Int)  = Game(makeChess960Board(position))
   def chess960Boards                   = (0 to 959).map(makeChess960Board).toList
 
-  def makeEmptyBoard: Board = Board(BBoard.empty, chess.variant.Standard)
+  def makeEmptyBoard: Board = Board(BBoard.empty, chess.variant.Standard, White.some)
 
   def makeGame: Game = Game(makeBoard, White)
 

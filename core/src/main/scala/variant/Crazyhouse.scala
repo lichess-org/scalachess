@@ -43,7 +43,7 @@ case object Crazyhouse
         .place(piece, square)
         .toRight(ErrorStr(s"Can't drop $role on $square, it's occupied"))
       _ <- Either.cond(
-        kingThreatened(b1, situation.color).no,
+        kingThreatened(b1.board, situation.color).no,
         b1,
         ErrorStr(s"Dropping $role on $square doesn't uncheck the king")
       )
@@ -289,3 +289,8 @@ case object Crazyhouse
         Pocket(whitePawn, whiteKnight, whiteBishop, whiteRook, whiteQueen),
         Pocket(blackPawn, blackKnight, blackBishop, blackRook, blackQueen)
       )
+
+    inline def apply(str: String): Pockets =
+      apply(str.flatMap(Piece.fromChar))
+
+    val empty: Pockets = ByColor.fill(Pocket.empty)

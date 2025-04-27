@@ -3,7 +3,7 @@ package variant
 
 import cats.Eq
 import cats.syntax.all.*
-import chess.bitboard.Bitboard
+import chess.bitboard.{ Bitboard, Board as BBoard }
 import chess.format.Fen
 
 // Correctness depends on singletons for each variant ID
@@ -34,6 +34,8 @@ abstract class Variant private[variant] (
 
   def allowsCastling = !castles.isEmpty
 
+  def makeUnmovedRooks(rooks: Bitboard) = if allowsCastling then UnmovedRooks(rooks) else UnmovedRooks.none
+
   protected val backRank = Vector(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
 
   def castles: Castles = Castles.init
@@ -51,17 +53,17 @@ abstract class Variant private[variant] (
   def pieceThreatened(board: Board, by: Color, to: Square): Boolean =
     board.board.attacks(to, by)
 
-  def kingThreatened(board: Board, color: Color): Check =
+  def kingThreatened(board: BBoard, color: Color): Check =
     board.isCheck(color)
 
-  def checkWhite(board: Board): Check = kingThreatened(board, White)
-  def checkBlack(board: Board): Check = kingThreatened(board, Black)
+  def checkWhite(board: BBoard): Check = kingThreatened(board, White)
+  def checkBlack(board: BBoard): Check = kingThreatened(board, Black)
 
-  def checkColor(board: Board): Option[Color] =
+  def checkColor(board: BBoard): Option[Color] =
     checkWhite(board).yes.option(White).orElse(checkBlack(board).yes.option(Black))
 
   def kingSafety(m: Move): Boolean =
-    kingThreatened(m.after, m.color).no
+    kingThreatened(m.after.board, m.color).no
 
   def castleCheckSafeSquare(board: Board, kingTo: Square, color: Color, occupied: Bitboard): Boolean =
     board.board.attackers(kingTo, !color, occupied).isEmpty

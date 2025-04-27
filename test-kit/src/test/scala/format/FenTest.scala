@@ -3,7 +3,7 @@ package format
 
 import scala.language.implicitConversions
 
-import variant.Standard
+import variant.*
 
 class FenTest extends ChessTest:
 
@@ -86,3 +86,10 @@ class FenTest extends ChessTest:
     val f8 = Fen.Full("4k1rr/8/8/8/8/8/8/4K3 w k -")
     List(f1, f2, f3, f4, f5, f6, f7, f8).foreach: fen =>
       assertEquals(Fen.writeOpening(Fen.read(fen).get), fen)
+
+  test("not CrazyHouse variant shouldn't have crazy data"):
+    val fen = Fen.Full("rnbqkbnr/pp1ppppp/2p5/8/3P1P2/8/PPP1P1PP/RNBQKBNR b KQkq - 0 2")
+    List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, Antichess, Atomic, Horde, RacingKings)
+      .foreach: variant =>
+        val situation = Fen.read(variant, fen).get
+        assert(situation.board.history.crazyData.isEmpty)

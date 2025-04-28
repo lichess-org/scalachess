@@ -41,7 +41,7 @@ class PlayTest extends ChessTest:
     makeGame.playMoves(E2 -> E4, E7 -> E5, F1 -> C4, G8 -> F6, D2 -> D3, C7 -> C6, C1 -> G5, H7 -> H6).get
   test("current game"):
     assertEquals(
-      addNewLines(game.board.visual),
+      addNewLines(game.situation.visual),
       """
 rnbqkb r
 pp p pp
@@ -55,7 +55,7 @@ RN QK NR
     )
   test("after recapture"):
     assertEquals(
-      addNewLines(game.playMoves(G5 -> F6, D8 -> F6).get.board.visual),
+      addNewLines(game.playMoves(G5 -> F6, D8 -> F6).get.situation.visual),
       """
 rnb kb r
 pp p pp
@@ -93,7 +93,7 @@ RN QK NR
       )
       .get
     assertEquals(
-      addNewLines(g.board.visual),
+      addNewLines(g.situation.visual),
       """
 r   k  r
 pp   ppp
@@ -139,7 +139,7 @@ RN Q RK
       )
       .get
     assertEquals(
-      addNewLines(g.board.visual),
+      addNewLines(g.situation.visual),
       """
   kr  nr
 p  n ppp

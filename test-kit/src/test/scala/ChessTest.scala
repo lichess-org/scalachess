@@ -186,4 +186,4 @@ trait ChessTest extends munit.FunSuite with ChessTestCommon with MunitExtensions
   def visualDests(board: Board, p: Option[Iterable[Square]]): String = visualDests(board, p | Nil)
 
   def assertGame(game: Game, visual: String)(using Location) =
-    assertEquals(game.board.visual, (Visual << visual).visual)
+    assertEquals(game.situation.visual, (Visual << visual).visual)

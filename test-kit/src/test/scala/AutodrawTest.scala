@@ -18,7 +18,7 @@ class AutodrawTest extends ChessTest:
     assertEquals(
       makeGame
         .playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5)
-        .map(_.board.autoDraw),
+        .map(_.situation.autoDraw),
       Right(false)
     )
   test("by lack of pieces: two kings"):
@@ -71,11 +71,11 @@ K   bB""".autoDraw
     assertNot(makeBoard.autoDraw)
   test("by fifty moves: opened"):
     assertNot:
-      makeGame.playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5).get.board.autoDraw
+      makeGame.playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5).get.situation.autoDraw
   test("by fifty moves: tons of pointless moves"):
     val moves = List.fill(30)(List(B1 -> C3, B8 -> C6, C3 -> B1, C6 -> B8))
     assert:
-      makeGame.playMoves(moves.flatten*).get.board.autoDraw
+      makeGame.playMoves(moves.flatten*).get.situation.autoDraw
   test("by threefold: from prod should 3fold"):
     val moves = List(
       E2 -> E4,
@@ -177,7 +177,7 @@ K   bB""".autoDraw
       H6 -> G6
     )
     assert:
-      makeGame.playMoves(moves*).get.board.history.threefoldRepetition
+      makeGame.playMoves(moves*).get.situation.history.threefoldRepetition
   test("by threefold: from prod should not 3fold"):
     val moves = List(
       E2 -> E4,
@@ -273,16 +273,16 @@ K   bB""".autoDraw
       G6 -> H6
     )
     assertNot:
-      makeGame.playMoves(moves*).get.board.history.threefoldRepetition
+      makeGame.playMoves(moves*).get.situation.history.threefoldRepetition
   test("by threefold: 3fold on initial position"):
     val moves: List[(Square, Square)] = List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten
     assert:
-      makeGame.playMoves(moves*).get.board.history.threefoldRepetition
+      makeGame.playMoves(moves*).get.situation.history.threefoldRepetition
   test("by threefold: pawn move then minimalist 3fold"):
     val moves: List[(Square, Square)] = List(E2 -> E4, E7 -> E5) :::
       (List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten: List[(Square, Square)])
     assert:
-      makeGame.playMoves(moves*).get.board.history.threefoldRepetition
+      makeGame.playMoves(moves*).get.situation.history.threefoldRepetition
 
   // https://lichess.org/BdvgPSMd#82
   val moves = List(

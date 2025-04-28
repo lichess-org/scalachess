@@ -14,8 +14,6 @@ case class Game(
   export situation.{ color as player, variant, history }
   export situation.history.halfMoveClock
 
-  def board: Board = situation
-
   def apply(
       orig: Square,
       dest: Square,
@@ -98,22 +96,16 @@ object Game:
   def apply(variant: chess.variant.Variant): Game =
     Game(Board.init(variant, White))
 
-  // use board color instead
-  // def apply(board: Board, color: Color): Game = Game(board.situationOf(color))
-
   def apply(variantOption: Option[chess.variant.Variant], fen: Option[Fen.Full]): Game =
     val variant = variantOption | chess.variant.Standard
     val g       = apply(variant)
     fen
-      .flatMap:
-        format.Fen.readWithMoveNumber(variant, _)
+      .flatMap(format.Fen.readWithMoveNumber(variant, _))
       .fold(g): parsed =>
         g.copy(
           situation = parsed.situation
             .withVariant(g.variant)
-            .withCrazyData {
-              parsed.situation.crazyData.orElse(g.situation.crazyData)
-            }
+            .withCrazyData(parsed.situation.crazyData.orElse(g.situation.crazyData))
             .situationOf(parsed.situation.color),
           ply = parsed.ply,
           startedAtPly = parsed.ply

@@ -129,19 +129,19 @@ class VariantTest extends ChessTest:
   test("standard Identify insufficient mating material when called (bishop)."):
     val position = FullFen("krq5/bqqq4/qqr5/1qq5/8/8/8/3qB2K b - -")
     val game     = fenToGame(position, Standard)
-    assertEquals(game.board.materialImbalance, -91)
+    assertEquals(game.situation.materialImbalance, -91)
     assert(game.situation.opponentHasInsufficientMaterial)
 
   test("standard Identify sufficient mating material when called (bishop)."):
     val position = FullFen("8/7B/K7/2b5/1k6/8/8/8 b - -")
     val game     = fenToGame(position, Standard)
-    assertEquals(game.board.materialImbalance, 0)
+    assertEquals(game.situation.materialImbalance, 0)
     assertNot(game.situation.opponentHasInsufficientMaterial)
 
   test("standard Identify insufficient mating material when called (knight)."):
     val position = FullFen("8/3k4/2q5/8/8/K1N5/8/8 b - -")
     val game     = fenToGame(position, Standard)
-    assertEquals(game.board.materialImbalance, -6)
+    assertEquals(game.situation.materialImbalance, -6)
     assert(game.situation.opponentHasInsufficientMaterial)
 
   test("chess960 position pieces correctly"):

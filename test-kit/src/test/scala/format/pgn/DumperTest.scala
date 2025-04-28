@@ -340,6 +340,6 @@ NRKNRQBB
   test("chess960 tricky rook disambiguation"):
     val fen           = FullFen("r5k1/1b5p/N3p1p1/Q4p2/4r3/2P1q3/1PK2RP1/5R2 w - - 1 38")
     val sit           = Fen.read(fen).get
-    val game1         = Game(sit.board, sit.color)
+    val game1         = Game(sit, sit.color)
     val (game2, move) = game1(Square.F2, Square.F3).get
     assertEquals(Dumper(game1.situation, move, game2.situation), "Rf3")

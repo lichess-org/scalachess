@@ -41,8 +41,8 @@ class CrazyhouseVariantTest extends ChessTest:
     Game(Crazyhouse)
       .playMoves(moves.flatten*)
       .assertRight: g =>
-        assertNot(g.board.variant.fiftyMoves(g.board.history))
-        assert(g.board.autoDraw)
+        assertNot(g.variant.fiftyMoves(g.history))
+        assert(g.situation.autoDraw)
   test("autodraw: from prod should 3fold"):
     val moves = List(
       E2 -> E4,
@@ -146,7 +146,7 @@ class CrazyhouseVariantTest extends ChessTest:
     Game(Crazyhouse)
       .playMoves(moves*)
       .assertRight: g =>
-        assert(g.board.history.threefoldRepetition)
+        assert(g.history.threefoldRepetition)
   test("autodraw: from prod with captures and drops should 3fold"):
     chess.Replay
       .boards(
@@ -257,7 +257,7 @@ class CrazyhouseVariantTest extends ChessTest:
     Game(Crazyhouse)
       .playMoves(moves*)
       .assertRight: g =>
-        assertNot(g.board.history.threefoldRepetition)
+        assertNot(g.history.threefoldRepetition)
 
   test("autodraw: not draw when only kings left"):
     val fenPosition = FullFen("k6K/8/8/8/8/8/8/8 w - - 0 25")
@@ -342,7 +342,7 @@ class CrazyhouseVariantTest extends ChessTest:
     dropTestCases.foreach:
       case DropTestCase(fen, drops) =>
         val game = fenToGame(fen, Crazyhouse)
-        assertEquals(Crazyhouse.possibleDrops(game.situation.board).map(_.toSet), drops)
+        assertEquals(Crazyhouse.possibleDrops(game.situation).map(_.toSet), drops)
 
   test("Index out of bounds when hashing pockets"):
     val fenPosition = FullFen("2q1k1nr/B3bbrb/8/8/8/8/3qN1RB/1Q2KB1R/RRRQQQQQQrrrqqq w Kk - 0 11")

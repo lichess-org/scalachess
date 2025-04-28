@@ -263,5 +263,5 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
   test("fen with castles"):
     val game = fenToGame(FullFen("rnbqk2r/ppppppbp/5np1/8/8/5NP1/PPPPPPBP/RNBQK2R w KQkq - 4 4"), Antichess)
-    assertEquals(game.situation.board.history.castles, Castles.none)
-    assertEquals(game.situation.board.history.unmovedRooks, UnmovedRooks.none)
+    assertEquals(game.situation.history.castles, Castles.none)
+    assertEquals(game.situation.history.unmovedRooks, UnmovedRooks.none)

@@ -194,7 +194,7 @@ object BinaryFen:
     val occupied = sit.board.occupied
     writeLong(builder, occupied.value)
 
-    val unmovedRooks = minimumUnmovedRooks(sit.board)
+    val unmovedRooks = minimumUnmovedRooks(sit)
     val pawnPushedTo = sit.enPassantSquare.flatMap(_.prevRank(sit.color))
 
     def packPiece(sq: Square): Byte =
@@ -247,7 +247,7 @@ object BinaryFen:
       if sit.variant.threeCheck then
         writeNibbles(builder, sit.history.checkCount.white, sit.history.checkCount.black)
       else if sit.variant.crazyhouse then
-        val crazyData = sit.board.crazyData.getOrElse(Crazyhouse.Data.init)
+        val crazyData = sit.crazyData.getOrElse(Crazyhouse.Data.init)
         val pockets   = crazyData.pockets
         writeNibbles(builder, pockets.white.pawn, pockets.black.pawn)
         writeNibbles(builder, pockets.white.knight, pockets.black.knight)

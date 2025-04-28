@@ -92,4 +92,4 @@ class FenTest extends ChessTest:
     List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, Antichess, Atomic, Horde, RacingKings)
       .foreach: variant =>
         val situation = Fen.read(variant, fen).get
-        assert(situation.board.history.crazyData.isEmpty)
+        assert(situation.history.crazyData.isEmpty)

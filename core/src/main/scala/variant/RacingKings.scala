@@ -60,7 +60,7 @@ case object RacingKings
     board.kingOf(color).intersects(Bitboard.rank(Rank.Eighth))
 
   private def reachesGoal(move: Move) =
-    reachedGoal(move.situationAfter.board, move.piece.color)
+    reachedGoal(move.situationAfter, move.piece.color)
 
   // It is a win, when exactly one king made it to the goal. When white reaches
   // the goal and black can make it on the next ply, he is given a chance to

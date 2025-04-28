@@ -44,9 +44,8 @@ case class Move(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  inline def before         = situationBefore.board
-  def situationAfter        = finalizeAfter.situationOf(!piece.color)
-  lazy val toSanStr: SanStr = format.pgn.Dumper(this)
+  def situationAfter: Situation = finalizeAfter.situationOf(!piece.color)
+  lazy val toSanStr: SanStr     = format.pgn.Dumper(this)
 
   // TODO rethink about how handle castling
   // it's quite messy and error prone now
@@ -102,7 +101,7 @@ case class Move(
         h2.withCastles(castleRights).copy(unmovedRooks = unmovedRooks)
       },
       toUci,
-      capture.flatMap(before(_))
+      capture.flatMap(situationBefore(_))
     )
 
     // Update position hashes last, only after updating the board,
@@ -133,7 +132,7 @@ case class Move(
     op.fold(this.some)(withPromotion)
 
   def withPromotion(p: PromotableRole): Option[Move] =
-    if after.count(color.queen) > before.count(color.queen) then
+    if after.count(color.queen) > situationBefore.count(color.queen) then
       for
         b2 <- after.take(dest)
         b3 <- b2.place(color - p, dest)
@@ -163,9 +162,9 @@ case class Drop(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  inline def before         = situationBefore.board
-  def situationAfter        = finalizeAfter.situationOf(!piece.color)
-  lazy val toSanStr: SanStr = format.pgn.Dumper(this)
+  inline def before: Situation  = situationBefore
+  def situationAfter: Situation = finalizeAfter.situationOf(!piece.color)
+  lazy val toSanStr: SanStr     = format.pgn.Dumper(this)
 
   lazy val finalizeAfter: Board =
     val board = after.variant.finalizeBoard(

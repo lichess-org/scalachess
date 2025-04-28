@@ -45,6 +45,8 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
 
   def withCastles(c: Castles) = updateHistory(_.withCastles(c))
 
+  def unary_! : Board = copy(color = !color)
+
   def withPieces(newPieces: PieceMap) = copy(board = BBoard.fromMap(newPieces))
 
   def withVariant(v: Variant): Board =
@@ -70,6 +72,29 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
 
   // =====================Situation migration =========================
   def toSituation: Situation = Situation(this)
+
+  lazy val moves: Map[Square, List[Move]] =
+    legalMoves.groupBy(_.orig)
+
+  lazy val playerCanCapture: Boolean = legalMoves.exists(_.captures)
+
+  lazy val destinations: Map[Square, Bitboard] = legalMoves.groupMapReduce(_.orig)(_.dest.bb)(_ | _)
+
+  def drops: Option[List[Square]] =
+    variant match
+      case v: Crazyhouse.type => v.possibleDrops(this)
+      case _                  => None
+
+  def checkSquare: Option[Square] = if check.yes then ourKing else None
+
+  def move(from: Square, to: Square, promotion: Option[PromotableRole]): Either[ErrorStr, Move] =
+    variant.move(toSituation, from, to, promotion)
+
+  def move(uci: Uci.Move): Either[ErrorStr, Move] =
+    variant.move(toSituation, uci.orig, uci.dest, uci.promotion)
+
+  def drop(role: Role, square: Square): Either[ErrorStr, Drop] =
+    variant.drop(toSituation, role, square)
 
   def playable(strict: Boolean): Boolean =
     variant.valid(this, strict) && !end && copy(color = !color).check.no

@@ -35,11 +35,11 @@ case object Crazyhouse
 
   override def drop(situation: Situation, role: Role, square: Square): Either[ErrorStr, Drop] =
     for
-      d1 <- situation.board.crazyData.toRight(ErrorStr("Board has no crazyhouse data"))
+      d1 <- situation.crazyData.toRight(ErrorStr("Board has no crazyhouse data"))
       _  <- Either.cond((role != Pawn || canDropPawnOn(square)), d1, ErrorStr(s"Can't drop $role on $square"))
       piece = Piece(situation.color, role)
       d2 <- d1.drop(piece).toRight(ErrorStr(s"No $piece to drop on $square"))
-      b1 <- situation.board
+      b1 <- situation
         .place(piece, square)
         .toRight(ErrorStr(s"Can't drop $role on $square, it's occupied"))
       _ <- Either.cond(
@@ -114,7 +114,7 @@ case object Crazyhouse
   private def legalDropSquares(situation: Situation): Bitboard =
     situation.ourKing
       .map(king =>
-        val checkers = situation.board.board.attackers(king, !situation.color)
+        val checkers = situation.board.attackers(king, !situation.color)
         if checkers.isEmpty then ~situation.board.occupied
         else checkers.singleSquare.map(Bitboard.between(king, _)).getOrElse(Bitboard.empty)
       )
@@ -126,14 +126,14 @@ case object Crazyhouse
     val targets = legalDropSquares(situation)
     if targets.isEmpty then Nil
     else
-      situation.board.crazyData.fold(Nil): data =>
+      situation.crazyData.fold(Nil): data =>
         val pocket = data.pockets(situation.color)
         for
           role <- List(Pawn, Knight, Bishop, Rook, Queen)
           if pocket.contains(role)
           to <- if role == Pawn then targets & ~Bitboard.firstRank & ~Bitboard.lastRank else targets
           piece = Piece(situation.color, role)
-          after <- situation.board.place(piece, to)
+          after <- situation.place(piece, to)
           d2    <- data.drop(piece)
         yield Drop(piece, to, situation, after.withCrazyData(d2))
 

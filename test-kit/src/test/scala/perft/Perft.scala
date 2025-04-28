@@ -73,14 +73,14 @@ object Perft:
         else moves.map(_.situationAfter.perft(depth - 1)).sum
 
     private def perftMoves: List[MoveOrDrop] =
-      if s.board.variant == chess.variant.Crazyhouse
+      if s.variant == chess.variant.Crazyhouse
       then Crazyhouse.legalMoves(s)
       else
         val legalMoves = s.legalMoves
-        if s.board.variant.chess960 then legalMoves
+        if s.variant.chess960 then legalMoves
         // if variant is not chess960 we need to deduplicated castlings moves
         // We filter out castling move that is Standard and king's dest is not in the rook position
         else legalMoves.filterNot(m => m.castle.exists(c => c.isStandard && m.dest != c.rook))
 
     // when calculate perft we don't do autoDraw
-    def perftEnd = s.checkMate || s.staleMate || s.variantEnd || s.board.variant.specialDraw(s.board)
+    def perftEnd = s.checkMate || s.staleMate || s.variantEnd || s.variant.specialDraw(s)

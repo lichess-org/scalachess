@@ -61,7 +61,7 @@ trait ChessTestCommon:
     Fen
       .read(variant, positionString)
       .map: sit =>
-        sit.color -> sit.withVariant(variant).board
+        sit.color -> sit.withVariant(variant)
       .map: (color, board) =>
         Game(variant).copy(situation = board.situationOf(color))
       .toRight("Could not construct situation from Fen")

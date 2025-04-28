@@ -25,10 +25,10 @@ class VariantTest extends ChessTest:
         .read(variant, FullFen("r1bqkbnr/1p1p1ppp/p7/2pP4/4P3/8/PPP2pPP/RNBQKBNR w KQkq c6 0 4"))
         .get
 
-      assertNot(game1.variant.valid(game1.board, true))
-      assert(game1.variant.valid(game1.board, false))
-      assertNot(game2.variant.valid(game2.board, true))
-      assert(game2.variant.valid(game2.board, false))
+      assertNot(game1.variant.valid(game1, true))
+      assert(game1.variant.valid(game1, false))
+      assertNot(game2.variant.valid(game2, true))
+      assert(game2.variant.valid(game2, false))
 
     test(
       s"$variant when previous move is a double pawn push and the only checker is a rook but not discovered check"
@@ -36,8 +36,8 @@ class VariantTest extends ChessTest:
       val game = Fen
         .read(variant, FullFen("1k6/5K1r/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HA c6 0 4"))
         .get
-      assertNot(game.variant.valid(game.board, true))
-      assert(game.variant.valid(game.board, false))
+      assertNot(game.variant.valid(game, true))
+      assert(game.variant.valid(game, false))
 
     test(
       s"$variant when previous move is a double pawn push and the only checker is a bishop but not discovered check"
@@ -45,29 +45,29 @@ class VariantTest extends ChessTest:
       val game = Fen
         .read(variant, FullFen("2b4r/kr5p/p7/2pP2b1/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4"))
         .get
-      assertNot(game.variant.valid(game.board, true))
-      assert(game.variant.valid(game.board, false))
+      assertNot(game.variant.valid(game, true))
+      assert(game.variant.valid(game, false))
 
     test(s"$variant when multiple checkers are aligned with the king"):
       val game = Fen
         .read(variant, FullFen("1nbqk3/1p1prppp/p1P5/8/4K3/8/PPP1rPPP/RNBQ1BNR w HA - 0 4"))
         .get
-      assertNot(game.variant.valid(game.board, true))
-      assert(game.variant.valid(game.board, false))
+      assertNot(game.variant.valid(game, true))
+      assert(game.variant.valid(game, false))
 
     test(s"$variant when previous move is a double pawn push and the only checker is the pushed pawn"):
       val game = Fen
         .read(variant, FullFen("r1bqkbnr/1p1p1ppp/p7/2pP4/3KP3/8/PPP3PP/RNBQ1BNR w HAkq c6 0 4"))
         .get
-      assert(game.variant.valid(game.board, true))
-      assert(game.variant.valid(game.board, false))
+      assert(game.variant.valid(game, true))
+      assert(game.variant.valid(game, false))
 
     test(s"$variant when two checkers are not on the same rank, file or diagonal"):
       val game = Fen
         .read(variant, FullFen("rnbqk2r/1p1p1ppp/p1P5/3np1b1/4P3/4K3/PPP2PPP/RNBQ1BNR w HAkq - 0 4"))
         .get
-      assert(game.variant.valid(game.board, true))
-      assert(game.variant.valid(game.board, false))
+      assert(game.variant.valid(game, true))
+      assert(game.variant.valid(game, false))
 
     test(
       s"$variant when previous move is a double pawn push and the only checker is a discovered rook check"
@@ -75,8 +75,8 @@ class VariantTest extends ChessTest:
       val game = Fen
         .read(variant, FullFen("1kb2b1r/1r3K1p/p7/2pP4/4P3/8/PPP3PP/RNBQ1BNR w HAk c6 0 4"))
         .get
-      assert(game.variant.valid(game.board, true))
-      assert(game.variant.valid(game.board, false))
+      assert(game.variant.valid(game, true))
+      assert(game.variant.valid(game, false))
 
     test(
       s"$variant when previous move is a double pawn push and the only checker is a discovered bishop check"
@@ -84,8 +84,8 @@ class VariantTest extends ChessTest:
       val game = Fen
         .read(variant, FullFen("1bb4r/kr5p/p7/2pP4/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4"))
         .get
-      assert(game.variant.valid(game.board, true))
-      assert(game.variant.valid(game.board, false))
+      assert(game.variant.valid(game, true))
+      assert(game.variant.valid(game, false))
 
   test("standard position pieces correctly"):
     assertEquals(
@@ -322,8 +322,8 @@ K  r
       val game = Fen
         .read(RacingKings, FullFen(fen))
         .get
-      assertNot(game.variant.valid(game.board, true))
-      assert(game.variant.valid(game.board, false))
+      assertNot(game.variant.valid(game, true))
+      assert(game.variant.valid(game, false))
 
   test("antichess initialize the board without castling rights"):
     assert(Board.init(Antichess, White).history.castles.isEmpty)
@@ -331,7 +331,7 @@ K  r
   test("antichess calculate material imbalance"):
     val position = FullFen("8/p7/8/8/2B5/b7/PPPK2PP/RNB3NR w - - 1 16")
     val game     = fenToGame(position, Antichess)
-    assertEquals(game.situation.board.materialImbalance, -20)
+    assertEquals(game.situation.materialImbalance, -20)
 
   List(
     "1bb4r/kr5p/p7/2pP4/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4",
@@ -348,8 +348,8 @@ K  r
       val game = Fen
         .read(Antichess, FullFen(fen))
         .get
-      assert(game.variant.valid(game.board, true))
-      assert(game.variant.valid(game.board, false))
+      assert(game.variant.valid(game, true))
+      assert(game.variant.valid(game, false))
 
   test("racingKings validate situation correctly with any check at all for white"):
     val position = FullFen("8/8/8/k5R1/8/8/1rbnNB1K/qrbnNBRQ b - - 0 1")
@@ -374,8 +374,8 @@ K  r
     val game = Fen
       .read(Horde, FullFen("1r6/6q1/8/3k4/2pPP3/8/PPP2PPP/PPPPPPPP b - d3 0 1"))
       .get
-    assert(game.variant.valid(game.board, false))
-    assertNot(game.variant.valid(game.board, true))
+    assert(game.variant.valid(game, false))
+    assertNot(game.variant.valid(game, true))
 
   test(
     "horde validate situation correctly: when previous move is a double pawn push and the only checker is a rook but not discovered check"
@@ -386,8 +386,8 @@ K  r
         FullFen("5r2/8/4k2R/8/3pP3/8/PPPP1PPP/2PPPPP1 b - e3 0 1")
       )
       .get
-    assertNot(game.variant.valid(game.board, true))
-    assert(game.variant.valid(game.board, false))
+    assertNot(game.variant.valid(game, true))
+    assert(game.variant.valid(game, false))
 
   test(
     "horde validate situation correctly: when previous move is a double pawn push and the only checker is a bishop but not discovered check"
@@ -395,15 +395,15 @@ K  r
     val game = Fen
       .read(Horde, FullFen("5r2/8/4k3/8/3pP1B1/8/PPPP1PPP/2PPPPP1 b - e3 0 1"))
       .get
-    assertNot(game.variant.valid(game.board, true))
-    assert(game.variant.valid(game.board, false))
+    assertNot(game.variant.valid(game, true))
+    assert(game.variant.valid(game, false))
 
   test("horde validate situation correctly: when multiple checkers are aligned with the king"):
     val game = Fen
       .read(Horde, FullFen("1q6/8/R2k1R2/8/8/8/8/8 b - - 0 1"))
       .get
-    assertNot(game.variant.valid(game.board, true))
-    assert(game.variant.valid(game.board, false))
+    assertNot(game.variant.valid(game, true))
+    assert(game.variant.valid(game, false))
 
   test(
     "horde validate situation correctly: when previous move is a double pawn push and the only checker is the pushed pawn"
@@ -411,15 +411,15 @@ K  r
     val game = Fen
       .read(Horde, FullFen("1r6/6q1/8/4k3/2pP4/2P5/PP3PPP/PPPPPPPP b - d3 0 3"))
       .get
-    assert(game.variant.valid(game.board, true))
-    assert(game.variant.valid(game.board, false))
+    assert(game.variant.valid(game, true))
+    assert(game.variant.valid(game, false))
 
   test("horde validate situation correctly: when two checkers are not on the same rank, file or diagonal"):
     val game = Fen
       .read(Horde, FullFen("7r/3k4/8/1B2N2q/1B6/8/PPPPPPPP/PPPPPPPP w - - 0 1"))
       .get
-    assert(game.variant.valid(game.board, true))
-    assert(game.variant.valid(game.board, false))
+    assert(game.variant.valid(game, true))
+    assert(game.variant.valid(game, false))
 
   test(
     "horde validate situation correctly: when previous move is a double pawn push and the only checker is a discovered rook check"
@@ -427,8 +427,8 @@ K  r
     val game = Fen
       .read(Horde, FullFen("8/8/8/8/3Pp3/8/k5R1/8 b - d3 0 2"))
       .get
-    assert(game.variant.valid(game.board, true))
-    assert(game.variant.valid(game.board, false))
+    assert(game.variant.valid(game, true))
+    assert(game.variant.valid(game, false))
 
   test(
     "horde validate situation correctly: when previous move is a double pawn push and the only checker is a discovered bishop check"
@@ -436,5 +436,5 @@ K  r
     val game = Fen
       .read(Horde, FullFen("8/8/8/8/1k1Pp3/8/8/4B3 b - d3 0 2"))
       .get
-    assert(game.variant.valid(game.board, true))
-    assert(game.variant.valid(game.board, false))
+    assert(game.variant.valid(game, true))
+    assert(game.variant.valid(game, false))

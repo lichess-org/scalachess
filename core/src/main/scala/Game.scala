@@ -11,8 +11,10 @@ case class Game(
     startedAtPly: Ply = Ply.initial
 ):
 
-  export situation.{ board, color as player, variant, history }
-  export situation.board.history.halfMoveClock
+  export situation.{ color as player, variant, history }
+  export situation.history.halfMoveClock
+
+  def board: Board = situation
 
   def apply(
       orig: Square,
@@ -83,20 +85,18 @@ case class Game(
 
   inline def fullMoveNumber: FullMoveNumber = ply.fullMoveNumber
 
-  inline def withBoard(inline b: Board) = copy(situation = situation.copy(board = b))
+  inline def withBoard(inline b: Board): Game = copy(situation = b)
 
-  inline def updateBoard(inline f: Board => Board) = withBoard(f(board))
+  inline def updateBoard(inline f: Board => Board): Game = withBoard(f(situation))
 
-  inline def withPlayer(c: Color) = copy(situation = situation.copy(board.copy(color = c)))
+  inline def withPlayer(c: Color): Game = copy(situation = situation.copy(color = c))
 
-  inline def withTurns(t: Ply) = copy(ply = t)
+  inline def withTurns(t: Ply): Game = copy(ply = t)
 
 object Game:
 
   def apply(variant: chess.variant.Variant): Game =
     Game(Situation(Board.init(variant, White)))
-
-  def apply(board: Board): Game = apply(board, White)
 
   // use board color instead
   def apply(board: Board, color: Color): Game = Game(board.situationOf(color))
@@ -109,10 +109,10 @@ object Game:
         format.Fen.readWithMoveNumber(variant, _)
       .fold(g): parsed =>
         g.copy(
-          situation = parsed.situation.board
-            .withVariant(g.board.variant)
+          situation = parsed.situation
+            .withVariant(g.variant)
             .withCrazyData {
-              parsed.situation.board.crazyData.orElse(g.board.crazyData)
+              parsed.situation.crazyData.orElse(g.situation.crazyData)
             }
             .situationOf(parsed.situation.color),
           ply = parsed.ply,

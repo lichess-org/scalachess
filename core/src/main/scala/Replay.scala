@@ -104,7 +104,7 @@ object Replay:
       initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, List[Board]] =
-    situations(sans, initialFen, variant).map(_.map(_.board))
+    situations(sans, initialFen, variant)
 
   def situations(
       sans: Iterable[SanStr],
@@ -117,12 +117,7 @@ object Replay:
       .flatMap: moves =>
         computeSituations(sit, moves.value, _.apply, identity)
 
-  def boardsFromUci(
-      moves: List[Uci],
-      initialFen: Option[Fen.Full],
-      variant: Variant
-  ): Either[ErrorStr, List[Board]] =
-    computeSituations(initialFenToSituation(initialFen, variant), moves, _.apply, _.board)
+  val boardsFromUci = situationsFromUci
 
   def situationsFromUci(
       moves: List[Uci],

@@ -136,31 +136,28 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
     else None
 
     Situation.AndFullMoveNumber(
-      Situation(
-        Board(
-          BBoard(
-            occupied = occupied,
-            white = white,
-            black = black,
-            pawns = pawns,
-            knights = knights,
-            bishops = bishops,
-            rooks = rooks,
-            queens = queens,
-            kings = kings
-          ),
-          History(
-            lastMove = epMove,
-            checkCount = checkCount,
-            castles =
-              maximumCastles(unmovedRooks = unmovedRooks, white = white, black = black, kings = kings),
-            unmovedRooks = unmovedRooks,
-            halfMoveClock = halfMoveClock,
-            crazyData = crazyData
-          ),
-          variant,
-          turn
-        )
+      Board(
+        BBoard(
+          occupied = occupied,
+          white = white,
+          black = black,
+          pawns = pawns,
+          knights = knights,
+          bishops = bishops,
+          rooks = rooks,
+          queens = queens,
+          kings = kings
+        ),
+        History(
+          lastMove = epMove,
+          checkCount = checkCount,
+          castles = maximumCastles(unmovedRooks = unmovedRooks, white = white, black = black, kings = kings),
+          unmovedRooks = unmovedRooks,
+          halfMoveClock = halfMoveClock,
+          crazyData = crazyData
+        ),
+        variant,
+        turn
       ),
       ply.fullMoveNumber
     )

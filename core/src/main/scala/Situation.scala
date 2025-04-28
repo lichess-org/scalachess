@@ -4,8 +4,6 @@ type Situation = Board
 
 object Situation:
 
-  def apply(board: Board): Situation = board
-
   def apply(variant: chess.variant.Variant): Situation = Board.init(variant, White)
 
   case class AndFullMoveNumber(situation: Situation, fullMoveNumber: FullMoveNumber):

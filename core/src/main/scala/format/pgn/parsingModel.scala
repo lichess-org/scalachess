@@ -45,7 +45,7 @@ case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[
 
   private def initContext(tags: Tags): AndFullMoveNumber =
     val variant = tags.variant | chess.variant.Standard
-    def default = Situation.AndFullMoveNumber(Situation(Board.init(variant, White)), FullMoveNumber.initial)
+    def default = Situation.AndFullMoveNumber(Board.init(variant, White), FullMoveNumber.initial)
 
     tags.fen
       .flatMap(Fen.readWithMoveNumber(variant, _))

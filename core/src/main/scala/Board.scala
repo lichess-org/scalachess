@@ -64,14 +64,14 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
 
   // def autoDraw: Boolean = variant.autoDraw(this)
 
-  inline def situationOf(inline color: Color) = Situation(copy(color = color))
+  inline def situationOf(inline color: Color): Situation = copy(color = color)
 
   def materialImbalance: Int = variant.materialImbalance(this)
 
   override def toString = s"$board $variant ${history.lastMove}\n"
 
   // =====================Situation migration =========================
-  def toSituation: Situation = Situation(this)
+  def toSituation: Situation = this
 
   lazy val moves: Map[Square, List[Move]] =
     legalMoves.groupBy(_.orig)

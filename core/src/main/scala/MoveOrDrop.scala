@@ -18,9 +18,9 @@ sealed trait MoveOrDrop:
 
   def finalizeAfter: Board
 
-  def situationBefore: Situation
+  def situationBefore: Board
 
-  def situationAfter: Situation
+  def situationAfter: Board
 
   def toUci: Uci
 
@@ -35,7 +35,7 @@ case class Move(
     piece: Piece,
     orig: Square,
     dest: Square,
-    situationBefore: Situation,
+    situationBefore: Board,
     after: Board,
     capture: Option[Square],
     promotion: Option[PromotableRole],
@@ -44,7 +44,7 @@ case class Move(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  def situationAfter: Situation = finalizeAfter.situationOf(!piece.color)
+  def situationAfter: Board = finalizeAfter.withColor(!piece.color)
   lazy val toSanStr: SanStr     = format.pgn.Dumper(this)
 
   // TODO rethink about how handle castling
@@ -112,7 +112,7 @@ case class Move(
       val resetsPositionHashes = board.variant.isIrreversible(this)
       val basePositionHashes =
         if resetsPositionHashes then PositionHash.empty else positionHashesOfSituationBefore
-      h.copy(positionHashes = PositionHash(Hash(board.situationOf(!piece.color))).combine(basePositionHashes))
+      h.copy(positionHashes = PositionHash(Hash(board.withColor(!piece.color))).combine(basePositionHashes))
     }
 
   // does this move capture an opponent piece?
@@ -163,7 +163,7 @@ case class Drop(
 ) extends MoveOrDrop:
 
   inline def before: Situation  = situationBefore
-  def situationAfter: Situation = finalizeAfter.situationOf(!piece.color)
+  def situationAfter: Situation = finalizeAfter.withColor(!piece.color)
   lazy val toSanStr: SanStr     = format.pgn.Dumper(this)
 
   lazy val finalizeAfter: Board =
@@ -182,7 +182,7 @@ case class Drop(
     board.updateHistory { h =>
       val basePositionHashes =
         if h.positionHashes.value.isEmpty then PositionHash(Hash(situationBefore)) else h.positionHashes
-      h.copy(positionHashes = PositionHash(Hash(board.situationOf(!piece.color))).combine(basePositionHashes))
+      h.copy(positionHashes = PositionHash(Hash(board.withColor(!piece.color))).combine(basePositionHashes))
     }
 
   def afterWithLastMove: Board =

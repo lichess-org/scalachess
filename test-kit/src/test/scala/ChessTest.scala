@@ -20,13 +20,13 @@ trait ChessTestCommon:
     def chess960: Board             = makeBoard(str, chess.variant.Chess960)
     def kingOfTheHill: Board        = makeBoard(str, chess.variant.KingOfTheHill)
     def threeCheck: Board           = makeBoard(str, chess.variant.ThreeCheck)
-    def as(color: Color): Situation = (Visual << str).situationOf(color)
+    def as(color: Color): Situation = (Visual << str).withColor(color)
 
   extension (board: Board)
     def visual = Visual >> board
     def destsFrom(from: Square): Option[List[Square]] =
       board(from).map: piece =>
-        board.situationOf(piece.color).generateMovesAt(from).map(_.dest)
+        board.withColor(piece.color).generateMovesAt(from).map(_.dest)
 
     def seq(actions: Board => Option[Board]*): Option[Board] =
       actions.foldLeft(board.some)(_ flatMap _)
@@ -63,7 +63,7 @@ trait ChessTestCommon:
       .map: sit =>
         sit.color -> sit.withVariant(variant)
       .map: (color, board) =>
-        Game(variant).copy(situation = board.situationOf(color))
+        Game(variant).copy(situation = board.withColor(color))
       .toRight("Could not construct situation from Fen")
 
   def makeBoard(pieces: (Square, Piece)*): Board =
@@ -95,7 +95,7 @@ trait ChessTestCommon:
 
   def pieceMoves(piece: Piece, square: Square): Option[List[Square]] =
     makeEmptyBoard.place(piece, square).map { b =>
-      b.situationOf(piece.color).movesAt(square).map(_.dest)
+      b.withColor(piece.color).movesAt(square).map(_.dest)
     }
 
   def defaultHistory(

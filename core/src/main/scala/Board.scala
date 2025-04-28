@@ -7,6 +7,7 @@ import variant.*
 import bitboard.Board as BBoard
 import bitboard.Bitboard
 import bitboard.Bitboard.*
+import chess.Board
 
 case class Board(board: BBoard, history: History, variant: Variant, color: Color):
 
@@ -60,11 +61,9 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
 
   def ensureCrazyData: Board = withCrazyData(crazyData.getOrElse(Crazyhouse.Data.init))
 
-  inline def updateHistory(inline f: History => History) = copy(history = f(history))
+  inline def updateHistory(inline f: History => History): Board = copy(history = f(history))
 
-  // def autoDraw: Boolean = variant.autoDraw(this)
-
-  inline def situationOf(inline color: Color): Situation = copy(color = color)
+  def withColor(color: Color): Board = copy(color = color)
 
   def materialImbalance: Int = variant.materialImbalance(this)
 
@@ -465,4 +464,5 @@ object Board:
       color.getOrElse(White)
     )
 
+  def apply(variant: chess.variant.Variant): Board = Board.init(variant, White)
   def init(variant: Variant, color: Color): Board = Board(BBoard.fromMap(variant.pieces), variant, color.some)

@@ -74,14 +74,14 @@ object Replay:
       case (game, gs, err) => (game, gs.reverse, err)
 
   private def computeSituations[M](
-      sit: Situation,
+      sit: Board,
       moves: List[M],
-      play: M => Situation => Either[ErrorStr, MoveOrDrop]
-  ): Either[ErrorStr, List[Situation]] =
+      play: M => Board => Either[ErrorStr, MoveOrDrop]
+  ): Either[ErrorStr, List[Board]] =
     moves
       .foldM((sit, List(sit))) { case ((current, acc), move) =>
         play(move)(current).map: md =>
-          val nextSit = md.finalizeAfter.situationOf(!current.color)
+          val nextSit = md.finalizeAfter.withColor(!current.color)
           (nextSit, nextSit :: acc)
       }
       .map(_._2.reverse)
@@ -95,8 +95,8 @@ object Replay:
           case Left(err) => err.asLeft
           case Right(md) => computeReplay(replay.addMove(md), rest)
 
-  private def initialFenToSituation(initialFen: Option[Fen.Full], variant: Variant): Situation =
-    (initialFen.flatMap(Fen.read) | Situation(variant)).withVariant(variant)
+  private def initialFenToSituation(initialFen: Option[Fen.Full], variant: Variant): Board =
+    (initialFen.flatMap(Fen.read) | Board(variant)).withVariant(variant)
 
   def boards(
       sans: Iterable[SanStr],
@@ -109,7 +109,7 @@ object Replay:
       sans: Iterable[SanStr],
       initialFen: Option[Fen.Full],
       variant: Variant
-  ): Either[ErrorStr, List[Situation]] =
+  ): Either[ErrorStr, List[Board]] =
     val sit = initialFenToSituation(initialFen, variant)
     Parser
       .moves(sans)
@@ -120,7 +120,7 @@ object Replay:
       moves: List[Uci],
       initialFen: Option[Fen.Full],
       variant: Variant
-  ): Either[ErrorStr, List[Situation]] =
+  ): Either[ErrorStr, List[Board]] =
     computeSituations(initialFenToSituation(initialFen, variant), moves, _.apply)
 
   def apply(
@@ -144,7 +144,7 @@ object Replay:
       def compareFen(fen: Fen.Full)  = truncateFen(fen) == atFenTruncated
 
       @scala.annotation.tailrec
-      def recursivePlyAtFen(sit: Situation, sans: List[San], ply: Ply): Either[ErrorStr, Ply] =
+      def recursivePlyAtFen(sit: Board, sans: List[San], ply: Ply): Either[ErrorStr, Ply] =
         sans match
           case Nil => ErrorStr(s"Can't find $atFenTruncated, reached ply $ply").asLeft
           case san :: rest =>
@@ -152,11 +152,11 @@ object Replay:
               case Left(err) => err.asLeft
               case Right(moveOrDrop) =>
                 val after = moveOrDrop.finalizeAfter
-                val fen   = Fen.write(Game(after.situationOf(ply.turn), ply = ply))
+                val fen   = Fen.write(Game(after.withColor(ply.turn), ply = ply))
                 if compareFen(fen) then ply.asRight
-                else recursivePlyAtFen(after.situationOf(!sit.color), rest, ply.next)
+                else recursivePlyAtFen(after.withColor(!sit.color), rest, ply.next)
 
-      val sit = initialFen.flatMap(Fen.read(variant, _)) | Situation(variant)
+      val sit = initialFen.flatMap(Fen.read(variant, _)) | Board(variant)
 
       Parser
         .moves(sans)

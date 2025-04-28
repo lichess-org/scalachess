@@ -4,7 +4,7 @@ import chess.format.pgn.SanStr
 import chess.format.{ Fen, Uci, pgn }
 
 case class Game(
-    situation: Situation,
+    situation: Board,
     sans: Vector[SanStr] = Vector(),
     clock: Option[Clock] = None,
     ply: Ply = Ply.initial, // plies
@@ -106,7 +106,7 @@ object Game:
           situation = parsed.situation
             .withVariant(g.variant)
             .withCrazyData(parsed.situation.crazyData.orElse(g.situation.crazyData))
-            .situationOf(parsed.situation.color),
+            .withColor(parsed.situation.color),
           ply = parsed.ply,
           startedAtPly = parsed.ply
         )

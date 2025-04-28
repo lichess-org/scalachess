@@ -4,10 +4,10 @@ import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.infra.Blackhole
-import chess.Situation
 import chess.format.*
 import chess.perft.Perft
 import chess.variant.*
+import chess.Board
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -23,14 +23,14 @@ class DestinationsBench:
   @Param(Array("100"))
   var games: Int = scala.compiletime.uninitialized
 
-  var threecheckInput: List[Situation]  = scala.compiletime.uninitialized
-  var antichessInput: List[Situation]   = scala.compiletime.uninitialized
-  var atomicInput: List[Situation]      = scala.compiletime.uninitialized
-  var crazyhouseInput: List[Situation]  = scala.compiletime.uninitialized
-  var racingkingsInput: List[Situation] = scala.compiletime.uninitialized
-  var hordeInput: List[Situation]       = scala.compiletime.uninitialized
-  var randomInput: List[Situation]      = scala.compiletime.uninitialized
-  var trickyInput: List[Situation]      = scala.compiletime.uninitialized
+  var threecheckInput: List[Board]  = scala.compiletime.uninitialized
+  var antichessInput: List[Board]   = scala.compiletime.uninitialized
+  var atomicInput: List[Board]      = scala.compiletime.uninitialized
+  var crazyhouseInput: List[Board]  = scala.compiletime.uninitialized
+  var racingkingsInput: List[Board] = scala.compiletime.uninitialized
+  var hordeInput: List[Board]       = scala.compiletime.uninitialized
+  var randomInput: List[Board]      = scala.compiletime.uninitialized
+  var trickyInput: List[Board]      = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =
@@ -75,13 +75,13 @@ class DestinationsBench:
   def tricky(bh: Blackhole) =
     bench(trickyInput)(bh)
 
-  private def bench(sits: List[Situation])(bh: Blackhole) =
+  private def bench(sits: List[Board])(bh: Blackhole) =
     val x = sits.map: x =>
       Blackhole.consumeCPU(Work)
       x.destinations
     bh.consume(x)
 
-  private def makeSituations(perfts: List[Perft], variant: Variant, games: Int): List[Situation] =
+  private def makeSituations(perfts: List[Perft], variant: Variant, games: Int): List[Board] =
     perfts
       .take(games)
       .map(p => Fen.read(variant, p.epd).getOrElse(throw RuntimeException("boooo")))

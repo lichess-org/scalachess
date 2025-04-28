@@ -19,30 +19,32 @@ abstract class Variant private[variant] (
 
   def pieces: Map[Square, Piece]
 
-  inline def standard      = this == Standard
-  inline def chess960      = this == Chess960
-  inline def fromPosition  = this == FromPosition
-  inline def kingOfTheHill = this == KingOfTheHill
-  inline def threeCheck    = this == ThreeCheck
-  inline def antichess     = this == Antichess
-  inline def atomic        = this == Atomic
-  inline def horde         = this == Horde
-  inline def racingKings   = this == RacingKings
-  inline def crazyhouse    = this == Crazyhouse
+  inline def standard: Boolean      = this == Standard
+  inline def chess960: Boolean      = this == Chess960
+  inline def fromPosition: Boolean  = this == FromPosition
+  inline def kingOfTheHill: Boolean = this == KingOfTheHill
+  inline def threeCheck: Boolean    = this == ThreeCheck
+  inline def antichess: Boolean     = this == Antichess
+  inline def atomic: Boolean        = this == Atomic
+  inline def horde: Boolean         = this == Horde
+  inline def racingKings: Boolean   = this == RacingKings
+  inline def crazyhouse: Boolean    = this == Crazyhouse
 
-  inline def exotic = !standard
+  inline def exotic: Boolean = !standard
 
-  def allowsCastling = !castles.isEmpty
+  def allowsCastling: Boolean = !castles.isEmpty
 
-  def makeUnmovedRooks(rooks: Bitboard) = if allowsCastling then UnmovedRooks(rooks) else UnmovedRooks.none
+  def makeUnmovedRooks(rooks: Bitboard): UnmovedRooks =
+    if allowsCastling then UnmovedRooks(rooks) else UnmovedRooks.none
 
-  protected val backRank = Vector(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
+  protected val backRank: Vector[Role] =
+    Vector(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
 
   def castles: Castles = Castles.init
 
   val initialFen: Fen.Full = Fen.Full.initial
 
-  def isValidPromotion(promotion: Option[PromotableRole]) =
+  def isValidPromotion(promotion: Option[PromotableRole]): Boolean =
     promotion match
       case None                                 => true
       case Some(Queen | Rook | Knight | Bishop) => true
@@ -97,19 +99,19 @@ abstract class Variant private[variant] (
 
   def staleMate(situation: Situation): Boolean = situation.check.no && situation.legalMoves.isEmpty
 
-  def checkmate(situation: Situation) = situation.check.yes && situation.legalMoves.isEmpty
+  def checkmate(situation: Situation): Boolean = situation.check.yes && situation.legalMoves.isEmpty
 
   // In most variants, the winner is the last player to have played and there is a possibility of either a traditional
   // checkmate or a variant end condition
   def winner(situation: Situation): Option[Color] =
     if situation.checkMate || specialEnd(situation) then Option(!situation.color) else None
 
-  def specialEnd(situation: Situation) = false
+  def specialEnd(situation: Situation): Boolean = false
 
-  def specialDraw(situation: Situation) = false
+  def specialDraw(situation: Situation): Boolean = false
 
   def autoDraw(board: Board): Boolean =
-    fiftyMoves(board.history) || isInsufficientMaterial(board) || board.history.fivefoldRepetition
+    isInsufficientMaterial(board) || fiftyMoves(board.history) || board.history.fivefoldRepetition
 
   /** Returns the material imbalance in pawns (overridden in Antichess)
     */
@@ -122,13 +124,13 @@ abstract class Variant private[variant] (
 
   /** Returns true if neither player can win. The game should end immediately.
     */
-  def isInsufficientMaterial(board: Board) = InsufficientMatingMaterial(board)
+  def isInsufficientMaterial(board: Board): Boolean = InsufficientMatingMaterial(board)
 
   /** Returns true if the other player cannot win. This is relevant when the
     * side to move times out or disconnects. Instead of losing on time,
     * the game should be drawn.
     */
-  def opponentHasInsufficientMaterial(situation: Situation) =
+  def opponentHasInsufficientMaterial(situation: Situation): Boolean =
     InsufficientMatingMaterial(situation.board, !situation.color)
 
   def fiftyMoves(history: History): Boolean = history.halfMoveClock >= HalfMoveClock(100)
@@ -140,19 +142,20 @@ abstract class Variant private[variant] (
     */
   def finalizeBoard(board: Board, uci: format.Uci, captured: Option[Piece]): Board = board
 
-  protected def pawnsOnPromotionRank(board: Board, color: Color) =
+  protected def pawnsOnPromotionRank(board: Board, color: Color): Boolean =
     board(color, Pawn).intersects(Bitboard.rank(color.promotablePawnRank))
 
-  protected def pawnsOnBackRank(board: Board, color: Color) =
+  protected def pawnsOnBackRank(board: Board, color: Color): Boolean =
     board(color, Pawn).intersects(Bitboard.rank(color.backRank))
 
-  protected def validSide(board: Board, strict: Boolean)(color: Color) =
+  protected def validSide(board: Board, strict: Boolean)(color: Color): Boolean =
     board(color, King).count == 1 &&
       (!strict || { board(color, Pawn).count <= 8 && board(color).count <= 16 }) &&
       !pawnsOnPromotionRank(board, color) &&
       !pawnsOnBackRank(board, color)
 
-  def valid(situation: Situation, strict: Boolean) = Color.all.forall(validSide(situation.board, strict))
+  def valid(situation: Situation, strict: Boolean): Boolean =
+    Color.all.forall(validSide(situation.board, strict))
 
   val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
 

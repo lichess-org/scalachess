@@ -15,7 +15,7 @@ case object Antichess
       standardInitialPosition = true
     ):
 
-  def pieces = Standard.pieces
+  def pieces: Map[Square, Piece] = Standard.pieces
 
   // In antichess, it is not permitted to castle
   override val castles    = Castles.none
@@ -24,9 +24,9 @@ case object Antichess
   // In antichess, the king can't be put into check so we always return false
   override def kingSafety(m: Move): Boolean = true
 
-  override def kingThreatened(board: BBoard, color: Color) = Check.No
+  override def kingThreatened(board: BBoard, color: Color): Check = Check.No
 
-  def validMoves(situation: Situation) =
+  override def validMoves(situation: Situation): List[Move] =
     import situation.{ genNonKing, board, genUnsafeKing, ourKings }
     val capturingMoves = captureMoves(situation)
     if capturingMoves.nonEmpty then capturingMoves
@@ -36,14 +36,14 @@ case object Antichess
     import situation.{ them, us, genNonKing, genEnPassant, board, genUnsafeKing, ourKings }
     ourKings.flatMap(genUnsafeKing(_, them)) ++ genEnPassant(us & board.pawns) ++ genNonKing(them)
 
-  override def valid(situation: Situation, strict: Boolean) =
+  override def valid(situation: Situation, strict: Boolean): Boolean =
     situation.board.nbPieces >= 2 && situation.board.nbPieces <= 32
 
   // In antichess, there is no checkmate condition, and the winner is the current player if they have no legal moves
   override def winner(situation: Situation): Option[Color] =
     specialEnd(situation).option(situation.color)
 
-  override def specialEnd(situation: Situation) =
+  override def specialEnd(situation: Situation): Boolean =
     // The game ends with a win when one player manages to lose all their pieces or is in stalemate
     situation.board(situation.color).isEmpty || situation.legalMoves.isEmpty
 
@@ -69,7 +69,7 @@ case object Antichess
   // No player can win if the only remaining pieces are opposing bishops on different coloured
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color
   // of square to allow the player to force their opponent to capture their bishop, also resulting in a draw
-  override def isInsufficientMaterial(board: Board) =
+  override def isInsufficientMaterial(board: Board): Boolean =
     // Exit early if we are not in a situation with only bishops and pawns
     if (board.bishops | board.pawns) != board.occupied then false
     else

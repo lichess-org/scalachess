@@ -73,17 +73,16 @@ object Replay:
     gameMoveWhileValidReverse(sans, initialFen, variant) match
       case (game, gs, err) => (game, gs.reverse, err)
 
-  private def computeSituations[M, S](
+  private def computeSituations[M](
       sit: Situation,
       moves: List[M],
-      play: M => Situation => Either[ErrorStr, MoveOrDrop],
-      transform: Situation => S
-  ): Either[ErrorStr, List[S]] =
+      play: M => Situation => Either[ErrorStr, MoveOrDrop]
+  ): Either[ErrorStr, List[Situation]] =
     moves
-      .foldM((sit, List(transform(sit)))) { case ((current, acc), move) =>
+      .foldM((sit, List(sit))) { case ((current, acc), move) =>
         play(move)(current).map: md =>
           val nextSit = md.finalizeAfter.situationOf(!current.color)
-          (nextSit, transform(nextSit) :: acc)
+          (nextSit, nextSit :: acc)
       }
       .map(_._2.reverse)
 
@@ -115,16 +114,14 @@ object Replay:
     Parser
       .moves(sans)
       .flatMap: moves =>
-        computeSituations(sit, moves.value, _.apply, identity)
-
-  val boardsFromUci = situationsFromUci
+        computeSituations(sit, moves.value, _.apply)
 
   def situationsFromUci(
       moves: List[Uci],
       initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, List[Situation]] =
-    computeSituations(initialFenToSituation(initialFen, variant), moves, _.apply, identity)
+    computeSituations(initialFenToSituation(initialFen, variant), moves, _.apply)
 
   def apply(
       moves: List[Uci],

@@ -61,7 +61,7 @@ case object Horde
     !mateInOne && {
       if situation.isWhiteTurn then situation.legalMoves.isEmpty
       else
-        val legalMoves = validMoves(situation.toSituation)
+        val legalMoves = validMoves(situation)
         legalMoves.filter(_.piece.role != King).isEmpty &&
         legalMoves.filter(_.piece.role == King).forall(move => validMoves(move.situationAfter).isEmpty)
     }

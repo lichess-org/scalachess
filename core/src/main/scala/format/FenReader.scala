@@ -80,7 +80,6 @@ trait FenReader:
               .flatMap(readCheckCount)
               .orElse(splitted.lift(6).flatMap(readCheckCount))
           checkCount.foldLeft(history)(_.withCheckCount(_))
-        .toSituation
     }
 
   def read(fen: FullFen): Option[Situation] = read(Standard, fen)

@@ -71,8 +71,6 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
   override def toString = s"$board $variant ${history.lastMove}\n"
 
   // =====================Situation migration =========================
-  def toSituation: Situation = this
-
   lazy val moves: Map[Square, List[Move]] =
     legalMoves.groupBy(_.orig)
 
@@ -88,13 +86,13 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
   def checkSquare: Option[Square] = if check.yes then ourKing else None
 
   def move(from: Square, to: Square, promotion: Option[PromotableRole]): Either[ErrorStr, Move] =
-    variant.move(toSituation, from, to, promotion)
+    variant.move(this, from, to, promotion)
 
   def move(uci: Uci.Move): Either[ErrorStr, Move] =
-    variant.move(toSituation, uci.orig, uci.dest, uci.promotion)
+    variant.move(this, uci.orig, uci.dest, uci.promotion)
 
   def drop(role: Role, square: Square): Either[ErrorStr, Drop] =
-    variant.drop(toSituation, role, square)
+    variant.drop(this, role, square)
 
   def playable(strict: Boolean): Boolean =
     variant.valid(this, strict) && !end && copy(color = !color).check.no
@@ -125,8 +123,8 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
 
   inline def winner: Option[Color] = variant.winner(this)
 
-  // todo remove toSituation
-  lazy val legalMoves: List[Move] = variant.validMoves(toSituation)
+  // todo remove this
+  lazy val legalMoves: List[Move] = variant.validMoves(this)
 
   lazy val enPassantSquare: Option[Square] =
     potentialEpSquare >> legalMoves.find(_.enpassant).map(_.dest)
@@ -165,7 +163,7 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
     // if they're not empty then filter by orig
     // else use the normal moveAt
     if variant.antichess then
-      val captureMoves = Antichess.captureMoves(toSituation)
+      val captureMoves = Antichess.captureMoves(this)
       if captureMoves.nonEmpty then captureMoves.filter(_.orig == square)
       else movesAt
     else movesAt
@@ -331,7 +329,7 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
           piece = color.pawn,
           orig = orig,
           dest = dest,
-          situationBefore = toSituation,
+          situationBefore = this,
           after = after,
           capture = capture.some,
           castle = None,
@@ -350,7 +348,7 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
         piece = Piece(color, role),
         orig = orig,
         dest = dest,
-        situationBefore = toSituation,
+        situationBefore = this,
         after = board,
         capture = taken,
         castle = None,
@@ -372,7 +370,7 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
           piece = color.pawn,
           orig = orig,
           dest = dest,
-          situationBefore = toSituation,
+          situationBefore = this,
           after = board,
           capture = taken,
           castle = None,
@@ -413,7 +411,7 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
       piece = color.king,
       orig = king,
       dest = inputKingSquare,
-      situationBefore = toSituation,
+      situationBefore = this,
       after = a,
       capture = None,
       castle = Move.Castle(king, kingTo, rook, rookTo).some,

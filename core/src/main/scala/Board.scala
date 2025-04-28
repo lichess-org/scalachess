@@ -9,42 +9,15 @@ import bitboard.Bitboard
 case class Board(board: BBoard, history: History, variant: Variant, color: Color):
 
   export history.{ castles, unmovedRooks, crazyData }
-  export board.{
-    attackers,
-    bishops,
-    black,
-    byColor,
-    byPiece,
-    byRole,
-    byRoleOf,
-    colorAt,
-    fold,
-    foreach,
-    isCheck,
-    isOccupied,
-    kingOf,
-    kingPosOf,
-    kings,
-    knights,
-    nbPieces,
-    occupied,
-    pawns,
-    pieceMap as pieces,
-    pieces as allPieces,
-    piecesOf,
-    queens,
-    rooks,
-    sliderBlockers,
-    sliders,
-    white
+  // format: off
+  export board.{ attackers, bishops, black, byColor, byPiece, byRole, byRoleOf, colorAt,
+    fold, foreach, isCheck, isOccupied, kingOf, kingPosOf, kings, kingsAndBishopsOnly,
+    kingsAndBishopsOnlyOf, kingsAndKnightsOnly, kingsAndKnightsOnlyOf, kingsAndMinorsOnly,
+    kingsOnly, kingsOnlyOf, kingsRooksAndMinorsOnly, knights, nbPieces, nonKingsOf, occupied,
+    onlyKnights, onlyOf, pawns, piece, pieceAt, pieceMap as pieces, pieces as allPieces, piecesOf,
+    queens, rooks, sliderBlockers, sliders, white, apply, count
   }
-
-  inline def apply(inline color: Color): Bitboard = color.fold(white, black)
-  inline def apply(inline color: Color, inline role: Role): Bitboard =
-    color.fold(white, black) & board.byRole(role)
-
-  inline def apply(inline at: Square): Option[Piece]     = board.pieceAt(at)
-  inline def apply(inline file: File, inline rank: Rank) = board.pieceAt(Square(file, rank))
+  // format: on
 
   def toSituation: Situation = Situation(this, color)
 
@@ -85,55 +58,11 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
 
   inline def updateHistory(inline f: History => History) = copy(history = f(history))
 
-  def count(p: Piece): Int = board.piece(p).count
-  def count(c: Color): Int = board.color(c).count
-
   def autoDraw: Boolean = variant.autoDraw(this)
 
   inline def situationOf(inline color: Color) = Situation(this, color)
 
   def materialImbalance: Int = variant.materialImbalance(this)
-
-  def kingsAndBishopsOnly: Boolean =
-    (kings | bishops) == occupied
-
-  def kingsAndKnightsOnly: Boolean =
-    (kings | knights) == occupied
-
-  def onlyKnights: Boolean = knights == occupied
-
-  def minors: Bitboard =
-    bishops | knights
-
-  def kingsAndMinorsOnly: Boolean =
-    (kings | minors) == occupied
-
-  def kingsRooksAndMinorsOnly: Boolean =
-    (kings | rooks | minors) == occupied
-
-  def kingsAndBishopsOnlyOf(color: Color): Boolean =
-    onlyOf(color, kings | bishops)
-
-  def kingsAndMinorsOnlyOf(color: Color): Boolean =
-    onlyOf(color, kings | minors)
-
-  def kingsOnly = kings == occupied
-
-  def kingsOnlyOf(color: Color) =
-    onlyOf(color, kings)
-
-  def kingsAndKnightsOnlyOf(color: Color) =
-    onlyOf(color, kings | knights)
-
-  def onlyOf(color: Color, roles: Bitboard): Boolean =
-    val colorPieces = byColor(color)
-    (roles & colorPieces) == colorPieces
-
-  def nonKingsOf(color: Color): Bitboard =
-    apply(color) & ~kings
-
-  def nonKing: Bitboard =
-    occupied & ~kings
 
   override def toString = s"$board $variant ${history.lastMove}\n"
 

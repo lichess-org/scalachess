@@ -17,6 +17,12 @@ case class Board(occupied: Bitboard, byColor: ByColor, byRole: ByRole):
   val queens  = byRole.queen
   val kings   = byRole.king
 
+  inline def apply(inline color: Color): Bitboard = color.fold(white, black)
+  inline def apply(inline color: Color, inline role: Role): Bitboard =
+    color.fold(white, black) & byRole(role)
+  inline def apply(inline at: Square): Option[Piece]     = pieceAt(at)
+  inline def apply(inline file: File, inline rank: Rank) = pieceAt(Square(file, rank))
+
   def sliders: Bitboard              = bishops ^ rooks ^ queens
   def isOccupied(s: Square): Boolean = occupied.contains(s)
 
@@ -54,6 +60,50 @@ case class Board(occupied: Bitboard, byColor: ByColor, byRole: ByRole):
 
   def kingPosOf(c: Color): Option[Square] =
     kingOf(c).singleSquare
+
+  def kingsAndBishopsOnly: Boolean =
+    (kings | bishops) == occupied
+
+  def kingsAndKnightsOnly: Boolean =
+    (kings | knights) == occupied
+
+  def onlyKnights: Boolean = knights == occupied
+
+  def minors: Bitboard =
+    bishops | knights
+
+  def kingsAndMinorsOnly: Boolean =
+    (kings | minors) == occupied
+
+  def kingsRooksAndMinorsOnly: Boolean =
+    (kings | rooks | minors) == occupied
+
+  def kingsAndBishopsOnlyOf(color: Color): Boolean =
+    onlyOf(color, kings | bishops)
+
+  def kingsAndMinorsOnlyOf(color: Color): Boolean =
+    onlyOf(color, kings | minors)
+
+  def kingsOnly = kings == occupied
+
+  def kingsOnlyOf(color: Color) =
+    onlyOf(color, kings)
+
+  def kingsAndKnightsOnlyOf(color: Color) =
+    onlyOf(color, kings | knights)
+
+  def onlyOf(color: Color, roles: Bitboard): Boolean =
+    val colorPieces = byColor(color)
+    (roles & colorPieces) == colorPieces
+
+  def nonKingsOf(color: Color): Bitboard =
+    apply(color) & ~kings
+
+  def nonKing: Bitboard =
+    occupied & ~kings
+
+  def count(p: Piece): Int = piece(p).count
+  def count(c: Color): Int = color(c).count
 
   def attackers(s: Square, attacker: Color): Bitboard =
     attackers(s, attacker, occupied)

@@ -45,7 +45,7 @@ case class Move(
 ) extends MoveOrDrop:
 
   inline def before         = situationBefore.board
-  def situationAfter        = Situation(finalizeAfter, !piece.color)
+  def situationAfter        = finalizeAfter.situationOf(!piece.color)
   lazy val toSanStr: SanStr = format.pgn.Dumper(this)
 
   // TODO rethink about how handle castling
@@ -113,7 +113,7 @@ case class Move(
       val resetsPositionHashes = board.variant.isIrreversible(this)
       val basePositionHashes =
         if resetsPositionHashes then PositionHash.empty else positionHashesOfSituationBefore
-      h.copy(positionHashes = PositionHash(Hash(Situation(board, !piece.color))).combine(basePositionHashes))
+      h.copy(positionHashes = PositionHash(Hash(board.situationOf(!piece.color))).combine(basePositionHashes))
     }
 
   // does this move capture an opponent piece?
@@ -164,7 +164,7 @@ case class Drop(
 ) extends MoveOrDrop:
 
   inline def before         = situationBefore.board
-  def situationAfter        = Situation(finalizeAfter, !piece.color)
+  def situationAfter        = finalizeAfter.situationOf(!piece.color)
   lazy val toSanStr: SanStr = format.pgn.Dumper(this)
 
   lazy val finalizeAfter: Board =
@@ -183,7 +183,7 @@ case class Drop(
     board.updateHistory { h =>
       val basePositionHashes =
         if h.positionHashes.value.isEmpty then PositionHash(Hash(situationBefore)) else h.positionHashes
-      h.copy(positionHashes = PositionHash(Hash(Situation(board, !piece.color))).combine(basePositionHashes))
+      h.copy(positionHashes = PositionHash(Hash(board.situationOf(!piece.color))).combine(basePositionHashes))
     }
 
   def afterWithLastMove: Board =

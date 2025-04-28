@@ -60,16 +60,46 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
 
   inline def updateHistory(inline f: History => History) = copy(history = f(history))
 
-  def autoDraw: Boolean = variant.autoDraw(this)
+  // def autoDraw: Boolean = variant.autoDraw(this)
 
-  inline def situationOf(inline color: Color) = Situation(this, color)
+  inline def situationOf(inline color: Color) = Situation(copy(color = color))
 
   def materialImbalance: Int = variant.materialImbalance(this)
 
   override def toString = s"$board $variant ${history.lastMove}\n"
 
   // =====================Situation migration =========================
-  def toSituation: Situation = Situation(this, color)
+  def toSituation: Situation = Situation(this)
+
+  def playable(strict: Boolean): Boolean =
+    variant.valid(this, strict) && !end && copy(color = !color).check.no
+
+  inline def end: Boolean = checkMate || staleMate || autoDraw || variantEnd
+
+  inline def checkMate: Boolean = variant.checkmate(this)
+
+  inline def staleMate: Boolean = variant.staleMate(this)
+
+  inline def autoDraw: Boolean = variant.autoDraw(this) || variant.specialDraw(this)
+
+  inline def opponentHasInsufficientMaterial: Boolean = variant.opponentHasInsufficientMaterial(this)
+
+  lazy val threefoldRepetition: Boolean = history.threefoldRepetition
+
+  inline def variantEnd: Boolean = variant.specialEnd(this)
+
+  lazy val check: Check               = checkOf(color)
+  inline def checkOf(c: Color): Check = variant.kingThreatened(board, c)
+
+  lazy val status: Option[Status] =
+    if checkMate then Status.Mate.some
+    else if variantEnd then Status.VariantEnd.some
+    else if staleMate then Status.Stalemate.some
+    else if autoDraw then Status.Draw.some
+    else none
+
+
+  inline def winner: Option[Color] = variant.winner(this)
 
   // todo remove toSituation
   lazy val legalMoves: List[Move] = variant.validMoves(toSituation)
@@ -413,4 +443,4 @@ object Board:
       color.getOrElse(White)
     )
 
-  def init(variant: Variant): Board = Board(BBoard.fromMap(variant.pieces), variant, White.some)
+  def init(variant: Variant, color: Color): Board = Board(BBoard.fromMap(variant.pieces), variant, color.some)

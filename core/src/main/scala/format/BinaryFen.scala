@@ -160,8 +160,7 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
           ),
           variant,
           turn
-        ),
-        color = turn
+        )
       ),
       ply.fullMoveNumber
     )

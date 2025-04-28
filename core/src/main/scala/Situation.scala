@@ -7,7 +7,7 @@ import chess.variant.Crazyhouse
 import bitboard.Bitboard
 import bitboard.Bitboard.*
 
-case class Situation(board: Board, color: Color):
+case class Situation(board: Board):
   export board.{
     history,
     isOccupied,
@@ -35,7 +35,20 @@ case class Situation(board: Board, color: Color):
     genRook,
     genUnsafeKing,
     genSafeKing,
-    genCastling
+    genCastling,
+    color,
+    playable,
+    end,
+    checkMate,
+    staleMate,
+    autoDraw,
+    opponentHasInsufficientMaterial,
+    threefoldRepetition,
+    variantEnd,
+    check,
+    checkOf,
+    status,
+    winner
   }
   export color.white as isWhiteTurn
 
@@ -48,39 +61,10 @@ case class Situation(board: Board, color: Color):
 
   def drops: Option[List[Square]] =
     variant match
-      case v: Crazyhouse.type => v.possibleDrops(this)
+      case v: Crazyhouse.type => v.possibleDrops(board)
       case _                  => None
 
-  lazy val check: Check               = checkOf(color)
-  inline def checkOf(c: Color): Check = variant.kingThreatened(board.board, c)
-
   def checkSquare: Option[Square] = if check.yes then board.ourKing else None
-
-  inline def checkMate: Boolean = variant.checkmate(this)
-
-  inline def staleMate: Boolean = variant.staleMate(this)
-
-  inline def autoDraw: Boolean = variant.autoDraw(board) || variant.specialDraw(this)
-
-  inline def opponentHasInsufficientMaterial: Boolean = variant.opponentHasInsufficientMaterial(this)
-
-  lazy val threefoldRepetition: Boolean = history.threefoldRepetition
-
-  inline def variantEnd: Boolean = variant.specialEnd(this)
-
-  inline def end: Boolean = checkMate || staleMate || autoDraw || variantEnd
-
-  inline def winner: Option[Color] = variant.winner(this)
-
-  def playable(strict: Boolean): Boolean =
-    board.variant.valid(this, strict) && !end && copy(color = !color).check.no
-
-  lazy val status: Option[Status] =
-    if checkMate then Status.Mate.some
-    else if variantEnd then Status.VariantEnd.some
-    else if staleMate then Status.Stalemate.some
-    else if autoDraw then Status.Draw.some
-    else none
 
   def move(from: Square, to: Square, promotion: Option[PromotableRole]): Either[ErrorStr, Move] =
     variant.move(this, from, to, promotion)
@@ -97,13 +81,13 @@ case class Situation(board: Board, color: Color):
   def withVariant(variant: chess.variant.Variant): Situation =
     copy(board = board.withVariant(variant))
 
-  def unary_! : Situation = copy(color = !color)
+  def unary_! : Situation = copy(board = board.copy(color = !color))
 
   // ========================bitboard===========================
 
 object Situation:
 
-  def apply(variant: chess.variant.Variant): Situation = Situation(Board.init(variant), White)
+  def apply(variant: chess.variant.Variant): Situation = Situation(Board.init(variant, White))
 
   case class AndFullMoveNumber(situation: Situation, fullMoveNumber: FullMoveNumber):
     def ply = fullMoveNumber.ply(situation.color)

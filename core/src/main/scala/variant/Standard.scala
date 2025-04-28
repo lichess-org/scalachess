@@ -52,16 +52,16 @@ case object Standard
     val blockers  = checkers.singleSquare.fold(Nil)(c => genNonKing(Bitboard.between(king, c) | checkers))
     safeKings ++ blockers
 
-  override def valid(situation: Situation, strict: Boolean): Boolean =
+  override def valid(situation: Board, strict: Boolean): Boolean =
     super.valid(situation, strict) && (!strict || hasValidCheckers(situation))
 
-  def hasValidCheckers(situation: Situation): Boolean =
+  def hasValidCheckers(situation: Board): Boolean =
     situation.checkers.isEmpty || {
       isValidChecksForMultipleCheckers(situation, situation.checkers) &&
       isValidCheckersForEnPassant(situation, situation.checkers)
     }
 
-  private def isValidCheckersForEnPassant(situation: Situation, activeCheckers: Bitboard): Boolean =
+  private def isValidCheckersForEnPassant(situation: Board, activeCheckers: Bitboard): Boolean =
     (for
       enPassantSquare <- situation.potentialEpSquare
       enPassantUp     <- situation.color.fold(enPassantSquare.down, enPassantSquare.up)
@@ -75,7 +75,7 @@ case object Standard
         )
     )).getOrElse(true)
 
-  private def isValidChecksForMultipleCheckers(situation: Situation, activeCheckers: Bitboard): Boolean =
+  private def isValidChecksForMultipleCheckers(situation: Board, activeCheckers: Bitboard): Boolean =
     val checkerCount = activeCheckers.count
     if checkerCount <= 1 then true
     else if checkerCount >= 3 then false

@@ -24,10 +24,10 @@ case object Crazyhouse
   def validMoves(situation: Situation): List[Move] =
     Standard.validMoves(situation)
 
-  override def valid(situation: Situation, strict: Boolean) =
-    Color.all.forall(validSide(situation.board, false)) &&
+  override def valid(situation: Board, strict: Boolean) =
+    Color.all.forall(validSide(situation, false)) &&
       (!strict ||
-        (situation.board.board.byRole(Pawn).count <= 16
+        (situation.board.byRole(Pawn).count <= 16
           && situation.board.nbPieces <= 32
           && Standard.hasValidCheckers(situation)))
 
@@ -70,8 +70,8 @@ case object Crazyhouse
         }
       case _ => board
 
-  private def canDropStuff(situation: Situation) =
-    situation.board.crazyData.exists { (data: Data) =>
+  private def canDropStuff(situation: Board) =
+    situation.crazyData.exists { (data: Data) =>
       val pocket = data.pockets(situation.color)
       pocket.nonEmpty && possibleDrops(situation).fold(true) { squares =>
         squares.nonEmpty && {
@@ -80,22 +80,22 @@ case object Crazyhouse
       }
     }
 
-  override def staleMate(situation: Situation) =
+  override def staleMate(situation: Board) =
     super.staleMate(situation) && !canDropStuff(situation)
 
-  override def checkmate(situation: Situation) =
+  override def checkmate(situation: Board) =
     super.checkmate(situation) && !canDropStuff(situation)
 
   // there is always sufficient mating material in Crazyhouse
-  override def opponentHasInsufficientMaterial(situation: Situation) = false
-  override def isInsufficientMaterial(board: Board)                  = false
+  override def opponentHasInsufficientMaterial(situation: Board) = false
+  override def isInsufficientMaterial(board: Board)              = false
 
   // if the king is not in check, all drops are possible, we just return None
   // king is in single check, we return the squares between the king and the checker
   // king is in double check, no drop is possible
-  def possibleDrops(situation: Situation): Option[List[Square]] =
+  def possibleDrops(situation: Board): Option[List[Square]] =
     situation.ourKing.flatMap(king =>
-      val checkers = situation.board.board.attackers(king, !situation.color)
+      val checkers = situation.board.attackers(king, !situation.color)
       if checkers.moreThanOne then Some(Nil)
       else checkers.first.map(Bitboard.between(king, _).squares)
     )

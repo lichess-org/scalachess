@@ -19,7 +19,7 @@ object InsufficientMatingMaterial:
   def pawnBlockedByPawn(pawn: Square, board: Board): Boolean =
     board(pawn).exists(p =>
       p.is(Pawn) &&
-        Situation(board, p.color).generateMovesAt(pawn).isEmpty && {
+        board.situationOf(p.color).generateMovesAt(pawn).isEmpty && {
           val blockingPosition = posAheadOfPawn(pawn, p.color)
           blockingPosition.flatMap(board(_)).exists(_.is(Pawn))
         }

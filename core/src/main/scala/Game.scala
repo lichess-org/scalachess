@@ -87,18 +87,18 @@ case class Game(
 
   inline def updateBoard(inline f: Board => Board) = withBoard(f(board))
 
-  inline def withPlayer(c: Color) = copy(situation = situation.copy(color = c))
+  inline def withPlayer(c: Color) = copy(situation = situation.copy(board.copy(color = c)))
 
   inline def withTurns(t: Ply) = copy(ply = t)
 
 object Game:
 
   def apply(variant: chess.variant.Variant): Game =
-    Game(Situation(Board.init(variant), White))
+    Game(Situation(Board.init(variant, White)))
 
   def apply(board: Board): Game = apply(board, White)
 
-  def apply(board: Board, color: Color): Game = Game(Situation(board, color))
+  def apply(board: Board, color: Color): Game = Game(board.situationOf(color))
 
   def apply(variantOption: Option[chess.variant.Variant], fen: Option[Fen.Full]): Game =
     val variant = variantOption | chess.variant.Standard
@@ -108,12 +108,12 @@ object Game:
         format.Fen.readWithMoveNumber(variant, _)
       .fold(g): parsed =>
         g.copy(
-          situation = Situation(
-            board = parsed.situation.board.withVariant(g.board.variant).withCrazyData {
+          situation = parsed.situation.board
+            .withVariant(g.board.variant)
+            .withCrazyData {
               parsed.situation.board.crazyData.orElse(g.board.crazyData)
-            },
-            color = parsed.situation.color
-          ),
+            }
+            .situationOf(parsed.situation.color),
           ply = parsed.ply,
           startedAtPly = parsed.ply
         )

@@ -82,7 +82,7 @@ object Replay:
     moves
       .foldM((sit, List(transform(sit)))) { case ((current, acc), move) =>
         play(move)(current).map: md =>
-          val nextSit = Situation(md.finalizeAfter, !current.color)
+          val nextSit = md.finalizeAfter.situationOf(!current.color)
           (nextSit, transform(nextSit) :: acc)
       }
       .map(_._2.reverse)
@@ -160,9 +160,9 @@ object Replay:
               case Left(err) => err.asLeft
               case Right(moveOrDrop) =>
                 val after = moveOrDrop.finalizeAfter
-                val fen   = Fen.write(Game(Situation(after, ply.turn), ply = ply))
+                val fen   = Fen.write(Game(after.situationOf(ply.turn), ply = ply))
                 if compareFen(fen) then ply.asRight
-                else recursivePlyAtFen(Situation(after, !sit.color), rest, ply.next)
+                else recursivePlyAtFen(after.situationOf(!sit.color), rest, ply.next)
 
       val sit = initialFen.flatMap(Fen.read(variant, _)) | Situation(variant)
 

@@ -97,18 +97,18 @@ abstract class Variant private[variant] (
   def drop(situation: Situation, role: Role, square: Square): Either[ErrorStr, Drop] =
     ErrorStr(s"$this variant cannot drop $role $square").asLeft
 
-  def staleMate(situation: Situation): Boolean = situation.check.no && situation.legalMoves.isEmpty
+  def staleMate(situation: Board): Boolean = situation.check.no && situation.legalMoves.isEmpty
 
-  def checkmate(situation: Situation): Boolean = situation.check.yes && situation.legalMoves.isEmpty
+  def checkmate(situation: Board): Boolean = situation.check.yes && situation.legalMoves.isEmpty
 
   // In most variants, the winner is the last player to have played and there is a possibility of either a traditional
   // checkmate or a variant end condition
-  def winner(situation: Situation): Option[Color] =
+  def winner(situation: Board): Option[Color] =
     if situation.checkMate || specialEnd(situation) then Option(!situation.color) else None
 
-  def specialEnd(situation: Situation): Boolean = false
+  def specialEnd(situation: Board): Boolean = false
 
-  def specialDraw(situation: Situation): Boolean = false
+  def specialDraw(situation: Board): Boolean = false
 
   def autoDraw(board: Board): Boolean =
     isInsufficientMaterial(board) || fiftyMoves(board.history) || board.history.fivefoldRepetition
@@ -130,8 +130,8 @@ abstract class Variant private[variant] (
     * side to move times out or disconnects. Instead of losing on time,
     * the game should be drawn.
     */
-  def opponentHasInsufficientMaterial(situation: Situation): Boolean =
-    InsufficientMatingMaterial(situation.board, !situation.color)
+  def opponentHasInsufficientMaterial(situation: Board): Boolean =
+    InsufficientMatingMaterial(situation, !situation.color)
 
   def fiftyMoves(history: History): Boolean = history.halfMoveClock >= HalfMoveClock(100)
 
@@ -154,8 +154,8 @@ abstract class Variant private[variant] (
       !pawnsOnPromotionRank(board, color) &&
       !pawnsOnBackRank(board, color)
 
-  def valid(situation: Situation, strict: Boolean): Boolean =
-    Color.all.forall(validSide(situation.board, strict))
+  def valid(situation: Board, strict: Boolean): Boolean =
+    Color.all.forall(validSide(situation, strict))
 
   val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
 

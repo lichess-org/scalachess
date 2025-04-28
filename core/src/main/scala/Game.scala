@@ -98,6 +98,7 @@ object Game:
 
   def apply(board: Board): Game = apply(board, White)
 
+  // use board color instead
   def apply(board: Board, color: Color): Game = Game(board.situationOf(color))
 
   def apply(variantOption: Option[chess.variant.Variant], fen: Option[Fen.Full]): Game =

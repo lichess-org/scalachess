@@ -20,13 +20,13 @@ trait ChessTestCommon:
     def chess960: Board             = makeBoard(str, chess.variant.Chess960)
     def kingOfTheHill: Board        = makeBoard(str, chess.variant.KingOfTheHill)
     def threeCheck: Board           = makeBoard(str, chess.variant.ThreeCheck)
-    def as(color: Color): Situation = Situation(Visual << str, color)
+    def as(color: Color): Situation = (Visual << str).situationOf(color)
 
   extension (board: Board)
     def visual = Visual >> board
     def destsFrom(from: Square): Option[List[Square]] =
       board(from).map: piece =>
-        Situation(board, piece.color).generateMovesAt(from).map(_.dest)
+        board.situationOf(piece.color).generateMovesAt(from).map(_.dest)
 
     def seq(actions: Board => Option[Board]*): Option[Board] =
       actions.foldLeft(board.some)(_ flatMap _)
@@ -63,7 +63,7 @@ trait ChessTestCommon:
       .map: sit =>
         sit.color -> sit.withVariant(variant).board
       .map: (color, board) =>
-        Game(variant).copy(situation = Situation(board, color))
+        Game(variant).copy(situation = board.situationOf(color))
       .toRight("Could not construct situation from Fen")
 
   def makeBoard(pieces: (Square, Piece)*): Board =
@@ -81,7 +81,7 @@ trait ChessTestCommon:
   def makeBoard(str: String, variant: Variant) =
     (Visual << str).withVariant(variant)
 
-  def makeBoard: Board = Board.init(chess.variant.Standard)
+  def makeBoard: Board = Board.init(chess.variant.Standard, White)
 
   def makeChess960Board(position: Int) = Board(BBoard.fromMap(Chess960.pieces(position)), Chess960, None)
   def makeChess960Game(position: Int)  = Game(makeChess960Board(position))
@@ -95,7 +95,7 @@ trait ChessTestCommon:
 
   def pieceMoves(piece: Piece, square: Square): Option[List[Square]] =
     makeEmptyBoard.place(piece, square).map { b =>
-      Situation(b, piece.color).movesAt(square).map(_.dest)
+      b.situationOf(piece.color).movesAt(square).map(_.dest)
     }
 
   def defaultHistory(

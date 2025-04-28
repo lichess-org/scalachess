@@ -83,4 +83,4 @@ object Perft:
         else legalMoves.filterNot(m => m.castle.exists(c => c.isStandard && m.dest != c.rook))
 
     // when calculate perft we don't do autoDraw
-    def perftEnd = s.checkMate || s.staleMate || s.variantEnd || s.board.variant.specialDraw(s)
+    def perftEnd = s.checkMate || s.staleMate || s.variantEnd || s.board.variant.specialDraw(s.board)

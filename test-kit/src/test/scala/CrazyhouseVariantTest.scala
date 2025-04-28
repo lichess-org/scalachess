@@ -342,7 +342,7 @@ class CrazyhouseVariantTest extends ChessTest:
     dropTestCases.foreach:
       case DropTestCase(fen, drops) =>
         val game = fenToGame(fen, Crazyhouse)
-        assertEquals(Crazyhouse.possibleDrops(game.situation).map(_.toSet), drops)
+        assertEquals(Crazyhouse.possibleDrops(game.situation.board).map(_.toSet), drops)
 
   test("Index out of bounds when hashing pockets"):
     val fenPosition = FullFen("2q1k1nr/B3bbrb/8/8/8/8/3qN1RB/1Q2KB1R/RRRQQQQQQrrrqqq w Kk - 0 11")

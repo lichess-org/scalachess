@@ -62,7 +62,7 @@ class DumperTest extends ChessTest:
     E2 -> A6
   )
 
-  val threeCheck = Game(Board.init(ThreeCheck)).playMoves(
+  val threeCheck = Game(Board.init(ThreeCheck, White)).playMoves(
     E2 -> E4,
     C7 -> C5,
     F1 -> C4,

@@ -1,12 +1,12 @@
 package chess
 
 import cats.syntax.all.*
+import chess.format.Uci
 
 import variant.*
 import bitboard.Board as BBoard
 import bitboard.Bitboard
 import bitboard.Bitboard.*
-import chess.format.Uci
 
 case class Board(board: BBoard, history: History, variant: Variant, color: Color):
 
@@ -97,7 +97,6 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
     else if staleMate then Status.Stalemate.some
     else if autoDraw then Status.Draw.some
     else none
-
 
   inline def winner: Option[Color] = variant.winner(this)
 

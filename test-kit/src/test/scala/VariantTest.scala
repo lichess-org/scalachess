@@ -155,8 +155,7 @@ class VariantTest extends ChessTest:
       """
   PPk
   K
-  """.kingOfTheHill,
-      White
+  """.kingOfTheHill
     )
     assertNot(game.situation.end)
 
@@ -165,8 +164,7 @@ class VariantTest extends ChessTest:
       """
 PP
 K  r
-""".kingOfTheHill,
-      White
+""".kingOfTheHill
     )
     assert(game.situation.end)
     assertEquals(game.situation.winner, Some(Black))
@@ -178,8 +176,7 @@ K  r
 
 PP
    K
-""".kingOfTheHill,
-      White
+""".kingOfTheHill
     ).situation
     assert(sit.end)
     assertEquals(sit.winner, Some(Black))
@@ -193,8 +190,7 @@ PP
         """
 PPk
 K
-""".threeCheck,
-        White
+""".threeCheck
       ).situation.end
     )
   test("threeCheck regular checkMate"):
@@ -202,8 +198,7 @@ K
       """
 PP
 K  r
-""".threeCheck,
-      White
+""".threeCheck
     )
     assert(game.situation.end)
     assertEquals(game.situation.winner, Some(Black))

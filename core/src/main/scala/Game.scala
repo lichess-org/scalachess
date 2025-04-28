@@ -96,10 +96,10 @@ case class Game(
 object Game:
 
   def apply(variant: chess.variant.Variant): Game =
-    Game(Situation(Board.init(variant, White)))
+    Game(Board.init(variant, White))
 
   // use board color instead
-  def apply(board: Board, color: Color): Game = Game(board.situationOf(color))
+  // def apply(board: Board, color: Color): Game = Game(board.situationOf(color))
 
   def apply(variantOption: Option[chess.variant.Variant], fen: Option[Fen.Full]): Game =
     val variant = variantOption | chess.variant.Standard

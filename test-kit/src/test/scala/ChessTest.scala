@@ -89,7 +89,7 @@ trait ChessTestCommon:
 
   def makeEmptyBoard: Board = Board(BBoard.empty, chess.variant.Standard, White.some)
 
-  def makeGame: Game = Game(makeBoard, White)
+  def makeGame: Game = Game(makeBoard)
 
   def sortPoss(poss: Seq[Square]): Seq[Square] = poss.sortBy(_.key)
 

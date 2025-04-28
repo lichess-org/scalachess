@@ -10,9 +10,9 @@ class GameTest extends ChessTest:
     """
     k
  b
-R   K""",
-    Black
+R   K""".copy(color = Black)
   )
+
   test("prevent castle by capturing a rook: can castle queenside"):
     assert(game.board.history.canCastle(White, QueenSide))
   test("prevent castle by capturing a rook: can still castle queenside"):

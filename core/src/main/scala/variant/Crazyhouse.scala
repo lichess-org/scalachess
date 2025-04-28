@@ -167,7 +167,7 @@ case object Crazyhouse
     def size    = pockets.reduce(_.size + _.size)
 
   object Data:
-    val init = Data(ByColor.fill(Pocket.empty), Bitboard.empty)
+    val init = Data(Pockets.empty, Bitboard.empty)
 
   extension (pockets: Pockets)
 

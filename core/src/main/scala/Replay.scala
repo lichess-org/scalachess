@@ -98,13 +98,6 @@ object Replay:
   private def initialFenToSituation(initialFen: Option[Fen.Full], variant: Variant): Board =
     (initialFen.flatMap(Fen.read) | Board(variant)).withVariant(variant)
 
-  def boards(
-      sans: Iterable[SanStr],
-      initialFen: Option[Fen.Full],
-      variant: Variant
-  ): Either[ErrorStr, List[Board]] =
-    situations(sans, initialFen, variant)
-
   def situations(
       sans: Iterable[SanStr],
       initialFen: Option[Fen.Full],

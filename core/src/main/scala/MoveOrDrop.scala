@@ -45,7 +45,7 @@ case class Move(
 ) extends MoveOrDrop:
 
   def situationAfter: Board = finalizeAfter.withColor(!piece.color)
-  lazy val toSanStr: SanStr     = format.pgn.Dumper(this)
+  lazy val toSanStr: SanStr = format.pgn.Dumper(this)
 
   // TODO rethink about how handle castling
   // it's quite messy and error prone now

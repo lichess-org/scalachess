@@ -7,7 +7,6 @@ import variant.*
 import bitboard.Board as BBoard
 import bitboard.Bitboard
 import bitboard.Bitboard.*
-import chess.Board
 
 case class Board(board: BBoard, history: History, variant: Variant, color: Color):
 

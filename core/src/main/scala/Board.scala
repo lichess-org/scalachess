@@ -23,8 +23,6 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
 
   export color.white as isWhiteTurn
 
-  def withBoard(b: BBoard): Board = copy(board = b)
-
   def place(piece: Piece, at: Square): Option[Board] =
     board.put(piece, at).map(withBoard)
 
@@ -62,13 +60,14 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
 
   inline def updateHistory(inline f: History => History): Board = copy(history = f(history))
 
+  def withBoard(b: BBoard): Board = copy(board = b)
+
   def withColor(color: Color): Board = copy(color = color)
 
   def materialImbalance: Int = variant.materialImbalance(this)
 
-  override def toString = s"$board $variant ${history.lastMove}\n"
+  override def toString = s"$board $variant ${history.lastMove} $color"
 
-  // =====================Situation migration =========================
   lazy val moves: Map[Square, List[Move]] =
     legalMoves.groupBy(_.orig)
 
@@ -121,7 +120,6 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
 
   inline def winner: Option[Color] = variant.winner(this)
 
-  // todo remove this
   lazy val legalMoves: List[Move] = variant.validMoves(this)
 
   lazy val enPassantSquare: Option[Square] =

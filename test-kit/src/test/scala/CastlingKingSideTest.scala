@@ -69,7 +69,7 @@ p pppppp
 
 
 
- K""".chess960.copy(color = Black)
+ K""".chess960.withColor(Black)
     )
     assertEquals(game.situation.destsFrom(E8), Set(D8, F8))
     assertGame(
@@ -96,6 +96,6 @@ R     NP
 PP  PP
 KNQRB""",
         FromPosition
-      ).copy(color = Black)
+      ).withColor(Black)
     )
     assertEquals(game.situation.destsFrom(B8), Set(A8, C8, E8))

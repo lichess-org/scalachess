@@ -45,7 +45,7 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
 
   def withCastles(c: Castles) = updateHistory(_.withCastles(c))
 
-  def unary_! : Board = copy(color = !color)
+  def unary_! : Board = withColor(color = !color)
 
   def withPieces(newPieces: PieceMap) = copy(board = BBoard.fromMap(newPieces))
 

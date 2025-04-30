@@ -23,10 +23,10 @@ R   KB R"""
   test("impossible: not allowed by history"):
     assertEquals(badHist.destsFrom(E1), Set(D1))
   test("possible: viable moves"):
-    val game = Game(goodHist, White)
-    assertEquals(game.board.destsFrom(E1), Set(A1, C1, D1))
+    val game = Game(goodHist)
+    assertEquals(game.situation.destsFrom(E1), Set(A1, C1, D1))
   test("possible: correct new board"):
-    val game = Game(goodHist, White)
+    val game = Game(goodHist)
     assertGame(
       game.playMove(E1, C1).get,
       """
@@ -38,7 +38,7 @@ PPPPPPPP
 PPPPPPPP
 R   K  R""".updateHistory(_ => castleHistory(White, kingSide = true, queenSide = true))
   test("impact history: if king castles kingside"):
-    val game = Game(board, White)
+    val game = Game(board)
     val g2   = game.playMove(E1, G1).get
     assertGame(
       g2,
@@ -46,9 +46,9 @@ R   K  R""".updateHistory(_ => castleHistory(White, kingSide = true, queenSide =
 PPPPPPPP
 R    RK """
     )
-    assertEquals(g2.board.destsFrom(G1), Set(H1))
+    assertEquals(g2.situation.destsFrom(G1), Set(H1))
     assertEquals(
-      g2.board
+      g2.situation
         .seq(
           _.move(F1, H1),
           _.move(G1, E1)
@@ -57,7 +57,7 @@ R    RK """
       Set(D1, F1)
     )
   test("impact history: if king castles queenside"):
-    val game = Game(board, White)
+    val game = Game(board)
     val g2   = game.playMove(E1, C1).get
     assertGame(
       g2,
@@ -65,9 +65,9 @@ R    RK """
 PPPPPPPP
   KR   R"""
     )
-    assertEquals(g2.board.destsFrom(C1), Set(B1))
+    assertEquals(g2.situation.destsFrom(C1), Set(B1))
     assertEquals(
-      g2.board
+      g2.situation
         .seq(
           _.move(D1, A1),
           _.move(C1, E1)
@@ -76,29 +76,29 @@ PPPPPPPP
       Set(D1, F1)
     )
   test("impact history: if king moves to the right"):
-    val game = Game(board, White)
+    val game = Game(board)
     val g2   = game.playMove(E1, F1).get.as(White)
-    assertEquals(g2.board.destsFrom(F1), Set(E1, G1))
+    assertEquals(g2.situation.destsFrom(F1), Set(E1, G1))
     val g3 = g2.playMove(F1, E1).get.as(White)
-    assertEquals(g3.board.destsFrom(E1), Set(D1, F1))
+    assertEquals(g3.situation.destsFrom(E1), Set(D1, F1))
   test("impact history: if king moves to the left"):
-    val game = Game(board, White)
+    val game = Game(board)
     val g2   = game.playMove(E1, D1).get.as(White)
-    assertEquals(g2.board.destsFrom(D1), Set(C1, E1))
+    assertEquals(g2.situation.destsFrom(D1), Set(C1, E1))
     val g3 = g2.playMove(D1, E1).get.as(White)
-    assertEquals(g3.board.destsFrom(E1), Set(D1, F1))
+    assertEquals(g3.situation.destsFrom(E1), Set(D1, F1))
   test("impact history: if kingside rook moves"):
-    val game = Game(board, White)
+    val game = Game(board)
     val g2   = game.playMove(H1, G1).get.as(White)
-    assertEquals(g2.board.destsFrom(E1), Set(C1, D1, F1, A1))
+    assertEquals(g2.situation.destsFrom(E1), Set(C1, D1, F1, A1))
     val g3 = g2.playMove(A1, B1).get
-    assertEquals(g3.board.destsFrom(E1), Set(D1, F1))
+    assertEquals(g3.situation.destsFrom(E1), Set(D1, F1))
   test("impact history: if queenside rook moves"):
-    val game = Game(board, White)
+    val game = Game(board)
     val g2   = game.playMove(A1, B1).get.as(White)
-    assertEquals(g2.board.destsFrom(E1), Set(D1, F1, G1, H1))
+    assertEquals(g2.situation.destsFrom(E1), Set(D1, F1, G1, H1))
     val g3 = g2.playMove(H1, G1).get
-    assertEquals(g3.board.destsFrom(E1), Set(D1, F1))
+    assertEquals(g3.situation.destsFrom(E1), Set(D1, F1))
 
   test("chess960"):
     val fenPosition = FullFen("r3k2r/8/8/8/8/8/8/1R2K2R b KQk - 1 1")

@@ -60,5 +60,6 @@ object Visual:
         unmovedRooks = unmovedRooks,
         crazyData = variant.crazyhouse.option(Crazyhouse.Data.init)
       ),
-      variant
+      variant,
+      White
     )

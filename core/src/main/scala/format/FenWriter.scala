@@ -26,25 +26,25 @@ trait FenWriter:
 
   def write(situation: Situation, fullMoveNumber: FullMoveNumber): FullFen = FullFen:
     val builder = scala.collection.mutable.StringBuilder(80)
-    builder.append(writeBoard(situation.board))
-    builder.append(writeCrazyPocket(situation.board))
+    builder.append(writeBoard(situation))
+    builder.append(writeCrazyPocket(situation))
     builder.addOne(' ')
     builder.addOne(situation.color.letter)
     builder.addOne(' ')
-    builder.append(writeCastles(situation.board))
+    builder.append(writeCastles(situation))
     builder.addOne(' ')
     builder.append(situation.enPassantSquare.fold("-")(_.key))
     builder.addOne(' ')
     builder.append(situation.history.halfMoveClock)
     builder.addOne(' ')
     builder.append(fullMoveNumber)
-    if situation.board.variant == variant.ThreeCheck then
+    if situation.variant == variant.ThreeCheck then
       builder.addOne(' ')
-      builder.append(writeCheckCount(situation.board))
+      builder.append(writeCheckCount(situation))
     builder.toString
 
   def writeOpening(situation: Situation): StandardFen = StandardFen:
-    s"${writeBoard(situation.board)} ${situation.color.letter} ${writeCastles(situation.board)} ${situation.enPassantSquare
+    s"${writeBoard(situation)} ${situation.color.letter} ${writeCastles(situation)} ${situation.enPassantSquare
         .fold("-")(_.key)}"
 
   def writeBoard(board: Board): BoardFen =
@@ -67,7 +67,7 @@ trait FenWriter:
     BoardFen(fen.toString)
 
   def writeBoardAndColor(situation: Situation): BoardAndColorFen =
-    writeBoardAndColor(situation.board, situation.color)
+    writeBoardAndColor(situation, situation.color)
 
   def writeBoardAndColor(board: Board, turnColor: Color): BoardAndColorFen =
     writeBoard(board).andColor(turnColor)

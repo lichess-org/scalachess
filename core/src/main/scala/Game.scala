@@ -4,15 +4,15 @@ import chess.format.pgn.SanStr
 import chess.format.{ Fen, Uci, pgn }
 
 case class Game(
-    situation: Situation,
+    situation: Board,
     sans: Vector[SanStr] = Vector(),
     clock: Option[Clock] = None,
     ply: Ply = Ply.initial, // plies
     startedAtPly: Ply = Ply.initial
 ):
 
-  export situation.{ board, color as player, variant, history }
-  export situation.board.history.halfMoveClock
+  export situation.{ color as player, variant, history }
+  export situation.history.halfMoveClock
 
   def apply(
       orig: Square,
@@ -83,37 +83,30 @@ case class Game(
 
   inline def fullMoveNumber: FullMoveNumber = ply.fullMoveNumber
 
-  inline def withBoard(inline b: Board) = copy(situation = situation.copy(board = b))
+  inline def withBoard(inline b: Board): Game = copy(situation = b)
 
-  inline def updateBoard(inline f: Board => Board) = withBoard(f(board))
+  inline def updateBoard(inline f: Board => Board): Game = withBoard(f(situation))
 
-  inline def withPlayer(c: Color) = copy(situation = situation.copy(color = c))
+  inline def withPlayer(c: Color): Game = copy(situation = situation.copy(color = c))
 
-  inline def withTurns(t: Ply) = copy(ply = t)
+  inline def withTurns(t: Ply): Game = copy(ply = t)
 
 object Game:
 
   def apply(variant: chess.variant.Variant): Game =
-    Game(Situation(Board.init(variant), White))
-
-  def apply(board: Board): Game = apply(board, White)
-
-  def apply(board: Board, color: Color): Game = Game(Situation(board, color))
+    Game(Board.init(variant, White))
 
   def apply(variantOption: Option[chess.variant.Variant], fen: Option[Fen.Full]): Game =
     val variant = variantOption | chess.variant.Standard
-    val g       = apply(variant)
+    val g: Game = apply(variant)
     fen
-      .flatMap:
-        format.Fen.readWithMoveNumber(variant, _)
+      .flatMap(format.Fen.readWithMoveNumber(variant, _))
       .fold(g): parsed =>
         g.copy(
-          situation = Situation(
-            board = parsed.situation.board.withVariant(g.board.variant).withCrazyData {
-              parsed.situation.board.crazyData.orElse(g.board.crazyData)
-            },
-            color = parsed.situation.color
-          ),
+          situation = parsed.situation
+            .withVariant(g.variant)
+            .withCrazyData(parsed.situation.crazyData.orElse(g.situation.crazyData))
+            .withColor(parsed.situation.color),
           ply = parsed.ply,
           startedAtPly = parsed.ply
         )

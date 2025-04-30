@@ -82,7 +82,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       (Square.G1, Square.H3)
     )
     val possibleDestinations =
-      game.flatMap(_.board.destsFrom(Square.E1).toRight("king has no destinations"))
+      game.flatMap(_.situation.destsFrom(Square.E1).toRight("king has no destinations"))
     assertEquals(possibleDestinations.get, List(Square.F1))
 
   test("Not allow a king to be put into check"):
@@ -105,7 +105,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
         Square.H5 -> Square.E8
       )
       .get
-    assert(game.board.kingOf(Color.black).isEmpty)
+    assert(game.situation.kingOf(Color.black).isEmpty)
 
   test("Not allow a king to be check mated"):
     val game = Game(Antichess)
@@ -122,7 +122,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     val position = FullFen("8/5P2/8/2b5/8/8/4B3/8 w - -")
     val game     = fenToGame(position, Antichess)
     val newGame  = game(Square.F7, Square.F8, Option(King)).get._1
-    assertEquals(newGame.board(Square.F8), Option(White - King))
+    assertEquals(newGame.situation(Square.F8), Option(White - King))
 
   test("deal with 2 white kings"):
     val position = FullFen("K3k1nr/p2q2pp/p2p1p2/8/2PP4/8/PP4PP/RNBQK1NR w - - 0 11")
@@ -263,5 +263,5 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
   test("fen with castles"):
     val game = fenToGame(FullFen("rnbqk2r/ppppppbp/5np1/8/8/5NP1/PPPPPPBP/RNBQK2R w KQkq - 4 4"), Antichess)
-    assertEquals(game.situation.board.history.castles, Castles.none)
-    assertEquals(game.situation.board.history.unmovedRooks, UnmovedRooks.none)
+    assertEquals(game.situation.history.castles, Castles.none)
+    assertEquals(game.situation.history.unmovedRooks, UnmovedRooks.none)

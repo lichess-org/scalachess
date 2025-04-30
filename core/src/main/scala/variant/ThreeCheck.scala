@@ -21,21 +21,21 @@ case object ThreeCheck
   def validMoves(situation: Situation): List[Move] =
     Standard.validMoves(situation)
 
-  override def valid(situation: Situation, strict: Boolean): Boolean = Standard.valid(situation, strict)
+  override def valid(situation: Board, strict: Boolean): Boolean = Standard.valid(situation, strict)
 
   override def finalizeBoard(board: Board, uci: format.Uci, capture: Option[Piece]): Board =
     board.updateHistory:
-      _.withCheck(Color.White, checkWhite(board)).withCheck(Color.Black, checkBlack(board))
+      _.withCheck(Color.White, checkWhite(board.board)).withCheck(Color.Black, checkBlack(board.board))
 
-  override def specialEnd(situation: Situation) =
+  override def specialEnd(situation: Board) =
     situation.check.yes && {
-      val checks = situation.board.history.checkCount
+      val checks = situation.history.checkCount
       situation.color.fold(checks.white, checks.black) >= 3
     }
 
   /** It's not possible to check or checkmate the opponent with only a king
     */
-  override def opponentHasInsufficientMaterial(situation: Situation) =
+  override def opponentHasInsufficientMaterial(situation: Board) =
     situation.board.kingsOnlyOf(!situation.color)
 
   // When there is insufficient mating material, there is still potential to win by checking the opponent 3 times

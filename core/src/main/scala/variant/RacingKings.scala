@@ -50,36 +50,36 @@ case object RacingKings
     val moves   = genNonKingAndNonPawn(targets) ++ genSafeKing(targets)
     moves.filter(kingSafety)
 
-  override def valid(situation: Situation, strict: Boolean): Boolean =
+  override def valid(situation: Board, strict: Boolean): Boolean =
     super.valid(situation, strict) && (!strict || situation.check.no)
 
-  override def isInsufficientMaterial(board: Board)                  = false
-  override def opponentHasInsufficientMaterial(situation: Situation) = false
+  override def isInsufficientMaterial(board: Board)              = false
+  override def opponentHasInsufficientMaterial(situation: Board) = false
 
   private def reachedGoal(board: Board, color: Color) =
     board.kingOf(color).intersects(Bitboard.rank(Rank.Eighth))
 
   private def reachesGoal(move: Move) =
-    reachedGoal(move.situationAfter.board, move.piece.color)
+    reachedGoal(move.situationAfter, move.piece.color)
 
   // It is a win, when exactly one king made it to the goal. When white reaches
   // the goal and black can make it on the next ply, he is given a chance to
   // draw, to compensate for the first-move advantage. The draw is not called
   // automatically, because black should also be given equal chances to flag.
-  override def specialEnd(situation: Situation) =
+  override def specialEnd(situation: Board) =
     situation.color match
       case White =>
-        reachedGoal(situation.board, White) ^ reachedGoal(situation.board, Black)
+        reachedGoal(situation, White) ^ reachedGoal(situation, Black)
       case Black =>
-        reachedGoal(situation.board, White) && situation.legalMoves.filter(reachesGoal).isEmpty
+        reachedGoal(situation, White) && situation.legalMoves.filter(reachesGoal).isEmpty
 
   // If white reaches the goal and black also reaches the goal directly after,
   // then it is a draw.
-  override def specialDraw(situation: Situation) =
-    situation.color.white && reachedGoal(situation.board, White) && reachedGoal(situation.board, Black)
+  override def specialDraw(situation: Board) =
+    situation.color.white && reachedGoal(situation, White) && reachedGoal(situation, Black)
 
-  override def winner(situation: Situation): Option[Color] =
-    specialEnd(situation).option(Color.fromWhite(reachedGoal(situation.board, White)))
+  override def winner(situation: Board): Option[Color] =
+    specialEnd(situation).option(Color.fromWhite(reachedGoal(situation, White)))
 
   // Not only check that our king is safe,
   // but also check the opponent's
@@ -87,5 +87,5 @@ case object RacingKings
     super.kingSafety(m) && m.after.isCheck(!m.color).no
 
   // When considering stalemate, take into account that checks are not allowed.
-  override def staleMate(situation: Situation): Boolean =
+  override def staleMate(situation: Board): Boolean =
     situation.check.no && !specialEnd(situation) && situation.legalMoves.isEmpty

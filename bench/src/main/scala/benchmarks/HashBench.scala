@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 
 import cats.syntax.all.*
 import chess.format.pgn.{ Fixtures, Reader }
-import chess.{ Hash, Situation }
+import chess.{ Board, Hash }
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -20,7 +20,7 @@ class HashBench:
   // the unit of CPU work per iteration
   private val Work: Long = 10
 
-  var situations: List[Situation] = scala.compiletime.uninitialized
+  var situations: List[Board] = scala.compiletime.uninitialized
 
   @Setup
   def setup() =
@@ -41,12 +41,12 @@ class HashBench:
   def repetition5(bh: Blackhole) =
     val result = situations.map: x =>
       Blackhole.consumeCPU(Work)
-      x.board.history.fivefoldRepetition
+      x.history.fivefoldRepetition
     bh.consume(result)
 
   @Benchmark
   def repetition3(bh: Blackhole) =
     val result = situations.map: x =>
       Blackhole.consumeCPU(Work)
-      x.board.history.threefoldRepetition
+      x.history.threefoldRepetition
     bh.consume(result)

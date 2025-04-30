@@ -13,7 +13,7 @@ class BoardTest extends ChessTest:
   given Conversion[Int, Square] = Square.unsafe(_)
 
   def parseFen(fen: FullFen): Board =
-    Fen.read(fen).map(_.board.board).getOrElse(throw RuntimeException("boooo"))
+    Fen.read(fen).map(_.board).getOrElse(throw RuntimeException("boooo"))
 
   test("generateMovesAt(square) = generateMoves.filter(_.orig == square)"):
     for

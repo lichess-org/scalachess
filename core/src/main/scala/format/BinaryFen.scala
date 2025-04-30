@@ -136,31 +136,28 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
     else None
 
     Situation.AndFullMoveNumber(
-      Situation(
-        Board(
-          BBoard(
-            occupied = occupied,
-            white = white,
-            black = black,
-            pawns = pawns,
-            knights = knights,
-            bishops = bishops,
-            rooks = rooks,
-            queens = queens,
-            kings = kings
-          ),
-          History(
-            lastMove = epMove,
-            checkCount = checkCount,
-            castles =
-              maximumCastles(unmovedRooks = unmovedRooks, white = white, black = black, kings = kings),
-            unmovedRooks = unmovedRooks,
-            halfMoveClock = halfMoveClock,
-            crazyData = crazyData
-          ),
-          variant
+      Board(
+        BBoard(
+          occupied = occupied,
+          white = white,
+          black = black,
+          pawns = pawns,
+          knights = knights,
+          bishops = bishops,
+          rooks = rooks,
+          queens = queens,
+          kings = kings
         ),
-        color = turn
+        History(
+          lastMove = epMove,
+          checkCount = checkCount,
+          castles = maximumCastles(unmovedRooks = unmovedRooks, white = white, black = black, kings = kings),
+          unmovedRooks = unmovedRooks,
+          halfMoveClock = halfMoveClock,
+          crazyData = crazyData
+        ),
+        variant,
+        turn
       ),
       ply.fullMoveNumber
     )
@@ -194,7 +191,7 @@ object BinaryFen:
     val occupied = sit.board.occupied
     writeLong(builder, occupied.value)
 
-    val unmovedRooks = minimumUnmovedRooks(sit.board)
+    val unmovedRooks = minimumUnmovedRooks(sit)
     val pawnPushedTo = sit.enPassantSquare.flatMap(_.prevRank(sit.color))
 
     def packPiece(sq: Square): Byte =
@@ -247,7 +244,7 @@ object BinaryFen:
       if sit.variant.threeCheck then
         writeNibbles(builder, sit.history.checkCount.white, sit.history.checkCount.black)
       else if sit.variant.crazyhouse then
-        val crazyData = sit.board.crazyData.getOrElse(Crazyhouse.Data.init)
+        val crazyData = sit.crazyData.getOrElse(Crazyhouse.Data.init)
         val pockets   = crazyData.pockets
         writeNibbles(builder, pockets.white.pawn, pockets.black.pawn)
         writeNibbles(builder, pockets.white.knight, pockets.black.knight)

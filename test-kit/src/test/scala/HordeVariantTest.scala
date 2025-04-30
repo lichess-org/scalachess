@@ -90,7 +90,7 @@ class HordeVariantTest extends ChessTest:
     assertNot(game.situation.autoDraw)
     assertNot(game.situation.end)
     assertEquals(game.situation.status, None)
-    assertNot(Horde.isInsufficientMaterial(game.situation.board))
+    assertNot(Horde.isInsufficientMaterial(game.situation))
     assertNot(game.situation.opponentHasInsufficientMaterial)
 
   test("Must not auto-draw in B vs K endgame, king can win"):
@@ -120,12 +120,12 @@ class HordeVariantTest extends ChessTest:
     assertEquals(steps.last._1.situation.legalMoves.exists(_.castles), true)
 
   test("UnmovedRooks & castles at the starting position"):
-    val board = Board.init(Horde)
+    val board = Board.init(Horde, White)
     assertEquals(board.history.unmovedRooks, UnmovedRooks(Set(Square.A8, Square.H8)))
     assertEquals(board.history.castles, Castles(false, false, true, true))
 
   test("the h8 rooks move"):
     val position = FullFen("r3kbnr/p1pqppp1/1pnp3P/PPPP1P1P/PPP1PPP1/1PPP1PPP/PPPPPPPP/PPPPPPPP b kq - 0 7")
     val game     = fenToGame(position, Horde)(Square.H8, Square.H6).get
-    assertEquals(game._1.situation.board.history.unmovedRooks, UnmovedRooks(Set(Square.A8)))
-    assertEquals(game._1.situation.board.history.castles, Castles(false, false, false, true))
+    assertEquals(game._1.situation.history.unmovedRooks, UnmovedRooks(Set(Square.A8)))
+    assertEquals(game._1.situation.history.castles, Castles(false, false, false, true))

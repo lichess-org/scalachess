@@ -24,10 +24,10 @@ case object Crazyhouse
   def validMoves(situation: Situation): List[Move] =
     Standard.validMoves(situation)
 
-  override def valid(situation: Situation, strict: Boolean) =
-    Color.all.forall(validSide(situation.board, false)) &&
+  override def valid(situation: Board, strict: Boolean) =
+    Color.all.forall(validSide(situation, false)) &&
       (!strict ||
-        (situation.board.board.byRole(Pawn).count <= 16
+        (situation.board.byRole(Pawn).count <= 16
           && situation.board.nbPieces <= 32
           && Standard.hasValidCheckers(situation)))
 
@@ -35,15 +35,15 @@ case object Crazyhouse
 
   override def drop(situation: Situation, role: Role, square: Square): Either[ErrorStr, Drop] =
     for
-      d1 <- situation.board.crazyData.toRight(ErrorStr("Board has no crazyhouse data"))
+      d1 <- situation.crazyData.toRight(ErrorStr("Board has no crazyhouse data"))
       _  <- Either.cond((role != Pawn || canDropPawnOn(square)), d1, ErrorStr(s"Can't drop $role on $square"))
       piece = Piece(situation.color, role)
       d2 <- d1.drop(piece).toRight(ErrorStr(s"No $piece to drop on $square"))
-      b1 <- situation.board
+      b1 <- situation
         .place(piece, square)
         .toRight(ErrorStr(s"Can't drop $role on $square, it's occupied"))
       _ <- Either.cond(
-        kingThreatened(b1, situation.color).no,
+        kingThreatened(b1.board, situation.color).no,
         b1,
         ErrorStr(s"Dropping $role on $square doesn't uncheck the king")
       )
@@ -70,8 +70,8 @@ case object Crazyhouse
         }
       case _ => board
 
-  private def canDropStuff(situation: Situation) =
-    situation.board.crazyData.exists { (data: Data) =>
+  private def canDropStuff(situation: Board) =
+    situation.crazyData.exists { (data: Data) =>
       val pocket = data.pockets(situation.color)
       pocket.nonEmpty && possibleDrops(situation).fold(true) { squares =>
         squares.nonEmpty && {
@@ -80,22 +80,22 @@ case object Crazyhouse
       }
     }
 
-  override def staleMate(situation: Situation) =
+  override def staleMate(situation: Board) =
     super.staleMate(situation) && !canDropStuff(situation)
 
-  override def checkmate(situation: Situation) =
+  override def checkmate(situation: Board) =
     super.checkmate(situation) && !canDropStuff(situation)
 
   // there is always sufficient mating material in Crazyhouse
-  override def opponentHasInsufficientMaterial(situation: Situation) = false
-  override def isInsufficientMaterial(board: Board)                  = false
+  override def opponentHasInsufficientMaterial(situation: Board) = false
+  override def isInsufficientMaterial(board: Board)              = false
 
   // if the king is not in check, all drops are possible, we just return None
   // king is in single check, we return the squares between the king and the checker
   // king is in double check, no drop is possible
-  def possibleDrops(situation: Situation): Option[List[Square]] =
+  def possibleDrops(situation: Board): Option[List[Square]] =
     situation.ourKing.flatMap(king =>
-      val checkers = situation.board.board.attackers(king, !situation.color)
+      val checkers = situation.board.attackers(king, !situation.color)
       if checkers.moreThanOne then Some(Nil)
       else checkers.first.map(Bitboard.between(king, _).squares)
     )
@@ -114,7 +114,7 @@ case object Crazyhouse
   private def legalDropSquares(situation: Situation): Bitboard =
     situation.ourKing
       .map(king =>
-        val checkers = situation.board.board.attackers(king, !situation.color)
+        val checkers = situation.board.attackers(king, !situation.color)
         if checkers.isEmpty then ~situation.board.occupied
         else checkers.singleSquare.map(Bitboard.between(king, _)).getOrElse(Bitboard.empty)
       )
@@ -126,14 +126,14 @@ case object Crazyhouse
     val targets = legalDropSquares(situation)
     if targets.isEmpty then Nil
     else
-      situation.board.crazyData.fold(Nil): data =>
+      situation.crazyData.fold(Nil): data =>
         val pocket = data.pockets(situation.color)
         for
           role <- List(Pawn, Knight, Bishop, Rook, Queen)
           if pocket.contains(role)
           to <- if role == Pawn then targets & ~Bitboard.firstRank & ~Bitboard.lastRank else targets
           piece = Piece(situation.color, role)
-          after <- situation.board.place(piece, to)
+          after <- situation.place(piece, to)
           d2    <- data.drop(piece)
         yield Drop(piece, to, situation, after.withCrazyData(d2))
 
@@ -167,7 +167,7 @@ case object Crazyhouse
     def size    = pockets.reduce(_.size + _.size)
 
   object Data:
-    val init = Data(ByColor.fill(Pocket.empty), Bitboard.empty)
+    val init = Data(Pockets.empty, Bitboard.empty)
 
   extension (pockets: Pockets)
 
@@ -289,3 +289,8 @@ case object Crazyhouse
         Pocket(whitePawn, whiteKnight, whiteBishop, whiteRook, whiteQueen),
         Pocket(blackPawn, blackKnight, blackBishop, blackRook, blackQueen)
       )
+
+    inline def apply(str: String): Pockets =
+      apply(str.flatMap(Piece.fromChar))
+
+    val empty: Pockets = ByColor.fill(Pocket.empty)

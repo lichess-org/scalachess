@@ -55,5 +55,5 @@ class CastlingTest extends ChessTest:
 
   test("unmovedRooks and castles are consistent"):
     val s1 = Fen.read(Standard, Fen.Full("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w Qq - 0 1")).get
-    val s2 = s1.focus(_.board.history.unmovedRooks).replace(UnmovedRooks.corners)
+    val s2 = s1.focus(_.history.unmovedRooks).replace(UnmovedRooks.corners)
     assertEquals(s2.legalMoves.filter(_.castles), Nil)

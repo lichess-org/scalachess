@@ -5,7 +5,7 @@ import chess.format.pgn.{ Comment, Glyphs, InitialComments, Move as PgnMove, Pgn
 import org.scalacheck.Gen
 import scalalib.model.Seconds
 
-case class GameTree[A](init: Situation, ply: Ply, tree: Option[Node[A]])
+case class GameTree[A](init: Board, ply: Ply, tree: Option[Node[A]])
 case class WithMove[A](move: Move, data: A)
 
 trait Generator[A]:
@@ -16,7 +16,7 @@ trait FromMove[A]:
 
 object ChessTreeArbitraries:
 
-  def genSituations(seed: Situation): Gen[LazyList[Situation]] =
+  def genSituations(seed: Board): Gen[LazyList[Board]] =
     if seed.end then Gen.const(LazyList(seed))
     else
       for
@@ -24,10 +24,10 @@ object ChessTreeArbitraries:
         situations <- genSituations(situation)
       yield situation #:: situations
 
-  def genMainline(seed: Situation): Gen[Node[Situation]] =
+  def genMainline(seed: Board): Gen[Node[Board]] =
     genSituations(seed).map(Tree.build(_).get)
 
-  def genPgn(seed: Situation): Gen[Pgn] =
+  def genPgn(seed: Board): Gen[Pgn] =
     for
       tree <- genTree(seed)
       pgnTree = tree.tree.map(_.map(_.data))
@@ -35,10 +35,10 @@ object ChessTreeArbitraries:
       pgn = Pgn(Tags.empty, InitialComments(comments), pgnTree, tree.ply.next)
     yield pgn
 
-  def genTree[A](seed: Situation)(using FromMove[A]): Gen[GameTree[WithMove[A]]] =
+  def genTree[A](seed: Board)(using FromMove[A]): Gen[GameTree[WithMove[A]]] =
     genNode(seed).map(GameTree(seed, Ply.initial, _))
 
-  def genNode[A](seed: Situation)(using FromMove[A]): Gen[Option[Node[WithMove[A]]]] =
+  def genNode[A](seed: Board)(using FromMove[A]): Gen[Option[Node[WithMove[A]]]] =
     if seed.end then Gen.const(None)
     else
       val nextSeeds = seed.legalMoves
@@ -49,7 +49,7 @@ object ChessTreeArbitraries:
         node       <- genNode(withMove, variations)
       yield node.some
 
-  def genNodeWithPath[A](seed: Situation)(using FromMove[A]): Gen[(Option[Node[WithMove[A]]], List[A])] =
+  def genNodeWithPath[A](seed: Board)(using FromMove[A]): Gen[(Option[Node[WithMove[A]]], List[A])] =
     if seed.end then Gen.const((None, Nil))
     else
       val nextSeeds = seed.legalMoves
@@ -68,8 +68,8 @@ object ChessTreeArbitraries:
       comments = xs.collect { case s if s.nonEmpty => Comment(s) }
     yield comments
 
-  given Generator[Situation] with
-    extension (situation: Situation) def next = pickSome(situation.legalMoves.map(_.situationAfter))
+  given Generator[Board] with
+    extension (situation: Board) def next = pickSome(situation.legalMoves.map(_.situationAfter))
 
   given Generator[Move] with
     extension (move: Move) def next = pickSome(move.situationAfter.legalMoves)

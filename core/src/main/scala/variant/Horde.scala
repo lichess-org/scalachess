@@ -40,24 +40,24 @@ case object Horde
     if isWhiteTurn then genEnPassant(us & board.pawns) ++ genNonKing(~us & ~board.kings)
     else Standard.validMoves(situation)
 
-  override def valid(situation: Situation, strict: Boolean) =
+  override def valid(situation: Board, strict: Boolean): Boolean =
     situation.board.kingOf(White).isEmpty
-      && validSide(situation.board, strict)(Black)
-      && !pawnsOnPromotionRank(situation.board, White)
+      && validSide(situation, strict)(Black)
+      && !pawnsOnPromotionRank(situation, White)
       && (!strict || situation.color.white || Standard.hasValidCheckers(situation))
 
   /** The game has a special end condition when black manages to capture all of white's pawns */
-  override def specialEnd(situation: Situation) =
+  override def specialEnd(situation: Board): Boolean =
     situation.board.white.isEmpty
 
   /** Any vs K + any where horde is stalemated and only king can move is a fortress draw
     * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
     * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
     */
-  private def hordeClosedPosition(situation: Situation): Boolean =
+  private def hordeClosedPosition(situation: Board): Boolean =
     val hordeSquare = situation.board.byColor(White)
     val mateInOne = hordeSquare.count == 1 &&
-      hordeSquare.singleSquare.exists(pieceThreatened(situation.board, Color.black, _))
+      hordeSquare.singleSquare.exists(pieceThreatened(situation, Color.black, _))
     !mateInOne && {
       if situation.isWhiteTurn then situation.legalMoves.isEmpty
       else
@@ -69,16 +69,16 @@ case object Horde
   /** In horde chess, black can win unless a fortress stalemate is unavoidable.
     *  Auto-drawing the game should almost never happen, but it did in https://lichess.org/xQ2RsU8N#121
     */
-  override def isInsufficientMaterial(board: Board) =
-    Color.all.forall(color => hordeClosedPosition(board.situationOf(color)))
+  override def isInsufficientMaterial(board: Board): Boolean =
+    Color.all.forall(color => hordeClosedPosition(board.copy(color = color)))
 
   /** In horde chess, the horde cannot win on * v K or [BN]{2} v K or just one piece
     * since they lack a king for checkmate support.
     * Technically there are some positions where stalemate is unavoidable which
     * this method does not detect; however, such are trivial to premove.
     */
-  override def opponentHasInsufficientMaterial(situation: Situation): Boolean =
-    hasInsufficientMaterial(situation.board, !situation.color) || hordeClosedPosition(situation)
+  override def opponentHasInsufficientMaterial(situation: Board): Boolean =
+    hasInsufficientMaterial(situation, !situation.color) || hordeClosedPosition(situation)
 
   extension (board: Board)
     def hasBishopPair: Color => Boolean = side =>

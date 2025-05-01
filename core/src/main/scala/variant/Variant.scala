@@ -3,7 +3,7 @@ package variant
 
 import cats.Eq
 import cats.syntax.all.*
-import chess.bitboard.{ Bitboard, Board }
+import chess.bitboard.Bitboard
 import chess.format.Fen
 
 // Correctness depends on singletons for each variant ID

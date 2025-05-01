@@ -4,7 +4,7 @@ import cats.syntax.all.*
 import chess.format.Uci
 
 import variant.*
-import bitboard.{ Bitboard, Board }
+import bitboard.Bitboard
 import bitboard.Bitboard.*
 
 case class Position(board: Board, history: History, variant: Variant, color: Color):

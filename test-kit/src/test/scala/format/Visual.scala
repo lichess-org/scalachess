@@ -3,8 +3,6 @@ package format
 
 import chess.variant.{ Crazyhouse, Variant }
 
-import bitboard.Board
-
 /** r bqkb r
   * p ppp pp
   * pr

@@ -8,7 +8,6 @@ import scala.language.implicitConversions
 import format.{ FullFen, Fen, Uci, Visual }
 import format.pgn.PgnStr
 import variant.{ Chess960, Variant }
-import bitboard.Board
 
 trait ChessTestCommon:
 

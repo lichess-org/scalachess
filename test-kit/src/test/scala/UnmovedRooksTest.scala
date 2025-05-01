@@ -8,7 +8,7 @@ import scala.language.implicitConversions
 import Square.*
 import variant.{ Atomic, Chess960 }
 import format.FullFen
-import bitboard.{Bitboard, Board}
+import bitboard.Bitboard
 
 class UnmovedRooksTest extends ChessTest:
 

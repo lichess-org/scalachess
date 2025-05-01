@@ -1,7 +1,6 @@
 package chess
 package variant
 
-import chess.bitboard.Board
 import chess.format.FullFen
 
 case object Antichess

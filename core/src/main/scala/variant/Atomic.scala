@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import bitboard.{ Bitboard, Board }
+import bitboard.Bitboard
 import bitboard.Bitboard.*
 
 case object Atomic

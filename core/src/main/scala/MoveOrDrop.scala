@@ -134,9 +134,9 @@ case class Move(
   def withPromotion(p: PromotableRole): Option[Move] =
     if after.count(color.queen) > boardBefore.count(color.queen) then
       for
-        b2 <- after.take(dest)
-        b3 <- b2.place(color - p, dest)
-      yield copy(after = b3, promotion = Option(p))
+        b2 <- after.board.take(dest)
+        b3 <- b2.put(color - p, dest)
+      yield copy(after = after.withBoard(b3), promotion = Option(p))
     else this.some
 
   inline def withAfter(newBoard: Position): Move = copy(after = newBoard)

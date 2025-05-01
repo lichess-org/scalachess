@@ -20,24 +20,6 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
   export color.white as isWhiteTurn
 
-  def place(piece: Piece, at: Square): Option[Position] =
-    board.put(piece, at).map(withBoard)
-
-  def putOrReplace(piece: Piece, at: Square): Position =
-    withBoard(board.putOrReplace(piece, at))
-
-  def take(at: Square): Option[Position] =
-    board.take(at).map(withBoard)
-
-  def move(orig: Square, dest: Square): Option[Position] =
-    board.move(orig, dest).map(withBoard)
-
-  def taking(orig: Square, dest: Square, taking: Option[Square] = None): Option[Position] =
-    board.taking(orig, dest, taking).map(withBoard)
-
-  def promote(orig: Square, dest: Square, piece: Piece): Option[Position] =
-    board.promote(orig, dest, piece).map(withBoard)
-
   def withCastles(c: Castles) = updateHistory(_.withCastles(c))
 
   def unary_! : Position = withColor(color = !color)
@@ -316,14 +298,15 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
   private def enpassant(orig: Square, dest: Square): Option[Move] =
     val capture = Square(dest.file, orig.rank)
-    taking(orig, dest, capture.some)
+    board
+      .taking(orig, dest, capture.some)
       .map(after =>
         Move(
           piece = color.pawn,
           orig = orig,
           dest = dest,
           boardBefore = this,
-          after = after,
+          after = withBoard(after),
           capture = capture.some,
           castle = None,
           promotion = None,
@@ -334,15 +317,15 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
   private def normalMove(orig: Square, dest: Square, role: Role, capture: Boolean): Option[Move] =
     val taken = if capture then Option(dest) else None
     val after =
-      if capture then taking(orig, dest, taken)
-      else move(orig, dest)
+      if capture then board.taking(orig, dest, taken)
+      else board.move(orig, dest)
     after.map(board =>
       Move(
         piece = Piece(color, role),
         orig = orig,
         dest = dest,
         boardBefore = this,
-        after = board,
+        after = withBoard(board),
         capture = taken,
         castle = None,
         promotion = None,
@@ -357,14 +340,15 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
       capture: Boolean
   ): Option[Move] =
     val taken = if capture then Option(dest) else None
-    promote(orig, dest, color - promotion)
+    board
+      .promote(orig, dest, color - promotion)
       .map(board =>
         Move(
           piece = color.pawn,
           orig = orig,
           dest = dest,
           boardBefore = this,
-          after = board,
+          after = withBoard(board),
           capture = taken,
           castle = None,
           promotion = Some(promotion),
@@ -383,11 +367,12 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
   // make sure that the 960 move is first since it will be the representative
   // move and we want 960 uci notation
   private def castle(king: Square, kingTo: Square, rook: Square, rookTo: Square): List[Move] =
-    val after = for
-      b1    <- take(king)
+
+    val boardAfter = for
+      b1    <- board.take(king)
       b2    <- b1.take(rook)
-      b3    <- b2.place(color.king, kingTo)
-      after <- b3.place(color.rook, rookTo)
+      b3    <- b2.put(color.king, kingTo)
+      after <- b3.put(color.rook, rookTo)
     yield after
 
     val isChess960 =
@@ -398,14 +383,14 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
     val destInput = if !isChess960 then List(rook, kingTo) else List(rook)
 
     for
-      a               <- after.toList
+      after           <- boardAfter.map(withBoard).toList
       inputKingSquare <- destInput
     yield Move(
       piece = color.king,
       orig = king,
       dest = inputKingSquare,
       boardBefore = this,
-      after = a,
+      after = after,
       capture = None,
       castle = Move.Castle(king, kingTo, rook, rookTo).some,
       promotion = None,

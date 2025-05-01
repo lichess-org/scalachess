@@ -37,19 +37,20 @@ case object Crazyhouse
       _  <- Either.cond((role != Pawn || canDropPawnOn(square)), d1, ErrorStr(s"Can't drop $role on $square"))
       piece = Piece(board.color, role)
       d2 <- d1.drop(piece).toRight(ErrorStr(s"No $piece to drop on $square"))
-      b1 <- board
-        .place(piece, square)
+      b1 <- board.board
+        .put(piece, square)
         .toRight(ErrorStr(s"Can't drop $role on $square, it's occupied"))
+      b2 = board.withBoard(b1)
       _ <- Either.cond(
-        kingThreatened(b1.board, board.color).no,
-        b1,
+        kingThreatened(b2.board, board.color).no,
+        b2,
         ErrorStr(s"Dropping $role on $square doesn't uncheck the king")
       )
     yield Drop(
       piece = piece,
       square = square,
       boardBefore = board,
-      after = b1.withCrazyData(d2)
+      after = b2.withCrazyData(d2)
     )
 
   override def fiftyMoves(history: History): Boolean = false
@@ -131,9 +132,9 @@ case object Crazyhouse
           if pocket.contains(role)
           to <- if role == Pawn then targets & ~Bitboard.firstRank & ~Bitboard.lastRank else targets
           piece = Piece(board.color, role)
-          after <- board.place(piece, to)
+          after <- board.board.put(piece, to)
           d2    <- data.drop(piece)
-        yield Drop(piece, to, board, after.withCrazyData(d2))
+        yield Drop(piece, to, board, board.withBoard(after).withCrazyData(d2))
 
   type Pockets = ByColor[Pocket]
 

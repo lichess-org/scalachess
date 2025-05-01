@@ -77,14 +77,14 @@ case object Horde
     * this method does not detect; however, such are trivial to premove.
     */
   override def opponentHasInsufficientMaterial(board: Position): Boolean =
-    hasInsufficientMaterial(board, !board.color) || hordeClosedPosition(board)
+    hasInsufficientMaterial(board.board, !board.color) || hordeClosedPosition(board)
 
-  extension (board: Position)
+  extension (board: Board)
     def hasBishopPair: Color => Boolean = side =>
       val bishops = board.bishops & board.byColor(side)
       bishops.intersects(Bitboard.lightSquares) && bishops.intersects(Bitboard.darkSquares)
 
-  def hasInsufficientMaterial(board: Position, color: Color): Boolean =
+  def hasInsufficientMaterial(board: Board, color: Color): Boolean =
     import SquareColor.*
     // Black can always win by capturing the horde
     if color.black then false

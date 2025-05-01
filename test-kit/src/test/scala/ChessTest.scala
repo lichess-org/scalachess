@@ -30,6 +30,15 @@ trait ChessTestCommon:
     def seq(actions: Position => Option[Position]*): Option[Position] =
       actions.foldLeft(board.some)(_ flatMap _)
 
+    def place(piece: Piece, at: Square): Option[Position] =
+      board.board.put(piece, at).map(board.withBoard)
+
+    def take(at: Square): Option[Position] =
+      board.board.take(at).map(board.withBoard)
+
+    def move(orig: Square, dest: Square): Option[Position] =
+      board.board.move(orig, dest).map(board.withBoard)
+
   extension (game: Game)
     def as(color: Color): Game = game.withPlayer(color)
 

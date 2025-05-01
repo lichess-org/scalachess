@@ -4,7 +4,6 @@ package bitboard
 import chess.format.{ Fen, FullFen }
 
 import Square.*
-import Bitboard.*
 
 class BoardTest extends ChessTest:
 

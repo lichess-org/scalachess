@@ -5,7 +5,6 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Prop.{ forAll, propBoolean }
 
 import CoreArbitraries.given
-import Bitboard.*
 
 class BitboardTest extends ScalaCheckSuite:
 

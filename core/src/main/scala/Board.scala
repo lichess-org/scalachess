@@ -1,7 +1,6 @@
 package chess
 
 import cats.syntax.all.*
-
 import chess.Bitboard.*
 
 // Chess board representation

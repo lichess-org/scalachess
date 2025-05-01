@@ -4,7 +4,6 @@ import cats.syntax.all.*
 import chess.format.Uci
 
 import variant.*
-import Bitboard.*
 
 case class Position(board: Board, history: History, variant: Variant, color: Color):
 
@@ -244,7 +243,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
   def genKnight(knights: Bitboard, mask: Bitboard): List[Move] =
     for
       from <- knights
-      to   <- Bitboard.knightAttacks(from) & mask
+      to   <- from.knightAttacks & mask
       move <- normalMove(from, to, Knight, isOccupied(to))
     yield move
 

@@ -1,8 +1,6 @@
 package chess
 package variant
 
-import Bitboard.*
-
 case object Standard
     extends Variant(
       id = Variant.Id(1),

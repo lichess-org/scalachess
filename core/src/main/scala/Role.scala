@@ -125,7 +125,7 @@ case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
 
 object ByRole:
 
-  def apply[A](a: A): ByRole[A] = ByRole(a, a, a, a, a, a)
+  def fill[A](a: A): ByRole[A] = ByRole(a, a, a, a, a, a)
 
   given Functor[ByRole] with
     def map[A, B](byRole: ByRole[A])(f: A => B): ByRole[B] =

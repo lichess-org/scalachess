@@ -20,9 +20,9 @@ object Division:
 
 object Divider:
 
-  def apply(boards: List[Board]): Division =
+  def apply(boards: List[Position]): Division =
 
-    val indexedBoards: List[(Board, Int)] = boards.zipWithIndex
+    val indexedBoards: List[(Position, Int)] = boards.zipWithIndex
 
     val midGame = indexedBoards.collectFirst:
       case (board, index)
@@ -43,11 +43,11 @@ object Divider:
       Ply(boards.size)
     )
 
-  private def majorsAndMinors(board: Board): Int =
+  private def majorsAndMinors(board: Position): Int =
     (board.occupied & ~(board.kings | board.pawns)).count
 
   // Sparse back-rank indicates that pieces have been developed
-  private def backrankSparse(board: Board): Boolean =
+  private def backrankSparse(board: Position): Boolean =
     (Bitboard.firstRank & board.white).count < 4 ||
       (Bitboard.lastRank & board.black).count < 4
 
@@ -85,7 +85,7 @@ object Divider:
     yield (smallSquare << (x + 8 * y), y + 1)
   }.toList
 
-  private def mixedness(board: Board): Int =
+  private def mixedness(board: Position): Int =
     mixednessRegions.foldLeft(0):
       case (acc, (region, y)) =>
         acc + board.byColor.mapReduce(c => (c & region).count)(score(y))

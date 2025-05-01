@@ -15,16 +15,16 @@ trait FenWriter:
   private given Ordering[File] = Ordering.by[File, Int](_.value)
   given Ordering[Square]       = Ordering.by[Square, File](_.file)
 
-  def write(board: Board): FullFen =
+  def write(board: Position): FullFen =
     write(board, FullMoveNumber(1))
 
-  def write(parsed: Board.AndFullMoveNumber): FullFen =
+  def write(parsed: Position.AndFullMoveNumber): FullFen =
     write(parsed.board, parsed.fullMoveNumber)
 
   def write(game: Game): FullFen =
     write(game.board, game.ply.fullMoveNumber)
 
-  def write(board: Board, fullMoveNumber: FullMoveNumber): FullFen = FullFen:
+  def write(board: Position, fullMoveNumber: FullMoveNumber): FullFen = FullFen:
     val builder = scala.collection.mutable.StringBuilder(80)
     builder.append(writeBoard(board))
     builder.append(writeCrazyPocket(board))
@@ -43,11 +43,11 @@ trait FenWriter:
       builder.append(writeCheckCount(board))
     builder.toString
 
-  def writeOpening(board: Board): StandardFen = StandardFen:
+  def writeOpening(board: Position): StandardFen = StandardFen:
     s"${writeBoard(board)} ${board.color.letter} ${writeCastles(board)} ${board.enPassantSquare
         .fold("-")(_.key)}"
 
-  def writeBoard(board: Board): BoardFen =
+  def writeBoard(board: Position): BoardFen =
     val fen   = scala.collection.mutable.StringBuilder(70)
     var empty = 0
     for y <- Rank.allReversed do
@@ -66,23 +66,23 @@ trait FenWriter:
       if y > Rank.First then fen.append('/')
     BoardFen(fen.toString)
 
-  def writeBoardAndColor(board: Board): BoardAndColorFen =
+  def writeBoardAndColor(board: Position): BoardAndColorFen =
     writeBoardAndColor(board, board.color)
 
-  def writeBoardAndColor(board: Board, turnColor: Color): BoardAndColorFen =
+  def writeBoardAndColor(board: Position, turnColor: Color): BoardAndColorFen =
     writeBoard(board).andColor(turnColor)
 
-  private def writeCheckCount(board: Board) =
+  private def writeCheckCount(board: Position) =
     board.history.checkCount match
       case CheckCount(white, black) => s"+$black+$white"
 
-  private def writeCrazyPocket(board: Board) =
+  private def writeCrazyPocket(board: Position) =
     board.crazyData match
       case Some(variant.Crazyhouse.Data(pockets, _)) =>
         "/" + pockets.forsyth
       case _ => ""
 
-  private[chess] def writeCastles(board: Board): String =
+  private[chess] def writeCastles(board: Position): String =
     val wr  = board.rooks & board.white & Bitboard.rank(White.backRank)
     val br  = board.rooks & board.black & Bitboard.rank(Black.backRank)
     val wur = board.unmovedRooks.without(Black).bb

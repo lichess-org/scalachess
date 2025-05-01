@@ -50,9 +50,9 @@ abstract class Variant private[variant] (
       case Some(Queen | Rook | Knight | Bishop) => true
       case _                                    => false
 
-  def validMoves(board: Board): List[Move]
+  def validMoves(board: Position): List[Move]
 
-  def pieceThreatened(board: Board, by: Color, to: Square): Boolean =
+  def pieceThreatened(board: Position, by: Color, to: Square): Boolean =
     board.attacks(to, by)
 
   def kingThreatened(board: BBoard, color: Color): Check =
@@ -67,11 +67,11 @@ abstract class Variant private[variant] (
   def kingSafety(m: Move): Boolean =
     kingThreatened(m.after.board, m.color).no
 
-  def castleCheckSafeSquare(board: Board, kingTo: Square, color: Color, occupied: Bitboard): Boolean =
+  def castleCheckSafeSquare(board: Position, kingTo: Square, color: Color, occupied: Bitboard): Boolean =
     board.attackers(kingTo, !color, occupied).isEmpty
 
   def move(
-      board: Board,
+      board: Position,
       from: Square,
       to: Square,
       promotion: Option[PromotableRole]
@@ -94,28 +94,28 @@ abstract class Variant private[variant] (
       )
     yield m3
 
-  def drop(board: Board, role: Role, square: Square): Either[ErrorStr, Drop] =
+  def drop(board: Position, role: Role, square: Square): Either[ErrorStr, Drop] =
     ErrorStr(s"$this variant cannot drop $role $square").asLeft
 
-  def staleMate(board: Board): Boolean = board.check.no && board.legalMoves.isEmpty
+  def staleMate(board: Position): Boolean = board.check.no && board.legalMoves.isEmpty
 
-  def checkmate(board: Board): Boolean = board.check.yes && board.legalMoves.isEmpty
+  def checkmate(board: Position): Boolean = board.check.yes && board.legalMoves.isEmpty
 
   // In most variants, the winner is the last player to have played and there is a possibility of either a traditional
   // checkmate or a variant end condition
-  def winner(board: Board): Option[Color] =
+  def winner(board: Position): Option[Color] =
     if board.checkMate || specialEnd(board) then Option(!board.color) else None
 
-  def specialEnd(board: Board): Boolean = false
+  def specialEnd(board: Position): Boolean = false
 
-  def specialDraw(board: Board): Boolean = false
+  def specialDraw(board: Position): Boolean = false
 
-  def autoDraw(board: Board): Boolean =
+  def autoDraw(board: Position): Boolean =
     isInsufficientMaterial(board) || fiftyMoves(board.history) || board.history.fivefoldRepetition
 
   /** Returns the material imbalance in pawns (overridden in Antichess)
     */
-  def materialImbalance(board: Board): Int =
+  def materialImbalance(board: Position): Int =
     board.fold(0): (acc, color, role) =>
       Role
         .valueOf(role)
@@ -124,13 +124,13 @@ abstract class Variant private[variant] (
 
   /** Returns true if neither player can win. The game should end immediately.
     */
-  def isInsufficientMaterial(board: Board): Boolean = InsufficientMatingMaterial(board)
+  def isInsufficientMaterial(board: Position): Boolean = InsufficientMatingMaterial(board)
 
   /** Returns true if the other player cannot win. This is relevant when the
     * side to move times out or disconnects. Instead of losing on time,
     * the game should be drawn.
     */
-  def opponentHasInsufficientMaterial(board: Board): Boolean =
+  def opponentHasInsufficientMaterial(board: Position): Boolean =
     InsufficientMatingMaterial(board, !board.color)
 
   def fiftyMoves(history: History): Boolean = history.halfMoveClock >= HalfMoveClock(100)
@@ -140,21 +140,21 @@ abstract class Variant private[variant] (
 
   /** Once a move has been decided upon from the available legal moves, the board is finalized
     */
-  def finalizeBoard(board: Board, uci: format.Uci, captured: Option[Piece]): Board = board
+  def finalizeBoard(board: Position, uci: format.Uci, captured: Option[Piece]): Position = board
 
-  protected def pawnsOnPromotionRank(board: Board, color: Color): Boolean =
+  protected def pawnsOnPromotionRank(board: Position, color: Color): Boolean =
     board(color, Pawn).intersects(Bitboard.rank(color.promotablePawnRank))
 
-  protected def pawnsOnBackRank(board: Board, color: Color): Boolean =
+  protected def pawnsOnBackRank(board: Position, color: Color): Boolean =
     board(color, Pawn).intersects(Bitboard.rank(color.backRank))
 
-  protected def validSide(board: Board, strict: Boolean)(color: Color): Boolean =
+  protected def validSide(board: Position, strict: Boolean)(color: Color): Boolean =
     board(color, King).count == 1 &&
       (!strict || { board(color, Pawn).count <= 8 && board(color).count <= 16 }) &&
       !pawnsOnPromotionRank(board, color) &&
       !pawnsOnBackRank(board, color)
 
-  def valid(board: Board, strict: Boolean): Boolean =
+  def valid(board: Position, strict: Boolean): Boolean =
     Color.all.forall(validSide(board, strict))
 
   val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)

@@ -10,7 +10,7 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
 
   import BinaryFen.implementation.*
 
-  def read: Board.AndFullMoveNumber =
+  def read: Position.AndFullMoveNumber =
     val reader = new Iterator[Byte]:
       val inner                            = value.iterator
       override inline def hasNext: Boolean = inner.hasNext
@@ -135,8 +135,8 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
       )
     else None
 
-    Board.AndFullMoveNumber(
-      Board(
+    Position.AndFullMoveNumber(
+      Position(
         BBoard(
           occupied = occupied,
           white = white,
@@ -171,9 +171,9 @@ object BinaryFen:
 
   import BinaryFen.implementation.*
 
-  def writeNormalized(board: Board): BinaryFen =
+  def writeNormalized(board: Position): BinaryFen =
     write(
-      Board.AndFullMoveNumber(
+      Position.AndFullMoveNumber(
         board
           .updateHistory(_.setHalfMoveClock(HalfMoveClock.initial))
           .withVariant(board.variant match
@@ -183,7 +183,7 @@ object BinaryFen:
       )
     )
 
-  def write(input: Board.AndFullMoveNumber) = BinaryFen:
+  def write(input: Position.AndFullMoveNumber) = BinaryFen:
     val builder = ArrayBuilder.ofByte()
     builder.sizeHint(8 + 32)
 
@@ -303,7 +303,7 @@ object BinaryFen:
       val b = reader.next
       ((b & 0xf), (b >>> 4) & 0xf)
 
-    def minimumUnmovedRooks(board: Board): UnmovedRooks =
+    def minimumUnmovedRooks(board: Position): UnmovedRooks =
       val white   = board.history.unmovedRooks.bb & board.white & Bitboard.firstRank
       val black   = board.history.unmovedRooks.bb & board.black & Bitboard.lastRank
       val castles = board.history.castles

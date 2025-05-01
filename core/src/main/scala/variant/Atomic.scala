@@ -18,23 +18,23 @@ case object Atomic
 
   def pieces = Standard.pieces
 
-  def validMoves(board: Board): List[Move] =
+  def validMoves(board: Position): List[Move] =
     import board.{ genNonKing, genEnPassant, us }
     val targets = ~us
     val moves   = genNonKing(targets) ++ genKing(board, targets) ++ genEnPassant(us & board.pawns)
     moves.map(explodeSurroundingPieces).filter(kingSafety)
 
-  private def genKing(board: Board, mask: Bitboard) =
+  private def genKing(board: Position, mask: Bitboard) =
     import board.{ genUnsafeKing, genCastling }
     board.ourKing.fold(Nil): king =>
       genCastling(king) ++ genUnsafeKing(king, mask)
 
   /** Move threatens to explode the opponent's king */
-  private def explodesOpponentKing(board: Board)(move: Move): Boolean =
+  private def explodesOpponentKing(board: Position)(move: Move): Boolean =
     move.captures && (board.them & board.kings).intersects(move.dest.kingAttacks)
 
   /** Move threatens to illegally explode our own king */
-  private def explodesOwnKing(board: Board)(move: Move): Boolean =
+  private def explodesOwnKing(board: Position)(move: Move): Boolean =
     move.captures && (board.us & board.kings).intersects(move.dest.kingAttacks)
 
   /** In atomic chess, a king cannot be threatened while it is in the perimeter of the other king as were the other player
@@ -62,7 +62,12 @@ case object Atomic
       explodesOpponentKing(m.boardBefore)(m))
       && !explodesOwnKing(m.boardBefore)(m)
 
-  override def castleCheckSafeSquare(board: Board, king: Square, color: Color, occupied: Bitboard): Boolean =
+  override def castleCheckSafeSquare(
+      board: Position,
+      king: Square,
+      color: Color,
+      occupied: Bitboard
+  ): Boolean =
     king.kingAttacks.intersects(board.kingOf(!color)) ||
       attackersWithoutKing(board.board, occupied, king, !color).isEmpty
 
@@ -86,7 +91,7 @@ case object Atomic
   /** Since kings cannot confine each other, if either player has only a king
     * then either a queen or multiple pieces are required for checkmate.
     */
-  private def insufficientAtomicWinningMaterial(board: Board) =
+  private def insufficientAtomicWinningMaterial(board: Position) =
     lazy val bishopsOnOppositeColors = InsufficientMatingMaterial.bishopsOnOppositeColors(board)
 
     // Bishops of opposite color (no other pieces) endgames are dead drawn
@@ -103,12 +108,12 @@ case object Atomic
    * mate would be not be very likely. Additionally, a player can only mate another player with sufficient material.
    * We also look out for closed positions (pawns that cannot move and kings which cannot capture them.)
    */
-  override def isInsufficientMaterial(board: Board) =
+  override def isInsufficientMaterial(board: Position) =
     insufficientAtomicWinningMaterial(board) || atomicClosedPosition(board)
 
   /** Since a king cannot capture, K + P vs K + P where none of the pawns can move is an automatic draw
     */
-  private def atomicClosedPosition(board: Board) =
+  private def atomicClosedPosition(board: Position) =
     val closedStructure = board.pieces.forall((square, piece) =>
       InsufficientMatingMaterial.pawnBlockedByPawn(square, board)
         || piece.is(King) || piece.is(Bishop)
@@ -119,7 +124,7 @@ case object Atomic
       case None                  => true
     closedStructure && bishopsAbsentOrPawnitized
 
-  private def bishopPawnitized(board: Board, sideWithBishop: Color, bishopLight: Boolean) =
+  private def bishopPawnitized(board: Position, sideWithBishop: Color, bishopLight: Boolean) =
     board.pieces.forall((square, piece) =>
       (piece.is(Pawn) && piece.is(sideWithBishop)) ||
         (piece.is(Pawn) && piece.is(!sideWithBishop) && square.isLight == !bishopLight) ||
@@ -131,8 +136,8 @@ case object Atomic
     * a piece in the opponent's king's proximity. On the other hand, a king alone or a king with
     * immobile pawns is not sufficient material to win with.
     */
-  override def opponentHasInsufficientMaterial(board: Board) =
+  override def opponentHasInsufficientMaterial(board: Position) =
     board.kingsOnlyOf(!board.color)
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
-  override def specialEnd(board: Board) = board.kings.count < 2
+  override def specialEnd(board: Position) = board.kings.count < 2

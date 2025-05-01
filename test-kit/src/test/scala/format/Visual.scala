@@ -15,7 +15,7 @@ import chess.variant.{ Crazyhouse, Variant }
   */
 object Visual:
 
-  def <<(source: String): Board =
+  def <<(source: String): Position =
     val lines = augmentString(source).linesIterator.to(List)
     val filtered = lines.size match
       case 8          => lines
@@ -33,9 +33,9 @@ object Visual:
     )
     b.updateHistory(_ => History(unmovedRooks = UnmovedRooks.from(b), crazyData = None))
 
-  def >>(board: Board): String = >>|(board, Map.empty)
+  def >>(board: Position): String = >>|(board, Map.empty)
 
-  def >>|(board: Board, marks: Map[Iterable[Square], Char]): String = {
+  def >>|(board: Position, marks: Map[Iterable[Square], Char]): String = {
     val markedPoss: Map[Square, Char] = marks.foldLeft(Map[Square, Char]()) { case (marks, (poss, char)) =>
       marks ++ (poss.toList.map { square =>
         (square, char)
@@ -50,10 +50,10 @@ object Visual:
 
   def addNewLines(str: String) = "\n" + str + "\n"
 
-  def createBoard(pieces: Iterable[(Square, Piece)], variant: Variant): Board =
+  def createBoard(pieces: Iterable[(Square, Piece)], variant: Variant): Position =
     val board        = BBoard.fromMap(pieces.toMap)
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
-    Board(
+    Position(
       board,
       History(
         castles = variant.castles,

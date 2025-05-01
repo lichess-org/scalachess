@@ -14,10 +14,10 @@ case object Chess960
       standardInitialPosition = false
     ):
 
-  def validMoves(board: Board): List[Move] =
+  def validMoves(board: Position): List[Move] =
     Standard.validMoves(board)
 
-  override def valid(board: Board, strict: Boolean): Boolean = Standard.valid(board, strict)
+  override def valid(board: Position, strict: Boolean): Boolean = Standard.valid(board, strict)
 
   def pieces = pieces(scala.util.Random.nextInt(960))
 

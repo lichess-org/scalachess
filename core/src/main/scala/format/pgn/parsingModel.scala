@@ -2,7 +2,7 @@ package chess
 package format.pgn
 
 import cats.syntax.all.*
-import chess.Board.AndFullMoveNumber
+import chess.Position.AndFullMoveNumber
 import chess.format.Fen
 
 // We don't support variation without move now,
@@ -18,7 +18,7 @@ case class PgnNodeData(
 ):
   export metas.*
 
-  private[pgn] def toMove(context: Board): Option[(Board, Move)] =
+  private[pgn] def toMove(context: Position): Option[(Position, Move)] =
     san(context).toOption
       .map(x =>
         (
@@ -45,13 +45,13 @@ case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[
 
   private def initContext(tags: Tags): AndFullMoveNumber =
     val variant = tags.variant | chess.variant.Standard
-    def default = Board.AndFullMoveNumber(Board.init(variant, White), FullMoveNumber.initial)
+    def default = Position.AndFullMoveNumber(Position.init(variant, White), FullMoveNumber.initial)
 
     tags.fen
       .flatMap(Fen.readWithMoveNumber(variant, _))
       .getOrElse(default)
 
-  private def treeToPgn(context: Board): Option[Node[Move]] =
+  private def treeToPgn(context: Position): Option[Node[Move]] =
     tree.flatMap:
       _.mapAccumlOption_(context): (ctx, d) =>
         d.toMove(ctx)
@@ -61,7 +61,7 @@ case class ParsedMainline[A](initialPosition: InitialComments, tags: Tags, sans:
 
 // Standard Algebraic Notation
 sealed trait San:
-  def apply(board: Board): Either[ErrorStr, MoveOrDrop]
+  def apply(board: Position): Either[ErrorStr, MoveOrDrop]
   def rawString: Option[String] = None
 
 case class Std(
@@ -74,7 +74,7 @@ case class Std(
     override val rawString: Option[String] = None
 ) extends San:
 
-  def apply(board: Board): Either[ErrorStr, chess.Move] =
+  def apply(board: Position): Either[ErrorStr, chess.Move] =
     board
       .byPiece(board.color, role)
       .first: square =>
@@ -90,12 +90,12 @@ case class Std(
 
 case class Drop(role: Role, square: Square, override val rawString: Option[String] = None) extends San:
 
-  def apply(board: Board): Either[ErrorStr, chess.Drop] =
+  def apply(board: Position): Either[ErrorStr, chess.Drop] =
     board.drop(role, square)
 
 case class Castle(side: Side, override val rawString: Option[String] = None) extends San:
 
-  def apply(board: Board): Either[ErrorStr, chess.Move] =
+  def apply(board: Position): Either[ErrorStr, chess.Move] =
 
     import board.{ genCastling, ourKing, variant }
     if !variant.allowsCastling then ErrorStr(s"Cannot castle in $variant").asLeft

@@ -17,7 +17,7 @@ case object Standard
 
   val pieces: Map[Square, Piece] = Variant.symmetricRank(backRank)
 
-  def validMoves(board: Board): List[Move] =
+  def validMoves(board: Position): List[Move] =
     import board.{ genNonKing, genSafeKing, genCastling, color, ourKing }
     val enPassantMoves = board.genEnPassant(board.us & board.pawns)
     ourKing.fold(Nil): king =>
@@ -33,7 +33,7 @@ case object Standard
       else candidates
 
   // Used for filtering candidate moves that would leave put the king in check.
-  def isSafe(board: Board, king: Square, blockers: Bitboard)(move: Move): Boolean =
+  def isSafe(board: Position, king: Square, blockers: Bitboard)(move: Move): Boolean =
     import board.{ us, them }
     if move.enpassant then
       val newOccupied = (board.occupied ^ move.orig.bl ^ move.dest.withRankOf(move.orig).bl) | move.dest.bl
@@ -43,7 +43,7 @@ case object Standard
       !(us & blockers).contains(move.orig) || Bitboard.aligned(move.orig, move.dest, king)
     else true
 
-  private def genEvasions(king: Square, board: Board, checkers: Bitboard): List[Move] =
+  private def genEvasions(king: Square, board: Position, checkers: Bitboard): List[Move] =
     import board.{ genNonKing, genSafeKing, us }
     // Checks by these sliding pieces can maybe be blocked.
     val sliders   = checkers & board.sliders
@@ -52,16 +52,16 @@ case object Standard
     val blockers  = checkers.singleSquare.fold(Nil)(c => genNonKing(Bitboard.between(king, c) | checkers))
     safeKings ++ blockers
 
-  override def valid(board: Board, strict: Boolean): Boolean =
+  override def valid(board: Position, strict: Boolean): Boolean =
     super.valid(board, strict) && (!strict || hasValidCheckers(board))
 
-  def hasValidCheckers(board: Board): Boolean =
+  def hasValidCheckers(board: Position): Boolean =
     board.checkers.isEmpty || {
       isValidChecksForMultipleCheckers(board, board.checkers) &&
       isValidCheckersForEnPassant(board, board.checkers)
     }
 
-  private def isValidCheckersForEnPassant(board: Board, activeCheckers: Bitboard): Boolean =
+  private def isValidCheckersForEnPassant(board: Position, activeCheckers: Bitboard): Boolean =
     (for
       enPassantSquare <- board.potentialEpSquare
       enPassantUp     <- board.color.fold(enPassantSquare.down, enPassantSquare.up)
@@ -73,7 +73,7 @@ case object Standard
         .exists(previousBoard => board.ourKing.exists(previousBoard.attackers(_, !board.color).isEmpty))
     )).getOrElse(true)
 
-  private def isValidChecksForMultipleCheckers(board: Board, activeCheckers: Bitboard): Boolean =
+  private def isValidChecksForMultipleCheckers(board: Position, activeCheckers: Bitboard): Boolean =
     val checkerCount = activeCheckers.count
     if checkerCount <= 1 then true
     else if checkerCount >= 3 then false

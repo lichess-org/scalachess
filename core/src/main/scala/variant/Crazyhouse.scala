@@ -21,10 +21,10 @@ case object Crazyhouse
 
   override val initialFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1")
 
-  def validMoves(board: Board): List[Move] =
+  def validMoves(board: Position): List[Move] =
     Standard.validMoves(board)
 
-  override def valid(board: Board, strict: Boolean) =
+  override def valid(board: Position, strict: Boolean) =
     Color.all.forall(validSide(board, false)) &&
       (!strict ||
         (board.byRole(Pawn).count <= 16
@@ -33,7 +33,7 @@ case object Crazyhouse
 
   private def canDropPawnOn(square: Square) = square.rank != Rank.First && square.rank != Rank.Eighth
 
-  override def drop(board: Board, role: Role, square: Square): Either[ErrorStr, Drop] =
+  override def drop(board: Position, role: Role, square: Square): Either[ErrorStr, Drop] =
     for
       d1 <- board.crazyData.toRight(ErrorStr("Board has no crazyhouse data"))
       _  <- Either.cond((role != Pawn || canDropPawnOn(square)), d1, ErrorStr(s"Can't drop $role on $square"))
@@ -58,7 +58,7 @@ case object Crazyhouse
 
   override def isIrreversible(move: Move): Boolean = move.castles
 
-  override def finalizeBoard(board: Board, uci: Uci, capture: Option[Piece]): Board =
+  override def finalizeBoard(board: Position, uci: Uci, capture: Option[Piece]): Position =
     uci match
       case Uci.Move(orig, dest, promOption) =>
         board.crazyData.fold(board) { data =>
@@ -70,7 +70,7 @@ case object Crazyhouse
         }
       case _ => board
 
-  private def canDropStuff(board: Board) =
+  private def canDropStuff(board: Position) =
     board.crazyData.exists { (data: Data) =>
       val pocket = data.pockets(board.color)
       pocket.nonEmpty && possibleDrops(board).fold(true) { squares =>
@@ -80,20 +80,20 @@ case object Crazyhouse
       }
     }
 
-  override def staleMate(board: Board) =
+  override def staleMate(board: Position) =
     super.staleMate(board) && !canDropStuff(board)
 
-  override def checkmate(board: Board) =
+  override def checkmate(board: Position) =
     super.checkmate(board) && !canDropStuff(board)
 
   // there is always sufficient mating material in Crazyhouse
-  override def opponentHasInsufficientMaterial(board: Board) = false
-  override def isInsufficientMaterial(board: Board)          = false
+  override def opponentHasInsufficientMaterial(board: Position) = false
+  override def isInsufficientMaterial(board: Position)          = false
 
   // if the king is not in check, all drops are possible, we just return None
   // king is in single check, we return the squares between the king and the checker
   // king is in double check, no drop is possible
-  def possibleDrops(board: Board): Option[List[Square]] =
+  def possibleDrops(board: Position): Option[List[Square]] =
     board.ourKing.flatMap(king =>
       val checkers = board.attackers(king, !board.color)
       if checkers.moreThanOne then Some(Nil)
@@ -102,7 +102,7 @@ case object Crazyhouse
 
   // all legal moves and drops
   // this function is used in perfts only
-  def legalMoves(board: Board): List[MoveOrDrop] =
+  def legalMoves(board: Position): List[MoveOrDrop] =
     legalDrops(board) ::: board.legalMoves.filterNot(m =>
       m.castle.exists(c => c.isStandard && m.dest != c.rook)
     )
@@ -111,7 +111,7 @@ case object Crazyhouse
   // king is in single check, return the squares between the king and the checker
   // king is in double check, no drop is possible
   // this function is used in perfts only
-  private def legalDropSquares(board: Board): Bitboard =
+  private def legalDropSquares(board: Position): Bitboard =
     board.ourKing
       .map(king =>
         val checkers = board.attackers(king, !board.color)
@@ -122,7 +122,7 @@ case object Crazyhouse
 
   // generate all legal drops
   // this function is used in perfts only
-  private def legalDrops(board: Board): List[Drop] =
+  private def legalDrops(board: Position): List[Drop] =
     val targets = legalDropSquares(board)
     if targets.isEmpty then Nil
     else

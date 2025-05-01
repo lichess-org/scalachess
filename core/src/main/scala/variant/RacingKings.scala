@@ -44,19 +44,19 @@ case object RacingKings
 
   override val initialFen = FullFen("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
 
-  def validMoves(board: Board): List[Move] =
+  def validMoves(board: Position): List[Move] =
     import board.{ genSafeKing, genNonKingAndNonPawn, us }
     val targets = ~us
     val moves   = genNonKingAndNonPawn(targets) ++ genSafeKing(targets)
     moves.filter(kingSafety)
 
-  override def valid(board: Board, strict: Boolean): Boolean =
+  override def valid(board: Position, strict: Boolean): Boolean =
     super.valid(board, strict) && (!strict || board.check.no)
 
-  override def isInsufficientMaterial(board: Board)          = false
-  override def opponentHasInsufficientMaterial(board: Board) = false
+  override def isInsufficientMaterial(board: Position)          = false
+  override def opponentHasInsufficientMaterial(board: Position) = false
 
-  private def reachedGoal(board: Board, color: Color) =
+  private def reachedGoal(board: Position, color: Color) =
     board.kingOf(color).intersects(Bitboard.rank(Rank.Eighth))
 
   private def reachesGoal(move: Move) =
@@ -66,7 +66,7 @@ case object RacingKings
   // the goal and black can make it on the next ply, he is given a chance to
   // draw, to compensate for the first-move advantage. The draw is not called
   // automatically, because black should also be given equal chances to flag.
-  override def specialEnd(board: Board) =
+  override def specialEnd(board: Position) =
     board.color match
       case White =>
         reachedGoal(board, White) ^ reachedGoal(board, Black)
@@ -75,10 +75,10 @@ case object RacingKings
 
   // If white reaches the goal and black also reaches the goal directly after,
   // then it is a draw.
-  override def specialDraw(board: Board) =
+  override def specialDraw(board: Position) =
     board.color.white && reachedGoal(board, White) && reachedGoal(board, Black)
 
-  override def winner(board: Board): Option[Color] =
+  override def winner(board: Position): Option[Color] =
     specialEnd(board).option(Color.fromWhite(reachedGoal(board, White)))
 
   // Not only check that our king is safe,
@@ -87,5 +87,5 @@ case object RacingKings
     super.kingSafety(m) && m.after.isCheck(!m.color).no
 
   // When considering stalemate, take into account that checks are not allowed.
-  override def staleMate(board: Board): Boolean =
+  override def staleMate(board: Position): Boolean =
     board.check.no && !specialEnd(board) && board.legalMoves.isEmpty

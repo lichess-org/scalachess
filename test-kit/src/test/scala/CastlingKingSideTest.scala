@@ -31,7 +31,7 @@ RQK   R """.chess960.updateHistory(_ => castleHistory(White, kingSide = true, qu
 PPPPPPPP
 R  Q RK """
     )
-    val board: Board = """
+    val board: Position = """
    PPPPP
 B     KR""".chess960
     val g2 = Game(board)
@@ -43,12 +43,12 @@ B     KR""".chess960
 B    RK """
     )
   test("chess960 close kingside with 2 rooks around"):
-    val board: Board = """
+    val board: Position = """
 PPPPPPPP
 RKRBB   """.chess960
     assertEquals(board.destsFrom(B1), Set())
   test("chess960 close queenside"):
-    val board: Board = """
+    val board: Position = """
 PPPPPPPP
 RK     B""".chess960
     val game = Game(board)

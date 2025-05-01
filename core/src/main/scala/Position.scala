@@ -8,7 +8,7 @@ import bitboard.Board as BBoard
 import bitboard.Bitboard
 import bitboard.Bitboard.*
 
-case class Board(board: BBoard, history: History, variant: Variant, color: Color):
+case class Position(board: BBoard, history: History, variant: Variant, color: Color):
 
   export history.{ castles, unmovedRooks, crazyData }
   // format: off
@@ -23,46 +23,46 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
 
   export color.white as isWhiteTurn
 
-  def place(piece: Piece, at: Square): Option[Board] =
+  def place(piece: Piece, at: Square): Option[Position] =
     board.put(piece, at).map(withBoard)
 
-  def putOrReplace(piece: Piece, at: Square): Board =
+  def putOrReplace(piece: Piece, at: Square): Position =
     withBoard(board.putOrReplace(piece, at))
 
-  def take(at: Square): Option[Board] =
+  def take(at: Square): Option[Position] =
     board.take(at).map(withBoard)
 
-  def move(orig: Square, dest: Square): Option[Board] =
+  def move(orig: Square, dest: Square): Option[Position] =
     board.move(orig, dest).map(withBoard)
 
-  def taking(orig: Square, dest: Square, taking: Option[Square] = None): Option[Board] =
+  def taking(orig: Square, dest: Square, taking: Option[Square] = None): Option[Position] =
     board.taking(orig, dest, taking).map(withBoard)
 
-  def promote(orig: Square, dest: Square, piece: Piece): Option[Board] =
+  def promote(orig: Square, dest: Square, piece: Piece): Option[Position] =
     board.promote(orig, dest, piece).map(withBoard)
 
   def withCastles(c: Castles) = updateHistory(_.withCastles(c))
 
-  def unary_! : Board = withColor(color = !color)
+  def unary_! : Position = withColor(color = !color)
 
   def withPieces(newPieces: PieceMap) = copy(board = BBoard.fromMap(newPieces))
 
-  def withVariant(v: Variant): Board =
+  def withVariant(v: Variant): Position =
     if v == Crazyhouse then copy(variant = v).ensureCrazyData
     else copy(variant = v)
 
-  def withCrazyData(data: Crazyhouse.Data): Board         = updateHistory(_.copy(crazyData = data.some))
-  def withCrazyData(data: Option[Crazyhouse.Data]): Board = updateHistory(_.copy(crazyData = data))
-  def withCrazyData(f: Crazyhouse.Data => Crazyhouse.Data): Board =
+  def withCrazyData(data: Crazyhouse.Data): Position         = updateHistory(_.copy(crazyData = data.some))
+  def withCrazyData(data: Option[Crazyhouse.Data]): Position = updateHistory(_.copy(crazyData = data))
+  def withCrazyData(f: Crazyhouse.Data => Crazyhouse.Data): Position =
     withCrazyData(f(crazyData.getOrElse(Crazyhouse.Data.init)))
 
-  def ensureCrazyData: Board = withCrazyData(crazyData.getOrElse(Crazyhouse.Data.init))
+  def ensureCrazyData: Position = withCrazyData(crazyData.getOrElse(Crazyhouse.Data.init))
 
-  inline def updateHistory(inline f: History => History): Board = copy(history = f(history))
+  inline def updateHistory(inline f: History => History): Position = copy(history = f(history))
 
-  def withBoard(b: BBoard): Board = copy(board = b)
+  def withBoard(b: BBoard): Position = copy(board = b)
 
-  def withColor(color: Color): Board = copy(color = color)
+  def withColor(color: Color): Position = copy(color = color)
 
   def materialImbalance: Int = variant.materialImbalance(this)
 
@@ -415,9 +415,9 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
       enpassant = false
     )
 
-object Board:
+object Position:
 
-  case class AndFullMoveNumber(board: Board, fullMoveNumber: FullMoveNumber):
+  case class AndFullMoveNumber(board: Position, fullMoveNumber: FullMoveNumber):
     def ply = fullMoveNumber.ply(board.color)
 
   def apply(
@@ -427,11 +427,11 @@ object Board:
       crazyData: Option[Crazyhouse.Data],
       color: Option[Color]
   ) =
-    new Board(BBoard.fromMap(pieces), history.copy(crazyData = crazyData), variant, color.getOrElse(White))
+    new Position(BBoard.fromMap(pieces), history.copy(crazyData = crazyData), variant, color.getOrElse(White))
 
-  def apply(board: BBoard, variant: Variant, color: Option[Color]): Board =
+  def apply(board: BBoard, variant: Variant, color: Option[Color]): Position =
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
-    Board(
+    Position(
       board,
       History(
         castles = variant.castles,
@@ -442,18 +442,18 @@ object Board:
       color.getOrElse(White)
     )
 
-  def apply(pieces: Iterable[(Square, Piece)], variant: Variant, color: Option[Color]): Board =
-    Board(pieces, variant.castles, variant, color)
+  def apply(pieces: Iterable[(Square, Piece)], variant: Variant, color: Option[Color]): Position =
+    Position(pieces, variant.castles, variant, color)
 
   def apply(
       pieces: Iterable[(Square, Piece)],
       castles: Castles,
       variant: Variant,
       color: Option[Color]
-  ): Board =
+  ): Position =
     val board        = BBoard.fromMap(pieces.toMap)
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
-    Board(
+    Position(
       board,
       History(
         castles = variant.castles,
@@ -464,5 +464,6 @@ object Board:
       color.getOrElse(White)
     )
 
-  def apply(variant: chess.variant.Variant): Board = Board.init(variant, White)
-  def init(variant: Variant, color: Color): Board = Board(BBoard.fromMap(variant.pieces), variant, color.some)
+  def apply(variant: chess.variant.Variant): Position = Position.init(variant, White)
+  def init(variant: Variant, color: Color): Position =
+    Position(BBoard.fromMap(variant.pieces), variant, color.some)

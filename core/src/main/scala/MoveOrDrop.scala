@@ -16,11 +16,11 @@ sealed trait MoveOrDrop:
 
   def color: Color
 
-  def finalizeAfter: Board
+  def finalizeAfter: Position
 
-  def boardBefore: Board
+  def boardBefore: Position
 
-  def boardAfter: Board
+  def boardAfter: Position
 
   def toUci: Uci
 
@@ -35,8 +35,8 @@ case class Move(
     piece: Piece,
     orig: Square,
     dest: Square,
-    boardBefore: Board,
-    after: Board,
+    boardBefore: Position,
+    after: Position,
     capture: Option[Square],
     promotion: Option[PromotableRole],
     castle: Option[Move.Castle],
@@ -44,12 +44,12 @@ case class Move(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  def boardAfter: Board     = finalizeAfter.withColor(!piece.color)
+  def boardAfter: Position  = finalizeAfter.withColor(!piece.color)
   lazy val toSanStr: SanStr = format.pgn.Dumper(this)
 
   // TODO rethink about how handle castling
   // it's quite messy and error prone now
-  lazy val finalizeAfter: Board =
+  lazy val finalizeAfter: Position =
     val board = after.variant.finalizeBoard(
       after.updateHistory { h1 =>
         val h2 = h1.copy(
@@ -139,7 +139,7 @@ case class Move(
       yield copy(after = b3, promotion = Option(p))
     else this.some
 
-  inline def withAfter(newBoard: Board): Move = copy(after = newBoard)
+  inline def withAfter(newBoard: Position): Move = copy(after = newBoard)
 
   inline def withMetrics(m: MoveMetrics): Move = copy(metrics = m)
 
@@ -157,16 +157,16 @@ object Move:
 case class Drop(
     piece: Piece,
     square: Square,
-    boardBefore: Board,
-    after: Board,
+    boardBefore: Position,
+    after: Position,
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  inline def before: Board  = boardBefore
-  def boardAfter: Board     = finalizeAfter.withColor(!piece.color)
-  lazy val toSanStr: SanStr = format.pgn.Dumper(this)
+  inline def before: Position = boardBefore
+  def boardAfter: Position    = finalizeAfter.withColor(!piece.color)
+  lazy val toSanStr: SanStr   = format.pgn.Dumper(this)
 
-  lazy val finalizeAfter: Board =
+  lazy val finalizeAfter: Position =
     val board = after.variant.finalizeBoard(
       after.updateHistory { h =>
         h.copy(
@@ -185,7 +185,7 @@ case class Drop(
       h.copy(positionHashes = PositionHash(Hash(board.withColor(!piece.color))).combine(basePositionHashes))
     }
 
-  def afterWithLastMove: Board =
+  def afterWithLastMove: Position =
     after.variant.finalizeBoard(
       after.copy(history = after.history.withLastMove(toUci)),
       toUci,
@@ -194,7 +194,7 @@ case class Drop(
 
   inline def color: Color = piece.color
 
-  inline def withAfter(newBoard: Board): Drop = copy(after = newBoard)
+  inline def withAfter(newBoard: Position): Drop = copy(after = newBoard)
 
   inline def withMetrics(m: MoveMetrics): Drop = copy(metrics = m)
 

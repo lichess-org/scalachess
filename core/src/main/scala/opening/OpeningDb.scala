@@ -54,7 +54,7 @@ object OpeningDb:
       moves.map(_.boardBefore) ++ moves.lastOption.map(_.boardAfter).toVector
 
   // first board is initial position
-  def searchInBoards(boards: Iterable[Board]): Option[Opening.AtPly] =
+  def searchInBoards(boards: Iterable[Position]): Option[Opening.AtPly] =
     boards
       .takeWhile(_.board.nbPieces >= SEARCH_MIN_PIECES)
       .zipWithIndex

@@ -81,7 +81,7 @@ object Replay:
     moves
       .foldM((sit, List(sit))) { case ((current, acc), move) =>
         play(move)(current).map: md =>
-          val nextSit = md.finalizeAfter.withColor(!current.color)
+          val nextSit = md.boardAfter
           (nextSit, nextSit :: acc)
       }
       .map(_._2.reverse)
@@ -137,23 +137,23 @@ object Replay:
       def compareFen(fen: Fen.Full)  = truncateFen(fen) == atFenTruncated
 
       @scala.annotation.tailrec
-      def recursivePlyAtFen(sit: Board, sans: List[San], ply: Ply): Either[ErrorStr, Ply] =
+      def recursivePlyAtFen(board: Board, sans: List[San], ply: Ply): Either[ErrorStr, Ply] =
         sans match
           case Nil => ErrorStr(s"Can't find $atFenTruncated, reached ply $ply").asLeft
           case san :: rest =>
-            san(sit) match
+            san(board) match
               case Left(err) => err.asLeft
               case Right(moveOrDrop) =>
                 val after = moveOrDrop.finalizeAfter
-                val fen   = Fen.write(Game(after.withColor(ply.turn), ply = ply))
+                val fen   = Fen.write(after.withColor(ply.turn), ply.fullMoveNumber)
                 if compareFen(fen) then ply.asRight
-                else recursivePlyAtFen(after.withColor(!sit.color), rest, ply.next)
+                else recursivePlyAtFen(after.withColor(!board.color), rest, ply.next)
 
-      val sit = initialFen.flatMap(Fen.read(variant, _)) | Board(variant)
+      val board = initialFen.flatMap(Fen.read(variant, _)) | Board(variant)
 
       Parser
         .moves(sans)
-        .flatMap(moves => recursivePlyAtFen(sit, moves.value, Ply.firstMove))
+        .flatMap(moves => recursivePlyAtFen(board, moves.value, Ply.firstMove))
 
   private def makeGame(variant: Variant, initialFen: Option[Fen.Full]): Game =
     val g = Game(variant.some, initialFen)

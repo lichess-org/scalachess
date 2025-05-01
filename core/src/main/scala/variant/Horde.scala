@@ -41,21 +41,21 @@ case object Horde
     else Standard.validMoves(board)
 
   override def valid(board: Board, strict: Boolean): Boolean =
-    board.board.kingOf(White).isEmpty
+    board.kingOf(White).isEmpty
       && validSide(board, strict)(Black)
       && !pawnsOnPromotionRank(board, White)
       && (!strict || board.color.white || Standard.hasValidCheckers(board))
 
   /** The game has a special end condition when black manages to capture all of white's pawns */
   override def specialEnd(board: Board): Boolean =
-    board.board.white.isEmpty
+    board.white.isEmpty
 
   /** Any vs K + any where horde is stalemated and only king can move is a fortress draw
     * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
     * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
     */
   private def hordeClosedPosition(board: Board): Boolean =
-    val hordeSquare = board.board.byColor(White)
+    val hordeSquare = board.byColor(White)
     val mateInOne = hordeSquare.count == 1 &&
       hordeSquare.singleSquare.exists(pieceThreatened(board, Color.black, _))
     !mateInOne && {

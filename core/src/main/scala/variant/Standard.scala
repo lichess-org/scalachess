@@ -68,7 +68,7 @@ case object Standard
       enPassantDown   <- board.color.fold(enPassantSquare.up, enPassantSquare.down)
       ourKing         <- board.ourKing
     yield activeCheckers.count == 1 && (
-      activeCheckers.first.contains(enPassantSquare) || board.board
+      activeCheckers.first.contains(enPassantSquare) || board
         .move(enPassantUp, enPassantDown)
         .exists(previousBoard => board.ourKing.exists(previousBoard.attackers(_, !board.color).isEmpty))
     )).getOrElse(true)

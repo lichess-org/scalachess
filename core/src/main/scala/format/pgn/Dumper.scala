@@ -25,9 +25,9 @@ object Dumper:
         //       - rank
         //       - both (only happens w/ at least 3 pieces of the same role)
         // We know Role ≠ Pawn, so it is fine to always pass None as promotion target
-        val candidates = (board.board.byPiece(piece) ^ orig.bl)
+        val candidates = (board.byPiece(piece) ^ orig.bl)
           .filter(square =>
-            piece.eyes(square, dest, board.board.occupied) && {
+            piece.eyes(square, dest, board.occupied) && {
               board.move(square, dest, None).isRight
             }
           )

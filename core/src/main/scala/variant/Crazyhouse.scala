@@ -27,8 +27,8 @@ case object Crazyhouse
   override def valid(board: Board, strict: Boolean) =
     Color.all.forall(validSide(board, false)) &&
       (!strict ||
-        (board.board.byRole(Pawn).count <= 16
-          && board.board.nbPieces <= 32
+        (board.byRole(Pawn).count <= 16
+          && board.nbPieces <= 32
           && Standard.hasValidCheckers(board)))
 
   private def canDropPawnOn(square: Square) = square.rank != Rank.First && square.rank != Rank.Eighth
@@ -95,7 +95,7 @@ case object Crazyhouse
   // king is in double check, no drop is possible
   def possibleDrops(board: Board): Option[List[Square]] =
     board.ourKing.flatMap(king =>
-      val checkers = board.board.attackers(king, !board.color)
+      val checkers = board.attackers(king, !board.color)
       if checkers.moreThanOne then Some(Nil)
       else checkers.first.map(Bitboard.between(king, _).squares)
     )
@@ -114,8 +114,8 @@ case object Crazyhouse
   private def legalDropSquares(board: Board): Bitboard =
     board.ourKing
       .map(king =>
-        val checkers = board.board.attackers(king, !board.color)
-        if checkers.isEmpty then ~board.board.occupied
+        val checkers = board.attackers(king, !board.color)
+        if checkers.isEmpty then ~board.occupied
         else checkers.singleSquare.map(Bitboard.between(king, _)).getOrElse(Bitboard.empty)
       )
       .getOrElse(Bitboard.empty)

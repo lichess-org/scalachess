@@ -53,7 +53,7 @@ abstract class Variant private[variant] (
   def validMoves(board: Board): List[Move]
 
   def pieceThreatened(board: Board, by: Color, to: Square): Boolean =
-    board.board.attacks(to, by)
+    board.attacks(to, by)
 
   def kingThreatened(board: BBoard, color: Color): Check =
     board.isCheck(color)
@@ -68,7 +68,7 @@ abstract class Variant private[variant] (
     kingThreatened(m.after.board, m.color).no
 
   def castleCheckSafeSquare(board: Board, kingTo: Square, color: Color, occupied: Bitboard): Boolean =
-    board.board.attackers(kingTo, !color, occupied).isEmpty
+    board.attackers(kingTo, !color, occupied).isEmpty
 
   def move(
       board: Board,
@@ -81,7 +81,7 @@ abstract class Variant private[variant] (
       board.generateMovesAt(from).find(_.dest == to)
 
     for
-      piece <- board.board(from).toRight(ErrorStr(s"No piece on ${from.key}"))
+      piece <- board(from).toRight(ErrorStr(s"No piece on ${from.key}"))
       _     <- Either.cond(piece.color == board.color, piece, ErrorStr(s"Not my piece on ${from.key}"))
       m1    <- findMove(from, to).toRight(ErrorStr(s"Piece on ${from.key} cannot move to ${to.key}"))
       m2 <- m1

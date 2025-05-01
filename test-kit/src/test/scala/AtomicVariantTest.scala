@@ -16,8 +16,8 @@ class AtomicVariantTest extends ChessTest:
     game
       .playMoves((Square.B2, Square.H8))
       .assertRight: game =>
-        assert(explodedSquares.forall(square => game.board.board(square).isEmpty))
-        assert(intactPawns.forall(square => game.board.board(square).isDefined))
+        assert(explodedSquares.forall(square => game.board(square).isEmpty))
+        assert(intactPawns.forall(square => game.board(square).isDefined))
 
   test("Must explode all surrounding non pawn pieces on capture (contrived board)"):
     val fenPosition = FullFen("k7/3bbn2/3rqn2/3qr3/8/7B/8/1K6 w - -")
@@ -28,7 +28,7 @@ class AtomicVariantTest extends ChessTest:
     game
       .playMoves((Square.H3, Square.E6))
       .assertRight: game =>
-        assert(explodedSquares.forall(square => game.board.board(square).isEmpty))
+        assert(explodedSquares.forall(square => game.board(square).isEmpty))
 
   test(
     "Must explode all surrounding non pawn pieces on capture (contrived board with bottom right position)"
@@ -40,7 +40,7 @@ class AtomicVariantTest extends ChessTest:
     game
       .playMoves((Square.B3, Square.E6))
       .assertRight: game =>
-        assert(explodedSquares.forall(square => game.board.board(square).isEmpty))
+        assert(explodedSquares.forall(square => game.board(square).isEmpty))
 
   test("Not allow a king to capture a piece"):
     val fenPosition = FullFen("8/8/8/1k6/8/8/8/1Kr5 w - -")
@@ -137,7 +137,7 @@ class AtomicVariantTest extends ChessTest:
     game
       .playMoves((Square.D6, Square.D7))
       .assertRight: game =>
-        assert(game.board.board(Square.D7).isDefined)
+        assert(game.board(Square.D7).isDefined)
         assertNot(game.board.check.yes)
 
   test("Draw on knight and king vs king"):

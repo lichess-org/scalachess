@@ -75,7 +75,7 @@ case class Std(
 ) extends San:
 
   def apply(board: Board): Either[ErrorStr, chess.Move] =
-    board.board
+    board
       .byPiece(board.color, role)
       .first: square =>
         if compare(file, square.file) && compare(rank, square.rank)

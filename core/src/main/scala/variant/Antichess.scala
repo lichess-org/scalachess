@@ -37,7 +37,7 @@ case object Antichess
     ourKings.flatMap(genUnsafeKing(_, them)) ++ genEnPassant(us & board.pawns) ++ genNonKing(them)
 
   override def valid(board: Board, strict: Boolean): Boolean =
-    board.board.nbPieces >= 2 && board.board.nbPieces <= 32
+    board.nbPieces >= 2 && board.nbPieces <= 32
 
   // In antichess, there is no checkmate condition, and the winner is the current player if they have no legal moves
   override def winner(board: Board): Option[Color] =
@@ -45,7 +45,7 @@ case object Antichess
 
   override def specialEnd(board: Board): Boolean =
     // The game ends with a win when one player manages to lose all their pieces or is in stalemate
-    board.board(board.color).isEmpty || board.legalMoves.isEmpty
+    board(board.color).isEmpty || board.legalMoves.isEmpty
 
   // In antichess, it is valuable for your opponent to have pieces.
   override def materialImbalance(board: Board): Int =
@@ -56,10 +56,10 @@ case object Antichess
   // blockade or stalemate. Only one player can win if the only remaining pieces are two knights
   override def opponentHasInsufficientMaterial(board: Board) =
     // Exit early if we are not in a board with only knights
-    board.board.onlyKnights && {
+    board.onlyKnights && {
 
-      val whiteKnights = board.board.white.squares
-      val blackKnights = board.board.black.squares
+      val whiteKnights = board.white.squares
+      val blackKnights = board.black.squares
 
       // We consider the case where a player has two knights
       whiteKnights.size == 1 && blackKnights.size == 1 && whiteKnights.forall(_.isLight) == blackKnights

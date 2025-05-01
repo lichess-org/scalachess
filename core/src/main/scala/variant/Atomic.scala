@@ -31,11 +31,11 @@ case object Atomic
 
   /** Move threatens to explode the opponent's king */
   private def explodesOpponentKing(board: Board)(move: Move): Boolean =
-    move.captures && (board.them & board.board.kings).intersects(move.dest.kingAttacks)
+    move.captures && (board.them & board.kings).intersects(move.dest.kingAttacks)
 
   /** Move threatens to illegally explode our own king */
   private def explodesOwnKing(board: Board)(move: Move): Boolean =
-    move.captures && (board.us & board.board.kings).intersects(move.dest.kingAttacks)
+    move.captures && (board.us & board.kings).intersects(move.dest.kingAttacks)
 
   /** In atomic chess, a king cannot be threatened while it is in the perimeter of the other king as were the other player
     * to capture it, their own king would explode. This effectively makes a king invincible while connected with another
@@ -132,7 +132,7 @@ case object Atomic
     * immobile pawns is not sufficient material to win with.
     */
   override def opponentHasInsufficientMaterial(board: Board) =
-    board.board.kingsOnlyOf(!board.color)
+    board.kingsOnlyOf(!board.color)
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
-  override def specialEnd(board: Board) = board.board.kings.count < 2
+  override def specialEnd(board: Board) = board.kings.count < 2

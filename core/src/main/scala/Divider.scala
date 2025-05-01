@@ -4,8 +4,6 @@ import cats.syntax.all.*
 
 import scala.annotation.switch
 
-import bitboard.Bitboard
-
 case class Division(middle: Option[Ply], end: Option[Ply], plies: Ply):
 
   def openingSize: Ply        = middle | plies

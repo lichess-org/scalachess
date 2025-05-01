@@ -1,5 +1,5 @@
 package chess
-import chess.bitboard.Bitboard
+
 import chess.variant.Crazyhouse.Data
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop.{ forAll, propBoolean }

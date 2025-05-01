@@ -1,11 +1,11 @@
 package chess
-package bitboard
 
 import scala.annotation.targetName
 
 opaque type Bitboard = Long
 object Bitboard:
-  import Attacks.*
+  import bitboard.Attacks.*
+  import bitboard.Magic
 
   inline def apply(inline l: Long): Bitboard              = l
   inline def apply(inline xs: Iterable[Square]): Bitboard = xs.foldLeft(empty)((b, s) => b | s.bl)

@@ -3,8 +3,7 @@ package chess
 import cats.Eq
 import cats.derived.*
 
-import bitboard.Bitboard
-import bitboard.Bitboard.*
+import Bitboard.*
 
 case class Piece(color: Color, role: Role) derives Eq:
 

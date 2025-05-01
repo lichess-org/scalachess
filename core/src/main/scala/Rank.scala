@@ -1,7 +1,5 @@
 package chess
 
-import chess.bitboard.Bitboard
-
 opaque type Rank = Int
 object Rank:
   extension (a: Rank)

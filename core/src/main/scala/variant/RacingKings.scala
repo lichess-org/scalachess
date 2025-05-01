@@ -3,8 +3,6 @@ package variant
 
 import chess.format.FullFen
 
-import bitboard.Bitboard
-
 case object RacingKings
     extends Variant(
       id = Variant.Id(9),

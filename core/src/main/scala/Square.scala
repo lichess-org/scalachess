@@ -1,7 +1,5 @@
 package chess
 
-import chess.bitboard.Bitboard
-
 import java.lang.Math.abs
 import scala.annotation.targetName
 

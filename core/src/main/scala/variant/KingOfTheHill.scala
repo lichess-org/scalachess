@@ -20,7 +20,7 @@ case object KingOfTheHill
   override def valid(board: Position, strict: Boolean): Boolean = Standard.valid(board, strict)
 
   override def specialEnd(board: Position) =
-    board.kingOf(!board.color).intersects(bitboard.Bitboard.center)
+    board.kingOf(!board.color).intersects(Bitboard.center)
 
   /** You only need a king to be able to win in this variant
     */

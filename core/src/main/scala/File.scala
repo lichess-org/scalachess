@@ -1,7 +1,5 @@
 package chess
 
-import chess.bitboard.Bitboard
-
 opaque type File = Int
 object File:
 

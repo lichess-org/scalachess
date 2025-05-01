@@ -1,8 +1,7 @@
 package chess
 package variant
 
-import bitboard.Bitboard
-import bitboard.Bitboard.*
+import Bitboard.*
 
 case object Atomic
     extends Variant(

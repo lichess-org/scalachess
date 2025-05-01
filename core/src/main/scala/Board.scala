@@ -2,8 +2,7 @@ package chess
 
 import cats.syntax.all.*
 
-import chess.bitboard.Bitboard.*
-import chess.bitboard.Bitboard
+import chess.Bitboard.*
 
 // Chess board representation
 case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[Bitboard]):

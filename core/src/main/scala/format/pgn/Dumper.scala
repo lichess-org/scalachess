@@ -5,7 +5,7 @@ object Dumper:
 
   def apply(board: Position, data: chess.Move, next: Position): SanStr =
     import data.*
-    import bitboard.Bitboard.*
+    import Bitboard.*
 
     val base = (promotion, piece.role) match
       case _ if castles =>

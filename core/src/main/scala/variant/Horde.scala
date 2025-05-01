@@ -2,8 +2,7 @@ package chess
 package variant
 
 import cats.syntax.all.*
-import chess.bitboard.Bitboard
-import chess.bitboard.Bitboard.*
+import chess.Bitboard.*
 import chess.format.FullFen
 
 case object Horde

@@ -4,8 +4,6 @@ package variant
 import chess.format.{ FullFen, Uci }
 import monocle.syntax.all.*
 
-import bitboard.Bitboard
-
 case object Crazyhouse
     extends Variant(
       id = Variant.Id(10),

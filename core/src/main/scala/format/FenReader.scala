@@ -7,7 +7,6 @@ import scalalib.zeros.given
 
 import variant.{ Standard, Variant }
 import variant.Crazyhouse.Pockets
-import bitboard.Bitboard
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *

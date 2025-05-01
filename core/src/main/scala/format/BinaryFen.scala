@@ -1,7 +1,6 @@
 package chess
 package format
 
-import chess.bitboard.Bitboard
 import chess.variant.*
 
 import scala.collection.mutable.ArrayBuilder

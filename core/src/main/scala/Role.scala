@@ -2,7 +2,6 @@ package chess
 
 import cats.Functor
 import cats.syntax.all.*
-import chess.bitboard.Bitboard
 
 sealed trait Role:
   val forsyth: Char

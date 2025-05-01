@@ -21,7 +21,7 @@ case object Crazyhouse
 
   override val initialFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1")
 
-  def validMoves(situation: Situation): List[Move] =
+  def validMoves(situation: Board): List[Move] =
     Standard.validMoves(situation)
 
   override def valid(situation: Board, strict: Boolean) =
@@ -33,7 +33,7 @@ case object Crazyhouse
 
   private def canDropPawnOn(square: Square) = square.rank != Rank.First && square.rank != Rank.Eighth
 
-  override def drop(situation: Situation, role: Role, square: Square): Either[ErrorStr, Drop] =
+  override def drop(situation: Board, role: Role, square: Square): Either[ErrorStr, Drop] =
     for
       d1 <- situation.crazyData.toRight(ErrorStr("Board has no crazyhouse data"))
       _  <- Either.cond((role != Pawn || canDropPawnOn(square)), d1, ErrorStr(s"Can't drop $role on $square"))
@@ -102,7 +102,7 @@ case object Crazyhouse
 
   // all legal moves and drops
   // this function is used in perfts only
-  def legalMoves(situation: Situation): List[MoveOrDrop] =
+  def legalMoves(situation: Board): List[MoveOrDrop] =
     legalDrops(situation) ::: situation.legalMoves.filterNot(m =>
       m.castle.exists(c => c.isStandard && m.dest != c.rook)
     )
@@ -111,7 +111,7 @@ case object Crazyhouse
   // king is in single check, return the squares between the king and the checker
   // king is in double check, no drop is possible
   // this function is used in perfts only
-  private def legalDropSquares(situation: Situation): Bitboard =
+  private def legalDropSquares(situation: Board): Bitboard =
     situation.ourKing
       .map(king =>
         val checkers = situation.board.attackers(king, !situation.color)
@@ -122,7 +122,7 @@ case object Crazyhouse
 
   // generate all legal drops
   // this function is used in perfts only
-  private def legalDrops(situation: Situation): List[Drop] =
+  private def legalDrops(situation: Board): List[Drop] =
     val targets = legalDropSquares(situation)
     if targets.isEmpty then Nil
     else

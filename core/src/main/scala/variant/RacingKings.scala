@@ -44,7 +44,7 @@ case object RacingKings
 
   override val initialFen = FullFen("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
 
-  def validMoves(situation: Situation): List[Move] =
+  def validMoves(situation: Board): List[Move] =
     import situation.{ genSafeKing, genNonKingAndNonPawn, us }
     val targets = ~us
     val moves   = genNonKingAndNonPawn(targets) ++ genSafeKing(targets)

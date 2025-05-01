@@ -253,7 +253,7 @@ class AtomicVariantTest extends ChessTest:
   // This would probably be harmless, but there might be a use case where the count of available moves matters,
   // or similar, so best to code defensively.
   test("There are no repeated moves in the list of available moves for the situation"):
-    // Situation where the queen can capture a pawn to both win and remove itself from check
+    // Board where the queen can capture a pawn to both win and remove itself from check
     val position = FullFen("k1r5/pp5Q/8/8/8/8/PP6/2K5 w - -")
     val game     = fenToGame(position, Atomic)
     game.situation.moves

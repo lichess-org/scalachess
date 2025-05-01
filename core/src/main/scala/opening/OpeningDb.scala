@@ -40,10 +40,10 @@ object OpeningDb:
         variant.Standard
       )
       .toOption
-      .flatMap(searchInSituations)
+      .flatMap(searchInBoards)
 
   def search(replay: Replay): Option[Opening.AtPly] =
-    searchInSituations:
+    searchInBoards:
       val moves: Vector[Move] = replay.chronoMoves.view
         .take(SEARCH_MAX_PLIES)
         .takeWhile:
@@ -54,7 +54,7 @@ object OpeningDb:
       moves.map(_.situationBefore) ++ moves.lastOption.map(_.situationAfter).toVector
 
   // first situation is initial position
-  def searchInSituations(situations: Iterable[Situation]): Option[Opening.AtPly] =
+  def searchInBoards(situations: Iterable[Board]): Option[Opening.AtPly] =
     situations
       .takeWhile(_.board.nbPieces >= SEARCH_MIN_PIECES)
       .zipWithIndex

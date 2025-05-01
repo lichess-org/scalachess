@@ -14,7 +14,7 @@ case object Chess960
       standardInitialPosition = false
     ):
 
-  def validMoves(situation: Situation): List[Move] =
+  def validMoves(situation: Board): List[Move] =
     Standard.validMoves(situation)
 
   override def valid(situation: Board, strict: Boolean): Boolean = Standard.valid(situation, strict)

@@ -17,10 +17,10 @@ trait ChessTestCommon:
   given Conversion[PgnStr, String] = _.value
 
   extension (str: String)
-    def chess960: Board             = makeBoard(str, chess.variant.Chess960)
-    def kingOfTheHill: Board        = makeBoard(str, chess.variant.KingOfTheHill)
-    def threeCheck: Board           = makeBoard(str, chess.variant.ThreeCheck)
-    def as(color: Color): Situation = (Visual << str).withColor(color)
+    def chess960: Board         = makeBoard(str, chess.variant.Chess960)
+    def kingOfTheHill: Board    = makeBoard(str, chess.variant.KingOfTheHill)
+    def threeCheck: Board       = makeBoard(str, chess.variant.ThreeCheck)
+    def as(color: Color): Board = (Visual << str).withColor(color)
 
   extension (board: Board)
     def visual = Visual >> board
@@ -49,7 +49,7 @@ trait ChessTestCommon:
 
     def withClock(c: Clock) = game.copy(clock = Option(c))
 
-  extension (sit: Situation)
+  extension (sit: Board)
     def movesAt(s: Square): List[Move] =
       sit.moves.getOrElse(s, Nil)
 

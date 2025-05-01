@@ -17,7 +17,7 @@ case object Standard
 
   val pieces: Map[Square, Piece] = Variant.symmetricRank(backRank)
 
-  def validMoves(situation: Situation): List[Move] =
+  def validMoves(situation: Board): List[Move] =
     import situation.{ genNonKing, genSafeKing, genCastling, color, board, ourKing }
     val enPassantMoves = situation.genEnPassant(situation.us & board.pawns)
     ourKing.fold(Nil): king =>
@@ -33,7 +33,7 @@ case object Standard
       else candidates
 
   // Used for filtering candidate moves that would leave put the king in check.
-  def isSafe(situation: Situation, king: Square, blockers: Bitboard)(move: Move): Boolean =
+  def isSafe(situation: Board, king: Square, blockers: Bitboard)(move: Move): Boolean =
     import situation.{ board, us, them }
     if move.enpassant then
       val newOccupied = (board.occupied ^ move.orig.bl ^ move.dest.withRankOf(move.orig).bl) | move.dest.bl
@@ -43,7 +43,7 @@ case object Standard
       !(us & blockers).contains(move.orig) || Bitboard.aligned(move.orig, move.dest, king)
     else true
 
-  private def genEvasions(king: Square, situation: Situation, checkers: Bitboard): List[Move] =
+  private def genEvasions(king: Square, situation: Board, checkers: Bitboard): List[Move] =
     import situation.{ genNonKing, genSafeKing, us, board }
     // Checks by these sliding pieces can maybe be blocked.
     val sliders   = checkers & board.sliders

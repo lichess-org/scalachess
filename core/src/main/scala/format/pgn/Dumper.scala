@@ -3,7 +3,7 @@ package format.pgn
 
 object Dumper:
 
-  def apply(situation: Situation, data: chess.Move, next: Situation): SanStr =
+  def apply(situation: Board, data: chess.Move, next: Board): SanStr =
     import data.*
     import bitboard.Bitboard.*
 
@@ -43,7 +43,7 @@ object Dumper:
 
     SanStr(s"$base${checkOrWinnerSymbol(next)}")
 
-  def apply(data: chess.Drop, next: Situation): SanStr =
+  def apply(data: chess.Drop, next: Board): SanStr =
     SanStr(s"${data.toUci.uci}${checkOrWinnerSymbol(next)}")
 
   def apply(data: chess.Move): SanStr =
@@ -52,7 +52,7 @@ object Dumper:
   def apply(data: chess.Drop): SanStr =
     apply(data, data.situationAfter)
 
-  private def checkOrWinnerSymbol(next: Situation): String =
+  private def checkOrWinnerSymbol(next: Board): String =
     if next.winner.isDefined then "#"
     else if next.check.yes then "+"
     else ""

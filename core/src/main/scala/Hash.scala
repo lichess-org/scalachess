@@ -30,9 +30,9 @@ opaque type Hash = Int
 object Hash:
   val size                      = 3
   def apply(value: Int): Hash   = value >>> 8
-  def apply(board: Board): Hash = hashSituation(board) >>> 8
+  def apply(board: Board): Hash = hashBoard(board) >>> 8
 
-  private def hashSituation(situation: Board): Int =
+  private def hashBoard(situation: Board): Int =
 
     val hPieces =
       var h = 0
@@ -73,7 +73,7 @@ object Hash:
       h
 
     hPieces ^ hTurn ^ hCastling ^ hEp ^ hChecks ^ hCrazy
-  end hashSituation
+  end hashBoard
 
   private def hashThreeCheck(color: Color, count: Int): Int =
     val subTable = ZobristTables.threeCheckMasks(color)

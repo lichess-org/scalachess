@@ -417,6 +417,9 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
 
 object Board:
 
+  case class AndFullMoveNumber(situation: Board, fullMoveNumber: FullMoveNumber):
+    def ply = fullMoveNumber.ply(situation.color)
+
   def apply(
       pieces: PieceMap,
       history: History,

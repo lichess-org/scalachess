@@ -51,7 +51,7 @@ object Perft:
     builder.append("\n").append(sum)
     println(builder)
 
-  extension (s: Situation)
+  extension (s: Board)
 
     def divide(depth: Int): List[DivideResult] =
       if depth == 0 then Nil

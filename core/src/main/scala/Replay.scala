@@ -73,7 +73,7 @@ object Replay:
     gameMoveWhileValidReverse(sans, initialFen, variant) match
       case (game, gs, err) => (game, gs.reverse, err)
 
-  private def computeSituations[M](
+  private def computeBoards[M](
       sit: Board,
       moves: List[M],
       play: M => Board => Either[ErrorStr, MoveOrDrop]
@@ -95,7 +95,7 @@ object Replay:
           case Left(err) => err.asLeft
           case Right(md) => computeReplay(replay.addMove(md), rest)
 
-  private def initialFenToSituation(initialFen: Option[Fen.Full], variant: Variant): Board =
+  private def initialFenToBoard(initialFen: Option[Fen.Full], variant: Variant): Board =
     (initialFen.flatMap(Fen.read) | Board(variant)).withVariant(variant)
 
   def situations(
@@ -103,18 +103,18 @@ object Replay:
       initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, List[Board]] =
-    val sit = initialFenToSituation(initialFen, variant)
+    val sit = initialFenToBoard(initialFen, variant)
     Parser
       .moves(sans)
       .flatMap: moves =>
-        computeSituations(sit, moves.value, _.apply)
+        computeBoards(sit, moves.value, _.apply)
 
   def situationsFromUci(
       moves: List[Uci],
       initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, List[Board]] =
-    computeSituations(initialFenToSituation(initialFen, variant), moves, _.apply)
+    computeBoards(initialFenToBoard(initialFen, variant), moves, _.apply)
 
   def apply(
       moves: List[Uci],

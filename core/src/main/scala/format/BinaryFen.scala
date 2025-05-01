@@ -10,7 +10,7 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
 
   import BinaryFen.implementation.*
 
-  def read: Situation.AndFullMoveNumber =
+  def read: Board.AndFullMoveNumber =
     val reader = new Iterator[Byte]:
       val inner                            = value.iterator
       override inline def hasNext: Boolean = inner.hasNext
@@ -135,7 +135,7 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
       )
     else None
 
-    Situation.AndFullMoveNumber(
+    Board.AndFullMoveNumber(
       Board(
         BBoard(
           occupied = occupied,
@@ -171,9 +171,9 @@ object BinaryFen:
 
   import BinaryFen.implementation.*
 
-  def writeNormalized(situation: Situation): BinaryFen =
+  def writeNormalized(situation: Board): BinaryFen =
     write(
-      Situation.AndFullMoveNumber(
+      Board.AndFullMoveNumber(
         situation
           .updateHistory(_.setHalfMoveClock(HalfMoveClock.initial))
           .withVariant(situation.variant match
@@ -183,7 +183,7 @@ object BinaryFen:
       )
     )
 
-  def write(input: Situation.AndFullMoveNumber) = BinaryFen:
+  def write(input: Board.AndFullMoveNumber) = BinaryFen:
     val builder = ArrayBuilder.ofByte()
     builder.sizeHint(8 + 32)
 

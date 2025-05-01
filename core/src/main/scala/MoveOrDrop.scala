@@ -107,11 +107,11 @@ case class Move(
     // Update position hashes last, only after updating the board,
     // castling rights and en-passant rights.
     board.updateHistory { h =>
-      lazy val positionHashesOfSituationBefore =
+      lazy val positionHashesOfBoardBefore =
         if h.positionHashes.isEmpty then PositionHash(Hash(situationBefore)) else h.positionHashes
       val resetsPositionHashes = board.variant.isIrreversible(this)
       val basePositionHashes =
-        if resetsPositionHashes then PositionHash.empty else positionHashesOfSituationBefore
+        if resetsPositionHashes then PositionHash.empty else positionHashesOfBoardBefore
       h.copy(positionHashes = PositionHash(Hash(board.withColor(!piece.color))).combine(basePositionHashes))
     }
 
@@ -157,14 +157,14 @@ object Move:
 case class Drop(
     piece: Piece,
     square: Square,
-    situationBefore: Situation,
+    situationBefore: Board,
     after: Board,
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  inline def before: Situation  = situationBefore
-  def situationAfter: Situation = finalizeAfter.withColor(!piece.color)
-  lazy val toSanStr: SanStr     = format.pgn.Dumper(this)
+  inline def before: Board  = situationBefore
+  def situationAfter: Board = finalizeAfter.withColor(!piece.color)
+  lazy val toSanStr: SanStr = format.pgn.Dumper(this)
 
   lazy val finalizeAfter: Board =
     val board = after.variant.finalizeBoard(

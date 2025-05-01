@@ -15,16 +15,16 @@ trait FenWriter:
   private given Ordering[File] = Ordering.by[File, Int](_.value)
   given Ordering[Square]       = Ordering.by[Square, File](_.file)
 
-  def write(situation: Situation): FullFen =
+  def write(situation: Board): FullFen =
     write(situation, FullMoveNumber(1))
 
-  def write(parsed: Situation.AndFullMoveNumber): FullFen =
+  def write(parsed: Board.AndFullMoveNumber): FullFen =
     write(parsed.situation, parsed.fullMoveNumber)
 
   def write(game: Game): FullFen =
     write(game.situation, game.ply.fullMoveNumber)
 
-  def write(situation: Situation, fullMoveNumber: FullMoveNumber): FullFen = FullFen:
+  def write(situation: Board, fullMoveNumber: FullMoveNumber): FullFen = FullFen:
     val builder = scala.collection.mutable.StringBuilder(80)
     builder.append(writeBoard(situation))
     builder.append(writeCrazyPocket(situation))
@@ -43,7 +43,7 @@ trait FenWriter:
       builder.append(writeCheckCount(situation))
     builder.toString
 
-  def writeOpening(situation: Situation): StandardFen = StandardFen:
+  def writeOpening(situation: Board): StandardFen = StandardFen:
     s"${writeBoard(situation)} ${situation.color.letter} ${writeCastles(situation)} ${situation.enPassantSquare
         .fold("-")(_.key)}"
 
@@ -66,7 +66,7 @@ trait FenWriter:
       if y > Rank.First then fen.append('/')
     BoardFen(fen.toString)
 
-  def writeBoardAndColor(situation: Situation): BoardAndColorFen =
+  def writeBoardAndColor(situation: Board): BoardAndColorFen =
     writeBoardAndColor(situation, situation.color)
 
   def writeBoardAndColor(board: Board, turnColor: Color): BoardAndColorFen =

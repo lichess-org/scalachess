@@ -18,7 +18,7 @@ case object ThreeCheck
 
   override val initialFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 +0+0")
 
-  def validMoves(situation: Situation): List[Move] =
+  def validMoves(situation: Board): List[Move] =
     Standard.validMoves(situation)
 
   override def valid(situation: Board, strict: Boolean): Boolean = Standard.valid(situation, strict)

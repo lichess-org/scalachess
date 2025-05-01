@@ -50,7 +50,7 @@ abstract class Variant private[variant] (
       case Some(Queen | Rook | Knight | Bishop) => true
       case _                                    => false
 
-  def validMoves(situation: Situation): List[Move]
+  def validMoves(situation: Board): List[Move]
 
   def pieceThreatened(board: Board, by: Color, to: Square): Boolean =
     board.board.attacks(to, by)
@@ -71,7 +71,7 @@ abstract class Variant private[variant] (
     board.board.attackers(kingTo, !color, occupied).isEmpty
 
   def move(
-      situation: Situation,
+      situation: Board,
       from: Square,
       to: Square,
       promotion: Option[PromotableRole]
@@ -94,7 +94,7 @@ abstract class Variant private[variant] (
       )
     yield m3
 
-  def drop(situation: Situation, role: Role, square: Square): Either[ErrorStr, Drop] =
+  def drop(situation: Board, role: Role, square: Square): Either[ErrorStr, Drop] =
     ErrorStr(s"$this variant cannot drop $role $square").asLeft
 
   def staleMate(situation: Board): Boolean = situation.check.no && situation.legalMoves.isEmpty

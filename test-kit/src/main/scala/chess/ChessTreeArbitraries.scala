@@ -16,16 +16,16 @@ trait FromMove[A]:
 
 object ChessTreeArbitraries:
 
-  def genSituations(seed: Board): Gen[LazyList[Board]] =
+  def genBoards(seed: Board): Gen[LazyList[Board]] =
     if seed.end then Gen.const(LazyList(seed))
     else
       for
         situation  <- Gen.oneOf(seed.legalMoves.map(_.situationAfter))
-        situations <- genSituations(situation)
+        situations <- genBoards(situation)
       yield situation #:: situations
 
   def genMainline(seed: Board): Gen[Node[Board]] =
-    genSituations(seed).map(Tree.build(_).get)
+    genBoards(seed).map(Tree.build(_).get)
 
   def genPgn(seed: Board): Gen[Pgn] =
     for

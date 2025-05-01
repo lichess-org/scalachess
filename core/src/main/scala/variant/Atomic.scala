@@ -18,23 +18,23 @@ case object Atomic
 
   def pieces = Standard.pieces
 
-  def validMoves(situation: Situation): List[Move] =
+  def validMoves(situation: Board): List[Move] =
     import situation.{ genNonKing, genEnPassant, us, board }
     val targets = ~us
     val moves   = genNonKing(targets) ++ genKing(situation, targets) ++ genEnPassant(us & board.pawns)
     moves.map(explodeSurroundingPieces).filter(kingSafety)
 
-  private def genKing(situation: Situation, mask: Bitboard) =
+  private def genKing(situation: Board, mask: Bitboard) =
     import situation.{ genUnsafeKing, genCastling }
     situation.ourKing.fold(Nil): king =>
       genCastling(king) ++ genUnsafeKing(king, mask)
 
   /** Move threatens to explode the opponent's king */
-  private def explodesOpponentKing(situation: Situation)(move: Move): Boolean =
+  private def explodesOpponentKing(situation: Board)(move: Move): Boolean =
     move.captures && (situation.them & situation.board.kings).intersects(move.dest.kingAttacks)
 
   /** Move threatens to illegally explode our own king */
-  private def explodesOwnKing(situation: Situation)(move: Move): Boolean =
+  private def explodesOwnKing(situation: Board)(move: Move): Boolean =
     move.captures && (situation.us & situation.board.kings).intersects(move.dest.kingAttacks)
 
   /** In atomic chess, a king cannot be threatened while it is in the perimeter of the other king as were the other player

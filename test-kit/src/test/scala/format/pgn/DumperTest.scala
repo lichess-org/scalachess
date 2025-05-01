@@ -14,7 +14,7 @@ class DumperTest extends ChessTest:
 
   test("Check with pawn not be checkmate if pawn can be taken en passant"):
     val game = Fen.readWithMoveNumber(FullFen("8/3b4/6R1/1P2kp2/6pp/2N1P3/4KPPP/8 w - -")).get match
-      case s: Situation.AndFullMoveNumber => Game(s.situation, ply = s.ply)
+      case s: Board.AndFullMoveNumber => Game(s.situation, ply = s.ply)
     val move = game(Square.F2, Square.F4).get._2
     assertEquals(Dumper(move), "f4+")
 

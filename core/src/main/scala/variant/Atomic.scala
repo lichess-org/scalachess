@@ -1,8 +1,7 @@
 package chess
 package variant
 
-import bitboard.Bitboard
-import bitboard.Board as BBoard
+import bitboard.{ Bitboard, Board }
 import bitboard.Bitboard.*
 
 case object Atomic
@@ -41,13 +40,13 @@ case object Atomic
     * to capture it, their own king would explode. This effectively makes a king invincible while connected with another
     * king.
     */
-  override def kingThreatened(board: BBoard, color: Color): Check = Check:
+  override def kingThreatened(board: Board, color: Color): Check = Check:
     import board.{ kingPosOf, kingOf, occupied }
     kingPosOf(color).exists: k =>
       k.kingAttacks.isDisjoint(kingOf(!color)) &&
         attackersWithoutKing(board, occupied, k, !color).nonEmpty
 
-  private def attackersWithoutKing(board: BBoard, occupied: Bitboard, s: Square, attacker: Color) =
+  private def attackersWithoutKing(board: Board, occupied: Bitboard, s: Square, attacker: Color) =
     import board.{ byColor, rooks, queens, bishops, knights, pawns }
     byColor(attacker) & (
       s.rookAttacks(occupied) & (rooks ^ queens) |

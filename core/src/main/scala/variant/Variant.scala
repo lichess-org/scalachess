@@ -3,7 +3,7 @@ package variant
 
 import cats.Eq
 import cats.syntax.all.*
-import chess.bitboard.{ Bitboard, Board as BBoard }
+import chess.bitboard.{ Bitboard, Board }
 import chess.format.Fen
 
 // Correctness depends on singletons for each variant ID
@@ -55,13 +55,13 @@ abstract class Variant private[variant] (
   def pieceThreatened(board: Position, by: Color, to: Square): Boolean =
     board.attacks(to, by)
 
-  def kingThreatened(board: BBoard, color: Color): Check =
+  def kingThreatened(board: Board, color: Color): Check =
     board.isCheck(color)
 
-  def checkWhite(board: BBoard): Check = kingThreatened(board, White)
-  def checkBlack(board: BBoard): Check = kingThreatened(board, Black)
+  def checkWhite(board: Board): Check = kingThreatened(board, White)
+  def checkBlack(board: Board): Check = kingThreatened(board, Black)
 
-  def checkColor(board: BBoard): Option[Color] =
+  def checkColor(board: Board): Option[Color] =
     checkWhite(board).yes.option(White).orElse(checkBlack(board).yes.option(Black))
 
   def kingSafety(m: Move): Boolean =

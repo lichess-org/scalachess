@@ -7,8 +7,7 @@ import scalalib.zeros.given
 
 import variant.{ Standard, Variant }
 import variant.Crazyhouse.Pockets
-import bitboard.Bitboard
-import bitboard.Board as BBoard
+import bitboard.{ Bitboard, Board }
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *
@@ -126,7 +125,7 @@ trait FenReader:
       case _ => None
 
   // only cares about pieces positions on the board (first part of FEN string)
-  def makeBoard(variant: Variant, fen: String): Option[(BBoard, Option[Crazyhouse.Data])] =
+  def makeBoard(variant: Variant, fen: String): Option[(Board, Option[Crazyhouse.Data])] =
     val (position, pocketsStr) = fen.takeWhile(' ' !=) match
       case word if word.count('/' ==) == 8 =>
         val splitted = word.split('/')
@@ -143,7 +142,7 @@ trait FenReader:
 
   private val numberSet = Set.from('1' to '8')
 
-  type BoardWithCrazyPromoted = (BBoard, Bitboard)
+  type BoardWithCrazyPromoted = (Board, Bitboard)
 
   def makeBoardOptionWithCrazyPromoted(boardFen: String, variant: Variant): Option[BoardWithCrazyPromoted] =
     val (board, error) = makeBoardWithCrazyPromoted(boardFen, variant)
@@ -206,7 +205,7 @@ trait FenReader:
                     iter.next
                 case None => error = Some(s"invalid piece $ch")
             file += 1
-    val bboard = BBoard(
+    val bboard = Board(
       occupied = occupied,
       white = white,
       black = black,

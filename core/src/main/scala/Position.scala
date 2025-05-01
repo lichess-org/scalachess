@@ -4,11 +4,10 @@ import cats.syntax.all.*
 import chess.format.Uci
 
 import variant.*
-import bitboard.Board as BBoard
-import bitboard.Bitboard
+import bitboard.{ Bitboard, Board }
 import bitboard.Bitboard.*
 
-case class Position(board: BBoard, history: History, variant: Variant, color: Color):
+case class Position(board: Board, history: History, variant: Variant, color: Color):
 
   export history.{ castles, unmovedRooks, crazyData }
   // format: off
@@ -45,7 +44,7 @@ case class Position(board: BBoard, history: History, variant: Variant, color: Co
 
   def unary_! : Position = withColor(color = !color)
 
-  def withPieces(newPieces: PieceMap) = copy(board = BBoard.fromMap(newPieces))
+  def withPieces(newPieces: PieceMap) = copy(board = Board.fromMap(newPieces))
 
   def withVariant(v: Variant): Position =
     if v == Crazyhouse then copy(variant = v).ensureCrazyData
@@ -60,7 +59,7 @@ case class Position(board: BBoard, history: History, variant: Variant, color: Co
 
   inline def updateHistory(inline f: History => History): Position = copy(history = f(history))
 
-  def withBoard(b: BBoard): Position = copy(board = b)
+  def withBoard(b: Board): Position = copy(board = b)
 
   def withColor(color: Color): Position = copy(color = color)
 
@@ -427,9 +426,9 @@ object Position:
       crazyData: Option[Crazyhouse.Data],
       color: Option[Color]
   ) =
-    new Position(BBoard.fromMap(pieces), history.copy(crazyData = crazyData), variant, color.getOrElse(White))
+    new Position(Board.fromMap(pieces), history.copy(crazyData = crazyData), variant, color.getOrElse(White))
 
-  def apply(board: BBoard, variant: Variant, color: Option[Color]): Position =
+  def apply(board: Board, variant: Variant, color: Option[Color]): Position =
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Position(
       board,
@@ -451,7 +450,7 @@ object Position:
       variant: Variant,
       color: Option[Color]
   ): Position =
-    val board        = BBoard.fromMap(pieces.toMap)
+    val board        = Board.fromMap(pieces.toMap)
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Position(
       board,
@@ -466,4 +465,4 @@ object Position:
 
   def apply(variant: chess.variant.Variant): Position = Position.init(variant, White)
   def init(variant: Variant, color: Color): Position =
-    Position(BBoard.fromMap(variant.pieces), variant, color.some)
+    Position(Board.fromMap(variant.pieces), variant, color.some)

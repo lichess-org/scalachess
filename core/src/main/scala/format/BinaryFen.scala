@@ -1,7 +1,7 @@
 package chess
 package format
 
-import chess.bitboard.{ Bitboard, Board as BBoard }
+import chess.bitboard.{ Bitboard, Board }
 import chess.variant.*
 
 import scala.collection.mutable.ArrayBuilder
@@ -137,7 +137,7 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
 
     Position.AndFullMoveNumber(
       Position(
-        BBoard(
+        Board(
           occupied = occupied,
           white = white,
           black = black,

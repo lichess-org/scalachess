@@ -1,8 +1,9 @@
 package chess
 package format
 
-import chess.bitboard.Board as BBoard
 import chess.variant.{ Crazyhouse, Variant }
+
+import bitboard.Board
 
 /** r bqkb r
   * p ppp pp
@@ -51,7 +52,7 @@ object Visual:
   def addNewLines(str: String) = "\n" + str + "\n"
 
   def createBoard(pieces: Iterable[(Square, Piece)], variant: Variant): Position =
-    val board        = BBoard.fromMap(pieces.toMap)
+    val board        = Board.fromMap(pieces.toMap)
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Position(
       board,

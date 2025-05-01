@@ -8,7 +8,7 @@ import scala.language.implicitConversions
 import format.{ FullFen, Fen, Uci, Visual }
 import format.pgn.PgnStr
 import variant.{ Chess960, Variant }
-import bitboard.Board as BBoard
+import bitboard.Board
 
 trait ChessTestCommon:
 
@@ -76,18 +76,18 @@ trait ChessTestCommon:
       crazyData: Option[Crazyhouse.Data],
       color: Option[Color]
   ): Position =
-    new Position(BBoard.fromMap(pieces), history.copy(crazyData = crazyData), variant, color.getOrElse(White))
+    new Position(Board.fromMap(pieces), history.copy(crazyData = crazyData), variant, color.getOrElse(White))
 
   def makeBoard(str: String, variant: Variant) =
     (Visual << str).withVariant(variant)
 
   def makeBoard: Position = Position.init(chess.variant.Standard, White)
 
-  def makeChess960Board(position: Int) = Position(BBoard.fromMap(Chess960.pieces(position)), Chess960, None)
+  def makeChess960Board(position: Int) = Position(Board.fromMap(Chess960.pieces(position)), Chess960, None)
   def makeChess960Game(position: Int)  = Game(makeChess960Board(position))
   def chess960Boards                   = (0 to 959).map(makeChess960Board).toList
 
-  def makeEmptyBoard: Position = Position(BBoard.empty, chess.variant.Standard, White.some)
+  def makeEmptyBoard: Position = Position(Board.empty, chess.variant.Standard, White.some)
 
   def makeGame: Game = Game(makeBoard)
 

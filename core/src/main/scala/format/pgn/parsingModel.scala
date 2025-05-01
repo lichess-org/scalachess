@@ -45,7 +45,7 @@ case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[
 
   private def initContext(tags: Tags): AndFullMoveNumber =
     val variant = tags.variant | chess.variant.Standard
-    def default = Position.AndFullMoveNumber(Position.init(variant, White), FullMoveNumber.initial)
+    def default = AndFullMoveNumber(Position.init(variant, White), FullMoveNumber.initial)
 
     tags.fen
       .flatMap(Fen.readWithMoveNumber(variant, _))
@@ -61,7 +61,7 @@ case class ParsedMainline[A](initialPosition: InitialComments, tags: Tags, sans:
 
 // Standard Algebraic Notation
 sealed trait San:
-  def apply(board: Position): Either[ErrorStr, MoveOrDrop]
+  def apply(position: Position): Either[ErrorStr, MoveOrDrop]
   def rawString: Option[String] = None
 
 case class Std(

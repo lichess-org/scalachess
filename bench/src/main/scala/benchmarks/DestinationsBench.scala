@@ -34,14 +34,14 @@ class DestinationsBench:
 
   @Setup
   def setup(): Unit =
-    threecheckInput = makeSituations(Perft.threeCheckPerfts, ThreeCheck, games)
-    antichessInput = makeSituations(Perft.antichessPerfts, Antichess, games)
-    atomicInput = makeSituations(Perft.atomicPerfts, Atomic, games)
-    crazyhouseInput = makeSituations(Perft.crazyhousePerfts, Crazyhouse, games)
-    racingkingsInput = makeSituations(Perft.racingkingsPerfts, RacingKings, games)
-    hordeInput = makeSituations(Perft.hordePerfts, Horde, games)
-    randomInput = makeSituations(Perft.randomPerfts, Chess960, games)
-    trickyInput = makeSituations(Perft.trickyPerfts, Chess960, games)
+    threecheckInput = makeBoards(Perft.threeCheckPerfts, ThreeCheck, games)
+    antichessInput = makeBoards(Perft.antichessPerfts, Antichess, games)
+    atomicInput = makeBoards(Perft.atomicPerfts, Atomic, games)
+    crazyhouseInput = makeBoards(Perft.crazyhousePerfts, Crazyhouse, games)
+    racingkingsInput = makeBoards(Perft.racingkingsPerfts, RacingKings, games)
+    hordeInput = makeBoards(Perft.hordePerfts, Horde, games)
+    randomInput = makeBoards(Perft.randomPerfts, Chess960, games)
+    trickyInput = makeBoards(Perft.trickyPerfts, Chess960, games)
 
   @Benchmark
   def threecheck(bh: Blackhole) =
@@ -81,7 +81,7 @@ class DestinationsBench:
       x.destinations
     bh.consume(x)
 
-  private def makeSituations(perfts: List[Perft], variant: Variant, games: Int): List[Board] =
+  private def makeBoards(perfts: List[Perft], variant: Variant, games: Int): List[Board] =
     perfts
       .take(games)
       .map(p => Fen.read(variant, p.epd).getOrElse(throw RuntimeException("boooo")))

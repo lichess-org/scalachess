@@ -62,18 +62,18 @@ class FenTest extends ChessTest:
     assertEquals(Fen.writeOpening(Fen.read(fen).get), fen)
 
   test("catsling rights with 2 rooks on the king side"):
-    val fen       = Fen.Full("4k3/8/8/8/8/8/8/4K1RR w K - 0 1")
-    val situation = Fen.read(Standard, fen).get
-    assertEquals(situation.history.unmovedRooks, UnmovedRooks(Square.H1.bl))
-    assertEquals(situation.history.castles, Castles(Square.H1.bl))
-    assertEquals(situation.legalMoves.filter(_.castles), Nil)
+    val fen   = Fen.Full("4k3/8/8/8/8/8/8/4K1RR w K - 0 1")
+    val board = Fen.read(Standard, fen).get
+    assertEquals(board.history.unmovedRooks, UnmovedRooks(Square.H1.bl))
+    assertEquals(board.history.castles, Castles(Square.H1.bl))
+    assertEquals(board.legalMoves.filter(_.castles), Nil)
 
   test("catsling rights with 2 rooks on the queen side"):
-    val fen       = Fen.Full("4k3/8/8/8/8/8/8/RR2K3 w Q - 0 1")
-    val situation = Fen.read(Standard, fen).get
-    assertEquals(situation.history.unmovedRooks, UnmovedRooks(Square.A1.bl))
-    assertEquals(situation.history.castles, Castles(Square.A1.bl))
-    assertEquals(situation.legalMoves.filter(_.castles), Nil)
+    val fen   = Fen.Full("4k3/8/8/8/8/8/8/RR2K3 w Q - 0 1")
+    val board = Fen.read(Standard, fen).get
+    assertEquals(board.history.unmovedRooks, UnmovedRooks(Square.A1.bl))
+    assertEquals(board.history.castles, Castles(Square.A1.bl))
+    assertEquals(board.legalMoves.filter(_.castles), Nil)
 
   test("castling rights with 2 rooks on the same side"):
     val f1 = Fen.Full("4k3/8/8/8/8/8/8/4K1RR w G -")
@@ -91,5 +91,5 @@ class FenTest extends ChessTest:
     val fen = Fen.Full("rnbqkbnr/pp1ppppp/2p5/8/3P1P2/8/PPP1P1PP/RNBQKBNR b KQkq - 0 2")
     List(Standard, Chess960, FromPosition, KingOfTheHill, ThreeCheck, Antichess, Atomic, Horde, RacingKings)
       .foreach: variant =>
-        val situation = Fen.read(variant, fen).get
-        assert(situation.history.crazyData.isEmpty)
+        val board = Fen.read(variant, fen).get
+        assert(board.history.crazyData.isEmpty)

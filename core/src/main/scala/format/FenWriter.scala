@@ -15,36 +15,36 @@ trait FenWriter:
   private given Ordering[File] = Ordering.by[File, Int](_.value)
   given Ordering[Square]       = Ordering.by[Square, File](_.file)
 
-  def write(situation: Situation): FullFen =
-    write(situation, FullMoveNumber(1))
+  def write(board: Board): FullFen =
+    write(board, FullMoveNumber(1))
 
-  def write(parsed: Situation.AndFullMoveNumber): FullFen =
-    write(parsed.situation, parsed.fullMoveNumber)
+  def write(parsed: Board.AndFullMoveNumber): FullFen =
+    write(parsed.board, parsed.fullMoveNumber)
 
   def write(game: Game): FullFen =
-    write(game.situation, game.ply.fullMoveNumber)
+    write(game.board, game.ply.fullMoveNumber)
 
-  def write(situation: Situation, fullMoveNumber: FullMoveNumber): FullFen = FullFen:
+  def write(board: Board, fullMoveNumber: FullMoveNumber): FullFen = FullFen:
     val builder = scala.collection.mutable.StringBuilder(80)
-    builder.append(writeBoard(situation))
-    builder.append(writeCrazyPocket(situation))
+    builder.append(writeBoard(board))
+    builder.append(writeCrazyPocket(board))
     builder.addOne(' ')
-    builder.addOne(situation.color.letter)
+    builder.addOne(board.color.letter)
     builder.addOne(' ')
-    builder.append(writeCastles(situation))
+    builder.append(writeCastles(board))
     builder.addOne(' ')
-    builder.append(situation.enPassantSquare.fold("-")(_.key))
+    builder.append(board.enPassantSquare.fold("-")(_.key))
     builder.addOne(' ')
-    builder.append(situation.history.halfMoveClock)
+    builder.append(board.history.halfMoveClock)
     builder.addOne(' ')
     builder.append(fullMoveNumber)
-    if situation.variant == variant.ThreeCheck then
+    if board.variant == variant.ThreeCheck then
       builder.addOne(' ')
-      builder.append(writeCheckCount(situation))
+      builder.append(writeCheckCount(board))
     builder.toString
 
-  def writeOpening(situation: Situation): StandardFen = StandardFen:
-    s"${writeBoard(situation)} ${situation.color.letter} ${writeCastles(situation)} ${situation.enPassantSquare
+  def writeOpening(board: Board): StandardFen = StandardFen:
+    s"${writeBoard(board)} ${board.color.letter} ${writeCastles(board)} ${board.enPassantSquare
         .fold("-")(_.key)}"
 
   def writeBoard(board: Board): BoardFen =
@@ -66,8 +66,8 @@ trait FenWriter:
       if y > Rank.First then fen.append('/')
     BoardFen(fen.toString)
 
-  def writeBoardAndColor(situation: Situation): BoardAndColorFen =
-    writeBoardAndColor(situation, situation.color)
+  def writeBoardAndColor(board: Board): BoardAndColorFen =
+    writeBoardAndColor(board, board.color)
 
   def writeBoardAndColor(board: Board, turnColor: Color): BoardAndColorFen =
     writeBoard(board).andColor(turnColor)

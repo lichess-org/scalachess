@@ -18,24 +18,24 @@ case object Atomic
 
   def pieces = Standard.pieces
 
-  def validMoves(situation: Situation): List[Move] =
-    import situation.{ genNonKing, genEnPassant, us, board }
+  def validMoves(board: Board): List[Move] =
+    import board.{ genNonKing, genEnPassant, us }
     val targets = ~us
-    val moves   = genNonKing(targets) ++ genKing(situation, targets) ++ genEnPassant(us & board.pawns)
+    val moves   = genNonKing(targets) ++ genKing(board, targets) ++ genEnPassant(us & board.pawns)
     moves.map(explodeSurroundingPieces).filter(kingSafety)
 
-  private def genKing(situation: Situation, mask: Bitboard) =
-    import situation.{ genUnsafeKing, genCastling }
-    situation.ourKing.fold(Nil): king =>
+  private def genKing(board: Board, mask: Bitboard) =
+    import board.{ genUnsafeKing, genCastling }
+    board.ourKing.fold(Nil): king =>
       genCastling(king) ++ genUnsafeKing(king, mask)
 
   /** Move threatens to explode the opponent's king */
-  private def explodesOpponentKing(situation: Situation)(move: Move): Boolean =
-    move.captures && (situation.them & situation.board.kings).intersects(move.dest.kingAttacks)
+  private def explodesOpponentKing(board: Board)(move: Move): Boolean =
+    move.captures && (board.them & board.kings).intersects(move.dest.kingAttacks)
 
   /** Move threatens to illegally explode our own king */
-  private def explodesOwnKing(situation: Situation)(move: Move): Boolean =
-    move.captures && (situation.us & situation.board.kings).intersects(move.dest.kingAttacks)
+  private def explodesOwnKing(board: Board)(move: Move): Boolean =
+    move.captures && (board.us & board.kings).intersects(move.dest.kingAttacks)
 
   /** In atomic chess, a king cannot be threatened while it is in the perimeter of the other king as were the other player
     * to capture it, their own king would explode. This effectively makes a king invincible while connected with another
@@ -59,8 +59,8 @@ case object Atomic
   // moves exploding opponent king are always playable
   override def kingSafety(m: Move): Boolean =
     (kingThreatened(m.after.board, m.color).no ||
-      explodesOpponentKing(m.situationBefore)(m))
-      && !explodesOwnKing(m.situationBefore)(m)
+      explodesOpponentKing(m.boardBefore)(m))
+      && !explodesOwnKing(m.boardBefore)(m)
 
   override def castleCheckSafeSquare(board: Board, king: Square, color: Color, occupied: Bitboard): Boolean =
     king.kingAttacks.intersects(board.kingOf(!color)) ||
@@ -131,8 +131,8 @@ case object Atomic
     * a piece in the opponent's king's proximity. On the other hand, a king alone or a king with
     * immobile pawns is not sufficient material to win with.
     */
-  override def opponentHasInsufficientMaterial(situation: Board) =
-    situation.board.kingsOnlyOf(!situation.color)
+  override def opponentHasInsufficientMaterial(board: Board) =
+    board.kingsOnlyOf(!board.color)
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
-  override def specialEnd(situation: Board) = situation.board.kings.count < 2
+  override def specialEnd(board: Board) = board.kings.count < 2

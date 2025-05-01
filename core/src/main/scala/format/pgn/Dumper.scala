@@ -3,7 +3,7 @@ package format.pgn
 
 object Dumper:
 
-  def apply(situation: Situation, data: chess.Move, next: Situation): SanStr =
+  def apply(board: Board, data: chess.Move, next: Board): SanStr =
     import data.*
     import bitboard.Bitboard.*
 
@@ -25,10 +25,10 @@ object Dumper:
         //       - rank
         //       - both (only happens w/ at least 3 pieces of the same role)
         // We know Role ≠ Pawn, so it is fine to always pass None as promotion target
-        val candidates = (situation.board.byPiece(piece) ^ orig.bl)
+        val candidates = (board.byPiece(piece) ^ orig.bl)
           .filter(square =>
-            piece.eyes(square, dest, situation.board.occupied) && {
-              situation.move(square, dest, None).isRight
+            piece.eyes(square, dest, board.occupied) && {
+              board.move(square, dest, None).isRight
             }
           )
 
@@ -43,16 +43,16 @@ object Dumper:
 
     SanStr(s"$base${checkOrWinnerSymbol(next)}")
 
-  def apply(data: chess.Drop, next: Situation): SanStr =
+  def apply(data: chess.Drop, next: Board): SanStr =
     SanStr(s"${data.toUci.uci}${checkOrWinnerSymbol(next)}")
 
   def apply(data: chess.Move): SanStr =
-    apply(data.situationBefore, data, data.situationAfter)
+    apply(data.boardBefore, data, data.boardAfter)
 
   def apply(data: chess.Drop): SanStr =
-    apply(data, data.situationAfter)
+    apply(data, data.boardAfter)
 
-  private def checkOrWinnerSymbol(next: Situation): String =
+  private def checkOrWinnerSymbol(next: Board): String =
     if next.winner.isDefined then "#"
     else if next.check.yes then "+"
     else ""

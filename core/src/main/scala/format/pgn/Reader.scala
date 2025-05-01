@@ -29,7 +29,7 @@ object Reader:
   private def makeReplay(game: Game, sans: Sans): Result =
     sans.value.zipWithIndex
       .foldM(Replay(game)) { case (replay, (san, index)) =>
-        san(replay.state.situation).bimap(_ => (replay, makeError(game.ply + index, san)), replay.addMove(_))
+        san(replay.state.board).bimap(_ => (replay, makeError(game.ply + index, san)), replay.addMove(_))
       }
       .match
         case Left(replay, err) => Result(replay, err.some)

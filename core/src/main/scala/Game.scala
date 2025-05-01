@@ -4,15 +4,15 @@ import chess.format.pgn.SanStr
 import chess.format.{ Fen, Uci, pgn }
 
 case class Game(
-    situation: Board,
+    board: Board,
     sans: Vector[SanStr] = Vector(),
     clock: Option[Clock] = None,
     ply: Ply = Ply.initial, // plies
     startedAtPly: Ply = Ply.initial
 ):
 
-  export situation.{ color as player, variant, history }
-  export situation.history.halfMoveClock
+  export board.{ color as player, variant, history }
+  export board.history.halfMoveClock
 
   def apply(
       orig: Square,
@@ -28,7 +28,7 @@ case class Game(
       promotion: Option[PromotableRole] = None,
       metrics: MoveMetrics = MoveMetrics.empty
   ): Either[ErrorStr, (Clock.WithCompensatedLag[Game], Move)] =
-    situation
+    board
       .move(orig, dest, promotion)
       .map(_.normalizeCastle.withMetrics(metrics))
       .map(move => applyWithCompensated(move) -> move)
@@ -36,12 +36,12 @@ case class Game(
   def apply(move: Move): Game = applyWithCompensated(move).value
 
   def applyWithCompensated(move: Move): Clock.WithCompensatedLag[Game] =
-    val newSituation = move.situationAfter
-    val newClock     = applyClock(move.metrics, newSituation.status.isEmpty)
+    val newBoard = move.boardAfter
+    val newClock = applyClock(move.metrics, newBoard.status.isEmpty)
 
     Clock.WithCompensatedLag(
       copy(
-        situation = newSituation,
+        board = newBoard,
         ply = ply + 1,
         sans = sans :+ move.toSanStr,
         clock = newClock.map(_.value)
@@ -54,15 +54,15 @@ case class Game(
       square: Square,
       metrics: MoveMetrics = MoveMetrics.empty
   ): Either[ErrorStr, (Game, Drop)] =
-    situation.drop(role, square).map(_.withMetrics(metrics)).map(drop => applyDrop(drop) -> drop)
+    board.drop(role, square).map(_.withMetrics(metrics)).map(drop => applyDrop(drop) -> drop)
 
   def applyDrop(drop: Drop): Game =
-    val newSituation = drop.situationAfter
+    val newBoard = drop.boardAfter
     copy(
-      situation = newSituation,
+      board = newBoard,
       ply = ply + 1,
       sans = sans :+ drop.toSanStr,
-      clock = applyClock(drop.metrics, newSituation.status.isEmpty).map(_.value)
+      clock = applyClock(drop.metrics, newBoard.status.isEmpty).map(_.value)
     )
 
   private def applyClock(
@@ -83,11 +83,11 @@ case class Game(
 
   inline def fullMoveNumber: FullMoveNumber = ply.fullMoveNumber
 
-  inline def withBoard(inline b: Board): Game = copy(situation = b)
+  inline def withBoard(inline b: Board): Game = copy(board = b)
 
-  inline def updateBoard(inline f: Board => Board): Game = withBoard(f(situation))
+  inline def updateBoard(inline f: Board => Board): Game = withBoard(f(board))
 
-  inline def withPlayer(c: Color): Game = copy(situation = situation.copy(color = c))
+  inline def withPlayer(c: Color): Game = copy(board = board.copy(color = c))
 
   inline def withTurns(t: Ply): Game = copy(ply = t)
 
@@ -103,10 +103,10 @@ object Game:
       .flatMap(format.Fen.readWithMoveNumber(variant, _))
       .fold(g): parsed =>
         g.copy(
-          situation = parsed.situation
+          board = parsed.board
             .withVariant(g.variant)
-            .withCrazyData(parsed.situation.crazyData.orElse(g.situation.crazyData))
-            .withColor(parsed.situation.color),
+            .withCrazyData(parsed.board.crazyData.orElse(g.board.crazyData))
+            .withColor(parsed.board.color),
           ply = parsed.ply,
           startedAtPly = parsed.ply
         )

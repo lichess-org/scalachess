@@ -2,7 +2,7 @@ package chess
 package format.pgn
 
 import cats.syntax.all.*
-import chess.Situation.AndFullMoveNumber
+import chess.Board.AndFullMoveNumber
 import chess.format.Fen
 
 // We don't support variation without move now,
@@ -18,11 +18,11 @@ case class PgnNodeData(
 ):
   export metas.*
 
-  private[pgn] def toMove(context: Situation): Option[(Situation, Move)] =
+  private[pgn] def toMove(context: Board): Option[(Board, Move)] =
     san(context).toOption
       .map(x =>
         (
-          x.situationAfter,
+          x.boardAfter,
           Move(
             san = x.toSanStr,
             comments = comments,
@@ -41,17 +41,17 @@ case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[
 
   def toPgn: Pgn =
     val sitWithMove = initContext(tags)
-    Pgn(tags, initialPosition, treeToPgn(sitWithMove.situation), sitWithMove.ply.next)
+    Pgn(tags, initialPosition, treeToPgn(sitWithMove.board), sitWithMove.ply.next)
 
   private def initContext(tags: Tags): AndFullMoveNumber =
     val variant = tags.variant | chess.variant.Standard
-    def default = Situation.AndFullMoveNumber(Board.init(variant, White), FullMoveNumber.initial)
+    def default = Board.AndFullMoveNumber(Board.init(variant, White), FullMoveNumber.initial)
 
     tags.fen
       .flatMap(Fen.readWithMoveNumber(variant, _))
       .getOrElse(default)
 
-  private def treeToPgn(context: Situation): Option[Node[Move]] =
+  private def treeToPgn(context: Board): Option[Node[Move]] =
     tree.flatMap:
       _.mapAccumlOption_(context): (ctx, d) =>
         d.toMove(ctx)
@@ -61,7 +61,7 @@ case class ParsedMainline[A](initialPosition: InitialComments, tags: Tags, sans:
 
 // Standard Algebraic Notation
 sealed trait San:
-  def apply(situation: Situation): Either[ErrorStr, MoveOrDrop]
+  def apply(board: Board): Either[ErrorStr, MoveOrDrop]
   def rawString: Option[String] = None
 
 case class Std(
@@ -74,12 +74,12 @@ case class Std(
     override val rawString: Option[String] = None
 ) extends San:
 
-  def apply(situation: Situation): Either[ErrorStr, chess.Move] =
-    situation.board
-      .byPiece(situation.color, role)
+  def apply(board: Board): Either[ErrorStr, chess.Move] =
+    board
+      .byPiece(board.color, role)
       .first: square =>
         if compare(file, square.file) && compare(rank, square.rank)
-        then situation.generateMovesAt(square).find(_.dest == dest)
+        then board.generateMovesAt(square).find(_.dest == dest)
         else None
       .toRight(ErrorStr(s"Cannot play $this"))
       .flatMap(_.withPromotion(promotion).toRight(ErrorStr("Wrong promotion")))
@@ -90,14 +90,14 @@ case class Std(
 
 case class Drop(role: Role, square: Square, override val rawString: Option[String] = None) extends San:
 
-  def apply(situation: Situation): Either[ErrorStr, chess.Drop] =
-    situation.drop(role, square)
+  def apply(board: Board): Either[ErrorStr, chess.Drop] =
+    board.drop(role, square)
 
 case class Castle(side: Side, override val rawString: Option[String] = None) extends San:
 
-  def apply(situation: Situation): Either[ErrorStr, chess.Move] =
+  def apply(board: Board): Either[ErrorStr, chess.Move] =
 
-    import situation.{ genCastling, ourKing, variant }
+    import board.{ genCastling, ourKing, variant }
     if !variant.allowsCastling then ErrorStr(s"Cannot castle in $variant").asLeft
     else
       ourKing

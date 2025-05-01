@@ -20,33 +20,33 @@ class HashBench:
   // the unit of CPU work per iteration
   private val Work: Long = 10
 
-  var situations: List[Board] = scala.compiletime.uninitialized
+  var boards: List[Board] = scala.compiletime.uninitialized
 
   @Setup
   def setup() =
     val results = for
       results <- Fixtures.gamesForPerfTest.traverse(Reader.full(_))
       replays <- results.traverse(_.valid)
-    yield replays.flatMap(_.moves).map(_.situationAfter)
-    situations = results.toOption.get
+    yield replays.flatMap(_.moves).map(_.boardAfter)
+    boards = results.toOption.get
 
   @Benchmark
   def hashes(bh: Blackhole) =
-    val result = situations.map: x =>
+    val result = boards.map: x =>
       Blackhole.consumeCPU(Work)
       Hash(x)
     bh.consume(result)
 
   @Benchmark
   def repetition5(bh: Blackhole) =
-    val result = situations.map: x =>
+    val result = boards.map: x =>
       Blackhole.consumeCPU(Work)
       x.history.fivefoldRepetition
     bh.consume(result)
 
   @Benchmark
   def repetition3(bh: Blackhole) =
-    val result = situations.map: x =>
+    val result = boards.map: x =>
       Blackhole.consumeCPU(Work)
       x.history.threefoldRepetition
     bh.consume(result)

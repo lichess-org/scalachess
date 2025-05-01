@@ -16,16 +16,16 @@ trait FromMove[A]:
 
 object ChessTreeArbitraries:
 
-  def genSituations(seed: Board): Gen[LazyList[Board]] =
+  def genBoards(seed: Board): Gen[LazyList[Board]] =
     if seed.end then Gen.const(LazyList(seed))
     else
       for
-        situation  <- Gen.oneOf(seed.legalMoves.map(_.situationAfter))
-        situations <- genSituations(situation)
-      yield situation #:: situations
+        board  <- Gen.oneOf(seed.legalMoves.map(_.boardAfter))
+        boards <- genBoards(board)
+      yield board #:: boards
 
   def genMainline(seed: Board): Gen[Node[Board]] =
-    genSituations(seed).map(Tree.build(_).get)
+    genBoards(seed).map(Tree.build(_).get)
 
   def genPgn(seed: Board): Gen[Pgn] =
     for
@@ -69,16 +69,16 @@ object ChessTreeArbitraries:
     yield comments
 
   given Generator[Board] with
-    extension (situation: Board) def next = pickSome(situation.legalMoves.map(_.situationAfter))
+    extension (board: Board) def next = pickSome(board.legalMoves.map(_.boardAfter))
 
   given Generator[Move] with
-    extension (move: Move) def next = pickSome(move.situationAfter.legalMoves)
+    extension (move: Move) def next = pickSome(move.boardAfter.legalMoves)
 
   given [A](using FromMove[A]): Generator[WithMove[A]] with
     extension (move: WithMove[A])
       def next: Gen[List[WithMove[A]]] =
         for
-          variations <- pickSome(move.move.situationAfter.legalMoves)
+          variations <- pickSome(move.move.boardAfter.legalMoves)
           nextMoves  <- variations.traverse(_.next(move.data.some))
         yield nextMoves
 

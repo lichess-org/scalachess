@@ -50,10 +50,10 @@ abstract class Variant private[variant] (
       case Some(Queen | Rook | Knight | Bishop) => true
       case _                                    => false
 
-  def validMoves(situation: Situation): List[Move]
+  def validMoves(board: Board): List[Move]
 
   def pieceThreatened(board: Board, by: Color, to: Square): Boolean =
-    board.board.attacks(to, by)
+    board.attacks(to, by)
 
   def kingThreatened(board: BBoard, color: Color): Check =
     board.isCheck(color)
@@ -68,21 +68,21 @@ abstract class Variant private[variant] (
     kingThreatened(m.after.board, m.color).no
 
   def castleCheckSafeSquare(board: Board, kingTo: Square, color: Color, occupied: Bitboard): Boolean =
-    board.board.attackers(kingTo, !color, occupied).isEmpty
+    board.attackers(kingTo, !color, occupied).isEmpty
 
   def move(
-      situation: Situation,
+      board: Board,
       from: Square,
       to: Square,
       promotion: Option[PromotableRole]
   ): Either[ErrorStr, Move] =
     // Find the move in the variant specific list of valid moves
     def findMove(from: Square, to: Square) =
-      situation.generateMovesAt(from).find(_.dest == to)
+      board.generateMovesAt(from).find(_.dest == to)
 
     for
-      piece <- situation.board(from).toRight(ErrorStr(s"No piece on ${from.key}"))
-      _     <- Either.cond(piece.color == situation.color, piece, ErrorStr(s"Not my piece on ${from.key}"))
+      piece <- board(from).toRight(ErrorStr(s"No piece on ${from.key}"))
+      _     <- Either.cond(piece.color == board.color, piece, ErrorStr(s"Not my piece on ${from.key}"))
       m1    <- findMove(from, to).toRight(ErrorStr(s"Piece on ${from.key} cannot move to ${to.key}"))
       m2 <- m1
         .withPromotion(promotion)
@@ -94,21 +94,21 @@ abstract class Variant private[variant] (
       )
     yield m3
 
-  def drop(situation: Situation, role: Role, square: Square): Either[ErrorStr, Drop] =
+  def drop(board: Board, role: Role, square: Square): Either[ErrorStr, Drop] =
     ErrorStr(s"$this variant cannot drop $role $square").asLeft
 
-  def staleMate(situation: Board): Boolean = situation.check.no && situation.legalMoves.isEmpty
+  def staleMate(board: Board): Boolean = board.check.no && board.legalMoves.isEmpty
 
-  def checkmate(situation: Board): Boolean = situation.check.yes && situation.legalMoves.isEmpty
+  def checkmate(board: Board): Boolean = board.check.yes && board.legalMoves.isEmpty
 
   // In most variants, the winner is the last player to have played and there is a possibility of either a traditional
   // checkmate or a variant end condition
-  def winner(situation: Board): Option[Color] =
-    if situation.checkMate || specialEnd(situation) then Option(!situation.color) else None
+  def winner(board: Board): Option[Color] =
+    if board.checkMate || specialEnd(board) then Option(!board.color) else None
 
-  def specialEnd(situation: Board): Boolean = false
+  def specialEnd(board: Board): Boolean = false
 
-  def specialDraw(situation: Board): Boolean = false
+  def specialDraw(board: Board): Boolean = false
 
   def autoDraw(board: Board): Boolean =
     isInsufficientMaterial(board) || fiftyMoves(board.history) || board.history.fivefoldRepetition
@@ -130,8 +130,8 @@ abstract class Variant private[variant] (
     * side to move times out or disconnects. Instead of losing on time,
     * the game should be drawn.
     */
-  def opponentHasInsufficientMaterial(situation: Board): Boolean =
-    InsufficientMatingMaterial(situation, !situation.color)
+  def opponentHasInsufficientMaterial(board: Board): Boolean =
+    InsufficientMatingMaterial(board, !board.color)
 
   def fiftyMoves(history: History): Boolean = history.halfMoveClock >= HalfMoveClock(100)
 
@@ -154,8 +154,8 @@ abstract class Variant private[variant] (
       !pawnsOnPromotionRank(board, color) &&
       !pawnsOnBackRank(board, color)
 
-  def valid(situation: Board, strict: Boolean): Boolean =
-    Color.all.forall(validSide(situation, strict))
+  def valid(board: Board, strict: Boolean): Boolean =
+    Color.all.forall(validSide(board, strict))
 
   val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
 

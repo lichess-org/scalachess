@@ -325,7 +325,7 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
           piece = color.pawn,
           orig = orig,
           dest = dest,
-          situationBefore = this,
+          boardBefore = this,
           after = after,
           capture = capture.some,
           castle = None,
@@ -344,7 +344,7 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
         piece = Piece(color, role),
         orig = orig,
         dest = dest,
-        situationBefore = this,
+        boardBefore = this,
         after = board,
         capture = taken,
         castle = None,
@@ -366,7 +366,7 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
           piece = color.pawn,
           orig = orig,
           dest = dest,
-          situationBefore = this,
+          boardBefore = this,
           after = board,
           capture = taken,
           castle = None,
@@ -407,7 +407,7 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
       piece = color.king,
       orig = king,
       dest = inputKingSquare,
-      situationBefore = this,
+      boardBefore = this,
       after = a,
       capture = None,
       castle = Move.Castle(king, kingTo, rook, rookTo).some,
@@ -417,8 +417,8 @@ case class Board(board: BBoard, history: History, variant: Variant, color: Color
 
 object Board:
 
-  case class AndFullMoveNumber(situation: Board, fullMoveNumber: FullMoveNumber):
-    def ply = fullMoveNumber.ply(situation.color)
+  case class AndFullMoveNumber(board: Board, fullMoveNumber: FullMoveNumber):
+    def ply = fullMoveNumber.ply(board.color)
 
   def apply(
       pieces: PieceMap,

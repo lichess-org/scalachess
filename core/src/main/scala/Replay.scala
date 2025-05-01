@@ -53,7 +53,7 @@ object Replay:
           Parser
             .san(str)
             .flatMap: san =>
-              san(head.situation)
+              san(head.board)
                 .bimap(
                   _ => Reader.makeError(init.ply + index, san),
                   { move =>
@@ -91,14 +91,14 @@ object Replay:
     ucis match
       case Nil => replay.asRight
       case uci :: rest =>
-        uci(replay.state.situation) match
+        uci(replay.state.board) match
           case Left(err) => err.asLeft
           case Right(md) => computeReplay(replay.addMove(md), rest)
 
   private def initialFenToBoard(initialFen: Option[Fen.Full], variant: Variant): Board =
     (initialFen.flatMap(Fen.read) | Board(variant)).withVariant(variant)
 
-  def situations(
+  def boards(
       sans: Iterable[SanStr],
       initialFen: Option[Fen.Full],
       variant: Variant
@@ -109,7 +109,7 @@ object Replay:
       .flatMap: moves =>
         computeBoards(sit, moves.value, _.apply)
 
-  def situationsFromUci(
+  def boardsFromUci(
       moves: List[Uci],
       initialFen: Option[Fen.Full],
       variant: Variant

@@ -18,9 +18,9 @@ sealed trait MoveOrDrop:
 
   def finalizeAfter: Board
 
-  def situationBefore: Board
+  def boardBefore: Board
 
-  def situationAfter: Board
+  def boardAfter: Board
 
   def toUci: Uci
 
@@ -35,7 +35,7 @@ case class Move(
     piece: Piece,
     orig: Square,
     dest: Square,
-    situationBefore: Board,
+    boardBefore: Board,
     after: Board,
     capture: Option[Square],
     promotion: Option[PromotableRole],
@@ -44,7 +44,7 @@ case class Move(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  def situationAfter: Board = finalizeAfter.withColor(!piece.color)
+  def boardAfter: Board     = finalizeAfter.withColor(!piece.color)
   lazy val toSanStr: SanStr = format.pgn.Dumper(this)
 
   // TODO rethink about how handle castling
@@ -101,14 +101,14 @@ case class Move(
         h2.withCastles(castleRights).copy(unmovedRooks = unmovedRooks)
       },
       toUci,
-      capture.flatMap(situationBefore(_))
+      capture.flatMap(boardBefore(_))
     )
 
     // Update position hashes last, only after updating the board,
     // castling rights and en-passant rights.
     board.updateHistory { h =>
       lazy val positionHashesOfBoardBefore =
-        if h.positionHashes.isEmpty then PositionHash(Hash(situationBefore)) else h.positionHashes
+        if h.positionHashes.isEmpty then PositionHash(Hash(boardBefore)) else h.positionHashes
       val resetsPositionHashes = board.variant.isIrreversible(this)
       val basePositionHashes =
         if resetsPositionHashes then PositionHash.empty else positionHashesOfBoardBefore
@@ -132,7 +132,7 @@ case class Move(
     op.fold(this.some)(withPromotion)
 
   def withPromotion(p: PromotableRole): Option[Move] =
-    if after.count(color.queen) > situationBefore.count(color.queen) then
+    if after.count(color.queen) > boardBefore.count(color.queen) then
       for
         b2 <- after.take(dest)
         b3 <- b2.place(color - p, dest)
@@ -157,13 +157,13 @@ object Move:
 case class Drop(
     piece: Piece,
     square: Square,
-    situationBefore: Board,
+    boardBefore: Board,
     after: Board,
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  inline def before: Board  = situationBefore
-  def situationAfter: Board = finalizeAfter.withColor(!piece.color)
+  inline def before: Board  = boardBefore
+  def boardAfter: Board     = finalizeAfter.withColor(!piece.color)
   lazy val toSanStr: SanStr = format.pgn.Dumper(this)
 
   lazy val finalizeAfter: Board =
@@ -181,7 +181,7 @@ case class Drop(
 
     board.updateHistory { h =>
       val basePositionHashes =
-        if h.positionHashes.value.isEmpty then PositionHash(Hash(situationBefore)) else h.positionHashes
+        if h.positionHashes.value.isEmpty then PositionHash(Hash(boardBefore)) else h.positionHashes
       h.copy(positionHashes = PositionHash(Hash(board.withColor(!piece.color))).combine(basePositionHashes))
     }
 

@@ -41,5 +41,5 @@ class InsufficientMaterialBench:
 
   @Benchmark
   def horde() =
-    hordeGames.map: situation =>
-      situation.variant.isInsufficientMaterial(situation)
+    hordeGames.map: board =>
+      board.variant.isInsufficientMaterial(board)

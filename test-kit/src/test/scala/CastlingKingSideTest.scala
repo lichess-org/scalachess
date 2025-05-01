@@ -24,7 +24,7 @@ RQK   R """.chess960.updateHistory(_ => castleHistory(White, kingSide = true, qu
     assertEquals(board960.place(White.knight, F1).flatMap(_.destsFrom(C1)), Set(D1))
   test("possible"):
     val game = Game(goodHist)
-    assertEquals(game.situation.destsFrom(E1), Set(F1, G1, H1))
+    assertEquals(game.board.destsFrom(E1), Set(F1, G1, H1))
     assertGame(
       game.playMove(E1, G1).get,
       """
@@ -71,7 +71,7 @@ p pppppp
 
  K""".chess960.withColor(Black)
     )
-    assertEquals(game.situation.destsFrom(E8), Set(D8, F8))
+    assertEquals(game.board.destsFrom(E8), Set(D8, F8))
     assertGame(
       game.playMove(E8, D8).get,
       """
@@ -98,4 +98,4 @@ KNQRB""",
         FromPosition
       ).withColor(Black)
     )
-    assertEquals(game.situation.destsFrom(B8), Set(A8, C8, E8))
+    assertEquals(game.board.destsFrom(B8), Set(A8, C8, E8))

@@ -35,35 +35,35 @@ case object Horde
     "rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1"
   )
 
-  def validMoves(situation: Board): List[Move] =
-    import situation.{ genEnPassant, genNonKing, isWhiteTurn, us, board }
+  def validMoves(board: Board): List[Move] =
+    import board.{ genEnPassant, genNonKing, isWhiteTurn, us }
     if isWhiteTurn then genEnPassant(us & board.pawns) ++ genNonKing(~us & ~board.kings)
-    else Standard.validMoves(situation)
+    else Standard.validMoves(board)
 
-  override def valid(situation: Board, strict: Boolean): Boolean =
-    situation.board.kingOf(White).isEmpty
-      && validSide(situation, strict)(Black)
-      && !pawnsOnPromotionRank(situation, White)
-      && (!strict || situation.color.white || Standard.hasValidCheckers(situation))
+  override def valid(board: Board, strict: Boolean): Boolean =
+    board.board.kingOf(White).isEmpty
+      && validSide(board, strict)(Black)
+      && !pawnsOnPromotionRank(board, White)
+      && (!strict || board.color.white || Standard.hasValidCheckers(board))
 
   /** The game has a special end condition when black manages to capture all of white's pawns */
-  override def specialEnd(situation: Board): Boolean =
-    situation.board.white.isEmpty
+  override def specialEnd(board: Board): Boolean =
+    board.board.white.isEmpty
 
   /** Any vs K + any where horde is stalemated and only king can move is a fortress draw
     * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
     * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
     */
-  private def hordeClosedPosition(situation: Board): Boolean =
-    val hordeSquare = situation.board.byColor(White)
+  private def hordeClosedPosition(board: Board): Boolean =
+    val hordeSquare = board.board.byColor(White)
     val mateInOne = hordeSquare.count == 1 &&
-      hordeSquare.singleSquare.exists(pieceThreatened(situation, Color.black, _))
+      hordeSquare.singleSquare.exists(pieceThreatened(board, Color.black, _))
     !mateInOne && {
-      if situation.isWhiteTurn then situation.legalMoves.isEmpty
+      if board.isWhiteTurn then board.legalMoves.isEmpty
       else
-        val legalMoves = validMoves(situation)
+        val legalMoves = validMoves(board)
         legalMoves.filter(_.piece.role != King).isEmpty &&
-        legalMoves.filter(_.piece.role == King).forall(move => validMoves(move.situationAfter).isEmpty)
+        legalMoves.filter(_.piece.role == King).forall(move => validMoves(move.boardAfter).isEmpty)
     }
 
   /** In horde chess, black can win unless a fortress stalemate is unavoidable.
@@ -77,8 +77,8 @@ case object Horde
     * Technically there are some positions where stalemate is unavoidable which
     * this method does not detect; however, such are trivial to premove.
     */
-  override def opponentHasInsufficientMaterial(situation: Board): Boolean =
-    hasInsufficientMaterial(situation, !situation.color) || hordeClosedPosition(situation)
+  override def opponentHasInsufficientMaterial(board: Board): Boolean =
+    hasInsufficientMaterial(board, !board.color) || hordeClosedPosition(board)
 
   extension (board: Board)
     def hasBishopPair: Color => Boolean = side =>

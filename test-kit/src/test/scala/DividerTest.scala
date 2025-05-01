@@ -7,7 +7,7 @@ class DividerTest extends ChessTest:
   def makeReplay(moves: String) =
     format.pgn.Reader.full(moves).get match
       case format.pgn.Reader.Result(replay, None) =>
-        replay.chronoMoves.map(_.fold(_.situationBefore, _.situationBefore))
+        replay.chronoMoves.map(_.fold(_.boardBefore, _.boardBefore))
       case x => sys.error(s"Unexpected incomplete replay $x")
 
   test("the divider finds middlegame and endgame: game1"):

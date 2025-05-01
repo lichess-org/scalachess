@@ -14,5 +14,5 @@ case object FromPosition
 
   def pieces = Standard.pieces
 
-  def validMoves(situation: Board): List[Move] =
-    Standard.validMoves(situation)
+  def validMoves(board: Board): List[Move] =
+    Standard.validMoves(board)

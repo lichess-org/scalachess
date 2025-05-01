@@ -28,10 +28,10 @@ class InsufficientMatingMaterialTest extends ChessTest:
     ).map(FullFen(_))
 
     trues.foreach: fen =>
-      assert(bishopsOnOppositeColors(fenToGame(fen, Standard).situation))
+      assert(bishopsOnOppositeColors(fenToGame(fen, Standard).board))
 
     falses.foreach: fen =>
-      assertNot(bishopsOnOppositeColors(fenToGame(fen, Standard).situation))
+      assertNot(bishopsOnOppositeColors(fenToGame(fen, Standard).board))
 
   // Determines whether a color does not have mating material.
   test("apply with board and color"):
@@ -59,9 +59,9 @@ class InsufficientMatingMaterialTest extends ChessTest:
     ).map(FullFen(_))
 
     trues.foreach: fen =>
-      val sit = fenToGame(fen, Standard).situation
+      val sit = fenToGame(fen, Standard).board
       assert(apply(sit, !sit.color))
 
     falses.foreach: fen =>
-      val sit = fenToGame(fen, Standard).situation
+      val sit = fenToGame(fen, Standard).board
       assertNot(apply(sit, !sit.color))

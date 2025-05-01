@@ -18,10 +18,10 @@ class BoardTest extends ChessTest:
   test("generateMovesAt(square) = generateMoves.filter(_.orig == square)"):
     for
       fen <- FenFixtures.fens
-      situation = Fen.read(fen).getOrElse(throw RuntimeException("boooo"))
+      board = Fen.read(fen).getOrElse(throw RuntimeException("boooo"))
       sq <- Square.all
-      legalMoves   = situation.legalMoves.filter(_.orig == sq)
-      legalMovesAt = situation.generateMovesAt(sq)
+      legalMoves   = board.legalMoves.filter(_.orig == sq)
+      legalMovesAt = board.generateMovesAt(sq)
     yield assertEquals(legalMoves.toSet, legalMovesAt.toSet)
 
   test("discard an empty square returns the same board"):

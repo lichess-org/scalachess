@@ -16,7 +16,7 @@ object UnmovedRooks:
 
   // guess unmovedRooks from board
   // we assume rooks are on their initial position
-  def from(board: Position): UnmovedRooks =
+  def from(board: Board): UnmovedRooks =
     val wr = board.rooks & board.white & Bitboard.rank(White.backRank)
     val br = board.rooks & board.black & Bitboard.rank(Black.backRank)
     UnmovedRooks(wr | br)

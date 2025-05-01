@@ -17,9 +17,10 @@ case object KingOfTheHill
   def validMoves(board: Position): List[Move] =
     Standard.validMoves(board)
 
-  override def valid(board: Position, strict: Boolean): Boolean = Standard.valid(board, strict)
+  override def valid(board: Position, strict: Boolean): Boolean =
+    Standard.valid(board, strict)
 
-  override def specialEnd(board: Position) =
+  override def specialEnd(board: Position): Boolean =
     board.kingOf(!board.color).intersects(Bitboard.center)
 
   /** You only need a king to be able to win in this variant

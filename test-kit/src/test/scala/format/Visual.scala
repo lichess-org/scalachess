@@ -20,7 +20,7 @@ object Visual:
       case 8          => lines
       case n if n > 8 => lines.slice(1, 9)
       case n          => (List.fill(8 - n)("")) ::: lines
-    val b = createBoard(
+    val p = createPosition(
       pieces = (for
         (l, y) <- filtered.zipWithIndex
         (c, x) <- l.zipWithIndex
@@ -30,7 +30,7 @@ object Visual:
       }).flatten,
       variant = chess.variant.Variant.default
     )
-    b.updateHistory(_ => History(unmovedRooks = UnmovedRooks.from(b), crazyData = None))
+    p.updateHistory(_ => History(unmovedRooks = UnmovedRooks.from(p.board), crazyData = None))
 
   def >>(board: Position): String = >>|(board, Map.empty)
 
@@ -49,7 +49,7 @@ object Visual:
 
   def addNewLines(str: String) = "\n" + str + "\n"
 
-  def createBoard(pieces: Iterable[(Square, Piece)], variant: Variant): Position =
+  def createPosition(pieces: Iterable[(Square, Piece)], variant: Variant): Position =
     val board        = Board.fromMap(pieces.toMap)
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Position(

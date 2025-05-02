@@ -41,7 +41,7 @@ case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[
 
   def toPgn: Pgn =
     val sitWithMove = initContext(tags)
-    Pgn(tags, initialPosition, treeToPgn(sitWithMove.board), sitWithMove.ply.next)
+    Pgn(tags, initialPosition, treeToPgn(sitWithMove.position), sitWithMove.ply.next)
 
   private def initContext(tags: Tags): AndFullMoveNumber =
     val variant = tags.variant | chess.variant.Standard

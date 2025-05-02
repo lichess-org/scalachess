@@ -6,14 +6,15 @@ import chess.Bitboard.*
 // Chess board representation
 case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[Bitboard]):
 
-  val white   = byColor.white
-  val black   = byColor.black
-  val pawns   = byRole.pawn
-  val knights = byRole.knight
-  val bishops = byRole.bishop
-  val rooks   = byRole.rook
-  val queens  = byRole.queen
-  val kings   = byRole.king
+  export byColor.{ white, black }
+  export byRole.{
+    pawn as pawns,
+    knight as knights,
+    bishop as bishops,
+    rook as rooks,
+    queen as queens,
+    king as kings
+  }
 
   inline def apply(inline color: Color): Bitboard = color.fold(white, black)
   inline def apply(inline color: Color, inline role: Role): Bitboard =

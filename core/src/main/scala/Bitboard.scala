@@ -223,10 +223,7 @@ object Bitboard:
         b &= (b - 1L)
         result
 
-    // TODO: nice to have, faster.
-    // but should only be used for debug
-    // TODO: override toString?
-    def display: String =
+    def debug: String =
       val builder = StringBuilder()
       Rank.allReversed.foreach: r =>
         File.all.foreach: f =>

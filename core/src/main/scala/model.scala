@@ -27,6 +27,9 @@ object Ply extends RelaxedOpaqueInt[Ply]:
 opaque type HalfMoveClock = Int
 object HalfMoveClock extends RichOpaqueInt[HalfMoveClock]:
   val initial: HalfMoveClock = 0
+  extension (e: HalfMoveClock)
+    inline def incr: HalfMoveClock =
+      HalfMoveClock(e + 1)
 
 opaque type Check = Boolean
 object Check extends YesNo[Check]

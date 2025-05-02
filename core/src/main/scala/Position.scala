@@ -43,7 +43,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
   def withColor(color: Color): Position = copy(color = color)
 
-  def materialImbalance: Int = variant.materialImbalance(this)
+  def materialImbalance: Int = variant.materialImbalance(board)
 
   override def toString = s"$board $variant ${history.lastMove} $color"
 
@@ -159,16 +159,17 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
     * the last move must have been a double pawn push
     * and not start from the back rank
     */
-  lazy val potentialEpSquare: Option[Square] = history.lastMove.flatMap:
-    case Uci.Move(orig, dest, _) =>
-      board
-        .pieceAt(dest)
-        .flatMap: piece =>
-          if piece.color != color && piece.role == Pawn &&
-            orig.yDist(dest) == 2 && orig.rank != piece.color.backRank
-          then dest.prevRank(!color)
-          else None
-    case _ => None
+  lazy val potentialEpSquare: Option[Square] =
+    history.lastMove.flatMap:
+      case Uci.Move(orig, dest, _) =>
+        board
+          .pieceAt(dest)
+          .flatMap: piece =>
+            if piece.color != color && piece.role == Pawn &&
+              orig.yDist(dest) == 2 && orig.rank != piece.color.backRank
+            then dest.prevRank(!color)
+            else None
+      case _ => None
 
   def genNonKingAndNonPawn(mask: Bitboard): List[Move] =
     genKnight(us & board.knights, mask) ++ genBishop(us & board.bishops, mask) ++
@@ -284,9 +285,9 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
           else Bitboard.between(king, rook)
         if (path & board.occupied & ~rook.bl).isEmpty
         kingPath = Bitboard.between(king, kingTo) | king.bl
-        if kingPath.forall(variant.castleCheckSafeSquare(this, _, color, board.occupied ^ king.bl))
+        if kingPath.forall(variant.castleCheckSafeSquare(board, _, color, board.occupied ^ king.bl))
         if variant.castleCheckSafeSquare(
-          this,
+          board,
           kingTo,
           color,
           board.occupied ^ king.bl ^ rook.bl ^ rookTo.bl

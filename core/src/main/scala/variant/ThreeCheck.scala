@@ -18,28 +18,28 @@ case object ThreeCheck
 
   override val initialFen: FullFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 +0+0")
 
-  def validMoves(board: Position): List[Move] =
-    Standard.validMoves(board)
+  override def validMoves(position: Position): List[Move] =
+    Standard.validMoves(position)
 
-  override def valid(board: Position, strict: Boolean): Boolean = Standard.valid(board, strict)
+  override def valid(position: Position, strict: Boolean): Boolean = Standard.valid(position, strict)
 
-  override def finalizeBoard(board: Position, uci: format.Uci, capture: Option[Piece]): Position =
-    board.updateHistory:
-      _.withCheck(Color.White, checkWhite(board.board)).withCheck(Color.Black, checkBlack(board.board))
+  override def finalizeBoard(position: Position, uci: format.Uci, capture: Option[Piece]): Position =
+    position.updateHistory:
+      _.withCheck(Color.White, checkWhite(position.board)).withCheck(Color.Black, checkBlack(position.board))
 
-  override def specialEnd(board: Position): Boolean =
-    board.check.yes && {
-      val checks = board.history.checkCount
-      board.color.fold(checks.white, checks.black) >= 3
+  override def specialEnd(position: Position): Boolean =
+    position.check.yes && {
+      val checks = position.history.checkCount
+      position.color.fold(checks.white, checks.black) >= 3
     }
 
   /** It's not possible to check or checkmate the opponent with only a king
     */
-  override def opponentHasInsufficientMaterial(board: Position): Boolean =
-    board.kingsOnlyOf(!board.color)
+  override def opponentHasInsufficientMaterial(position: Position): Boolean =
+    position.kingsOnlyOf(!position.color)
 
   /**
   * When there is insufficient mating material, there is still potential to win by checking the opponent 3 times
   * by the variant ending. However, no players can check if there are only kings remaining
   */
-  override def isInsufficientMaterial(board: Position): Boolean = board.kingsOnly
+  override def isInsufficientMaterial(position: Position): Boolean = position.kingsOnly

@@ -25,40 +25,40 @@ case object Antichess
 
   override def kingThreatened(board: Board, color: Color): Check = Check.No
 
-  override def validMoves(board: Position): List[Move] =
-    import board.{ genNonKing, genUnsafeKing, ourKings }
-    val capturingMoves = captureMoves(board)
+  override def validMoves(position: Position): List[Move] =
+    import position.{ genNonKing, genUnsafeKing, ourKings }
+    val capturingMoves = captureMoves(position)
     if capturingMoves.nonEmpty then capturingMoves
-    else genNonKing(~board.occupied) ++ ourKings.flatMap(genUnsafeKing(_, ~board.occupied))
+    else genNonKing(~position.occupied) ++ ourKings.flatMap(genUnsafeKing(_, ~position.occupied))
 
-  def captureMoves(board: Position): List[Move] =
-    import board.{ them, us, genNonKing, genEnPassant, genUnsafeKing, ourKings }
-    ourKings.flatMap(genUnsafeKing(_, them)) ++ genEnPassant(us & board.pawns) ++ genNonKing(them)
+  def captureMoves(position: Position): List[Move] =
+    import position.{ them, us, genNonKing, genEnPassant, genUnsafeKing, ourKings }
+    ourKings.flatMap(genUnsafeKing(_, them)) ++ genEnPassant(us & position.pawns) ++ genNonKing(them)
 
-  override def valid(board: Position, strict: Boolean): Boolean =
-    board.nbPieces >= 2 && board.nbPieces <= 32
+  override def valid(position: Position, strict: Boolean): Boolean =
+    position.nbPieces >= 2 && position.nbPieces <= 32
 
   // In antichess, there is no checkmate condition, and the winner is the current player if they have no legal moves
-  override def winner(board: Position): Option[Color] =
-    specialEnd(board).option(board.color)
+  override def winner(position: Position): Option[Color] =
+    specialEnd(position).option(position.color)
 
   override def specialEnd(position: Position): Boolean =
     // The game ends with a win when one player manages to lose all their pieces or is in stalemate
     position.us.isEmpty || position.legalMoves.isEmpty
 
   // In antichess, it is valuable for your opponent to have pieces.
-  override def materialImbalance(board: Position): Int =
+  override def materialImbalance(board: Board): Int =
     board.fold(0): (acc, color, _) =>
       acc + color.fold(-2, 2)
 
   // In antichess, there is no checkmate condition therefore a player may only draw either by agreement,
   // blockade or stalemate. Only one player can win if the only remaining pieces are two knights
-  override def opponentHasInsufficientMaterial(board: Position): Boolean =
+  override def opponentHasInsufficientMaterial(position: Position): Boolean =
     // Exit early if we are not in a board with only knights
-    board.onlyKnights && {
+    position.onlyKnights && {
 
-      val whiteKnights = board.white.squares
-      val blackKnights = board.black.squares
+      val whiteKnights = position.white.squares
+      val blackKnights = position.black.squares
 
       // We consider the case where a player has two knights
       whiteKnights.size == 1 && blackKnights.size == 1 && whiteKnights.forall(_.isLight) == blackKnights
@@ -68,30 +68,30 @@ case object Antichess
   // No player can win if the only remaining pieces are opposing bishops on different coloured
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color
   // of square to allow the player to force their opponent to capture their bishop, also resulting in a draw
-  override def isInsufficientMaterial(board: Position): Boolean =
+  override def isInsufficientMaterial(position: Position): Boolean =
     // Exit early if we are not in a board with only bishops and pawns
-    if (board.bishops | board.pawns) != board.occupied then false
+    if (position.bishops | position.pawns) != position.occupied then false
     else
-      val whiteBishops = (board.white & board.bishops).squares
-      val blackBishops = (board.black & board.bishops).squares
+      val whiteBishops = (position.white & position.bishops).squares
+      val blackBishops = (position.black & position.bishops).squares
       if whiteBishops.map(_.isLight).to(Set).size != 1 ||
         blackBishops.map(_.isLight).to(Set).size != 1
       then false
       else
-        val whitePawns = (board.white & board.pawns).squares
-        val blackPawns = (board.black & board.pawns).squares
+        val whitePawns = (position.white & position.pawns).squares
+        val blackPawns = (position.black & position.pawns).squares
         (for
           whiteBishopLight <- whiteBishops.headOption.map(_.isLight)
           blackBishopLight <- blackBishops.headOption.map(_.isLight)
         yield whiteBishopLight != blackBishopLight && whitePawns.forall(
-          pawnNotAttackable(_, blackBishopLight, board)
-        ) && blackPawns.forall(pawnNotAttackable(_, whiteBishopLight, board)))
+          pawnNotAttackable(_, blackBishopLight, position)
+        ) && blackPawns.forall(pawnNotAttackable(_, whiteBishopLight, position)))
           .getOrElse(false)
 
-  private def pawnNotAttackable(pawn: Square, oppositeBishopLight: Boolean, board: Position): Boolean =
+  private def pawnNotAttackable(pawn: Square, oppositeBishopLight: Boolean, position: Position): Boolean =
     // The pawn cannot attack a bishop or be attacked by a bishop
     val cannotAttackBishop = pawn.isLight != oppositeBishopLight
-    InsufficientMatingMaterial.pawnBlockedByPawn(pawn, board) && cannotAttackBishop
+    InsufficientMatingMaterial.pawnBlockedByPawn(pawn, position) && cannotAttackBishop
 
   // In this game variant, a king is a valid promotion
   override def isValidPromotion(_promotion: Option[PromotableRole]): Boolean = true

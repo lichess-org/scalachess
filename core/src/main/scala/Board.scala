@@ -120,6 +120,9 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   def isCheck(color: Color): Check =
     Check(kings(color).exists(attacks(_, !color)))
 
+  def checkers(color: Color): Bitboard =
+    kingPosOf(color).fold(Bitboard.empty)(attackers(_, !color))
+
   /** Find all blockers between the king and attacking sliders First we find all snipers (all potential sliders which
     * can attack the king) Then we loop over those snipers if there is only one blockers between the king and the sniper
     * we add them into the blockers list

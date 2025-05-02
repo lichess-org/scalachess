@@ -33,16 +33,16 @@ case object Horde
   override val initialFen: FullFen =
     FullFen("rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1")
 
-  def validMoves(board: Position): List[Move] =
-    import board.{ genEnPassant, genNonKing, isWhiteTurn, us }
-    if isWhiteTurn then genEnPassant(us & board.pawns) ++ genNonKing(~us & ~board.kings)
-    else Standard.validMoves(board)
+  override def validMoves(position: Position): List[Move] =
+    import position.{ genEnPassant, genNonKing, isWhiteTurn, us }
+    if isWhiteTurn then genEnPassant(us & position.pawns) ++ genNonKing(~us & ~position.kings)
+    else Standard.validMoves(position)
 
-  override def valid(board: Position, strict: Boolean): Boolean =
-    board.kingOf(White).isEmpty
-      && validSide(board, strict)(Black)
-      && !pawnsOnPromotionRank(board, White)
-      && (!strict || board.color.white || Standard.hasValidCheckers(board))
+  override def valid(position: Position, strict: Boolean): Boolean =
+    position.kingOf(White).isEmpty
+      && validSide(position, strict)(Black)
+      && !pawnsOnPromotionRank(position.board, White)
+      && (!strict || position.color.white || Standard.hasValidCheckers(position))
 
   /** The game has a special end condition when black manages to capture all of white's pawns */
   override def specialEnd(position: Position): Boolean =
@@ -55,7 +55,7 @@ case object Horde
   private def hordeClosedPosition(position: Position): Boolean =
     val hordeSquare = position.byColor(White)
     val mateInOne = hordeSquare.count == 1 &&
-      hordeSquare.singleSquare.exists(pieceThreatened(position, Color.black, _))
+      hordeSquare.singleSquare.exists(pieceThreatened(position.board, Color.black, _))
     !mateInOne && {
       if position.isWhiteTurn then position.legalMoves.isEmpty
       else
@@ -75,8 +75,8 @@ case object Horde
     * Technically there are some positions where stalemate is unavoidable which
     * this method does not detect; however, such are trivial to premove.
     */
-  override def opponentHasInsufficientMaterial(board: Position): Boolean =
-    hasInsufficientMaterial(board.board, !board.color) || hordeClosedPosition(board)
+  override def opponentHasInsufficientMaterial(position: Position): Boolean =
+    hasInsufficientMaterial(position.board, !position.color) || hordeClosedPosition(position)
 
   extension (board: Board)
     def hasBishopPair: Color => Boolean = side =>

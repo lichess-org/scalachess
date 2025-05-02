@@ -9,7 +9,7 @@ object InsufficientMatingMaterial:
 
   // verify if there are at least two bishops of opposite color
   // no matter which sides they are on
-  def bishopsOnOppositeColors(board: Position): Boolean =
+  def bishopsOnOppositeColors(board: Board): Boolean =
     board.bishops.map(_.isLight).distinct.size == 2
 
   /*
@@ -31,7 +31,7 @@ object InsufficientMatingMaterial:
    * Determines whether a board position is an automatic draw due to neither player
    * being able to mate the other as informed by the traditional chess rules.
    */
-  def apply(board: Position): Boolean =
+  def apply(board: Board): Boolean =
     board.kingsAndMinorsOnly &&
       (board.nbPieces <= 3 || (board.kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
 
@@ -48,7 +48,7 @@ object InsufficientMatingMaterial:
       board.nonKingsOf(color).count == 1 &&
       board.onlyOf(!color, board.kings | board.queens)
     else if board.kingsAndBishopsOnlyOf(color) then
-      !(bishopsOnOppositeColors(board) ||
+      !(bishopsOnOppositeColors(board.board) ||
         (board.byPiece(!color, Knight) | board.byPiece(!color, Pawn)).nonEmpty)
     else false
 

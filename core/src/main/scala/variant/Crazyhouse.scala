@@ -19,38 +19,38 @@ case object Crazyhouse
 
   override val initialFen: FullFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1")
 
-  def validMoves(board: Position): List[Move] =
-    Standard.validMoves(board)
+  override def validMoves(position: Position): List[Move] =
+    Standard.validMoves(position)
 
-  override def valid(board: Position, strict: Boolean): Boolean =
-    Color.all.forall(validSide(board, false)) &&
+  override def valid(position: Position, strict: Boolean): Boolean =
+    Color.all.forall(validSide(position, false)) &&
       (!strict ||
-        (board.byRole(Pawn).count <= 16
-          && board.nbPieces <= 32
-          && Standard.hasValidCheckers(board)))
+        (position.byRole(Pawn).count <= 16
+          && position.nbPieces <= 32
+          && Standard.hasValidCheckers(position)))
 
   private def canDropPawnOn(square: Square): Boolean =
     square.rank != Rank.First && square.rank != Rank.Eighth
 
-  override def drop(board: Position, role: Role, square: Square): Either[ErrorStr, Drop] =
+  override def drop(position: Position, role: Role, square: Square): Either[ErrorStr, Drop] =
     for
-      d1 <- board.crazyData.toRight(ErrorStr("Board has no crazyhouse data"))
+      d1 <- position.crazyData.toRight(ErrorStr("Position has no crazyhouse data"))
       _  <- Either.cond((role != Pawn || canDropPawnOn(square)), d1, ErrorStr(s"Can't drop $role on $square"))
-      piece = Piece(board.color, role)
+      piece = Piece(position.color, role)
       d2 <- d1.drop(piece).toRight(ErrorStr(s"No $piece to drop on $square"))
-      b1 <- board.board
+      b1 <- position.board
         .put(piece, square)
         .toRight(ErrorStr(s"Can't drop $role on $square, it's occupied"))
-      b2 = board.withBoard(b1)
+      b2 = position.withBoard(b1)
       _ <- Either.cond(
-        kingThreatened(b2.board, board.color).no,
+        kingThreatened(b2.board, position.color).no,
         b2,
         ErrorStr(s"Dropping $role on $square doesn't uncheck the king")
       )
     yield Drop(
       piece = piece,
       square = square,
-      boardBefore = board,
+      boardBefore = position,
       after = b2.withCrazyData(d2)
     )
 
@@ -58,52 +58,52 @@ case object Crazyhouse
 
   override def isIrreversible(move: Move): Boolean = move.castles
 
-  override def finalizeBoard(board: Position, uci: Uci, capture: Option[Piece]): Position =
+  override def finalizeBoard(position: Position, uci: Uci, capture: Option[Piece]): Position =
     uci match
       case Uci.Move(orig, dest, promOption) =>
-        board.crazyData.fold(board) { data =>
+        position.crazyData.fold(position) { data =>
           val d1 = capture.fold(data) { data.store(_, dest) }
           val d2 = promOption.fold(d1.move(orig, dest)) { _ =>
             d1.promote(dest)
           }
-          board.withCrazyData(d2)
+          position.withCrazyData(d2)
         }
-      case _ => board
+      case _ => position
 
-  private def canDropStuff(board: Position): Boolean =
-    board.crazyData.exists { (data: Data) =>
-      val pocket = data.pockets(board.color)
-      pocket.nonEmpty && possibleDrops(board).fold(true) { squares =>
+  private def canDropStuff(position: Position): Boolean =
+    position.crazyData.exists { (data: Data) =>
+      val pocket = data.pockets(position.color)
+      pocket.nonEmpty && possibleDrops(position).fold(true) { squares =>
         squares.nonEmpty && {
           squares.exists(canDropPawnOn) || pocket.hasNonPawn
         }
       }
     }
 
-  override def staleMate(board: Position): Boolean =
-    super.staleMate(board) && !canDropStuff(board)
+  override def staleMate(position: Position): Boolean =
+    super.staleMate(position) && !canDropStuff(position)
 
-  override def checkmate(board: Position): Boolean =
-    super.checkmate(board) && !canDropStuff(board)
+  override def checkmate(position: Position): Boolean =
+    super.checkmate(position) && !canDropStuff(position)
 
   // there is always sufficient mating material in Crazyhouse
-  override def opponentHasInsufficientMaterial(board: Position): Boolean = false
-  override def isInsufficientMaterial(board: Position): Boolean          = false
+  override def opponentHasInsufficientMaterial(position: Position): Boolean = false
+  override def isInsufficientMaterial(position: Position): Boolean          = false
 
   // if the king is not in check, all drops are possible, we just return None
   // king is in single check, we return the squares between the king and the checker
   // king is in double check, no drop is possible
-  def possibleDrops(board: Position): Option[List[Square]] =
-    board.ourKing.flatMap(king =>
-      val checkers = board.attackers(king, !board.color)
+  def possibleDrops(position: Position): Option[List[Square]] =
+    position.ourKing.flatMap(king =>
+      val checkers = position.attackers(king, !position.color)
       if checkers.moreThanOne then Some(Nil)
       else checkers.first.map(Bitboard.between(king, _).squares)
     )
 
   // all legal moves and drops
   // this function is used in perfts only
-  def legalMoves(board: Position): List[MoveOrDrop] =
-    legalDrops(board) ::: board.legalMoves.filterNot(m =>
+  def legalMoves(position: Position): List[MoveOrDrop] =
+    legalDrops(position) ::: position.legalMoves.filterNot(m =>
       m.castle.exists(c => c.isStandard && m.dest != c.rook)
     )
 
@@ -111,31 +111,31 @@ case object Crazyhouse
   // king is in single check, return the squares between the king and the checker
   // king is in double check, no drop is possible
   // this function is used in perfts only
-  private def legalDropSquares(board: Position): Bitboard =
-    board.ourKing
+  private def legalDropSquares(position: Position): Bitboard =
+    position.ourKing
       .map(king =>
-        val checkers = board.attackers(king, !board.color)
-        if checkers.isEmpty then ~board.occupied
+        val checkers = position.attackers(king, !position.color)
+        if checkers.isEmpty then ~position.occupied
         else checkers.singleSquare.map(Bitboard.between(king, _)).getOrElse(Bitboard.empty)
       )
       .getOrElse(Bitboard.empty)
 
   // generate all legal drops
   // this function is used in perfts only
-  private def legalDrops(board: Position): List[Drop] =
-    val targets = legalDropSquares(board)
+  private def legalDrops(position: Position): List[Drop] =
+    val targets = legalDropSquares(position)
     if targets.isEmpty then Nil
     else
-      board.crazyData.fold(Nil): data =>
-        val pocket = data.pockets(board.color)
+      position.crazyData.fold(Nil): data =>
+        val pocket = data.pockets(position.color)
         for
           role <- List(Pawn, Knight, Bishop, Rook, Queen)
           if pocket.contains(role)
           to <- if role == Pawn then targets & ~Bitboard.firstRank & ~Bitboard.lastRank else targets
-          piece = Piece(board.color, role)
-          after <- board.board.put(piece, to)
+          piece = Piece(position.color, role)
+          after <- position.board.put(piece, to)
           d2    <- data.drop(piece)
-        yield Drop(piece, to, board, board.withBoard(after).withCrazyData(d2))
+        yield Drop(piece, to, position, position.withBoard(after).withCrazyData(d2))
 
   type Pockets = ByColor[Pocket]
 

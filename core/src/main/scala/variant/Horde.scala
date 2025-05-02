@@ -38,6 +38,9 @@ case object Horde
     if isWhiteTurn then genEnPassant(us & position.pawns) ++ genNonKing(~us & ~position.kings)
     else Standard.validMoves(position)
 
+  override def validMovesAt(position: Position, square: Square): List[Move] =
+    super.validMovesAt(position, square).filter(kingSafety)
+
   override def valid(position: Position, strict: Boolean): Boolean =
     position.kingOf(White).isEmpty
       && validSide(position, strict)(Black)

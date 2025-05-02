@@ -19,13 +19,17 @@ case object ThreeCheck
   override val initialFen: FullFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 +0+0")
 
   override def validMoves(position: Position): List[Move] =
-    Standard.validMoves(position)
+    Standard.validMoves(position).map(updateCheckCount)
+
+  override def validMovesAt(position: Position, square: Square): List[Move] =
+    super.validMovesAt(position, square).filter(kingSafety).map(updateCheckCount)
 
   override def valid(position: Position, strict: Boolean): Boolean = Standard.valid(position, strict)
 
-  override def finalizeBoard(position: Position, uci: format.Uci, capture: Option[Piece]): Position =
-    position.updateHistory:
-      _.withCheck(Color.White, checkWhite(position.board)).withCheck(Color.Black, checkBlack(position.board))
+  private def updateCheckCount(move: Move): Move =
+    move.copy(after = move.after.updateHistory:
+      _.withCheck(Color.White, checkWhite(move.after.board))
+        .withCheck(Color.Black, checkBlack(move.after.board)))
 
   override def specialEnd(position: Position): Boolean =
     position.check.yes && {

@@ -32,6 +32,9 @@ case object Standard
         candidates.filter(isSafe(position, king, sliderBlockers))
       else candidates
 
+  override def validMovesAt(position: Position, square: Square): List[Move] =
+    super.validMovesAt(position, square).filter(kingSafety)
+
   // Used for filtering candidate moves that would leave put the king in check.
   def isSafe(position: Position, king: Square, blockers: Bitboard)(move: Move): Boolean =
     import position.{ us, them }

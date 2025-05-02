@@ -12,7 +12,7 @@ case object Atomic
       standardInitialPosition = true
     ):
 
-  def pieces = Standard.pieces
+  override val pieces: Map[Square, Piece] = Standard.pieces
 
   def validMoves(board: Position): List[Move] =
     import board.{ genNonKing, genEnPassant, us }
@@ -43,7 +43,7 @@ case object Atomic
       k.kingAttacks.isDisjoint(kingOf(!color)) &&
         attackersWithoutKing(board, occupied, k, !color).nonEmpty
 
-  private def attackersWithoutKing(board: Board, occupied: Bitboard, s: Square, attacker: Color) =
+  private def attackersWithoutKing(board: Board, occupied: Bitboard, s: Square, attacker: Color): Bitboard =
     import board.{ byColor, rooks, queens, bishops, knights, pawns }
     byColor(attacker) & (
       s.rookAttacks(occupied) & (rooks ^ queens) |
@@ -87,7 +87,7 @@ case object Atomic
   /** Since kings cannot confine each other, if either player has only a king
     * then either a queen or multiple pieces are required for checkmate.
     */
-  private def insufficientAtomicWinningMaterial(board: Position) =
+  private def insufficientAtomicWinningMaterial(board: Position): Boolean =
     lazy val bishopsOnOppositeColors = InsufficientMatingMaterial.bishopsOnOppositeColors(board)
 
     // Bishops of opposite color (no other pieces) endgames are dead drawn
@@ -104,7 +104,7 @@ case object Atomic
    * mate would be not be very likely. Additionally, a player can only mate another player with sufficient material.
    * We also look out for closed positions (pawns that cannot move and kings which cannot capture them.)
    */
-  override def isInsufficientMaterial(board: Position) =
+  override def isInsufficientMaterial(board: Position): Boolean =
     insufficientAtomicWinningMaterial(board) || atomicClosedPosition(board)
 
   /** Since a king cannot capture, K + P vs K + P where none of the pawns can move is an automatic draw
@@ -136,4 +136,4 @@ case object Atomic
     board.kingsOnlyOf(!board.color)
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
-  override def specialEnd(board: Position) = board.kings.count < 2
+  override def specialEnd(board: Position): Boolean = board.kings.count < 2

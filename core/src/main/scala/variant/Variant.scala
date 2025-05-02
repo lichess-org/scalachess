@@ -100,8 +100,12 @@ abstract class Variant private[variant] (
 
   def checkmate(board: Position): Boolean = board.check.yes && board.legalMoves.isEmpty
 
-  // In most variants, the winner is the last player to have played and there is a possibility of either a traditional
-  // checkmate or a variant end condition
+  /**
+  * Return the winner of the game if there is one.
+  *
+  * In most variants, the winner is the last player to have played and there is a possibility
+  * of either a traditional checkmate or a variant end condition
+  * */
   def winner(board: Position): Option[Color] =
     if board.checkMate || specialEnd(board) then Option(!board.color) else None
 
@@ -132,7 +136,8 @@ abstract class Variant private[variant] (
   def opponentHasInsufficientMaterial(board: Position): Boolean =
     InsufficientMatingMaterial(board, !board.color)
 
-  def fiftyMoves(history: History): Boolean = history.halfMoveClock >= HalfMoveClock(100)
+  def fiftyMoves(history: History): Boolean =
+    history.halfMoveClock >= HalfMoveClock(100)
 
   def isIrreversible(move: Move): Boolean =
     (move.piece.is(Pawn)) || move.captures || move.promotes || move.castles
@@ -227,7 +232,7 @@ object Variant:
       File.all.map(Square(_, Rank.Seventh) -> Black.pawn) ++
       File.all.zip(rank).map((x, role) => Square(x, Rank.Eighth) -> (Black - role))).toMap
 
-  def isValidInitialFen(variant: Variant, fen: Option[Fen.Full], strict: Boolean = false) =
+  def isValidInitialFen(variant: Variant, fen: Option[Fen.Full], strict: Boolean = false): Boolean =
     if variant.chess960
     then fen.forall(f => Chess960.positionNumber(f).isDefined)
     else if variant.fromPosition then

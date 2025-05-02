@@ -14,11 +14,11 @@ case object Antichess
       standardInitialPosition = true
     ):
 
-  def pieces: Map[Square, Piece] = Standard.pieces
+  override val pieces: Map[Square, Piece] = Standard.pieces
 
   // In antichess, it is not permitted to castle
-  override val castles    = Castles.none
-  override val initialFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1")
+  override val castles: Castles    = Castles.none
+  override val initialFen: FullFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1")
 
   // In antichess, the king can't be put into check so we always return false
   override def kingSafety(m: Move): Boolean = true
@@ -53,7 +53,7 @@ case object Antichess
 
   // In antichess, there is no checkmate condition therefore a player may only draw either by agreement,
   // blockade or stalemate. Only one player can win if the only remaining pieces are two knights
-  override def opponentHasInsufficientMaterial(board: Position) =
+  override def opponentHasInsufficientMaterial(board: Position): Boolean =
     // Exit early if we are not in a board with only knights
     board.onlyKnights && {
 
@@ -94,6 +94,6 @@ case object Antichess
     InsufficientMatingMaterial.pawnBlockedByPawn(pawn, board) && cannotAttackBishop
 
   // In this game variant, a king is a valid promotion
-  override def isValidPromotion(_promotion: Option[PromotableRole]) = true
+  override def isValidPromotion(_promotion: Option[PromotableRole]): Boolean = true
 
   override val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, King)

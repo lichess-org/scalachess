@@ -12,7 +12,7 @@ case object FromPosition
       standardInitialPosition = false
     ):
 
-  def pieces = Standard.pieces
+  override val pieces: Map[Square, Piece] = Standard.pieces
 
-  def validMoves(board: Position): List[Move] =
+  override def validMoves(board: Position): List[Move] =
     Standard.validMoves(board)

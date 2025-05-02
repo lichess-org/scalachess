@@ -12,9 +12,12 @@ case object Standard
       standardInitialPosition = true
     ):
 
-  val pieces: Map[Square, Piece] = Variant.symmetricRank(backRank)
+  override val pieces: Map[Square, Piece] = Variant.symmetricRank(backRank)
 
-  def validMoves(board: Position): List[Move] =
+  override def valid(board: Position, strict: Boolean): Boolean =
+    super.valid(board, strict) && (!strict || hasValidCheckers(board))
+
+  override def validMoves(board: Position): List[Move] =
     import board.{ genNonKing, genSafeKing, genCastling, color, ourKing }
     val enPassantMoves = board.genEnPassant(board.us & board.pawns)
     ourKing.fold(Nil): king =>
@@ -48,9 +51,6 @@ case object Standard
     val safeKings = genSafeKing(king, ~us & ~attacked)
     val blockers  = checkers.singleSquare.fold(Nil)(c => genNonKing(Bitboard.between(king, c) | checkers))
     safeKings ++ blockers
-
-  override def valid(board: Position, strict: Boolean): Boolean =
-    super.valid(board, strict) && (!strict || hasValidCheckers(board))
 
   def hasValidCheckers(board: Position): Boolean =
     board.checkers.isEmpty || {

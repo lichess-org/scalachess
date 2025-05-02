@@ -12,7 +12,7 @@ case object KingOfTheHill
       standardInitialPosition = true
     ):
 
-  def pieces = Standard.pieces
+  def pieces: Map[Square, Piece] = Standard.pieces
 
   def validMoves(board: Position): List[Move] =
     Standard.validMoves(board)

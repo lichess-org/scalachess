@@ -15,21 +15,22 @@ case object Crazyhouse
       standardInitialPosition = true
     ):
 
-  def pieces = Standard.pieces
+  override val pieces: Map[Square, Piece] = Standard.pieces
 
-  override val initialFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1")
+  override val initialFen: FullFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1")
 
   def validMoves(board: Position): List[Move] =
     Standard.validMoves(board)
 
-  override def valid(board: Position, strict: Boolean) =
+  override def valid(board: Position, strict: Boolean): Boolean =
     Color.all.forall(validSide(board, false)) &&
       (!strict ||
         (board.byRole(Pawn).count <= 16
           && board.nbPieces <= 32
           && Standard.hasValidCheckers(board)))
 
-  private def canDropPawnOn(square: Square) = square.rank != Rank.First && square.rank != Rank.Eighth
+  private def canDropPawnOn(square: Square): Boolean =
+    square.rank != Rank.First && square.rank != Rank.Eighth
 
   override def drop(board: Position, role: Role, square: Square): Either[ErrorStr, Drop] =
     for
@@ -69,7 +70,7 @@ case object Crazyhouse
         }
       case _ => board
 
-  private def canDropStuff(board: Position) =
+  private def canDropStuff(board: Position): Boolean =
     board.crazyData.exists { (data: Data) =>
       val pocket = data.pockets(board.color)
       pocket.nonEmpty && possibleDrops(board).fold(true) { squares =>
@@ -79,15 +80,15 @@ case object Crazyhouse
       }
     }
 
-  override def staleMate(board: Position) =
+  override def staleMate(board: Position): Boolean =
     super.staleMate(board) && !canDropStuff(board)
 
-  override def checkmate(board: Position) =
+  override def checkmate(board: Position): Boolean =
     super.checkmate(board) && !canDropStuff(board)
 
   // there is always sufficient mating material in Crazyhouse
-  override def opponentHasInsufficientMaterial(board: Position) = false
-  override def isInsufficientMaterial(board: Position)          = false
+  override def opponentHasInsufficientMaterial(board: Position): Boolean = false
+  override def isInsufficientMaterial(board: Position): Boolean          = false
 
   // if the king is not in check, all drops are possible, we just return None
   // king is in single check, we return the squares between the king and the checker
@@ -138,14 +139,13 @@ case object Crazyhouse
 
   type Pockets = ByColor[Pocket]
 
-  case class Data(
-      pockets: Pockets,
-      // in crazyhouse, a promoted piece becomes a pawn
-      // when captured and put in the pocket.
-      // there we need to remember which pieces are issued from promotions.
-      // we do that by tracking their positions on the board.
-      promoted: Bitboard
-  ):
+  /**
+  * in crazyhouse, a promoted piece becomes a pawn
+  * when captured and put in the pocket.
+  * there we need to remember which pieces are issued from promotions.
+  * we do that by tracking their positions on the board.
+  * */
+  case class Data(pockets: Pockets, promoted: Bitboard):
 
     def drop(piece: Piece): Option[Data] =
       this.focus(_.pockets).modifyF(_.take(piece))
@@ -166,7 +166,7 @@ case object Crazyhouse
     def size    = pockets.reduce(_.size + _.size)
 
   object Data:
-    val init = Data(Pockets.empty, Bitboard.empty)
+    val init: Data = Data(Pockets.empty, Bitboard.empty)
 
   extension (pockets: Pockets)
 
@@ -180,16 +180,16 @@ case object Crazyhouse
 
   case class Pocket(pawn: Int, knight: Int, bishop: Int, rook: Int, queen: Int):
 
-    def forsythUpper = forsyth.toUpperCase
+    def forsythUpper: String = forsyth.toUpperCase
     def forsyth: String = forsyth(pawn, 'p') + forsyth(knight, 'n') +
       forsyth(bishop, 'b') + forsyth(rook, 'r') + forsyth(queen, 'q')
 
-    def forsyth(role: Int, char: Char) = List.fill(role)(char).mkString
+    def forsyth(role: Int, char: Char): String = List.fill(role)(char).mkString
 
-    def size       = pawn + knight + bishop + rook + queen
-    def isEmpty    = size == 0
-    def nonEmpty   = size > 0
-    def hasNonPawn = knight + bishop + rook + queen > 0
+    def size: Int           = pawn + knight + bishop + rook + queen
+    def isEmpty: Boolean    = size == 0
+    def nonEmpty: Boolean   = size > 0
+    def hasNonPawn: Boolean = knight + bishop + rook + queen > 0
 
     def contains(r: Role): Boolean = r match
       case Pawn   => pawn > 0
@@ -243,7 +243,7 @@ case object Crazyhouse
       f(Queen, queen)
 
   object Pocket:
-    val empty = Pocket(0, 0, 0, 0, 0)
+    val empty: Pocket = Pocket(0, 0, 0, 0, 0)
 
     def apply(roles: Seq[Role]): Pocket =
       var pawn   = 0

@@ -14,8 +14,6 @@ case object RacingKings
       standardInitialPosition = false
     ):
 
-  override val allowsCastling = false
-
   // Both sides start on the first two ranks:
   // krbnNBRK
   // qrbnNBRQ
@@ -38,9 +36,10 @@ case object RacingKings
     Square.H2 -> White.king
   )
 
-  override val castles = Castles.none
+  override val castles: Castles        = Castles.none
+  override val allowsCastling: Boolean = false
 
-  override val initialFen = FullFen("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
+  override val initialFen: FullFen = FullFen("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
 
   def validMoves(board: Position): List[Move] =
     import board.{ genSafeKing, genNonKingAndNonPawn, us }
@@ -51,10 +50,10 @@ case object RacingKings
   override def valid(board: Position, strict: Boolean): Boolean =
     super.valid(board, strict) && (!strict || board.check.no)
 
-  override def isInsufficientMaterial(board: Position)          = false
-  override def opponentHasInsufficientMaterial(board: Position) = false
+  override def isInsufficientMaterial(board: Position): Boolean          = false
+  override def opponentHasInsufficientMaterial(board: Position): Boolean = false
 
-  private def reachedGoal(board: Position, color: Color) =
+  private def reachedGoal(board: Position, color: Color): Boolean =
     board.kingOf(color).intersects(Bitboard.rank(Rank.Eighth))
 
   private def reachesGoal(move: Move) =
@@ -64,7 +63,7 @@ case object RacingKings
   // the goal and black can make it on the next ply, he is given a chance to
   // draw, to compensate for the first-move advantage. The draw is not called
   // automatically, because black should also be given equal chances to flag.
-  override def specialEnd(board: Position) =
+  override def specialEnd(board: Position): Boolean =
     board.color match
       case White =>
         reachedGoal(board, White) ^ reachedGoal(board, Black)
@@ -73,7 +72,7 @@ case object RacingKings
 
   // If white reaches the goal and black also reaches the goal directly after,
   // then it is a draw.
-  override def specialDraw(board: Position) =
+  override def specialDraw(board: Position): Boolean =
     board.color.white && reachedGoal(board, White) && reachedGoal(board, Black)
 
   override def winner(board: Position): Option[Color] =

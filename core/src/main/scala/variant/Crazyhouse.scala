@@ -1,7 +1,7 @@
 package chess
 package variant
 
-import chess.format.{ FullFen, Uci }
+import chess.format.FullFen
 import monocle.syntax.all.*
 
 case object Crazyhouse
@@ -20,7 +20,7 @@ case object Crazyhouse
   override val initialFen: FullFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1")
 
   override def validMoves(position: Position): List[Move] =
-    Standard.validMoves(position)
+    Standard.validMoves(position).map(updateCrazyData)
 
   override def valid(position: Position, strict: Boolean): Boolean =
     Color.all.forall(validSide(position, false)) &&
@@ -58,17 +58,12 @@ case object Crazyhouse
 
   override def isIrreversible(move: Move): Boolean = move.castles
 
-  override def finalizeBoard(position: Position, uci: Uci, capture: Option[Piece]): Position =
-    uci match
-      case Uci.Move(orig, dest, promOption) =>
-        position.crazyData.fold(position) { data =>
-          val d1 = capture.fold(data) { data.store(_, dest) }
-          val d2 = promOption.fold(d1.move(orig, dest)) { _ =>
-            d1.promote(dest)
-          }
-          position.withCrazyData(d2)
-        }
-      case _ => position
+  def updateCrazyData(move: Move): Move =
+    val after = move.after.crazyData.fold(move.after): data =>
+      val d1 = move.capture.flatMap(move.boardBefore.pieceAt).fold(data)(data.store(_, move.dest))
+      val d2 = move.promotion.fold(d1.move(move.orig, move.dest))(_ => d1.promote(move.dest))
+      move.after.withCrazyData(d2)
+    move.copy(after = after)
 
   private def canDropStuff(position: Position): Boolean =
     position.crazyData.exists { (data: Data) =>

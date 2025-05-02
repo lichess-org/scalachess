@@ -142,10 +142,6 @@ abstract class Variant private[variant] (
   def isIrreversible(move: Move): Boolean =
     (move.piece.is(Pawn)) || move.captures || move.promotes || move.castles
 
-  /** Once a move has been decided upon from the available legal moves, the board is finalized
-    */
-  def finalizeBoard(position: Position, uci: format.Uci, captured: Option[Piece]): Position = position
-
   protected def pawnsOnPromotionRank(board: Board, color: Color): Boolean =
     board.byPiece(color, Pawn).intersects(Bitboard.rank(color.promotablePawnRank))
 

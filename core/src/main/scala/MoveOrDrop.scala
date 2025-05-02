@@ -50,59 +50,55 @@ case class Move(
   // TODO rethink about how handle castling
   // it's quite messy and error prone now
   lazy val finalizeAfter: Position =
-    val board = after.variant.finalizeBoard(
-      after.updateHistory { h1 =>
-        val h2 = h1.copy(
-          lastMove = Option(toUci),
-          halfMoveClock =
-            if piece.is(Pawn) || captures || promotes then HalfMoveClock.initial
-            else h1.halfMoveClock.map(_ + 1)
-        )
+    val board = after.updateHistory { h1 =>
+      val h2 = h1.copy(
+        lastMove = Option(toUci),
+        halfMoveClock =
+          if piece.is(Pawn) || captures || promotes then HalfMoveClock.initial
+          else h1.halfMoveClock.map(_ + 1)
+      )
 
-        var castleRights: Castles      = h1.castles
-        var unmovedRooks: UnmovedRooks = h1.unmovedRooks
+      var castleRights: Castles      = h1.castles
+      var unmovedRooks: UnmovedRooks = h1.unmovedRooks
 
-        // If the rook is captured
-        // remove the captured rook from unmovedRooks
-        // check the captured rook's side and remove it from castlingRights
-        if captures then
-          unmovedRooks.side(dest) match
-            case Some(result) =>
-              unmovedRooks = unmovedRooks & ~dest.bl
-              result match
-                case Some(side) =>
-                  castleRights = castleRights.without(!piece.color, side)
-                case None =>
-                  // There is only one unmovedrook left so just remove the color from castlingRights
-                  castleRights = castleRights.without(!piece.color)
-            case _ =>
+      // If the rook is captured
+      // remove the captured rook from unmovedRooks
+      // check the captured rook's side and remove it from castlingRights
+      if captures then
+        unmovedRooks.side(dest) match
+          case Some(result) =>
+            unmovedRooks = unmovedRooks & ~dest.bl
+            result match
+              case Some(side) =>
+                castleRights = castleRights.without(!piece.color, side)
+              case None =>
+                // There is only one unmovedrook left so just remove the color from castlingRights
+                castleRights = castleRights.without(!piece.color)
+          case _ =>
 
-        // If a Rook is moved
-        // Remove that rook from unmovedRooks.
-        // check the captured rook's side and remove it from castlingRights
-        if piece.is(Rook) && unmovedRooks.contains(orig) then
-          unmovedRooks.side(orig) match
-            case Some(result) =>
-              unmovedRooks = unmovedRooks & ~orig.bl
-              result match
-                case Some(side) =>
-                  castleRights = castleRights.without(piece.color, side)
-                case None =>
-                  // There is only one unmovedrook left so just remove the color from castlingRights
-                  castleRights = castleRights.without(piece.color)
-            case _ =>
+      // If a Rook is moved
+      // Remove that rook from unmovedRooks.
+      // check the captured rook's side and remove it from castlingRights
+      if piece.is(Rook) && unmovedRooks.contains(orig) then
+        unmovedRooks.side(orig) match
+          case Some(result) =>
+            unmovedRooks = unmovedRooks & ~orig.bl
+            result match
+              case Some(side) =>
+                castleRights = castleRights.without(piece.color, side)
+              case None =>
+                // There is only one unmovedrook left so just remove the color from castlingRights
+                castleRights = castleRights.without(piece.color)
+          case _ =>
 
-        // If the King is moved
-        // remove castlingRights and unmovedRooks for the moving side
-        else if piece.is(King) then
-          unmovedRooks = unmovedRooks.without(piece.color)
-          castleRights = castleRights.without(piece.color)
+      // If the King is moved
+      // remove castlingRights and unmovedRooks for the moving side
+      else if piece.is(King) then
+        unmovedRooks = unmovedRooks.without(piece.color)
+        castleRights = castleRights.without(piece.color)
 
-        h2.withCastles(castleRights).copy(unmovedRooks = unmovedRooks)
-      },
-      toUci,
-      capture.flatMap(boardBefore.pieceAt)
-    )
+      h2.withCastles(castleRights).copy(unmovedRooks = unmovedRooks)
+    }
 
     // Update position hashes last, only after updating the board,
     // castling rights and en-passant rights.
@@ -143,7 +139,7 @@ case class Move(
 
   inline def withMetrics(m: MoveMetrics): Move = copy(metrics = m)
 
-  inline def toUci: Uci.Move = Uci.Move(orig, dest, promotion)
+  override lazy val toUci: Uci.Move = Uci.Move(orig, dest, promotion)
 
   override def toString = s"$piece ${toUci.uci}"
 end Move
@@ -167,30 +163,16 @@ case class Drop(
   lazy val toSanStr: SanStr   = format.pgn.Dumper(this)
 
   lazy val finalizeAfter: Position =
-    val board = after.variant.finalizeBoard(
-      after.updateHistory { h =>
-        h.copy(
-          lastMove = Option(Uci.Drop(piece.role, square)),
-          unmovedRooks = before.unmovedRooks,
-          halfMoveClock = if piece.is(Pawn) then HalfMoveClock.initial else h.halfMoveClock.map(_ + 1)
-        )
-      },
-      toUci,
-      none
-    )
-
-    board.updateHistory { h =>
+    after.updateHistory { h =>
       val basePositionHashes =
         if h.positionHashes.value.isEmpty then PositionHash(Hash(boardBefore)) else h.positionHashes
-      h.copy(positionHashes = PositionHash(Hash(board.withColor(!piece.color))).combine(basePositionHashes))
+      h.copy(
+        lastMove = toUci.some,
+        unmovedRooks = before.unmovedRooks,
+        halfMoveClock = if piece.is(Pawn) then HalfMoveClock.initial else h.halfMoveClock.map(_ + 1),
+        positionHashes = PositionHash(Hash(after.withColor(!piece.color))).combine(basePositionHashes)
+      )
     }
-
-  def afterWithLastMove: Position =
-    after.variant.finalizeBoard(
-      after.copy(history = after.history.withLastMove(toUci)),
-      toUci,
-      none
-    )
 
   inline def color: Color = piece.color
 
@@ -198,6 +180,6 @@ case class Drop(
 
   inline def withMetrics(m: MoveMetrics): Drop = copy(metrics = m)
 
-  inline def toUci: Uci.Drop = Uci.Drop(piece.role, square)
+  override lazy val toUci: Uci.Drop = Uci.Drop(piece.role, square)
 
   override def toString = toUci.uci

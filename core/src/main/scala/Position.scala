@@ -115,33 +115,32 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
   lazy val checkers: Bitboard       = ourKing.fold(Bitboard.empty)(board.attackers(_, !color))
 
   def generateMovesAt(square: Square): List[Move] =
-    def movesAt =
-      val moves = board.pieceAt(square).fold(Nil) { piece =>
-        if piece.color != color then Nil
-        else
-          val targets = ~us
-          val bb      = square.bb
-          piece.role match
-            case Pawn   => genEnPassant(us & bb) ++ genPawn(bb, targets)
-            case Knight => genKnight(us & bb, targets)
-            case Bishop => genBishop(us & bb, targets)
-            case Rook   => genRook(us & bb, targets)
-            case Queen  => genQueen(us & bb, targets)
-            case King   => genKingAt(targets, square)
-      }
+    val moves = board.pieceAt(square).fold(Nil) { piece =>
+      if piece.color != color then Nil
+      else
+        val targets = ~us
+        val bb      = square.bb
+        piece.role match
+          case Pawn   => genEnPassant(us & bb) ++ genPawn(bb, targets)
+          case Knight => genKnight(us & bb, targets)
+          case Bishop => genBishop(us & bb, targets)
+          case Rook   => genRook(us & bb, targets)
+          case Queen  => genQueen(us & bb, targets)
+          case King   => genKingAt(targets, square)
+    }
 
-      if variant.atomic then moves.map(Atomic.explodeSurroundingPieces).filter(variant.kingSafety)
-      else moves.filter(variant.kingSafety)
-
-    // in antichess, if there are capture moves, only capture moves are allowed
-    // so, we have to find all captures first,
-    // if they're not empty then filter by orig
-    // else use the normal moveAt
-    if variant.antichess then
+    if variant.atomic then moves.map(Atomic.explodeSurroundingPieces).filter(variant.kingSafety)
+    else if variant.crazyhouse then moves.map(Crazyhouse.updateCrazyData).filter(variant.kingSafety)
+    else if variant.threeCheck then moves.map(ThreeCheck.updateCheckCount).filter(variant.kingSafety)
+    else if variant.antichess then
+      // in antichess, if there are capture moves, only capture moves are allowed
+      // so, we have to find all captures first,
+      // if they're not empty then filter by orig
+      // else use the normal moveAt
       val captureMoves = Antichess.captureMoves(this)
       if captureMoves.nonEmpty then captureMoves.filter(_.orig == square)
-      else movesAt
-    else movesAt
+      else moves
+    else moves.filter(variant.kingSafety)
 
   def genKingAt(mask: Bitboard, square: Square) =
     val withoutCastles = genUnsafeKing(square, mask)

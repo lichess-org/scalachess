@@ -19,7 +19,7 @@ trait FenWriter:
     write(position, FullMoveNumber(1))
 
   def write(parsed: Position.AndFullMoveNumber): FullFen =
-    write(parsed.board, parsed.fullMoveNumber)
+    write(parsed.position, parsed.fullMoveNumber)
 
   def write(game: Game): FullFen =
     write(game.position, game.ply.fullMoveNumber)

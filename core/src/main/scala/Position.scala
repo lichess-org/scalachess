@@ -402,8 +402,8 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
 object Position:
 
-  case class AndFullMoveNumber(board: Position, fullMoveNumber: FullMoveNumber):
-    def ply = fullMoveNumber.ply(board.color)
+  case class AndFullMoveNumber(position: Position, fullMoveNumber: FullMoveNumber):
+    def ply = fullMoveNumber.ply(position.color)
 
   def apply(
       pieces: PieceMap,

@@ -103,10 +103,10 @@ object Game:
       .flatMap(format.Fen.readWithMoveNumber(variant, _))
       .fold(g): parsed =>
         g.copy(
-          position = parsed.board
+          position = parsed.position
             .withVariant(g.variant)
-            .withCrazyData(parsed.board.crazyData.orElse(g.position.crazyData))
-            .withColor(parsed.board.color),
+            .withCrazyData(parsed.position.crazyData.orElse(g.position.crazyData))
+            .withColor(parsed.position.color),
           ply = parsed.ply,
           startedAtPly = parsed.ply
         )

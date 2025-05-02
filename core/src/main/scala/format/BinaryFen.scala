@@ -186,7 +186,7 @@ object BinaryFen:
     val builder = ArrayBuilder.ofByte()
     builder.sizeHint(8 + 32)
 
-    val position = input.board
+    val position = input.position
     val occupied = position.board.occupied
     writeLong(builder, occupied.value)
 

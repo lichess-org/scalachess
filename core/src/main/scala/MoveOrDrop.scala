@@ -44,72 +44,76 @@ case class Move(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  def boardAfter: Position  = finalizeAfter.withColor(!piece.color)
-  lazy val toSanStr: SanStr = format.pgn.Dumper(this)
+  override lazy val boardAfter: Position = finalizeAfter.withColor(!piece.color)
+  lazy val toSanStr: SanStr              = format.pgn.Dumper(this)
 
-  // TODO rethink about how handle castling
-  // it's quite messy and error prone now
   lazy val finalizeAfter: Position =
-    val board = after.updateHistory { h1 =>
-      val h2 = h1.copy(
+    val position = after.updateHistory { h =>
+      val (castles, unmovedRooks) = castleRights
+      h.copy(
         lastMove = Option(toUci),
         halfMoveClock =
           if piece.is(Pawn) || captures || promotes then HalfMoveClock.initial
-          else h1.halfMoveClock.map(_ + 1)
+          else h.halfMoveClock.incr,
+        castles = castles,
+        unmovedRooks = unmovedRooks
       )
-
-      var castleRights: Castles      = h1.castles
-      var unmovedRooks: UnmovedRooks = h1.unmovedRooks
-
-      // If the rook is captured
-      // remove the captured rook from unmovedRooks
-      // check the captured rook's side and remove it from castlingRights
-      if captures then
-        unmovedRooks.side(dest) match
-          case Some(result) =>
-            unmovedRooks = unmovedRooks & ~dest.bl
-            result match
-              case Some(side) =>
-                castleRights = castleRights.without(!piece.color, side)
-              case None =>
-                // There is only one unmovedrook left so just remove the color from castlingRights
-                castleRights = castleRights.without(!piece.color)
-          case _ =>
-
-      // If a Rook is moved
-      // Remove that rook from unmovedRooks.
-      // check the captured rook's side and remove it from castlingRights
-      if piece.is(Rook) && unmovedRooks.contains(orig) then
-        unmovedRooks.side(orig) match
-          case Some(result) =>
-            unmovedRooks = unmovedRooks & ~orig.bl
-            result match
-              case Some(side) =>
-                castleRights = castleRights.without(piece.color, side)
-              case None =>
-                // There is only one unmovedrook left so just remove the color from castlingRights
-                castleRights = castleRights.without(piece.color)
-          case _ =>
-
-      // If the King is moved
-      // remove castlingRights and unmovedRooks for the moving side
-      else if piece.is(King) then
-        unmovedRooks = unmovedRooks.without(piece.color)
-        castleRights = castleRights.without(piece.color)
-
-      h2.withCastles(castleRights).copy(unmovedRooks = unmovedRooks)
     }
 
     // Update position hashes last, only after updating the board,
     // castling rights and en-passant rights.
-    board.updateHistory { h =>
+    position.updateHistory { h =>
       lazy val positionHashesOfBoardBefore =
         if h.positionHashes.isEmpty then PositionHash(Hash(boardBefore)) else h.positionHashes
-      val resetsPositionHashes = board.variant.isIrreversible(this)
+      val resetsPositionHashes = position.variant.isIrreversible(this)
       val basePositionHashes =
         if resetsPositionHashes then PositionHash.empty else positionHashesOfBoardBefore
-      h.copy(positionHashes = PositionHash(Hash(board.withColor(!piece.color))).combine(basePositionHashes))
+      h.copy(positionHashes =
+        PositionHash(Hash(position.withColor(!piece.color))).combine(basePositionHashes)
+      )
     }
+
+  private def castleRights: (Castles, UnmovedRooks) =
+    var castleRights: Castles      = after.history.castles
+    var unmovedRooks: UnmovedRooks = after.history.unmovedRooks
+
+    // if the rook is captured
+    // remove the captured rook from unmovedRooks
+    // check the captured rook's side and remove it from castlingRights
+    if captures then
+      unmovedRooks.side(dest) match
+        case Some(result) =>
+          unmovedRooks = unmovedRooks & ~dest.bl
+          result match
+            case Some(side) =>
+              castleRights = castleRights.without(!piece.color, side)
+            case None =>
+              // There is only one unmovedrook left so just remove the color from castlingRights
+              castleRights = castleRights.without(!piece.color)
+        case _ =>
+
+    // if a rook is moved
+    // remove that rook from unmovedRooks
+    // check the moved rook's side and remove it from castlingRights
+    if piece.is(Rook) && unmovedRooks.contains(orig) then
+      unmovedRooks.side(orig) match
+        case Some(result) =>
+          unmovedRooks = unmovedRooks & ~orig.bl
+          result match
+            case Some(side) =>
+              castleRights = castleRights.without(piece.color, side)
+            case None =>
+              // There is only one unmovedrook left so just remove the color from castlingRights
+              castleRights = castleRights.without(piece.color)
+        case _ =>
+
+    // If the King is moved
+    // remove castlingRights and unmovedRooks for the moving side
+    else if piece.is(King) then
+      unmovedRooks = unmovedRooks.without(piece.color)
+      castleRights = castleRights.without(piece.color)
+
+    (castleRights, unmovedRooks)
 
   // does this move capture an opponent piece?
   inline def captures: Boolean = capture.isDefined
@@ -158,9 +162,8 @@ case class Drop(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  inline def before: Position = boardBefore
-  def boardAfter: Position    = finalizeAfter.withColor(!piece.color)
-  lazy val toSanStr: SanStr   = format.pgn.Dumper(this)
+  override lazy val boardAfter: Position = finalizeAfter.withColor(!piece.color)
+  lazy val toSanStr: SanStr              = format.pgn.Dumper(this)
 
   lazy val finalizeAfter: Position =
     after.updateHistory { h =>
@@ -168,15 +171,13 @@ case class Drop(
         if h.positionHashes.value.isEmpty then PositionHash(Hash(boardBefore)) else h.positionHashes
       h.copy(
         lastMove = toUci.some,
-        unmovedRooks = before.unmovedRooks,
-        halfMoveClock = if piece.is(Pawn) then HalfMoveClock.initial else h.halfMoveClock.map(_ + 1),
+        unmovedRooks = boardBefore.unmovedRooks,
+        halfMoveClock = if piece.is(Pawn) then HalfMoveClock.initial else h.halfMoveClock.incr,
         positionHashes = PositionHash(Hash(after.withColor(!piece.color))).combine(basePositionHashes)
       )
     }
 
   inline def color: Color = piece.color
-
-  inline def withAfter(newBoard: Position): Drop = copy(after = newBoard)
 
   inline def withMetrics(m: MoveMetrics): Drop = copy(metrics = m)
 

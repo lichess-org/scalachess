@@ -30,11 +30,14 @@ object UnmovedRooks:
     def without(color: Color): UnmovedRooks =
       ur & Bitboard.rank(color.lastRank).value
 
-    // Try to guess the side of the rook at postion `square`
-    // If the position is not a ummovedRook return None
-    // If the position is a ummovedRook but there is no other rook on the
-    // same rank return Some(None) (because we cannot guess)
-    // If there are two rooks on the same rank, return the side of the rook
+    /**
+    * Guess the side of the rook at the given square
+    *
+    * If the position is not a ummovedRook return None
+    * If the position is a ummovedRook but there is no other rook on the
+    * same rank return Some(None) (because we cannot guess)
+    * If there are two rooks on the same rank, return the side of the rook
+    */
     def side(square: Square): Option[Option[Side]] =
       val rook = square.bb
       if rook.isDisjoint(ur) then None

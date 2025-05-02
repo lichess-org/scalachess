@@ -120,7 +120,7 @@ class HordeVariantTest extends ChessTest:
     assertEquals(steps.last._1.board.legalMoves.exists(_.castles), true)
 
   test("UnmovedRooks & castles at the starting position"):
-    val board = Board.init(Horde, White)
+    val board = Position.init(Horde, White)
     assertEquals(board.history.unmovedRooks, UnmovedRooks(Set(Square.A8, Square.H8)))
     assertEquals(board.history.castles, Castles(false, false, true, true))
 

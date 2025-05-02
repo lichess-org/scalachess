@@ -1,9 +1,10 @@
 package chess
 
-import chess.bitboard.Bitboard
-
 import java.lang.Math.abs
 import scala.annotation.targetName
+
+import bitboard.Attacks.*
+import bitboard.Magic
 
 opaque type Square = Int
 object Square:
@@ -61,6 +62,22 @@ object Square:
 
     inline def bb: Bitboard = Bitboard(1L << s.value)
     inline def bl: Long     = 1L << s.value
+
+    def bishopAttacks(occupied: Bitboard): Bitboard =
+      Bitboard(ATTACKS(Magic.BISHOP(s.value).bishopIndex(occupied.value)))
+
+    def rookAttacks(occupied: Bitboard): Bitboard =
+      Bitboard(ATTACKS(Magic.ROOK(s.value).rookIndex(occupied.value)))
+
+    def queenAttacks(occupied: Bitboard): Bitboard =
+      bishopAttacks(occupied) ^ rookAttacks(occupied)
+
+    def pawnAttacks(color: Color): Bitboard =
+      Bitboard(color.fold(WHITE_PAWN_ATTACKS(s), BLACK_PAWN_ATTACKS(s)))
+
+    def kingAttacks: Bitboard = Bitboard(KING_ATTACKS(s))
+
+    def knightAttacks: Bitboard = Bitboard(KNIGHT_ATTACKS(s))
 
   end extension
 

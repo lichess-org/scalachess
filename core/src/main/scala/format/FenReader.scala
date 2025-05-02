@@ -7,8 +7,6 @@ import scalalib.zeros.given
 
 import variant.{ Standard, Variant }
 import variant.Crazyhouse.Pockets
-import bitboard.Bitboard
-import bitboard.Board as BBoard
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation
   *
@@ -17,13 +15,13 @@ import bitboard.Board as BBoard
   * http://scidb.sourceforge.net/help/en/FEN.html#ThreeCheck
   */
 trait FenReader:
-  def read(variant: Variant, fen: FullFen): Option[Board] =
+  def read(variant: Variant, fen: FullFen): Option[Position] =
     val (fBoard, fColor, fCastling, fEnpassant) = fen.parts
     makeBoard(variant, fBoard).map { (bboard, crazyData) =>
       // We trust Fen's color to be correct, if there is no color we use the color of the king in check
       // If there is no king in check we use white
       val color = fColor.orElse(variant.checkColor(bboard)) | Color.White
-      val board: Board = new Board(
+      val board: Position = new Position(
         bboard,
         History(
           unmovedRooks = variant.makeUnmovedRooks(bboard.rooks),
@@ -82,18 +80,18 @@ trait FenReader:
           checkCount.foldLeft(history)(_.withCheckCount(_))
     }
 
-  def read(fen: FullFen): Option[Board] = read(Standard, fen)
+  def read(fen: FullFen): Option[Position] = read(Standard, fen)
 
-  def readWithMoveNumber(variant: Variant, fen: FullFen): Option[Board.AndFullMoveNumber] =
+  def readWithMoveNumber(variant: Variant, fen: FullFen): Option[Position.AndFullMoveNumber] =
     read(variant, fen).map { sit =>
       val (halfMoveClock, fullMoveNumber) = readHalfMoveClockAndFullMoveNumber(fen)
-      Board.AndFullMoveNumber(
+      Position.AndFullMoveNumber(
         halfMoveClock.map(sit.history.setHalfMoveClock).fold(sit)(x => sit.updateHistory(_ => x)),
         fullMoveNumber | FullMoveNumber(1)
       )
     }
 
-  def readWithMoveNumber(fen: FullFen): Option[Board.AndFullMoveNumber] =
+  def readWithMoveNumber(fen: FullFen): Option[Position.AndFullMoveNumber] =
     readWithMoveNumber(Standard, fen)
 
   def readHalfMoveClockAndFullMoveNumber(fen: FullFen): (Option[HalfMoveClock], Option[FullMoveNumber]) =
@@ -126,7 +124,7 @@ trait FenReader:
       case _ => None
 
   // only cares about pieces positions on the board (first part of FEN string)
-  def makeBoard(variant: Variant, fen: String): Option[(BBoard, Option[Crazyhouse.Data])] =
+  def makeBoard(variant: Variant, fen: String): Option[(Board, Option[Crazyhouse.Data])] =
     val (position, pocketsStr) = fen.takeWhile(' ' !=) match
       case word if word.count('/' ==) == 8 =>
         val splitted = word.split('/')
@@ -143,7 +141,7 @@ trait FenReader:
 
   private val numberSet = Set.from('1' to '8')
 
-  type BoardWithCrazyPromoted = (BBoard, Bitboard)
+  type BoardWithCrazyPromoted = (Board, Bitboard)
 
   def makeBoardOptionWithCrazyPromoted(boardFen: String, variant: Variant): Option[BoardWithCrazyPromoted] =
     val (board, error) = makeBoardWithCrazyPromoted(boardFen, variant)
@@ -206,7 +204,7 @@ trait FenReader:
                     iter.next
                 case None => error = Some(s"invalid piece $ch")
             file += 1
-    val bboard = BBoard(
+    val bboard = Board(
       occupied = occupied,
       white = white,
       black = black,

@@ -8,8 +8,6 @@ import scala.language.implicitConversions
 import Square.*
 import variant.{ Atomic, Chess960 }
 import format.FullFen
-import bitboard.Board as BBoard
-import bitboard.Bitboard
 
 class UnmovedRooksTest extends ChessTest:
 
@@ -30,7 +28,7 @@ class UnmovedRooksTest extends ChessTest:
 
   test("At the start, unmovedRooks == rooks"):
     chess960Boards.map: board =>
-      assertEquals(board.history.unmovedRooks, BBoard.fromMap(board.pieces).rooks)
+      assertEquals(board.history.unmovedRooks, Board.fromMap(board.pieces).rooks)
 
   test("At the start, both sides should have two unmoved rooks"):
     chess960Boards.map: board =>

@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 
 import cats.syntax.all.*
 import chess.format.pgn.{ Fixtures, Reader }
-import chess.{ Board, Hash }
+import chess.{ Position, Hash }
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -20,7 +20,7 @@ class HashBench:
   // the unit of CPU work per iteration
   private val Work: Long = 10
 
-  var boards: List[Board] = scala.compiletime.uninitialized
+  var boards: List[Position] = scala.compiletime.uninitialized
 
   @Setup
   def setup() =

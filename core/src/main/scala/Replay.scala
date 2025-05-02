@@ -74,10 +74,10 @@ object Replay:
       case (game, gs, err) => (game, gs.reverse, err)
 
   private def computeBoards[M](
-      sit: Board,
+      sit: Position,
       moves: List[M],
-      play: M => Board => Either[ErrorStr, MoveOrDrop]
-  ): Either[ErrorStr, List[Board]] =
+      play: M => Position => Either[ErrorStr, MoveOrDrop]
+  ): Either[ErrorStr, List[Position]] =
     moves
       .foldM((sit, List(sit))) { case ((current, acc), move) =>
         play(move)(current).map: md =>
@@ -95,14 +95,14 @@ object Replay:
           case Left(err) => err.asLeft
           case Right(md) => computeReplay(replay.addMove(md), rest)
 
-  private def initialFenToBoard(initialFen: Option[Fen.Full], variant: Variant): Board =
-    (initialFen.flatMap(Fen.read) | Board(variant)).withVariant(variant)
+  private def initialFenToBoard(initialFen: Option[Fen.Full], variant: Variant): Position =
+    (initialFen.flatMap(Fen.read) | Position(variant)).withVariant(variant)
 
   def boards(
       sans: Iterable[SanStr],
       initialFen: Option[Fen.Full],
       variant: Variant
-  ): Either[ErrorStr, List[Board]] =
+  ): Either[ErrorStr, List[Position]] =
     val sit = initialFenToBoard(initialFen, variant)
     Parser
       .moves(sans)
@@ -113,7 +113,7 @@ object Replay:
       moves: List[Uci],
       initialFen: Option[Fen.Full],
       variant: Variant
-  ): Either[ErrorStr, List[Board]] =
+  ): Either[ErrorStr, List[Position]] =
     computeBoards(initialFenToBoard(initialFen, variant), moves, _.apply)
 
   def apply(
@@ -137,7 +137,7 @@ object Replay:
       def compareFen(fen: Fen.Full)  = truncateFen(fen) == atFenTruncated
 
       @scala.annotation.tailrec
-      def recursivePlyAtFen(board: Board, sans: List[San], ply: Ply): Either[ErrorStr, Ply] =
+      def recursivePlyAtFen(board: Position, sans: List[San], ply: Ply): Either[ErrorStr, Ply] =
         sans match
           case Nil => ErrorStr(s"Can't find $atFenTruncated, reached ply $ply").asLeft
           case san :: rest =>
@@ -149,7 +149,7 @@ object Replay:
                 if compareFen(fen) then ply.asRight
                 else recursivePlyAtFen(after.withColor(!board.color), rest, ply.next)
 
-      val board = initialFen.flatMap(Fen.read(variant, _)) | Board(variant)
+      val board = initialFen.flatMap(Fen.read(variant, _)) | Position(variant)
 
       Parser
         .moves(sans)

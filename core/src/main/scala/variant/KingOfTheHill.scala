@@ -14,15 +14,16 @@ case object KingOfTheHill
 
   def pieces = Standard.pieces
 
-  def validMoves(board: Board): List[Move] =
+  def validMoves(board: Position): List[Move] =
     Standard.validMoves(board)
 
-  override def valid(board: Board, strict: Boolean): Boolean = Standard.valid(board, strict)
+  override def valid(board: Position, strict: Boolean): Boolean =
+    Standard.valid(board, strict)
 
-  override def specialEnd(board: Board) =
-    board.kingOf(!board.color).intersects(bitboard.Bitboard.center)
+  override def specialEnd(board: Position): Boolean =
+    board.kingOf(!board.color).intersects(Bitboard.center)
 
   /** You only need a king to be able to win in this variant
     */
-  override def opponentHasInsufficientMaterial(board: Board): Boolean = false
-  override def isInsufficientMaterial(board: Board): Boolean          = false
+  override def opponentHasInsufficientMaterial(board: Position): Boolean = false
+  override def isInsufficientMaterial(board: Position): Boolean          = false

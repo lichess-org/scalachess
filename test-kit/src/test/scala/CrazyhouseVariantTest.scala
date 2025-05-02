@@ -2,7 +2,6 @@ package chess
 
 import cats.syntax.option.*
 import chess.Square.*
-import chess.bitboard.Bitboard
 import chess.format.FullFen
 import chess.format.pgn.SanStr
 import chess.variant.Crazyhouse

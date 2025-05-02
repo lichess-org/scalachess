@@ -28,11 +28,11 @@ object PositionHash:
 
 opaque type Hash = Int
 object Hash:
-  val size                      = 3
-  def apply(value: Int): Hash   = value >>> 8
-  def apply(board: Board): Hash = hashBoard(board) >>> 8
+  val size                         = 3
+  def apply(value: Int): Hash      = value >>> 8
+  def apply(board: Position): Hash = hashBoard(board) >>> 8
 
-  private def hashBoard(board: Board): Int =
+  private def hashBoard(board: Position): Int =
 
     val hPieces =
       var h = 0

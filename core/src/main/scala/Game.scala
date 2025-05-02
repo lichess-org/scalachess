@@ -4,7 +4,7 @@ import chess.format.pgn.SanStr
 import chess.format.{ Fen, Uci, pgn }
 
 case class Game(
-    board: Board,
+    board: Position,
     sans: Vector[SanStr] = Vector(),
     clock: Option[Clock] = None,
     ply: Ply = Ply.initial, // plies
@@ -83,9 +83,9 @@ case class Game(
 
   inline def fullMoveNumber: FullMoveNumber = ply.fullMoveNumber
 
-  inline def withBoard(inline b: Board): Game = copy(board = b)
+  inline def withBoard(inline b: Position): Game = copy(board = b)
 
-  inline def updateBoard(inline f: Board => Board): Game = withBoard(f(board))
+  inline def updateBoard(inline f: Position => Position): Game = withBoard(f(board))
 
   inline def withPlayer(c: Color): Game = copy(board = board.copy(color = c))
 
@@ -94,7 +94,7 @@ case class Game(
 object Game:
 
   def apply(variant: chess.variant.Variant): Game =
-    Game(Board.init(variant, White))
+    Game(Position.init(variant, White))
 
   def apply(variantOption: Option[chess.variant.Variant], fen: Option[Fen.Full]): Game =
     val variant = variantOption | chess.variant.Standard

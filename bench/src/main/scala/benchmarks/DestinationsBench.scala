@@ -7,7 +7,7 @@ import org.openjdk.jmh.infra.Blackhole
 import chess.format.*
 import chess.perft.Perft
 import chess.variant.*
-import chess.Board
+import chess.Position
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -23,14 +23,14 @@ class DestinationsBench:
   @Param(Array("100"))
   var games: Int = scala.compiletime.uninitialized
 
-  var threecheckInput: List[Board]  = scala.compiletime.uninitialized
-  var antichessInput: List[Board]   = scala.compiletime.uninitialized
-  var atomicInput: List[Board]      = scala.compiletime.uninitialized
-  var crazyhouseInput: List[Board]  = scala.compiletime.uninitialized
-  var racingkingsInput: List[Board] = scala.compiletime.uninitialized
-  var hordeInput: List[Board]       = scala.compiletime.uninitialized
-  var randomInput: List[Board]      = scala.compiletime.uninitialized
-  var trickyInput: List[Board]      = scala.compiletime.uninitialized
+  var threecheckInput: List[Position]  = scala.compiletime.uninitialized
+  var antichessInput: List[Position]   = scala.compiletime.uninitialized
+  var atomicInput: List[Position]      = scala.compiletime.uninitialized
+  var crazyhouseInput: List[Position]  = scala.compiletime.uninitialized
+  var racingkingsInput: List[Position] = scala.compiletime.uninitialized
+  var hordeInput: List[Position]       = scala.compiletime.uninitialized
+  var randomInput: List[Position]      = scala.compiletime.uninitialized
+  var trickyInput: List[Position]      = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =
@@ -75,13 +75,13 @@ class DestinationsBench:
   def tricky(bh: Blackhole) =
     bench(trickyInput)(bh)
 
-  private def bench(sits: List[Board])(bh: Blackhole) =
+  private def bench(sits: List[Position])(bh: Blackhole) =
     val x = sits.map: x =>
       Blackhole.consumeCPU(Work)
       x.destinations
     bh.consume(x)
 
-  private def makeBoards(perfts: List[Perft], variant: Variant, games: Int): List[Board] =
+  private def makeBoards(perfts: List[Perft], variant: Variant, games: Int): List[Position] =
     perfts
       .take(games)
       .map(p => Fen.read(variant, p.epd).getOrElse(throw RuntimeException("boooo")))

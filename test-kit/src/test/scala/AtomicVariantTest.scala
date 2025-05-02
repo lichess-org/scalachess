@@ -191,7 +191,6 @@ class AtomicVariantTest extends ChessTest:
       .assertRight: game =>
         assertEquals(game.board(Square.E6), None)
         // Every piece surrounding the en-passant destination square that is not a pawn should be empty
-        import bitboard.Bitboard.*
         assert:
           Square.E6.kingAttacks.forall: square =>
             game.board(square).isEmpty || square == Square.E7 || square == Square.D7

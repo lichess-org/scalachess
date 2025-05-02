@@ -5,7 +5,7 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 import cats.syntax.all.*
-import chess.{ FullMoveNumber, Board }
+import chess.{ FullMoveNumber, Position }
 import chess.variant.Chess960
 import chess.{ Mode as _, * }
 import chess.format.{ Fen, FullFen, BinaryFen }
@@ -24,20 +24,20 @@ class BinaryFenBench:
   private val Work: Long = 10
 
   @Param(Array("10", "100", "1000"))
-  var games: Int                          = scala.compiletime.uninitialized
-  var sits: List[Board.AndFullMoveNumber] = scala.compiletime.uninitialized
-  var fens: List[BinaryFen]               = scala.compiletime.uninitialized
+  var games: Int                             = scala.compiletime.uninitialized
+  var sits: List[Position.AndFullMoveNumber] = scala.compiletime.uninitialized
+  var fens: List[BinaryFen]                  = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =
     sits = makeBoards(Perft.randomPerfts, games)
     fens = sits.map(BinaryFen.write)
 
-  private def makeBoards(perfts: List[Perft], games: Int): List[Board.AndFullMoveNumber] =
+  private def makeBoards(perfts: List[Perft], games: Int): List[Position.AndFullMoveNumber] =
     perfts
       .take(games)
       .flatMap(x => Fen.read(Chess960, x.epd))
-      .map(Board.AndFullMoveNumber(_, FullMoveNumber(1)))
+      .map(Position.AndFullMoveNumber(_, FullMoveNumber(1)))
 
   @Benchmark
   def write(bh: Blackhole) =

@@ -9,7 +9,7 @@ class Magic(val mask: Long, val factor: Long, val offset: Int):
 
 object Magic:
   @static
-  private[bitboard] val ROOK = Array[Magic](
+  private[chess] val ROOK = Array[Magic](
     Magic(0x000101010101017eL, 0x00280077ffebfffeL, 26304),
     Magic(0x000202020202027cL, 0x2004010201097fffL, 35520),
     Magic(0x000404040404047aL, 0x0010020010053fffL, 38592),
@@ -77,7 +77,7 @@ object Magic:
   )
 
   @static
-  private[bitboard] val BISHOP = Array[Magic](
+  private[chess] val BISHOP = Array[Magic](
     Magic(0x0040201008040200L, 0x007fbfbfbfbfbfffL, 5378),
     Magic(0x0000402010080400L, 0x0000a060401007fcL, 4093),
     Magic(0x0000004020100a00L, 0x0001004008020000L, 4314),

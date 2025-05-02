@@ -1,11 +1,11 @@
 package chess
-package bitboard
 
 import scala.annotation.targetName
 
+import bitboard.Attacks.*
+
 opaque type Bitboard = Long
 object Bitboard:
-  import Attacks.*
 
   inline def apply(inline l: Long): Bitboard              = l
   inline def apply(inline xs: Iterable[Square]): Bitboard = xs.foldLeft(empty)((b, s) => b | s.bl)
@@ -30,24 +30,6 @@ object Bitboard:
 
   def aligned(a: Square, b: Square, c: Square): Boolean = ray(a, b).contains(c)
   def between(a: Square, b: Square): Bitboard           = BETWEEN(a.value)(b.value)
-
-  extension (s: Square)
-
-    def bishopAttacks(occupied: Bitboard): Bitboard =
-      ATTACKS(Magic.BISHOP(s.value).bishopIndex(occupied))
-
-    def rookAttacks(occupied: Bitboard): Bitboard =
-      ATTACKS(Magic.ROOK(s.value).rookIndex(occupied))
-
-    def queenAttacks(occupied: Bitboard): Bitboard =
-      bishopAttacks(occupied) ^ rookAttacks(occupied)
-
-    def pawnAttacks(color: Color): Bitboard =
-      color.fold(WHITE_PAWN_ATTACKS(s.value), BLACK_PAWN_ATTACKS(s.value))
-
-    def kingAttacks: Bitboard = KING_ATTACKS(s.value)
-
-    def knightAttacks: Bitboard = KNIGHT_ATTACKS(s.value)
 
   extension (l: Long)
     private def lsb: Square = Square.unsafe(java.lang.Long.numberOfTrailingZeros(l))

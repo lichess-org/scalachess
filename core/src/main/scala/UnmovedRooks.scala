@@ -2,8 +2,6 @@ package chess
 
 import scala.annotation.targetName
 
-import bitboard.Bitboard
-
 opaque type UnmovedRooks = Long
 object UnmovedRooks:
   // for lila testing only

@@ -39,7 +39,7 @@ trait FenReader:
               val color    = Color.fromWhite(ch.isUpper)
               val backRank = Bitboard.rank(color.backRank)
               // rooks that can be used for castling
-              val rooks = board.rooks & board(color) & backRank
+              val rooks = board.rooks & board.byColor(color) & backRank
               {
                 for
                   kingSquare <- (board.kingOf(color) & backRank).first
@@ -58,9 +58,9 @@ trait FenReader:
         if square.rank == sixthRank
         orig = square.withRank(seventhRank)
         dest = square.withRank(fifthRank)
-        if board(dest).contains(Piece(!board.color, Pawn)) &&
-          board(square.file, sixthRank).isEmpty &&
-          board(orig).isEmpty
+        if board.pieceAt(dest).contains(Piece(!board.color, Pawn)) &&
+          board.pieceAt(square.file, sixthRank).isEmpty &&
+          board.pieceAt(orig).isEmpty
       yield Uci.Move(orig, dest)
 
       board

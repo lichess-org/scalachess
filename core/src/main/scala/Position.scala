@@ -14,7 +14,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
     kingsAndBishopsOnlyOf, kingsAndKnightsOnly, kingsAndKnightsOnlyOf, kingsAndMinorsOnly,
     kingsOnly, kingsOnlyOf, kingsRooksAndMinorsOnly, knights, nbPieces, nonKingsOf, occupied,
     onlyKnights, onlyOf, pawns, piece, pieceAt, pieceMap as pieces, pieces as allPieces, piecesOf,
-    queens, rooks, sliderBlockers, sliders, white, apply, count
+    queens, rooks, sliderBlockers, sliders, white, count
   }
   // format: on
 
@@ -116,7 +116,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
   def generateMovesAt(square: Square): List[Move] =
     def movesAt =
-      val moves = board(square).fold(Nil) { piece =>
+      val moves = board.pieceAt(square).fold(Nil) { piece =>
         if piece.color != color then Nil
         else
           val targets = ~us
@@ -161,11 +161,13 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
     */
   lazy val potentialEpSquare: Option[Square] = history.lastMove.flatMap:
     case Uci.Move(orig, dest, _) =>
-      board(dest).flatMap: piece =>
-        if piece.color != color && piece.role == Pawn &&
-          orig.yDist(dest) == 2 && orig.rank != piece.color.backRank
-        then dest.prevRank(!color)
-        else None
+      board
+        .pieceAt(dest)
+        .flatMap: piece =>
+          if piece.color != color && piece.role == Pawn &&
+            orig.yDist(dest) == 2 && orig.rank != piece.color.backRank
+          then dest.prevRank(!color)
+          else None
     case _ => None
 
   def genNonKingAndNonPawn(mask: Bitboard): List[Move] =

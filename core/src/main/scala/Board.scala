@@ -16,19 +16,13 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
     king as kings
   }
 
-  inline def apply(inline color: Color): Bitboard = color.fold(white, black)
-  inline def apply(inline color: Color, inline role: Role): Bitboard =
-    color.fold(white, black) & byRole(role)
-  inline def apply(inline at: Square): Option[Piece]     = pieceAt(at)
-  inline def apply(inline file: File, inline rank: Rank) = pieceAt(Square(file, rank))
-
   def sliders: Bitboard              = bishops ^ rooks ^ queens
   def isOccupied(s: Square): Boolean = occupied.contains(s)
 
   lazy val nbPieces: Int = occupied.count
 
   def byPiece(piece: Piece): Bitboard =
-    byColor(piece.color) & byRole(piece.role)
+    byPiece(piece.color, piece.role)
 
   def byPiece(color: Color, role: Role): Bitboard =
     byColor(color) & byRole(role)
@@ -38,6 +32,9 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
 
   def colorAt(s: Square): Option[Color] =
     byColor.findColor(_.contains(s))
+
+  def pieceAt(file: File, rank: Rank): Option[Piece] =
+    pieceAt(Square(file, rank))
 
   def pieceAt(s: Square): Option[Piece] =
     for
@@ -96,7 +93,7 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
     (roles & colorPieces) == colorPieces
 
   def nonKingsOf(color: Color): Bitboard =
-    apply(color) & ~kings
+    byColor(color) & ~kings
 
   def nonKing: Bitboard =
     occupied & ~kings

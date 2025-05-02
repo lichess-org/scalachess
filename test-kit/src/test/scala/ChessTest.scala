@@ -24,8 +24,10 @@ trait ChessTestCommon:
   extension (board: Position)
     def visual = Visual >> board
     def destsFrom(from: Square): Option[List[Square]] =
-      board(from).map: piece =>
-        board.withColor(piece.color).generateMovesAt(from).map(_.dest)
+      board
+        .pieceAt(from)
+        .map: piece =>
+          board.withColor(piece.color).generateMovesAt(from).map(_.dest)
 
     def seq(actions: Position => Option[Position]*): Option[Position] =
       actions.foldLeft(board.some)(_ flatMap _)

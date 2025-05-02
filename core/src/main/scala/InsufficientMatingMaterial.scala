@@ -17,13 +17,15 @@ object InsufficientMatingMaterial:
    * and it doesn't have any capture
    */
   def pawnBlockedByPawn(pawn: Square, board: Position): Boolean =
-    board(pawn).exists(p =>
-      p.is(Pawn) &&
-        board.withColor(p.color).generateMovesAt(pawn).isEmpty && {
-          val blockingPosition = posAheadOfPawn(pawn, p.color)
-          blockingPosition.flatMap(board(_)).exists(_.is(Pawn))
-        }
-    )
+    board
+      .pieceAt(pawn)
+      .exists(p =>
+        p.is(Pawn) &&
+          board.withColor(p.color).generateMovesAt(pawn).isEmpty && {
+            val blockingPosition = posAheadOfPawn(pawn, p.color)
+            blockingPosition.flatMap(board.pieceAt).exists(_.is(Pawn))
+          }
+      )
 
   /*
    * Determines whether a board position is an automatic draw due to neither player
@@ -46,7 +48,8 @@ object InsufficientMatingMaterial:
       board.nonKingsOf(color).count == 1 &&
       board.onlyOf(!color, board.kings | board.queens)
     else if board.kingsAndBishopsOnlyOf(color) then
-      !(bishopsOnOppositeColors(board) || (board(!color, Knight) | board(!color, Pawn)).nonEmpty)
+      !(bishopsOnOppositeColors(board) ||
+        (board.byPiece(!color, Knight) | board.byPiece(!color, Pawn)).nonEmpty)
     else false
 
   /** Determines the position one ahead of a pawn based on the color of the piece.

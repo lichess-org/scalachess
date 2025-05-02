@@ -42,9 +42,9 @@ case object Antichess
   override def winner(board: Position): Option[Color] =
     specialEnd(board).option(board.color)
 
-  override def specialEnd(board: Position): Boolean =
+  override def specialEnd(position: Position): Boolean =
     // The game ends with a win when one player manages to lose all their pieces or is in stalemate
-    board(board.color).isEmpty || board.legalMoves.isEmpty
+    position.us.isEmpty || position.legalMoves.isEmpty
 
   // In antichess, it is valuable for your opponent to have pieces.
   override def materialImbalance(board: Position): Int =

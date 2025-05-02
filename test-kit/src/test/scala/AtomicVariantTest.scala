@@ -16,8 +16,8 @@ class AtomicVariantTest extends ChessTest:
     game
       .playMoves((Square.B2, Square.H8))
       .assertRight: game =>
-        assert(explodedSquares.forall(square => game.board(square).isEmpty))
-        assert(intactPawns.forall(square => game.board(square).isDefined))
+        assert(explodedSquares.forall(square => game.board.pieceAt(square).isEmpty))
+        assert(intactPawns.forall(square => game.board.pieceAt(square).isDefined))
 
   test("Must explode all surrounding non pawn pieces on capture (contrived board)"):
     val fenPosition = FullFen("k7/3bbn2/3rqn2/3qr3/8/7B/8/1K6 w - -")
@@ -28,7 +28,7 @@ class AtomicVariantTest extends ChessTest:
     game
       .playMoves((Square.H3, Square.E6))
       .assertRight: game =>
-        assert(explodedSquares.forall(square => game.board(square).isEmpty))
+        assert(explodedSquares.forall(square => game.board.pieceAt(square).isEmpty))
 
   test(
     "Must explode all surrounding non pawn pieces on capture (contrived board with bottom right position)"
@@ -40,7 +40,7 @@ class AtomicVariantTest extends ChessTest:
     game
       .playMoves((Square.B3, Square.E6))
       .assertRight: game =>
-        assert(explodedSquares.forall(square => game.board(square).isEmpty))
+        assert(explodedSquares.forall(square => game.board.pieceAt(square).isEmpty))
 
   test("Not allow a king to capture a piece"):
     val fenPosition = FullFen("8/8/8/1k6/8/8/8/1Kr5 w - -")
@@ -137,7 +137,7 @@ class AtomicVariantTest extends ChessTest:
     game
       .playMoves((Square.D6, Square.D7))
       .assertRight: game =>
-        assert(game.board(Square.D7).isDefined)
+        assert(game.board.pieceAt(Square.D7).isDefined)
         assertNot(game.board.check.yes)
 
   test("Draw on knight and king vs king"):
@@ -189,11 +189,11 @@ class AtomicVariantTest extends ChessTest:
     game
       .playMoves((Square.E7, Square.E5), (Square.D5, Square.E6))
       .assertRight: game =>
-        assertEquals(game.board(Square.E6), None)
+        assertEquals(game.board.pieceAt(Square.E6), None)
         // Every piece surrounding the en-passant destination square that is not a pawn should be empty
         assert:
           Square.E6.kingAttacks.forall: square =>
-            game.board(square).isEmpty || square == Square.E7 || square == Square.D7
+            game.board.pieceAt(square).isEmpty || square == Square.E7 || square == Square.D7
 
   test("Verify it is not possible to walk into check"):
     val position = FullFen("rnbqkbnr/ppp1pppp/8/3pN3/8/8/PPPPPPPP/RNBQKB1R b KQkq - 1 2")
@@ -427,16 +427,16 @@ class AtomicVariantTest extends ChessTest:
     fenToGame(position, Atomic)
       .playMove(Square.E1, Square.C1)
       .assertRight: game =>
-        assertEquals(game.board(Square.C1), White.king.some)
-        assertEquals(game.board(Square.D1), White.rook.some)
+        assertEquals(game.board.pieceAt(Square.C1), White.king.some)
+        assertEquals(game.board.pieceAt(Square.D1), White.rook.some)
 
   test("Allow castling with touching kings and rook shielding final attack 2"):
     val position = FullFen("r3k1rR/5K2/8/8/8/8/8/8 b kq - 0 1")
     fenToGame(position, Atomic)
       .playMoves((Square.G8, Square.G6), (Square.F7, Square.E7), (Square.E8, Square.A8))
       .assertRight: game =>
-        assertEquals(game.board(Square.C8), Black.king.some)
-        assertEquals(game.board(Square.D8), Black.rook.some)
+        assertEquals(game.board.pieceAt(Square.C8), Black.king.some)
+        assertEquals(game.board.pieceAt(Square.D8), Black.rook.some)
 
   test("Disallow castling through atomic check"):
     val position = FullFen("8/8/8/8/8/8/5k2/R3K2r w Q - 0 1")

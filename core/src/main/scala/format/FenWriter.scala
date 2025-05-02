@@ -52,7 +52,7 @@ trait FenWriter:
     for y <- Rank.allReversed do
       empty = 0
       for x <- File.all do
-        board(x, y) match
+        board.pieceAt(x, y) match
           case None => empty = empty + 1
           case Some(piece) =>
             if empty == 0 then fen.append(piece.forsyth.toString)

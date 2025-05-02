@@ -80,7 +80,7 @@ abstract class Variant private[variant] (
       board.generateMovesAt(from).find(_.dest == to)
 
     for
-      piece <- board(from).toRight(ErrorStr(s"No piece on ${from.key}"))
+      piece <- board.pieceAt(from).toRight(ErrorStr(s"No piece on ${from.key}"))
       _     <- Either.cond(piece.color == board.color, piece, ErrorStr(s"Not my piece on ${from.key}"))
       m1    <- findMove(from, to).toRight(ErrorStr(s"Piece on ${from.key} cannot move to ${to.key}"))
       m2 <- m1
@@ -147,14 +147,14 @@ abstract class Variant private[variant] (
   def finalizeBoard(board: Position, uci: format.Uci, captured: Option[Piece]): Position = board
 
   protected def pawnsOnPromotionRank(board: Position, color: Color): Boolean =
-    board(color, Pawn).intersects(Bitboard.rank(color.promotablePawnRank))
+    board.byPiece(color, Pawn).intersects(Bitboard.rank(color.promotablePawnRank))
 
   protected def pawnsOnBackRank(board: Position, color: Color): Boolean =
-    board(color, Pawn).intersects(Bitboard.rank(color.backRank))
+    board.byPiece(color, Pawn).intersects(Bitboard.rank(color.backRank))
 
   protected def validSide(board: Position, strict: Boolean)(color: Color): Boolean =
-    board(color, King).count == 1 &&
-      (!strict || { board(color, Pawn).count <= 8 && board(color).count <= 16 }) &&
+    board.byPiece(color, King).count == 1 &&
+      (!strict || { board.byPiece(color, Pawn).count <= 8 && board.byColor(color).count <= 16 }) &&
       !pawnsOnPromotionRank(board, color) &&
       !pawnsOnBackRank(board, color)
 

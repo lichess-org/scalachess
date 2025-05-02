@@ -139,8 +139,6 @@ case class Move(
       yield copy(after = after.withBoard(b3), promotion = Option(p))
     else this.some
 
-  inline def withAfter(newBoard: Position): Move = copy(after = newBoard)
-
   inline def withMetrics(m: MoveMetrics): Move = copy(metrics = m)
 
   override lazy val toUci: Uci.Move = Uci.Move(orig, dest, promotion)

@@ -79,7 +79,7 @@ case object Atomic
       val castles      = afterBoard.castles & ~rooksToExploded
       val unMovedRooks = afterBoard.unmovedRooks & ~rooksToExploded
       val newBoard     = afterExplosions.updateHistory(_.copy(castles = castles, unmovedRooks = unMovedRooks))
-      move.withAfter(newBoard)
+      move.copy(after = newBoard)
     else move
 
   /** Since kings cannot confine each other, if either player has only a king

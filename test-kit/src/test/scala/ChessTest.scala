@@ -73,7 +73,7 @@ trait ChessTestCommon:
       .map: sit =>
         sit.color -> sit.withVariant(variant)
       .map: (color, board) =>
-        Game(variant).copy(board = board.withColor(color))
+        Game(variant).copy(position = board.withColor(color))
       .toRight("Could not construct board from Fen")
 
   def makeBoard(pieces: (Square, Piece)*): Position =
@@ -196,4 +196,4 @@ trait ChessTest extends munit.FunSuite with ChessTestCommon with MunitExtensions
   def visualDests(board: Position, p: Option[Iterable[Square]]): String = visualDests(board, p | Nil)
 
   def assertGame(game: Game, visual: String)(using Location) =
-    assertEquals(game.board.visual, (Visual << visual).visual)
+    assertEquals(game.position.visual, (Visual << visual).visual)

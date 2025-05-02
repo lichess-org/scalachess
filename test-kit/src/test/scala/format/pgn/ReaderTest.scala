@@ -63,7 +63,7 @@ class ReaderTest extends ChessTest:
       .full(invalidVariant)
       .assertRight:
         case Result(replay, None) =>
-          assertEquals(replay.setup.board.variant, variant.Standard)
+          assertEquals(replay.setup.position.variant, variant.Standard)
   test("promoting to a rook"):
     Reader
       .full(fromLichessBadPromotion)

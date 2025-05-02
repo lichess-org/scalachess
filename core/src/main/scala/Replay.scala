@@ -53,7 +53,7 @@ object Replay:
           Parser
             .san(str)
             .flatMap: san =>
-              san(head.board)
+              san(head.position)
                 .bimap(
                   _ => Reader.makeError(init.ply + index, san),
                   { move =>
@@ -91,7 +91,7 @@ object Replay:
     ucis match
       case Nil => replay.asRight
       case uci :: rest =>
-        uci(replay.state.board) match
+        uci(replay.state.position) match
           case Left(err) => err.asLeft
           case Right(md) => computeReplay(replay.addMove(md), rest)
 

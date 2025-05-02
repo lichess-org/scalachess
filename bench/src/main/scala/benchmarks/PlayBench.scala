@@ -101,6 +101,6 @@ class PlayBench:
           // because possible moves are asked for player highlight
           // before the move is played (on initial board)
           Blackhole.consumeCPU(Work)
-          var result = game.board.destinations
+          var result = game.position.destinations
           bh.consume(result)
           game(o, d).map(_._1)

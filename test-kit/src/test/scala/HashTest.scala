@@ -10,51 +10,51 @@ class HashTest extends ChessTest:
   test("Polyglot hasher: match on the starting position"):
     val fen  = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.board), Hash(0x463b_9618))
+    assertEquals(Hash(game.position), Hash(0x463b_9618))
 
   test("Polyglot hasher: match after 1. e4"):
     val fen  = FullFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.board), Hash(0x823c_9b50))
+    assertEquals(Hash(game.position), Hash(0x823c_9b50))
 
   test("Polyglot hasher: match after 1. e4 d5"):
     val fen  = FullFen("rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.board), Hash(0x0756_b944))
+    assertEquals(Hash(game.position), Hash(0x0756_b944))
 
   test("Polyglot hasher: match after 1. e4 d5 2. e5"):
     val fen  = FullFen("rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 2")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.board), Hash(0x662f_afb9))
+    assertEquals(Hash(game.position), Hash(0x662f_afb9))
 
   test("Polyglot hasher: match after 1. e4 d5 2. e5 f5"):
     // note that en-passant matters
     val fen  = FullFen("rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.board), Hash(0x22a4_8b5a))
+    assertEquals(Hash(game.position), Hash(0x22a4_8b5a))
 
   test("Polyglot hasher: match after 1. e4 d5 2. e5 f5 3. Ke2"):
     // 3. Ke2 forfeits castling rights
     val fen  = FullFen("rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPPKPPP/RNBQ1BNR b kq - 1 3")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.board), Hash(0x652a_607c))
+    assertEquals(Hash(game.position), Hash(0x652a_607c))
 
   test("Polyglot hasher: match after 1. e4 d5 2. e5 f5 3. Ke2 Kf7"):
     val fen  = FullFen("rnbq1bnr/ppp1pkpp/8/3pPp2/8/8/PPPPKPPP/RNBQ1BNR w - - 2 4")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.board), Hash(0x00fd_d303))
+    assertEquals(Hash(game.position), Hash(0x00fd_d303))
 
   test("Polyglot hasher: match after 1. a4 b5 2. h4 b4 3. c4"):
     // again, note en-passant matters
     val fen  = FullFen("rnbqkbnr/p1pppppp/8/8/PpP4P/8/1P1PPPP1/RNBQKBNR b KQkq c3 0 3")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.board), Hash(0x3c81_23ea))
+    assertEquals(Hash(game.position), Hash(0x3c81_23ea))
 
   test("Polyglot hasher: match after 1. a4 b5 2. h4 b4 3. c4 bxc3 4. Ra3"):
     // 4. Ra3 partially forfeits castling rights
     val fen  = FullFen("rnbqkbnr/p1pppppp/8/8/P6P/R1p5/1P1PPPP1/1NBQKBNR b Kkq - 1 4")
     val game = fenToGame(fen, Standard)
-    assertEquals(Hash(game.board), Hash(0x5c3f_9b82))
+    assertEquals(Hash(game.position), Hash(0x5c3f_9b82))
 
   // Variants
 
@@ -81,7 +81,7 @@ class HashTest extends ChessTest:
       .toOption
       .get
 
-    assertNotEquals(Hash(gameA.board), Hash(gameB.board))
+    assertNotEquals(Hash(gameA.position), Hash(gameB.position))
 
   test("Hasher: account for pockets in crazyhouse"):
     val gameA = Game(Crazyhouse)
@@ -102,7 +102,7 @@ class HashTest extends ChessTest:
       )
       .get
 
-    assertNotEquals(Hash(gameA.board), Hash(gameB.board))
+    assertNotEquals(Hash(gameA.position), Hash(gameB.position))
 
   test("Hasher: be consistent in crazyhouse"):
     // from https://lichess.org/j4r7XHTB/black

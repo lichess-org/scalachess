@@ -342,4 +342,4 @@ NRKNRQBB
     val sit           = Fen.read(fen).get
     val game1         = Game(sit)
     val (game2, move) = game1(Square.F2, Square.F3).get
-    assertEquals(Dumper(game1.board, move, game2.board), "Rf3")
+    assertEquals(Dumper(game1.position, move, game2.position), "Rf3")

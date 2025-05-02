@@ -170,12 +170,12 @@ object BinaryFen:
 
   import BinaryFen.implementation.*
 
-  def writeNormalized(board: Position): BinaryFen =
+  def writeNormalized(position: Position): BinaryFen =
     write(
       Position.AndFullMoveNumber(
-        board
+        position
           .updateHistory(_.setHalfMoveClock(HalfMoveClock.initial))
-          .withVariant(board.variant match
+          .withVariant(position.variant match
             case Standard | Chess960 | FromPosition => Standard
             case other                              => other),
         FullMoveNumber.initial
@@ -186,15 +186,15 @@ object BinaryFen:
     val builder = ArrayBuilder.ofByte()
     builder.sizeHint(8 + 32)
 
-    val sit      = input.board
-    val occupied = sit.board.occupied
+    val position = input.board
+    val occupied = position.board.occupied
     writeLong(builder, occupied.value)
 
-    val unmovedRooks = minimumUnmovedRooks(sit)
-    val pawnPushedTo = sit.enPassantSquare.flatMap(_.prevRank(sit.color))
+    val unmovedRooks = minimumUnmovedRooks(position)
+    val pawnPushedTo = position.enPassantSquare.flatMap(_.prevRank(position.color))
 
     def packPiece(sq: Square): Byte =
-      sit.board(sq) match
+      position.board.pieceAt(sq) match
         // Encoding from
         // https://github.com/official-stockfish/nnue-pytorch/blob/2db3787d2e36f7142ea4d0e307b502dda4095cd9/lib/nnue_training_data_formats.h#L4607
         case Some(Piece(_, Pawn)) if pawnPushedTo.contains(sq) => 12
@@ -209,17 +209,17 @@ object BinaryFen:
         case Some(Piece(White, Queen))                         => 8
         case Some(Piece(Black, Queen))                         => 9
         case Some(Piece(White, King))                          => 10
-        case Some(Piece(Black, King))                          => if sit.color.white then 11 else 15
+        case Some(Piece(Black, King))                          => if position.color.white then 11 else 15
         case None                                              => 0 // unreachable
 
     val it = occupied.iterator
     while it.hasNext
     do writeNibbles(builder, packPiece(it.next), if it.hasNext then packPiece(it.next) else 0)
 
-    val halfMoveClock = sit.history.halfMoveClock.value
-    val ply           = input.fullMoveNumber.ply(sit.color).value
-    val brokenTurn    = sit.color.black && sit.board(Black, King).isEmpty
-    val variantHeader = sit.variant match
+    val halfMoveClock = position.history.halfMoveClock.value
+    val ply           = input.fullMoveNumber.ply(position.color).value
+    val brokenTurn    = position.color.black && position.board.byPiece(Black, King).isEmpty
+    val variantHeader = position.variant match
       case Standard      => 0
       case Crazyhouse    => 1
       case Chess960      => 2
@@ -240,10 +240,10 @@ object BinaryFen:
     if variantHeader != 0
     then
       builder.addOne(variantHeader.toByte)
-      if sit.variant.threeCheck then
-        writeNibbles(builder, sit.history.checkCount.white, sit.history.checkCount.black)
-      else if sit.variant.crazyhouse then
-        val crazyData = sit.crazyData.getOrElse(Crazyhouse.Data.init)
+      if position.variant.threeCheck then
+        writeNibbles(builder, position.history.checkCount.white, position.history.checkCount.black)
+      else if position.variant.crazyhouse then
+        val crazyData = position.crazyData.getOrElse(Crazyhouse.Data.init)
         val pockets   = crazyData.pockets
         writeNibbles(builder, pockets.white.pawn, pockets.black.pawn)
         writeNibbles(builder, pockets.white.knight, pockets.black.knight)
@@ -302,10 +302,10 @@ object BinaryFen:
       val b = reader.next
       ((b & 0xf), (b >>> 4) & 0xf)
 
-    def minimumUnmovedRooks(board: Position): UnmovedRooks =
-      val white   = board.history.unmovedRooks.bb & board.white & Bitboard.firstRank
-      val black   = board.history.unmovedRooks.bb & board.black & Bitboard.lastRank
-      val castles = board.history.castles
+    def minimumUnmovedRooks(position: Position): UnmovedRooks =
+      val white   = position.history.unmovedRooks.bb & position.white & Bitboard.firstRank
+      val black   = position.history.unmovedRooks.bb & position.black & Bitboard.lastRank
+      val castles = position.history.castles
       UnmovedRooks(
         (if castles.whiteKingSide then white.isolateLast else Bitboard.empty) |
           (if castles.whiteQueenSide then white.isolateFirst else Bitboard.empty) |

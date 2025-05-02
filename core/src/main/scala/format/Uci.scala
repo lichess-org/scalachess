@@ -10,7 +10,7 @@ sealed trait Uci:
 
   def origDest: (Square, Square)
 
-  def apply(board: Position): Either[ErrorStr, MoveOrDrop]
+  def apply(position: Position): Either[ErrorStr, MoveOrDrop]
 
 object Uci:
 
@@ -30,7 +30,7 @@ object Uci:
 
     def origDest: (Square, Square) = orig -> dest
 
-    def apply(board: Position): Either[ErrorStr, MoveOrDrop] = board.move(orig, dest, promotion)
+    def apply(position: Position): Either[ErrorStr, MoveOrDrop] = position.move(orig, dest, promotion)
 
     override def toString = s"Move(${orig.key}${dest.key}${promotion.fold("")(_.forsyth)})"
 
@@ -62,7 +62,7 @@ object Uci:
 
     def origDest: (Square, Square) = square -> square
 
-    def apply(board: Position): Either[ErrorStr, MoveOrDrop] = board.drop(role, square)
+    def apply(position: Position): Either[ErrorStr, MoveOrDrop] = position.drop(role, square)
 
   object Drop:
 

@@ -43,7 +43,7 @@ object Visual:
     for (y <- Rank.allReversed) yield {
       for (x <- File.all) yield
         val square = Square(x, y)
-        markedPoss.get(square).getOrElse(board(square).fold(' ')(_.forsyth))
+        markedPoss.get(square).getOrElse(board.pieceAt(square).fold(' ')(_.forsyth))
     }.mkString
   }.map { """\s*$""".r.replaceFirstIn(_, "") }.mkString("\n")
 

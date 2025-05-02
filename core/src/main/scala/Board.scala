@@ -6,20 +6,15 @@ import chess.Bitboard.*
 // Chess board representation
 case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[Bitboard]):
 
-  val white   = byColor.white
-  val black   = byColor.black
-  val pawns   = byRole.pawn
-  val knights = byRole.knight
-  val bishops = byRole.bishop
-  val rooks   = byRole.rook
-  val queens  = byRole.queen
-  val kings   = byRole.king
-
-  inline def apply(inline color: Color): Bitboard = color.fold(white, black)
-  inline def apply(inline color: Color, inline role: Role): Bitboard =
-    color.fold(white, black) & byRole(role)
-  inline def apply(inline at: Square): Option[Piece]     = pieceAt(at)
-  inline def apply(inline file: File, inline rank: Rank) = pieceAt(Square(file, rank))
+  export byColor.{ white, black }
+  export byRole.{
+    pawn as pawns,
+    knight as knights,
+    bishop as bishops,
+    rook as rooks,
+    queen as queens,
+    king as kings
+  }
 
   def sliders: Bitboard              = bishops ^ rooks ^ queens
   def isOccupied(s: Square): Boolean = occupied.contains(s)
@@ -27,7 +22,7 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   lazy val nbPieces: Int = occupied.count
 
   def byPiece(piece: Piece): Bitboard =
-    byColor(piece.color) & byRole(piece.role)
+    byPiece(piece.color, piece.role)
 
   def byPiece(color: Color, role: Role): Bitboard =
     byColor(color) & byRole(role)
@@ -37,6 +32,9 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
 
   def colorAt(s: Square): Option[Color] =
     byColor.findColor(_.contains(s))
+
+  def pieceAt(file: File, rank: Rank): Option[Piece] =
+    pieceAt(Square(file, rank))
 
   def pieceAt(s: Square): Option[Piece] =
     for
@@ -95,7 +93,7 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
     (roles & colorPieces) == colorPieces
 
   def nonKingsOf(color: Color): Bitboard =
-    apply(color) & ~kings
+    byColor(color) & ~kings
 
   def nonKing: Bitboard =
     occupied & ~kings
@@ -121,6 +119,9 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   // is a king of this color in check
   def isCheck(color: Color): Check =
     Check(kings(color).exists(attacks(_, !color)))
+
+  def checkers(color: Color): Bitboard =
+    kingPosOf(color).fold(Bitboard.empty)(attackers(_, !color))
 
   /** Find all blockers between the king and attacking sliders First we find all snipers (all potential sliders which
     * can attack the king) Then we loop over those snipers if there is only one blockers between the king and the sniper

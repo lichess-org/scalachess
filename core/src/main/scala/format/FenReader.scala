@@ -17,14 +17,14 @@ import variant.Crazyhouse.Pockets
 trait FenReader:
   def read(variant: Variant, fen: FullFen): Option[Position] =
     val (fBoard, fColor, fCastling, fEnpassant) = fen.parts
-    makeBoard(variant, fBoard).map { (bboard, crazyData) =>
+    makeBoard(variant, fBoard).map { (board, crazyData) =>
       // We trust Fen's color to be correct, if there is no color we use the color of the king in check
       // If there is no king in check we use white
-      val color = fColor.orElse(variant.checkColor(bboard)) | Color.White
-      val board: Position = new Position(
-        bboard,
+      val color = fColor.orElse(variant.checkColor(board)) | Color.White
+      val position = new Position(
+        board,
         History(
-          unmovedRooks = variant.makeUnmovedRooks(bboard.rooks),
+          unmovedRooks = variant.makeUnmovedRooks(board.rooks),
           crazyData = variant.crazyhouse.so(crazyData)
         ),
         variant,
@@ -39,10 +39,10 @@ trait FenReader:
               val color    = Color.fromWhite(ch.isUpper)
               val backRank = Bitboard.rank(color.backRank)
               // rooks that can be used for castling
-              val rooks = board.rooks & board(color) & backRank
+              val rooks = position.rooks & position.byColor(color) & backRank
               {
                 for
-                  kingSquare <- (board.kingOf(color) & backRank).first
+                  kingSquare <- (position.kingOf(color) & backRank).first
                   rookSquare <- ch.toLower match
                     case 'k'  => rooks.findLast(_ ?> kingSquare)
                     case 'q'  => rooks.find(_ ?< kingSquare)
@@ -51,19 +51,19 @@ trait FenReader:
                 yield (c.add(color, side), r | rookSquare.bl)
               }.getOrElse(c -> r)
 
-      import board.color.{ fifthRank, sixthRank, seventhRank }
+      import position.color.{ fifthRank, sixthRank, seventhRank }
 
       val enpassantMove = for
         square <- fEnpassant
         if square.rank == sixthRank
         orig = square.withRank(seventhRank)
         dest = square.withRank(fifthRank)
-        if board(dest).contains(Piece(!board.color, Pawn)) &&
-          board(square.file, sixthRank).isEmpty &&
-          board(orig).isEmpty
+        if position.pieceAt(dest).contains(Piece(!position.color, Pawn)) &&
+          position.pieceAt(square.file, sixthRank).isEmpty &&
+          position.pieceAt(orig).isEmpty
       yield Uci.Move(orig, dest)
 
-      board
+      position
         .updateHistory: original =>
           val history = original.copy(
             lastMove = enpassantMove,

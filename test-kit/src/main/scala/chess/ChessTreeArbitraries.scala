@@ -69,7 +69,7 @@ object ChessTreeArbitraries:
     yield comments
 
   given Generator[Position] with
-    extension (board: Position) def next = pickSome(board.legalMoves.map(_.boardAfter))
+    extension (position: Position) def next = pickSome(position.legalMoves.map(_.boardAfter))
 
   given Generator[Move] with
     extension (move: Move) def next = pickSome(move.boardAfter.legalMoves)

@@ -137,17 +137,17 @@ object Replay:
       def compareFen(fen: Fen.Full)  = truncateFen(fen) == atFenTruncated
 
       @scala.annotation.tailrec
-      def recursivePlyAtFen(board: Position, sans: List[San], ply: Ply): Either[ErrorStr, Ply] =
+      def recursivePlyAtFen(position: Position, sans: List[San], ply: Ply): Either[ErrorStr, Ply] =
         sans match
           case Nil => ErrorStr(s"Can't find $atFenTruncated, reached ply $ply").asLeft
           case san :: rest =>
-            san(board) match
+            san(position) match
               case Left(err) => err.asLeft
               case Right(moveOrDrop) =>
                 val after = moveOrDrop.finalizeAfter
                 val fen   = Fen.write(after.withColor(ply.turn), ply.fullMoveNumber)
                 if compareFen(fen) then ply.asRight
-                else recursivePlyAtFen(after.withColor(!board.color), rest, ply.next)
+                else recursivePlyAtFen(after.withColor(!position.color), rest, ply.next)
 
       val board = initialFen.flatMap(Fen.read(variant, _)) | Position(variant)
 

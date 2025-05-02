@@ -136,8 +136,3 @@ object ByRole:
         f(byRole.queen),
         f(byRole.king)
       )
-
-  extension (byRole: ByRole[Bitboard])
-    def discard(mask: Bitboard): ByRole[Bitboard] =
-      val notMask = ~mask
-      byRole.map(_ & notMask)

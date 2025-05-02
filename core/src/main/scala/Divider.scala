@@ -6,48 +6,46 @@ import scala.annotation.switch
 
 case class Division(middle: Option[Ply], end: Option[Ply], plies: Ply):
 
-  def openingSize: Ply        = middle | plies
-  def middleSize: Option[Ply] = middle.map((end | plies) - _)
-  def endSize                 = end.map(plies - _)
-  def openingBounds           = middle.map(0 -> _)
-  def middleBounds            = (middle, end).tupled
-  def endBounds               = end.map(_ -> plies)
+  def openingSize: Ply                  = middle | plies
+  def middleSize: Option[Ply]           = middle.map((end | plies) - _)
+  def endSize: Option[Ply]              = end.map(plies - _)
+  def openingBounds: Option[(Int, Ply)] = middle.map(0 -> _)
+  def middleBounds: Option[(Ply, Ply)]  = (middle, end).tupled
+  def endBounds: Option[(Ply, Ply)]     = end.map(_ -> plies)
 
 object Division:
   val empty = Division(None, None, Ply.initial)
 
 object Divider:
 
-  def apply(boards: List[Position]): Division =
+  def apply(positions: List[Position]): Division =
 
-    val indexedBoards: List[(Position, Int)] = boards.zipWithIndex
+    val indexedPositions: List[(Position, Int)] = positions.zipWithIndex
 
-    val midGame = indexedBoards.collectFirst:
-      case (board, index)
-          if (majorsAndMinors(board) <= 10 ||
-            backrankSparse(board) ||
-            mixedness(board) > 150) =>
+    val midGame = indexedPositions.collectFirst:
+      case (position, index)
+          if (majorsAndMinors(position) <= 10 || backrankSparse(position) || mixedness(position) > 150) =>
         index
 
     val endGame =
       if midGame.isDefined then
-        indexedBoards.collectFirst:
-          case (board, index) if majorsAndMinors(board) <= 6 => index
+        indexedPositions.collectFirst:
+          case (position, index) if majorsAndMinors(position) <= 6 => index
       else None
 
     Division(
       Ply.from(midGame.filter(m => endGame.fold(true)(m < _))),
       Ply.from(endGame),
-      Ply(boards.size)
+      Ply(positions.size)
     )
 
-  private def majorsAndMinors(board: Position): Int =
-    (board.occupied & ~(board.kings | board.pawns)).count
+  private def majorsAndMinors(position: Position): Int =
+    (position.occupied & ~(position.kings | position.pawns)).count
 
   // Sparse back-rank indicates that pieces have been developed
-  private def backrankSparse(board: Position): Boolean =
-    (Bitboard.firstRank & board.white).count < 4 ||
-      (Bitboard.lastRank & board.black).count < 4
+  private def backrankSparse(position: Position): Boolean =
+    (Bitboard.firstRank & position.white).count < 4 ||
+      (Bitboard.lastRank & position.black).count < 4
 
   private def score(y: Int)(white: Int, black: Int): Int =
     ((white, black): @switch) match
@@ -83,7 +81,7 @@ object Divider:
     yield (smallSquare << (x + 8 * y), y + 1)
   }.toList
 
-  private def mixedness(board: Position): Int =
+  private def mixedness(position: Position): Int =
     mixednessRegions.foldLeft(0):
       case (acc, (region, y)) =>
-        acc + board.byColor.mapReduce(c => (c & region).count)(score(y))
+        acc + position.byColor.mapReduce(c => (c & region).count)(score(y))

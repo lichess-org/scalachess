@@ -170,12 +170,12 @@ object BinaryFen:
 
   import BinaryFen.implementation.*
 
-  def writeNormalized(board: Position): BinaryFen =
+  def writeNormalized(position: Position): BinaryFen =
     write(
       Position.AndFullMoveNumber(
-        board
+        position
           .updateHistory(_.setHalfMoveClock(HalfMoveClock.initial))
-          .withVariant(board.variant match
+          .withVariant(position.variant match
             case Standard | Chess960 | FromPosition => Standard
             case other                              => other),
         FullMoveNumber.initial
@@ -302,10 +302,10 @@ object BinaryFen:
       val b = reader.next
       ((b & 0xf), (b >>> 4) & 0xf)
 
-    def minimumUnmovedRooks(board: Position): UnmovedRooks =
-      val white   = board.history.unmovedRooks.bb & board.white & Bitboard.firstRank
-      val black   = board.history.unmovedRooks.bb & board.black & Bitboard.lastRank
-      val castles = board.history.castles
+    def minimumUnmovedRooks(position: Position): UnmovedRooks =
+      val white   = position.history.unmovedRooks.bb & position.white & Bitboard.firstRank
+      val black   = position.history.unmovedRooks.bb & position.black & Bitboard.lastRank
+      val castles = position.history.castles
       UnmovedRooks(
         (if castles.whiteKingSide then white.isolateLast else Bitboard.empty) |
           (if castles.whiteQueenSide then white.isolateFirst else Bitboard.empty) |

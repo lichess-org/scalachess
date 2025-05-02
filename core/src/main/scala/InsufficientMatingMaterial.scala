@@ -16,14 +16,14 @@ object InsufficientMatingMaterial:
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
    * and it doesn't have any capture
    */
-  def pawnBlockedByPawn(pawn: Square, board: Position): Boolean =
-    board
+  def pawnBlockedByPawn(pawn: Square, position: Position): Boolean =
+    position
       .pieceAt(pawn)
       .exists(p =>
         p.is(Pawn) &&
-          board.withColor(p.color).generateMovesAt(pawn).isEmpty && {
+          position.withColor(p.color).generateMovesAt(pawn).isEmpty && {
             val blockingPosition = posAheadOfPawn(pawn, p.color)
-            blockingPosition.flatMap(board.pieceAt).exists(_.is(Pawn))
+            blockingPosition.flatMap(position.pieceAt).exists(_.is(Pawn))
           }
       )
 
@@ -42,14 +42,14 @@ object InsufficientMatingMaterial:
    * King + bishop mates against king + any(bishop, knight, pawn)
    * King + bishop(s) versus king + bishop(s) depends upon bishop square colors
    */
-  def apply(board: Position, color: Color): Boolean =
-    if board.kingsOnlyOf(color) then true
-    else if board.kingsAndKnightsOnlyOf(color) then
-      board.nonKingsOf(color).count == 1 &&
-      board.onlyOf(!color, board.kings | board.queens)
-    else if board.kingsAndBishopsOnlyOf(color) then
-      !(bishopsOnOppositeColors(board.board) ||
-        (board.byPiece(!color, Knight) | board.byPiece(!color, Pawn)).nonEmpty)
+  def apply(position: Position, color: Color): Boolean =
+    if position.kingsOnlyOf(color) then true
+    else if position.kingsAndKnightsOnlyOf(color) then
+      position.nonKingsOf(color).count == 1 &&
+      position.onlyOf(!color, position.kings | position.queens)
+    else if position.kingsAndBishopsOnlyOf(color) then
+      !(bishopsOnOppositeColors(position.board) ||
+        (position.byPiece(!color, Knight) | position.byPiece(!color, Pawn)).nonEmpty)
     else false
 
   /** Determines the position one ahead of a pawn based on the color of the piece.

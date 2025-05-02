@@ -74,12 +74,12 @@ case class Std(
     override val rawString: Option[String] = None
 ) extends San:
 
-  def apply(board: Position): Either[ErrorStr, chess.Move] =
-    board
-      .byPiece(board.color, role)
+  def apply(position: Position): Either[ErrorStr, chess.Move] =
+    position
+      .byPiece(position.color, role)
       .first: square =>
         if compare(file, square.file) && compare(rank, square.rank)
-        then board.generateMovesAt(square).find(_.dest == dest)
+        then position.generateMovesAt(square).find(_.dest == dest)
         else None
       .toRight(ErrorStr(s"Cannot play $this"))
       .flatMap(_.withPromotion(promotion).toRight(ErrorStr("Wrong promotion")))
@@ -90,14 +90,14 @@ case class Std(
 
 case class Drop(role: Role, square: Square, override val rawString: Option[String] = None) extends San:
 
-  def apply(board: Position): Either[ErrorStr, chess.Drop] =
-    board.drop(role, square)
+  def apply(position: Position): Either[ErrorStr, chess.Drop] =
+    position.drop(role, square)
 
 case class Castle(side: Side, override val rawString: Option[String] = None) extends San:
 
-  def apply(board: Position): Either[ErrorStr, chess.Move] =
+  def apply(position: Position): Either[ErrorStr, chess.Move] =
 
-    import board.{ genCastling, ourKing, variant }
+    import position.{ genCastling, ourKing, variant }
     if !variant.allowsCastling then ErrorStr(s"Cannot castle in $variant").asLeft
     else
       ourKing

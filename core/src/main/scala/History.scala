@@ -27,25 +27,25 @@ case class History(
     crazyData: Option[Crazyhouse.Data]
 ):
 
-  def setHalfMoveClock(v: HalfMoveClock) = copy(halfMoveClock = v)
+  def setHalfMoveClock(v: HalfMoveClock): History = copy(halfMoveClock = v)
 
-  inline def threefoldRepetition = positionHashes.isRepetition(3)
-  inline def fivefoldRepetition  = positionHashes.isRepetition(5)
+  inline def threefoldRepetition: Boolean = positionHashes.isRepetition(3)
+  inline def fivefoldRepetition: Boolean  = positionHashes.isRepetition(5)
 
-  inline def canCastle(inline color: Color)                    = castles.can(color)
-  inline def canCastle(inline color: Color, inline side: Side) = castles.can(color, side)
+  inline def canCastle(inline color: Color): Boolean                    = castles.can(color)
+  inline def canCastle(inline color: Color, inline side: Side): Boolean = castles.can(color, side)
 
-  inline def withoutCastles(inline color: Color) = copy(castles = castles.without(color))
+  inline def withoutCastles(inline color: Color): History = copy(castles = castles.without(color))
 
-  inline def withoutAnyCastles = copy(castles = Castles.none)
+  inline def withoutAnyCastles: History = copy(castles = Castles.none)
 
-  inline def withoutCastle(color: Color, side: Side) = copy(castles = castles.without(color, side))
+  inline def withoutCastle(color: Color, side: Side): History = copy(castles = castles.without(color, side))
 
-  inline def withCastles(inline c: Castles) = copy(castles = c)
+  inline def withCastles(inline c: Castles): History = copy(castles = c)
 
-  inline def withLastMove(inline m: Uci) = copy(lastMove = Option(m))
+  inline def withLastMove(inline m: Uci): History = copy(lastMove = Option(m))
 
-  def withCheck(color: Color, check: Check) =
+  def withCheck(color: Color, check: Check): History =
     if check.yes then copy(checkCount = checkCount.add(color)) else this
 
-  def withCheckCount(cc: CheckCount) = copy(checkCount = cc)
+  def withCheckCount(cc: CheckCount): History = copy(checkCount = cc)

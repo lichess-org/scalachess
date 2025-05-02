@@ -20,6 +20,9 @@ case object Atomic
     val moves   = genNonKing(targets) ++ genKing(position, targets) ++ genEnPassant(us & position.pawns)
     moves.map(explodeSurroundingPieces).filter(kingSafety)
 
+  override def validMovesAt(position: Position, square: Square): List[Move] =
+    super.validMovesAt(position, square).map(explodeSurroundingPieces).filter(kingSafety)
+
   private def genKing(position: Position, mask: Bitboard) =
     import position.{ genUnsafeKing, genCastling }
     position.ourKing.fold(Nil): king =>
@@ -63,7 +66,7 @@ case object Atomic
       attackersWithoutKing(board, occupied, king, !color).isEmpty
 
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
-  def explodeSurroundingPieces(move: Move): Move =
+  private def explodeSurroundingPieces(move: Move): Move =
     if move.captures then
       val afterBoard = move.after
       // Pawns are immune (for some reason), but all pieces surrounding the captured piece and the capturing piece

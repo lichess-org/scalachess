@@ -51,6 +51,22 @@ abstract class Variant private[variant] (
 
   def validMoves(position: Position): List[Move]
 
+  def validMovesAt(position: Position, square: Square): List[Move] =
+    import position.us
+    position.pieceAt(square).fold(Nil) { piece =>
+      if piece.color != position.color then Nil
+      else
+        val targets = ~us
+        val bb      = square.bb
+        piece.role match
+          case Pawn   => position.genEnPassant(us & bb) ++ position.genPawn(bb, targets)
+          case Knight => position.genKnight(us & bb, targets)
+          case Bishop => position.genBishop(us & bb, targets)
+          case Rook   => position.genRook(us & bb, targets)
+          case Queen  => position.genQueen(us & bb, targets)
+          case King   => position.genKingAt(targets, square)
+    }
+
   def pieceThreatened(board: Board, by: Color, to: Square): Boolean =
     board.attacks(to, by)
 

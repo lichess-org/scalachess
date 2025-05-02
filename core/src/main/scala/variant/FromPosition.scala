@@ -16,3 +16,6 @@ case object FromPosition
 
   override def validMoves(position: Position): List[Move] =
     Standard.validMoves(position)
+
+  override def validMovesAt(position: Position, square: Square): List[Move] =
+    super.validMovesAt(position, square).filter(kingSafety)

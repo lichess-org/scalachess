@@ -21,9 +21,12 @@ case object ThreeCheck
   override def validMoves(position: Position): List[Move] =
     Standard.validMoves(position).map(updateCheckCount)
 
+  override def validMovesAt(position: Position, square: Square): List[Move] =
+    super.validMovesAt(position, square).filter(kingSafety).map(updateCheckCount)
+
   override def valid(position: Position, strict: Boolean): Boolean = Standard.valid(position, strict)
 
-  def updateCheckCount(move: Move): Move =
+  private def updateCheckCount(move: Move): Move =
     move.copy(after = move.after.updateHistory:
       _.withCheck(Color.White, checkWhite(move.after.board))
         .withCheck(Color.Black, checkBlack(move.after.board)))

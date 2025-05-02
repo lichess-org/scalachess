@@ -47,6 +47,9 @@ case object RacingKings
     val moves   = genNonKingAndNonPawn(targets) ++ genSafeKing(targets)
     moves.filter(kingSafety)
 
+  override def validMovesAt(position: Position, square: Square): List[Move] =
+    super.validMovesAt(position, square).filter(kingSafety)
+
   override def valid(position: Position, strict: Boolean): Boolean =
     super.valid(position, strict) && (!strict || position.check.no)
 

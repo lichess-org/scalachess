@@ -22,6 +22,9 @@ case object Crazyhouse
   override def validMoves(position: Position): List[Move] =
     Standard.validMoves(position).map(updateCrazyData)
 
+  override def validMovesAt(position: Position, square: Square): List[Move] =
+    super.validMovesAt(position, square).filter(kingSafety).map(updateCrazyData)
+
   override def valid(position: Position, strict: Boolean): Boolean =
     Color.all.forall(validSide(position, false)) &&
       (!strict ||
@@ -58,7 +61,7 @@ case object Crazyhouse
 
   override def isIrreversible(move: Move): Boolean = move.castles
 
-  def updateCrazyData(move: Move): Move =
+  private def updateCrazyData(move: Move): Move =
     val after = move.after.crazyData.fold(move.after): data =>
       val d1 = move.capture.flatMap(move.boardBefore.pieceAt).fold(data)(data.store(_, move.dest))
       val d2 = move.promotion.fold(d1.move(move.orig, move.dest))(_ => d1.promote(move.dest))

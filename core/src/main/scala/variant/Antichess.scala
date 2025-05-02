@@ -31,7 +31,12 @@ case object Antichess
     if capturingMoves.nonEmpty then capturingMoves
     else genNonKing(~position.occupied) ++ ourKings.flatMap(genUnsafeKing(_, ~position.occupied))
 
-  def captureMoves(position: Position): List[Move] =
+  override def validMovesAt(position: Position, square: Square): List[Move] =
+    val captures = captureMoves(position)
+    if captures.nonEmpty then captures.filter(_.orig == square)
+    else super.validMovesAt(position, square)
+
+  private def captureMoves(position: Position): List[Move] =
     import position.{ them, us, genNonKing, genEnPassant, genUnsafeKing, ourKings }
     ourKings.flatMap(genUnsafeKing(_, them)) ++ genEnPassant(us & position.pawns) ++ genNonKing(them)
 

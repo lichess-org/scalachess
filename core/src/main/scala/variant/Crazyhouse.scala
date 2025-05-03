@@ -41,18 +41,13 @@ case object Crazyhouse
       b1 <- position.board
         .put(piece, square)
         .toRight(ErrorStr(s"Can't drop $role on $square, it's occupied"))
-      b2 = position.withBoard(b1)
+      b2 = position.withBoard(b1).withCrazyData(d2)
       _ <- Either.cond(
         kingThreatened(b2.board, position.color).no,
         b2,
         ErrorStr(s"Dropping $role on $square doesn't uncheck the king")
       )
-    yield Drop(
-      piece = piece,
-      square = square,
-      before = position,
-      after = b2.withCrazyData(d2)
-    )
+    yield Drop(piece = piece, square = square, before = position, after = b2)
 
   override def fiftyMoves(history: History): Boolean = false
 

@@ -56,12 +56,6 @@ case object RacingKings
   override def isInsufficientMaterial(position: Position): Boolean          = false
   override def opponentHasInsufficientMaterial(position: Position): Boolean = false
 
-  private def reachedGoal(board: Board, color: Color): Boolean =
-    board.kingOf(color).intersects(Bitboard.rank(Rank.Eighth))
-
-  private def reachesGoal(move: Move) =
-    reachedGoal(move.finalizeAfter.board, move.piece.color)
-
   // It is a win, when exactly one king made it to the goal. When white reaches
   // the goal and black can make it on the next ply, he is given a chance to
   // draw, to compensate for the first-move advantage. The draw is not called
@@ -89,3 +83,9 @@ case object RacingKings
   // When considering stalemate, take into account that checks are not allowed.
   override def staleMate(position: Position): Boolean =
     position.check.no && !specialEnd(position) && position.legalMoves.isEmpty
+
+  private def reachedGoal(board: Board, color: Color): Boolean =
+    board.kingOf(color).intersects(Bitboard.rank(Rank.Eighth))
+
+  private def reachesGoal(move: Move) =
+    reachedGoal(move.finalizeAfter.board, move.piece.color)

@@ -18,7 +18,7 @@ case object Horde
 
   /** In Horde chess white advances against black with a horde of pawns.
     */
-  lazy val pieces: Map[Square, Piece] =
+  override lazy val pieces: Map[Square, Piece] =
     val whitePawnsHorde = for
       x <- File.all
       y <- Rank.all.take(4)
@@ -51,6 +51,20 @@ case object Horde
   override def specialEnd(position: Position): Boolean =
     position.white.isEmpty
 
+  /** In horde chess, black can win unless a fortress stalemate is unavoidable.
+    *  Auto-drawing the game should almost never happen, but it did in https://lichess.org/xQ2RsU8N#121
+    */
+  override def isInsufficientMaterial(position: Position): Boolean =
+    Color.all.forall(color => hordeClosedPosition(position.copy(color = color)))
+
+  /** In horde chess, the horde cannot win on * v K or [BN]{2} v K or just one piece
+    * since they lack a king for checkmate support.
+    * Technically there are some positions where stalemate is unavoidable which
+    * this method does not detect; however, such are trivial to premove.
+    */
+  override def opponentHasInsufficientMaterial(position: Position): Boolean =
+    hasInsufficientMaterial(position.board, !position.color) || hordeClosedPosition(position)
+
   /** Any vs K + any where horde is stalemated and only king can move is a fortress draw
     * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
     * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
@@ -67,26 +81,12 @@ case object Horde
         legalMoves.filter(_.piece.role == King).forall(move => validMoves(move.finalizeAfter).isEmpty)
     }
 
-  /** In horde chess, black can win unless a fortress stalemate is unavoidable.
-    *  Auto-drawing the game should almost never happen, but it did in https://lichess.org/xQ2RsU8N#121
-    */
-  override def isInsufficientMaterial(position: Position): Boolean =
-    Color.all.forall(color => hordeClosedPosition(position.copy(color = color)))
-
-  /** In horde chess, the horde cannot win on * v K or [BN]{2} v K or just one piece
-    * since they lack a king for checkmate support.
-    * Technically there are some positions where stalemate is unavoidable which
-    * this method does not detect; however, such are trivial to premove.
-    */
-  override def opponentHasInsufficientMaterial(position: Position): Boolean =
-    hasInsufficientMaterial(position.board, !position.color) || hordeClosedPosition(position)
-
   extension (board: Board)
-    def hasBishopPair: Color => Boolean = side =>
+    private def hasBishopPair: Color => Boolean = side =>
       val bishops = board.bishops & board.byColor(side)
       bishops.intersects(Bitboard.lightSquares) && bishops.intersects(Bitboard.darkSquares)
 
-  def hasInsufficientMaterial(board: Board, color: Color): Boolean =
+  private[chess] def hasInsufficientMaterial(board: Board, color: Color): Boolean =
     import SquareColor.*
     // Black can always win by capturing the horde
     if color.black then false

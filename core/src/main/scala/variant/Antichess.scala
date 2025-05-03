@@ -36,10 +36,6 @@ case object Antichess
     if captures.nonEmpty then captures.filter(_.orig == square)
     else super.validMovesAt(position, square)
 
-  private def captureMoves(position: Position): List[Move] =
-    import position.{ them, us, genNonKing, genEnPassant, genUnsafeKing, ourKings }
-    ourKings.flatMap(genUnsafeKing(_, them)) ++ genEnPassant(us & position.pawns) ++ genNonKing(them)
-
   override def valid(position: Position, strict: Boolean): Boolean =
     position.nbPieces >= 2 && position.nbPieces <= 32
 
@@ -93,12 +89,16 @@ case object Antichess
         ) && blackPawns.forall(pawnNotAttackable(_, whiteBishopLight, position)))
           .getOrElse(false)
 
-  private def pawnNotAttackable(pawn: Square, oppositeBishopLight: Boolean, position: Position): Boolean =
-    // The pawn cannot attack a bishop or be attacked by a bishop
-    val cannotAttackBishop = pawn.isLight != oppositeBishopLight
-    InsufficientMatingMaterial.pawnBlockedByPawn(pawn, position) && cannotAttackBishop
-
   // In this game variant, a king is a valid promotion
   override def isValidPromotion(_promotion: Option[PromotableRole]): Boolean = true
 
   override val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, King)
+
+  private def captureMoves(position: Position): List[Move] =
+    import position.{ them, us, genNonKing, genEnPassant, genUnsafeKing, ourKings }
+    ourKings.flatMap(genUnsafeKing(_, them)) ++ genEnPassant(us & position.pawns) ++ genNonKing(them)
+
+  private def pawnNotAttackable(pawn: Square, oppositeBishopLight: Boolean, position: Position): Boolean =
+    // The pawn cannot attack a bishop or be attacked by a bishop
+    val cannotAttackBishop = pawn.isLight != oppositeBishopLight
+    InsufficientMatingMaterial.pawnBlockedByPawn(pawn, position) && cannotAttackBishop

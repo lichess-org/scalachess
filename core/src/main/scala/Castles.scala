@@ -31,6 +31,8 @@ object Castles:
     def update(color: Color, kingSide: Boolean, queenSide: Boolean): Castles =
       c.without(color) | kingSide.at(color.kingSide) | queenSide.at(color.queenSide)
 
+    def toSeq: Array[Boolean] = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
+
     inline def unary_~ : Castles                = ~c
     inline infix def &(inline o: Long): Castles = c & o
     inline infix def ^(inline o: Long): Castles = c ^ o

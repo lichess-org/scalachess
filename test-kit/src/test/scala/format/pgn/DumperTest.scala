@@ -109,7 +109,7 @@ PP   PPP
 KNBQ BNR
 """)
     game
-      .playMoves(A7 -> A8)
+      .playMove(A7, A8, Some(Queen))
       .map(_.sans)
       .assertRight: ms =>
         assertEquals(ms, Vector(SanStr("a8=Q")))
@@ -125,7 +125,7 @@ PP   PPP
 KNBQ BNR
 """)
     game
-      .playMoves(A7 -> A8)
+      .playMove(A7, A8, Some(Queen))
       .map(_.sans)
       .assertRight: ms =>
         assertEquals(ms, Vector(SanStr("a8=Q+")))
@@ -141,7 +141,7 @@ PP   PPP
 KNBQ BNR
 """)
     game
-      .playMoves(A7 -> A8)
+      .playMove(A7, A8, Some(Queen))
       .map(_.sans)
       .assertRight: ms =>
         assertEquals(ms, Vector(SanStr("a8=Q#")))

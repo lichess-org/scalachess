@@ -27,7 +27,7 @@ class HashBench:
     val results = for
       results <- Fixtures.gamesForPerfTest.traverse(Reader.full(_))
       replays <- results.traverse(_.valid)
-    yield replays.flatMap(_.moves).map(_.boardAfter)
+    yield replays.flatMap(_.moves).map(_.finalizeAfter)
     boards = results.toOption.get
 
   @Benchmark

@@ -34,7 +34,7 @@ case class Move(
     orig: Square,
     dest: Square,
     before: Position,
-    after: Position,
+    private[chess] val after: Position,
     capture: Option[Square],
     promotion: Option[PromotableRole],
     castle: Option[Move.Castle],
@@ -141,7 +141,7 @@ case class Drop(
     piece: Piece,
     square: Square,
     before: Position,
-    after: Position,
+    private[chess] val after: Position,
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 

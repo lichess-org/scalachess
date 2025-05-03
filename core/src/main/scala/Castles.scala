@@ -31,8 +31,6 @@ object Castles:
     def update(color: Color, kingSide: Boolean, queenSide: Boolean): Castles =
       c.without(color) | kingSide.at(color.kingSide) | queenSide.at(color.queenSide)
 
-    def toSeq: Array[Boolean] = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
-
     inline def unary_~ : Castles                = ~c
     inline infix def &(inline o: Long): Castles = c & o
     inline infix def ^(inline o: Long): Castles = c ^ o
@@ -48,7 +46,7 @@ object Castles:
     inline def value: Long  = c
     inline def bb: Bitboard = Bitboard(c)
 
-    def contains(square: Square): Boolean =
+    inline def contains(inline square: Square): Boolean =
       (c & (1L << square.value)) != 0L
 
     def addSquare(square: Square): Castles = c | square.bl
@@ -72,12 +70,10 @@ object Castles:
       blackKingSide: Boolean,
       blackQueenSide: Boolean
   ): Castles =
-    whiteKingSide.at(White.kingSide) |
-      whiteQueenSide.at(White.queenSide) |
-      blackKingSide.at(Black.kingSide) |
-      blackQueenSide.at(Black.queenSide)
+    whiteKingSide.at(White.kingSide) | whiteQueenSide.at(White.queenSide) |
+      blackKingSide.at(Black.kingSide) | blackQueenSide.at(Black.queenSide)
 
-  def apply(l: Long): Castles = init & l
+  inline def apply(inline l: Long): Castles = init & l
 
   @targetName("applyBitboard")
   def apply(bb: Bitboard): Castles = init & bb.value

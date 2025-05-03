@@ -82,6 +82,7 @@ case object Crazyhouse
 
   private def canDropPawnOn(square: Square): Boolean =
     square.rank != Rank.First && square.rank != Rank.Eighth
+
   // all legal moves and drops
   // this function is used in perfts only
   private[chess] def legalMoves(position: Position): List[MoveOrDrop] =

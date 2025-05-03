@@ -92,8 +92,8 @@ abstract class Variant private[variant] (
       promotion: Option[PromotableRole]
   ): Either[ErrorStr, Move] =
     // Find the move in the variant specific list of valid moves
-    def findMove(from: Square, to: Square) =
-      position.generateMovesAt(from).find(_.dest == to)
+    inline def findMove(from: Square, to: Square) =
+      validMovesAt(position, from).find(_.dest == to)
 
     for
       piece <- position.pieceAt(from).toRight(ErrorStr(s"No piece on ${from.key}"))

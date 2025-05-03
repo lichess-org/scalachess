@@ -58,8 +58,8 @@ case object Atomic
   // moves exploding opponent king are always playable
   override def kingSafety(m: Move): Boolean =
     (kingThreatened(m.after.board, m.color).no ||
-      explodesOpponentKing(m.boardBefore)(m))
-      && !explodesOwnKing(m.boardBefore)(m)
+      explodesOpponentKing(m.before)(m))
+      && !explodesOwnKing(m.before)(m)
 
   override def castleCheckSafeSquare(board: Board, king: Square, color: Color, occupied: Bitboard): Boolean =
     king.kingAttacks.intersects(board.kingOf(!color)) ||

@@ -53,7 +53,7 @@ case object Crazyhouse
     yield Drop(
       piece = piece,
       square = square,
-      boardBefore = position,
+      before = position,
       after = b2.withCrazyData(d2)
     )
 
@@ -63,7 +63,7 @@ case object Crazyhouse
 
   private def updateCrazyData(move: Move): Move =
     val after = move.after.crazyData.fold(move.after): data =>
-      val d1 = move.capture.flatMap(move.boardBefore.pieceAt).fold(data)(data.store(_, move.dest))
+      val d1 = move.capture.flatMap(move.before.pieceAt).fold(data)(data.store(_, move.dest))
       val d2 = move.promotion.fold(d1.move(move.orig, move.dest))(_ => d1.promote(move.dest))
       move.after.withCrazyData(d2)
     move.copy(after = after)

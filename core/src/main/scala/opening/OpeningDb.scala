@@ -47,11 +47,11 @@ object OpeningDb:
       val moves: Vector[Move] = replay.chronoMoves.view
         .take(SEARCH_MAX_PLIES)
         .takeWhile:
-          case move: Move => move.boardBefore.board.nbPieces >= SEARCH_MIN_PIECES
+          case move: Move => move.before.board.nbPieces >= SEARCH_MIN_PIECES
           case _          => false
         .collect { case move: Move => move }
         .toVector
-      moves.map(_.boardBefore) ++ moves.lastOption.map(_.finalizeAfter).toVector
+      moves.map(_.before) ++ moves.lastOption.map(_.finalizeAfter).toVector
 
   // first board is initial position
   def searchInBoards(boards: Iterable[Position]): Option[Opening.AtPly] =

@@ -46,7 +46,7 @@ object Dumper:
     SanStr(s"${data.toUci.uci}${checkOrWinnerSymbol(next)}")
 
   def apply(data: chess.Move): SanStr =
-    apply(data.boardBefore, data, data.finalizeAfter)
+    apply(data.before, data, data.finalizeAfter)
 
   def apply(data: chess.Drop): SanStr =
     apply(data, data.finalizeAfter)

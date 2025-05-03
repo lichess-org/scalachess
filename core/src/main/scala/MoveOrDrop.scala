@@ -44,7 +44,7 @@ case class Move(
 
   override lazy val after: Position = finalizeHistory
 
-  // does this move capture an opponent piece?
+  /* return whether this move captures an opponent piece */
   inline def captures: Boolean = capture.isDefined
 
   inline def promotes: Boolean = promotion.isDefined
@@ -54,8 +54,7 @@ case class Move(
   inline def normalizeCastle: Move =
     castle.fold(this)(x => copy(dest = x.rook))
 
-  val isWhiteTurn: Boolean = piece.color.white
-  inline def color         = piece.color
+  override inline def color: Color = piece.color
 
   inline def withMetrics(m: MoveMetrics): Move = copy(metrics = m)
 
@@ -148,7 +147,17 @@ case class Drop(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  override lazy val after: Position =
+  override lazy val after: Position = finalizeHistory
+
+  inline def withMetrics(m: MoveMetrics): Drop = copy(metrics = m)
+
+  override inline def color: Color   = piece.color
+  override lazy val toSanStr: SanStr = format.pgn.Dumper(this)
+  override lazy val toUci: Uci.Drop  = Uci.Drop(piece.role, square)
+
+  override def toString = toUci.uci
+
+  private def finalizeHistory: Position =
     val after = this.afterWithoutHistory.withColor(!piece.color)
     after
       .updateHistory { h =>
@@ -161,11 +170,3 @@ case class Drop(
           positionHashes = PositionHash(Hash(after)).combine(basePositionHashes)
         )
       }
-
-  inline def withMetrics(m: MoveMetrics): Drop = copy(metrics = m)
-
-  override inline def color: Color   = piece.color
-  override lazy val toSanStr: SanStr = format.pgn.Dumper(this)
-  override lazy val toUci: Uci.Drop  = Uci.Drop(piece.role, square)
-
-  override def toString = toUci.uci

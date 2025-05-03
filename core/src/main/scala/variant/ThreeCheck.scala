@@ -44,6 +44,6 @@ case object ThreeCheck
   override def isInsufficientMaterial(position: Position): Boolean = position.kingsOnly
 
   private def updateCheckCount(move: Move): Move =
-    move.copy(after = move.after.updateHistory:
-      _.withCheck(Color.White, checkWhite(move.after.board))
-        .withCheck(Color.Black, checkBlack(move.after.board)))
+    move.copy(afterWithoutHistory = move.afterWithoutHistory.updateHistory:
+      _.withCheck(Color.White, checkWhite(move.afterWithoutHistory.board))
+        .withCheck(Color.Black, checkBlack(move.afterWithoutHistory.board)))

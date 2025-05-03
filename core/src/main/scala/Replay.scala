@@ -81,7 +81,7 @@ object Replay:
     moves
       .foldM((sit, List(sit))) { case ((current, acc), move) =>
         play(move)(current).map: md =>
-          val nextSit = md.finalizeAfter
+          val nextSit = md.after
           (nextSit, nextSit :: acc)
       }
       .map(_._2.reverse)
@@ -144,7 +144,7 @@ object Replay:
             san(position) match
               case Left(err) => err.asLeft
               case Right(moveOrDrop) =>
-                val after = moveOrDrop.finalizeAfter
+                val after = moveOrDrop.after
                 val fen   = Fen.write(after.withColor(ply.turn), ply.fullMoveNumber)
                 if compareFen(fen) then ply.asRight
                 else recursivePlyAtFen(after.withColor(!position.color), rest, ply.next)

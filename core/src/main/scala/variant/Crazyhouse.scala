@@ -47,7 +47,7 @@ case object Crazyhouse
         b2,
         ErrorStr(s"Dropping $role on $square doesn't uncheck the king")
       )
-    yield Drop(piece = piece, square = square, before = position, after = b2)
+    yield Drop(piece = piece, square = square, before = position, afterWithoutHistory = b2)
 
   override def fiftyMoves(history: History): Boolean = false
 
@@ -74,11 +74,11 @@ case object Crazyhouse
     )
 
   private def updateCrazyData(move: Move): Move =
-    val after = move.after.crazyData.fold(move.after): data =>
+    val after = move.afterWithoutHistory.crazyData.fold(move.afterWithoutHistory): data =>
       val d1 = move.capture.flatMap(move.before.pieceAt).fold(data)(data.store(_, move.dest))
       val d2 = move.promotion.fold(d1.move(move.orig, move.dest))(_ => d1.promote(move.dest))
-      move.after.withCrazyData(d2)
-    move.copy(after = after)
+      move.afterWithoutHistory.withCrazyData(d2)
+    move.copy(afterWithoutHistory = after)
 
   private def canDropPawnOn(square: Square): Boolean =
     square.rank != Rank.First && square.rank != Rank.Eighth

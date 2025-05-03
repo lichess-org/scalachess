@@ -49,7 +49,7 @@ case object Atomic
 
   // moves exploding opponent king are always playable
   override def kingSafety(m: Move): Boolean =
-    (kingThreatened(m.after.board, m.color).no ||
+    (kingThreatened(m.afterWithoutHistory.board, m.color).no ||
       explodesOpponentKing(m.before)(m))
       && !explodesOwnKing(m.before)(m)
 
@@ -77,7 +77,7 @@ case object Atomic
   /** If the move captures, we explode the surrounding pieces. Otherwise, nothing explodes. */
   private def explodeSurroundingPieces(move: Move): Move =
     if move.captures then
-      val afterBoard = move.after
+      val afterBoard = move.afterWithoutHistory
       // Pawns are immune (for some reason), but all pieces surrounding the captured piece and the capturing piece
       // itself explode
       val squaresToExplode = (move.dest.kingAttacks & afterBoard.occupied & ~afterBoard.pawns) | move.dest.bl
@@ -88,7 +88,7 @@ case object Atomic
       val castles      = afterBoard.castles & ~rooksToExploded
       val unMovedRooks = afterBoard.unmovedRooks & ~rooksToExploded
       val newBoard     = afterExplosions.updateHistory(_.copy(castles = castles, unmovedRooks = unMovedRooks))
-      move.copy(after = newBoard)
+      move.copy(afterWithoutHistory = newBoard)
     else move
 
   /** Since kings cannot confine each other, if either player has only a king

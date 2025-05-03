@@ -51,7 +51,7 @@ object OpeningDb:
           case _          => false
         .collect { case move: Move => move }
         .toVector
-      moves.map(_.before) ++ moves.lastOption.map(_.finalizeAfter).toVector
+      moves.map(_.before) ++ moves.lastOption.map(_.after).toVector
 
   // first board is initial position
   def searchInBoards(boards: Iterable[Position]): Option[Opening.AtPly] =

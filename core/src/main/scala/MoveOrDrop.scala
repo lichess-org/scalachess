@@ -43,32 +43,30 @@ case class Move(
 ) extends MoveOrDrop:
 
   override lazy val finalizeAfter: Position =
-    val position = after.updateHistory { h =>
-      val (castles, unmovedRooks) = castleRights
-      h.copy(
-        lastMove = Option(toUci),
-        halfMoveClock =
-          if piece.is(Pawn) || captures || promotes then HalfMoveClock.initial
-          else h.halfMoveClock.incr,
-        castles = castles,
-        unmovedRooks = unmovedRooks
-      )
-    }
+    val after = this.after
+      .withColor(!piece.color)
+      .updateHistory { h =>
+        val (castles, unmovedRooks) = castleRights
+        h.copy(
+          lastMove = Option(toUci),
+          halfMoveClock =
+            if piece.is(Pawn) || captures || promotes then HalfMoveClock.initial
+            else h.halfMoveClock.incr,
+          castles = castles,
+          unmovedRooks = unmovedRooks
+        )
+      }
 
     // Update position hashes last, only after updating the board,
     // castling rights and en-passant rights.
-    position
-      .withColor(!piece.color)
-      .updateHistory { h =>
-        lazy val positionHashesOfBoardBefore =
-          if h.positionHashes.isEmpty then PositionHash(Hash(boardBefore)) else h.positionHashes
-        val resetsPositionHashes = position.variant.isIrreversible(this)
-        val basePositionHashes =
-          if resetsPositionHashes then PositionHash.empty else positionHashesOfBoardBefore
-        h.copy(positionHashes =
-          PositionHash(Hash(position.withColor(!piece.color))).combine(basePositionHashes)
-        )
-      }
+    after.updateHistory { h =>
+      lazy val positionHashesOfBoardBefore =
+        if h.positionHashes.isEmpty then PositionHash(Hash(boardBefore)) else h.positionHashes
+      val resetsPositionHashes = after.variant.isIrreversible(this)
+      val basePositionHashes =
+        if resetsPositionHashes then PositionHash.empty else positionHashesOfBoardBefore
+      h.copy(positionHashes = PositionHash(Hash(after)).combine(basePositionHashes))
+    }
 
   private def castleRights: (Castles, UnmovedRooks) =
     var castleRights: Castles      = after.history.castles
@@ -159,7 +157,7 @@ case class Drop(
 ) extends MoveOrDrop:
 
   override lazy val finalizeAfter: Position =
-    val after: Position = this.after.withColor(!piece.color)
+    val after = this.after.withColor(!piece.color)
     after
       .updateHistory { h =>
         val basePositionHashes =

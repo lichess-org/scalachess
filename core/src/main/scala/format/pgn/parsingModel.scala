@@ -22,7 +22,7 @@ case class PgnNodeData(
     san(context).toOption
       .map(x =>
         (
-          x.finalizeAfter,
+          x.after,
           Move(
             san = x.toSanStr,
             comments = comments,

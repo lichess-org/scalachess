@@ -20,7 +20,7 @@ object ChessTreeArbitraries:
     if seed.end then Gen.const(LazyList(seed))
     else
       for
-        board  <- Gen.oneOf(seed.legalMoves.map(_.finalizeAfter))
+        board  <- Gen.oneOf(seed.legalMoves.map(_.after))
         boards <- genBoards(board)
       yield board #:: boards
 
@@ -69,16 +69,16 @@ object ChessTreeArbitraries:
     yield comments
 
   given Generator[Position] with
-    extension (position: Position) def next = pickSome(position.legalMoves.map(_.finalizeAfter))
+    extension (position: Position) def next = pickSome(position.legalMoves.map(_.after))
 
   given Generator[Move] with
-    extension (move: Move) def next = pickSome(move.finalizeAfter.legalMoves)
+    extension (move: Move) def next = pickSome(move.after.legalMoves)
 
   given [A](using FromMove[A]): Generator[WithMove[A]] with
     extension (move: WithMove[A])
       def next: Gen[List[WithMove[A]]] =
         for
-          variations <- pickSome(move.move.finalizeAfter.legalMoves)
+          variations <- pickSome(move.move.after.legalMoves)
           nextMoves  <- variations.traverse(_.next(move.data.some))
         yield nextMoves
 

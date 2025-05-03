@@ -46,10 +46,10 @@ object Dumper:
     SanStr(s"${data.toUci.uci}${checkOrWinnerSymbol(next)}")
 
   def apply(data: chess.Move): SanStr =
-    apply(data.before, data, data.finalizeAfter)
+    apply(data.before, data, data.after)
 
   def apply(data: chess.Drop): SanStr =
-    apply(data, data.finalizeAfter)
+    apply(data, data.after)
 
   private def checkOrWinnerSymbol(next: Position): String =
     if next.winner.isDefined then "#"

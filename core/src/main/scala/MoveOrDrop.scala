@@ -16,9 +16,9 @@ sealed trait MoveOrDrop:
 
   def color: Color
 
-  def finalizeAfter: Position
-
   def before: Position
+
+  def after: Position
 
   def toUci: Uci
 
@@ -34,7 +34,7 @@ case class Move(
     orig: Square,
     dest: Square,
     before: Position,
-    private[chess] val after: Position,
+    private[chess] val afterWithoutHistory: Position,
     capture: Option[Square],
     promotion: Option[PromotableRole],
     castle: Option[Move.Castle],
@@ -42,8 +42,30 @@ case class Move(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  override lazy val finalizeAfter: Position =
-    val after = this.after
+  override lazy val after: Position = finalizeHistory
+
+  // does this move capture an opponent piece?
+  inline def captures: Boolean = capture.isDefined
+
+  inline def promotes: Boolean = promotion.isDefined
+
+  inline def castles: Boolean = castle.isDefined
+
+  inline def normalizeCastle: Move =
+    castle.fold(this)(x => copy(dest = x.rook))
+
+  val isWhiteTurn: Boolean = piece.color.white
+  inline def color         = piece.color
+
+  inline def withMetrics(m: MoveMetrics): Move = copy(metrics = m)
+
+  override lazy val toSanStr: SanStr = format.pgn.Dumper(this)
+  override lazy val toUci: Uci.Move  = Uci.Move(orig, dest, promotion)
+
+  override def toString = s"$piece ${toUci.uci}"
+
+  private def finalizeHistory: Position =
+    val after = this.afterWithoutHistory
       .withColor(!piece.color)
       .updateHistory { h =>
         val (castles, unmovedRooks) = castleRights
@@ -69,8 +91,8 @@ case class Move(
     }
 
   private def castleRights: (Castles, UnmovedRooks) =
-    var castleRights: Castles      = after.history.castles
-    var unmovedRooks: UnmovedRooks = after.history.unmovedRooks
+    var castleRights: Castles      = afterWithoutHistory.history.castles
+    var unmovedRooks: UnmovedRooks = afterWithoutHistory.history.unmovedRooks
 
     // if the rook is captured
     // remove the captured rook from unmovedRooks
@@ -110,25 +132,6 @@ case class Move(
 
     (castleRights, unmovedRooks)
 
-  // does this move capture an opponent piece?
-  inline def captures: Boolean = capture.isDefined
-
-  inline def promotes: Boolean = promotion.isDefined
-
-  inline def castles: Boolean = castle.isDefined
-
-  inline def normalizeCastle: Move =
-    castle.fold(this)(x => copy(dest = x.rook))
-
-  val isWhiteTurn: Boolean = piece.color.white
-  inline def color         = piece.color
-
-  inline def withMetrics(m: MoveMetrics): Move = copy(metrics = m)
-
-  override lazy val toSanStr: SanStr = format.pgn.Dumper(this)
-  override lazy val toUci: Uci.Move  = Uci.Move(orig, dest, promotion)
-
-  override def toString = s"$piece ${toUci.uci}"
 end Move
 
 object Move:
@@ -141,12 +144,12 @@ case class Drop(
     piece: Piece,
     square: Square,
     before: Position,
-    private[chess] val after: Position,
+    private val afterWithoutHistory: Position,
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  override lazy val finalizeAfter: Position =
-    val after = this.after.withColor(!piece.color)
+  override lazy val after: Position =
+    val after = this.afterWithoutHistory.withColor(!piece.color)
     after
       .updateHistory { h =>
         val basePositionHashes =

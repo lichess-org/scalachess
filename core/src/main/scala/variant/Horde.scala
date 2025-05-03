@@ -78,7 +78,7 @@ case object Horde
       else
         val legalMoves = validMoves(position)
         legalMoves.filter(_.piece.role != King).isEmpty &&
-        legalMoves.filter(_.piece.role == King).forall(move => validMoves(move.finalizeAfter).isEmpty)
+        legalMoves.filter(_.piece.role == King).forall(move => validMoves(move.after).isEmpty)
     }
 
   extension (board: Board)

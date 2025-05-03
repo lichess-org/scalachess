@@ -109,7 +109,7 @@ class HashTest extends ChessTest:
     val fen           = FullFen("r2qkb1r/ppp1pppp/2n2n2/3p2B1/3P2b1/4PN2/PPP1BPPP/RN1QK2R/ b KQkq - 9 5")
     val board         = Fen.read(Crazyhouse, fen).get
     val move          = board.move(Square.G4, Square.F3, None).get
-    val hashAfterMove = Hash(move.finalizeAfter)
+    val hashAfterMove = Hash(move.after)
 
     // 5 ... Bxf3
     val fenAfter   = FullFen("r2qkb1r/ppp1pppp/2n2n2/3p2B1/3P4/4Pb2/PPP1BPPP/RN1QK2R/n w KQkq - 10 6")
@@ -122,7 +122,7 @@ class HashTest extends ChessTest:
     val fen           = FullFen("rnbqkb1r/ppp1pppp/3p1n2/1B6/8/4P3/PPPP1PPP/RNBQK1NR w KQkq - 2 3")
     val board         = Fen.read(Antichess, fen).get
     val move          = board.move(Square.B5, Square.E8, None).get
-    val hashAfterMove = Hash(move.finalizeAfter)
+    val hashAfterMove = Hash(move.after)
 
     // 3. BxK
     val fenAfter   = FullFen("rnbqBb1r/ppp1pppp/3p1n2/8/8/4P3/PPPP1PPP/RNBQK1NR b KQkq - 0 3")
@@ -135,7 +135,7 @@ class HashTest extends ChessTest:
     val fen           = FullFen("rnbqkb1r/ppppp1pp/5p1n/6N1/8/8/PPPPPPPP/RNBQKB1R w KQkq - 2 3")
     val board         = Fen.read(Atomic, fen).get
     val move          = board.move(Square.G5, Square.H7, None).get
-    val hashAfterMove = Hash(move.finalizeAfter)
+    val hashAfterMove = Hash(move.after)
 
     // 3. Nxh7
     val fenAfter   = FullFen("rnbqkb2/ppppp1p1/5p2/8/8/8/PPPPPPPP/RNBQKB1R b KQkq - 0 3")

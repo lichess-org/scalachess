@@ -80,7 +80,7 @@ abstract class Variant private[variant] (
     checkWhite(board).yes.option(White).orElse(checkBlack(board).yes.option(Black))
 
   def kingSafety(m: Move): Boolean =
-    kingThreatened(m.after.board, m.color).no
+    kingThreatened(m.afterWithoutHistory.board, m.color).no
 
   def castleCheckSafeSquare(board: Board, kingTo: Square, color: Color, occupied: Bitboard): Boolean =
     board.attackers(kingTo, !color, occupied).isEmpty

@@ -59,7 +59,7 @@ object Perft:
       else
         s.perftMoves
           .map { move =>
-            val nodes = move.finalizeAfter.perft(depth - 1)
+            val nodes = move.after.perft(depth - 1)
             DivideResult(move, nodes)
           }
           .sortBy(_.move.toUci.uci)
@@ -70,7 +70,7 @@ object Perft:
       else
         val moves = s.perftMoves
         if depth == 1 then moves.size.toLong
-        else moves.map(_.finalizeAfter.perft(depth - 1)).sum
+        else moves.map(_.after.perft(depth - 1)).sum
 
     private def perftMoves: List[MoveOrDrop] =
       if s.variant == chess.variant.Crazyhouse

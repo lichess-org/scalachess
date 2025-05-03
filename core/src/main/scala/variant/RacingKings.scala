@@ -78,7 +78,7 @@ case object RacingKings
   // Not only check that our king is safe,
   // but also check the opponent's
   override def kingSafety(m: Move): Boolean =
-    super.kingSafety(m) && m.after.isCheck(!m.color).no
+    super.kingSafety(m) && m.afterWithoutHistory.isCheck(!m.color).no
 
   // When considering stalemate, take into account that checks are not allowed.
   override def staleMate(position: Position): Boolean =
@@ -88,4 +88,4 @@ case object RacingKings
     board.kingOf(color).intersects(Bitboard.rank(Rank.Eighth))
 
   private def reachesGoal(move: Move) =
-    reachedGoal(move.finalizeAfter.board, move.piece.color)
+    reachedGoal(move.after.board, move.piece.color)

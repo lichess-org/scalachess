@@ -18,7 +18,7 @@ sealed trait MoveOrDrop:
 
   def finalizeAfter: Position
 
-  def boardBefore: Position
+  def before: Position
 
   def toUci: Uci
 
@@ -33,7 +33,7 @@ case class Move(
     piece: Piece,
     orig: Square,
     dest: Square,
-    boardBefore: Position,
+    before: Position,
     after: Position,
     capture: Option[Square],
     promotion: Option[PromotableRole],
@@ -61,7 +61,7 @@ case class Move(
     // castling rights and en-passant rights.
     after.updateHistory { h =>
       lazy val positionHashesOfBoardBefore =
-        if h.positionHashes.isEmpty then PositionHash(Hash(boardBefore)) else h.positionHashes
+        if h.positionHashes.isEmpty then PositionHash(Hash(before)) else h.positionHashes
       val resetsPositionHashes = after.variant.isIrreversible(this)
       val basePositionHashes =
         if resetsPositionHashes then PositionHash.empty else positionHashesOfBoardBefore
@@ -127,7 +127,7 @@ case class Move(
     op.fold(this.some)(withPromotion)
 
   def withPromotion(p: PromotableRole): Option[Move] =
-    if after.count(color.queen) > boardBefore.count(color.queen) then
+    if after.count(color.queen) > before.count(color.queen) then
       for
         b2 <- after.board.take(dest)
         b3 <- b2.put(color - p, dest)
@@ -151,7 +151,7 @@ object Move:
 case class Drop(
     piece: Piece,
     square: Square,
-    boardBefore: Position,
+    before: Position,
     after: Position,
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
@@ -161,10 +161,10 @@ case class Drop(
     after
       .updateHistory { h =>
         val basePositionHashes =
-          if h.positionHashes.value.isEmpty then PositionHash(Hash(boardBefore)) else h.positionHashes
+          if h.positionHashes.value.isEmpty then PositionHash(Hash(before)) else h.positionHashes
         h.copy(
           lastMove = toUci.some,
-          unmovedRooks = boardBefore.unmovedRooks,
+          unmovedRooks = before.unmovedRooks,
           halfMoveClock = if piece.is(Pawn) then HalfMoveClock.initial else h.halfMoveClock.incr,
           positionHashes = PositionHash(Hash(after)).combine(basePositionHashes)
         )

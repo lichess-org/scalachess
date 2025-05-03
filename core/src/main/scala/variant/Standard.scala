@@ -36,7 +36,7 @@ case object Standard
     super.validMovesAt(position, square).filter(kingSafety)
 
   // Used for filtering candidate moves that would leave put the king in check.
-  def isSafe(position: Position, king: Square, blockers: Bitboard)(move: Move): Boolean =
+  private def isSafe(position: Position, king: Square, blockers: Bitboard)(move: Move): Boolean =
     import position.{ us, them }
     if move.enpassant then
       val newOccupied = (position.occupied ^ move.orig.bl ^ move.dest.withRankOf(move.orig).bl) | move.dest.bl

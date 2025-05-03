@@ -26,11 +26,6 @@ case object ThreeCheck
 
   override def valid(position: Position, strict: Boolean): Boolean = Standard.valid(position, strict)
 
-  private def updateCheckCount(move: Move): Move =
-    move.copy(after = move.after.updateHistory:
-      _.withCheck(Color.White, checkWhite(move.after.board))
-        .withCheck(Color.Black, checkBlack(move.after.board)))
-
   override def specialEnd(position: Position): Boolean =
     position.check.yes && {
       val checks = position.history.checkCount
@@ -47,3 +42,8 @@ case object ThreeCheck
   * by the variant ending. However, no players can check if there are only kings remaining
   */
   override def isInsufficientMaterial(position: Position): Boolean = position.kingsOnly
+
+  private def updateCheckCount(move: Move): Move =
+    move.copy(after = move.after.updateHistory:
+      _.withCheck(Color.White, checkWhite(move.after.board))
+        .withCheck(Color.Black, checkBlack(move.after.board)))

@@ -32,9 +32,6 @@ case object Crazyhouse
           && position.nbPieces <= 32
           && Standard.hasValidCheckers(position)))
 
-  private def canDropPawnOn(square: Square): Boolean =
-    square.rank != Rank.First && square.rank != Rank.Eighth
-
   override def drop(position: Position, role: Role, square: Square): Either[ErrorStr, Drop] =
     for
       d1 <- position.crazyData.toRight(ErrorStr("Position has no crazyhouse data"))
@@ -53,30 +50,13 @@ case object Crazyhouse
     yield Drop(
       piece = piece,
       square = square,
-      boardBefore = position,
+      before = position,
       after = b2.withCrazyData(d2)
     )
 
   override def fiftyMoves(history: History): Boolean = false
 
   override def isIrreversible(move: Move): Boolean = move.castles
-
-  private def updateCrazyData(move: Move): Move =
-    val after = move.after.crazyData.fold(move.after): data =>
-      val d1 = move.capture.flatMap(move.boardBefore.pieceAt).fold(data)(data.store(_, move.dest))
-      val d2 = move.promotion.fold(d1.move(move.orig, move.dest))(_ => d1.promote(move.dest))
-      move.after.withCrazyData(d2)
-    move.copy(after = after)
-
-  private def canDropStuff(position: Position): Boolean =
-    position.crazyData.exists { (data: Data) =>
-      val pocket = data.pockets(position.color)
-      pocket.nonEmpty && possibleDrops(position).fold(true) { squares =>
-        squares.nonEmpty && {
-          squares.exists(canDropPawnOn) || pocket.hasNonPawn
-        }
-      }
-    }
 
   override def staleMate(position: Position): Boolean =
     super.staleMate(position) && !canDropStuff(position)
@@ -91,19 +71,38 @@ case object Crazyhouse
   // if the king is not in check, all drops are possible, we just return None
   // king is in single check, we return the squares between the king and the checker
   // king is in double check, no drop is possible
-  def possibleDrops(position: Position): Option[List[Square]] =
+  private[chess] def possibleDrops(position: Position): Option[List[Square]] =
     position.ourKing.flatMap(king =>
       val checkers = position.attackers(king, !position.color)
       if checkers.moreThanOne then Some(Nil)
       else checkers.first.map(Bitboard.between(king, _).squares)
     )
 
+  private def updateCrazyData(move: Move): Move =
+    val after = move.after.crazyData.fold(move.after): data =>
+      val d1 = move.capture.flatMap(move.before.pieceAt).fold(data)(data.store(_, move.dest))
+      val d2 = move.promotion.fold(d1.move(move.orig, move.dest))(_ => d1.promote(move.dest))
+      move.after.withCrazyData(d2)
+    move.copy(after = after)
+
+  private def canDropPawnOn(square: Square): Boolean =
+    square.rank != Rank.First && square.rank != Rank.Eighth
   // all legal moves and drops
   // this function is used in perfts only
-  def legalMoves(position: Position): List[MoveOrDrop] =
+  private[chess] def legalMoves(position: Position): List[MoveOrDrop] =
     legalDrops(position) ::: position.legalMoves.filterNot(m =>
       m.castle.exists(c => c.isStandard && m.dest != c.rook)
     )
+
+  private def canDropStuff(position: Position): Boolean =
+    position.crazyData.exists { (data: Data) =>
+      val pocket = data.pockets(position.color)
+      pocket.nonEmpty && possibleDrops(position).fold(true) { squares =>
+        squares.nonEmpty && {
+          squares.exists(canDropPawnOn) || pocket.hasNonPawn
+        }
+      }
+    }
 
   // if the king is not in check, all empty squares are possible drop
   // king is in single check, return the squares between the king and the checker

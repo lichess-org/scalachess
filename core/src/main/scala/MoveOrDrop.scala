@@ -123,17 +123,6 @@ case class Move(
   val isWhiteTurn: Boolean = piece.color.white
   inline def color         = piece.color
 
-  def withPromotion(op: Option[PromotableRole]): Option[Move] =
-    op.fold(this.some)(withPromotion)
-
-  def withPromotion(p: PromotableRole): Option[Move] =
-    if after.count(color.queen) > before.count(color.queen) then
-      for
-        b2 <- after.board.take(dest)
-        b3 <- b2.put(color - p, dest)
-      yield copy(after = after.withBoard(b3), promotion = Option(p))
-    else this.some
-
   inline def withMetrics(m: MoveMetrics): Move = copy(metrics = m)
 
   override lazy val toSanStr: SanStr = format.pgn.Dumper(this)

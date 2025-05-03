@@ -91,23 +91,9 @@ abstract class Variant private[variant] (
       to: Square,
       promotion: Option[PromotableRole]
   ): Either[ErrorStr, Move] =
-    // Find the move in the variant specific list of valid moves
-    def findMove(from: Square, to: Square) =
-      position.generateMovesAt(from).find(_.dest == to)
-
-    for
-      piece <- position.pieceAt(from).toRight(ErrorStr(s"No piece on ${from.key}"))
-      _     <- Either.cond(piece.color == position.color, piece, ErrorStr(s"Not my piece on ${from.key}"))
-      m1    <- findMove(from, to).toRight(ErrorStr(s"Piece on ${from.key} cannot move to ${to.key}"))
-      m2 <- m1
-        .withPromotion(promotion)
-        .toRight(ErrorStr(s"Piece on ${from.key} cannot promote to $promotion"))
-      m3 <- Either.cond(
-        isValidPromotion(promotion),
-        m2,
-        ErrorStr(s"Cannot promote to $promotion in this game mode")
-      )
-    yield m3
+    validMovesAt(position, from)
+      .find(m => m.dest == to && m.promotion == promotion)
+      .toRight(ErrorStr(s"Piece on ${from.key} cannot move to ${to.key}"))
 
   def drop(position: Position, role: Role, square: Square): Either[ErrorStr, Drop] =
     ErrorStr(s"$this variant cannot drop $role $square").asLeft

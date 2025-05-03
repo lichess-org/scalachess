@@ -79,10 +79,9 @@ case class Std(
       .byPiece(position.color, role)
       .first: square =>
         if compare(file, square.file) && compare(rank, square.rank)
-        then position.generateMovesAt(square).find(_.dest == dest)
+        then position.generateMovesAt(square).find(m => m.dest == dest && m.promotion == promotion)
         else None
       .toRight(ErrorStr(s"Cannot play $this"))
-      .flatMap(_.withPromotion(promotion).toRight(ErrorStr("Wrong promotion")))
 
   override def toString = s"$role ${dest.key}"
 

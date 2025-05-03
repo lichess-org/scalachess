@@ -64,7 +64,7 @@ case object Horde
       else
         val legalMoves = validMoves(position)
         legalMoves.filter(_.piece.role != King).isEmpty &&
-        legalMoves.filter(_.piece.role == King).forall(move => validMoves(move.boardAfter).isEmpty)
+        legalMoves.filter(_.piece.role == King).forall(move => validMoves(move.finalizeAfter).isEmpty)
     }
 
   /** In horde chess, black can win unless a fortress stalemate is unavoidable.

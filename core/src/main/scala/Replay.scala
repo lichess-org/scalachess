@@ -81,7 +81,7 @@ object Replay:
     moves
       .foldM((sit, List(sit))) { case ((current, acc), move) =>
         play(move)(current).map: md =>
-          val nextSit = md.boardAfter
+          val nextSit = md.finalizeAfter
           (nextSit, nextSit :: acc)
       }
       .map(_._2.reverse)

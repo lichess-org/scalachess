@@ -36,7 +36,7 @@ case class Game(
   def apply(move: Move): Game = applyWithCompensated(move).value
 
   def applyWithCompensated(move: Move): Clock.WithCompensatedLag[Game] =
-    val newPosition = move.boardAfter
+    val newPosition = move.finalizeAfter
     val newClock    = applyClock(move.metrics, newPosition.status.isEmpty)
 
     Clock.WithCompensatedLag(
@@ -57,7 +57,7 @@ case class Game(
     position.drop(role, square).map(_.withMetrics(metrics)).map(drop => applyDrop(drop) -> drop)
 
   def applyDrop(drop: Drop): Game =
-    val newPosition = drop.boardAfter
+    val newPosition = drop.finalizeAfter
     copy(
       position = newPosition,
       ply = ply + 1,

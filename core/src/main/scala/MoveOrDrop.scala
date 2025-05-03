@@ -20,8 +20,6 @@ sealed trait MoveOrDrop:
 
   def boardBefore: Position
 
-  def boardAfter: Position
-
   def toUci: Uci
 
   def toSanStr: SanStr
@@ -44,10 +42,7 @@ case class Move(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  override lazy val boardAfter: Position = finalizeAfter.withColor(!piece.color)
-  lazy val toSanStr: SanStr              = format.pgn.Dumper(this)
-
-  lazy val finalizeAfter: Position =
+  override lazy val finalizeAfter: Position =
     val position = after.updateHistory { h =>
       val (castles, unmovedRooks) = castleRights
       h.copy(
@@ -62,16 +57,18 @@ case class Move(
 
     // Update position hashes last, only after updating the board,
     // castling rights and en-passant rights.
-    position.updateHistory { h =>
-      lazy val positionHashesOfBoardBefore =
-        if h.positionHashes.isEmpty then PositionHash(Hash(boardBefore)) else h.positionHashes
-      val resetsPositionHashes = position.variant.isIrreversible(this)
-      val basePositionHashes =
-        if resetsPositionHashes then PositionHash.empty else positionHashesOfBoardBefore
-      h.copy(positionHashes =
-        PositionHash(Hash(position.withColor(!piece.color))).combine(basePositionHashes)
-      )
-    }
+    position
+      .withColor(!piece.color)
+      .updateHistory { h =>
+        lazy val positionHashesOfBoardBefore =
+          if h.positionHashes.isEmpty then PositionHash(Hash(boardBefore)) else h.positionHashes
+        val resetsPositionHashes = position.variant.isIrreversible(this)
+        val basePositionHashes =
+          if resetsPositionHashes then PositionHash.empty else positionHashesOfBoardBefore
+        h.copy(positionHashes =
+          PositionHash(Hash(position.withColor(!piece.color))).combine(basePositionHashes)
+        )
+      }
 
   private def castleRights: (Castles, UnmovedRooks) =
     var castleRights: Castles      = after.history.castles
@@ -141,7 +138,8 @@ case class Move(
 
   inline def withMetrics(m: MoveMetrics): Move = copy(metrics = m)
 
-  override lazy val toUci: Uci.Move = Uci.Move(orig, dest, promotion)
+  override lazy val toSanStr: SanStr = format.pgn.Dumper(this)
+  override lazy val toUci: Uci.Move  = Uci.Move(orig, dest, promotion)
 
   override def toString = s"$piece ${toUci.uci}"
 end Move
@@ -160,25 +158,24 @@ case class Drop(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  override lazy val boardAfter: Position = finalizeAfter.withColor(!piece.color)
-  lazy val toSanStr: SanStr              = format.pgn.Dumper(this)
-
-  lazy val finalizeAfter: Position =
-    after.updateHistory { h =>
-      val basePositionHashes =
-        if h.positionHashes.value.isEmpty then PositionHash(Hash(boardBefore)) else h.positionHashes
-      h.copy(
-        lastMove = toUci.some,
-        unmovedRooks = boardBefore.unmovedRooks,
-        halfMoveClock = if piece.is(Pawn) then HalfMoveClock.initial else h.halfMoveClock.incr,
-        positionHashes = PositionHash(Hash(after.withColor(!piece.color))).combine(basePositionHashes)
-      )
-    }
-
-  inline def color: Color = piece.color
+  override lazy val finalizeAfter: Position =
+    val after: Position = this.after.withColor(!piece.color)
+    after
+      .updateHistory { h =>
+        val basePositionHashes =
+          if h.positionHashes.value.isEmpty then PositionHash(Hash(boardBefore)) else h.positionHashes
+        h.copy(
+          lastMove = toUci.some,
+          unmovedRooks = boardBefore.unmovedRooks,
+          halfMoveClock = if piece.is(Pawn) then HalfMoveClock.initial else h.halfMoveClock.incr,
+          positionHashes = PositionHash(Hash(after)).combine(basePositionHashes)
+        )
+      }
 
   inline def withMetrics(m: MoveMetrics): Drop = copy(metrics = m)
 
-  override lazy val toUci: Uci.Drop = Uci.Drop(piece.role, square)
+  override inline def color: Color   = piece.color
+  override lazy val toSanStr: SanStr = format.pgn.Dumper(this)
+  override lazy val toUci: Uci.Drop  = Uci.Drop(piece.role, square)
 
   override def toString = toUci.uci

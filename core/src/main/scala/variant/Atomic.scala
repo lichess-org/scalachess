@@ -17,8 +17,10 @@ case object Atomic
   override def validMoves(position: Position): List[Move] =
     import position.{ genNonKing, genEnPassant, us }
     val targets = ~us
-    val moves   = genNonKing(targets) ++ genKing(position, targets) ++ genEnPassant(us & position.pawns)
-    moves.map(explodeSurroundingPieces).filter(kingSafety)
+    (genNonKing(targets) ++ genKing(position, targets) ++ genEnPassant(us & position.pawns)).view
+      .map(explodeSurroundingPieces)
+      .filter(kingSafety)
+      .toList
 
   /** In atomic chess, it is possible to win with a single knight, bishop, etc, by exploding
     * a piece in the opponent's king's proximity. On the other hand, a king alone or a king with
@@ -30,7 +32,7 @@ case object Atomic
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
   override def specialEnd(position: Position): Boolean = position.kings.count < 2
   override def validMovesAt(position: Position, square: Square): List[Move] =
-    super.validMovesAt(position, square).map(explodeSurroundingPieces).filter(kingSafety)
+    super.validMovesAt(position, square).view.map(explodeSurroundingPieces).filter(kingSafety).toList
 
   private def genKing(position: Position, mask: Bitboard) =
     import position.{ genUnsafeKing, genCastling }

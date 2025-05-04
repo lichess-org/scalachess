@@ -58,7 +58,7 @@ trait FenReader:
         if square.rank == sixthRank
         orig = square.withRank(seventhRank)
         dest = square.withRank(fifthRank)
-        if position.pieceAt(dest).contains(Piece(!position.color, Pawn)) &&
+        if position.pieceAt(dest).exists(p => p.color != position.color && p.is(Pawn)) &&
           position.pieceAt(square.file, sixthRank).isEmpty &&
           position.pieceAt(orig).isEmpty
       yield Uci.Move(orig, dest)
@@ -204,15 +204,19 @@ trait FenReader:
                     iter.next
                 case None => error = Some(s"invalid piece $ch")
             file += 1
-    val bboard = Board(
+    val board = Board(
       occupied = occupied,
-      white = white,
-      black = black,
-      pawns = pawns,
-      knights = knights,
-      bishops = bishops,
-      rooks = rooks,
-      queens = queens,
-      kings = kings
+      ByColor(
+        white = white,
+        black = black
+      ),
+      ByRole(
+        pawn = pawns,
+        knight = knights,
+        bishop = bishops,
+        rook = rooks,
+        queen = queens,
+        king = kings
+      )
     )
-    (bboard -> promoted, error)
+    (board -> promoted, error)

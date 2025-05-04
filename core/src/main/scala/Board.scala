@@ -30,17 +30,20 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   def roleAt(s: Square): Option[Role] =
     byRole.findRole(_.contains(s))
 
+  def roleAt(file: File, rank: Rank): Option[Role] =
+    byRole.findRole(_.contains(file, rank))
+
   def colorAt(s: Square): Option[Color] =
     byColor.findColor(_.contains(s))
 
+  def colorAt(file: File, rank: Rank): Option[Color] =
+    byColor.findColor(_.contains(file, rank))
+
   def pieceAt(file: File, rank: Rank): Option[Piece] =
-    pieceAt(Square(file, rank))
+    (colorAt(file, rank), roleAt(file, rank)).mapN(Piece.apply)
 
   def pieceAt(s: Square): Option[Piece] =
-    for
-      color <- colorAt(s)
-      role  <- roleAt(s)
-    yield Piece(color, role)
+    (colorAt(s), roleAt(s)).mapN(Piece.apply)
 
   def whiteAt(s: Square): Boolean =
     white.contains(s)
@@ -150,7 +153,7 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
       byRole.map(_ & notMask)
     )
 
-  def byRoleOf(color: Color): chess.ByRole[Bitboard] =
+  def byRoleOf(color: Color): ByRole[Bitboard] =
     byRole.map(_ & byColor(color))
 
   // put a piece to an empty square
@@ -194,7 +197,7 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   def promote(orig: Square, dest: Square, piece: Piece): Option[Board] =
     take(orig).map(_.putOrReplace(piece, dest))
 
-  inline def isOccupied(inline p: Piece) =
+  inline def isOccupied(inline p: Piece): Boolean =
     piece(p).nonEmpty
 
   // benchmarked: https://github.com/lichess-org/scalachess/pull/438
@@ -248,19 +251,6 @@ object Board:
     ByColor.fill(Bitboard.empty),
     ByRole.fill(Bitboard.empty)
   )
-
-  def apply(
-      occupied: Bitboard,
-      white: Bitboard,
-      black: Bitboard,
-      pawns: Bitboard,
-      knights: Bitboard,
-      bishops: Bitboard,
-      rooks: Bitboard,
-      queens: Bitboard,
-      kings: Bitboard
-  ): Board =
-    Board(occupied, ByColor(white, black), ByRole(pawns, knights, bishops, rooks, queens, kings))
 
   def fromMap(pieces: PieceMap): Board =
     var pawns    = Bitboard.empty

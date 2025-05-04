@@ -53,8 +53,11 @@ object Bitboard:
     def isEmpty: Boolean  = a == empty
     def nonEmpty: Boolean = !isEmpty
 
-    def contains(square: Square): Boolean =
+    inline def contains(square: Square): Boolean =
       (a & (1L << square.value)) != 0L
+
+    inline def contains(file: File, rank: Rank): Boolean =
+      (a & file.bb & rank.bb) != 0L
 
     def add(square: Square): Bitboard    = a | square.bl
     def remove(square: Square): Bitboard = a & ~square.bl

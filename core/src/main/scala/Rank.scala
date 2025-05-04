@@ -13,7 +13,7 @@ object Rank:
     inline def char: Char = (49 + a).toChar
 
     // the bitboard of the rank
-    def bb: Bitboard = Bitboard.rank(value)
+    inline def bb: Bitboard = Bitboard.rank(value)
   end extension
 
   inline def apply(index: Int): Option[Rank] = Option.when(0 <= index && index < 8)(index)

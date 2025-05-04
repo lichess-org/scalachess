@@ -5,15 +5,10 @@ import cats.derived.*
 
 case class Piece(color: Color, role: Role) derives Eq:
 
-  def is(c: Color)   = c == color
-  def is(r: Role)    = r == role
-  def isNot(r: Role) = r != role
-  def unary_!        = Piece(!color, role)
-
-  def oneOf(rs: Set[Role]) = rs(role)
-
-  def isMinor = oneOf(Set(Knight, Bishop))
-  def isMajor = oneOf(Set(Queen, Rook))
+  def is(c: Color): Boolean   = c == color
+  def is(r: Role): Boolean    = r == role
+  def isNot(r: Role): Boolean = r != role
+  def unary_! : Piece         = Piece(!color, role)
 
   def forsyth: Char = if color.white then role.forsythUpper else role.forsyth
 

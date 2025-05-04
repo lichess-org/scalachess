@@ -17,7 +17,7 @@ object File:
     inline def toUpperCaseString: String = upperCaseChar.toString
 
     // the bitboard of the file
-    def bb: Bitboard = Bitboard.file(value)
+    inline def bb: Bitboard = Bitboard.file(value)
   end extension
 
   inline def of(inline square: Square): File = square.value & 0x7

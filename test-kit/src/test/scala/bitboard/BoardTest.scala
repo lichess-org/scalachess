@@ -32,6 +32,13 @@ class BoardTest extends ChessTest:
       newBoard = board.discard(s)
     yield assertEquals(newBoard, board)
 
+  test("pieceAt are consistent"):
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      s <- Square.all
+    yield assertEquals(board.pieceAt(s), board.pieceAt(s.file, s.rank))
+
   test("discard an occupied square returns a board with one piece left"):
     for
       str <- FenFixtures.fens

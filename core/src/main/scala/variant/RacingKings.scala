@@ -42,10 +42,9 @@ case object RacingKings
   override val initialFen: FullFen = FullFen("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
 
   override def validMoves(position: Position): List[Move] =
-    import position.{ genSafeKing, genNonKingAndNonPawn, us }
-    val targets = ~us
-    val moves   = genNonKingAndNonPawn(targets) ++ genSafeKing(targets)
-    moves.filter(kingSafety)
+    import position.{ genSafeKing, genNonKingAndNonPawn }
+    val targets = ~position.us
+    (genNonKingAndNonPawn(targets) ++ genSafeKing(targets)).filter(kingSafety)
 
   override def validMovesAt(position: Position, square: Square): List[Move] =
     super.validMovesAt(position, square).filter(kingSafety)

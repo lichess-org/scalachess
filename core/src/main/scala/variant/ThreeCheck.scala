@@ -22,7 +22,7 @@ case object ThreeCheck
     Standard.validMoves(position).map(updateCheckCount)
 
   override def validMovesAt(position: Position, square: Square): List[Move] =
-    super.validMovesAt(position, square).filter(kingSafety).map(updateCheckCount)
+    super.validMovesAt(position, square).view.filter(kingSafety).map(updateCheckCount).toList
 
   override def valid(position: Position, strict: Boolean): Boolean = Standard.valid(position, strict)
 

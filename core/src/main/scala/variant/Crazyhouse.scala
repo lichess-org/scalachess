@@ -23,7 +23,7 @@ case object Crazyhouse
     Standard.validMoves(position).map(updateCrazyData)
 
   override def validMovesAt(position: Position, square: Square): List[Move] =
-    super.validMovesAt(position, square).filter(kingSafety).map(updateCrazyData)
+    super.validMovesAt(position, square).view.filter(kingSafety).map(updateCrazyData).toList
 
   override def valid(position: Position, strict: Boolean): Boolean =
     Color.all.forall(validSide(position, false)) &&

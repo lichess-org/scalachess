@@ -58,7 +58,7 @@ trait FenReader:
         if square.rank == sixthRank
         orig = square.withRank(seventhRank)
         dest = square.withRank(fifthRank)
-        if position.pieceAt(dest).contains(Piece(!position.color, Pawn)) &&
+        if position.pieceAt(dest).exists(p => p.color != position.color && p.is(Pawn)) &&
           position.pieceAt(square.file, sixthRank).isEmpty &&
           position.pieceAt(orig).isEmpty
       yield Uci.Move(orig, dest)

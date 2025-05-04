@@ -14,7 +14,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
     kingsAndBishopsOnlyOf, kingsAndKnightsOnly, kingsAndKnightsOnlyOf, kingsAndMinorsOnly,
     kingsOnly, kingsOnlyOf, kingsRooksAndMinorsOnly, knights, nbPieces, nonKingsOf, occupied,
     onlyKnights, onlyOf, pawns, piece, pieceAt, pieceMap as pieces, pieces as allPieces, piecesOf,
-    queens, rooks, sliderBlockers, sliders, white, count
+    queens, rooks, sliderBlockers, sliders, white, count, contains
   }
   // format: on
 

@@ -187,12 +187,20 @@ class BoardTest extends ChessTest:
       square <- Square.all
     yield assertEquals(board.isOccupied(square), board.pieceMap.contains(square))
 
-  test("isOccupied(piece) == true if pieces contains piece"):
+  test("contains(piece) == true if pieces contains piece"):
     for
       str <- FenFixtures.fens
       board = parseFen(str)
       piece <- board.pieces
-    yield assert(board.isOccupied(piece))
+    yield assert(board.contains(piece))
+
+  test("contains(piece) == contains(color, role)"):
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      role  <- Role.all
+      color <- Color.all
+    yield assertEquals(board.contains(Piece(color, role)), board.contains(color, role))
 
   test("move(x, x) always returns None"):
     for

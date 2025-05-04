@@ -16,10 +16,18 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
     king as kings
   }
 
-  def sliders: Bitboard              = bishops ^ rooks ^ queens
+  lazy val nbPieces: Int = occupied.count
+
+  /* whether a square occupied by a piece */
   def isOccupied(s: Square): Boolean = occupied.contains(s)
 
-  lazy val nbPieces: Int = occupied.count
+  /* whether a piece exists */
+  def contains(p: Piece): Boolean =
+    piece(p).nonEmpty
+
+  /* whether a piece exists */
+  def contains(color: Color, role: Role): Boolean =
+    piece(color, role).nonEmpty
 
   def byPiece(piece: Piece): Bitboard =
     byPiece(piece.color, piece.role)
@@ -43,7 +51,13 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
     (colorAt(file, rank), roleAt(file, rank)).mapN(Piece.apply)
 
   def pieceAt(s: Square): Option[Piece] =
-    (colorAt(s), roleAt(s)).mapN(Piece.apply)
+    pieceAt(s.file, s.rank)
+
+  def piece(p: Piece): Bitboard =
+    piece(p.color, p.role)
+
+  def piece(color: Color, role: Role): Bitboard =
+    byColor(color) & byRole(role)
 
   def whiteAt(s: Square): Boolean =
     white.contains(s)
@@ -66,7 +80,8 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   def kingsAndKnightsOnly: Boolean =
     (kings | knights) == occupied
 
-  def onlyKnights: Boolean = knights == occupied
+  def onlyKnights: Boolean =
+    knights == occupied
 
   def minors: Bitboard =
     bishops | knights
@@ -83,12 +98,13 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   def kingsAndMinorsOnlyOf(color: Color): Boolean =
     onlyOf(color, kings | minors)
 
-  def kingsOnly = kings == occupied
+  def kingsOnly: Boolean =
+    kings == occupied
 
-  def kingsOnlyOf(color: Color) =
+  def kingsOnlyOf(color: Color): Boolean =
     onlyOf(color, kings)
 
-  def kingsAndKnightsOnlyOf(color: Color) =
+  def kingsAndKnightsOnlyOf(color: Color): Boolean =
     onlyOf(color, kings | knights)
 
   def onlyOf(color: Color, roles: Bitboard): Boolean =
@@ -101,14 +117,20 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   def nonKing: Bitboard =
     occupied & ~kings
 
-  def count(p: Piece): Int = piece(p).count
-  def count(c: Color): Int = color(c).count
+  def count(p: Piece): Int =
+    piece(p).count
 
-  def attackers(s: Square, attacker: Color): Bitboard =
-    attackers(s, attacker, occupied)
+  def count(c: Color): Int =
+    byColor(c).count
+
+  def sliders: Bitboard =
+    bishops ^ rooks ^ queens
 
   def attacks(s: Square, attacker: Color): Boolean =
     attackers(s, attacker).nonEmpty
+
+  def attackers(s: Square, attacker: Color): Bitboard =
+    attackers(s, attacker, occupied)
 
   def attackers(s: Square, attacker: Color, occupied: Bitboard): Bitboard =
     byColor(attacker) & (
@@ -119,7 +141,7 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
         s.pawnAttacks(!attacker) & pawns
     )
 
-  // is a king of this color in check
+  /* is a king of this color in check */
   def isCheck(color: Color): Check =
     Check(kings(color).exists(attacks(_, !color)))
 
@@ -141,6 +163,8 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
       val between = Bitboard.between(ourKing, sniper) & occupied
       if between.moreThanOne then blockers
       else blockers | between
+
+  /* ====== Board manipulation ====== */
 
   def discard(s: Square): Board =
     discard(s.bb)
@@ -197,9 +221,6 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   def promote(orig: Square, dest: Square, piece: Piece): Option[Board] =
     take(orig).map(_.putOrReplace(piece, dest))
 
-  inline def isOccupied(inline p: Piece): Boolean =
-    piece(p).nonEmpty
-
   // benchmarked: https://github.com/lichess-org/scalachess/pull/438
   lazy val pieceMap: Map[Square, Piece] =
     val m = Map.newBuilder[Square, Piece]
@@ -209,6 +230,14 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
         (c & r).foreach: s =>
           m += s -> piece
     m.result
+
+  def piecesOf(c: Color): Map[Square, Piece] =
+    pieceMap.filter((_, p) => p.color == c)
+
+  def pieces: List[Piece] = pieces(occupied)
+
+  def pieces(occupied: Bitboard): List[Piece] =
+    occupied.flatMap(pieceAt)
 
   def fold[B](init: B)(f: (B, Color, Role) => B): B =
     var m = init
@@ -231,18 +260,6 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
       byRole.foreach: (role, r) =>
         (c & r).foreach: s =>
           f(color, role, s)
-
-  def piecesOf(c: Color): Map[Square, Piece] =
-    pieceMap.filter((_, p) => p.color == c)
-
-  def pieces: List[Piece] = pieces(occupied)
-
-  def pieces(occupied: Bitboard): List[Piece] =
-    occupied.flatMap(pieceAt)
-
-  def color(c: Color): Bitboard = byColor(c)
-
-  def piece(p: Piece): Bitboard = byColor(p.color) & byRole(p.role)
 
 object Board:
 

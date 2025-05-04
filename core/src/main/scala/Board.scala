@@ -153,7 +153,7 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
       byRole.map(_ & notMask)
     )
 
-  def byRoleOf(color: Color): chess.ByRole[Bitboard] =
+  def byRoleOf(color: Color): ByRole[Bitboard] =
     byRole.map(_ & byColor(color))
 
   // put a piece to an empty square
@@ -197,7 +197,7 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   def promote(orig: Square, dest: Square, piece: Piece): Option[Board] =
     take(orig).map(_.putOrReplace(piece, dest))
 
-  inline def isOccupied(inline p: Piece) =
+  inline def isOccupied(inline p: Piece): Boolean =
     piece(p).nonEmpty
 
   // benchmarked: https://github.com/lichess-org/scalachess/pull/438
@@ -251,19 +251,6 @@ object Board:
     ByColor.fill(Bitboard.empty),
     ByRole.fill(Bitboard.empty)
   )
-
-  def apply(
-      occupied: Bitboard,
-      white: Bitboard,
-      black: Bitboard,
-      pawns: Bitboard,
-      knights: Bitboard,
-      bishops: Bitboard,
-      rooks: Bitboard,
-      queens: Bitboard,
-      kings: Bitboard
-  ): Board =
-    Board(occupied, ByColor(white, black), ByRole(pawns, knights, bishops, rooks, queens, kings))
 
   def fromMap(pieces: PieceMap): Board =
     var pawns    = Bitboard.empty

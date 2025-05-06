@@ -10,7 +10,7 @@ import NodeArbitraries.{ *, given }
 
 class NodeTest extends ScalaCheckSuite:
 
-  import Foo.{ *, given }
+  import Foo.given
 
   given HasId[Int, Int] with
     extension (a: Int) def id: Int = a

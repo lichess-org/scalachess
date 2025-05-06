@@ -1,7 +1,6 @@
 package chess
 package format
 
-import cats.syntax.all.*
 import chess.variant.Crazyhouse
 
 /** https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation

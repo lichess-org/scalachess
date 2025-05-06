@@ -418,7 +418,7 @@ class AtomicVariantTest extends ChessTest:
           .split(' ')
           .toVector
       )
-    val (game, steps, error) = chess.Replay.gameMoveWhileValid(sans, Atomic.initialFen, Atomic)
+    val (_, steps, error) = chess.Replay.gameMoveWhileValid(sans, Atomic.initialFen, Atomic)
     assertEquals(error, None)
     assertEquals(steps.size, sans.size)
 
@@ -460,6 +460,6 @@ class AtomicVariantTest extends ChessTest:
           .split(' ')
           .toVector
       )
-    val (game, steps, error) = chess.Replay.gameMoveWhileValid(sans, Atomic.initialFen, Atomic)
+    val (_, steps, error) = chess.Replay.gameMoveWhileValid(sans, Atomic.initialFen, Atomic)
     assertEquals(error, None)
     assertEquals(steps.size, sans.size)

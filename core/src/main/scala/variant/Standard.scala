@@ -66,7 +66,6 @@ case object Standard
       enPassantSquare <- position.potentialEpSquare
       enPassantUp     <- position.color.fold(enPassantSquare.down, enPassantSquare.up)
       enPassantDown   <- position.color.fold(enPassantSquare.up, enPassantSquare.down)
-      ourKing         <- position.ourKing
     yield activeCheckers.count == 1 && (
       activeCheckers.first.contains(enPassantSquare) || position.board
         .move(enPassantUp, enPassantDown)

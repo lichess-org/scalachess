@@ -1,7 +1,6 @@
 package chess
 
 import cats.Functor
-import cats.syntax.all.*
 
 case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
   def apply(role: Role): A = role match

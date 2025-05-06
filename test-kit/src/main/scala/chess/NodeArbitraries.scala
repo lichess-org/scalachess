@@ -12,9 +12,9 @@ object NodeArbitraries:
   type NodeWithPath[A] = (Node[A], List[A])
   given [A](using Arbitrary[A]): Arbitrary[NodeWithPath[A]] = Arbitrary(genNodeWithPath)
 
-  given treeEq[A](using Eq[A]): Eq[Tree[A]]           = Eq.fromUniversalEquals
-  given nodeEq[A](using Eq[A]): Eq[Node[A]]           = Eq.fromUniversalEquals
-  given variationEq[A](using Eq[A]): Eq[Variation[A]] = Eq.fromUniversalEquals
+  given treeEq[A]: Eq[Tree[A]]           = Eq.fromUniversalEquals
+  given nodeEq[A]: Eq[Node[A]]           = Eq.fromUniversalEquals
+  given variationEq[A]: Eq[Variation[A]] = Eq.fromUniversalEquals
 
   def genNodeWithPath[A](using Arbitrary[A]) =
     for

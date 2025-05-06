@@ -1,6 +1,6 @@
 inThisBuild(
   Seq(
-    scalaVersion      := "3.6.4",
+    scalaVersion      := "3.7.0",
     version           := "17.6.0-RC5",
     organization      := "org.lichess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
@@ -17,7 +17,6 @@ val commonSettings = Seq(
     "-encoding",
     "utf-8",
     "-rewrite",
-    "-source:3.7-migration",
     // "-indent",
     "-feature",
     "-language:postfixOps",

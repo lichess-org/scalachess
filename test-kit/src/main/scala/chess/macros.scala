@@ -16,8 +16,8 @@ object macros:
   object PgnLiteral extends Literally[ParsedPgn]:
     def validate(s: String)(using Quotes) =
       Parser.full(PgnStr(s)) match
-        case Right(parsed) => Right('{ Parser.full(PgnStr(${ Expr(s) })).toOption.get })
-        case Left(err)     => Left(err.toString)
+        case Right(_)  => Right('{ Parser.full(PgnStr(${ Expr(s) })).toOption.get })
+        case Left(err) => Left(err.toString)
 
   object UciLiteral extends Literally[Uci]:
     def validate(s: String)(using Quotes) =

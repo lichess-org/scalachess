@@ -143,7 +143,7 @@ trait MunitExtensions extends munit.FunSuite:
     assert(n.gteq(v, min))
     assert(n.lteq(v, max))
 
-  private def isCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T])(using Location) =
+  private def isCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T]): Boolean =
     (n.toDouble(a) - n.toDouble(b)).abs <= delta
 
   given [A, B](using sr: SameRuntime[B, A]): munit.Compare[A, B] with
@@ -160,7 +160,7 @@ trait MunitExtensions extends munit.FunSuite:
       obtained.sameElements(expected.map(sr(_)))
 
   extension [A](a: A)
-    def matchZero[B: Zero](f: PartialFunction[A, B])(using Location): B =
+    def matchZero[B: Zero](f: PartialFunction[A, B]): B =
       f.lift(a) | Zero[B].zero
 
   extension [A](v: Option[A])
@@ -171,10 +171,10 @@ trait MunitExtensions extends munit.FunSuite:
   extension [E, A](v: Either[E, A])
     def assertRight(f: PartialFunction[A, Unit])(using Location): Any = v match
       case Right(r) => f.lift(r).getOrElse(fail(s"Unexpected Right value: $r"))
-      case Left(e)  => fail(s"Expected Right but received $v")
+      case Left(_)  => fail(s"Expected Right but received $v")
     def get: A = v match
       case Right(r) => r
-      case Left(e)  => fail(s"Expected Right but received $v")
+      case Left(_)  => fail(s"Expected Right but received $v")
 
 trait ChessTest extends munit.FunSuite with ChessTestCommon with MunitExtensions:
   import munit.Location
@@ -188,7 +188,7 @@ trait ChessTest extends munit.FunSuite with ChessTestCommon with MunitExtensions
       def isEqual(obtained: Option[List[Square]], expected: Set[Square]): Boolean =
         obtained.fold(Set.empty)(_.toSet) == expected
 
-  def fenToGame(positionString: FullFen, variant: Variant)(using Location): Game =
+  def fenToGame(positionString: FullFen, variant: Variant): Game =
     fenToGameEither(positionString, variant).get
 
   def visualDests(board: Position, p: Iterable[Square]): String =

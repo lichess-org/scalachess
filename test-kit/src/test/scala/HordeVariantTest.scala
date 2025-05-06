@@ -115,7 +115,7 @@ class HordeVariantTest extends ChessTest:
         .split(' ')
         .toVector
     )
-    val (game, steps, error) = chess.Replay.gameMoveWhileValid(sans, Horde.initialFen, Horde)
+    val (_, steps, error) = chess.Replay.gameMoveWhileValid(sans, Horde.initialFen, Horde)
     assertEquals(error, None)
     assertEquals(steps.last._1.position.legalMoves.exists(_.castles), true)
 

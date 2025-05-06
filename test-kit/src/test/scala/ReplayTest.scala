@@ -60,7 +60,7 @@ class ReplayTest extends ChessTest:
           .split(' ')
           .toVector
       )
-    val (game, steps, error) = chess.Replay.gameMoveWhileValid(
+    val (_, steps, error) = chess.Replay.gameMoveWhileValid(
       sans,
       Fen.Full("nrknbbqr/pppppppp/8/8/8/8/PPPPPPPP/NRKNBBQR w KQkq - 0 1"),
       Chess960
@@ -75,7 +75,7 @@ class ReplayTest extends ChessTest:
           .split(' ')
           .toVector
       )
-    val (game, steps, error) = chess.Replay.gameMoveWhileValid(
+    val (_, steps, error) = chess.Replay.gameMoveWhileValid(
       sans,
       Fen.Full.initial,
       variant.Standard
@@ -86,9 +86,9 @@ class ReplayTest extends ChessTest:
     assertEquals(steps(18)._2.uci.uci, "e1a1")
 
   test("replay from fen then castle"):
-    val fen                  = Fen.Full("2bqkb1r/1pp1ppp1/7r/pN2p2p/3PP3/P3P3/1PP1B1PP/R2Q1RK1 w k - 3 13")
-    val moves                = SanStr.from("dxe5 Qxd1 Raxd1 Rc6 Rd2 e6 Rfd1 Be7 Na7 O-O".split(" "))
-    val (game, steps, error) = chess.Replay.gameMoveWhileValid(moves, fen, variant.Standard)
+    val fen               = Fen.Full("2bqkb1r/1pp1ppp1/7r/pN2p2p/3PP3/P3P3/1PP1B1PP/R2Q1RK1 w k - 3 13")
+    val moves             = SanStr.from("dxe5 Qxd1 Raxd1 Rc6 Rd2 e6 Rfd1 Be7 Na7 O-O".split(" "))
+    val (_, steps, error) = chess.Replay.gameMoveWhileValid(moves, fen, variant.Standard)
     assertEquals(error, None)
     assertEquals(steps.size, moves.size)
 

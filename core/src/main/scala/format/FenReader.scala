@@ -135,7 +135,7 @@ trait FenReader:
       case word => word -> None
     if pocketsStr.isDefined && !variant.crazyhouse then None
     else
-      makeBoardOptionWithCrazyPromoted(position, variant).map: (board, promoted) =>
+      makeBoardOptionWithCrazyPromoted(position).map: (board, promoted) =>
         val pockets = pocketsStr.fold(Pockets.empty)(Pockets.apply)
         board -> Crazyhouse.Data(pockets, promoted).some
 
@@ -143,14 +143,11 @@ trait FenReader:
 
   type BoardWithCrazyPromoted = (Board, Bitboard)
 
-  def makeBoardOptionWithCrazyPromoted(boardFen: String, variant: Variant): Option[BoardWithCrazyPromoted] =
-    val (board, error) = makeBoardWithCrazyPromoted(boardFen, variant)
+  def makeBoardOptionWithCrazyPromoted(boardFen: String): Option[BoardWithCrazyPromoted] =
+    val (board, error) = makeBoardWithCrazyPromoted(boardFen)
     error.fold(board.some)(_ => none)
 
-  def makeBoardWithCrazyPromoted(
-      boardFen: String,
-      variant: Variant
-  ): (BoardWithCrazyPromoted, Option[String]) =
+  def makeBoardWithCrazyPromoted(boardFen: String): (BoardWithCrazyPromoted, Option[String]) =
     var promoted = Bitboard.empty
     var pawns    = Bitboard.empty
     var knights  = Bitboard.empty

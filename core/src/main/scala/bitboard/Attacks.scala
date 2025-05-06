@@ -48,9 +48,7 @@ object Attacks:
     var attacks = 0L
     deltas.foreach: delta =>
       var sq = square
-      var i  = 0
       while
-        i += 1
         sq += delta
         val con = (sq < 0 || 64 <= sq || distance(sq, sq - delta) > 2)
         if !con then attacks |= 1L << sq

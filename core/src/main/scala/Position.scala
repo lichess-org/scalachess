@@ -415,7 +415,7 @@ object Position:
     Position(
       board,
       History(
-        castles = variant.castles,
+        castles = castles,
         unmovedRooks = unmovedRooks,
         crazyData = variant.crazyhouse.option(Crazyhouse.Data.init)
       ),

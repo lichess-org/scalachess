@@ -1,6 +1,5 @@
 package chess
 
-import cats.syntax.all.*
 import chess.format.Uci
 import chess.format.pgn.*
 import org.typelevel.literally.Literally

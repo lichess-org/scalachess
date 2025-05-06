@@ -4,7 +4,6 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Prop
 
 import CoreArbitraries.given
-import Square.*
 import Castles.*
 
 class CastlesTest extends ScalaCheckSuite:

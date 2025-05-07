@@ -16,23 +16,22 @@ trait PgnNodeEncoder[A]:
 
 object PgnNodeEncoder:
 
-  extension [A](tree: Node[A])
+  extension [A](node: Node[A])
     def toPgn[B, C](
         context: C,
         f: (C, A) => Option[(C, B)],
         startPly: Ply
-    ): PgnNodeEncoder[B] ?=> Option[PgnStr] =
-      tree
+    )(using PgnNodeEncoder[B]): Option[PgnStr] =
+      node
         .mapAccumlOption_(context): (context, a) =>
           f(context, a).fold(context -> none)(_ -> _.some)
         .map(_.toPgnStr(startPly))
 
   extension [A](tree: Tree[A])
-
     /**
      * render a tree to a PgnStr
      */
-    def toPgnStr(startPly: Ply): PgnNodeEncoder[A] ?=> PgnStr =
+    def toPgnStr(startPly: Ply)(using PgnNodeEncoder[A]): PgnStr =
       PgnStr:
         val builder = new StringBuilder
         appendPgnStr(builder, startPly)
@@ -41,14 +40,14 @@ object PgnNodeEncoder:
     /**
      * append the rendred PgnStr to the builder
      */
-    def appendPgnStr(builder: StringBuilder, ply: Ply): PgnNodeEncoder[A] ?=> Unit =
+    def appendPgnStr(builder: StringBuilder, ply: Ply)(using PgnNodeEncoder[A]): Unit =
       render(builder, !ply.isWhiteTurn, ply)
 
     // We force to render turn number for the next black turn when the current value
     // has comment(s) or variation(s) or the rendered string of this value is not compact
     // so, this returns true if the current value is black
     // or the current value is white and has comment(s) or variation(s)
-    private def forceTurnNumber(ply: Ply): PgnNodeEncoder[A] ?=> Boolean =
+    private def forceTurnNumber(ply: Ply)(using PgnNodeEncoder[A]): Boolean =
       !ply.isWhiteTurn || (tree.value.hasComment || tree.variations.nonEmpty)
 
     @annotation.tailrec
@@ -56,7 +55,7 @@ object PgnNodeEncoder:
         builder: StringBuilder,
         forceTurnNumber: Boolean,
         ply: Ply
-    ): PgnNodeEncoder[A] ?=> Unit =
+    )(using PgnNodeEncoder[A]): Unit =
       if tree.isVariation then tree.value.appendVariationComment(builder)
       tree.addTurnNumberPrefix(forceTurnNumber, builder, ply)
       renderValueAndVariations(builder, ply)
@@ -83,7 +82,7 @@ object PgnNodeEncoder:
         builder.addOne(')')
 
   extension (ply: Ply)
-    private def isWhiteTurn: Boolean =
+    private inline def isWhiteTurn: Boolean =
       ply.isOdd
-    private def turnNumber: FullMoveNumber =
+    private inline def turnNumber: FullMoveNumber =
       ply.fullMoveNumber.map(_ + ply.value % 2 - 1)

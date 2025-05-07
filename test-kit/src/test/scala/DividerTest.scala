@@ -5,7 +5,7 @@ import scala.language.implicitConversions
 class DividerTest extends ChessTest:
 
   def makeReplay(moves: String): List[Position] =
-    format.pgn.Reader.full(moves).get match
+    format.pgn.Reader.mainline(moves).get match
       case format.pgn.Reader.Result(replay, None) =>
         replay.chronoMoves.map(_.before)
       case x => sys.error(s"Unexpected incomplete replay $x")

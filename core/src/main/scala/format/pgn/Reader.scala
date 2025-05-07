@@ -9,22 +9,22 @@ object Reader:
     def valid: Either[ErrorStr, Replay] =
       failure.fold(replay.asRight)(_.asLeft)
 
-  def full(pgn: PgnStr, tags: Tags = Tags.empty): Either[ErrorStr, Result] =
-    Parser.mainline(pgn).map(fullWithSans)
+  def mainline(pgn: PgnStr): Either[ErrorStr, Result] =
+    Parser.mainline(pgn).map(ml => makeReplay(ml.tags, ml.sans))
 
   def moves(sans: Iterable[SanStr], tags: Tags): Either[ErrorStr, Result] =
-    movesWithSans(sans, identity, tags)
+    moves(sans, identity, tags)
 
-  def fullWithSans(parsed: ParsedMainline[San]): Result =
-    makeReplay(makeGame(parsed.tags), Sans(parsed.sans))
-
-  def fullWithSans(parsed: ParsedPgn, op: Sans => Sans): Result =
+  def full(parsed: ParsedPgn, op: Sans => Sans): Result =
     makeReplay(makeGame(parsed.tags), op(Sans(parsed.mainline)))
 
-  def movesWithSans(sans: Iterable[SanStr], op: Sans => Sans, tags: Tags): Either[ErrorStr, Result] =
+  def moves(sans: Iterable[SanStr], op: Sans => Sans, tags: Tags): Either[ErrorStr, Result] =
     Parser
       .moves(sans)
       .map(moves => makeReplay(makeGame(tags), op(moves)))
+
+  private def makeReplay(tags: Tags, sans: List[San]): Result =
+    makeReplay(makeGame(tags), Sans(sans))
 
   private def makeReplay(game: Game, sans: Sans): Result =
     sans.value.zipWithIndex

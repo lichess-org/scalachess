@@ -34,7 +34,7 @@ class Chess960Test extends ChessTest:
       """
 
     Reader
-      .full(pgn)
+      .mainline(pgn)
       .assertRight:
         case Reader.Result(replay, None) =>
           assertEquals(

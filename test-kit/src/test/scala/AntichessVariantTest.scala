@@ -209,7 +209,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
   test("Successfully play through a full game until one player loses all their pieces"):
     Reader
-      .full(fullGame)
+      .mainline(fullGame)
       .assertRight:
         case Reader.Result(replay, None) =>
           val game = replay.state
@@ -254,7 +254,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 1. e3 b5 2. Bxb5 Bb7 3. Bxd7 Bxg2 4. Bxe8 Bxh1 5. Bxf7 Qxd2 6. Bxg8 Qxc2 7. Bxh7 Rxh7 8. Qxc2 Rxh2 9. Qxc7 Rxf2 10. Qxe7 Bxe7 11. Kxf2 Ba3 12. bxa3 Bf3 13. Nxf3 Nc6 14. Ne5 Nxe5 15. Kf3 Nxf3 16. Bd2 Nxd2 17. Nxd2 Rh8 18. Rh1 Rxh1 19. Nf1 Rxf1 20. a4 g6 21. e4 Rb1 22. a5 a6 23. a4 Rb6 24. axb6 g5 25. b7 g4 26. b8=R g3 27. a5 g2 28. Rb5 axb5 29. e5 g1=R 30. e6 b4 31. e7 Rg3 32. e8=K b3 33. a6 b2 34. a7 b1=R 35. a8=K Rb8 36. Kxb8 Rg6 37. Kc8 Ra6 38. Kf8 Rh6 39. Ke8 Rg6 40. Kcd8 Rb6 41. Kf8 Rh6 42. Kfe8 Rb6 43. Kf8 Rh6 44. Kfe8 Rb6 { The game is a draw. } 1/2-1/2
     """
     Reader
-      .full(pgn)
+      .mainline(pgn)
       .assertRight:
         case Reader.Result(replay, None) =>
           val game = replay.state

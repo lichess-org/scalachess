@@ -1,6 +1,6 @@
 package chess
 
-import chess.format.pgn.SanStr
+import chess.format.pgn.{ SanStr, Tags }
 import chess.format.{ Fen, Uci }
 
 case class Game(
@@ -33,6 +33,13 @@ case class Game(
       .map(_.normalizeCastle.withMetrics(metrics))
       .map(move => applyWithCompensated(move) -> move)
 
+  def drop(
+      role: Role,
+      square: Square,
+      metrics: MoveMetrics = MoveMetrics.empty
+  ): Either[ErrorStr, (Game, Drop)] =
+    position.drop(role, square).map(_.withMetrics(metrics)).map(drop => applyDrop(drop) -> drop)
+
   def apply(move: Move): Game = applyWithCompensated(move).value
 
   def applyWithCompensated(move: Move): Clock.WithCompensatedLag[Game] =
@@ -48,13 +55,6 @@ case class Game(
       ),
       newClock.flatMap(_.compensated)
     )
-
-  def drop(
-      role: Role,
-      square: Square,
-      metrics: MoveMetrics = MoveMetrics.empty
-  ): Either[ErrorStr, (Game, Drop)] =
-    position.drop(role, square).map(_.withMetrics(metrics)).map(drop => applyDrop(drop) -> drop)
 
   def applyDrop(drop: Drop): Game =
     val newPosition = drop.after
@@ -110,3 +110,12 @@ object Game:
           ply = parsed.ply,
           startedAtPly = parsed.ply
         )
+
+  def apply(tags: Tags): Game =
+    val g = Game(variantOption = tags.variant, fen = tags.fen)
+    g.copy(startedAtPly = g.ply, clock = tags.timeControl.flatMap(_.toClockConfig).map(Clock.apply))
+
+  given CanPlay[Game]:
+    extension (game: Game)
+      def play(move: Moveable): Either[ErrorStr, (Game, MoveOrDrop)] =
+        move(game.position).map(md => md.applyGame(game) -> md)

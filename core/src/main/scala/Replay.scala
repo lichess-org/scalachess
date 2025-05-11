@@ -45,25 +45,15 @@ object Replay:
       initialFen: Fen.Full,
       variant: Variant
   ): (Game, List[(Game, Uci.WithSan)], Option[ErrorStr]) =
-    val init       = makeGame(variant, initialFen.some)
-    val emptyGames = List.empty[(Game, Uci.WithSan)]
-    sans.zipWithIndex
-      .foldM((init, emptyGames)):
-        case ((head, games), (str, index)) =>
-          Parser
-            .san(str)
-            .flatMap: san =>
-              san(head.position)
-                .bimap(
-                  _ => Reader.makeError(init.ply + index, san),
-                  { move =>
-                    val newGame = move.applyGame(head)
-                    (newGame, (newGame, Uci.WithSan(move.toUci, str)) :: games)
-                  }
-                )
-            .leftMap(err => (init, games, err.some))
-      .map(gs => (init, gs._2, none))
-      .merge
+    val init: Game = makeGame(variant, initialFen.some)
+    inline def transform(success: (next: Game, move: MoveOrDrop)) =
+      (success.next, Uci.WithSan(success.move.toUci, success.move.toSanStr))
+    Parser
+      .moves(sans)
+      .fold(
+        err => (init, List.empty[(Game, Uci.WithSan)], err.some),
+        moves => init.playMovesReverse(moves.value, init.ply, transform)
+      )
 
   def gameMoveWhileValid(
       sans: Seq[SanStr],
@@ -72,19 +62,6 @@ object Replay:
   ): (Game, List[(Game, Uci.WithSan)], Option[ErrorStr]) =
     gameMoveWhileValidReverse(sans, initialFen, variant) match
       case (game, gs, err) => (game, gs.reverse, err)
-
-  private def computeBoards[M](
-      sit: Position,
-      moves: List[M],
-      play: M => Position => Either[ErrorStr, MoveOrDrop]
-  ): Either[ErrorStr, List[Position]] =
-    moves
-      .foldM((sit, List(sit))) { case ((current, acc), move) =>
-        play(move)(current).map: md =>
-          val nextSit = md.after
-          (nextSit, nextSit :: acc)
-      }
-      .map(_._2.reverse)
 
   @scala.annotation.tailrec
   private def computeReplay(replay: Replay, ucis: List[Uci]): Either[ErrorStr, Replay] =
@@ -95,7 +72,7 @@ object Replay:
           case Left(err) => err.asLeft
           case Right(md) => computeReplay(replay.addMove(md), rest)
 
-  private def initialFenToBoard(initialFen: Option[Fen.Full], variant: Variant): Position =
+  private def makePosition(initialFen: Option[Fen.Full], variant: Variant): Position =
     (initialFen.flatMap(Fen.read) | Position(variant)).withVariant(variant)
 
   def boards(
@@ -103,18 +80,17 @@ object Replay:
       initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, List[Position]] =
-    val sit = initialFenToBoard(initialFen, variant)
     Parser
       .moves(sans)
-      .flatMap: moves =>
-        computeBoards(sit, moves.value, _.apply)
+      .flatMap(moves => boardsFromUci(moves.value, initialFen, variant))
 
-  def boardsFromUci(
-      moves: List[Uci],
+  def boardsFromUci[M <: Moveable](
+      moves: List[Moveable],
       initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, List[Position]] =
-    computeBoards(initialFenToBoard(initialFen, variant), moves, _.apply)
+    val init = makePosition(initialFen, variant)
+    init.playPositions(moves).map(init :: _)
 
   def apply(
       moves: List[Uci],

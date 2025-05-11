@@ -1,7 +1,7 @@
 package chess
 
 import cats.syntax.all.*
-import chess.format.Uci
+import chess.format.{ Fen, Uci }
 
 import variant.{ Variant, Crazyhouse }
 
@@ -423,6 +423,17 @@ object Position:
       color.getOrElse(White)
     )
 
-  def apply(variant: chess.variant.Variant): Position = Position.init(variant, White)
+  def apply(variant: chess.variant.Variant): Position =
+    Position.init(variant, White)
+
+  def apply(variantOpt: Option[Variant], fen: Option[Fen.Full]): Position =
+    val variant = variantOpt.getOrElse(chess.variant.Standard)
+    fen.flatMap(Fen.read(variant, _)).getOrElse(init(variant, White))
+
   def init(variant: Variant, color: Color): Position =
     Position(Board.fromMap(variant.pieces), variant, color.some)
+
+  given CanPlay[Position]:
+    extension (position: Position)
+      def play(move: Moveable): Either[ErrorStr, (Position, MoveOrDrop)] =
+        move(position).map(x => (x.after, x))

@@ -24,6 +24,7 @@ class ReplayTest extends ChessTest:
       case (_, games, Some(_)) =>
         assertEquals(games.size, 2)
         assertEquals(games(1)._2._2, "d5")
+        assertEquals(games(0)._2._2, "d4")
 
   test("bongcloud attack"):
     Replay

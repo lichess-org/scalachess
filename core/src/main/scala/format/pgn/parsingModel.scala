@@ -38,20 +38,21 @@ case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[
 
   def mainline: List[San] =
     tree.fold(List.empty[San])(_.mainline.map(_.value.san))
+
   def mainlineWithMetas: List[SanWithMetas] =
     tree.fold(List.empty)(_.mainline.map(x => SanWithMetas(x.value.san, x.value.metas)))
 
+  // def play: (state: Position, moves: List[MoveOrDrop], error: Option[ErrorStr]) =
+  //   Position(tags.variant, tags.fen).playMoves(mainline)
+
   def toPgn: Pgn =
-    val sitWithMove = initContext(tags)
-    Pgn(tags, initialPosition, treeToPgn(sitWithMove.position), sitWithMove.ply.next)
+    val positionWithMove = initContext(tags)
+    Pgn(tags, initialPosition, treeToPgn(positionWithMove.position), positionWithMove.ply.next)
 
   private def initContext(tags: Tags): AndFullMoveNumber =
-    val variant = tags.variant | chess.variant.Standard
-    def default = AndFullMoveNumber(Position.init(variant, White), FullMoveNumber.initial)
-
-    tags.fen
-      .flatMap(Fen.readWithMoveNumber(variant, _))
-      .getOrElse(default)
+    val variant        = tags.variant | chess.variant.Standard
+    inline def default = AndFullMoveNumber(Position.init(variant, White), FullMoveNumber.initial)
+    tags.fen.flatMap(Fen.readWithMoveNumber(variant, _)) | default
 
   private def treeToPgn(context: Position): Option[Node[Move]] =
     tree.flatMap:
@@ -62,7 +63,7 @@ case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[
 case class ParsedMainline[A](initialPosition: InitialComments, tags: Tags, sans: List[A])
 
 // Standard Algebraic Notation
-sealed trait San:
+sealed trait San extends Moveable:
   def apply(position: Position): Either[ErrorStr, MoveOrDrop]
   def rawString: Option[String] = None
 

@@ -3,7 +3,7 @@ package format
 
 import cats.syntax.all.*
 
-sealed trait Uci:
+sealed trait Uci extends Moveable:
 
   def uci: String
   def chars: String
@@ -11,6 +11,8 @@ sealed trait Uci:
   def origDest: (Square, Square)
 
   def apply(position: Position): Either[ErrorStr, MoveOrDrop]
+
+  def rawString: Option[String] = Some(uci)
 
 object Uci:
 

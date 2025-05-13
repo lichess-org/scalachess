@@ -1,6 +1,7 @@
 package chess
 package format.pgn
 
+import cats.Traverse
 import cats.parse.Parser.Expectation
 import cats.parse.{ LocationMap, Numbers as N, Parser as P, Parser0 as P0, Rfc5234 as R }
 import cats.syntax.all.*
@@ -38,6 +39,9 @@ object Parser:
 
   def moves(strMoves: Iterable[SanStr]): Either[ErrorStr, Sans] =
     strMoves.toList.traverse(san).map(Sans(_))
+
+  def moves[F[_]: Traverse](strMoves: F[SanStr]): Either[ErrorStr, F[San]] =
+    strMoves.traverse(san)
 
   def moves(str: PgnMovesStr): Either[ErrorStr, Option[ParsedPgnTree]] =
     moveParser.rep0

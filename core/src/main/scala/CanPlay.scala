@@ -1,8 +1,9 @@
 package chess
 
-import cats.Traverse
 import cats.syntax.all.*
+import cats.{ Foldable, Traverse }
 import chess.CanPlay.makeError
+import chess.format.pgn.{ Parser, SanStr }
 
 trait CanPlay[A]:
   type Step      = (next: A, move: MoveOrDrop)
@@ -22,6 +23,9 @@ trait CanPlay[A]:
     def playMoves[A <: Moveable, B, F[_]: Traverse](moves: F[A], initialPly: Ply, f: Step => B): Result[B] =
       val (state, acc, error) = playMovesReverse(moves, initialPly, f)
       (state = state, moves = acc.reverse, error = error)
+
+    def playSans[F[_]: Traverse](moves: F[SanStr]): Either[ErrorStr, Result[MoveOrDrop]] =
+      Parser.moves(moves).map(a.playMoves(_, Ply.initial, _.move))
 
     def playMovesReverse[M <: Moveable, B, F[_]: Traverse](
         moves: F[M],
@@ -43,8 +47,11 @@ trait CanPlay[A]:
       val (moves = result, error = error) = playMoves(moves, Ply.initial, _.move.after)
       error.fold(result.asRight)(_.asLeft)
 
-    // def moves[F[_]: Traverse](moves: F[Moveable]): Either[ErrorStr, List[MoveOrDrop]] =
-    //   play(moves).map(_.moves)
+    def validate[F[_]: Foldable](moves: F[Moveable]): Either[ErrorStr, Unit] =
+      moves.foldM(())((_, move) => a.play(move).void)
+
+    def rewind[F[_]: Foldable](moves: F[Moveable]): Either[ErrorStr, A] =
+      moves.foldM(a)((state, move) => state.play(move).map(_.next))
 
 object CanPlay:
 

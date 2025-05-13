@@ -1,6 +1,7 @@
 package chess
 
 import cats.syntax.all.*
+import chess.format.pgn.Tags
 import chess.format.{ Fen, Uci }
 
 import variant.{ Variant, Crazyhouse }
@@ -425,6 +426,9 @@ object Position:
 
   def apply(variant: chess.variant.Variant): Position =
     Position.init(variant, White)
+
+  def apply(tags: Tags): Position =
+    apply(tags.variant, tags.fen)
 
   def apply(variantOpt: Option[Variant], fen: Option[Fen.Full]): Position =
     val variant = variantOpt.getOrElse(chess.variant.Standard)

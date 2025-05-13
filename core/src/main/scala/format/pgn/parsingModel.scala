@@ -42,14 +42,17 @@ case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[
   def mainlineWithMetas: List[SanWithMetas] =
     tree.fold(List.empty)(_.mainline.map(x => SanWithMetas(x.value.san, x.value.metas)))
 
-  // def play: (state: Position, moves: List[MoveOrDrop], error: Option[ErrorStr]) =
-  //   Position(tags.variant, tags.fen).playMoves(mainline)
+  def toGame: Game =
+    Game(tags)
+
+  def toPosition: Position =
+    Position(tags)
 
   def toPgn: Pgn =
-    val positionWithMove = initContext(tags)
+    val positionWithMove = initContext
     Pgn(tags, initialPosition, treeToPgn(positionWithMove.position), positionWithMove.ply.next)
 
-  private def initContext(tags: Tags): AndFullMoveNumber =
+  private def initContext: AndFullMoveNumber =
     val variant        = tags.variant | chess.variant.Standard
     inline def default = AndFullMoveNumber(Position.init(variant, White), FullMoveNumber.initial)
     tags.fen.flatMap(Fen.readWithMoveNumber(variant, _)) | default
@@ -60,7 +63,13 @@ case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[
         d.toMove(ctx)
           .fold(ctx -> None)(_ -> _.some)
 
-case class ParsedMainline[A](initialPosition: InitialComments, tags: Tags, sans: List[A])
+case class ParsedMainline[A](initialPosition: InitialComments, tags: Tags, sans: List[A]):
+
+  def toGame: Game =
+    Game(tags)
+
+  def toPosition: Position =
+    Position(tags)
 
 // Standard Algebraic Notation
 sealed trait San extends Moveable:

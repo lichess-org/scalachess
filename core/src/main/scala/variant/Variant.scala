@@ -91,8 +91,19 @@ abstract class Variant private[variant] (
       to: Square,
       promotion: Option[PromotableRole]
   ): Either[ErrorStr, Move] =
+
+    // when users set auto queen promotion, lichobile will send an uci move
+    // without promotion ex: b2a1 instead of b2a1q.
+    // So if a move is a pawn move to the last rank, we need to set the promotion
+    // to queen if it is not already set.
+    inline def findMove(m: Move): Boolean =
+      m.dest == to && m.promotion == promotion.orElse(Option.when(isPromotion(m))(Queen))
+
+    inline def isPromotion(m: Move): Boolean =
+      m.piece.is(Pawn) && m.dest.rank == m.piece.color.lastRank
+
     validMovesAt(position, from)
-      .find(m => m.dest == to && m.promotion == promotion)
+      .find(findMove)
       .toRight(ErrorStr(s"Piece on ${from.key} cannot move to ${to.key}"))
 
   def drop(position: Position, role: Role, square: Square): Either[ErrorStr, Drop] =

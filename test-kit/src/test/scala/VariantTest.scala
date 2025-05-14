@@ -433,3 +433,17 @@ K  r
       .get
     assert(game.variant.valid(game, true))
     assert(game.variant.valid(game, false))
+
+  test("promotion without promotion role should default to queen"):
+    val position = Fen.read(Standard, FullFen("8/P4p2/4p3/4P3/1K3k2/8/1P4p1/8 b - - 0 43")).get
+    position.variant
+      .move(position, G2, G1, none)
+      .assertRight: move =>
+        assertEquals(move.promotion, Queen.some)
+
+  test("promotion with promotion role should be the same"):
+    val position = Fen.read(Standard, FullFen("8/P4p2/4p3/4P3/1K3k2/8/1P4p1/8 b - - 0 43")).get
+    position.variant
+      .move(position, G2, G1, Knight.some)
+      .assertRight: move =>
+        assertEquals(move.promotion, Knight.some)

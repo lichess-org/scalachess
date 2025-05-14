@@ -2,7 +2,7 @@ package chess
 
 import cats.syntax.all.*
 import chess.format.pgn.Sans.*
-import chess.format.pgn.{ Parser, Reader, San, SanStr, Tag, Tags }
+import chess.format.pgn.{ Parser, Reader, San, SanStr }
 import chess.format.{ Fen, Uci }
 import chess.variant.Variant
 
@@ -23,37 +23,14 @@ object Replay:
 
   def apply(game: Game): Replay = Replay(game, Nil, game)
 
-  def apply(
-      sans: Iterable[SanStr],
-      initialFen: Option[Fen.Full],
-      variant: Variant
-  ): Either[ErrorStr, Reader.Result] =
-    if sans.isEmpty then ErrorStr("[replay] pgn is empty").asLeft
-    else
-      Reader.moves(
-        sans,
-        Tags(
-          List(
-            initialFen.map(fen => Tag(_.FEN, fen.value)),
-            variant.some.filterNot(_.standard).map(v => Tag(_.Variant, v.name))
-          ).flatten
-        )
-      )
-
   def gameMoveWhileValidReverse(
       sans: Seq[SanStr],
       initialFen: Fen.Full,
       variant: Variant
   ): (Game, List[(Game, Uci.WithSan)], Option[ErrorStr]) =
-    val init: Game = makeGame(variant, initialFen.some)
     inline def transform(success: (next: Game, move: MoveOrDrop)) =
       (success.next, Uci.WithSan(success.move.toUci, success.move.toSanStr))
-    Parser
-      .moves(sans)
-      .fold(
-        err => (init, List.empty[(Game, Uci.WithSan)], err.some),
-        moves => init.playMovesReverse(moves.value, init.ply, transform)
-      )
+    Game(variant.some, initialFen.some).movesWhileValidReverse(sans, transform)
 
   def gameMoveWhileValid(
       sans: Seq[SanStr],
@@ -72,9 +49,6 @@ object Replay:
           case Left(err) => err.asLeft
           case Right(md) => computeReplay(replay.addMove(md), rest)
 
-  private def makePosition(initialFen: Option[Fen.Full], variant: Variant): Position =
-    (initialFen.flatMap(Fen.read) | Position(variant)).withVariant(variant)
-
   def boards(
       sans: Iterable[SanStr],
       initialFen: Option[Fen.Full],
@@ -85,19 +59,26 @@ object Replay:
       .flatMap(moves => boardsFromUci(moves.value, initialFen, variant))
 
   def boardsFromUci[M <: Moveable](
-      moves: List[Moveable],
+      moves: List[M],
       initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, List[Position]] =
-    val init = makePosition(initialFen, variant)
-    init.playPositions(moves).map(init :: _)
+    Position(variant, initialFen).playPositions(moves)
 
   def apply(
       moves: List[Uci],
       initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, Replay] =
-    computeReplay(Replay(makeGame(variant, initialFen)), moves)
+    computeReplay(Replay(Game(variant.some, initialFen)), moves)
+
+  def apply(
+      sans: Iterable[SanStr],
+      initialFen: Option[Fen.Full],
+      variant: Variant
+  ): Either[ErrorStr, Reader.Result] =
+    if sans.isEmpty then ErrorStr("[replay] pgn is empty").asLeft
+    else Reader.moves(sans, Game(variant.some, initialFen))
 
   def plyAtFen(
       sans: Iterable[SanStr],
@@ -130,7 +111,3 @@ object Replay:
       Parser
         .moves(sans)
         .flatMap(moves => recursivePlyAtFen(position, moves.value, Ply.firstMove))
-
-  private def makeGame(variant: Variant, initialFen: Option[Fen.Full]): Game =
-    val g = Game(variant.some, initialFen)
-    g.copy(startedAtPly = g.ply)

@@ -2,6 +2,7 @@ package chess
 package format
 
 import cats.syntax.all.*
+import chess.format.pgn.Parser
 import chess.variant.Variant
 
 object UciDump:
@@ -17,7 +18,12 @@ object UciDump:
       force960Notation: Boolean = false
   ): Either[ErrorStr, List[String]] =
     if moves.isEmpty then Nil.asRight
-    else Replay(moves, initialFen, variant).flatMap(_.valid).map(apply(force960Notation))
+    else
+      Parser
+        .moves(moves)
+        .flatMap: sans =>
+          Position(variant, initialFen).play(sans.value)
+        .map(_.map(move(variant, force960Notation)))
 
   def move(variant: Variant, force960Notation: Boolean = false)(mod: MoveOrDrop): String =
     mod match

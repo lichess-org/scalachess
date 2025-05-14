@@ -377,8 +377,35 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
 object Position:
 
+  val standard: Position = Position.init(variant.Standard, White)
+
   case class AndFullMoveNumber(position: Position, fullMoveNumber: FullMoveNumber):
-    def ply = fullMoveNumber.ply(position.color)
+    def ply: Ply         = fullMoveNumber.ply(position.color)
+    def toGame: Game     = Game(position = position, ply = ply, startedAtPly = ply)
+    def toAndPly: AndPly = AndPly(position, ply)
+
+  object AndFullMoveNumber:
+    def apply(variant: Variant, fen: Option[Fen.Full]): AndFullMoveNumber =
+      fen
+        .flatMap(Fen.readWithMoveNumber(variant, _))
+        .getOrElse:
+          AndFullMoveNumber(Position.init(variant, White), FullMoveNumber.initial)
+
+    given CanPlay[AndFullMoveNumber] with
+      extension (position: AndFullMoveNumber)
+        def apply[M <: Moveable](move: M): Either[ErrorStr, (AndFullMoveNumber, MoveOrDrop)] =
+          move(position.position).map(x => (AndFullMoveNumber(x.after, position.ply.next.fullMoveNumber), x))
+        inline def position: Position = position.position
+
+  case class AndPly(position: Position, ply: Ply):
+    def fullMoveNumber = ply.fullMoveNumber
+
+  object AndPly:
+    given CanPlay[AndPly] with
+      extension (position: AndPly)
+        def apply[M <: Moveable](move: M): Either[ErrorStr, (AndPly, MoveOrDrop)] =
+          move(position.position).map(x => (AndPly(x.after, position.ply.next), x))
+        inline def position: Position = position.position
 
   def apply(
       pieces: PieceMap,
@@ -432,6 +459,9 @@ object Position:
 
   def apply(variantOpt: Option[Variant], fen: Option[Fen.Full]): Position =
     val variant = variantOpt.getOrElse(chess.variant.Standard)
+    apply(variant, fen)
+
+  def apply(variant: Variant, fen: Option[Fen.Full]): Position =
     fen.flatMap(Fen.read(variant, _)).getOrElse(init(variant, White))
 
   def init(variant: Variant, color: Color): Position =
@@ -439,5 +469,6 @@ object Position:
 
   given CanPlay[Position]:
     extension (position: Position)
-      def play(move: Moveable): Either[ErrorStr, (Position, MoveOrDrop)] =
+      def apply[M <: Moveable](move: M): Either[ErrorStr, (Position, MoveOrDrop)] =
         move(position).map(x => (x.after, x))
+      inline def position: Position = position

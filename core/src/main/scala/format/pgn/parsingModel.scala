@@ -81,7 +81,7 @@ case class Std(
       .byPiece(position.color, role)
       .first: square =>
         if compare(file, square.file) && compare(rank, square.rank)
-        then position.generateMovesAt(square).find(m => m.dest == dest && m.promotion == promotion)
+        then position.variant.move(position, square, dest, promotion).toOption
         else None
       .toRight(ErrorStr(s"Cannot play $this"))
 

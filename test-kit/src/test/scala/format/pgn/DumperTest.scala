@@ -109,7 +109,7 @@ PP   PPP
 KNBQ BNR
 """)
     game
-      .playMove(A7, A8, Some(Queen))
+      .playMove(A7, A8)
       .map(_.sans)
       .assertRight: ms =>
         assertEquals(ms, Vector(SanStr("a8=Q")))

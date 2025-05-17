@@ -114,4 +114,5 @@ object Game:
       def apply[M <: Moveable](move: M): Either[ErrorStr, (Game, MoveOrDrop)] =
         move(game.position).map(md => md.applyGame(game) -> md)
 
-      inline def position: Position = game.position
+  given HasPosition[Game]:
+    extension (game: Game) inline def position: Position = game.position

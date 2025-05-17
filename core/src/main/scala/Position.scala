@@ -394,7 +394,9 @@ object Position:
       extension (position: AndFullMoveNumber)
         def apply[M <: Moveable](move: M): Either[ErrorStr, (AndFullMoveNumber, MoveOrDrop)] =
           move(position.position).map(x => (AndFullMoveNumber(x.after, position.ply.next.fullMoveNumber), x))
-        inline def position: Position = position.position
+
+  given HasPosition[AndFullMoveNumber]:
+    extension (position: AndFullMoveNumber) inline def position: Position = position.position
 
   def apply(
       pieces: PieceMap,
@@ -460,4 +462,6 @@ object Position:
     extension (position: Position)
       def apply[M <: Moveable](move: M): Either[ErrorStr, (Position, MoveOrDrop)] =
         move(position).map(x => (x.after, x))
-      inline def position: Position = position
+
+  given HasPosition[Position]:
+    extension (position: Position) inline def position: Position = position

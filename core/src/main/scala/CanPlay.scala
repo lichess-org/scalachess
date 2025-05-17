@@ -15,7 +15,7 @@ trait HasPosition[A]:
     inline def color: Color     = position.color
     inline def history: History = position.history
 
-trait CanPlay[A] extends HasPosition[A]:
+trait CanPlay[A]:
   type Step      = (next: A, move: MoveOrDrop)
   type Result[B] = (state: A, moves: List[B], error: Option[ErrorStr])
   extension (a: A)
@@ -71,17 +71,23 @@ trait CanPlay[A] extends HasPosition[A]:
         }
         .fold(identity, (next, acc) => (state = next, moves = acc, error = none))
 
-    def playPositions[M <: Moveable, F[_]: Traverse](moves: F[M]): Either[ErrorStr, List[Position]] =
+    def playPositions[M <: Moveable, F[_]: Traverse](moves: F[M])(using
+        HasPosition[A]
+    ): Either[ErrorStr, List[Position]] =
       val result = playSoft(moves, Ply.initial, _.move.after)
       result.error.fold((a.position :: result.moves).asRight)(_.asLeft)
 
     @targetName("playPositionsFromSans")
-    def playPositions[F[_]: Traverse](moves: F[SanStr]): Either[ErrorStr, List[Position]] =
+    def playPositions[F[_]: Traverse](moves: F[SanStr])(using
+        HasPosition[A]
+    ): Either[ErrorStr, List[Position]] =
       Parser.moves(moves).flatMap(playPositions)
 
-    def playBoards[M <: Moveable, F[_]: Traverse](moves: F[M]): Either[ErrorStr, List[Board]] =
+    def playBoards[M <: Moveable, F[_]: Traverse](moves: F[M])(using
+        HasPosition[A]
+    ): Either[ErrorStr, List[Board]] =
       val result = playSoft(moves, Ply.initial, _.move.after.board)
-      result.error.fold(result.moves.asRight)(_.asLeft)
+      result.error.fold((a.position.board :: result.moves).asRight)(_.asLeft)
 
     def validate[M <: Moveable, F[_]: Foldable](moves: F[M]): Either[ErrorStr, Unit] =
       moves.foldM(())((_, move) => a(move).void)

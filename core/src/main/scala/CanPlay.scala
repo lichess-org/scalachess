@@ -5,6 +5,7 @@ import cats.{ Foldable, Traverse }
 import chess.CanPlay.makeError
 import chess.format.pgn.{ Parser, SanStr }
 import chess.variant.Variant
+
 import scala.annotation.targetName
 
 trait HasPosition[A]:
@@ -133,7 +134,3 @@ object CanPlay:
     val moveAt    = currentPly.fullMoveNumber.value
     val rawString = move.rawString.getOrElse(move.toString())
     ErrorStr(s"Cannot play $rawString at move $moveAt by ${currentPly.turn.name}")
-
-trait Moveable:
-  def apply(position: Position): Either[ErrorStr, MoveOrDrop]
-  def rawString: Option[String]

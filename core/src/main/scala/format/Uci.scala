@@ -10,8 +10,6 @@ sealed trait Uci extends Moveable:
 
   def origDest: (Square, Square)
 
-  def apply(position: Position): Either[ErrorStr, MoveOrDrop]
-
   def rawString: Option[String] = Some(uci)
 
 object Uci:

@@ -98,7 +98,9 @@ object Game:
     Game(Position.init(variant, White))
 
   def apply(variantOption: Option[chess.variant.Variant], fen: Option[Fen.Full]): Game =
-    val variant = variantOption | chess.variant.Standard
+    apply(variantOption | chess.variant.Standard, fen)
+
+  def apply(variant: chess.variant.Variant, fen: Option[Fen.Full]): Game =
     fen
       .flatMap(format.Fen.readWithMoveNumber(variant, _))
       .fold(Game(variant))(_.toGame)

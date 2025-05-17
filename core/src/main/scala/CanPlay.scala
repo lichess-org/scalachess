@@ -5,6 +5,7 @@ import cats.{ Foldable, Traverse }
 import chess.CanPlay.makeError
 import chess.format.pgn.{ Parser, SanStr }
 import chess.variant.Variant
+import scala.annotation.targetName
 
 trait HasPosition[A]:
   extension (a: A)
@@ -36,6 +37,13 @@ trait CanPlay[A] extends HasPosition[A]:
       val (moves = acc, error = error) = playReverse(moves, initialPly, transform)
       error.fold(acc.reverse.asRight)(_.asLeft)
 
+    def playSoft[B, F[_]: Traverse](
+        moves: F[SanStr],
+        initialPly: Ply,
+        transform: Step => B
+    ): Either[ErrorStr, Result[B]] =
+      Parser.moves(moves).map(playSoft(_, initialPly, transform))
+
     def playSoft[M <: Moveable, B, F[_]: Traverse](
         moves: F[M],
         initialPly: Ply,
@@ -66,12 +74,19 @@ trait CanPlay[A] extends HasPosition[A]:
       val result = playSoft(moves, Ply.initial, _.move.after)
       result.error.fold((a.position :: result.moves).asRight)(_.asLeft)
 
+    @targetName("playPositionsFromSans")
+    def playPositions[F[_]: Traverse](moves: F[SanStr]): Either[ErrorStr, List[Position]] =
+      Parser.moves(moves).flatMap(playPositions)
+
     def playBoards[M <: Moveable, F[_]: Traverse](moves: F[M]): Either[ErrorStr, List[Board]] =
       val result = playSoft(moves, Ply.initial, _.move.after.board)
       result.error.fold(result.moves.asRight)(_.asLeft)
 
     def validate[M <: Moveable, F[_]: Foldable](moves: F[M]): Either[ErrorStr, Unit] =
       moves.foldM(())((_, move) => a(move).void)
+
+    def rewind[F[_]: Traverse](moves: F[SanStr]): Either[ErrorStr, A] =
+      Parser.moves(moves).flatMap(rewind)
 
     def rewind[M <: Moveable, F[_]: Foldable](moves: F[M]): Either[ErrorStr, A] =
       moves.foldM(a)((state, move) => state(move).map(_.next))

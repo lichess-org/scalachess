@@ -28,7 +28,7 @@ class ReplayTest extends ChessTest:
 
   test("bongcloud attack"):
     Replay
-      .boardsFromUci(
+      .boards(
         moves = List(uci"e2e4", uci"e7e5", uci"e1e2"),
         initialFen = None,
         variant = variant.Standard

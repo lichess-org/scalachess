@@ -41,8 +41,8 @@ object Replay:
       case (game, gs, err) => (game, gs.reverse, err)
 
   @scala.annotation.tailrec
-  private def computeReplay(replay: Replay, ucis: List[Uci]): Either[ErrorStr, Replay] =
-    ucis match
+  private def computeReplay[M <: Moveable](replay: Replay, moves: List[Moveable]): Either[ErrorStr, Replay] =
+    moves match
       case Nil => replay.asRight
       case uci :: rest =>
         uci(replay.state.position) match
@@ -56,9 +56,9 @@ object Replay:
   ): Either[ErrorStr, List[Position]] =
     Parser
       .moves(sans)
-      .flatMap(moves => boardsFromUci(moves.value, initialFen, variant))
+      .flatMap(moves => boards(moves.value, initialFen, variant))
 
-  def boardsFromUci[M <: Moveable](
+  def boards[M <: Moveable](
       moves: List[M],
       initialFen: Option[Fen.Full],
       variant: Variant

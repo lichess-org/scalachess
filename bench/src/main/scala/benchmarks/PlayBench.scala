@@ -27,7 +27,7 @@ class PlayBench:
   var standard: Game                     = scala.compiletime.uninitialized
 
   def gameReplay(sans: String) =
-    Replay.boards(SanStr.from(sans.split(' ')), None, Standard).toOption.get
+    Position.standard.playPositions(SanStr.from(sans.split(' ')).toList).toOption.get
 
   @Setup
   def setup() =

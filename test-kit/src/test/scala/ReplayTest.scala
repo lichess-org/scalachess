@@ -27,12 +27,8 @@ class ReplayTest extends ChessTest:
         assertEquals(games(0)._2._2, "d4")
 
   test("bongcloud attack"):
-    Replay
-      .boards(
-        moves = List(uci"e2e4", uci"e7e5", uci"e1e2"),
-        initialFen = None,
-        variant = variant.Standard
-      )
+    Position.standard
+      .playPositions(List(uci"e2e4", uci"e7e5", uci"e1e2"))
       .assertRight: boards =>
         assertEquals(
           boards.map(Fen.write),
@@ -46,12 +42,9 @@ class ReplayTest extends ChessTest:
 
   test("racing kings"):
     assert:
-      Replay
-        .boards(
-          sans = SanStr.from("Be3 Ne4 Rg3 Nxe3 Rxe3".split(" ")),
-          initialFen = None,
-          variant = chess.variant.RacingKings
-        )
+      Position
+        .init(chess.variant.RacingKings, White)
+        .playPositions(SanStr.from("Be3 Ne4 Rg3 Nxe3 Rxe3".split(" ")).toList)
         .isRight
 
   test("chess960 castlings"):

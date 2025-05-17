@@ -380,9 +380,8 @@ object Position:
   val standard: Position = Position.init(variant.Standard, White)
 
   case class AndFullMoveNumber(position: Position, fullMoveNumber: FullMoveNumber):
-    def ply: Ply         = fullMoveNumber.ply(position.color)
-    def toGame: Game     = Game(position = position, ply = ply, startedAtPly = ply)
-    def toAndPly: AndPly = AndPly(position, ply)
+    def ply: Ply     = fullMoveNumber.ply(position.color)
+    def toGame: Game = Game(position = position, ply = ply, startedAtPly = ply)
 
   object AndFullMoveNumber:
     def apply(variant: Variant, fen: Option[Fen.Full]): AndFullMoveNumber =
@@ -395,16 +394,6 @@ object Position:
       extension (position: AndFullMoveNumber)
         def apply[M <: Moveable](move: M): Either[ErrorStr, (AndFullMoveNumber, MoveOrDrop)] =
           move(position.position).map(x => (AndFullMoveNumber(x.after, position.ply.next.fullMoveNumber), x))
-        inline def position: Position = position.position
-
-  case class AndPly(position: Position, ply: Ply):
-    def fullMoveNumber = ply.fullMoveNumber
-
-  object AndPly:
-    given CanPlay[AndPly] with
-      extension (position: AndPly)
-        def apply[M <: Moveable](move: M): Either[ErrorStr, (AndPly, MoveOrDrop)] =
-          move(position.position).map(x => (AndPly(x.after, position.ply.next), x))
         inline def position: Position = position.position
 
   def apply(

@@ -83,6 +83,12 @@ trait CanPlay[A]:
     ): Either[ErrorStr, List[Position]] =
       Parser.moves(moves).flatMap(playPositions)
 
+    @targetName("playBoardsFromSans")
+    def playBoards[F[_]: Traverse](moves: F[SanStr])(using
+        HasPosition[A]
+    ): Either[ErrorStr, List[Board]] =
+      Parser.moves(moves).flatMap(playBoards)
+
     def playBoards[M <: Moveable, F[_]: Traverse](moves: F[M])(using
         HasPosition[A]
     ): Either[ErrorStr, List[Board]] =

@@ -18,34 +18,34 @@ object Division:
 
 object Divider:
 
-  def apply(positions: List[Position]): Division =
+  def apply(boards: List[Board]): Division =
 
-    val indexedPositions: List[(Position, Int)] = positions.zipWithIndex
+    val indexedBoards: List[(Board, Int)] = boards.zipWithIndex
 
-    val midGame = indexedPositions.collectFirst:
-      case (position, index)
-          if (majorsAndMinors(position) <= 10 || backrankSparse(position) || mixedness(position) > 150) =>
+    val midGame = indexedBoards.collectFirst:
+      case (board, index)
+          if (majorsAndMinors(board) <= 10 || backrankSparse(board) || mixedness(board) > 150) =>
         index
 
     val endGame =
       if midGame.isDefined then
-        indexedPositions.collectFirst:
-          case (position, index) if majorsAndMinors(position) <= 6 => index
+        indexedBoards.collectFirst:
+          case (board, index) if majorsAndMinors(board) <= 6 => index
       else None
 
     Division(
       Ply.from(midGame.filter(m => endGame.fold(true)(m < _))),
       Ply.from(endGame),
-      Ply(positions.size)
+      Ply(boards.size)
     )
 
-  private def majorsAndMinors(position: Position): Int =
-    (position.occupied & ~(position.kings | position.pawns)).count
+  private def majorsAndMinors(board: Board): Int =
+    (board.occupied & ~(board.kings | board.pawns)).count
 
   // Sparse back-rank indicates that pieces have been developed
-  private def backrankSparse(position: Position): Boolean =
-    (Bitboard.firstRank & position.white).count < 4 ||
-      (Bitboard.lastRank & position.black).count < 4
+  private def backrankSparse(board: Board): Boolean =
+    (Bitboard.firstRank & board.white).count < 4 ||
+      (Bitboard.lastRank & board.black).count < 4
 
   private def score(y: Int)(white: Int, black: Int): Int =
     ((white, black): @switch) match
@@ -81,7 +81,7 @@ object Divider:
     yield (smallSquare << (x + 8 * y), y + 1)
   }.toList
 
-  private def mixedness(position: Position): Int =
+  private def mixedness(board: Board): Int =
     mixednessRegions.foldLeft(0):
       case (acc, (region, y)) =>
-        acc + position.byColor.mapReduce(c => (c & region).count)(score(y))
+        acc + board.byColor.mapReduce(c => (c & region).count)(score(y))

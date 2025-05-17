@@ -136,6 +136,7 @@ class ReaderTest extends ChessTest:
       .assertRight:
         case Result(replay, None) =>
           assertEquals(replay.chronoMoves.size, 19)
+
   test("exotic notation from clono.no"):
     Reader
       .mainline(clonoNoExoticNotation)

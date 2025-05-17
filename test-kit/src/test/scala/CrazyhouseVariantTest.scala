@@ -146,19 +146,20 @@ class CrazyhouseVariantTest extends ChessTest:
       .playMoves(moves*)
       .assertRight: g =>
         assert(g.history.threefoldRepetition)
+
   test("autodraw: from prod with captures and drops should 3fold"):
-    chess.Replay
-      .boards(
-        sans = SanStr.from(
+    Position
+      .init(Crazyhouse, White)
+      .playPositions(
+        SanStr.from(
           "e4 e5 Nf3 Nc6 Bc4 Bc5 d3 d6 Nc3 h6 O-O Nf6 Be3 Bg4 Na4 b6 Nxc5 bxc5 B@b7 Nd4 Bxd4 cxd4 N@c6 O-O Nxd8 Raxd8 Bbd5 B@h5 Bxf7+ Bxf7 P@e7 Bxc4 exf8=Q+ Rxf8 dxc4 B@f7 B@d5 B@h5 Bxf7+ Bxf7 B@f5 B@h5 Bxg4 Bxg4"
             .split(' ')
             .toVector
-        ),
-        initialFen = None,
-        variant = Crazyhouse
+        )
       )
       .assertRight: boards =>
         assert(boards.last.history.threefoldRepetition)
+
   test("autodraw: from prod should not 3fold"):
     val moves = List(
       E2 -> E4,
@@ -284,15 +285,14 @@ class CrazyhouseVariantTest extends ChessTest:
 
   test("replay ZH"):
     assert(
-      chess.Replay
-        .boards(
-          sans = SanStr.from(
+      chess.Position
+        .init(Crazyhouse, White)
+        .playPositions(
+          SanStr.from(
             "e4 c5 Na3 d6 Nf3 Bg4 Bc4 Bxf3 Qxf3 N@b4 Bxf7+ Kd7 P@d5 Nf6 O-O Nxc2 Nb5 P@c4 Be6+ Ke8 B@f7#"
               .split(' ')
               .toVector
-          ),
-          initialFen = None,
-          variant = Crazyhouse
+          )
         )
         .isRight
     )

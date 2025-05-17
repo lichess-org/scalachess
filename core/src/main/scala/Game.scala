@@ -1,6 +1,6 @@
 package chess
 
-import chess.format.pgn.SanStr
+import chess.format.pgn.{ SanStr, Tags }
 import chess.format.{ Fen, Uci }
 
 case class Game(
@@ -33,7 +33,15 @@ case class Game(
       .map(_.normalizeCastle.withMetrics(metrics))
       .map(move => applyWithCompensated(move) -> move)
 
-  def apply(move: Move): Game = applyWithCompensated(move).value
+  def drop(
+      role: Role,
+      square: Square,
+      metrics: MoveMetrics = MoveMetrics.empty
+  ): Either[ErrorStr, (Game, Drop)] =
+    position.drop(role, square).map(_.withMetrics(metrics)).map(drop => applyDrop(drop) -> drop)
+
+  def apply(move: Move): Game =
+    applyWithCompensated(move).value
 
   def applyWithCompensated(move: Move): Clock.WithCompensatedLag[Game] =
     val newPosition = move.after
@@ -48,13 +56,6 @@ case class Game(
       ),
       newClock.flatMap(_.compensated)
     )
-
-  def drop(
-      role: Role,
-      square: Square,
-      metrics: MoveMetrics = MoveMetrics.empty
-  ): Either[ErrorStr, (Game, Drop)] =
-    position.drop(role, square).map(_.withMetrics(metrics)).map(drop => applyDrop(drop) -> drop)
 
   def applyDrop(drop: Drop): Game =
     val newPosition = drop.after
@@ -96,17 +97,22 @@ object Game:
   def apply(variant: chess.variant.Variant): Game =
     Game(Position.init(variant, White))
 
-  def apply(variantOption: Option[chess.variant.Variant], fen: Option[Fen.Full]): Game =
-    val variant = variantOption | chess.variant.Standard
-    val g: Game = apply(variant)
+  def apply(variant: Option[chess.variant.Variant], fen: Option[Fen.Full]): Game =
+    apply(variant | chess.variant.Standard, fen)
+
+  def apply(variant: chess.variant.Variant, fen: Option[Fen.Full]): Game =
     fen
       .flatMap(format.Fen.readWithMoveNumber(variant, _))
-      .fold(g): parsed =>
-        g.copy(
-          position = parsed.position
-            .withVariant(g.variant)
-            .withCrazyData(parsed.position.crazyData.orElse(g.position.crazyData))
-            .withColor(parsed.position.color),
-          ply = parsed.ply,
-          startedAtPly = parsed.ply
-        )
+      .fold(Game(variant))(_.toGame)
+
+  def apply(tags: Tags): Game =
+    val g = Game(variant = tags.variant, fen = tags.fen)
+    g.copy(startedAtPly = g.ply, clock = tags.timeControl.flatMap(_.toClockConfig).map(Clock.apply))
+
+  given CanPlay[Game]:
+    extension (game: Game)
+      def apply[M <: Moveable](move: M): Either[ErrorStr, (Game, MoveOrDrop)] =
+        move(game.position).map(md => md.applyGame(game) -> md)
+
+  given HasPosition[Game]:
+    extension (game: Game) inline def position: Position = game.position

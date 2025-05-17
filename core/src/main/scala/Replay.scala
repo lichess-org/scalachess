@@ -49,22 +49,6 @@ object Replay:
           case Left(err) => err.asLeft
           case Right(md) => computeReplay(replay.addMove(md), rest)
 
-  // def boards(
-  //     sans: Iterable[SanStr],
-  //     initialFen: Option[Fen.Full],
-  //     variant: Variant
-  // ): Either[ErrorStr, List[Position]] =
-  //   Parser
-  //     .moves(sans)
-  //     .flatMap(moves => boards(moves.value, initialFen, variant))
-
-  // def boards[M <: Moveable](
-  //     moves: List[M],
-  //     initialFen: Option[Fen.Full],
-  //     variant: Variant
-  // ): Either[ErrorStr, List[Position]] =
-  //   Position(variant, initialFen).playPositions(moves)
-
   def apply(
       moves: List[Uci],
       initialFen: Option[Fen.Full],

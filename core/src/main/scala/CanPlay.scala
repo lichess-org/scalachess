@@ -24,6 +24,10 @@ trait CanPlay[A]:
      */
     def apply[M <: Moveable](move: M): Either[ErrorStr, Step]
 
+    @targetName("playFromSans")
+    def play[F[_]: Traverse](moves: F[SanStr]): Either[ErrorStr, List[MoveOrDrop]] =
+      Parser.moves(moves).flatMap(play)
+
     def play[M <: Moveable, F[_]: Traverse](moves: F[M]): Either[ErrorStr, List[MoveOrDrop]] =
       play(moves, Ply.initial, _.move)
 

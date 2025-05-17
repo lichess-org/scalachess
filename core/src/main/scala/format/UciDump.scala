@@ -2,14 +2,9 @@ package chess
 package format
 
 import cats.syntax.all.*
-import chess.format.pgn.Parser
 import chess.variant.Variant
 
 object UciDump:
-
-  // a2a4, b8c6
-  def apply(force960Notation: Boolean)(replay: Replay): List[String] =
-    replay.chronoMoves.map(move(replay.setup.variant, force960Notation))
 
   def apply(
       moves: Seq[pgn.SanStr],
@@ -19,10 +14,8 @@ object UciDump:
   ): Either[ErrorStr, List[String]] =
     if moves.isEmpty then Nil.asRight
     else
-      Parser
-        .moves(moves)
-        .flatMap: sans =>
-          Position(variant, initialFen).play(sans.value)
+      Position(variant, initialFen)
+        .play(moves)
         .map(_.map(move(variant, force960Notation)))
 
   def move(variant: Variant, force960Notation: Boolean = false)(mod: MoveOrDrop): String =

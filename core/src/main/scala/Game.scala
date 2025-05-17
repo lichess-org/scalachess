@@ -97,8 +97,8 @@ object Game:
   def apply(variant: chess.variant.Variant): Game =
     Game(Position.init(variant, White))
 
-  def apply(variantOption: Option[chess.variant.Variant], fen: Option[Fen.Full]): Game =
-    apply(variantOption | chess.variant.Standard, fen)
+  def apply(variant: Option[chess.variant.Variant], fen: Option[Fen.Full]): Game =
+    apply(variant | chess.variant.Standard, fen)
 
   def apply(variant: chess.variant.Variant, fen: Option[Fen.Full]): Game =
     fen
@@ -106,7 +106,7 @@ object Game:
       .fold(Game(variant))(_.toGame)
 
   def apply(tags: Tags): Game =
-    val g = Game(variantOption = tags.variant, fen = tags.fen)
+    val g = Game(variant = tags.variant, fen = tags.fen)
     g.copy(startedAtPly = g.ply, clock = tags.timeControl.flatMap(_.toClockConfig).map(Clock.apply))
 
   given CanPlay[Game]:

@@ -29,5 +29,5 @@ object Reader:
       .map(moves => makeReplay(Game(tags), op(moves)))
 
   def makeReplay(game: Game, sans: Sans): Result =
-    val (state, moves, error) = game.playReverse(sans.value)
+    val (state, moves, error) = game.playWhileValidReverse(sans.value)
     Result(Replay(game, moves, state), error)

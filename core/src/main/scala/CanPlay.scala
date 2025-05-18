@@ -24,45 +24,37 @@ trait CanPlay[A]:
      */
     def apply[M <: Moveable](move: M): Either[ErrorStr, Step]
 
+    def play[M <: Moveable, F[_]: Traverse](moves: F[M]): Either[ErrorStr, List[MoveOrDrop]] =
+      play(moves, Ply.initial)(_.move)
+
     @targetName("playFromSans")
     def play[F[_]: Traverse](moves: F[SanStr]): Either[ErrorStr, List[MoveOrDrop]] =
       Parser.moves(moves).flatMap(play)
 
-    def play[M <: Moveable, F[_]: Traverse](moves: F[M]): Either[ErrorStr, List[MoveOrDrop]] =
-      play(moves, Ply.initial, _.move)
-
     def playSoft[M <: Moveable, F[_]: Traverse](moves: F[M]): Result[MoveOrDrop] =
-      playSoft(moves, Ply.initial, _.move)
+      playWhileValid(moves, Ply.initial)(_.move)
 
-    def play[M <: Moveable, B, F[_]: Traverse](
-        moves: F[M],
-        initialPly: Ply,
+    def play[M <: Moveable, F[_]: Traverse](moves: F[M], initialPly: Ply)[B](
         transform: Step => B
     ): Either[ErrorStr, List[B]] =
-      val (moves = acc, error = error) = playReverse(moves, initialPly, transform)
+      val (moves = acc, error = error) = playWhileValidReverse(moves, initialPly)(transform)
       error.fold(acc.reverse.asRight)(_.asLeft)
 
-    def playSoft[B, F[_]: Traverse](
-        moves: F[SanStr],
-        initialPly: Ply,
+    def playWhileValid[F[_]: Traverse](moves: F[SanStr], initialPly: Ply)[B](
         transform: Step => B
     ): Either[ErrorStr, Result[B]] =
-      Parser.moves(moves).map(playSoft(_, initialPly, transform))
+      Parser.moves(moves).map(playWhileValid(_, initialPly)(transform))
 
-    def playSoft[M <: Moveable, B, F[_]: Traverse](
-        moves: F[M],
-        initialPly: Ply,
+    def playWhileValid[M <: Moveable, F[_]: Traverse](moves: F[M], initialPly: Ply)[B](
         transform: Step => B
     ): Result[B] =
-      val (state, acc, error) = playReverse(moves, initialPly, transform)
+      val (state, acc, error) = playWhileValidReverse(moves, initialPly)(transform)
       (state = state, moves = acc.reverse, error = error)
 
-    def playReverse[M <: Moveable, F[_]: Traverse](moves: F[M]): Result[MoveOrDrop] =
-      playReverse(moves, Ply.initial, _.move)
+    def playWhileValidReverse[M <: Moveable, F[_]: Traverse](moves: F[M]): Result[MoveOrDrop] =
+      playWhileValidReverse(moves, Ply.initial)(_.move)
 
-    def playReverse[M <: Moveable, B, F[_]: Traverse](
-        moves: F[M],
-        initialPly: Ply,
+    def playWhileValidReverse[M <: Moveable, F[_]: Traverse](moves: F[M], initialPly: Ply)[B](
         transform: Step => B
     ): (state: A, moves: List[B], error: Option[ErrorStr]) =
       moves.zipWithIndex
@@ -78,8 +70,59 @@ trait CanPlay[A]:
     def playPositions[M <: Moveable, F[_]: Traverse](moves: F[M])(using
         HasPosition[A]
     ): Either[ErrorStr, List[Position]] =
-      val result = playSoft(moves, Ply.initial, _.move.after)
+      val result = playWhileValid(moves, Ply.initial)(_.move.after)
       result.error.fold((a.position :: result.moves).asRight)(_.asLeft)
+
+    def playBoards[M <: Moveable, F[_]: Traverse](moves: F[M])(using
+        HasPosition[A]
+    ): Either[ErrorStr, List[Board]] =
+      val result = playWhileValid(moves, Ply.initial)(_.move.after.board)
+      result.error.fold((a.position.board :: result.moves).asRight)(_.asLeft)
+
+    def validate[M <: Moveable, F[_]: Foldable](moves: F[M]): Either[ErrorStr, Unit] =
+      moves.foldM(())((_, move) => a(move).void)
+
+    def rewind[F[_]: Traverse](moves: F[SanStr]): Either[ErrorStr, A] =
+      Parser.moves(moves).flatMap(rewind)
+
+    def rewind[M <: Moveable, F[_]: Foldable](moves: F[M]): Either[ErrorStr, A] =
+      moves.foldM(a)((state, move) => state(move).map(_.next))
+
+    @targetName("playWhileValidReverseFromSans")
+    def playWhileValidReverse[F[_]: Traverse](sans: F[SanStr], initialPly: Ply)[B](
+        transform: Step => B
+    ): (A, List[B], Option[ErrorStr]) =
+      Parser
+        .moves(sans)
+        .fold(
+          err => (a, List.empty[B], err.some),
+          moves => playWhileValidReverse(moves, initialPly)(transform)
+        )
+
+    @targetName("playWhileValidReverseFromSans")
+    def playWhileValidReverse[F[_]: Traverse](sans: F[SanStr], initialPly: Ply): (List[A], Option[ErrorStr]) =
+      Parser
+        .moves(sans)
+        .fold(
+          err => (List.empty[A], err.some),
+          moves =>
+            val (_, xs, error) = a.playWhileValidReverse(moves, initialPly)(_.next)
+            (xs :+ a, error)
+        )
+
+    @targetName("playWhileValidFromSans")
+    def playWhileValid[F[_]: Traverse](sans: F[SanStr], initialPly: Ply)[B](
+        transform: Step => B
+    ): (A, List[B], Option[ErrorStr]) =
+      val (state, moves, error) = playWhileValidReverse(sans, initialPly)(transform)
+      (state, moves.reverse, error)
+
+    def playWhileValid[F[_]: Traverse](
+        sans: F[SanStr],
+        initialPly: Ply
+    ): (List[A], Option[ErrorStr]) =
+      val (moves, error) = playWhileValidReverse(sans, initialPly)
+      (moves.reverse, error)
 
     @targetName("playPositionsFromSans")
     def playPositions[F[_]: Traverse](moves: F[SanStr])(using
@@ -92,57 +135,6 @@ trait CanPlay[A]:
         HasPosition[A]
     ): Either[ErrorStr, List[Board]] =
       Parser.moves(moves).flatMap(playBoards)
-
-    def playBoards[M <: Moveable, F[_]: Traverse](moves: F[M])(using
-        HasPosition[A]
-    ): Either[ErrorStr, List[Board]] =
-      val result = playSoft(moves, Ply.initial, _.move.after.board)
-      result.error.fold((a.position.board :: result.moves).asRight)(_.asLeft)
-
-    def validate[M <: Moveable, F[_]: Foldable](moves: F[M]): Either[ErrorStr, Unit] =
-      moves.foldM(())((_, move) => a(move).void)
-
-    def rewind[F[_]: Traverse](moves: F[SanStr]): Either[ErrorStr, A] =
-      Parser.moves(moves).flatMap(rewind)
-
-    def rewind[M <: Moveable, F[_]: Foldable](moves: F[M]): Either[ErrorStr, A] =
-      moves.foldM(a)((state, move) => state(move).map(_.next))
-
-    def movesWhileValidReverse[B, F[_]: Traverse](
-        sans: F[SanStr],
-        transform: Step => B
-    ): (A, List[B], Option[ErrorStr]) =
-      Parser
-        .moves(sans)
-        .fold(
-          err => (a, List.empty[B], err.some),
-          moves => a.playReverse(moves, Ply.initial, transform)
-        )
-
-    def movesWhileValid[B, F[_]: Traverse](
-        sans: F[SanStr],
-        transform: Step => B
-    ): (A, List[B], Option[ErrorStr]) =
-      val (state, moves, error) = movesWhileValidReverse(sans, transform)
-      (state, moves.reverse, error)
-
-    def movesWhileValid[F[_]: Traverse](
-        sans: F[SanStr]
-    ): (List[A], Option[ErrorStr]) =
-      val (moves, error) = movesWhileValidReverse(sans)
-      (moves.reverse, error)
-
-    def movesWhileValidReverse[F[_]: Traverse](
-        sans: F[SanStr]
-    ): (List[A], Option[ErrorStr]) =
-      Parser
-        .moves(sans)
-        .fold(
-          err => (List.empty[A], err.some),
-          moves =>
-            val (_, xs, error) = a.playReverse(moves, Ply.initial, _.next)
-            (xs :+ a, error)
-        )
 
 object CanPlay:
 

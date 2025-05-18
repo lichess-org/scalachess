@@ -7,6 +7,9 @@ import chess.format.pgn.{ Parser, SanStr }
 
 import scala.annotation.targetName
 
+/**
+ * a typeclass that can apply a Moveable and produce a new state and a MoveOrDrop.
+*/
 trait CanPlay[A]:
   type Step      = (next: A, move: MoveOrDrop)
   type Result[B] = (state: A, moves: List[B], error: Option[ErrorStr])
@@ -16,9 +19,17 @@ trait CanPlay[A]:
      */
     def apply[M <: Moveable](move: M): Either[ErrorStr, Step]
 
+    /**
+     * Play a sequence of moves and return the new state and a list of MoveOrDrop that were played.
+     */
     def play[M <: Moveable, F[_]: Traverse](moves: F[M]): Either[ErrorStr, List[MoveOrDrop]] =
       play(moves, Ply.initial)(_.move)
 
+    /**
+     * Akin to play but from a sequence of SanStr instead
+     *
+     * This will return left if parsing the moves fails
+     */
     @targetName("playFromSans")
     def play[F[_]: Traverse](moves: F[SanStr]): Either[ErrorStr, List[MoveOrDrop]] =
       Parser.moves(moves).flatMap(play)
@@ -83,14 +94,23 @@ trait CanPlay[A]:
     ): Either[ErrorStr, List[Board]] =
       Parser.moves(moves).flatMap(playBoards)
 
+    /**
+    * Validate a sequence of moves. This will return an error if any of the moves are invalid.
+    */
     def validate[M <: Moveable, F[_]: Foldable](moves: F[M]): Either[ErrorStr, Unit] =
       moves.foldM(())((_, move) => a(move).void)
 
-    def rewind[F[_]: Traverse](moves: F[SanStr]): Either[ErrorStr, A] =
-      Parser.moves(moves).flatMap(rewind)
-
-    def rewind[M <: Moveable, F[_]: Foldable](moves: F[M]): Either[ErrorStr, A] =
+    /*
+     * Play a sequence of moves and return the last state.
+     */
+    def forward[M <: Moveable, F[_]: Foldable](moves: F[M]): Either[ErrorStr, A] =
       moves.foldM(a)((state, move) => state(move).map(_.next))
+
+    /*
+     * Akin to forward but from a sequence of SanStr instead
+     */
+    def forward[F[_]: Traverse](moves: F[SanStr]): Either[ErrorStr, A] =
+      Parser.moves(moves).flatMap(forward)
 
     @targetName("playWhileValidReverseFromSans")
     def playWhileValidReverse[F[_]: Traverse](sans: F[SanStr], initialPly: Ply)[B](

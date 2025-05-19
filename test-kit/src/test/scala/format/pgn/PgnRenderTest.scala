@@ -1,6 +1,7 @@
 package chess
 package format.pgn
 
+import scala.annotation.nowarn
 import cats.syntax.all.*
 import monocle.syntax.all.*
 
@@ -13,7 +14,7 @@ class PgnRenderTest extends ChessTest:
   given Conversion[String, SanStr]  = SanStr(_)
   given Conversion[String, Comment] = Comment(_)
 
-  extension (pgn: ParsedPgn)
+  extension (@nowarn pgn: ParsedPgn)
     def cleanTags: ParsedPgn =
       pgn.copy(tags = Tags.empty)
 

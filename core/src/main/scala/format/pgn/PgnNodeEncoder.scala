@@ -1,6 +1,7 @@
 package chess
 package format.pgn
 
+import scala.annotation.{ tailrec, nowarn }
 import cats.syntax.all.*
 
 /**
@@ -27,7 +28,7 @@ object PgnNodeEncoder:
           f(context, a).fold(context -> none)(_ -> _.some)
         .map(_.toPgnStr(startPly))
 
-  extension [A](tree: Tree[A])
+  extension [A](@nowarn tree: Tree[A])
     /**
      * render a tree to a PgnStr
      */
@@ -50,7 +51,7 @@ object PgnNodeEncoder:
     private def forceTurnNumber(ply: Ply)(using PgnNodeEncoder[A]): Boolean =
       !ply.isWhiteTurn || (tree.value.hasComment || tree.variations.nonEmpty)
 
-    @annotation.tailrec
+    @tailrec
     private def render(
         builder: StringBuilder,
         forceTurnNumber: Boolean,

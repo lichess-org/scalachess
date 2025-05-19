@@ -1,7 +1,7 @@
 inThisBuild(
   Seq(
     scalaVersion      := "3.7.0",
-    version           := "17.6.1",
+    version           := "17.6.2",
     organization      := "org.lichess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
     publishTo         := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", "")))),
@@ -10,7 +10,7 @@ inThisBuild(
   )
 )
 
-val scalalibVersion = "11.8.4"
+val scalalibVersion = "11.8.6"
 
 val commonSettings = Seq(
   scalacOptions := Seq(
@@ -32,15 +32,15 @@ lazy val scalachess: Project = Project("scalachess", file("core")).settings(
   commonSettings,
   name := "scalachess",
   libraryDependencies ++= List(
-    "org.lichess"   %% "scalalib-core"  % scalalibVersion,
-    "org.lichess"   %% "scalalib-model" % scalalibVersion,
-    "org.typelevel" %% "cats-core"      % "2.13.0",
-    "org.typelevel" %% "alleycats-core" % "2.13.0",
-    "org.typelevel" %% "cats-parse"     % "1.1.0",
-    "dev.optics"    %% "monocle-core"   % "3.3.0",
-    "org.typelevel" %% "kittens"        % "3.5.0"
+    "com.github.lichess-org.scalalib" %% "scalalib-core"  % scalalibVersion,
+    "com.github.lichess-org.scalalib" %% "scalalib-model" % scalalibVersion,
+    "org.typelevel"                   %% "cats-core"      % "2.13.0",
+    "org.typelevel"                   %% "alleycats-core" % "2.13.0",
+    "org.typelevel"                   %% "cats-parse"     % "1.1.0",
+    "dev.optics"                      %% "monocle-core"   % "3.3.0",
+    "org.typelevel"                   %% "kittens"        % "3.5.0"
   ),
-  resolvers += "lila-maven".at("https://raw.githubusercontent.com/ornicar/lila-maven/master")
+  resolvers += "jitpack".at("https://jitpack.io")
 )
 
 lazy val playJson: Project = Project("playJson", file("playJson"))
@@ -48,8 +48,8 @@ lazy val playJson: Project = Project("playJson", file("playJson"))
     commonSettings,
     name := "scalachess-play-json",
     libraryDependencies ++= List(
-      "org.playframework" %% "play-json"          % "3.0.4",
-      "org.lichess"       %% "scalalib-play-json" % scalalibVersion
+      "org.playframework"               %% "play-json"          % "3.0.4",
+      "com.github.lichess-org.scalalib" %% "scalalib-play-json" % scalalibVersion
     )
   )
   .dependsOn(scalachess)

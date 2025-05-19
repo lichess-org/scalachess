@@ -5,6 +5,8 @@ import cats.Eq
 import cats.syntax.all.*
 import chess.format.Fen
 
+import scala.annotation.nowarn
+
 // Correctness depends on singletons for each variant ID
 abstract class Variant private[variant] (
     val id: Variant.Id,
@@ -106,7 +108,7 @@ abstract class Variant private[variant] (
       .find(findMove)
       .toRight(ErrorStr(s"Piece on ${from.key} cannot move to ${to.key}"))
 
-  def drop(position: Position, role: Role, square: Square): Either[ErrorStr, Drop] =
+  def drop(@nowarn position: Position, role: Role, square: Square): Either[ErrorStr, Drop] =
     ErrorStr(s"$this variant cannot drop $role $square").asLeft
 
   def staleMate(position: Position): Boolean = position.check.no && position.legalMoves.isEmpty

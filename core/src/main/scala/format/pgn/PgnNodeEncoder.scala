@@ -3,6 +3,8 @@ package format.pgn
 
 import cats.syntax.all.*
 
+import scala.annotation.{ nowarn, tailrec }
+
 /**
  * PgnNodeEncoder,
  * Provide encoding of a node to a string, which is used to render a PGN string
@@ -27,7 +29,7 @@ object PgnNodeEncoder:
           f(context, a).fold(context -> none)(_ -> _.some)
         .map(_.toPgnStr(startPly))
 
-  extension [A](tree: Tree[A])
+  extension [A](@nowarn tree: Tree[A])
     /**
      * render a tree to a PgnStr
      */
@@ -50,7 +52,7 @@ object PgnNodeEncoder:
     private def forceTurnNumber(ply: Ply)(using PgnNodeEncoder[A]): Boolean =
       !ply.isWhiteTurn || (tree.value.hasComment || tree.variations.nonEmpty)
 
-    @annotation.tailrec
+    @tailrec
     private def render(
         builder: StringBuilder,
         forceTurnNumber: Boolean,

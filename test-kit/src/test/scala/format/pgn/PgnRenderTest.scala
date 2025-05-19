@@ -1,10 +1,10 @@
 package chess
 package format.pgn
 
-import scala.annotation.nowarn
 import cats.syntax.all.*
 import monocle.syntax.all.*
 
+import scala.annotation.nowarn
 import scala.language.implicitConversions
 
 class PgnRenderTest extends ChessTest:

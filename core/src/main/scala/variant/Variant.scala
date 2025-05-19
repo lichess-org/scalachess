@@ -1,10 +1,11 @@
 package chess
 package variant
 
-import scala.annotation.nowarn
 import cats.Eq
 import cats.syntax.all.*
 import chess.format.Fen
+
+import scala.annotation.nowarn
 
 // Correctness depends on singletons for each variant ID
 abstract class Variant private[variant] (

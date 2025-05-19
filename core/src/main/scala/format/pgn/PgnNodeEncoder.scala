@@ -1,8 +1,9 @@
 package chess
 package format.pgn
 
-import scala.annotation.{ tailrec, nowarn }
 import cats.syntax.all.*
+
+import scala.annotation.{ nowarn, tailrec }
 
 /**
  * PgnNodeEncoder,

@@ -3,7 +3,6 @@ package format.pgn
 
 import cats.syntax.all.*
 import chess.Position.AndFullMoveNumber
-import chess.format.Fen
 
 // We don't support variation without move now,
 // but we can in the future when we support null move
@@ -49,17 +48,12 @@ case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[
     Position(tags)
 
   def toPgn: Pgn =
-    val positionWithMove = initContext
+    val positionWithMove = AndFullMoveNumber(tags.variant, tags.fen)
     Pgn(tags, initialPosition, treeToPgn(positionWithMove.position), positionWithMove.ply.next)
 
-  private def initContext: AndFullMoveNumber =
-    val variant        = tags.variant | chess.variant.Standard
-    inline def default = AndFullMoveNumber(Position.init(variant, White), FullMoveNumber.initial)
-    tags.fen.flatMap(Fen.readWithMoveNumber(variant, _)) | default
-
-  private def treeToPgn(context: Position): Option[Node[Move]] =
+  private def treeToPgn(position: Position): Option[Node[Move]] =
     tree.flatMap:
-      _.mapAccumlOption_(context): (ctx, d) =>
+      _.mapAccumlOption_(position): (ctx, d) =>
         d.toMove(ctx)
           .fold(ctx -> None)(_ -> _.some)
 

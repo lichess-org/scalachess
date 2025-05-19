@@ -384,6 +384,10 @@ object Position:
     def toGame: Game = Game(position = position, ply = ply, startedAtPly = ply)
 
   object AndFullMoveNumber:
+
+    def apply(variant: Option[Variant], fen: Option[Fen.Full]): AndFullMoveNumber =
+      apply(variant.getOrElse(chess.variant.Standard), fen)
+
     def apply(variant: Variant, fen: Option[Fen.Full]): AndFullMoveNumber =
       fen
         .flatMap(Fen.readWithMoveNumber(variant, _))

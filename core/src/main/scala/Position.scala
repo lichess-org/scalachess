@@ -1,7 +1,8 @@
 package chess
 
 import cats.syntax.all.*
-import chess.format.Uci
+import chess.format.pgn.Tags
+import chess.format.{ Fen, Uci }
 
 import variant.{ Variant, Crazyhouse }
 
@@ -376,8 +377,30 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
 object Position:
 
+  val standard: Position = Position.init(variant.Standard, White)
+
   case class AndFullMoveNumber(position: Position, fullMoveNumber: FullMoveNumber):
-    def ply = fullMoveNumber.ply(position.color)
+    def ply: Ply     = fullMoveNumber.ply(position.color)
+    def toGame: Game = Game(position = position, ply = ply, startedAtPly = ply)
+
+  object AndFullMoveNumber:
+
+    def apply(variant: Option[Variant], fen: Option[Fen.Full]): AndFullMoveNumber =
+      apply(variant.getOrElse(chess.variant.Standard), fen)
+
+    def apply(variant: Variant, fen: Option[Fen.Full]): AndFullMoveNumber =
+      fen
+        .flatMap(Fen.readWithMoveNumber(variant, _))
+        .getOrElse:
+          AndFullMoveNumber(Position.init(variant, White), FullMoveNumber.initial)
+
+    given CanPlay[AndFullMoveNumber] with
+      extension (position: AndFullMoveNumber)
+        def apply[M <: Moveable](move: M): Either[ErrorStr, (AndFullMoveNumber, MoveOrDrop)] =
+          move(position.position).map(x => (AndFullMoveNumber(x.after, position.ply.next.fullMoveNumber), x))
+
+  given HasPosition[AndFullMoveNumber]:
+    extension (position: AndFullMoveNumber) inline def position: Position = position.position
 
   def apply(
       pieces: PieceMap,
@@ -423,6 +446,26 @@ object Position:
       color.getOrElse(White)
     )
 
-  def apply(variant: chess.variant.Variant): Position = Position.init(variant, White)
+  def apply(variant: chess.variant.Variant): Position =
+    Position.init(variant, White)
+
+  def apply(tags: Tags): Position =
+    apply(tags.variant, tags.fen)
+
+  def apply(variantOpt: Option[Variant], fen: Option[Fen.Full]): Position =
+    val variant = variantOpt.getOrElse(chess.variant.Standard)
+    apply(variant, fen)
+
+  def apply(variant: Variant, fen: Option[Fen.Full]): Position =
+    fen.flatMap(Fen.read(variant, _)).getOrElse(init(variant, White))
+
   def init(variant: Variant, color: Color): Position =
     Position(Board.fromMap(variant.pieces), variant, color.some)
+
+  given CanPlay[Position]:
+    extension (position: Position)
+      def apply[M <: Moveable](move: M): Either[ErrorStr, (Position, MoveOrDrop)] =
+        move(position).map(x => (x.after, x))
+
+  given HasPosition[Position]:
+    extension (position: Position) inline def position: Position = position

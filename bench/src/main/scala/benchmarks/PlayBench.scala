@@ -22,12 +22,12 @@ class PlayBench:
   // the unit of CPU work per iteration
   private val Work: Long = 10
 
-  var dividerGames: List[List[Position]] = scala.compiletime.uninitialized
-  var gameMoves: List[List[SanStr]]      = scala.compiletime.uninitialized
-  var standard: Game                     = scala.compiletime.uninitialized
+  var dividerGames: List[List[Board]] = scala.compiletime.uninitialized
+  var gameMoves: List[List[SanStr]]   = scala.compiletime.uninitialized
+  var standard: Game                  = scala.compiletime.uninitialized
 
   def gameReplay(sans: String) =
-    Replay.boards(SanStr.from(sans.split(' ')), None, Standard).toOption.get
+    Position.standard.playBoards(SanStr.from(sans.split(' ')).toList).toOption.get
 
   @Setup
   def setup() =

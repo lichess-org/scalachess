@@ -133,6 +133,6 @@ trait CanPlay[A]:
 object CanPlay:
 
   inline def makeError(currentPly: Ply, move: Moveable): ErrorStr =
-    val moveAt    = currentPly.fullMoveNumber.value
-    val rawString = move.rawString.getOrElse(move.toString())
-    ErrorStr(s"Cannot play $rawString at move $moveAt by ${currentPly.turn.name}")
+    val moveAt  = currentPly.fullMoveNumber
+    val moveStr = move.rawString.getOrElse(move.toString)
+    ErrorStr(s"Cannot play $moveStr at move $moveAt by ${currentPly.turn.name}")

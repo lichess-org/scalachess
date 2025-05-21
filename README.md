@@ -4,8 +4,9 @@ Chess API written in scala for [lichess.org](https://lichess.org)
 
 It is entirely functional, immutable, and free of side effects.
 
-INSTALL
--------
+[![](https://jitpack.io/v/lichess-org/scalachess.svg)](https://jitpack.io/#lichess-org/scalachess)
+
+## INSTALL
 
 Clone scalachess
 
@@ -43,7 +44,7 @@ To run [scalafmt](https://scalameta.org/scalafmt/docs/installation.html) and [sc
 
     sbt prepare
 
+## Install (python)
 
-Install (python)
--------
 For python code, [install pipenv](https://pipenv.pypa.io/en/latest/installation.html#installing-pipenv), and run `$ pipenv install` from project root.
+

@@ -85,7 +85,7 @@ case object Crazyhouse
 
   // all legal moves and drops
   // this function is used in perfts only
-  private[chess] def legalMoves(position: Position): List[MoveOrDrop] =
+  def legalMoves(position: Position): List[MoveOrDrop] =
     legalDrops(position) ::: position.legalMoves.filterNot(m =>
       m.castle.exists(c => c.isStandard && m.dest != c.rook)
     )

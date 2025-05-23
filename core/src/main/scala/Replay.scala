@@ -40,14 +40,8 @@ object Replay:
     gameMoveWhileValidReverse(sans, initialFen, variant) match
       case (game, gs, err) => (game, gs.reverse, err)
 
-  @scala.annotation.tailrec
-  private def computeReplay[M <: Moveable](replay: Replay, moves: List[Moveable]): Either[ErrorStr, Replay] =
-    moves match
-      case Nil => replay.asRight
-      case uci :: rest =>
-        uci(replay.state.position) match
-          case Left(err) => err.asLeft
-          case Right(md) => computeReplay(replay.addMove(md), rest)
+  private def computeReplay(replay: Replay, moves: List[Moveable]): Either[ErrorStr, Replay] =
+    moves.foldM(replay) { (replay, uci) => uci(replay.state.position).map(replay.addMove(_)) }
 
   def apply(
       moves: List[Uci],

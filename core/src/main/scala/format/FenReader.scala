@@ -198,7 +198,7 @@ trait FenReader:
                   addPieceAt(p, square)
                   if iter.headOption == Some('~') then
                     promoted |= square
-                    iter.next
+                    val _ = iter.next
                 case None => error = Some(s"invalid piece $ch")
             file += 1
     val board = Board(

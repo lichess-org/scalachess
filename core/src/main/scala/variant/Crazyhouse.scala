@@ -229,11 +229,11 @@ case object Crazyhouse
       List(f(Pawn, pawn), f(Knight, knight), f(Bishop, bishop), f(Rook, rook), f(Queen, queen))
 
     def foreach[U](f: (Role, Int) => U): Unit =
-      f(Pawn, pawn)
-      f(Knight, knight)
-      f(Bishop, bishop)
-      f(Rook, rook)
-      f(Queen, queen)
+      f(Pawn, pawn): Unit
+      f(Knight, knight): Unit
+      f(Bishop, bishop): Unit
+      f(Rook, rook): Unit
+      f(Queen, queen): Unit
 
   object Pocket:
     val empty: Pocket = Pocket(0, 0, 0, 0, 0)

@@ -149,8 +149,7 @@ class NodeTest extends ScalaCheckSuite:
       ps.nonEmpty ==> {
         val path  = ps.map(_.id)
         val added = node.addValueAsChildAt(path, foo)
-        added.flatMap(_.find(path).map(_.size))
-        added.isEmpty || (added.get.size >= node.size)
+        added.isEmpty || added.get.size >= node.size
       }
 
   test("addValueAsChildAt twice return the same size"):
@@ -185,13 +184,13 @@ class NodeTest extends ScalaCheckSuite:
 
   test("modifyInMainlineAt return none when n is out of range"):
     forAll: (node: Node[Int], f: Int => Int) =>
-      node.modifyInMainlineAt(-1, _.updateValue(f)) == none
-      node.modifyInMainlineAt(node.mainline.size, _.updateValue(f)) == none
+      node.modifyInMainlineAt(-1, _.updateValue(f)) == none &&
+        node.modifyInMainlineAt(node.mainline.size, _.updateValue(f)) == none
 
   test("modifyInMainlineAt return none when n is out of range"):
     forAll: (node: Node[Int], f: Int => Int) =>
-      node.modifyInMainlineAt(-1, _.updateValue(f)) == none
-      node.modifyInMainlineAt(node.mainline.size, _.updateValue(f)) == none
+      node.modifyInMainlineAt(-1, _.updateValue(f)) == none &&
+        node.modifyInMainlineAt(node.mainline.size, _.updateValue(f)) == none
 
   test("modifyInMainlineAt with updateValue return have the same size"):
     forAll: (node: Node[Int], f: Int => Int) =>

@@ -43,12 +43,12 @@ case class ByColor[A](white: A, black: A):
   def fold[B](init: B)(f: (B, Color, A) => B): B = f(f(init, White, white), Black, black)
 
   def foreach[U](f: A => U): Unit =
-    f(white)
-    f(black)
+    f(white): Unit
+    f(black): Unit
 
   def foreach[U](f: (Color, A) => U): Unit =
-    f(White, white)
-    f(Black, black)
+    f(White, white): Unit
+    f(Black, black): Unit
 
   def forall(pred: A => Boolean): Boolean = pred(white) && pred(black)
 

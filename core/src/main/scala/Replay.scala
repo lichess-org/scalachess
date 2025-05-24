@@ -1,5 +1,6 @@
 package chess
 
+import cats.Foldable
 import cats.syntax.all.*
 import chess.format.pgn.Sans.*
 import chess.format.pgn.{ Parser, Reader, San, SanStr }
@@ -40,15 +41,13 @@ object Replay:
     gameMoveWhileValidReverse(sans, initialFen, variant) match
       case (game, gs, err) => (game, gs.reverse, err)
 
-  private def computeReplay(replay: Replay, moves: List[Moveable]): Either[ErrorStr, Replay] =
-    moves.foldM(replay) { (replay, uci) => uci(replay.state.position).map(replay.addMove(_)) }
-
-  def apply(
-      moves: List[Uci],
+  def computeReplay[F[_]: Foldable, M <: Moveable](
+      moves: F[M],
       initialFen: Option[Fen.Full],
       variant: Variant
   ): Either[ErrorStr, Replay] =
-    computeReplay(Replay(Game(variant.some, initialFen)), moves)
+    inline def replay = Replay(Game(variant.some, initialFen))
+    moves.foldM(replay)((replay, uci) => uci(replay.state.position).map(replay.addMove(_)))
 
   def apply(
       sans: Iterable[SanStr],

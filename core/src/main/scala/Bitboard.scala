@@ -50,8 +50,8 @@ object Bitboard:
     @targetName("or")
     inline infix def |(o: Bitboard): Bitboard = (a | o)
 
-    def isEmpty: Boolean  = a == empty
-    def nonEmpty: Boolean = !isEmpty
+    inline def isEmpty: Boolean  = a == 0L
+    inline def nonEmpty: Boolean = !isEmpty
 
     inline def contains(square: Square): Boolean =
       (a & (1L << square.value)) != 0L
@@ -88,7 +88,7 @@ object Bitboard:
     // remove the last/largest non empty square
     def removeLast: Bitboard = a & ~a.msb.bl
 
-    def isolateFirst: Bitboard = Bitboard(a & -a)
+    def isolateFirst: Bitboard = a & -a
 
     def isolateLast: Bitboard = last.fold(empty)(_.bl)
 
@@ -182,7 +182,7 @@ object Bitboard:
         f(b.lsb)
         b &= (b - 1L)
 
-    def forall[B](f: Square => Boolean): Boolean =
+    def forall(f: Square => Boolean): Boolean =
       var b      = a
       var result = true
       while b != 0L && result
@@ -191,7 +191,7 @@ object Bitboard:
         b &= (b - 1L)
       result
 
-    def exists[B](f: Square => Boolean): Boolean =
+    def exists(f: Square => Boolean): Boolean =
       var b      = a
       var result = false
       while b != 0L && !result

@@ -1,9 +1,9 @@
 package chess
 
-import cats.Foldable
 import cats.syntax.all.*
+import cats.{ Foldable, Traverse }
 import chess.format.pgn.Sans.*
-import chess.format.pgn.{ Parser, Reader, San, SanStr }
+import chess.format.pgn.{ Parser, PgnStr, San, SanStr }
 import chess.format.{ Fen, Uci }
 import chess.variant.Variant
 
@@ -53,9 +53,12 @@ object Replay:
       sans: Iterable[SanStr],
       initialFen: Option[Fen.Full],
       variant: Variant
-  ): Either[ErrorStr, Reader.Result] =
+  ): Either[ErrorStr, Result] =
     if sans.isEmpty then ErrorStr("[replay] pgn is empty").asLeft
-    else Reader.moves(sans, Game(variant.some, initialFen))
+    else
+      Parser
+        .moves(sans)
+        .map(moves => makeReplay(Game(variant, initialFen), moves.value))
 
   def plyAtFen(
       sans: Iterable[SanStr],
@@ -86,3 +89,14 @@ object Replay:
       Parser
         .moves(sans)
         .flatMap(moves => recursivePlyAtFen(Position(variant, initialFen), moves.value, Ply.firstMove))
+
+  case class Result(replay: Replay, failure: Option[ErrorStr]):
+    def valid: Either[ErrorStr, Replay] =
+      failure.fold(replay.asRight)(_.asLeft)
+
+  def mainline(pgn: PgnStr): Either[ErrorStr, Result] =
+    Parser.mainline(pgn).map(ml => makeReplay(Game(ml.tags), ml.sans))
+
+  def makeReplay[F[_]: Traverse](game: Game, sans: F[San]): Result =
+    val (state, moves, error) = game.playWhileValidReverse(sans)
+    Result(Replay(game, moves, state), error)

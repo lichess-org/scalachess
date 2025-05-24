@@ -83,8 +83,6 @@ object Replay:
                 if compareFen(fen) then ply.asRight
                 else recursivePlyAtFen(after.withColor(!position.color), rest, ply.next)
 
-      val position = initialFen.flatMap(Fen.read(variant, _)) | Position(variant)
-
       Parser
         .moves(sans)
-        .flatMap(moves => recursivePlyAtFen(position, moves.value, Ply.firstMove))
+        .flatMap(moves => recursivePlyAtFen(Position(variant, initialFen), moves.value, Ply.firstMove))

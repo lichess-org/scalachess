@@ -5,8 +5,8 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 import cats.syntax.all.*
-import chess.format.pgn.{ Fixtures, Reader }
-import chess.{ Position, Hash }
+import chess.format.pgn.Fixtures
+import chess.{ Position, Hash, Replay }
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -25,7 +25,7 @@ class HashBench:
   @Setup
   def setup() =
     val results = for
-      results <- Fixtures.gamesForPerfTest.traverse(Reader.mainline(_))
+      results <- Fixtures.gamesForPerfTest.traverse(Replay.mainline(_))
       replays <- results.traverse(_.valid)
     yield replays.flatMap(_.moves).map(_.after)
     boards = results.toOption.get

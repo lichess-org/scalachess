@@ -9,25 +9,25 @@ object Attacks:
   private val all = -1L
 
   @static
-  private[bitboard] val RANKS = Array.fill(8)(0L)
+  private[chess] val RANKS = Array.fill(8)(0L)
   @static
-  private[bitboard] val FILES = Array.fill(8)(0L)
+  private[chess] val FILES = Array.fill(8)(0L)
   @static
-  private[bitboard] val BETWEEN = Array.ofDim[Long](64, 64)
+  private[chess] val BETWEEN = Array.ofDim[Long](64, 64)
   @static
-  private[bitboard] val RAYS = Array.ofDim[Long](64, 64)
+  private[chess] val RAYS = Array.ofDim[Long](64, 64)
 
   // Large overlapping attack table indexed using magic multiplication.
   @static
-  private[bitboard] val ATTACKS = Array.fill(88772)(0L)
+  private[chess] val ATTACKS = Array.fill(88772)(0L)
   @static
-  private[bitboard] val KNIGHT_ATTACKS = Array.fill(64)(0L)
+  private[chess] val KNIGHT_ATTACKS = Array.fill(64)(0L)
   @static
-  private[bitboard] val KING_ATTACKS = Array.fill(64)(0L)
+  private[chess] val KING_ATTACKS = Array.fill(64)(0L)
   @static
-  private[bitboard] val WHITE_PAWN_ATTACKS = Array.fill(64)(0L)
+  private[chess] val WHITE_PAWN_ATTACKS = Array.fill(64)(0L)
   @static
-  private[bitboard] val BLACK_PAWN_ATTACKS = Array.fill(64)(0L)
+  private[chess] val BLACK_PAWN_ATTACKS = Array.fill(64)(0L)
 
   @static
   private val KNIGHT_DELTAS = Array[Int](17, 15, 10, 6, -17, -15, -10, -6)
@@ -48,9 +48,7 @@ object Attacks:
     var attacks = 0L
     deltas.foreach: delta =>
       var sq = square
-      var i  = 0
       while
-        i += 1
         sq += delta
         val con = (sq < 0 || 64 <= sq || distance(sq, sq - delta) > 2)
         if !con then attacks |= 1L << sq

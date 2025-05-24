@@ -2,14 +2,13 @@ package chess
 
 import scala.language.implicitConversions
 
-import MoveOrDrop.*
-
 class DividerTest extends ChessTest:
 
-  def makeReplay(moves: String) =
-    format.pgn.Reader.full(moves).get match
-      case format.pgn.Reader.Result(replay, None) => replay.chronoMoves.map(_.fold(_.before, _.before))
-      case x                                      => sys.error(s"Unexpected incomplete replay $x")
+  def makeReplay(moves: String): List[Board] =
+    format.pgn.Reader.mainline(moves).get match
+      case format.pgn.Reader.Result(replay, None) =>
+        replay.chronoMoves.map(_.before.board)
+      case x => sys.error(s"Unexpected incomplete replay $x")
 
   test("the divider finds middlegame and endgame: game1"):
     // http://l.org/KrTnOvuD

@@ -9,7 +9,7 @@ import scala.util.NotGiven
 
 case class ByColor[A](white: A, black: A):
 
-  inline def apply(inline color: Color) = if color.white then white else black
+  inline def apply(inline color: Color): A = if color.white then white else black
 
   inline def apply[B](inline color: Color)(f: A => B): B = if color.white then f(white) else f(black)
 
@@ -21,7 +21,7 @@ case class ByColor[A](white: A, black: A):
     if color.white then f(white).map(w => copy(white = w))
     else f(black).map(b => copy(black = b))
 
-  def map[B](fw: A => B, fb: A => B) = ByColor(fw(white), fb(black))
+  def map[B](fw: A => B, fb: A => B): ByColor[B] = ByColor(fw(white), fb(black))
 
   def map[B](f: A => B): ByColor[B]                 = map(f, f)
   def mapList[B](f: A => B): List[B]                = List(f(white), f(black))
@@ -50,9 +50,9 @@ case class ByColor[A](white: A, black: A):
     f(White, white)
     f(Black, black)
 
-  def forall(pred: A => Boolean) = pred(white) && pred(black)
+  def forall(pred: A => Boolean): Boolean = pred(white) && pred(black)
 
-  def exists(pred: A => Boolean) = pred(white) || pred(black)
+  def exists(pred: A => Boolean): Boolean = pred(white) || pred(black)
 
   def swap: ByColor[A] = copy(white = black, black = white)
 
@@ -98,6 +98,7 @@ object ByColor:
   inline def fill[A](a: A): ByColor[A]          = ByColor(a, a)
   inline def fromPair[A](p: (A, A)): ByColor[A] = ByColor(p._1, p._2)
 
+  @annotation.nowarn("msg=unused implicit parameter")
   def apply[A](f: Color => A)(using NotGiven[f.type <:< PartialFunction[Color, A]]): ByColor[A] =
     ByColor(white = f(White), black = f(Black))
 

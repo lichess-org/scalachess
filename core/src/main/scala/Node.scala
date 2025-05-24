@@ -26,8 +26,8 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   final def withoutChild: TreeSelector[A, this.type] = withChild(none)
 
   final def isNode: Boolean = this match
-    case n: Node[A]      => true
-    case v: Variation[A] => false
+    case _: Node[A]      => true
+    case _: Variation[A] => false
 
   final def isVariation: Boolean = !this.isNode
 
@@ -46,7 +46,7 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   def variations: List[Tree[A]] =
     this match
       case n: Node[A]      => n.variations
-      case v: Variation[A] => Nil
+      case _: Variation[A] => Nil
 
   final def mainlineValues: List[A] =
     @tailrec
@@ -111,11 +111,11 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   // if the tree has no child, add value as child
   // if the value has the same id as the child, merge the values
   // otherwise add value as a variation (and merge it to one of the existing variation if necessary)
-  final def addValueAsChild[Id](value: A)(using HasId[A, Id], Mergeable[A]): TreeSelector[A, this.type] =
+  final def addValueAsChild[Id](value: A)(using Mergeable[A]): TreeSelector[A, this.type] =
     addChild(Node(value))
 
   // Add a node as a child or child's variation
-  def addChild[Id](other: Node[A])(using HasId[A, Id], Mergeable[A]): TreeSelector[A, this.type] =
+  def addChild[Id](other: Node[A])(using Mergeable[A]): TreeSelector[A, this.type] =
     val newChild = child.fold(other)(_.mergeOrAddAsVariation(other))
     withChild(newChild.some)
 
@@ -232,7 +232,7 @@ final case class Node[A](
       case head :: _ =>
         variations.foldLeft((false.some, List.empty[Variation[A]])):
           case ((Some(true), acc), n) => (true.some, n :: acc)
-          case ((Some(fale), acc), n) if n.hasId(head) =>
+          case ((Some(_), acc), n) if n.hasId(head) =>
             n.modifyAt(path, f) match
               case None     => (None, n :: acc)
               case Some(nn) => (true.some, nn :: acc)

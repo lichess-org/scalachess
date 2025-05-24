@@ -97,7 +97,7 @@ class PawnTest extends ChessTest:
     // "with irrelevant history" in:
     assertEquals(
       board
-        .withHistory(
+        .updateHistory(_ =>
           defaultHistory(
             lastMove = Option(Uci.Move(A2, A4))
           )
@@ -108,7 +108,7 @@ class PawnTest extends ChessTest:
     // "with relevant history on the left" in:
     assertEquals(
       board
-        .withHistory(
+        .updateHistory(_ =>
           defaultHistory(
             lastMove = Option(Uci.Move(C7, C5))
           )
@@ -119,7 +119,7 @@ class PawnTest extends ChessTest:
     // "with relevant history on the right" in:
     assertEquals(
       board
-        .withHistory(
+        .updateHistory(_ =>
           defaultHistory(
             lastMove = Option(Uci.Move(E7, E5))
           )
@@ -132,7 +132,7 @@ class PawnTest extends ChessTest:
       makeBoard(
         D5 -> White.pawn,
         E5 -> Black.rook
-      ).withHistory(
+      ).updateHistory(_ =>
         defaultHistory(
           lastMove = Option(Uci.Move(E7, E5))
         )
@@ -144,7 +144,7 @@ class PawnTest extends ChessTest:
       makeBoard(
         D5 -> White.pawn,
         E5 -> White.pawn
-      ).withHistory(
+      ).updateHistory(_ =>
         defaultHistory(
           lastMove = Option(Uci.Move(E7, E5))
         )
@@ -242,7 +242,7 @@ class PawnTest extends ChessTest:
     // "with relevant history on the left" in:
     assertEquals(
       board
-        .withHistory(
+        .updateHistory(_ =>
           defaultHistory(
             lastMove = Option(Uci.Move(C2, C4))
           )
@@ -255,7 +255,7 @@ class PawnTest extends ChessTest:
       makeBoard(
         D4 -> Black.pawn,
         E4 -> White.rook
-      ).withHistory(
+      ).updateHistory(_ =>
         defaultHistory(
           lastMove = Option(Uci.Move(E2, E4))
         )

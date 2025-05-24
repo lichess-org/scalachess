@@ -33,35 +33,31 @@ object OpeningDb:
 
   // assumes standard initial Fen and variant
   def search(sans: Iterable[SanStr]): Option[Opening.AtPly] =
-    chess.Replay
-      .situations(
-        sans.take(SEARCH_MAX_PLIES).takeWhile(!_.value.contains('@')),
-        None,
-        variant.Standard
-      )
+    Position.standard
+      .playPositions(sans.take(SEARCH_MAX_PLIES).takeWhile(!_.value.contains('@')).toList)
       .toOption
-      .flatMap(searchInSituations)
+      .flatMap(searchInBoards)
 
   def search(replay: Replay): Option[Opening.AtPly] =
-    searchInSituations:
+    searchInBoards:
       val moves: Vector[Move] = replay.chronoMoves.view
         .take(SEARCH_MAX_PLIES)
         .takeWhile:
-          case move: Move => move.situationBefore.board.nbPieces >= SEARCH_MIN_PIECES
+          case move: Move => move.before.board.nbPieces >= SEARCH_MIN_PIECES
           case _          => false
         .collect { case move: Move => move }
         .toVector
-      moves.map(_.situationBefore) ++ moves.lastOption.map(_.situationAfter).toVector
+      moves.map(_.before) ++ moves.lastOption.map(_.after).toVector
 
-  // first situation is initial position
-  def searchInSituations(situations: Iterable[Situation]): Option[Opening.AtPly] =
-    situations
+  // first board is initial position
+  def searchInBoards(boards: Iterable[Position]): Option[Opening.AtPly] =
+    boards
       .takeWhile(_.board.nbPieces >= SEARCH_MIN_PIECES)
       .zipWithIndex
       .drop(1)
       .foldRight(none[Opening.AtPly]):
-        case ((situation, ply), None) => byFen.get(format.Fen.writeOpening(situation)).map(_.atPly(Ply(ply)))
-        case (_, found)               => found
+        case ((board, ply), None) => byFen.get(format.Fen.writeOpening(board)).map(_.atPly(Ply(ply)))
+        case (_, found)           => found
 
   def searchInFens(fens: Iterable[StandardFen]): Option[Opening] =
     fens.foldRight(none[Opening]):

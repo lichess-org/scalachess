@@ -2,18 +2,16 @@ package chess
 package perft
 
 import chess.format.{ Fen, FullFen }
-import chess.variant.{ Chess960, Crazyhouse, Variant }
-
-import MoveOrDrop.*
+import chess.variant.{ Crazyhouse, Variant }
 
 case class Perft(id: String, epd: FullFen, cases: List[TestCase]):
   import Perft.*
   def calculate(variant: Variant): List[Result] =
-    val situation =
+    val board =
       Fen.read(variant, epd).getOrElse { throw RuntimeException(s"Invalid fen: $epd for variant: $variant") }
     cases.map(c =>
-      // printResult(situation.divide(c.depth))
-      Result(c.depth, situation.perft(c.depth), c.result)
+      // printResult(board.divide(c.depth))
+      Result(c.depth, board.perft(c.depth), c.result)
     )
 
   def withLimit(limit: Long): Perft =
@@ -53,7 +51,7 @@ object Perft:
     builder.append("\n").append(sum)
     println(builder)
 
-  extension (s: Situation)
+  extension (s: Position)
 
     def divide(depth: Int): List[DivideResult] =
       if depth == 0 then Nil
@@ -61,7 +59,7 @@ object Perft:
       else
         s.perftMoves
           .map { move =>
-            val nodes = move.situationAfter.perft(depth - 1)
+            val nodes = move.after.perft(depth - 1)
             DivideResult(move, nodes)
           }
           .sortBy(_.move.toUci.uci)
@@ -72,17 +70,17 @@ object Perft:
       else
         val moves = s.perftMoves
         if depth == 1 then moves.size.toLong
-        else moves.map(_.situationAfter.perft(depth - 1)).sum
+        else moves.map(_.after.perft(depth - 1)).sum
 
     private def perftMoves: List[MoveOrDrop] =
-      if s.board.variant == chess.variant.Crazyhouse
+      if s.variant == chess.variant.Crazyhouse
       then Crazyhouse.legalMoves(s)
       else
         val legalMoves = s.legalMoves
-        if s.board.variant.chess960 then legalMoves
+        if s.variant.chess960 then legalMoves
         // if variant is not chess960 we need to deduplicated castlings moves
         // We filter out castling move that is Standard and king's dest is not in the rook position
         else legalMoves.filterNot(m => m.castle.exists(c => c.isStandard && m.dest != c.rook))
 
     // when calculate perft we don't do autoDraw
-    def perftEnd = s.checkMate || s.staleMate || s.variantEnd || s.board.variant.specialDraw(s)
+    def perftEnd = s.checkMate || s.staleMate || s.variantEnd || s.variant.specialDraw(s)

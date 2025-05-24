@@ -2,7 +2,6 @@ package chess
 
 import cats.Eq
 import cats.derived.*
-import cats.syntax.all.*
 
 import scala.annotation.targetName
 

@@ -2,8 +2,7 @@ package chess
 package variant
 
 import cats.syntax.all.*
-import chess.bitboard.Bitboard
-import chess.bitboard.Bitboard.*
+import chess.Bitboard.*
 import chess.format.FullFen
 
 case object Horde
@@ -19,7 +18,7 @@ case object Horde
 
   /** In Horde chess white advances against black with a horde of pawns.
     */
-  lazy val pieces: Map[Square, Piece] =
+  override lazy val pieces: Map[Square, Piece] =
     val whitePawnsHorde = for
       x <- File.all
       y <- Rank.all.take(4)
@@ -29,65 +28,66 @@ case object Horde
     val blackPieces = File.all.map { x => Square(x, Rank.Eighth) -> (Black - backRank(x.value)) }
     (whitePawnsHorde ++ frontPawns ++ blackPawns ++ blackPieces).toMap
 
-  override val castles = Castles.black
+  override val castles: Castles = Castles.black
 
-  override val initialFen = FullFen(
-    "rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1"
-  )
+  override val initialFen: FullFen =
+    FullFen("rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1")
 
-  def validMoves(situation: Situation): List[Move] =
-    import situation.{ genEnPassant, genNonKing, isWhiteTurn, us, board }
-    if isWhiteTurn then genEnPassant(us & board.pawns) ++ genNonKing(~us & ~board.kings)
-    else Standard.validMoves(situation)
+  override def validMoves(position: Position): List[Move] =
+    import position.{ genEnPassant, genNonKing, isWhiteTurn, us }
+    if isWhiteTurn then genEnPassant(us & position.pawns) ++ genNonKing(~us & ~position.kings)
+    else Standard.validMoves(position)
 
-  override def valid(situation: Situation, strict: Boolean) =
-    situation.board.kingOf(White).isEmpty
-      && validSide(situation.board, strict)(Black)
-      && !pawnsOnPromotionRank(situation.board, White)
-      && (!strict || situation.color.white || Standard.hasValidCheckers(situation))
+  override def validMovesAt(position: Position, square: Square): List[Move] =
+    super.validMovesAt(position, square).filter(kingSafety)
+
+  override def valid(position: Position, strict: Boolean): Boolean =
+    position.kingOf(White).isEmpty
+      && validSide(position, strict)(Black)
+      && !pawnsOnPromotionRank(position.board, White)
+      && (!strict || position.color.white || Standard.hasValidCheckers(position))
 
   /** The game has a special end condition when black manages to capture all of white's pawns */
-  override def specialEnd(situation: Situation) =
-    situation.board.white.isEmpty
-
-  /** Any vs K + any where horde is stalemated and only king can move is a fortress draw
-    * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
-    * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
-    */
-  private def hordeClosedPosition(situation: Situation): Boolean =
-    val hordeSquare = situation.board.byColor(White)
-    val mateInOne = hordeSquare.count == 1 &&
-      hordeSquare.singleSquare.exists(pieceThreatened(situation.board, Color.black, _))
-    !mateInOne && {
-      if situation.isWhiteTurn then situation.legalMoves.isEmpty
-      else
-        val legalMoves = validMoves(situation)
-        legalMoves.filter(_.piece.role != King).isEmpty &&
-        legalMoves.filter(_.piece.role == King).forall(move => validMoves(move.situationAfter).isEmpty)
-    }
+  override def specialEnd(position: Position): Boolean =
+    position.white.isEmpty
 
   /** In horde chess, black can win unless a fortress stalemate is unavoidable.
     *  Auto-drawing the game should almost never happen, but it did in https://lichess.org/xQ2RsU8N#121
     */
-  override def isInsufficientMaterial(board: Board) =
-    Color.all.forall(color => hordeClosedPosition(board.situationOf(color)))
+  override def isInsufficientMaterial(position: Position): Boolean =
+    Color.all.forall(color => hordeClosedPosition(position.copy(color = color)))
 
   /** In horde chess, the horde cannot win on * v K or [BN]{2} v K or just one piece
     * since they lack a king for checkmate support.
     * Technically there are some positions where stalemate is unavoidable which
     * this method does not detect; however, such are trivial to premove.
     */
-  override def opponentHasInsufficientMaterial(situation: Situation): Boolean =
-    hasInsufficientMaterial(situation.board, !situation.color) || hordeClosedPosition(situation)
+  override def opponentHasInsufficientMaterial(position: Position): Boolean =
+    hasInsufficientMaterial(position.board, !position.color) || hordeClosedPosition(position)
+
+  /** Any vs K + any where horde is stalemated and only king can move is a fortress draw
+    * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
+    * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
+    */
+  private def hordeClosedPosition(position: Position): Boolean =
+    val hordeSquare = position.byColor(White)
+    val mateInOne = hordeSquare.count == 1 &&
+      hordeSquare.singleSquare.exists(pieceThreatened(position.board, Color.black, _))
+    !mateInOne && {
+      if position.isWhiteTurn then position.legalMoves.isEmpty
+      else
+        val legalMoves = validMoves(position)
+        legalMoves.filter(_.piece.role != King).isEmpty &&
+        legalMoves.filter(_.piece.role == King).forall(move => validMoves(move.after).isEmpty)
+    }
 
   extension (board: Board)
-    def hasBishopPair: Color => Boolean = side =>
+    private def hasBishopPair: Color => Boolean = side =>
       val bishops = board.bishops & board.byColor(side)
       bishops.intersects(Bitboard.lightSquares) && bishops.intersects(Bitboard.darkSquares)
 
-  def hasInsufficientMaterial(board: Board, color: Color): Boolean =
+  private[chess] def hasInsufficientMaterial(board: Board, color: Color): Boolean =
     import SquareColor.*
-    import Bitboard.*
     // Black can always win by capturing the horde
     if color.black then false
     else
@@ -242,10 +242,10 @@ enum SquareColor:
   case Light
   case Dark
 
-  def bb = this match
+  def bb: Bitboard = this match
     case Light => Bitboard.lightSquares
     case Dark  => Bitboard.darkSquares
 
-  def unary_! = this match
+  def unary_! : SquareColor = this match
     case Light => Dark
     case Dark  => Light

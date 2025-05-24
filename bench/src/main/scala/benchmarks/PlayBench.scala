@@ -27,7 +27,7 @@ class PlayBench:
   var standard: Game                  = scala.compiletime.uninitialized
 
   def gameReplay(sans: String) =
-    Replay.boards(SanStr.from(sans.split(' ')), None, Standard).toOption.get
+    Position.standard.playBoards(SanStr.from(sans.split(' ')).toList).toOption.get
 
   @Setup
   def setup() =
@@ -37,7 +37,7 @@ class PlayBench:
     var games = Fixtures.prod500standard
     gameMoves = games.take(nb).map(g => SanStr.from(g.split(' ').toList))
 
-    standard = Game(Board.init(chess.variant.Standard), White)
+    standard = Game(Position.init(chess.variant.Standard, White))
 
   @Benchmark
   def divider(bh: Blackhole) =
@@ -99,8 +99,8 @@ class PlayBench:
       moves.toList.foldM(game):
         case (game, (o, d)) =>
           // because possible moves are asked for player highlight
-          // before the move is played (on initial situation)
+          // before the move is played (on initial board)
           Blackhole.consumeCPU(Work)
-          var result = game.situation.destinations
+          var result = game.position.destinations
           bh.consume(result)
           game(o, d).map(_._1)

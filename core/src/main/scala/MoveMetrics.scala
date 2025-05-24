@@ -7,8 +7,8 @@ case class MoveMetrics(
 ):
 
   // Calculate client reported lag given the server's duration for the move.
-  def reportedLag(elapsed: Centis) =
+  def reportedLag(elapsed: Centis): Option[Centis] =
     clientMoveTime.fold(clientLag)(mt => Option(elapsed - mt))
 
 object MoveMetrics:
-  val empty = MoveMetrics()
+  val empty: MoveMetrics = MoveMetrics()

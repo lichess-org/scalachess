@@ -1,34 +1,45 @@
 package chess
 
 import cats.syntax.all.*
+import chess.variant.Crazyhouse
 
 import scala.language.implicitConversions
 
 import format.{ FullFen, Fen, Uci, Visual }
 import format.pgn.PgnStr
 import variant.{ Chess960, Variant }
-import bitboard.Board as BBoard
 
 trait ChessTestCommon:
 
-  given Conversion[String, Board]  = Visual.<<
-  given Conversion[String, PgnStr] = PgnStr(_)
-  given Conversion[PgnStr, String] = _.value
+  given Conversion[String, Position] = Visual.<<
+  given Conversion[String, PgnStr]   = PgnStr(_)
+  given Conversion[PgnStr, String]   = _.value
 
   extension (str: String)
-    def chess960: Board             = makeBoard(str, chess.variant.Chess960)
-    def kingOfTheHill: Board        = makeBoard(str, chess.variant.KingOfTheHill)
-    def threeCheck: Board           = makeBoard(str, chess.variant.ThreeCheck)
-    def as(color: Color): Situation = Situation(Visual << str, color)
+    def chess960: Position         = makeBoard(str, chess.variant.Chess960)
+    def kingOfTheHill: Position    = makeBoard(str, chess.variant.KingOfTheHill)
+    def threeCheck: Position       = makeBoard(str, chess.variant.ThreeCheck)
+    def as(color: Color): Position = (Visual << str).withColor(color)
 
-  extension (board: Board)
+  extension (board: Position)
     def visual = Visual >> board
     def destsFrom(from: Square): Option[List[Square]] =
-      board(from).map: piece =>
-        Situation(board, piece.color).generateMovesAt(from).map(_.dest)
+      board
+        .pieceAt(from)
+        .map: piece =>
+          board.withColor(piece.color).generateMovesAt(from).map(_.dest)
 
-    def seq(actions: Board => Option[Board]*): Option[Board] =
+    def seq(actions: Position => Option[Position]*): Option[Position] =
       actions.foldLeft(board.some)(_ flatMap _)
+
+    def place(piece: Piece, at: Square): Option[Position] =
+      board.board.put(piece, at).map(board.withBoard)
+
+    def take(at: Square): Option[Position] =
+      board.board.take(at).map(board.withBoard)
+
+    def move(orig: Square, dest: Square): Option[Position] =
+      board.board.move(orig, dest).map(board.withBoard)
 
   extension (game: Game)
     def as(color: Color): Game = game.withPlayer(color)
@@ -48,40 +59,53 @@ trait ChessTestCommon:
 
     def withClock(c: Clock) = game.copy(clock = Option(c))
 
-  extension (sit: Situation)
+  extension (sit: Position)
     def movesAt(s: Square): List[Move] =
       sit.moves.getOrElse(s, Nil)
+
+  def castleHistory(color: Color, kingSide: Boolean, queenSide: Boolean): History =
+    val castles = Castles.init.update(color, kingSide, queenSide)
+    History(castles = castles, unmovedRooks = UnmovedRooks.corners, crazyData = None)
 
   def fenToGameEither(positionString: FullFen, variant: Variant): Either[String, Game] =
     Fen
       .read(variant, positionString)
       .map: sit =>
-        sit.color -> sit.withVariant(variant).board
+        sit.color -> sit.withVariant(variant)
       .map: (color, board) =>
-        Game(variant).copy(situation = Situation(board, color))
-      .toRight("Could not construct situation from Fen")
+        Game(variant).copy(position = board.withColor(color))
+      .toRight("Could not construct board from Fen")
 
-  def makeBoard(pieces: (Square, Piece)*): Board =
-    Board(BBoard.fromMap(pieces.toMap), defaultHistory(), chess.variant.Standard)
+  def makeBoard(pieces: (Square, Piece)*): Position =
+    makeBoard(pieces.toMap, defaultHistory(), chess.variant.Standard, None, None)
+
+  def makeBoard(
+      pieces: PieceMap,
+      history: History,
+      variant: Variant,
+      crazyData: Option[Crazyhouse.Data],
+      color: Option[Color]
+  ): Position =
+    new Position(Board.fromMap(pieces), history.copy(crazyData = crazyData), variant, color.getOrElse(White))
 
   def makeBoard(str: String, variant: Variant) =
     (Visual << str).withVariant(variant)
 
-  def makeBoard: Board = Board.init(chess.variant.Standard)
+  def makeBoard: Position = Position.init(chess.variant.Standard, White)
 
-  def makeChess960Board(position: Int) = Board(BBoard.fromMap(Chess960.pieces(position)), Chess960)
+  def makeChess960Board(position: Int) = Position(Board.fromMap(Chess960.pieces(position)), Chess960, None)
   def makeChess960Game(position: Int)  = Game(makeChess960Board(position))
   def chess960Boards                   = (0 to 959).map(makeChess960Board).toList
 
-  def makeEmptyBoard: Board = Board(BBoard.empty, chess.variant.Standard)
+  def makeEmptyBoard: Position = Position(Board.empty, chess.variant.Standard, White.some)
 
-  def makeGame: Game = Game(makeBoard, White)
+  def makeGame: Game = Game(makeBoard)
 
   def sortPoss(poss: Seq[Square]): Seq[Square] = poss.sortBy(_.key)
 
   def pieceMoves(piece: Piece, square: Square): Option[List[Square]] =
     makeEmptyBoard.place(piece, square).map { b =>
-      Situation(b, piece.color).movesAt(square).map(_.dest)
+      b.withColor(piece.color).movesAt(square).map(_.dest)
     }
 
   def defaultHistory(
@@ -90,14 +114,16 @@ trait ChessTestCommon:
       castles: Castles = Castles.init,
       checkCount: CheckCount = CheckCount(0, 0),
       unmovedRooks: UnmovedRooks = UnmovedRooks.corners,
-      halfMoveClock: HalfMoveClock = HalfMoveClock.initial
+      halfMoveClock: HalfMoveClock = HalfMoveClock.initial,
+      crazyData: Option[Crazyhouse.Data] = None
   ) = History(
     lastMove = lastMove,
     positionHashes = positionHashes,
     castles = castles,
     checkCount = checkCount,
     unmovedRooks = unmovedRooks,
-    halfMoveClock = halfMoveClock
+    halfMoveClock = halfMoveClock,
+    crazyData = crazyData
   )
 
 trait MunitExtensions extends munit.FunSuite:
@@ -117,7 +143,7 @@ trait MunitExtensions extends munit.FunSuite:
     assert(n.gteq(v, min))
     assert(n.lteq(v, max))
 
-  private def isCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T])(using Location) =
+  private def isCloseTo[T](a: T, b: T, delta: Double)(using n: Numeric[T]): Boolean =
     (n.toDouble(a) - n.toDouble(b)).abs <= delta
 
   given [A, B](using sr: SameRuntime[B, A]): munit.Compare[A, B] with
@@ -134,7 +160,7 @@ trait MunitExtensions extends munit.FunSuite:
       obtained.sameElements(expected.map(sr(_)))
 
   extension [A](a: A)
-    def matchZero[B: Zero](f: PartialFunction[A, B])(using Location): B =
+    def matchZero[B: Zero](f: PartialFunction[A, B]): B =
       f.lift(a) | Zero[B].zero
 
   extension [A](v: Option[A])
@@ -145,10 +171,10 @@ trait MunitExtensions extends munit.FunSuite:
   extension [E, A](v: Either[E, A])
     def assertRight(f: PartialFunction[A, Unit])(using Location): Any = v match
       case Right(r) => f.lift(r).getOrElse(fail(s"Unexpected Right value: $r"))
-      case Left(e)  => fail(s"Expected Right but received $v")
+      case Left(_)  => fail(s"Expected Right but received $v")
     def get: A = v match
       case Right(r) => r
-      case Left(e)  => fail(s"Expected Right but received $v")
+      case Left(_)  => fail(s"Expected Right but received $v")
 
 trait ChessTest extends munit.FunSuite with ChessTestCommon with MunitExtensions:
   import munit.Location
@@ -162,12 +188,12 @@ trait ChessTest extends munit.FunSuite with ChessTestCommon with MunitExtensions
       def isEqual(obtained: Option[List[Square]], expected: Set[Square]): Boolean =
         obtained.fold(Set.empty)(_.toSet) == expected
 
-  def fenToGame(positionString: FullFen, variant: Variant)(using Location): Game =
+  def fenToGame(positionString: FullFen, variant: Variant): Game =
     fenToGameEither(positionString, variant).get
 
-  def visualDests(board: Board, p: Iterable[Square]): String =
+  def visualDests(board: Position, p: Iterable[Square]): String =
     Visual.addNewLines(Visual.>>|(board, Map(p -> 'x')))
-  def visualDests(board: Board, p: Option[Iterable[Square]]): String = visualDests(board, p | Nil)
+  def visualDests(board: Position, p: Option[Iterable[Square]]): String = visualDests(board, p | Nil)
 
   def assertGame(game: Game, visual: String)(using Location) =
-    assertEquals(game.board.visual, (Visual << visual).visual)
+    assertEquals(game.position.visual, (Visual << visual).visual)

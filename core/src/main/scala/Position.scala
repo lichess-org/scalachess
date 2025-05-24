@@ -1,17 +1,52 @@
 package chess
 
 import cats.syntax.all.*
-import chess.format.Uci
-import chess.variant.{ Antichess, Crazyhouse, Standard }
+import chess.format.pgn.Tags
+import chess.format.{ Fen, Uci }
 
-import bitboard.Bitboard
-import bitboard.Bitboard.*
+import variant.{ Variant, Crazyhouse }
 
-case class Situation(board: Board, color: Color):
-  export board.{ history, isOccupied, kingOf, variant }
+case class Position(board: Board, history: History, variant: Variant, color: Color):
+
+  export history.{ castles, unmovedRooks, crazyData }
+  // format: off
+  export board.{ attackers, attacks, bishops, black, byColor, byPiece, byRole, byRoleOf, colorAt,
+    fold, foreach, isCheck, isOccupied, kingOf, kingPosOf, kings, kingsAndBishopsOnly,
+    kingsAndBishopsOnlyOf, kingsAndKnightsOnly, kingsAndKnightsOnlyOf, kingsAndMinorsOnly,
+    kingsOnly, kingsOnlyOf, kingsRooksAndMinorsOnly, knights, nbPieces, nonKingsOf, occupied,
+    onlyKnights, onlyOf, pawns, piece, pieceAt, pieceMap as pieces, pieces as allPieces, piecesOf,
+    queens, rooks, sliderBlockers, sliders, white, count, contains
+  }
+  // format: on
+
   export color.white as isWhiteTurn
 
-  lazy val legalMoves: List[Move] = variant.validMoves(this)
+  def withCastles(c: Castles) = updateHistory(_.withCastles(c))
+
+  def unary_! : Position = withColor(color = !color)
+
+  def withPieces(newPieces: PieceMap) = copy(board = Board.fromMap(newPieces))
+
+  def withVariant(v: Variant): Position =
+    if v == Crazyhouse then copy(variant = v).ensureCrazyData
+    else copy(variant = v)
+
+  def withCrazyData(data: Crazyhouse.Data): Position         = updateHistory(_.copy(crazyData = data.some))
+  def withCrazyData(data: Option[Crazyhouse.Data]): Position = updateHistory(_.copy(crazyData = data))
+  def withCrazyData(f: Crazyhouse.Data => Crazyhouse.Data): Position =
+    withCrazyData(f(crazyData.getOrElse(Crazyhouse.Data.init)))
+
+  def ensureCrazyData: Position = withCrazyData(crazyData.getOrElse(Crazyhouse.Data.init))
+
+  inline def updateHistory(inline f: History => History): Position = copy(history = f(history))
+
+  def withBoard(b: Board): Position = copy(board = b)
+
+  def withColor(color: Color): Position = copy(color = color)
+
+  def materialImbalance: Int = variant.materialImbalance(board)
+
+  override def toString = s"$board $variant ${history.lastMove} $color"
 
   lazy val moves: Map[Square, List[Move]] =
     legalMoves.groupBy(_.orig)
@@ -25,35 +60,7 @@ case class Situation(board: Board, color: Color):
       case v: Crazyhouse.type => v.possibleDrops(this)
       case _                  => None
 
-  lazy val check: Check = board.checkOf(color)
-
   def checkSquare: Option[Square] = if check.yes then ourKing else None
-
-  inline def checkMate: Boolean = variant.checkmate(this)
-
-  inline def staleMate: Boolean = variant.staleMate(this)
-
-  inline def autoDraw: Boolean = board.autoDraw || variant.specialDraw(this)
-
-  inline def opponentHasInsufficientMaterial: Boolean = variant.opponentHasInsufficientMaterial(this)
-
-  lazy val threefoldRepetition: Boolean = history.threefoldRepetition
-
-  inline def variantEnd: Boolean = variant.specialEnd(this)
-
-  inline def end: Boolean = checkMate || staleMate || autoDraw || variantEnd
-
-  inline def winner: Option[Color] = variant.winner(this)
-
-  def playable(strict: Boolean): Boolean =
-    board.variant.valid(this, strict) && !end && copy(color = !color).check.no
-
-  lazy val status: Option[Status] =
-    if checkMate then Status.Mate.some
-    else if variantEnd then Status.VariantEnd.some
-    else if staleMate then Status.Stalemate.some
-    else if autoDraw then Status.Draw.some
-    else none
 
   def move(from: Square, to: Square, promotion: Option[PromotableRole]): Either[ErrorStr, Move] =
     variant.move(this, from, to, promotion)
@@ -64,55 +71,52 @@ case class Situation(board: Board, color: Color):
   def drop(role: Role, square: Square): Either[ErrorStr, Drop] =
     variant.drop(this, role, square)
 
-  def withHistory(history: History): Situation =
-    copy(board = board.withHistory(history))
+  def playable(strict: Boolean): Boolean =
+    variant.valid(this, strict) && !end && copy(color = !color).check.no
 
-  def withVariant(variant: chess.variant.Variant): Situation =
-    copy(board = board.withVariant(variant))
+  inline def end: Boolean = checkMate || staleMate || autoDraw || variantEnd
+
+  inline def checkMate: Boolean = variant.checkmate(this)
+
+  inline def staleMate: Boolean = variant.staleMate(this)
+
+  inline def autoDraw: Boolean = variant.autoDraw(this) || variant.specialDraw(this)
+
+  inline def opponentHasInsufficientMaterial: Boolean = variant.opponentHasInsufficientMaterial(this)
+
+  lazy val threefoldRepetition: Boolean = history.threefoldRepetition
+
+  inline def variantEnd: Boolean = variant.specialEnd(this)
+
+  lazy val check: Check               = checkOf(color)
+  inline def checkOf(c: Color): Check = variant.kingThreatened(board, c)
+
+  lazy val status: Option[Status] =
+    if checkMate then Status.Mate.some
+    else if variantEnd then Status.VariantEnd.some
+    else if staleMate then Status.Stalemate.some
+    else if autoDraw then Status.Draw.some
+    else none
+
+  inline def winner: Option[Color] = variant.winner(this)
+
+  lazy val legalMoves: List[Move] = variant.validMoves(this)
 
   lazy val enPassantSquare: Option[Square] =
     potentialEpSquare >> legalMoves.find(_.enpassant).map(_.dest)
 
-  def unary_! : Situation = copy(color = !color)
-
-  // ========================bitboard===========================
-
-  lazy val ourKing: Option[Square]   = board.kingPosOf(color)
-  lazy val theirKing: Option[Square] = board.kingPosOf(!color)
+  lazy val ourKing: Option[Square]   = kingPosOf(color)
+  lazy val theirKing: Option[Square] = kingPosOf(!color)
   // alternative version of ourKing is used in Antichess only
-  lazy val ourKings: List[Square] = board.kings(color)
+  lazy val ourKings: List[Square] = kings(color)
   // alternative version of theirKing is used in Antichess only
-  lazy val theirKings: List[Square] = board.kings(!color)
-  lazy val us: Bitboard             = board.byColor(color)
-  lazy val them: Bitboard           = board.byColor(!color)
+  lazy val theirKings: List[Square] = kings(!color)
+  lazy val us: Bitboard             = byColor(color)
+  lazy val them: Bitboard           = byColor(!color)
   lazy val checkers: Bitboard       = ourKing.fold(Bitboard.empty)(board.attackers(_, !color))
 
   def generateMovesAt(square: Square): List[Move] =
-    def movesAt =
-      val moves = board(square).fold(Nil) { piece =>
-        if piece.color != color then Nil
-        else
-          val targets = ~us
-          val bb      = square.bb
-          piece.role match
-            case Pawn   => genEnPassant(us & bb) ++ genPawn(bb, targets)
-            case Knight => genKnight(us & bb, targets)
-            case Bishop => genBishop(us & bb, targets)
-            case Rook   => genRook(us & bb, targets)
-            case Queen  => genQueen(us & bb, targets)
-            case King   => genKingAt(targets, square)
-      }
-      variant.applyVariantEffect(moves).filter(variant.kingSafety)
-
-    // in antichess, if there are capture moves, only capture moves are allowed
-    // so, we have to find all captures first,
-    // if they're not empty then filter by orig
-    // else use the normal moveAt
-    if variant.antichess then
-      val captureMoves = Antichess.captureMoves(this)
-      if captureMoves.nonEmpty then captureMoves.filter(_.orig == square)
-      else movesAt
-    else movesAt
+    variant.validMovesAt(this, square)
 
   def genKingAt(mask: Bitboard, square: Square) =
     val withoutCastles = genUnsafeKing(square, mask)
@@ -130,14 +134,17 @@ case class Situation(board: Board, color: Color):
     * the last move must have been a double pawn push
     * and not start from the back rank
     */
-  lazy val potentialEpSquare: Option[Square] = history.lastMove.flatMap:
-    case Uci.Move(orig, dest, _) =>
-      board(dest).flatMap: piece =>
-        if piece.color != color && piece.role == Pawn &&
-          orig.yDist(dest) == 2 && orig.rank != piece.color.backRank
-        then dest.prevRank(!color)
-        else None
-    case _ => None
+  lazy val potentialEpSquare: Option[Square] =
+    history.lastMove.flatMap:
+      case Uci.Move(orig, dest, _) =>
+        board
+          .pieceAt(dest)
+          .flatMap: piece =>
+            if piece.color != color && piece.role == Pawn &&
+              orig.yDist(dest) == 2 && orig.rank != piece.color.backRank
+            then dest.prevRank(!color)
+            else None
+      case _ => None
 
   def genNonKingAndNonPawn(mask: Bitboard): List[Move] =
     genKnight(us & board.knights, mask) ++ genBishop(us & board.bishops, mask) ++
@@ -196,7 +203,7 @@ case class Situation(board: Board, color: Color):
   def genKnight(knights: Bitboard, mask: Bitboard): List[Move] =
     for
       from <- knights
-      to   <- Bitboard.knightAttacks(from) & mask
+      to   <- from.knightAttacks & mask
       move <- normalMove(from, to, Knight, isOccupied(to))
     yield move
 
@@ -276,8 +283,8 @@ case class Situation(board: Board, color: Color):
           piece = color.pawn,
           orig = orig,
           dest = dest,
-          situationBefore = this,
-          after = after,
+          before = this,
+          afterWithoutHistory = withBoard(after),
           capture = capture.some,
           castle = None,
           promotion = None,
@@ -295,8 +302,8 @@ case class Situation(board: Board, color: Color):
         piece = Piece(color, role),
         orig = orig,
         dest = dest,
-        situationBefore = this,
-        after = board,
+        before = this,
+        afterWithoutHistory = withBoard(board),
         capture = taken,
         castle = None,
         promotion = None,
@@ -318,8 +325,8 @@ case class Situation(board: Board, color: Color):
           piece = color.pawn,
           orig = orig,
           dest = dest,
-          situationBefore = this,
-          after = board,
+          before = this,
+          afterWithoutHistory = withBoard(board),
           capture = taken,
           castle = None,
           promotion = Some(promotion),
@@ -338,11 +345,12 @@ case class Situation(board: Board, color: Color):
   // make sure that the 960 move is first since it will be the representative
   // move and we want 960 uci notation
   private def castle(king: Square, kingTo: Square, rook: Square, rookTo: Square): List[Move] =
-    val after = for
+
+    val boardAfter = for
       b1    <- board.take(king)
       b2    <- b1.take(rook)
-      b3    <- b2.place(color.king, kingTo)
-      after <- b3.place(color.rook, rookTo)
+      b3    <- b2.put(color.king, kingTo)
+      after <- b3.put(color.rook, rookTo)
     yield after
 
     val isChess960 =
@@ -353,23 +361,111 @@ case class Situation(board: Board, color: Color):
     val destInput = if !isChess960 then List(rook, kingTo) else List(rook)
 
     for
-      a               <- after.toList
+      after           <- boardAfter.map(withBoard).toList
       inputKingSquare <- destInput
     yield Move(
       piece = color.king,
       orig = king,
       dest = inputKingSquare,
-      situationBefore = this,
-      after = a,
+      before = this,
+      afterWithoutHistory = after,
       capture = None,
       castle = Move.Castle(king, kingTo, rook, rookTo).some,
       promotion = None,
       enpassant = false
     )
 
-object Situation:
+object Position:
 
-  def apply(variant: chess.variant.Variant): Situation = Situation(Board.init(variant), White)
+  val standard: Position = Position.init(variant.Standard, White)
 
-  case class AndFullMoveNumber(situation: Situation, fullMoveNumber: FullMoveNumber):
-    def ply = fullMoveNumber.ply(situation.color)
+  case class AndFullMoveNumber(position: Position, fullMoveNumber: FullMoveNumber):
+    def ply: Ply     = fullMoveNumber.ply(position.color)
+    def toGame: Game = Game(position = position, ply = ply, startedAtPly = ply)
+
+  object AndFullMoveNumber:
+
+    def apply(variant: Option[Variant], fen: Option[Fen.Full]): AndFullMoveNumber =
+      apply(variant.getOrElse(chess.variant.Standard), fen)
+
+    def apply(variant: Variant, fen: Option[Fen.Full]): AndFullMoveNumber =
+      fen
+        .flatMap(Fen.readWithMoveNumber(variant, _))
+        .getOrElse:
+          AndFullMoveNumber(Position.init(variant, White), FullMoveNumber.initial)
+
+    given CanPlay[AndFullMoveNumber] with
+      extension (position: AndFullMoveNumber)
+        def apply[M <: Moveable](move: M): Either[ErrorStr, (AndFullMoveNumber, MoveOrDrop)] =
+          move(position.position).map(x => (AndFullMoveNumber(x.after, position.ply.next.fullMoveNumber), x))
+
+  given HasPosition[AndFullMoveNumber]:
+    extension (position: AndFullMoveNumber) inline def position: Position = position.position
+
+  def apply(
+      pieces: PieceMap,
+      history: History,
+      variant: Variant,
+      crazyData: Option[Crazyhouse.Data],
+      color: Option[Color]
+  ) =
+    new Position(Board.fromMap(pieces), history.copy(crazyData = crazyData), variant, color.getOrElse(White))
+
+  def apply(board: Board, variant: Variant, color: Option[Color]): Position =
+    val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
+    Position(
+      board,
+      History(
+        castles = variant.castles,
+        unmovedRooks = unmovedRooks,
+        crazyData = variant.crazyhouse.option(Crazyhouse.Data.init)
+      ),
+      variant,
+      color.getOrElse(White)
+    )
+
+  def apply(pieces: Iterable[(Square, Piece)], variant: Variant, color: Option[Color]): Position =
+    Position(pieces, variant.castles, variant, color)
+
+  def apply(
+      pieces: Iterable[(Square, Piece)],
+      castles: Castles,
+      variant: Variant,
+      color: Option[Color]
+  ): Position =
+    val board        = Board.fromMap(pieces.toMap)
+    val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
+    Position(
+      board,
+      History(
+        castles = castles,
+        unmovedRooks = unmovedRooks,
+        crazyData = variant.crazyhouse.option(Crazyhouse.Data.init)
+      ),
+      variant,
+      color.getOrElse(White)
+    )
+
+  def apply(variant: chess.variant.Variant): Position =
+    Position.init(variant, White)
+
+  def apply(tags: Tags): Position =
+    apply(tags.variant, tags.fen)
+
+  def apply(variantOpt: Option[Variant], fen: Option[Fen.Full]): Position =
+    val variant = variantOpt.getOrElse(chess.variant.Standard)
+    apply(variant, fen)
+
+  def apply(variant: Variant, fen: Option[Fen.Full]): Position =
+    fen.flatMap(Fen.read(variant, _)).getOrElse(init(variant, White))
+
+  def init(variant: Variant, color: Color): Position =
+    Position(Board.fromMap(variant.pieces), variant, color.some)
+
+  given CanPlay[Position]:
+    extension (position: Position)
+      def apply[M <: Moveable](move: M): Either[ErrorStr, (Position, MoveOrDrop)] =
+        move(position).map(x => (x.after, x))
+
+  given HasPosition[Position]:
+    extension (position: Position) inline def position: Position = position

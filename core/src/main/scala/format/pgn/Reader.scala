@@ -9,37 +9,25 @@ object Reader:
     def valid: Either[ErrorStr, Replay] =
       failure.fold(replay.asRight)(_.asLeft)
 
-  def full(pgn: PgnStr, tags: Tags = Tags.empty): Either[ErrorStr, Result] =
-    Parser.mainline(pgn).map(fullWithSans)
+  def mainline(pgn: PgnStr): Either[ErrorStr, Result] =
+    Parser.mainline(pgn).map(ml => makeReplay(Game(ml.tags), Sans(ml.sans)))
 
   def moves(sans: Iterable[SanStr], tags: Tags): Either[ErrorStr, Result] =
-    movesWithSans(sans, identity, tags)
+    moves(sans, identity, tags)
 
-  def fullWithSans(parsed: ParsedMainline[San]): Result =
-    makeReplay(makeGame(parsed.tags), Sans(parsed.sans))
-
-  def fullWithSans(parsed: ParsedPgn, op: Sans => Sans): Result =
-    makeReplay(makeGame(parsed.tags), op(Sans(parsed.mainline)))
-
-  def movesWithSans(sans: Iterable[SanStr], op: Sans => Sans, tags: Tags): Either[ErrorStr, Result] =
+  def moves(sans: Iterable[SanStr], game: Game): Either[ErrorStr, Result] =
     Parser
       .moves(sans)
-      .map(moves => makeReplay(makeGame(tags), op(moves)))
+      .map(moves => makeReplay(game, moves))
 
-  private def makeReplay(game: Game, sans: Sans): Result =
-    sans.value.zipWithIndex
-      .foldM(Replay(game)) { case (replay, (san, index)) =>
-        san(replay.state.situation).bimap(_ => (replay, makeError(game.ply + index, san)), replay.addMove(_))
-      }
-      .match
-        case Left(replay, err) => Result(replay, err.some)
-        case Right(replay)     => Result(replay, none)
+  def full(parsed: ParsedPgn, op: Sans => Sans): Result =
+    makeReplay(Game(parsed.tags), op(Sans(parsed.mainline)))
 
-  inline def makeError(currentPly: Ply, san: San): ErrorStr =
-    val moveAt = currentPly.fullMoveNumber.value
-    val move   = san.rawString.getOrElse(san.toString)
-    ErrorStr(s"Cannot play $move at move $moveAt by ${currentPly.turn.name}")
+  def moves(sans: Iterable[SanStr], op: Sans => Sans, tags: Tags): Either[ErrorStr, Result] =
+    Parser
+      .moves(sans)
+      .map(moves => makeReplay(Game(tags), op(moves)))
 
-  private def makeGame(tags: Tags) =
-    val g = Game(variantOption = tags.variant, fen = tags.fen)
-    g.copy(startedAtPly = g.ply, clock = tags.timeControl.flatMap(_.toClockConfig).map(Clock.apply))
+  def makeReplay(game: Game, sans: Sans): Result =
+    val (state, moves, error) = game.playWhileValidReverse(sans.value)
+    Result(Replay(game, moves, state), error)

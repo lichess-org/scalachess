@@ -19,22 +19,22 @@ R  QK  R"""
     assertEquals(badHist.destsFrom(E1), Set(F1))
     val board960 = """
 PPPPPPPP
-RQK   R """.chess960.withHistory(History.castle(White, kingSide = true, queenSide = true))
+RQK   R """.chess960.updateHistory(_ => castleHistory(White, kingSide = true, queenSide = true))
     assertEquals(board960.place(White.bishop, D1).flatMap(_.destsFrom(C1)), Set())
     assertEquals(board960.place(White.knight, F1).flatMap(_.destsFrom(C1)), Set(D1))
   test("possible"):
-    val game = Game(goodHist, White)
-    assertEquals(game.board.destsFrom(E1), Set(F1, G1, H1))
+    val game = Game(goodHist)
+    assertEquals(game.position.destsFrom(E1), Set(F1, G1, H1))
     assertGame(
       game.playMove(E1, G1).get,
       """
 PPPPPPPP
 R  Q RK """
     )
-    val board: Board = """
+    val board: Position = """
    PPPPP
 B     KR""".chess960
-    val g2 = Game(board, White)
+    val g2 = Game(board)
     assertEquals(board.destsFrom(G1), Set(F1, H1))
     assertGame(
       g2.playMove(G1, H1).get,
@@ -43,15 +43,15 @@ B     KR""".chess960
 B    RK """
     )
   test("chess960 close kingside with 2 rooks around"):
-    val board: Board = """
+    val board: Position = """
 PPPPPPPP
 RKRBB   """.chess960
     assertEquals(board.destsFrom(B1), Set())
   test("chess960 close queenside"):
-    val board: Board = """
+    val board: Position = """
 PPPPPPPP
 RK     B""".chess960
-    val game = Game(board, White)
+    val game = Game(board)
     assertEquals(board.destsFrom(B1), Set(A1, C1))
     assertGame(
       game.playMove(B1, A1).get,
@@ -69,10 +69,9 @@ p pppppp
 
 
 
- K""".chess960,
-      Black
+ K""".chess960.withColor(Black)
     )
-    assertEquals(game.board.destsFrom(E8), Set(D8, F8))
+    assertEquals(game.position.destsFrom(E8), Set(D8, F8))
     assertGame(
       game.playMove(E8, D8).get,
       """
@@ -97,7 +96,6 @@ R     NP
 PP  PP
 KNQRB""",
         FromPosition
-      ),
-      Black
+      ).withColor(Black)
     )
-    assertEquals(game.board.destsFrom(B8), Set(A8, C8, E8))
+    assertEquals(game.position.destsFrom(B8), Set(A8, C8, E8))

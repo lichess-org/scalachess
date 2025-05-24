@@ -3,8 +3,9 @@ package variant
 
 import cats.Eq
 import cats.syntax.all.*
-import chess.bitboard.Bitboard
 import chess.format.Fen
+
+import scala.annotation.nowarn
 
 // Correctness depends on singletons for each variant ID
 abstract class Variant private[variant] (
@@ -19,86 +20,116 @@ abstract class Variant private[variant] (
 
   def pieces: Map[Square, Piece]
 
-  inline def standard      = this == Standard
-  inline def chess960      = this == Chess960
-  inline def fromPosition  = this == FromPosition
-  inline def kingOfTheHill = this == KingOfTheHill
-  inline def threeCheck    = this == ThreeCheck
-  inline def antichess     = this == Antichess
-  inline def atomic        = this == Atomic
-  inline def horde         = this == Horde
-  inline def racingKings   = this == RacingKings
-  inline def crazyhouse    = this == Crazyhouse
+  inline def standard: Boolean      = this == Standard
+  inline def chess960: Boolean      = this == Chess960
+  inline def fromPosition: Boolean  = this == FromPosition
+  inline def kingOfTheHill: Boolean = this == KingOfTheHill
+  inline def threeCheck: Boolean    = this == ThreeCheck
+  inline def antichess: Boolean     = this == Antichess
+  inline def atomic: Boolean        = this == Atomic
+  inline def horde: Boolean         = this == Horde
+  inline def racingKings: Boolean   = this == RacingKings
+  inline def crazyhouse: Boolean    = this == Crazyhouse
 
-  inline def exotic = !standard
+  inline def exotic: Boolean = !standard
 
-  def allowsCastling = !castles.isEmpty
+  def allowsCastling: Boolean = !castles.isEmpty
 
-  protected val backRank = Vector(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
+  def makeUnmovedRooks(rooks: Bitboard): UnmovedRooks =
+    if allowsCastling then UnmovedRooks(rooks) else UnmovedRooks.none
+
+  protected val backRank: Vector[Role] =
+    Vector(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
 
   def castles: Castles = Castles.init
 
   val initialFen: Fen.Full = Fen.Full.initial
 
-  def isValidPromotion(promotion: Option[PromotableRole]) =
+  def isValidPromotion(promotion: Option[PromotableRole]): Boolean =
     promotion match
       case None                                 => true
       case Some(Queen | Rook | Knight | Bishop) => true
       case _                                    => false
 
-  def validMoves(situation: Situation): List[Move]
+  def validMoves(position: Position): List[Move]
+
+  def validMovesAt(position: Position, square: Square): List[Move] =
+    import position.us
+    position.pieceAt(square).fold(Nil) { piece =>
+      if piece.color != position.color then Nil
+      else
+        val targets = ~us
+        val bb      = square.bb
+        piece.role match
+          case Pawn   => position.genEnPassant(us & bb) ++ position.genPawn(bb, targets)
+          case Knight => position.genKnight(us & bb, targets)
+          case Bishop => position.genBishop(us & bb, targets)
+          case Rook   => position.genRook(us & bb, targets)
+          case Queen  => position.genQueen(us & bb, targets)
+          case King   => position.genKingAt(targets, square)
+    }
 
   def pieceThreatened(board: Board, by: Color, to: Square): Boolean =
-    board.board.attacks(to, by)
+    board.attacks(to, by)
 
   def kingThreatened(board: Board, color: Color): Check =
     board.isCheck(color)
 
+  def checkWhite(board: Board): Check = kingThreatened(board, White)
+  def checkBlack(board: Board): Check = kingThreatened(board, Black)
+
+  def checkColor(board: Board): Option[Color] =
+    checkWhite(board).yes.option(White).orElse(checkBlack(board).yes.option(Black))
+
   def kingSafety(m: Move): Boolean =
-    kingThreatened(m.after, m.color).no
+    kingThreatened(m.afterWithoutHistory.board, m.color).no
 
   def castleCheckSafeSquare(board: Board, kingTo: Square, color: Color, occupied: Bitboard): Boolean =
-    board.board.attackers(kingTo, !color, occupied).isEmpty
+    board.attackers(kingTo, !color, occupied).isEmpty
 
   def move(
-      situation: Situation,
+      position: Position,
       from: Square,
       to: Square,
       promotion: Option[PromotableRole]
   ): Either[ErrorStr, Move] =
-    // Find the move in the variant specific list of valid moves
-    def findMove(from: Square, to: Square) =
-      situation.generateMovesAt(from).find(_.dest == to)
 
-    for
-      piece <- situation.board(from).toRight(ErrorStr(s"No piece on ${from.key}"))
-      _     <- Either.cond(piece.color == situation.color, piece, ErrorStr(s"Not my piece on ${from.key}"))
-      m1    <- findMove(from, to).toRight(ErrorStr(s"Piece on ${from.key} cannot move to ${to.key}"))
-      m2 <- m1
-        .withPromotion(promotion)
-        .toRight(ErrorStr(s"Piece on ${from.key} cannot promote to $promotion"))
-      m3 <- Either.cond(
-        isValidPromotion(promotion),
-        m2,
-        ErrorStr(s"Cannot promote to $promotion in this game mode")
-      )
-    yield m3
+    // when users set auto queen promotion, lichobile will send an uci move
+    // without promotion ex: b2a1 instead of b2a1q.
+    // So if a move is a pawn move to the last rank, we need to set the promotion
+    // to queen if it is not already set.
+    inline def findMove(m: Move): Boolean =
+      m.dest == to && m.promotion == promotion.orElse(Option.when(isPromotion(m))(Queen))
 
-  def drop(situation: Situation, role: Role, square: Square): Either[ErrorStr, Drop] =
+    inline def isPromotion(m: Move): Boolean =
+      m.piece.is(Pawn) && m.dest.rank == m.piece.color.lastRank
+
+    validMovesAt(position, from)
+      .find(findMove)
+      .toRight(ErrorStr(s"Piece on ${from.key} cannot move to ${to.key}"))
+
+  def drop(@nowarn position: Position, role: Role, square: Square): Either[ErrorStr, Drop] =
     ErrorStr(s"$this variant cannot drop $role $square").asLeft
 
-  def staleMate(situation: Situation): Boolean = situation.check.no && situation.legalMoves.isEmpty
+  def staleMate(position: Position): Boolean = position.check.no && position.legalMoves.isEmpty
 
-  def checkmate(situation: Situation) = situation.check.yes && situation.legalMoves.isEmpty
+  def checkmate(position: Position): Boolean = position.check.yes && position.legalMoves.isEmpty
 
-  // In most variants, the winner is the last player to have played and there is a possibility of either a traditional
-  // checkmate or a variant end condition
-  def winner(situation: Situation): Option[Color] =
-    if situation.checkMate || specialEnd(situation) then Option(!situation.color) else None
+  /**
+  * Return the winner of the game if there is one.
+  *
+  * In most variants, the winner is the last player to have played and there is a possibility
+  * of either a traditional checkmate or a variant end condition
+  * */
+  def winner(position: Position): Option[Color] =
+    if position.checkMate || specialEnd(position) then Option(!position.color) else None
 
-  def specialEnd(situation: Situation) = false
+  def specialEnd(position: Position): Boolean = false
 
-  def specialDraw(situation: Situation) = false
+  def specialDraw(position: Position): Boolean = false
+
+  def autoDraw(position: Position): Boolean =
+    isInsufficientMaterial(position) || fiftyMoves(position.history) || position.history.fivefoldRepetition
 
   /** Returns the material imbalance in pawns (overridden in Antichess)
     */
@@ -111,50 +142,35 @@ abstract class Variant private[variant] (
 
   /** Returns true if neither player can win. The game should end immediately.
     */
-  def isInsufficientMaterial(board: Board) = InsufficientMatingMaterial(board)
+  def isInsufficientMaterial(position: Position): Boolean = InsufficientMatingMaterial(position.board)
 
   /** Returns true if the other player cannot win. This is relevant when the
     * side to move times out or disconnects. Instead of losing on time,
     * the game should be drawn.
     */
-  def opponentHasInsufficientMaterial(situation: Situation) =
-    InsufficientMatingMaterial(situation.board, !situation.color)
+  def opponentHasInsufficientMaterial(position: Position): Boolean =
+    InsufficientMatingMaterial(position, !position.color)
 
-  // Some variants have an extra effect on the board on a move. For example, in Atomic, some
-  // pieces surrounding a capture explode
-  def hasMoveEffects = false
-
-  /** Applies a variant specific effect to the move. This helps decide whether a king is endangered by a move, for
-    * example
-    */
-  def addVariantEffect(move: Move): Move = move
-
-  // TODO remove this implementation
-  def applyVariantEffect(moves: List[Move]): List[Move] =
-    if hasMoveEffects then moves.map(addVariantEffect) else moves
-
-  def fiftyMoves(history: History): Boolean = history.halfMoveClock >= HalfMoveClock(100)
+  def fiftyMoves(history: History): Boolean =
+    history.halfMoveClock >= HalfMoveClock(100)
 
   def isIrreversible(move: Move): Boolean =
     (move.piece.is(Pawn)) || move.captures || move.promotes || move.castles
 
-  /** Once a move has been decided upon from the available legal moves, the board is finalized
-    */
-  def finalizeBoard(board: Board, uci: format.Uci, captured: Option[Piece]): Board = board
+  protected def pawnsOnPromotionRank(board: Board, color: Color): Boolean =
+    board.byPiece(color, Pawn).intersects(Bitboard.rank(color.promotablePawnRank))
 
-  protected def pawnsOnPromotionRank(board: Board, color: Color) =
-    board(color, Pawn).intersects(Bitboard.rank(color.promotablePawnRank))
+  protected def pawnsOnBackRank(board: Board, color: Color): Boolean =
+    board.byPiece(color, Pawn).intersects(Bitboard.rank(color.backRank))
 
-  protected def pawnsOnBackRank(board: Board, color: Color) =
-    board(color, Pawn).intersects(Bitboard.rank(color.backRank))
+  protected def validSide(position: Position, strict: Boolean)(color: Color): Boolean =
+    position.byPiece(color, King).count == 1 &&
+      (!strict || { position.byPiece(color, Pawn).count <= 8 && position.byColor(color).count <= 16 }) &&
+      !pawnsOnPromotionRank(position.board, color) &&
+      !pawnsOnBackRank(position.board, color)
 
-  protected def validSide(board: Board, strict: Boolean)(color: Color) =
-    board(color, King).count == 1 &&
-      (!strict || { board(color, Pawn).count <= 8 && board(color).count <= 16 }) &&
-      !pawnsOnPromotionRank(board, color) &&
-      !pawnsOnBackRank(board, color)
-
-  def valid(situation: Situation, strict: Boolean) = Color.all.forall(validSide(situation.board, strict))
+  def valid(position: Position, strict: Boolean): Boolean =
+    Color.all.forall(validSide(position, strict))
 
   val promotableRoles: List[PromotableRole] = List(Queen, Rook, Bishop, Knight)
 
@@ -227,7 +243,7 @@ object Variant:
       File.all.map(Square(_, Rank.Seventh) -> Black.pawn) ++
       File.all.zip(rank).map((x, role) => Square(x, Rank.Eighth) -> (Black - role))).toMap
 
-  def isValidInitialFen(variant: Variant, fen: Option[Fen.Full], strict: Boolean = false) =
+  def isValidInitialFen(variant: Variant, fen: Option[Fen.Full], strict: Boolean = false): Boolean =
     if variant.chess960
     then fen.forall(f => Chess960.positionNumber(f).isDefined)
     else if variant.fromPosition then

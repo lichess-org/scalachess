@@ -260,7 +260,7 @@ object BinaryFen:
 
   object implementation:
 
-    def writeLong(builder: ArrayBuilder[Byte], v: Long) =
+    def writeLong(builder: ArrayBuilder[Byte], v: Long): Unit =
       builder.addOne((v >>> 56).toByte)
       builder.addOne((v >>> 48).toByte)
       builder.addOne((v >>> 40).toByte)
@@ -280,7 +280,7 @@ object BinaryFen:
         ((reader.next & 0xffL) << 8) |
         (reader.next & 0xffL)
 
-    def writeLeb128(builder: ArrayBuilder[Byte], v: Int) =
+    def writeLeb128(builder: ArrayBuilder[Byte], v: Int): Unit =
       var n = v
       while n > 127
       do
@@ -299,7 +299,7 @@ object BinaryFen:
       do ()
       n & 0x7fff_ffff
 
-    def writeNibbles(builder: ArrayBuilder[Byte], lo: Int, hi: Int) =
+    def writeNibbles(builder: ArrayBuilder[Byte], lo: Int, hi: Int): Unit =
       builder.addOne((lo | (hi << 4)).toByte)
 
     def readNibbles(reader: Iterator[Byte]): (Int, Int) =

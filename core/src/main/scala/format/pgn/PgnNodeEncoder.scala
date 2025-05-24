@@ -73,13 +73,13 @@ object PgnNodeEncoder:
     // if the current value is black and forceTurnNumber is true it needs to
     // render with a turn number and 3 dots for example: `1... e5`
     private def addTurnNumberPrefix(forceTurnNumber: Boolean, builder: StringBuilder, ply: Ply): Unit =
-      if ply.isWhiteTurn then builder.append(ply.turnNumber).append(". ")
-      else if forceTurnNumber then builder.append(ply.turnNumber).append("... ")
+      if ply.isWhiteTurn then builder.append(ply.turnNumber).append(". "): Unit
+      else if forceTurnNumber then builder.append(ply.turnNumber).append("... "): Unit
 
     private def renderValueAndVariations(builder: StringBuilder, ply: Ply): PgnNodeEncoder[A] ?=> Unit =
       tree.value.appendSanStr(builder)
       tree.variations.foreach: x =>
-        builder.addOne(' ').addOne('(')
+        builder.addOne(' ').addOne('('): Unit
         x.appendPgnStr(builder, ply)
         builder.addOne(')')
 

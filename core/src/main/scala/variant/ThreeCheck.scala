@@ -14,30 +14,36 @@ case object ThreeCheck
       standardInitialPosition = true
     ):
 
-  def pieces = Standard.pieces
+  override val pieces: Map[Square, Piece] = Standard.pieces
 
-  override val initialFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 +0+0")
+  override val initialFen: FullFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 +0+0")
 
-  def validMoves(situation: Situation): List[Move] =
-    Standard.validMoves(situation)
+  override def validMoves(position: Position): List[Move] =
+    Standard.validMoves(position).map(updateCheckCount)
 
-  override def valid(situation: Situation, strict: Boolean): Boolean = Standard.valid(situation, strict)
+  override def validMovesAt(position: Position, square: Square): List[Move] =
+    super.validMovesAt(position, square).view.filter(kingSafety).map(updateCheckCount).toList
 
-  override def finalizeBoard(board: Board, uci: format.Uci, capture: Option[Piece]): Board =
-    board.updateHistory:
-      _.withCheck(Color.White, board.checkWhite).withCheck(Color.Black, board.checkBlack)
+  override def valid(position: Position, strict: Boolean): Boolean = Standard.valid(position, strict)
 
-  override def specialEnd(situation: Situation) =
-    situation.check.yes && {
-      val checks = situation.board.history.checkCount
-      situation.color.fold(checks.white, checks.black) >= 3
+  override def specialEnd(position: Position): Boolean =
+    position.check.yes && {
+      val checks = position.history.checkCount
+      position.color.fold(checks.white, checks.black) >= 3
     }
 
   /** It's not possible to check or checkmate the opponent with only a king
     */
-  override def opponentHasInsufficientMaterial(situation: Situation) =
-    situation.board.kingsOnlyOf(!situation.color)
+  override def opponentHasInsufficientMaterial(position: Position): Boolean =
+    position.kingsOnlyOf(!position.color)
 
-  // When there is insufficient mating material, there is still potential to win by checking the opponent 3 times
-  // by the variant ending. However, no players can check if there are only kings remaining
-  override def isInsufficientMaterial(board: Board) = board.kingsOnly
+  /**
+  * When there is insufficient mating material, there is still potential to win by checking the opponent 3 times
+  * by the variant ending. However, no players can check if there are only kings remaining
+  */
+  override def isInsufficientMaterial(position: Position): Boolean = position.kingsOnly
+
+  private def updateCheckCount(move: Move): Move =
+    move.copy(afterWithoutHistory = move.afterWithoutHistory.updateHistory:
+      _.withCheck(Color.White, checkWhite(move.afterWithoutHistory.board))
+        .withCheck(Color.Black, checkBlack(move.afterWithoutHistory.board)))

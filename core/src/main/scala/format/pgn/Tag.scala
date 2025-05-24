@@ -3,7 +3,7 @@ package chess
 package format.pgn
 
 import cats.Eq
-import cats.syntax.option.*
+import cats.syntax.all.*
 import chess.format.FullFen
 
 import java.time.format.DateTimeFormatter
@@ -30,10 +30,11 @@ case class Tags(value: List[Tag]) extends AnyVal:
     val name = which(Tag)
     value.find(_.name == name).map(_.value)
 
-  def clockConfig: Option[Clock.Config] =
+  def timeControl: Option[TournamentClock] =
+    val strict = exists(_.GameId) // lichess games use proper PGN specification
     value
       .collectFirst { case Tag(Tag.TimeControl, str) => str }
-      .flatMap(Clock.readPgnConfig)
+      .flatMap(TournamentClock.parse(strict))
 
   def variant: Option[chess.variant.Variant] =
     apply(_.Variant)
@@ -94,8 +95,20 @@ case class Tags(value: List[Tag]) extends AnyVal:
     ByColor(apply(_.WhiteTitle), apply(_.BlackTitle)).map(_.flatMap(PlayerTitle.get))
   def fideIds: ByColor[Option[FideId]] = ByColor(apply(_.WhiteFideId), apply(_.BlackFideId)).map: id =>
     FideId.from(id.flatMap(_.toIntOption))
-  def teams  = ByColor(apply(_.WhiteTeam), apply(_.BlackTeam))
-  def clocks = ByColor(apply(_.WhiteClock), apply(_.BlackClock))
+  def teams = ByColor(apply(_.WhiteTeam), apply(_.BlackTeam))
+
+  def clocks: ByColor[Option[Centis]] = ByColor(apply(_.WhiteClock), apply(_.BlackClock)).map:
+    _.flatMap: s =>
+      val seconds = s.toIntOption.orElse:
+        def readMinutesAndSeconds(m: String, s: String) = for
+          minutes <- m.toIntOption
+          seconds <- s.toIntOption
+        yield minutes * 60 + seconds
+        s.split(':').toList match
+          case List(h, m, s) => (h.toIntOption, readMinutesAndSeconds(m, s)).mapN(_ * 3600 + _)
+          case List(m, s)    => readMinutesAndSeconds(m, s)
+          case _             => None
+      seconds.map(Centis.ofSeconds)
 
   override def toString = sorted.value.mkString("\n")
 
@@ -142,6 +155,7 @@ object Tag:
   case object TimeControl     extends TagType
   case object WhiteClock      extends TagType
   case object BlackClock      extends TagType
+  case object ReferenceTime   extends TagType
   case object WhiteElo        extends TagType
   case object BlackElo        extends TagType
   case object WhiteRatingDiff extends TagType
@@ -159,6 +173,7 @@ object Tag:
   case object Opening         extends TagType
   case object Termination     extends TagType
   case object Annotator       extends TagType
+  case object GameId          extends TagType
   case class Unknown(n: String) extends TagType:
     override def toString  = n
     override val isUnknown = true
@@ -183,6 +198,7 @@ object Tag:
     TimeControl,
     WhiteClock,
     BlackClock,
+    ReferenceTime,
     WhiteElo,
     BlackElo,
     WhiteRatingDiff,
@@ -199,7 +215,8 @@ object Tag:
     ECO,
     Opening,
     Termination,
-    Annotator
+    Annotator,
+    GameId
   )
   val tagTypesByLowercase: Map[String, TagType] = tagTypes.mapBy(_.lowercase)
 
@@ -217,6 +234,8 @@ object Tag:
 
   def tagType(name: String) =
     tagTypesByLowercase.getOrElse(name.toLowerCase, Unknown(name))
+
+  def timeControl(clock: TournamentClock) = Tag(TimeControl, clock.toString)
 
   def timeControl(clock: Option[Clock.Config]) = Tag(
     TimeControl,

@@ -1,7 +1,7 @@
 inThisBuild(
   Seq(
-    scalaVersion      := "3.5.2",
-    version           := "16.5.0",
+    scalaVersion      := "3.7.0",
+    version           := "17.6.3",
     organization      := "org.lichess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
     publishTo         := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", "")))),
@@ -10,14 +10,13 @@ inThisBuild(
   )
 )
 
-val scalalibVersion = "11.3.2"
+val scalalibVersion = "11.8.7"
 
 val commonSettings = Seq(
   scalacOptions := Seq(
     "-encoding",
     "utf-8",
     "-rewrite",
-    "-source:3.7-migration",
     // "-indent",
     "-feature",
     "-language:postfixOps",
@@ -33,14 +32,15 @@ lazy val scalachess: Project = Project("scalachess", file("core")).settings(
   commonSettings,
   name := "scalachess",
   libraryDependencies ++= List(
-    "org.lichess"   %% "scalalib-core"  % scalalibVersion,
-    "org.typelevel" %% "cats-core"      % "2.12.0",
-    "org.typelevel" %% "alleycats-core" % "2.12.0",
-    "org.typelevel" %% "cats-parse"     % "1.0.0",
-    "dev.optics"    %% "monocle-core"   % "3.3.0",
-    "org.typelevel" %% "kittens"        % "3.4.0"
+    "com.github.lichess-org.scalalib" %% "scalalib-core"  % scalalibVersion,
+    "com.github.lichess-org.scalalib" %% "scalalib-model" % scalalibVersion,
+    "org.typelevel"                   %% "cats-core"      % "2.13.0",
+    "org.typelevel"                   %% "alleycats-core" % "2.13.0",
+    "org.typelevel"                   %% "cats-parse"     % "1.1.0",
+    "dev.optics"                      %% "monocle-core"   % "3.3.0",
+    "org.typelevel"                   %% "kittens"        % "3.5.0"
   ),
-  resolvers += "lila-maven".at("https://raw.githubusercontent.com/ornicar/lila-maven/master")
+  resolvers += "jitpack".at("https://jitpack.io")
 )
 
 lazy val playJson: Project = Project("playJson", file("playJson"))
@@ -48,8 +48,8 @@ lazy val playJson: Project = Project("playJson", file("playJson"))
     commonSettings,
     name := "scalachess-play-json",
     libraryDependencies ++= List(
-      "org.playframework" %% "play-json"          % "3.0.4",
-      "org.lichess"       %% "scalalib-play-json" % scalalibVersion
+      "org.playframework"               %% "play-json"          % "3.0.4",
+      "com.github.lichess-org.scalalib" %% "scalalib-play-json" % scalalibVersion
     )
   )
   .dependsOn(scalachess)
@@ -76,14 +76,14 @@ lazy val testKit = project
     libraryDependencies ++= List(
       "org.scalacheck"      %% "scalacheck"        % "1.18.1",
       "org.typelevel"       %% "literally"         % "1.2.0",
-      "org.scalameta"       %% "munit"             % "1.0.2"  % Test,
-      "org.scalameta"       %% "munit-scalacheck"  % "1.0.0"  % Test,
+      "org.scalameta"       %% "munit"             % "1.1.1"  % Test,
+      "org.scalameta"       %% "munit-scalacheck"  % "1.1.0"  % Test,
       "com.disneystreaming" %% "weaver-cats"       % "0.8.4"  % Test,
       "com.disneystreaming" %% "weaver-scalacheck" % "0.8.4"  % Test,
-      "co.fs2"              %% "fs2-core"          % "3.11.0" % Test,
-      "co.fs2"              %% "fs2-io"            % "3.11.0" % Test,
+      "co.fs2"              %% "fs2-core"          % "3.12.0" % Test,
+      "co.fs2"              %% "fs2-io"            % "3.12.0" % Test,
       "org.typelevel"       %% "discipline-munit"  % "2.0.0"  % Test,
-      "org.typelevel"       %% "cats-laws"         % "2.12.0" % Test
+      "org.typelevel"       %% "cats-laws"         % "2.13.0" % Test
     )
   )
   .dependsOn(scalachess % "compile->compile", rating % "compile->compile")

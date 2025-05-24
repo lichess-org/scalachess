@@ -5,13 +5,16 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Prop.{ forAll, propBoolean }
 
 import CoreArbitraries.given
-import Bitboard.*
 
 class BitboardTest extends ScalaCheckSuite:
 
   test("the result of add should contain the added square"):
     forAll: (bb: Bitboard, square: Square) =>
       assertEquals(bb.add(square).contains(square), true)
+
+  test("contains by square always consistent with contains by file and rank"):
+    forAll: (bb: Bitboard, square: Square) =>
+      assertEquals(bb.contains(square), bb.contains(square.file, square.rank))
 
   test("Square.bb.singleSquare == Some(square)"):
     forAll: (square: Square) =>

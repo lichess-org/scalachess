@@ -5,44 +5,29 @@ import cats.syntax.all.*
 
 object Reader:
 
-  sealed trait Result:
-    def valid: Either[ErrorStr, Replay]
+  case class Result(replay: Replay, failure: Option[ErrorStr]):
+    def valid: Either[ErrorStr, Replay] =
+      failure.fold(replay.asRight)(_.asLeft)
 
-  object Result:
-    case class Complete(replay: Replay) extends Result:
-      def valid = replay.asRight
-    case class Incomplete(replay: Replay, failure: ErrorStr) extends Result:
-      def valid = failure.asLeft
-
-  def full(pgn: PgnStr, tags: Tags = Tags.empty): Either[ErrorStr, Result] =
-    fullWithSans(pgn, identity, tags)
+  def mainline(pgn: PgnStr): Either[ErrorStr, Result] =
+    Parser.mainline(pgn).map(ml => makeReplay(Game(ml.tags), Sans(ml.sans)))
 
   def moves(sans: Iterable[SanStr], tags: Tags): Either[ErrorStr, Result] =
-    movesWithSans(sans, identity, tags)
+    moves(sans, identity, tags)
 
-  def fullWithSans(pgn: PgnStr, op: Sans => Sans, tags: Tags = Tags.empty): Either[ErrorStr, Result] =
-    Parser
-      .full(pgn)
-      .map: parsed =>
-        makeReplay(makeGame(parsed.tags ++ tags), op(Sans(parsed.mainline)))
-
-  def fullWithSans(parsed: ParsedPgn, op: Sans => Sans): Result =
-    makeReplay(makeGame(parsed.tags), op(Sans(parsed.mainline)))
-
-  def movesWithSans(sans: Iterable[SanStr], op: Sans => Sans, tags: Tags): Either[ErrorStr, Result] =
+  def moves(sans: Iterable[SanStr], game: Game): Either[ErrorStr, Result] =
     Parser
       .moves(sans)
-      .map(moves => makeReplay(makeGame(tags), op(moves)))
+      .map(moves => makeReplay(game, moves))
 
-  private def makeReplay(game: Game, sans: Sans): Result =
-    sans.value
-      .foldM(Replay(game)): (replay, san) =>
-        san(replay.state.situation)
-          .bimap((replay, _), replay.addMove(_))
-      .match
-        case Left(replay, err) => Result.Incomplete(replay, err)
-        case Right(replay)     => Result.Complete(replay)
+  def full(parsed: ParsedPgn, op: Sans => Sans): Result =
+    makeReplay(Game(parsed.tags), op(Sans(parsed.mainline)))
 
-  private def makeGame(tags: Tags) =
-    val g = Game(variantOption = tags.variant, fen = tags.fen)
-    g.copy(startedAtPly = g.ply, clock = tags.clockConfig.map(Clock.apply))
+  def moves(sans: Iterable[SanStr], op: Sans => Sans, tags: Tags): Either[ErrorStr, Result] =
+    Parser
+      .moves(sans)
+      .map(moves => makeReplay(Game(tags), op(moves)))
+
+  def makeReplay(game: Game, sans: Sans): Result =
+    val (state, moves, error) = game.playWhileValidReverse(sans.value)
+    Result(Replay(game, moves, state), error)

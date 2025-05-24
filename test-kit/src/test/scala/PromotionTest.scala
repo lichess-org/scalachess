@@ -1,6 +1,5 @@
 package chess
 
-import chess.Square.*
 import chess.format.FullFen
 import chess.variant.Standard
 

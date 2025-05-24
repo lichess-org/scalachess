@@ -10,7 +10,7 @@ import NodeArbitraries.{ *, given }
 
 class NodeTest extends ScalaCheckSuite:
 
-  import Foo.{ *, given }
+  import Foo.given
 
   given HasId[Int, Int] with
     extension (a: Int) def id: Int = a
@@ -198,6 +198,14 @@ class NodeTest extends ScalaCheckSuite:
       val n      = Random.nextInt(node.mainline.size)
       val output = node.modifyInMainlineAt(n, _.updateValue(f))
       output.get.size == node.size && output.get.mainline.size == node.mainline.size
+
+  test("modifyInMainline with identity is identity"):
+    forAll: (node: Node[Int]) =>
+      node.modifyInMainline(identity) == node
+
+  test("modifyInMainline f . mainlineValues == mainlineValues . f"):
+    forAll: (node: Node[Int], f: Int => Int) =>
+      node.modifyInMainline(f).mainlineValues == node.mainlineValues.map(f)
 
   test("take n doesn't impact by modifyInMainlineAt n"):
     forAll: (node: Node[Int], s: Short, newNode: Node[Int]) =>

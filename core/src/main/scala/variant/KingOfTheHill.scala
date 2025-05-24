@@ -12,17 +12,21 @@ case object KingOfTheHill
       standardInitialPosition = true
     ):
 
-  def pieces = Standard.pieces
+  override val pieces: Map[Square, Piece] = Standard.pieces
 
-  def validMoves(situation: Situation): List[Move] =
-    Standard.validMoves(situation)
+  override def validMoves(position: Position): List[Move] =
+    Standard.validMoves(position)
 
-  override def valid(situation: Situation, strict: Boolean): Boolean = Standard.valid(situation, strict)
+  override def validMovesAt(position: Position, square: Square): List[Move] =
+    super.validMovesAt(position, square).filter(kingSafety)
 
-  override def specialEnd(situation: Situation) =
-    situation.kingOf(!situation.color).intersects(bitboard.Bitboard.center)
+  override def valid(position: Position, strict: Boolean): Boolean =
+    Standard.valid(position, strict)
+
+  override def specialEnd(position: Position): Boolean =
+    position.kingOf(!position.color).intersects(Bitboard.center)
 
   /** You only need a king to be able to win in this variant
     */
-  override def opponentHasInsufficientMaterial(situation: Situation) = false
-  override def isInsufficientMaterial(board: Board)                  = false
+  override def opponentHasInsufficientMaterial(position: Position): Boolean = false
+  override def isInsufficientMaterial(position: Position): Boolean          = false

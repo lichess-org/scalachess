@@ -1,7 +1,6 @@
 package chess
 package json
 
-import chess.bitboard.Bitboard
 import chess.format.pgn.{ Glyph, Glyphs }
 import chess.format.{ Uci, UciCharPair }
 import chess.opening.Opening

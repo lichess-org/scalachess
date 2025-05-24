@@ -1,6 +1,5 @@
 package chess
 
-import chess.bitboard.Bitboard
 import chess.format.pgn.{ Glyph, Glyphs }
 import chess.format.{ Uci, UciCharPair }
 import chess.variant.{ Crazyhouse, Variant }

@@ -4,8 +4,7 @@ import org.openjdk.jmh.annotations.*
 import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
-import chess.perft.{ Perft, Result }
-import chess.format.Fen
+import chess.perft.Perft
 import chess.variant.*
 
 @State(Scope.Thread)

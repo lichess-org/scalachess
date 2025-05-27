@@ -54,11 +54,9 @@ class ReplayTest extends ChessTest:
           .split(' ')
           .toVector
       )
-    val (_, steps, error) = chess.Replay.gameMoveWhileValid(
-      sans,
-      Fen.Full("nrknbbqr/pppppppp/8/8/8/8/PPPPPPPP/NRKNBBQR w KQkq - 0 1"),
-      Chess960
-    )
+    val fen                  = Fen.Full("nrknbbqr/pppppppp/8/8/8/8/PPPPPPPP/NRKNBBQR w KQkq - 0 1")
+    val (init, steps, error) = chess.Replay.gameMoveWhileValid(sans, fen, Chess960)
+    assertEquals(init, Game(Chess960, fen.some))
     assertEquals(error, None)
     assertEquals(steps.size, sans.size)
 

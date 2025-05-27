@@ -31,7 +31,8 @@ object Replay:
   ): (Game, List[(Game, Uci.WithSan)], Option[ErrorStr]) =
     inline def transform(success: (next: Game, move: MoveOrDrop)) =
       (success.next, Uci.WithSan(success.move.toUci, success.move.toSanStr))
-    Game(variant.some, initialFen.some).playWhileValidReverse(sans, Ply.initial)(transform)
+    val init = Game(variant, initialFen.some)
+    init.playWhileValidReverse(sans, Ply.initial)(transform).copy(_1 = init)
 
   def gameMoveWhileValid(
       sans: Seq[SanStr],

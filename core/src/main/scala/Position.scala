@@ -377,7 +377,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
 object Position:
 
-  val standard: Position = Position.init(variant.Standard, White)
+  def standard: Position = variant.Standard.position
 
   case class AndFullMoveNumber(position: Position, fullMoveNumber: FullMoveNumber):
     def ply: Ply     = fullMoveNumber.ply(position.color)
@@ -392,7 +392,7 @@ object Position:
       fen
         .flatMap(Fen.readWithMoveNumber(variant, _))
         .getOrElse:
-          AndFullMoveNumber(Position.init(variant, White), FullMoveNumber.initial)
+          AndFullMoveNumber(variant.position, FullMoveNumber.initial)
 
     given CanPlay[AndFullMoveNumber] with
       extension (position: AndFullMoveNumber)
@@ -411,7 +411,7 @@ object Position:
   ) =
     new Position(Board.fromMap(pieces), history.copy(crazyData = crazyData), variant, color.getOrElse(White))
 
-  def apply(board: Board, variant: Variant, color: Option[Color]): Position =
+  def apply(board: Board, variant: Variant, color: Color): Position =
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Position(
       board,
@@ -421,7 +421,7 @@ object Position:
         crazyData = variant.crazyhouse.option(Crazyhouse.Data.init)
       ),
       variant,
-      color.getOrElse(White)
+      color
     )
 
   def apply(pieces: Iterable[(Square, Piece)], variant: Variant, color: Option[Color]): Position =
@@ -446,9 +446,6 @@ object Position:
       color.getOrElse(White)
     )
 
-  def apply(variant: chess.variant.Variant): Position =
-    Position.init(variant, White)
-
   def apply(tags: Tags): Position =
     apply(tags.variant, tags.fen)
 
@@ -457,10 +454,7 @@ object Position:
     apply(variant, fen)
 
   def apply(variant: Variant, fen: Option[Fen.Full]): Position =
-    fen.flatMap(Fen.read(variant, _)).getOrElse(init(variant, White))
-
-  def init(variant: Variant, color: Color): Position =
-    Position(Board.fromMap(variant.pieces), variant, color.some)
+    fen.flatMap(Fen.read(variant, _)).getOrElse(variant.position)
 
   given CanPlay[Position]:
     extension (position: Position)

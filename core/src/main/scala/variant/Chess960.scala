@@ -24,6 +24,8 @@ case object Chess960
 
   override def pieces = pieces(scala.util.Random.nextInt(960))
 
+  override def board = Board.fromMap(pieces)
+
   def pieces(position: Int) =
     Variant.symmetricRank:
       positions(position).flatMap(Role.allByForsyth.get)

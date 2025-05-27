@@ -15,6 +15,7 @@ case object Antichess
     ):
 
   override val pieces: Map[Square, Piece] = Standard.pieces
+  override val board: Board               = Board.fromMap(pieces)
 
   // In antichess, it is not permitted to castle
   override val castles: Castles    = Castles.none

@@ -35,6 +35,7 @@ case object RacingKings
     Square.H1 -> White.queen,
     Square.H2 -> White.king
   )
+  override val board: Board = Board.fromMap(pieces)
 
   override val castles: Castles        = Castles.none
   override val allowsCastling: Boolean = false

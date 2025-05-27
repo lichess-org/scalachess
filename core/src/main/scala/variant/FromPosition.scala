@@ -13,6 +13,7 @@ case object FromPosition
     ):
 
   override val pieces: Map[Square, Piece] = Standard.pieces
+  override val board: Board               = Board.fromMap(pieces)
 
   override def validMoves(position: Position): List[Move] =
     Standard.validMoves(position)

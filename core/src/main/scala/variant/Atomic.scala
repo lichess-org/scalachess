@@ -13,6 +13,7 @@ case object Atomic
     ):
 
   override val pieces: Map[Square, Piece] = Standard.pieces
+  override val board: Board               = Board.fromMap(pieces)
 
   override def validMoves(position: Position): List[Move] =
     import position.{ genNonKing, genEnPassant, us }

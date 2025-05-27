@@ -95,7 +95,7 @@ case class Game(
 object Game:
 
   def apply(variant: chess.variant.Variant): Game =
-    Game(Position.init(variant, White))
+    Game(variant.position)
 
   def apply(variant: Option[chess.variant.Variant], fen: Option[Fen.Full]): Game =
     apply(variant | chess.variant.Standard, fen)

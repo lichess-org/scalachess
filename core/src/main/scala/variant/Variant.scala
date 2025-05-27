@@ -19,6 +19,8 @@ abstract class Variant private[variant] (
 ):
 
   def pieces: Map[Square, Piece]
+  def board: Board
+  def position: Position = Position(board, this, White)
 
   inline def standard: Boolean      = this == Standard
   inline def chess960: Boolean      = this == Chess960

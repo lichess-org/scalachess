@@ -123,13 +123,6 @@ trait CanPlay[A]:
           moves => playWhileValidReverse(moves, initialPly)(transform)
         )
 
-    @targetName("playWhileValidFromSans")
-    def playWhileValid[F[_]: Traverse](sans: F[SanStr], initialPly: Ply)[B](
-        transform: Step => B
-    ): (A, List[B], Option[ErrorStr]) =
-      val (state, moves, error) = playWhileValidReverse(sans, initialPly)(transform)
-      (state, moves.reverse, error)
-
 object CanPlay:
 
   inline def makeError(currentPly: Ply, move: Moveable): ErrorStr =

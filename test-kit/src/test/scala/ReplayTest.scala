@@ -2,7 +2,7 @@ package chess
 
 import cats.syntax.option.*
 import chess.format.pgn.{ Fixtures, SanStr }
-import chess.variant.{ Chess960, Standard }
+import chess.variant.{ Chess960, Standard, RacingKings }
 
 import format.{ FullFen, Fen, Uci }
 import macros.uci
@@ -42,8 +42,7 @@ class ReplayTest extends ChessTest:
 
   test("racing kings"):
     assert:
-      Position
-        .init(chess.variant.RacingKings, White)
+      RacingKings.position
         .playPositions(SanStr.from("Be3 Ne4 Rg3 Nxe3 Rxe3".split(" ")).toList)
         .isRight
 

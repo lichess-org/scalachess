@@ -2,7 +2,7 @@ package chess
 
 import cats.syntax.option.*
 import chess.format.pgn.{ Fixtures, SanStr }
-import chess.variant.{ Chess960, Standard, RacingKings }
+import chess.variant.{Chess960, RacingKings, Standard}
 
 import format.{ FullFen, Fen, Uci }
 import macros.uci

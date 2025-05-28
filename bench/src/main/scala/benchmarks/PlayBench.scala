@@ -36,7 +36,7 @@ class PlayBench:
     var games = Fixtures.prod500standard
     gameMoves = games.take(nb).map(g => SanStr.from(g.split(' ').toList))
 
-    standard = Game(chess.variant.Standard.position)
+    standard = Game(chess.variant.Standard.initialPosition)
 
   @Benchmark
   def divider(bh: Blackhole) =

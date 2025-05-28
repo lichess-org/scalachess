@@ -42,7 +42,7 @@ class ReplayTest extends ChessTest:
 
   test("racing kings"):
     assert:
-      RacingKings.position
+      RacingKings.initialPosition
         .playPositions(SanStr.from("Be3 Ne4 Rg3 Nxe3 Rxe3".split(" ")).toList)
         .isRight
 

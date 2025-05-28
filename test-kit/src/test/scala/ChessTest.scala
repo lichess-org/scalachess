@@ -90,11 +90,12 @@ trait ChessTestCommon:
   def makeBoard(str: String, variant: Variant) =
     (Visual << str).withVariant(variant)
 
-  def makeBoard: Position = Standard.position
+  def makeBoard: Position = Standard.initialPosition
 
-  def makeChess960Board(position: Int) = Position(Board.fromMap(Chess960.pieces(position)), Chess960, White)
-  def makeChess960Game(position: Int)  = Game(makeChess960Board(position))
-  def chess960Boards                   = (0 to 959).map(makeChess960Board).toList
+  def makeChess960Board(position: Int) =
+    Position(Board.fromMap(Chess960.initialPieces(position)), Chess960, White)
+  def makeChess960Game(position: Int) = Game(makeChess960Board(position))
+  def chess960Boards                  = (0 to 959).map(makeChess960Board).toList
 
   def makeEmptyBoard: Position = Position(Board.empty, Standard, White)
 

@@ -377,7 +377,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
 object Position:
 
-  def standard: Position = variant.Standard.position
+  def standard: Position = variant.Standard.initialPosition
 
   case class AndFullMoveNumber(position: Position, fullMoveNumber: FullMoveNumber):
     def ply: Ply     = fullMoveNumber.ply(position.color)
@@ -392,7 +392,7 @@ object Position:
       fen
         .flatMap(Fen.readWithMoveNumber(variant, _))
         .getOrElse:
-          AndFullMoveNumber(variant.position, FullMoveNumber.initial)
+          AndFullMoveNumber(variant.initialPosition, FullMoveNumber.initial)
 
     given CanPlay[AndFullMoveNumber] with
       extension (position: AndFullMoveNumber)
@@ -454,7 +454,7 @@ object Position:
     apply(variant, fen)
 
   def apply(variant: Variant, fen: Option[Fen.Full]): Position =
-    fen.flatMap(Fen.read(variant, _)).getOrElse(variant.position)
+    fen.flatMap(Fen.read(variant, _)).getOrElse(variant.initialPosition)
 
   given CanPlay[Position]:
     extension (position: Position)

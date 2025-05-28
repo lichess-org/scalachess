@@ -18,9 +18,9 @@ abstract class Variant private[variant] (
     val standardInitialPosition: Boolean
 ):
 
-  def pieces: Map[Square, Piece]
-  def board: Board
-  def position: Position = Position(board, this, White)
+  def initialPieces: Map[Square, Piece]
+  def initialBoard: Board
+  def initialPosition: Position = Position(initialBoard, this, White)
 
   inline def standard: Boolean      = this == Standard
   inline def chess960: Boolean      = this == Chess960

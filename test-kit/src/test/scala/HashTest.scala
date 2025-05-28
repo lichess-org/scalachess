@@ -60,7 +60,7 @@ class HashTest extends ChessTest:
 
   test("Hasher: account for checks in three-check"):
     // 2 ... Bb4+
-    val gameA = Game(ThreeCheck.position)
+    val gameA = Game(ThreeCheck.initialPosition)
       .playMoves(
         E2 -> E4,
         E7 -> E6,

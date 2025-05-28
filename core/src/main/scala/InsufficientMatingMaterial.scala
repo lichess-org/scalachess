@@ -22,7 +22,7 @@ object InsufficientMatingMaterial:
       .exists(p =>
         p.is(Pawn) &&
           position.withColor(p.color).generateMovesAt(pawn).isEmpty && {
-            val blockingPosition = posAheadOfPawn(pawn, p.color)
+            val blockingPosition = pawn.nextRank(p.color)
             blockingPosition.flatMap(position.pieceAt).exists(_.is(Pawn))
           }
       )
@@ -51,8 +51,3 @@ object InsufficientMatingMaterial:
       !(bishopsOnOppositeColors(position.board) ||
         (position.byPiece(!color, Knight) | position.byPiece(!color, Pawn)).nonEmpty)
     else false
-
-  /** Determines the position one ahead of a pawn based on the color of the piece.
-    * White pawns move up and black pawns move down.
-    */
-  def posAheadOfPawn(square: Square, color: Color): Option[Square] = color.fold(square.up, square.down)

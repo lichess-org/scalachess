@@ -64,8 +64,8 @@ case object Standard
   private def isValidCheckersForEnPassant(position: Position, activeCheckers: Bitboard): Boolean =
     (for
       enPassantSquare <- position.potentialEpSquare
-      enPassantUp     <- position.color.fold(enPassantSquare.down, enPassantSquare.up)
-      enPassantDown   <- position.color.fold(enPassantSquare.up, enPassantSquare.down)
+      enPassantUp     <- enPassantSquare.prevRank(position.color)
+      enPassantDown   <- enPassantSquare.nextRank(position.color)
     yield activeCheckers.count == 1 && (
       activeCheckers.first.contains(enPassantSquare) || position.board
         .move(enPassantUp, enPassantDown)

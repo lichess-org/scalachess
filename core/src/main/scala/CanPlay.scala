@@ -98,7 +98,7 @@ trait CanPlay[A]:
     * Validate a sequence of moves. This will return an error if any of the moves are invalid.
     */
     def validate[M <: Moveable, F[_]: Foldable](moves: F[M]): Either[ErrorStr, Unit] =
-      moves.foldM(())((_, move) => a(move).void)
+      moves.foldM(a)((state, move) => state(move).map(_.next)).void
 
     /*
      * Play a sequence of moves and return the last state.

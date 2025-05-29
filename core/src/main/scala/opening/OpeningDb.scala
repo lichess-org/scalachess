@@ -33,7 +33,7 @@ object OpeningDb:
 
   // assumes standard initial Fen and variant
   def search(sans: Iterable[SanStr]): Option[Opening.AtPly] =
-    Position.standard
+    chess.variant.Standard.initialPosition
       .playPositions(sans.take(SEARCH_MAX_PLIES).takeWhile(!_.value.contains('@')).toList)
       .toOption
       .flatMap(searchInBoards)

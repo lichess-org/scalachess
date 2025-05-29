@@ -1,7 +1,9 @@
+import snapshot4s.BuildInfo.snapshot4sVersion
+
 inThisBuild(
   Seq(
     scalaVersion      := "3.7.0",
-    version           := "17.7.1",
+    version           := "17.7.2",
     organization      := "org.lichess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
     publishTo         := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", "")))),
@@ -70,20 +72,22 @@ lazy val bench = project
 
 lazy val testKit = project
   .in(file("./test-kit"))
+  .enablePlugins(Snapshot4sPlugin)
   .settings(
     commonSettings,
     name := "scalachess-test-kit",
     libraryDependencies ++= List(
-      "org.scalacheck"      %% "scalacheck"        % "1.18.1",
-      "org.typelevel"       %% "literally"         % "1.2.0",
-      "org.scalameta"       %% "munit"             % "1.1.1"  % Test,
-      "org.scalameta"       %% "munit-scalacheck"  % "1.1.0"  % Test,
-      "com.disneystreaming" %% "weaver-cats"       % "0.8.4"  % Test,
-      "com.disneystreaming" %% "weaver-scalacheck" % "0.8.4"  % Test,
-      "co.fs2"              %% "fs2-core"          % "3.12.0" % Test,
-      "co.fs2"              %% "fs2-io"            % "3.12.0" % Test,
-      "org.typelevel"       %% "discipline-munit"  % "2.0.0"  % Test,
-      "org.typelevel"       %% "cats-laws"         % "2.13.0" % Test
+      "org.scalacheck" %% "scalacheck"        % "1.18.1",
+      "org.typelevel"  %% "literally"         % "1.2.0",
+      "org.scalameta"  %% "munit"             % "1.1.1"           % Test,
+      "org.scalameta"  %% "munit-scalacheck"  % "1.1.0"           % Test,
+      "org.typelevel"  %% "weaver-cats"       % "0.9.0"           % Test,
+      "org.typelevel"  %% "weaver-scalacheck" % "0.9.0"           % Test,
+      "co.fs2"         %% "fs2-core"          % "3.12.0"          % Test,
+      "co.fs2"         %% "fs2-io"            % "3.12.0"          % Test,
+      "org.typelevel"  %% "discipline-munit"  % "2.0.0"           % Test,
+      "org.typelevel"  %% "cats-laws"         % "2.13.0"          % Test,
+      "com.siriusxm"   %% "snapshot4s-munit"  % snapshot4sVersion % Test
     )
   )
   .dependsOn(scalachess % "compile->compile", rating % "compile->compile")

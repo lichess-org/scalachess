@@ -20,6 +20,12 @@ trait CanPlay[A]:
     def apply[M <: Moveable](move: M): Either[ErrorStr, Step]
 
     /**
+     * Parse a SanStr and play the encoded move and return new state and the move or drop that was played.
+     */
+    def play(san: SanStr): Either[ErrorStr, Step] =
+      Parser.san(san).flatMap(a.apply)
+
+    /**
      * Play a sequence of moves and return the new state and a list of MoveOrDrop that were played.
      */
     def play[M <: Moveable, F[_]: Traverse](moves: F[M]): Either[ErrorStr, List[MoveOrDrop]] =
@@ -40,13 +46,13 @@ trait CanPlay[A]:
       val (moves = acc, error = error) = playWhileValidReverse(moves, initialPly)(transform)
       error.fold(acc.reverse.asRight)(_.asLeft)
 
-    def playWhileValid[M <: Moveable, F[_]: Traverse](moves: F[M]): Result[MoveOrDrop] =
-      playWhileValid(moves, Ply.initial)(_.move)
-
     def playWhileValid[F[_]: Traverse](moves: F[SanStr], initialPly: Ply)[B](
         transform: Step => B
     ): Either[ErrorStr, Result[B]] =
       Parser.moves(moves).map(playWhileValid(_, initialPly)(transform))
+
+    def playWhileValid[M <: Moveable, F[_]: Traverse](moves: F[M]): Result[MoveOrDrop] =
+      playWhileValid(moves, Ply.initial)(_.move)
 
     def playWhileValid[M <: Moveable, F[_]: Traverse](moves: F[M], initialPly: Ply)[B](
         transform: Step => B
@@ -56,6 +62,13 @@ trait CanPlay[A]:
 
     def playWhileValidReverse[M <: Moveable, F[_]: Traverse](moves: F[M]): Result[MoveOrDrop] =
       playWhileValidReverse(moves, Ply.initial)(_.move)
+
+    def playWhileValidReverse[F[_]: Traverse](sans: F[SanStr], initialPly: Ply)[B](
+        transform: Step => B
+    ): Either[ErrorStr, Result[B]] =
+      Parser
+        .moves(sans)
+        .map(moves => playWhileValidReverse(moves, initialPly)(transform))
 
     def playWhileValidReverse[M <: Moveable, F[_]: Traverse](moves: F[M], initialPly: Ply)[B](
         transform: Step => B
@@ -95,10 +108,16 @@ trait CanPlay[A]:
       Parser.moves(moves).flatMap(playBoards)
 
     /**
-    * Validate a sequence of moves. This will return an error if any of the moves are invalid.
+    * Validate a sequence of moves. This will return an error if any of the moves is invalid.
     */
     def validate[M <: Moveable, F[_]: Foldable](moves: F[M]): Either[ErrorStr, Unit] =
-      moves.foldM(())((_, move) => a(move).void)
+      moves.foldM(a)((state, move) => state(move).map(_.next)).void
+
+    /**
+     * Akin to [[validate]] but from a sequence of SanStr instead
+    */
+    def validate[F[_]: Traverse](sans: F[SanStr]): Either[ErrorStr, Unit] =
+      Parser.moves(sans).flatMap(validate)
 
     /*
      * Play a sequence of moves and return the last state.
@@ -111,17 +130,6 @@ trait CanPlay[A]:
      */
     def forward[F[_]: Traverse](moves: F[SanStr]): Either[ErrorStr, A] =
       Parser.moves(moves).flatMap(forward)
-
-    @targetName("playWhileValidReverseFromSans")
-    def playWhileValidReverse[F[_]: Traverse](sans: F[SanStr], initialPly: Ply)[B](
-        transform: Step => B
-    ): (A, List[B], Option[ErrorStr]) =
-      Parser
-        .moves(sans)
-        .fold(
-          err => (a, List.empty[B], err.some),
-          moves => playWhileValidReverse(moves, initialPly)(transform)
-        )
 
 object CanPlay:
 

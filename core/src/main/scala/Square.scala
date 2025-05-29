@@ -11,16 +11,8 @@ object Square:
   extension (s: Square)
     inline def value: Int = s
 
-    inline def down: Option[Square]      = Square.at(file.value, rank.value - 1)
-    inline def left: Option[Square]      = Square.at(file.value - 1, rank.value)
-    inline def downLeft: Option[Square]  = Square.at(file.value - 1, rank.value - 1)
-    inline def downRight: Option[Square] = Square.at(file.value + 1, rank.value - 1)
-    inline def up: Option[Square]        = Square.at(file.value, rank.value + 1)
-    inline def right: Option[Square]     = Square.at(file.value + 1, rank.value)
-    inline def upLeft: Option[Square]    = Square.at(file.value - 1, rank.value + 1)
-    inline def upRight: Option[Square]   = Square.at(file.value + 1, rank.value + 1)
-
-    inline def prevRank(color: Color): Option[Square] = color.fold(s.down, s.up)
+    inline def prevRank(color: Color): Option[Square] = Square.at(file.value, rank.value + color.fold(-1, 1))
+    inline def nextRank(color: Color): Option[Square] = Square.at(file.value, rank.value + color.fold(1, -1))
 
     @targetName("onLeftOf")
     inline def ?<(inline other: Square): Boolean = file < other.file

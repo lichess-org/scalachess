@@ -12,7 +12,7 @@ import weaver.*
 object InsufficientMaterialTest extends SimpleIOSuite:
 
   test("horde"):
-    run("test-kit/src/test/resources/horde_insufficient_material.csv", Horde).map(assert(_))
+    run("test-kit/src/test/resources/horde_insufficient_material.csv", Horde).map(expect(_))
 
   given Monoid[Boolean] with
     def empty                           = true

@@ -2123,14 +2123,14 @@ Ne5 37. Rg7 Rf8 38. h3 c4 39. Re7 Nd3 40. f7 Nxf2 41. Re8+ Kd7
 c3 47. h4 Ra6 48. Bd4 Ra4 49. Bxc3 Nxc3 50. Rxc3 Rxh4 51. Rf3
 Rh5 52. Kf2 Rg5 53. Rf8 Ke5 1/2-1/2"""
 
-  val gamesForPerfTest = PgnStr `from` List(enpassantEP, enpassantEP2, recentChessCom, chessComCrazyhouse, fromPosProdCloseChess,
+  val gamesForPerfTest = PgnStr.from(List(enpassantEP, enpassantEP2, recentChessCom, chessComCrazyhouse, fromPosProdCloseChess,
   fromChessProgrammingWiki, noTagButResult, inlineTags, whiteResignsInTags, whiteResignsInMoves, whiteResignsInTagsAndMoves,
   crazyhouseFromProd, complete960, fromWikipedia, stLouisFischerandom, inlineComments, fromChessgames,
   fromChessgamesWithEscapeChar, chessgamesWeirdComments, withDelimiters, withDelimitersOnNewLines, fromProd1, fromProd2,
   promoteRook, castleCheck1, castleCheck2, fromCrafty, withNag, fromTcec, fromLichessBadPromotion, fromTcecWithEngineOutput,
   fromPositionEmptyFen, chessbaseWeird, chessbaseArrows, commentsAndVariations, bySmartChess, android, chesskids, variations,
   caissa, handwritten, chessByPost, atomicRegression, atomicPromotion, weirdDashes, lichobile, overflow, overflow3,
-  crazyhouse1, crazyhouse2, stackOverflow, explorerPartialDate, withGlyphAnnotations)
+  crazyhouse1, crazyhouse2, stackOverflow, explorerPartialDate, withGlyphAnnotations))
 
 
   val wcc2023 = List(

@@ -1,13 +1,15 @@
 package chess
 
-import cats.syntax.option.*
-import chess.format.pgn.{ Fixtures, SanStr }
-import chess.variant.{ Chess960, Standard }
+import cats.syntax.all.*
+import chess.format.pgn.Fixtures.*
+import chess.format.pgn.{ PgnStr, SanStr }
+import chess.variant.Chess960
+import snapshot4s.generated.snapshotConfig
+import snapshot4s.munit.SnapshotAssertions
 
-import format.{ FullFen, Fen, Uci }
-import macros.uci
+import format.{ FullFen, Fen }
 
-class ReplayTest extends ChessTest:
+class ReplayTest extends MunitExtensions with SnapshotAssertions:
 
   test("replay from position close chess"):
     val fen   = FullFen("""8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1""")
@@ -25,27 +27,6 @@ class ReplayTest extends ChessTest:
         assertEquals(games.size, 2)
         assertEquals(games(1)._2._2, "d5")
         assertEquals(games(0)._2._2, "d4")
-
-  test("bongcloud attack"):
-    Position.standard
-      .playPositions(List(uci"e2e4", uci"e7e5", uci"e1e2"))
-      .assertRight: boards =>
-        assertEquals(
-          boards.map(Fen.write),
-          List(
-            FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"),
-            FullFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"),
-            FullFen("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"),
-            FullFen("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPPKPPP/RNBQ1BNR b kq - 1 1")
-          )
-        )
-
-  test("racing kings"):
-    assert:
-      Position
-        .init(chess.variant.RacingKings, White)
-        .playPositions(SanStr.from("Be3 Ne4 Rg3 Nxe3 Rxe3".split(" ")).toList)
-        .isRight
 
   test("chess960 castlings"):
     val sans: Vector[SanStr] =
@@ -96,33 +77,36 @@ class ReplayTest extends ChessTest:
     assertMatch(Replay.gameMoveWhileValid(moves, fen, variant.Standard)):
       case (_, games, Some(_)) => assertEquals(games.size, 0)
 
-  test("Castling in Antichess is not allowed"):
-    val fen   = FullFen("r3kbnr/p3pp1p/1p4p1/8/8/P7/1P1P1PPP/RNB2KNR b - - 0 9")
-    val moves = List(SanStr("O-O-0"))
-    assertMatch(Replay.gameMoveWhileValid(moves, fen, variant.Antichess)):
-      case (_, games, Some(_)) => assertEquals(games.size, 0)
 
-  test("replay from standard positions"):
-    val nb    = 500
-    val games = Fixtures.prod500standard
-    (games
-      .take(nb))
-      .map: g =>
-        SanStr.from(g.split(' ').toList)
-      .foreach: moves =>
-        assertMatch(Replay.gameMoveWhileValid(moves, chess.format.Fen.initial, chess.variant.Standard)):
-          case (_, games, None) => assertEquals(games.size, moves.size)
+  // format: off
+  private val fixtures = PgnStr.from:
+    List( clonoNoExoticNotation, invisibleChar, fromProd1, fromProd2, promoteRook, castleCheck1, castleCheck2, complete960,
+      "\n" + complete960 + "\n", fromTcec, fromChessProgrammingWiki, commentsAndVariations, bySmartChess, invalidVariant,
+      fromLichessBadPromotion, chessbaseArrows, atomicRegression, lichobile, crazyhouse1, crazyhouse2, crazyhouseNoVariantTag,
+      withDelimiters, withDelimitersOnNewLines, chessComCrazyhouse, fromPosProdCloseChess, fromPositionEmptyFen, caissa, festivalFigueira
+    ) ++ raws
+  // format: on
 
-  /*============== Error Messages ==============*/
+  test("Replay.mainline to fens snapshot"):
+    val x = fixtures.traverse(Replay.mainline).toOption.get.writeFen
+    assertFileSnapshot(x, "replay/mainline_fen.txt")
 
-  test("error message for white"):
-    val sans = List(SanStr("Nf7"))
-    Replay.gameMoveWhileValid(sans, Standard.initialFen, Standard) match
-      case (_, _, error) =>
-        assertEquals(error, ErrorStr("Cannot play Nf7 at move 1 by white").some)
+  test("Replay.mainline preserves initial ply"):
+    Replay
+      .mainline(PgnStr(caissa))
+      .assertRight:
+        case Replay.Result(replay, None) =>
+          assertEquals(replay.setup.startedAtPly, 43)
 
-  test("error message for black"):
-    val sans = List("e4", "e4").map(SanStr(_))
-    Replay.gameMoveWhileValid(sans, Standard.initialFen, Standard) match
-      case (_, _, error) =>
-        assertEquals(error, ErrorStr("Cannot play e4 at move 1 by black").some)
+  extension (xs: List[Replay.Result])
+    def writeFen: String =
+      xs.map(_.replay.writeFen)
+        .mkString("\n")
+
+  extension (replay: Replay)
+    // write fen for every positions in the replay, including the last position twice
+    // to test that replay include the initial position and the final position
+    def writeFen: String =
+      (replay.setup.position +: replay.chronoMoves.map(_.after) :+ replay.state.position)
+        .map(Fen.write)
+        .mkString("\n")

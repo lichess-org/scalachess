@@ -32,7 +32,12 @@ object Replay:
     inline def transform(success: (next: Game, move: MoveOrDrop)) =
       (success.next, Uci.WithSan(success.move.toUci, success.move.toSanStr))
     val init = Game(variant, initialFen.some)
-    init.playWhileValidReverse(sans, Ply.initial)(transform).copy(_1 = init)
+    init
+      .playWhileValidReverse(sans, Ply.initial)(transform)
+      .fold(
+        error => (init, Nil, error.some),
+        success => (init, success.moves, success.error)
+      )
 
   def gameMoveWhileValid(
       sans: Seq[SanStr],
@@ -96,8 +101,8 @@ object Replay:
       failure.fold(replay.asRight)(_.asLeft)
 
   def mainline(pgn: PgnStr): Either[ErrorStr, Result] =
-    Parser.mainline(pgn).map(ml => makeReplay(Game(ml.tags), ml.sans))
+    Parser.mainline(pgn).map(ml => makeReplay(ml.toGame, ml.sans))
 
-  def makeReplay[F[_]: Traverse](game: Game, sans: F[San]): Result =
+  private def makeReplay[F[_]: Traverse](game: Game, sans: F[San]): Result =
     val (state, moves, error) = game.playWhileValidReverse(sans)
     Result(Replay(game, moves, state), error)

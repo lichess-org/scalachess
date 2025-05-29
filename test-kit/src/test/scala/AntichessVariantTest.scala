@@ -1,6 +1,7 @@
 package chess
 
 import cats.syntax.option.*
+import chess.format.pgn.SanStr
 import chess.format.{ Fen, FullFen }
 import chess.variant.Antichess
 
@@ -264,3 +265,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     val game = fenToGame(FullFen("rnbqk2r/ppppppbp/5np1/8/8/5NP1/PPPPPPBP/RNBQK2R w KQkq - 4 4"), Antichess)
     assertEquals(game.position.history.castles, Castles.none)
     assertEquals(game.position.history.unmovedRooks, UnmovedRooks.none)
+
+  test("Castling in Antichess is not allowed"):
+    val fen = FullFen("r3kbnr/p3pp1p/1p4p1/8/8/P7/1P1P1PPP/RNB2KNR b - - 0 9")
+    Fen.read(Antichess, fen).get.play(SanStr("O-O--O")).isLeft

@@ -109,7 +109,7 @@ class NodeTest extends ScalaCheckSuite:
 
   test("modifyAt and modifyChildAt are consistent if the child exists"):
     forAll: (p: NodeWithPath[Int], f: Int => Int) =>
-      val (node, path) = p
+      val (node, path)                 = p
       def modifyChild(node: Tree[Int]) =
         node.withChild(node.child.map(c => c.withValue(f(c.value)))).some
 
@@ -329,7 +329,7 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (vs: List[Variation[Foo]], v: Variation[Foo]) =>
       val added       = vs.add(v)
       val isContained = vs.exists(_.sameId(v))
-      val expected =
+      val expected    =
         if isContained then vs.map(_.id)
         else vs.map(_.id) :+ v.id
 

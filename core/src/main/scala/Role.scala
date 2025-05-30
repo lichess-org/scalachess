@@ -2,9 +2,9 @@ package chess
 
 sealed trait Role:
   val forsyth: Char
-  lazy val forsythUpper: Char = forsyth.toUpper
-  lazy val pgn: Char          = forsythUpper
-  lazy val name               = toString.toLowerCase
+  lazy val forsythUpper: Char              = forsyth.toUpper
+  lazy val pgn: Char                       = forsythUpper
+  lazy val name                            = toString.toLowerCase
   inline def forsythBy(color: Color): Char =
     if color.white then forsythUpper else forsyth
 

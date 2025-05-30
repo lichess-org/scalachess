@@ -23,9 +23,9 @@ object Square:
     @targetName("aboveOf")
     inline def ?^(inline other: Square): Boolean = rank > other.rank
 
-    inline def onSameFile(inline other: Square): Boolean = file == other.file
-    inline def onSameRank(inline other: Square): Boolean = rank == other.rank
-    inline def onSameLine(inline other: Square): Boolean = onSameFile(other) || onSameRank(other)
+    inline def onSameFile(inline other: Square): Boolean     = file == other.file
+    inline def onSameRank(inline other: Square): Boolean     = rank == other.rank
+    inline def onSameLine(inline other: Square): Boolean     = onSameFile(other) || onSameRank(other)
     inline def onSameDiagonal(inline other: Square): Boolean =
       file.value - rank.value == other.file.value - other.rank.value || file.value + rank.value == other.file.value + other.rank.value
 

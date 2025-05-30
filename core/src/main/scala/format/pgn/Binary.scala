@@ -39,8 +39,8 @@ object Binary:
 
     def intMoves(bs: List[Int], pliesToGo: Int): List[String] =
       bs match
-        case _ if pliesToGo <= 0 => Nil
-        case Nil                 => Nil
+        case _ if pliesToGo <= 0                               => Nil
+        case Nil                                               => Nil
         case b1 :: rest if moveType(b1) == MoveType.SimplePawn =>
           simplePawn(b1) :: intMoves(rest, pliesToGo - 1)
         case b1 :: b2 :: rest if moveType(b1) == MoveType.SimplePiece =>
@@ -80,7 +80,7 @@ object Binary:
       s"$piece@$square$check"
 
     def fullPawn(b1: Int, b2: Int): String =
-      val square = squareString(right(b1, 6))
+      val square      = squareString(right(b1, 6))
       val fileCapture = (b2 >> 6) match
         case 1 => s"${(square(0) - 1).toChar}x"
         case 2 => s"${(square(0) + 1).toChar}x"
@@ -95,7 +95,7 @@ object Binary:
       val piece   = pieceStrs(b2 >> 5)
       val capture = if bitAt(b2, 3) then "x" else ""
       val check   = checkStrs(cut(b2, 5, 3))
-      val disamb = (b3 >> 6) match
+      val disamb  = (b3 >> 6) match
         case 0 => fileChar(right(b3, 3)).toString
         case 1 => rankChar(right(b3, 3)).toString
         case _ => squareString(right(b3, 6))
@@ -109,7 +109,7 @@ object Binary:
     private def right(i: Int, x: Int): Int           = i & lengthMasks(x)
     private def cut(i: Int, from: Int, to: Int): Int = right(i, from) >> to
     private def bitAt(i: Int, p: Int): Boolean       = cut(i, p, p - 1) != 0
-    private val lengthMasks =
+    private val lengthMasks                          =
       Map(1 -> 0x01, 2 -> 0x03, 3 -> 0x07, 4 -> 0x0f, 5 -> 0x1f, 6 -> 0x3f, 7 -> 0x7f, 8 -> 0xff)
     private def !!(msg: String) = throw Exception("Binary reader failed: " + msg)
 
@@ -119,8 +119,8 @@ object Binary:
 
     def move(str: SanStr): List[Byte] =
       (str.value match
-        case square if square.length == 2 => simplePawn(square)
-        case CastlingR(str, check)        => castling(str, check)
+        case square if square.length == 2                => simplePawn(square)
+        case CastlingR(str, check)                       => castling(str, check)
         case SimplePieceR(piece, capture, square, check) =>
           simplePiece(piece, square, capture, check)
         case FullPawnR(file, square, promotion, check) =>

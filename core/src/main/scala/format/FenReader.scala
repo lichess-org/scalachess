@@ -20,7 +20,7 @@ trait FenReader:
     makeBoard(variant, fBoard).map { (board, crazyData) =>
       // We trust Fen's color to be correct, if there is no color we use the color of the king in check
       // If there is no king in check we use white
-      val color = fColor.orElse(variant.checkColor(board)) | Color.White
+      val color    = fColor.orElse(variant.checkColor(board)) | Color.White
       val position = new Position(
         board,
         History(
@@ -185,7 +185,7 @@ trait FenReader:
       if rank < 0 then error = Some("too many ranks")
       else
         iter.next match
-          case '/' => // ignored, optional. Rank switch is automatic
+          case '/'                          => // ignored, optional. Rank switch is automatic
           case ch if numberSet.contains(ch) =>
             file += (ch - '0')
             if file > 8 then error = Some(s"file = $file")

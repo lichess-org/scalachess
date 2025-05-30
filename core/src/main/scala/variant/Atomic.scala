@@ -30,7 +30,7 @@ case object Atomic
     position.kingsOnlyOf(!position.color)
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
-  override def specialEnd(position: Position): Boolean = position.kings.count < 2
+  override def specialEnd(position: Position): Boolean                      = position.kings.count < 2
   override def validMovesAt(position: Position, square: Square): List[Move] =
     super.validMovesAt(position, square).view.map(explodeSurroundingPieces).filter(kingSafety).toList
 
@@ -123,7 +123,7 @@ case object Atomic
       InsufficientMatingMaterial.pawnBlockedByPawn(square, position)
         || piece.is(King) || piece.is(Bishop)
     )
-    val randomBishop = position.pieces.find { case (_, piece) => piece.is(Bishop) }
+    val randomBishop              = position.pieces.find { case (_, piece) => piece.is(Bishop) }
     val bishopsAbsentOrPawnitized = randomBishop match
       case Some((square, piece)) => bishopPawnitized(position.board, piece.color, square.isLight)
       case None                  => true

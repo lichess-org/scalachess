@@ -143,7 +143,7 @@ class BoardTest extends ChessTest:
   test("putOrReplace for every occupied square returns the same board"):
     for
       str <- FenFixtures.fens
-      board = parseFen(str)
+      board  = parseFen(str)
       result = board.occupied.fold(board) { (b, s) =>
         val piece = b.pieceAt(s).get
         b.putOrReplace(piece, s)
@@ -238,7 +238,7 @@ class BoardTest extends ChessTest:
       from <- Square.all
       to   <- Square.all
       if from != to
-      moved = board.move(from, to)
+      moved      = board.move(from, to)
       takeAndPut = for
         piece     <- board.pieceAt(from)
         afterTake <- board.take(from)
@@ -253,7 +253,7 @@ class BoardTest extends ChessTest:
       from <- Square.all
       to   <- Square.all
       if from != to
-      taking = board.taking(from, to)
+      taking         = board.taking(from, to)
       takeAndReplace = for
         piece     <- board.pieceAt(from)
         afterTake <- board.take(from)
@@ -269,7 +269,7 @@ class BoardTest extends ChessTest:
       to    <- Square.all
       taken <- Square.all
       if taken != from && from != to && taken != to
-      taking <- board.taking(from, to, Some(taken))
+      taking            <- board.taking(from, to, Some(taken))
       takeAndPutAndTake <- for
         piece     <- board.pieceAt(from)
         afterTake <- board.take(from)
@@ -285,8 +285,8 @@ class BoardTest extends ChessTest:
       from <- Square.all
       to   <- Square.all
       if from != to && !board.isOccupied(to)
-      piece    = White.knight
-      promoted = board.promote(from, to, piece)
+      piece          = White.knight
+      promoted       = board.promote(from, to, piece)
       moveAndReplace = for
         moved    <- board.move(from, to)
         newBoard <- moved.replace(piece, to)
@@ -300,8 +300,8 @@ class BoardTest extends ChessTest:
       from <- Square.all
       to   <- Square.all
       if from != to && board.isOccupied(to)
-      piece    = White.knight
-      promoted = board.promote(from, to, piece)
+      piece            = White.knight
+      promoted         = board.promote(from, to, piece)
       takingAndReplace = for
         moved    <- board.taking(from, to)
         newBoard <- moved.replace(piece, to)

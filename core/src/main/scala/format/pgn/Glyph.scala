@@ -21,7 +21,7 @@ case class Glyphs(
     glyph match
       case g: Glyph.MoveAssessment     => copy(move = (!move.contains(g)).option(g))
       case g: Glyph.PositionAssessment => copy(position = (!position.contains(g)).option(g))
-      case g: Glyph.Observation =>
+      case g: Glyph.Observation        =>
         copy(observations =
           if observations.contains(g) then observations.filter(g !=)
           else g :: observations

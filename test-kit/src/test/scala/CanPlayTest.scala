@@ -12,8 +12,8 @@ import format.Uci
 class CanPlayTest extends MunitExtensions with SnapshotAssertions:
 
   test("playPositions from standard prod games"):
-    val nb    = 10
-    val games = Fixtures.prod500standard
+    val nb     = 10
+    val games  = Fixtures.prod500standard
     val result = games
       .take(nb)
       .map(g => SanStr.from(g.split(' ').toList))
@@ -27,7 +27,7 @@ class CanPlayTest extends MunitExtensions with SnapshotAssertions:
     assertFileSnapshot(result.writeFen, "canplay/playPositions_racing_kings.txt")
 
   test("validate from prod games"):
-    val games = Fixtures.prod500standard
+    val games  = Fixtures.prod500standard
     val result = games
       .map(g => SanStr.from(g.split(' ').toList))
       .traverse_(moves => Position.standard.validate(moves))
@@ -40,8 +40,8 @@ class CanPlayTest extends MunitExtensions with SnapshotAssertions:
     assert(result.isLeft)
 
   test("forwad from prod games"):
-    val nb    = 10
-    val games = Fixtures.prod500standard
+    val nb     = 10
+    val games  = Fixtures.prod500standard
     val result = games
       .take(nb)
       .map(g => SanStr.from(g.split(' ').toList))

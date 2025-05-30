@@ -71,7 +71,7 @@ case object Horde
     */
   private def hordeClosedPosition(position: Position): Boolean =
     val hordeSquare = position.byColor(White)
-    val mateInOne = hordeSquare.count == 1 &&
+    val mateInOne   = hordeSquare.count == 1 &&
       hordeSquare.singleSquare.exists(pieceThreatened(position.board, Color.black, _))
     !mateInOne && {
       if position.isWhiteTurn then position.legalMoves.isEmpty

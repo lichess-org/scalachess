@@ -10,7 +10,7 @@ object PositionHash:
     def value: Array[Byte]                                = p
     inline def isEmpty: Boolean                           = p.length == 0
     inline def combine(other: PositionHash): PositionHash = p ++ other
-    def isRepetition(times: Int) =
+    def isRepetition(times: Int)                          =
       if times <= 1 then true
       else if p.length <= (times - 1) * 4 * Hash.size then false
       else

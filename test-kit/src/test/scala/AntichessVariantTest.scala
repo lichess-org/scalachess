@@ -200,7 +200,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     assertNot(game.position.end)
 
   test("Be drawn on a three move repetition"):
-    val game = Game(Antichess)
+    val game  = Game(Antichess)
     val moves =
       List((Square.G1, Square.F3), (Square.G8, Square.F6), (Square.F3, Square.G1), (Square.F6, Square.G8))
     val repeatedMoves: List[(Square, Square)] = List.fill(3)(moves).flatten

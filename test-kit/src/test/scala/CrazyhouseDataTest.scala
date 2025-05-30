@@ -47,7 +47,7 @@ class CrazyhouseDataTest extends ScalaCheckSuite:
   property("store and drop multiple pieces with promotion"):
     forAll: (ps: List[Piece], square: Square, promoted: Bitboard) =>
       val filtered = ps.filter(_.role != King)
-      val data = filtered.foldLeft(Data.init.copy(promoted = promoted)) { (data, piece) =>
+      val data     = filtered.foldLeft(Data.init.copy(promoted = promoted)) { (data, piece) =>
         data.store(piece, square)
       }
       assertEquals(data.size, filtered.size)

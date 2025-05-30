@@ -82,10 +82,10 @@ object Replay:
       @scala.annotation.tailrec
       def recursivePlyAtFen(position: Position, sans: List[San], ply: Ply): Either[ErrorStr, Ply] =
         sans match
-          case Nil => ErrorStr(s"Can't find $atFenTruncated, reached ply $ply").asLeft
+          case Nil         => ErrorStr(s"Can't find $atFenTruncated, reached ply $ply").asLeft
           case san :: rest =>
             san(position) match
-              case Left(err) => err.asLeft
+              case Left(err)         => err.asLeft
               case Right(moveOrDrop) =>
                 val after = moveOrDrop.after
                 val fen   = Fen.write(after.withColor(ply.turn), ply.fullMoveNumber)

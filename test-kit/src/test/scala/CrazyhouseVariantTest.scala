@@ -10,7 +10,7 @@ class CrazyhouseVariantTest extends ChessTest:
 
   test("nothing to drop"):
     val fenPosition = FullFen("3Nkb1r/1pQP1ppp/4p3/3N4/N5N1/6B1/PPPPBPPP/R1B2RK1 b - - 0 25")
-    val game = fenToGame(fenPosition, Crazyhouse).updatePosition: b =>
+    val game        = fenToGame(fenPosition, Crazyhouse).updatePosition: b =>
       b.withCrazyData(Crazyhouse.Data.init)
     assert(game.position.checkMate)
     assertNot(game.position.opponentHasInsufficientMaterial)
@@ -22,7 +22,7 @@ class CrazyhouseVariantTest extends ChessTest:
 
   test("pieces to drop, in vain"):
     val fenPosition = FullFen("3Nkb1r/1pQP1ppp/4p3/3N4/N5N1/6B1/PPPPBPPP/R1B2RK1 b - - 0 25")
-    val game = fenToGame(fenPosition, Crazyhouse).updatePosition: b =>
+    val game        = fenToGame(fenPosition, Crazyhouse).updatePosition: b =>
       b.withCrazyData(
         Crazyhouse.Data(
           pockets = ByColor(

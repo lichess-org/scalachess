@@ -97,7 +97,7 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
 
     val halfMoveClock = HalfMoveClock(readLeb128(reader))
     val ply           = Ply(readLeb128(reader))
-    val variant = reader.next match
+    val variant       = reader.next match
       case 0 => Standard
       case 1 => Crazyhouse
       case 2 => Chess960
@@ -165,7 +165,7 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
       ply.fullMoveNumber
     )
 
-  override def hashCode: Int = value.toSeq.hashCode
+  override def hashCode: Int              = value.toSeq.hashCode
   override def equals(that: Any): Boolean = that match
     case thatFen: BinaryFen => value.toSeq.equals(thatFen.value.toSeq)
     case _                  => false

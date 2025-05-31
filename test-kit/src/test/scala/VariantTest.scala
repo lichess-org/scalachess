@@ -7,8 +7,6 @@ import chess.variant.*
 
 class VariantTest extends ChessTest:
 
-  val board = makeBoard
-
   List(Standard, Chess960, ThreeCheck, KingOfTheHill, Crazyhouse).foreach: variant =>
     test(s"$variant two-step pawn advance with no check should be valid"):
       val position = FullFen("2r3k1/p2Q1pp1/1p5p/3p4/P7/KP6/2r5/8 b - - 1 36")

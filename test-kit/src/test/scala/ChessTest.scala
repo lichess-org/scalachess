@@ -90,8 +90,6 @@ trait ChessTestCommon:
   def makeBoard(str: String, variant: Variant) =
     (Visual << str).withVariant(variant)
 
-  def makeBoard: Position = Standard.initialPosition
-
   def makeChess960Board(position: Int) =
     Position(Board.fromMap(Chess960.initialPieces(position)), Chess960, White)
   def makeChess960Game(position: Int) = Game(makeChess960Board(position))
@@ -99,7 +97,7 @@ trait ChessTestCommon:
 
   def makeEmptyBoard: Position = Position(Board.empty, Standard, White)
 
-  def makeGame: Game = Game(makeBoard)
+  def makeGame: Game = Game(Standard.initialPosition)
 
   def sortPoss(poss: Seq[Square]): Seq[Square] = poss.sortBy(_.key)
 

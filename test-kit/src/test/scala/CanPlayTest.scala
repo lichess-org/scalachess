@@ -21,8 +21,7 @@ class CanPlayTest extends MunitExtensions with SnapshotAssertions:
     assertFileSnapshot(result.writeFen, "canplay/playPositions_standard.txt")
 
   test("playPositions racing kings"):
-    val result = Position
-      .init(chess.variant.RacingKings, White)
+    val result = chess.variant.RacingKings.initialPosition
       .playPositions(SanStr.from("Be3 Ne4 Rg3 Nxe3 Rxe3".split(" ")).toList)
     assertFileSnapshot(result.writeFen, "canplay/playPositions_racing_kings.txt")
 

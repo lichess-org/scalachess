@@ -53,7 +53,7 @@ trait FenWriter:
       empty = 0
       for x <- File.all do
         position.pieceAt(x, y) match
-          case None => empty = empty + 1
+          case None        => empty = empty + 1
           case Some(piece) =>
             if empty == 0 then fen.append(piece.forsyth.toString)
             else

@@ -87,7 +87,7 @@ case class Move(
       lazy val positionHashesOfBoardBefore =
         if h.positionHashes.isEmpty then PositionHash(Hash(before)) else h.positionHashes
       val resetsPositionHashes = after.variant.isIrreversible(this)
-      val basePositionHashes =
+      val basePositionHashes   =
         if resetsPositionHashes then PositionHash.empty else positionHashesOfBoardBefore
       h.copy(positionHashes = PositionHash(Hash(after)).combine(basePositionHashes))
     }

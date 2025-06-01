@@ -29,8 +29,8 @@ object Parser extends DefaultParser0[List[Perft]]:
   private val comment = (P.caret.filter(_.col == 0) *> P.char('#')).endWith(R.lf)
   private val ignored = (comment | blank).void
 
-  private val id: P[String]   = "id".prefix
-  private val epd: P[FullFen] = "epd".prefix.map(FullFen.clean)
+  private val id: P[String]         = "id".prefix
+  private val epd: P[FullFen]       = "epd".prefix.map(FullFen.clean)
   private val testCase: P[TestCase] =
     ((nonNegative.map(_.toInt) <* P.char(' ')) ~ nonNegative.map(_.toLong)).map(TestCase.apply)
   private val oneTestCase: P[TestCase] = P.string("perft ") *> testCase <* R.lf.?

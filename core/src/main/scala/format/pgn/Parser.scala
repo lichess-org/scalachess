@@ -112,7 +112,7 @@ object Parser:
         (P.char('(') *> comment.rep0.surroundedBy(escape) ~ recurse.rep0 <* (P.char(')') ~ escape))
           .map((comments, sans) =>
             sans match
-              case Nil => None
+              case Nil     => None
               case x :: xs =>
                 Variation(x.value.copy(variationComments = comments.cleanUp), Tree.build(xs)).some
           )
@@ -232,7 +232,7 @@ object Parser:
       .map: (optionalTags, optionalMoves) =>
         val preTags = Tags.sanitize(optionalTags)
         optionalMoves match
-          case None => ParsedPgn(InitialComments.empty, preTags, None)
+          case None                        => ParsedPgn(InitialComments.empty, preTags, None)
           case Some((init, nodes, result)) =>
             ParsedPgn(init, updateTagsWithResult(preTags, result), Tree.build(nodes))
 
@@ -242,7 +242,7 @@ object Parser:
     (TagParser.tags.surroundedBy(escape) ~ p.?).map: (optionalTags, optionalMoves) =>
       val preTags = Tags.sanitize(optionalTags)
       optionalMoves match
-        case None => ParsedMainline(InitialComments.empty, preTags, Nil)
+        case None                       => ParsedMainline(InitialComments.empty, preTags, Nil)
         case Some((init, sans, result)) =>
           ParsedMainline(init, updateTagsWithResult(preTags, result), sans)
 
@@ -281,8 +281,8 @@ object Parser:
       case Expectation.InRange(_, lower, upper) =>
         if lower == upper then s"expected: $lower"
         else s"expected char in range: [$lower, $upper]"
-      case Expectation.StartOfString(_)       => "expected start of the file"
-      case Expectation.EndOfString(_, length) => s"expected end of file but $length characters remaining"
+      case Expectation.StartOfString(_)            => "expected start of the file"
+      case Expectation.EndOfString(_, length)      => s"expected end of file but $length characters remaining"
       case Expectation.Length(_, expected, actual) =>
         s"expected $expected more characters but only $actual remaining"
       case Expectation.ExpectedFailureAt(_, matched) =>

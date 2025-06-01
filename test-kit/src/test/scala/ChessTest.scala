@@ -21,7 +21,7 @@ trait ChessTestCommon:
     def as(color: Color): Position = (Visual << str).withColor(color)
 
   extension (board: Position)
-    def visual = Visual >> board
+    def visual                                        = Visual >> board
     def destsFrom(from: Square): Option[List[Square]] =
       board
         .pieceAt(from)

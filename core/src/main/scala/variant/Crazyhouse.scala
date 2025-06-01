@@ -175,7 +175,7 @@ case object Crazyhouse
   case class Pocket(pawn: Int, knight: Int, bishop: Int, rook: Int, queen: Int):
 
     def forsythUpper: String = forsyth.toUpperCase
-    def forsyth: String = forsyth(pawn, 'p') + forsyth(knight, 'n') +
+    def forsyth: String      = forsyth(pawn, 'p') + forsyth(knight, 'n') +
       forsyth(bishop, 'b') + forsyth(rook, 'r') + forsyth(queen, 'q')
 
     def forsyth(role: Int, char: Char): String = List.fill(role)(char).mkString

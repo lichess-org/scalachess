@@ -23,7 +23,7 @@ case object Standard
     import position.{ genNonKing, genSafeKing, genCastling, color, ourKing }
     val enPassantMoves = position.genEnPassant(position.us & position.pawns)
     ourKing.fold(Nil): king =>
-      val checkers = position.attackers(king, !position.color)
+      val checkers   = position.attackers(king, !position.color)
       val candidates =
         if checkers.isEmpty then
           val targets = ~position.us

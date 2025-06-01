@@ -15,7 +15,7 @@ import chess.variant.{ Crazyhouse, Variant }
 object Visual:
 
   def <<(source: String): Position =
-    val lines = augmentString(source).linesIterator.to(List)
+    val lines    = augmentString(source).linesIterator.to(List)
     val filtered = lines.size match
       case 8          => lines
       case n if n > 8 => lines.slice(1, 9)

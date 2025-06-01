@@ -113,7 +113,7 @@ object ByColor:
     def zero = ByColor.fill(Zero[A].zero)
 
   given [A: Monoid]: Monoid[ByColor[A]] with
-    def empty = ByColor.fill(Monoid[A].empty)
+    def empty                                 = ByColor.fill(Monoid[A].empty)
     def combine(x: ByColor[A], y: ByColor[A]) =
       ByColor(Monoid[A].combine(x.white, y.white), Monoid[A].combine(x.black, y.black))
 
@@ -130,7 +130,7 @@ object ByColor:
     def traverse[G[_]: Applicative, A, B](fa: ByColor[A])(f: A => G[B]): G[ByColor[B]] =
       fa.traverse(f)
 
-    def pure[A](a: A): ByColor[A] = ByColor.fill(a)
+    def pure[A](a: A): ByColor[A]                                 = ByColor.fill(a)
     def ap[A, B](ff: ByColor[A => B])(fa: ByColor[A]): ByColor[B] =
       ByColor(ff.white(fa.white), ff.black(fa.black))
 

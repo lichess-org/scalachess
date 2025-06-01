@@ -392,8 +392,6 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
 object Position:
 
-  // def standard: Position = variant.Standard.initialPosition
-
   case class AndFullMoveNumber(position: Position, fullMoveNumber: FullMoveNumber):
     def ply: Ply     = fullMoveNumber.ply(position.color)
     def toGame: Game = Game(position = position, ply = ply, startedAtPly = ply)

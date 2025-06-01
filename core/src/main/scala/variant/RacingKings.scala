@@ -17,7 +17,7 @@ case object RacingKings
   // Both sides start on the first two ranks:
   // krbnNBRK
   // qrbnNBRQ
-  override val pieces: Map[Square, Piece] = Map(
+  override val initialPieces: Map[Square, Piece] = Map(
     Square.A1 -> Black.queen,
     Square.A2 -> Black.king,
     Square.B1 -> Black.rook,
@@ -35,6 +35,7 @@ case object RacingKings
     Square.H1 -> White.queen,
     Square.H2 -> White.king
   )
+  override val initialBoard: Board = Board.fromMap(initialPieces)
 
   override val castles: Castles        = Castles.none
   override val allowsCastling: Boolean = false

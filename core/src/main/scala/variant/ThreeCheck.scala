@@ -14,7 +14,8 @@ case object ThreeCheck
       standardInitialPosition = true
     ):
 
-  override val pieces: Map[Square, Piece] = Standard.pieces
+  override val initialPieces: Map[Square, Piece] = Standard.initialPieces
+  override val initialBoard: Board               = Board.fromMap(initialPieces)
 
   override val initialFen: FullFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 +0+0")
 

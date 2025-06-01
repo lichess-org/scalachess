@@ -7,8 +7,6 @@ import chess.variant.*
 
 class VariantTest extends ChessTest:
 
-  val board = makeBoard
-
   List(Standard, Chess960, ThreeCheck, KingOfTheHill, Crazyhouse).foreach: variant =>
     test(s"$variant two-step pawn advance with no check should be valid"):
       val position = FullFen("2r3k1/p2Q1pp1/1p5p/3p4/P7/KP6/2r5/8 b - - 1 36")
@@ -89,7 +87,7 @@ class VariantTest extends ChessTest:
 
   test("standard position pieces correctly"):
     assertEquals(
-      Standard.pieces,
+      Standard.initialPieces,
       Map(
         A1 -> (White - Rook),
         B1 -> (White - Knight),
@@ -145,10 +143,10 @@ class VariantTest extends ChessTest:
     assert(game.position.opponentHasInsufficientMaterial)
 
   test("chess960 position pieces correctly"):
-    assertEquals(Chess960.pieces.get(A2), Some(White - Pawn))
+    assertEquals(Chess960.initialPieces.get(A2), Some(White - Pawn))
 
   test("chess960 initialize the board with castling rights"):
-    assertEquals(Position.init(Chess960, White).history.castles, Castles.init)
+    assertEquals(Chess960.initialPosition.history.castles, Castles.init)
 
   test("kingOfTheHill detect win"):
     val game = Game(
@@ -182,7 +180,7 @@ PP
     assertEquals(sit.winner, Some(Black))
 
   test("kingOfTheHill initialize the board with castling rights"):
-    assertEquals(Position.init(KingOfTheHill, White).history.castles, Castles.init)
+    assertEquals(KingOfTheHill.initialPosition.history.castles, Castles.init)
 
   test("threeCheck detect win"):
     assertNot(
@@ -203,7 +201,7 @@ K  r
     assert(game.position.end)
     assertEquals(game.position.winner, Some(Black))
   test("threeCheck 1 check"):
-    val game = Game(Position.init(ThreeCheck, White))
+    val game = Game(ThreeCheck.initialPosition)
       .playMoves(
         E2 -> E4,
         E7 -> E6,
@@ -213,7 +211,7 @@ K  r
       .get
     assertNot(game.position.end)
   test("threeCheck 2 checks"):
-    val game = Game(Position.init(ThreeCheck, White))
+    val game = Game(ThreeCheck.initialPosition)
       .playMoves(
         E2 -> E4,
         E7 -> E6,
@@ -225,7 +223,7 @@ K  r
       .get
     assertNot(game.position.end)
   test("threeCheck 3 checks"):
-    val game = Game(Position.init(ThreeCheck, White))
+    val game = Game(ThreeCheck.initialPosition)
       .playMoves(
         E2 -> E4,
         E7 -> E6,
@@ -256,7 +254,7 @@ K  r
     assertEquals(game.position.status, Status.Draw.some)
 
   test("threeCheck initialize the board with castling rights"):
-    assertEquals(Position.init(KingOfTheHill, White).history.castles, Castles.init)
+    assertEquals(KingOfTheHill.initialPosition.history.castles, Castles.init)
 
   test("racingKings call it stalemate when there is no legal move"):
     val position = FullFen("8/8/8/8/3K4/8/1k6/b7 b - - 5 3")
@@ -300,7 +298,7 @@ K  r
     assertEquals(game.position.status, Status.Draw.some)
 
   test("racingKings initialize the board without castling rights"):
-    assert(Position.init(RacingKings, White).history.castles.isEmpty)
+    assert(RacingKings.initialPosition.history.castles.isEmpty)
 
   List(
     "1bb4r/kr5p/p7/2pP4/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4",
@@ -321,7 +319,7 @@ K  r
       assert(game.variant.valid(game, false))
 
   test("antichess initialize the board without castling rights"):
-    assert(Position.init(Antichess, White).history.castles.isEmpty)
+    assert(Antichess.initialPosition.history.castles.isEmpty)
 
   test("antichess calculate material imbalance"):
     val position = FullFen("8/p7/8/8/2B5/b7/PPPK2PP/RNB3NR w - - 1 16")

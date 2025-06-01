@@ -3,6 +3,7 @@ package chess
 import cats.syntax.all.*
 import chess.format.Fen
 import chess.format.pgn.{ Fixtures, PgnStr, SanStr }
+import chess.variant.Standard
 import snapshot4s.generated.snapshotConfig
 import snapshot4s.munit.SnapshotAssertions
 
@@ -17,12 +18,11 @@ class CanPlayTest extends MunitExtensions with SnapshotAssertions:
     val result = games
       .take(nb)
       .map(g => SanStr.from(g.split(' ').toList))
-      .flatTraverse(moves => Position.standard.playPositions(moves))
+      .flatTraverse(moves => Standard.initialPosition.playPositions(moves))
     assertFileSnapshot(result.writeFen, "canplay/playPositions_standard.txt")
 
   test("playPositions racing kings"):
-    val result = Position
-      .init(chess.variant.RacingKings, White)
+    val result = chess.variant.RacingKings.initialPosition
       .playPositions(SanStr.from("Be3 Ne4 Rg3 Nxe3 Rxe3".split(" ")).toList)
     assertFileSnapshot(result.writeFen, "canplay/playPositions_racing_kings.txt")
 
@@ -30,13 +30,12 @@ class CanPlayTest extends MunitExtensions with SnapshotAssertions:
     val games  = Fixtures.prod500standard
     val result = games
       .map(g => SanStr.from(g.split(' ').toList))
-      .traverse_(moves => Position.standard.validate(moves))
+      .traverse_(moves => Standard.initialPosition.validate(moves))
     assertEquals(result, ().asRight)
 
   test("validate return left on invalid move"):
-    val position = Position.standard
-    val moves    = List(uci"e2e4", uci"e7e5", uci"g1f3", uci"b8b6")
-    val result   = position.validate(moves)
+    val moves  = List(uci"e2e4", uci"e7e5", uci"g1f3", uci"b8b6")
+    val result = Standard.initialPosition.validate(moves)
     assert(result.isLeft)
 
   test("forwad from prod games"):
@@ -45,13 +44,13 @@ class CanPlayTest extends MunitExtensions with SnapshotAssertions:
     val result = games
       .take(nb)
       .map(g => SanStr.from(g.split(' ').toList))
-      .traverse(moves => Position.standard.forward(moves))
+      .traverse(moves => Standard.initialPosition.forward(moves))
     assertFileSnapshot(result.writeFen, "canplay/forward_standard.txt")
 
   test("playWhileValid and playWhileValidReverse from prod games"):
     val sans = SanStr.from(Fixtures.fromProd2.split(' ').toList)
-    val x    = Position.standard.playWhileValid(sans, Ply.initial)(_.move.toUci).toOption.get
-    val y    = Position.standard.playWhileValidReverse(sans, Ply.initial)(_.move.toUci).toOption.get
+    val x    = Standard.initialPosition.playWhileValid(sans, Ply.initial)(_.move.toUci).toOption.get
+    val y    = Standard.initialPosition.playWhileValidReverse(sans, Ply.initial)(_.move.toUci).toOption.get
     assertEquals(x.moves, y.moves.reverse)
     assertEquals(x.error, y.error)
     assertEquals(x.state.board, y.state.board)
@@ -60,12 +59,12 @@ class CanPlayTest extends MunitExtensions with SnapshotAssertions:
 
   test("error message for white"):
     val sans  = List(SanStr("Nf7"))
-    val error = Position.standard.playPositions(sans).swap.toOption.get
+    val error = Standard.initialPosition.playPositions(sans).swap.toOption.get
     assertEquals(error, ErrorStr("Cannot play Nf7 at move 1 by white"))
 
   test("error message for black"):
     val sans  = List("e4", "e4").map(SanStr(_))
-    val error = Position.standard.playPositions(sans).swap.toOption.get
+    val error = Standard.initialPosition.playPositions(sans).swap.toOption.get
     assertEquals(error, ErrorStr("Cannot play e4 at move 1 by black"))
 
   test("more error message"):

@@ -8,6 +8,7 @@ import cats.syntax.all.*
 import chess.Square.*
 import chess.format.pgn.{ Fixtures, SanStr }
 import chess.{ Mode as _, * }
+import chess.variant.Standard
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -26,7 +27,7 @@ class PlayBench:
   var standard: Game                  = scala.compiletime.uninitialized
 
   def gameReplay(sans: String) =
-    Position.standard.playBoards(SanStr.from(sans.split(' ')).toList).toOption.get
+    Standard.initialPosition.playBoards(SanStr.from(sans.split(' ')).toList).toOption.get
 
   @Setup
   def setup() =
@@ -36,7 +37,7 @@ class PlayBench:
     var games = Fixtures.prod500standard
     gameMoves = games.take(nb).map(g => SanStr.from(g.split(' ').toList))
 
-    standard = Game(Position.init(chess.variant.Standard, White))
+    standard = Game(chess.variant.Standard.initialPosition)
 
   @Benchmark
   def divider(bh: Blackhole) =

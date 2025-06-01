@@ -1,13 +1,12 @@
 package chess
 
 import cats.syntax.all.*
-import chess.variant.Crazyhouse
 
 import scala.language.implicitConversions
 
 import format.{ FullFen, Fen, Uci, Visual }
 import format.pgn.PgnStr
-import variant.{ Chess960, Variant }
+import variant.{ Chess960, Variant, Standard, Crazyhouse }
 
 trait ChessTestCommon:
 
@@ -91,15 +90,14 @@ trait ChessTestCommon:
   def makeBoard(str: String, variant: Variant) =
     (Visual << str).withVariant(variant)
 
-  def makeBoard: Position = Position.init(chess.variant.Standard, White)
+  def makeChess960Board(position: Int) =
+    Position(Board.fromMap(Chess960.initialPieces(position)), Chess960, White)
+  def makeChess960Game(position: Int) = Game(makeChess960Board(position))
+  def chess960Boards                  = (0 to 959).map(makeChess960Board).toList
 
-  def makeChess960Board(position: Int) = Position(Board.fromMap(Chess960.pieces(position)), Chess960, None)
-  def makeChess960Game(position: Int)  = Game(makeChess960Board(position))
-  def chess960Boards                   = (0 to 959).map(makeChess960Board).toList
+  def makeEmptyBoard: Position = Position(Board.empty, Standard, White)
 
-  def makeEmptyBoard: Position = Position(Board.empty, chess.variant.Standard, White.some)
-
-  def makeGame: Game = Game(makeBoard)
+  def makeGame: Game = Game(Standard.initialPosition)
 
   def sortPoss(poss: Seq[Square]): Seq[Square] = poss.sortBy(_.key)
 

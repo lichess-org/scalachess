@@ -18,7 +18,7 @@ case object Horde
 
   /** In Horde chess white advances against black with a horde of pawns.
     */
-  override lazy val pieces: Map[Square, Piece] =
+  override lazy val initialPieces: Map[Square, Piece] =
     val whitePawnsHorde = for
       x <- File.all
       y <- Rank.all.take(4)
@@ -27,6 +27,8 @@ case object Horde
     val blackPawns  = File.all.map { Square(_, Rank.Seventh) -> Black.pawn }
     val blackPieces = File.all.map { x => Square(x, Rank.Eighth) -> (Black - backRank(x.value)) }
     (whitePawnsHorde ++ frontPawns ++ blackPawns ++ blackPieces).toMap
+
+  override val initialBoard: Board = Board.fromMap(initialPieces)
 
   override val castles: Castles = Castles.black
 

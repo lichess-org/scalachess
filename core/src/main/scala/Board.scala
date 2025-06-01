@@ -16,7 +16,7 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
     king as kings
   }
 
-  lazy val nbPieces: Int = occupied.count
+  def nbPieces: Int = occupied.count
 
   /* whether a square occupied by a piece */
   def isOccupied(s: Square): Boolean = occupied.contains(s)

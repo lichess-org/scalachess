@@ -4,6 +4,8 @@ import cats.syntax.all.*
 import chess.format.Uci
 import chess.format.pgn.SanStr
 
+import scala.annotation.threadUnsafe
+
 sealed trait MoveOrDrop:
 
   inline def fold[A](move: Move => A, drop: Drop => A): A =
@@ -42,7 +44,7 @@ case class Move(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  override lazy val after: Position = finalizeHistory
+  override def after: Position = finalizeHistory.copy()
 
   /* return whether this move captures an opponent piece */
   inline def captures: Boolean = capture.isDefined
@@ -63,7 +65,8 @@ case class Move(
 
   override def toString = s"$piece ${toUci.uci}"
 
-  private def finalizeHistory: Position =
+  @threadUnsafe
+  private lazy val finalizeHistory: Position =
     val after = this.afterWithoutHistory
       .withColor(!piece.color)
       .updateHistory { h =>
@@ -147,7 +150,7 @@ case class Drop(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  override lazy val after: Position = finalizeHistory
+  override def after: Position = finalizeHistory
 
   inline def withMetrics(m: MoveMetrics): Drop = copy(metrics = m)
 
@@ -157,7 +160,8 @@ case class Drop(
 
   override def toString = toUci.uci
 
-  private def finalizeHistory: Position =
+  @threadUnsafe
+  private lazy val finalizeHistory: Position =
     val after = this.afterWithoutHistory.withColor(!piece.color)
     after
       .updateHistory { h =>

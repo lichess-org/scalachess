@@ -4,8 +4,9 @@ import cats.syntax.all.*
 import chess.format.pgn.Tags
 import chess.format.{ Fen, Uci }
 
-import variant.{ Variant, Crazyhouse }
 import scala.annotation.threadUnsafe
+
+import variant.{ Variant, Crazyhouse }
 
 case class Position(board: Board, history: History, variant: Variant, color: Color):
 

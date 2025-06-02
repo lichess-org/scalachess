@@ -211,13 +211,13 @@ final case class Node[A](
           case None    => None
           case Some(c) => copy(child = c.some).some
       case _ =>
-        variations.foldLeft((false, List.empty[Variation[A]])) {
-          case ((true, acc), n)  => (true, acc :+ n)
-          case ((false, acc), n) =>
+        variations.mapAccumulate(false):
+          case (true, n)  => (true, n)
+          case (false, n) =>
             n.modifyChildAt(path, f) match
-              case Some(nn) => (true, acc :+ nn)
-              case None     => (false, acc :+ n)
-        } match
+              case Some(nn) => (true, nn)
+              case None     => (false, n)
+        match
           case (true, ns) => copy(variations = ns).some
           case (false, _) => none
 
@@ -230,15 +230,15 @@ final case class Node[A](
           case None    => None
           case Some(c) => copy(child = c.some).some
       case head :: _ =>
-        variations.foldLeft((false.some, List.empty[Variation[A]])):
-          case ((Some(true), acc), n)               => (true.some, n :: acc)
-          case ((Some(_), acc), n) if n.hasId(head) =>
+        variations.mapAccumulate(false.some):
+          case (Some(true), n)               => (true.some, n)
+          case (Some(_), n) if n.hasId(head) =>
             n.modifyAt(path, f) match
-              case None     => (None, n :: acc)
-              case Some(nn) => (true.some, nn :: acc)
-          case ((x, acc), n) => (x, n :: acc)
+              case None     => (None, n)
+              case Some(nn) => (true.some, nn)
+          case (x, n) => (x, n)
         match
-          case (Some(true), ns) => copy(variations = ns.reverse).some
+          case (Some(true), ns) => copy(variations = ns).some
           case _                => none
 
   // delete the node at the end of the path

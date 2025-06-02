@@ -415,15 +415,6 @@ object Position:
   given HasPosition[AndFullMoveNumber]:
     extension (position: AndFullMoveNumber) inline def position: Position = position.position
 
-  def apply(
-      pieces: PieceMap,
-      history: History,
-      variant: Variant,
-      crazyData: Option[Crazyhouse.Data],
-      color: Option[Color]
-  ) =
-    new Position(Board.fromMap(pieces), history.copy(crazyData = crazyData), variant, color.getOrElse(White))
-
   def apply(board: Board, variant: Variant, color: Color): Position =
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Position(
@@ -435,28 +426,6 @@ object Position:
       ),
       variant,
       color
-    )
-
-  def apply(pieces: Iterable[(Square, Piece)], variant: Variant, color: Option[Color]): Position =
-    Position(pieces, variant.castles, variant, color)
-
-  def apply(
-      pieces: Iterable[(Square, Piece)],
-      castles: Castles,
-      variant: Variant,
-      color: Option[Color]
-  ): Position =
-    val board        = Board.fromMap(pieces.toMap)
-    val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
-    Position(
-      board,
-      History(
-        castles = castles,
-        unmovedRooks = unmovedRooks,
-        crazyData = variant.crazyhouse.option(Crazyhouse.Data.init)
-      ),
-      variant,
-      color.getOrElse(White)
     )
 
   def apply(tags: Tags): Position =

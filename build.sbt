@@ -4,7 +4,7 @@ inThisBuild(
   Seq(
     scalaVersion      := "3.7.0",
     version           := "17.7.4",
-    organization      := "org.lichess",
+    organization      := "com.github.lichess-org.scalachess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
     publishTo         := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", "")))),
     semanticdbEnabled := true, // for scalafix

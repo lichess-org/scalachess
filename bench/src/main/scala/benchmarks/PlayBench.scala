@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit
 import cats.syntax.all.*
 import chess.Square.*
 import chess.format.pgn.{ Fixtures, SanStr }
-import chess.{ Mode as _, * }
+import chess.*
 import chess.variant.Standard
 
 @State(Scope.Thread)

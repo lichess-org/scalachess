@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 
 import chess.{ FullMoveNumber, Position }
 import chess.variant.Chess960
-import chess.{ Mode as _, * }
+import chess.*
 import chess.format.{ Fen, BinaryFen }
 import chess.perft.Perft
 

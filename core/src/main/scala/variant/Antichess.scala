@@ -100,8 +100,8 @@ case object Antichess
     InsufficientMatingMaterial.pawnBlockedByPawn(pawn, position) && cannotAttackBishop
 
   private def allOnSameColourSquares(position: Position): Boolean =
-    (position.white.squares.forall(_.isLight) && position.black.squares.forall(_.isLight)) ||
-      (position.white.squares.forall(s => !s.isLight) && position.black.squares.forall(s => !s.isLight))
+    Bitboard.lightSquares.isDisjoint(position.occupied) ||
+      Bitboard.darkSquares.isDisjoint(position.occupied)
 
   private def justOneKnightEach(position: Position): Boolean =
     position.onlyKnights && position.white.count == 1 && position.black.count == 1

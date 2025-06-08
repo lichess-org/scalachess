@@ -104,6 +104,4 @@ case object Antichess
       (position.white.squares.forall(s => !s.isLight) && position.black.squares.forall(s => !s.isLight))
 
   private def justOneKnightEach(position: Position): Boolean =
-    position.onlyKnights && position.byPiece(Color.White, Knight).count == 1 && position
-      .byPiece(Color.Black, Knight)
-      .count == 1
+    position.onlyKnights && position.white.count == 1 && position.black.count == 1

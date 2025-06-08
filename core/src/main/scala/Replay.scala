@@ -1,7 +1,7 @@
 package chess
 
+import cats.Traverse
 import cats.syntax.all.*
-import cats.{ Foldable, Traverse }
 import chess.format.pgn.Sans.*
 import chess.format.pgn.{ Parser, PgnStr, San, SanStr }
 import chess.format.{ Fen, Uci }
@@ -46,25 +46,6 @@ object Replay:
   ): (Game, List[(Game, Uci.WithSan)], Option[ErrorStr]) =
     gameMoveWhileValidReverse(sans, initialFen, variant) match
       case (game, gs, err) => (game, gs.reverse, err)
-
-  def computeReplay[F[_]: Foldable, M <: Moveable](
-      moves: F[M],
-      initialFen: Option[Fen.Full],
-      variant: Variant
-  ): Either[ErrorStr, Replay] =
-    inline def replay = Replay(Game(variant.some, initialFen))
-    moves.foldM(replay)((replay, uci) => uci(replay.state.position).map(replay.addMove(_)))
-
-  def apply(
-      sans: Iterable[SanStr],
-      initialFen: Option[Fen.Full],
-      variant: Variant
-  ): Either[ErrorStr, Result] =
-    if sans.isEmpty then ErrorStr("[replay] pgn is empty").asLeft
-    else
-      Parser
-        .moves(sans)
-        .map(moves => makeReplay(Game(variant, initialFen), moves.value))
 
   def plyAtFen(
       sans: Iterable[SanStr],

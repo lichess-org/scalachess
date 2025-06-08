@@ -154,13 +154,13 @@ abstract class Variant private[variant] (
     InsufficientMatingMaterial(position, !position.color)
 
   def playerHasInsufficientMaterial(position: Position): Boolean =
-    InsufficientMatingMaterial(position, position.color)
+    throw Exception("`playerHasInsufficientMaterial` is not implemented for this variant")
 
   def fiftyMoves(history: History): Boolean =
     history.halfMoveClock >= HalfMoveClock(100)
 
   def isIrreversible(move: Move): Boolean =
-    (move.piece.is(Pawn)) || move.captures || move.promotes || move.castles
+    move.piece.is(Pawn) || move.captures || move.promotes || move.castles
 
   protected def pawnsOnPromotionRank(board: Board, color: Color): Boolean =
     board.byPiece(color, Pawn).intersects(Bitboard.rank(color.promotablePawnRank))

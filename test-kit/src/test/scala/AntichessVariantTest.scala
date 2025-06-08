@@ -194,6 +194,18 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     val game     = fenToGame(position, Antichess).playMoves(Square.A1 -> Square.B3).get
     assertNot(game.position.opponentHasInsufficientMaterial)
 
+  test("Player has insufficient material when there are only two remaining knights on opposite color squares"):
+    val position = FullFen("1n6/8/8/8/8/4N3/8/8 w - - 0 1")
+    val game     = fenToGame(position, Antichess).playMoves(Square.E3 -> Square.D1).get
+    assert(game.position.playerHasInsufficientMaterial)
+
+  test(
+    "Player has sufficient material when there are only two remaining knights on same color squares"
+  ):
+    val position = FullFen("1n6/8/8/8/8/8/8/7N w - - 0 1")
+    val game     = fenToGame(position, Antichess).playMoves(Square.H1 -> Square.G3).get
+    assertNot(game.position.playerHasInsufficientMaterial)
+
   test("Not be drawn on insufficient mating material"):
     val position = FullFen("4K3/8/1b6/8/8/8/5B2/3k4 b - -")
     val game     = fenToGame(position, Antichess)

@@ -57,10 +57,10 @@ case object Antichess
   // player can win (depending on whose turn it is).
 
   override def opponentHasInsufficientMaterial(position: Position): Boolean =
-    JustOneKnightEach(position) && AllOnSameColourSquares(position)
+    justOneKnightEach(position) && allOnSameColourSquares(position)
 
   override def playerHasInsufficientMaterial(position: Position): Boolean =
-    JustOneKnightEach(position) && !AllOnSameColourSquares(position)
+    justOneKnightEach(position) && !allOnSameColourSquares(position)
 
   // No player can win if the only remaining pieces are opposing bishops on different coloured
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color
@@ -99,8 +99,8 @@ case object Antichess
     val cannotAttackBishop = pawn.isLight != oppositeBishopLight
     InsufficientMatingMaterial.pawnBlockedByPawn(pawn, position) && cannotAttackBishop
 
-  private def AllOnSameColourSquares(position: Position): Boolean =
+  private def allOnSameColourSquares(position: Position): Boolean =
     position.white.squares.forall(_.isLight) == position.black.squares.forall(_.isLight)
 
-  private def JustOneKnightEach(position: Position): Boolean =
+  private def justOneKnightEach(position: Position): Boolean =
     position.onlyKnights && position.white.squares.size == 1 && position.black.squares.size == 1

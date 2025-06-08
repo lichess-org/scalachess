@@ -1,6 +1,7 @@
 package chess
 package opening
 
+import cats.Foldable
 import cats.syntax.all.*
 import chess.format.pgn.SanStr
 import chess.format.{ FullFen, StandardFen }
@@ -51,9 +52,9 @@ object OpeningDb:
       moves.map(_.before) ++ moves.lastOption.map(_.after).toVector
 
   // first position is initial position
-  def searchInPositions(positions: Iterable[Position]) =
+  def searchInPositions[F[_]: Foldable](positions: F[Position]) =
     positions
-      .takeWhile(_.board.nbPieces >= SEARCH_MIN_PIECES)
+      .takeWhile_(_.board.nbPieces >= SEARCH_MIN_PIECES)
       .zipWithIndex
       .drop(1)
       .foldRight(none[Opening.AtPly]):

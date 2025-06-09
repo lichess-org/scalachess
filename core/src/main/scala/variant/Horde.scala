@@ -67,6 +67,9 @@ case object Horde
   override def opponentHasInsufficientMaterial(position: Position): Boolean =
     hasInsufficientMaterial(position.board, !position.color) || hordeClosedPosition(position)
 
+  override def playerHasInsufficientMaterial(position: Position): Boolean =
+    throw Exception("`playerHasInsufficientMaterial` is not implemented yet for Horde")
+
   /** Any vs K + any where horde is stalemated and only king can move is a fortress draw
     * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
     * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -

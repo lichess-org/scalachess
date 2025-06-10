@@ -86,7 +86,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
   inline def opponentHasInsufficientMaterial: Boolean = variant.opponentHasInsufficientMaterial(this)
 
-  inline def playerHasInsufficientMaterial: Boolean = variant.playerHasInsufficientMaterial(this)
+  inline def playerHasInsufficientMaterial: Option[Boolean] = variant.playerHasInsufficientMaterial(this)
 
   @threadUnsafe
   lazy val threefoldRepetition: Boolean = history.threefoldRepetition

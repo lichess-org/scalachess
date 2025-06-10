@@ -153,9 +153,9 @@ abstract class Variant private[variant] (
   def opponentHasInsufficientMaterial(position: Position): Boolean =
     InsufficientMatingMaterial(position, !position.color)
 
-  def playerHasInsufficientMaterial(position: Position): Boolean =
+  def playerHasInsufficientMaterial(position: Position): Option[Boolean] =
     // For all variants except Antichess and Horde, considering turn isn't needed:
-    opponentHasInsufficientMaterial(position.withColor(!position.color))
+    Some(opponentHasInsufficientMaterial(position.withColor(!position.color)))
 
   def fiftyMoves(history: History): Boolean =
     history.halfMoveClock >= HalfMoveClock(100)

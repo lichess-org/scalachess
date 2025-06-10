@@ -3,7 +3,7 @@ package format.pgn
 
 import cats.syntax.all.*
 
-import scala.annotation.{ nowarn, tailrec }
+import scala.annotation.tailrec
 
 /**
  * PgnNodeEncoder,
@@ -29,7 +29,7 @@ object PgnNodeEncoder:
           f(context, a).fold(context -> none)(_ -> _.some)
         .map(_.toPgnStr(startPly))
 
-  extension [A](@nowarn tree: Tree[A])
+  extension [A](tree: Tree[A])
     /**
      * render a tree to a PgnStr
      */
@@ -59,7 +59,7 @@ object PgnNodeEncoder:
         ply: Ply
     )(using PgnNodeEncoder[A]): Unit =
       if tree.isVariation then tree.value.appendVariationComment(builder)
-      tree.addTurnNumberPrefix(forceTurnNumber, builder, ply)
+      addTurnNumberPrefix(forceTurnNumber, builder, ply)
       renderValueAndVariations(builder, ply)
       tree.child.match
         case None    => ()
@@ -67,21 +67,21 @@ object PgnNodeEncoder:
           builder.addOne(' ')
           x.render(builder, tree.forceTurnNumber(ply), ply.next)
 
-    // Add turn number prefix to the builder if needed
-    // if the current value is white, We ignore forceTurnNumber value as
-    // it always renders with a turn number and a dot for example: `1. e4`
-    // if the current value is black and forceTurnNumber is true it needs to
-    // render with a turn number and 3 dots for example: `1... e5`
-    private def addTurnNumberPrefix(forceTurnNumber: Boolean, builder: StringBuilder, ply: Ply): Unit =
-      if ply.isWhiteTurn then builder.append(ply.turnNumber).append(". "): Unit
-      else if forceTurnNumber then builder.append(ply.turnNumber).append("... "): Unit
-
     private def renderValueAndVariations(builder: StringBuilder, ply: Ply): PgnNodeEncoder[A] ?=> Unit =
       tree.value.appendSanStr(builder)
       tree.variations.foreach: x =>
         builder.addOne(' ').addOne('('): Unit
         x.appendPgnStr(builder, ply)
         builder.addOne(')')
+
+  // Add turn number prefix to the builder if needed
+  // if the current value is white, We ignore forceTurnNumber value as
+  // it always renders with a turn number and a dot for example: `1. e4`
+  // if the current value is black and forceTurnNumber is true it needs to
+  // render with a turn number and 3 dots for example: `1... e5`
+  private inline def addTurnNumberPrefix(forceTurnNumber: Boolean, builder: StringBuilder, ply: Ply): Unit =
+    if ply.isWhiteTurn then builder.append(ply.turnNumber).append(". "): Unit
+    else if forceTurnNumber then builder.append(ply.turnNumber).append("... "): Unit
 
   extension (ply: Ply)
     private inline def isWhiteTurn: Boolean =

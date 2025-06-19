@@ -22,8 +22,7 @@ object InsufficientMaterialTest extends SimpleIOSuite:
     parser(file)
       .foldMap(_.run(variant))
       .compile
-      .toList
-      .map(_.head)
+      .lastOrError
 
   private def parser(file: String): Stream[IO, Case] =
     Files[IO]

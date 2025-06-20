@@ -44,11 +44,9 @@ object InsufficientMatingMaterial:
    * King + bishop(s) versus king + bishop(s) depends upon bishop square colors
    */
   def apply(board: Board, color: Color): Boolean =
-    if board.kingsOnlyOf(color) then true
-    else if board.kingsAndKnightsOnlyOf(color) then
-      board.nonKingsOf(color).count == 1 &&
-      board.onlyOf(!color, board.kings | board.queens)
-    else if board.kingsAndBishopsOnlyOf(color) then
-      !(bishopsOnOppositeColors(board) ||
-        (board.byPiece(!color, Knight) | board.byPiece(!color, Pawn)).nonEmpty)
-    else false
+    board.kingsOnlyOf(color)
+    // a king and a knight vs a king and queen(s)
+      || (board.kingsAndKnightsOnlyOf(color) && board.nonKingsOf(color).count == 1 &&
+        board.onlyOf(!color, board.kings | board.queens))
+      || (board.kingsAndBishopsOnlyOf(color) && !(bishopsOnOppositeColors(board) ||
+        (board.byPiece(!color, Knight) | board.byPiece(!color, Pawn)).nonEmpty))

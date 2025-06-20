@@ -10,7 +10,8 @@ object InsufficientMatingMaterial:
   // verify if there are at least two bishops of opposite color
   // no matter which sides they are on
   def bishopsOnOppositeColors(board: Board): Boolean =
-    board.bishops.map(_.isLight).distinct.size == 2
+    board.bishops.intersects(Bitboard.lightSquares) &&
+      board.bishops.intersects(Bitboard.darkSquares)
 
   /*
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
@@ -42,12 +43,12 @@ object InsufficientMatingMaterial:
    * King + bishop mates against king + any(bishop, knight, pawn)
    * King + bishop(s) versus king + bishop(s) depends upon bishop square colors
    */
-  def apply(position: Position, color: Color): Boolean =
-    if position.kingsOnlyOf(color) then true
-    else if position.kingsAndKnightsOnlyOf(color) then
-      position.nonKingsOf(color).count == 1 &&
-      position.onlyOf(!color, position.kings | position.queens)
-    else if position.kingsAndBishopsOnlyOf(color) then
-      !(bishopsOnOppositeColors(position.board) ||
-        (position.byPiece(!color, Knight) | position.byPiece(!color, Pawn)).nonEmpty)
+  def apply(board: Board, color: Color): Boolean =
+    if board.kingsOnlyOf(color) then true
+    else if board.kingsAndKnightsOnlyOf(color) then
+      board.nonKingsOf(color).count == 1 &&
+      board.onlyOf(!color, board.kings | board.queens)
+    else if board.kingsAndBishopsOnlyOf(color) then
+      !(bishopsOnOppositeColors(board) ||
+        (board.byPiece(!color, Knight) | board.byPiece(!color, Pawn)).nonEmpty)
     else false

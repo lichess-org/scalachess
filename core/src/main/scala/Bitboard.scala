@@ -53,6 +53,20 @@ object Bitboard:
     inline def isEmpty: Boolean  = a == 0L
     inline def nonEmpty: Boolean = !isEmpty
 
+    inline def superSetOf(l: Long): Boolean =
+      (a & l) == l
+
+    @targetName("superSetOfB")
+    inline def superSetOf(o: Bitboard): Boolean =
+      (a & o) == o
+
+    inline def subSetOf(l: Long): Boolean =
+      (a & l) == a
+
+    @targetName("subSetOfB")
+    inline def subSetOf(o: Bitboard): Boolean =
+      (a & o) == a
+
     inline def contains(square: Square): Boolean =
       (a & (1L << square.value)) != 0L
 
@@ -116,7 +130,9 @@ object Bitboard:
         b &= (b - 1L)
       builder.result
 
-    // min square in the bitboard if it is not empty
+    def toSet: Set[Square] =
+      squares.toSet
+
     def first[B](f: Square => Option[B]): Option[B] =
       var b                 = a
       var result: Option[B] = None
@@ -126,7 +142,6 @@ object Bitboard:
         b &= (b - 1L)
       result
 
-    // max square in the bitboard if it is not empty
     def last[B](f: Square => Option[B]): Option[B] =
       var b                 = a
       var result: Option[B] = None
@@ -136,6 +151,7 @@ object Bitboard:
         b &= ~b.msb.bl
       result
 
+    // the smallest square that satisfies the predicate
     def find(f: Square => Boolean): Option[Square] =
       var b                      = a
       var result: Option[Square] = None
@@ -145,6 +161,7 @@ object Bitboard:
         b &= (b - 1L)
       result
 
+    // the larget square that satisfies the predicate
     def findLast(f: Square => Boolean): Option[Square] =
       var b                      = a
       var result: Option[Square] = None

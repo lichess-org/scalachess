@@ -107,9 +107,8 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   def kingsAndKnightsOnlyOf(color: Color): Boolean =
     onlyOf(color, kings | knights)
 
-  def onlyOf(color: Color, roles: Bitboard): Boolean =
-    val colorPieces = byColor(color)
-    (roles & colorPieces) == colorPieces
+  def onlyOf(color: Color, mask: Bitboard): Boolean =
+    byColor(color).subSetOf(mask)
 
   def nonKingsOf(color: Color): Bitboard =
     byColor(color) & ~kings

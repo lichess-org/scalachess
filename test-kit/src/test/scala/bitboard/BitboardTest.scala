@@ -16,7 +16,18 @@ class BitboardTest extends ScalaCheckSuite:
     forAll: (bb: Bitboard, square: Square) =>
       assertEquals(bb.contains(square), bb.contains(square.file, square.rank))
 
-  test("Square.bb.singleSquare == Some(square)"):
+  test("supersetOf and subsetOf"):
+    forAll: (b1: Bitboard, b2: Bitboard) =>
+      assert((b1 | b2).supersetOf(b1))
+      assert((b1 | b2).supersetOf(b2))
+      assert((b1 & b2).subsetOf(b1))
+      assert((b1 & b2).subsetOf(b2))
+      assert(Bitboard.all.supersetOf(b1))
+      assert(Bitboard.all.supersetOf(b2))
+      assert(Bitboard.empty.subsetOf(b1))
+      assert(Bitboard.empty.subsetOf(b2))
+
+  test("square.bb.singleSquare == Some(square)"):
     forAll: (square: Square) =>
       assertEquals(square.bb.singleSquare, Some(square))
 
@@ -144,6 +155,10 @@ class BitboardTest extends ScalaCheckSuite:
     forAll: (xs: Set[Square]) =>
       val result = Bitboard(xs).squares.toSet
       assertEquals(result, xs)
+
+  test("Set >>= Bitboard >>= toSet === identity"):
+    forAll: (xs: Set[Square]) =>
+      assertEquals(Bitboard(xs).toSet, xs)
 
   test("nonEmpty bitboard should have at least one square"):
     forAll: (bb: Bitboard) =>

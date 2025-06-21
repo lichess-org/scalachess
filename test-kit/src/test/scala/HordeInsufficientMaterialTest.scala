@@ -9,7 +9,7 @@ import fs2.*
 import fs2.io.file.Files
 import weaver.*
 
-object InsufficientMaterialTest extends SimpleIOSuite:
+object HordeInsufficientMaterialTest extends SimpleIOSuite:
 
   test("horde"):
     run("test-kit/src/test/resources/horde_insufficient_material.csv", Horde).map(expect(_))

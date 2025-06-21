@@ -18,14 +18,14 @@ class BitboardTest extends ScalaCheckSuite:
 
   test("supersetOf and subsetOf"):
     forAll: (b1: Bitboard, b2: Bitboard) =>
-      assert((b1 | b2).superSetOf(b1))
-      assert((b1 | b2).superSetOf(b2))
-      assert((b1 & b2).subSetOf(b1))
-      assert((b1 & b2).subSetOf(b2))
-      assert(Bitboard.all.superSetOf(b1))
-      assert(Bitboard.all.superSetOf(b2))
-      assert(Bitboard.empty.subSetOf(b1))
-      assert(Bitboard.empty.subSetOf(b2))
+      assert((b1 | b2).supersetOf(b1))
+      assert((b1 | b2).supersetOf(b2))
+      assert((b1 & b2).subsetOf(b1))
+      assert((b1 & b2).subsetOf(b2))
+      assert(Bitboard.all.supersetOf(b1))
+      assert(Bitboard.all.supersetOf(b2))
+      assert(Bitboard.empty.subsetOf(b1))
+      assert(Bitboard.empty.subsetOf(b2))
 
   test("square.bb.singleSquare == Some(square)"):
     forAll: (square: Square) =>

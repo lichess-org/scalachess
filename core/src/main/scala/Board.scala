@@ -29,21 +29,31 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   def contains(color: Color, role: Role): Boolean =
     piece(color, role).nonEmpty
 
+  /* bitboard of a given piece */
   def byPiece(piece: Piece): Bitboard =
     byPiece(piece.color, piece.role)
 
+  /* bitboard of a piece by given color and role */
   def byPiece(color: Color, role: Role): Bitboard =
     byColor(color) & byRole(role)
 
+  /* bitboard of pieces by given color and roles */
+  def byPiece(color: Color, roles: Role*): Bitboard =
+    byColor(color) & byRole(roles*)
+
+  /* return a Role at a given square if any */
   def roleAt(s: Square): Option[Role] =
     byRole.findRole(_.contains(s))
 
+  /* return a Role at a square by given file and rank if any */
   def roleAt(file: File, rank: Rank): Option[Role] =
     byRole.findRole(_.contains(file, rank))
 
+  /* return a Color at a square by if any */
   def colorAt(s: Square): Option[Color] =
     byColor.findColor(_.contains(s))
 
+  /* return a Color at a square by given file and rank if any */
   def colorAt(file: File, rank: Rank): Option[Color] =
     byColor.findColor(_.contains(file, rank))
 
@@ -64,6 +74,12 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
 
   def blackAt(s: Square): Boolean =
     black.contains(s)
+
+  def byRole(roles: Role*): Bitboard =
+    roles.foldLeft(Bitboard.empty)((acc, r) => acc | byRole(r))
+
+  def byRoleOf(color: Color): ByRole[Bitboard] =
+    byRole.map(_ & byColor(color))
 
   def kings(color: Color): List[Square] =
     kingOf(color).squares
@@ -108,7 +124,14 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
     onlyOf(color, kings | knights)
 
   def onlyOf(color: Color, mask: Bitboard): Boolean =
-    byColor(color).subSetOf(mask)
+    byColor(color).subsetOf(mask)
+
+  /* Tests whether a color has only pieces of given roles
+   * e.g. onlyOf(Color.White, Role.King, Role.Queen) means that White has only King and Queen
+   * and no other pieces
+   */
+  def onlyOf(color: Color, roles: Role*): Boolean =
+    byColor(color).subsetOf(byRole(roles*))
 
   def nonKingsOf(color: Color): Bitboard =
     byColor(color) & ~kings
@@ -116,9 +139,15 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   def nonKing: Bitboard =
     occupied & ~kings
 
+  /* Count number of a given piece */
   def count(p: Piece): Int =
     piece(p).count
 
+  /* Count number of a piece by given color and role */
+  def count(color: Color, role: Role): Int =
+    (byColor(color) & byRole(role)).count
+
+  /* Count number of pieces by a given color */
   def count(c: Color): Int =
     byColor(c).count
 
@@ -175,9 +204,6 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
       byColor.map(_ & notMask),
       byRole.map(_ & notMask)
     )
-
-  def byRoleOf(color: Color): ByRole[Bitboard] =
-    byRole.map(_ & byColor(color))
 
   // put a piece to an empty square
   def put(piece: Piece, at: Square): Option[Board] =

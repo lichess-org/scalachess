@@ -53,18 +53,18 @@ object Bitboard:
     inline def isEmpty: Boolean  = a == 0L
     inline def nonEmpty: Boolean = !isEmpty
 
-    inline def superSetOf(l: Long): Boolean =
+    inline def supersetOf(l: Long): Boolean =
       (a & l) == l
 
     @targetName("superSetOfB")
-    inline def superSetOf(o: Bitboard): Boolean =
+    inline def supersetOf(o: Bitboard): Boolean =
       (a & o) == o
 
-    inline def subSetOf(l: Long): Boolean =
+    inline def subsetOf(l: Long): Boolean =
       (a & l) == a
 
     @targetName("subSetOfB")
-    inline def subSetOf(o: Bitboard): Boolean =
+    inline def subsetOf(o: Bitboard): Boolean =
       (a & o) == a
 
     inline def contains(square: Square): Boolean =

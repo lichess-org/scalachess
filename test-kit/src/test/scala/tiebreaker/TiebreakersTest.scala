@@ -38,6 +38,7 @@ class TiebreakersTest extends ChessTest:
     Game(playerC, playerE, ByColor(Points.Half, Points.Half)), // C draws E
 
     Game(playerD, playerE, ByColor(Points.One, Points.Zero)) // D beats E
+
   )
 
   def povGames(player: Player): Seq[POVGame] =
@@ -114,3 +115,7 @@ class TiebreakersTest extends ChessTest:
   test("AverageOpponentRating"):
     val tiebreaker = tb(AverageOpponentRating, playerA, allGames)
     assertEquals(tiebreaker, 1562.5f)
+
+  test("AveragePerformanceOfOpponents"):
+    val tiebreaker = tb(AveragePerformanceOfOpponents, playerA, allGames)
+    assertEquals(tiebreaker, 1542.75f)

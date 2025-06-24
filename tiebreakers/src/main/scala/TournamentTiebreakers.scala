@@ -4,6 +4,7 @@ import chess.rating.Elo
 import chess.Outcome.Points
 import chess.Color
 import scalalib.newtypes.*
+import scalalib.extensions.*
 
 opaque type TieBreakPoints = Float
 object TieBreakPoints extends OpaqueFloat[TieBreakPoints]
@@ -41,6 +42,12 @@ enum Tiebreaker(val code: String, val name: String):
   case AverageOpponentRating extends Tiebreaker("AOR", "Average opponent rating")
 
   case AverageOpponentRatingCut1 extends Tiebreaker("AOR-C1", "Average opponent rating cut 1")
+
+  case AveragePerformanceOfOpponents
+      extends Tiebreaker(
+        "APRO",
+        "Average performance of opponents"
+      )
 
 object Tiebreaker:
 
@@ -114,6 +121,15 @@ object Tiebreaker:
               )
             case AverageOpponentRating     => AverageOpponentRatingCutN(0, opponentGames)
             case AverageOpponentRatingCut1 => AverageOpponentRatingCutN(1, opponentGames)
+            case AveragePerformanceOfOpponents =>
+              val perfs = opponentGames
+                .map: opp =>
+                  Elo
+                    .computePerformanceRating(opp.games.collect:
+                      case POVGame(Some(points), _, _) => Elo.Game(points, opp.player.rating))
+                    .map(_.value)
+                .flatten
+              TieBreakPoints(perfs.nonEmpty.option(perfs.sum / perfs.size.toFloat) | 0f)
 
   case class POVGame(
       points: Option[chess.Outcome.Points],

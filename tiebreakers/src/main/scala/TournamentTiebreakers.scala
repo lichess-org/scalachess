@@ -49,6 +49,8 @@ enum Tiebreaker(val code: String, val name: String):
         "Average performance of opponents"
       )
 
+  case KoyaSystem extends Tiebreaker("KS", "Koya system")
+
 object Tiebreaker:
 
   private def BuchholzCutN(cut: Int, opponentGames: Seq[PlayerGames]): TieBreakPoints =
@@ -130,6 +132,12 @@ object Tiebreaker:
                     .map(_.value)
                 .flatten
               TieBreakPoints(perfs.nonEmpty.option(perfs.sum / perfs.size.toFloat) | 0f)
+            case KoyaSystem =>
+              val halfOfMaxPossibleScore = allGames
+                .map:
+                  case PlayerGames(_, games) => games.size
+                .max / 2
+              tb(Buchholz, player, allGames.filter(_.score >= halfOfMaxPossibleScore))
 
   case class POVGame(
       points: Option[chess.Outcome.Points],

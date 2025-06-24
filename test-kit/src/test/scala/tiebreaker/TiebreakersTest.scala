@@ -119,3 +119,7 @@ class TiebreakersTest extends ChessTest:
   test("AveragePerformanceOfOpponents"):
     val tiebreaker = tb(AveragePerformanceOfOpponents, playerA, allGames)
     assertEquals(tiebreaker, 1542.75f)
+
+  test("KoyaSystem"):
+    val tiebreaker = tb(KoyaSystem, playerA, allGames)
+    assertEquals(tiebreaker, 4.5f)

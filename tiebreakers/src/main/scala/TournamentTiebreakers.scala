@@ -51,6 +51,8 @@ enum Tiebreaker(val code: String, val name: String):
 
   case KoyaSystem extends Tiebreaker("KS", "Koya system")
 
+  case SumOfProgressiveScores extends Tiebreaker("PS", "Sum of progressive scores")
+
 object Tiebreaker:
 
   private def BuchholzCutN(cut: Int, opponentGames: Seq[PlayerGames]): TieBreakPoints =
@@ -134,10 +136,15 @@ object Tiebreaker:
               TieBreakPoints(perfs.nonEmpty.option(perfs.sum / perfs.size.toFloat) | 0f)
             case KoyaSystem =>
               val halfOfMaxPossibleScore = allGames
-                .map:
-                  case PlayerGames(_, games) => games.size
+                .map(_.games.size)
                 .max / 2
               tb(Buchholz, player, allGames.filter(_.score >= halfOfMaxPossibleScore))
+            case SumOfProgressiveScores =>
+              val progressiveScores = games.indices
+                .map: i =>
+                  playerWithGames.copy(games = games.take(i + 1))
+                .map(_.score)
+              TieBreakPoints(progressiveScores.sum)
 
   case class POVGame(
       points: Option[chess.Outcome.Points],

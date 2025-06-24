@@ -123,3 +123,7 @@ class TiebreakersTest extends ChessTest:
   test("KoyaSystem"):
     val tiebreaker = tb(KoyaSystem, playerA, allGames)
     assertEquals(tiebreaker, 4.5f)
+
+  test("SumOfProgressiveScores"):
+    val tiebreaker = tb(SumOfProgressiveScores, playerA, allGames)
+    assertEquals(tiebreaker, 6.5f)

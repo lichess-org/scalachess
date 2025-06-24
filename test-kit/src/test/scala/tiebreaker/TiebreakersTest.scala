@@ -127,3 +127,7 @@ class TiebreakersTest extends ChessTest:
   test("SumOfProgressiveScores"):
     val tiebreaker = tb(SumOfProgressiveScores, playerA, allGames)
     assertEquals(tiebreaker, 6.5f)
+
+  test("SumOfProgressiveScoresCut1"):
+    val tiebreaker = tb(SumOfProgressiveScoresCut1, playerA, allGames)
+    assertEquals(tiebreaker, 5.5f)

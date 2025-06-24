@@ -44,12 +44,12 @@ class TiebreakersTest extends ChessTest:
         val playerColor = if white == player then Color.White else Color.Black
         POVGame(Some(result(playerColor)), if playerColor == Color.White then black else white, playerColor)
 
-  val playerA_Games = PlayerGames(playerA, povGames(playerA))
-  val playerB_Games = PlayerGames(playerB, povGames(playerB))
-  val playerC_Games = PlayerGames(playerC, povGames(playerC))
-  val playerD_Games = PlayerGames(playerD, povGames(playerD))
-  val playerE_Games = PlayerGames(playerE, povGames(playerE))
-
+  val playerA_Games     = PlayerGames(playerA, povGames(playerA))
+  val playerB_Games     = PlayerGames(playerB, povGames(playerB))
+  val playerC_Games     = PlayerGames(playerC, povGames(playerC))
+  val playerD_Games     = PlayerGames(playerD, povGames(playerD))
+  val playerE_Games     = PlayerGames(playerE, povGames(playerE))
+  val allGames          = Seq(playerA_Games, playerB_Games, playerC_Games, playerD_Games, playerE_Games)
   val playerA_opponents = Seq(playerB_Games, playerC_Games, playerD_Games, playerE_Games)
 
   test("scores"):
@@ -60,51 +60,51 @@ class TiebreakersTest extends ChessTest:
     assertEquals(playerE_Games.score, 1.5f)
 
   test("NbGames"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbGames, playerA_Games, playerA_opponents)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbGames, playerA, allGames)
     assertEquals(tiebreaker, 4.0f)
 
   test("NbBlackGames"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbBlackGames, playerA_Games, playerA_opponents)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbBlackGames, playerA, allGames)
     assertEquals(tiebreaker, 1.0f)
 
   test("NbWins"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbWins, playerA_Games, playerA_opponents)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbWins, playerA, allGames)
     assertEquals(tiebreaker, 2.0f)
 
   test("NbBlackWins"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbBlackWins, playerA_Games, playerA_opponents)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbBlackWins, playerA, allGames)
     assertEquals(tiebreaker, 0f)
 
   test("SonnebornBerger"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.SonnebornBerger, playerA_Games, playerA_opponents)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.SonnebornBerger, playerA, allGames)
     assertEquals(tiebreaker, 4.0f)
 
   test("SonnebornBergerCut1"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.SonnebornBergerCut1, playerA_Games, playerA_opponents)
-    assertEquals(tiebreaker, 3.0f)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.SonnebornBergerCut1, playerA, allGames)
+    assertEquals(tiebreaker, 4.0f)
 
   test("Buchholz"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.Buchholz, playerA_Games, playerA_opponents)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.Buchholz, playerA, allGames)
     assertEquals(tiebreaker, 7.5f)
 
   test("BuchholzCut1"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.BuchholzCut1, playerA_Games, playerA_opponents)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.BuchholzCut1, playerA, allGames)
     assertEquals(tiebreaker, 6f)
 
   test("BuchholzCut2"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.BuchholzCut2, playerA_Games, playerA_opponents)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.BuchholzCut2, playerA, allGames)
     assertEquals(tiebreaker, 4.5f)
 
   test("DirectEncounter"):
-    val tiebreaker1 = Tiebreaker.tb(Tiebreaker.DirectEncounter, playerA_Games, playerA_opponents)
+    val tiebreaker1 = Tiebreaker.tb(Tiebreaker.DirectEncounter, playerA, allGames)
     val tiebreaker2 = Tiebreaker.tb(
       Tiebreaker.DirectEncounter,
-      playerD_Games,
-      Seq(playerA_Games, playerB_Games, playerC_Games, playerE_Games)
+      playerD,
+      allGames
     )
     assertEquals(tiebreaker1, 0f)
     assertEquals(tiebreaker2, 1f)
 
   test("AverageOpponentRating"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.AverageOpponentRating, playerA_Games, playerA_opponents)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.AverageOpponentRating, playerA, allGames)
     assertEquals(tiebreaker, 1562.5f)

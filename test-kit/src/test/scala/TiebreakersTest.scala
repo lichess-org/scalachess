@@ -1,53 +1,16 @@
 package chess
 
-import chess.Outcome.Points
+import chess.Outcome.*
 
 class TiebreakersTest extends ChessTest:
 
-  val game1 = POVGame(plies = Ply(40), points = Some(Points.One), opponent = "PlayerB", color = Color.White)
-  val game2 = POVGame(plies = Ply(40), points = Some(Points.Half), opponent = "PlayerC", color = Color.Black)
-  val game3 = POVGame(plies = Ply(20), points = Some(Points.Zero), opponent = "PlayerD", color = Color.Black)
-  val game4 = POVGame(plies = Ply(1), points = Some(Points.One), opponent = "PlayerE", color = Color.White)
+  val playerA = Player("PlayerA", rating = 1500)
+  val playerB = Player("PlayerB", rating = 1600)
+  val playerC = Player("PlayerC", rating = 1550)
+  val playerD = Player("PlayerD", rating = 1450)
+  val playerE = Player("PlayerE", rating = 1650)
 
-  val playerA = PlayerGames("PlayerA", Seq(game1, game2, game3, game4))
-  val playerB = PlayerGames(
-    "PlayerB",
-    Seq(
-      game1.copy(opponent = "PlayerA", points = Some(Points.Zero)),
-      POVGame(plies = Ply(30), points = Some(Points.One), opponent = "PlayerC", color = Color.White),
-      POVGame(plies = Ply(25), points = Some(Points.Half), opponent = "PlayerD", color = Color.Black),
-      POVGame(plies = Ply(15), points = Some(Points.Zero), opponent = "PlayerE", color = Color.White)
-    )
-  )
-  val playerC = PlayerGames(
-    "PlayerC",
-    Seq(
-      game2.copy(opponent = "PlayerA", points = Some(Points.Half)),
-      POVGame(plies = Ply(30), points = Some(Points.Zero), opponent = "PlayerB", color = Color.Black),
-      POVGame(plies = Ply(20), points = Some(Points.One), opponent = "PlayerD", color = Color.White),
-      POVGame(plies = Ply(10), points = Some(Points.Half), opponent = "PlayerE", color = Color.Black)
-    )
-  )
-  val playerD = PlayerGames(
-    "PlayerD",
-    Seq(
-      game3.copy(opponent = "PlayerA", points = Some(Points.One)),
-      POVGame(plies = Ply(25), points = Some(Points.Half), opponent = "PlayerB", color = Color.White),
-      POVGame(plies = Ply(20), points = Some(Points.Zero), opponent = "PlayerC", color = Color.Black),
-      POVGame(plies = Ply(5), points = Some(Points.One), opponent = "PlayerE", color = Color.White)
-    )
-  )
-  val playerE = PlayerGames(
-    "PlayerE",
-    Seq(
-      game4.copy(opponent = "PlayerA", points = Some(Points.Zero)),
-      POVGame(plies = Ply(15), points = Some(Points.One), opponent = "PlayerB", color = Color.Black),
-      POVGame(plies = Ply(10), points = Some(Points.Half), opponent = "PlayerC", color = Color.White),
-      POVGame(plies = Ply(5), points = Some(Points.Zero), opponent = "PlayerD", color = Color.Black)
-    )
-  )
-
-  val opponents = Seq(playerB, playerC, playerD, playerE)
+  case class Game(white: Player, black: Player, result: ByColor[Points])
 
   // Crosstable:
   //          | A   B   C   D   E   | Total
@@ -58,44 +21,90 @@ class TiebreakersTest extends ChessTest:
   // PlayerD  | 1   ½   0   X   1   | 2.5
   // PlayerE  | 0   1   ½   0   X   | 1.5
 
+  // Define all games based on crosstable
+  val games = Seq(
+    Game(playerA, playerB, ByColor(Points.One, Points.Zero)),  // A beats B
+    Game(playerA, playerC, ByColor(Points.Half, Points.Half)), // A draws C
+    Game(playerD, playerA, ByColor(Points.One, Points.Zero)),  // D beats A
+    Game(playerA, playerE, ByColor(Points.One, Points.Zero)),  // A beats E
+
+    Game(playerB, playerC, ByColor(Points.One, Points.Zero)),  // B beats C
+    Game(playerB, playerD, ByColor(Points.Half, Points.Half)), // B draws D
+    Game(playerE, playerB, ByColor(Points.One, Points.Zero)),  // E beats B
+
+    Game(playerC, playerD, ByColor(Points.One, Points.Zero)),  // C beats D
+    Game(playerC, playerE, ByColor(Points.Half, Points.Half)), // C draws E
+
+    Game(playerD, playerE, ByColor(Points.One, Points.Zero)) // D beats E
+  )
+
+  def povGames(player: Player): Seq[POVGame] =
+    games.collect:
+      case Game(white, black, result) if white == player || black == player =>
+        val playerColor = if white == player then Color.White else Color.Black
+        POVGame(Some(result(playerColor)), if playerColor == Color.White then black else white, playerColor)
+
+  val playerA_Games = PlayerGames(playerA, povGames(playerA))
+  val playerB_Games = PlayerGames(playerB, povGames(playerB))
+  val playerC_Games = PlayerGames(playerC, povGames(playerC))
+  val playerD_Games = PlayerGames(playerD, povGames(playerD))
+  val playerE_Games = PlayerGames(playerE, povGames(playerE))
+
+  val playerA_opponents = Seq(playerB_Games, playerC_Games, playerD_Games, playerE_Games)
+
+  test("scores"):
+    assertEquals(playerA_Games.score, 2.5f)
+    assertEquals(playerB_Games.score, 1.5f)
+    assertEquals(playerC_Games.score, 2.0f)
+    assertEquals(playerD_Games.score, 2.5f)
+    assertEquals(playerE_Games.score, 1.5f)
+
   test("NbGames"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbGames, playerA, opponents)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbGames, playerA_Games, playerA_opponents)
     assertEquals(tiebreaker, 4.0f)
 
   test("NbBlackGames"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbBlackGames, playerA, opponents)
-    assertEquals(tiebreaker, 2.0f)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbBlackGames, playerA_Games, playerA_opponents)
+    assertEquals(tiebreaker, 1.0f)
 
   test("NbWins"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbWins, playerA, opponents)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbWins, playerA_Games, playerA_opponents)
     assertEquals(tiebreaker, 2.0f)
 
   test("NbBlackWins"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbBlackWins, playerA, opponents)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbBlackWins, playerA_Games, playerA_opponents)
     assertEquals(tiebreaker, 0f)
 
-  test("NbWinsExcludingByes"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbWinsExcludingByes, playerA, opponents)
-    assertEquals(tiebreaker, 1.0f) // Excludes game4 with plies <= 2
-
   test("SonnebornBerger"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.SonnebornBerger, playerA, opponents)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.SonnebornBerger, playerA_Games, playerA_opponents)
     assertEquals(tiebreaker, 4.0f)
 
+  test("SonnebornBergerCut1"):
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.SonnebornBergerCut1, playerA_Games, playerA_opponents)
+    assertEquals(tiebreaker, 3.0f)
+
   test("Buchholz"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.Buchholz, playerA, opponents)
-    assertEquals(tiebreaker, opponents.map(_.score).sum)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.Buchholz, playerA_Games, playerA_opponents)
+    assertEquals(tiebreaker, 7.5f)
 
   test("BuchholzCut1"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.BuchholzCut1, playerA, opponents)
-    assertEquals(tiebreaker, opponents.map(_.score).sorted.drop(1).sum)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.BuchholzCut1, playerA_Games, playerA_opponents)
+    assertEquals(tiebreaker, 6f)
 
   test("BuchholzCut2"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.BuchholzCut2, playerA, opponents)
-    assertEquals(tiebreaker, opponents.map(_.score).sorted.drop(2).sum)
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.BuchholzCut2, playerA_Games, playerA_opponents)
+    assertEquals(tiebreaker, 4.5f)
 
   test("DirectEncounter"):
-    val tiebreaker1 = Tiebreaker.tb(Tiebreaker.DirectEncounter, playerA, opponents)
-    val tiebreaker2 = Tiebreaker.tb(Tiebreaker.DirectEncounter, playerD, Seq(playerA, playerB, playerC, playerE))
+    val tiebreaker1 = Tiebreaker.tb(Tiebreaker.DirectEncounter, playerA_Games, playerA_opponents)
+    val tiebreaker2 = Tiebreaker.tb(
+      Tiebreaker.DirectEncounter,
+      playerD_Games,
+      Seq(playerA_Games, playerB_Games, playerC_Games, playerE_Games)
+    )
     assertEquals(tiebreaker1, 0f)
     assertEquals(tiebreaker2, 1f)
+
+  test("AverageOpponentRating"):
+    val tiebreaker = Tiebreaker.tb(Tiebreaker.AverageOpponentRating, playerA_Games, playerA_opponents)
+    assertEquals(tiebreaker, 1562.5f)

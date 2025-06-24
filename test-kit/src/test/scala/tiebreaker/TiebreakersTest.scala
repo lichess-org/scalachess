@@ -1,14 +1,16 @@
 package chess
 
-import chess.Outcome.*
+import chess.tiebreakers.Tiebreaker.*
+import chess.rating.Elo
+import chess.Outcome.Points
 
 class TiebreakersTest extends ChessTest:
 
-  val playerA = Player("PlayerA", rating = 1500)
-  val playerB = Player("PlayerB", rating = 1600)
-  val playerC = Player("PlayerC", rating = 1550)
-  val playerD = Player("PlayerD", rating = 1450)
-  val playerE = Player("PlayerE", rating = 1650)
+  val playerA = Player("PlayerA", rating = Elo(1500))
+  val playerB = Player("PlayerB", rating = Elo(1600))
+  val playerC = Player("PlayerC", rating = Elo(1550))
+  val playerD = Player("PlayerD", rating = Elo(1450))
+  val playerE = Player("PlayerE", rating = Elo(1650))
 
   case class Game(white: Player, black: Player, result: ByColor[Points])
 
@@ -60,49 +62,49 @@ class TiebreakersTest extends ChessTest:
     assertEquals(playerE_Games.score, 1.5f)
 
   test("NbGames"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbGames, playerA, allGames)
+    val tiebreaker = tb(NbGames, playerA, allGames)
     assertEquals(tiebreaker, 4.0f)
 
   test("NbBlackGames"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbBlackGames, playerA, allGames)
+    val tiebreaker = tb(NbBlackGames, playerA, allGames)
     assertEquals(tiebreaker, 1.0f)
 
   test("NbWins"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbWins, playerA, allGames)
+    val tiebreaker = tb(NbWins, playerA, allGames)
     assertEquals(tiebreaker, 2.0f)
 
   test("NbBlackWins"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.NbBlackWins, playerA, allGames)
+    val tiebreaker = tb(NbBlackWins, playerA, allGames)
     assertEquals(tiebreaker, 0f)
 
   test("SonnebornBerger"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.SonnebornBerger, playerA, allGames)
+    val tiebreaker = tb(SonnebornBerger, playerA, allGames)
     assertEquals(tiebreaker, 4.0f)
 
   test("SonnebornBergerCut1"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.SonnebornBergerCut1, playerA, allGames)
+    val tiebreaker = tb(SonnebornBergerCut1, playerA, allGames)
     assertEquals(tiebreaker, 4.0f)
 
   test("Buchholz"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.Buchholz, playerA, allGames)
+    val tiebreaker = tb(Buchholz, playerA, allGames)
     assertEquals(tiebreaker, 7.5f)
 
   test("BuchholzCut1"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.BuchholzCut1, playerA, allGames)
+    val tiebreaker = tb(BuchholzCut1, playerA, allGames)
     assertEquals(tiebreaker, 6f)
 
   test("BuchholzCut2"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.BuchholzCut2, playerA, allGames)
+    val tiebreaker = tb(BuchholzCut2, playerA, allGames)
     assertEquals(tiebreaker, 4.5f)
 
   test("AverageOfOpponentsBuchholz"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.AverageOfOpponentsBuchholz, playerA, allGames)
+    val tiebreaker = tb(AverageOfOpponentsBuchholz, playerA, allGames)
     assertEquals(tiebreaker, 8.125f)
 
   test("DirectEncounter"):
-    val tiebreaker1 = Tiebreaker.tb(Tiebreaker.DirectEncounter, playerA, allGames)
-    val tiebreaker2 = Tiebreaker.tb(
-      Tiebreaker.DirectEncounter,
+    val tiebreaker1 = tb(DirectEncounter, playerA, allGames)
+    val tiebreaker2 = tb(
+      DirectEncounter,
       playerD,
       allGames
     )
@@ -110,5 +112,5 @@ class TiebreakersTest extends ChessTest:
     assertEquals(tiebreaker2, 1f)
 
   test("AverageOpponentRating"):
-    val tiebreaker = Tiebreaker.tb(Tiebreaker.AverageOpponentRating, playerA, allGames)
+    val tiebreaker = tb(AverageOpponentRating, playerA, allGames)
     assertEquals(tiebreaker, 1562.5f)

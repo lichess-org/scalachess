@@ -66,6 +66,13 @@ lazy val rating: Project = Project("rating", file("rating"))
   )
   .dependsOn(scalachess)
 
+lazy val tiebreakers: Project = Project("tiebreakers", file("tiebreakers"))
+  .settings(
+    commonSettings,
+    name := "scalachess-tiebreakers"
+  )
+  .dependsOn(scalachess, rating)
+
 lazy val bench = project
   .enablePlugins(JmhPlugin)
   .settings(commonSettings, scalacOptions -= "-Wunused:all", name := "bench")
@@ -93,12 +100,12 @@ lazy val testKit = project
       "com.siriusxm"   %% "snapshot4s-munit"  % snapshot4sVersion % Test
     )
   )
-  .dependsOn(scalachess % "compile->compile", rating % "compile->compile")
+  .dependsOn(scalachess % "compile->compile", rating % "compile->compile", tiebreakers % "compile->compile")
 
 lazy val root = project
   .in(file("."))
   .settings(publish := {}, publish / skip := true)
-  .aggregate(scalachess, rating, playJson, testKit, bench)
+  .aggregate(scalachess, rating, tiebreakers, playJson, testKit, bench)
 
 addCommandAlias("prepare", "scalafixAll; scalafmtAll")
 addCommandAlias("check", "; scalafixAll --check; scalafmtCheckAll")

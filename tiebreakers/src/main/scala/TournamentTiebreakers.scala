@@ -1,6 +1,8 @@
-package chess
+package chess.tiebreakers
 
+import chess.rating.Elo
 import chess.Outcome.Points
+import chess.Color
 import scalalib.newtypes.*
 
 opaque type TieBreakPoints = Float
@@ -10,6 +12,7 @@ extension (tieBreakSeq: Seq[TieBreakPoints])
   def cutSum(cut: Int): TieBreakPoints =
     tieBreakSeq.sorted.drop(cut).sum
 
+// Tie-breakers for individuals for swiss/round-robins
 // https://handbook.fide.com/chapter/TieBreakRegulations082024
 enum Tiebreaker(val code: String, val name: String):
 
@@ -37,6 +40,8 @@ enum Tiebreaker(val code: String, val name: String):
 
   case AverageOpponentRating extends Tiebreaker("AOR", "Average opponent rating")
 
+  case AverageOpponentRatingCut1 extends Tiebreaker("AOR-C1", "Average opponent rating cut 1")
+
 object Tiebreaker:
 
   private def BuchholzCutN(cut: Int, opponentGames: Seq[PlayerGames]): TieBreakPoints =
@@ -58,6 +63,18 @@ object Tiebreaker:
           case (Some(score), Some(Points.Half)) => TieBreakPoints(score / 2f)
           case _                                => TieBreakPoints(0f)
       .cutSum(cut)
+
+  private def AverageOpponentRatingCutN(
+      cut: Int,
+      opponentGames: Seq[PlayerGames]
+  ): TieBreakPoints =
+    TieBreakPoints(
+      opponentGames
+        .map(_.player.rating.value)
+        .sorted
+        .drop(cut)
+        .sum / opponentGames.size.toFloat
+    )
 
   def tb(tiebreaker: Tiebreaker, player: Player, allGames: Seq[PlayerGames]): TieBreakPoints =
     val playerGamesOpt = allGames.find(_.player == player)
@@ -95,20 +112,16 @@ object Tiebreaker:
                       ))
                   .score
               )
-            case AverageOpponentRating =>
-              TieBreakPoints(
-                opponentGames
-                  .map(_.player.rating)
-                  .sum / opponentGames.size.toFloat
-              )
+            case AverageOpponentRating     => AverageOpponentRatingCutN(0, opponentGames)
+            case AverageOpponentRatingCut1 => AverageOpponentRatingCutN(1, opponentGames)
 
-case class POVGame(
-    points: Option[chess.Outcome.Points],
-    opponent: Player,
-    color: Color
-)
+  case class POVGame(
+      points: Option[chess.Outcome.Points],
+      opponent: Player,
+      color: Color
+  )
 
-case class PlayerGames(player: Player, games: Seq[POVGame]):
-  def score: Float = games.flatMap(_.points.map(_.value)).sum
+  case class PlayerGames(player: Player, games: Seq[POVGame]):
+    def score: Float = games.flatMap(_.points.map(_.value)).sum
 
-case class Player(name: String, rating: Int)
+  case class Player(name: String, rating: Elo)

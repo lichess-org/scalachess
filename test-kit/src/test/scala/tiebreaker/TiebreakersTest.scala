@@ -113,7 +113,7 @@ class TiebreakersTest extends ChessTest:
     assertEquals(tiebreaker2, 1f)
 
   test("AverageOpponentRating"):
-    val tiebreaker = tb(AverageOpponentRating, playerA, allGames)
+    val tiebreaker = tb(AverageRatingOfOpponents, playerA, allGames)
     assertEquals(tiebreaker, 1562.5f)
 
   test("AveragePerformanceOfOpponents"):

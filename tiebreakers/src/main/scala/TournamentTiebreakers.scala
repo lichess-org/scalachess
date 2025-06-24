@@ -15,6 +15,29 @@ extension (tieBreakSeq: Seq[TieBreakPoints])
 
 // Tie-breakers for individuals for swiss/round-robins
 // https://handbook.fide.com/chapter/TieBreakRegulations082024
+
+/*
+
+| Name (in alphabetical order)                        | Type | Section | Acronym | Cut-1 |
+|-----------------------------------------------------|------|---------|---------|-------|
+| Average of Opponents' Buchholz                      | CC   | 8.2     | AOB     |       | ✅
+| Average Perfect [Tournament] Performance of Opponents| DC   | 10.5    | APPO    |       | ❌
+| Average [Tournament] Performance Rating of Opponents | DC   | 10.4    | APRO    |       | ✅
+| Average Rating of Opponents                         | D    | 10.1    | ARO     |   ●   | ✅
+| Buchholz                                            | C    | 8.1     | BH      |   ●   | ✅
+| Direct Encounter                                    | A    | 6       | DE      |       | ✅
+| Fore Buchholz                                       | D    | 8.3     | FB      |   ●   | ❌
+| Games one Elected to Play                           | B    | 7.6     | GE      |       | ❌
+| Koya System for Round Robin                         | BC   | 9.2     | KS      |       | ✅
+| Number of Games Played with Black                   | B    | 7.3     | BPG     |       | ✅
+| Number of Games Won                                 | B    | 7.2     | WON     |       | ❌
+| Number of Games Won with Black                      | B    | 7.4     | BWG     |       | ✅
+| Number of Wins                                      | B    | 7.1     | WIN     |       | ✅
+| Perfect Tournament Performance                      | DB   | 10.3    | PTP     |       | ❌
+| Sonneborn-Berger                                    | BC   | 9.1     | SB      |   ●   | ✅
+| (Sum of) Progressive Scores                         | B    | 7.5     | PS      |   ●   | ✅
+| Tournament Performance Rating                       | DB   | 10.2    | TPR     |       | ✅
+ */
 enum Tiebreaker(val code: String, val name: String):
 
   case NbGames extends Tiebreaker("GAMES", "Number of games played")
@@ -39,9 +62,9 @@ enum Tiebreaker(val code: String, val name: String):
 
   case DirectEncounter extends Tiebreaker("DE", "Direct encounter")
 
-  case AverageOpponentRating extends Tiebreaker("AOR", "Average opponent rating")
+  case AverageRatingOfOpponents extends Tiebreaker("ARO", "Average rating of opponents")
 
-  case AverageOpponentRatingCut1 extends Tiebreaker("AOR-C1", "Average opponent rating cut 1")
+  case AverageRatingOfOpponentsCut1 extends Tiebreaker("ARO-C1", "Average rating of opponents cut 1")
 
   case AveragePerformanceOfOpponents
       extends Tiebreaker(
@@ -77,7 +100,7 @@ object Tiebreaker:
           case _                                => TieBreakPoints(0f)
       .cutSum(cut)
 
-  private def AverageOpponentRatingCutN(
+  private def AverageRatingOfOpponentsCutN(
       cut: Int,
       opponentGames: Seq[PlayerGames]
   ): TieBreakPoints =
@@ -135,8 +158,8 @@ object Tiebreaker:
                       ))
                   .score
               )
-            case AverageOpponentRating     => AverageOpponentRatingCutN(0, opponentGames)
-            case AverageOpponentRatingCut1 => AverageOpponentRatingCutN(1, opponentGames)
+            case AverageRatingOfOpponents     => AverageRatingOfOpponentsCutN(0, opponentGames)
+            case AverageRatingOfOpponentsCut1 => AverageRatingOfOpponentsCutN(1, opponentGames)
             case AveragePerformanceOfOpponents =>
               val perfs = opponentGames
                 .map: opp =>

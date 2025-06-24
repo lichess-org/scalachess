@@ -62,10 +62,6 @@ class TiebreakersTest extends ChessTest:
     assertEquals(playerD_Games.score, 2.5f)
     assertEquals(playerE_Games.score, 1.5f)
 
-  test("NbGames"):
-    val tiebreaker = tb(NbGames, playerA, allGames)
-    assertEquals(tiebreaker, 4.0f)
-
   test("NbBlackGames"):
     val tiebreaker = tb(NbBlackGames, playerA, allGames)
     assertEquals(tiebreaker, 1.0f)

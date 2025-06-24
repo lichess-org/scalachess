@@ -13,10 +13,10 @@ extension (tieBreakSeq: Seq[TieBreakPoints])
   def cutSum(cut: Int): TieBreakPoints =
     tieBreakSeq.sorted.drop(cut).sum
 
-// Tie-breakers for individuals for swiss/round-robins
-// https://handbook.fide.com/chapter/TieBreakRegulations082024
-
 /*
+
+Tie-breakers for individuals for swiss/round-robins
+https://handbook.fide.com/chapter/TieBreakRegulations082024
 
 | Name (in alphabetical order)                        | Type | Section | Acronym | Cut-1 |
 |-----------------------------------------------------|------|---------|---------|-------|
@@ -39,8 +39,6 @@ extension (tieBreakSeq: Seq[TieBreakPoints])
 | Tournament Performance Rating                       | DB   | 10.2    | TPR     |       | ✅
  */
 enum Tiebreaker(val code: String, val name: String):
-
-  case NbGames extends Tiebreaker("GAMES", "Number of games played")
 
   case NbBlackGames extends Tiebreaker("BPG", "Number of games played with black")
 
@@ -129,7 +127,6 @@ object Tiebreaker:
       playerWithGames match
         case PlayerGames(player, games) =>
           tiebreaker match
-            case NbGames      => TieBreakPoints(games.size)
             case NbBlackGames => TieBreakPoints(games.filter(_.color == Color.Black).size)
             case NbWins       => TieBreakPoints(games.count(_.points.contains(Points.One)))
             case NbBlackWins =>

@@ -29,7 +29,7 @@ object Replay:
       initialFen: Fen.Full,
       variant: Variant
   ): (Game, List[(Game, Uci.WithSan)], Option[ErrorStr]) =
-    inline def transform(success: (next: Game, move: MoveOrDrop)) =
+    inline def transform(success: (next: Game, move: MoveOrDrop, ply: Ply)) =
       (success.next, Uci.WithSan(success.move.toUci, success.move.toSanStr))
     val init = Game(variant, initialFen.some)
     init

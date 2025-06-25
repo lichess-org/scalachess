@@ -55,6 +55,21 @@ class CanPlayTest extends MunitExtensions with SnapshotAssertions:
     assertEquals(x.error, y.error)
     assertEquals(x.state.board, y.state.board)
 
+  test("refold has correct plies"):
+    val sans = SanStr.from(Fixtures.fromProd2.split(' ').toList)
+    val x    = Standard.initialPosition
+      .refold(sans, Ply.initial)(List.empty[Ply], (xs, step) => step.ply :: xs)
+      .toOption
+      .get
+    val y = Standard.initialPosition
+      .refoldRight(sans, Ply.initial)(List.empty[Ply], (step, xs) => step.ply :: xs)
+      .toOption
+      .get
+    assertEquals(y.result(0), Ply.initial.next)
+    assertEquals(x.result, y.result.reverse)
+    assertEquals(x.error, None)
+    assertEquals(y.error, None)
+
   /*============== Error Messages ==============*/
 
   test("error message for white"):

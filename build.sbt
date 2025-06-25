@@ -5,7 +5,6 @@ inThisBuild(
     scalaVersion      := "3.7.1",
     version           := "17.8.2",
     organization      := "com.github.lichess-org.scalachess",
-    scalaVersion      := "3.6.4",
     version           := "tiebreaker",
     organization      := "org.lichess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),

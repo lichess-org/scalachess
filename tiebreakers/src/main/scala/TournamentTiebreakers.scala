@@ -100,16 +100,21 @@ object Tiebreaker:
           case _                                => TieBreakPoints(0f)
       .cutSum(cut)
 
+  private def Average(numerator: Float, denominator: Float): TieBreakPoints =
+    if denominator > 0 then TieBreakPoints(numerator / denominator)
+    else TieBreakPoints(0f)
+
   private def AverageRatingOfOpponentsCutN(
       cut: Int,
       opponentGames: Seq[PlayerGames]
   ): TieBreakPoints =
-    TieBreakPoints(
+    Average(
       opponentGames
         .map(_.player.rating.value)
         .sorted
         .drop(cut)
-        .sum / opponentGames.size.toFloat
+        .sum,
+      opponentGames.size.toFloat
     )
 
   private def SumOfProgressiveScoresCutN(
@@ -141,11 +146,12 @@ object Tiebreaker:
             case BuchholzCut1               => BuchholzCutN(1, allOpponents)
             case BuchholzCut2               => BuchholzCutN(2, allOpponents)
             case AverageOfOpponentsBuchholz =>
-              TieBreakPoints(
+              Average(
                 allOpponents
                   .map: opp =>
                     tb(Buchholz, opp.player, allPlayers).value
-                  .sum / allOpponents.size.toFloat
+                  .sum,
+                allOpponents.size.toFloat
               )
             case DirectEncounter =>
               TieBreakPoints(
@@ -169,7 +175,7 @@ object Tiebreaker:
                       case POVGame(Some(points), _, _) => Elo.Game(points, opp.player.rating))
                     .map(_.value)
                 .flatten
-              TieBreakPoints(perfs.nonEmpty.option(perfs.sum / perfs.size.toFloat) | 0f)
+              Average(perfs.sum, perfs.size.toFloat)
             case KoyaSystem =>
               val halfOfMaxPossibleScore = (allPlayers
                 .map(_.games.size)

@@ -5,6 +5,7 @@ import chess.Outcome.Points
 import chess.Color
 import scalalib.newtypes.*
 import scalalib.extensions.*
+import cats.data.NonEmptySeq
 
 opaque type TieBreakPoints = Float
 object TieBreakPoints extends OpaqueFloat[TieBreakPoints]
@@ -127,21 +128,21 @@ object Tiebreaker:
       .map(_.score)
     TieBreakPoints(progressiveScores.sorted.drop(cut).sum)
 
-  def tb(tiebreaker: Tiebreaker, player: Player, allPlayers: Seq[PlayerGames]): TieBreakPoints =
-    val playerGamesOpt = allPlayers.find(_.player == player)
-    val allOpponents   = allPlayers.filter(_.games.exists(_.opponent == player))
-    playerGamesOpt.fold(TieBreakPoints(0f)): playerWithGames =>
-      playerWithGames match
-        case PlayerGames(player, games, partialTiebreaks) =>
+  def tb(tiebreaker: Tiebreaker, me: Player, allPlayers: Seq[PlayerGames]): TieBreakPoints =
+    val myGames      = allPlayers.find(_.player == me)
+    val allOpponents = allPlayers.filter(_.games.exists(_.opponent == me))
+    myGames.fold(TieBreakPoints(0f)): meAndMyGames =>
+      meAndMyGames match
+        case PlayerGames(_, myGames, partialTiebreaks) =>
           tiebreaker match
-            case NbBlackGames => TieBreakPoints(games.filter(_.color == Color.Black).size)
-            case NbWins       => TieBreakPoints(games.count(_.points.contains(Points.One)))
+            case NbBlackGames => TieBreakPoints(myGames.filter(_.color == Color.Black).size)
+            case NbWins       => TieBreakPoints(myGames.count(_.points.contains(Points.One)))
             case NbBlackWins  =>
               TieBreakPoints(
-                games.count(g => g.color == Color.Black && g.points.contains(Points.One))
+                myGames.count(g => g.color == Color.Black && g.points.contains(Points.One))
               )
-            case SonnebornBerger            => sonnebornBergerCutN(0, playerWithGames, allOpponents)
-            case SonnebornBergerCut1        => sonnebornBergerCutN(1, playerWithGames, allOpponents)
+            case SonnebornBerger            => sonnebornBergerCutN(0, meAndMyGames, allOpponents)
+            case SonnebornBergerCut1        => sonnebornBergerCutN(1, meAndMyGames, allOpponents)
             case Buchholz                   => buchholzCutN(0, allOpponents)
             case BuchholzCut1               => buchholzCutN(1, allOpponents)
             case BuchholzCut2               => buchholzCutN(2, allOpponents)
@@ -155,15 +156,17 @@ object Tiebreaker:
               )
             case DirectEncounter =>
               TieBreakPoints(
-                playerWithGames
-                  .copy(games = games.filter: game =>
-                    allOpponents
-                      .exists(opponent =>
-                        game.opponent == opponent.player && opponent.score == playerWithGames.score && partialTiebreaks
-                          .zip(opponent.partialTiebreaks)
-                          .forall(_ == _)
-                      ))
-                  .score
+                myGames
+                  .groupBy(_.opponent)
+                  .map: (opponent, games) =>
+                    val theirGames           = PlayerGames(opponent, games)
+                    val validDirectEncounter = theirGames.score == meAndMyGames.score && partialTiebreaks
+                      .zip(allOpponents.find(_.player == opponent).flatMap(_.partialTiebreaks))
+                      .forall(_ == _)
+                    val deScore = games.flatMap(_.points.map(_.value)).sum
+                    if validDirectEncounter && games.size > 1 then deScore / 2f
+                    else deScore
+                  .sum
               )
             case AverageRatingOfOpponents      => averageRatingOfOpponentsCutN(0, allOpponents)
             case AverageRatingOfOpponentsCut1  => averageRatingOfOpponentsCutN(1, allOpponents)
@@ -181,8 +184,8 @@ object Tiebreaker:
                 .map(_.games.size)
                 .max) / 2f
               TieBreakPoints(
-                playerWithGames
-                  .copy(games = games.filter: game =>
+                meAndMyGames
+                  .copy(games = myGames.filter: game =>
                     allOpponents
                       .exists(opponent =>
                         game.opponent == opponent.player && opponent.score >= halfOfMaxPossibleScore
@@ -190,9 +193,9 @@ object Tiebreaker:
                   .score
               )
             case SumOfProgressiveScores =>
-              sumOfProgressiveScoresCutN(0, playerWithGames)
+              sumOfProgressiveScoresCutN(0, meAndMyGames)
             case SumOfProgressiveScoresCut1 =>
-              sumOfProgressiveScoresCutN(1, playerWithGames)
+              sumOfProgressiveScoresCutN(1, meAndMyGames)
 
   case class POVGame(
       points: Option[chess.Outcome.Points],
@@ -203,7 +206,7 @@ object Tiebreaker:
   case class PlayerGames(
       player: Player,
       games: Seq[POVGame],
-      partialTiebreaks: Option[Seq[TieBreakPoints]] = None
+      partialTiebreaks: Option[NonEmptySeq[TieBreakPoints]] = None
   ):
     def score: Float = games.flatMap(_.points.map(_.value)).sum
 

@@ -80,13 +80,13 @@ object Tiebreaker:
 
   val byCode: Map[String, Tiebreaker] = values.mapBy(_.code)
 
-  private def BuchholzCutN(cut: Int, opponentGames: Seq[PlayerGames]): TieBreakPoints =
+  private def buchholzCutN(cut: Int, opponentGames: Seq[PlayerGames]): TieBreakPoints =
     opponentGames
       .map: opponent =>
         TieBreakPoints(opponent.score)
       .cutSum(cut)
 
-  private def SonnebornBergerCutN(
+  private def sonnebornBergerCutN(
       cut: Int,
       player: PlayerGames,
       opponentGames: Seq[PlayerGames]
@@ -100,15 +100,15 @@ object Tiebreaker:
           case _                                => TieBreakPoints(0f)
       .cutSum(cut)
 
-  private def Average(numerator: Float, denominator: Float): TieBreakPoints =
+  private def average(numerator: Float, denominator: Float): TieBreakPoints =
     if denominator > 0 then TieBreakPoints(numerator / denominator)
     else TieBreakPoints(0f)
 
-  private def AverageRatingOfOpponentsCutN(
+  private def averageRatingOfOpponentsCutN(
       cut: Int,
       opponentGames: Seq[PlayerGames]
   ): TieBreakPoints =
-    Average(
+    average(
       opponentGames
         .map(_.player.rating.value)
         .sorted
@@ -117,7 +117,7 @@ object Tiebreaker:
       opponentGames.size.toFloat
     )
 
-  private def SumOfProgressiveScoresCutN(
+  private def sumOfProgressiveScoresCutN(
       cut: Int,
       player: PlayerGames
   ): TieBreakPoints =
@@ -140,13 +140,13 @@ object Tiebreaker:
               TieBreakPoints(
                 games.count(g => g.color == Color.Black && g.points.contains(Points.One))
               )
-            case SonnebornBerger            => SonnebornBergerCutN(0, playerWithGames, allOpponents)
-            case SonnebornBergerCut1        => SonnebornBergerCutN(1, playerWithGames, allOpponents)
-            case Buchholz                   => BuchholzCutN(0, allOpponents)
-            case BuchholzCut1               => BuchholzCutN(1, allOpponents)
-            case BuchholzCut2               => BuchholzCutN(2, allOpponents)
+            case SonnebornBerger            => sonnebornBergerCutN(0, playerWithGames, allOpponents)
+            case SonnebornBergerCut1        => sonnebornBergerCutN(1, playerWithGames, allOpponents)
+            case Buchholz                   => buchholzCutN(0, allOpponents)
+            case BuchholzCut1               => buchholzCutN(1, allOpponents)
+            case BuchholzCut2               => buchholzCutN(2, allOpponents)
             case AverageOfOpponentsBuchholz =>
-              Average(
+              average(
                 allOpponents
                   .map: opp =>
                     tb(Buchholz, opp.player, allPlayers).value
@@ -165,8 +165,8 @@ object Tiebreaker:
                       ))
                   .score
               )
-            case AverageRatingOfOpponents      => AverageRatingOfOpponentsCutN(0, allOpponents)
-            case AverageRatingOfOpponentsCut1  => AverageRatingOfOpponentsCutN(1, allOpponents)
+            case AverageRatingOfOpponents      => averageRatingOfOpponentsCutN(0, allOpponents)
+            case AverageRatingOfOpponentsCut1  => averageRatingOfOpponentsCutN(1, allOpponents)
             case AveragePerformanceOfOpponents =>
               val perfs = allOpponents
                 .map: opp =>
@@ -175,7 +175,7 @@ object Tiebreaker:
                       case POVGame(Some(points), _, _) => Elo.Game(points, opp.player.rating))
                     .map(_.value)
                 .flatten
-              Average(perfs.sum, perfs.size.toFloat)
+              average(perfs.sum, perfs.size.toFloat)
             case KoyaSystem =>
               val halfOfMaxPossibleScore = (allPlayers
                 .map(_.games.size)
@@ -190,9 +190,9 @@ object Tiebreaker:
                   .score
               )
             case SumOfProgressiveScores =>
-              SumOfProgressiveScoresCutN(0, playerWithGames)
+              sumOfProgressiveScoresCutN(0, playerWithGames)
             case SumOfProgressiveScoresCut1 =>
-              SumOfProgressiveScoresCutN(1, playerWithGames)
+              sumOfProgressiveScoresCutN(1, playerWithGames)
 
   case class POVGame(
       points: Option[chess.Outcome.Points],

@@ -171,10 +171,18 @@ object Tiebreaker:
                 .flatten
               TieBreakPoints(perfs.nonEmpty.option(perfs.sum / perfs.size.toFloat) | 0f)
             case KoyaSystem =>
-              val halfOfMaxPossibleScore = allPlayers
+              val halfOfMaxPossibleScore = (allPlayers
                 .map(_.games.size)
-                .max / 2
-              tb(Buchholz, player, allPlayers.filter(_.score >= halfOfMaxPossibleScore))
+                .max) / 2f
+              TieBreakPoints(
+                playerWithGames
+                  .copy(games = games.filter: game =>
+                    allOpponents
+                      .exists(opponent =>
+                        game.opponent == opponent.player && opponent.score >= halfOfMaxPossibleScore
+                      ))
+                  .score
+              )
             case SumOfProgressiveScores =>
               SumOfProgressiveScoresCutN(0, playerWithGames)
             case SumOfProgressiveScoresCut1 =>

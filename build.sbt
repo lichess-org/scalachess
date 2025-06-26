@@ -3,7 +3,6 @@ import snapshot4s.BuildInfo.snapshot4sVersion
 inThisBuild(
   Seq(
     scalaVersion      := "3.7.1",
-    version           := "17.8.2",
     organization      := "com.github.lichess-org.scalachess",
     version           := "tiebreaker",
     organization      := "org.lichess",

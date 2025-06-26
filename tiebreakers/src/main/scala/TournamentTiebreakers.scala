@@ -78,6 +78,8 @@ enum Tiebreaker(val code: String, val name: String):
 
 object Tiebreaker:
 
+  val byCode: Map[String, Tiebreaker] = values.mapBy(_.code)
+
   private def BuchholzCutN(cut: Int, opponentGames: Seq[PlayerGames]): TieBreakPoints =
     opponentGames
       .map: opponent =>
@@ -120,45 +122,45 @@ object Tiebreaker:
       .map(_.score)
     TieBreakPoints(progressiveScores.sorted.drop(cut).sum)
 
-  def tb(tiebreaker: Tiebreaker, player: Player, allGames: Seq[PlayerGames]): TieBreakPoints =
-    val playerGamesOpt = allGames.find(_.player == player)
-    val opponentGames  = allGames.filter(_.games.exists(_.opponent == player))
+  def tb(tiebreaker: Tiebreaker, player: Player, allPlayers: Seq[PlayerGames]): TieBreakPoints =
+    val playerGamesOpt = allPlayers.find(_.player == player)
+    val allOpponents   = allPlayers.filter(_.games.exists(_.opponent == player))
     playerGamesOpt.fold(TieBreakPoints(0f)): playerWithGames =>
       playerWithGames match
         case PlayerGames(player, games) =>
           tiebreaker match
             case NbBlackGames => TieBreakPoints(games.filter(_.color == Color.Black).size)
             case NbWins       => TieBreakPoints(games.count(_.points.contains(Points.One)))
-            case NbBlackWins =>
+            case NbBlackWins  =>
               TieBreakPoints(
                 games.count(g => g.color == Color.Black && g.points.contains(Points.One))
               )
-            case SonnebornBerger     => SonnebornBergerCutN(0, playerWithGames, opponentGames)
-            case SonnebornBergerCut1 => SonnebornBergerCutN(1, playerWithGames, opponentGames)
-            case Buchholz            => BuchholzCutN(0, opponentGames)
-            case BuchholzCut1        => BuchholzCutN(1, opponentGames)
-            case BuchholzCut2        => BuchholzCutN(2, opponentGames)
+            case SonnebornBerger            => SonnebornBergerCutN(0, playerWithGames, allOpponents)
+            case SonnebornBergerCut1        => SonnebornBergerCutN(1, playerWithGames, allOpponents)
+            case Buchholz                   => BuchholzCutN(0, allOpponents)
+            case BuchholzCut1               => BuchholzCutN(1, allOpponents)
+            case BuchholzCut2               => BuchholzCutN(2, allOpponents)
             case AverageOfOpponentsBuchholz =>
               TieBreakPoints(
-                opponentGames
+                allOpponents
                   .map: opp =>
-                    tb(Buchholz, opp.player, allGames).value
-                  .sum / opponentGames.size.toFloat
+                    tb(Buchholz, opp.player, allPlayers).value
+                  .sum / allOpponents.size.toFloat
               )
             case DirectEncounter =>
               TieBreakPoints(
                 playerWithGames
                   .copy(games = games.filter: game =>
-                    opponentGames
+                    allOpponents
                       .exists(opponent =>
-                        opponent.player == game.opponent && opponent.score == playerWithGames.score
+                        game.opponent == opponent.player && opponent.score == playerWithGames.score
                       ))
                   .score
               )
-            case AverageRatingOfOpponents     => AverageRatingOfOpponentsCutN(0, opponentGames)
-            case AverageRatingOfOpponentsCut1 => AverageRatingOfOpponentsCutN(1, opponentGames)
+            case AverageRatingOfOpponents      => AverageRatingOfOpponentsCutN(0, allOpponents)
+            case AverageRatingOfOpponentsCut1  => AverageRatingOfOpponentsCutN(1, allOpponents)
             case AveragePerformanceOfOpponents =>
-              val perfs = opponentGames
+              val perfs = allOpponents
                 .map: opp =>
                   Elo
                     .computePerformanceRating(opp.games.collect:
@@ -167,10 +169,10 @@ object Tiebreaker:
                 .flatten
               TieBreakPoints(perfs.nonEmpty.option(perfs.sum / perfs.size.toFloat) | 0f)
             case KoyaSystem =>
-              val halfOfMaxPossibleScore = allGames
+              val halfOfMaxPossibleScore = allPlayers
                 .map(_.games.size)
                 .max / 2
-              tb(Buchholz, player, allGames.filter(_.score >= halfOfMaxPossibleScore))
+              tb(Buchholz, player, allPlayers.filter(_.score >= halfOfMaxPossibleScore))
             case SumOfProgressiveScores =>
               SumOfProgressiveScoresCutN(0, playerWithGames)
             case SumOfProgressiveScoresCut1 =>

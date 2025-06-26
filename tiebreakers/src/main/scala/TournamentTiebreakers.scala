@@ -127,7 +127,7 @@ object Tiebreaker:
     val allOpponents   = allPlayers.filter(_.games.exists(_.opponent == player))
     playerGamesOpt.fold(TieBreakPoints(0f)): playerWithGames =>
       playerWithGames match
-        case PlayerGames(player, games) =>
+        case PlayerGames(player, games, partialTiebreaks) =>
           tiebreaker match
             case NbBlackGames => TieBreakPoints(games.filter(_.color == Color.Black).size)
             case NbWins       => TieBreakPoints(games.count(_.points.contains(Points.One)))
@@ -153,7 +153,9 @@ object Tiebreaker:
                   .copy(games = games.filter: game =>
                     allOpponents
                       .exists(opponent =>
-                        game.opponent == opponent.player && opponent.score == playerWithGames.score
+                        game.opponent == opponent.player && opponent.score == playerWithGames.score && partialTiebreaks
+                          .zip(opponent.partialTiebreaks)
+                          .forall(_ == _)
                       ))
                   .score
               )
@@ -184,7 +186,11 @@ object Tiebreaker:
       color: Color
   )
 
-  case class PlayerGames(player: Player, games: Seq[POVGame]):
+  case class PlayerGames(
+      player: Player,
+      games: Seq[POVGame],
+      partialTiebreaks: Option[Seq[TieBreakPoints]] = None
+  ):
     def score: Float = games.flatMap(_.points.map(_.value)).sum
 
   case class Player(name: String, rating: Elo)

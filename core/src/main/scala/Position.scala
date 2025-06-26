@@ -13,7 +13,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
   export history.{ castles, unmovedRooks, crazyData }
   // format: off
   export board.{ attackers, attacks, bishops, black, byColor, byPiece, byRole, byRoleOf, colorAt,
-    fold, foreach, isCheck, isOccupied, kingOf, kingPosOf, kings, kingsAndBishopsOnly,
+    foreach, isCheck, isOccupied, kingOf, kingPosOf, kings, kingsAndBishopsOnly,
     kingsAndBishopsOnlyOf, kingsAndKnightsOnly, kingsAndKnightsOnlyOf, kingsAndMinorsOnly,
     kingsOnly, kingsOnlyOf, kingsRooksAndMinorsOnly, knights, nbPieces, nonKingsOf, occupied,
     onlyKnights, onlyOf, pawns, piece, pieceAt, pieceMap as pieces, pieces as allPieces, piecesOf,

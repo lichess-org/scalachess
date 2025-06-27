@@ -159,13 +159,16 @@ object Tiebreaker:
                 myGames
                   .groupBy(_.opponent)
                   .map: (opponent, games) =>
-                    val theirGames           = PlayerGames(opponent, games)
-                    val validDirectEncounter = theirGames.score == meAndMyGames.score && partialTiebreaks
-                      .zip(allOpponents.find(_.player == opponent).flatMap(_.partialTiebreaks))
-                      .forall(_ == _)
-                    val deScore = games.flatMap(_.points.map(_.value)).sum
-                    if validDirectEncounter && games.size > 1 then deScore / 2f
-                    else deScore
+                    val opponentGames        = allOpponents.find(_.player == opponent)
+                    val validDirectEncounter =
+                      opponentGames.exists(_.score == meAndMyGames.score) && partialTiebreaks
+                        .zip(opponentGames.flatMap(_.partialTiebreaks))
+                        .forall(_ == _)
+                    lazy val scoreAgainstOpp = games.flatMap(_.points.map(_.value)).sum
+                    if !validDirectEncounter then 0f
+                    // If the players meet more than once, FIDE dictates that we average the score
+                    else if games.size > 1 then scoreAgainstOpp / games.size.toFloat
+                    else scoreAgainstOpp
                   .sum
               )
             case AverageRatingOfOpponents      => averageRatingOfOpponentsCutN(0, allOpponents)

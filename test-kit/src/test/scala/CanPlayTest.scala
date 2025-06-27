@@ -57,14 +57,8 @@ class CanPlayTest extends MunitExtensions with SnapshotAssertions:
 
   test("foldLeft and foldRight has correct plies"):
     val sans = SanStr.from(Fixtures.fromProd2.split(' ').toList)
-    val x    = Standard.initialPosition
-      .foldLeft(sans, Ply.initial)(List.empty[Ply], (xs, step) => step.ply :: xs)
-      .toOption
-      .get
-    val y = Standard.initialPosition
-      .foldRight(sans, Ply.initial)(List.empty[Ply], (step, xs) => step.ply :: xs)
-      .toOption
-      .get
+    val x    = Standard.initialPosition.foldLeft(sans, Ply.initial)(List.empty, (xs, step) => step.ply :: xs)
+    val y    = Standard.initialPosition.foldRight(sans, Ply.initial)(List.empty, (step, xs) => step.ply :: xs)
     assertEquals(y.result(0), Ply.initial.next)
     assertEquals(x.result, y.result.reverse)
     assertEquals(x.error, None)

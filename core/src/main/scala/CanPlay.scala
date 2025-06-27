@@ -83,13 +83,17 @@ trait CanPlay[A]:
     /**
      * Parse, play a sequence of SanStr and fold the result into a value B, starting with an initial value.
      * */
+    @targetName("foldLeftFromSans")
     def foldLeft[F[_]: Traverse](
         sans: F[SanStr],
         initialPly: Ply
-    )[B](empty: B, combine: (B, Step) => B): Either[ErrorStr, (result: B, error: Option[ErrorStr])] =
+    )[B](empty: B, combine: (B, Step) => B): (result: B, error: Option[ErrorStr]) =
       Parser
         .moves(sans)
-        .map(moves => foldLeft(moves, initialPly)(empty, combine))
+        .fold(
+          error => (empty, error.some),
+          moves => foldLeft(moves, initialPly)(empty, combine)
+        )
 
     /**
      * Play a sequence of moves and fold the result into a value B.
@@ -111,13 +115,17 @@ trait CanPlay[A]:
     /**
      * Parse, play a sequence of SanStr and fold the result from right to left into a value B, starting with an initial value.
      * */
+    @targetName("foldRightFromSans")
     def foldRight[F[_]: Traverse](
         sans: F[SanStr],
         initialPly: Ply
-    )[B](empty: B, combine: (Step, B) => B): Either[ErrorStr, (result: B, error: Option[ErrorStr])] =
+    )[B](empty: B, combine: (Step, B) => B): (result: B, error: Option[ErrorStr]) =
       Parser
         .moves(sans)
-        .map(moves => foldRight(moves, initialPly)(empty, combine))
+        .fold(
+          error => (empty, error.some),
+          moves => foldRight(moves, initialPly)(empty, combine)
+        )
 
     /**
     * Play a sequence of moves and fold the result from right to left into a value B, starting with an initial value.

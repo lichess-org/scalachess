@@ -178,7 +178,7 @@ object Tiebreaker:
                 .map: opp =>
                   Elo
                     .computePerformanceRating(opp.games.collect:
-                      case POVGame(Some(points), _, _) => Elo.Game(points, opp.player.rating))
+                      case POVGame(Some(points), opponent, _) => Elo.Game(points, opponent.rating))
                     .map(_.value)
                 .flatten
               // FIDE says that the performance rating should be rounded up.

@@ -11,18 +11,18 @@ import scala.annotation.targetName
  * a typeclass that can apply a Moveable and produce a new state and a MoveOrDrop.
 */
 trait CanPlay[A]:
-  type Step      = (next: A, move: MoveOrDrop)
+  type Step      = (next: A, move: MoveOrDrop, ply: Ply)
   type Result[B] = (state: A, moves: List[B], error: Option[ErrorStr])
   extension (a: A)
     /**
      * Play a move and return the new state and the move or drop that was played.
      */
-    def apply[M <: Moveable](move: M): Either[ErrorStr, Step]
+    def apply[M <: Moveable](move: M): Either[ErrorStr, (next: A, move: MoveOrDrop)]
 
     /**
      * Parse a SanStr and play the encoded move and return new state and the move or drop that was played.
      */
-    def play(san: SanStr): Either[ErrorStr, Step] =
+    def play(san: SanStr): Either[ErrorStr, (next: A, move: MoveOrDrop)] =
       Parser.san(san).flatMap(a.apply)
 
     /**
@@ -34,11 +34,17 @@ trait CanPlay[A]:
     /**
      * Akin to play but from a sequence of SanStr instead
      *
-     * This will return left if parsing the moves fails
+     * This returns left if parsing the moves fails
      */
     @targetName("playFromSans")
     def play[F[_]: Traverse](moves: F[SanStr]): Either[ErrorStr, List[MoveOrDrop]] =
       Parser.moves(moves).flatMap(play)
+
+    @targetName("playFromSans")
+    def play[F[_]: Traverse](moves: F[SanStr], initialPly: Ply)[B](
+        transform: Step => B
+    ): Either[ErrorStr, List[B]] =
+      Parser.moves(moves).flatMap(xs => play(xs, initialPly)(transform))
 
     def play[M <: Moveable, F[_]: Traverse](moves: F[M], initialPly: Ply)[B](
         transform: Step => B
@@ -63,6 +69,10 @@ trait CanPlay[A]:
     def playWhileValidReverse[M <: Moveable, F[_]: Traverse](moves: F[M]): Result[MoveOrDrop] =
       playWhileValidReverse(moves, Ply.initial)(_.move)
 
+    /**
+     * Play a sequence of moves while they are valid, returning the state, the moves played and an error if any.
+     * The moves are played in reverse order.
+     */
     def playWhileValidReverse[F[_]: Traverse](sans: F[SanStr], initialPly: Ply)[B](
         transform: Step => B
     ): Either[ErrorStr, Result[B]] =
@@ -70,25 +80,80 @@ trait CanPlay[A]:
         .moves(sans)
         .map(moves => playWhileValidReverse(moves, initialPly)(transform))
 
+    /**
+     * Parse, play a sequence of SanStr and fold the result into a value B, starting with an initial value.
+     * */
+    def foldLeft[F[_]: Traverse](
+        sans: F[SanStr],
+        initialPly: Ply
+    )[B](empty: B, combine: (B, Step) => B): Either[ErrorStr, (result: B, error: Option[ErrorStr])] =
+      Parser
+        .moves(sans)
+        .map(moves => foldLeft(moves, initialPly)(empty, combine))
+
+    /**
+     * Play a sequence of moves and fold the result into a value B.
+     * */
+    def foldLeft[M <: Moveable, F[_]: Traverse](
+        moves: F[M],
+        initialPly: Ply
+    )[B](empty: B, combine: (B, Step) => B): (result: B, error: Option[ErrorStr]) =
+      moves.zipWithIndex
+        .foldM((a, empty)) { case ((next, acc), (move, index)) =>
+          next(move)
+            .leftMap(_ => (acc, makeError(initialPly + index, move).some))
+            .map { case (next: A, move: MoveOrDrop) =>
+              (state = next, result = combine(acc, (next, move, initialPly + index + 1)))
+            }
+        }
+        .fold(identity, (_, acc) => (result = acc, error = none))
+
+    /**
+     * Parse, play a sequence of SanStr and fold the result from right to left into a value B, starting with an initial value.
+     * */
+    def foldRight[F[_]: Traverse](
+        sans: F[SanStr],
+        initialPly: Ply
+    )[B](empty: B, combine: (Step, B) => B): Either[ErrorStr, (result: B, error: Option[ErrorStr])] =
+      Parser
+        .moves(sans)
+        .map(moves => foldRight(moves, initialPly)(empty, combine))
+
+    /**
+    * Play a sequence of moves and fold the result from right to left into a value B, starting with an initial value.
+    */
+    def foldRight[M <: Moveable, F[_]: Traverse](
+        moves: F[M],
+        initialPly: Ply
+    )[B](empty: B, combine: (Step, B) => B): (result: B, error: Option[ErrorStr]) =
+      val (_, acc, error) = playWhileValidReverse(moves, initialPly)(identity)
+      acc.foldLeft(empty)((acc, step) => combine(step, acc)) -> error
+
     def playWhileValidReverse[M <: Moveable, F[_]: Traverse](moves: F[M], initialPly: Ply)[B](
         transform: Step => B
     ): (state: A, moves: List[B], error: Option[ErrorStr]) =
       moves.zipWithIndex
         .foldM((a, List.empty[B])) { case ((next, acc), (move, index)) =>
           next(move)
-            .bimap(
-              _ => (next, acc, makeError(initialPly + index, move).some),
-              step => (state = step.next, moves = transform(step) :: acc)
-            )
+            .leftMap(_ => (next, acc, makeError(initialPly + index, move).some))
+            .map { case (next: A, move: MoveOrDrop) =>
+              (state = next, moves = transform((next, move, initialPly + index + 1)) :: acc)
+            }
         }
         .fold(identity, (next, acc) => (state = next, moves = acc, error = none))
 
+    /**
+    * Play a sequence of moves and return list of played positions including the initial position.
+    */
     def playPositions[M <: Moveable, F[_]: Traverse](moves: F[M])(using
         HasPosition[A]
     ): Either[ErrorStr, List[Position]] =
       val result = playWhileValid(moves, Ply.initial)(_.move.after)
       result.error.fold((a.position :: result.moves).asRight)(_.asLeft)
 
+    /**
+    * Parse and play a sequence of moves and return list of played positions including the initial position.
+    */
     @targetName("playPositionsFromSans")
     def playPositions[F[_]: Traverse](moves: F[SanStr])(using
         HasPosition[A]

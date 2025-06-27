@@ -181,7 +181,8 @@ object Tiebreaker:
                       case POVGame(Some(points), _, _) => Elo.Game(points, opp.player.rating))
                     .map(_.value)
                 .flatten
-              average(perfs.sum, perfs.size.toFloat)
+              // FIDE says that the performance rating should be rounded up.
+              average(perfs.sum, perfs.size.toFloat).map(_.round)
             case KoyaSystem =>
               val halfOfMaxPossibleScore = (allPlayers
                 .map(_.games.size)

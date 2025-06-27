@@ -116,7 +116,7 @@ object Tiebreaker:
         .drop(cut)
         .sum,
       opponentGames.size.toFloat
-    )
+    ).map(_.round) // Must round up according to FIDE rules
 
   private def sumOfProgressiveScoresCutN(
       cut: Int,

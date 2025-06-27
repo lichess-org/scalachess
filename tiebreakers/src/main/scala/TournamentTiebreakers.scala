@@ -77,6 +77,8 @@ enum Tiebreaker(val code: String, val name: String):
 
   case SumOfProgressiveScoresCut1 extends Tiebreaker("PS-C1", "Sum of progressive scores cut 1")
 
+  case TournamentPerformanceRating extends Tiebreaker("TPR", "Tournament performance rating")
+
 object Tiebreaker:
 
   val byCode: Map[String, Tiebreaker] = values.mapBy(_.code)
@@ -175,12 +177,7 @@ object Tiebreaker:
             case AverageRatingOfOpponentsCut1  => averageRatingOfOpponentsCutN(1, allOpponents)
             case AveragePerformanceOfOpponents =>
               val perfs = allOpponents
-                .map: opp =>
-                  Elo
-                    .computePerformanceRating(opp.games.collect:
-                      case POVGame(Some(points), opponent, _) => Elo.Game(points, opponent.rating))
-                    .map(_.value)
-                .flatten
+                .map(opp => tb(TournamentPerformanceRating, opp.player, allPlayers).value)
               // FIDE says that the performance rating should be rounded up.
               average(perfs.sum, perfs.size.toFloat).map(_.round)
             case KoyaSystem =>
@@ -200,6 +197,13 @@ object Tiebreaker:
               sumOfProgressiveScoresCutN(0, meAndMyGames)
             case SumOfProgressiveScoresCut1 =>
               sumOfProgressiveScoresCutN(1, meAndMyGames)
+            case TournamentPerformanceRating =>
+              TieBreakPoints(
+                Elo
+                  .computePerformanceRating(myGames.collect:
+                    case POVGame(Some(points), opponent, _) => Elo.Game(points, opponent.rating))
+                  .map(_.value.toFloat) | 0f
+              )
 
   case class POVGame(
       points: Option[chess.Outcome.Points],

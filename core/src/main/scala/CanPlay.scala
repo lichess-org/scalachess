@@ -83,18 +83,18 @@ trait CanPlay[A]:
     /**
      * Parse, play a sequence of SanStr and fold the result into a value B, starting with an initial value.
      * */
-    def fold[F[_]: Traverse](
+    def foldLeft[F[_]: Traverse](
         sans: F[SanStr],
         initialPly: Ply
     )[B](empty: B, combine: (B, Step) => B): Either[ErrorStr, (result: B, error: Option[ErrorStr])] =
       Parser
         .moves(sans)
-        .map(moves => fold(moves, initialPly)(empty, combine))
+        .map(moves => foldLeft(moves, initialPly)(empty, combine))
 
     /**
      * Play a sequence of moves and fold the result into a value B.
      * */
-    def fold[M <: Moveable, F[_]: Traverse](
+    def foldLeft[M <: Moveable, F[_]: Traverse](
         moves: F[M],
         initialPly: Ply
     )[B](empty: B, combine: (B, Step) => B): (result: B, error: Option[ErrorStr]) =

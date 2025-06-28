@@ -124,8 +124,8 @@ object Tiebreaker:
       .cutSum(cut)
 
   def tb(tiebreaker: Tiebreaker, me: Player, allPlayers: Seq[PlayerGames]): TieBreakPoints =
-    val myGames      = allPlayers.find(_.player == me)
-    val allOpponents = allPlayers.filter(_.games.exists(_.opponent == me))
+    val myGames     = allPlayers.find(_.player == me)
+    val myOpponents = allPlayers.filter(_.games.exists(_.opponent == me))
     myGames.fold(TieBreakPoints(0f)): meAndMyGames =>
       meAndMyGames match
         case PlayerGames(_, myGames, partialTiebreaks) =>
@@ -133,28 +133,26 @@ object Tiebreaker:
             case NbBlackGames => TieBreakPoints(myGames.filter(_.color == Color.Black).size)
             case NbWins       => TieBreakPoints(myGames.count(_.points.contains(Points.One)))
             case NbBlackWins  =>
-              TieBreakPoints(
-                myGames.count(g => g.color == Color.Black && g.points.contains(Points.One))
-              )
-            case SonnebornBerger            => sonnebornBergerCutN(0, meAndMyGames, allOpponents)
-            case SonnebornBergerCut1        => sonnebornBergerCutN(1, meAndMyGames, allOpponents)
-            case Buchholz                   => buchholzCutN(0, allOpponents)
-            case BuchholzCut1               => buchholzCutN(1, allOpponents)
-            case BuchholzCut2               => buchholzCutN(2, allOpponents)
+              TieBreakPoints(myGames.count(g => g.color == Color.Black && g.points.contains(Points.One)))
+            case SonnebornBerger            => sonnebornBergerCutN(0, meAndMyGames, myOpponents)
+            case SonnebornBergerCut1        => sonnebornBergerCutN(1, meAndMyGames, myOpponents)
+            case Buchholz                   => buchholzCutN(0, myOpponents)
+            case BuchholzCut1               => buchholzCutN(1, myOpponents)
+            case BuchholzCut2               => buchholzCutN(2, myOpponents)
             case AverageOfOpponentsBuchholz =>
               average(
-                allOpponents
+                myOpponents
                   .map: opp =>
                     tb(Buchholz, opp.player, allPlayers)
                   .sum,
-                allOpponents.size.toFloat
+                myOpponents.size.toFloat
               )
             case DirectEncounter =>
               TieBreakPoints(
                 myGames
                   .groupBy(_.opponent)
                   .map: (opponent, games) =>
-                    val opponentGames        = allOpponents.find(_.player == opponent)
+                    val opponentGames        = myOpponents.find(_.player == opponent)
                     val validDirectEncounter =
                       opponentGames.exists(_.score == meAndMyGames.score) && partialTiebreaks
                         .zip(opponentGames.flatMap(_.partialTiebreaks))
@@ -166,10 +164,10 @@ object Tiebreaker:
                     else scoreAgainstOpp
                   .sum
               )
-            case AverageRatingOfOpponents      => averageRatingOfOpponentsCutN(0, allOpponents)
-            case AverageRatingOfOpponentsCut1  => averageRatingOfOpponentsCutN(1, allOpponents)
+            case AverageRatingOfOpponents      => averageRatingOfOpponentsCutN(0, myOpponents)
+            case AverageRatingOfOpponentsCut1  => averageRatingOfOpponentsCutN(1, myOpponents)
             case AveragePerformanceOfOpponents =>
-              val perfs = allOpponents
+              val perfs = myOpponents
                 .map(opp => tb(TournamentPerformanceRating, opp.player, allPlayers))
               // FIDE says that the performance rating should be rounded up.
               average(perfs.sum, perfs.size.toFloat).map(_.round)
@@ -180,7 +178,7 @@ object Tiebreaker:
               TieBreakPoints(
                 meAndMyGames
                   .copy(games = myGames.filter: game =>
-                    allOpponents
+                    myOpponents
                       .exists(opponent =>
                         game.opponent == opponent.player && opponent.score >= halfOfMaxPossibleScore
                       ))

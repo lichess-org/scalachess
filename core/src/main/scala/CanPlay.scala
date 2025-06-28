@@ -44,7 +44,7 @@ trait CanPlay[A]:
     def play[F[_]: Traverse](moves: F[SanStr], initialPly: Ply)[B](
         transform: Step => B
     ): Either[ErrorStr, List[B]] =
-      Parser.moves(moves).flatMap(xs => play(xs, initialPly)(transform))
+      Parser.moves(moves).flatMap(play(_, initialPly)(transform))
 
     def play[M <: Moveable, F[_]: Traverse](moves: F[M], initialPly: Ply)[B](
         transform: Step => B

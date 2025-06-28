@@ -137,6 +137,31 @@ trait CanPlay[A]:
       val (_, acc, error) = playWhileValidReverse(moves, initialPly)(identity)
       acc.foldLeft(empty)((acc, step) => combine(step, acc)) -> error
 
+    /**
+     * Parse, play a sequence of SanStr and fold the result into Tree[B]
+     * */
+    @targetName("buildTreeFromSans")
+    def buildTree[F[_]: Traverse](
+        sans: F[SanStr],
+        initialPly: Ply
+    )[B](combine: Step => Node[B]): (result: Option[Node[B]], error: Option[ErrorStr]) =
+      foldRight(sans, initialPly)(
+        none[Node[B]],
+        (step, node) => node.fold(combine(step))(node => combine(step).withChild(node.some)).some
+      )
+
+    /**
+     * Parse, play a sequence of SanStr and fold the result into Tree[B]
+     * */
+    def buildTree[M <: Moveable, F[_]: Traverse](
+        moves: F[M],
+        initialPly: Ply
+    )[B](combine: Step => Node[B]): (result: Option[Node[B]], error: Option[ErrorStr]) =
+      foldRight(moves, initialPly)(
+        none[Node[B]],
+        (step, node) => node.fold(combine(step))(node => combine(step).withChild(node.some)).some
+      )
+
     def playWhileValidReverse[M <: Moveable, F[_]: Traverse](moves: F[M], initialPly: Ply)[B](
         transform: Step => B
     ): (state: A, moves: List[B], error: Option[ErrorStr]) =

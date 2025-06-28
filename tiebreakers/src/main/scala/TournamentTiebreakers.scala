@@ -6,14 +6,6 @@ import chess.Color
 import scalalib.newtypes.*
 import scalalib.extensions.*
 import cats.data.NonEmptySeq
-
-opaque type TieBreakPoints = Float
-object TieBreakPoints extends OpaqueFloat[TieBreakPoints]
-
-extension (tieBreakSeq: Seq[TieBreakPoints])
-  def cutSum(cut: Int): TieBreakPoints =
-    tieBreakSeq.sorted.drop(cut).sum
-
 /*
 
 Tie-breakers for individuals for swiss/round-robins
@@ -75,6 +67,14 @@ enum Tiebreaker(val code: String, val name: String):
 
   case TournamentPerformanceRating extends Tiebreaker("TPR", "Tournament performance rating")
 
+opaque type TieBreakPoints = Float
+object TieBreakPoints extends OpaqueFloat[TieBreakPoints]
+given Numeric[TieBreakPoints] = Numeric[Float]
+
+extension (tieBreakSeq: Seq[TieBreakPoints])
+  def cutSum(cut: Int): TieBreakPoints =
+    tieBreakSeq.sorted.drop(cut).sum
+
 object Tiebreaker:
 
   val byCode: Map[String, Tiebreaker] = values.mapBy(_.code)
@@ -99,8 +99,8 @@ object Tiebreaker:
           case _                                => TieBreakPoints(0f)
       .cutSum(cut)
 
-  private def average(numerator: Float, denominator: Float): TieBreakPoints =
-    if denominator > 0 then TieBreakPoints(numerator / denominator)
+  private def average(numerator: TieBreakPoints, denominator: Float): TieBreakPoints =
+    if denominator > 0 then TieBreakPoints(numerator.value / denominator)
     else TieBreakPoints(0f)
 
   private def averageRatingOfOpponentsCutN(
@@ -109,10 +109,8 @@ object Tiebreaker:
   ): TieBreakPoints =
     average(
       opponentGames
-        .map(_.player.rating.value)
-        .sorted
-        .drop(cut)
-        .sum,
+        .map(elo => TieBreakPoints(elo.player.rating.value))
+        .cutSum(cut),
       opponentGames.size.toFloat
     ).map(_.round) // Must round up according to FIDE rules
 
@@ -120,11 +118,10 @@ object Tiebreaker:
       cut: Int,
       player: PlayerGames
   ): TieBreakPoints =
-    val progressiveScores = player.games.indices
+    player.games.indices
       .map: i =>
-        player.copy(games = player.games.take(i + 1))
-      .map(_.score)
-    TieBreakPoints(progressiveScores.sorted.drop(cut).sum)
+        TieBreakPoints(player.copy(games = player.games.take(i + 1)).score)
+      .cutSum(cut)
 
   def tb(tiebreaker: Tiebreaker, me: Player, allPlayers: Seq[PlayerGames]): TieBreakPoints =
     val myGames      = allPlayers.find(_.player == me)
@@ -148,7 +145,7 @@ object Tiebreaker:
               average(
                 allOpponents
                   .map: opp =>
-                    tb(Buchholz, opp.player, allPlayers).value
+                    tb(Buchholz, opp.player, allPlayers)
                   .sum,
                 allOpponents.size.toFloat
               )
@@ -173,7 +170,7 @@ object Tiebreaker:
             case AverageRatingOfOpponentsCut1  => averageRatingOfOpponentsCutN(1, allOpponents)
             case AveragePerformanceOfOpponents =>
               val perfs = allOpponents
-                .map(opp => tb(TournamentPerformanceRating, opp.player, allPlayers).value)
+                .map(opp => tb(TournamentPerformanceRating, opp.player, allPlayers))
               // FIDE says that the performance rating should be rounded up.
               average(perfs.sum, perfs.size.toFloat).map(_.round)
             case KoyaSystem =>

@@ -65,11 +65,7 @@ enum Tiebreaker(val code: String, val name: String):
 
   case AverageRatingOfOpponentsCut1 extends Tiebreaker("ARO-C1", "Average rating of opponents cut 1")
 
-  case AveragePerformanceOfOpponents
-      extends Tiebreaker(
-        "APRO",
-        "Average performance of opponents"
-      )
+  case AveragePerformanceOfOpponents extends Tiebreaker("APRO", "Average performance of opponents")
 
   case KoyaSystem extends Tiebreaker("KS", "Koya system")
 

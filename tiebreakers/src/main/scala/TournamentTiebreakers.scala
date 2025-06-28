@@ -75,6 +75,10 @@ extension (tieBreakSeq: Seq[TieBreakPoints])
   def cutSum(cut: Int): TieBreakPoints =
     tieBreakSeq.sorted.drop(cut).sum
 
+extension (games: Seq[Tiebreaker.POVGame])
+  def score: Float =
+    games.flatMap(_.points.map(_.value)).sum
+
 object Tiebreaker:
 
   val byCode: Map[String, Tiebreaker] = values.mapBy(_.code)
@@ -82,7 +86,7 @@ object Tiebreaker:
   private def buchholzCutN(cut: Int, opponentGames: Seq[PlayerGames]): TieBreakPoints =
     opponentGames
       .map: opponent =>
-        TieBreakPoints(opponent.score)
+        TieBreakPoints(opponent.games.score)
       .cutSum(cut)
 
   private def sonnebornBergerCutN(
@@ -92,7 +96,7 @@ object Tiebreaker:
   ): TieBreakPoints =
     player.games
       .map: game =>
-        val oppScore = opponentGames.find(_.player == game.opponent).map(_.score)
+        val oppScore = opponentGames.find(_.player == game.opponent).map(_.games.score)
         (oppScore, game.points) match
           case (Some(score), Some(Points.One))  => TieBreakPoints(score)
           case (Some(score), Some(Points.Half)) => TieBreakPoints(score / 2f)
@@ -120,13 +124,13 @@ object Tiebreaker:
   ): TieBreakPoints =
     player.games.indices
       .map: i =>
-        TieBreakPoints(player.copy(games = player.games.take(i + 1)).score)
+        TieBreakPoints(player.games.take(i + 1).score)
       .cutSum(cut)
 
   def tb(tiebreaker: Tiebreaker, me: Player, allPlayers: Seq[PlayerGames]): TieBreakPoints =
-    val myGames     = allPlayers.find(_.player == me)
-    val myOpponents = allPlayers.filter(_.games.exists(_.opponent == me))
-    myGames.fold(TieBreakPoints(0f)): meAndMyGames =>
+    val allMyGames          = allPlayers.find(_.player == me)
+    val allMyOpponentsGames = allPlayers.filter(_.games.exists(_.opponent == me))
+    allMyGames.fold(TieBreakPoints(0f)): meAndMyGames =>
       meAndMyGames match
         case PlayerGames(_, myGames, partialTiebreaks) =>
           tiebreaker match
@@ -134,40 +138,39 @@ object Tiebreaker:
             case NbWins       => TieBreakPoints(myGames.count(_.points.contains(Points.One)))
             case NbBlackWins  =>
               TieBreakPoints(myGames.count(g => g.color == Color.Black && g.points.contains(Points.One)))
-            case SonnebornBerger            => sonnebornBergerCutN(0, meAndMyGames, myOpponents)
-            case SonnebornBergerCut1        => sonnebornBergerCutN(1, meAndMyGames, myOpponents)
-            case Buchholz                   => buchholzCutN(0, myOpponents)
-            case BuchholzCut1               => buchholzCutN(1, myOpponents)
-            case BuchholzCut2               => buchholzCutN(2, myOpponents)
+            case SonnebornBerger            => sonnebornBergerCutN(0, meAndMyGames, allMyOpponentsGames)
+            case SonnebornBergerCut1        => sonnebornBergerCutN(1, meAndMyGames, allMyOpponentsGames)
+            case Buchholz                   => buchholzCutN(0, allMyOpponentsGames)
+            case BuchholzCut1               => buchholzCutN(1, allMyOpponentsGames)
+            case BuchholzCut2               => buchholzCutN(2, allMyOpponentsGames)
             case AverageOfOpponentsBuchholz =>
               average(
-                myOpponents
+                allMyOpponentsGames
                   .map: opp =>
                     tb(Buchholz, opp.player, allPlayers)
                   .sum,
-                myOpponents.size.toFloat
+                allMyOpponentsGames.size.toFloat
               )
             case DirectEncounter =>
               TieBreakPoints(
                 myGames
                   .groupBy(_.opponent)
                   .map: (opponent, games) =>
-                    val opponentGames        = myOpponents.find(_.player == opponent)
+                    val opponentGames        = allMyOpponentsGames.find(_.player == opponent)
                     val validDirectEncounter =
-                      opponentGames.exists(_.score == meAndMyGames.score) && partialTiebreaks
+                      opponentGames.exists(_.games.score == myGames.score) && partialTiebreaks
                         .zip(opponentGames.flatMap(_.partialTiebreaks))
                         .forall(_ == _)
-                    lazy val scoreAgainstOpp = games.flatMap(_.points.map(_.value)).sum
                     if !validDirectEncounter then 0f
                     // If the players meet more than once, FIDE dictates that we average the score
-                    else if games.size > 1 then scoreAgainstOpp / games.size.toFloat
-                    else scoreAgainstOpp
+                    else if games.size > 1 then games.score / games.size.toFloat
+                    else games.score
                   .sum
               )
-            case AverageRatingOfOpponents      => averageRatingOfOpponentsCutN(0, myOpponents)
-            case AverageRatingOfOpponentsCut1  => averageRatingOfOpponentsCutN(1, myOpponents)
+            case AverageRatingOfOpponents      => averageRatingOfOpponentsCutN(0, allMyOpponentsGames)
+            case AverageRatingOfOpponentsCut1  => averageRatingOfOpponentsCutN(1, allMyOpponentsGames)
             case AveragePerformanceOfOpponents =>
-              val perfs = myOpponents
+              val perfs = allMyOpponentsGames
                 .map(opp => tb(TournamentPerformanceRating, opp.player, allPlayers))
               // FIDE says that the performance rating should be rounded up.
               average(perfs.sum, perfs.size.toFloat).map(_.round)
@@ -176,12 +179,12 @@ object Tiebreaker:
                 .map(_.games.size)
                 .max) / 2f
               TieBreakPoints(
-                meAndMyGames
-                  .copy(games = myGames.filter: game =>
-                    myOpponents
+                myGames
+                  .filter: game =>
+                    allMyOpponentsGames
                       .exists(opponent =>
-                        game.opponent == opponent.player && opponent.score >= halfOfMaxPossibleScore
-                      ))
+                        game.opponent == opponent.player && opponent.games.score >= halfOfMaxPossibleScore
+                      )
                   .score
               )
             case SumOfProgressiveScores =>
@@ -206,7 +209,6 @@ object Tiebreaker:
       player: Player,
       games: Seq[POVGame],
       partialTiebreaks: Option[NonEmptySeq[TieBreakPoints]] = None
-  ):
-    def score: Float = games.flatMap(_.points.map(_.value)).sum
+  )
 
   case class Player(name: String, rating: Elo)

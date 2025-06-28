@@ -5,6 +5,7 @@ import chess.rating.Elo
 import chess.Outcome.Points
 import cats.data.NonEmptySeq
 import chess.tiebreakers.TieBreakPoints
+import chess.tiebreakers.score
 
 class TiebreakersTest extends ChessTest:
 
@@ -58,11 +59,11 @@ class TiebreakersTest extends ChessTest:
   val playerA_opponents = Seq(playerB_Games, playerC_Games, playerD_Games, playerE_Games)
 
   test("scores"):
-    assertEquals(playerA_Games.score, 2.5f)
-    assertEquals(playerB_Games.score, 1.5f)
-    assertEquals(playerC_Games.score, 2.0f)
-    assertEquals(playerD_Games.score, 2.5f)
-    assertEquals(playerE_Games.score, 1.5f)
+    assertEquals(playerA_Games.games.score, 2.5f)
+    assertEquals(playerB_Games.games.score, 1.5f)
+    assertEquals(playerC_Games.games.score, 2.0f)
+    assertEquals(playerD_Games.games.score, 2.5f)
+    assertEquals(playerE_Games.games.score, 1.5f)
 
   test("NbBlackGames"):
     val tiebreaker = tb(NbBlackGames, playerA, allGames)

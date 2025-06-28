@@ -72,9 +72,6 @@ trait CanPlay[A]:
       val (state, acc, error) = playWhileValidReverse(moves, initialPly)(transform)
       (state = state, moves = acc.reverse, error = error)
 
-    def playWhileValidReverse[M <: Moveable, F[_]: Traverse](moves: F[M]): Result[MoveOrDrop] =
-      playWhileValidReverse(moves, Ply.initial)(_.move)
-
     /**
      * Play a sequence of moves while they are valid, returning the state, the moves played and an error if any.
      * The moves are played in reverse order.

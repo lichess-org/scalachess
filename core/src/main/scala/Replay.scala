@@ -62,5 +62,5 @@ object Replay:
     Parser.mainline(pgn).map(ml => makeReplay(ml.toGame, ml.sans))
 
   def makeReplay[F[_]: Traverse](game: Game, sans: F[San]): Result =
-    val (state, moves, error) = game.playWhileValidReverse(sans)
+    val (state, moves, error) = game.playWhileValidReverse(sans, game.ply)(_.move)
     Result(Replay(game, moves, state), error)

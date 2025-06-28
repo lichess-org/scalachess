@@ -52,13 +52,19 @@ trait CanPlay[A]:
       val (moves = acc, error = error) = playWhileValidReverse(moves, initialPly)(transform)
       error.fold(acc.reverse.asRight)(_.asLeft)
 
+    def playWhileValid[F[_]: Traverse](
+        moves: F[SanStr],
+        initialPly: Ply
+    ): Either[ErrorStr, Result[MoveOrDrop]] =
+      Parser.moves(moves).map(playWhileValid(_, initialPly))
+
     def playWhileValid[F[_]: Traverse](moves: F[SanStr], initialPly: Ply)[B](
         transform: Step => B
     ): Either[ErrorStr, Result[B]] =
       Parser.moves(moves).map(playWhileValid(_, initialPly)(transform))
 
-    def playWhileValid[M <: Moveable, F[_]: Traverse](moves: F[M]): Result[MoveOrDrop] =
-      playWhileValid(moves, Ply.initial)(_.move)
+    def playWhileValid[M <: Moveable, F[_]: Traverse](moves: F[M], initialPly: Ply): Result[MoveOrDrop] =
+      playWhileValid(moves, initialPly)(_.move)
 
     def playWhileValid[M <: Moveable, F[_]: Traverse](moves: F[M], initialPly: Ply)[B](
         transform: Step => B

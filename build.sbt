@@ -3,9 +3,8 @@ import snapshot4s.BuildInfo.snapshot4sVersion
 inThisBuild(
   Seq(
     scalaVersion      := "3.7.1",
+    version           := "17.8.2",
     organization      := "com.github.lichess-org.scalachess",
-    version           := "tiebreaker",
-    organization      := "org.lichess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
     publishTo         := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", "")))),
     semanticdbEnabled := true, // for scalafix
@@ -64,10 +63,10 @@ lazy val rating: Project = Project("rating", file("rating"))
   )
   .dependsOn(scalachess)
 
-lazy val tiebreakers: Project = Project("tiebreakers", file("tiebreakers"))
+lazy val tiebreaker: Project = Project("tiebreaker", file("tiebreaker"))
   .settings(
     commonSettings,
-    name := "scalachess-tiebreakers"
+    name := "scalachess-tiebreaker"
   )
   .dependsOn(scalachess, rating)
 
@@ -98,12 +97,12 @@ lazy val testKit = project
       "com.siriusxm"   %% "snapshot4s-munit"  % snapshot4sVersion % Test
     )
   )
-  .dependsOn(scalachess % "compile->compile", rating % "compile->compile", tiebreakers % "compile->compile")
+  .dependsOn(scalachess % "compile->compile", rating % "compile->compile", tiebreaker % "compile->compile")
 
 lazy val root = project
   .in(file("."))
   .settings(publish := {}, publish / skip := true)
-  .aggregate(scalachess, rating, tiebreakers, playJson, testKit, bench)
+  .aggregate(scalachess, rating, tiebreaker, playJson, testKit, bench)
 
 addCommandAlias("prepare", "scalafixAll; scalafmtAll")
 addCommandAlias("check", "; scalafixAll --check; scalafmtCheckAll")

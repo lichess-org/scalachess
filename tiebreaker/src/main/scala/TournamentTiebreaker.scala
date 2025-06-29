@@ -1,4 +1,4 @@
-package chess.tiebreakers
+package chess.tiebreaker
 
 import chess.rating.Elo
 import chess.Outcome.Points

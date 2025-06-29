@@ -418,9 +418,8 @@ class AtomicVariantTest extends ChessTest:
           .split(' ')
           .toVector
       )
-    val (_, steps, error) = chess.Replay.gameMoveWhileValid(sans, Atomic.initialFen, Atomic)
-    assertEquals(error, None)
-    assertEquals(steps.size, sans.size)
+    assertRight(Atomic.initialPosition.play(sans)): steps =>
+      assertEquals(steps.size, sans.size)
 
   test("Allow castling with touching kings and rook shielding final attack"):
     val position = FullFen("8/8/8/8/8/8/4k3/R3K2r w Q - 0 1")
@@ -460,6 +459,5 @@ class AtomicVariantTest extends ChessTest:
           .split(' ')
           .toVector
       )
-    val (_, steps, error) = chess.Replay.gameMoveWhileValid(sans, Atomic.initialFen, Atomic)
-    assertEquals(error, None)
-    assertEquals(steps.size, sans.size)
+    assertRight(Atomic.initialPosition.play(sans)): steps =>
+      assertEquals(steps.size, sans.size)

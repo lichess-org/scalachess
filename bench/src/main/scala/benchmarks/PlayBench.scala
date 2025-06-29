@@ -45,16 +45,6 @@ class PlayBench:
     result
 
   @Benchmark
-  def gameMoveWhileValid(bh: Blackhole) =
-    val games = this.gameMoves
-    var i     = 0
-    while i < games.size do
-      val moves = games(i)
-      Blackhole.consumeCPU(Work)
-      bh.consume(Replay.gameMoveWhileValid(moves, chess.format.Fen.initial, chess.variant.Standard))
-      i += 1
-
-  @Benchmark
   def playMoveOrDropWithPly(bh: Blackhole) =
     val games = this.gameMoves
     var i     = 0

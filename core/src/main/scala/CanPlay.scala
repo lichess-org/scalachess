@@ -52,22 +52,25 @@ trait CanPlay[A]:
       val (moves = acc, error = error) = playWhileValidReverse(moves, initialPly)(transform)
       error.fold(acc.reverse.asRight)(_.asLeft)
 
+    def playWhileValid[F[_]: Traverse](
+        moves: F[SanStr],
+        initialPly: Ply
+    ): Either[ErrorStr, Result[MoveOrDrop]] =
+      Parser.moves(moves).map(playWhileValid(_, initialPly))
+
     def playWhileValid[F[_]: Traverse](moves: F[SanStr], initialPly: Ply)[B](
         transform: Step => B
     ): Either[ErrorStr, Result[B]] =
       Parser.moves(moves).map(playWhileValid(_, initialPly)(transform))
 
-    def playWhileValid[M <: Moveable, F[_]: Traverse](moves: F[M]): Result[MoveOrDrop] =
-      playWhileValid(moves, Ply.initial)(_.move)
+    def playWhileValid[M <: Moveable, F[_]: Traverse](moves: F[M], initialPly: Ply): Result[MoveOrDrop] =
+      playWhileValid(moves, initialPly)(_.move)
 
     def playWhileValid[M <: Moveable, F[_]: Traverse](moves: F[M], initialPly: Ply)[B](
         transform: Step => B
     ): Result[B] =
       val (state, acc, error) = playWhileValidReverse(moves, initialPly)(transform)
       (state = state, moves = acc.reverse, error = error)
-
-    def playWhileValidReverse[M <: Moveable, F[_]: Traverse](moves: F[M]): Result[MoveOrDrop] =
-      playWhileValidReverse(moves, Ply.initial)(_.move)
 
     /**
      * Play a sequence of moves while they are valid, returning the state, the moves played and an error if any.
@@ -136,6 +139,64 @@ trait CanPlay[A]:
     )[B](empty: B, combine: (Step, B) => B): (result: B, error: Option[ErrorStr]) =
       val (_, acc, error) = playWhileValidReverse(moves, initialPly)(identity)
       acc.foldLeft(empty)((acc, step) => combine(step, acc)) -> error
+
+    /**
+     * Parse, play a sequence of SanStr and apply a function to each step.
+     * */
+    @targetName("foreachFromSans")
+    def foreach[F[_]: Traverse](
+        sans: F[SanStr],
+        initialPly: Ply
+    )[U](f: Step => U): Option[ErrorStr] =
+      Parser
+        .moves(sans)
+        .fold(
+          error => error.some,
+          moves => foreach(moves, initialPly)(f)
+        )
+
+    /**
+     * Play a sequence of moves and and apply a function to each step.
+     * */
+    def foreach[M <: Moveable, F[_]: Traverse](
+        moves: F[M],
+        initialPly: Ply
+    )[U](f: Step => U): Option[ErrorStr] =
+      moves.zipWithIndex
+        .foldM(a) { case (next, (move, index)) =>
+          next(move)
+            .leftMap(_ => makeError(initialPly + index, move).some)
+            .map { case (next: A, move: MoveOrDrop) =>
+              f((next, move, initialPly + index + 1))
+              next
+            }
+        }
+        .fold(identity, _ => none[ErrorStr])
+
+    /**
+     * Parse, play a sequence of SanStr and fold the result into Tree[B]
+     * */
+    @targetName("buildTreeFromSans")
+    def buildTree[F[_]: Traverse](
+        sans: F[SanStr],
+        initialPly: Ply
+    )[B](combine: Step => Node[B]): (result: Option[Node[B]], error: Option[ErrorStr]) =
+      foldRight(sans, initialPly)(
+        none[Node[B]],
+        (step, node) => node.fold(combine(step))(node => combine(step).withChild(node.some)).some
+      )
+
+    /**
+     * Parse, play a sequence of SanStr and fold the result into Tree[B]
+     * */
+    def buildTree[M <: Moveable, F[_]: Traverse](
+        moves: F[M],
+        initialPly: Ply
+    )[B](combine: Step => Node[B]): (result: Option[Node[B]], error: Option[ErrorStr]) =
+      foldRight(moves, initialPly)(
+        none[Node[B]],
+        (step, node) => node.fold(combine(step))(node => combine(step).withChild(node.some)).some
+      )
 
     def playWhileValidReverse[M <: Moveable, F[_]: Traverse](moves: F[M], initialPly: Ply)[B](
         transform: Step => B

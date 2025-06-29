@@ -115,9 +115,8 @@ class HordeVariantTest extends ChessTest:
         .split(' ')
         .toVector
     )
-    val (_, steps, error) = chess.Replay.gameMoveWhileValid(sans, Horde.initialFen, Horde)
-    assertEquals(error, None)
-    assertEquals(steps.last._1.position.legalMoves.exists(_.castles), true)
+    assertRight(Horde.initialPosition.play(sans)): steps =>
+      assertEquals(steps.last.after.legalMoves.exists(_.castles), true)
 
   test("UnmovedRooks & castles at the starting position"):
     val board = Horde.initialPosition

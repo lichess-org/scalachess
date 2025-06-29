@@ -2,9 +2,9 @@ package chess
 
 import cats.Traverse
 import cats.syntax.all.*
+import chess.format.Fen
 import chess.format.pgn.Sans.*
 import chess.format.pgn.{ Parser, PgnStr, San, SanStr }
-import chess.format.{ Fen, Uci }
 import chess.variant.Variant
 
 case class Replay(setup: Game, moves: List[MoveOrDrop], state: Game):
@@ -23,29 +23,6 @@ case class Replay(setup: Game, moves: List[MoveOrDrop], state: Game):
 object Replay:
 
   def apply(game: Game): Replay = Replay(game, Nil, game)
-
-  def gameMoveWhileValidReverse(
-      sans: Seq[SanStr],
-      initialFen: Fen.Full,
-      variant: Variant
-  ): (Game, List[(Game, Uci.WithSan)], Option[ErrorStr]) =
-    inline def transform(success: (next: Game, move: MoveOrDrop, ply: Ply)) =
-      (success.next, Uci.WithSan(success.move.toUci, success.move.toSanStr))
-    val init = Game(variant, initialFen.some)
-    init
-      .playWhileValidReverse(sans, Ply.initial)(transform)
-      .fold(
-        error => (init, Nil, error.some),
-        success => (init, success.moves, success.error)
-      )
-
-  def gameMoveWhileValid(
-      sans: Seq[SanStr],
-      initialFen: Fen.Full,
-      variant: Variant
-  ): (Game, List[(Game, Uci.WithSan)], Option[ErrorStr]) =
-    gameMoveWhileValidReverse(sans, initialFen, variant) match
-      case (game, gs, err) => (game, gs.reverse, err)
 
   def plyAtFen(
       sans: Iterable[SanStr],
@@ -85,5 +62,5 @@ object Replay:
     Parser.mainline(pgn).map(ml => makeReplay(ml.toGame, ml.sans))
 
   def makeReplay[F[_]: Traverse](game: Game, sans: F[San]): Result =
-    val (state, moves, error) = game.playWhileValidReverse(sans)
+    val (state, moves, error) = game.playWhileValidReverse(sans, game.ply)(_.move)
     Result(Replay(game, moves, state), error)

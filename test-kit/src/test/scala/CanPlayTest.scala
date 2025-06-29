@@ -64,6 +64,16 @@ class CanPlayTest extends MunitExtensions with SnapshotAssertions:
     assertEquals(x.error, None)
     assertEquals(y.error, None)
 
+  test("foldLeft from foreach"):
+    val sans = SanStr.from(Fixtures.fromProd2.split(' ').toList)
+    val x    =
+      Standard.initialPosition.foldLeft(sans, Ply.initial)(List.empty, (xs, step) => xs :+ step.move.toUci)
+    val builder = scala.collection.mutable.ListBuffer.empty[Uci]
+    val y       = Standard.initialPosition.foreach(sans, Ply.initial)(step => builder += step.move.toUci)
+    assertEquals(x.result, builder.toList)
+    assertEquals(x.error, None)
+    assertEquals(y, None)
+
   /*============== Error Messages ==============*/
 
   test("error message for white"):

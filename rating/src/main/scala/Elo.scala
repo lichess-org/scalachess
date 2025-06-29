@@ -48,8 +48,8 @@ object Elo extends RichOpaqueInt[Elo]:
   final class Player(val rating: Elo, val kFactor: KFactor)
 
   final class Game(val points: chess.Outcome.Points, val opponentRating: Elo)
-
   // 8.1.2 FIDE table
+  // We use the full table for perfect tournament performance rating  (PTP) calculations (no +- 400 limit)
   val conversionTableFIDE: Map[Int, Float] = List(
     3   -> 0.50f,
     10  -> 0.51f,
@@ -92,7 +92,15 @@ object Elo extends RichOpaqueInt[Elo]:
     344 -> 0.88f,
     357 -> 0.89f,
     374 -> 0.90f,
-    391 -> 0.91f
+    391 -> 0.91f,
+    411 -> 0.92f,
+    432 -> 0.93f,
+    456 -> 0.94f,
+    484 -> 0.95f,
+    517 -> 0.96f,
+    559 -> 0.97f,
+    619 -> 0.98f,
+    735 -> 0.99f
   ).foldLeft(0 -> Map.empty[Int, Float]):
     case ((low, table), (up, value)) =>
       val newTable = table ++

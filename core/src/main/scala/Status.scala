@@ -12,19 +12,20 @@ enum Status(val id: Int):
   inline infix def <=(inline s: Status): Boolean = id <= s.id
   inline infix def <(inline s: Status): Boolean  = id < s.id
 
-  case Created       extends Status(10)
-  case Started       extends Status(20)
-  case Aborted       extends Status(25) // from this point the game is finished
-  case Mate          extends Status(30)
-  case Resign        extends Status(31)
-  case Stalemate     extends Status(32)
-  case Timeout       extends Status(33) // when player leaves the game
-  case Draw          extends Status(34)
-  case Outoftime     extends Status(35) // clock flag
-  case Cheat         extends Status(36)
-  case NoStart       extends Status(37) // the player did not make the first move in time
-  case UnknownFinish extends Status(38) // we don't know why the game ended
-  case VariantEnd    extends Status(60) // the variant has a special ending
+  case Created                   extends Status(10)
+  case Started                   extends Status(20)
+  case Aborted                   extends Status(25) // from this point the game is finished
+  case Mate                      extends Status(30)
+  case Resign                    extends Status(31)
+  case Stalemate                 extends Status(32)
+  case Timeout                   extends Status(33) // when player leaves the game
+  case Draw                      extends Status(34)
+  case Outoftime                 extends Status(35) // clock flag
+  case Cheat                     extends Status(36)
+  case NoStart                   extends Status(37) // the player did not make the first move in time
+  case InsufficientMaterialClaim extends Status(38)
+  case UnknownFinish             extends Status(50) // we don't know why the game ended
+  case VariantEnd                extends Status(60) // the variant has a special ending
 
 object Status:
 

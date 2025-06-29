@@ -59,7 +59,7 @@ object Outcome:
     status match
       case Created | Started                                                => None
       case Aborted | Cheat | NoStart                                        => Some(ByColor(Zero, Zero))
-      case Stalemate | Draw                                                 => Some(ByColor(Half, Half))
+      case Stalemate | Draw | InsufficientMaterialClaim                     => Some(ByColor(Half, Half))
       case Mate | Resign | Timeout | Outoftime | UnknownFinish | VariantEnd =>
         positionWinner match
           case Some(White) => Some(ByColor(One, Zero))

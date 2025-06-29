@@ -3,6 +3,7 @@ package chess
 import cats.syntax.all.*
 import cats.{ Foldable, Traverse }
 import chess.CanPlay.makeError
+import chess.format.Uci
 import chess.format.pgn.{ Parser, SanStr }
 
 import scala.annotation.targetName
@@ -24,6 +25,14 @@ trait CanPlay[A]:
      */
     def play(san: SanStr): Either[ErrorStr, (next: A, move: MoveOrDrop)] =
       Parser.san(san).flatMap(a.apply)
+
+    /**
+     * Parse a String to UCI and play the encoded move and return new state and the move or drop that was played.
+     */
+    def playUci(uci: String): Either[ErrorStr, (next: A, move: MoveOrDrop)] =
+      Uci(uci)
+        .toRight(ErrorStr(s"Invalid UCI: $uci"))
+        .flatMap(a.apply)
 
     /**
      * Play a sequence of moves and return the new state and a list of MoveOrDrop that were played.

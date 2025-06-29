@@ -445,6 +445,9 @@ object Position:
   def apply(variant: Variant, fen: Option[Fen.Full]): Position =
     fen.flatMap(Fen.read(variant, _)).getOrElse(variant.initialPosition)
 
+  def apply(variant: Variant, fen: Fen.Full): Position =
+    Fen.read(variant, fen).getOrElse(variant.initialPosition)
+
   given CanPlay[Position]:
     extension (position: Position)
       def apply[M <: Moveable](move: M): Either[ErrorStr, (Position, MoveOrDrop)] =

@@ -141,6 +141,39 @@ trait CanPlay[A]:
       acc.foldLeft(empty)((acc, step) => combine(step, acc)) -> error
 
     /**
+     * Parse, play a sequence of SanStr and apply a function to each step.
+     * */
+    @targetName("foreachFromSans")
+    def foreach[F[_]: Traverse](
+        sans: F[SanStr],
+        initialPly: Ply
+    )[U](f: Step => U): Option[ErrorStr] =
+      Parser
+        .moves(sans)
+        .fold(
+          error => error.some,
+          moves => foreach(moves, initialPly)(f)
+        )
+
+    /**
+     * Play a sequence of moves and and apply a function to each step.
+     * */
+    def foreach[M <: Moveable, F[_]: Traverse](
+        moves: F[M],
+        initialPly: Ply
+    )[U](f: Step => U): Option[ErrorStr] =
+      moves.zipWithIndex
+        .foldM(a) { case (next, (move, index)) =>
+          next(move)
+            .leftMap(_ => makeError(initialPly + index, move).some)
+            .map { case (next: A, move: MoveOrDrop) =>
+              f((next, move, initialPly + index + 1))
+              next
+            }
+        }
+        .fold(identity, _ => none[ErrorStr])
+
+    /**
      * Parse, play a sequence of SanStr and fold the result into Tree[B]
      * */
     @targetName("buildTreeFromSans")

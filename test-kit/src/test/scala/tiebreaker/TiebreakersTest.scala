@@ -6,14 +6,15 @@ import chess.Outcome.Points
 import cats.data.NonEmptySeq
 import chess.tiebreakers.TieBreakPoints
 import chess.tiebreakers.score
+import cats.syntax.all.*
 
 class TiebreakersTest extends ChessTest:
 
-  val playerA = Player("PlayerA", rating = Elo(1500))
-  val playerB = Player("PlayerB", rating = Elo(1600))
-  val playerC = Player("PlayerC", rating = Elo(1550))
-  val playerD = Player("PlayerD", rating = Elo(1450))
-  val playerE = Player("PlayerE", rating = Elo(1650))
+  val playerA = Player("PlayerA", rating = Elo(1500).some)
+  val playerB = Player("PlayerB", rating = Elo(1600).some)
+  val playerC = Player("PlayerC", rating = Elo(1550).some)
+  val playerD = Player("PlayerD", rating = Elo(1450).some)
+  val playerE = Player("PlayerE", rating = Elo(1650).some)
 
   case class Game(white: Player, black: Player, result: ByColor[Points])
 
@@ -156,3 +157,64 @@ class TiebreakersTest extends ChessTest:
   test("SumOfProgressiveScoresCut1"):
     val tiebreaker = tb(SumOfProgressiveScoresCut1, playerA, allGames)
     assertEquals(tiebreaker, 5.5f)
+
+  test("PerfectTournamentPerformance - Perfect scores"):
+    // from https://chess-results.com/tnr1166026.aspx?lan=1&art=1&rd=8
+    val ruslan = Player("Ruslan Pogorelov", rating = Elo(2255).some)
+    val josep  = Player("Josep M. Beltran Reverter", rating = Elo(1834).some)
+    val carles = Player("Carles Costas Bella", rating = Elo(1929).some)
+    val sergi  = Player("Sergi Aubanell Ber", rating = Elo(1988).some)
+    val xavier = Player("Xavier Palomo Teruel", rating = Elo(2145).some)
+    val agusti = Player("Agusti Guasch Figuerola", rating = Elo(1990).some)
+    val daniel = Player("Daniel Torrens Gonzalez", rating = Elo(1965).some)
+    val aaron  = Player("Aaron Alfonso Pellisa", rating = Elo(2125).some)
+
+    val ruslanGames = Seq(
+      POVGame(Some(Points.One), josep, Color.White),
+      POVGame(Some(Points.One), carles, Color.Black),
+      POVGame(Some(Points.One), sergi, Color.White),
+      POVGame(Some(Points.Half), Player("bye", None), Color.White),
+      POVGame(Some(Points.One), xavier, Color.Black),
+      POVGame(Some(Points.One), agusti, Color.White),
+      POVGame(Some(Points.One), daniel, Color.Black),
+      POVGame(Some(Points.One), aaron, Color.White)
+    )
+    val ruslanPlayerGames = PlayerGames(ruslan, ruslanGames)
+    assertEquals(tb(TournamentPerformanceRating, ruslan, Seq(ruslanPlayerGames)), 2796f)
+    assertEquals(
+      tb(PerfectTournamentPerformance, ruslan, Seq(ruslanPlayerGames)),
+      2945f
+    ) // chess-results says 2949. Perfect scores though so :shrug:
+
+  test("PerfectTournamentPerformance - Regular"):
+    val marc     = Player("Marc Guardia Curto", rating = Elo(1830).some)
+    val enric    = Player("Enric Regue Farran", rating = Elo(1914).some)
+    val josepmg  = Player("Josep Maria Guasch Murtra", rating = Elo(1867).some)
+    val francesc = Player("Francesc Xavier Senso Moreno", rating = Elo(1818).some)
+    val ruslan   = Player("Ruslan Pogorelov", rating = Elo(2255).some)
+    val agusti   = Player("Agusti Guasch Figuerola", rating = Elo(1990).some)
+    val xavier   = Player("Xavier Palomo Teruel", rating = Elo(2145).some)
+
+    val xavierGames = Seq(
+      POVGame(Some(Points.One), marc, Color.White),
+      POVGame(Some(Points.One), enric, Color.Black),
+      POVGame(Some(Points.One), josepmg, Color.White),
+      POVGame(Some(Points.Zero), ruslan, Color.White),
+      POVGame(Some(Points.One), francesc, Color.Black),
+      // POVGame(Some(Points.Zero), Player("bye", None), Color.White), // Rd 7: bye (0)
+      POVGame(Some(Points.One), agusti, Color.White)
+    )
+    // Lila excludes all bye games. So we don't need to check for them.
+    val xavierPlayerGames = PlayerGames(xavier, xavierGames)
+    assertEquals(tb(TournamentPerformanceRating, xavier, Seq(xavierPlayerGames)), 2218f)
+    assertEquals(tb(PerfectTournamentPerformance, xavier, Seq(xavierPlayerGames)), 2259f)
+
+  test("PerfectTournamentPerformance - Zero score"):
+    val games = Seq(
+      POVGame(Some(Points.Zero), playerB, Color.Black),
+      POVGame(Some(Points.Zero), playerC, Color.White),
+      POVGame(Some(Points.Zero), playerD, Color.Black)
+    )
+    val playerGames = PlayerGames(playerA, games)
+    // Lowest rated opponent - 800
+    assertEquals(tb(PerfectTournamentPerformance, playerA, Seq(playerGames)), 650f)

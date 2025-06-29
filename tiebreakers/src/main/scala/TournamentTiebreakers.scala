@@ -26,7 +26,7 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
 | Number of Games Won                                 | B    | 7.2     | WON     |       | ❌
 | Number of Games Won with Black                      | B    | 7.4     | BWG     |       | ✅
 | Number of Wins                                      | B    | 7.1     | WIN     |       | ✅
-| Perfect Tournament Performance                      | DB   | 10.3    | PTP     |       | ❌
+| Perfect Tournament Performance                      | DB   | 10.3    | PTP     |       | ✅
 | Sonneborn-Berger                                    | BC   | 9.1     | SB      |   ●   | ✅
 | (Sum of) Progressive Scores                         | B    | 7.5     | PS      |   ●   | ✅
 | Tournament Performance Rating                       | DB   | 10.2    | TPR     |       | ✅
@@ -67,6 +67,8 @@ enum Tiebreaker(val code: String, val name: String):
 
   case TournamentPerformanceRating extends Tiebreaker("TPR", "Tournament performance rating")
 
+  case PerfectTournamentPerformance extends Tiebreaker("PTP", "Perfect tournament performance")
+
 opaque type TieBreakPoints = Float
 object TieBreakPoints extends OpaqueFloat[TieBreakPoints]
 given Numeric[TieBreakPoints] = Numeric[Float]
@@ -77,7 +79,7 @@ extension (tieBreakSeq: Seq[TieBreakPoints])
 
 extension (games: Seq[Tiebreaker.POVGame])
   def score: Float =
-    games.flatMap(_.points.map(_.value)).sum
+    games.flatMap(_.points.map(_.value)).sum // including byes
 
 object Tiebreaker:
 
@@ -113,7 +115,8 @@ object Tiebreaker:
   ): TieBreakPoints =
     average(
       opponentGames
-        .map(elo => TieBreakPoints(elo.player.rating.value))
+        .collect:
+          case PlayerGames(Player(_, Some(elo)), _, _) => TieBreakPoints(elo.value)
         .cutSum(cut),
       opponentGames.size.toFloat
     ).map(_.round) // Must round up according to FIDE rules
@@ -195,9 +198,32 @@ object Tiebreaker:
               TieBreakPoints(
                 Elo
                   .computePerformanceRating(myGames.collect:
-                    case POVGame(Some(points), opponent, _) => Elo.Game(points, opponent.rating))
+                    case POVGame(Some(points), Player(_, Some(rating)), _) => Elo.Game(points, rating))
                   .map(_.value.toFloat) | 0f
               )
+            case PerfectTournamentPerformance =>
+              val oppRatings = myGames.flatMap(_.opponent.rating.map(_.value))
+              val minR       = oppRatings.min - 800
+              val maxR       = oppRatings.max + 800
+              if myGames.score == 0f && oppRatings.nonEmpty then TieBreakPoints(minR)
+              else if oppRatings.isEmpty then TieBreakPoints(0f)
+              else
+                // Find the lowest integer rating R such that sum of expected scores >= myScore
+                // Use the full FIDE conversion table, no ±400 cut
+                def expectedScoreFor(r: Int): Float =
+                  oppRatings
+                    .map: oppR =>
+                      Elo.getExpectedScore(oppR - r)
+                    .sum
+                @annotation.tailrec
+                def binarySearch(low: Int, high: Int): Int =
+                  if low >= high then low
+                  else
+                    val mid = (low + high) / 2
+                    if expectedScoreFor(mid) >= myGames.score then binarySearch(low, mid)
+                    else binarySearch(mid + 1, high)
+                val ptp = binarySearch(minR, maxR)
+                TieBreakPoints(ptp)
 
   case class POVGame(
       points: Option[chess.Outcome.Points],
@@ -211,4 +237,4 @@ object Tiebreaker:
       partialTiebreaks: Option[NonEmptySeq[TieBreakPoints]] = None
   )
 
-  case class Player(name: String, rating: Elo)
+  case class Player(name: String, rating: Option[Elo])

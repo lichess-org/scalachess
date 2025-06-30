@@ -1,12 +1,11 @@
 package chess
 
-import chess.tiebreaker.Tiebreaker.*
-import chess.rating.Elo
-import chess.Outcome.Points
 import cats.data.NonEmptySeq
-import chess.tiebreaker.TieBreakPoints
-import chess.tiebreaker.score
 import cats.syntax.all.*
+import chess.Outcome.Points
+import chess.rating.Elo
+import chess.tiebreaker.Tiebreaker.*
+import chess.tiebreaker.{TieBreakPoints, score}
 
 class TiebreakersTest extends ChessTest:
 

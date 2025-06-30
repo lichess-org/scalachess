@@ -1,11 +1,11 @@
 package chess.tiebreaker
 
-import chess.rating.Elo
-import chess.Outcome.Points
-import chess.Color
-import scalalib.newtypes.*
-import scalalib.extensions.*
 import cats.data.NonEmptySeq
+import chess.Color
+import chess.Outcome.Points
+import chess.rating.Elo
+import scalalib.extensions.*
+import scalalib.newtypes.*
 /*
 
 Tie-breakers for individuals for swiss/round-robins

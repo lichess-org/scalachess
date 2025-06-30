@@ -77,6 +77,10 @@ extension (tieBreakSeq: Seq[TieBreakPoints])
   def cutSum(cut: Int): TieBreakPoints =
     tieBreakSeq.sorted.drop(cut).sum
 
+  def average: TieBreakPoints =
+    if tieBreakSeq.isEmpty then TieBreakPoints(0f)
+    else TieBreakPoints(tieBreakSeq.sum / tieBreakSeq.size)
+
 extension (games: Seq[Tiebreaker.POVGame])
   def score: Float =
     games.flatMap(_.points.map(_.value)).sum // including byes
@@ -105,21 +109,17 @@ object Tiebreaker:
           case _                                => TieBreakPoints(0f)
       .cutSum(cut)
 
-  private def average(numerator: TieBreakPoints, denominator: Float): TieBreakPoints =
-    if denominator > 0 then TieBreakPoints(numerator.value / denominator)
-    else TieBreakPoints(0f)
-
   private def averageRatingOfOpponentsCutN(
       cut: Int,
       opponentGames: Seq[PlayerGames]
   ): TieBreakPoints =
-    average(
-      opponentGames
-        .collect:
-          case PlayerGames(Player(_, Some(elo)), _, _) => TieBreakPoints(elo.value)
-        .cutSum(cut),
-      opponentGames.size.toFloat
-    ).map(_.round) // Must round up according to FIDE rules
+    opponentGames
+      .collect:
+        case PlayerGames(Player(_, Some(elo)), _, _) => TieBreakPoints(elo.value)
+      .sorted
+      .drop(cut)
+      .average
+      .map(_.round) // Must round up according to FIDE rules
 
   private def sumOfProgressiveScoresCutN(
       cut: Int,
@@ -147,13 +147,10 @@ object Tiebreaker:
             case BuchholzCut1               => buchholzCutN(1, allMyOpponentsGames)
             case BuchholzCut2               => buchholzCutN(2, allMyOpponentsGames)
             case AverageOfOpponentsBuchholz =>
-              average(
-                allMyOpponentsGames
-                  .map: opp =>
-                    tb(Buchholz, opp.player, allPlayers)
-                  .sum,
-                allMyOpponentsGames.size.toFloat
-              )
+              allMyOpponentsGames
+                .map: opp =>
+                  tb(Buchholz, opp.player, allPlayers)
+                .average
             case DirectEncounter =>
               TieBreakPoints(
                 myGames
@@ -173,10 +170,11 @@ object Tiebreaker:
             case AverageRatingOfOpponents      => averageRatingOfOpponentsCutN(0, allMyOpponentsGames)
             case AverageRatingOfOpponentsCut1  => averageRatingOfOpponentsCutN(1, allMyOpponentsGames)
             case AveragePerformanceOfOpponents =>
-              val perfs = allMyOpponentsGames
+              allMyOpponentsGames
                 .map(opp => tb(TournamentPerformanceRating, opp.player, allPlayers))
-              // FIDE says that the performance rating should be rounded up.
-              average(perfs.sum, perfs.size.toFloat).map(_.round)
+                .average
+                // FIDE says that the performance rating should be rounded up.
+                .map(_.round)
             case KoyaSystem =>
               val halfOfMaxPossibleScore = (allPlayers
                 .map(_.games.size)

@@ -138,6 +138,16 @@ class TiebreakersTest extends ChessTest:
     val tiebreaker = tb(AverageRatingOfOpponents, playerA, allGames)
     assertEquals(tiebreaker, 1563f)
 
+  test("AverageOpponentRating with unrated opponents"):
+    val unratedOpponent = Player("Unrated Opponent", rating = None)
+    val unratedGames    = Seq(
+      POVGame(Some(Points.One), unratedOpponent, Color.White)
+    )
+    val unratedPlayerGames = PlayerGames(unratedOpponent, unratedGames)
+    val tiebreaker         = tb(AverageRatingOfOpponents, playerA, Seq(unratedPlayerGames))
+    assertEquals(tiebreaker, 0f)
+    assertEquals(tb(AverageRatingOfOpponents, playerA, allGames :+ unratedPlayerGames), 1563f)
+
   test("AveragePerformanceOfOpponents"):
     val tiebreaker = tb(AveragePerformanceOfOpponents, playerA, allGames)
     assertEquals(tiebreaker, 1527f)

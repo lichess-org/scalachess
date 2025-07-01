@@ -133,6 +133,32 @@ class TiebreakersTest extends ChessTest:
     assertEquals(tiebreaker1, 0f)
     assertEquals(tiebreaker2, 1f)
 
+  test("DirectEncounter with equal partial tiebreaks but not all players have met"):
+    val playerAWithPartial =
+      playerA_Games.copy(partialTiebreaks = NonEmptySeq.fromSeq(Seq(TieBreakPoints(1f))))
+    val playerDWithPartial =
+      playerD_Games.copy(partialTiebreaks = NonEmptySeq.fromSeq(Seq(TieBreakPoints(1f))))
+    // Create a player X that has not played against A or D
+    // A, D and X are all on 2.5 points with partial tiebreaks of 1 but only A and D have met
+    val playerX_Games = PlayerGames(
+      Player("PlayerX", rating = Elo(1500).some),
+      Seq(
+        POVGame(Some(Points.Half), playerB, Color.White),
+        POVGame(Some(Points.One), playerD, Color.White),
+        POVGame(Some(Points.One), playerE, Color.Black)
+      ),
+      NonEmptySeq.fromSeq(Seq(TieBreakPoints(1f)))
+    )
+    val allGamesWithPartial =
+      Seq(playerAWithPartial, playerDWithPartial, playerC_Games, playerD_Games, playerE_Games, playerX_Games)
+
+    val tiebreaker1 = tb(DirectEncounter, playerAWithPartial.player, allGamesWithPartial)
+    val tiebreaker2 = tb(DirectEncounter, playerDWithPartial.player, allGamesWithPartial)
+    val tiebreakerX = tb(DirectEncounter, playerX_Games.player, allGamesWithPartial)
+    assertEquals(tiebreaker1, 0f)
+    assertEquals(tiebreaker2, 0f)
+    assertEquals(tiebreakerX, 0f)
+
   test("AverageOpponentRating"):
     val tiebreaker = tb(AverageRatingOfOpponents, playerA, allGames)
     assertEquals(tiebreaker, 1563f)

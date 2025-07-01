@@ -152,15 +152,22 @@ object Tiebreaker:
                   tb(Buchholz, opp.player, allPlayers)
                 .average
             case DirectEncounter =>
+              val tiedWithMe = allPlayers.filter(p =>
+                p.games.score == myGames.score && p.partialTiebreaks
+                  .zip(partialTiebreaks)
+                  .forall(_ == _)
+              )
+              val tiedPlayerSet         = tiedWithMe.map(_.player).toSet
+              val allTiedPlayersHaveMet =
+                tiedWithMe
+                  .forall: tied =>
+                    tiedPlayerSet.excl(tied.player).subsetOf(tied.games.map(_.opponent).toSet)
               TieBreakPoints(
                 myGames
                   .groupBy(_.opponent)
                   .map: (opponent, games) =>
-                    val opponentGames        = allMyOpponentsGames.find(_.player == opponent)
                     val validDirectEncounter =
-                      opponentGames.exists(_.games.score == myGames.score) && partialTiebreaks
-                        .zip(opponentGames.flatMap(_.partialTiebreaks))
-                        .forall(_ == _)
+                      tiedPlayerSet.contains(opponent) && allTiedPlayersHaveMet
                     if !validDirectEncounter then 0f
                     // If the players meet more than once, FIDE dictates that we average the score
                     else if games.size > 1 then games.score / games.size.toFloat

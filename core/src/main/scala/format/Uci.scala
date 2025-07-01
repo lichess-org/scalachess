@@ -94,8 +94,8 @@ object Uci:
     if move.lift(1).contains('@') then Uci.Drop.fromChars(move)
     else Uci.Move.fromChars(move)
 
-  def readList(moves: String): Option[List[Uci]] =
-    moves.split(' ').toList.traverse(apply)
+  def readList(moves: String): Either[ErrorStr, List[Uci]] =
+    moves.split(' ').toList.traverse(x => apply(x).toRight(ErrorStr(s"Invalid UCI strign: $x")))
 
   def writeList(moves: List[Uci]): String =
     moves.map(_.uci).mkString(" ")

@@ -15,8 +15,8 @@ object UciDump:
     if moves.isEmpty then Nil.asRight
     else
       Position(variant, initialFen)
-        .play(moves)
-        .map(_.map(move(variant, force960Notation)))
+        .play(moves, Ply.initial): step =>
+          move(variant, force960Notation)(step.move)
 
   def move(variant: Variant, force960Notation: Boolean = false)(mod: MoveOrDrop): String =
     mod match

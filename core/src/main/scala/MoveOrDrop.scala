@@ -31,6 +31,11 @@ sealed trait MoveOrDrop:
       case m: Move => game(m)
       case d: Drop => game.applyDrop(d)
 
+object MoveOrDrop:
+
+  case class WithPly(moveOrDrop: MoveOrDrop, ply: Ply):
+    export moveOrDrop.*
+
 case class Move(
     piece: Piece,
     orig: Square,

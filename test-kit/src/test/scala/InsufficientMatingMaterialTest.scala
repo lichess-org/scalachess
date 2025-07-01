@@ -59,9 +59,9 @@ class InsufficientMatingMaterialTest extends ChessTest:
     ).map(FullFen(_))
 
     trues.foreach: fen =>
-      val sit = fenToGame(fen, Standard).position
-      assert(apply(sit, !sit.color))
+      val position = fenToGame(fen, Standard).position
+      assert(apply(position.board, !position.color))
 
     falses.foreach: fen =>
-      val sit = fenToGame(fen, Standard).position
-      assertNot(apply(sit, !sit.color))
+      val position = fenToGame(fen, Standard).position
+      assertNot(apply(position.board, !position.color))

@@ -151,7 +151,7 @@ abstract class Variant private[variant] (
     * the game should be drawn.
     */
   def opponentHasInsufficientMaterial(position: Position): Boolean =
-    InsufficientMatingMaterial(position, !position.color)
+    InsufficientMatingMaterial(position.board, !position.color)
 
   def playerHasInsufficientMaterial(position: Position): Option[Boolean] =
     // For all variants except Antichess and Horde, considering turn isn't needed:

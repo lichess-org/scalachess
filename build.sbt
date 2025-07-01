@@ -50,7 +50,7 @@ lazy val playJson: Project = Project("playJson", file("playJson"))
     commonSettings,
     name := "scalachess-play-json",
     libraryDependencies ++= List(
-      "org.playframework"               %% "play-json"          % "3.0.4",
+      "org.playframework"               %% "play-json"          % "3.0.5",
       "com.github.lichess-org.scalalib" %% "scalalib-play-json" % scalalibVersion
     )
   )

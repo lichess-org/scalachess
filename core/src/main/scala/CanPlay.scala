@@ -34,21 +34,6 @@ trait CanPlay[A]:
         .toRight(ErrorStr(s"Invalid UCI: $uci"))
         .flatMap(a.apply)
 
-    /**
-     * Play a sequence of moves and return the new state and a list of MoveOrDrop that were played.
-     */
-    def play[M <: Moveable, F[_]: Traverse](moves: F[M]): Either[ErrorStr, List[MoveOrDrop]] =
-      play(moves, Ply.initial)(_.move)
-
-    /**
-     * Akin to play but from a sequence of SanStr instead
-     *
-     * This returns left if parsing the moves fails
-     */
-    @targetName("playFromSans")
-    def play[F[_]: Traverse](moves: F[SanStr]): Either[ErrorStr, List[MoveOrDrop]] =
-      Parser.moves(moves).flatMap(play)
-
     @targetName("playFromSans")
     def play[F[_]: Traverse](moves: F[SanStr], initialPly: Ply)[B](
         transform: Step => B
@@ -249,6 +234,14 @@ trait CanPlay[A]:
         HasPosition[A]
     ): Either[ErrorStr, List[Board]] =
       Parser.moves(moves).flatMap(playBoards)
+
+    @targetName("playMovesFromSans")
+    def playMoves[F[_]: Traverse](moves: F[SanStr]): Either[ErrorStr, List[MoveOrDrop]] =
+      Parser.moves(moves).flatMap(playMoves)
+
+    def playMoves[M <: Moveable, F[_]: Traverse](moves: F[M]): Either[ErrorStr, List[MoveOrDrop]] =
+      val result = playWhileValid(moves, Ply.initial)(_.move)
+      result.error.fold(result.moves.asRight)(_.asLeft)
 
     /**
     * Validate a sequence of moves. This will return an error if any of the moves is invalid.

@@ -115,7 +115,7 @@ class HordeVariantTest extends ChessTest:
         .split(' ')
         .toVector
     )
-    assertRight(Horde.initialPosition.play(sans)): steps =>
+    assertRight(Horde.initialPosition.playMoves(sans)): steps =>
       assertEquals(steps.last.after.legalMoves.exists(_.castles), true)
 
   test("UnmovedRooks & castles at the starting position"):

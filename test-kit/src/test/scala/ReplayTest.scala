@@ -15,7 +15,7 @@ class ReplayTest extends MunitExtensions with SnapshotAssertions:
     val fen   = FullFen("""8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1""")
     val moves = SanStr.from("""d4 d5 Nf4 Nf5 g4 g5 gxf5 exf5""".split(' ').toList)
     val init  = Position.AndFullMoveNumber(FromPosition, fen)
-    assertRight(init.play(moves)): moves =>
+    assertRight(init.playMoves(moves)): moves =>
       assertEquals(moves.size, 8)
       assertEquals(moves(1).toSanStr, "d5")
 
@@ -34,14 +34,14 @@ class ReplayTest extends MunitExtensions with SnapshotAssertions:
     val sans = SanStr.from("e4 e5 Ne3 f6 Nb3 Nb6 O-O-O Ne6 Ba6 O-O-O Nd5 Nxd5 Bxb7+ Kb8".split(' ')).toVector
     val fen  = Fen.Full("nrknbbqr/pppppppp/8/8/8/8/PPPPPPPP/NRKNBBQR w KQkq - 0 1")
     val init = Position.AndFullMoveNumber(Chess960, fen)
-    assertRight(init.play(sans)): moves =>
+    assertRight(init.playMoves(sans)): moves =>
       assertEquals(moves.size, sans.size)
 
   test("castling always 960 notation"):
     val sans =
       SanStr.from("d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3 e5 d5 Nh5 Qd2 Qh4+ g3 Qe7 O-O-O".split(' ')).toVector
     val init = Position.AndFullMoveNumber(Standard, Fen.Full.initial)
-    assertRight(init.play(sans)): moves =>
+    assertRight(init.playMoves(sans)): moves =>
       assertEquals(moves.size, sans.size)
       assertEquals(moves(9).toUci.uci, "e8h8")
       assertEquals(moves(18).toUci.uci, "e1a1")
@@ -50,7 +50,7 @@ class ReplayTest extends MunitExtensions with SnapshotAssertions:
     val fen   = Fen.Full("2bqkb1r/1pp1ppp1/7r/pN2p2p/3PP3/P3P3/1PP1B1PP/R2Q1RK1 w k - 3 13")
     val moves = SanStr.from("dxe5 Qxd1 Raxd1 Rc6 Rd2 e6 Rfd1 Be7 Na7 O-O".split(" ")).toList
     val init  = Position.AndFullMoveNumber(Standard, fen)
-    assertRight(init.play(moves)): steps =>
+    assertRight(init.playMoves(moves)): steps =>
       assertEquals(steps.size, moves.size)
 
   test("antichess replay invalid san"):
@@ -63,7 +63,7 @@ class ReplayTest extends MunitExtensions with SnapshotAssertions:
     val fen  = FullFen("r1bq1rk1/ppp2ppp/2n5/8/1bB1Pp2/5N2/PPP1Q1PP/R1B1K2R w KQ - 1 10")
     val init = Position.AndFullMoveNumber(variant.Standard, fen)
     assert(init.play(SanStr("O-O")).isLeft)
-    assert(init.play(List(SanStr("O-O"))).isLeft)
+    assert(init.playMoves(List(SanStr("O-O"))).isLeft)
     assert(init.play(SanStr("Qd2")).isRight)
 
 

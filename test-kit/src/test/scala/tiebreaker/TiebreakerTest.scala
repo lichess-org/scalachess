@@ -17,6 +17,11 @@ class TiebreakersTest extends ChessTest:
 
   case class Game(white: Player, black: Player, result: ByColor[Points])
 
+  extension (p: Player)
+    def beats(opponent: Player) = Game(p, opponent, ByColor(Points.One, Points.Zero))
+    def draws(opponent: Player) = Game(p, opponent, ByColor(Points.Half, Points.Half))
+    def loses(opponent: Player) = opponent.beats(p)
+
   // Crosstable:
   //          | A   B   C   D   E   | Total
   // ---------------------------------------
@@ -28,27 +33,23 @@ class TiebreakersTest extends ChessTest:
 
   // Define all games based on crosstable
   val games = Seq(
-    Game(playerA, playerB, ByColor(Points.One, Points.Zero)),  // A beats B
-    Game(playerA, playerC, ByColor(Points.Half, Points.Half)), // A draws C
-    Game(playerD, playerA, ByColor(Points.One, Points.Zero)),  // D beats A
-    Game(playerA, playerE, ByColor(Points.One, Points.Zero)),  // A beats E
-
-    Game(playerB, playerC, ByColor(Points.One, Points.Zero)),  // B beats C
-    Game(playerB, playerD, ByColor(Points.Half, Points.Half)), // B draws D
-    Game(playerE, playerB, ByColor(Points.One, Points.Zero)),  // E beats B
-
-    Game(playerC, playerD, ByColor(Points.One, Points.Zero)),  // C beats D
-    Game(playerC, playerE, ByColor(Points.Half, Points.Half)), // C draws E
-
-    Game(playerD, playerE, ByColor(Points.One, Points.Zero)) // D beats E
-
+    playerA.beats(playerB),
+    playerA.draws(playerC),
+    playerA.loses(playerD),
+    playerA.beats(playerE),
+    playerB.beats(playerC),
+    playerB.draws(playerD),
+    playerB.loses(playerE),
+    playerC.beats(playerD),
+    playerC.draws(playerE),
+    playerD.beats(playerE)
   )
 
   def povGames(player: Player): Seq[POVGame] =
     games.collect:
       case Game(white, black, result) if white == player || black == player =>
-        val playerColor = if white == player then Color.White else Color.Black
-        POVGame(Some(result(playerColor)), if playerColor == Color.White then black else white, playerColor)
+        val playerColor = Color.fromWhite(white == player)
+        POVGame(Some(result(playerColor)), playerColor.fold(black, white), playerColor)
 
   val playerA_Games     = PlayerGames(playerA, povGames(playerA))
   val playerB_Games     = PlayerGames(playerB, povGames(playerB))

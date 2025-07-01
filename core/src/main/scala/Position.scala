@@ -409,6 +409,11 @@ object Position:
         .getOrElse:
           AndFullMoveNumber(variant.initialPosition, FullMoveNumber.initial)
 
+    def apply(variant: Variant, fen: Fen.Full): AndFullMoveNumber =
+      Fen
+        .readWithMoveNumber(variant, fen)
+        .getOrElse(AndFullMoveNumber(variant.initialPosition, FullMoveNumber.initial))
+
     given CanPlay[AndFullMoveNumber] with
       extension (position: AndFullMoveNumber)
         def apply[M <: Moveable](move: M): Either[ErrorStr, (AndFullMoveNumber, MoveOrDrop)] =
@@ -439,6 +444,9 @@ object Position:
 
   def apply(variant: Variant, fen: Option[Fen.Full]): Position =
     fen.flatMap(Fen.read(variant, _)).getOrElse(variant.initialPosition)
+
+  def apply(variant: Variant, fen: Fen.Full): Position =
+    Fen.read(variant, fen).getOrElse(variant.initialPosition)
 
   given CanPlay[Position]:
     extension (position: Position)

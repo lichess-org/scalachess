@@ -12,8 +12,8 @@ case object Standard
       standardInitialPosition = true
     ):
 
-  override val initialPieces: Map[Square, Piece] = Variant.symmetricRank(backRank)
-  override val initialBoard: Board               = Board.fromMap(initialPieces)
+  override def initialPieces: Map[Square, Piece] = Variant.symmetricRank(backRank)
+  override val initialBoard: Board               = Board.standard
   override val initialPosition: Position         = Position(initialBoard, this, White)
 
   override def valid(position: Position, strict: Boolean): Boolean =

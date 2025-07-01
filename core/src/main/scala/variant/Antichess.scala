@@ -14,8 +14,8 @@ case object Antichess
       standardInitialPosition = true
     ):
 
-  override val initialPieces: Map[Square, Piece] = Standard.initialPieces
-  override val initialBoard: Board               = Board.fromMap(initialPieces)
+  override def initialPieces: Map[Square, Piece] = Standard.initialPieces
+  override val initialBoard: Board               = Board.standard
 
   // In antichess, it is not permitted to castle
   override val castles: Castles    = Castles.none

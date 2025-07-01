@@ -12,8 +12,8 @@ case object KingOfTheHill
       standardInitialPosition = true
     ):
 
-  override val initialPieces: Map[Square, Piece] = Standard.initialPieces
-  override val initialBoard: Board               = Board.fromMap(initialPieces)
+  override def initialPieces: Map[Square, Piece] = Standard.initialPieces
+  override val initialBoard: Board               = Board.standard
 
   override def validMoves(position: Position): List[Move] =
     Standard.validMoves(position)

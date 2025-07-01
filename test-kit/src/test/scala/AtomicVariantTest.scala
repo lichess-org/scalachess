@@ -418,7 +418,7 @@ class AtomicVariantTest extends ChessTest:
           .split(' ')
           .toVector
       )
-    assertRight(Atomic.initialPosition.play(sans)): steps =>
+    assertRight(Atomic.initialPosition.playMoves(sans)): steps =>
       assertEquals(steps.size, sans.size)
 
   test("Allow castling with touching kings and rook shielding final attack"):
@@ -459,5 +459,5 @@ class AtomicVariantTest extends ChessTest:
           .split(' ')
           .toVector
       )
-    assertRight(Atomic.initialPosition.play(sans)): steps =>
+    assertRight(Atomic.initialPosition.playMoves(sans)): steps =>
       assertEquals(steps.size, sans.size)

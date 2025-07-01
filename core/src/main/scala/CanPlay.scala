@@ -40,6 +40,22 @@ trait CanPlay[A]:
     ): Either[ErrorStr, List[B]] =
       Parser.moves(moves).flatMap(play(_, initialPly)(transform))
 
+    @targetName("playFromUcis")
+    def play[F[_]: Traverse](ucis: F[String], initialPly: Ply)[B](
+        transform: Step => B
+    ): Either[ErrorStr, List[B]] =
+      ucis
+        .traverse(move => Uci.apply(move).toRight(ErrorStr(s"Invalid UCI move: $move")))
+        .flatMap(play(_, initialPly)(transform))
+
+    @targetName("playFromUcis")
+    def play(moves: String, initialPly: Ply)[B](
+        transform: Step => B
+    ): Either[ErrorStr, List[B]] =
+      Uci
+        .readList(moves)
+        .flatMap(play(_, initialPly)(transform))
+
     def play[M <: Moveable, F[_]: Traverse](moves: F[M], initialPly: Ply)[B](
         transform: Step => B
     ): Either[ErrorStr, List[B]] =

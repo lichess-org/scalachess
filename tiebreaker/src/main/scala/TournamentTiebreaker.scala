@@ -260,7 +260,6 @@ object Tiebreaker:
               allMyOpponentsGames
                 .map: opp =>
                   tb(PerfectTournamentPerformance, opp.player, allPlayers)
-                .pp
                 .average
                 .map(_.round) // Fide says to round up
 

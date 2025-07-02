@@ -262,3 +262,7 @@ class TiebreakersTest extends ChessTest:
     val playerGames = PlayerGames(playerA, games)
     // Lowest rated opponent - 800
     assertEquals(tb(PerfectTournamentPerformance, playerA, Seq(playerGames)), 650f)
+
+  test("AveragePerfectPerformanceOfOpponents"):
+    val tiebreaker = tb(AveragePerfectPerformanceOfOpponents, playerA, allGames)
+    assertEquals(tiebreaker, 1523f) // 1444 + 1549 + 1668 + 1432 = 6093 / 4 = 1523.25, rounded to 1523

@@ -14,7 +14,7 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
 | Name (in alphabetical order)                        | Type | Section | Acronym | Cut-1 |
 |-----------------------------------------------------|------|---------|---------|-------|
 | Average of Opponents' Buchholz                      | CC   | 8.2     | AOB     |       | ✅
-| Average Perfect [Tournament] Performance of Opponents| DC   | 10.5    | APPO    |       | ❌
+| Average Perfect [Tournament] Performance of Opponents| DC   | 10.5    | APPO    |       | ✅
 | Average [Tournament] Performance Rating of Opponents | DC   | 10.4    | APRO    |       | ✅
 | Average Rating of Opponents                         | D    | 10.1    | ARO     |   ●   | ✅
 | Buchholz                                            | C    | 8.1     | BH      |   ●   | ✅
@@ -72,6 +72,9 @@ enum Tiebreaker(val code: String, val name: String):
   case TournamentPerformanceRating extends Tiebreaker("TPR", "Tournament performance rating")
 
   case PerfectTournamentPerformance extends Tiebreaker("PTP", "Perfect tournament performance")
+
+  case AveragePerfectPerformanceOfOpponents
+      extends Tiebreaker("APPO", "Average perfect tournament performance of opponents")
 
 opaque type TieBreakPoints = Float
 object TieBreakPoints extends OpaqueFloat[TieBreakPoints]
@@ -253,6 +256,13 @@ object Tiebreaker:
                     else binarySearch(mid + 1, high)
                 val ptp = binarySearch(minR, maxR)
                 TieBreakPoints(ptp)
+            case AveragePerfectPerformanceOfOpponents =>
+              allMyOpponentsGames
+                .map: opp =>
+                  tb(PerfectTournamentPerformance, opp.player, allPlayers)
+                .pp
+                .average
+                .map(_.round) // Fide says to round up
 
   case class POVGame(
       points: Option[chess.Outcome.Points],

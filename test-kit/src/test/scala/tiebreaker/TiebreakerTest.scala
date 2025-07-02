@@ -98,6 +98,14 @@ class TiebreakersTest extends ChessTest:
     val tiebreaker = tb(BuchholzCut2, playerA, allGames)
     assertEquals(tiebreaker, 4.5f)
 
+  test("ForeBuchholz"):
+    val tiebreaker = tb(ForeBuchholz, playerA, allGames)
+    assertEquals(tiebreaker, 8f)
+
+  test("ForeBuchholzCut1"):
+    val tiebreaker = tb(ForeBuchholzCut1, playerA, allGames)
+    assertEquals(tiebreaker, 6f)
+
   test("AverageOfOpponentsBuchholz"):
     val tiebreaker = tb(AverageOfOpponentsBuchholz, playerA, allGames)
     assertEquals(tiebreaker, 8.125f)

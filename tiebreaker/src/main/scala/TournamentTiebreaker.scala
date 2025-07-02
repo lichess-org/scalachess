@@ -19,7 +19,7 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
 | Average Rating of Opponents                         | D    | 10.1    | ARO     |   ●   | ✅
 | Buchholz                                            | C    | 8.1     | BH      |   ●   | ✅
 | Direct Encounter                                    | A    | 6       | DE      |       | ✅
-| Fore Buchholz                                       | D    | 8.3     | FB      |   ●   | ❌
+| Fore Buchholz                                       | D    | 8.3     | FB      |   ●   | ✅
 | Games one Elected to Play                           | B    | 7.6     | GE      |       | ❌
 | Koya System for Round Robin                         | BC   | 9.2     | KS      |       | ✅
 | Number of Games Played with Black                   | B    | 7.3     | BPG     |       | ✅
@@ -48,6 +48,10 @@ enum Tiebreaker(val code: String, val name: String):
   case BuchholzCut1 extends Tiebreaker("BH-C1", "Buchholz cut 1")
 
   case BuchholzCut2 extends Tiebreaker("BH-C2", "Buchholz cut 2")
+
+  case ForeBuchholz extends Tiebreaker("FB", "Fore Buchholz")
+
+  case ForeBuchholzCut1 extends Tiebreaker("FB-C1", "Fore Buchholz cut 1")
 
   case AverageOfOpponentsBuchholz extends Tiebreaker("AOB", "Average of opponents Buchholz score")
 
@@ -94,6 +98,24 @@ object Tiebreaker:
       .map: opponent =>
         TieBreakPoints(opponent.games.score)
       .cutSum(cut)
+
+  private def foreBuchholzCutN(
+      cut: Int,
+      opponentGames: Seq[PlayerGames]
+  ): TieBreakPoints =
+    val maxGames            = opponentGames.map(_.games.size).max
+    val playersWithMaxGames =
+      opponentGames.filter(_.games.size == maxGames).map(_.player).toSet
+    val withLastRoundDrawn: Seq[PlayerGames] = opponentGames.map: opp =>
+      playersWithMaxGames
+        .contains(opp.player)
+        .option(
+          opp.copy(games =
+            opp.games.dropRight(1) ++ opp.games.lastOption.map(_.copy(points = Some(Points.Half))).toSeq
+          )
+        )
+        .getOrElse(opp)
+    buchholzCutN(cut, withLastRoundDrawn)
 
   private def sonnebornBergerCutN(
       cut: Int,
@@ -146,6 +168,8 @@ object Tiebreaker:
             case Buchholz                   => buchholzCutN(0, allMyOpponentsGames)
             case BuchholzCut1               => buchholzCutN(1, allMyOpponentsGames)
             case BuchholzCut2               => buchholzCutN(2, allMyOpponentsGames)
+            case ForeBuchholz               => foreBuchholzCutN(0, allMyOpponentsGames)
+            case ForeBuchholzCut1           => foreBuchholzCutN(1, allMyOpponentsGames)
             case AverageOfOpponentsBuchholz =>
               allMyOpponentsGames
                 .map: opp =>

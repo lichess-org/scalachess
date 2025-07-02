@@ -44,12 +44,10 @@ case object Chess960
       case _ => None
 
   def positionToFen(position: Int): Option[FullFen] =
-    FullFen.from(
+    FullFen.from:
       initialPositionsStr
         .lift(position)
-        .map: rank8 =>
-          s"$rank8/pppppppp/8/8/8/8/PPPPPPPP/${rank8.toUpperCase} w KQkq - 0 1"
-    )
+        .map(rank8 => s"$rank8/pppppppp/8/8/8/8/PPPPPPPP/${rank8.toUpperCase} w KQkq - 0 1")
 
   private val initialPositionsStr = Array(
     "bbqnnrkr",

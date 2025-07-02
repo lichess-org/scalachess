@@ -20,12 +20,12 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
 | Buchholz                                            | C    | 8.1     | BH      |   ●   | ✅
 | Direct Encounter                                    | A    | 6       | DE      |       | ✅
 | Fore Buchholz                                       | D    | 8.3     | FB      |   ●   | ✅
-| Games one Elected to Play                           | B    | 7.6     | GE      |       | ❌
+| Games one Elected to Play                           | B    | 7.6     | GE      |       | ❌ // Need byes
 | Koya System for Round Robin                         | BC   | 9.2     | KS      |       | ✅
 | Number of Games Played with Black                   | B    | 7.3     | BPG     |       | ✅
-| Number of Games Won                                 | B    | 7.2     | WON     |       | ❌
+| Number of Games Won                                 | B    | 7.2     | WON     |       | ✅
 | Number of Games Won with Black                      | B    | 7.4     | BWG     |       | ✅
-| Number of Wins                                      | B    | 7.1     | WIN     |       | ✅
+| Number of Wins                                      | B    | 7.1     | WIN     |       | ❌ // Need byes
 | Perfect Tournament Performance                      | DB   | 10.3    | PTP     |       | ✅
 | Sonneborn-Berger                                    | BC   | 9.1     | SB      |   ●   | ✅
 | (Sum of) Progressive Scores                         | B    | 7.5     | PS      |   ●   | ✅
@@ -35,7 +35,7 @@ enum Tiebreaker(val code: String, val name: String):
 
   case NbBlackGames extends Tiebreaker("BPG", "Number of games played with black")
 
-  case NbWins extends Tiebreaker("WIN", "Number of Wins")
+  case NbWins extends Tiebreaker("WON", "Number of Wins")
 
   case NbBlackWins extends Tiebreaker("BWG", "Number of wins with black")
 

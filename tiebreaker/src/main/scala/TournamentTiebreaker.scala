@@ -90,7 +90,7 @@ extension (tieBreakSeq: Seq[TieBreakPoints])
 
 extension (games: Seq[Tiebreaker.POVGame])
   def score: Float =
-    games.flatMap(_.points.map(_.value)).sum // including byes
+    games.flatMap(_.points.map(_.value)).sum
 
 object Tiebreaker:
 

@@ -106,6 +106,10 @@ object Tiebreaker:
       cut: Int,
       opponentGames: Seq[PlayerGames]
   ): TieBreakPoints =
+    // We don't know which round is the last one -
+    // so we assume that all players with the maximum number of games are always playing their last round.
+    // And this will eventually turn out to be true.
+    // This is not strictly correct and it should be tweaked/removed if it becomes an issue.
     val maxGames            = opponentGames.map(_.games.size).max
     val playersWithMaxGames =
       opponentGames.filter(_.games.size == maxGames).map(_.player).toSet

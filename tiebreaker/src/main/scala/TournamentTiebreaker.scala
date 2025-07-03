@@ -5,6 +5,7 @@ import chess.Outcome.Points
 import chess.rating.Elo
 import scalalib.extensions.*
 import scalalib.newtypes.*
+import scalalib.zeros.given
 
 /*
 Tie-breakers for individuals for swiss/round-robins
@@ -13,8 +14,8 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
 | Name (in alphabetical order)                        | Type | Section | Acronym | Cut-1 |
 |-----------------------------------------------------|------|---------|---------|-------|
 | Average of Opponents' Buchholz                      | CC   | 8.2     | AOB     |       | ✅
-| Average Perfect [Tournament] Performance of Opponents| DC   | 10.5    | APPO    |       | ✅
-| Average [Tournament] Performance Rating of Opponents | DC   | 10.4    | APRO    |       | ✅
+| Average Perfect [Tournament] Performance of Opponents| DC  | 10.5    | APPO    |       | ✅
+| Average [Tournament] Performance Rating of Opponents | DC  | 10.4    | APRO    |       | ✅
 | Average Rating of Opponents                         | D    | 10.1    | ARO     |   ●   | ✅
 | Buchholz                                            | C    | 8.1     | BH      |   ●   | ✅
 | Direct Encounter                                    | A    | 6       | DE      |       | ✅
@@ -79,16 +80,20 @@ opaque type TieBreakPoints = Float
 object TieBreakPoints extends OpaqueFloat[TieBreakPoints]
 given Numeric[TieBreakPoints] = Numeric[Float]
 
+opaque type TournamentScore = Float
+object TournamentScore extends OpaqueFloat[TournamentScore]:
+  extension (score: TournamentScore) def >=(other: TournamentScore): Boolean = score.value >= other.value
+
 extension (tieBreakSeq: Seq[TieBreakPoints])
   def cutSum(cut: Int): TieBreakPoints =
     tieBreakSeq.sorted.drop(cut).sum
 
   def average: TieBreakPoints =
-    if tieBreakSeq.isEmpty then TieBreakPoints(0f)
-    else TieBreakPoints(tieBreakSeq.sum / tieBreakSeq.size)
+    if tieBreakSeq.isEmpty then 0f
+    else tieBreakSeq.sum / tieBreakSeq.size
 
 extension (games: Seq[Tiebreaker.POVGame])
-  def score: Float =
+  def score: TournamentScore =
     games.flatMap(_.points.map(_.value)).sum
 
 object Tiebreaker:
@@ -97,8 +102,7 @@ object Tiebreaker:
 
   private def buchholzCutN(cut: Int, opponentGames: Seq[PlayerGames]): TieBreakPoints =
     opponentGames
-      .map: opponent =>
-        TieBreakPoints(opponent.games.score)
+      .map(_.games.score.into(TieBreakPoints))
       .cutSum(cut)
 
   private def foreBuchholzCutN(
@@ -132,8 +136,8 @@ object Tiebreaker:
       .map: game =>
         val oppScore = opponentGames.find(_.player == game.opponent).map(_.games.score)
         (oppScore, game.points) match
-          case (Some(score), Some(Points.One))  => TieBreakPoints(score)
-          case (Some(score), Some(Points.Half)) => TieBreakPoints(score / 2f)
+          case (Some(score), Some(Points.One))  => score.into(TieBreakPoints)
+          case (Some(score), Some(Points.Half)) => score.map(_ / 2f).into(TieBreakPoints)
           case _                                => TieBreakPoints(0f)
       .cutSum(cut)
 
@@ -155,7 +159,7 @@ object Tiebreaker:
   ): TieBreakPoints =
     player.games.indices
       .map: i =>
-        TieBreakPoints(player.games.take(i + 1).score)
+        player.games.take(i + 1).score.into(TieBreakPoints)
       .cutSum(cut)
 
   def tb(tiebreaker: Tiebreaker, me: Player, allPlayers: Seq[PlayerGames]): TieBreakPoints =
@@ -192,7 +196,7 @@ object Tiebreaker:
                 tiedWithMe
                   .forall: tied =>
                     tiedPlayerSet.excl(tied.player).subsetOf(tied.games.map(_.opponent).toSet)
-              TieBreakPoints(
+              TieBreakPoints:
                 myGames
                   .groupBy(_.opponent)
                   .map: (opponent, games) =>
@@ -200,10 +204,9 @@ object Tiebreaker:
                       tiedPlayerSet.contains(opponent) && allTiedPlayersHaveMet
                     if !validDirectEncounter then 0f
                     // If the players meet more than once, FIDE dictates that we average the score
-                    else if games.size > 1 then games.score / games.size.toFloat
-                    else games.score
+                    else if games.nonEmpty then games.score.value / games.size
+                    else 0f
                   .sum
-              )
             case AverageRatingOfOpponents      => averageRatingOfOpponentsCutN(0, allMyOpponentsGames)
             case AverageRatingOfOpponentsCut1  => averageRatingOfOpponentsCutN(1, allMyOpponentsGames)
             case AveragePerformanceOfOpponents =>
@@ -213,39 +216,34 @@ object Tiebreaker:
                 // FIDE says that the performance rating should be rounded up.
                 .map(_.round)
             case KoyaSystem =>
-              val halfOfMaxPossibleScore = (allPlayers
-                .map(_.games.size)
-                .max) / 2f
-              TieBreakPoints(
-                myGames
-                  .filter: game =>
-                    allMyOpponentsGames
-                      .exists(opponent =>
-                        game.opponent == opponent.player && opponent.games.score >= halfOfMaxPossibleScore
-                      )
-                  .score
-              )
+              val halfOfMaxPossibleScore = TournamentScore(allPlayers.map(_.games.size).max / 2f)
+              myGames
+                .filter: game =>
+                  allMyOpponentsGames.exists: opponent =>
+                    game.opponent == opponent.player && opponent.games.score >= halfOfMaxPossibleScore
+                .score
+                .into(TieBreakPoints)
             case SumOfProgressiveScores =>
               sumOfProgressiveScoresCutN(0, meAndMyGames)
             case SumOfProgressiveScoresCut1 =>
               sumOfProgressiveScoresCutN(1, meAndMyGames)
             case TournamentPerformanceRating =>
-              TieBreakPoints(
+              TieBreakPoints:
                 Elo
-                  .computePerformanceRating(myGames.collect:
-                    case POVGame(Some(points), Player(_, Some(rating)), _) => Elo.Game(points, rating))
-                  .map(_.value.toFloat) | 0f
-              )
+                  .computePerformanceRating:
+                    myGames.collect:
+                      case POVGame(Some(points), Player(_, Some(rating)), _) => Elo.Game(points, rating)
+                  .so(_.value.toFloat)
             case PerfectTournamentPerformance =>
               val oppRatings = myGames.flatMap(_.opponent.rating.map(_.value))
               val minR       = oppRatings.min - 800
               val maxR       = oppRatings.max + 800
-              if myGames.score == 0f && oppRatings.nonEmpty then TieBreakPoints(minR)
+              if myGames.score == TournamentScore(0f) && oppRatings.nonEmpty then TieBreakPoints(minR)
               else if oppRatings.isEmpty then TieBreakPoints(0f)
               else
                 // Find the lowest integer rating R such that sum of expected scores >= myScore
                 // Use the full FIDE conversion table, no ±400 cut
-                def expectedScoreFor(r: Int): Float =
+                def expectedScoreFor(r: Int) = TournamentScore:
                   oppRatings
                     .map: oppR =>
                       Elo.getExpectedScore(oppR - r)

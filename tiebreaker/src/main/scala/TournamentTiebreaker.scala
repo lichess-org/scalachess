@@ -182,8 +182,9 @@ object Tiebreaker:
                   tb(Buchholz, opp.player, allPlayers)
                 .average
             case DirectEncounter =>
+              val myScore    = myGames.score
               val tiedWithMe = allPlayers.filter(p =>
-                p.games.score == myGames.score && p.partialTiebreaks
+                p.games.score == myScore && p.partialTiebreaks
                   .zip(partialTiebreaks)
                   .forall(_ == _)
               )
@@ -231,10 +232,11 @@ object Tiebreaker:
                       case POVGame(Some(points), Player(_, Some(rating)), _) => Elo.Game(points, rating)
                   .so(_.value.toFloat)
             case PerfectTournamentPerformance =>
+              val myScore    = myGames.score
               val oppRatings = myGames.flatMap(_.opponent.rating.map(_.value))
               val minR       = oppRatings.min - 800
               val maxR       = oppRatings.max + 800
-              if myGames.score == TournamentScore(0f) && oppRatings.nonEmpty then TieBreakPoints(minR)
+              if myScore == TournamentScore(0f) && oppRatings.nonEmpty then TieBreakPoints(minR)
               else if oppRatings.isEmpty then TieBreakPoints(0f)
               else
                 // Find the lowest integer rating R such that sum of expected scores >= myScore
@@ -249,7 +251,7 @@ object Tiebreaker:
                   if low >= high then low
                   else
                     val mid = (low + high) / 2
-                    if expectedScoreFor(mid) >= myGames.score then binarySearch(low, mid)
+                    if expectedScoreFor(mid) >= myScore then binarySearch(low, mid)
                     else binarySearch(mid + 1, high)
                 val ptp = binarySearch(minR, maxR)
                 TieBreakPoints(ptp)

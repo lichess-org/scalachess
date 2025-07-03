@@ -38,7 +38,7 @@ class TiebreakerBench:
 
     val pgnSplit = pgnText.split("\n\n\n").toList
 
-    val parsedGames = pgnSplit.map(pgnstr => chess.format.pgn.Parser.full(PgnStr(pgnstr)).toOption).flatten
+    val parsedTags = pgnSplit.map(pgnstr => chess.format.pgn.Parser.tags(PgnStr(pgnstr)).toOption).flatten
 
     def playerFromTag(
         name: Option[String],
@@ -58,17 +58,17 @@ class TiebreakerBench:
           black = POVGame(result.map(_(Color.Black)), white, Color.Black)
         )
 
-    val tiebreakerGames: Seq[Game] = parsedGames.foldLeft(Seq.empty[Game]): (acc, pgn) =>
-      val names         = pgn.tags.names
-      val ratings       = pgn.tags.ratings
-      val fideIds       = pgn.tags.fideIds
-      val result        = pgn.tags.outcome
+    val tiebreakerGames: Seq[Game] = parsedTags.foldLeft(Seq.empty[Game]): (acc, tags) =>
+      val names         = tags.names
+      val ratings       = tags.ratings
+      val fideIds       = tags.fideIds
+      val result        = tags.outcome
       val white         = playerFromTag(names.white.map(_.value), ratings.white, fideIds.white.map(_.value))
       val black         = playerFromTag(names.black.map(_.value), ratings.black, fideIds.black.map(_.value))
       val byColorPoints = result.map(chess.Outcome.outcomeToPoints)
       (white, black) match
         case (Some(w), Some(b)) =>
-          acc :+ Game(w, b, byColorPoints)
+          Game(w, b, byColorPoints) +: acc
         case _ => acc
 
     // Flatten all POVGames from tiebreakerGames, associating each with its player

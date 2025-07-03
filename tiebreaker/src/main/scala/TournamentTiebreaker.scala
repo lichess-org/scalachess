@@ -272,4 +272,4 @@ object Tiebreaker:
       partialTiebreaks: List[TieBreakPoints] = Nil
   )
 
-  case class Player(name: String, rating: Option[Elo])
+  case class Player(uniqueIdentifier: String, rating: Option[Elo])

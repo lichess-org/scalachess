@@ -1,6 +1,5 @@
 package chess
 
-import cats.data.NonEmptySeq
 import cats.syntax.all.*
 import chess.Outcome.Points
 import chess.rating.Elo
@@ -117,10 +116,8 @@ class TiebreakersTest extends ChessTest:
     assertEquals(tiebreaker2, 1f)
 
   test("DirectEncounter with unequal partial tiebreaks"):
-    val playerAWithPartial =
-      playerA_Games.copy(partialTiebreaks = NonEmptySeq.fromSeq(Seq(TieBreakPoints(1f))))
-    val playerDWithPartial =
-      playerD_Games.copy(partialTiebreaks = NonEmptySeq.fromSeq(Seq(TieBreakPoints(0.5f))))
+    val playerAWithPartial  = playerA_Games.copy(partialTiebreaks = List(TieBreakPoints(1f)))
+    val playerDWithPartial  = playerD_Games.copy(partialTiebreaks = List(TieBreakPoints(0.5f)))
     val allGamesWithPartial =
       Seq(playerAWithPartial, playerB_Games, playerC_Games, playerDWithPartial, playerE_Games)
 
@@ -130,10 +127,8 @@ class TiebreakersTest extends ChessTest:
     assertEquals(tiebreaker2, 0f)
 
   test("DirectEncounter with equal partial tiebreaks"):
-    val playerAWithPartial =
-      playerA_Games.copy(partialTiebreaks = NonEmptySeq.fromSeq(Seq(TieBreakPoints(1f))))
-    val playerDWithPartial =
-      playerD_Games.copy(partialTiebreaks = NonEmptySeq.fromSeq(Seq(TieBreakPoints(1f))))
+    val playerAWithPartial  = playerA_Games.copy(partialTiebreaks = List(TieBreakPoints(1f)))
+    val playerDWithPartial  = playerD_Games.copy(partialTiebreaks = List(TieBreakPoints(1f)))
     val allGamesWithPartial =
       Seq(playerAWithPartial, playerB_Games, playerC_Games, playerDWithPartial, playerE_Games)
 
@@ -143,10 +138,8 @@ class TiebreakersTest extends ChessTest:
     assertEquals(tiebreaker2, 1f)
 
   test("DirectEncounter with equal partial tiebreaks but not all players have met"):
-    val playerAWithPartial =
-      playerA_Games.copy(partialTiebreaks = NonEmptySeq.fromSeq(Seq(TieBreakPoints(1f))))
-    val playerDWithPartial =
-      playerD_Games.copy(partialTiebreaks = NonEmptySeq.fromSeq(Seq(TieBreakPoints(1f))))
+    val playerAWithPartial = playerA_Games.copy(partialTiebreaks = List(TieBreakPoints(1f)))
+    val playerDWithPartial = playerD_Games.copy(partialTiebreaks = List(TieBreakPoints(1f)))
     // Create a player X that has not played against A or D
     // A, D and X are all on 2.5 points with partial tiebreaks of 1 but only A and D have met
     val playerX_Games = PlayerGames(
@@ -156,7 +149,7 @@ class TiebreakersTest extends ChessTest:
         POVGame(Some(Points.One), playerD, Color.White),
         POVGame(Some(Points.One), playerE, Color.Black)
       ),
-      NonEmptySeq.fromSeq(Seq(TieBreakPoints(1f)))
+      List(TieBreakPoints(1f))
     )
     val allGamesWithPartial =
       Seq(playerAWithPartial, playerDWithPartial, playerC_Games, playerD_Games, playerE_Games, playerX_Games)

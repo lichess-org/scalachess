@@ -1,13 +1,12 @@
 package chess.tiebreaker
 
-import cats.data.NonEmptySeq
 import chess.Color
 import chess.Outcome.Points
 import chess.rating.Elo
 import scalalib.extensions.*
 import scalalib.newtypes.*
-/*
 
+/*
 Tie-breakers for individuals for swiss/round-robins
 https://handbook.fide.com/chapter/TieBreakRegulations082024
 
@@ -268,7 +267,7 @@ object Tiebreaker:
                 .map(_.round) // Fide says to round up
 
   case class POVGame(
-      points: Option[chess.Outcome.Points],
+      points: Option[Points],
       opponent: Player,
       color: Color
   )
@@ -276,7 +275,7 @@ object Tiebreaker:
   case class PlayerGames(
       player: Player,
       games: Seq[POVGame],
-      partialTiebreaks: Option[NonEmptySeq[TieBreakPoints]] = None
+      partialTiebreaks: List[TieBreakPoints] = Nil
   )
 
   case class Player(name: String, rating: Option[Elo])

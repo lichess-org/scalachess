@@ -89,8 +89,8 @@ extension (tieBreakSeq: Seq[TieBreakPoints])
     tieBreakSeq.sorted.drop(cut).sum
 
   def average: TieBreakPoints =
-    if tieBreakSeq.isEmpty then 0f
-    else tieBreakSeq.sum / tieBreakSeq.size
+    tieBreakSeq.nonEmpty.so:
+      tieBreakSeq.sum / tieBreakSeq.size
 
 extension (games: Seq[Tiebreaker.POVGame])
   def score: TournamentScore =
@@ -114,17 +114,13 @@ object Tiebreaker:
     // And this will eventually turn out to be true.
     // This is not strictly correct and it should be tweaked/removed if it becomes an issue.
     val maxGames            = opponentGames.map(_.games.size).max
-    val playersWithMaxGames =
-      opponentGames.filter(_.games.size == maxGames).map(_.player).toSet
+    val playersWithMaxGames = opponentGames.filter(_.games.size == maxGames).map(_.player).toSet
     val withLastRoundDrawn: Seq[PlayerGames] = opponentGames.map: opp =>
-      playersWithMaxGames
-        .contains(opp.player)
-        .option(
-          opp.copy(games =
-            opp.games.dropRight(1) ++ opp.games.lastOption.map(_.copy(points = Some(Points.Half))).toSeq
-          )
+      if playersWithMaxGames.contains(opp.player) then
+        opp.copy(
+          games = opp.games.dropRight(1) ++ opp.games.lastOption.map(_.copy(points = Some(Points.Half))).toSeq
         )
-        .getOrElse(opp)
+      else opp
     buchholzCutN(cut, withLastRoundDrawn)
 
   private def sonnebornBergerCutN(

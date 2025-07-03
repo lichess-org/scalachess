@@ -30,7 +30,6 @@ class TiebreakerBench:
   private val Work: Long = 10
 
   var allGames: Seq[PlayerGames] = scala.compiletime.uninitialized
-  var tbs: Seq[Tiebreaker]       = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =
@@ -85,17 +84,37 @@ class TiebreakerBench:
         PlayerGames(player, games.map(_._2))
       .toSeq
 
-    tbs = Seq(
-      AveragePerfectPerformanceOfOpponents,
-      AverageOfOpponentsBuchholz,
-      DirectEncounter,
-      PerfectTournamentPerformance,
-      SonnebornBerger
-    ) // APPO, DE and PTP are quite demanding
+  @Benchmark
+  def averageOfOpponentsBuchholz(bh: Blackhole) =
+    bh.consume:
+      allGames.map: pg =>
+        Blackhole.consumeCPU(Work)
+        Tiebreaker.tb(AverageOfOpponentsBuchholz, pg.player, allGames)
 
   @Benchmark
-  def tourney(bh: Blackhole) =
-    Blackhole.consumeCPU(Work)
-    bh.consume(allGames.map: pg =>
-      tbs
-        .map(tbreaker => tb(tbreaker, pg.player, allGames)))
+  def averagePerfectPerformanceOfOpponents(bh: Blackhole) =
+    bh.consume:
+      allGames.map: pg =>
+        Blackhole.consumeCPU(Work)
+        Tiebreaker.tb(AveragePerfectPerformanceOfOpponents, pg.player, allGames)
+
+  @Benchmark
+  def directEncounter(bh: Blackhole) =
+    bh.consume:
+      allGames.map: pg =>
+        Blackhole.consumeCPU(Work)
+        Tiebreaker.tb(DirectEncounter, pg.player, allGames)
+
+  @Benchmark
+  def perfectTournamentPerformance(bh: Blackhole) =
+    bh.consume:
+      allGames.map: pg =>
+        Blackhole.consumeCPU(Work)
+        Tiebreaker.tb(PerfectTournamentPerformance, pg.player, allGames)
+
+  @Benchmark
+  def sonnebornBerger(bh: Blackhole) =
+    bh.consume:
+      allGames.map: pg =>
+        Blackhole.consumeCPU(Work)
+        Tiebreaker.tb(SonnebornBerger, pg.player, allGames)

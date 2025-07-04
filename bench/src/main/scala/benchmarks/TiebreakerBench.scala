@@ -14,6 +14,7 @@ import chess.format.pgn.PgnStr
 import chess.IntRating
 import chess.ByColor
 import chess.tiebreaker.Tiebreaker
+import chess.tiebreaker.*
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -86,32 +87,32 @@ class TiebreakerBench:
     bh.consume:
       allGames.map: pg =>
         Blackhole.consumeCPU(Work)
-        Tiebreaker.tb(AverageOfOpponentsBuchholz, pg.player, allGames)
+        AverageOfOpponentsBuchholz.compute(pg.player, allGames)
 
   @Benchmark
   def averagePerfectPerformanceOfOpponents(bh: Blackhole) =
     bh.consume:
       allGames.map: pg =>
         Blackhole.consumeCPU(Work)
-        Tiebreaker.tb(AveragePerfectPerformanceOfOpponents, pg.player, allGames)
+        AveragePerfectPerformanceOfOpponents.compute(pg.player, allGames)
 
   @Benchmark
   def directEncounter(bh: Blackhole) =
     bh.consume:
       allGames.map: pg =>
         Blackhole.consumeCPU(Work)
-        Tiebreaker.tb(DirectEncounter, pg.player, allGames)
+        DirectEncounter.compute(pg.player, allGames)
 
   @Benchmark
   def perfectTournamentPerformance(bh: Blackhole) =
     bh.consume:
       allGames.map: pg =>
         Blackhole.consumeCPU(Work)
-        Tiebreaker.tb(PerfectTournamentPerformance, pg.player, allGames)
+        PerfectTournamentPerformance.compute(pg.player, allGames)
 
   @Benchmark
   def sonnebornBerger(bh: Blackhole) =
     bh.consume:
       allGames.map: pg =>
         Blackhole.consumeCPU(Work)
-        Tiebreaker.tb(SonnebornBerger, pg.player, allGames)
+        SonnebornBerger.compute(pg.player, allGames)

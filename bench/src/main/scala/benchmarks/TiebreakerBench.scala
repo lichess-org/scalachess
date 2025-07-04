@@ -3,7 +3,6 @@ package benchmarks
 import org.openjdk.jmh.annotations.*
 import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
-import scala.jdk.CollectionConverters.*
 
 import cats.syntax.all.*
 import chess.Color
@@ -14,9 +13,7 @@ import chess.tiebreaker.TieBreakPoints
 import chess.format.pgn.PgnStr
 import chess.IntRating
 import chess.ByColor
-import os.FileType.Dir
 import chess.tiebreaker.Tiebreaker
-import chess.File.A
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))

@@ -18,8 +18,8 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
 | Average [Tournament] Performance Rating of Opponents | DC  | 10.4    | APRO    |       | ✅
 | Average Rating of Opponents                         | D    | 10.1    | ARO     |   ●   | ✅
 | Buchholz                                            | C    | 8.1     | BH      |   ●   | ✅
-| Direct Encounter                                    | A    | 6       | DE      |       | ✅
-| Fore Buchholz                                       | D    | 8.3     | FB      |   ●   | ✅
+| Direct Encounter                                    | A    | 6       | DE      |       | ✅ (*1)
+| Fore Buchholz                                       | D    | 8.3     | FB      |   ●   | ✅ (*2)
 | Games one Elected to Play                           | B    | 7.6     | GE      |       | ❌ // Need byes
 | Koya System for Round Robin                         | BC   | 9.2     | KS      |       | ✅
 | Number of Games Played with Black                   | B    | 7.3     | BPG     |       | ✅
@@ -30,6 +30,17 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
 | Sonneborn-Berger                                    | BC   | 9.1     | SB      |   ●   | ✅
 | (Sum of) Progressive Scores                         | B    | 7.5     | PS      |   ●   | ✅
 | Tournament Performance Rating                       | DB   | 10.2    | TPR     |       | ✅
+
+1. DE - Not implemented this clause:
+  If the tied participants have not played all the games against each other,
+  but one of them will be alone at the top of the separate standings whatever the outcome of the missing games,
+  that participant is ranked first among the tied participants –
+  the same applies to the second rank when the first is assigned this way; and so on.
+
+2. FB -  We don't know which round is the last one -
+  so we assume that all players with the maximum number of games are always playing their last round.
+  And this will eventually turn out to be true.
+  This is not strictly correct and it should be tweaked/removed if it becomes an issue.
  */
 enum Tiebreaker(val code: String, val name: String):
 
@@ -109,10 +120,6 @@ object Tiebreaker:
       cut: Int,
       opponentGames: Seq[PlayerGames]
   ): TieBreakPoints =
-    // We don't know which round is the last one -
-    // so we assume that all players with the maximum number of games are always playing their last round.
-    // And this will eventually turn out to be true.
-    // This is not strictly correct and it should be tweaked/removed if it becomes an issue.
     val maxGames            = opponentGames.map(_.games.size).max
     val playersWithMaxGames = opponentGames.filter(_.games.size == maxGames).map(_.player).toSet
     val withLastRoundDrawn: Seq[PlayerGames] = opponentGames.map: opp =>

@@ -115,6 +115,23 @@ class TiebreakersTest extends ChessTest:
     assertEquals(tiebreaker1, 0f)
     assertEquals(tiebreaker2, 1f)
 
+  test("DirectEncounter with more than one game"):
+    val extraDraw = Seq(
+      playerA_Games.copy(games =
+        playerA_Games.games ++ Seq(POVGame(Some(Points.Half), playerD, Color.White))
+      ),
+      playerB_Games,
+      playerC_Games,
+      playerD_Games.copy(games =
+        playerD_Games.games ++ Seq(POVGame(Some(Points.Half), playerA, Color.Black))
+      ),
+      playerE_Games
+    )
+    val tiebreaker1 = tb(DirectEncounter, playerD, extraDraw)
+    val tiebreaker2 = tb(DirectEncounter, playerA, extraDraw)
+    assertEquals(tiebreaker1, 0.75f) // 1 win + 1 draw / 2 games
+    assertEquals(tiebreaker2, 0.25f) // 1 draw / 2 games
+
   test("DirectEncounter with unequal partial tiebreaks"):
     val playerAWithPartial  = playerA_Games.copy(partialTiebreaks = List(TieBreakPoints(1f)))
     val playerDWithPartial  = playerD_Games.copy(partialTiebreaks = List(TieBreakPoints(0.5f)))

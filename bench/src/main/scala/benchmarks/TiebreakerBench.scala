@@ -34,9 +34,9 @@ class TiebreakerBench:
 
     val pgnText = scala.io.Source.fromResource("FWWRC.pgn").mkString
 
-    val pgnSplit = pgnText.split("\n\n\n").toList
+    val pgnSplit = pgnText.split("\n\n").toList
 
-    val parsedTags = pgnSplit.map(pgnstr => chess.format.pgn.Parser.tags(PgnStr(pgnstr)).toOption).flatten
+    val parsedTags = pgnSplit.flatMap(pgnstr => chess.format.pgn.Parser.tags(PgnStr(pgnstr)).toOption)
 
     def playerFromTag(
         name: Option[String],

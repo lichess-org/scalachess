@@ -3,8 +3,8 @@ package chess
 import cats.syntax.all.*
 import chess.Outcome.Points
 import chess.rating.Elo
-import chess.tiebreaker.Tiebreaker.*
 import chess.tiebreaker.*
+import chess.tiebreaker.Tiebreaker.*
 
 class TiebreakersTest extends ChessTest:
 

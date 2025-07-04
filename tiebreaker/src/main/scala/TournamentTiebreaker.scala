@@ -189,21 +189,20 @@ object Tiebreaker:
                   .forall(_ == _)
               )
               val tiedPlayerSet         = tiedWithMe.map(_.player).toSet
-              val allTiedPlayersHaveMet =
-                tiedWithMe
-                  .forall: tied =>
-                    tiedPlayerSet.excl(tied.player).subsetOf(tied.games.map(_.opponent).toSet)
-              TieBreakPoints:
-                myGames
-                  .groupBy(_.opponent)
-                  .map: (opponent, games) =>
-                    val validDirectEncounter =
-                      tiedPlayerSet.contains(opponent) && allTiedPlayersHaveMet
-                    if !validDirectEncounter then 0f
-                    // If the players meet more than once, FIDE dictates that we average the score
-                    else if games.nonEmpty then games.score.value / games.size
-                    else 0f
-                  .sum
+              val allTiedPlayersHaveMet = tiedWithMe.forall: tied =>
+                tiedPlayerSet.excl(tied.player).subsetOf(tied.games.map(_.opponent).toSet)
+              if !allTiedPlayersHaveMet then TieBreakPoints(0f)
+              else
+                val directGames = myGames.filter(g => tiedPlayerSet.contains(g.opponent))
+                if directGames.isEmpty then TieBreakPoints(0f)
+                else
+                  TieBreakPoints:
+                    directGames
+                      .groupBy(_.opponent)
+                      .map: (_, games) =>
+                        // If the players meet more than once, FIDE says that we average the score
+                        games.score.value / games.size
+                      .sum
             case AverageRatingOfOpponents      => averageRatingOfOpponentsCutN(0, allMyOpponentsGames)
             case AverageRatingOfOpponentsCut1  => averageRatingOfOpponentsCutN(1, allMyOpponentsGames)
             case AveragePerformanceOfOpponents =>

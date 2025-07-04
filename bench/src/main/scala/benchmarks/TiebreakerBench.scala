@@ -1,0 +1,118 @@
+package benchmarks
+
+import org.openjdk.jmh.annotations.*
+import org.openjdk.jmh.infra.Blackhole
+import java.util.concurrent.TimeUnit
+
+import cats.syntax.all.*
+import chess.Color
+import chess.Outcome.Points
+import chess.rating.Elo
+import chess.tiebreaker.Tiebreaker.*
+import chess.tiebreaker.TieBreakPoints
+import chess.format.pgn.PgnStr
+import chess.IntRating
+import chess.ByColor
+import chess.tiebreaker.Tiebreaker
+import chess.tiebreaker.*
+
+@State(Scope.Thread)
+@BenchmarkMode(Array(Mode.Throughput))
+@OutputTimeUnit(TimeUnit.SECONDS)
+@Measurement(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
+@Warmup(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
+@Fork(value = 3)
+@Threads(value = 1)
+class TiebreakerBench:
+
+  private val Work: Long = 10
+
+  var allGames: Seq[PlayerGames] = scala.compiletime.uninitialized
+
+  @Setup
+  def setup(): Unit =
+
+    val pgnText = scala.io.Source.fromResource("FWWRC.pgn").mkString
+
+    val pgnSplit = pgnText.split("\n\n").toList
+
+    val parsedTags = pgnSplit.flatMap(pgnstr => chess.format.pgn.Parser.tags(PgnStr(pgnstr)).toOption)
+
+    def playerFromTag(
+        name: Option[String],
+        rating: Option[IntRating],
+        fideId: Option[Int]
+    ): Option[Player] =
+      fideId
+        .map(_.toString)
+        .orElse(name)
+        .map: id =>
+          Player(id, rating.map(_.into(Elo)))
+
+    case class Game(white: Player, black: Player, result: Option[ByColor[Points]]):
+      def toPovGame: ByColor[POVGame] =
+        ByColor(
+          white = POVGame(result.map(_(Color.White)), black, Color.White),
+          black = POVGame(result.map(_(Color.Black)), white, Color.Black)
+        )
+
+    val tiebreakerGames: Seq[Game] = parsedTags.foldLeft(Seq.empty[Game]): (acc, tags) =>
+      val names         = tags.names
+      val ratings       = tags.ratings
+      val fideIds       = tags.fideIds
+      val result        = tags.outcome
+      val white         = playerFromTag(names.white.map(_.value), ratings.white, fideIds.white.map(_.value))
+      val black         = playerFromTag(names.black.map(_.value), ratings.black, fideIds.black.map(_.value))
+      val byColorPoints = result.map(chess.Outcome.outcomeToPoints)
+      (white, black) match
+        case (Some(w), Some(b)) =>
+          Game(w, b, byColorPoints) +: acc
+        case _ => acc
+
+    // Flatten all POVGames from tiebreakerGames, associating each with its player
+    val povGamesWithPlayer: Seq[(Player, POVGame)] = tiebreakerGames.flatMap: g =>
+      Seq(
+        g.white -> g.toPovGame.white,
+        g.black -> g.toPovGame.black
+      )
+
+    allGames = povGamesWithPlayer
+      .groupBy(_._1)
+      .map: (player, games) =>
+        PlayerGames(player, games.map(_._2))
+      .toSeq
+
+  @Benchmark
+  def averageOfOpponentsBuchholz(bh: Blackhole) =
+    bh.consume:
+      allGames.map: pg =>
+        Blackhole.consumeCPU(Work)
+        AverageOfOpponentsBuchholz.compute(pg.player, allGames)
+
+  @Benchmark
+  def averagePerfectPerformanceOfOpponents(bh: Blackhole) =
+    bh.consume:
+      allGames.map: pg =>
+        Blackhole.consumeCPU(Work)
+        AveragePerfectPerformanceOfOpponents.compute(pg.player, allGames)
+
+  @Benchmark
+  def directEncounter(bh: Blackhole) =
+    bh.consume:
+      allGames.map: pg =>
+        Blackhole.consumeCPU(Work)
+        DirectEncounter.compute(pg.player, allGames)
+
+  @Benchmark
+  def perfectTournamentPerformance(bh: Blackhole) =
+    bh.consume:
+      allGames.map: pg =>
+        Blackhole.consumeCPU(Work)
+        PerfectTournamentPerformance.compute(pg.player, allGames)
+
+  @Benchmark
+  def sonnebornBerger(bh: Blackhole) =
+    bh.consume:
+      allGames.map: pg =>
+        Blackhole.consumeCPU(Work)
+        SonnebornBerger.compute(pg.player, allGames)

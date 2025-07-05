@@ -53,7 +53,7 @@ class ClockLagCompTest extends ChessTest:
   def clockStep(clock: Clock, wait: Int, lags: Int*) =
     (lags
       .foldLeft(clock) { (clk, lag) =>
-        advance(clk.step().value, wait + lag).step(durOf(lag)) value
+        advance(clk.step().value, wait + lag).step(durOf(lag)).value
       }
       .remainingTime(Black))
       .centis

@@ -14,16 +14,21 @@ case object Chess960
       standardInitialPosition = false
     ):
 
-  def validMoves(situation: Situation): List[Move] =
-    Standard.validMoves(situation)
+  override def validMoves(position: Position): List[Move] =
+    Standard.validMoves(position)
 
-  override def valid(situation: Situation, strict: Boolean): Boolean = Standard.valid(situation, strict)
+  override def validMovesAt(position: Position, square: Square): List[Move] =
+    super.validMovesAt(position, square).filter(kingSafety)
 
-  def pieces = pieces(scala.util.Random.nextInt(960))
+  override def valid(position: Position, strict: Boolean): Boolean = Standard.valid(position, strict)
 
-  def pieces(position: Int) =
+  override def initialPieces = initialPieces(scala.util.Random.nextInt(960))
+
+  override def initialBoard = Board.fromMap(initialPieces)
+
+  def initialPieces(position: Int) =
     Variant.symmetricRank:
-      positions(position).flatMap(Role.allByForsyth.get)
+      initialPositionsStr(position).flatMap(Role.allByForsyth.get)
 
   def positionNumber(fen: FullFen): Option[Int] =
     fen.value.split(' ') match
@@ -39,14 +44,12 @@ case object Chess960
       case _ => None
 
   def positionToFen(position: Int): Option[FullFen] =
-    FullFen.from(
-      positions
+    FullFen.from:
+      initialPositionsStr
         .lift(position)
-        .map: rank8 =>
-          s"$rank8/pppppppp/8/8/8/8/PPPPPPPP/${rank8.toUpperCase} w KQkq - 0 1"
-    )
+        .map(rank8 => s"$rank8/pppppppp/8/8/8/8/PPPPPPPP/${rank8.toUpperCase} w KQkq - 0 1")
 
-  private val positions = Array(
+  private val initialPositionsStr = Array(
     "bbqnnrkr",
     "bqnbnrkr",
     "bqnnrbkr",
@@ -1009,4 +1012,4 @@ case object Chess960
     "rkrnnqbb"
   )
 
-  private val positionsMap: Map[String, Int] = positions.zipWithIndex.toMap
+  private val positionsMap: Map[String, Int] = initialPositionsStr.zipWithIndex.toMap

@@ -24,7 +24,7 @@ object Elo extends RichOpaqueInt[Elo]:
       val prd = playersRatingDiff(player.rating, game.opponentRating)
       getExpectedScore(prd)
     val achievedScore = games.foldMap(_.points.value)
-    val ratingDiff =
+    val ratingDiff    =
       Math.round(player.kFactor * (achievedScore - expectedScore))
     player.rating + ratingDiff
 

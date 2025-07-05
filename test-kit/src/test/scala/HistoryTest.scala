@@ -2,7 +2,7 @@ package chess
 
 class ThreefoldRepetitionTest extends ChessTest:
 
-  def toHash(a: Int) = PositionHash(Hash(a << 8))
+  def toHash(a: Int)                    = PositionHash(Hash(a << 8))
   def makeHistory(positions: List[Int]) =
     (positions
       .map(toHash))

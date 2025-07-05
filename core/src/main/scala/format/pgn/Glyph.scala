@@ -13,22 +13,22 @@ case class Glyphs(
     observations: List[Glyph.Observation]
 ):
 
-  def isEmpty = this == Glyphs.empty
+  def isEmpty: Boolean = this == Glyphs.empty
 
   def nonEmpty: Option[Glyphs] = Option.when(!isEmpty)(this)
 
-  def toggle(glyph: Glyph) =
+  def toggle(glyph: Glyph): Glyphs =
     glyph match
       case g: Glyph.MoveAssessment     => copy(move = (!move.contains(g)).option(g))
       case g: Glyph.PositionAssessment => copy(position = (!position.contains(g)).option(g))
-      case g: Glyph.Observation =>
+      case g: Glyph.Observation        =>
         copy(observations =
           if observations.contains(g) then observations.filter(g !=)
           else g :: observations
         )
       case _ => this
 
-  def merge(g: Glyphs) =
+  def merge(g: Glyphs): Glyphs =
     if isEmpty then g
     else if g.isEmpty then this
     else
@@ -41,7 +41,7 @@ case class Glyphs(
   def toList: List[Glyph] = move.toList ::: position.toList ::: observations
 
 object Glyphs:
-  val empty = Glyphs(None, None, Nil)
+  val empty: Glyphs = Glyphs(None, None, Nil)
 
   given Zero[Glyphs] = new:
     def zero = empty
@@ -53,7 +53,7 @@ object Glyphs:
       observations = glyphs.collect { case g: Glyph.Observation => g }
     )
 
-  val all = Glyph.MoveAssessment.all ++ Glyph.Observation.all ++ Glyph.PositionAssessment.all
+  val all: List[Glyph] = Glyph.MoveAssessment.all ++ Glyph.Observation.all ++ Glyph.PositionAssessment.all
 
   val bySymbol: Map[String, Glyph] = all.mapBy(_.symbol)
 

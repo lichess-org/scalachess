@@ -13,7 +13,7 @@ case class UciCharPair(a: Char, b: Char):
 
     char2squareMap.get(b) match
       case Some(sq) => Uci.Move(from, sq, None)
-      case None =>
+      case None     =>
         char2promotionMap.get(b) match
           case Some((file, prom)) => Uci.Move(from, Square(file, lastRank(from)), Some(prom))
           case None               => Uci.Drop(unsafeCharToDropRole(b), from)

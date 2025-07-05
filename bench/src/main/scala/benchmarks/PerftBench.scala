@@ -4,8 +4,7 @@ import org.openjdk.jmh.annotations.*
 import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
-import chess.perft.{ Perft, Result }
-import chess.format.Fen
+import chess.perft.Perft
 import chess.variant.*
 
 @State(Scope.Thread)
@@ -20,10 +19,10 @@ class PerftBench:
   // the unit of CPU work per iteration
   private val Work: Long = 10
 
-  @Param(Array("50"))
+  @Param(Array("10"))
   var games: Int = scala.compiletime.uninitialized
 
-  @Param(Array("10000"))
+  @Param(Array("10000", "100000", "1000000", "10000000"))
   var nodes: Long = scala.compiletime.uninitialized
 
   var threecheckPerfts: List[Perft]  = scala.compiletime.uninitialized
@@ -82,16 +81,9 @@ class PerftBench:
     perfts.take(games).map(_.withLimit(nodes))
 
   private def bench(perfts: List[Perft], variant: Variant)(bh: Blackhole) =
-    val x = perfts.map:
+    var i = 0
+    while i < perfts.size do
+      val game = perfts(i)
       Blackhole.consumeCPU(Work)
-      _.calculate(variant)
-    bh.consume(x)
-    x
-
-  extension (perft: Perft)
-    def bench(variant: Variant): List[Result] =
-      var situation = Fen.read(variant, perft.epd).get
-      perft.cases.map: c =>
-        import Perft.*
-        Blackhole.consumeCPU(Work)
-        Result(c.depth, situation.perft(c.depth), c.result)
+      bh.consume(game.calculate(variant))
+      i += 1

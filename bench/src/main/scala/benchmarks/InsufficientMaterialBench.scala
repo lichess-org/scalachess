@@ -2,7 +2,6 @@ package benchmarks
 
 import org.openjdk.jmh.annotations.*
 
-import cats.syntax.all.*
 import java.util.concurrent.TimeUnit
 import chess.format.{ FullFen, Fen }
 import chess.variant.Horde

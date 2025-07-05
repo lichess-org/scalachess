@@ -57,7 +57,7 @@ opaque type StandardFen = String
 object StandardFen extends OpaqueString[StandardFen]:
   extension (a: StandardFen) def board: BoardFen = a.value.takeWhile(_ != ' ')
   def fromFull(fen: FullFen): StandardFen        = fromSimple(FullFen.simple(fen))
-  def fromSimple(fen: SimpleFen): StandardFen =
+  def fromSimple(fen: SimpleFen): StandardFen    =
     fen.value.split(' ').take(4) match
       case Array(board, turn, castle, ep) =>
         StandardFen(s"${BoardFen(board).removePockets} $turn $castle $ep")
@@ -72,7 +72,7 @@ object BoardAndColorFen extends OpaqueString[BoardAndColorFen]
 opaque type BoardFen = String
 object BoardFen extends OpaqueString[BoardFen]:
   extension (a: BoardFen)
-    def andColor(c: Color) = BoardAndColorFen(s"$a ${c.letter}")
+    def andColor(c: Color)      = BoardAndColorFen(s"$a ${c.letter}")
     def removePockets: BoardFen =
       if a.contains('[') then a.takeWhile('[' !=)
       else if a.count('/' == _) == 8 then a.split('/').take(8).mkString("/")

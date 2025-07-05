@@ -58,16 +58,16 @@ object Divider:
         if y > 1 then 3 + (y - 1) else 0 // group of 4 on the homerow = 0
 
       case (0, 1) => 1 + y
-      case (1, 1) => 5 + (3 - y).abs
-      case (2, 1) => 4 + y
-      case (3, 1) => 5 + y
+      case (1, 1) => 5 + (4 - y).abs
+      case (2, 1) => 4 + (y - 1)
+      case (3, 1) => 5 + (y - 1)
 
       case (0, 2) => if y < 6 then 2 + (6 - y) else 0
-      case (1, 2) => 4 + (6 - y)
+      case (1, 2) => 4 + (7 - y)
       case (2, 2) => 7
 
       case (0, 3) => if y < 7 then 3 + (7 - y) else 0
-      case (1, 3) => 5 + (6 - y)
+      case (1, 3) => 5 + (7 - y)
 
       case (0, 4) => if y < 7 then 3 + (7 - y) else 0
 

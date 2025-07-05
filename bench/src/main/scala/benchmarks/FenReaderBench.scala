@@ -5,7 +5,6 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 import chess.variant.*
-import chess.{ Mode as _, * }
 import chess.format.FullFen
 import chess.perft.Perft
 import chess.format.Fen

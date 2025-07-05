@@ -109,7 +109,7 @@ class NodeTest extends ScalaCheckSuite:
 
   test("modifyAt and modifyChildAt are consistent if the child exists"):
     forAll: (p: NodeWithPath[Int], f: Int => Int) =>
-      val (node, path) = p
+      val (node, path)                 = p
       def modifyChild(node: Tree[Int]) =
         node.withChild(node.child.map(c => c.withValue(f(c.value)))).some
 
@@ -149,8 +149,7 @@ class NodeTest extends ScalaCheckSuite:
       ps.nonEmpty ==> {
         val path  = ps.map(_.id)
         val added = node.addValueAsChildAt(path, foo)
-        added.flatMap(_.find(path).map(_.size))
-        added.isEmpty || (added.get.size >= node.size)
+        added.isEmpty || added.get.size >= node.size
       }
 
   test("addValueAsChildAt twice return the same size"):
@@ -185,13 +184,13 @@ class NodeTest extends ScalaCheckSuite:
 
   test("modifyInMainlineAt return none when n is out of range"):
     forAll: (node: Node[Int], f: Int => Int) =>
-      node.modifyInMainlineAt(-1, _.updateValue(f)) == none
-      node.modifyInMainlineAt(node.mainline.size, _.updateValue(f)) == none
+      node.modifyInMainlineAt(-1, _.updateValue(f)) == none &&
+        node.modifyInMainlineAt(node.mainline.size, _.updateValue(f)) == none
 
   test("modifyInMainlineAt return none when n is out of range"):
     forAll: (node: Node[Int], f: Int => Int) =>
-      node.modifyInMainlineAt(-1, _.updateValue(f)) == none
-      node.modifyInMainlineAt(node.mainline.size, _.updateValue(f)) == none
+      node.modifyInMainlineAt(-1, _.updateValue(f)) == none &&
+        node.modifyInMainlineAt(node.mainline.size, _.updateValue(f)) == none
 
   test("modifyInMainlineAt with updateValue return have the same size"):
     forAll: (node: Node[Int], f: Int => Int) =>
@@ -330,7 +329,7 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (vs: List[Variation[Foo]], v: Variation[Foo]) =>
       val added       = vs.add(v)
       val isContained = vs.exists(_.sameId(v))
-      val expected =
+      val expected    =
         if isContained then vs.map(_.id)
         else vs.map(_.id) :+ v.id
 

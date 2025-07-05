@@ -4,11 +4,10 @@ import org.openjdk.jmh.annotations.*
 import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
-import cats.syntax.all.*
 import chess.{ FullMoveNumber, Position }
 import chess.variant.Chess960
-import chess.{ Mode as _, * }
-import chess.format.{ Fen, FullFen, BinaryFen }
+import chess.*
+import chess.format.{ Fen, BinaryFen }
 import chess.perft.Perft
 
 @State(Scope.Thread)

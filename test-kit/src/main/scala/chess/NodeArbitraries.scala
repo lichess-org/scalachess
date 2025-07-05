@@ -27,7 +27,7 @@ object NodeArbitraries:
     Gen
       .prob(prob)
       .flatMap:
-        case true => node.child.fold(Gen.const(Nil))(genPath(_)).map(node.value :: _)
+        case true  => node.child.fold(Gen.const(Nil))(genPath(_)).map(node.value :: _)
         case false =>
           if node.variations.isEmpty
           then Gen.const(Nil)

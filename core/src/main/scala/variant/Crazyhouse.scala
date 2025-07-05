@@ -15,7 +15,8 @@ case object Crazyhouse
       standardInitialPosition = true
     ):
 
-  override val pieces: Map[Square, Piece] = Standard.pieces
+  override val initialBoard: Board               = Board.standard
+  override def initialPieces: Map[Square, Piece] = initialBoard.pieceMap
 
   override val initialFen: FullFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1")
 
@@ -174,7 +175,7 @@ case object Crazyhouse
   case class Pocket(pawn: Int, knight: Int, bishop: Int, rook: Int, queen: Int):
 
     def forsythUpper: String = forsyth.toUpperCase
-    def forsyth: String = forsyth(pawn, 'p') + forsyth(knight, 'n') +
+    def forsyth: String      = forsyth(pawn, 'p') + forsyth(knight, 'n') +
       forsyth(bishop, 'b') + forsyth(rook, 'r') + forsyth(queen, 'q')
 
     def forsyth(role: Int, char: Char): String = List.fill(role)(char).mkString
@@ -229,11 +230,11 @@ case object Crazyhouse
       List(f(Pawn, pawn), f(Knight, knight), f(Bishop, bishop), f(Rook, rook), f(Queen, queen))
 
     def foreach[U](f: (Role, Int) => U): Unit =
-      f(Pawn, pawn)
-      f(Knight, knight)
-      f(Bishop, bishop)
-      f(Rook, rook)
-      f(Queen, queen)
+      f(Pawn, pawn): Unit
+      f(Knight, knight): Unit
+      f(Bishop, bishop): Unit
+      f(Rook, rook): Unit
+      f(Queen, queen): Unit
 
   object Pocket:
     val empty: Pocket = Pocket(0, 0, 0, 0, 0)

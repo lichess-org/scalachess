@@ -38,7 +38,7 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree], star
     import PgnNodeEncoder.*
     val builder = new StringBuilder
 
-    if tags.value.nonEmpty then builder.append(tags).addOne('\n').addOne('\n')
+    if tags.value.nonEmpty then builder.append(tags).addOne('\n').addOne('\n'): Unit
     if initial.comments.nonEmpty then builder.append(initial.comments.mkString("{ ", " } { ", " }\n"))
     tree.foreach(_.appendPgnStr(builder, startPly))
     tags(_.Result).foreach(x => builder.addOne(' ').append(x))
@@ -84,7 +84,7 @@ object Move:
 
   given PgnNodeEncoder[Move] with
     extension (m: Move)
-      def appendSanStr(builder: StringBuilder) = m.appendSanStr(builder)
+      def appendSanStr(builder: StringBuilder)           = m.appendSanStr(builder)
       def appendVariationComment(builder: StringBuilder) =
         m.variationComments.foreach(x => builder.append(" { ").append(x.value).append(" }"))
       def hasComment = m.hasComment

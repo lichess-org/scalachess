@@ -35,20 +35,20 @@ case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
     f(f(f(f(f(f(z, Pawn, pawn), Knight, knight), Bishop, bishop), Rook, rook), Queen, queen), King, king)
 
   inline def foreach[U](f: A => U): Unit =
-    f(pawn)
-    f(knight)
-    f(bishop)
-    f(rook)
-    f(queen)
-    f(king)
+    f(pawn): Unit
+    f(knight): Unit
+    f(bishop): Unit
+    f(rook): Unit
+    f(queen): Unit
+    f(king): Unit
 
   inline def foreach[U](f: (Role, A) => U): Unit =
-    f(Pawn, pawn)
-    f(Knight, knight)
-    f(Bishop, bishop)
-    f(Rook, rook)
-    f(Queen, queen)
-    f(King, king)
+    f(Pawn, pawn): Unit
+    f(Knight, knight): Unit
+    f(Bishop, bishop): Unit
+    f(Rook, rook): Unit
+    f(Queen, queen): Unit
+    f(King, king): Unit
 
   inline def findRole(f: A => Boolean): Option[Role] =
     if f(pawn) then Some(Pawn)

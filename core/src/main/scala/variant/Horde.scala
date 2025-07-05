@@ -18,7 +18,7 @@ case object Horde
 
   /** In Horde chess white advances against black with a horde of pawns.
     */
-  override lazy val pieces: Map[Square, Piece] =
+  override lazy val initialPieces: Map[Square, Piece] =
     val whitePawnsHorde = for
       x <- File.all
       y <- Rank.all.take(4)
@@ -27,6 +27,8 @@ case object Horde
     val blackPawns  = File.all.map { Square(_, Rank.Seventh) -> Black.pawn }
     val blackPieces = File.all.map { x => Square(x, Rank.Eighth) -> (Black - backRank(x.value)) }
     (whitePawnsHorde ++ frontPawns ++ blackPawns ++ blackPieces).toMap
+
+  override val initialBoard: Board = Board.fromMap(initialPieces)
 
   override val castles: Castles = Castles.black
 
@@ -65,13 +67,16 @@ case object Horde
   override def opponentHasInsufficientMaterial(position: Position): Boolean =
     hasInsufficientMaterial(position.board, !position.color) || hordeClosedPosition(position)
 
+  /** This function is not implemented yet for Horde chess. */
+  override def playerHasInsufficientMaterial(position: Position): Option[Boolean] = None
+
   /** Any vs K + any where horde is stalemated and only king can move is a fortress draw
     * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
     * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
     */
   private def hordeClosedPosition(position: Position): Boolean =
     val hordeSquare = position.byColor(White)
-    val mateInOne = hordeSquare.count == 1 &&
+    val mateInOne   = hordeSquare.count == 1 &&
       hordeSquare.singleSquare.exists(pieceThreatened(position.board, Color.black, _))
     !mateInOne && {
       if position.isWhiteTurn then position.legalMoves.isEmpty

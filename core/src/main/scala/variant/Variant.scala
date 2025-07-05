@@ -18,7 +18,9 @@ abstract class Variant private[variant] (
     val standardInitialPosition: Boolean
 ):
 
-  def pieces: Map[Square, Piece]
+  def initialPieces: Map[Square, Piece]
+  def initialBoard: Board
+  def initialPosition: Position = Position(initialBoard, this, White)
 
   inline def standard: Boolean      = this == Standard
   inline def chess960: Boolean      = this == Chess960
@@ -149,13 +151,17 @@ abstract class Variant private[variant] (
     * the game should be drawn.
     */
   def opponentHasInsufficientMaterial(position: Position): Boolean =
-    InsufficientMatingMaterial(position, !position.color)
+    InsufficientMatingMaterial(position.board, !position.color)
+
+  def playerHasInsufficientMaterial(position: Position): Option[Boolean] =
+    // For all variants except Antichess and Horde, considering turn isn't needed:
+    Some(opponentHasInsufficientMaterial(position.withColor(!position.color)))
 
   def fiftyMoves(history: History): Boolean =
     history.halfMoveClock >= HalfMoveClock(100)
 
   def isIrreversible(move: Move): Boolean =
-    (move.piece.is(Pawn)) || move.captures || move.promotes || move.castles
+    move.piece.is(Pawn) || move.captures || move.promotes || move.castles
 
   protected def pawnsOnPromotionRank(board: Board, color: Color): Boolean =
     board.byPiece(color, Pawn).intersects(Bitboard.rank(color.promotablePawnRank))

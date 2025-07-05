@@ -12,7 +12,7 @@ class AutodrawTest extends ChessTest:
   test("by lack of pieces: empty"):
     assert(makeEmptyBoard.autoDraw)
   test("by lack of pieces: new"):
-    assertNot(makeBoard.autoDraw)
+    assertNot(Standard.initialPosition.autoDraw)
 
   test("by lack of pieces: opened"):
     assertEquals(
@@ -68,7 +68,7 @@ K B b B""".autoDraw
 K   bB""".autoDraw
 
   test("by fifty moves: new"):
-    assertNot(makeBoard.autoDraw)
+    assertNot(Standard.initialPosition.autoDraw)
   test("by fifty moves: opened"):
     assertNot:
       makeGame.playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5).get.position.autoDraw

@@ -14,7 +14,7 @@ object CoreArbitraries:
   given Arbitrary[Square]  = Arbitrary(Gen.oneOf(Square.all))
   given Arbitrary[Variant] = Arbitrary(Gen.oneOf(Variant.list.all))
   given Arbitrary[Glyph]   = Arbitrary(Gen.oneOf(Glyphs.all))
-  given Arbitrary[Glyphs] = Arbitrary:
+  given Arbitrary[Glyphs]  = Arbitrary:
     Gen.listOf(Arbitrary.arbitrary[Glyph]).map(Glyphs.fromList)
   given Arbitrary[Centis] = Arbitrary(Gen.posNum[Int].map(Centis(_)))
 
@@ -79,7 +79,7 @@ object CoreArbitraries:
       role <- Gen.oneOf(Pawn, Knight, Bishop, Rook, Queen)
     yield Uci.Drop(role, dest)
 
-  private val genBool = Gen.prob(0.5)
+  private val genBool    = Gen.prob(0.5)
   private val castlesGen =
     for
       wks <- genBool

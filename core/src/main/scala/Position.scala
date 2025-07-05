@@ -4,6 +4,8 @@ import cats.syntax.all.*
 import chess.format.pgn.Tags
 import chess.format.{ Fen, Uci }
 
+import scala.annotation.threadUnsafe
+
 import variant.{ Variant, Crazyhouse }
 
 case class Position(board: Board, history: History, variant: Variant, color: Color):
@@ -48,11 +50,11 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
   override def toString = s"$board $variant ${history.lastMove} $color"
 
+  @threadUnsafe
   lazy val moves: Map[Square, List[Move]] =
     legalMoves.groupBy(_.orig)
 
-  lazy val playerCanCapture: Boolean = legalMoves.exists(_.captures)
-
+  @threadUnsafe
   lazy val destinations: Map[Square, Bitboard] = legalMoves.groupMapReduce(_.orig)(_.dest.bb)(_ | _)
 
   def drops: Option[List[Square]] =
@@ -84,13 +86,18 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
   inline def opponentHasInsufficientMaterial: Boolean = variant.opponentHasInsufficientMaterial(this)
 
+  inline def playerHasInsufficientMaterial: Option[Boolean] = variant.playerHasInsufficientMaterial(this)
+
+  @threadUnsafe
   lazy val threefoldRepetition: Boolean = history.threefoldRepetition
 
   inline def variantEnd: Boolean = variant.specialEnd(this)
 
+  @threadUnsafe
   lazy val check: Check               = checkOf(color)
   inline def checkOf(c: Color): Check = variant.kingThreatened(board, c)
 
+  @threadUnsafe
   lazy val status: Option[Status] =
     if checkMate then Status.Mate.some
     else if variantEnd then Status.VariantEnd.some
@@ -100,20 +107,29 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
   inline def winner: Option[Color] = variant.winner(this)
 
+  @threadUnsafe
   lazy val legalMoves: List[Move] = variant.validMoves(this)
 
+  @threadUnsafe
   lazy val enPassantSquare: Option[Square] =
     potentialEpSquare >> legalMoves.find(_.enpassant).map(_.dest)
 
-  lazy val ourKing: Option[Square]   = kingPosOf(color)
+  @threadUnsafe
+  lazy val ourKing: Option[Square] = kingPosOf(color)
+  @threadUnsafe
   lazy val theirKing: Option[Square] = kingPosOf(!color)
   // alternative version of ourKing is used in Antichess only
+  @threadUnsafe
   lazy val ourKings: List[Square] = kings(color)
   // alternative version of theirKing is used in Antichess only
+  @threadUnsafe
   lazy val theirKings: List[Square] = kings(!color)
-  lazy val us: Bitboard             = byColor(color)
-  lazy val them: Bitboard           = byColor(!color)
-  lazy val checkers: Bitboard       = ourKing.fold(Bitboard.empty)(board.attackers(_, !color))
+  @threadUnsafe
+  lazy val us: Bitboard = byColor(color)
+  @threadUnsafe
+  lazy val them: Bitboard = byColor(!color)
+  @threadUnsafe
+  lazy val checkers: Bitboard = ourKing.fold(Bitboard.empty)(board.attackers(_, !color))
 
   def generateMovesAt(square: Square): List[Move] =
     variant.validMovesAt(this, square)
@@ -134,6 +150,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
     * the last move must have been a double pawn push
     * and not start from the back rank
     */
+  @threadUnsafe
   lazy val potentialEpSquare: Option[Square] =
     history.lastMove.flatMap:
       case Uci.Move(orig, dest, _) =>
@@ -377,8 +394,6 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
 object Position:
 
-  val standard: Position = Position.init(variant.Standard, White)
-
   case class AndFullMoveNumber(position: Position, fullMoveNumber: FullMoveNumber):
     def ply: Ply     = fullMoveNumber.ply(position.color)
     def toGame: Game = Game(position = position, ply = ply, startedAtPly = ply)
@@ -392,7 +407,12 @@ object Position:
       fen
         .flatMap(Fen.readWithMoveNumber(variant, _))
         .getOrElse:
-          AndFullMoveNumber(Position.init(variant, White), FullMoveNumber.initial)
+          AndFullMoveNumber(variant.initialPosition, FullMoveNumber.initial)
+
+    def apply(variant: Variant, fen: Fen.Full): AndFullMoveNumber =
+      Fen
+        .readWithMoveNumber(variant, fen)
+        .getOrElse(AndFullMoveNumber(variant.initialPosition, FullMoveNumber.initial))
 
     given CanPlay[AndFullMoveNumber] with
       extension (position: AndFullMoveNumber)
@@ -402,16 +422,7 @@ object Position:
   given HasPosition[AndFullMoveNumber]:
     extension (position: AndFullMoveNumber) inline def position: Position = position.position
 
-  def apply(
-      pieces: PieceMap,
-      history: History,
-      variant: Variant,
-      crazyData: Option[Crazyhouse.Data],
-      color: Option[Color]
-  ) =
-    new Position(Board.fromMap(pieces), history.copy(crazyData = crazyData), variant, color.getOrElse(White))
-
-  def apply(board: Board, variant: Variant, color: Option[Color]): Position =
+  def apply(board: Board, variant: Variant, color: Color): Position =
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Position(
       board,
@@ -421,33 +432,8 @@ object Position:
         crazyData = variant.crazyhouse.option(Crazyhouse.Data.init)
       ),
       variant,
-      color.getOrElse(White)
+      color
     )
-
-  def apply(pieces: Iterable[(Square, Piece)], variant: Variant, color: Option[Color]): Position =
-    Position(pieces, variant.castles, variant, color)
-
-  def apply(
-      pieces: Iterable[(Square, Piece)],
-      castles: Castles,
-      variant: Variant,
-      color: Option[Color]
-  ): Position =
-    val board        = Board.fromMap(pieces.toMap)
-    val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
-    Position(
-      board,
-      History(
-        castles = castles,
-        unmovedRooks = unmovedRooks,
-        crazyData = variant.crazyhouse.option(Crazyhouse.Data.init)
-      ),
-      variant,
-      color.getOrElse(White)
-    )
-
-  def apply(variant: chess.variant.Variant): Position =
-    Position.init(variant, White)
 
   def apply(tags: Tags): Position =
     apply(tags.variant, tags.fen)
@@ -457,10 +443,10 @@ object Position:
     apply(variant, fen)
 
   def apply(variant: Variant, fen: Option[Fen.Full]): Position =
-    fen.flatMap(Fen.read(variant, _)).getOrElse(init(variant, White))
+    fen.flatMap(Fen.read(variant, _)).getOrElse(variant.initialPosition)
 
-  def init(variant: Variant, color: Color): Position =
-    Position(Board.fromMap(variant.pieces), variant, color.some)
+  def apply(variant: Variant, fen: Fen.Full): Position =
+    Fen.read(variant, fen).getOrElse(variant.initialPosition)
 
   given CanPlay[Position]:
     extension (position: Position)

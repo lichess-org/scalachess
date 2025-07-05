@@ -14,7 +14,8 @@ case object Antichess
       standardInitialPosition = true
     ):
 
-  override val pieces: Map[Square, Piece] = Standard.pieces
+  override val initialBoard: Board               = Board.standard
+  override def initialPieces: Map[Square, Piece] = initialBoard.pieceMap
 
   // In antichess, it is not permitted to castle
   override val castles: Castles    = Castles.none
@@ -52,19 +53,14 @@ case object Antichess
     board.fold(0): (acc, color, _) =>
       acc + color.fold(-2, 2)
 
-  // In antichess, there is no checkmate condition therefore a player may only draw either by agreement,
-  // blockade or stalemate. Only one player can win if the only remaining pieces are two knights
+  // In antichess, if the only remaining pieces are a knight each, then exactly one
+  // player can win (depending on whose turn it is).
+
   override def opponentHasInsufficientMaterial(position: Position): Boolean =
-    // Exit early if we are not in a board with only knights
-    position.onlyKnights && {
+    justOneKnightEach(position) && allOnSameColourSquares(position)
 
-      val whiteKnights = position.white.squares
-      val blackKnights = position.black.squares
-
-      // We consider the case where a player has two knights
-      whiteKnights.size == 1 && blackKnights.size == 1 && whiteKnights.forall(_.isLight) == blackKnights
-        .forall(_.isLight)
-    }
+  override def playerHasInsufficientMaterial(position: Position): Option[Boolean] =
+    Some(justOneKnightEach(position) && !allOnSameColourSquares(position))
 
   // No player can win if the only remaining pieces are opposing bishops on different coloured
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color
@@ -102,3 +98,10 @@ case object Antichess
     // The pawn cannot attack a bishop or be attacked by a bishop
     val cannotAttackBishop = pawn.isLight != oppositeBishopLight
     InsufficientMatingMaterial.pawnBlockedByPawn(pawn, position) && cannotAttackBishop
+
+  private def allOnSameColourSquares(position: Position): Boolean =
+    Bitboard.lightSquares.isDisjoint(position.occupied) ||
+      Bitboard.darkSquares.isDisjoint(position.occupied)
+
+  private def justOneKnightEach(position: Position): Boolean =
+    position.onlyKnights && position.white.count == 1 && position.black.count == 1

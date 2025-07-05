@@ -20,8 +20,8 @@ class AtomicVariantTest extends ChessTest:
         assert(intactPawns.forall(square => game.position.pieceAt(square).isDefined))
 
   test("Must explode all surrounding non pawn pieces on capture (contrived board)"):
-    val fenPosition = FullFen("k7/3bbn2/3rqn2/3qr3/8/7B/8/1K6 w - -")
-    val game        = fenToGame(fenPosition, Atomic)
+    val fenPosition     = FullFen("k7/3bbn2/3rqn2/3qr3/8/7B/8/1K6 w - -")
+    val game            = fenToGame(fenPosition, Atomic)
     val explodedSquares =
       List(Square.D5, Square.E5, Square.D6, Square.E6, Square.F6, Square.D7, Square.E7, Square.F7)
 
@@ -33,8 +33,8 @@ class AtomicVariantTest extends ChessTest:
   test(
     "Must explode all surrounding non pawn pieces on capture (contrived board with bottom right position)"
   ):
-    val fenPosition = FullFen("k7/3bbn2/3rqn2/4rq2/8/1B6/8/K7 w - -")
-    val game        = fenToGame(fenPosition, Atomic)
+    val fenPosition     = FullFen("k7/3bbn2/3rqn2/4rq2/8/1B6/8/K7 w - -")
+    val game            = fenToGame(fenPosition, Atomic)
     val explodedSquares =
       List(Square.F5, Square.E5, Square.D6, Square.E6, Square.F6, Square.D7, Square.E7, Square.F7)
     game
@@ -418,9 +418,8 @@ class AtomicVariantTest extends ChessTest:
           .split(' ')
           .toVector
       )
-    val (_, steps, error) = chess.Replay.gameMoveWhileValid(sans, Atomic.initialFen, Atomic)
-    assertEquals(error, None)
-    assertEquals(steps.size, sans.size)
+    assertRight(Atomic.initialPosition.playMoves(sans)): steps =>
+      assertEquals(steps.size, sans.size)
 
   test("Allow castling with touching kings and rook shielding final attack"):
     val position = FullFen("8/8/8/8/8/8/4k3/R3K2r w Q - 0 1")
@@ -460,6 +459,5 @@ class AtomicVariantTest extends ChessTest:
           .split(' ')
           .toVector
       )
-    val (_, steps, error) = chess.Replay.gameMoveWhileValid(sans, Atomic.initialFen, Atomic)
-    assertEquals(error, None)
-    assertEquals(steps.size, sans.size)
+    assertRight(Atomic.initialPosition.playMoves(sans)): steps =>
+      assertEquals(steps.size, sans.size)

@@ -4,8 +4,7 @@ import org.openjdk.jmh.annotations.*
 import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
-import chess.perft.{ Perft, Result }
-import chess.format.Fen
+import chess.perft.Perft
 import chess.variant.*
 
 @State(Scope.Thread)
@@ -20,10 +19,10 @@ class PerftBench:
   // the unit of CPU work per iteration
   private val Work: Long = 10
 
-  @Param(Array("50"))
+  @Param(Array("10"))
   var games: Int = scala.compiletime.uninitialized
 
-  @Param(Array("10000"))
+  @Param(Array("10000", "100000", "1000000", "10000000"))
   var nodes: Long = scala.compiletime.uninitialized
 
   var threecheckPerfts: List[Perft]  = scala.compiletime.uninitialized

@@ -4,6 +4,8 @@ import cats.syntax.all.*
 import chess.format.Uci
 import chess.format.pgn.SanStr
 
+import scala.annotation.threadUnsafe
+
 sealed trait MoveOrDrop:
 
   inline def fold[A](move: Move => A, drop: Drop => A): A =
@@ -29,6 +31,11 @@ sealed trait MoveOrDrop:
       case m: Move => game(m)
       case d: Drop => game.applyDrop(d)
 
+object MoveOrDrop:
+
+  case class WithPly(moveOrDrop: MoveOrDrop, ply: Ply):
+    export moveOrDrop.*
+
 case class Move(
     piece: Piece,
     orig: Square,
@@ -42,7 +49,7 @@ case class Move(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  override lazy val after: Position = finalizeHistory
+  override def after: Position = finalizeHistory.copy()
 
   /* return whether this move captures an opponent piece */
   inline def captures: Boolean = capture.isDefined
@@ -63,7 +70,8 @@ case class Move(
 
   override def toString = s"$piece ${toUci.uci}"
 
-  private def finalizeHistory: Position =
+  @threadUnsafe
+  private lazy val finalizeHistory: Position =
     val after = this.afterWithoutHistory
       .withColor(!piece.color)
       .updateHistory { h =>
@@ -84,7 +92,7 @@ case class Move(
       lazy val positionHashesOfBoardBefore =
         if h.positionHashes.isEmpty then PositionHash(Hash(before)) else h.positionHashes
       val resetsPositionHashes = after.variant.isIrreversible(this)
-      val basePositionHashes =
+      val basePositionHashes   =
         if resetsPositionHashes then PositionHash.empty else positionHashesOfBoardBefore
       h.copy(positionHashes = PositionHash(Hash(after)).combine(basePositionHashes))
     }
@@ -147,7 +155,7 @@ case class Drop(
     metrics: MoveMetrics = MoveMetrics.empty
 ) extends MoveOrDrop:
 
-  override lazy val after: Position = finalizeHistory
+  override def after: Position = finalizeHistory
 
   inline def withMetrics(m: MoveMetrics): Drop = copy(metrics = m)
 
@@ -157,7 +165,8 @@ case class Drop(
 
   override def toString = toUci.uci
 
-  private def finalizeHistory: Position =
+  @threadUnsafe
+  private lazy val finalizeHistory: Position =
     val after = this.afterWithoutHistory.withColor(!piece.color)
     after
       .updateHistory { h =>

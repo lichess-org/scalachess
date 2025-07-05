@@ -43,12 +43,12 @@ case class ByColor[A](white: A, black: A):
   def fold[B](init: B)(f: (B, Color, A) => B): B = f(f(init, White, white), Black, black)
 
   def foreach[U](f: A => U): Unit =
-    f(white)
-    f(black)
+    f(white): Unit
+    f(black): Unit
 
   def foreach[U](f: (Color, A) => U): Unit =
-    f(White, white)
-    f(Black, black)
+    f(White, white): Unit
+    f(Black, black): Unit
 
   def forall(pred: A => Boolean): Boolean = pred(white) && pred(black)
 
@@ -98,7 +98,6 @@ object ByColor:
   inline def fill[A](a: A): ByColor[A]          = ByColor(a, a)
   inline def fromPair[A](p: (A, A)): ByColor[A] = ByColor(p._1, p._2)
 
-  @annotation.nowarn("msg=unused implicit parameter")
   def apply[A](f: Color => A)(using NotGiven[f.type <:< PartialFunction[Color, A]]): ByColor[A] =
     ByColor(white = f(White), black = f(Black))
 
@@ -113,7 +112,7 @@ object ByColor:
     def zero = ByColor.fill(Zero[A].zero)
 
   given [A: Monoid]: Monoid[ByColor[A]] with
-    def empty = ByColor.fill(Monoid[A].empty)
+    def empty                                 = ByColor.fill(Monoid[A].empty)
     def combine(x: ByColor[A], y: ByColor[A]) =
       ByColor(Monoid[A].combine(x.white, y.white), Monoid[A].combine(x.black, y.black))
 
@@ -130,7 +129,7 @@ object ByColor:
     def traverse[G[_]: Applicative, A, B](fa: ByColor[A])(f: A => G[B]): G[ByColor[B]] =
       fa.traverse(f)
 
-    def pure[A](a: A): ByColor[A] = ByColor.fill(a)
+    def pure[A](a: A): ByColor[A]                                 = ByColor.fill(a)
     def ap[A, B](ff: ByColor[A => B])(fa: ByColor[A]): ByColor[B] =
       ByColor(ff.white(fa.white), ff.black(fa.black))
 

@@ -75,8 +75,8 @@ case class Game(
       val c2 = c1.step(metrics, gameActive)
       if ply - startedAtPly == Ply(1) then c2.map(_.start) else c2
 
-  def apply(uci: Uci.Move): Either[ErrorStr, (Game, Move)] = apply(uci.orig, uci.dest, uci.promotion)
-  def apply(uci: Uci.Drop): Either[ErrorStr, (Game, Drop)] = drop(uci.role, uci.square)
+  def apply(uci: Uci.Move): Either[ErrorStr, (Game, Move)]  = apply(uci.orig, uci.dest, uci.promotion)
+  def apply(uci: Uci.Drop): Either[ErrorStr, (Game, Drop)]  = drop(uci.role, uci.square)
   def apply(uci: Uci): Either[ErrorStr, (Game, MoveOrDrop)] =
     uci match
       case uci: Uci.Move => apply(uci)
@@ -95,7 +95,7 @@ case class Game(
 object Game:
 
   def apply(variant: chess.variant.Variant): Game =
-    Game(Position.init(variant, White))
+    Game(variant.initialPosition)
 
   def apply(variant: Option[chess.variant.Variant], fen: Option[Fen.Full]): Game =
     apply(variant | chess.variant.Standard, fen)

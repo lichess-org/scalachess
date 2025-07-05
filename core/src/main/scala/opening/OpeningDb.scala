@@ -1,7 +1,8 @@
 package chess
 package opening
 
-import cats.syntax.option.*
+import cats.Foldable
+import cats.syntax.all.*
 import chess.format.pgn.SanStr
 import chess.format.{ FullFen, StandardFen }
 
@@ -33,14 +34,15 @@ object OpeningDb:
 
   // assumes standard initial Fen and variant
   def search(sans: Iterable[SanStr]): Option[Opening.AtPly] =
-    Position.standard
+    chess.variant.Standard.initialPosition
       .playPositions(sans.take(SEARCH_MAX_PLIES).takeWhile(!_.value.contains('@')).toList)
       .toOption
-      .flatMap(searchInBoards)
+      .flatMap(searchInPositions)
 
-  def search(replay: Replay): Option[Opening.AtPly] =
-    searchInBoards:
-      val moves: Vector[Move] = replay.chronoMoves.view
+  @scala.annotation.targetName("searchMoveOrDrops")
+  def search(moveOrDrops: Iterable[MoveOrDrop]): Option[Opening.AtPly] =
+    searchInPositions:
+      val moves: Vector[Move] = moveOrDrops.view
         .take(SEARCH_MAX_PLIES)
         .takeWhile:
           case move: Move => move.before.board.nbPieces >= SEARCH_MIN_PIECES
@@ -49,10 +51,10 @@ object OpeningDb:
         .toVector
       moves.map(_.before) ++ moves.lastOption.map(_.after).toVector
 
-  // first board is initial position
-  def searchInBoards(boards: Iterable[Position]): Option[Opening.AtPly] =
-    boards
-      .takeWhile(_.board.nbPieces >= SEARCH_MIN_PIECES)
+  // first position is initial position
+  def searchInPositions[F[_]: Foldable](positions: F[Position]) =
+    positions
+      .takeWhile_(_.board.nbPieces >= SEARCH_MIN_PIECES)
       .zipWithIndex
       .drop(1)
       .foldRight(none[Opening.AtPly]):

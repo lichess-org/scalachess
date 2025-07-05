@@ -1,12 +1,14 @@
 package chess
 
+import chess.variant.Standard
+
 import scala.language.implicitConversions
 
 import Square.*
 
 class BoardTest extends ChessTest:
 
-  val board = makeBoard
+  val board = Standard.initialPosition
 
   test("position pieces correctly"):
     assertEquals(

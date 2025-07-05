@@ -32,7 +32,7 @@ object Json:
   given Writes[Opening] with
     def writes(o: Opening) = PlayJson.obj("eco" -> o.eco, "name" -> o.name)
 
-  given Writes[Glyph] = PlayJson.writes[Glyph]
+  given Writes[Glyph]  = PlayJson.writes[Glyph]
   given Writes[Glyphs] = Writes[Glyphs]: gs =>
     PlayJson.toJson(gs.toList)
 

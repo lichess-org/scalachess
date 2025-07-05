@@ -100,7 +100,7 @@ object Attacks:
             (1L << a) | (1L << b) | slidingAttacks(a, 0, BISHOP_DELTAS) & slidingAttacks(b, 0, BISHOP_DELTAS)
     yield ()
 
-  initialize()
+  val _ = initialize()
 
   extension (l: Long)
     private def contains(s: Int): Boolean =

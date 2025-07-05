@@ -1,7 +1,7 @@
 package chess
 
 import cats.syntax.option.*
-import chess.format.pgn.Reader
+import chess.format.pgn.SanStr
 import chess.format.{ Fen, FullFen }
 import chess.variant.Antichess
 
@@ -194,13 +194,27 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     val game     = fenToGame(position, Antichess).playMoves(Square.A1 -> Square.B3).get
     assertNot(game.position.opponentHasInsufficientMaterial)
 
+  test(
+    "Player has insufficient material when there are only two remaining knights on opposite color squares"
+  ):
+    val position = FullFen("1n6/8/8/8/8/4N3/8/8 w - - 0 1")
+    val game     = fenToGame(position, Antichess).playMoves(Square.E3 -> Square.D1).get
+    assertEquals(game.position.playerHasInsufficientMaterial, Some(true))
+
+  test(
+    "Player has sufficient material when there are only two remaining knights on same color squares"
+  ):
+    val position = FullFen("1n6/8/8/8/8/8/8/7N w - - 0 1")
+    val game     = fenToGame(position, Antichess).playMoves(Square.H1 -> Square.G3).get
+    assertEquals(game.position.playerHasInsufficientMaterial, Some(false))
+
   test("Not be drawn on insufficient mating material"):
     val position = FullFen("4K3/8/1b6/8/8/8/5B2/3k4 b - -")
     val game     = fenToGame(position, Antichess)
     assertNot(game.position.end)
 
   test("Be drawn on a three move repetition"):
-    val game = Game(Antichess)
+    val game  = Game(Antichess)
     val moves =
       List((Square.G1, Square.F3), (Square.G8, Square.F6), (Square.F3, Square.G1), (Square.F6, Square.G8))
     val repeatedMoves: List[(Square, Square)] = List.fill(3)(moves).flatten
@@ -208,10 +222,10 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     assert(g.position.threefoldRepetition)
 
   test("Successfully play through a full game until one player loses all their pieces"):
-    Reader
+    Replay
       .mainline(fullGame)
       .assertRight:
-        case Reader.Result(replay, None) =>
+        case Replay.Result(replay, None) =>
           val game = replay.state
           assert(game.position.end)
           // In antichess, the player who has just lost all their pieces is the winner
@@ -253,10 +267,10 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
 
 1. e3 b5 2. Bxb5 Bb7 3. Bxd7 Bxg2 4. Bxe8 Bxh1 5. Bxf7 Qxd2 6. Bxg8 Qxc2 7. Bxh7 Rxh7 8. Qxc2 Rxh2 9. Qxc7 Rxf2 10. Qxe7 Bxe7 11. Kxf2 Ba3 12. bxa3 Bf3 13. Nxf3 Nc6 14. Ne5 Nxe5 15. Kf3 Nxf3 16. Bd2 Nxd2 17. Nxd2 Rh8 18. Rh1 Rxh1 19. Nf1 Rxf1 20. a4 g6 21. e4 Rb1 22. a5 a6 23. a4 Rb6 24. axb6 g5 25. b7 g4 26. b8=R g3 27. a5 g2 28. Rb5 axb5 29. e5 g1=R 30. e6 b4 31. e7 Rg3 32. e8=K b3 33. a6 b2 34. a7 b1=R 35. a8=K Rb8 36. Kxb8 Rg6 37. Kc8 Ra6 38. Kf8 Rh6 39. Ke8 Rg6 40. Kcd8 Rb6 41. Kf8 Rh6 42. Kfe8 Rb6 43. Kf8 Rh6 44. Kfe8 Rb6 { The game is a draw. } 1/2-1/2
     """
-    Reader
+    Replay
       .mainline(pgn)
       .assertRight:
-        case Reader.Result(replay, None) =>
+        case Replay.Result(replay, None) =>
           val game = replay.state
           assertNot(game.position.end)
           assertEquals(game.position.winner, None)
@@ -265,3 +279,7 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     val game = fenToGame(FullFen("rnbqk2r/ppppppbp/5np1/8/8/5NP1/PPPPPPBP/RNBQK2R w KQkq - 4 4"), Antichess)
     assertEquals(game.position.history.castles, Castles.none)
     assertEquals(game.position.history.unmovedRooks, UnmovedRooks.none)
+
+  test("Castling in Antichess is not allowed"):
+    val fen = FullFen("r3kbnr/p3pp1p/1p4p1/8/8/P7/1P1P1PPP/RNB2KNR b - - 0 9")
+    Fen.read(Antichess, fen).get.play(SanStr("O-O--O")).isLeft

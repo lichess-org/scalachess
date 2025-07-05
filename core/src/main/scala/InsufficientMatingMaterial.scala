@@ -10,7 +10,8 @@ object InsufficientMatingMaterial:
   // verify if there are at least two bishops of opposite color
   // no matter which sides they are on
   def bishopsOnOppositeColors(board: Board): Boolean =
-    board.bishops.map(_.isLight).distinct.size == 2
+    board.bishops.intersects(Bitboard.lightSquares) &&
+      board.bishops.intersects(Bitboard.darkSquares)
 
   /*
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
@@ -22,7 +23,7 @@ object InsufficientMatingMaterial:
       .exists(p =>
         p.is(Pawn) &&
           position.withColor(p.color).generateMovesAt(pawn).isEmpty && {
-            val blockingPosition = posAheadOfPawn(pawn, p.color)
+            val blockingPosition = pawn.nextRank(p.color)
             blockingPosition.flatMap(position.pieceAt).exists(_.is(Pawn))
           }
       )
@@ -41,18 +42,20 @@ object InsufficientMatingMaterial:
    * King + knight mates against king + any(rook, bishop, knight, pawn)
    * King + bishop mates against king + any(bishop, knight, pawn)
    * King + bishop(s) versus king + bishop(s) depends upon bishop square colors
+   * So this function returns true in three cases:
+   * - if color has only king
+   * - if color has king + knight and opponent has king + queen(s)
+   * - if color has king + bishop and opponent doesn't have:
+   *   - opposite color bishop(s)
+   *   - or knight(s) or pawn(s)
    */
-  def apply(position: Position, color: Color): Boolean =
-    if position.kingsOnlyOf(color) then true
-    else if position.kingsAndKnightsOnlyOf(color) then
-      position.nonKingsOf(color).count == 1 &&
-      position.onlyOf(!color, position.kings | position.queens)
-    else if position.kingsAndBishopsOnlyOf(color) then
-      !(bishopsOnOppositeColors(position.board) ||
-        (position.byPiece(!color, Knight) | position.byPiece(!color, Pawn)).nonEmpty)
-    else false
+  def apply(board: Board, color: Color): Boolean =
+    import board.*
+    inline def onlyKing = kingsOnlyOf(color)
+    inline def KN       =
+      onlyOf(color, King, Knight) && count(color, Knight) == 1 && onlyOf(!color, King, Queen)
+    inline def KB =
+      onlyOf(color, King, Bishop) &&
+        !(bishopsOnOppositeColors(board) || byPiece(!color, Knight, Pawn).nonEmpty)
 
-  /** Determines the position one ahead of a pawn based on the color of the piece.
-    * White pawns move up and black pawns move down.
-    */
-  def posAheadOfPawn(square: Square, color: Color): Option[Square] = color.fold(square.up, square.down)
+    onlyKing || KN || KB

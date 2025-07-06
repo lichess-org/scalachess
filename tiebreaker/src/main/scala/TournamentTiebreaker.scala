@@ -390,8 +390,7 @@ trait Tournament:
     val playersWithScores = players.map: player =>
       val score = pointsById(player.uniqueIdentifier).getOrElse(0f)
       PlayerWithScore(player, score, points.getOrElse(player.uniqueIdentifier, Nil))
-    playersWithScores
-      .sortBy(p => (p.score, p.tiebreakers))
+    playersWithScores.sorted
 
 private object Tournament:
   private case class Impl(games: Map[PlayerId, Tiebreaker.PlayerGames]) extends Tournament:

@@ -294,6 +294,21 @@ object Board:
     ByRole.fill(Bitboard.empty)
   )
 
+  val standard = Board(
+    occupied = Bitboard(0xffff00000000ffffL),
+    byColor = ByColor(
+      white = Bitboard(0x000000000000ffffL),
+      black = Bitboard(0xffff000000000000L)
+    ),
+    byRole = ByRole(
+      pawn = Bitboard(0x00ff00000000ff00L),
+      knight = Bitboard(0x4200000000000042L),
+      bishop = Bitboard(0x2400000000000024L),
+      rook = Bitboard(0x8100000000000081L),
+      queen = Bitboard(0x0800000000000008L),
+      king = Bitboard(0x1000000000000010L)
+    )
+  )
   def fromMap(pieces: PieceMap): Board =
     var pawns    = Bitboard.empty
     var knights  = Bitboard.empty

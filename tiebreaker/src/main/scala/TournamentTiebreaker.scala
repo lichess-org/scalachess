@@ -292,9 +292,7 @@ trait Tournament:
       // sort by score descending, then by tiebreakers descending
       val scoreComparison = b.score.compare(a.score)
       if scoreComparison != 0 then scoreComparison
-      else
-        // compare tiebreakers lexicographically
-        Ordering[List[Tiebreaker.Point]].compare(b.tiebreakers, a.tiebreakers)
+      else Ordering[List[Tiebreaker.Point]].compare(b.tiebreakers, a.tiebreakers)
 
   def toPlayerGames: List[PlayerGames] =
     players.map: player =>
@@ -353,6 +351,7 @@ trait Tiebreaker(val code: String, val name: String):
         val point = Point(self, self.compute(pg.player, playerGames).value)
         pg.player.uniqueIdentifier -> (previousPoints.getOrElse(pg.player.uniqueIdentifier, Nil) :+ point)
       .toMap
+
   def compute(me: Player, allPlayers: Seq[PlayerGames]): TieBreakPoints
 
 object Tiebreaker:

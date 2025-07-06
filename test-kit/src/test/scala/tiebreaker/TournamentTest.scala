@@ -1,13 +1,12 @@
 package chess
 package tiebreaker
 
-import snapshot4s.generated.snapshotConfig
-import snapshot4s.munit.SnapshotAssertions
-import chess.tiebreaker.Tiebreaker.*
+import chess.Outcome.Points
 import chess.format.pgn.PgnStr
 import chess.rating.Elo
-
-import chess.Outcome.Points
+import chess.tiebreaker.Tiebreaker.*
+import snapshot4s.generated.snapshotConfig
+import snapshot4s.munit.SnapshotAssertions
 
 class TournamentTest extends MunitExtensions with SnapshotAssertions:
 
@@ -60,15 +59,18 @@ class TournamentTest extends MunitExtensions with SnapshotAssertions:
     .map: (player, games) =>
       player.uniqueIdentifier -> PlayerGames(player, games.map(_._2))
 
-  test("tiebreaker games snapshot"):
-    val x = Tiebreaker.compute(
-      allGames,
-      List(
-        AverageOfOpponentsBuchholz,
-        AveragePerfectPerformanceOfOpponents,
-        DirectEncounter,
-        PerfectTournamentPerformance,
-        SonnebornBerger
+  test("tiebreaker games snapshot") {
+    val result = Tiebreaker
+      .compute(
+        allGames,
+        List(
+          AverageOfOpponentsBuchholz,
+          AveragePerfectPerformanceOfOpponents,
+          DirectEncounter,
+          PerfectTournamentPerformance,
+          SonnebornBerger
+        )
       )
-      ).mkString("\n")
-    assertFileSnapshot(x, "tiebreaker/tournament.txt")
+      .mkString("\n")
+    assertFileSnapshot(result, "tiebreaker/tournament.txt")
+  }

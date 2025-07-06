@@ -50,12 +50,14 @@ class TiebreakersTest extends ChessTest:
         val playerColor = Color.fromWhite(white == player)
         POVGame(Some(result(playerColor)), playerColor.fold(black, white), playerColor)
 
-  val playerA_Games     = PlayerGames(playerA, povGames(playerA))
-  val playerB_Games     = PlayerGames(playerB, povGames(playerB))
-  val playerC_Games     = PlayerGames(playerC, povGames(playerC))
-  val playerD_Games     = PlayerGames(playerD, povGames(playerD))
-  val playerE_Games     = PlayerGames(playerE, povGames(playerE))
-  val allGames          = Seq(playerA_Games, playerB_Games, playerC_Games, playerD_Games, playerE_Games)
+  val playerA_Games = PlayerGames(playerA, povGames(playerA))
+  val playerB_Games = PlayerGames(playerB, povGames(playerB))
+  val playerC_Games = PlayerGames(playerC, povGames(playerC))
+  val playerD_Games = PlayerGames(playerD, povGames(playerD))
+  val playerE_Games = PlayerGames(playerE, povGames(playerE))
+  val allGames      = Seq(playerA_Games, playerB_Games, playerC_Games, playerD_Games, playerE_Games).mapBy(
+    _.player.uniqueIdentifier
+  )
   val playerA_opponents = Seq(playerB_Games, playerC_Games, playerD_Games, playerE_Games)
 
   test("scores"):
@@ -126,7 +128,7 @@ class TiebreakersTest extends ChessTest:
         playerD_Games.games ++ Seq(POVGame(Some(Points.Half), playerA, Color.Black))
       ),
       playerE_Games
-    )
+    ).mapBy(_.player.uniqueIdentifier)
     val tiebreaker1 = DirectEncounter.compute(playerD, extraDraw)
     val tiebreaker2 = DirectEncounter.compute(playerA, extraDraw)
     assertEquals(tiebreaker1, 0.75f) // 1 win + 1 draw / 2 games
@@ -136,7 +138,9 @@ class TiebreakersTest extends ChessTest:
     val playerAWithPartial  = playerA_Games.copy(partialTiebreaks = List(TieBreakPoints(1f)))
     val playerDWithPartial  = playerD_Games.copy(partialTiebreaks = List(TieBreakPoints(0.5f)))
     val allGamesWithPartial =
-      Seq(playerAWithPartial, playerB_Games, playerC_Games, playerDWithPartial, playerE_Games)
+      Seq(playerAWithPartial, playerB_Games, playerC_Games, playerDWithPartial, playerE_Games).mapBy(
+        _.player.uniqueIdentifier
+      )
 
     val tiebreaker1 = DirectEncounter.compute(playerAWithPartial.player, allGamesWithPartial)
     val tiebreaker2 = DirectEncounter.compute(playerDWithPartial.player, allGamesWithPartial)
@@ -147,7 +151,9 @@ class TiebreakersTest extends ChessTest:
     val playerAWithPartial  = playerA_Games.copy(partialTiebreaks = List(TieBreakPoints(1f)))
     val playerDWithPartial  = playerD_Games.copy(partialTiebreaks = List(TieBreakPoints(1f)))
     val allGamesWithPartial =
-      Seq(playerAWithPartial, playerB_Games, playerC_Games, playerDWithPartial, playerE_Games)
+      Seq(playerAWithPartial, playerB_Games, playerC_Games, playerDWithPartial, playerE_Games).mapBy(
+        _.player.uniqueIdentifier
+      )
 
     val tiebreaker1 = DirectEncounter.compute(playerAWithPartial.player, allGamesWithPartial)
     val tiebreaker2 = DirectEncounter.compute(playerDWithPartial.player, allGamesWithPartial)
@@ -170,6 +176,7 @@ class TiebreakersTest extends ChessTest:
     )
     val allGamesWithPartial =
       Seq(playerAWithPartial, playerDWithPartial, playerC_Games, playerD_Games, playerE_Games, playerX_Games)
+        .mapBy(_.player.uniqueIdentifier)
 
     val tiebreaker1 = DirectEncounter.compute(playerAWithPartial.player, allGamesWithPartial)
     val tiebreaker2 = DirectEncounter.compute(playerDWithPartial.player, allGamesWithPartial)
@@ -187,10 +194,10 @@ class TiebreakersTest extends ChessTest:
     val unratedGames    = Seq(
       POVGame(Some(Points.One), unratedOpponent, Color.White)
     )
-    val unratedPlayerGames = PlayerGames(unratedOpponent, unratedGames)
-    val tiebreaker         = AverageRatingOfOpponents.compute(playerA, Seq(unratedPlayerGames))
+    val unratedPlayerGames = Seq(PlayerGames(unratedOpponent, unratedGames)).mapBy(_.player.uniqueIdentifier)
+    val tiebreaker         = AverageRatingOfOpponents.compute(playerA, unratedPlayerGames)
     assertEquals(tiebreaker, 0f)
-    assertEquals(AverageRatingOfOpponents.compute(playerA, allGames :+ unratedPlayerGames), 1563f)
+    assertEquals(AverageRatingOfOpponents.compute(playerA, allGames ++ unratedPlayerGames), 1563f)
 
   test("AveragePerformanceOfOpponents"):
     val tiebreaker = AveragePerformanceOfOpponents.compute(playerA, allGames)
@@ -233,10 +240,10 @@ class TiebreakersTest extends ChessTest:
       POVGame(Some(Points.One), daniel, Color.Black),
       POVGame(Some(Points.One), aaron, Color.White)
     )
-    val ruslanPlayerGames = PlayerGames(ruslan, ruslanGames)
-    assertEquals(TournamentPerformanceRating.compute(ruslan, Seq(ruslanPlayerGames)), 2796f)
+    val ruslanPlayerGames = Seq(PlayerGames(ruslan, ruslanGames)).mapBy(_.player.uniqueIdentifier)
+    assertEquals(TournamentPerformanceRating.compute(ruslan, ruslanPlayerGames), 2796f)
     assertEquals(
-      PerfectTournamentPerformance.compute(ruslan, Seq(ruslanPlayerGames)),
+      PerfectTournamentPerformance.compute(ruslan, ruslanPlayerGames),
       2945f
     ) // chess-results says 2949. Perfect scores though so :shrug:
 
@@ -259,9 +266,9 @@ class TiebreakersTest extends ChessTest:
       POVGame(Some(Points.One), agusti, Color.White)
     )
     // Lila excludes all bye games. So we don't need to check for them.
-    val xavierPlayerGames = PlayerGames(xavier, xavierGames)
-    assertEquals(TournamentPerformanceRating.compute(xavier, Seq(xavierPlayerGames)), 2218f)
-    assertEquals(PerfectTournamentPerformance.compute(xavier, Seq(xavierPlayerGames)), 2259f)
+    val xavierPlayerGames = Seq(PlayerGames(xavier, xavierGames)).mapBy(_.player.uniqueIdentifier)
+    assertEquals(TournamentPerformanceRating.compute(xavier, xavierPlayerGames), 2218f)
+    assertEquals(PerfectTournamentPerformance.compute(xavier, xavierPlayerGames), 2259f)
 
   test("PerfectTournamentPerformance - Zero score"):
     val games = Seq(
@@ -269,9 +276,9 @@ class TiebreakersTest extends ChessTest:
       POVGame(Some(Points.Zero), playerC, Color.White),
       POVGame(Some(Points.Zero), playerD, Color.Black)
     )
-    val playerGames = PlayerGames(playerA, games)
+    val playerGames = Seq(PlayerGames(playerA, games)).mapBy(_.player.uniqueIdentifier)
     // Lowest rated opponent - 800
-    assertEquals(PerfectTournamentPerformance.compute(playerA, Seq(playerGames)), 650f)
+    assertEquals(PerfectTournamentPerformance.compute(playerA, playerGames), 650f)
 
   test("AveragePerfectPerformanceOfOpponents"):
     val tiebreaker = AveragePerfectPerformanceOfOpponents.compute(playerA, allGames)

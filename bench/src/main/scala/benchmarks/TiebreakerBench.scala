@@ -87,35 +87,35 @@ class TiebreakerBench:
     bh.consume:
       allGames.values.map: pg =>
         Blackhole.consumeCPU(Work)
-        AverageOfOpponentsBuchholz.compute(pg.player, allGames)
+        AverageOfOpponentsBuchholz.compute(pg.player, allGames, Map.empty)
 
   @Benchmark
   def averagePerfectPerformanceOfOpponents(bh: Blackhole) =
     bh.consume:
       allGames.values.map: pg =>
         Blackhole.consumeCPU(Work)
-        AveragePerfectPerformanceOfOpponents.compute(pg.player, allGames)
+        AveragePerfectPerformanceOfOpponents.compute(pg.player, allGames, Map.empty)
 
   @Benchmark
   def directEncounter(bh: Blackhole) =
     bh.consume:
       allGames.values.map: pg =>
         Blackhole.consumeCPU(Work)
-        DirectEncounter.compute(pg.player, allGames)
+        DirectEncounter.compute(pg.player, allGames, Map.empty)
 
   @Benchmark
   def perfectTournamentPerformance(bh: Blackhole) =
     bh.consume:
       allGames.values.map: pg =>
         Blackhole.consumeCPU(Work)
-        PerfectTournamentPerformance.compute(pg.player, allGames)
+        PerfectTournamentPerformance.compute(pg.player, allGames, Map.empty)
 
   @Benchmark
   def sonnebornBerger(bh: Blackhole) =
     bh.consume:
       allGames.values.map: pg =>
         Blackhole.consumeCPU(Work)
-        SonnebornBerger.compute(pg.player, allGames)
+        SonnebornBerger.compute(pg.player, allGames, Map.empty)
 
   @Benchmark
   def tournamentPerformance(bh: Blackhole) =

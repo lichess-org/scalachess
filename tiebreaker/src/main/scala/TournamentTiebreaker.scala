@@ -318,6 +318,31 @@ trait Tournament:
     playersWithScores
       .sortBy(p => (p.score, p.tiebreakers))
 
+private object Tournament:
+  private case class Impl(games: List[PlayerGames]) extends Tournament:
+    def players: List[Player] = games.map(_.player)
+
+    override def gamesById(id: PlayerId): List[(Color, Game)] =
+      games.find(_.player.uniqueIdentifier == id) match
+        case Some(playerGames) =>
+          playerGames.games
+            .map: povGame =>
+              povGame.color ->
+                Game(
+                  players = ByColor(playerGames.player, povGame.opponent),
+                  result = ByColor(povGame.points, None)
+                )
+            .toList
+        case None => Nil
+
+    override def pointsById(id: PlayerId): Option[Float] =
+      games
+        .find(_.player.uniqueIdentifier == id)
+        .fold(None)(_.games.flatten(using _.points.map(_.value)).sum.some)
+
+  def apply(games: List[PlayerGames]): Tournament =
+    Impl(games)
+
 trait Tiebreaker(val code: String, val name: String):
   self =>
   // compute players' tiebreak points based on the tournament and a list of previously computed tiebreak points
@@ -334,6 +359,9 @@ object Tiebreaker:
   case class Point(tiebreaker: Tiebreaker, value: Float)
   type PlayerPoints = Map[PlayerId, List[Point]]
 
+  def compute(games: List[PlayerGames], tiebreakers: List[Tiebreaker]): List[PlayerWithScore] =
+    Tournament(games).compute(tiebreakers)
+
   // old tiebreakers
   case class PlayerGames(
       player: Player,
@@ -348,31 +376,6 @@ object Tiebreaker:
   )
 
   case class Player(uniqueIdentifier: String, rating: Option[Elo])
-
-  object Tournament:
-    private case class Impl(games: List[PlayerGames]) extends Tournament:
-      def players: List[Player] = games.map(_.player)
-
-      override def gamesById(id: PlayerId): List[(Color, Game)] =
-        games.find(_.player.uniqueIdentifier == id) match
-          case Some(playerGames) =>
-            playerGames.games
-              .map: povGame =>
-                povGame.color ->
-                  Game(
-                    players = ByColor(playerGames.player, povGame.opponent),
-                    result = ByColor(povGame.points, None)
-                  )
-              .toList
-          case None => Nil
-
-      override def pointsById(id: PlayerId): Option[Float] =
-        games
-          .find(_.player.uniqueIdentifier == id)
-          .fold(None)(_.games.flatten(using _.points.map(_.value)).sum.some)
-
-    def apply(games: List[PlayerGames]): Tournament =
-      Impl(games)
 
   val all: List[Tiebreaker] = List(
     NbBlackGames,

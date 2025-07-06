@@ -28,6 +28,7 @@ class TiebreakerBench:
   private val Work: Long = 10
 
   var allGames: Seq[PlayerGames] = scala.compiletime.uninitialized
+  var tournament: Tournament     = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =
@@ -81,38 +82,52 @@ class TiebreakerBench:
       .map: (player, games) =>
         PlayerGames(player, games.map(_._2))
       .toSeq
+    tournament = Tournament(allGames.toList)
 
+  // @Benchmark
+  // def averageOfOpponentsBuchholz(bh: Blackhole) =
+  //   bh.consume:
+  //     allGames.map: pg =>
+  //       Blackhole.consumeCPU(Work)
+  //       AverageOfOpponentsBuchholz.compute(pg.player, allGames)
+  //
+  // @Benchmark
+  // def averagePerfectPerformanceOfOpponents(bh: Blackhole) =
+  //   bh.consume:
+  //     allGames.map: pg =>
+  //       Blackhole.consumeCPU(Work)
+  //       AveragePerfectPerformanceOfOpponents.compute(pg.player, allGames)
+  //
+  // @Benchmark
+  // def directEncounter(bh: Blackhole) =
+  //   bh.consume:
+  //     allGames.map: pg =>
+  //       Blackhole.consumeCPU(Work)
+  //       DirectEncounter.compute(pg.player, allGames)
+  //
+  // @Benchmark
+  // def perfectTournamentPerformance(bh: Blackhole) =
+  //   bh.consume:
+  //     allGames.map: pg =>
+  //       Blackhole.consumeCPU(Work)
+  //       PerfectTournamentPerformance.compute(pg.player, allGames)
+  //
+  // @Benchmark
+  // def sonnebornBerger(bh: Blackhole) =
+  //   bh.consume:
+  //     allGames.map: pg =>
+  //       Blackhole.consumeCPU(Work)
+  //       SonnebornBerger.compute(pg.player, allGames)
+  //
   @Benchmark
-  def averageOfOpponentsBuchholz(bh: Blackhole) =
+  def tournamentPerformance(bh: Blackhole) =
     bh.consume:
-      allGames.map: pg =>
-        Blackhole.consumeCPU(Work)
-        AverageOfOpponentsBuchholz.compute(pg.player, allGames)
-
-  @Benchmark
-  def averagePerfectPerformanceOfOpponents(bh: Blackhole) =
-    bh.consume:
-      allGames.map: pg =>
-        Blackhole.consumeCPU(Work)
-        AveragePerfectPerformanceOfOpponents.compute(pg.player, allGames)
-
-  @Benchmark
-  def directEncounter(bh: Blackhole) =
-    bh.consume:
-      allGames.map: pg =>
-        Blackhole.consumeCPU(Work)
-        DirectEncounter.compute(pg.player, allGames)
-
-  @Benchmark
-  def perfectTournamentPerformance(bh: Blackhole) =
-    bh.consume:
-      allGames.map: pg =>
-        Blackhole.consumeCPU(Work)
-        PerfectTournamentPerformance.compute(pg.player, allGames)
-
-  @Benchmark
-  def sonnebornBerger(bh: Blackhole) =
-    bh.consume:
-      allGames.map: pg =>
-        Blackhole.consumeCPU(Work)
-        SonnebornBerger.compute(pg.player, allGames)
+      tournament.compute(
+        List(
+          AverageOfOpponentsBuchholz,
+          AveragePerfectPerformanceOfOpponents,
+          DirectEncounter,
+          PerfectTournamentPerformance,
+          SonnebornBerger
+        )
+      )

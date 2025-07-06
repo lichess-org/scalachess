@@ -1,6 +1,7 @@
-package chess.tiebreaker
+package chess
+package tiebreaker
 
-import chess.Color
+import cats.syntax.all.*
 import chess.Outcome.Points
 import chess.rating.Elo
 import scalalib.extensions.*
@@ -42,8 +43,6 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
   And this will eventually turn out to be true.
   This is not strictly correct and it should be tweaked/removed if it becomes an issue.
  */
-trait Tiebreaker(val code: String, val name: String):
-  def compute(me: Tiebreaker.Player, allPlayers: Seq[Tiebreaker.PlayerGames]): TieBreakPoints
 
 opaque type TieBreakPoints = Float
 object TieBreakPoints extends OpaqueFloat[TieBreakPoints]
@@ -251,21 +250,129 @@ case object AveragePerfectPerformanceOfOpponents
       .average
       .map(_.round) // Fide says to round up
 
+type PlayerId = String
+
+import Tiebreaker.*
+case class PlayerWithScore(
+    player: Player,
+    score: Float,
+    tiebreakers: List[Tiebreaker.Point]
+)
+
+case class Game(players: ByColor[Player], result: ByColor[Option[Outcome.Points]]) // result by color
+
+trait Tournament:
+  def players: List[Player]
+  def gamesById(id: PlayerId): List[(color: Color, game: Game)]
+  def pointsById(id: PlayerId): Option[Float]
+  // def currentRound: Int
+  // def totalRounds: Int
+  // def byes: (PlayerId, Int) => Boolean // playerId, round => true if player has a bye in that round
+
+  given Ordering[Tiebreaker.Point]       = Ordering.by(_.value)
+  given Ordering[List[Tiebreaker.Point]] = new Ordering[List[Tiebreaker.Point]]:
+    def compare(a: List[Tiebreaker.Point], b: List[Tiebreaker.Point]): Int =
+      @scala.annotation.tailrec
+      def loop(
+          a: List[Tiebreaker.Point],
+          b: List[Tiebreaker.Point]
+      ): Int =
+        (a, b) match
+          case (Nil, Nil)           => 0
+          case (Nil, _)             => -1 // a is empty, b is not
+          case (_, Nil)             => 1  // b is empty, a is not
+          case (ah :: at, bh :: bt) =>
+            val cmp = ah.value.compare(bh.value)
+            if cmp != 0 then cmp else loop(at, bt)
+
+      loop(a, b)
+
+  given Ordering[PlayerWithScore] = new Ordering[PlayerWithScore]:
+    def compare(a: PlayerWithScore, b: PlayerWithScore): Int =
+      // sort by score descending, then by tiebreakers descending
+      val scoreComparison = b.score.compare(a.score)
+      if scoreComparison != 0 then scoreComparison
+      else
+        // compare tiebreakers lexicographically
+        Ordering[List[Tiebreaker.Point]].compare(b.tiebreakers, a.tiebreakers)
+
+  def toPlayerGames: List[PlayerGames] =
+    players.map: player =>
+      PlayerGames(
+        player,
+        gamesById(player.uniqueIdentifier).map: p =>
+          Tiebreaker.POVGame(
+            points = p.game.result(p.color),
+            opponent = p.game.players(!p.color),
+            color = p.color
+          )
+      )
+
+  // compute and sort players by their scores and tiebreakers
+  def compute(tiebreakers: List[Tiebreaker]): List[PlayerWithScore] =
+    val points = tiebreakers.foldLeft(Map.empty[PlayerId, List[Point]]): (acc, tiebreaker) =>
+      tiebreaker.compute(this, acc)
+    val playersWithScores = players.map: player =>
+      val score = pointsById(player.uniqueIdentifier).getOrElse(0f)
+      PlayerWithScore(player, score, points.getOrElse(player.uniqueIdentifier, Nil))
+    playersWithScores
+      .sortBy(p => (p.score, p.tiebreakers))
+
+trait Tiebreaker(val code: String, val name: String):
+  self =>
+  // compute players' tiebreak points based on the tournament and a list of previously computed tiebreak points
+  def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
+    val playerGames = tour.toPlayerGames
+    tour.toPlayerGames
+      .map: pg =>
+        val point = Point(self, self.compute(pg.player, playerGames).value)
+        pg.player.uniqueIdentifier -> (previousPoints.getOrElse(pg.player.uniqueIdentifier, Nil) :+ point)
+      .toMap
+  def compute(me: Player, allPlayers: Seq[PlayerGames]): TieBreakPoints
+
 object Tiebreaker:
+  case class Point(tiebreaker: Tiebreaker, value: Float)
+  type PlayerPoints = Map[PlayerId, List[Point]]
 
-  case class POVGame(
-      points: Option[Points],
-      opponent: Player,
-      color: Color
-  )
-
+  // old tiebreakers
   case class PlayerGames(
       player: Player,
       games: Seq[POVGame],
       partialTiebreaks: List[TieBreakPoints] = Nil
   )
 
+  case class POVGame(
+      points: Option[Outcome.Points],
+      opponent: Player,
+      color: Color
+  )
+
   case class Player(uniqueIdentifier: String, rating: Option[Elo])
+
+  object Tournament:
+    private case class Impl(games: List[PlayerGames]) extends Tournament:
+      def players: List[Player] = games.map(_.player)
+
+      override def gamesById(id: PlayerId): List[(Color, Game)] =
+        games.find(_.player.uniqueIdentifier == id) match
+          case Some(playerGames) =>
+            playerGames.games
+              .map: povGame =>
+                povGame.color ->
+                  Game(
+                    players = ByColor(playerGames.player, povGame.opponent),
+                    result = ByColor(povGame.points, None)
+                  )
+              .toList
+          case None => Nil
+
+      override def pointsById(id: PlayerId): Option[Float] =
+        games
+          .find(_.player.uniqueIdentifier == id)
+          .fold(None)(_.games.flatten(using _.points.map(_.value)).sum.some)
+
+    def apply(games: List[PlayerGames]): Tournament =
+      Impl(games)
 
   val all: List[Tiebreaker] = List(
     NbBlackGames,

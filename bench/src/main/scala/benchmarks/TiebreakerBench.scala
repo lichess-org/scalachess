@@ -27,7 +27,7 @@ class TiebreakerBench:
 
   private val Work: Long = 10
 
-  var allGames: List[PlayerGames] = scala.compiletime.uninitialized
+  var allGames: Map[PlayerId, PlayerGames] = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =
@@ -79,41 +79,41 @@ class TiebreakerBench:
     allGames = povGamesWithPlayer
       .groupBy(_._1)
       .map: (player, games) =>
-        PlayerGames(player, games.map(_._2))
-      .toList
+        player.uniqueIdentifier -> PlayerGames(player, games.map(_._2))
+      .toMap
 
   @Benchmark
   def averageOfOpponentsBuchholz(bh: Blackhole) =
     bh.consume:
-      allGames.map: pg =>
+      allGames.values.map: pg =>
         Blackhole.consumeCPU(Work)
         AverageOfOpponentsBuchholz.compute(pg.player, allGames)
 
   @Benchmark
   def averagePerfectPerformanceOfOpponents(bh: Blackhole) =
     bh.consume:
-      allGames.map: pg =>
+      allGames.values.map: pg =>
         Blackhole.consumeCPU(Work)
         AveragePerfectPerformanceOfOpponents.compute(pg.player, allGames)
 
   @Benchmark
   def directEncounter(bh: Blackhole) =
     bh.consume:
-      allGames.map: pg =>
+      allGames.values.map: pg =>
         Blackhole.consumeCPU(Work)
         DirectEncounter.compute(pg.player, allGames)
 
   @Benchmark
   def perfectTournamentPerformance(bh: Blackhole) =
     bh.consume:
-      allGames.map: pg =>
+      allGames.values.map: pg =>
         Blackhole.consumeCPU(Work)
         PerfectTournamentPerformance.compute(pg.player, allGames)
 
   @Benchmark
   def sonnebornBerger(bh: Blackhole) =
     bh.consume:
-      allGames.map: pg =>
+      allGames.values.map: pg =>
         Blackhole.consumeCPU(Work)
         SonnebornBerger.compute(pg.player, allGames)
 

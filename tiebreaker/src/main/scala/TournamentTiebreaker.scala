@@ -268,6 +268,7 @@ trait Tournament:
   def players: List[Player]
   def gamesById(id: PlayerId): List[(color: Color, game: Game)]
   def pointsById(id: PlayerId): Option[Float]
+  def toPlayerGames: Map[PlayerId, Tiebreaker.PlayerGames]
   // def currentRound: Int
   // def totalRounds: Int
   // def byes: (PlayerId, Int) => Boolean // playerId, round => true if player has a bye in that round
@@ -297,21 +298,6 @@ trait Tournament:
       if scoreComparison != 0 then scoreComparison
       else Ordering[List[Tiebreaker.Point]].compare(b.tiebreakers, a.tiebreakers)
 
-  def toPlayerGames: Map[PlayerId, Tiebreaker.PlayerGames] =
-    players
-      .map: player =>
-        player.uniqueIdentifier ->
-          Tiebreaker.PlayerGames(
-            player,
-            gamesById(player.uniqueIdentifier).map: p =>
-              Tiebreaker.POVGame(
-                points = p.game.result(p.color),
-                opponent = p.game.players(!p.color),
-                color = p.color
-              )
-          )
-      .toMap
-
   // compute and sort players by their scores and tiebreakers
   def compute(tiebreakers: List[Tiebreaker]): List[PlayerWithScore] =
     val points = tiebreakers.foldLeft(Map.empty[PlayerId, List[Point]]): (acc, tiebreaker) =>
@@ -324,6 +310,9 @@ trait Tournament:
 
 private object Tournament:
   private case class Impl(games: Map[PlayerId, Tiebreaker.PlayerGames]) extends Tournament:
+
+    override def toPlayerGames: Map[PlayerId, PlayerGames] = games
+
     def players: List[Player] = games.values.map(_.player).toList
 
     override def gamesById(id: PlayerId): List[(Color, Game)] =
@@ -352,7 +341,7 @@ trait Tiebreaker(val code: String, val name: String):
   // compute players' tiebreak points based on the tournament and a list of previously computed tiebreak points
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     val playerGames = tour.toPlayerGames
-    tour.toPlayerGames.values
+    playerGames.values
       .map: pg =>
         val point = Point(self, self.compute(pg.player, playerGames).value)
         pg.player.uniqueIdentifier -> (previousPoints.getOrElse(pg.player.uniqueIdentifier, Nil) :+ point)

@@ -29,6 +29,7 @@ class TiebreakerBench:
   private val Work: Long = 10
 
   var allGames: Map[PlayerId, PlayerGames] = scala.compiletime.uninitialized
+  var tournament: Tournament = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =
@@ -82,6 +83,7 @@ class TiebreakerBench:
       .map: (player, games) =>
         player.uniqueIdentifier -> PlayerGames(player, games.map(_._2))
       .toMap
+    tournament = Tournament(allGames)
 
   @Benchmark
   def averageOfOpponentsBuchholz(bh: Blackhole) =
@@ -138,6 +140,11 @@ class TiebreakerBench:
       allGames.values.map: pg =>
         Blackhole.consumeCPU(Work)
         AverageRatingOfOpponents.compute(pg.player, allGames, Map.empty)
+
+  @Benchmark
+  def averageRatingOfOpponentsAll(bh: Blackhole) =
+    bh.consume:
+      AverageRatingOfOpponents.compute(tournament, Map.empty)
 
   @Benchmark
   def foreBuchholz(bh: Blackhole) =

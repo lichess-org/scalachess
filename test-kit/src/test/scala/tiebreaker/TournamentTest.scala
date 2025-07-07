@@ -83,7 +83,7 @@ class TournamentTest extends MunitExtensions with SnapshotAssertions:
         List(
           BuchholzCut1,
           Buchholz,
-          AverageRatingOfOpponents
+          AverageRatingOfOpponentsCut1
         )
       )
       .mkString("\n")

@@ -190,6 +190,37 @@ case object AverageOfOpponentsBuchholz extends Tiebreaker("AOB", "Average of opp
       .average
 
 case object DirectEncounter extends Tiebreaker("DE", "Direct encounter"):
+  self =>
+
+  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
+    tour.players.view
+      .map: player =>
+        val myScore    = tour.scoreOf(player.uniqueIdentifier)
+        val tiedWithMe = tour.players.filter(p =>
+          tour.scoreOf(p.uniqueIdentifier) == myScore &&
+            previousPoints.get(p.uniqueIdentifier) == previousPoints.get(player.uniqueIdentifier)
+        )
+        val tiedPlayerSet         = tiedWithMe.toSet
+        val allTiedPlayersHaveMet = tiedPlayerSet.subsetOf(tour.opponentOf(player.uniqueIdentifier).toSet)
+
+        val points =
+          if !allTiedPlayersHaveMet then TieBreakPoints(0f)
+          else
+            val directGames =
+              tour.gamesById(player.uniqueIdentifier).filter(g => tiedPlayerSet.contains(g.opponent))
+            if directGames.isEmpty then TieBreakPoints(0f)
+            else
+              TieBreakPoints:
+                directGames
+                  .groupBy(_.opponent)
+                  .map: (_, games) =>
+                    // If the players meet more than once, FIDE says that we average the score
+                    games.score.value / games.size
+                  .sum
+        player.uniqueIdentifier -> (previousPoints
+          .getOrElse(player.uniqueIdentifier, Nil) :+ Point(self, points))
+      .toMap
+
   def compute(
       me: Tiebreaker.Player,
       allPlayers: Map[PlayerId, Tiebreaker.PlayerGames],
@@ -396,10 +427,11 @@ case class Game(players: ByColor[Player], result: ByColor[Option[Outcome.Points]
 
 trait Tournament:
   def players: List[Player]
-  def gamesById(id: PlayerId): List[(color: Color, game: Game)]
+  def gamesById(id: PlayerId): List[POVGame]
   def pointsById(id: PlayerId): Option[Float]
   def toPlayerGames: Map[PlayerId, Tiebreaker.PlayerGames]
   def opponentOf: PlayerId => List[Player]
+  def scoreOf: PlayerId => TournamentScore
   // def currentRound: Int
   // def totalRounds: Int
   // def byes: (PlayerId, Int) => Boolean // playerId, round => true if player has a bye in that round
@@ -453,20 +485,25 @@ object Tournament:
     override lazy val opponentOf: PlayerId => List[Player] = memoize: id =>
       games.get(id).map(_.games.map(_.opponent).toList).getOrElse(Nil)
 
+    override lazy val scoreOf: PlayerId => TournamentScore = memoize: id =>
+      games.get(id).map(_.games.score).getOrElse(TournamentScore(0f))
+
     // lazy val
 
-    override def gamesById(id: PlayerId): List[(Color, Game)] =
-      games.get(id) match
-        case Some(playerGames) =>
-          playerGames.games
-            .map: povGame =>
-              povGame.color ->
-                Game(
-                  players = ByColor(playerGames.player, povGame.opponent),
-                  result = ByColor(povGame.points, None)
-                )
-            .toList
-        case None => Nil
+    override def gamesById(id: PlayerId): List[POVGame] =
+      games.get(id).fold(Nil)(_.games.toList)
+    // override def gamesById(id: PlayerId): List[(Color, Game)] =
+    //   games.get(id) match
+    //     case Some(playerGames) =>
+    //       playerGames.games
+    //         .map: povGame =>
+    //           povGame.color ->
+    //             Game(
+    //               players = ByColor(playerGames.player, povGame.opponent),
+    //               result = ByColor(povGame.points, None)
+    //             )
+    //         .toList
+    //     case None => Nil
 
     override def pointsById(id: PlayerId): Option[Float] =
       games

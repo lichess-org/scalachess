@@ -29,7 +29,7 @@ class TiebreakerBench:
   private val Work: Long = 10
 
   var allGames: Map[PlayerId, PlayerGames] = scala.compiletime.uninitialized
-  var tournament: Tournament = scala.compiletime.uninitialized
+  var tournament: Tournament               = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =
@@ -105,6 +105,11 @@ class TiebreakerBench:
       allGames.values.map: pg =>
         Blackhole.consumeCPU(Work)
         DirectEncounter.compute(pg.player, allGames, Map.empty)
+
+  @Benchmark
+  def directEncounterAll(bh: Blackhole) =
+    bh.consume:
+      DirectEncounter.compute(tournament, Map.empty)
 
   @Benchmark
   def perfectTournamentPerformance(bh: Blackhole) =

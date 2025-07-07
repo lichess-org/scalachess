@@ -364,6 +364,16 @@ case object TournamentPerformanceRating extends Tiebreaker("TPR", "Tournament pe
             .so(_.value.toFloat)
 
 case object PerfectTournamentPerformance extends Tiebreaker("PTP", "Perfect tournament performance"):
+  self =>
+
+  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
+    tour.players.view
+      .map: player =>
+        val points = tour.perfectTournamentPerformance(player.uniqueIdentifier)
+        player.uniqueIdentifier -> (previousPoints
+          .getOrElse(player.uniqueIdentifier, Nil) :+ Point(self, points))
+      .toMap
+
   def compute(
       me: Tiebreaker.Player,
       allPlayers: Map[PlayerId, Tiebreaker.PlayerGames],
@@ -372,33 +382,50 @@ case object PerfectTournamentPerformance extends Tiebreaker("PTP", "Perfect tour
     val allMyGames = allPlayers.get(me.uniqueIdentifier)
     allMyGames.fold(TieBreakPoints(0f)):
       case Tiebreaker.PlayerGames(_, myGames) =>
-        val oppRatings = myGames.flatMap(_.opponent.rating.map(_.value))
+        val oppRatings: Seq[Int] = myGames.flatMap(_.opponent.rating.map(_.value))
         if oppRatings.isEmpty then TieBreakPoints(0f)
         else
           val myScore = myGames.score
           val minR    = oppRatings.min - 800
           val maxR    = oppRatings.max + 800
-          if myScore == TournamentScore(0f) && oppRatings.nonEmpty then TieBreakPoints(minR)
+          if myScore == TournamentScore(0f) then TieBreakPoints(minR)
           else
-            // Find the lowest integer rating R such that sum of expected scores >= myScore
-            // Use the full FIDE conversion table, no ±400 cut
-            def expectedScoreFor(r: Int) = TournamentScore:
-              oppRatings
-                .map: oppR =>
-                  Elo.getExpectedScore(oppR - r)
-                .sum
-            @annotation.tailrec
-            def binarySearch(low: Int, high: Int): Int =
-              if low >= high then low
-              else
-                val mid = (low + high) / 2
-                if expectedScoreFor(mid) >= myScore then binarySearch(low, mid)
-                else binarySearch(mid + 1, high)
-            val ptp = binarySearch(minR, maxR)
+            val ptp = binarySearch(oppRatings, myScore)(minR, maxR)
             TieBreakPoints(ptp)
+
+  // Find the lowest integer rating R such that sum of expected scores >= myScore
+  // Use the full FIDE conversion table, no ±400 cut
+  private def expectedScoreFor(r: Int, oppRatings: Seq[Int]) = TournamentScore:
+    oppRatings
+      .foldMap: oppR =>
+        Elo.getExpectedScore(oppR - r)
+
+  @annotation.tailrec
+  def binarySearch(oppRatings: Seq[Int], myScore: TournamentScore)(low: Int, high: Int): Int =
+    if low >= high then low
+    else
+      val mid = (low + high) / 2
+      if expectedScoreFor(mid, oppRatings) >= myScore then binarySearch(oppRatings, myScore)(low, mid)
+      else binarySearch(oppRatings, myScore)(mid + 1, high)
 
 case object AveragePerfectPerformanceOfOpponents
     extends Tiebreaker("APPO", "Average perfect tournament performance of opponents"):
+  self =>
+
+  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
+    tour.players.view
+      .map: player =>
+        val points = tour
+          .opponentOf(player.uniqueIdentifier)
+          .map: opp =>
+            tour.perfectTournamentPerformance(opp.uniqueIdentifier)
+          .toSeq
+          .average
+          .map(_.round) // Fide says to round up
+        player.uniqueIdentifier -> (previousPoints
+          .getOrElse(player.uniqueIdentifier, Nil) :+ Point(self, points))
+      .toMap
+
   def compute(
       me: Tiebreaker.Player,
       allPlayers: Map[PlayerId, Tiebreaker.PlayerGames],
@@ -406,7 +433,9 @@ case object AveragePerfectPerformanceOfOpponents
   ): TieBreakPoints =
     val myOpponents =
       allPlayers.get(me.uniqueIdentifier).map(_.games.map(_.opponent).toSet).getOrElse(Set.empty)
+
     val allMyOpponentsGames = allPlayers.values.filter(pg => myOpponents.contains(pg.player))
+
     allMyOpponentsGames
       .map: opp =>
         PerfectTournamentPerformance.compute(opp.player, allPlayers, previousPoints)
@@ -435,6 +464,7 @@ trait Tournament:
   // def currentRound: Int
   // def totalRounds: Int
   // def byes: (PlayerId, Int) => Boolean // playerId, round => true if player has a bye in that round
+  def perfectTournamentPerformance: PlayerId => TieBreakPoints
 
   given Ordering[Tiebreaker.Point]       = Ordering.by(_.points)
   given Ordering[List[Tiebreaker.Point]] = new Ordering[List[Tiebreaker.Point]]:
@@ -488,7 +518,18 @@ object Tournament:
     override lazy val scoreOf: PlayerId => TournamentScore = memoize: id =>
       games.get(id).map(_.games.score).getOrElse(TournamentScore(0f))
 
-    // lazy val
+    override lazy val perfectTournamentPerformance: PlayerId => TieBreakPoints = memoize: id =>
+      val oppRatings: Seq[Int] =
+        gamesById(id).flatMap(_.opponent.rating.map(_.value))
+      if oppRatings.isEmpty then TieBreakPoints(0f)
+      else
+        val myScore = scoreOf(id)
+        val minR    = oppRatings.min - 800
+        val maxR    = oppRatings.max + 800
+        if myScore == TournamentScore(0f) then TieBreakPoints(minR)
+        else
+          val ptp = binarySearch(oppRatings, myScore)(minR, maxR)
+          TieBreakPoints(ptp)
 
     override def gamesById(id: PlayerId): List[POVGame] =
       games.get(id).fold(Nil)(_.games.toList)
@@ -509,6 +550,21 @@ object Tournament:
       games
         .get(id)
         .map(_.games.flatten(using _.points.map(_.value)).sum)
+
+  // Find the lowest integer rating R such that sum of expected scores >= myScore
+  // Use the full FIDE conversion table, no ±400 cut
+  private def expectedScoreFor(r: Int, oppRatings: Seq[Int]) = TournamentScore:
+    oppRatings
+      .foldMap: oppR =>
+        Elo.getExpectedScore(oppR - r)
+
+  @annotation.tailrec
+  def binarySearch(oppRatings: Seq[Int], myScore: TournamentScore)(low: Int, high: Int): Int =
+    if low >= high then low
+    else
+      val mid = (low + high) / 2
+      if expectedScoreFor(mid, oppRatings) >= myScore then binarySearch(oppRatings, myScore)(low, mid)
+      else binarySearch(oppRatings, myScore)(mid + 1, high)
 
   def apply(games: Map[PlayerId, Tiebreaker.PlayerGames]): Tournament =
     Impl(games)

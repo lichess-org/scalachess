@@ -74,3 +74,18 @@ class TournamentTest extends MunitExtensions with SnapshotAssertions:
       .mkString("\n")
     assertFileSnapshot(result, "tiebreaker/tournament.txt")
   }
+
+  // https://chess-results.com/tnr1074691.aspx?lan=1&art=1&flag=30
+  test("tiebreaker games official snapshot") {
+    val result = Tiebreaker
+      .compute(
+        allGames,
+        List(
+          BuchholzCut1,
+          Buchholz,
+          AverageRatingOfOpponents
+        )
+      )
+      .mkString("\n")
+    assertFileSnapshot(result, "tiebreaker/official_tournament.txt")
+  }

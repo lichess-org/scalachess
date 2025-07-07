@@ -15,6 +15,7 @@ import chess.IntRating
 import chess.ByColor
 import chess.tiebreaker.Tiebreaker
 import chess.tiebreaker.*
+import chess.File.B
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -130,3 +131,66 @@ class TiebreakerBench:
           SonnebornBerger
         )
       )
+
+  @Benchmark
+  def averageRatingOfOpponents(bh: Blackhole) =
+    bh.consume:
+      allGames.values.map: pg =>
+        Blackhole.consumeCPU(Work)
+        AverageRatingOfOpponents.compute(pg.player, allGames, Map.empty)
+
+  @Benchmark
+  def foreBuchholz(bh: Blackhole) =
+    bh.consume:
+      allGames.values.map: pg =>
+        Blackhole.consumeCPU(Work)
+        ForeBuchholz.compute(pg.player, allGames, Map.empty)
+
+  @Benchmark
+  def koyaSystem(bh: Blackhole) =
+    bh.consume:
+      allGames.values.map: pg =>
+        Blackhole.consumeCPU(Work)
+        KoyaSystem.compute(pg.player, allGames, Map.empty)
+
+  @Benchmark
+  def blackPlayedGames(bh: Blackhole) =
+    bh.consume:
+      allGames.values.map: pg =>
+        Blackhole.consumeCPU(Work)
+        NbBlackGames.compute(pg.player, allGames, Map.empty)
+
+  @Benchmark
+  def blackWonGames(bh: Blackhole) =
+    bh.consume:
+      allGames.values.map: pg =>
+        Blackhole.consumeCPU(Work)
+        NbBlackWins.compute(pg.player, allGames, Map.empty)
+
+  @Benchmark
+  def gamesWon(bh: Blackhole) =
+    bh.consume:
+      allGames.values.map: pg =>
+        Blackhole.consumeCPU(Work)
+        NbWins.compute(pg.player, allGames, Map.empty)
+
+  @Benchmark
+  def tournamentPerformanceRating(bh: Blackhole) =
+    bh.consume:
+      allGames.values.map: pg =>
+        Blackhole.consumeCPU(Work)
+        TournamentPerformanceRating.compute(pg.player, allGames, Map.empty)
+
+  @Benchmark
+  def averagePerformanceOfOpponents(bh: Blackhole) =
+    bh.consume:
+      allGames.values.map: pg =>
+        Blackhole.consumeCPU(Work)
+        AveragePerformanceOfOpponents.compute(pg.player, allGames, Map.empty)
+
+  @Benchmark
+  def progressiveScores(bh: Blackhole) =
+    bh.consume:
+      allGames.values.map: pg =>
+        Blackhole.consumeCPU(Work)
+        SumOfProgressiveScores.compute(pg.player, allGames, Map.empty)

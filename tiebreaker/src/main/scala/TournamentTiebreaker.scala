@@ -200,7 +200,7 @@ case object DirectEncounter extends Tiebreaker("DE", "Direct encounter"):
           tour.scoreOf(p.uniqueIdentifier) == myScore &&
             previousPoints.get(p.uniqueIdentifier) == previousPoints.get(player.uniqueIdentifier)
         )
-        val tiedPlayerSet         = tiedWithMe.toSet
+        val tiedPlayerSet         = tiedWithMe.toSet.excl(player)
         val allTiedPlayersHaveMet = tiedPlayerSet.subsetOf(tour.opponentOf(player.uniqueIdentifier).toSet)
 
         val points =

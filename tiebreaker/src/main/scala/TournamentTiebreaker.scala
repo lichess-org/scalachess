@@ -98,8 +98,10 @@ case object SonnebornBerger extends Tiebreaker("SB", "Sonneborn-Berger score"):
       allPlayers: Map[PlayerId, Tiebreaker.PlayerGames],
       previousPoints: PlayerPoints
   ): TieBreakPoints =
-    val allMyGames          = allPlayers.get(me.uniqueIdentifier)
-    val allMyOpponentsGames = allPlayers.values.filter(_.games.exists(_.opponent == me))
+    val allMyGames  = allPlayers.get(me.uniqueIdentifier)
+    val myOpponents =
+      allMyGames.map(_.games.map(_.opponent).toSet).getOrElse(Set.empty)
+    val allMyOpponentsGames = allPlayers.values.filter(pg => myOpponents.contains(pg.player))
     allMyGames.fold(TieBreakPoints(0f)): allMyGames =>
       sonnebornBergerCutN(0, allMyGames, allMyOpponentsGames.toSeq)
 
@@ -109,8 +111,10 @@ case object SonnebornBergerCut1 extends Tiebreaker("SB-C1", "Sonneborn-Berger cu
       allPlayers: Map[PlayerId, Tiebreaker.PlayerGames],
       previousPoints: PlayerPoints
   ): TieBreakPoints =
-    val allMyGames          = allPlayers.get(me.uniqueIdentifier)
-    val allMyOpponentsGames = allPlayers.values.filter(_.games.exists(_.opponent == me))
+    val allMyGames  = allPlayers.get(me.uniqueIdentifier)
+    val myOpponents =
+      allMyGames.map(_.games.map(_.opponent).toSet).getOrElse(Set.empty)
+    val allMyOpponentsGames = allPlayers.values.filter(pg => myOpponents.contains(pg.player))
     allMyGames.fold(TieBreakPoints(0f)): allMyGames =>
       sonnebornBergerCutN(1, allMyGames, allMyOpponentsGames.toSeq)
 
@@ -120,7 +124,9 @@ case object Buchholz extends Tiebreaker("BH", "Buchholz score"):
       allPlayers: Map[PlayerId, Tiebreaker.PlayerGames],
       previousPoints: PlayerPoints
   ): TieBreakPoints =
-    val allMyOpponentsGames = allPlayers.values.filter(_.games.exists(_.opponent == me))
+    val myOpponents =
+      allPlayers.get(me.uniqueIdentifier).map(_.games.map(_.opponent).toSet).getOrElse(Set.empty)
+    val allMyOpponentsGames = allPlayers.values.filter(pg => myOpponents.contains(pg.player))
     buchholzCutN(0, allMyOpponentsGames.toSeq)
 
 case object BuchholzCut1 extends Tiebreaker("BH-C1", "Buchholz cut 1"):
@@ -129,7 +135,9 @@ case object BuchholzCut1 extends Tiebreaker("BH-C1", "Buchholz cut 1"):
       allPlayers: Map[PlayerId, Tiebreaker.PlayerGames],
       previousPoints: PlayerPoints
   ): TieBreakPoints =
-    val allMyOpponentsGames = allPlayers.values.filter(_.games.exists(_.opponent == me))
+    val myOpponents =
+      allPlayers.get(me.uniqueIdentifier).map(_.games.map(_.opponent).toSet).getOrElse(Set.empty)
+    val allMyOpponentsGames = allPlayers.values.filter(pg => myOpponents.contains(pg.player))
     buchholzCutN(1, allMyOpponentsGames.toSeq)
 
 case object BuchholzCut2 extends Tiebreaker("BH-C2", "Buchholz cut 2"):
@@ -138,7 +146,9 @@ case object BuchholzCut2 extends Tiebreaker("BH-C2", "Buchholz cut 2"):
       allPlayers: Map[PlayerId, Tiebreaker.PlayerGames],
       previousPoints: PlayerPoints
   ): TieBreakPoints =
-    val allMyOpponentsGames = allPlayers.values.filter(_.games.exists(_.opponent == me))
+    val myOpponents =
+      allPlayers.get(me.uniqueIdentifier).map(_.games.map(_.opponent).toSet).getOrElse(Set.empty)
+    val allMyOpponentsGames = allPlayers.values.filter(pg => myOpponents.contains(pg.player))
     buchholzCutN(2, allMyOpponentsGames.toSeq)
 
 case object ForeBuchholz extends Tiebreaker("FB", "Fore Buchholz"):
@@ -147,7 +157,9 @@ case object ForeBuchholz extends Tiebreaker("FB", "Fore Buchholz"):
       allPlayers: Map[PlayerId, Tiebreaker.PlayerGames],
       previousPoints: PlayerPoints
   ): TieBreakPoints =
-    val allMyOpponentsGames = allPlayers.values.filter(_.games.exists(_.opponent == me))
+    val myOpponents =
+      allPlayers.get(me.uniqueIdentifier).map(_.games.map(_.opponent).toSet).getOrElse(Set.empty)
+    val allMyOpponentsGames = allPlayers.values.filter(pg => myOpponents.contains(pg.player))
     foreBuchholzCutN(0, allMyOpponentsGames.toSeq)
 
 case object ForeBuchholzCut1 extends Tiebreaker("FB-C1", "Fore Buchholz cut 1"):
@@ -156,7 +168,9 @@ case object ForeBuchholzCut1 extends Tiebreaker("FB-C1", "Fore Buchholz cut 1"):
       allPlayers: Map[PlayerId, Tiebreaker.PlayerGames],
       previousPoints: PlayerPoints
   ): TieBreakPoints =
-    val allMyOpponentsGames = allPlayers.values.filter(_.games.exists(_.opponent == me))
+    val myOpponents =
+      allPlayers.get(me.uniqueIdentifier).map(_.games.map(_.opponent).toSet).getOrElse(Set.empty)
+    val allMyOpponentsGames = allPlayers.values.filter(pg => myOpponents.contains(pg.player))
     foreBuchholzCutN(1, allMyOpponentsGames.toSeq)
 
 case object AverageOfOpponentsBuchholz extends Tiebreaker("AOB", "Average of opponents Buchholz score"):
@@ -165,7 +179,9 @@ case object AverageOfOpponentsBuchholz extends Tiebreaker("AOB", "Average of opp
       allPlayers: Map[PlayerId, Tiebreaker.PlayerGames],
       previousPoints: PlayerPoints
   ): TieBreakPoints =
-    val allMyOpponentsGames = allPlayers.values.filter(_.games.exists(_.opponent == me))
+    val myOpponents =
+      allPlayers.get(me.uniqueIdentifier).map(_.games.map(_.opponent).toSet).getOrElse(Set.empty)
+    val allMyOpponentsGames = allPlayers.values.filter(pg => myOpponents.contains(pg.player))
     allMyOpponentsGames
       .map: opp =>
         Buchholz.compute(opp.player, allPlayers, previousPoints)
@@ -208,7 +224,9 @@ case object AverageRatingOfOpponents extends Tiebreaker("ARO", "Average rating o
       allPlayers: Map[PlayerId, Tiebreaker.PlayerGames],
       previousPoints: PlayerPoints
   ): TieBreakPoints =
-    val allMyOpponentsGames = allPlayers.values.filter(_.games.exists(_.opponent == me))
+    val myOpponents =
+      allPlayers.get(me.uniqueIdentifier).map(_.games.map(_.opponent).toSet).getOrElse(Set.empty)
+    val allMyOpponentsGames = allPlayers.values.filter(pg => myOpponents.contains(pg.player))
     averageRatingOfOpponentsCutN(0, allMyOpponentsGames.toSeq)
 
 case object AverageRatingOfOpponentsCut1 extends Tiebreaker("ARO-C1", "Average rating of opponents cut 1"):
@@ -217,7 +235,9 @@ case object AverageRatingOfOpponentsCut1 extends Tiebreaker("ARO-C1", "Average r
       allPlayers: Map[PlayerId, Tiebreaker.PlayerGames],
       previousPoints: PlayerPoints
   ): TieBreakPoints =
-    val allMyOpponentsGames = allPlayers.values.filter(_.games.exists(_.opponent == me))
+    val myOpponents =
+      allPlayers.get(me.uniqueIdentifier).map(_.games.map(_.opponent).toSet).getOrElse(Set.empty)
+    val allMyOpponentsGames = allPlayers.values.filter(pg => myOpponents.contains(pg.player))
     averageRatingOfOpponentsCutN(1, allMyOpponentsGames.toSeq)
 
 case object AveragePerformanceOfOpponents extends Tiebreaker("APRO", "Average performance of opponents"):
@@ -226,7 +246,9 @@ case object AveragePerformanceOfOpponents extends Tiebreaker("APRO", "Average pe
       allPlayers: Map[PlayerId, Tiebreaker.PlayerGames],
       previousPoints: PlayerPoints
   ): TieBreakPoints =
-    val allMyOpponentsGames = allPlayers.values.filter(_.games.exists(_.opponent == me))
+    val myOpponents =
+      allPlayers.get(me.uniqueIdentifier).map(_.games.map(_.opponent).toSet).getOrElse(Set.empty)
+    val allMyOpponentsGames = allPlayers.values.filter(pg => myOpponents.contains(pg.player))
     allMyOpponentsGames
       .map(opp => TournamentPerformanceRating.compute(opp.player, allPlayers, previousPoints))
       .toSeq
@@ -240,8 +262,10 @@ case object KoyaSystem extends Tiebreaker("KS", "Koya system"):
       allPlayers: Map[PlayerId, Tiebreaker.PlayerGames],
       previousPoints: PlayerPoints
   ): TieBreakPoints =
-    val allMyGames          = allPlayers.get(me.uniqueIdentifier)
-    val allMyOpponentsGames = allPlayers.values.filter(_.games.exists(_.opponent == me))
+    val allMyGames  = allPlayers.get(me.uniqueIdentifier)
+    val myOpponents =
+      allMyGames.map(_.games.map(_.opponent).toSet).getOrElse(Set.empty)
+    val allMyOpponentsGames = allPlayers.values.filter(pg => myOpponents.contains(pg.player))
     allMyGames.fold(TieBreakPoints(0f)):
       case Tiebreaker.PlayerGames(_, myGames) =>
         val halfOfMaxPossibleScore = TournamentScore(allPlayers.values.map(_.games.size).max / 2f)
@@ -330,7 +354,9 @@ case object AveragePerfectPerformanceOfOpponents
       allPlayers: Map[PlayerId, Tiebreaker.PlayerGames],
       previousPoints: PlayerPoints
   ): TieBreakPoints =
-    val allMyOpponentsGames = allPlayers.values.filter(_.games.exists(_.opponent == me))
+    val myOpponents =
+      allPlayers.get(me.uniqueIdentifier).map(_.games.map(_.opponent).toSet).getOrElse(Set.empty)
+    val allMyOpponentsGames = allPlayers.values.filter(pg => myOpponents.contains(pg.player))
     allMyOpponentsGames
       .map: opp =>
         PerfectTournamentPerformance.compute(opp.player, allPlayers, previousPoints)

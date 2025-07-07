@@ -119,6 +119,15 @@ case object SonnebornBergerCut1 extends Tiebreaker("SB-C1", "Sonneborn-Berger cu
       sonnebornBergerCutN(1, allMyGames, allMyOpponentsGames.toSeq)
 
 case object Buchholz extends Tiebreaker("BH", "Buchholz score"):
+  self =>
+  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
+    tour.players.view
+      .map: player =>
+        val points = tour.buchholz(player.id)
+        player.id -> (previousPoints
+          .getOrElse(player.id, Nil) :+ Point(self, points))
+      .toMap
+
   def compute(
       me: Tiebreaker.Player,
       allPlayers: Map[PlayerId, Tiebreaker.PlayerWithGames],
@@ -175,6 +184,13 @@ case object ForeBuchholzCut1 extends Tiebreaker("FB-C1", "Fore Buchholz cut 1"):
 
 case object AverageOfOpponentsBuchholz extends Tiebreaker("AOB", "Average of opponents Buchholz score"):
 
+  self =>
+  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
+    tour.players.view
+      .map: player =>
+        val points = tour.opponentOf(player.id).map(opp => tour.buchholz(opp.id)).average
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ Point(self, points))
+      .toMap
   def compute(
       me: Tiebreaker.Player,
       allPlayers: Map[PlayerId, Tiebreaker.PlayerWithGames],
@@ -217,8 +233,7 @@ case object DirectEncounter extends Tiebreaker("DE", "Direct encounter"):
                     // If the players meet more than once, FIDE says that we average the score
                     games.score.value / games.size
                   .sum
-        player.id -> (previousPoints
-          .getOrElse(player.id, Nil) :+ Point(self, points))
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ Point(self, points))
       .toMap
 
   def compute(
@@ -257,8 +272,7 @@ case object AverageRatingOfOpponents extends Tiebreaker("ARO", "Average rating o
       .map: player =>
         val myOpponents = tour.opponentOf(player.id)
         val points      = averageRatingOfOpponentsCutN(0, myOpponents)
-        player.id -> (previousPoints
-          .getOrElse(player.id, Nil) :+ Point(AverageRatingOfOpponents, points))
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ Point(AverageRatingOfOpponents, points))
       .toMap
 
   def compute(
@@ -276,8 +290,7 @@ case object AverageRatingOfOpponentsCut1 extends Tiebreaker("ARO-C1", "Average r
       .map: player =>
         val myOpponents = tour.opponentOf(player.id)
         val points      = averageRatingOfOpponentsCutN(1, myOpponents)
-        player.id -> (previousPoints
-          .getOrElse(player.id, Nil) :+ Point(AverageRatingOfOpponentsCut1, points))
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ Point(AverageRatingOfOpponentsCut1, points))
       .toMap
 
   def compute(
@@ -370,8 +383,7 @@ case object PerfectTournamentPerformance extends Tiebreaker("PTP", "Perfect tour
     tour.players.view
       .map: player =>
         val points = tour.perfectTournamentPerformance(player.id)
-        player.id -> (previousPoints
-          .getOrElse(player.id, Nil) :+ Point(self, points))
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ Point(self, points))
       .toMap
 
   def compute(
@@ -422,8 +434,7 @@ case object AveragePerfectPerformanceOfOpponents
           .toSeq
           .average
           .map(_.round) // Fide says to round up
-        player.id -> (previousPoints
-          .getOrElse(player.id, Nil) :+ Point(self, points))
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ Point(self, points))
       .toMap
 
   def compute(
@@ -462,7 +473,25 @@ trait Tournament:
   // def currentRound: Int
   // def totalRounds: Int
   // def byes: (PlayerId, Int) => Boolean // playerId, round => true if player has a bye in that round
-  def perfectTournamentPerformance: PlayerId => TieBreakPoints
+
+  lazy val perfectTournamentPerformance: PlayerId => TieBreakPoints = memoize: id =>
+    val oppRatings: Seq[Int] =
+      gamesById(id).flatMap(_.opponent.rating.map(_.value))
+    if oppRatings.isEmpty then TieBreakPoints(0f)
+    else
+      val myScore = scoreOf(id)
+      val minR    = oppRatings.min - 800
+      val maxR    = oppRatings.max + 800
+      if myScore == TournamentScore(0f) then TieBreakPoints(minR)
+      else TieBreakPoints(Tournament.binarySearch(oppRatings, myScore)(minR, maxR))
+
+  lazy val buchholz: PlayerId => TieBreakPoints = memoize: id =>
+    buchholzCutN(0, opponentOf(id))
+
+  private def buchholzCutN(cut: Int, opponents: List[Player]): TieBreakPoints =
+    opponents
+      .map(opponent => scoreOf(opponent.id).into(TieBreakPoints))
+      .cutSum(cut)
 
   given Ordering[Tiebreaker.Point]       = Ordering.by(_.points)
   given Ordering[List[Tiebreaker.Point]] = new Ordering[List[Tiebreaker.Point]]:
@@ -493,15 +522,12 @@ trait Tournament:
   def compute(tiebreakers: List[Tiebreaker]): List[PlayerWithScore] =
     val points = tiebreakers.foldLeft(Map.empty[PlayerId, List[Point]]): (acc, tiebreaker) =>
       tiebreaker.compute(this, acc)
-    val playersWithScores = players.map: player =>
-      val score = pointsById(player.id).getOrElse(0f)
-      PlayerWithScore(player, score, points.getOrElse(player.id, Nil))
-    playersWithScores.sorted
+    players
+      .map: player =>
+        PlayerWithScore(player, scoreOf(player.id).value, points.getOrElse(player.id, Nil))
+      .sorted
 
 object Tournament:
-
-  private def memoize[I, O](f: I => O): I => O = new collection.mutable.HashMap[I, O]():
-    override def apply(key: I) = getOrElseUpdate(key, f(key))
 
   private case class Impl(games: Map[PlayerId, Tiebreaker.PlayerWithGames]) extends Tournament:
 
@@ -515,19 +541,6 @@ object Tournament:
 
     override lazy val scoreOf: PlayerId => TournamentScore = memoize: id =>
       games.get(id).map(_.games.score).getOrElse(TournamentScore(0f))
-
-    override lazy val perfectTournamentPerformance: PlayerId => TieBreakPoints = memoize: id =>
-      val oppRatings: Seq[Int] =
-        gamesById(id).flatMap(_.opponent.rating.map(_.value))
-      if oppRatings.isEmpty then TieBreakPoints(0f)
-      else
-        val myScore = scoreOf(id)
-        val minR    = oppRatings.min - 800
-        val maxR    = oppRatings.max + 800
-        if myScore == TournamentScore(0f) then TieBreakPoints(minR)
-        else
-          val ptp = binarySearch(oppRatings, myScore)(minR, maxR)
-          TieBreakPoints(ptp)
 
     override def gamesById(id: PlayerId): List[Game] =
       games.get(id).fold(Nil)(_.games.toList)
@@ -680,3 +693,6 @@ private def sonnebornBergerCutN(
         case (Some(score), Some(Points.Half)) => score.map(_ / 2f).into(TieBreakPoints)
         case _                                => TieBreakPoints(0f)
     .cutSum(cut)
+
+private def memoize[I, O](f: I => O): I => O = new collection.mutable.HashMap[I, O]():
+  override def apply(key: I) = getOrElseUpdate(key, f(key))

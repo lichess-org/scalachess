@@ -358,7 +358,7 @@ trait Tournament:
   // def totalRounds: Int
   // def byes: (PlayerId, Int) => Boolean // playerId, round => true if player has a bye in that round
 
-  given Ordering[Tiebreaker.Point]       = Ordering.by(_.value)
+  given Ordering[Tiebreaker.Point]       = Ordering.by(_.points)
   given Ordering[List[Tiebreaker.Point]] = new Ordering[List[Tiebreaker.Point]]:
     def compare(a: List[Tiebreaker.Point], b: List[Tiebreaker.Point]): Int =
       @scala.annotation.tailrec
@@ -371,7 +371,7 @@ trait Tournament:
           case (Nil, _)             => -1 // a is empty, b is not
           case (_, Nil)             => 1  // b is empty, a is not
           case (ah :: at, bh :: bt) =>
-            val cmp = ah.value.compare(bh.value)
+            val cmp = ah.points.value.compare(bh.points.value)
             if cmp != 0 then cmp else loop(at, bt)
 
       loop(a, b)
@@ -427,7 +427,7 @@ trait Tiebreaker(val code: String, val name: String):
     val playerGames = tour.toPlayerGames
     playerGames.values
       .map: pg =>
-        val point = Point(self, self.compute(pg.player, playerGames, previousPoints).value)
+        val point = Point(self, self.compute(pg.player, playerGames, previousPoints))
         pg.player.uniqueIdentifier -> (previousPoints.getOrElse(pg.player.uniqueIdentifier, Nil) :+ point)
       .toMap
 
@@ -438,7 +438,7 @@ trait Tiebreaker(val code: String, val name: String):
   ): TieBreakPoints
 
 object Tiebreaker:
-  case class Point(tiebreaker: Tiebreaker, value: Float)
+  case class Point(tiebreaker: Tiebreaker, points: TieBreakPoints)
   type PlayerPoints = Map[PlayerId, List[Point]]
 
   def compute(

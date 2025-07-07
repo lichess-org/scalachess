@@ -136,8 +136,8 @@ class TiebreakersTest extends ChessTest:
 
   test("DirectEncounter with unequal partial tiebreaks"):
     val previousPoints = Map(
-      playerA.uniqueIdentifier -> List(Point(NbBlackWins, 1f)),
-      playerD.uniqueIdentifier -> List(Point(NbBlackWins, 0.5f))
+      playerA.uniqueIdentifier -> List(Point(NbBlackWins, TieBreakPoints(1f))),
+      playerD.uniqueIdentifier -> List(Point(NbBlackWins, TieBreakPoints(0.5f)))
     )
 
     val tiebreaker1 = DirectEncounter.compute(playerA, allGames, previousPoints)
@@ -148,8 +148,8 @@ class TiebreakersTest extends ChessTest:
   test("DirectEncounter with equal partial tiebreaks"):
 
     val previousPoints = Map(
-      playerA.uniqueIdentifier -> List(Point(NbBlackWins, 1f)),
-      playerD.uniqueIdentifier -> List(Point(NbBlackWins, 1f))
+      playerA.uniqueIdentifier -> List(Point(NbBlackWins, TieBreakPoints(1f))),
+      playerD.uniqueIdentifier -> List(Point(NbBlackWins, TieBreakPoints(1f)))
     )
 
     val tiebreaker1 = DirectEncounter.compute(playerA, allGames, previousPoints)
@@ -171,9 +171,9 @@ class TiebreakersTest extends ChessTest:
     )
 
     val previousPoints = Map(
-      playerA.uniqueIdentifier              -> List(Point(NbBlackWins, 1f)),
-      playerD.uniqueIdentifier              -> List(Point(NbBlackWins, 1f)),
-      playerX_Games.player.uniqueIdentifier -> List(Point(NbBlackWins, 1f))
+      playerA.uniqueIdentifier              -> List(Point(NbBlackWins, TieBreakPoints(1f))),
+      playerD.uniqueIdentifier              -> List(Point(NbBlackWins, TieBreakPoints(1f))),
+      playerX_Games.player.uniqueIdentifier -> List(Point(NbBlackWins, TieBreakPoints(1f)))
     )
 
     val allGamesWithPartial =

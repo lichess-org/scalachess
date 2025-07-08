@@ -25,7 +25,7 @@ class TournamentTest extends MunitExtensions with SnapshotAssertions:
   }
 
   // https://chess-results.com/tnr1074691.aspx?lan=1&art=1&flag=30
-  test("Woment world rapid championship") {
+  test("Women's world rapid championship") {
     val result = Tiebreaker
       .compute(
         games("FWWRC.pgn"),

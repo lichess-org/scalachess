@@ -209,7 +209,7 @@ case object AverageOfOpponentsBuchholz extends Tiebreaker("AOB", "Average of opp
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val points = tour.opponentOf(player.id).map(opp => tour.buchholz(opp.id)).average
+        val points = tour.opponentsOf(player.id).map(opp => tour.buchholz(opp.id)).average
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ Point(self, points))
       .toMap
   def compute(
@@ -238,7 +238,7 @@ case object DirectEncounter extends Tiebreaker("DE", "Direct encounter"):
             previousPoints.get(p.id) == previousPoints.get(player.id)
         )
         val tiedPlayerSet         = tiedWithMe.toSet.excl(player)
-        val allTiedPlayersHaveMet = tiedPlayerSet.subsetOf(tour.opponentOf(player.id).toSet)
+        val allTiedPlayersHaveMet = tiedPlayerSet.subsetOf(tour.opponentsOf(player.id).toSet)
 
         val points =
           if !allTiedPlayersHaveMet then TieBreakPoints(0f)
@@ -291,7 +291,7 @@ case object AverageRatingOfOpponents extends Tiebreaker("ARO", "Average rating o
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val myOpponents = tour.opponentOf(player.id)
+        val myOpponents = tour.opponentsOf(player.id)
         val points      = averageRatingOfOpponentsCutN(0, myOpponents)
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ Point(AverageRatingOfOpponents, points))
       .toMap
@@ -309,7 +309,7 @@ case object AverageRatingOfOpponentsCut1 extends Tiebreaker("ARO-C1", "Average r
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val myOpponents = tour.opponentOf(player.id)
+        val myOpponents = tour.opponentsOf(player.id)
         val points      = averageRatingOfOpponentsCutN(1, myOpponents)
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ Point(AverageRatingOfOpponentsCut1, points))
       .toMap
@@ -449,7 +449,7 @@ case object AveragePerfectPerformanceOfOpponents
     tour.players.view
       .map: player =>
         val points = tour
-          .opponentOf(player.id)
+          .opponentsOf(player.id)
           .map: opp =>
             tour.perfectTournamentPerformance(opp.id)
           .toSeq
@@ -489,7 +489,7 @@ trait Tournament:
   def gamesById(id: PlayerId): List[Game]
   def pointsById(id: PlayerId): Option[Float]
   def toPlayerGames: Map[PlayerId, Tiebreaker.PlayerWithGames]
-  def opponentOf: PlayerId => List[Player]
+  def opponentsOf: PlayerId => List[Player]
   def scoreOf: PlayerId => TournamentScore
   // def currentRound: Int
   // def totalRounds: Int
@@ -513,7 +513,7 @@ trait Tournament:
   // Without having to recompute them.
   // Tournaments often include both the cut and the uncut version of the tiebreaker.
   lazy val buchholzSeq: PlayerId => Seq[TieBreakPoints] = memoize: id =>
-    opponentOf(id)
+    opponentsOf(id)
       .map(opponent => scoreOf(opponent.id).into(TieBreakPoints))
       .sorted
 
@@ -569,7 +569,7 @@ object Tournament:
     @scala.annotation.threadUnsafe
     override lazy val players: List[Player] = games.values.map(_.player).toList
 
-    override lazy val opponentOf: PlayerId => List[Player] = memoize: id =>
+    override lazy val opponentsOf: PlayerId => List[Player] = memoize: id =>
       games.get(id).map(_.games.map(_.opponent).toList).getOrElse(Nil)
 
     override lazy val scoreOf: PlayerId => TournamentScore = memoize: id =>

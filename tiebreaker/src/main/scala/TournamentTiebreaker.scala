@@ -93,6 +93,13 @@ case object NbBlackWins extends Tiebreaker("BWG", "Number of wins with black"):
     TieBreakPoints(myGames.count(g => g.color == Color.Black && g.points.contains(Points.One)))
 
 case object SonnebornBerger extends Tiebreaker("SB", "Sonneborn-Berger score"):
+  self =>
+  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
+    tour.players.view
+      .map: player =>
+        player.id -> (previousPoints
+          .getOrElse(player.id, Nil) :+ Point(self, tour.sonnebornBergerSeq(player.id).sum))
+      .toMap
   def compute(
       me: Tiebreaker.Player,
       allPlayers: Map[PlayerId, Tiebreaker.PlayerWithGames],
@@ -106,6 +113,13 @@ case object SonnebornBerger extends Tiebreaker("SB", "Sonneborn-Berger score"):
       sonnebornBergerCutN(0, allMyGames, allMyOpponentsGames.toSeq)
 
 case object SonnebornBergerCut1 extends Tiebreaker("SB-C1", "Sonneborn-Berger cut 1"):
+  self =>
+  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
+    tour.players.view
+      .map: player =>
+        player.id -> (previousPoints
+          .getOrElse(player.id, Nil) :+ Point(self, tour.sonnebornBergerSeq(player.id).drop(1).sum))
+      .toMap
   def compute(
       me: Tiebreaker.Player,
       allPlayers: Map[PlayerId, Tiebreaker.PlayerWithGames],
@@ -139,6 +153,13 @@ case object Buchholz extends Tiebreaker("BH", "Buchholz score"):
     buchholzCutN(0, allMyOpponentsGames.toSeq)
 
 case object BuchholzCut1 extends Tiebreaker("BH-C1", "Buchholz cut 1"):
+  self =>
+  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
+    tour.players.view
+      .map: player =>
+        player.id -> (previousPoints
+          .getOrElse(player.id, Nil) :+ Point(self, tour.buchholzSeq(player.id).drop(1).sum))
+      .toMap
   def compute(
       me: Tiebreaker.Player,
       allPlayers: Map[PlayerId, Tiebreaker.PlayerWithGames],
@@ -486,12 +507,24 @@ trait Tournament:
       else TieBreakPoints(Tournament.binarySearch(oppRatings, myScore)(minR, maxR))
 
   lazy val buchholz: PlayerId => TieBreakPoints = memoize: id =>
-    buchholzCutN(0, opponentOf(id))
+    buchholzSeq(id).sum
 
-  private def buchholzCutN(cut: Int, opponents: List[Player]): TieBreakPoints =
-    opponents
+  // Memoize sorted sequences of cuttable tiebreaks so that we can cut them later in the tournament if necessary
+  // Without having to recompute them.
+  // Tournaments often include both the cut and the uncut version of the tiebreaker.
+  lazy val buchholzSeq: PlayerId => Seq[TieBreakPoints] = memoize: id =>
+    opponentOf(id)
       .map(opponent => scoreOf(opponent.id).into(TieBreakPoints))
-      .cutSum(cut)
+      .sorted
+
+  lazy val sonnebornBergerSeq: PlayerId => Seq[TieBreakPoints] = memoize: id =>
+    toPlayerGames(id).games
+      .map: game =>
+        game.points match
+          case Some(Points.One)  => scoreOf(game.opponent.id).into(TieBreakPoints)
+          case Some(Points.Half) => scoreOf(game.opponent.id).map(_ / 2f).into(TieBreakPoints)
+          case _                 => TieBreakPoints(0f)
+      .sorted
 
   given Ordering[Tiebreaker.Point]       = Ordering.by(_.points)
   given Ordering[List[Tiebreaker.Point]] = new Ordering[List[Tiebreaker.Point]]:

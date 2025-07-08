@@ -26,6 +26,7 @@ class TiebreakerBench:
   @Setup
   def setup(): Unit =
     allGames = Helper.games("FWWRC.pgn")
+    tournament = Tournament(allGames)
 
   @Benchmark
   def averageOfOpponentsBuchholz(bh: Blackhole) =
@@ -33,6 +34,11 @@ class TiebreakerBench:
       allGames.values.map: pg =>
         Blackhole.consumeCPU(Work)
         AverageOfOpponentsBuchholz.compute(pg.player, allGames, Map.empty)
+
+  @Benchmark
+  def averageOfOpponentsBuchholzAll(bh: Blackhole) =
+    bh.consume:
+      AverageOfOpponentsBuchholz.compute(tournament, Map.empty)
 
   @Benchmark
   def averagePerfectPerformanceOfOpponents(bh: Blackhole) =
@@ -76,6 +82,11 @@ class TiebreakerBench:
       allGames.values.map: pg =>
         Blackhole.consumeCPU(Work)
         SonnebornBerger.compute(pg.player, allGames, Map.empty)
+
+  @Benchmark
+  def sonnebornBergerAll(bh: Blackhole) =
+    bh.consume:
+      SonnebornBerger.compute(tournament, Map.empty)
 
   @Benchmark
   def tournamentPerformance(bh: Blackhole) =

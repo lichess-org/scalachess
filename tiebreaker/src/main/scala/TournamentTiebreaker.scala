@@ -241,31 +241,25 @@ case object KoyaSystem extends Tiebreaker("KS", "Koya system"):
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ Point(self, points.into(TieBreakPoints)))
       .toMap
 
-case object SumOfProgressiveScores extends Tiebreaker("PS", "Sum of progressive scores"):
+case class SumOfProgressiveScores(modifier: Option[Modifier] = None)
+    extends Tiebreaker(
+      s"PS${modifier.fold("")(m => s"-${m.code}")}",
+      s"PS${modifier.fold("")(m => s" ${m.name}")}"
+    )
+    with CuttableTiebreaker:
   self =>
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val myGames = tour
-          .gamesById(player.id)
-        val points: TieBreakPoints = myGames.indices
-          .map: i =>
-            myGames.take(i + 1).score.into(TieBreakPoints)
+        val pointsSeq = tour
+          .progressiveScoresSeq(player.id)
+        val points: TieBreakPoints = modifier
+          .fold(pointsSeq):
+            case Modifier.Cut1    => pointsSeq.drop(1)
+            case Modifier.Cut2    => pointsSeq.drop(2)
+            case Modifier.Median1 => pointsSeq.drop(1).dropRight(1)
+            case Modifier.Median2 => pointsSeq.drop(2).dropRight(2)
           .sum
-        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ Point(self, points))
-      .toMap
-
-case object SumOfProgressiveScoresCut1 extends Tiebreaker("PS-C1", "Sum of progressive scores cut 1"):
-  self =>
-  def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
-    tour.players.view
-      .map: player =>
-        val myGames = tour
-          .gamesById(player.id)
-        val points: TieBreakPoints = myGames.indices
-          .map: i =>
-            myGames.take(i + 1).score.into(TieBreakPoints)
-          .cutSum(1)
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ Point(self, points))
       .toMap
 
@@ -373,6 +367,13 @@ trait Tournament:
           case Some(Points.One)  => scoreOf(game.opponent.id).into(TieBreakPoints)
           case Some(Points.Half) => scoreOf(game.opponent.id).map(_ / 2f).into(TieBreakPoints)
           case _                 => TieBreakPoints(0f)
+      .sorted
+
+  lazy val progressiveScoresSeq: PlayerId => Seq[TieBreakPoints] = memoize: id =>
+    val games = gamesById(id)
+    games.indices
+      .map: i =>
+        games.take(i + 1).score.into(TieBreakPoints)
       .sorted
 
   given Ordering[Tiebreaker.Point]       = Ordering.by(_.points)
@@ -494,8 +495,6 @@ object Tiebreaker:
     AverageRatingOfOpponentsCut1,
     AveragePerformanceOfOpponents,
     KoyaSystem,
-    SumOfProgressiveScores,
-    SumOfProgressiveScoresCut1,
     TournamentPerformanceRating,
     PerfectTournamentPerformance,
     AveragePerfectPerformanceOfOpponents

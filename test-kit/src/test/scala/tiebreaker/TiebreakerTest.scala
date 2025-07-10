@@ -256,12 +256,22 @@ class TiebreakersTest extends ChessTest:
     assertEquals(tiebreaker, Some(Point(KoyaSystem, TieBreakPoints(0.5f))))
 
   test("SumOfProgressiveScores"):
-    val tiebreaker = computeTournamentPoints(allGames, playerA, SumOfProgressiveScores)
-    assertEquals(tiebreaker, Some(Point(SumOfProgressiveScores, TieBreakPoints(6.5f))))
+    val tiebreaker = computeTournamentPoints(allGames, playerA, SumOfProgressiveScores())
+    assertEquals(tiebreaker, Some(Point(SumOfProgressiveScores(), TieBreakPoints(6.5f))))
 
   test("SumOfProgressiveScoresCut1"):
-    val tiebreaker = computeTournamentPoints(allGames, playerA, SumOfProgressiveScoresCut1)
-    assertEquals(tiebreaker, Some(Point(SumOfProgressiveScoresCut1, TieBreakPoints(5.5f))))
+    val tiebreaker = computeTournamentPoints(allGames, playerA, SumOfProgressiveScores(Some(Modifier.Cut1)))
+    assertEquals(tiebreaker, Some(Point(SumOfProgressiveScores(Some(Modifier.Cut1)), TieBreakPoints(5.5f))))
+
+  test("SumOfProgressiveScoresMedian1"):
+    val tiebreaker =
+      computeTournamentPoints(allGames, playerA, SumOfProgressiveScores(Some(Modifier.Median1)))
+    assertEquals(tiebreaker, Some(Point(SumOfProgressiveScores(Some(Modifier.Median1)), TieBreakPoints(3f))))
+
+  test("SumOfProgressiveScoresMedian2"):
+    val tiebreaker =
+      computeTournamentPoints(allGames, playerA, SumOfProgressiveScores(Some(Modifier.Median2)))
+    assertEquals(tiebreaker, Some(Point(SumOfProgressiveScores(Some(Modifier.Median2)), TieBreakPoints(0f))))
 
   test("PerfectTournamentPerformance - Perfect scores"):
     // from https://chess-results.com/tnr1166026.aspx?lan=1&art=1&rd=8

@@ -110,4 +110,4 @@ class TiebreakerBench:
   @Benchmark
   def progressiveScores(bh: Blackhole) =
     bh.consume:
-      SumOfProgressiveScores.compute(tournament, Map.empty)
+      SumOfProgressiveScores().compute(tournament, Map.empty)

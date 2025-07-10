@@ -30,8 +30,8 @@ class TournamentTest extends MunitExtensions with SnapshotAssertions:
       .compute(
         games("FWWRC.pgn"),
         List(
-          BuchholzCut1,
-          Buchholz,
+          Buchholz(Some(Modifier.Cut1)),
+          Buchholz(),
           AverageRatingOfOpponentsCut1
         )
       )

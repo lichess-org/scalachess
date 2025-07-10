@@ -89,16 +89,25 @@ class TiebreakersTest extends ChessTest:
     assertEquals(tiebreaker, 4.0f)
 
   test("Buchholz"):
-    val tiebreaker = Buchholz.compute(playerA, allGames, Map.empty)
-    assertEquals(tiebreaker, 7.5f)
+    val tiebreaker = Tournament(allGames)
+      .compute(List(Buchholz()))
+      .find(_.player.id == playerA.id)
+      .flatMap(_.tiebreakers.headOption)
+    assertEquals(tiebreaker, Some(Point(Buchholz(), TieBreakPoints(7.5f))))
 
   test("BuchholzCut1"):
-    val tiebreaker = BuchholzCut1.compute(playerA, allGames, Map.empty)
-    assertEquals(tiebreaker, 6f)
+    val tiebreaker = Tournament(allGames)
+      .compute(List(Buchholz(Some(Modifier.Cut1))))
+      .find(_.player.id == playerA.id)
+      .flatMap(_.tiebreakers.headOption)
+    assertEquals(tiebreaker, Some(Point(Buchholz(Some(Modifier.Cut1)), TieBreakPoints(6f))))
 
   test("BuchholzCut2"):
-    val tiebreaker = BuchholzCut2.compute(playerA, allGames, Map.empty)
-    assertEquals(tiebreaker, 4.5f)
+    val tiebreaker = Tournament(allGames)
+      .compute(List(Buchholz(Some(Modifier.Cut2))))
+      .find(_.player.id == playerA.id)
+      .flatMap(_.tiebreakers.headOption)
+    assertEquals(tiebreaker, Some(Point(Buchholz(Some(Modifier.Cut2)), TieBreakPoints(4.5f))))
 
   test("ForeBuchholz"):
     val tiebreaker = ForeBuchholz.compute(playerA, allGames, Map.empty)

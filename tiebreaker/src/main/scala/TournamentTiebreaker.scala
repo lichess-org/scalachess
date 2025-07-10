@@ -169,30 +169,26 @@ case object DirectEncounter extends Tiebreaker("DE", "Direct encounter"):
 
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
-      .map: player =>
-        val myScore    = tour.scoreOf(player.id)
-        val tiedWithMe = tour.players.filter(p =>
-          tour.scoreOf(p.id) == myScore &&
-            previousPoints.get(p.id) == previousPoints.get(player.id)
-        )
-        val tiedPlayerSet         = tiedWithMe.toSet.excl(player)
-        val allTiedPlayersHaveMet = tiedPlayerSet.subsetOf(tour.opponentsOf(player.id).toSet)
-
-        val points =
-          if !allTiedPlayersHaveMet then TieBreakPoints(0f)
-          else
-            val directGames =
-              tour.gamesById(player.id).filter(g => tiedPlayerSet.contains(g.opponent))
-            if directGames.isEmpty then TieBreakPoints(0f)
+      .groupBy(p => (tour.scoreOf(p.id), previousPoints.get(p.id)))
+      .flatMap: (_, tiedPlayers) =>
+        lazy val allTiedPlayersHaveMet = tiedPlayers.forall: player =>
+          tiedPlayers.toSet.excl(player).subsetOf(tour.opponentsOf(player.id).toSet)
+        tiedPlayers.map: player =>
+          val points =
+            if tiedPlayers.size <= 1 || !allTiedPlayersHaveMet then TieBreakPoints(0f)
             else
-              TieBreakPoints:
-                directGames
-                  .groupBy(_.opponent)
-                  .map: (_, games) =>
-                    // If the players meet more than once, FIDE says that we average the score
-                    games.score.value / games.size
-                  .sum
-        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ Point(self, points))
+              val directGames =
+                tour.gamesById(player.id).filter(g => tiedPlayers.toSet.excl(player).contains(g.opponent))
+              if directGames.isEmpty then TieBreakPoints(0f)
+              else
+                TieBreakPoints:
+                  directGames
+                    .groupBy(_.opponent)
+                    .map: (_, games) =>
+                      // If the players meet more than once, FIDE says that we average the score
+                      games.score.value / games.size
+                    .sum
+          player.id -> (previousPoints.getOrElse(player.id, Nil) :+ Point(self, points))
       .toMap
 
 case object AverageRatingOfOpponents extends Tiebreaker("ARO", "Average rating of opponents"):
@@ -309,7 +305,7 @@ case class PlayerWithScore(
 )
 
 trait Tournament:
-  def players: List[Player]
+  def players: Set[Player]
   def gamesById(id: PlayerId): List[Game]
   def pointsById(id: PlayerId): Option[Float]
   def toPlayerGames: Map[PlayerId, Tiebreaker.PlayerWithGames]
@@ -405,7 +401,7 @@ trait Tournament:
   def compute(tiebreakers: List[Tiebreaker]): List[PlayerWithScore] =
     val points = tiebreakers.foldLeft(Map.empty[PlayerId, List[Point]]): (acc, tiebreaker) =>
       tiebreaker.compute(this, acc)
-    players
+    players.toList
       .map: player =>
         PlayerWithScore(player, scoreOf(player.id).value, points.getOrElse(player.id, Nil))
       .sorted
@@ -417,7 +413,7 @@ object Tournament:
     override def toPlayerGames: Map[PlayerId, PlayerWithGames] = games
 
     @scala.annotation.threadUnsafe
-    override lazy val players: List[Player] = games.values.map(_.player).toList
+    override lazy val players: Set[Player] = games.values.map(_.player).toSet
 
     override lazy val opponentsOf: PlayerId => List[Player] = memoize: id =>
       games.get(id).map(_.games.map(_.opponent).toList).getOrElse(Nil)

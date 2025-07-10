@@ -109,6 +109,20 @@ class TiebreakersTest extends ChessTest:
       .flatMap(_.tiebreakers.headOption)
     assertEquals(tiebreaker, Some(Point(Buchholz(Some(Modifier.Cut2)), TieBreakPoints(4.5f))))
 
+  test("BuchholzMedian1"):
+    val tiebreaker = Tournament(allGames)
+      .compute(List(Buchholz(Some(Modifier.Median1))))
+      .find(_.player.id == playerA.id)
+      .flatMap(_.tiebreakers.headOption)
+    assertEquals(tiebreaker, Some(Point(Buchholz(Some(Modifier.Median1)), TieBreakPoints(3.5f))))
+
+  test("BuchholzMedian2"):
+    val tiebreaker = Tournament(allGames)
+      .compute(List(Buchholz(Some(Modifier.Median2))))
+      .find(_.player.id == playerA.id)
+      .flatMap(_.tiebreakers.headOption)
+    assertEquals(tiebreaker, Some(Point(Buchholz(Some(Modifier.Median2)), TieBreakPoints(0f))))
+
   test("ForeBuchholz"):
     val tiebreaker = ForeBuchholz.compute(playerA, allGames, Map.empty)
     assertEquals(tiebreaker, 8f)

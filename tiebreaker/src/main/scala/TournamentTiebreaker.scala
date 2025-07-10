@@ -14,13 +14,13 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
 
 | Name (in alphabetical order)                        | Type | Section | Acronym | Cut-1 |
 |-----------------------------------------------------|------|---------|---------|-------|
-| Average of Opponents' Buchholz                      | CC   | 8.2     | AOB     |       | ✅
+| Average of Opponents' Buchholz                      | CC   | 8.2     | AOB     |       | ✅ (*3)
 | Average Perfect [Tournament] Performance of Opponents| DC  | 10.5    | APPO    |       | ✅
 | Average [Tournament] Performance Rating of Opponents | DC  | 10.4    | APRO    |       | ✅
 | Average Rating of Opponents                         | D    | 10.1    | ARO     |   ●   | ✅
-| Buchholz                                            | C    | 8.1     | BH      |   ●   | ✅
+| Buchholz                                            | C    | 8.1     | BH      |   ●   | ✅ (*3)
 | Direct Encounter                                    | A    | 6       | DE      |       | ✅ (*1)
-| Fore Buchholz                                       | D    | 8.3     | FB      |   ●   | ✅ (*2)
+| Fore Buchholz                                       | D    | 8.3     | FB      |   ●   | ✅ (*2, *3)
 | Games one Elected to Play                           | B    | 7.6     | GE      |       | ❌ // Need byes
 | Koya System for Round Robin                         | BC   | 9.2     | KS      |       | ✅
 | Number of Games Played with Black                   | B    | 7.3     | BPG     |       | ✅
@@ -28,7 +28,7 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
 | Number of Games Won with Black                      | B    | 7.4     | BWG     |       | ✅
 | Number of Wins                                      | B    | 7.1     | WIN     |       | ❌ // Need byes
 | Perfect Tournament Performance                      | DB   | 10.3    | PTP     |       | ✅
-| Sonneborn-Berger                                    | BC   | 9.1     | SB      |   ●   | ✅
+| Sonneborn-Berger                                    | BC   | 9.1     | SB      |   ●   | ✅ (*3)
 | (Sum of) Progressive Scores                         | B    | 7.5     | PS      |   ●   | ✅
 | Tournament Performance Rating                       | DB   | 10.2    | TPR     |       | ✅
 
@@ -42,6 +42,10 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
   so we assume that all players with the maximum number of games are always playing their last round.
   And this will eventually turn out to be true.
   This is not strictly correct and it should be tweaked/removed if it becomes an issue.
+
+3. BH, FB, AOB and SB -
+  We don't have information about byes and forfeits so we do not implement FIDE's recommendations about
+  handling unplayed rounds. (Section 16)
  */
 
 opaque type TieBreakPoints = Float

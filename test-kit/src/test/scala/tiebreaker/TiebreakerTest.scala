@@ -156,11 +156,11 @@ class TiebreakersTest extends ChessTest:
     val tiebreaker1 = DirectEncounter
       .compute(Tournament(allGames), previousPoints)
       .get(playerA.id)
-      .flatMap(_.headOption)
+      .flatMap(_.lift(1))
     val tiebreaker2 = DirectEncounter
       .compute(Tournament(allGames), previousPoints)
       .get(playerD.id)
-      .flatMap(_.headOption)
+      .flatMap(_.lift(1))
     assertEquals(tiebreaker1, Some(TieBreakPoints(0f)))
     assertEquals(tiebreaker2, Some(TieBreakPoints(0f)))
 
@@ -174,11 +174,11 @@ class TiebreakersTest extends ChessTest:
     val tiebreaker1 = DirectEncounter
       .compute(Tournament(allGames), previousPoints)
       .get(playerA.id)
-      .flatMap(_.headOption)
+      .flatMap(_.lift(1))
     val tiebreaker2 = DirectEncounter
       .compute(Tournament(allGames), previousPoints)
       .get(playerD.id)
-      .flatMap(_.headOption)
+      .flatMap(_.lift(1))
     assertEquals(tiebreaker1, Some(TieBreakPoints(0f)))
     assertEquals(tiebreaker2, Some(TieBreakPoints(1f)))
 
@@ -208,15 +208,15 @@ class TiebreakersTest extends ChessTest:
     val tiebreaker1 = DirectEncounter
       .compute(Tournament(allGamesWithPartial), previousPoints)
       .get(playerA.id)
-      .flatMap(_.headOption)
+      .flatMap(_.lift(1))
     val tiebreaker2 = DirectEncounter
       .compute(Tournament(allGamesWithPartial), previousPoints)
       .get(playerD.id)
-      .flatMap(_.headOption)
+      .flatMap(_.lift(1))
     val tiebreakerX = DirectEncounter
       .compute(Tournament(allGamesWithPartial), previousPoints)
       .get(playerX_Games.player.id)
-      .flatMap(_.headOption)
+      .flatMap(_.lift(1))
     assertEquals(tiebreaker1, Some(TieBreakPoints(0f)))
     assertEquals(tiebreaker2, Some(TieBreakPoints(0f)))
     assertEquals(tiebreakerX, Some(TieBreakPoints(0f)))

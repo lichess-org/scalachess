@@ -56,8 +56,7 @@ class TiebreakerBench:
   @Benchmark
   def tournamentPerformance(bh: Blackhole) =
     bh.consume:
-      Tiebreaker.compute(
-        allGames,
+      tournament.compute(
         List(
           AverageOfOpponentsBuchholz,
           AveragePerfectPerformanceOfOpponents,

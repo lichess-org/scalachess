@@ -446,16 +446,14 @@ object Tiebreaker:
   )
 
   val allCuttable: Seq[Tiebreaker] =
-    for
-      modifier <- Modifier.values.toList
-      cuttable <- List[Modifier => Tiebreaker](
-        SonnebornBerger.apply,
-        Buchholz.apply,
-        ForeBuchholz.apply,
-        AverageRatingOfOpponents.apply,
-        SumOfProgressiveScores.apply
+    Modifier.values.toList.flatMap: modifier =>
+      List(
+        SonnebornBerger(modifier),
+        Buchholz(modifier),
+        ForeBuchholz(modifier),
+        AverageRatingOfOpponents(modifier),
+        SumOfProgressiveScores(modifier)
       )
-    yield cuttable(modifier)
 
   val all: List[Tiebreaker] = allSimple ++ allCuttable
 

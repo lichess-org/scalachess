@@ -101,8 +101,7 @@ case class SonnebornBerger(modifier: Modifier)
     extends Tiebreaker(
       modifier.extendedCode("SB"),
       modifier.extendedName("Sonneborn-Berger")
-    )
-    with CuttableTiebreaker:
+    ):
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -114,8 +113,7 @@ case class Buchholz(modifier: Modifier)
     extends Tiebreaker(
       modifier.extendedCode("BH"),
       modifier.extendedName("Buchholz")
-    )
-    with CuttableTiebreaker:
+    ):
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -127,8 +125,7 @@ case class ForeBuchholz(modifier: Modifier)
     extends Tiebreaker(
       modifier.extendedCode("FB"),
       modifier.extendedName("Fore Buchholz")
-    )
-    with CuttableTiebreaker:
+    ):
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -170,8 +167,7 @@ case object DirectEncounter extends Tiebreaker("DE", "Direct encounter"):
       .toMap
 
 case class AverageRatingOfOpponents(modifier: Modifier)
-    extends Tiebreaker("ARO", "Average rating of opponents")
-    with CuttableTiebreaker:
+    extends Tiebreaker("ARO", "Average rating of opponents"):
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -212,8 +208,7 @@ case class SumOfProgressiveScores(modifier: Modifier)
     extends Tiebreaker(
       modifier.extendedCode("PS"),
       modifier.extendedName("Sum of progressive scores")
-    )
-    with CuttableTiebreaker:
+    ):
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -417,8 +412,6 @@ enum Modifier(val code: String, val name: String, val top: Int, val bottom: Int)
 
 case class LimitModifier(val value: Float)
 
-trait CuttableTiebreaker extends Tiebreaker
-
 trait Tiebreaker(val code: String, val name: String):
   // compute players' tiebreak points based on the tournament and a list of previously computed tiebreak points
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints
@@ -452,10 +445,10 @@ object Tiebreaker:
     AveragePerfectPerformanceOfOpponents
   )
 
-  val allCuttable: Seq[CuttableTiebreaker] =
+  val allCuttable: Seq[Tiebreaker] =
     for
       modifier <- Modifier.values.toList
-      cuttable <- List[Modifier => CuttableTiebreaker](
+      cuttable <- List[Modifier => Tiebreaker](
         SonnebornBerger.apply,
         Buchholz.apply,
         ForeBuchholz.apply,

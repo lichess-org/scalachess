@@ -97,6 +97,11 @@ class TiebreakersTest extends ChessTest:
       computeTournamentPoints(allGames, playerA, SonnebornBerger(modifier = Some(Modifier.Cut1)))
     assertEquals(tiebreaker, Some(TieBreakPoints(4.0f)))
 
+  test("SonnebornBergerMedian1"):
+    val tiebreaker =
+      computeTournamentPoints(allGames, playerA, SonnebornBerger(modifier = Some(Modifier.Median1)))
+    assertEquals(tiebreaker, Some(TieBreakPoints(2.5f)))
+
   test("Buchholz"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, Buchholz())
     assertEquals(tiebreaker, Some(TieBreakPoints(7.5f)))
@@ -124,6 +129,14 @@ class TiebreakersTest extends ChessTest:
   test("ForeBuchholzCut1"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, ForeBuchholz(Some(Modifier.Cut1)))
     assertEquals(tiebreaker, Some(TieBreakPoints(6f)))
+
+  test("ForeBuchholzMedian1"):
+    val tiebreaker = computeTournamentPoints(allGames, playerA, ForeBuchholz(Some(Modifier.Median1)))
+    assertEquals(tiebreaker, Some(TieBreakPoints(4f)))
+
+  test("ForeBuchholzMedian2"):
+    val tiebreaker = computeTournamentPoints(allGames, playerA, ForeBuchholz(Some(Modifier.Median2)))
+    assertEquals(tiebreaker, Some(TieBreakPoints(0f)))
 
   test("AverageOfOpponentsBuchholz"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, AverageOfOpponentsBuchholz)
@@ -225,6 +238,20 @@ class TiebreakersTest extends ChessTest:
   test("AverageOpponentRating"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, AverageRatingOfOpponents())
     assertEquals(tiebreaker, Some(TieBreakPoints(1563f)))
+
+  test("AverageOpponentRatingCut1"):
+    val tiebreaker = computeTournamentPoints(allGames, playerA, AverageRatingOfOpponents(Some(Modifier.Cut1)))
+    assertEquals(tiebreaker, Some(TieBreakPoints(1600f)))
+
+  test("AverageOpponentRatingMedian1"):
+    val tiebreaker =
+      computeTournamentPoints(allGames, playerA, AverageRatingOfOpponents(Some(Modifier.Median1)))
+    assertEquals(tiebreaker, Some(TieBreakPoints(1575f)))
+
+  test("AverageOpponentRatingMedian2"):
+    val tiebreaker =
+      computeTournamentPoints(allGames, playerA, AverageRatingOfOpponents(Some(Modifier.Median2)))
+    assertEquals(tiebreaker, Some(TieBreakPoints(0f)))
 
   test("AverageOpponentRating with unrated opponents"):
     val unratedOpponent = Player("Unrated Opponent", rating = None)

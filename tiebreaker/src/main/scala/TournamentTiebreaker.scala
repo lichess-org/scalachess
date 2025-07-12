@@ -57,14 +57,10 @@ object TournamentScore extends OpaqueFloat[TournamentScore]:
   extension (score: TournamentScore) def >=(other: TournamentScore): Boolean = score.value >= other.value
 
 extension (tieBreakSeq: Seq[TieBreakPoints])
-  def cut(modifier: Option[Modifier]): Seq[TieBreakPoints] =
-    modifier.fold(tieBreakSeq):
-      case Modifier.Cut1    => tieBreakSeq.drop(1)
-      case Modifier.Cut2    => tieBreakSeq.drop(2)
-      case Modifier.Median1 => tieBreakSeq.drop(1).dropRight(1)
-      case Modifier.Median2 => tieBreakSeq.drop(2).dropRight(2)
+  def cut(modifier: Modifier): Seq[TieBreakPoints] =
+    tieBreakSeq.drop(modifier.bottom).dropRight(modifier.top)
 
-  def cutSum(modifier: Option[Modifier]): TieBreakPoints =
+  def cutSum(modifier: Modifier): TieBreakPoints =
     tieBreakSeq.cut(modifier).sum
 
   def average: TieBreakPoints =
@@ -101,10 +97,10 @@ case object NbBlackWins extends Tiebreaker("BWG", "Number of wins with black"):
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TieBreakPoints(myBlackWins))
       .toMap
 
-case class SonnebornBerger(modifier: Option[Modifier] = None)
+case class SonnebornBerger(modifier: Modifier)
     extends Tiebreaker(
-      s"SB${modifier.fold("")(m => s"-${m.code}")}",
-      s"Sonneborn-Berger ${modifier.fold("score")(m => s"${m.name}")}"
+      modifier.extendedCode("SB"),
+      modifier.extendedName("Sonneborn-Berger")
     )
     with CuttableTiebreaker:
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
@@ -114,10 +110,10 @@ case class SonnebornBerger(modifier: Option[Modifier] = None)
           .getOrElse(player.id, Nil) :+ tour.sonnebornBergerSeq(player.id).cutSum(modifier))
       .toMap
 
-case class Buchholz(modifier: Option[Modifier] = None)
+case class Buchholz(modifier: Modifier)
     extends Tiebreaker(
-      s"BH${modifier.fold("")(m => s"-${m.code}")}",
-      s"Buchholz ${modifier.fold("")(m => s"${m.name}")}"
+      modifier.extendedCode("BH"),
+      modifier.extendedName("Buchholz")
     )
     with CuttableTiebreaker:
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
@@ -127,10 +123,10 @@ case class Buchholz(modifier: Option[Modifier] = None)
           .getOrElse(player.id, Nil) :+ tour.buchholzSeq(player.id).cutSum(modifier))
       .toMap
 
-case class ForeBuchholz(modifier: Option[Modifier] = None)
+case class ForeBuchholz(modifier: Modifier)
     extends Tiebreaker(
-      s"FB${modifier.fold("")(m => s"-${m.code}")}",
-      s"Fore Buchholz ${modifier.fold("")(m => s"${m.name}")}"
+      modifier.extendedCode("FB"),
+      modifier.extendedName("Fore Buchholz")
     )
     with CuttableTiebreaker:
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
@@ -173,7 +169,7 @@ case object DirectEncounter extends Tiebreaker("DE", "Direct encounter"):
           player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
       .toMap
 
-case class AverageRatingOfOpponents(modifier: Option[Modifier] = None)
+case class AverageRatingOfOpponents(modifier: Modifier)
     extends Tiebreaker("ARO", "Average rating of opponents")
     with CuttableTiebreaker:
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
@@ -199,37 +195,30 @@ case object AveragePerformanceOfOpponents extends Tiebreaker("APRO", "Average pe
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
       .toMap
 
-case object KoyaSystem extends Tiebreaker("KS", "Koya system"):
+case class KoyaSystem(val limit: LimitModifier) extends Tiebreaker("KS", "Koya system"):
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val myGames                = tour.gamesById(player.id)
-        val halfOfMaxPossibleScore = tour.maxRounds / 2f
-        val points                 = myGames
+        val myGames                   = tour.gamesById(player.id)
+        val maxPossibleScoreWithLimit = tour.maxRounds * limit.value
+        val points                    = myGames
           .filter: game =>
-            tour.scoreOf(game.opponent.id).value >= halfOfMaxPossibleScore
+            tour.scoreOf(game.opponent.id).value >= maxPossibleScoreWithLimit
           .score
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points.into(TieBreakPoints))
       .toMap
 
-case class SumOfProgressiveScores(modifier: Option[Modifier] = None)
+case class SumOfProgressiveScores(modifier: Modifier)
     extends Tiebreaker(
-      s"PS${modifier.fold("")(m => s"-${m.code}")}",
-      s"Sum of progressive scores ${modifier.fold("")(m => s"${m.name}")}"
+      modifier.extendedCode("PS"),
+      modifier.extendedName("Sum of progressive scores")
     )
     with CuttableTiebreaker:
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val pointsSeq = tour
-          .progressiveScoresSeq(player.id)
-        val points: TieBreakPoints = modifier
-          .fold(pointsSeq):
-            case Modifier.Cut1    => pointsSeq.drop(1)
-            case Modifier.Cut2    => pointsSeq.drop(2)
-            case Modifier.Median1 => pointsSeq.drop(1).dropRight(1)
-            case Modifier.Median2 => pointsSeq.drop(2).dropRight(2)
-          .sum
+        val pointsSeq              = tour.progressiveScoresSeq(player.id)
+        val points: TieBreakPoints = pointsSeq.cut(modifier).sum
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
       .toMap
 
@@ -411,11 +400,22 @@ object Tournament:
   def apply(games: Map[PlayerId, Tiebreaker.PlayerWithGames]): Tournament =
     Impl(games)
 
-enum Modifier(val code: String, val name: String):
-  case Cut1    extends Modifier("C1", "Cut1")
-  case Cut2    extends Modifier("C2", "Cut2")
-  case Median1 extends Modifier("M1", "Median1")
-  case Median2 extends Modifier("M2", "Median2")
+enum Modifier(val code: String, val name: String, val top: Int, val bottom: Int):
+  case None    extends Modifier("", "", 0, 0)
+  case Cut1    extends Modifier("C1", "Cut1", 0, 1)
+  case Cut2    extends Modifier("C2", "Cut2", 0, 2)
+  case Median1 extends Modifier("M1", "Median1", 1, 1)
+  case Median2 extends Modifier("M2", "Median2", 2, 2)
+
+  def extendedCode(code: String): String =
+    if this == Modifier.None then code
+    else s"$code-${this.code}"
+
+  def extendedName(name: String): String =
+    if this == Modifier.None then name
+    else s"$name ${this.name}"
+
+case class LimitModifier(val value: Float)
 
 trait CuttableTiebreaker extends Tiebreaker
 
@@ -446,7 +446,7 @@ object Tiebreaker:
     AverageOfOpponentsBuchholz,
     DirectEncounter,
     AveragePerformanceOfOpponents,
-    KoyaSystem,
+    KoyaSystem(LimitModifier(0.5f)),
     TournamentPerformanceRating,
     PerfectTournamentPerformance,
     AveragePerfectPerformanceOfOpponents
@@ -454,8 +454,8 @@ object Tiebreaker:
 
   val allCuttable: Seq[CuttableTiebreaker] =
     for
-      modifier <- (Modifier.values).map(Some(_)) :+ None
-      cuttable <- List[Option[Modifier] => CuttableTiebreaker](
+      modifier <- Modifier.values.toList
+      cuttable <- List[Modifier => CuttableTiebreaker](
         SonnebornBerger.apply,
         Buchholz.apply,
         ForeBuchholz.apply,

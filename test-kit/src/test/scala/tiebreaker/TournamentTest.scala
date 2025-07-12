@@ -17,7 +17,7 @@ class TournamentTest extends MunitExtensions with SnapshotAssertions:
           AveragePerfectPerformanceOfOpponents,
           DirectEncounter,
           PerfectTournamentPerformance,
-          SonnebornBerger
+          SonnebornBerger()
         )
       )
       .mkString("\n")
@@ -32,7 +32,7 @@ class TournamentTest extends MunitExtensions with SnapshotAssertions:
         List(
           Buchholz(Some(Modifier.Cut1)),
           Buchholz(),
-          AverageRatingOfOpponentsCut1
+          AverageRatingOfOpponents(Some(Modifier.Cut1))
         )
       )
       .mkString("\n")
@@ -46,7 +46,7 @@ class TournamentTest extends MunitExtensions with SnapshotAssertions:
         games("uzchesscup.pgn"),
         List(
           DirectEncounter,
-          SonnebornBerger,
+          SonnebornBerger(),
           NbWins,
           NbBlackWins,
           KoyaSystem

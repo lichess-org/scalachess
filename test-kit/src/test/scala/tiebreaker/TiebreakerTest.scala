@@ -89,11 +89,12 @@ class TiebreakersTest extends ChessTest:
     assertEquals(tiebreaker, Some(TieBreakPoints(0f)))
 
   test("SonnebornBerger"):
-    val tiebreaker = computeTournamentPoints(allGames, playerA, SonnebornBerger)
+    val tiebreaker = computeTournamentPoints(allGames, playerA, SonnebornBerger())
     assertEquals(tiebreaker, Some(TieBreakPoints(4.0f)))
 
   test("SonnebornBergerCut1"):
-    val tiebreaker = computeTournamentPoints(allGames, playerA, SonnebornBergerCut1)
+    val tiebreaker =
+      computeTournamentPoints(allGames, playerA, SonnebornBerger(modifier = Some(Modifier.Cut1)))
     assertEquals(tiebreaker, Some(TieBreakPoints(4.0f)))
 
   test("Buchholz"):
@@ -117,11 +118,11 @@ class TiebreakersTest extends ChessTest:
     assertEquals(tiebreaker, Some(TieBreakPoints(0f)))
 
   test("ForeBuchholz"):
-    val tiebreaker = computeTournamentPoints(allGames, playerA, ForeBuchholz)
+    val tiebreaker = computeTournamentPoints(allGames, playerA, ForeBuchholz())
     assertEquals(tiebreaker, Some(TieBreakPoints(8f)))
 
   test("ForeBuchholzCut1"):
-    val tiebreaker = computeTournamentPoints(allGames, playerA, ForeBuchholzCut1)
+    val tiebreaker = computeTournamentPoints(allGames, playerA, ForeBuchholz(Some(Modifier.Cut1)))
     assertEquals(tiebreaker, Some(TieBreakPoints(6f)))
 
   test("AverageOfOpponentsBuchholz"):
@@ -222,7 +223,7 @@ class TiebreakersTest extends ChessTest:
     assertEquals(tiebreakerX, Some(TieBreakPoints(0f)))
 
   test("AverageOpponentRating"):
-    val tiebreaker = computeTournamentPoints(allGames, playerA, AverageRatingOfOpponents)
+    val tiebreaker = computeTournamentPoints(allGames, playerA, AverageRatingOfOpponents())
     assertEquals(tiebreaker, Some(TieBreakPoints(1563f)))
 
   test("AverageOpponentRating with unrated opponents"):
@@ -232,13 +233,13 @@ class TiebreakersTest extends ChessTest:
     )
     val unratedPlayerGames = Seq(PlayerWithGames(playerA, unratedGames))
     val tiebreaker         =
-      computeTournamentPoints(unratedPlayerGames.mapBy(_.player.id), playerA, AverageRatingOfOpponents)
+      computeTournamentPoints(unratedPlayerGames.mapBy(_.player.id), playerA, AverageRatingOfOpponents())
     assertEquals(tiebreaker, Some(TieBreakPoints(0f)))
     assertEquals(
       computeTournamentPoints(
         allGames.updated(playerA.id, playerA_Games.copy(games = playerA_Games.games ++ unratedGames)),
         playerA,
-        AverageRatingOfOpponents
+        AverageRatingOfOpponents()
       ),
       Some(TieBreakPoints(1563f))
     )

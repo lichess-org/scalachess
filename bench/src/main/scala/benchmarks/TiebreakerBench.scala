@@ -51,7 +51,7 @@ class TiebreakerBench:
   @Benchmark
   def sonnebornBerger(bh: Blackhole) =
     bh.consume:
-      SonnebornBerger.compute(tournament, Map.empty)
+      SonnebornBerger().compute(tournament, Map.empty)
 
   @Benchmark
   def tournamentPerformance(bh: Blackhole) =
@@ -63,19 +63,19 @@ class TiebreakerBench:
           AveragePerfectPerformanceOfOpponents,
           DirectEncounter,
           PerfectTournamentPerformance,
-          SonnebornBerger
+          SonnebornBerger()
         )
       )
 
   @Benchmark
   def averageRatingOfOpponents(bh: Blackhole) =
     bh.consume:
-      AverageRatingOfOpponents.compute(tournament, Map.empty)
+      AverageRatingOfOpponents().compute(tournament, Map.empty)
 
   @Benchmark
   def foreBuchholz(bh: Blackhole) =
     bh.consume:
-      ForeBuchholz.compute(tournament, Map.empty)
+      ForeBuchholz().compute(tournament, Map.empty)
 
   @Benchmark
   def koyaSystem(bh: Blackhole) =

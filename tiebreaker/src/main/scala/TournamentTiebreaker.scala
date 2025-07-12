@@ -39,7 +39,7 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
   the same applies to the second rank when the first is assigned this way; and so on.
 
 2. FB -  We don't know which round is the last one -
-  so we assume that all players with the maximum number of games are always playing their last round.
+  so we assume that players are always playing their last round and give them a half point.
   And this will eventually turn out to be true.
   This is not strictly correct and it should be tweaked/removed if it becomes an issue.
 
@@ -57,9 +57,17 @@ object TournamentScore extends OpaqueFloat[TournamentScore]:
   extension (score: TournamentScore) def >=(other: TournamentScore): Boolean = score.value >= other.value
 
 extension (tieBreakSeq: Seq[TieBreakPoints])
-  def pointSum: TieBreakPoints         = tieBreakSeq.sum
-  def cutSum(cut: Int): TieBreakPoints = tieBreakSeq.sorted.drop(cut).sum
-  def average: TieBreakPoints          =
+  def cut(modifier: Option[Modifier]): Seq[TieBreakPoints] =
+    modifier.fold(tieBreakSeq):
+      case Modifier.Cut1    => tieBreakSeq.drop(1)
+      case Modifier.Cut2    => tieBreakSeq.drop(2)
+      case Modifier.Median1 => tieBreakSeq.drop(1).dropRight(1)
+      case Modifier.Median2 => tieBreakSeq.drop(2).dropRight(2)
+
+  def cutSum(modifier: Option[Modifier]): TieBreakPoints =
+    tieBreakSeq.cut(modifier).sum
+
+  def average: TieBreakPoints =
     tieBreakSeq.nonEmpty.so:
       tieBreakSeq.sum / tieBreakSeq.size
 
@@ -93,55 +101,42 @@ case object NbBlackWins extends Tiebreaker("BWG", "Number of wins with black"):
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TieBreakPoints(myBlackWins))
       .toMap
 
-case object SonnebornBerger extends Tiebreaker("SB", "Sonneborn-Berger score"):
-  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
-    tour.players.view
-      .map: player =>
-        player.id -> (previousPoints
-          .getOrElse(player.id, Nil) :+ tour.sonnebornBergerSeq(player.id).pointSum)
-      .toMap
-
-case object SonnebornBergerCut1 extends Tiebreaker("SB-C1", "Sonneborn-Berger cut 1"):
-  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
-    tour.players.view
-      .map: player =>
-        player.id -> (previousPoints
-          .getOrElse(player.id, Nil) :+ tour.sonnebornBergerSeq(player.id).drop(1).pointSum)
-      .toMap
-
-case class Buchholz(modifier: Option[Modifier] = None)
+case class SonnebornBerger(modifier: Option[Modifier] = None)
     extends Tiebreaker(
-      s"BH${modifier.fold("")(m => s"-${m.code}")}",
-      s"Buchholz${modifier.fold("")(m => s" ${m.name}")}"
+      s"SB${modifier.fold("")(m => s"-${m.code}")}",
+      s"Sonneborn-Berger ${modifier.fold("score")(m => s"${m.name}")}"
     )
     with CuttableTiebreaker:
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val points                    = tour.buchholzSeq(player.id)
-        val cutPoints: TieBreakPoints = modifier
-          .fold(points):
-            case Modifier.Cut1    => points.drop(1)
-            case Modifier.Cut2    => points.drop(2)
-            case Modifier.Median1 => points.drop(1).dropRight(1)
-            case Modifier.Median2 => points.drop(2).dropRight(2)
-          .sum
-        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ cutPoints)
+        player.id -> (previousPoints
+          .getOrElse(player.id, Nil) :+ tour.sonnebornBergerSeq(player.id).cutSum(modifier))
       .toMap
 
-case object ForeBuchholz extends Tiebreaker("FB", "Fore Buchholz"):
+case class Buchholz(modifier: Option[Modifier] = None)
+    extends Tiebreaker(
+      s"BH${modifier.fold("")(m => s"-${m.code}")}",
+      s"Buchholz ${modifier.fold("")(m => s"${m.name}")}"
+    )
+    with CuttableTiebreaker:
+  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
+    tour.players.view
+      .map: player =>
+        player.id -> (previousPoints
+          .getOrElse(player.id, Nil) :+ tour.buchholzSeq(player.id).cutSum(modifier))
+      .toMap
+
+case class ForeBuchholz(modifier: Option[Modifier] = None)
+    extends Tiebreaker(
+      s"FB${modifier.fold("")(m => s"-${m.code}")}",
+      s"Fore Buchholz ${modifier.fold("")(m => s"${m.name}")}"
+    )
+    with CuttableTiebreaker:
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val points: TieBreakPoints = tour.foreBuchholzSeq(player.id).sum
-        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
-      .toMap
-
-case object ForeBuchholzCut1 extends Tiebreaker("FB-C1", "Fore Buchholz cut 1"):
-  def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
-    tour.players.view
-      .map: player =>
-        val points: TieBreakPoints = tour.foreBuchholzSeq(player.id).drop(1).sum
+        val points: TieBreakPoints = tour.foreBuchholzSeq(player.id).cutSum(modifier)
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
       .toMap
 
@@ -178,22 +173,21 @@ case object DirectEncounter extends Tiebreaker("DE", "Direct encounter"):
           player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
       .toMap
 
-case object AverageRatingOfOpponents extends Tiebreaker("ARO", "Average rating of opponents"):
+case class AverageRatingOfOpponents(modifier: Option[Modifier] = None)
+    extends Tiebreaker("ARO", "Average rating of opponents")
+    with CuttableTiebreaker:
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val myOpponents = tour.opponentsOf(player.id)
-        val points      = averageRatingOfOpponentsCutN(0, myOpponents)
+        val points = tour
+          .opponentsOf(player.id)
+          .collect:
+            case Tiebreaker.Player(_, Some(elo)) => TieBreakPoints(elo.value)
+          .sorted
+          .cut(modifier)
+          .average
+          .map(_.round) // Fide says to round up
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
-      .toMap
-
-case object AverageRatingOfOpponentsCut1 extends Tiebreaker("ARO-C1", "Average rating of opponents cut 1"):
-  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
-    tour.players.view
-      .map: player =>
-        val myOpponents = tour.opponentsOf(player.id)
-        player.id -> (previousPoints
-          .getOrElse(player.id, Nil) :+ averageRatingOfOpponentsCutN(1, myOpponents))
       .toMap
 
 case object AveragePerformanceOfOpponents extends Tiebreaker("APRO", "Average performance of opponents"):
@@ -221,7 +215,7 @@ case object KoyaSystem extends Tiebreaker("KS", "Koya system"):
 case class SumOfProgressiveScores(modifier: Option[Modifier] = None)
     extends Tiebreaker(
       s"PS${modifier.fold("")(m => s"-${m.code}")}",
-      s"PS${modifier.fold("")(m => s" ${m.name}")}"
+      s"Sum of progressive scores ${modifier.fold("")(m => s"${m.name}")}"
     )
     with CuttableTiebreaker:
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
@@ -445,18 +439,12 @@ object Tiebreaker:
 
   case class Player(id: PlayerId, rating: Option[Elo])
 
-  val all: List[Tiebreaker] = List(
+  val allSimple: List[Tiebreaker] = List(
     NbBlackGames,
     NbWins,
     NbBlackWins,
-    SonnebornBerger,
-    SonnebornBergerCut1,
-    ForeBuchholz,
-    ForeBuchholzCut1,
     AverageOfOpponentsBuchholz,
     DirectEncounter,
-    AverageRatingOfOpponents,
-    AverageRatingOfOpponentsCut1,
     AveragePerformanceOfOpponents,
     KoyaSystem,
     TournamentPerformanceRating,
@@ -464,61 +452,21 @@ object Tiebreaker:
     AveragePerfectPerformanceOfOpponents
   )
 
-  val byCode: Map[String, Tiebreaker] = all.mapBy(_.code)
-
-private def sumOfProgressiveScoresCutN(
-    cut: Int,
-    player: Tiebreaker.PlayerWithGames
-): TieBreakPoints =
-  player.games.indices
-    .map: i =>
-      player.games.take(i + 1).score.into(TieBreakPoints)
-    .cutSum(cut)
-
-private def averageRatingOfOpponentsCutN(
-    cut: Int,
-    opponentGames: Seq[Player]
-): TieBreakPoints =
-  opponentGames
-    .collect:
-      case Tiebreaker.Player(_, Some(elo)) => TieBreakPoints(elo.value)
-    .sorted
-    .drop(cut)
-    .average
-    .map(_.round) // Must round up according to FIDE rules
-
-private def buchholzCutN(cut: Int, opponentGames: Seq[Tiebreaker.PlayerWithGames]): TieBreakPoints =
-  opponentGames
-    .map(_.games.score.into(TieBreakPoints))
-    .cutSum(cut)
-
-private def foreBuchholzCutN(
-    cut: Int,
-    opponentGames: Seq[Tiebreaker.PlayerWithGames]
-): TieBreakPoints =
-  val maxGames            = opponentGames.map(_.games.size).max
-  val playersWithMaxGames = opponentGames.filter(_.games.size == maxGames).map(_.player).toSet
-  val withLastRoundDrawn: Seq[Tiebreaker.PlayerWithGames] = opponentGames.map: opp =>
-    if playersWithMaxGames.contains(opp.player) then
-      opp.copy(
-        games = opp.games.dropRight(1) ++ opp.games.lastOption.map(_.copy(points = Some(Points.Half))).toSeq
+  val allCuttable: Seq[CuttableTiebreaker] =
+    for
+      modifier <- (Modifier.values).map(Some(_)) :+ None
+      cuttable <- List[Option[Modifier] => CuttableTiebreaker](
+        SonnebornBerger.apply,
+        Buchholz.apply,
+        ForeBuchholz.apply,
+        AverageRatingOfOpponents.apply,
+        SumOfProgressiveScores.apply
       )
-    else opp
-  buchholzCutN(cut, withLastRoundDrawn)
+    yield cuttable(modifier)
 
-private def sonnebornBergerCutN(
-    cut: Int,
-    player: Tiebreaker.PlayerWithGames,
-    opponentGames: Seq[Tiebreaker.PlayerWithGames]
-): TieBreakPoints =
-  player.games
-    .map: game =>
-      val oppScore = opponentGames.find(_.player == game.opponent).map(_.games.score)
-      (oppScore, game.points) match
-        case (Some(score), Some(Points.One))  => score.into(TieBreakPoints)
-        case (Some(score), Some(Points.Half)) => score.map(_ / 2f).into(TieBreakPoints)
-        case _                                => TieBreakPoints(0f)
-    .cutSum(cut)
+  val all: List[Tiebreaker] = allSimple ++ allCuttable
+
+  val byCode: Map[String, Tiebreaker] = all.mapBy(_.code)
 
 private def memoize[I, O](f: I => O): I => O = new collection.mutable.HashMap[I, O]():
   override def apply(key: I) = getOrElseUpdate(key, f(key))

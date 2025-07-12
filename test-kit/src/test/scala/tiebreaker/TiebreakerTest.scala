@@ -260,7 +260,11 @@ class TiebreakersTest extends ChessTest:
     )
     val unratedPlayerGames = Seq(PlayerWithGames(playerA, unratedGames))
     val tiebreaker         =
-      computeTournamentPoints(unratedPlayerGames.mapBy(_.player.id), playerA, AverageRatingOfOpponents(Modifier.None))
+      computeTournamentPoints(
+        unratedPlayerGames.mapBy(_.player.id),
+        playerA,
+        AverageRatingOfOpponents(Modifier.None)
+      )
     assertEquals(tiebreaker, Some(TieBreakPoints(0f)))
     assertEquals(
       computeTournamentPoints(

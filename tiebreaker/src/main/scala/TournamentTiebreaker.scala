@@ -410,7 +410,8 @@ enum Modifier(val code: String, val name: String, val top: Int, val bottom: Int)
     if this == Modifier.None then name
     else s"$name ${this.name}"
 
-case class LimitModifier(val value: Float)
+opaque type LimitModifier = Float
+object LimitModifier extends OpaqueFloat[LimitModifier]
 
 trait Tiebreaker(val code: String, val name: String):
   // compute players' tiebreak points based on the tournament and a list of previously computed tiebreak points

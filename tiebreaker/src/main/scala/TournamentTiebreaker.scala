@@ -14,13 +14,13 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
 
 | Name (in alphabetical order)                        | Type | Section | Acronym | Cut-1 |
 |-----------------------------------------------------|------|---------|---------|-------|
-| Average of Opponents' Buchholz                      | CC   | 8.2     | AOB     |       | ✅ (*3)
+| Average of Opponents' Buchholz                      | CC   | 8.2     | AOB     |       | ✅ (*2)
 | Average Perfect [Tournament] Performance of Opponents| DC  | 10.5    | APPO    |       | ✅
 | Average [Tournament] Performance Rating of Opponents | DC  | 10.4    | APRO    |       | ✅
 | Average Rating of Opponents                         | D    | 10.1    | ARO     |   ●   | ✅
-| Buchholz                                            | C    | 8.1     | BH      |   ●   | ✅ (*3)
+| Buchholz                                            | C    | 8.1     | BH      |   ●   | ✅ (*2)
 | Direct Encounter                                    | A    | 6       | DE      |       | ✅ (*1)
-| Fore Buchholz                                       | D    | 8.3     | FB      |   ●   | ✅ (*2, *3)
+| Fore Buchholz                                       | D    | 8.3     | FB      |   ●   | ✅ (*2)
 | Games one Elected to Play                           | B    | 7.6     | GE      |       | ❌ // Need byes
 | Koya System for Round Robin                         | BC   | 9.2     | KS      |       | ✅
 | Number of Games Played with Black                   | B    | 7.3     | BPG     |       | ✅
@@ -28,7 +28,7 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
 | Number of Games Won with Black                      | B    | 7.4     | BWG     |       | ✅
 | Number of Wins                                      | B    | 7.1     | WIN     |       | ❌ // Need byes
 | Perfect Tournament Performance                      | DB   | 10.3    | PTP     |       | ✅
-| Sonneborn-Berger                                    | BC   | 9.1     | SB      |   ●   | ✅ (*3)
+| Sonneborn-Berger                                    | BC   | 9.1     | SB      |   ●   | ✅ (*2)
 | (Sum of) Progressive Scores                         | B    | 7.5     | PS      |   ●   | ✅
 | Tournament Performance Rating                       | DB   | 10.2    | TPR     |       | ✅
 
@@ -38,12 +38,7 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
   that participant is ranked first among the tied participants –
   the same applies to the second rank when the first is assigned this way; and so on.
 
-2. FB -  We don't know which round is the last one -
-  so we assume that players are always playing their last round and give them a half point.
-  And this will eventually turn out to be true.
-  This is not strictly correct and it should be tweaked/removed if it becomes an issue.
-
-3. BH, FB, AOB and SB -
+2. BH, FB, AOB and SB -
   We don't have information about byes and forfeits so we do not implement FIDE's recommendations about
   handling unplayed rounds. (Section 16)
  */
@@ -286,7 +281,7 @@ trait Tournament:
         .computePerformanceRating:
           myGames
             .collect:
-              case Tiebreaker.Game(Some(points), Tiebreaker.Player(_, Some(rating)), _) =>
+              case Tiebreaker.Game(Some(points), Tiebreaker.Player(_, Some(rating)), _, _) =>
                 Elo.Game(points, rating)
         .so(_.value.toFloat)
 
@@ -303,11 +298,22 @@ trait Tournament:
       .map(opponent => scoreOf(opponent.id).into(TieBreakPoints))
       .sorted
 
+  lazy val lastRoundId: Option[String] = toPlayerGames.values
+    .maxBy(_.games.size)
+    .games
+    .lastOption
+    .flatMap(_.roundId)
+
   lazy val foreBuchholzSeq: PlayerId => Seq[TieBreakPoints] = memoize: id =>
-    opponentsOf(id)
-      .map: opponent =>
-        TieBreakPoints(gamesById(opponent.id).dropRight(1).score.value + 0.5f)
-      .sorted
+    lastRoundId.fold(buchholzSeq(id)): lastRound =>
+      opponentsOf(id)
+        .map: opponent =>
+          TieBreakPoints:
+            val opponentGames = gamesById(opponent.id)
+            val lastRoundGame = opponentGames.find(_.roundId.exists(_ == lastRound))
+            if lastRoundGame.exists(_.points.isDefined) then opponentGames.dropRight(1).score.value + 0.5f
+            else opponentGames.score.value
+        .sorted
 
   lazy val sonnebornBergerSeq: PlayerId => Seq[TieBreakPoints] = memoize: id =>
     toPlayerGames(id).games
@@ -429,7 +435,7 @@ object Tiebreaker:
   // old tiebreakers
   case class PlayerWithGames(player: Player, games: Seq[Game])
 
-  case class Game(points: Option[Outcome.Points], opponent: Player, color: Color)
+  case class Game(points: Option[Outcome.Points], opponent: Player, color: Color, roundId: Option[String])
 
   case class Player(id: PlayerId, rating: Option[Elo])
 

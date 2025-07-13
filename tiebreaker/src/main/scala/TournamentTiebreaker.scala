@@ -186,7 +186,8 @@ case object AveragePerformanceOfOpponents extends Tiebreaker("APRO", "Average pe
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
       .toMap
 
-case class KoyaSystem(val limit: LimitModifier) extends Tiebreaker("KS", "Koya system"):
+case class KoyaSystem(val limit: LimitModifier)
+    extends Tiebreaker(s"KS-${limit.value * 100}", s"Koya system (limit ${limit.value * 100}% of score)"):
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>

@@ -93,10 +93,7 @@ case object NbBlackWins extends Tiebreaker("BWG", "Number of wins with black"):
       .toMap
 
 case class SonnebornBerger(modifier: CutModifier)
-    extends Tiebreaker(
-      modifier.extendedCode("SB"),
-      modifier.extendedName("Sonneborn-Berger")
-    ):
+    extends Tiebreaker(modifier.extendedCode("SB"), modifier.extendedName("Sonneborn-Berger")):
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -105,10 +102,7 @@ case class SonnebornBerger(modifier: CutModifier)
       .toMap
 
 case class Buchholz(modifier: CutModifier)
-    extends Tiebreaker(
-      modifier.extendedCode("BH"),
-      modifier.extendedName("Buchholz")
-    ):
+    extends Tiebreaker(modifier.extendedCode("BH"), modifier.extendedName("Buchholz")):
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -217,8 +211,7 @@ case object TournamentPerformanceRating extends Tiebreaker("TPR", "Tournament pe
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        player.id -> (previousPoints
-          .getOrElse(player.id, Nil) :+ tour.tournamentPerformance(player.id))
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ tour.tournamentPerformance(player.id))
       .toMap
 
 case object PerfectTournamentPerformance extends Tiebreaker("PTP", "Perfect tournament performance"):

@@ -52,10 +52,10 @@ object TournamentScore extends OpaqueFloat[TournamentScore]:
   extension (score: TournamentScore) def >=(other: TournamentScore): Boolean = score.value >= other.value
 
 extension (tieBreakSeq: Seq[TieBreakPoints])
-  def cut(modifier: Modifier): Seq[TieBreakPoints] =
+  def cut(modifier: CutModifier): Seq[TieBreakPoints] =
     tieBreakSeq.drop(modifier.bottom).dropRight(modifier.top)
 
-  def cutSum(modifier: Modifier): TieBreakPoints =
+  def cutSum(modifier: CutModifier): TieBreakPoints =
     tieBreakSeq.cut(modifier).sum
 
   def average: TieBreakPoints =
@@ -92,7 +92,7 @@ case object NbBlackWins extends Tiebreaker("BWG", "Number of wins with black"):
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TieBreakPoints(myBlackWins))
       .toMap
 
-case class SonnebornBerger(modifier: Modifier)
+case class SonnebornBerger(modifier: CutModifier)
     extends Tiebreaker(
       modifier.extendedCode("SB"),
       modifier.extendedName("Sonneborn-Berger")
@@ -104,7 +104,7 @@ case class SonnebornBerger(modifier: Modifier)
           .getOrElse(player.id, Nil) :+ tour.sonnebornBergerSeq(player.id).cutSum(modifier))
       .toMap
 
-case class Buchholz(modifier: Modifier)
+case class Buchholz(modifier: CutModifier)
     extends Tiebreaker(
       modifier.extendedCode("BH"),
       modifier.extendedName("Buchholz")
@@ -116,11 +116,8 @@ case class Buchholz(modifier: Modifier)
           .getOrElse(player.id, Nil) :+ tour.buchholzSeq(player.id).cutSum(modifier))
       .toMap
 
-case class ForeBuchholz(modifier: Modifier)
-    extends Tiebreaker(
-      modifier.extendedCode("FB"),
-      modifier.extendedName("Fore Buchholz")
-    ):
+case class ForeBuchholz(modifier: CutModifier)
+    extends Tiebreaker(modifier.extendedCode("FB"), modifier.extendedName("Fore Buchholz")):
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -161,7 +158,7 @@ case object DirectEncounter extends Tiebreaker("DE", "Direct encounter"):
           player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
       .toMap
 
-case class AverageRatingOfOpponents(modifier: Modifier)
+case class AverageRatingOfOpponents(modifier: CutModifier)
     extends Tiebreaker(modifier.extendedCode("ARO"), modifier.extendedName("Average rating of opponents")):
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
@@ -203,7 +200,7 @@ case class KoyaSystem(val limit: LimitModifier)
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points.into(TieBreakPoints))
       .toMap
 
-case class SumOfProgressiveScores(modifier: Modifier)
+case class SumOfProgressiveScores(modifier: CutModifier)
     extends Tiebreaker(
       modifier.extendedCode("PS"),
       modifier.extendedName("Sum of progressive scores")
@@ -400,19 +397,19 @@ object Tournament:
   def apply(games: Map[PlayerId, Tiebreaker.PlayerWithGames]): Tournament =
     Impl(games)
 
-enum Modifier(val code: String, val name: String, val top: Int, val bottom: Int):
-  case None    extends Modifier("", "", 0, 0)
-  case Cut1    extends Modifier("C1", "Cut1", 0, 1)
-  case Cut2    extends Modifier("C2", "Cut2", 0, 2)
-  case Median1 extends Modifier("M1", "Median1", 1, 1)
-  case Median2 extends Modifier("M2", "Median2", 2, 2)
+enum CutModifier(val code: String, val name: String, val top: Int, val bottom: Int):
+  case None    extends CutModifier("", "", 0, 0)
+  case Cut1    extends CutModifier("C1", "Cut1", 0, 1)
+  case Cut2    extends CutModifier("C2", "Cut2", 0, 2)
+  case Median1 extends CutModifier("M1", "Median1", 1, 1)
+  case Median2 extends CutModifier("M2", "Median2", 2, 2)
 
   def extendedCode(code: String): String =
-    if this == Modifier.None then code
+    if this == CutModifier.None then code
     else s"$code-${this.code}"
 
   def extendedName(name: String): String =
-    if this == Modifier.None then name
+    if this == CutModifier.None then name
     else s"$name ${this.name}"
 
 opaque type LimitModifier = Float
@@ -431,7 +428,6 @@ object Tiebreaker:
   ): List[PlayerWithScore] =
     Tournament(games).compute(tiebreakers)
 
-  // old tiebreakers
   case class PlayerWithGames(player: Player, games: Seq[Game])
 
   case class PlayerWithScore(
@@ -458,7 +454,7 @@ object Tiebreaker:
   )
 
   val allCuttable: Seq[Tiebreaker] =
-    Modifier.values.toList.flatMap: modifier =>
+    CutModifier.values.toList.flatMap: modifier =>
       List(
         SonnebornBerger(modifier),
         Buchholz(modifier),

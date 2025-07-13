@@ -134,8 +134,17 @@ class TiebreakersTest extends ChessTest:
     )
     val allGamesWithLastRound = allGames.updated(playerB.id, playerB_GamesWithLastRound)
     val tiebreaker = computeTournamentPoints(allGamesWithLastRound, playerA, ForeBuchholz(Modifier.None))
-    // PlayerB's points should be 1.5 and does not get the added 0.5 from the last round
+    // No player has played the last round yet so this should be equivalent to buchholz
     assertEquals(tiebreaker, Some(TieBreakPoints(7.5f)))
+
+  test("ForeBuchholz with one game played in last round"):
+    val playerB_GamesWithLastRound = playerB_Games.copy(
+      games = playerB_Games.games ++ Seq(Game(Points.Zero.some, playerA, Color.White, "5".some))
+    )
+    val allGamesWithLastRound = allGames.updated(playerB.id, playerB_GamesWithLastRound)
+    val tiebreaker = computeTournamentPoints(allGamesWithLastRound, playerA, ForeBuchholz(Modifier.None))
+    // PlayerB's points should be 2. The rest don't get the +-0.5 from the last round
+    assertEquals(tiebreaker, Some(TieBreakPoints(8f)))
 
   test("ForeBuchholzCut1"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, ForeBuchholz(Modifier.Cut1))

@@ -44,7 +44,8 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
  */
 
 opaque type TieBreakPoints = Float
-object TieBreakPoints extends OpaqueFloat[TieBreakPoints]
+object TieBreakPoints extends OpaqueFloat[TieBreakPoints]:
+  val zero: TieBreakPoints = TieBreakPoints(0f)
 given Numeric[TieBreakPoints] = Numeric[Float]
 
 opaque type TournamentScore = Float
@@ -132,15 +133,15 @@ case object DirectEncounter extends Tiebreaker("DE", "Direct encounter"):
     tour.players.view
       .groupBy(p => (tour.scoreOf(p.id), previousPoints.get(p.id)))
       .flatMap: (_, tiedPlayers) =>
-        lazy val allTiedPlayersHaveMet = tiedPlayers.forall: player =>
+        inline def allTiedPlayersHaveMet = tiedPlayers.forall: player =>
           tiedPlayers.toSet.excl(player).subsetOf(tour.opponentsOf(player.id).toSet)
         tiedPlayers.map: player =>
           val points =
-            if tiedPlayers.size <= 1 || !allTiedPlayersHaveMet then TieBreakPoints(0f)
+            if tiedPlayers.size <= 1 || !allTiedPlayersHaveMet then TieBreakPoints.zero
             else
               val directGames =
                 tour.gamesById(player.id).filter(g => tiedPlayers.toSet.excl(player).contains(g.opponent))
-              if directGames.isEmpty then TieBreakPoints(0f)
+              if directGames.isEmpty then TieBreakPoints.zero
               else
                 TieBreakPoints:
                   directGames
@@ -255,7 +256,7 @@ trait Tournament:
   lazy val perfectTournamentPerformance: PlayerId => TieBreakPoints = memoize: id =>
     val oppRatings: Seq[Int] =
       gamesById(id).flatMap(_.opponent.rating.map(_.value))
-    if oppRatings.isEmpty then TieBreakPoints(0f)
+    if oppRatings.isEmpty then TieBreakPoints.zero
     else
       val myScore = scoreOf(id)
       val minR    = oppRatings.min - 800
@@ -310,7 +311,7 @@ trait Tournament:
         game.points match
           case Some(Points.One)  => scoreOf(game.opponent.id).into(TieBreakPoints)
           case Some(Points.Half) => scoreOf(game.opponent.id).map(_ / 2f).into(TieBreakPoints)
-          case _                 => TieBreakPoints(0f)
+          case _                 => TieBreakPoints.zero
       .sorted
 
   lazy val progressiveScoresSeq: PlayerId => Seq[TieBreakPoints] = memoize: id =>
@@ -355,7 +356,6 @@ object Tournament:
 
     override def toPlayerGames: Map[PlayerId, PlayerWithGames] = games
 
-    @scala.annotation.threadUnsafe
     override lazy val players: Set[Player] = games.values.map(_.player).toSet
 
     override lazy val opponentsOf: PlayerId => List[Player] = memoize: id =>

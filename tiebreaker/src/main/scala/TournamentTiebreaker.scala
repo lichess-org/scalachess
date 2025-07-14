@@ -162,7 +162,7 @@ case object DirectEncounter extends Tiebreaker("DE", "Direct encounter"):
       .toMap
 
 case class AverageRatingOfOpponents(modifier: Modifier)
-    extends Tiebreaker("ARO", "Average rating of opponents"):
+    extends Tiebreaker(modifier.extendedCode("ARO"), modifier.extendedName("Average rating of opponents")):
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -187,7 +187,10 @@ case object AveragePerformanceOfOpponents extends Tiebreaker("APRO", "Average pe
       .toMap
 
 case class KoyaSystem(val limit: LimitModifier)
-    extends Tiebreaker(s"KS-${limit.value * 100}", s"Koya system (limit ${limit.value * 100}% of score)"):
+    extends Tiebreaker(
+      s"KS-${(limit.value * 100).toInt}",
+      s"Koya system (limit ${(limit.value * 100).toInt}% of score)"
+    ):
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>

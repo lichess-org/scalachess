@@ -1,9 +1,9 @@
 package chess
-package tiebreaker
+package tiebreak
 
 import chess.format.pgn.PgnStr
 import chess.rating.Elo
-import chess.tiebreaker.Tiebreaker.*
+import chess.tiebreak.Tiebreak.*
 
 object Helper:
 
@@ -21,7 +21,7 @@ object Helper:
       .map: id =>
         Player(id, rating.map(_.into(Elo)))
 
-  def tiebreakerGames(pgnSplit: List[String]): List[(Player, Game)] =
+  def tiebreakGames(pgnSplit: List[String]): List[(Player, Game)] =
     parsedTags(pgnSplit).foldLeft(List.empty): (acc, tags) =>
       val names         = tags.names
       val ratings       = tags.ratings
@@ -43,7 +43,7 @@ object Helper:
     val pgnText  = scala.io.Source.fromResource(fileName).mkString
     val pgnSplit = pgnText.split("\n\n").toList
 
-    tiebreakerGames(pgnSplit)
+    tiebreakGames(pgnSplit)
       .groupBy(_._1)
       .map: (player, games) =>
         player.id -> PlayerWithGames(player, games.map(_._2))

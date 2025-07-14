@@ -5,9 +5,9 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 import cats.syntax.all.*
-import chess.tiebreaker.Tiebreaker.*
-import chess.tiebreaker.TiebreakPoint
-import chess.tiebreaker.*
+import chess.tiebreak.Tiebreak.*
+import chess.tiebreak.TiebreakPoint
+import chess.tiebreak.*
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -16,7 +16,7 @@ import chess.tiebreaker.*
 @Warmup(iterations = 15, timeUnit = TimeUnit.SECONDS, time = 3)
 @Fork(value = 3)
 @Threads(value = 1)
-class TiebreakerBench:
+class TiebreakBench:
 
   private val Work: Long = 10
 

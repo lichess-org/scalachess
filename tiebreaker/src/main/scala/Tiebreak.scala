@@ -472,9 +472,7 @@ object Tiebreak:
         SumOfProgressiveScores(modifier)
       )
 
-  val all: List[Tiebreak] = allSimple ++ allCuttable
-
-  val byCode: Map[String, Tiebreak] = all.mapBy(_.code)
+  val preset: List[Tiebreak] = allSimple ++ allCuttable
 
 private def memoize[I, O](f: I => O): I => O = new collection.mutable.HashMap[I, O]():
   override def apply(key: I) = getOrElseUpdate(key, f(key))

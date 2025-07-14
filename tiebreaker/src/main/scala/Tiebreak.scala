@@ -1,14 +1,15 @@
 package chess
 package tiebreak
 
+import cats.Applicative
 import cats.syntax.all.*
 import chess.Outcome.Points
 import chess.rating.Elo
 import scalalib.extensions.*
 import scalalib.newtypes.*
 import scalalib.zeros.given
+
 import Tiebreak.*
-import cats.Applicative
 
 /*
 Tie-breakers for individuals for swiss/round-robins

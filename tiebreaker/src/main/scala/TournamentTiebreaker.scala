@@ -250,11 +250,6 @@ case object AveragePerfectPerformanceOfOpponents
 type PlayerId = String
 
 import Tiebreaker.*
-case class PlayerWithScore(
-    player: Player,
-    score: Float,
-    tiebreakers: List[TieBreakPoints]
-)
 
 trait Tournament:
   def players: Set[Player]
@@ -438,6 +433,12 @@ object Tiebreaker:
 
   // old tiebreakers
   case class PlayerWithGames(player: Player, games: Seq[Game])
+
+  case class PlayerWithScore(
+      player: Player,
+      score: Float,
+      tiebreakers: List[TieBreakPoints]
+  )
 
   case class Game(points: Option[Outcome.Points], opponent: Player, color: Color, roundId: Option[String])
 

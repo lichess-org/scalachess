@@ -7,6 +7,8 @@ import chess.rating.Elo
 import scalalib.extensions.*
 import scalalib.newtypes.*
 import scalalib.zeros.given
+import Tiebreak.*
+import cats.Applicative
 
 /*
 Tie-breakers for individuals for swiss/round-robins
@@ -52,22 +54,11 @@ opaque type TournamentScore = Float
 object TournamentScore extends OpaqueFloat[TournamentScore]:
   extension (score: TournamentScore) def >=(other: TournamentScore): Boolean = score.value >= other.value
 
-extension (tieBreakSeq: Seq[TiebreakPoint])
-  def cut(modifier: CutModifier): Seq[TiebreakPoint] =
-    tieBreakSeq.drop(modifier.bottom).dropRight(modifier.top)
+sealed trait Tiebreak(val code: Code, val description: String):
+  def extendedCode: String = code
+  // compute players' tiebreak points based on the tournament and a list of previously computed tiebreak points
+  def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints
 
-  def cutSum(modifier: CutModifier): TiebreakPoint =
-    tieBreakSeq.cut(modifier).sum
-
-  def average: TiebreakPoint =
-    tieBreakSeq.nonEmpty.so:
-      tieBreakSeq.sum / tieBreakSeq.size
-
-extension (games: Seq[Tiebreak.Game])
-  def score: TournamentScore =
-    games.flatMap(_.points.map(_.value)).sum
-
-import Tiebreak.*
 case object NbBlackGames extends Tiebreak("BPG", "Number of games played with black"):
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
@@ -94,7 +85,8 @@ case object NbBlackWins extends Tiebreak("BWG", "Number of wins with black"):
       .toMap
 
 case class SonnebornBerger(modifier: CutModifier)
-    extends Tiebreak(modifier.extendedCode("SB"), modifier.extendedName("Sonneborn-Berger")):
+    extends Tiebreak("SB", modifier.extendedName("Sonneborn-Berger")):
+  override def extendedCode: String = modifier.extendedCode(code)
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -102,8 +94,8 @@ case class SonnebornBerger(modifier: CutModifier)
           .getOrElse(player.id, Nil) :+ tour.sonnebornBergerSeq(player.id).cutSum(modifier))
       .toMap
 
-case class Buchholz(modifier: CutModifier)
-    extends Tiebreak(modifier.extendedCode("BH"), modifier.extendedName("Buchholz")):
+case class Buchholz(modifier: CutModifier) extends Tiebreak("BH", modifier.extendedName("Buchholz")):
+  override def extendedCode: String = modifier.extendedCode(code)
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -111,8 +103,7 @@ case class Buchholz(modifier: CutModifier)
           .getOrElse(player.id, Nil) :+ tour.buchholzSeq(player.id).cutSum(modifier))
       .toMap
 
-case class ForeBuchholz(modifier: CutModifier)
-    extends Tiebreak(modifier.extendedCode("FB"), modifier.extendedName("Fore Buchholz")):
+case class ForeBuchholz(modifier: CutModifier) extends Tiebreak("FB", modifier.extendedName("Fore Buchholz")):
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -154,7 +145,8 @@ case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
       .toMap
 
 case class AverageRatingOfOpponents(modifier: CutModifier)
-    extends Tiebreak(modifier.extendedCode("ARO"), modifier.extendedName("Average rating of opponents")):
+    extends Tiebreak("ARO", modifier.extendedName("Average rating of opponents")):
+  override def extendedCode: String = modifier.extendedCode(code)
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -179,10 +171,7 @@ case object AveragePerformanceOfOpponents extends Tiebreak("APRO", "Average perf
       .toMap
 
 case class KoyaSystem(val limit: LimitModifier)
-    extends Tiebreak(
-      s"KS-${(limit.value * 100).toInt}",
-      s"Koya system (limit ${(limit.value * 100).toInt}% of score)"
-    ):
+    extends Tiebreak("KS", s"Koya system (limit ${(limit.value * 100).toInt}% of score)"):
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -196,10 +185,8 @@ case class KoyaSystem(val limit: LimitModifier)
       .toMap
 
 case class SumOfProgressiveScores(modifier: CutModifier)
-    extends Tiebreak(
-      modifier.extendedCode("PS"),
-      modifier.extendedName("Sum of progressive scores")
-    ):
+    extends Tiebreak("PS", modifier.extendedName("Sum of progressive scores")):
+  override def extendedCode: String                                         = modifier.extendedCode(code)
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -408,18 +395,39 @@ enum CutModifier(val code: String, val name: String, val top: Int, val bottom: I
 opaque type LimitModifier = Float
 object LimitModifier extends OpaqueFloat[LimitModifier]
 
-sealed trait Tiebreak(val code: String, val name: String):
-  // compute players' tiebreak points based on the tournament and a list of previously computed tiebreak points
-  def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints
-
 object Tiebreak:
-  type PlayerPoints = Map[PlayerId, List[TiebreakPoint]]
+  type Code = "BPG" | "WON" | "BWG" | "BH" | "FB" | "AOB" | "DE" | "ARO" | "APRO" | "APPO" | "KS" | "TPR" |
+    "PTP" | "SB" | "PS"
+
+  def apply[F[_]: Applicative](
+      code: Code,
+      mkCutModifier: () => F[CutModifier],
+      mkLimitModifier: () => F[LimitModifier]
+  ): F[Tiebreak] =
+    code match
+      case "BPG"  => NbBlackGames.pure[F]
+      case "WON"  => NbWins.pure[F]
+      case "BWG"  => NbBlackWins.pure[F]
+      case "BH"   => mkCutModifier().map(Buchholz.apply)
+      case "FB"   => mkCutModifier().map(ForeBuchholz.apply)
+      case "AOB"  => AverageOfOpponentsBuchholz.pure[F]
+      case "DE"   => DirectEncounter.pure[F]
+      case "ARO"  => mkCutModifier().map(AverageRatingOfOpponents.apply)
+      case "APRO" => AveragePerformanceOfOpponents.pure[F]
+      case "APPO" => AveragePerfectPerformanceOfOpponents.pure[F]
+      case "KS"   => mkLimitModifier().map(KoyaSystem.apply)
+      case "TPR"  => TournamentPerformanceRating.pure[F]
+      case "PTP"  => PerfectTournamentPerformance.pure[F]
+      case "SB"   => mkCutModifier().map(SonnebornBerger.apply)
+      case "PS"   => mkCutModifier().map(SumOfProgressiveScores.apply)
 
   def compute(
       games: Map[PlayerId, Tiebreak.PlayerWithGames],
       tiebreaks: List[Tiebreak]
   ): List[PlayerWithScore] =
     Tournament(games).compute(tiebreaks)
+
+  type PlayerPoints = Map[PlayerId, List[TiebreakPoint]]
 
   case class PlayerWithGames(player: Player, games: Seq[Game])
 
@@ -462,3 +470,18 @@ object Tiebreak:
 
 private def memoize[I, O](f: I => O): I => O = new collection.mutable.HashMap[I, O]():
   override def apply(key: I) = getOrElseUpdate(key, f(key))
+
+extension (tieBreakSeq: Seq[TiebreakPoint])
+  def cut(modifier: CutModifier): Seq[TiebreakPoint] =
+    tieBreakSeq.drop(modifier.bottom).dropRight(modifier.top)
+
+  def cutSum(modifier: CutModifier): TiebreakPoint =
+    tieBreakSeq.cut(modifier).sum
+
+  def average: TiebreakPoint =
+    tieBreakSeq.nonEmpty.so:
+      tieBreakSeq.sum / tieBreakSeq.size
+
+extension (games: Seq[Tiebreak.Game])
+  def score: TournamentScore =
+    games.flatMap(_.points.map(_.value)).sum

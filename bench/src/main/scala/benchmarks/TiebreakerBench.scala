@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit
 
 import cats.syntax.all.*
 import chess.tiebreaker.Tiebreaker.*
-import chess.tiebreaker.TieBreakPoints
+import chess.tiebreaker.TiebreakPoint
 import chess.tiebreaker.*
 
 @State(Scope.Thread)

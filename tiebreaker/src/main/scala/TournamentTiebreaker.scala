@@ -43,23 +43,23 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
   handling unplayed rounds. (Section 16)
  */
 
-opaque type TieBreakPoints = Float
-object TieBreakPoints extends OpaqueFloat[TieBreakPoints]:
-  val zero: TieBreakPoints = TieBreakPoints(0f)
-given Numeric[TieBreakPoints] = Numeric[Float]
+opaque type TiebreakPoint = Float
+object TiebreakPoint extends OpaqueFloat[TiebreakPoint]:
+  val zero: TiebreakPoint = TiebreakPoint(0f)
+given Numeric[TiebreakPoint] = Numeric[Float]
 
 opaque type TournamentScore = Float
 object TournamentScore extends OpaqueFloat[TournamentScore]:
   extension (score: TournamentScore) def >=(other: TournamentScore): Boolean = score.value >= other.value
 
-extension (tieBreakSeq: Seq[TieBreakPoints])
-  def cut(modifier: CutModifier): Seq[TieBreakPoints] =
+extension (tieBreakSeq: Seq[TiebreakPoint])
+  def cut(modifier: CutModifier): Seq[TiebreakPoint] =
     tieBreakSeq.drop(modifier.bottom).dropRight(modifier.top)
 
-  def cutSum(modifier: CutModifier): TieBreakPoints =
+  def cutSum(modifier: CutModifier): TiebreakPoint =
     tieBreakSeq.cut(modifier).sum
 
-  def average: TieBreakPoints =
+  def average: TiebreakPoint =
     tieBreakSeq.nonEmpty.so:
       tieBreakSeq.sum / tieBreakSeq.size
 
@@ -73,7 +73,7 @@ case object NbBlackGames extends Tiebreaker("BPG", "Number of games played with 
     tour.players.view
       .map: player =>
         val myBlackGames = tour.gamesById(player.id).filter(_.color == Color.Black).size
-        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TieBreakPoints(myBlackGames))
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(myBlackGames))
       .toMap
 
 case object NbWins extends Tiebreaker("WON", "Number of Wins"):
@@ -81,7 +81,7 @@ case object NbWins extends Tiebreaker("WON", "Number of Wins"):
     tour.players.view
       .map: player =>
         val myWins = tour.gamesById(player.id).count(_.points.contains(Points.One))
-        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TieBreakPoints(myWins))
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(myWins))
       .toMap
 
 case object NbBlackWins extends Tiebreaker("BWG", "Number of wins with black"):
@@ -90,7 +90,7 @@ case object NbBlackWins extends Tiebreaker("BWG", "Number of wins with black"):
       .map: player =>
         val myBlackWins =
           tour.gamesById(player.id).count(g => g.color == Color.Black && g.points.contains(Points.One))
-        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TieBreakPoints(myBlackWins))
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(myBlackWins))
       .toMap
 
 case class SonnebornBerger(modifier: CutModifier)
@@ -116,7 +116,7 @@ case class ForeBuchholz(modifier: CutModifier)
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val points: TieBreakPoints = tour.foreBuchholzSeq(player.id).cutSum(modifier)
+        val points: TiebreakPoint = tour.foreBuchholzSeq(player.id).cutSum(modifier)
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
       .toMap
 
@@ -137,13 +137,13 @@ case object DirectEncounter extends Tiebreaker("DE", "Direct encounter"):
           tiedPlayers.toSet.excl(player).subsetOf(tour.opponentsOf(player.id).toSet)
         tiedPlayers.map: player =>
           val points =
-            if tiedPlayers.size <= 1 || !allTiedPlayersHaveMet then TieBreakPoints.zero
+            if tiedPlayers.size <= 1 || !allTiedPlayersHaveMet then TiebreakPoint.zero
             else
               val directGames =
                 tour.gamesById(player.id).filter(g => tiedPlayers.toSet.excl(player).contains(g.opponent))
-              if directGames.isEmpty then TieBreakPoints.zero
+              if directGames.isEmpty then TiebreakPoint.zero
               else
-                TieBreakPoints:
+                TiebreakPoint:
                   directGames
                     .groupBy(_.opponent)
                     .map: (_, games) =>
@@ -161,7 +161,7 @@ case class AverageRatingOfOpponents(modifier: CutModifier)
         val points = tour
           .opponentsOf(player.id)
           .collect:
-            case Tiebreaker.Player(_, Some(elo)) => TieBreakPoints(elo.value)
+            case Tiebreaker.Player(_, Some(elo)) => TiebreakPoint(elo.value)
           .sorted
           .cut(modifier)
           .average
@@ -192,7 +192,7 @@ case class KoyaSystem(val limit: LimitModifier)
           .filter: game =>
             tour.scoreOf(game.opponent.id).value >= maxPossibleScoreWithLimit
           .score
-        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points.into(TieBreakPoints))
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points.into(TiebreakPoint))
       .toMap
 
 case class SumOfProgressiveScores(modifier: CutModifier)
@@ -204,7 +204,7 @@ case class SumOfProgressiveScores(modifier: CutModifier)
     tour.players.view
       .map: player =>
         val pointsSeq              = tour.progressiveScoresSeq(player.id)
-        val points: TieBreakPoints = pointsSeq.cut(modifier).sum
+        val points: TiebreakPoint = pointsSeq.cut(modifier).sum
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
       .toMap
 
@@ -253,20 +253,20 @@ trait Tournament:
   // def totalRounds: Int
   // def byes: (PlayerId, Int) => Boolean // playerId, round => true if player has a bye in that round
 
-  lazy val perfectTournamentPerformance: PlayerId => TieBreakPoints = memoize: id =>
+  lazy val perfectTournamentPerformance: PlayerId => TiebreakPoint = memoize: id =>
     val oppRatings: Seq[Int] =
       gamesById(id).flatMap(_.opponent.rating.map(_.value))
-    if oppRatings.isEmpty then TieBreakPoints.zero
+    if oppRatings.isEmpty then TiebreakPoint.zero
     else
       val myScore = scoreOf(id)
       val minR    = oppRatings.min - 800
       val maxR    = oppRatings.max + 800
-      if myScore == TournamentScore(0f) then TieBreakPoints(minR)
-      else TieBreakPoints(Tournament.binarySearch(oppRatings, myScore)(minR, maxR))
+      if myScore == TournamentScore(0f) then TiebreakPoint(minR)
+      else TiebreakPoint(Tournament.binarySearch(oppRatings, myScore)(minR, maxR))
 
-  lazy val tournamentPerformance: PlayerId => TieBreakPoints = memoize: id =>
+  lazy val tournamentPerformance: PlayerId => TiebreakPoint = memoize: id =>
     val myGames = gamesById(id)
-    TieBreakPoints:
+    TiebreakPoint:
       Elo
         .computePerformanceRating:
           myGames
@@ -277,15 +277,15 @@ trait Tournament:
 
   lazy val maxRounds = players.map(p => gamesById(p.id).size).maxOption.getOrElse(0)
 
-  lazy val buchholz: PlayerId => TieBreakPoints = memoize: id =>
+  lazy val buchholz: PlayerId => TiebreakPoint = memoize: id =>
     buchholzSeq(id).sum
 
   // Memoize sorted sequences of cuttable tiebreaks so that we can cut them later in the tournament if necessary
   // Without having to recompute them.
   // Tournaments often include both the cut and the uncut version of the tiebreaker.
-  lazy val buchholzSeq: PlayerId => Seq[TieBreakPoints] = memoize: id =>
+  lazy val buchholzSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>
     opponentsOf(id)
-      .map(opponent => scoreOf(opponent.id).into(TieBreakPoints))
+      .map(opponent => scoreOf(opponent.id).into(TiebreakPoint))
       .sorted
 
   lazy val lastRoundId: Option[String] = toPlayerGames.values
@@ -294,37 +294,37 @@ trait Tournament:
     .lastOption
     .flatMap(_.roundId)
 
-  lazy val foreBuchholzSeq: PlayerId => Seq[TieBreakPoints] = memoize: id =>
+  lazy val foreBuchholzSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>
     lastRoundId.fold(buchholzSeq(id)): lastRound =>
       opponentsOf(id)
         .map: opponent =>
-          TieBreakPoints:
+          TiebreakPoint:
             val opponentGames = gamesById(opponent.id)
             val lastRoundGame = opponentGames.find(_.roundId.exists(_ == lastRound))
             if lastRoundGame.exists(_.points.isDefined) then opponentGames.dropRight(1).score.value + 0.5f
             else opponentGames.score.value
         .sorted
 
-  lazy val sonnebornBergerSeq: PlayerId => Seq[TieBreakPoints] = memoize: id =>
+  lazy val sonnebornBergerSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>
     toPlayerGames(id).games
       .map: game =>
         game.points match
-          case Some(Points.One)  => scoreOf(game.opponent.id).into(TieBreakPoints)
-          case Some(Points.Half) => scoreOf(game.opponent.id).map(_ / 2f).into(TieBreakPoints)
-          case _                 => TieBreakPoints.zero
+          case Some(Points.One)  => scoreOf(game.opponent.id).into(TiebreakPoint)
+          case Some(Points.Half) => scoreOf(game.opponent.id).map(_ / 2f).into(TiebreakPoint)
+          case _                 => TiebreakPoint.zero
       .sorted
 
-  lazy val progressiveScoresSeq: PlayerId => Seq[TieBreakPoints] = memoize: id =>
+  lazy val progressiveScoresSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>
     val games = gamesById(id)
     games.indices
       .map: i =>
-        games.take(i + 1).score.into(TieBreakPoints)
+        games.take(i + 1).score.into(TiebreakPoint)
       .sorted
 
-  given Ordering[List[TieBreakPoints]] = new:
-    def compare(a: List[TieBreakPoints], b: List[TieBreakPoints]): Int =
+  given Ordering[List[TiebreakPoint]] = new:
+    def compare(a: List[TiebreakPoint], b: List[TiebreakPoint]): Int =
       @scala.annotation.tailrec
-      def loop(a: List[TieBreakPoints], b: List[TieBreakPoints]): Int = (a, b) match
+      def loop(a: List[TiebreakPoint], b: List[TiebreakPoint]): Int = (a, b) match
         case (Nil, Nil)           => 0
         case (Nil, _)             => -1 // a is empty, b is not
         case (_, Nil)             => 1  // b is empty, a is not
@@ -339,11 +339,11 @@ trait Tournament:
       // sort by score descending, then by tiebreakers descending
       val scoreComparison = b.score.compare(a.score)
       if scoreComparison != 0 then scoreComparison
-      else Ordering[List[TieBreakPoints]].compare(b.tiebreakers, a.tiebreakers)
+      else Ordering[List[TiebreakPoint]].compare(b.tiebreakers, a.tiebreakers)
 
   // compute and sort players by their scores and tiebreakers
   def compute(tiebreakers: List[Tiebreaker]): List[PlayerWithScore] =
-    val points = tiebreakers.foldLeft(Map.empty[PlayerId, List[TieBreakPoints]]): (acc, tiebreaker) =>
+    val points = tiebreakers.foldLeft(Map.empty[PlayerId, List[TiebreakPoint]]): (acc, tiebreaker) =>
       tiebreaker.compute(this, acc)
     players.toList
       .map: player =>
@@ -408,12 +408,12 @@ enum CutModifier(val code: String, val name: String, val top: Int, val bottom: I
 opaque type LimitModifier = Float
 object LimitModifier extends OpaqueFloat[LimitModifier]
 
-trait Tiebreaker(val code: String, val name: String):
+sealed trait Tiebreaker(val code: String, val name: String):
   // compute players' tiebreak points based on the tournament and a list of previously computed tiebreak points
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints
 
 object Tiebreaker:
-  type PlayerPoints = Map[PlayerId, List[TieBreakPoints]]
+  type PlayerPoints = Map[PlayerId, List[TiebreakPoint]]
 
   def compute(
       games: Map[PlayerId, Tiebreaker.PlayerWithGames],
@@ -426,7 +426,7 @@ object Tiebreaker:
   case class PlayerWithScore(
       player: Player,
       score: Float,
-      tiebreakers: List[TieBreakPoints]
+      tiebreakers: List[TiebreakPoint]
   )
 
   case class Game(points: Option[Outcome.Points], opponent: Player, color: Color, roundId: Option[String])

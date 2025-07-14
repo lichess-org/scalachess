@@ -65,7 +65,7 @@ class TiebreakersTest extends ChessTest:
       allGames: Map[PlayerId, PlayerWithGames],
       player: Player,
       tiebreak: Tiebreaker
-  ): Option[TieBreakPoints] =
+  ): Option[TiebreakPoint] =
     Tournament(allGames)
       .compute(List(tiebreak))
       .find(_.player.id == player.id)
@@ -80,53 +80,53 @@ class TiebreakersTest extends ChessTest:
 
   test("NbBlackGames"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, NbBlackGames)
-    assertEquals(tiebreaker, Some(TieBreakPoints(1.0f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(1.0f)))
 
   test("NbWins"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, NbWins)
-    assertEquals(tiebreaker, Some(TieBreakPoints(2.0f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(2.0f)))
 
   test("NbBlackWins"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, NbBlackWins)
-    assertEquals(tiebreaker, Some(TieBreakPoints(0f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(0f)))
 
   test("SonnebornBerger"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, SonnebornBerger(CutModifier.None))
-    assertEquals(tiebreaker, Some(TieBreakPoints(4.0f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(4.0f)))
 
   test("SonnebornBergerCut1"):
     val tiebreaker =
       computeTournamentPoints(allGames, playerA, SonnebornBerger(modifier = CutModifier.Cut1))
-    assertEquals(tiebreaker, Some(TieBreakPoints(4.0f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(4.0f)))
 
   test("SonnebornBergerMedian1"):
     val tiebreaker =
       computeTournamentPoints(allGames, playerA, SonnebornBerger(modifier = CutModifier.Median1))
-    assertEquals(tiebreaker, Some(TieBreakPoints(2.5f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(2.5f)))
 
   test("Buchholz"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, Buchholz(CutModifier.None))
-    assertEquals(tiebreaker, Some(TieBreakPoints(7.5f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(7.5f)))
 
   test("BuchholzCut1"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, Buchholz(CutModifier.Cut1))
-    assertEquals(tiebreaker, Some(TieBreakPoints(6f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(6f)))
 
   test("BuchholzCut2"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, Buchholz(CutModifier.Cut2))
-    assertEquals(tiebreaker, Some(TieBreakPoints(4.5f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(4.5f)))
 
   test("BuchholzMedian1"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, Buchholz(CutModifier.Median1))
-    assertEquals(tiebreaker, Some(TieBreakPoints(3.5f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(3.5f)))
 
   test("BuchholzMedian2"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, Buchholz(CutModifier.Median2))
-    assertEquals(tiebreaker, Some(TieBreakPoints(0f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(0f)))
 
   test("ForeBuchholz"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, ForeBuchholz(CutModifier.None))
-    assertEquals(tiebreaker, Some(TieBreakPoints(8f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(8f)))
 
   test("ForeBuchholz with last round yet to be played"):
     val playerB_GamesWithLastRound = playerB_Games.copy(
@@ -135,7 +135,7 @@ class TiebreakersTest extends ChessTest:
     val allGamesWithLastRound = allGames.updated(playerB.id, playerB_GamesWithLastRound)
     val tiebreaker = computeTournamentPoints(allGamesWithLastRound, playerA, ForeBuchholz(CutModifier.None))
     // No player has played the last round yet so this should be equivalent to buchholz
-    assertEquals(tiebreaker, Some(TieBreakPoints(7.5f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(7.5f)))
 
   test("ForeBuchholz with one game played in last round"):
     val playerB_GamesWithLastRound = playerB_Games.copy(
@@ -144,29 +144,29 @@ class TiebreakersTest extends ChessTest:
     val allGamesWithLastRound = allGames.updated(playerB.id, playerB_GamesWithLastRound)
     val tiebreaker = computeTournamentPoints(allGamesWithLastRound, playerA, ForeBuchholz(CutModifier.None))
     // PlayerB's points should be 2. The rest don't get the +-0.5 from the last round
-    assertEquals(tiebreaker, Some(TieBreakPoints(8f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(8f)))
 
   test("ForeBuchholzCut1"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, ForeBuchholz(CutModifier.Cut1))
-    assertEquals(tiebreaker, Some(TieBreakPoints(6f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(6f)))
 
   test("ForeBuchholzMedian1"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, ForeBuchholz(CutModifier.Median1))
-    assertEquals(tiebreaker, Some(TieBreakPoints(4f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(4f)))
 
   test("ForeBuchholzMedian2"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, ForeBuchholz(CutModifier.Median2))
-    assertEquals(tiebreaker, Some(TieBreakPoints(0f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(0f)))
 
   test("AverageOfOpponentsBuchholz"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, AverageOfOpponentsBuchholz)
-    assertEquals(tiebreaker, Some(TieBreakPoints(8.125f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(8.125f)))
 
   test("DirectEncounter"):
     val tiebreaker1 = computeTournamentPoints(allGames, playerA, DirectEncounter)
     val tiebreaker2 = computeTournamentPoints(allGames, playerD, DirectEncounter)
-    assertEquals(tiebreaker1, Some(TieBreakPoints(0f)))
-    assertEquals(tiebreaker2, Some(TieBreakPoints(1f)))
+    assertEquals(tiebreaker1, Some(TiebreakPoint(0f)))
+    assertEquals(tiebreaker2, Some(TiebreakPoint(1f)))
 
   test("DirectEncounter with more than one game"):
     val extraDraw = Seq(
@@ -182,13 +182,13 @@ class TiebreakersTest extends ChessTest:
     ).mapBy(_.player.id)
     val tiebreaker1 = computeTournamentPoints(extraDraw, playerD, DirectEncounter)
     val tiebreaker2 = computeTournamentPoints(extraDraw, playerA, DirectEncounter)
-    assertEquals(tiebreaker1, Some(TieBreakPoints(0.75f)))
-    assertEquals(tiebreaker2, Some(TieBreakPoints(0.25f)))
+    assertEquals(tiebreaker1, Some(TiebreakPoint(0.75f)))
+    assertEquals(tiebreaker2, Some(TiebreakPoint(0.25f)))
 
   test("DirectEncounter with unequal partial tiebreaks"):
     val previousPoints = Map(
-      playerA.id -> List(TieBreakPoints(1f)),
-      playerD.id -> List(TieBreakPoints(0.5f))
+      playerA.id -> List(TiebreakPoint(1f)),
+      playerD.id -> List(TiebreakPoint(0.5f))
     )
 
     val tiebreaker1 = DirectEncounter
@@ -199,14 +199,14 @@ class TiebreakersTest extends ChessTest:
       .compute(Tournament(allGames), previousPoints)
       .get(playerD.id)
       .flatMap(_.lift(1))
-    assertEquals(tiebreaker1, Some(TieBreakPoints(0f)))
-    assertEquals(tiebreaker2, Some(TieBreakPoints(0f)))
+    assertEquals(tiebreaker1, Some(TiebreakPoint(0f)))
+    assertEquals(tiebreaker2, Some(TiebreakPoint(0f)))
 
   test("DirectEncounter with equal partial tiebreaks"):
 
     val previousPoints = Map(
-      playerA.id -> List(TieBreakPoints(1f)),
-      playerD.id -> List(TieBreakPoints(1f))
+      playerA.id -> List(TiebreakPoint(1f)),
+      playerD.id -> List(TiebreakPoint(1f))
     )
 
     val tiebreaker1 = DirectEncounter
@@ -217,8 +217,8 @@ class TiebreakersTest extends ChessTest:
       .compute(Tournament(allGames), previousPoints)
       .get(playerD.id)
       .flatMap(_.lift(1))
-    assertEquals(tiebreaker1, Some(TieBreakPoints(0f)))
-    assertEquals(tiebreaker2, Some(TieBreakPoints(1f)))
+    assertEquals(tiebreaker1, Some(TiebreakPoint(0f)))
+    assertEquals(tiebreaker2, Some(TiebreakPoint(1f)))
 
   test("DirectEncounter with equal partial tiebreaks but not all players have met"):
 
@@ -234,9 +234,9 @@ class TiebreakersTest extends ChessTest:
     )
 
     val previousPoints = Map(
-      playerA.id              -> List(TieBreakPoints(1f)),
-      playerD.id              -> List(TieBreakPoints(1f)),
-      playerX_Games.player.id -> List(TieBreakPoints(1f))
+      playerA.id              -> List(TiebreakPoint(1f)),
+      playerD.id              -> List(TiebreakPoint(1f)),
+      playerX_Games.player.id -> List(TiebreakPoint(1f))
     )
 
     val allGamesWithPartial =
@@ -255,27 +255,27 @@ class TiebreakersTest extends ChessTest:
       .compute(Tournament(allGamesWithPartial), previousPoints)
       .get(playerX_Games.player.id)
       .flatMap(_.lift(1))
-    assertEquals(tiebreaker1, Some(TieBreakPoints(0f)))
-    assertEquals(tiebreaker2, Some(TieBreakPoints(0f)))
-    assertEquals(tiebreakerX, Some(TieBreakPoints(0f)))
+    assertEquals(tiebreaker1, Some(TiebreakPoint(0f)))
+    assertEquals(tiebreaker2, Some(TiebreakPoint(0f)))
+    assertEquals(tiebreakerX, Some(TiebreakPoint(0f)))
 
   test("AverageOpponentRating"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, AverageRatingOfOpponents(CutModifier.None))
-    assertEquals(tiebreaker, Some(TieBreakPoints(1563f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(1563f)))
 
   test("AverageOpponentRatingCut1"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, AverageRatingOfOpponents(CutModifier.Cut1))
-    assertEquals(tiebreaker, Some(TieBreakPoints(1600f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(1600f)))
 
   test("AverageOpponentRatingMedian1"):
     val tiebreaker =
       computeTournamentPoints(allGames, playerA, AverageRatingOfOpponents(CutModifier.Median1))
-    assertEquals(tiebreaker, Some(TieBreakPoints(1575f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(1575f)))
 
   test("AverageOpponentRatingMedian2"):
     val tiebreaker =
       computeTournamentPoints(allGames, playerA, AverageRatingOfOpponents(CutModifier.Median2))
-    assertEquals(tiebreaker, Some(TieBreakPoints(0f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(0f)))
 
   test("AverageOpponentRating with unrated opponents"):
     val unratedOpponent = Player("Unrated Opponent", rating = None)
@@ -289,45 +289,45 @@ class TiebreakersTest extends ChessTest:
         playerA,
         AverageRatingOfOpponents(CutModifier.None)
       )
-    assertEquals(tiebreaker, Some(TieBreakPoints(0f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(0f)))
     assertEquals(
       computeTournamentPoints(
         allGames.updated(playerA.id, playerA_Games.copy(games = playerA_Games.games ++ unratedGames)),
         playerA,
         AverageRatingOfOpponents(CutModifier.None)
       ),
-      Some(TieBreakPoints(1563f))
+      Some(TiebreakPoint(1563f))
     )
 
   test("AveragePerformanceOfOpponents"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, AveragePerformanceOfOpponents)
-    assertEquals(tiebreaker, Some(TieBreakPoints(1527f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(1527f)))
 
   test("TournamentPerformanceRating"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, TournamentPerformanceRating)
-    assertEquals(tiebreaker, Some(TieBreakPoints(1657f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(1657f)))
 
   test("KoyaSystem"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, KoyaSystem(LimitModifier(0.5f)))
-    assertEquals(tiebreaker, Some(TieBreakPoints(0.5f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(0.5f)))
 
   test("SumOfProgressiveScores"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, SumOfProgressiveScores(CutModifier.None))
-    assertEquals(tiebreaker, Some(TieBreakPoints(6.5f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(6.5f)))
 
   test("SumOfProgressiveScoresCut1"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, SumOfProgressiveScores(CutModifier.Cut1))
-    assertEquals(tiebreaker, Some(TieBreakPoints(5.5f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(5.5f)))
 
   test("SumOfProgressiveScoresMedian1"):
     val tiebreaker =
       computeTournamentPoints(allGames, playerA, SumOfProgressiveScores(CutModifier.Median1))
-    assertEquals(tiebreaker, Some(TieBreakPoints(3f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(3f)))
 
   test("SumOfProgressiveScoresMedian2"):
     val tiebreaker =
       computeTournamentPoints(allGames, playerA, SumOfProgressiveScores(CutModifier.Median2))
-    assertEquals(tiebreaker, Some(TieBreakPoints(0f)))
+    assertEquals(tiebreaker, Some(TiebreakPoint(0f)))
 
   test("PerfectTournamentPerformance - Perfect scores"):
     // from https://chess-results.com/tnr1166026.aspx?lan=1&art=1&rd=8
@@ -353,11 +353,11 @@ class TiebreakersTest extends ChessTest:
     val ruslanPlayerGames = Seq(PlayerWithGames(ruslan, ruslanGames)).mapBy(_.player.id)
     assertEquals(
       computeTournamentPoints(ruslanPlayerGames, ruslan, TournamentPerformanceRating),
-      Some(TieBreakPoints(2796f))
+      Some(TiebreakPoint(2796f))
     )
     assertEquals(
       computeTournamentPoints(ruslanPlayerGames, ruslan, PerfectTournamentPerformance),
-      Some(TieBreakPoints(2945f))
+      Some(TiebreakPoint(2945f))
     ) // chess-results says 2949. Perfect scores though so :shrug:
 
   test("PerfectTournamentPerformance - Regular"):
@@ -382,11 +382,11 @@ class TiebreakersTest extends ChessTest:
     val xavierPlayerGames = Seq(PlayerWithGames(xavier, xavierGames)).mapBy(_.player.id)
     assertEquals(
       computeTournamentPoints(xavierPlayerGames, xavier, TournamentPerformanceRating),
-      Some(TieBreakPoints(2218f))
+      Some(TiebreakPoint(2218f))
     )
     assertEquals(
       computeTournamentPoints(xavierPlayerGames, xavier, PerfectTournamentPerformance),
-      Some(TieBreakPoints(2259f))
+      Some(TiebreakPoint(2259f))
     )
 
   test("PerfectTournamentPerformance - Zero score"):
@@ -399,12 +399,12 @@ class TiebreakersTest extends ChessTest:
     // Lowest rated opponent - 800
     assertEquals(
       computeTournamentPoints(playerGames, playerA, PerfectTournamentPerformance),
-      Some(TieBreakPoints(650f))
+      Some(TiebreakPoint(650f))
     )
 
   test("AveragePerfectPerformanceOfOpponents"):
     val tiebreaker = computeTournamentPoints(allGames, playerA, AveragePerfectPerformanceOfOpponents)
     assertEquals(
       tiebreaker,
-      Some(TieBreakPoints(1523f))
+      Some(TiebreakPoint(1523f))
     ) // 1444 + 1549 + 1668 + 1432 = 6093 / 4 = 1523.25, rounded to 1523

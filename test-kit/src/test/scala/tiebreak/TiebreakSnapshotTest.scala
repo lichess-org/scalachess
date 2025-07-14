@@ -49,7 +49,7 @@ class TiebreakSnapshotTest extends MunitExtensions with SnapshotAssertions:
           SonnebornBerger(CutModifier.None),
           NbWins,
           NbBlackWins,
-          KoyaSystem(LimitModifier(0.5f))
+          KoyaSystem(LimitModifier.default)
         )
       )
       .mkString("\n")

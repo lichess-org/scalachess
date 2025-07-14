@@ -308,7 +308,7 @@ class TiebreakTest extends ChessTest:
     assertEquals(points, Some(TiebreakPoint(1657f)))
 
   test("KoyaSystem"):
-    val points = computeTournamentPoints(allGames, playerA, KoyaSystem(LimitModifier(0.5f)))
+    val points = computeTournamentPoints(allGames, playerA, KoyaSystem(LimitModifier.default))
     assertEquals(points, Some(TiebreakPoint(0.5f)))
 
   test("SumOfProgressiveScores"):

@@ -79,7 +79,7 @@ class TiebreakBench:
   @Benchmark
   def koyaSystem(bh: Blackhole) =
     bh.consume:
-      KoyaSystem(LimitModifier(0.5f)).compute(tournament, Map.empty)
+      KoyaSystem(LimitModifier.default).compute(tournament, Map.empty)
 
   @Benchmark
   def blackPlayedGames(bh: Blackhole) =

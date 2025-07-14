@@ -394,7 +394,14 @@ enum CutModifier(val code: String, val name: String, val top: Int, val bottom: I
     else s"$name ${this.name}"
 
 opaque type LimitModifier = Float
-object LimitModifier extends OpaqueFloat[LimitModifier]
+object LimitModifier:
+  def apply(value: Float): Option[LimitModifier] =
+    if value < 0f || value > 1f then None
+    else Some(value)
+
+  val default: LimitModifier = 0.5f
+
+  extension (lm: LimitModifier) inline def value: Float = lm
 
 object Tiebreak:
   type Code = "BPG" | "WON" | "BWG" | "BH" | "FB" | "AOB" | "DE" | "ARO" | "APRO" | "APPO" | "KS" | "TPR" |
@@ -449,7 +456,7 @@ object Tiebreak:
     AverageOfOpponentsBuchholz,
     DirectEncounter,
     AveragePerformanceOfOpponents,
-    KoyaSystem(LimitModifier(0.5f)),
+    KoyaSystem(LimitModifier.default),
     TournamentPerformanceRating,
     PerfectTournamentPerformance,
     AveragePerfectPerformanceOfOpponents

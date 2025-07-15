@@ -86,7 +86,7 @@ case object NbBlackWins extends Tiebreak("BWG", "Number of wins with black"):
       .toMap
 
 case class SonnebornBerger(modifier: CutModifier)
-    extends Tiebreak("SB", modifier.extendedName("Sonneborn-Berger")):
+    extends Tiebreak("SB", modifier.extendedDescription("Sonneborn-Berger")):
   override def extendedCode: String = modifier.extendedCode(code)
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
@@ -95,7 +95,7 @@ case class SonnebornBerger(modifier: CutModifier)
           .getOrElse(player.id, Nil) :+ tour.sonnebornBergerSeq(player.id).cutSum(modifier))
       .toMap
 
-case class Buchholz(modifier: CutModifier) extends Tiebreak("BH", modifier.extendedName("Buchholz")):
+case class Buchholz(modifier: CutModifier) extends Tiebreak("BH", modifier.extendedDescription("Buchholz")):
   override def extendedCode: String = modifier.extendedCode(code)
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
@@ -104,7 +104,8 @@ case class Buchholz(modifier: CutModifier) extends Tiebreak("BH", modifier.exten
           .getOrElse(player.id, Nil) :+ tour.buchholzSeq(player.id).cutSum(modifier))
       .toMap
 
-case class ForeBuchholz(modifier: CutModifier) extends Tiebreak("FB", modifier.extendedName("Fore Buchholz")):
+case class ForeBuchholz(modifier: CutModifier)
+    extends Tiebreak("FB", modifier.extendedDescription("Fore Buchholz")):
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -146,7 +147,7 @@ case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
       .toMap
 
 case class AverageRatingOfOpponents(modifier: CutModifier)
-    extends Tiebreak("ARO", modifier.extendedName("Average rating of opponents")):
+    extends Tiebreak("ARO", modifier.extendedDescription("Average rating of opponents")):
   override def extendedCode: String = modifier.extendedCode(code)
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
@@ -186,7 +187,7 @@ case class KoyaSystem(val limit: LimitModifier)
       .toMap
 
 case class SumOfProgressiveScores(modifier: CutModifier)
-    extends Tiebreak("PS", modifier.extendedName("Sum of progressive scores")):
+    extends Tiebreak("PS", modifier.extendedDescription("Sum of progressive scores")):
   override def extendedCode: String                                         = modifier.extendedCode(code)
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
@@ -389,7 +390,7 @@ enum CutModifier(val code: String, val name: String, val top: Int, val bottom: I
     if this == CutModifier.None then code
     else s"$code-${this.code}"
 
-  def extendedName(name: String): String =
+  def extendedDescription(name: String): String =
     if this == CutModifier.None then name
     else s"$name ${this.name}"
 

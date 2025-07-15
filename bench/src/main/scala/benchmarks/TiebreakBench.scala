@@ -20,13 +20,11 @@ class TiebreakBench:
 
   private val Work: Long = 10
 
-  var allGames: Map[PlayerId, PlayerWithGames] = scala.compiletime.uninitialized
-  var tournament: Tournament                   = scala.compiletime.uninitialized
+  var tournament: Tournament = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =
-    allGames = Helper.games("FWWRC.pgn")
-    tournament = Tournament(allGames)
+    tournament = Tournament(Helper.games("FWWRC.pgn"))
 
   @Benchmark
   def averageOfOpponentsBuchholz(bh: Blackhole) =
@@ -52,19 +50,6 @@ class TiebreakBench:
   def sonnebornBerger(bh: Blackhole) =
     bh.consume:
       SonnebornBerger(CutModifier.None).compute(tournament, Map.empty)
-
-  @Benchmark
-  def tournamentPerformance(bh: Blackhole) =
-    bh.consume:
-      tournament.compute(
-        List(
-          AverageOfOpponentsBuchholz,
-          AveragePerfectPerformanceOfOpponents,
-          DirectEncounter,
-          PerfectTournamentPerformance,
-          SonnebornBerger(CutModifier.None)
-        )
-      )
 
   @Benchmark
   def averageRatingOfOpponents(bh: Blackhole) =
@@ -110,3 +95,16 @@ class TiebreakBench:
   def progressiveScores(bh: Blackhole) =
     bh.consume:
       SumOfProgressiveScores(CutModifier.None).compute(tournament, Map.empty)
+
+  @Benchmark
+  def fullTournament(bh: Blackhole) =
+    bh.consume:
+      tournament.compute(
+        List(
+          DirectEncounter,
+          AverageOfOpponentsBuchholz,
+          AveragePerfectPerformanceOfOpponents,
+          PerfectTournamentPerformance,
+          SonnebornBerger(CutModifier.None)
+        )
+      )

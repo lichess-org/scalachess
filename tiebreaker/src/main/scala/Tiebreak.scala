@@ -123,12 +123,13 @@ case object AverageOfOpponentsBuchholz extends Tiebreak("AOB", "Average of oppon
 
 case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
-    tour.players.view
+    val builder = Map.newBuilder[PlayerId, List[TiebreakPoint]]
+    tour.players
       .groupBy(p => (tour.scoreOf(p.id), previousPoints.get(p.id)))
-      .flatMap: (_, tiedPlayers) =>
+      .foreach: (_, tiedPlayers) =>
         lazy val allTiedPlayersHaveMet = tiedPlayers.forall: player =>
           tiedPlayers.toSet.excl(player).subsetOf(tour.opponentsOf(player.id).toSet)
-        tiedPlayers.map: player =>
+        tiedPlayers.foreach: player =>
           val points =
             if tiedPlayers.size <= 1 || !allTiedPlayersHaveMet then TiebreakPoint.zero
             else
@@ -143,8 +144,8 @@ case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
                       // If the players meet more than once, FIDE says that we average the score
                       games.score.value / games.size
                     .sum
-          player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
-      .toMap
+          builder.addOne(player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points))
+    builder.result()
 
 case class AverageRatingOfOpponents(modifier: CutModifier)
     extends Tiebreak("ARO", modifier.extendedDescription("Average rating of opponents")):

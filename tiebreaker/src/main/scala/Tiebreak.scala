@@ -407,6 +407,13 @@ object Tiebreak:
   type Code = "BPG" | "WON" | "BWG" | "BH" | "FB" | "AOB" | "DE" | "ARO" | "APRO" | "APPO" | "KS" | "TPR" |
     "PTP" | "SB" | "PS"
 
+  object Code:
+    val all: Set[Code] =
+      Set("BPG", "WON", "BWG", "BH", "FB", "AOB", "DE", "ARO", "APRO", "APPO", "KS", "TPR", "PTP", "SB", "PS")
+
+    def fromString(str: String): Option[Code] =
+      all.find(_ == str)
+
   def apply[F[_]: Applicative](
       code: Code,
       mkCutModifier: () => F[CutModifier],

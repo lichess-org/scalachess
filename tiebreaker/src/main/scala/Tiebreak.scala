@@ -126,7 +126,7 @@ case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
     tour.players.view
       .groupBy(p => (tour.scoreOf(p.id), previousPoints.get(p.id)))
       .flatMap: (_, tiedPlayers) =>
-        inline def allTiedPlayersHaveMet = tiedPlayers.forall: player =>
+        lazy val allTiedPlayersHaveMet = tiedPlayers.forall: player =>
           tiedPlayers.toSet.excl(player).subsetOf(tour.opponentsOf(player.id).toSet)
         tiedPlayers.map: player =>
           val points =

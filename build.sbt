@@ -63,7 +63,7 @@ lazy val rating: Project = Project("rating", file("rating"))
   )
   .dependsOn(scalachess)
 
-lazy val tiebreaker: Project = Project("tiebreaker", file("tiebreaker"))
+lazy val tiebreak: Project = Project("tiebreak", file("tiebreak"))
   .settings(
     commonSettings,
     name := "scalachess-tiebreaker"
@@ -97,12 +97,12 @@ lazy val testKit = project
       "com.siriusxm"   %% "snapshot4s-munit"  % snapshot4sVersion % Test
     )
   )
-  .dependsOn(scalachess % "compile->compile", rating % "compile->compile", tiebreaker % "compile->compile")
+  .dependsOn(scalachess % "compile->compile", rating % "compile->compile", tiebreak % "compile->compile")
 
 lazy val root = project
   .in(file("."))
   .settings(publish := {}, publish / skip := true)
-  .aggregate(scalachess, rating, tiebreaker, playJson, testKit, bench)
+  .aggregate(scalachess, rating, tiebreak, playJson, testKit, bench)
 
 addCommandAlias("prepare", "scalafixAll; scalafmtAll")
 addCommandAlias("check", "; scalafixAll --check; scalafmtCheckAll")

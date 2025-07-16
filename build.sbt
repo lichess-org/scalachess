@@ -66,7 +66,7 @@ lazy val rating: Project = Project("rating", file("rating"))
 lazy val tiebreak: Project = Project("tiebreak", file("tiebreak"))
   .settings(
     commonSettings,
-    name := "scalachess-tiebreaker"
+    name := "scalachess-tiebreak"
   )
   .dependsOn(scalachess, rating)
 

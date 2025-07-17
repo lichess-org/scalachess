@@ -425,25 +425,25 @@ object Tiebreak:
 
   def apply[F[_]: Applicative](
       code: Code,
-      mkCutModifier: () => F[CutModifier],
-      mkLimitModifier: () => F[LimitModifier]
+      mkCutModifier: => F[CutModifier],
+      mkLimitModifier: => F[LimitModifier]
   ): F[Tiebreak] =
     code match
       case "BPG"  => NbBlackGames.pure[F]
       case "WON"  => NbWins.pure[F]
       case "BWG"  => NbBlackWins.pure[F]
-      case "BH"   => mkCutModifier().map(Buchholz.apply)
-      case "FB"   => mkCutModifier().map(ForeBuchholz.apply)
+      case "BH"   => mkCutModifier.map(Buchholz.apply)
+      case "FB"   => mkCutModifier.map(ForeBuchholz.apply)
       case "AOB"  => AverageOfOpponentsBuchholz.pure[F]
       case "DE"   => DirectEncounter.pure[F]
-      case "ARO"  => mkCutModifier().map(AverageRatingOfOpponents.apply)
+      case "ARO"  => mkCutModifier.map(AverageRatingOfOpponents.apply)
       case "APRO" => AveragePerformanceOfOpponents.pure[F]
       case "APPO" => AveragePerfectPerformanceOfOpponents.pure[F]
-      case "KS"   => mkLimitModifier().map(KoyaSystem.apply)
+      case "KS"   => mkLimitModifier.map(KoyaSystem.apply)
       case "TPR"  => TournamentPerformanceRating.pure[F]
       case "PTP"  => PerfectTournamentPerformance.pure[F]
-      case "SB"   => mkCutModifier().map(SonnebornBerger.apply)
-      case "PS"   => mkCutModifier().map(SumOfProgressiveScores.apply)
+      case "SB"   => mkCutModifier.map(SonnebornBerger.apply)
+      case "PS"   => mkCutModifier.map(SumOfProgressiveScores.apply)
 
   def compute(
       games: Map[PlayerId, Tiebreak.PlayerWithGames],

@@ -5,9 +5,8 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 import cats.syntax.all.*
-import chess.format.pgn.{ Fixtures, Reader }
-import chess.MoveOrDrop.situationAfter
-import chess.{ Hash, Situation }
+import chess.format.pgn.Fixtures
+import chess.{ Position, Hash, Replay }
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -21,33 +20,33 @@ class HashBench:
   // the unit of CPU work per iteration
   private val Work: Long = 10
 
-  var situations: List[Situation] = scala.compiletime.uninitialized
+  var boards: List[Position] = scala.compiletime.uninitialized
 
   @Setup
   def setup() =
     val results = for
-      results <- Fixtures.gamesForPerfTest.traverse(Reader.full(_))
+      results <- Fixtures.gamesForPerfTest.traverse(Replay.mainline(_))
       replays <- results.traverse(_.valid)
-    yield replays.flatMap(_.moves).map(_.situationAfter)
-    situations = results.toOption.get
+    yield replays.flatMap(_.moves).map(_.after)
+    boards = results.toOption.get
 
   @Benchmark
   def hashes(bh: Blackhole) =
-    val result = situations.map: x =>
+    val result = boards.map: x =>
       Blackhole.consumeCPU(Work)
       Hash(x)
     bh.consume(result)
 
   @Benchmark
   def repetition5(bh: Blackhole) =
-    val result = situations.map: x =>
+    val result = boards.map: x =>
       Blackhole.consumeCPU(Work)
-      x.board.history.fivefoldRepetition
+      x.history.fivefoldRepetition
     bh.consume(result)
 
   @Benchmark
   def repetition3(bh: Blackhole) =
-    val result = situations.map: x =>
+    val result = boards.map: x =>
       Blackhole.consumeCPU(Work)
-      x.board.history.threefoldRepetition
+      x.history.threefoldRepetition
     bh.consume(result)

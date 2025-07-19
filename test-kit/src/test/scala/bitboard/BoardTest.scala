@@ -4,7 +4,6 @@ package bitboard
 import chess.format.{ Fen, FullFen }
 
 import Square.*
-import Bitboard.*
 
 class BoardTest extends ChessTest:
 
@@ -13,15 +12,15 @@ class BoardTest extends ChessTest:
   given Conversion[Int, Square] = Square.unsafe(_)
 
   def parseFen(fen: FullFen): Board =
-    Fen.read(fen).map(_.board.board).getOrElse(throw RuntimeException("boooo"))
+    Fen.read(fen).map(_.board).getOrElse(throw RuntimeException("boooo"))
 
   test("generateMovesAt(square) = generateMoves.filter(_.orig == square)"):
     for
       fen <- FenFixtures.fens
-      situation = Fen.read(fen).getOrElse(throw RuntimeException("boooo"))
+      board = Fen.read(fen).getOrElse(throw RuntimeException("boooo"))
       sq <- Square.all
-      legalMoves   = situation.legalMoves.filter(_.orig == sq)
-      legalMovesAt = situation.generateMovesAt(sq)
+      legalMoves   = board.legalMoves.filter(_.orig == sq)
+      legalMovesAt = board.generateMovesAt(sq)
     yield assertEquals(legalMoves.toSet, legalMovesAt.toSet)
 
   test("discard an empty square returns the same board"):
@@ -32,6 +31,13 @@ class BoardTest extends ChessTest:
       if !board.isOccupied(s)
       newBoard = board.discard(s)
     yield assertEquals(newBoard, board)
+
+  test("pieceAt are consistent"):
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      s <- Square.all
+    yield assertEquals(board.pieceAt(s), board.pieceAt(s.file, s.rank))
 
   test("discard an occupied square returns a board with one piece left"):
     for
@@ -137,7 +143,7 @@ class BoardTest extends ChessTest:
   test("putOrReplace for every occupied square returns the same board"):
     for
       str <- FenFixtures.fens
-      board = parseFen(str)
+      board  = parseFen(str)
       result = board.occupied.fold(board) { (b, s) =>
         val piece = b.pieceAt(s).get
         b.putOrReplace(piece, s)
@@ -181,12 +187,20 @@ class BoardTest extends ChessTest:
       square <- Square.all
     yield assertEquals(board.isOccupied(square), board.pieceMap.contains(square))
 
-  test("isOccupied(piece) == true if pieces contains piece"):
+  test("contains(piece) == true if pieces contains piece"):
     for
       str <- FenFixtures.fens
       board = parseFen(str)
       piece <- board.pieces
-    yield assert(board.isOccupied(piece))
+    yield assert(board.contains(piece))
+
+  test("contains(piece) == contains(color, role)"):
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      role  <- Role.all
+      color <- Color.all
+    yield assertEquals(board.contains(Piece(color, role)), board.contains(color, role))
 
   test("move(x, x) always returns None"):
     for
@@ -224,7 +238,7 @@ class BoardTest extends ChessTest:
       from <- Square.all
       to   <- Square.all
       if from != to
-      moved = board.move(from, to)
+      moved      = board.move(from, to)
       takeAndPut = for
         piece     <- board.pieceAt(from)
         afterTake <- board.take(from)
@@ -239,7 +253,7 @@ class BoardTest extends ChessTest:
       from <- Square.all
       to   <- Square.all
       if from != to
-      taking = board.taking(from, to)
+      taking         = board.taking(from, to)
       takeAndReplace = for
         piece     <- board.pieceAt(from)
         afterTake <- board.take(from)
@@ -255,7 +269,7 @@ class BoardTest extends ChessTest:
       to    <- Square.all
       taken <- Square.all
       if taken != from && from != to && taken != to
-      taking <- board.taking(from, to, Some(taken))
+      taking            <- board.taking(from, to, Some(taken))
       takeAndPutAndTake <- for
         piece     <- board.pieceAt(from)
         afterTake <- board.take(from)
@@ -271,8 +285,8 @@ class BoardTest extends ChessTest:
       from <- Square.all
       to   <- Square.all
       if from != to && !board.isOccupied(to)
-      piece    = White.knight
-      promoted = board.promote(from, to, piece)
+      piece          = White.knight
+      promoted       = board.promote(from, to, piece)
       moveAndReplace = for
         moved    <- board.move(from, to)
         newBoard <- moved.replace(piece, to)
@@ -286,8 +300,8 @@ class BoardTest extends ChessTest:
       from <- Square.all
       to   <- Square.all
       if from != to && board.isOccupied(to)
-      piece    = White.knight
-      promoted = board.promote(from, to, piece)
+      piece            = White.knight
+      promoted         = board.promote(from, to, piece)
       takingAndReplace = for
         moved    <- board.taking(from, to)
         newBoard <- moved.replace(piece, to)

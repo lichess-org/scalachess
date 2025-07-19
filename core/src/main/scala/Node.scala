@@ -26,8 +26,8 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   final def withoutChild: TreeSelector[A, this.type] = withChild(none)
 
   final def isNode: Boolean = this match
-    case n: Node[A]      => true
-    case v: Variation[A] => false
+    case _: Node[A]      => true
+    case _: Variation[A] => false
 
   final def isVariation: Boolean = !this.isNode
 
@@ -46,7 +46,7 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   def variations: List[Tree[A]] =
     this match
       case n: Node[A]      => n.variations
-      case v: Variation[A] => Nil
+      case _: Variation[A] => Nil
 
   final def mainlineValues: List[A] =
     @tailrec
@@ -66,8 +66,8 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   final def findPathReserve[Id](path: List[Id])(using HasId[A, Id]): Option[List[Tree[A]]] =
     @tailrec
     def loop(tree: Tree[A], path: List[Id], acc: List[Tree[A]]): Option[List[Tree[A]]] = path match
-      case Nil                             => None
-      case head :: Nil if tree.hasId(head) => (tree :: acc).some
+      case Nil                              => None
+      case head :: Nil if tree.hasId(head)  => (tree :: acc).some
       case head :: rest if tree.hasId(head) =>
         tree.child match
           case None        => None
@@ -111,11 +111,11 @@ sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives 
   // if the tree has no child, add value as child
   // if the value has the same id as the child, merge the values
   // otherwise add value as a variation (and merge it to one of the existing variation if necessary)
-  final def addValueAsChild[Id](value: A)(using HasId[A, Id], Mergeable[A]): TreeSelector[A, this.type] =
+  final def addValueAsChild[Id](value: A)(using Mergeable[A]): TreeSelector[A, this.type] =
     addChild(Node(value))
 
   // Add a node as a child or child's variation
-  def addChild[Id](other: Node[A])(using HasId[A, Id], Mergeable[A]): TreeSelector[A, this.type] =
+  def addChild[Id](other: Node[A])(using Mergeable[A]): TreeSelector[A, this.type] =
     val newChild = child.fold(other)(_.mergeOrAddAsVariation(other))
     withChild(newChild.some)
 
@@ -153,6 +153,10 @@ final case class Node[A](
   lazy val mainline: List[Node[A]] =
     mainlineReverse.reverse
 
+  /*
+   * Return all nodes in the mainline but in reverse order
+   * Could be useful as a building block for other operations
+   */
   final def mainlineReverse: List[Node[A]] =
     @tailrec
     def loop(tree: Node[A], acc: List[Node[A]]): List[Node[A]] =
@@ -176,8 +180,10 @@ final case class Node[A](
           case Some(child) => loop(n - 1, child, node.withoutChild :: acc)
     Option.when(n > 0)(Tree.buildReverse(loop(n, this, Nil)).getOrElse(this))
 
-  // take nodes while mainline nodes satisfy the predicate
-  // keep all variations
+  /**
+   *  take nodes while mainline nodes satisfy the predicate
+    * keep all variations
+    */
   def takeMainlineWhile(f: A => Boolean): Option[Node[A]] =
     @tailrec
     def loop(node: Node[A], acc: List[Node[A]]): List[Node[A]] =
@@ -188,7 +194,7 @@ final case class Node[A](
           case Some(child) => loop(child, node.withoutChild :: acc)
     Tree.buildReverse(loop(this, Nil))
 
-  // get the nth node of in the mainline
+  /** get the nth node of in the mainline */
   def apply(n: Int): Option[Node[A]] =
     @tailrec
     def loop(tree: Option[Node[A]], n: Int): Option[Node[A]] =
@@ -198,41 +204,41 @@ final case class Node[A](
 
   def modifyChildAt[Id](path: List[Id], f: Node[A] => Option[Node[A]]): HasId[A, Id] ?=> Option[Node[A]] =
     path match
-      case Nil                             => f(this)
-      case head :: Nil if this.hasId(head) => child.map(c => withChild(f(c)))
+      case Nil                              => f(this)
+      case head :: Nil if this.hasId(head)  => child.map(c => withChild(f(c)))
       case head :: rest if this.hasId(head) =>
         child.flatMap(_.modifyChildAt(rest, f)) match
           case None    => None
           case Some(c) => copy(child = c.some).some
       case _ =>
-        variations.foldLeft((false, List.empty[Variation[A]])) {
-          case ((true, acc), n) => (true, acc :+ n)
-          case ((false, acc), n) =>
+        variations.mapAccumulate(false):
+          case (true, n)  => (true, n)
+          case (false, n) =>
             n.modifyChildAt(path, f) match
-              case Some(nn) => (true, acc :+ nn)
-              case None     => (false, acc :+ n)
-        } match
+              case Some(nn) => (true, nn)
+              case None     => (false, n)
+        match
           case (true, ns) => copy(variations = ns).some
           case (false, _) => none
 
   def modifyAt[Id](path: List[Id], f: TreeMapOption[A]): HasId[A, Id] ?=> Option[Node[A]] =
     path match
-      case Nil                             => None
-      case head :: Nil if this.hasId(head) => f(this)
+      case Nil                              => None
+      case head :: Nil if this.hasId(head)  => f(this)
       case head :: rest if this.hasId(head) =>
         child.flatMap(_.modifyAt(rest, f)) match
           case None    => None
           case Some(c) => copy(child = c.some).some
       case head :: _ =>
-        variations.foldLeft((false.some, List.empty[Variation[A]])):
-          case ((Some(true), acc), n) => (true.some, n :: acc)
-          case ((Some(fale), acc), n) if n.hasId(head) =>
+        variations.mapAccumulate(false.some):
+          case (Some(true), n)               => (true.some, n)
+          case (Some(_), n) if n.hasId(head) =>
             n.modifyAt(path, f) match
-              case None     => (None, n :: acc)
-              case Some(nn) => (true.some, nn :: acc)
-          case ((x, acc), n) => (x, n :: acc)
+              case None     => (None, n)
+              case Some(nn) => (true.some, nn)
+          case (x, n) => (x, n)
         match
-          case (Some(true), ns) => copy(variations = ns.reverse).some
+          case (Some(true), ns) => copy(variations = ns).some
           case _                => none
 
   // delete the node at the end of the path
@@ -240,15 +246,15 @@ final case class Node[A](
   // return Some(None) if the node is deleted
   def deleteAt[Id](path: List[Id])(using HasId[A, Id]): Option[Option[Node[A]]] =
     path match
-      case Nil                             => None
-      case head :: Nil if this.hasId(head) => Some(None)
+      case Nil                              => None
+      case head :: Nil if this.hasId(head)  => Some(None)
       case head :: rest if this.hasId(head) =>
         child.flatMap(_.deleteAt(rest)) match
           case None    => None
           case Some(c) => copy(child = c).some.some
       case head :: _ =>
         variations.foldLeft((false.some, List.empty[Variation[A]])) {
-          case ((Some(true), acc), n) => (true.some, n :: acc)
+          case ((Some(true), acc), n)                   => (true.some, n :: acc)
           case ((Some(false), acc), n) if n.hasId(head) =>
             n.deleteAt(path) match
               case None     => (None, n :: acc)
@@ -259,7 +265,7 @@ final case class Node[A](
           case _                => none
 
   def promoteToMainline[Id](path: List[Id])(using HasId[A, Id]): Option[Node[A]] = path match
-    case Nil => None
+    case Nil         => None
     case head :: Nil =>
       promote(head)
     case head :: rest =>
@@ -270,14 +276,14 @@ final case class Node[A](
   // find the lastest variation in the path
   // promote it into mainline
   def promote[Id](path: List[Id])(using HasId[A, Id]): Option[Node[A]] = path match
-    case Nil => None
+    case Nil       => None
     case head :: _ =>
       findPathReserve(path).flatMap: ps =>
         if ps.forall(_.isVariation) then this.promote(head)
         else if ps.forall(_.isNode) then None
         else
           ps.dropWhile(_.isNode).dropWhile(_.isVariation) match
-            case Nil => this.promote(head)
+            case Nil  => this.promote(head)
             case rest =>
               val swappingNodePath = rest.map(_.id).reverse
               path
@@ -291,7 +297,7 @@ final case class Node[A](
     if this.hasId(id) then this.some
     else
       variations.find(_.hasId(id)) match
-        case None => None
+        case None    => None
         case Some(v) =>
           val vs = this.toVariations.removeById(id)
           v.toNode.withVariations(vs).some
@@ -319,7 +325,7 @@ final case class Node[A](
   // should we promote a variation to mainline if the f(value) is None?
   def mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): (S, Option[Node[B]]) =
     f(init, value) match
-      case (s1, None) => (s1, None)
+      case (s1, None)    => (s1, None)
       case (s1, Some(b)) =>
         val vs = variations.map(_.mapAccumlOption(init)(f)._2).flatten
         child.map(_.mapAccumlOption(s1)(f)) match
@@ -341,6 +347,9 @@ final case class Node[A](
   def modifyInMainline(predicate: A => Boolean, f: Node[A] => Node[A]): Option[Node[A]] =
     if predicate(value) then f(this).some
     else child.flatMap(_.modifyInMainline(predicate, f)).map(c => withChild(c.some))
+
+  def modifyInMainline(f: A => A): Node[A] =
+    copy(value = f(value), child = child.map(_.modifyInMainline(f)))
 
   def modifyInMainlineAt(n: Int, f: Node[A] => Node[A]): Option[Node[A]] =
     if n < 0 || n >= mainline.size then none
@@ -431,8 +440,8 @@ final case class Variation[A](override val value: A, override val child: Option[
       f: Node[A] => Option[Node[A]]
   ): HasId[A, Id] ?=> Option[Variation[A]] =
     path match
-      case Nil                             => None
-      case head :: Nil if this.hasId(head) => child.map(c => withChild(f(c)))
+      case Nil                              => None
+      case head :: Nil if this.hasId(head)  => child.map(c => withChild(f(c)))
       case head :: rest if this.hasId(head) =>
         child.flatMap(_.modifyChildAt(rest, f)) match
           case None    => None
@@ -441,8 +450,8 @@ final case class Variation[A](override val value: A, override val child: Option[
 
   def modifyAt[Id](path: List[Id], f: TreeMapOption[A]): HasId[A, Id] ?=> Option[Variation[A]] =
     path match
-      case Nil                             => None
-      case head :: Nil if this.hasId(head) => f(this)
+      case Nil                              => None
+      case head :: Nil if this.hasId(head)  => f(this)
       case head :: rest if this.hasId(head) =>
         child.flatMap(_.modifyAt(rest, f)) match
           case None    => None
@@ -454,8 +463,8 @@ final case class Variation[A](override val value: A, override val child: Option[
   // return Some(None) if the node is deleted
   def deleteAt[Id](path: List[Id])(using HasId[A, Id]): Option[Option[Variation[A]]] =
     path match
-      case Nil                             => None
-      case head :: Nil if this.hasId(head) => Some(None)
+      case Nil                              => None
+      case head :: Nil if this.hasId(head)  => Some(None)
       case head :: rest if this.hasId(head) =>
         child.flatMap(_.deleteAt(rest)) match
           case None    => None
@@ -478,7 +487,7 @@ final case class Variation[A](override val value: A, override val child: Option[
   // should we promote a variation to mainline if the f(value) is None?
   def mapAccumlOption[S, B](init: S)(f: (S, A) => (S, Option[B])): (S, Option[Variation[B]]) =
     f(init, value) match
-      case (s1, None) => (s1, None)
+      case (s1, None)    => (s1, None)
       case (s1, Some(b)) =>
         child.map(_.mapAccumlOption(s1)(f)) match
           case None    => (s1, Variation(b, None).some)

@@ -1,5 +1,5 @@
 package chess
-import chess.bitboard.Bitboard
+
 import chess.variant.Crazyhouse.Data
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop.{ forAll, propBoolean }
@@ -47,7 +47,7 @@ class CrazyhouseDataTest extends ScalaCheckSuite:
   property("store and drop multiple pieces with promotion"):
     forAll: (ps: List[Piece], square: Square, promoted: Bitboard) =>
       val filtered = ps.filter(_.role != King)
-      val data = filtered.foldLeft(Data.init.copy(promoted = promoted)) { (data, piece) =>
+      val data     = filtered.foldLeft(Data.init.copy(promoted = promoted)) { (data, piece) =>
         data.store(piece, square)
       }
       assertEquals(data.size, filtered.size)

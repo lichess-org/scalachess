@@ -9,7 +9,7 @@ import scala.util.NotGiven
 
 case class ByColor[A](white: A, black: A):
 
-  inline def apply(inline color: Color) = if color.white then white else black
+  inline def apply(inline color: Color): A = if color.white then white else black
 
   inline def apply[B](inline color: Color)(f: A => B): B = if color.white then f(white) else f(black)
 
@@ -21,7 +21,7 @@ case class ByColor[A](white: A, black: A):
     if color.white then f(white).map(w => copy(white = w))
     else f(black).map(b => copy(black = b))
 
-  def map[B](fw: A => B, fb: A => B) = ByColor(fw(white), fb(black))
+  def map[B](fw: A => B, fb: A => B): ByColor[B] = ByColor(fw(white), fb(black))
 
   def map[B](f: A => B): ByColor[B]                 = map(f, f)
   def mapList[B](f: A => B): List[B]                = List(f(white), f(black))
@@ -43,16 +43,16 @@ case class ByColor[A](white: A, black: A):
   def fold[B](init: B)(f: (B, Color, A) => B): B = f(f(init, White, white), Black, black)
 
   def foreach[U](f: A => U): Unit =
-    f(white)
-    f(black)
+    f(white): Unit
+    f(black): Unit
 
   def foreach[U](f: (Color, A) => U): Unit =
-    f(White, white)
-    f(Black, black)
+    f(White, white): Unit
+    f(Black, black): Unit
 
-  def forall(pred: A => Boolean) = pred(white) && pred(black)
+  def forall(pred: A => Boolean): Boolean = pred(white) && pred(black)
 
-  def exists(pred: A => Boolean) = pred(white) || pred(black)
+  def exists(pred: A => Boolean): Boolean = pred(white) || pred(black)
 
   def swap: ByColor[A] = copy(white = black, black = white)
 
@@ -112,7 +112,7 @@ object ByColor:
     def zero = ByColor.fill(Zero[A].zero)
 
   given [A: Monoid]: Monoid[ByColor[A]] with
-    def empty = ByColor.fill(Monoid[A].empty)
+    def empty                                 = ByColor.fill(Monoid[A].empty)
     def combine(x: ByColor[A], y: ByColor[A]) =
       ByColor(Monoid[A].combine(x.white, y.white), Monoid[A].combine(x.black, y.black))
 
@@ -129,7 +129,7 @@ object ByColor:
     def traverse[G[_]: Applicative, A, B](fa: ByColor[A])(f: A => G[B]): G[ByColor[B]] =
       fa.traverse(f)
 
-    def pure[A](a: A): ByColor[A] = ByColor.fill(a)
+    def pure[A](a: A): ByColor[A]                                 = ByColor.fill(a)
     def ap[A, B](ff: ByColor[A => B])(fa: ByColor[A]): ByColor[B] =
       ByColor(ff.white(fa.white), ff.black(fa.black))
 

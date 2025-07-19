@@ -48,7 +48,7 @@ trait Mergeable[A]:
       @tailrec
       def loop(acc: List[A], rest: List[A]): List[A] =
         rest match
-          case Nil => acc :+ v
+          case Nil     => acc :+ v
           case y :: ys =>
             y.merge(v) match
               case Some(m) => acc ++ (m +: ys)

@@ -1,11 +1,11 @@
 package chess
-package bitboard
 
 import scala.annotation.targetName
 
+import bitboard.Attacks.*
+
 opaque type Bitboard = Long
 object Bitboard:
-  import Attacks.*
 
   inline def apply(inline l: Long): Bitboard              = l
   inline def apply(inline xs: Iterable[Square]): Bitboard = xs.foldLeft(empty)((b, s) => b | s.bl)
@@ -31,24 +31,6 @@ object Bitboard:
   def aligned(a: Square, b: Square, c: Square): Boolean = ray(a, b).contains(c)
   def between(a: Square, b: Square): Bitboard           = BETWEEN(a.value)(b.value)
 
-  extension (s: Square)
-
-    def bishopAttacks(occupied: Bitboard): Bitboard =
-      ATTACKS(Magic.BISHOP(s.value).bitshopIndex(occupied))
-
-    def rookAttacks(occupied: Bitboard): Bitboard =
-      ATTACKS(Magic.ROOK(s.value).rookIndex(occupied))
-
-    def queenAttacks(occupied: Bitboard): Bitboard =
-      bishopAttacks(occupied) ^ rookAttacks(occupied)
-
-    def pawnAttacks(color: Color): Bitboard =
-      color.fold(WHITE_PAWN_ATTACKS(s.value), BLACK_PAWN_ATTACKS(s.value))
-
-    def kingAttacks: Bitboard = KING_ATTACKS(s.value)
-
-    def knightAttacks: Bitboard = KNIGHT_ATTACKS(s.value)
-
   extension (l: Long)
     private def lsb: Square = Square.unsafe(java.lang.Long.numberOfTrailingZeros(l))
     private def msb: Square = Square.unsafe(63 - java.lang.Long.numberOfLeadingZeros(l))
@@ -68,11 +50,28 @@ object Bitboard:
     @targetName("or")
     inline infix def |(o: Bitboard): Bitboard = (a | o)
 
-    def isEmpty: Boolean  = a == empty
-    def nonEmpty: Boolean = !isEmpty
+    inline def isEmpty: Boolean  = a == 0L
+    inline def nonEmpty: Boolean = !isEmpty
 
-    def contains(square: Square): Boolean =
+    inline def supersetOf(l: Long): Boolean =
+      (a & l) == l
+
+    @targetName("superSetOfB")
+    inline def supersetOf(o: Bitboard): Boolean =
+      (a & o) == o
+
+    inline def subsetOf(l: Long): Boolean =
+      (a & l) == a
+
+    @targetName("subSetOfB")
+    inline def subsetOf(o: Bitboard): Boolean =
+      (a & o) == a
+
+    inline def contains(square: Square): Boolean =
       (a & (1L << square.value)) != 0L
+
+    inline def contains(file: File, rank: Rank): Boolean =
+      (a & file.bb & rank.bb) != 0L
 
     def add(square: Square): Bitboard    = a | square.bl
     def remove(square: Square): Bitboard = a & ~square.bl
@@ -103,7 +102,7 @@ object Bitboard:
     // remove the last/largest non empty square
     def removeLast: Bitboard = a & ~a.msb.bl
 
-    def isolateFirst: Bitboard = Bitboard(a & -a)
+    def isolateFirst: Bitboard = a & -a
 
     def isolateLast: Bitboard = last.fold(empty)(_.bl)
 
@@ -131,7 +130,9 @@ object Bitboard:
         b &= (b - 1L)
       builder.result
 
-    // min square in the bitboard if it is not empty
+    def toSet: Set[Square] =
+      squares.toSet
+
     def first[B](f: Square => Option[B]): Option[B] =
       var b                 = a
       var result: Option[B] = None
@@ -141,7 +142,6 @@ object Bitboard:
         b &= (b - 1L)
       result
 
-    // max square in the bitboard if it is not empty
     def last[B](f: Square => Option[B]): Option[B] =
       var b                 = a
       var result: Option[B] = None
@@ -151,6 +151,7 @@ object Bitboard:
         b &= ~b.msb.bl
       result
 
+    // the smallest square that satisfies the predicate
     def find(f: Square => Boolean): Option[Square] =
       var b                      = a
       var result: Option[Square] = None
@@ -160,6 +161,7 @@ object Bitboard:
         b &= (b - 1L)
       result
 
+    // the larget square that satisfies the predicate
     def findLast(f: Square => Boolean): Option[Square] =
       var b                      = a
       var result: Option[Square] = None
@@ -197,7 +199,7 @@ object Bitboard:
         f(b.lsb)
         b &= (b - 1L)
 
-    def forall[B](f: Square => Boolean): Boolean =
+    def forall(f: Square => Boolean): Boolean =
       var b      = a
       var result = true
       while b != 0L && result
@@ -206,7 +208,7 @@ object Bitboard:
         b &= (b - 1L)
       result
 
-    def exists[B](f: Square => Boolean): Boolean =
+    def exists(f: Square => Boolean): Boolean =
       var b      = a
       var result = false
       while b != 0L && !result
@@ -236,15 +238,12 @@ object Bitboard:
     def iterator: Iterator[Square] = new:
       private var b                        = a
       override inline def hasNext: Boolean = b != 0L
-      override inline def next: Square =
+      override inline def next: Square     =
         val result = b.lsb
         b &= (b - 1L)
         result
 
-    // TODO: nice to have, faster.
-    // but should only be used for debug
-    // TODO: override toString?
-    def display: String =
+    def debug: String =
       val builder = StringBuilder()
       Rank.allReversed.foreach: r =>
         File.all.foreach: f =>

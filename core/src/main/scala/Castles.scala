@@ -2,7 +2,6 @@ package chess
 
 import scala.annotation.targetName
 
-import bitboard.Bitboard
 import Square.*
 
 opaque type Castles = Long
@@ -46,9 +45,10 @@ object Castles:
     @targetName("orB")
     inline infix def |(o: Bitboard): Castles = c | o.value
 
-    def value: Long     = c
-    def display: String = Bitboard(c).display // TODO: override tostring if possible
-    def contains(square: Square): Boolean =
+    inline def value: Long  = c
+    inline def bb: Bitboard = Bitboard(c)
+
+    inline def contains(inline square: Square): Boolean =
       (c & (1L << square.value)) != 0L
 
     def addSquare(square: Square): Castles = c | square.bl
@@ -72,12 +72,10 @@ object Castles:
       blackKingSide: Boolean,
       blackQueenSide: Boolean
   ): Castles =
-    whiteKingSide.at(White.kingSide) |
-      whiteQueenSide.at(White.queenSide) |
-      blackKingSide.at(Black.kingSide) |
-      blackQueenSide.at(Black.queenSide)
+    whiteKingSide.at(White.kingSide) | whiteQueenSide.at(White.queenSide) |
+      blackKingSide.at(Black.kingSide) | blackQueenSide.at(Black.queenSide)
 
-  def apply(l: Long): Castles = init & l
+  inline def apply(inline l: Long): Castles = init & l
 
   @targetName("applyBitboard")
   def apply(bb: Bitboard): Castles = init & bb.value

@@ -171,7 +171,7 @@ class ParserTest extends ChessTest:
 
   def verifyMainlineWithMetas(pgns: List[String]) =
     val expected = pgns.map(PgnStr(_)).traverse(parse).toOption.get.map(_.mainlineWithMetas)
-    val mainline = pgns.map(PgnStr(_)).traverse(parseMainlineWithMetas).toOption.get.map(_.sans)
+    val mainline = pgns.map(PgnStr(_)).traverse(parseMainlineWithMetas).toOption.get.map(_.moves)
     assertEquals(mainline, expected)
 
   test("mainline == full.mainline"):
@@ -191,7 +191,7 @@ class ParserTest extends ChessTest:
 
   def verifyMainline(pgns: List[String]) =
     val expected = pgns.map(PgnStr(_)).traverse(parse).toOption.get.map(_.mainline)
-    val mainline = pgns.map(PgnStr(_)).traverse(parseMainline).toOption.get.map(_.sans)
+    val mainline = pgns.map(PgnStr(_)).traverse(parseMainline).toOption.get.map(_.moves)
     assertEquals(mainline, expected)
 
   (shortCastles ++ longCastles ++ annotatedCastles).foreach: sans =>

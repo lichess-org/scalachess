@@ -19,12 +19,12 @@ class ParserCheck extends ScalaCheckSuite:
     forAll(genPgn(Standard.initialPosition)): pgn =>
       val str      = pgn.render
       val expected = Parser.full(str).toOption.map(_.mainlineWithMetas)
-      val mainline = Parser.mainlineWithMetas(str).toOption.map(_.sans)
+      val mainline = Parser.mainlineWithMetas(str).toOption.map(_.moves)
       assertEquals(mainline, expected)
 
   test("mainlineWithSan == full.mainline"):
     forAll(genPgn(Standard.initialPosition)): pgn =>
       val str      = pgn.render
       val expected = Parser.full(str).toOption.map(_.mainline)
-      val mainline = Parser.mainline(str).toOption.map(_.sans)
+      val mainline = Parser.mainline(str).toOption.map(_.moves)
       assertEquals(mainline, expected)

@@ -421,7 +421,7 @@ object Tiebreak:
       Set("BPG", "WON", "BWG", "BH", "FB", "AOB", "DE", "ARO", "APRO", "APPO", "KS", "TPR", "PTP", "SB", "PS")
 
     def fromString(str: String): Option[Code] =
-      all.find(_ == str)
+      all.contains(str).option(str)
 
   def apply[F[_]: Applicative](
       code: Code,

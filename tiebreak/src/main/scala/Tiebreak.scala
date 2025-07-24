@@ -420,11 +420,12 @@ object Tiebreak:
     "PTP" | "SB" | "PS"
 
   object Code:
-    val all: Set[Code] =
-      Set("BPG", "WON", "BWG", "BH", "FB", "AOB", "DE", "ARO", "APRO", "APPO", "KS", "TPR", "PTP", "SB", "PS")
 
-    def fromString(str: String): Option[Code] =
-      all.contains(str).option(str)
+    //format: off
+    private val all: List[Code] = List("BPG", "WON", "BWG", "BH", "FB", "AOB", "DE", "ARO", "APRO", "APPO", "KS", "TPR", "PTP", "SB", "PS")
+    //format: on
+
+    val byStr: Map[String, Code] = all.mapBy(_.toString)
 
   def apply[F[_]: Applicative](
       code: Code,

@@ -402,6 +402,9 @@ enum CutModifier(val code: String, val name: String, val top: Int, val bottom: I
     if this == CutModifier.None then name
     else s"$name ${this.name}"
 
+object CutModifier:
+  val byCode = values.mapBy(_.code)
+
 opaque type LimitModifier = Float
 object LimitModifier:
   def apply(value: Float): Option[LimitModifier] =

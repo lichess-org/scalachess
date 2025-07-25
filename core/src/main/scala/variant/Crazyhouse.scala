@@ -15,7 +15,7 @@ case object Crazyhouse
       standardInitialPosition = true
     ):
 
-  override val initialBoard: Board               = Board.standard
+  override val initialBoard: Board = Board.standard
   override def initialPieces: Map[Square, Piece] = initialBoard.pieceMap
 
   override val initialFen: FullFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR/ w KQkq - 0 1")
@@ -36,7 +36,7 @@ case object Crazyhouse
   override def drop(position: Position, role: Role, square: Square): Either[ErrorStr, Drop] =
     for
       d1 <- position.crazyData.toRight(ErrorStr("Position has no crazyhouse data"))
-      _  <- Either.cond((role != Pawn || canDropPawnOn(square)), d1, ErrorStr(s"Can't drop $role on $square"))
+      _ <- Either.cond((role != Pawn || canDropPawnOn(square)), d1, ErrorStr(s"Can't drop $role on $square"))
       piece = Piece(position.color, role)
       d2 <- d1.drop(piece).toRight(ErrorStr(s"No $piece to drop on $square"))
       b1 <- position.board
@@ -62,7 +62,7 @@ case object Crazyhouse
 
   // there is always sufficient mating material in Crazyhouse
   override def opponentHasInsufficientMaterial(position: Position): Boolean = false
-  override def isInsufficientMaterial(position: Position): Boolean          = false
+  override def isInsufficientMaterial(position: Position): Boolean = false
 
   // if the king is not in check, all drops are possible, we just return None
   // king is in single check, we return the squares between the king and the checker
@@ -128,7 +128,7 @@ case object Crazyhouse
           to <- if role == Pawn then targets & ~Bitboard.firstRank & ~Bitboard.lastRank else targets
           piece = Piece(position.color, role)
           after <- position.board.put(piece, to)
-          d2    <- data.drop(piece)
+          d2 <- data.drop(piece)
         yield Drop(piece, to, position, position.withBoard(after).withCrazyData(d2))
 
   type Pockets = ByColor[Pocket]
@@ -157,7 +157,7 @@ case object Crazyhouse
       if promoted.contains(orig) then copy(promoted = promoted.move(orig, dest)) else this
 
     def isEmpty = pockets.forall(_.isEmpty)
-    def size    = pockets.reduce(_.size + _.size)
+    def size = pockets.reduce(_.size + _.size)
 
   object Data:
     val init: Data = Data(Pockets.empty, Bitboard.empty)
@@ -175,32 +175,32 @@ case object Crazyhouse
   case class Pocket(pawn: Int, knight: Int, bishop: Int, rook: Int, queen: Int):
 
     def forsythUpper: String = forsyth.toUpperCase
-    def forsyth: String      = forsyth(pawn, 'p') + forsyth(knight, 'n') +
+    def forsyth: String = forsyth(pawn, 'p') + forsyth(knight, 'n') +
       forsyth(bishop, 'b') + forsyth(rook, 'r') + forsyth(queen, 'q')
 
     def forsyth(role: Int, char: Char): String = List.fill(role)(char).mkString
 
-    def size: Int           = pawn + knight + bishop + rook + queen
-    def isEmpty: Boolean    = size == 0
-    def nonEmpty: Boolean   = size > 0
+    def size: Int = pawn + knight + bishop + rook + queen
+    def isEmpty: Boolean = size == 0
+    def nonEmpty: Boolean = size > 0
     def hasNonPawn: Boolean = knight + bishop + rook + queen > 0
 
     def contains(r: Role): Boolean = r match
-      case Pawn   => pawn > 0
+      case Pawn => pawn > 0
       case Knight => knight > 0
       case Bishop => bishop > 0
-      case Rook   => rook > 0
-      case Queen  => queen > 0
-      case King   => false
+      case Rook => rook > 0
+      case Queen => queen > 0
+      case King => false
 
     def apply(role: Role): Option[Int] =
       role match
-        case Pawn   => Some(pawn)
+        case Pawn => Some(pawn)
         case Knight => Some(knight)
         case Bishop => Some(bishop)
-        case Rook   => Some(rook)
-        case Queen  => Some(queen)
-        case King   => None
+        case Rook => Some(rook)
+        case Queen => Some(queen)
+        case King => None
 
     def take(role: Role): Option[Pocket] =
       update(role, (x => Option.when(x > 0)(x - 1)))
@@ -208,20 +208,20 @@ case object Crazyhouse
     def store(role: Role): Pocket = update(role, _ + 1)
 
     def update(role: Role, f: Int => Int): Pocket = role match
-      case Pawn   => copy(pawn = f(pawn))
+      case Pawn => copy(pawn = f(pawn))
       case Knight => copy(knight = f(knight))
       case Bishop => copy(bishop = f(bishop))
-      case Rook   => copy(rook = f(rook))
-      case Queen  => copy(queen = f(queen))
-      case King   => this
+      case Rook => copy(rook = f(rook))
+      case Queen => copy(queen = f(queen))
+      case King => this
 
     def update(role: Role, f: Int => Option[Int]): Option[Pocket] = role match
-      case Pawn   => f(pawn).map(x => copy(pawn = x))
+      case Pawn => f(pawn).map(x => copy(pawn = x))
       case Knight => f(knight).map(x => copy(knight = x))
       case Bishop => f(bishop).map(x => copy(bishop = x))
-      case Rook   => f(rook).map(x => copy(rook = x))
-      case Queen  => f(queen).map(x => copy(queen = x))
-      case King   => None
+      case Rook => f(rook).map(x => copy(rook = x))
+      case Queen => f(queen).map(x => copy(queen = x))
+      case King => None
 
     def flatMap[B](f: (Role, Int) => IterableOnce[B]): List[B] =
       List(f(Pawn, pawn), f(Knight, knight), f(Bishop, bishop), f(Rook, rook), f(Queen, queen)).flatten
@@ -240,44 +240,44 @@ case object Crazyhouse
     val empty: Pocket = Pocket(0, 0, 0, 0, 0)
 
     def apply(roles: Seq[Role]): Pocket =
-      var pawn   = 0
+      var pawn = 0
       var knight = 0
       var bishop = 0
-      var rook   = 0
-      var queen  = 0
+      var rook = 0
+      var queen = 0
       roles.foreach:
-        case Pawn   => pawn += 1
+        case Pawn => pawn += 1
         case Knight => knight += 1
         case Bishop => bishop += 1
-        case Rook   => rook += 1
-        case Queen  => queen += 1
-        case King   =>
+        case Rook => rook += 1
+        case Queen => queen += 1
+        case King =>
       Pocket(pawn, knight, bishop, rook, queen)
 
   object Pockets:
     inline def apply(pieces: Seq[Piece]): Pockets =
-      var whitePawn   = 0
+      var whitePawn = 0
       var whiteKnight = 0
       var whiteBishop = 0
-      var whiteRook   = 0
-      var whiteQueen  = 0
-      var blackPawn   = 0
+      var whiteRook = 0
+      var whiteQueen = 0
+      var blackPawn = 0
       var blackKnight = 0
       var blackBishop = 0
-      var blackRook   = 0
-      var blackQueen  = 0
+      var blackRook = 0
+      var blackQueen = 0
       pieces.foreach:
-        case Piece(White, Pawn)   => whitePawn += 1
+        case Piece(White, Pawn) => whitePawn += 1
         case Piece(White, Knight) => whiteKnight += 1
         case Piece(White, Bishop) => whiteBishop += 1
-        case Piece(White, Rook)   => whiteRook += 1
-        case Piece(White, Queen)  => whiteQueen += 1
-        case Piece(Black, Pawn)   => blackPawn += 1
+        case Piece(White, Rook) => whiteRook += 1
+        case Piece(White, Queen) => whiteQueen += 1
+        case Piece(Black, Pawn) => blackPawn += 1
         case Piece(Black, Knight) => blackKnight += 1
         case Piece(Black, Bishop) => blackBishop += 1
-        case Piece(Black, Rook)   => blackRook += 1
-        case Piece(Black, Queen)  => blackQueen += 1
-        case Piece(_, King)       =>
+        case Piece(Black, Rook) => blackRook += 1
+        case Piece(Black, Queen) => blackQueen += 1
+        case Piece(_, King) =>
       ByColor(
         Pocket(whitePawn, whiteKnight, whiteBishop, whiteRook, whiteQueen),
         Pocket(blackPawn, blackKnight, blackBishop, blackRook, blackQueen)

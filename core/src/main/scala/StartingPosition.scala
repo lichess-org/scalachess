@@ -209,5 +209,5 @@ object StartingPosition:
     OpeningDb.findByStandardFen(fen).map(StartingPosition(_, featurable))
 
   object presets:
-    val halloween    = of(StandardFen("r1bqkb1r/pppp1ppp/2n2n2/4N3/4P3/2N5/PPPP1PPP/R1BQKB1R b KQkq -"))
+    val halloween = of(StandardFen("r1bqkb1r/pppp1ppp/2n2n2/4N3/4P3/2N5/PPPP1PPP/R1BQKB1R b KQkq -"))
     val frankenstein = of(StandardFen("rnbqkb1r/pppp1ppp/8/4p3/2B1n3/2N5/PPPP1PPP/R1BQK1NR w KQkq -"))

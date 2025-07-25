@@ -10,9 +10,9 @@ import cats.syntax.all.*
 object Parser:
 
   // https://unicode-explorer.com/c/00A0
-  private val nbsp       = P.char('\u00A0')
+  private val nbsp = P.char('\u00A0')
   private val whitespace = R.cr | R.lf | R.wsp | nbsp | P.char('\uFEFF')
-  val pgnComment         = P.caret.filter(_.col == 0) *> P.char('%') *> P.until(P.char('\n')).void
+  val pgnComment = P.caret.filter(_.col == 0) *> P.char('%') *> P.until(P.char('\n')).void
   // pgnComment with % or whitespaces
   private val escape = pgnComment.? *> whitespace.rep0.?
 
@@ -54,9 +54,9 @@ object Parser:
   def san(str: SanStr): Either[ErrorStr, San] =
     simpleSan.parse(str.value, "Error parsing move")
 
-  private val blockComment  = P.until0(P.char('}')).with1.between(P.char('{'), P.char('}')).map(Comment(_))
+  private val blockComment = P.until0(P.char('}')).with1.between(P.char('{'), P.char('}')).map(Comment(_))
   private val inlineComment = P.char(';') *> P.until(R.lf).map(Comment(_))
-  private val comment       = (blockComment | inlineComment).withContext("Invalid comment") <* escape
+  private val comment = (blockComment | inlineComment).withContext("Invalid comment") <* escape
 
   private def mapResult(result: String): String = Outcome.fromResult(result).fold(result)(_.toString)
 
@@ -84,8 +84,8 @@ object Parser:
     .?
     .flatMap(o => o.fold(P.unit)(_ => P.failWith("Null moves are not supported").void))
 
-  private val preMoveEscape  = ((number.backtrack | comment).rep0 ~ forbidNullMove).void
-  private val moveAndMetas   = SanParser.san ~ SanParser.metas
+  private val preMoveEscape = ((number.backtrack | comment).rep0 ~ forbidNullMove).void
+  private val moveAndMetas = SanParser.san ~ SanParser.metas
   private val postMoveEscape = moveExtras.rep0.void <* escape
 
   private val simpleSan: P[San] =
@@ -112,7 +112,7 @@ object Parser:
         (P.char('(') *> comment.rep0.surroundedBy(escape) ~ recurse.rep0 <* (P.char(')') ~ escape))
           .map((comments, sans) =>
             sans match
-              case Nil     => None
+              case Nil => None
               case x :: xs =>
                 Variation(x.value.copy(variationComments = comments.cleanUp), Tree.build(xs)).some
           )
@@ -135,7 +135,7 @@ object Parser:
     val rankMap = Rank.all.mapBy(_.char)
 
     val glyph: P[Glyph] = mapParser(Glyph.MoveAssessment.all.mapBy(_.symbol), "glyph")
-    val glyphs          = glyph.rep0.map(Glyphs.fromList)
+    val glyphs = glyph.rep0.map(Glyphs.fromList)
 
     val capture = P.char('x').?.map(_.isDefined)
 
@@ -194,7 +194,7 @@ object Parser:
     val castleQSide = List("O-O-O", "o-o-o", "0-0-0", "O‑O‑O", "o‑o‑o", "0‑0‑0", "O–O–O", "o–o–o", "0–0–0")
     val qCastle: P[Side] = P.stringIn(castleQSide).as(QueenSide)
 
-    val castleKSide      = List("O-O", "o-o", "0-0", "O‑O", "o‑o", "0‑0", "O–O", "o–o", "0–0")
+    val castleKSide = List("O-O", "o-o", "0-0", "O‑O", "o‑o", "0‑0", "O–O", "o–o", "0–0")
     val kCastle: P[Side] = P.stringIn(castleKSide).as(KingSide)
 
     val castle: P[San] = (qCastle | kCastle).withString.map((side, raw) => Castle(side, raw.some))
@@ -222,17 +222,17 @@ object Parser:
     val tagName: P[String] = R.alpha.rep.string.withContext("Tag name can only contains alphabet characters")
     val escaped: P[String] = P.char('\\') *> (R.dquote | P.char('\\')).string
     val valueChar: P[String] = escaped | P.charWhere(_ != '"').string
-    val tagValue: P[String]  = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
-    val tagContent: P[Tag]   = ((tagName <* R.wsp.rep) ~ tagValue).map(Tag(_, _))
-    val tag: P[Tag]          = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
-    val tags: P0[List[Tag]]  = tag.rep0
+    val tagValue: P[String] = valueChar.rep0.map(_.mkString).with1.surroundedBy(R.dquote)
+    val tagContent: P[Tag] = ((tagName <* R.wsp.rep) ~ tagValue).map(Tag(_, _))
+    val tag: P[Tag] = tagContent.between(P.char('['), P.char(']')) <* whitespace.rep0
+    val tags: P0[List[Tag]] = tag.rep0
 
   private val tagsAndMovesParser: P0[ParsedPgn] =
     (TagParser.tags.surroundedBy(escape) ~ fullMovesParser.?)
       .map: (optionalTags, optionalMoves) =>
         val preTags = Tags.sanitize(optionalTags)
         optionalMoves match
-          case None                        => ParsedPgn(InitialComments.empty, preTags, None)
+          case None => ParsedPgn(InitialComments.empty, preTags, None)
           case Some((init, nodes, result)) =>
             ParsedPgn(init, updateTagsWithResult(preTags, result), Tree.build(nodes))
 
@@ -242,7 +242,7 @@ object Parser:
     (TagParser.tags.surroundedBy(escape) ~ p.?).map: (optionalTags, optionalMoves) =>
       val preTags = Tags.sanitize(optionalTags)
       optionalMoves match
-        case None                       => ParsedMainline(InitialComments.empty, preTags, Nil)
+        case None => ParsedMainline(InitialComments.empty, preTags, Nil)
         case Some((init, sans, result)) =>
           ParsedMainline(init, updateTagsWithResult(preTags, result), sans)
 
@@ -252,7 +252,7 @@ object Parser:
   private inline def escapePgnTag[A](p: P0[A]): P0[A] =
     escape *> P.string("[pgn]").? *> p <* P.string("[/pgn]").? <* escape
 
-  private val tagsParser               = TagParser.tags.surroundedBy(escape)
+  private val tagsParser = TagParser.tags.surroundedBy(escape)
   private val pgnParser: P0[ParsedPgn] = escapePgnTag(tagsAndMovesParser)
 
   private val pgnMainlineParser: P0[ParsedMainline[SanWithMetas]] =
@@ -266,8 +266,8 @@ object Parser:
       p.parse(str).bimap(showExpectations(context, str), _._2)
 
   private def showExpectations(context: String, str: String)(error: P.Error): ErrorStr =
-    val lm    = LocationMap(str)
-    val idx   = error.failedAtOffset
+    val lm = LocationMap(str)
+    val idx = error.failedAtOffset
     val caret = lm.toCaret(idx).getOrElse(throw RuntimeException("This is impossible"))
     ErrorStr:
       s"$context: ${expToString(error.expected.head)} at line ${caret.line + 1}, column ${caret.col + 1}"
@@ -277,16 +277,16 @@ object Parser:
       case Expectation.OneOfStr(_, strs) =>
         strs match
           case one :: Nil => s"expected: $one"
-          case _          => s"expected one of: $strs"
+          case _ => s"expected one of: $strs"
       case Expectation.InRange(_, lower, upper) =>
         if lower == upper then s"expected: $lower"
         else s"expected char in range: [$lower, $upper]"
-      case Expectation.StartOfString(_)            => "expected start of the file"
-      case Expectation.EndOfString(_, length)      => s"expected end of file but $length characters remaining"
+      case Expectation.StartOfString(_) => "expected start of the file"
+      case Expectation.EndOfString(_, length) => s"expected end of file but $length characters remaining"
       case Expectation.Length(_, expected, actual) =>
         s"expected $expected more characters but only $actual remaining"
       case Expectation.ExpectedFailureAt(_, matched) =>
         s"expected failure but the parser matched: $matched"
-      case Expectation.Fail(_)                    => "Failed"
-      case Expectation.FailWith(_, message)       => message
+      case Expectation.Fail(_) => "Failed"
+      case Expectation.FailWith(_, message) => message
       case Expectation.WithContext(contextStr, _) => contextStr

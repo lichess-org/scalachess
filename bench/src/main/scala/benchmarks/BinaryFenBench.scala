@@ -23,9 +23,9 @@ class BinaryFenBench:
   private val Work: Long = 10
 
   @Param(Array("10", "100", "1000"))
-  var games: Int                             = scala.compiletime.uninitialized
+  var games: Int = scala.compiletime.uninitialized
   var sits: List[Position.AndFullMoveNumber] = scala.compiletime.uninitialized
-  var fens: List[BinaryFen]                  = scala.compiletime.uninitialized
+  var fens: List[BinaryFen] = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =
@@ -41,7 +41,7 @@ class BinaryFenBench:
   @Benchmark
   def write(bh: Blackhole) =
     val games = this.sits
-    var i     = 0
+    var i = 0
     while i < games.size do
       val game = games(i)
       Blackhole.consumeCPU(Work)
@@ -51,7 +51,7 @@ class BinaryFenBench:
   @Benchmark
   def read(bh: Blackhole) =
     val games = this.fens
-    var i     = 0
+    var i = 0
     while i < games.size do
       val fen = games(i)
       Blackhole.consumeCPU(Work)

@@ -13,8 +13,8 @@ import format.Uci
 class CanPlayTest extends MunitExtensions with SnapshotAssertions:
 
   test("playPositions from standard prod games"):
-    val nb     = 10
-    val games  = Fixtures.prod500standard
+    val nb = 10
+    val games = Fixtures.prod500standard
     val result = games
       .take(nb)
       .map(g => SanStr.from(g.split(' ').toList))
@@ -27,20 +27,20 @@ class CanPlayTest extends MunitExtensions with SnapshotAssertions:
     assertFileSnapshot(result.writeFen, "canplay/playPositions_racing_kings.txt")
 
   test("validate from prod games"):
-    val games  = Fixtures.prod500standard
+    val games = Fixtures.prod500standard
     val result = games
       .map(g => SanStr.from(g.split(' ').toList))
       .traverse_(moves => Standard.initialPosition.validate(moves))
     assertEquals(result, ().asRight)
 
   test("validate return left on invalid move"):
-    val moves  = List(uci"e2e4", uci"e7e5", uci"g1f3", uci"b8b6")
+    val moves = List(uci"e2e4", uci"e7e5", uci"g1f3", uci"b8b6")
     val result = Standard.initialPosition.validate(moves)
     assert(result.isLeft)
 
   test("forwad from prod games"):
-    val nb     = 10
-    val games  = Fixtures.prod500standard
+    val nb = 10
+    val games = Fixtures.prod500standard
     val result = games
       .take(nb)
       .map(g => SanStr.from(g.split(' ').toList))
@@ -49,16 +49,16 @@ class CanPlayTest extends MunitExtensions with SnapshotAssertions:
 
   test("playWhileValid and playWhileValidReverse from prod games"):
     val sans = SanStr.from(Fixtures.fromProd2.split(' ').toList)
-    val x    = Standard.initialPosition.playWhileValid(sans, Ply.initial)(_.move.toUci).toOption.get
-    val y    = Standard.initialPosition.playWhileValidReverse(sans, Ply.initial)(_.move.toUci).toOption.get
+    val x = Standard.initialPosition.playWhileValid(sans, Ply.initial)(_.move.toUci).toOption.get
+    val y = Standard.initialPosition.playWhileValidReverse(sans, Ply.initial)(_.move.toUci).toOption.get
     assertEquals(x.moves, y.moves.reverse)
     assertEquals(x.error, y.error)
     assertEquals(x.state.board, y.state.board)
 
   test("foldLeft and foldRight has correct plies"):
     val sans = SanStr.from(Fixtures.fromProd2.split(' ').toList)
-    val x    = Standard.initialPosition.foldLeft(sans, Ply.initial)(List.empty, (xs, step) => step.ply :: xs)
-    val y    = Standard.initialPosition.foldRight(sans, Ply.initial)(List.empty, (step, xs) => step.ply :: xs)
+    val x = Standard.initialPosition.foldLeft(sans, Ply.initial)(List.empty, (xs, step) => step.ply :: xs)
+    val y = Standard.initialPosition.foldRight(sans, Ply.initial)(List.empty, (step, xs) => step.ply :: xs)
     assertEquals(y.result(0), Ply.initial.next)
     assertEquals(x.result, y.result.reverse)
     assertEquals(x.error, None)
@@ -66,10 +66,10 @@ class CanPlayTest extends MunitExtensions with SnapshotAssertions:
 
   test("foldLeft from foreach"):
     val sans = SanStr.from(Fixtures.fromProd2.split(' ').toList)
-    val x    =
+    val x =
       Standard.initialPosition.foldLeft(sans, Ply.initial)(List.empty, (xs, step) => xs :+ step.move.toUci)
     val builder = scala.collection.mutable.ListBuffer.empty[Uci]
-    val y       = Standard.initialPosition.foreach(sans, Ply.initial)(step => builder += step.move.toUci)
+    val y = Standard.initialPosition.foreach(sans, Ply.initial)(step => builder += step.move.toUci)
     assertEquals(x.result, builder.toList)
     assertEquals(x.error, None)
     assertEquals(y, None)
@@ -77,12 +77,12 @@ class CanPlayTest extends MunitExtensions with SnapshotAssertions:
   /*============== Error Messages ==============*/
 
   test("error message for white"):
-    val sans  = List(SanStr("Nf7"))
+    val sans = List(SanStr("Nf7"))
     val error = Standard.initialPosition.playPositions(sans).swap.toOption.get
     assertEquals(error, ErrorStr("Cannot play Nf7 at move 1 by white"))
 
   test("error message for black"):
-    val sans  = List("e4", "e4").map(SanStr(_))
+    val sans = List("e4", "e4").map(SanStr(_))
     val error = Standard.initialPosition.playPositions(sans).swap.toOption.get
     assertEquals(error, ErrorStr("Cannot play e4 at move 1 by black"))
 

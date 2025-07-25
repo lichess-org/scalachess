@@ -58,7 +58,7 @@ class TiebreakTest extends ChessTest:
   val playerC_Games = PlayerWithGames(playerC, povGames(playerC))
   val playerD_Games = PlayerWithGames(playerD, povGames(playerD))
   val playerE_Games = PlayerWithGames(playerE, povGames(playerE))
-  val allGames      =
+  val allGames =
     Seq(playerA_Games, playerB_Games, playerC_Games, playerD_Games, playerE_Games).mapBy(_.player.id)
 
   def computeTournamentPoints(
@@ -234,8 +234,8 @@ class TiebreakTest extends ChessTest:
     )
 
     val previousPoints = Map(
-      playerA.id              -> List(TiebreakPoint(1f)),
-      playerD.id              -> List(TiebreakPoint(1f)),
+      playerA.id -> List(TiebreakPoint(1f)),
+      playerD.id -> List(TiebreakPoint(1f)),
       playerX_Games.player.id -> List(TiebreakPoint(1f))
     )
 
@@ -279,11 +279,11 @@ class TiebreakTest extends ChessTest:
 
   test("AverageOpponentRating with unrated opponents"):
     val unratedOpponent = Player("Unrated Opponent", rating = None)
-    val unratedGames    = Seq(
+    val unratedGames = Seq(
       Game(Some(Points.One), unratedOpponent, Color.White, "1".some)
     )
     val unratedPlayerGames = Seq(PlayerWithGames(playerA, unratedGames))
-    val points             =
+    val points =
       computeTournamentPoints(
         unratedPlayerGames.mapBy(_.player.id),
         playerA,
@@ -332,13 +332,13 @@ class TiebreakTest extends ChessTest:
   test("PerfectTournamentPerformance - Perfect scores"):
     // from https://chess-results.com/tnr1166026.aspx?lan=1&art=1&rd=8
     val ruslan = Player("Ruslan Pogorelov", rating = Elo(2255).some)
-    val josep  = Player("Josep M. Beltran Reverter", rating = Elo(1834).some)
+    val josep = Player("Josep M. Beltran Reverter", rating = Elo(1834).some)
     val carles = Player("Carles Costas Bella", rating = Elo(1929).some)
-    val sergi  = Player("Sergi Aubanell Ber", rating = Elo(1988).some)
+    val sergi = Player("Sergi Aubanell Ber", rating = Elo(1988).some)
     val xavier = Player("Xavier Palomo Teruel", rating = Elo(2145).some)
     val agusti = Player("Agusti Guasch Figuerola", rating = Elo(1990).some)
     val daniel = Player("Daniel Torrens Gonzalez", rating = Elo(1965).some)
-    val aaron  = Player("Aaron Alfonso Pellisa", rating = Elo(2125).some)
+    val aaron = Player("Aaron Alfonso Pellisa", rating = Elo(2125).some)
 
     val ruslanGames = Seq(
       Game(Some(Points.One), josep, Color.White, "1".some),
@@ -361,13 +361,13 @@ class TiebreakTest extends ChessTest:
     ) // chess-results says 2949. Perfect scores though so :shrug:
 
   test("PerfectTournamentPerformance - Regular"):
-    val marc     = Player("Marc Guardia Curto", rating = Elo(1830).some)
-    val enric    = Player("Enric Regue Farran", rating = Elo(1914).some)
-    val josepmg  = Player("Josep Maria Guasch Murtra", rating = Elo(1867).some)
+    val marc = Player("Marc Guardia Curto", rating = Elo(1830).some)
+    val enric = Player("Enric Regue Farran", rating = Elo(1914).some)
+    val josepmg = Player("Josep Maria Guasch Murtra", rating = Elo(1867).some)
     val francesc = Player("Francesc Xavier Senso Moreno", rating = Elo(1818).some)
-    val ruslan   = Player("Ruslan Pogorelov", rating = Elo(2255).some)
-    val agusti   = Player("Agusti Guasch Figuerola", rating = Elo(1990).some)
-    val xavier   = Player("Xavier Palomo Teruel", rating = Elo(2145).some)
+    val ruslan = Player("Ruslan Pogorelov", rating = Elo(2255).some)
+    val agusti = Player("Agusti Guasch Figuerola", rating = Elo(1990).some)
+    val xavier = Player("Xavier Palomo Teruel", rating = Elo(2145).some)
 
     val xavierGames = Seq(
       Game(Some(Points.One), marc, Color.White, "1".some),

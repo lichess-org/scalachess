@@ -66,7 +66,7 @@ case class Move(
   inline def withMetrics(m: MoveMetrics): Move = copy(metrics = m)
 
   override lazy val toSanStr: SanStr = format.pgn.Dumper(this)
-  override lazy val toUci: Uci.Move  = Uci.Move(orig, dest, promotion)
+  override lazy val toUci: Uci.Move = Uci.Move(orig, dest, promotion)
 
   override def toString = s"$piece ${toUci.uci}"
 
@@ -92,13 +92,13 @@ case class Move(
       lazy val positionHashesOfBoardBefore =
         if h.positionHashes.isEmpty then PositionHash(Hash(before)) else h.positionHashes
       val resetsPositionHashes = after.variant.isIrreversible(this)
-      val basePositionHashes   =
+      val basePositionHashes =
         if resetsPositionHashes then PositionHash.empty else positionHashesOfBoardBefore
       h.copy(positionHashes = PositionHash(Hash(after)).combine(basePositionHashes))
     }
 
   private def castleRights: (Castles, UnmovedRooks) =
-    var castleRights: Castles      = afterWithoutHistory.history.castles
+    var castleRights: Castles = afterWithoutHistory.history.castles
     var unmovedRooks: UnmovedRooks = afterWithoutHistory.history.unmovedRooks
 
     // if the rook is captured
@@ -144,7 +144,7 @@ end Move
 object Move:
 
   case class Castle(king: Square, kingTo: Square, rook: Square, rookTo: Square):
-    def side: Side          = if kingTo.file == File.C then QueenSide else KingSide
+    def side: Side = if kingTo.file == File.C then QueenSide else KingSide
     def isStandard: Boolean = king.file == File.E && (rook.file == File.A || rook.file == File.H)
 
 case class Drop(
@@ -159,9 +159,9 @@ case class Drop(
 
   inline def withMetrics(m: MoveMetrics): Drop = copy(metrics = m)
 
-  override inline def color: Color   = piece.color
+  override inline def color: Color = piece.color
   override lazy val toSanStr: SanStr = format.pgn.Dumper(this)
-  override lazy val toUci: Uci.Drop  = Uci.Drop(piece.role, square)
+  override lazy val toUci: Uci.Drop = Uci.Drop(piece.role, square)
 
   override def toString = toUci.uci
 

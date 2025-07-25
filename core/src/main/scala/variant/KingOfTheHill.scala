@@ -12,7 +12,7 @@ case object KingOfTheHill
       standardInitialPosition = true
     ):
 
-  override val initialBoard: Board               = Board.standard
+  override val initialBoard: Board = Board.standard
   override def initialPieces: Map[Square, Piece] = initialBoard.pieceMap
 
   override def validMoves(position: Position): List[Move] =
@@ -30,4 +30,4 @@ case object KingOfTheHill
   /** You only need a king to be able to win in this variant
     */
   override def opponentHasInsufficientMaterial(position: Position): Boolean = false
-  override def isInsufficientMaterial(position: Position): Boolean          = false
+  override def isInsufficientMaterial(position: Position): Boolean = false

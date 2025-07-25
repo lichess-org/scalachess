@@ -14,9 +14,9 @@ final case class LagTracker(
 ):
 
   def onMove(lag: Centis) =
-    val comp     = lag.atMost(quota)
+    val comp = lag.atMost(quota)
     val uncomped = lag - comp
-    val ceDiff   = compEstimate.getOrElse(Centis(1)) - comp
+    val ceDiff = compEstimate.getOrElse(Centis(1)) - comp
 
     (
       comp,

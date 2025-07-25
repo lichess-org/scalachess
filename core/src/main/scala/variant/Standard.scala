@@ -12,9 +12,9 @@ case object Standard
       standardInitialPosition = true
     ):
 
-  override val initialBoard: Board               = Board.standard
+  override val initialBoard: Board = Board.standard
   override def initialPieces: Map[Square, Piece] = initialBoard.pieceMap
-  override val initialPosition: Position         = Position(initialBoard, this, White)
+  override val initialPosition: Position = Position(initialBoard, this, White)
 
   override def valid(position: Position, strict: Boolean): Boolean =
     super.valid(position, strict) && (!strict || hasValidCheckers(position))
@@ -23,7 +23,7 @@ case object Standard
     import position.{ genNonKing, genSafeKing, genCastling, color, ourKing }
     val enPassantMoves = position.genEnPassant(position.us & position.pawns)
     ourKing.fold(Nil): king =>
-      val checkers   = position.attackers(king, !position.color)
+      val checkers = position.attackers(king, !position.color)
       val candidates =
         if checkers.isEmpty then
           val targets = ~position.us
@@ -51,10 +51,10 @@ case object Standard
   private def genEvasions(king: Square, position: Position, checkers: Bitboard): List[Move] =
     import position.{ genNonKing, genSafeKing, us }
     // Checks by these sliding pieces can maybe be blocked.
-    val sliders   = checkers & position.sliders
-    val attacked  = sliders.fold(Bitboard.empty)((a, s) => a | (Bitboard.ray(king, s) ^ s.bl))
+    val sliders = checkers & position.sliders
+    val attacked = sliders.fold(Bitboard.empty)((a, s) => a | (Bitboard.ray(king, s) ^ s.bl))
     val safeKings = genSafeKing(king, ~us & ~attacked)
-    val blockers  = checkers.singleSquare.fold(Nil)(c => genNonKing(Bitboard.between(king, c) | checkers))
+    val blockers = checkers.singleSquare.fold(Nil)(c => genNonKing(Bitboard.between(king, c) | checkers))
     safeKings ++ blockers
 
   def hasValidCheckers(position: Position): Boolean =
@@ -66,8 +66,8 @@ case object Standard
   private def isValidCheckersForEnPassant(position: Position, activeCheckers: Bitboard): Boolean =
     (for
       enPassantSquare <- position.potentialEpSquare
-      enPassantUp     <- enPassantSquare.prevRank(position.color)
-      enPassantDown   <- enPassantSquare.nextRank(position.color)
+      enPassantUp <- enPassantSquare.prevRank(position.color)
+      enPassantDown <- enPassantSquare.nextRank(position.color)
     yield activeCheckers.count == 1 && (
       activeCheckers.first.contains(enPassantSquare) || position.board
         .move(enPassantUp, enPassantDown)
@@ -81,7 +81,7 @@ case object Standard
     else
       (for
         firstChecker <- activeCheckers.first
-        lastChecker  <- activeCheckers.last
-        ourKing      <- position.ourKing
+        lastChecker <- activeCheckers.last
+        ourKing <- position.ourKing
       yield !Bitboard.aligned(firstChecker, lastChecker, ourKing))
         .getOrElse(false)

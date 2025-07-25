@@ -52,7 +52,7 @@ object InsufficientMatingMaterial:
   def apply(board: Board, color: Color): Boolean =
     import board.*
     inline def onlyKing = kingsOnlyOf(color)
-    inline def KN       =
+    inline def KN =
       onlyOf(color, King, Knight) && count(color, Knight) == 1 && onlyOf(!color, King, Queen)
     inline def KB =
       onlyOf(color, King, Bishop) &&

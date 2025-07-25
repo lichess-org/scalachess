@@ -61,14 +61,14 @@ class FenTest extends ChessTest:
     assertEquals(Fen.writeOpening(Fen.read(fen).get), fen)
 
   test("catsling rights with 2 rooks on the king side"):
-    val fen   = Fen.Full("4k3/8/8/8/8/8/8/4K1RR w K - 0 1")
+    val fen = Fen.Full("4k3/8/8/8/8/8/8/4K1RR w K - 0 1")
     val board = Fen.read(Standard, fen).get
     assertEquals(board.history.unmovedRooks, UnmovedRooks(Square.H1.bl))
     assertEquals(board.history.castles, Castles(Square.H1.bl))
     assertEquals(board.legalMoves.filter(_.castles), Nil)
 
   test("catsling rights with 2 rooks on the queen side"):
-    val fen   = Fen.Full("4k3/8/8/8/8/8/8/RR2K3 w Q - 0 1")
+    val fen = Fen.Full("4k3/8/8/8/8/8/8/RR2K3 w Q - 0 1")
     val board = Fen.read(Standard, fen).get
     assertEquals(board.history.unmovedRooks, UnmovedRooks(Square.A1.bl))
     assertEquals(board.history.castles, Castles(Square.A1.bl))

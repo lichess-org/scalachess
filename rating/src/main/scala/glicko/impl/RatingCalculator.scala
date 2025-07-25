@@ -8,7 +8,7 @@ import java.time.Instant
 private object RatingCalculator:
 
   private val MULTIPLIER: Double = 173.7178
-  val DEFAULT_RATING: Double     = 1500.0
+  val DEFAULT_RATING: Double = 1500.0
 
   def convertRatingToOriginalGlickoScale(rating: Double): Double =
     ((rating * MULTIPLIER) + DEFAULT_RATING)
@@ -30,8 +30,8 @@ final private[glicko] class RatingCalculator(
   import RatingCalculator.*
 
   private val CONVERGENCE_TOLERANCE: Double = 0.000001
-  private val ITERATION_MAX: Int            = 1000
-  private val DAYS_PER_MILLI: Double        = 1.0 / (1000 * 60 * 60 * 24)
+  private val ITERATION_MAX: Int = 1000
+  private val DAYS_PER_MILLI: Double = 1.0 / (1000 * 60 * 60 * 24)
 
   private val ratingPeriodsPerMilli: Double = ratingPeriodsPerDay.value * DAYS_PER_MILLI
 
@@ -86,12 +86,12 @@ final private[glicko] class RatingCalculator(
     * @param elapsedRatingPeriods
     */
   private def calculateNewRating(player: Rating, results: List[Result], elapsedRatingPeriods: Double): Unit =
-    val phi   = player.getGlicko2RatingDeviation
+    val phi = player.getGlicko2RatingDeviation
     val sigma = player.volatility
-    val a     = Math.log(Math.pow(sigma, 2))
+    val a = Math.log(Math.pow(sigma, 2))
     val delta = deltaOf(player, results)
-    val v     = vOf(player, results)
-    val tau   = this.tau.value
+    val v = vOf(player, results)
+    val tau = this.tau.value
 
     // step 5.2 - set the initial values of the iterative algorithm to come in step 5.4
     var A: Double = a
@@ -114,7 +114,7 @@ final private[glicko] class RatingCalculator(
     while Math.abs(B - A) > CONVERGENCE_TOLERANCE && iterations < ITERATION_MAX do
       iterations = iterations + 1
       // println(String.format("%f - %f (%f) > %f", B, A, Math.abs(B - A), CONVERGENCE_TOLERANCE))
-      val C  = A + (((A - B) * fA) / (fB - fA))
+      val C = A + (((A - B) * fA) / (fB - fA))
       val fC = f(C, delta, phi, v, a, tau)
 
       if fC * fB <= 0 then

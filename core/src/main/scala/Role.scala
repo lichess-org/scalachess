@@ -2,9 +2,9 @@ package chess
 
 sealed trait Role:
   val forsyth: Char
-  lazy val forsythUpper: Char              = forsyth.toUpper
-  lazy val pgn: Char                       = forsythUpper
-  lazy val name                            = toString.toLowerCase
+  lazy val forsythUpper: Char = forsyth.toUpper
+  lazy val pgn: Char = forsythUpper
+  lazy val name = toString.toLowerCase
   inline def forsythBy(color: Color): Char =
     if color.white then forsythUpper else forsyth
 
@@ -31,14 +31,14 @@ case object Pawn extends Role:
 
 object Role:
 
-  val all: List[Role]                                   = List(King, Queen, Rook, Bishop, Knight, Pawn)
-  val allPromotable: List[PromotableRole]               = List(Queen, Rook, Bishop, Knight, King)
-  val allByForsyth: Map[Char, Role]                     = all.mapBy(_.forsyth)
-  val allByPgn: Map[Char, Role]                         = all.mapBy(_.pgn)
-  val allByName: Map[String, Role]                      = all.mapBy(_.name)
-  val allPromotableByName: Map[String, PromotableRole]  = allPromotable.mapBy(_.toString)
+  val all: List[Role] = List(King, Queen, Rook, Bishop, Knight, Pawn)
+  val allPromotable: List[PromotableRole] = List(Queen, Rook, Bishop, Knight, King)
+  val allByForsyth: Map[Char, Role] = all.mapBy(_.forsyth)
+  val allByPgn: Map[Char, Role] = all.mapBy(_.pgn)
+  val allByName: Map[String, Role] = all.mapBy(_.name)
+  val allPromotableByName: Map[String, PromotableRole] = allPromotable.mapBy(_.toString)
   val allPromotableByForsyth: Map[Char, PromotableRole] = allPromotable.mapBy(_.forsyth)
-  val allPromotableByPgn: Map[Char, PromotableRole]     = allPromotable.mapBy(_.pgn)
+  val allPromotableByPgn: Map[Char, PromotableRole] = allPromotable.mapBy(_.pgn)
 
   def forsyth(c: Char): Option[Role] = allByForsyth.get(c)
 
@@ -53,9 +53,9 @@ object Role:
 
   def valueOf(r: Role): Option[Int] =
     r match
-      case Pawn   => Option(1)
+      case Pawn => Option(1)
       case Knight => Option(3)
       case Bishop => Option(3)
-      case Rook   => Option(5)
-      case Queen  => Option(9)
-      case King   => None
+      case Rook => Option(5)
+      case Queen => Option(9)
+      case King => None

@@ -14,11 +14,11 @@ case object Antichess
       standardInitialPosition = true
     ):
 
-  override val initialBoard: Board               = Board.standard
+  override val initialBoard: Board = Board.standard
   override def initialPieces: Map[Square, Piece] = initialBoard.pieceMap
 
   // In antichess, it is not permitted to castle
-  override val castles: Castles    = Castles.none
+  override val castles: Castles = Castles.none
   override val initialFen: FullFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1")
 
   // In antichess, the king can't be put into check so we always return false

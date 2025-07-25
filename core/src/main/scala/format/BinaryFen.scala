@@ -11,23 +11,23 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
 
   def read: Position.AndFullMoveNumber =
     val reader = new Iterator[Byte]:
-      val inner                            = value.iterator
+      val inner = value.iterator
       override inline def hasNext: Boolean = inner.hasNext
-      override inline def next: Byte       = if hasNext then inner.next else 0.toByte
+      override inline def next: Byte = if hasNext then inner.next else 0.toByte
 
     val occupied = Bitboard(readLong(reader))
 
-    var pawns   = Bitboard.empty
+    var pawns = Bitboard.empty
     var knights = Bitboard.empty
     var bishops = Bitboard.empty
-    var rooks   = Bitboard.empty
-    var queens  = Bitboard.empty
-    var kings   = Bitboard.empty
-    var white   = Bitboard.empty
-    var black   = Bitboard.empty
+    var rooks = Bitboard.empty
+    var queens = Bitboard.empty
+    var kings = Bitboard.empty
+    var white = Bitboard.empty
+    var black = Bitboard.empty
 
-    var turn                     = White
-    var unmovedRooks             = UnmovedRooks(Bitboard.empty)
+    var turn = White
+    var unmovedRooks = UnmovedRooks(Bitboard.empty)
     var epMove: Option[Uci.Move] = None
 
     def unpackPiece(sq: Square, nibble: Int) =
@@ -96,8 +96,8 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
       if it.hasNext then unpackPiece(it.next, hi)
 
     val halfMoveClock = HalfMoveClock(readLeb128(reader))
-    val ply           = Ply(readLeb128(reader))
-    val variant       = reader.next match
+    val ply = Ply(readLeb128(reader))
+    val variant = reader.next match
       case 0 => Standard
       case 1 => Crazyhouse
       case 2 => Chess960
@@ -165,10 +165,10 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
       ply.fullMoveNumber
     )
 
-  override def hashCode: Int              = value.toSeq.hashCode
+  override def hashCode: Int = value.toSeq.hashCode
   override def equals(that: Any): Boolean = that match
     case thatFen: BinaryFen => value.toSeq.equals(thatFen.value.toSeq)
-    case _                  => false
+    case _ => false
 
 object BinaryFen:
 
@@ -181,7 +181,7 @@ object BinaryFen:
           .updateHistory(_.setHalfMoveClock(HalfMoveClock.initial))
           .withVariant(position.variant match
             case Standard | Chess960 | FromPosition => Standard
-            case other                              => other),
+            case other => other),
         FullMoveNumber.initial
       )
     )
@@ -202,38 +202,38 @@ object BinaryFen:
         // Encoding from
         // https://github.com/official-stockfish/nnue-pytorch/blob/2db3787d2e36f7142ea4d0e307b502dda4095cd9/lib/nnue_training_data_formats.h#L4607
         case Some(Piece(_, Pawn)) if pawnPushedTo.contains(sq) => 12
-        case Some(Piece(White, Pawn))                          => 0
-        case Some(Piece(Black, Pawn))                          => 1
-        case Some(Piece(White, Knight))                        => 2
-        case Some(Piece(Black, Knight))                        => 3
-        case Some(Piece(White, Bishop))                        => 4
-        case Some(Piece(Black, Bishop))                        => 5
-        case Some(Piece(White, Rook))                          => if unmovedRooks.contains(sq) then 13 else 6
-        case Some(Piece(Black, Rook))                          => if unmovedRooks.contains(sq) then 14 else 7
-        case Some(Piece(White, Queen))                         => 8
-        case Some(Piece(Black, Queen))                         => 9
-        case Some(Piece(White, King))                          => 10
-        case Some(Piece(Black, King))                          => if position.color.white then 11 else 15
-        case None                                              => 0 // unreachable
+        case Some(Piece(White, Pawn)) => 0
+        case Some(Piece(Black, Pawn)) => 1
+        case Some(Piece(White, Knight)) => 2
+        case Some(Piece(Black, Knight)) => 3
+        case Some(Piece(White, Bishop)) => 4
+        case Some(Piece(Black, Bishop)) => 5
+        case Some(Piece(White, Rook)) => if unmovedRooks.contains(sq) then 13 else 6
+        case Some(Piece(Black, Rook)) => if unmovedRooks.contains(sq) then 14 else 7
+        case Some(Piece(White, Queen)) => 8
+        case Some(Piece(Black, Queen)) => 9
+        case Some(Piece(White, King)) => 10
+        case Some(Piece(Black, King)) => if position.color.white then 11 else 15
+        case None => 0 // unreachable
 
     val it = occupied.iterator
     while it.hasNext
     do writeNibbles(builder, packPiece(it.next), if it.hasNext then packPiece(it.next) else 0)
 
     val halfMoveClock = position.history.halfMoveClock.value
-    val ply           = input.fullMoveNumber.ply(position.color).value
-    val brokenTurn    = position.color.black && position.board.byPiece(Black, King).isEmpty
+    val ply = input.fullMoveNumber.ply(position.color).value
+    val brokenTurn = position.color.black && position.board.byPiece(Black, King).isEmpty
     val variantHeader = position.variant match
-      case Standard      => 0
-      case Crazyhouse    => 1
-      case Chess960      => 2
-      case FromPosition  => 3
+      case Standard => 0
+      case Crazyhouse => 1
+      case Chess960 => 2
+      case FromPosition => 3
       case KingOfTheHill => 4
-      case ThreeCheck    => 5
-      case Antichess     => 6
-      case Atomic        => 7
-      case Horde         => 8
-      case RacingKings   => 9
+      case ThreeCheck => 5
+      case Antichess => 6
+      case Atomic => 7
+      case Horde => 8
+      case RacingKings => 9
 
     if halfMoveClock > 0 || ply > 1 || brokenTurn || variantHeader != 0
     then writeLeb128(builder, halfMoveClock)
@@ -248,7 +248,7 @@ object BinaryFen:
         writeNibbles(builder, position.history.checkCount.white, position.history.checkCount.black)
       else if position.variant.crazyhouse then
         val crazyData = position.crazyData.getOrElse(Crazyhouse.Data.init)
-        val pockets   = crazyData.pockets
+        val pockets = crazyData.pockets
         writeNibbles(builder, pockets.white.pawn, pockets.black.pawn)
         writeNibbles(builder, pockets.white.knight, pockets.black.knight)
         writeNibbles(builder, pockets.white.bishop, pockets.black.bishop)
@@ -289,7 +289,7 @@ object BinaryFen:
       builder.addOne(n.toByte)
 
     def readLeb128(reader: Iterator[Byte]): Int =
-      var n     = 0
+      var n = 0
       var shift = 0
       while
         val b = reader.next
@@ -307,8 +307,8 @@ object BinaryFen:
       ((b & 0xf), (b >>> 4) & 0xf)
 
     def minimumUnmovedRooks(position: Position): UnmovedRooks =
-      val white   = position.history.unmovedRooks.bb & position.white & Bitboard.firstRank
-      val black   = position.history.unmovedRooks.bb & position.black & Bitboard.lastRank
+      val white = position.history.unmovedRooks.bb & position.white & Bitboard.firstRank
+      val black = position.history.unmovedRooks.bb & position.black & Bitboard.lastRank
       val castles = position.history.castles
       UnmovedRooks(
         (if castles.whiteKingSide then white.isolateLast else Bitboard.empty) |
@@ -325,8 +325,8 @@ object BinaryFen:
     ): Castles =
       val whiteRooks = unmovedRooks.bb & white & Bitboard.firstRank
       val blackRooks = unmovedRooks.bb & black & Bitboard.lastRank
-      val whiteKing  = (white & kings & Bitboard.firstRank).first.getOrElse(Square.E1)
-      val blackKing  = (black & kings & Bitboard.lastRank).first.getOrElse(Square.E8)
+      val whiteKing = (white & kings & Bitboard.firstRank).first.getOrElse(Square.E1)
+      val blackKing = (black & kings & Bitboard.lastRank).first.getOrElse(Square.E8)
       Castles(
         whiteKingSide = whiteRooks.last.exists(r => r.value > whiteKing.value),
         whiteQueenSide = whiteRooks.first.exists(r => r.value < whiteKing.value),

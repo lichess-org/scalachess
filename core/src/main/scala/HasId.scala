@@ -6,7 +6,7 @@ trait HasId[A, Id]:
   extension (a: A)
     def id: Id
     inline def sameId(other: A): Boolean = a.id == other.id
-    inline def hasId(id: Id): Boolean    = a.id == id
+    inline def hasId(id: Id): Boolean = a.id == id
 
   extension (xs: List[A])
     final def remove(v: A): List[A] =
@@ -21,8 +21,8 @@ trait HasId[A, Id]:
       def loop(acc: List[A], xs: List[A]): List[A] =
         xs match
           case (v :: vs) if v.hasId(id) => acc ++ vs
-          case (v :: vs)                => loop(acc :+ v, vs)
-          case Nil                      => acc
+          case (v :: vs) => loop(acc :+ v, vs)
+          case Nil => acc
       loop(Nil, xs)
 
 trait Mergeable[A]:
@@ -48,11 +48,11 @@ trait Mergeable[A]:
       @tailrec
       def loop(acc: List[A], rest: List[A]): List[A] =
         rest match
-          case Nil     => acc :+ v
+          case Nil => acc :+ v
           case y :: ys =>
             y.merge(v) match
               case Some(m) => acc ++ (m +: ys)
-              case _       => loop(acc :+ y, ys)
+              case _ => loop(acc :+ y, ys)
 
       loop(Nil, xs)
 

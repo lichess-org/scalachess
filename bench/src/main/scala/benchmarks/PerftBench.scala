@@ -25,14 +25,14 @@ class PerftBench:
   @Param(Array("10000", "100000", "1000000", "10000000"))
   var nodes: Long = scala.compiletime.uninitialized
 
-  var threecheckPerfts: List[Perft]  = scala.compiletime.uninitialized
-  var antichessPerfts: List[Perft]   = scala.compiletime.uninitialized
-  var atomicPerfts: List[Perft]      = scala.compiletime.uninitialized
-  var crazyhousePerfts: List[Perft]  = scala.compiletime.uninitialized
+  var threecheckPerfts: List[Perft] = scala.compiletime.uninitialized
+  var antichessPerfts: List[Perft] = scala.compiletime.uninitialized
+  var atomicPerfts: List[Perft] = scala.compiletime.uninitialized
+  var crazyhousePerfts: List[Perft] = scala.compiletime.uninitialized
   var racingkingsPerfts: List[Perft] = scala.compiletime.uninitialized
-  var hordePerfts: List[Perft]       = scala.compiletime.uninitialized
-  var randomPerfts: List[Perft]      = scala.compiletime.uninitialized
-  var trickyPerfts: List[Perft]      = scala.compiletime.uninitialized
+  var hordePerfts: List[Perft] = scala.compiletime.uninitialized
+  var randomPerfts: List[Perft] = scala.compiletime.uninitialized
+  var trickyPerfts: List[Perft] = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =

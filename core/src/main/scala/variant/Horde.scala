@@ -23,8 +23,8 @@ case object Horde
       x <- File.all
       y <- Rank.all.take(4)
     yield (Square(x, y) -> White.pawn)
-    val frontPawns  = List(Square.B5, Square.C5, Square.F5, Square.G5).map { _ -> White.pawn }
-    val blackPawns  = File.all.map { Square(_, Rank.Seventh) -> Black.pawn }
+    val frontPawns = List(Square.B5, Square.C5, Square.F5, Square.G5).map { _ -> White.pawn }
+    val blackPawns = File.all.map { Square(_, Rank.Seventh) -> Black.pawn }
     val blackPieces = File.all.map { x => Square(x, Rank.Eighth) -> (Black - backRank(x.value)) }
     (whitePawnsHorde ++ frontPawns ++ blackPawns ++ blackPieces).toMap
 
@@ -76,7 +76,7 @@ case object Horde
     */
   private def hordeClosedPosition(position: Position): Boolean =
     val hordeSquare = position.byColor(White)
-    val mateInOne   = hordeSquare.count == 1 &&
+    val mateInOne = hordeSquare.count == 1 &&
       hordeSquare.singleSquare.exists(pieceThreatened(position.board, Color.black, _))
     !mateInOne && {
       if position.isWhiteTurn then position.legalMoves.isEmpty
@@ -96,20 +96,20 @@ case object Horde
     // Black can always win by capturing the horde
     if color.black then false
     else
-      val hordeRole                        = board.byRoleOf(color)
-      val horde                            = hordeRole.map(_.count)
+      val hordeRole = board.byRoleOf(color)
+      val horde = hordeRole.map(_.count)
       val hordeBishops: SquareColor => Int = color => (hordeRole.bishop & color.bb).count
-      val hordeBishopColor                 = if hordeBishops(Light) >= 1 then Light else Dark
+      val hordeBishopColor = if hordeBishops(Light) >= 1 then Light else Dark
 
       val hordeBishopNum = Math.min(hordeBishops(Light), 2) + Math.min(hordeBishops(Dark), 2)
       // Two same color bishops suffice to cover all the light and dark squares
       // around the enemy king.
-      val hordeNum   = horde.pawn + horde.knight + horde.rook + horde.queen + hordeBishopNum
+      val hordeNum = horde.pawn + horde.knight + horde.rook + horde.queen + hordeBishopNum
       val piecesRole = board.byRoleOf(Color.black)
-      val pieces     = piecesRole.map(_.count)
+      val pieces = piecesRole.map(_.count)
       val piecesBishops: SquareColor => Int = color => (piecesRole.bishop & color.bb).count
-      val piecesNum                         = piecesRole.map(_.count).values.sum
-      val piecesOfTypeNot                   = (pieces: Int) => piecesNum - pieces
+      val piecesNum = piecesRole.map(_.count).values.sum
+      val piecesOfTypeNot = (pieces: Int) => piecesNum - pieces
       if hordeNum == 0 then true
       else if hordeNum >= 4 then false // Four or more white pieces can always deliver mate.
       // Pawns/queens are never insufficient material when paired with any other
@@ -142,7 +142,7 @@ case object Horde
         else if horde.pawn == 1 then
           // Promote the pawn to a queen or a knight and check whether white
           // can mate.
-          val pawnSquare     = (board.pawns & board.byColor(Color.white)).first.get // we know there is a pawn
+          val pawnSquare = (board.pawns & board.byColor(Color.white)).first.get // we know there is a pawn
           val promoteToQueen = board.putOrReplace(White.queen, pawnSquare)
           val promoteToKnight = board.putOrReplace(White.knight, pawnSquare)
           hasInsufficientMaterial(promoteToQueen, color) && hasInsufficientMaterial(promoteToKnight, color)
@@ -249,8 +249,8 @@ enum SquareColor:
 
   def bb: Bitboard = this match
     case Light => Bitboard.lightSquares
-    case Dark  => Bitboard.darkSquares
+    case Dark => Bitboard.darkSquares
 
   def unary_! : SquareColor = this match
     case Light => Dark
-    case Dark  => Light
+    case Dark => Light

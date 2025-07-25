@@ -23,14 +23,14 @@ class DestinationsBench:
   @Param(Array("100"))
   var games: Int = scala.compiletime.uninitialized
 
-  var threecheckInput: List[Position]  = scala.compiletime.uninitialized
-  var antichessInput: List[Position]   = scala.compiletime.uninitialized
-  var atomicInput: List[Position]      = scala.compiletime.uninitialized
-  var crazyhouseInput: List[Position]  = scala.compiletime.uninitialized
+  var threecheckInput: List[Position] = scala.compiletime.uninitialized
+  var antichessInput: List[Position] = scala.compiletime.uninitialized
+  var atomicInput: List[Position] = scala.compiletime.uninitialized
+  var crazyhouseInput: List[Position] = scala.compiletime.uninitialized
   var racingkingsInput: List[Position] = scala.compiletime.uninitialized
-  var hordeInput: List[Position]       = scala.compiletime.uninitialized
-  var randomInput: List[Position]      = scala.compiletime.uninitialized
-  var trickyInput: List[Position]      = scala.compiletime.uninitialized
+  var hordeInput: List[Position] = scala.compiletime.uninitialized
+  var randomInput: List[Position] = scala.compiletime.uninitialized
+  var trickyInput: List[Position] = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =

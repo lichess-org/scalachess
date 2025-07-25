@@ -6,7 +6,7 @@ import Clock.{ LimitSeconds, LimitMinutes, IncrementSeconds }
 
 case class TournamentClock(limitSeconds: LimitSeconds, incrementSeconds: IncrementSeconds):
 
-  def limit: Centis     = Centis.ofSeconds(limitSeconds.value)
+  def limit: Centis = Centis.ofSeconds(limitSeconds.value)
   def increment: Centis = Centis.ofSeconds(incrementSeconds.value)
 
   def limitMinutes = LimitMinutes(limitSeconds.value / 60)
@@ -32,6 +32,6 @@ object TournamentClock:
         .replaceAllIn(str.toLowerCase.replace(" ", ""), "")
         .split('+')
         .match
-          case Array(a)    => a.toIntOption.map(make(strict)(_, 0))
+          case Array(a) => a.toIntOption.map(make(strict)(_, 0))
           case Array(a, b) => (a.toIntOption, b.toIntOption).mapN(make(strict))
-          case _           => none
+          case _ => none

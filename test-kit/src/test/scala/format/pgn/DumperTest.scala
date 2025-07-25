@@ -338,8 +338,8 @@ NRKNRQBB
         assertEquals(ms, SanStr.from("f4 Nc6 Nc3 g6 Nb5 O-O-O O-O-O".split(' ').toVector))
 
   test("chess960 tricky rook disambiguation"):
-    val fen           = FullFen("r5k1/1b5p/N3p1p1/Q4p2/4r3/2P1q3/1PK2RP1/5R2 w - - 1 38")
-    val sit           = Fen.read(fen).get
-    val game1         = Game(sit)
+    val fen = FullFen("r5k1/1b5p/N3p1p1/Q4p2/4r3/2P1q3/1PK2RP1/5R2 w - - 1 38")
+    val sit = Fen.read(fen).get
+    val game1 = Game(sit)
     val (game2, move) = game1(Square.F2, Square.F3).get
     assertEquals(Dumper(game1.position, move, game2.position), "Rf3")

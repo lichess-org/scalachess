@@ -5,9 +5,9 @@ final case class Stats(samples: Int, mean: Float, sn: Float):
 
   def record(value: Float) =
     val newSamples = samples + 1
-    val delta      = value - mean
-    val newMean    = mean + delta / newSamples
-    val newSN      = sn + delta * (value - newMean)
+    val delta = value - mean
+    val newMean = mean + delta / newSamples
+    val newSN = sn + delta * (value - newMean)
 
     Stats(
       samples = newSamples,
@@ -27,6 +27,6 @@ final case class Stats(samples: Int, mean: Float, sn: Float):
   def total = samples * mean
 
 object Stats:
-  val empty: Stats                                  = Stats(0, 0, 0)
-  def apply(value: Float): Stats                    = empty.record(value)
+  val empty: Stats = Stats(0, 0, 0)
+  def apply(value: Float): Stats = empty.record(value)
   def apply[T: Numeric](values: Iterable[T]): Stats = empty.record(values)

@@ -17,9 +17,9 @@ case class History(
   def setHalfMoveClock(v: HalfMoveClock): History = copy(halfMoveClock = v)
 
   inline def threefoldRepetition: Boolean = positionHashes.isRepetition(3)
-  inline def fivefoldRepetition: Boolean  = positionHashes.isRepetition(5)
+  inline def fivefoldRepetition: Boolean = positionHashes.isRepetition(5)
 
-  inline def canCastle(inline color: Color): Boolean                    = castles.can(color)
+  inline def canCastle(inline color: Color): Boolean = castles.can(color)
   inline def canCastle(inline color: Color, inline side: Side): Boolean = castles.can(color, side)
 
   inline def withoutCastles(inline color: Color): History = copy(castles = castles.without(color))

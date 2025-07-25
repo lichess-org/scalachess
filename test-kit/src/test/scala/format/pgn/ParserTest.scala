@@ -11,10 +11,10 @@ class ParserTest extends ChessTest:
 
   import Fixtures.*
 
-  given Conversion[SanStr, String]                                   = _.value
-  given Conversion[String, SanStr]                                   = SanStr(_)
+  given Conversion[SanStr, String] = _.value
+  given Conversion[String, SanStr] = SanStr(_)
   extension (tree: Option[ParsedPgnTree]) def firstMove: PgnNodeData = tree.get.mainline.head.value
-  extension (parsed: ParsedPgn) def metas                            = parsed.tree.get.value.metas
+  extension (parsed: ParsedPgn) def metas = parsed.tree.get.value.metas
 
   import Parser.{
     full as parse,
@@ -148,7 +148,7 @@ class ParserTest extends ChessTest:
 
   test("raws with moves"):
     raws.foreach: sans =>
-      val result   = Parser.moves(sans.split(' ').toList.map(SanStr(_))).toOption.get
+      val result = Parser.moves(sans.split(' ').toList.map(SanStr(_))).toOption.get
       val expected = parse(sans).toOption.get.mainline
       assertEquals(result, expected)
 
@@ -186,7 +186,7 @@ class ParserTest extends ChessTest:
 
   test("tags = full.tags"):
     val expected = wcc2023.map(PgnStr(_)).traverse(parse).toOption.get.map(_.tags)
-    val tags     = wcc2023.map(PgnStr(_)).traverse(Parser.tags).toOption.get
+    val tags = wcc2023.map(PgnStr(_)).traverse(Parser.tags).toOption.get
     assertEquals(tags, expected)
 
   def verifyMainline(pgns: List[String]) =

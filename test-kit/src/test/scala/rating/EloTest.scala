@@ -9,7 +9,7 @@ class EloTest extends ChessTest:
       munit.Location
   ) =
     val player = Elo.Player(Elo(r), KFactor(k))
-    val game   = Elo.Game(points, Elo(opRating))
+    val game = Elo.Game(points, Elo(opRating))
     assertEquals(Elo.computeRatingDiff(player, List(game)), expected)
 
   test("new rating calculation over one game"):
@@ -53,7 +53,7 @@ class EloTest extends ChessTest:
     assertEquals(Elo.computePerformanceRating(games), Some(Elo(expected)))
 
   test("performance rating"):
-    def win(r: Int)  = Elo.Game(One, Elo(r))
+    def win(r: Int) = Elo.Game(One, Elo(r))
     def loss(r: Int) = Elo.Game(Zero, Elo(r))
     def draw(r: Int) = Elo.Game(Half, Elo(r))
     assertEquals(Elo.computePerformanceRating(Nil), None)

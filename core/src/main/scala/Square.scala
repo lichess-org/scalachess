@@ -23,9 +23,9 @@ object Square:
     @targetName("aboveOf")
     inline def ?^(inline other: Square): Boolean = rank > other.rank
 
-    inline def onSameFile(inline other: Square): Boolean     = file == other.file
-    inline def onSameRank(inline other: Square): Boolean     = rank == other.rank
-    inline def onSameLine(inline other: Square): Boolean     = onSameFile(other) || onSameRank(other)
+    inline def onSameFile(inline other: Square): Boolean = file == other.file
+    inline def onSameRank(inline other: Square): Boolean = rank == other.rank
+    inline def onSameLine(inline other: Square): Boolean = onSameFile(other) || onSameRank(other)
     inline def onSameDiagonal(inline other: Square): Boolean =
       file.value - rank.value == other.file.value - other.rank.value || file.value + rank.value == other.file.value + other.rank.value
 
@@ -38,9 +38,9 @@ object Square:
     inline def rank: Rank = Rank.of(s)
 
     def asChar: Char =
-      if s <= 25 then (97 + s).toChar      // a ...
+      if s <= 25 then (97 + s).toChar // a ...
       else if s <= 51 then (39 + s).toChar // A ...
-      else if s <= 61 then (s - 4).toChar  // 0 ...
+      else if s <= 61 then (s - 4).toChar // 0 ...
       else if s == 62 then '!'
       else '?'
 
@@ -53,7 +53,7 @@ object Square:
     inline def withFileOf(inline o: Square): Square = withFile(o.file)
 
     inline def bb: Bitboard = Bitboard(1L << s.value)
-    inline def bl: Long     = 1L << s.value
+    inline def bl: Long = 1L << s.value
 
     def bishopAttacks(occupied: Bitboard): Bitboard =
       Bitboard(ATTACKS(Magic.BISHOP(s.value).bishopIndex(occupied.value)))
@@ -75,7 +75,7 @@ object Square:
 
   inline def apply(inline file: File, inline rank: Rank): Square = file.value + 8 * rank.value
 
-  inline def apply(index: Int): Option[Square]  = Option.when(0 <= index && index < 64)(index)
+  inline def apply(index: Int): Option[Square] = Option.when(0 <= index && index < 64)(index)
   private[chess] def unsafe(index: Int): Square = index
 
   inline def at(x: Int, y: Int): Option[Square] = Option.when(0 <= x && x < 8 && 0 <= y && y < 8)(x + 8 * y)
@@ -154,4 +154,4 @@ object Square:
   val all: List[Square] = (0 to 63).toList
 
   val allKeys: Map[String, Square] = all.mapBy(_.key)
-  val charMap: Map[Char, Square]   = all.mapBy(_.asChar)
+  val charMap: Map[Char, Square] = all.mapBy(_.asChar)

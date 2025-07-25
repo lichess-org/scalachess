@@ -23,7 +23,7 @@ class PlayBench:
   private val Work: Long = 10
 
   var dividerGames: List[List[Board]] = scala.compiletime.uninitialized
-  var gameMoves: List[List[SanStr]]   = scala.compiletime.uninitialized
+  var gameMoves: List[List[SanStr]] = scala.compiletime.uninitialized
 
   def gameReplay(sans: String) =
     Standard.initialPosition.playBoards(SanStr.from(sans.split(' ')).toList).toOption.get
@@ -32,7 +32,7 @@ class PlayBench:
   def setup() =
     dividerGames = Fixtures.prod500standard.map(gameReplay)
 
-    var nb    = 50
+    var nb = 50
     var games = Fixtures.prod500standard
     gameMoves = games.take(nb).map(g => SanStr.from(g.split(' ').toList))
 
@@ -47,7 +47,7 @@ class PlayBench:
   @Benchmark
   def playMoveOrDropWithPly(bh: Blackhole) =
     val games = this.gameMoves
-    var i     = 0
+    var i = 0
     while i < games.size do
       val moves = games(i)
       Blackhole.consumeCPU(Work)

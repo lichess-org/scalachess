@@ -310,26 +310,26 @@ object Board:
     )
   )
   def fromMap(pieces: PieceMap): Board =
-    var pawns    = Bitboard.empty
-    var knights  = Bitboard.empty
-    var bishops  = Bitboard.empty
-    var rooks    = Bitboard.empty
-    var queens   = Bitboard.empty
-    var kings    = Bitboard.empty
-    var white    = Bitboard.empty
-    var black    = Bitboard.empty
+    var pawns = Bitboard.empty
+    var knights = Bitboard.empty
+    var bishops = Bitboard.empty
+    var rooks = Bitboard.empty
+    var queens = Bitboard.empty
+    var kings = Bitboard.empty
+    var white = Bitboard.empty
+    var black = Bitboard.empty
     var occupied = Bitboard.empty
 
     pieces.foreach: (s, p) =>
       val position = s.bb
       occupied |= position
       p.role match
-        case Pawn   => pawns |= position
+        case Pawn => pawns |= position
         case Knight => knights |= position
         case Bishop => bishops |= position
-        case Rook   => rooks |= position
-        case Queen  => queens |= position
-        case King   => kings |= position
+        case Rook => rooks |= position
+        case Queen => queens |= position
+        case King => kings |= position
 
       p.color match
         case Color.White => white |= position

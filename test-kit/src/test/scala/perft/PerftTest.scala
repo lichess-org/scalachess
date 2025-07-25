@@ -10,7 +10,7 @@ import weaver.*
 object PerftTest extends SimpleIOSuite:
 
   given Monoid[Boolean] with
-    def empty                           = true
+    def empty = true
     def combine(x: Boolean, y: Boolean) = x && y
 
   val nodeLimits = 1_000L

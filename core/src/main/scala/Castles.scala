@@ -9,14 +9,14 @@ object Castles:
 
   extension (c: Castles)
 
-    inline def can(inline color: Color): Boolean           = Bitboard.rank(color.backRank).intersects(c)
+    inline def can(inline color: Color): Boolean = Bitboard.rank(color.backRank).intersects(c)
     inline def can(inline color: Color, inline side: Side) = c.contains(color.at(side))
 
     def isEmpty = c == 0L
 
-    def whiteKingSide: Boolean  = c.contains(H1)
+    def whiteKingSide: Boolean = c.contains(H1)
     def whiteQueenSide: Boolean = c.contains(A1)
-    def blackKingSide: Boolean  = c.contains(H8)
+    def blackKingSide: Boolean = c.contains(H8)
     def blackQueenSide: Boolean = c.contains(A8)
 
     def without(color: Color): Castles =
@@ -33,7 +33,7 @@ object Castles:
 
     def toSeq: Array[Boolean] = Array(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
 
-    inline def unary_~ : Castles                = ~c
+    inline def unary_~ : Castles = ~c
     inline infix def &(inline o: Long): Castles = c & o
     inline infix def ^(inline o: Long): Castles = c ^ o
     inline infix def |(inline o: Long): Castles = c | o
@@ -45,7 +45,7 @@ object Castles:
     @targetName("orB")
     inline infix def |(o: Bitboard): Castles = c | o.value
 
-    inline def value: Long  = c
+    inline def value: Long = c
     inline def bb: Bitboard = Bitboard(c)
 
     inline def contains(inline square: Square): Boolean =
@@ -58,12 +58,12 @@ object Castles:
   extension (color: Color)
     inline def at(side: Side): Square =
       (color, side) match
-        case (White, KingSide)  => H1
+        case (White, KingSide) => H1
         case (White, QueenSide) => A1
-        case (Black, KingSide)  => H8
+        case (Black, KingSide) => H8
         case (Black, QueenSide) => A8
 
-    inline def kingSide: Square  = at(KingSide)
+    inline def kingSide: Square = at(KingSide)
     inline def queenSide: Square = at(QueenSide)
 
   def apply(
@@ -86,8 +86,8 @@ object Castles:
     case 'q' => Some(A8)
     case 'K' => Some(H1)
     case 'Q' => Some(A1)
-    case _   => None
+    case _ => None
 
-  val init: Castles  = 0x8100000000000081L
-  val none: Castles  = 0L
+  val init: Castles = 0x8100000000000081L
+  val none: Castles = 0L
   val black: Castles = 0x8100000000000000L

@@ -23,8 +23,10 @@ enum Status(val id: Int):
   case Outoftime extends Status(35) // clock flag
   case Cheat extends Status(36)
   case NoStart extends Status(37) // the player did not make the first move in time
-  case InsufficientMaterialClaim extends Status(38)
-  case UnknownFinish extends Status(50) // we don't know why the game ended
+  case UnknownFinish extends Status(38) // we don't know why the game ended
+  case InsufficientMaterialClaim extends Status(39)
+  // When the side that cannot lose offers (claims) a draw. Not to be confused with automatic draws by
+  // insufficient material.
   case VariantEnd extends Status(60) // the variant has a special ending
 
 object Status:

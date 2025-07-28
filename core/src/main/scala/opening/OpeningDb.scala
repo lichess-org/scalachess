@@ -20,7 +20,7 @@ object OpeningDb:
     .foldLeft(Map.empty) { case (acc, op) =>
       acc.updatedWith(op.key):
         case Some(prev) if prev.uci.value.size < op.uci.value.size => prev.some
-        case _                                                     => op.some
+        case _ => op.some
     }
 
   def isShortest(op: Opening) = shortestLines.get(op.key).contains(op)
@@ -29,7 +29,7 @@ object OpeningDb:
 
   def findByStandardFen(fen: StandardFen): Option[Opening] = byFen.get(fen)
 
-  val SEARCH_MAX_PLIES  = 40
+  val SEARCH_MAX_PLIES = 40
   val SEARCH_MIN_PIECES = 20
 
   // assumes standard initial Fen and variant
@@ -46,7 +46,7 @@ object OpeningDb:
         .take(SEARCH_MAX_PLIES)
         .takeWhile:
           case move: Move => move.before.board.nbPieces >= SEARCH_MIN_PIECES
-          case _          => false
+          case _ => false
         .collect { case move: Move => move }
         .toVector
       moves.map(_.before) ++ moves.lastOption.map(_.after).toVector
@@ -59,9 +59,9 @@ object OpeningDb:
       .drop(1)
       .foldRight(none[Opening.AtPly]):
         case ((board, ply), None) => byFen.get(format.Fen.writeOpening(board)).map(_.atPly(Ply(ply)))
-        case (_, found)           => found
+        case (_, found) => found
 
   def searchInFens(fens: Iterable[StandardFen]): Option[Opening] =
     fens.foldRight(none[Opening]):
       case (fen, None) => findByStandardFen(fen)
-      case (_, found)  => found
+      case (_, found) => found

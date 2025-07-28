@@ -10,7 +10,7 @@ class VariantTest extends ChessTest:
   List(Standard, Chess960, ThreeCheck, KingOfTheHill, Crazyhouse).foreach: variant =>
     test(s"$variant two-step pawn advance with no check should be valid"):
       val position = FullFen("2r3k1/p2Q1pp1/1p5p/3p4/P7/KP6/2r5/8 b - - 1 36")
-      val game     = fenToGame(position, variant).playMoves(A7 -> A5).get
+      val game = fenToGame(position, variant).playMoves(A7 -> A5).get
       assert(game.position.playable(true))
 
     test(
@@ -126,19 +126,19 @@ class VariantTest extends ChessTest:
 
   test("standard Identify insufficient mating material when called (bishop)."):
     val position = FullFen("krq5/bqqq4/qqr5/1qq5/8/8/8/3qB2K b - -")
-    val game     = fenToGame(position, Standard)
+    val game = fenToGame(position, Standard)
     assertEquals(game.position.materialImbalance, -91)
     assert(game.position.opponentHasInsufficientMaterial)
 
   test("standard Identify sufficient mating material when called (bishop)."):
     val position = FullFen("8/7B/K7/2b5/1k6/8/8/8 b - -")
-    val game     = fenToGame(position, Standard)
+    val game = fenToGame(position, Standard)
     assertEquals(game.position.materialImbalance, 0)
     assertNot(game.position.opponentHasInsufficientMaterial)
 
   test("standard Identify insufficient mating material when called (knight)."):
     val position = FullFen("8/3k4/2q5/8/8/K1N5/8/8 b - -")
-    val game     = fenToGame(position, Standard)
+    val game = fenToGame(position, Standard)
     assertEquals(game.position.materialImbalance, -6)
     assert(game.position.opponentHasInsufficientMaterial)
 
@@ -249,7 +249,7 @@ K  r
 
   test("threeCheck Force a draw when there are only kings remaining"):
     val position = FullFen("8/6K1/8/8/8/8/k7/8 b - -")
-    val game     = fenToGame(position, ThreeCheck)
+    val game = fenToGame(position, ThreeCheck)
     assert(game.position.end)
     assertEquals(game.position.status, Status.Draw.some)
 
@@ -258,42 +258,42 @@ K  r
 
   test("racingKings call it stalemate when there is no legal move"):
     val position = FullFen("8/8/8/8/3K4/8/1k6/b7 b - - 5 3")
-    val game     = fenToGame(position, RacingKings)
+    val game = fenToGame(position, RacingKings)
     assert(game.position.end)
     assert(game.position.staleMate)
 
   test("racingKings should not draw because of insufficient material"):
     val position = FullFen("8/8/8/8/5K2/8/2k5/8 w - - 0 1")
-    val game     = fenToGame(position, RacingKings)
+    val game = fenToGame(position, RacingKings)
     assertNot(game.position.end)
     assertNot(game.position.staleMate)
 
   test("racingKings should recognize a king in the goal"):
     val position = FullFen("2K5/8/6k1/8/8/8/8/Q6q w - - 0 1")
-    val game     = fenToGame(position, RacingKings)
+    val game = fenToGame(position, RacingKings)
     assert(game.position.end)
     assertEquals(game.position.winner, Some(White))
 
   test("racingKings should recognize a king in the goal - black"):
     val position = FullFen("6k1/8/8/8/8/2r5/1KB5/2B5 w - - 0 1")
-    val game     = fenToGame(position, RacingKings)
+    val game = fenToGame(position, RacingKings)
     assert(game.position.end)
     assertEquals(game.position.winner, Some(Black))
 
   test("racingKings should give black one more move when white is in the goal"):
     val position = FullFen("2K5/5k2/8/8/8/8/8/8 b - - 0 1")
-    val game     = fenToGame(position, RacingKings)
+    val game = fenToGame(position, RacingKings)
     assertNot(game.position.end)
 
   test("racingKings should give black one more move but not if it does not matter anyway"):
     val position = FullFen("2K5/8/2n1nk2/8/8/8/8/4r3 b - - 0 1")
-    val game     = fenToGame(position, RacingKings)
+    val game = fenToGame(position, RacingKings)
     assert(game.position.end)
     assertEquals(game.position.winner, Some(White))
 
   test("racingKings should call it a draw with both kings in the goal"):
     val position = FullFen("2K2k2/8/8/8/8/1b6/1b6/8 w - - 0 1")
-    val game     = fenToGame(position, RacingKings)
+    val game = fenToGame(position, RacingKings)
     assert(game.position.end)
     assertEquals(game.position.status, Status.Draw.some)
 
@@ -323,7 +323,7 @@ K  r
 
   test("antichess calculate material imbalance"):
     val position = FullFen("8/p7/8/8/2B5/b7/PPPK2PP/RNB3NR w - - 1 16")
-    val game     = fenToGame(position, Antichess)
+    val game = fenToGame(position, Antichess)
     assertEquals(game.position.materialImbalance, -20)
 
   List(
@@ -346,19 +346,19 @@ K  r
 
   test("racingKings validate board correctly with any check at all for white"):
     val position = FullFen("8/8/8/k5R1/8/8/1rbnNB1K/qrbnNBRQ b - - 0 1")
-    val game     = fenToGame(position, RacingKings)
+    val game = fenToGame(position, RacingKings)
     assertNot(game.position.playable(true))
     assert(game.position.playable(false))
 
   test("racingKings validate board correctly with any check at all for black"):
     val position = FullFen("8/8/8/k7/7r/8/2bnNBRK/qrbnNBRQ w - - 0 1")
-    val game     = fenToGame(position, RacingKings)
+    val game = fenToGame(position, RacingKings)
     assertNot(game.position.playable(true))
     assert(game.position.playable(false))
 
   test("horde validate board correctly: two-step pawn advance with no check should be valid"):
     val position = FullFen("2r3k1/p2P1pp1/1p5p/3p4/P7/PP6/2P3P1/8 b - - 1 36")
-    val game     = fenToGame(position, Horde).playMoves(A7 -> A5).get
+    val game = fenToGame(position, Horde).playMoves(A7 -> A5).get
     assert(game.position.playable(true))
 
   test(

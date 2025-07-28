@@ -13,7 +13,7 @@ object Json:
 
   given Writes[chess.Color] = LibJson.writeAs(_.name)
 
-  given Reads[Uci]  = LibJson.optRead(Uci.apply)
+  given Reads[Uci] = LibJson.optRead(Uci.apply)
   given Writes[Uci] = LibJson.writeAs(_.uci)
 
   given OWrites[Crazyhouse.Pocket] = OWrites: p =>
@@ -32,7 +32,7 @@ object Json:
   given Writes[Opening] with
     def writes(o: Opening) = PlayJson.obj("eco" -> o.eco, "name" -> o.name)
 
-  given Writes[Glyph]  = PlayJson.writes[Glyph]
+  given Writes[Glyph] = PlayJson.writes[Glyph]
   given Writes[Glyphs] = Writes[Glyphs]: gs =>
     PlayJson.toJson(gs.toList)
 
@@ -49,20 +49,20 @@ object Json:
   given OWrites[CorrespondenceClock] = OWrites: c =>
     PlayJson.obj(
       "daysPerTurn" -> c.daysPerTurn,
-      "increment"   -> c.increment,
-      "white"       -> c.whiteTime,
-      "black"       -> c.blackTime
+      "increment" -> c.increment,
+      "white" -> c.whiteTime,
+      "black" -> c.blackTime
     )
 
   given OWrites[chess.opening.Opening.AtPly] = OWrites: o =>
     PlayJson.obj(
-      "eco"  -> o.opening.eco,
+      "eco" -> o.opening.eco,
       "name" -> o.opening.name,
-      "ply"  -> o.ply
+      "ply" -> o.ply
     )
 
   def destString(dests: Map[Square, Bitboard]): String =
-    val sb    = new java.lang.StringBuilder(80)
+    val sb = new java.lang.StringBuilder(80)
     var first = true
     dests.foreach: (orig, dests) =>
       if first then first = false

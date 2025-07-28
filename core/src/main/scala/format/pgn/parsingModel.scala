@@ -18,18 +18,14 @@ case class PgnNodeData(
   export metas.*
 
   private[pgn] def toMove(context: Position): Option[(Position, Move)] =
-    san(context).toOption
-      .map(x =>
-        (
-          x.after,
-          Move(
-            san = x.toSanStr,
-            comments = comments,
-            glyphs = glyphs,
-            variationComments = variationComments
-          )
-        )
+    san(context).toOption.map: x =>
+      val move = Move(
+        san = x.toSanStr,
+        comments = comments,
+        glyphs = glyphs,
+        variationComments = variationComments
       )
+      (x.after, move)
 
 type ParsedPgnTree = Node[PgnNodeData]
 
@@ -57,7 +53,7 @@ case class ParsedPgn(initialPosition: InitialComments, tags: Tags, tree: Option[
         d.toMove(ctx)
           .fold(ctx -> None)(_ -> _.some)
 
-case class ParsedMainline[A](initialPosition: InitialComments, tags: Tags, sans: List[A]):
+case class ParsedMainline[A](initialPosition: InitialComments, tags: Tags, moves: List[A]):
 
   def toGame: Game =
     Game(tags)

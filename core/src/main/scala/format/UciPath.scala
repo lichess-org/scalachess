@@ -5,13 +5,13 @@ package format
  * Made from concatenated UciCharPair strings */
 opaque type UciPath = String
 object UciPath extends OpaqueString[UciPath]:
-  def fromId(id: UciCharPair): UciPath             = id.toString
+  def fromId(id: UciCharPair): UciPath = id.toString
   def fromIds(ids: Iterable[UciCharPair]): UciPath = ids.mkString
 
   extension (e: UciPath)
 
     def computeIds: Iterator[UciCharPair] = e.grouped(2).flatMap(strToId)
-    def ids: List[UciCharPair]            = computeIds.toList
+    def ids: List[UciCharPair] = computeIds.toList
 
     def head: Option[UciCharPair] = strToId(e)
 
@@ -19,13 +19,13 @@ object UciPath extends OpaqueString[UciPath]:
 
     def split: Option[(UciCharPair, UciPath)] = head.map(_ -> e.drop(2))
 
-    inline def isEmpty: Boolean  = e.isEmpty
+    inline def isEmpty: Boolean = e.isEmpty
     inline def nonEmpty: Boolean = !isEmpty
 
     def lastId: Option[UciCharPair] = strToId(e.takeRight(2))
 
     def +(id: UciCharPair): UciPath = e + id.toString
-    def +(more: UciPath): UciPath   = e + more
+    def +(more: UciPath): UciPath = e + more
 
     def prepend(id: UciCharPair): UciPath = id.toString + e
 

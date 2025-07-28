@@ -62,7 +62,7 @@ object PgnNodeEncoder:
       addTurnNumberPrefix(forceTurnNumber, builder, ply)
       renderValueAndVariations(builder, ply)
       tree.child.match
-        case None    => ()
+        case None => ()
         case Some(x) =>
           builder.addOne(' ')
           x.render(builder, tree.forceTurnNumber(ply), ply.next)

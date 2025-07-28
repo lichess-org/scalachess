@@ -23,7 +23,7 @@ final private[glicko] class FloatingResult(player: Rating, opponent: Rating, sco
   def players = List(player, opponent)
 
 final private[glicko] class GameResult(winner: Rating, loser: Rating, isDraw: Boolean) extends Result:
-  private val POINTS_FOR_WIN  = 1.0d
+  private val POINTS_FOR_WIN = 1.0d
   private val POINTS_FOR_LOSS = 0.0d
   private val POINTS_FOR_DRAW = 0.5d
 
@@ -54,7 +54,7 @@ final private[glicko] class GameResult(winner: Rating, loser: Rating, isDraw: Bo
 private[glicko] trait RatingPeriodResults[R <: Result]():
   val results: List[R]
   def getResults(player: Rating): List[R] = results.filter(_.participated(player))
-  def getParticipants: Set[Rating]        = results.flatMap(_.players).toSet
+  def getParticipants: Set[Rating] = results.flatMap(_.players).toSet
 
 final private[glicko] class GameRatingPeriodResults(val results: List[GameResult])
     extends RatingPeriodResults[GameResult]

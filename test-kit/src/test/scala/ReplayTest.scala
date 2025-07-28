@@ -3,7 +3,7 @@ package chess
 import cats.syntax.all.*
 import chess.format.pgn.Fixtures.*
 import chess.format.pgn.{ PgnStr, SanStr }
-import chess.variant.Chess960
+import chess.variant.{ Chess960, FromPosition, Standard }
 import snapshot4s.generated.snapshotConfig
 import snapshot4s.munit.SnapshotAssertions
 
@@ -12,70 +12,59 @@ import format.{ FullFen, Fen }
 class ReplayTest extends MunitExtensions with SnapshotAssertions:
 
   test("replay from position close chess"):
-    val fen   = FullFen("""8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1""")
+    val fen = FullFen("""8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1""")
     val moves = SanStr.from("""d4 d5 Nf4 Nf5 g4 g5 gxf5 exf5""".split(' ').toList)
-    assertMatch(Replay.gameMoveWhileValid(moves, fen, variant.FromPosition)):
-      case (_, games, None) =>
-        assertEquals(games.size, 8)
-        assertEquals(games(1)._2._2, "d5")
+    val init = Position.AndFullMoveNumber(FromPosition, fen)
+    assertRight(init.playMoves(moves)): moves =>
+      assertEquals(moves.size, 8)
+      assertEquals(moves(1).toSanStr, "d5")
 
   test("replay errors should keep order"):
-    val fen   = FullFen("""8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1""")
+    val fen = FullFen("""8/rnbqkbnr/pppppppp/8/8/PPPPPPPP/RNBQKBNR/8 w - - 0 1""")
     val moves = SanStr.from("""d4 d5 Nf3""".split(' ').toList)
-    assertMatch(Replay.gameMoveWhileValid(moves, fen, variant.FromPosition)):
-      case (_, games, Some(_)) =>
-        assertEquals(games.size, 2)
-        assertEquals(games(1)._2._2, "d5")
-        assertEquals(games(0)._2._2, "d4")
+    val init = Position.AndFullMoveNumber(FromPosition, fen)
+    assertRight(init.playWhileValid(moves, init.ply)):
+      case (_, moves, Some(err)) =>
+        assertEquals(moves.size, 2)
+        assertEquals(moves(1).toSanStr, "d5")
+        assertEquals(moves(0).toSanStr, "d4")
+        assertEquals(err, ErrorStr("Cannot play Nf3 at move 2 by white"))
 
   test("chess960 castlings"):
-    val sans: Vector[SanStr] =
-      SanStr.from(
-        "e4 e5 Ne3 f6 Nb3 Nb6 O-O-O Ne6 Ba6 O-O-O Nd5 Nxd5 Bxb7+ Kb8"
-          .split(' ')
-          .toVector
-      )
-    val fen                  = Fen.Full("nrknbbqr/pppppppp/8/8/8/8/PPPPPPPP/NRKNBBQR w KQkq - 0 1")
-    val (init, steps, error) = chess.Replay.gameMoveWhileValid(sans, fen, Chess960)
-    assertEquals(init, Game(Chess960, fen.some))
-    assertEquals(error, None)
-    assertEquals(steps.size, sans.size)
+    val sans = SanStr.from("e4 e5 Ne3 f6 Nb3 Nb6 O-O-O Ne6 Ba6 O-O-O Nd5 Nxd5 Bxb7+ Kb8".split(' ')).toVector
+    val fen = Fen.Full("nrknbbqr/pppppppp/8/8/8/8/PPPPPPPP/NRKNBBQR w KQkq - 0 1")
+    val init = Position.AndFullMoveNumber(Chess960, fen)
+    assertRight(init.playMoves(sans)): moves =>
+      assertEquals(moves.size, sans.size)
 
   test("castling always 960 notation"):
-    val sans: Vector[SanStr] =
-      SanStr.from(
-        "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3 e5 d5 Nh5 Qd2 Qh4+ g3 Qe7 O-O-O"
-          .split(' ')
-          .toVector
-      )
-    val (_, steps, error) = chess.Replay.gameMoveWhileValid(
-      sans,
-      Fen.Full.initial,
-      variant.Standard
-    )
-    assertEquals(error, None)
-    assertEquals(steps.size, sans.size)
-    assertEquals(steps(9)._2.uci.uci, "e8h8")
-    assertEquals(steps(18)._2.uci.uci, "e1a1")
+    val sans =
+      SanStr.from("d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 f3 O-O Be3 e5 d5 Nh5 Qd2 Qh4+ g3 Qe7 O-O-O".split(' ')).toVector
+    val init = Position.AndFullMoveNumber(Standard, Fen.Full.initial)
+    assertRight(init.playMoves(sans)): moves =>
+      assertEquals(moves.size, sans.size)
+      assertEquals(moves(9).toUci.uci, "e8h8")
+      assertEquals(moves(18).toUci.uci, "e1a1")
 
   test("replay from fen then castle"):
-    val fen               = Fen.Full("2bqkb1r/1pp1ppp1/7r/pN2p2p/3PP3/P3P3/1PP1B1PP/R2Q1RK1 w k - 3 13")
-    val moves             = SanStr.from("dxe5 Qxd1 Raxd1 Rc6 Rd2 e6 Rfd1 Be7 Na7 O-O".split(" "))
-    val (_, steps, error) = chess.Replay.gameMoveWhileValid(moves, fen, variant.Standard)
-    assertEquals(error, None)
-    assertEquals(steps.size, moves.size)
+    val fen = Fen.Full("2bqkb1r/1pp1ppp1/7r/pN2p2p/3PP3/P3P3/1PP1B1PP/R2Q1RK1 w k - 3 13")
+    val moves = SanStr.from("dxe5 Qxd1 Raxd1 Rc6 Rd2 e6 Rfd1 Be7 Na7 O-O".split(" ")).toList
+    val init = Position.AndFullMoveNumber(Standard, fen)
+    assertRight(init.playMoves(moves)): steps =>
+      assertEquals(steps.size, moves.size)
 
   test("antichess replay invalid san"):
-    val fen   = FullFen("r1b1k3/pp3p2/n2pp3/2p5/4p3/2P2N2/P4n2/R7 b - - 0 17")
-    val moves = List(SanStr("c4"))
-    assertMatch(Replay.gameMoveWhileValid(moves, fen, variant.Antichess)):
-      case (_, games, Some(_)) => assertEquals(games.size, 0)
+    val fen = FullFen("r1b1k3/pp3p2/n2pp3/2p5/4p3/2P2N2/P4n2/R7 b - - 0 17")
+    val init = Position.AndFullMoveNumber(variant.Antichess, fen)
+    assert(init.play(SanStr("c4")).isLeft)
+    assert(init.play(SanStr("exf3")).isRight)
 
   test("Castling should not be possible when in check"):
-    val fen   = FullFen("r1bq1rk1/ppp2ppp/2n5/8/1bB1Pp2/5N2/PPP1Q1PP/R1B1K2R w KQ - 1 10")
-    val moves = List(SanStr("O-O"))
-    assertMatch(Replay.gameMoveWhileValid(moves, fen, variant.Standard)):
-      case (_, games, Some(_)) => assertEquals(games.size, 0)
+    val fen = FullFen("r1bq1rk1/ppp2ppp/2n5/8/1bB1Pp2/5N2/PPP1Q1PP/R1B1K2R w KQ - 1 10")
+    val init = Position.AndFullMoveNumber(variant.Standard, fen)
+    assert(init.play(SanStr("O-O")).isLeft)
+    assert(init.playMoves(List(SanStr("O-O"))).isLeft)
+    assert(init.play(SanStr("Qd2")).isRight)
 
 
   // format: off

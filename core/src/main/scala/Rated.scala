@@ -6,7 +6,7 @@ object Rated extends YesNo[Rated]:
 
   extension (r: Rated)
     def name: String = if r then "rated" else "casual"
-    def id: Int      = if r then 1 else 0
+    def id: Int = if r then 1 else 0
 
   val all: List[Rated] = List(No, Yes)
 

@@ -19,8 +19,8 @@ class PgnBench:
   // the unit of CPU work per iteration
   private val Work: Long = 10
 
-  var pgnStrs: List[PgnStr]      = scala.compiletime.uninitialized
-  var pgns: List[Pgn]            = scala.compiletime.uninitialized
+  var pgnStrs: List[PgnStr] = scala.compiletime.uninitialized
+  var pgns: List[Pgn] = scala.compiletime.uninitialized
   var parsedPgn: List[ParsedPgn] = scala.compiletime.uninitialized
 
   @Setup
@@ -32,7 +32,7 @@ class PgnBench:
   @Benchmark
   def pgnFullParser(bh: Blackhole) =
     var games = this.pgnStrs
-    var i     = 0
+    var i = 0
     while i < games.size do
       val game = games(i)
       Blackhole.consumeCPU(Work)
@@ -42,7 +42,7 @@ class PgnBench:
   @Benchmark
   def pgnMainlineWithMetasParser(bh: Blackhole) =
     var games = this.pgnStrs
-    var i     = 0
+    var i = 0
     while i < games.size do
       val game = games(i)
       Blackhole.consumeCPU(Work)
@@ -52,7 +52,7 @@ class PgnBench:
   @Benchmark
   def pgnMainlineParser(bh: Blackhole) =
     var games = this.pgnStrs
-    var i     = 0
+    var i = 0
     while i < games.size do
       val game = games(i)
       Blackhole.consumeCPU(Work)

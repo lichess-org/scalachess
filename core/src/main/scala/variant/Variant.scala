@@ -22,16 +22,16 @@ abstract class Variant private[variant] (
   def initialBoard: Board
   def initialPosition: Position = Position(initialBoard, this, White)
 
-  inline def standard: Boolean      = this == Standard
-  inline def chess960: Boolean      = this == Chess960
-  inline def fromPosition: Boolean  = this == FromPosition
+  inline def standard: Boolean = this == Standard
+  inline def chess960: Boolean = this == Chess960
+  inline def fromPosition: Boolean = this == FromPosition
   inline def kingOfTheHill: Boolean = this == KingOfTheHill
-  inline def threeCheck: Boolean    = this == ThreeCheck
-  inline def antichess: Boolean     = this == Antichess
-  inline def atomic: Boolean        = this == Atomic
-  inline def horde: Boolean         = this == Horde
-  inline def racingKings: Boolean   = this == RacingKings
-  inline def crazyhouse: Boolean    = this == Crazyhouse
+  inline def threeCheck: Boolean = this == ThreeCheck
+  inline def antichess: Boolean = this == Antichess
+  inline def atomic: Boolean = this == Atomic
+  inline def horde: Boolean = this == Horde
+  inline def racingKings: Boolean = this == RacingKings
+  inline def crazyhouse: Boolean = this == Crazyhouse
 
   inline def exotic: Boolean = !standard
 
@@ -49,9 +49,9 @@ abstract class Variant private[variant] (
 
   def isValidPromotion(promotion: Option[PromotableRole]): Boolean =
     promotion match
-      case None                                 => true
+      case None => true
       case Some(Queen | Rook | Knight | Bishop) => true
-      case _                                    => false
+      case _ => false
 
   def validMoves(position: Position): List[Move]
 
@@ -61,14 +61,14 @@ abstract class Variant private[variant] (
       if piece.color != position.color then Nil
       else
         val targets = ~us
-        val bb      = square.bb
+        val bb = square.bb
         piece.role match
-          case Pawn   => position.genEnPassant(us & bb) ++ position.genPawn(bb, targets)
+          case Pawn => position.genEnPassant(us & bb) ++ position.genPawn(bb, targets)
           case Knight => position.genKnight(us & bb, targets)
           case Bishop => position.genBishop(us & bb, targets)
-          case Rook   => position.genRook(us & bb, targets)
-          case Queen  => position.genQueen(us & bb, targets)
-          case King   => position.genKingAt(targets, square)
+          case Rook => position.genRook(us & bb, targets)
+          case Queen => position.genQueen(us & bb, targets)
+          case King => position.genKingAt(targets, square)
     }
 
   def pieceThreatened(board: Board, by: Color, to: Square): Boolean =
@@ -151,7 +151,7 @@ abstract class Variant private[variant] (
     * the game should be drawn.
     */
   def opponentHasInsufficientMaterial(position: Position): Boolean =
-    InsufficientMatingMaterial(position, !position.color)
+    InsufficientMatingMaterial(position.board, !position.color)
 
   def playerHasInsufficientMaterial(position: Position): Option[Boolean] =
     // For all variants except Antichess and Horde, considering turn isn't needed:
@@ -212,7 +212,7 @@ object Variant:
       Horde,
       RacingKings
     )
-    val byId  = all.mapBy(_.id)
+    val byId = all.mapBy(_.id)
     val byKey = all.mapBy(_.key)
 
     val openingSensibleVariants: Set[Variant] = Set(
@@ -231,12 +231,12 @@ object Variant:
 
   inline def default: Variant = Standard
 
-  inline def apply(inline id: Id): Option[Variant]       = list.byId.get(id)
+  inline def apply(inline id: Id): Option[Variant] = list.byId.get(id)
   inline def apply(inline key: LilaKey): Option[Variant] = list.byKey.get(key)
-  def orDefault(id: Id): Variant                         = apply(id) | default
-  def orDefault(key: LilaKey): Variant                   = apply(key) | default
-  def idOrDefault(id: Option[Id]): Variant               = id.flatMap(apply(_)) | default
-  def orDefault(key: Option[LilaKey]): Variant           = key.flatMap(apply(_)) | default
+  def orDefault(id: Id): Variant = apply(id) | default
+  def orDefault(key: LilaKey): Variant = apply(key) | default
+  def idOrDefault(id: Option[Id]): Variant = id.flatMap(apply(_)) | default
+  def orDefault(key: Option[LilaKey]): Variant = key.flatMap(apply(_)) | default
 
   def byName(name: String): Option[Variant] =
     list.all.find(_.name.toLowerCase == name.toLowerCase)

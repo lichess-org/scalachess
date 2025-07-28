@@ -9,21 +9,20 @@ import fs2.*
 import fs2.io.file.Files
 import weaver.*
 
-object InsufficientMaterialTest extends SimpleIOSuite:
+object HordeInsufficientMaterialTest extends SimpleIOSuite:
 
   test("horde"):
     run("test-kit/src/test/resources/horde_insufficient_material.csv", Horde).map(expect(_))
 
   given Monoid[Boolean] with
-    def empty                           = true
+    def empty = true
     def combine(x: Boolean, y: Boolean) = x && y
 
   private def run(file: String, variant: Variant): IO[Boolean] =
     parser(file)
       .foldMap(_.run(variant))
       .compile
-      .toList
-      .map(_.head)
+      .lastOrError
 
   private def parser(file: String): Stream[IO, Case] =
     Files[IO]

@@ -33,7 +33,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
     if v == Crazyhouse then copy(variant = v).ensureCrazyData
     else copy(variant = v)
 
-  def withCrazyData(data: Crazyhouse.Data): Position         = updateHistory(_.copy(crazyData = data.some))
+  def withCrazyData(data: Crazyhouse.Data): Position = updateHistory(_.copy(crazyData = data.some))
   def withCrazyData(data: Option[Crazyhouse.Data]): Position = updateHistory(_.copy(crazyData = data))
   def withCrazyData(f: Crazyhouse.Data => Crazyhouse.Data): Position =
     withCrazyData(f(crazyData.getOrElse(Crazyhouse.Data.init)))
@@ -60,7 +60,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
   def drops: Option[List[Square]] =
     variant match
       case v: Crazyhouse.type => v.possibleDrops(this)
-      case _                  => None
+      case _ => None
 
   def checkSquare: Option[Square] = if check.yes then ourKing else None
 
@@ -94,7 +94,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
   inline def variantEnd: Boolean = variant.specialEnd(this)
 
   @threadUnsafe
-  lazy val check: Check               = checkOf(color)
+  lazy val check: Check = checkOf(color)
   inline def checkOf(c: Color): Check = variant.kingThreatened(board, c)
 
   @threadUnsafe
@@ -187,7 +187,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
     val s1: List[Move] = for
       from <- capturers
-      to   <- from.pawnAttacks(color) & them & mask
+      to <- from.pawnAttacks(color) & them & mask
       move <- genPawnMoves(from, to, true)
     yield move
 
@@ -204,13 +204,13 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
          else Bitboard.rank(color.fourthRank))
 
     val s2: List[Move] = for
-      to   <- singleMoves & mask
+      to <- singleMoves & mask
       from <- Square(to.value + (if isWhiteTurn then -8 else 8)).toList
       move <- genPawnMoves(from, to, false)
     yield move
 
     val s3: List[Move] = for
-      to   <- doubleMoves & mask
+      to <- doubleMoves & mask
       from <- Square(to.value + (if isWhiteTurn then -16 else 16))
       move <- normalMove(from, to, Pawn, false)
     yield move
@@ -220,28 +220,28 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
   def genKnight(knights: Bitboard, mask: Bitboard): List[Move] =
     for
       from <- knights
-      to   <- from.knightAttacks & mask
+      to <- from.knightAttacks & mask
       move <- normalMove(from, to, Knight, isOccupied(to))
     yield move
 
   def genBishop(bishops: Bitboard, mask: Bitboard): List[Move] =
     for
       from <- bishops
-      to   <- from.bishopAttacks(board.occupied) & mask
+      to <- from.bishopAttacks(board.occupied) & mask
       move <- normalMove(from, to, Bishop, isOccupied(to))
     yield move
 
   def genRook(rooks: Bitboard, mask: Bitboard): List[Move] =
     for
       from <- rooks
-      to   <- from.rookAttacks(board.occupied) & mask
+      to <- from.rookAttacks(board.occupied) & mask
       move <- normalMove(from, to, Rook, isOccupied(to))
     yield move
 
   def genQueen(queens: Bitboard, mask: Bitboard): List[Move] =
     for
       from <- queens
-      to   <- from.queenAttacks(board.occupied) & mask
+      to <- from.queenAttacks(board.occupied) & mask
       move <- normalMove(from, to, Queen, isOccupied(to))
     yield move
 
@@ -268,8 +268,8 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
           || (rook.value > king.value && history.castles.can(color, KingSide))
         toKingFile = if rook.value < king.value then File.C else File.G
         toRookFile = if rook.value < king.value then File.D else File.F
-        kingTo     = Square(toKingFile, king.rank)
-        rookTo     = Square(toRookFile, rook.rank)
+        kingTo = Square(toKingFile, king.rank)
+        rookTo = Square(toRookFile, rook.rank)
         // calulate different path for standard vs chess960
         path =
           if variant.chess960 || variant.fromPosition
@@ -364,9 +364,9 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
   private def castle(king: Square, kingTo: Square, rook: Square, rookTo: Square): List[Move] =
 
     val boardAfter = for
-      b1    <- board.take(king)
-      b2    <- b1.take(rook)
-      b3    <- b2.put(color.king, kingTo)
+      b1 <- board.take(king)
+      b2 <- b1.take(rook)
+      b3 <- b2.put(color.king, kingTo)
       after <- b3.put(color.rook, rookTo)
     yield after
 
@@ -378,7 +378,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
     val destInput = if !isChess960 then List(rook, kingTo) else List(rook)
 
     for
-      after           <- boardAfter.map(withBoard).toList
+      after <- boardAfter.map(withBoard).toList
       inputKingSquare <- destInput
     yield Move(
       piece = color.king,
@@ -395,7 +395,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 object Position:
 
   case class AndFullMoveNumber(position: Position, fullMoveNumber: FullMoveNumber):
-    def ply: Ply     = fullMoveNumber.ply(position.color)
+    def ply: Ply = fullMoveNumber.ply(position.color)
     def toGame: Game = Game(position = position, ply = ply, startedAtPly = ply)
 
   object AndFullMoveNumber:
@@ -408,6 +408,11 @@ object Position:
         .flatMap(Fen.readWithMoveNumber(variant, _))
         .getOrElse:
           AndFullMoveNumber(variant.initialPosition, FullMoveNumber.initial)
+
+    def apply(variant: Variant, fen: Fen.Full): AndFullMoveNumber =
+      Fen
+        .readWithMoveNumber(variant, fen)
+        .getOrElse(AndFullMoveNumber(variant.initialPosition, FullMoveNumber.initial))
 
     given CanPlay[AndFullMoveNumber] with
       extension (position: AndFullMoveNumber)
@@ -439,6 +444,9 @@ object Position:
 
   def apply(variant: Variant, fen: Option[Fen.Full]): Position =
     fen.flatMap(Fen.read(variant, _)).getOrElse(variant.initialPosition)
+
+  def apply(variant: Variant, fen: Fen.Full): Position =
+    Fen.read(variant, fen).getOrElse(variant.initialPosition)
 
   given CanPlay[Position]:
     extension (position: Position)

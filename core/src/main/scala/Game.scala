@@ -45,7 +45,7 @@ case class Game(
 
   def applyWithCompensated(move: Move): Clock.WithCompensatedLag[Game] =
     val newPosition = move.after
-    val newClock    = applyClock(move.metrics, newPosition.status.isEmpty)
+    val newClock = applyClock(move.metrics, newPosition.status.isEmpty)
 
     Clock.WithCompensatedLag(
       copy(
@@ -75,8 +75,8 @@ case class Game(
       val c2 = c1.step(metrics, gameActive)
       if ply - startedAtPly == Ply(1) then c2.map(_.start) else c2
 
-  def apply(uci: Uci.Move): Either[ErrorStr, (Game, Move)]  = apply(uci.orig, uci.dest, uci.promotion)
-  def apply(uci: Uci.Drop): Either[ErrorStr, (Game, Drop)]  = drop(uci.role, uci.square)
+  def apply(uci: Uci.Move): Either[ErrorStr, (Game, Move)] = apply(uci.orig, uci.dest, uci.promotion)
+  def apply(uci: Uci.Drop): Either[ErrorStr, (Game, Drop)] = drop(uci.role, uci.square)
   def apply(uci: Uci): Either[ErrorStr, (Game, MoveOrDrop)] =
     uci match
       case uci: Uci.Move => apply(uci)

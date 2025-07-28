@@ -29,21 +29,31 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   def contains(color: Color, role: Role): Boolean =
     piece(color, role).nonEmpty
 
+  /* bitboard of a given piece */
   def byPiece(piece: Piece): Bitboard =
     byPiece(piece.color, piece.role)
 
+  /* bitboard of a piece by given color and role */
   def byPiece(color: Color, role: Role): Bitboard =
     byColor(color) & byRole(role)
 
+  /* bitboard of pieces by given color and roles */
+  def byPiece(color: Color, roles: Role*): Bitboard =
+    byColor(color) & byRole(roles*)
+
+  /* return a Role at a given square if any */
   def roleAt(s: Square): Option[Role] =
     byRole.findRole(_.contains(s))
 
+  /* return a Role at a square by given file and rank if any */
   def roleAt(file: File, rank: Rank): Option[Role] =
     byRole.findRole(_.contains(file, rank))
 
+  /* return a Color at a square by if any */
   def colorAt(s: Square): Option[Color] =
     byColor.findColor(_.contains(s))
 
+  /* return a Color at a square by given file and rank if any */
   def colorAt(file: File, rank: Rank): Option[Color] =
     byColor.findColor(_.contains(file, rank))
 
@@ -64,6 +74,12 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
 
   def blackAt(s: Square): Boolean =
     black.contains(s)
+
+  def byRole(roles: Role*): Bitboard =
+    roles.foldLeft(Bitboard.empty)((acc, r) => acc | byRole(r))
+
+  def byRoleOf(color: Color): ByRole[Bitboard] =
+    byRole.map(_ & byColor(color))
 
   def kings(color: Color): List[Square] =
     kingOf(color).squares
@@ -107,9 +123,15 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   def kingsAndKnightsOnlyOf(color: Color): Boolean =
     onlyOf(color, kings | knights)
 
-  def onlyOf(color: Color, roles: Bitboard): Boolean =
-    val colorPieces = byColor(color)
-    (roles & colorPieces) == colorPieces
+  def onlyOf(color: Color, mask: Bitboard): Boolean =
+    byColor(color).subsetOf(mask)
+
+  /* Tests whether a color has only pieces of given roles
+   * e.g. onlyOf(Color.White, Role.King, Role.Queen) means that White has only King and Queen
+   * and no other pieces
+   */
+  def onlyOf(color: Color, roles: Role*): Boolean =
+    byColor(color).subsetOf(byRole(roles*))
 
   def nonKingsOf(color: Color): Bitboard =
     byColor(color) & ~kings
@@ -117,9 +139,15 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   def nonKing: Bitboard =
     occupied & ~kings
 
+  /* Count number of a given piece */
   def count(p: Piece): Int =
     piece(p).count
 
+  /* Count number of a piece by given color and role */
+  def count(color: Color, role: Role): Int =
+    (byColor(color) & byRole(role)).count
+
+  /* Count number of pieces by a given color */
   def count(c: Color): Int =
     byColor(c).count
 
@@ -176,9 +204,6 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
       byColor.map(_ & notMask),
       byRole.map(_ & notMask)
     )
-
-  def byRoleOf(color: Color): ByRole[Bitboard] =
-    byRole.map(_ & byColor(color))
 
   // put a piece to an empty square
   def put(piece: Piece, at: Square): Option[Board] =
@@ -269,27 +294,42 @@ object Board:
     ByRole.fill(Bitboard.empty)
   )
 
+  val standard = Board(
+    occupied = Bitboard(0xffff00000000ffffL),
+    byColor = ByColor(
+      white = Bitboard(0x000000000000ffffL),
+      black = Bitboard(0xffff000000000000L)
+    ),
+    byRole = ByRole(
+      pawn = Bitboard(0x00ff00000000ff00L),
+      knight = Bitboard(0x4200000000000042L),
+      bishop = Bitboard(0x2400000000000024L),
+      rook = Bitboard(0x8100000000000081L),
+      queen = Bitboard(0x0800000000000008L),
+      king = Bitboard(0x1000000000000010L)
+    )
+  )
   def fromMap(pieces: PieceMap): Board =
-    var pawns    = Bitboard.empty
-    var knights  = Bitboard.empty
-    var bishops  = Bitboard.empty
-    var rooks    = Bitboard.empty
-    var queens   = Bitboard.empty
-    var kings    = Bitboard.empty
-    var white    = Bitboard.empty
-    var black    = Bitboard.empty
+    var pawns = Bitboard.empty
+    var knights = Bitboard.empty
+    var bishops = Bitboard.empty
+    var rooks = Bitboard.empty
+    var queens = Bitboard.empty
+    var kings = Bitboard.empty
+    var white = Bitboard.empty
+    var black = Bitboard.empty
     var occupied = Bitboard.empty
 
     pieces.foreach: (s, p) =>
       val position = s.bb
       occupied |= position
       p.role match
-        case Pawn   => pawns |= position
+        case Pawn => pawns |= position
         case Knight => knights |= position
         case Bishop => bishops |= position
-        case Rook   => rooks |= position
-        case Queen  => queens |= position
-        case King   => kings |= position
+        case Rook => rooks |= position
+        case Queen => queens |= position
+        case King => kings |= position
 
       p.color match
         case Color.White => white |= position

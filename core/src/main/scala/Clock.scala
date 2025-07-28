@@ -80,15 +80,15 @@ case class Clock(
         )
       case Some(t) =>
         val elapsed = toNow(t)
-        val lag     = (~metrics.reportedLag(elapsed)).nonNeg
+        val lag = (~metrics.reportedLag(elapsed)).nonNeg
 
-        val player              = players(color)
+        val player = players(color)
         val (lagComp, lagTrack) = player.lag.onMove(lag)
 
         val moveTime = (elapsed - lagComp).nonNeg
 
         val clockActive = gameActive && moveTime < player.remaining
-        val inc         = clockActive.so(player.increment)
+        val inc = clockActive.so(player.increment)
 
         val newC = updatePlayer(color):
           _.takeTime(moveTime - inc)
@@ -117,7 +117,7 @@ case class Clock(
   def goBerserk(c: Color): Clock = updatePlayer(c)(_.copy(berserk = true))
 
   def berserked(c: Color): Boolean = players(c).berserk
-  def lag(c: Color): LagTracker    = players(c).lag
+  def lag(c: Color): LagTracker = players(c).lag
 
   def lagCompAvg: Centis = players.mapReduce(~_.lag.compAvg)(_.avg(_))
 
@@ -192,7 +192,7 @@ object Clock:
         case 30 => "½"
         case 45 => "¾"
         case 90 => "1.5"
-        case _  => limitFormatter.format(limitSeconds / 60d)
+        case _ => limitFormatter.format(limitSeconds / 60d)
 
     def show: String = toString
 

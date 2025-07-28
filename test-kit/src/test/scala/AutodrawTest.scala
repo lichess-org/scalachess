@@ -378,7 +378,7 @@ K   bB""".autoDraw
 
   test("do not detect insufficient material: on two knights"):
     val position = FullFen("1n2k1n1/8/8/8/8/8/8/4K3 w - - 0 1")
-    val game     = fenToGame(position, Standard)
+    val game = fenToGame(position, Standard)
     assertNot(game.position.autoDraw)
     assertNot(game.position.end)
     assertNot(game.position.opponentHasInsufficientMaterial)
@@ -440,7 +440,7 @@ K   bB""".autoDraw
         assertNot(game.position.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on same-color bishops on both sides"):
     val position = FullFen("5K2/8/8/1B6/8/k7/6b1/8 w - - 0 39")
-    val game     = fenToGame(position, Standard)
+    val game = fenToGame(position, Standard)
     assert(game.position.autoDraw)
     assert(game.position.end)
     assert(game.position.opponentHasInsufficientMaterial)

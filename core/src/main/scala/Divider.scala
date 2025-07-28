@@ -6,12 +6,12 @@ import scala.annotation.switch
 
 case class Division(middle: Option[Ply], end: Option[Ply], plies: Ply):
 
-  def openingSize: Ply                  = middle | plies
-  def middleSize: Option[Ply]           = middle.map((end | plies) - _)
-  def endSize: Option[Ply]              = end.map(plies - _)
+  def openingSize: Ply = middle | plies
+  def middleSize: Option[Ply] = middle.map((end | plies) - _)
+  def endSize: Option[Ply] = end.map(plies - _)
   def openingBounds: Option[(Int, Ply)] = middle.map(0 -> _)
-  def middleBounds: Option[(Ply, Ply)]  = (middle, end).tupled
-  def endBounds: Option[(Ply, Ply)]     = end.map(_ -> plies)
+  def middleBounds: Option[(Ply, Ply)] = (middle, end).tupled
+  def endBounds: Option[(Ply, Ply)] = end.map(_ -> plies)
 
 object Division:
   val empty = Division(None, None, Ply.initial)

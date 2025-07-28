@@ -10,19 +10,19 @@ class CrazyhouseVariantTest extends ChessTest:
 
   test("nothing to drop"):
     val fenPosition = FullFen("3Nkb1r/1pQP1ppp/4p3/3N4/N5N1/6B1/PPPPBPPP/R1B2RK1 b - - 0 25")
-    val game        = fenToGame(fenPosition, Crazyhouse).updatePosition: b =>
+    val game = fenToGame(fenPosition, Crazyhouse).updatePosition: b =>
       b.withCrazyData(Crazyhouse.Data.init)
     assert(game.position.checkMate)
     assertNot(game.position.opponentHasInsufficientMaterial)
 
   test("checkmate"):
     val fenPosition = FullFen("r2q1b1r/ppp1kPpp/2p5/2PpN3/1n1Pb3/3PK3/PPr1BPPP/n1q1N2R/b w - - 0 20")
-    val game        = fenToGame(fenPosition, Crazyhouse)
+    val game = fenToGame(fenPosition, Crazyhouse)
     assert(game.position.checkMate)
 
   test("pieces to drop, in vain"):
     val fenPosition = FullFen("3Nkb1r/1pQP1ppp/4p3/3N4/N5N1/6B1/PPPPBPPP/R1B2RK1 b - - 0 25")
-    val game        = fenToGame(fenPosition, Crazyhouse).updatePosition: b =>
+    val game = fenToGame(fenPosition, Crazyhouse).updatePosition: b =>
       b.withCrazyData(
         Crazyhouse.Data(
           pockets = ByColor(
@@ -260,7 +260,7 @@ class CrazyhouseVariantTest extends ChessTest:
 
   test("autodraw: not draw when only kings left"):
     val fenPosition = FullFen("k6K/8/8/8/8/8/8/8 w - - 0 25")
-    val game        = fenToGame(fenPosition, Crazyhouse)
+    val game = fenToGame(fenPosition, Crazyhouse)
     assertNot(game.position.autoDraw)
     assertNot(game.position.end)
     assertNot(game.position.opponentHasInsufficientMaterial)
@@ -343,7 +343,7 @@ class CrazyhouseVariantTest extends ChessTest:
 
   test("Index out of bounds when hashing pockets"):
     val fenPosition = FullFen("2q1k1nr/B3bbrb/8/8/8/8/3qN1RB/1Q2KB1R/RRRQQQQQQrrrqqq w Kk - 0 11")
-    val game        = fenToGame(fenPosition, Crazyhouse)
+    val game = fenToGame(fenPosition, Crazyhouse)
     assert(game.apply(E1, D2).isRight)
 
 case class DropTestCase(fen: FullFen, drops: Option[Set[Square]])

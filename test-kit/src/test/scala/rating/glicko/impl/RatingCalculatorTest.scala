@@ -15,7 +15,7 @@ class RatingCalculatorTest extends ScalaCheckSuite with chess.MunitExtensions:
     val results = GameRatingPeriodResults:
       List:
         outcome.winner match
-          case None        => GameResult(wRating, bRating, true)
+          case None => GameResult(wRating, bRating, true)
           case Some(White) => GameResult(wRating, bRating, false)
           case Some(Black) => GameResult(bRating, wRating, false)
     calculator.updateRatings(results, true)

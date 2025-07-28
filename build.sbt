@@ -2,17 +2,17 @@ import snapshot4s.BuildInfo.snapshot4sVersion
 
 inThisBuild(
   Seq(
-    scalaVersion      := "3.7.1",
-    version           := "17.8.2",
-    organization      := "com.github.lichess-org.scalachess",
+    scalaVersion := "3.7.1",
+    version := "17.9.1",
+    organization := "com.github.lichess-org.scalachess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
-    publishTo         := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", "")))),
+    publishTo := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", "")))),
     semanticdbEnabled := true, // for scalafix
     Compile / packageDoc / publishArtifact := false
   )
 )
 
-val scalalibVersion = "11.8.8"
+val scalalibVersion = "11.9.0"
 
 val commonSettings = Seq(
   scalacOptions := Seq(
@@ -34,13 +34,13 @@ lazy val scalachess: Project = Project("scalachess", file("core")).settings(
   commonSettings,
   name := "scalachess",
   libraryDependencies ++= List(
-    "com.github.lichess-org.scalalib" %% "scalalib-core"  % scalalibVersion,
+    "com.github.lichess-org.scalalib" %% "scalalib-core" % scalalibVersion,
     "com.github.lichess-org.scalalib" %% "scalalib-model" % scalalibVersion,
-    "org.typelevel"                   %% "cats-core"      % "2.13.0",
-    "org.typelevel"                   %% "alleycats-core" % "2.13.0",
-    "org.typelevel"                   %% "cats-parse"     % "1.1.0",
-    "dev.optics"                      %% "monocle-core"   % "3.3.0",
-    "org.typelevel"                   %% "kittens"        % "3.5.0"
+    "org.typelevel" %% "cats-core" % "2.13.0",
+    "org.typelevel" %% "alleycats-core" % "2.13.0",
+    "org.typelevel" %% "cats-parse" % "1.1.0",
+    "dev.optics" %% "monocle-core" % "3.3.0",
+    "org.typelevel" %% "kittens" % "3.5.0"
   ),
   resolvers += "jitpack".at("https://jitpack.io")
 )
@@ -50,7 +50,7 @@ lazy val playJson: Project = Project("playJson", file("playJson"))
     commonSettings,
     name := "scalachess-play-json",
     libraryDependencies ++= List(
-      "org.playframework"               %% "play-json"          % "3.0.4",
+      "org.playframework" %% "play-json" % "3.0.5",
       "com.github.lichess-org.scalalib" %% "scalalib-play-json" % scalalibVersion
     )
   )
@@ -62,6 +62,13 @@ lazy val rating: Project = Project("rating", file("rating"))
     name := "scalachess-rating"
   )
   .dependsOn(scalachess)
+
+lazy val tiebreak: Project = Project("tiebreak", file("tiebreak"))
+  .settings(
+    commonSettings,
+    name := "scalachess-tiebreak"
+  )
+  .dependsOn(scalachess, rating)
 
 lazy val bench = project
   .enablePlugins(JmhPlugin)
@@ -77,25 +84,25 @@ lazy val testKit = project
     commonSettings,
     name := "scalachess-test-kit",
     libraryDependencies ++= List(
-      "org.scalacheck" %% "scalacheck"        % "1.18.1",
-      "org.typelevel"  %% "literally"         % "1.2.0",
-      "org.scalameta"  %% "munit"             % "1.1.1"           % Test,
-      "org.scalameta"  %% "munit-scalacheck"  % "1.1.0"           % Test,
-      "org.typelevel"  %% "weaver-cats"       % "0.9.0"           % Test,
-      "org.typelevel"  %% "weaver-scalacheck" % "0.9.0"           % Test,
-      "co.fs2"         %% "fs2-core"          % "3.12.0"          % Test,
-      "co.fs2"         %% "fs2-io"            % "3.12.0"          % Test,
-      "org.typelevel"  %% "discipline-munit"  % "2.0.0"           % Test,
-      "org.typelevel"  %% "cats-laws"         % "2.13.0"          % Test,
-      "com.siriusxm"   %% "snapshot4s-munit"  % snapshot4sVersion % Test
+      "org.scalacheck" %% "scalacheck" % "1.18.1",
+      "org.typelevel" %% "literally" % "1.2.0",
+      "org.scalameta" %% "munit" % "1.1.1" % Test,
+      "org.scalameta" %% "munit-scalacheck" % "1.1.0" % Test,
+      "org.typelevel" %% "weaver-cats" % "0.9.3" % Test,
+      "org.typelevel" %% "weaver-scalacheck" % "0.9.3" % Test,
+      "co.fs2" %% "fs2-core" % "3.12.0" % Test,
+      "co.fs2" %% "fs2-io" % "3.12.0" % Test,
+      "org.typelevel" %% "discipline-munit" % "2.0.0" % Test,
+      "org.typelevel" %% "cats-laws" % "2.13.0" % Test,
+      "com.siriusxm" %% "snapshot4s-munit" % snapshot4sVersion % Test
     )
   )
-  .dependsOn(scalachess % "compile->compile", rating % "compile->compile")
+  .dependsOn(scalachess % "compile->compile", rating % "compile->compile", tiebreak % "compile->compile")
 
 lazy val root = project
   .in(file("."))
   .settings(publish := {}, publish / skip := true)
-  .aggregate(scalachess, rating, playJson, testKit, bench)
+  .aggregate(scalachess, rating, tiebreak, playJson, testKit, bench)
 
 addCommandAlias("prepare", "scalafixAll; scalafmtAll")
 addCommandAlias("check", "; scalafixAll --check; scalafmtCheckAll")

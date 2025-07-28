@@ -5,15 +5,15 @@ import org.scalacheck.{ Arbitrary, Gen }
 
 object NodeArbitraries:
 
-  given [A](using Arbitrary[A]): Arbitrary[Tree[A]]      = Arbitrary(Gen.oneOf(genNode, genVariation))
-  given [A](using Arbitrary[A]): Arbitrary[Node[A]]      = Arbitrary(genNode)
+  given [A](using Arbitrary[A]): Arbitrary[Tree[A]] = Arbitrary(Gen.oneOf(genNode, genVariation))
+  given [A](using Arbitrary[A]): Arbitrary[Node[A]] = Arbitrary(genNode)
   given [A](using Arbitrary[A]): Arbitrary[Variation[A]] = Arbitrary(genVariation)
 
   type NodeWithPath[A] = (Node[A], List[A])
   given [A](using Arbitrary[A]): Arbitrary[NodeWithPath[A]] = Arbitrary(genNodeWithPath)
 
-  given treeEq[A]: Eq[Tree[A]]           = Eq.fromUniversalEquals
-  given nodeEq[A]: Eq[Node[A]]           = Eq.fromUniversalEquals
+  given treeEq[A]: Eq[Tree[A]] = Eq.fromUniversalEquals
+  given nodeEq[A]: Eq[Node[A]] = Eq.fromUniversalEquals
   given variationEq[A]: Eq[Variation[A]] = Eq.fromUniversalEquals
 
   def genNodeWithPath[A](using Arbitrary[A]) =
@@ -27,7 +27,7 @@ object NodeArbitraries:
     Gen
       .prob(prob)
       .flatMap:
-        case true  => node.child.fold(Gen.const(Nil))(genPath(_)).map(node.value :: _)
+        case true => node.child.fold(Gen.const(Nil))(genPath(_)).map(node.value :: _)
         case false =>
           if node.variations.isEmpty
           then Gen.const(Nil)
@@ -35,7 +35,7 @@ object NodeArbitraries:
             Gen
               .prob(0.95)
               .flatMap:
-                case true  => Gen.oneOf(node.variations).flatMap(v => genPath(v.toNode))
+                case true => Gen.oneOf(node.variations).flatMap(v => genPath(v.toNode))
                 case false => Gen.const(node.value :: Nil)
 
   def genNode[A](using Arbitrary[A]): Gen[Node[A]] =

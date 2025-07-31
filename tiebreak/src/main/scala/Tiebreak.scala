@@ -110,6 +110,8 @@ case class Buchholz(modifier: CutModifier) extends Tiebreak("BH", modifier.exten
 
 case class ForeBuchholz(modifier: CutModifier)
     extends Tiebreak("FB", modifier.extendedDescription("Fore Buchholz")):
+  override def extendedCode: String = modifier.extendedCode(code)
+  override def cutModifier: Option[CutModifier] = modifier.some
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>

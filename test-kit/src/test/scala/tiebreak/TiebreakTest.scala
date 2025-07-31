@@ -51,7 +51,7 @@ class TiebreakTest extends ChessTest:
     games.collect:
       case TestGame(white, black, result, roundId) if white == player || black == player =>
         val playerColor = Color.fromWhite(white == player)
-        Game(Some(result(playerColor)), playerColor.fold(black, white), playerColor, roundId)
+        Game(result(playerColor), playerColor.fold(black, white), playerColor, roundId)
 
   val playerA_Games = PlayerWithGames(playerA, povGames(playerA))
   val playerB_Games = PlayerWithGames(playerB, povGames(playerB))
@@ -128,18 +128,9 @@ class TiebreakTest extends ChessTest:
     val points = computeTournamentPoints(allGames, playerA, ForeBuchholz(CutModifier.None))
     assertEquals(points, Some(TiebreakPoint(8f)))
 
-  test("ForeBuchholz with last round yet to be played"):
-    val playerB_GamesWithLastRound = playerB_Games.copy(
-      games = playerB_Games.games ++ Seq(Game(None, playerA, Color.White, "5".some))
-    )
-    val allGamesWithLastRound = allGames.updated(playerB.id, playerB_GamesWithLastRound)
-    val points = computeTournamentPoints(allGamesWithLastRound, playerA, ForeBuchholz(CutModifier.None))
-    // No player has played the last round yet so this should be equivalent to buchholz
-    assertEquals(points, Some(TiebreakPoint(7.5f)))
-
   test("ForeBuchholz with one game played in last round"):
     val playerB_GamesWithLastRound = playerB_Games.copy(
-      games = playerB_Games.games ++ Seq(Game(Points.Zero.some, playerA, Color.White, "5".some))
+      games = playerB_Games.games ++ Seq(Game(Points.Zero, playerA, Color.White, "5".some))
     )
     val allGamesWithLastRound = allGames.updated(playerB.id, playerB_GamesWithLastRound)
     val points = computeTournamentPoints(allGamesWithLastRound, playerA, ForeBuchholz(CutModifier.None))
@@ -171,12 +162,12 @@ class TiebreakTest extends ChessTest:
   test("DirectEncounter with more than one game"):
     val extraDraw = Seq(
       playerA_Games.copy(games =
-        playerA_Games.games ++ Seq(Game(Some(Points.Half), playerD, Color.White, "6".some))
+        playerA_Games.games ++ Seq(Game(Points.Half, playerD, Color.White, "6".some))
       ),
       playerB_Games,
       playerC_Games,
       playerD_Games.copy(games =
-        playerD_Games.games ++ Seq(Game(Some(Points.Half), playerA, Color.Black, "6".some))
+        playerD_Games.games ++ Seq(Game(Points.Half, playerA, Color.Black, "6".some))
       ),
       playerE_Games
     ).mapBy(_.player.id)
@@ -227,9 +218,9 @@ class TiebreakTest extends ChessTest:
     val playerX_Games = PlayerWithGames(
       Player("PlayerX", rating = Elo(1500).some),
       Seq(
-        Game(Some(Points.Half), playerB, Color.White, "1".some),
-        Game(Some(Points.One), playerD, Color.White, "2".some),
-        Game(Some(Points.One), playerE, Color.Black, "3".some)
+        Game(Points.Half, playerB, Color.White, "1".some),
+        Game(Points.One, playerD, Color.White, "2".some),
+        Game(Points.One, playerE, Color.Black, "3".some)
       )
     )
 
@@ -280,7 +271,7 @@ class TiebreakTest extends ChessTest:
   test("AverageOpponentRating with unrated opponents"):
     val unratedOpponent = Player("Unrated Opponent", rating = None)
     val unratedGames = Seq(
-      Game(Some(Points.One), unratedOpponent, Color.White, "1".some)
+      Game(Points.One, unratedOpponent, Color.White, "1".some)
     )
     val unratedPlayerGames = Seq(PlayerWithGames(playerA, unratedGames))
     val points =
@@ -341,14 +332,14 @@ class TiebreakTest extends ChessTest:
     val aaron = Player("Aaron Alfonso Pellisa", rating = Elo(2125).some)
 
     val ruslanGames = Seq(
-      Game(Some(Points.One), josep, Color.White, "1".some),
-      Game(Some(Points.One), carles, Color.Black, "2".some),
-      Game(Some(Points.One), sergi, Color.White, "3".some),
-      Game(Some(Points.Half), Player("bye", None), Color.White, "4".some),
-      Game(Some(Points.One), xavier, Color.Black, "5".some),
-      Game(Some(Points.One), agusti, Color.White, "6".some),
-      Game(Some(Points.One), daniel, Color.Black, "7".some),
-      Game(Some(Points.One), aaron, Color.White, "8".some)
+      Game(Points.One, josep, Color.White, "1".some),
+      Game(Points.One, carles, Color.Black, "2".some),
+      Game(Points.One, sergi, Color.White, "3".some),
+      Game(Points.Half, Player("bye", None), Color.White, "4".some),
+      Game(Points.One, xavier, Color.Black, "5".some),
+      Game(Points.One, agusti, Color.White, "6".some),
+      Game(Points.One, daniel, Color.Black, "7".some),
+      Game(Points.One, aaron, Color.White, "8".some)
     )
     val ruslanPlayerGames = Seq(PlayerWithGames(ruslan, ruslanGames)).mapBy(_.player.id)
     assertEquals(
@@ -370,13 +361,13 @@ class TiebreakTest extends ChessTest:
     val xavier = Player("Xavier Palomo Teruel", rating = Elo(2145).some)
 
     val xavierGames = Seq(
-      Game(Some(Points.One), marc, Color.White, "1".some),
-      Game(Some(Points.One), enric, Color.Black, "2".some),
-      Game(Some(Points.One), josepmg, Color.White, "3".some),
-      Game(Some(Points.Zero), ruslan, Color.White, "4".some),
-      Game(Some(Points.One), francesc, Color.Black, "5".some),
+      Game(Points.One, marc, Color.White, "1".some),
+      Game(Points.One, enric, Color.Black, "2".some),
+      Game(Points.One, josepmg, Color.White, "3".some),
+      Game(Points.Zero, ruslan, Color.White, "4".some),
+      Game(Points.One, francesc, Color.Black, "5".some),
       // POVGame(Some(Points.Zero), Player("bye", None), Color.White), // Rd 7: bye (0)
-      Game(Some(Points.One), agusti, Color.White, "6".some)
+      Game(Points.One, agusti, Color.White, "6".some)
     )
     // Lila excludes all bye games. So we don't need to check for them.
     val xavierPlayerGames = Seq(PlayerWithGames(xavier, xavierGames)).mapBy(_.player.id)
@@ -391,9 +382,9 @@ class TiebreakTest extends ChessTest:
 
   test("PerfectTournamentPerformance - Zero score"):
     val games = Seq(
-      Game(Some(Points.Zero), playerB, Color.Black, "1".some),
-      Game(Some(Points.Zero), playerC, Color.White, "2".some),
-      Game(Some(Points.Zero), playerD, Color.Black, "3".some)
+      Game(Points.Zero, playerB, Color.Black, "1".some),
+      Game(Points.Zero, playerC, Color.White, "2".some),
+      Game(Points.Zero, playerD, Color.Black, "3".some)
     )
     val playerGames = Seq(PlayerWithGames(playerA, games)).mapBy(_.player.id)
     // Lowest rated opponent - 800

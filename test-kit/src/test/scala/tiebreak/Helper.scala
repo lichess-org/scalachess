@@ -31,11 +31,11 @@ object Helper:
       val black = playerFromTag(names.black.map(_.value), ratings.black, fideIds.black.map(_.value))
       val roundId = tags.roundNumber.map(_.toString)
       val byColorPoints = result.map(chess.Outcome.outcomeToPoints)
-      (white, black) match
-        case (Some(w), Some(b)) =>
+      (white, black, byColorPoints) match
+        case (Some(w), Some(b), Some(points)) =>
           List(
-            w -> Game(byColorPoints.map(_.white), b, White, roundId),
-            b -> Game(byColorPoints.map(_.black), w, Black, roundId)
+            w -> Game(points.white, b, White, roundId),
+            b -> Game(points.black, w, Black, roundId)
           ) ++ acc
         case _ => acc
 

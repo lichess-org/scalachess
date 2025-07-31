@@ -74,7 +74,7 @@ case object NbWins extends Tiebreak("WON", "Number of Wins"):
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val myWins = tour.gamesById(player.id).count(_.points.contains(Points.One))
+        val myWins = tour.gamesById(player.id).count(_.points == Points.One)
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(myWins))
       .toMap
 
@@ -83,7 +83,7 @@ case object NbBlackWins extends Tiebreak("BWG", "Number of wins with black"):
     tour.players.view
       .map: player =>
         val myBlackWins =
-          tour.gamesById(player.id).count(g => g.color == Color.Black && g.points.contains(Points.One))
+          tour.gamesById(player.id).count(g => g.color == Color.Black && g.points == Points.One)
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(myBlackWins))
       .toMap
 
@@ -268,7 +268,7 @@ trait Tournament:
         .computePerformanceRating:
           myGames
             .collect:
-              case Tiebreak.Game(Some(points), Tiebreak.Player(_, Some(rating)), _, _) =>
+              case Tiebreak.Game(points, Tiebreak.Player(_, Some(rating)), _, _) =>
                 Elo.Game(points, rating)
         .so(_.value.toFloat)
 
@@ -298,7 +298,7 @@ trait Tournament:
           TiebreakPoint:
             val opponentGames = gamesById(opponent.id)
             val lastRoundGame = opponentGames.find(_.roundId.exists(_ == lastRound))
-            if lastRoundGame.exists(_.points.isDefined) then opponentGames.dropRight(1).score.value + 0.5f
+            if lastRoundGame.isDefined then opponentGames.dropRight(1).score.value + 0.5f
             else opponentGames.score.value
         .sorted
 
@@ -306,8 +306,8 @@ trait Tournament:
     toPlayerGames(id).games
       .map: game =>
         game.points match
-          case Some(Points.One) => scoreOf(game.opponent.id).into(TiebreakPoint)
-          case Some(Points.Half) => scoreOf(game.opponent.id).map(_ / 2f).into(TiebreakPoint)
+          case Points.One => scoreOf(game.opponent.id).into(TiebreakPoint)
+          case Points.Half => scoreOf(game.opponent.id).map(_ / 2f).into(TiebreakPoint)
           case _ => TiebreakPoint.zero
       .sorted
 
@@ -367,7 +367,7 @@ object Tournament:
     override def pointsById(id: PlayerId): Option[Float] =
       games
         .get(id)
-        .map(_.games.flatten(using _.points.map(_.value)).sum)
+        .map(_.games.map(_.points.value).sum)
 
   // Find the lowest integer rating R such that sum of expected scores >= myScore
   // Use the full FIDE conversion table, no ±400 cut
@@ -465,7 +465,7 @@ object Tiebreak:
       tiebreakPoints: List[TiebreakPoint]
   )
 
-  case class Game(points: Option[Outcome.Points], opponent: Player, color: Color, roundId: Option[String])
+  case class Game(points: Outcome.Points, opponent: Player, color: Color, roundId: Option[String])
 
   case class Player(id: PlayerId, rating: Option[Elo])
 
@@ -510,4 +510,4 @@ extension (tieBreakSeq: Seq[TiebreakPoint])
 
 extension (games: Seq[Tiebreak.Game])
   def score: TournamentScore =
-    games.flatMap(_.points.map(_.value)).sum
+    games.map(_.points.value).sum

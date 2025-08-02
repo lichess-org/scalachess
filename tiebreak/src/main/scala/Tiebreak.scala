@@ -56,11 +56,32 @@ object TournamentScore extends OpaqueFloat[TournamentScore]:
   extension (score: TournamentScore) def >=(other: TournamentScore): Boolean = score.value >= other.value
 
 sealed trait Tiebreak(val code: Code, val description: String):
-  def extendedCode: String = code
-  def cutModifier: Option[CutModifier] = None
-  def limitModifier: Option[LimitModifier] = None
+  def extendedCode: String = foldModifier(code, _.extendedCode(code), _ => code)
   // compute players' tiebreak points based on the tournament and a list of previously computed tiebreak points
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints
+
+  def foldModifier[B](
+      default: => B,
+      f: CutModifier => B,
+      g: LimitModifier => B
+  ): B =
+    this match
+      case SumOfProgressiveScores(modifier) =>
+        f(modifier)
+      case AverageRatingOfOpponents(modifier) =>
+        f(modifier)
+      case SonnebornBerger(modifier) =>
+        f(modifier)
+      case Buchholz(modifier) =>
+        f(modifier)
+      case ForeBuchholz(modifier) =>
+        f(modifier)
+      case KoyaSystem(modifier) =>
+        g(modifier)
+      case TournamentPerformanceRating | PerfectTournamentPerformance | NbBlackGames | NbWins | NbBlackWins |
+          AverageOfOpponentsBuchholz | DirectEncounter | AveragePerformanceOfOpponents |
+          AveragePerfectPerformanceOfOpponents =>
+        default
 
 case object NbBlackGames extends Tiebreak("BPG", "Number of games played with black"):
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
@@ -89,8 +110,6 @@ case object NbBlackWins extends Tiebreak("BWG", "Number of wins with black"):
 
 case class SonnebornBerger(modifier: CutModifier)
     extends Tiebreak("SB", modifier.extendedDescription("Sonneborn-Berger")):
-  override def extendedCode: String = modifier.extendedCode(code)
-  override def cutModifier: Option[CutModifier] = modifier.some
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -99,8 +118,6 @@ case class SonnebornBerger(modifier: CutModifier)
       .toMap
 
 case class Buchholz(modifier: CutModifier) extends Tiebreak("BH", modifier.extendedDescription("Buchholz")):
-  override def extendedCode: String = modifier.extendedCode(code)
-  override def cutModifier: Option[CutModifier] = modifier.some
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -110,8 +127,6 @@ case class Buchholz(modifier: CutModifier) extends Tiebreak("BH", modifier.exten
 
 case class ForeBuchholz(modifier: CutModifier)
     extends Tiebreak("FB", modifier.extendedDescription("Fore Buchholz")):
-  override def extendedCode: String = modifier.extendedCode(code)
-  override def cutModifier: Option[CutModifier] = modifier.some
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -155,8 +170,6 @@ case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
 
 case class AverageRatingOfOpponents(modifier: CutModifier)
     extends Tiebreak("ARO", modifier.extendedDescription("Average rating of opponents")):
-  override def extendedCode: String = modifier.extendedCode(code)
-  override def cutModifier: Option[CutModifier] = modifier.some
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -182,7 +195,6 @@ case object AveragePerformanceOfOpponents extends Tiebreak("APRO", "Average perf
 
 case class KoyaSystem(val limit: LimitModifier)
     extends Tiebreak("KS", s"Koya system (limit ${(limit.value * 100).toInt}% of score)"):
-  override def limitModifier: Option[LimitModifier] = limit.some
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
@@ -197,8 +209,6 @@ case class KoyaSystem(val limit: LimitModifier)
 
 case class SumOfProgressiveScores(modifier: CutModifier)
     extends Tiebreak("PS", modifier.extendedDescription("Sum of progressive scores")):
-  override def extendedCode: String = modifier.extendedCode(code)
-  override def cutModifier: Option[CutModifier] = modifier.some
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>

@@ -70,7 +70,7 @@ case object Horde
   /** This function is not implemented yet for Horde chess. */
   override def playerHasInsufficientMaterial(position: Position): Option[Boolean] = None
 
-  /** Any vs K + any where horde is stalemated and only king can move is a fortress draw
+  /** If the horde is stalemated and all of Black's moves keep the stalemate, it's a fortress draw.
     * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
     * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
     */
@@ -80,10 +80,7 @@ case object Horde
       hordeSquare.singleSquare.exists(pieceThreatened(position.board, Color.black, _))
     !mateInOne && {
       if position.isWhiteTurn then position.legalMoves.isEmpty
-      else
-        val legalMoves = validMoves(position)
-        legalMoves.filter(_.piece.role != King).isEmpty &&
-        legalMoves.filter(_.piece.role == King).forall(move => validMoves(move.after).isEmpty)
+      else validMoves(position).forall(move => validMoves(move.after).isEmpty)
     }
 
   extension (board: Board)

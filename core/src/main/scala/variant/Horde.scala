@@ -56,8 +56,7 @@ case object Horde
   /** In horde chess, black can win unless a fortress stalemate is unavoidable.
     *  Auto-drawing the game should almost never happen, but it did in https://lichess.org/xQ2RsU8N#121
     */
-  override def isInsufficientMaterial(position: Position): Boolean =
-    Color.all.forall(color => hordeClosedPosition(position.copy(color = color)))
+  override def isInsufficientMaterial(position: Position): Boolean = hordeClosedPosition(position)
 
   /** In horde chess, the horde cannot win on * v K or [BN]{2} v K or just one piece
     * since they lack a king for checkmate support.

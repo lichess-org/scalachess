@@ -66,8 +66,8 @@ case object Horde
   override def opponentHasInsufficientMaterial(position: Position): Boolean =
     hasInsufficientMaterial(position.board, !position.color) || hordeClosedPosition(position)
 
-  /** This function is not implemented yet for Horde chess. */
-  override def playerHasInsufficientMaterial(position: Position): Option[Boolean] = None
+  override def playerHasInsufficientMaterial(position: Position): Boolean =
+    hasInsufficientMaterial(position.board, position.color) || hordeClosedPosition(position)
 
   /** If the horde is stalemated and all of Black's moves keep the stalemate, it's a fortress draw.
     * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -

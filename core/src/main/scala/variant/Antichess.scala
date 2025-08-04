@@ -59,8 +59,8 @@ case object Antichess
   override def opponentHasInsufficientMaterial(position: Position): Boolean =
     justOneKnightEach(position) && allOnSameColourSquares(position)
 
-  override def playerHasInsufficientMaterial(position: Position): Option[Boolean] =
-    Some(justOneKnightEach(position) && !allOnSameColourSquares(position))
+  override def playerHasInsufficientMaterial(position: Position): Boolean =
+    justOneKnightEach(position) && !allOnSameColourSquares(position)
 
   // No player can win if the only remaining pieces are opposing bishops on different coloured
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color

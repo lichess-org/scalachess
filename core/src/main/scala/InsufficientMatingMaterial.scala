@@ -13,7 +13,7 @@ object InsufficientMatingMaterial:
     board.bishops.intersects(Bitboard.lightSquares) &&
       board.bishops.intersects(Bitboard.darkSquares)
 
-  /*
+  /**
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
    * and it doesn't have any capture
    */
@@ -28,7 +28,48 @@ object InsufficientMatingMaterial:
           }
       )
 
-  /*
+  // todo - review function and make sure no square can ever be iterated over more than once in algorithm
+  /**
+   * Returns whether some square in `destinations` can be reached by a king moving from `startSquare`,
+   * while avoiding all squares in `forbidden`.
+   *
+   * `destinations` must not contain `startSquare`, or any square in `forbidden`.
+   */
+  def kingPathExists(startSquare: Square, destinations: Bitboard, forbidden: Bitboard): Boolean =
+    if destinations.intersects(forbidden) || destinations.contains(startSquare) then
+      throw IllegalArgumentException(
+        "`destinations` contains either the start square or some forbidden square"
+      )
+
+    var skip = forbidden
+    var frontier = startSquare.bb
+
+    while frontier.nonEmpty do
+      if frontier.intersects(destinations) then return true
+      skip |= frontier
+      frontier = frontier.fold(Bitboard.empty) { (newFrontier, sq) =>
+        newFrontier | (sq.kingAttacks & ~skip)
+      }
+    end while
+
+    false
+
+  def baseChainPawns(board: Board, color: Color): Board = ???
+  /* todo:
+    1) Get bitboard of pawns for `color`
+    2) Use squares attacked by pawns to find just pawns that are undefended by fellow pawns
+    3) Return that bitboard?
+   */
+
+  def pawnsLocked(board: Board): Boolean = ???
+  /* todo:
+    1) Loop through pawns and see if pawnBlockedByPawn passes for each one
+   */
+
+  def justKingsAndPawns(board: Board): Boolean = ???
+  // todo
+
+  /**
    * Determines whether a board position is an automatic draw due to neither player
    * being able to mate the other as informed by the traditional chess rules.
    */
@@ -36,7 +77,7 @@ object InsufficientMatingMaterial:
     board.kingsAndMinorsOnly &&
       (board.nbPieces <= 3 || (board.kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
 
-  /*
+  /**
    * Determines whether a color does not have mating material. In general:
    * King by itself is not mating material
    * King + knight mates against king + any(rook, bishop, knight, pawn)

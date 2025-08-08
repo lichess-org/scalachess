@@ -92,12 +92,17 @@ class InsufficientMatingMaterialTest extends ChessTest:
 
     val testCases: List[KingPathTestCase] =
       parsed.map: pc =>
-        KingPathTestCase(
+        val tc = KingPathTestCase(
           fen = pc.fen,
           color = pc.color,
           kingShouldBreakthrough = pc.shouldBreakthrough,
           reachableSquaresForKing = Bitboard.fromKeys(pc.reachables*)
         )
+        if tc.reachableSquaresForKing.intersects(tc.forbiddenSquares.add(tc.kingStartPos)) then
+          throw new IllegalArgumentException(
+            s"reachables may not include kingStartPos or forbidden squares"
+          )
+        tc
 
     testCases.foreach: testCase =>
       val illegalSquaresToCheck = testCase.forbiddenSquares.add(testCase.kingStartPos)

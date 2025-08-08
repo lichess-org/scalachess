@@ -4,6 +4,7 @@ import chess.format.FullFen
 import chess.variant.Standard
 
 import InsufficientMatingMaterial.*
+import FortressesCsv.*
 
 class InsufficientMatingMaterialTest extends ChessTest:
 
@@ -83,134 +84,20 @@ class InsufficientMatingMaterialTest extends ChessTest:
       val position = fenToGame(fen, Standard).position
       assertNot(apply(position.board, !position.color))
 
-  test("king path"):
-    val fen1 = "8/p1p3p1/P1Ppk1Pp/3Pp2P/3pPp2/3PpP2/4P3/1K6 b - - 0 1"
-    val fen2 = "8/p1p3p1/P1Ppk1Pp/p1pPp2P/P1PpPp2/p1pPpP2/P1P1P3/1K6 b - - 0 1"
+  test("king paths"):
+    val parsed: List[ParsedCase] =
+      load("king_pawn_fortresses.csv") match
+        case Left(err) => fail("CSV parse error: " + err)
+        case Right(cs) => cs
 
-    val testCases: List[KingPathTestCase] = List(
-      KingPathTestCase(
-        fen1,
-        Color.white,
-        kingShouldBreakthrough = true,
-        reachableSquaresForKing = Bitboard.fromKeys(
-          "a1",
-          "a2",
-          "a3",
-          "a4",
-          "a5",
-          "b2",
-          "b3",
-          "b4",
-          "b5",
-          "c1",
-          "c2",
-          "c4",
-          "d1",
-          "e1",
-          "f1",
-          "g1",
-          "h1",
-          "g2",
-          "h2",
-          "h3",
-          "g4",
-          "h4",
-          "f5",
-          "e6",
-          "d7",
-          "d8",
-          "c7",
-          "c8",
-          "b7",
-          "b8",
-          "a7",
-          "a8",
-          "e7",
-          "e8",
-          "f7",
-          "f8",
-          "g7",
-          "g8",
-          "h8",
-          "h7"
+    val testCases: List[KingPathTestCase] =
+      parsed.map: pc =>
+        KingPathTestCase(
+          fen = pc.fen,
+          color = pc.color,
+          kingShouldBreakthrough = pc.shouldBreakthrough,
+          reachableSquaresForKing = Bitboard.fromKeys(pc.reachables*)
         )
-      ),
-      KingPathTestCase(
-        fen2,
-        Color.white,
-        kingShouldBreakthrough = true,
-        reachableSquaresForKing = Bitboard.fromKeys(
-          "a1",
-          "c1",
-          "d1",
-          "e1",
-          "f1",
-          "g1",
-          "h1",
-          "g2",
-          "h2",
-          "h3",
-          "g4",
-          "h4",
-          "f5",
-          "e6",
-          "d7",
-          "d8",
-          "c7",
-          "c8",
-          "b7",
-          "b8",
-          "a7",
-          "a8",
-          "e7",
-          "e8",
-          "f7",
-          "f8",
-          "g7",
-          "g8",
-          "h8",
-          "h7"
-        )
-      ),
-      KingPathTestCase(
-        fen2,
-        Color.black,
-        kingShouldBreakthrough = true,
-        reachableSquaresForKing = Bitboard.fromKeys(
-          "a1",
-          "a2",
-          "b1",
-          "b2",
-          "c1",
-          "c2",
-          "d1",
-          "d2",
-          "e1",
-          "e2",
-          "f1",
-          "f2",
-          "g1",
-          "h1",
-          "g2",
-          "h2",
-          "g3",
-          "h3",
-          "h4",
-          "g5",
-          "h5",
-          "f6",
-          "e7",
-          "d8",
-          "c8",
-          "b8",
-          "a8",
-          "e8",
-          "f8",
-          "g8",
-          "h8"
-        )
-      )
-    )
 
     testCases.foreach: testCase =>
       val illegalSquaresToCheck = testCase.forbiddenSquares.add(testCase.kingStartPos)
@@ -218,18 +105,13 @@ class InsufficientMatingMaterialTest extends ChessTest:
         kingPathExists(testCase.kingStartPos, testCase.occupiedByBaseEnemyPawns, testCase.forbiddenSquares),
         testCase.kingShouldBreakthrough
       )
-      Bitboard.all.squares.foreach(sq =>
-        lazy val pathExists = kingPathExists(
-          testCase.kingStartPos,
-          Bitboard.apply(sq),
-          testCase.forbiddenSquares
-        )
-        if illegalSquaresToCheck.contains(sq) then
-          intercept[IllegalArgumentException] {
-            pathExists
-          }
+
+      Bitboard.all.squares.foreach: sq =>
+        lazy val pathExists =
+          kingPathExists(testCase.kingStartPos, Bitboard.apply(sq), testCase.forbiddenSquares)
+
+        if illegalSquaresToCheck.contains(sq) then intercept[IllegalArgumentException](pathExists)
         else
           if !testCase.reachableSquaresForKing.contains(sq) then
-            println(sq.key + " is unreachable for " + testCase.color)
+            println(s"${sq.key} is unreachable for ${testCase.color}")
           assertEquals(pathExists, testCase.reachableSquaresForKing.contains(sq))
-      )

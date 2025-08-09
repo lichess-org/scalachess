@@ -56,8 +56,7 @@ case object Horde
   /** In horde chess, black can win unless a fortress stalemate is unavoidable.
     *  Auto-drawing the game should almost never happen, but it did in https://lichess.org/xQ2RsU8N#121
     */
-  override def isInsufficientMaterial(position: Position): Boolean =
-    Color.all.forall(color => hordeClosedPosition(position.copy(color = color)))
+  override def isInsufficientMaterial(position: Position): Boolean = hordeClosedPosition(position)
 
   /** In horde chess, the horde cannot win on * v K or [BN]{2} v K or just one piece
     * since they lack a king for checkmate support.
@@ -65,12 +64,12 @@ case object Horde
     * this method does not detect; however, such are trivial to premove.
     */
   override def opponentHasInsufficientMaterial(position: Position): Boolean =
-    hasInsufficientMaterial(position.board, !position.color) || hordeClosedPosition(position)
+    hasInsufficientMaterial(position.board, !position.color) || isInsufficientMaterial(position)
 
-  /** This function is not implemented yet for Horde chess. */
-  override def playerHasInsufficientMaterial(position: Position): Option[Boolean] = None
+  override def playerHasInsufficientMaterial(position: Position): Boolean =
+    hasInsufficientMaterial(position.board, position.color) || isInsufficientMaterial(position)
 
-  /** Any vs K + any where horde is stalemated and only king can move is a fortress draw
+  /** If the horde is stalemated and all of Black's moves keep the stalemate, it's a fortress draw.
     * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
     * nor does it consider contrived fortresses such as b7/pk6/P7/P7/8/8/8/8 b - -
     */
@@ -80,10 +79,7 @@ case object Horde
       hordeSquare.singleSquare.exists(pieceThreatened(position.board, Color.black, _))
     !mateInOne && {
       if position.isWhiteTurn then position.legalMoves.isEmpty
-      else
-        val legalMoves = validMoves(position)
-        legalMoves.filter(_.piece.role != King).isEmpty &&
-        legalMoves.filter(_.piece.role == King).forall(move => validMoves(move.after).isEmpty)
+      else validMoves(position).forall(move => validMoves(move.after).isEmpty)
     }
 
   extension (board: Board)

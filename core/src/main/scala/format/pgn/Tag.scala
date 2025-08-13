@@ -31,7 +31,7 @@ case class Tags(value: List[Tag]) extends AnyVal:
     value.find(_.name == name).map(_.value)
 
   def timeControl: Option[TournamentClock] =
-    val strict = apply(_.Site).exists(Tags.SiteIsStrictRegex.findFirstIn(_).isDefined)
+    val strict = apply(_.Site).exists(Tags.SiteIsStrictRegex.matches)
     value
       .collectFirst { case Tag(Tag.TimeControl, str) => str }
       .flatMap(TournamentClock.parse(strict))
@@ -136,7 +136,7 @@ object Tags:
         else tag.copy(value = tag.value.replace("\"", "").trim)
 
   private val DateRegex = """(\d{4}|\?{4})\.(\d\d|\?\?)\.(\d\d|\?\?)""".r
-  private val SiteIsStrictRegex = """(?i)lichess\.org|chess\.com""".r
+  private val SiteIsStrictRegex = """(?i)lichess\.org|chess\.com""".r.unanchored
 
 object Tag:
 

@@ -145,3 +145,27 @@ class InsufficientMatingMaterialTest extends ChessTest:
     )
     fens.foreach: fen =>
       assertNot(onlyKingsAndPawns(fenToGame(FullFen(fen), Standard).position.board))
+
+  test("detect all pawns locked"):
+    val fens: List[String] = List(
+      "8/8/8/8/8/8/8/8 w - - 0 1",
+      "4k3/8/8/8/8/8/8/4K3 w - - 0 1",
+      "4k3/8/8/8/8/4p3/4P3/4K3 w - - 0 1",
+      "4k3/8/8/8/8/2p1p3/2P1P3/4K3 w - - 0 1",
+      "4k3/8/8/p7/Pp6/1Pp1p3/2P1P3/4K3 w - - 0 1",
+      "4k3/p4p2/p4p2/p4p2/Pp2pPp1/1Pp1P1Pp/2P1P2P/4K3 w - - 0 1"
+    )
+    fens.foreach: fen =>
+      assert(allPawnsLocked(fenToGame(FullFen(fen), Standard).position))
+
+  test("detect not all pawns locked"):
+    val fens: List[String] = List(
+      "4k3/8/8/8/8/8/4P3/4K3 w - - 0 1",
+      "4k3/4p3/8/8/8/8/8/4K3 w - - 0 1",
+      "4k3/8/8/8/7p/8/7P/4K3 w - - 0 1",
+      "4k3/8/8/p4p2/Pp2pPp1/1Pp3Pp/2P1P2P/4K3 w - - 0 1",
+      "4k3/p4p2/p4p2/p4p2/Pp2pPp1/1Pp1P1Pp/2P1P2P/4K3 b - f3 0 1",
+      "4k3/p4p2/p4p2/p4p2/Pp2pPp1/1Pp1P1Pp/2P1P1PP/4K3 b - - 0 1"
+    )
+    fens.foreach: fen =>
+      assertNot(allPawnsLocked(fenToGame(FullFen(fen), Standard).position))

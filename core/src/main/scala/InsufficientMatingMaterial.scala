@@ -60,10 +60,9 @@ object InsufficientMatingMaterial:
     3) Return that bitboard?
    */
 
-  def pawnsLocked(board: Board): Boolean = ???
-  /* todo:
-    1) Loop through pawns and see if pawnBlockedByPawn passes for each one
-   */
+  def allPawnsLocked(position: Position): Boolean =
+    position.board.pawns.forall: sq =>
+      pawnBlockedByPawn(sq, position)
 
   def onlyKingsAndPawns(board: Board): Boolean = (board.kings | board.pawns) == board.occupied
 

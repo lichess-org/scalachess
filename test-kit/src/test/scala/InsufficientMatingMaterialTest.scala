@@ -114,9 +114,34 @@ class InsufficientMatingMaterialTest extends ChessTest:
       Bitboard.all.squares.foreach: sq =>
         lazy val pathExists =
           kingPathExists(testCase.kingStartPos, Bitboard.apply(sq), testCase.forbiddenSquares)
-
         if illegalSquaresToCheck.contains(sq) then intercept[IllegalArgumentException](pathExists)
         else
           if !testCase.reachableSquaresForKing.contains(sq) then
             println(s"${sq.key} is unreachable for ${testCase.color}")
           assertEquals(pathExists, testCase.reachableSquaresForKing.contains(sq))
+
+  test("detect none except kings and pawns"):
+    val fens: List[String] = List(
+      "4k3/8/8/8/8/8/8/4K3 w - - 0 1",
+      "4k3/8/8/8/8/8/4P3/4K3 w - - 0 1",
+      "4k3/4p3/8/8/8/8/8/4K3 w - - 0 1",
+      "4k3/4p3/8/8/8/8/4P3/4K3 w - - 0 1",
+      "8/8/8/8/8/8/8/8 w - - 0 1",
+      "8/8/8/8/8/8/4P3/8 w - - 0 1",
+      "8/4p3/8/8/8/8/8/8 w - - 0 1",
+      "8/4p3/8/8/8/8/4P3/8 w - - 0 1"
+    )
+    fens.foreach: fen =>
+      assert(onlyKingsAndPawns(fenToGame(FullFen(fen), Standard).position.board))
+
+  test("detect none except kings and pawns"):
+    val fens: List[String] = List(
+      "8/4p3/8/8/8/8/4P3/4KB2 w - - 0 1",
+      "8/8/8/8/8/8/8/6N1 w - - 0 1",
+      "8/8/8/8/8/8/8/6n1 w - - 0 1",
+      "8/8/8/8/8/8/8/6R1 w - - 0 1",
+      "8/8/8/8/8/8/8/6B1 w - - 0 1",
+      "8/8/8/8/8/8/8/6b1 w - - 0 1"
+    )
+    fens.foreach: fen =>
+      assertNot(onlyKingsAndPawns(fenToGame(FullFen(fen), Standard).position.board))

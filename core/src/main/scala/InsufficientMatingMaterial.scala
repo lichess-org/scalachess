@@ -28,7 +28,6 @@ object InsufficientMatingMaterial:
           }
       )
 
-  // todo - review function and make sure no square can ever be iterated over more than once in algorithm
   /**
    * Returns whether some square in `destinations` can be reached by a king moving from `startSquare`,
    * while avoiding all squares in `forbidden`.
@@ -66,8 +65,7 @@ object InsufficientMatingMaterial:
     1) Loop through pawns and see if pawnBlockedByPawn passes for each one
    */
 
-  def justKingsAndPawns(board: Board): Boolean = ???
-  // todo
+  def onlyKingsAndPawns(board: Board): Boolean = (board.kings | board.pawns) == board.occupied
 
   /**
    * Determines whether a board position is an automatic draw due to neither player

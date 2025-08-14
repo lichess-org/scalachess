@@ -60,11 +60,29 @@ object InsufficientMatingMaterial:
     3) Return that bitboard?
    */
 
-  def allPawnsLocked(position: Position): Boolean =
-    position.board.pawns.forall: sq =>
-      pawnBlockedByPawn(sq, position)
+  /**
+    * Checks if all pawns are locked, just with respect to each other. Other pieces that could allow the
+    * pawns to make captures are not considered.
+    */
+  def allPawnsLocked(board: Board): Boolean =
+    List(White, Black).forall: color =>
+      board.squaresAttackedByPawns(color).isDisjoint(board.byPiece(!color, Pawn)) &&
+        board
+          .byPiece(color, Pawn)
+          .forall: pawnSq =>
+            pawnSq
+              .nextRank(color)
+              .exists: frontSq =>
+                board.pawns.contains(frontSq)
 
   def onlyKingsAndPawns(board: Board): Boolean = (board.kings | board.pawns) == board.occupied
+
+  def kingPawnFortress(position: Position): Boolean =
+    onlyKingsAndPawns(position.board) &&
+      allPawnsLocked(position.board) &&
+      // todo - add call checking for king path to any base pawns
+      ??? &&
+      position.potentialEpSquare.isEmpty
 
   /**
    * Determines whether a board position is an automatic draw due to neither player

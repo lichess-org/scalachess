@@ -24,7 +24,8 @@ private object RatingCalculator:
 
 final private[glicko] class RatingCalculator(
     tau: Tau = Tau.default,
-    ratingPeriodsPerDay: RatingPeriodsPerDay = RatingPeriodsPerDay.default
+    ratingPeriodsPerDay: RatingPeriodsPerDay = RatingPeriodsPerDay.default,
+    colorAdvantage: ColorAdvantage = ColorAdvantage.zero
 ):
 
   import RatingCalculator.*

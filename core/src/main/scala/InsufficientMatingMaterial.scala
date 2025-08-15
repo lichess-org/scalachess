@@ -53,13 +53,6 @@ object InsufficientMatingMaterial:
 
     false
 
-  def baseChainPawns(board: Board, color: Color): Board = ???
-  /* todo:
-    1) Get bitboard of pawns for `color`
-    2) Use squares attacked by pawns to find just pawns that are undefended by fellow pawns
-    3) Return that bitboard?
-   */
-
   /**
     * Checks if all pawns are locked, just with respect to each other. Other pieces that could allow the
     * pawns to make captures are not considered.
@@ -75,14 +68,20 @@ object InsufficientMatingMaterial:
               .exists: frontSq =>
                 board.pawns.contains(frontSq)
 
-  def onlyKingsAndPawns(board: Board): Boolean = (board.kings | board.pawns) == board.occupied
-
   def kingPawnFortress(position: Position): Boolean =
-    onlyKingsAndPawns(position.board) &&
-      allPawnsLocked(position.board) &&
-      // todo - add call checking for king path to any base pawns
-      ??? &&
-      position.enPassantSquare.isEmpty
+    val board = position.board
+    (board.kings | board.pawns) == board.occupied &&
+    allPawnsLocked(board) &&
+    (
+      List(White, Black).forall: color =>
+        val squaresAttackedByEnemyPawns = board.squaresAttackedByPawns(!color)
+        !kingPathExists(
+          board.kingPosOf(color).get,
+          board.byPiece(!color, Pawn) & ~squaresAttackedByEnemyPawns,
+          board.byPiece(color, Pawn) | squaresAttackedByEnemyPawns
+        )
+    ) &&
+    position.enPassantSquare.isEmpty
 
   /**
    * Determines whether a board position is an automatic draw due to neither player

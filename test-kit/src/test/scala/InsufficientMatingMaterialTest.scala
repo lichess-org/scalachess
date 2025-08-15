@@ -120,32 +120,6 @@ class InsufficientMatingMaterialTest extends ChessTest:
             println(s"${sq.key} is unreachable for ${testCase.color}")
           assertEquals(pathExists, testCase.reachableSquaresForKing.contains(sq))
 
-  test("detect there are only kings and pawns"):
-    val fens: List[String] = List(
-      "4k3/8/8/8/8/8/8/4K3 w - - 0 1",
-      "4k3/8/8/8/8/8/4P3/4K3 w - - 0 1",
-      "4k3/4p3/8/8/8/8/8/4K3 w - - 0 1",
-      "4k3/4p3/8/8/8/8/4P3/4K3 w - - 0 1",
-      "8/8/8/8/8/8/8/8 w - - 0 1",
-      "8/8/8/8/8/8/4P3/8 w - - 0 1",
-      "8/4p3/8/8/8/8/8/8 w - - 0 1",
-      "8/4p3/8/8/8/8/4P3/8 w - - 0 1"
-    )
-    fens.foreach: fen =>
-      assert(onlyKingsAndPawns(fenToGame(FullFen(fen), Standard).position.board))
-
-  test("detect there are not only kings and pawns"):
-    val fens: List[String] = List(
-      "8/4p3/8/8/8/8/4P3/4KB2 w - - 0 1",
-      "8/8/8/8/8/8/8/6N1 w - - 0 1",
-      "8/8/8/8/8/8/8/6n1 w - - 0 1",
-      "8/8/8/8/8/8/8/6R1 w - - 0 1",
-      "8/8/8/8/8/8/8/6B1 w - - 0 1",
-      "8/8/8/8/8/8/8/6b1 w - - 0 1"
-    )
-    fens.foreach: fen =>
-      assertNot(onlyKingsAndPawns(fenToGame(FullFen(fen), Standard).position.board))
-
   test("detect all pawns locked"):
     val fens: List[String] = List(
       "8/8/8/8/8/8/8/8 w - - 0 1",
@@ -169,3 +143,5 @@ class InsufficientMatingMaterialTest extends ChessTest:
     )
     fens.foreach: fen =>
       assertNot(allPawnsLocked(fenToGame(FullFen(fen), Standard).position.board))
+    fens.foreach: fen =>
+      assertNot(kingPawnFortress(fenToGame(FullFen(fen), Standard).position))

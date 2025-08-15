@@ -31,7 +31,7 @@ case class Tags(value: List[Tag]) extends AnyVal:
     value.find(_.name == name).map(_.value)
 
   def timeControl: Option[TournamentClock] =
-    val strict = exists(_.GameId) // lichess games use proper PGN specification
+    val strict = apply(_.Site).exists(Tags.SiteIsStrictRegex.matches)
     value
       .collectFirst { case Tag(Tag.TimeControl, str) => str }
       .flatMap(TournamentClock.parse(strict))
@@ -136,6 +136,7 @@ object Tags:
         else tag.copy(value = tag.value.replace("\"", "").trim)
 
   private val DateRegex = """(\d{4}|\?{4})\.(\d\d|\?\?)\.(\d\d|\?\?)""".r
+  private val SiteIsStrictRegex = """(?i)\b(?:lichess\.org|chess\.com)\b""".r.unanchored
 
 object Tag:
 

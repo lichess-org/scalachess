@@ -5,6 +5,8 @@ import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
 import chess.format.{ FullFen, Fen }
 import chess.variant.Horde
+import chess.variant.Standard
+import chess.InsufficientMatingMaterial
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -42,3 +44,52 @@ class InsufficientMaterialBench:
   def horde() =
     hordeGames.map: board =>
       board.variant.isInsufficientMaterial(board)
+
+  var fens = List(
+    "4k3/8/8/8/8/8/8/4K3 w - - 0 1",
+    "4k3/8/8/8/8/8/4P3/4K3 w - - 0 1",
+    "4k3/4p3/8/8/8/8/8/4K3 w - - 0 1",
+    "4k3/4p3/8/8/8/8/4P3/4K3 w - - 0 1",
+    "8/8/8/8/8/8/8/8 w - - 0 1",
+    "8/8/8/8/8/8/4P3/8 w - - 0 1",
+    "8/4p3/8/8/8/8/8/8 w - - 0 1",
+    "8/4p3/8/8/8/8/4P3/8 w - - 0 1",
+    "8/4p3/8/8/8/8/4P3/4KB2 w - - 0 1",
+    "8/8/8/8/8/8/8/6N1 w - - 0 1",
+    "8/8/8/8/8/8/8/6n1 w - - 0 1",
+    "8/8/8/8/8/8/8/6R1 w - - 0 1",
+    "8/8/8/8/8/8/8/6B1 w - - 0 1",
+    "8/8/8/8/8/8/8/6b1 w - - 0 1",
+    "8/8/8/8/8/8/8/8 w - - 0 1",
+    "4k3/8/8/8/8/8/8/4K3 w - - 0 1",
+    "4k3/8/8/8/8/4p3/4P3/4K3 w - - 0 1",
+    "4k3/8/8/8/8/2p1p3/2P1P3/4K3 w - - 0 1",
+    "4k3/8/8/p7/Pp6/1Pp1p3/2P1P3/4K3 w - - 0 1",
+    "4k3/p4p2/p4p2/p4p2/Pp2pPp1/1Pp1P1Pp/2P1P2P/4K3 w - - 0 1",
+    "4k3/p4p2/p4p2/p4p2/Pp2pPp1/1Pp1P1Pp/2P1P2P/4K3 b - f3 0 1",
+    "4k3/8/8/8/8/8/4P3/4K3 w - - 0 1",
+    "4k3/4p3/8/8/8/8/8/4K3 w - - 0 1",
+    "4k3/8/8/8/7p/8/7P/4K3 w - - 0 1",
+    "4k3/8/8/p4p2/Pp2pPp1/1Pp3Pp/2P1P2P/4K3 w - - 0 1",
+    "4k3/p4p2/p4p2/p4p2/Pp2pPp1/1Pp1P1Pp/2P1P1PP/4K3 b - - 0 1"
+  ).map(FullFen(_)).map(Fen.read(Standard, _).get)
+
+  @Benchmark
+  def pawnsLocked() =
+    fens.map: position =>
+      InsufficientMatingMaterial.allPawnsLocked(position.board)
+
+  @Benchmark
+  def kingsAndPawns() =
+    fens.map: position =>
+      InsufficientMatingMaterial.onlyKingsAndPawns(position.board)
+
+  @Benchmark
+  def kingPawnFortress() =
+    fens.map: position =>
+      InsufficientMatingMaterial.kingPawnFortress(position)
+
+  @Benchmark
+  def insufficientMatingMaterial() =
+    fens.map: position =>
+      InsufficientMatingMaterial(position)

@@ -82,15 +82,16 @@ object InsufficientMatingMaterial:
       allPawnsLocked(position.board) &&
       // todo - add call checking for king path to any base pawns
       ??? &&
-      position.potentialEpSquare.isEmpty
+      position.enPassantSquare.isEmpty
 
   /**
    * Determines whether a board position is an automatic draw due to neither player
    * being able to mate the other as informed by the traditional chess rules.
    */
-  def apply(board: Board): Boolean =
+  def apply(position: Position): Boolean =
+    val board = position.board
     board.kingsAndMinorsOnly &&
-      (board.nbPieces <= 3 || (board.kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
+    (board.nbPieces <= 3 || (board.kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
 
   /**
    * Determines whether a color does not have mating material. In general:
@@ -105,8 +106,9 @@ object InsufficientMatingMaterial:
    *   - opposite color bishop(s)
    *   - or knight(s) or pawn(s)
    */
-  def apply(board: Board, color: Color): Boolean =
+  def apply(position: Position, color: Color): Boolean =
     import board.*
+    val board = position.board
     inline def onlyKing = kingsOnlyOf(color)
     inline def KN =
       onlyOf(color, King, Knight) && count(color, Knight) == 1 && onlyOf(!color, King, Queen)

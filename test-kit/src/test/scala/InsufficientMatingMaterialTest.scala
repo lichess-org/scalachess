@@ -78,11 +78,11 @@ class InsufficientMatingMaterialTest extends ChessTest:
 
     trues.foreach: fen =>
       val position = fenToGame(fen, Standard).position
-      assert(apply(position.board, !position.color))
+      assert(apply(position, !position.color))
 
     falses.foreach: fen =>
       val position = fenToGame(fen, Standard).position
-      assertNot(apply(position.board, !position.color))
+      assertNot(apply(position, !position.color))
 
   test("king paths"):
     val parsed: List[ParsedCase] =
@@ -120,7 +120,7 @@ class InsufficientMatingMaterialTest extends ChessTest:
             println(s"${sq.key} is unreachable for ${testCase.color}")
           assertEquals(pathExists, testCase.reachableSquaresForKing.contains(sq))
 
-  test("detect none except kings and pawns"):
+  test("detect there are only kings and pawns"):
     val fens: List[String] = List(
       "4k3/8/8/8/8/8/8/4K3 w - - 0 1",
       "4k3/8/8/8/8/8/4P3/4K3 w - - 0 1",
@@ -134,7 +134,7 @@ class InsufficientMatingMaterialTest extends ChessTest:
     fens.foreach: fen =>
       assert(onlyKingsAndPawns(fenToGame(FullFen(fen), Standard).position.board))
 
-  test("detect none except kings and pawns"):
+  test("detect there are not only kings and pawns"):
     val fens: List[String] = List(
       "8/4p3/8/8/8/8/4P3/4KB2 w - - 0 1",
       "8/8/8/8/8/8/8/6N1 w - - 0 1",

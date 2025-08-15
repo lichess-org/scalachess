@@ -5,6 +5,7 @@ import chess.variant.Standard
 
 import InsufficientMatingMaterial.*
 import FortressesCsv.*
+import chess.variant.*
 
 class InsufficientMatingMaterialTest extends ChessTest:
 
@@ -153,8 +154,11 @@ class InsufficientMatingMaterialTest extends ChessTest:
       "8/8/1p1k4/1Pp1p1p1/2P1p1P1/1K2P3/8/8 b - - 0 113",
       "8/8/3k4/1p2p3/pP2Pp2/P4Pp1/K5P1/8 w - - 0 58"
     )
-    fens.foreach: fen =>
-      val position = fenToGame(FullFen(fen), Standard).position
+    for
+      fen <- fens
+      variant <- List(Standard, ThreeCheck)
+    do
+      val position = fenToGame(FullFen(fen), variant).position
       assert(kingPawnFortress(position))
       assert(apply(position))
       assert(apply(position, White))
@@ -169,13 +173,16 @@ class InsufficientMatingMaterialTest extends ChessTest:
       "8/8/2k3p1/3p1pPp/p2P1P1P/P4K2/8/8 b - - 0 100",
       "8/8/3k1p1p/2p1pPpP/1pP1P1P1/1P1BK3/8/8 b - - 0 60",
       "8/8/1p1k4/1Pp1p1p1/2P1p1P1/1p2P3/1K6/8 w - - 4 113",
-      "8/8/3k4/1p2p3/pP2Pp2/5Pp1/PK4P1/8 w - - 0 58"
+      "8/8/3k4/1p2p3/pP2Pp2/5Pp1/PK4P1/8 w - - 0 58",
+      "8/8/3k4/1p2p3/pP2Pp2/PK3Pp1/6P1/8 w - - 0 58",
+      "8/8/8/1p2pk2/pP2Pp2/P4Pp1/K5P1/8 b - - 0 58"
     )
-    fens.foreach: fen =>
-      val position = fenToGame(FullFen(fen), Standard).position
+    for
+      fen <- fens
+      variant <- List(Standard, ThreeCheck)
+    do
+      val position = fenToGame(FullFen(fen), variant).position
       assertNot(kingPawnFortress(position))
       assertNot(apply(position))
       assertNot(apply(position, White))
       assertNot(apply(position, Black))
-
-  // todo - for insufficient material, test variants too by looping thru them?

@@ -75,8 +75,9 @@ object InsufficientMatingMaterial:
     (
       List(White, Black).forall: color =>
         val squaresAttackedByEnemyPawns = board.squaresAttackedByPawns(!color)
-        !kingPathExists(
-          board.kingPosOf(color).get,
+        val squareOfKing = board.kingPosOf(color).get
+        !squaresAttackedByEnemyPawns.contains(squareOfKing) && !kingPathExists(
+          squareOfKing,
           board.byPiece(!color, Pawn) & ~squaresAttackedByEnemyPawns,
           board.byPiece(color, Pawn) | squaresAttackedByEnemyPawns
         )

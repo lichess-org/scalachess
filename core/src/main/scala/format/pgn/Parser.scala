@@ -114,7 +114,7 @@ object Parser:
             sans match
               case Nil => None
               case x :: xs =>
-                Variation(x.value.copy(variationComments = comments.cleanUp), Tree.build(xs)).some
+                Variation(x.value.copy(variationComments = comments.trimNonEmpty), Tree.build(xs)).some
           )
 
       preMoveEscape.with1 *> ((moveAndMetas ~ variation.rep0) <* postMoveEscape).map:
@@ -125,7 +125,7 @@ object Parser:
 
   private inline def fullBody[A](p: P[A]): P0[(InitialComments, List[A], Option[String])] =
     ((comment.rep0 ~ p.rep0) ~ (result <* escape).? <* comment.rep0).map:
-      case ((comments, xs), result) => (InitialComments(comments.cleanUp), xs, result)
+      case ((comments, xs), result) => (InitialComments(comments.trimNonEmpty), xs, result)
 
   private val fullMovesParser = fullBody(moveParser)
 
@@ -184,7 +184,7 @@ object Parser:
       (checkmate, check, (glyphs <* escape), nagGlyphs, comment.rep0, nagGlyphs)
         .mapN: (checkmate, check, glyphs1, glyphs2, comments, glyphs3) =>
           val glyphs = glyphs1.merge(glyphs2.merge(glyphs3))
-          Metas(check, checkmate, comments.cleanUp, glyphs)
+          Metas(check, checkmate, comments.trimNonEmpty, glyphs)
 
     val standard: P[Std] =
       P.oneOf:

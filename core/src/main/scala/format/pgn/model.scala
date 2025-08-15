@@ -16,7 +16,7 @@ object PgnStr extends OpaqueString[PgnStr]
 
 opaque type Comment = String
 object Comment extends TotalWrapper[Comment, String]:
-  extension (c: Comment) def cleanUp: Option[Comment] = Option.unless(c.isBlank)(c.trim)
+  extension (c: Comment) def trimNonEmpty: Option[Comment] = Option.unless(c.isBlank)(c.trim)
 
 opaque type InitialComments = List[Comment]
 object InitialComments extends TotalWrapper[InitialComments, List[Comment]]:

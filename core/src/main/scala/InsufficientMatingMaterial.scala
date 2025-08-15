@@ -89,8 +89,10 @@ object InsufficientMatingMaterial:
    */
   def apply(position: Position): Boolean =
     val board = position.board
-    board.kingsAndMinorsOnly &&
-    (board.nbPieces <= 3 || (board.kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
+    (
+      board.kingsAndMinorsOnly &&
+        (board.nbPieces <= 3 || (board.kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
+    ) || kingPawnFortress(position)
 
   /**
    * Determines whether a color does not have mating material. In general:
@@ -115,4 +117,4 @@ object InsufficientMatingMaterial:
       onlyOf(color, King, Bishop) &&
         !(bishopsOnOppositeColors(board) || byPiece(!color, Knight, Pawn).nonEmpty)
 
-    onlyKing || KN || KB
+    onlyKing || KN || KB || kingPawnFortress(position)

@@ -115,10 +115,7 @@ class InsufficientMatingMaterialTest extends ChessTest:
         lazy val pathExists =
           kingPathExists(testCase.kingStartPos, Bitboard.apply(sq), testCase.forbiddenSquares)
         if illegalSquaresToCheck.contains(sq) then intercept[IllegalArgumentException](pathExists)
-        else
-          if !testCase.reachableSquaresForKing.contains(sq) then
-            println(s"${sq.key} is unreachable for ${testCase.color}")
-          assertEquals(pathExists, testCase.reachableSquaresForKing.contains(sq))
+        else assertEquals(pathExists, testCase.reachableSquaresForKing.contains(sq))
 
   test("detect all pawns locked"):
     val fens: List[String] = List(
@@ -142,9 +139,9 @@ class InsufficientMatingMaterialTest extends ChessTest:
       "4k3/p4p2/p4p2/p4p2/Pp2pPp1/1Pp1P1Pp/2P1P1PP/4K3 b - - 0 1"
     )
     fens.foreach: fen =>
-      assertNot(allPawnsLocked(fenToGame(FullFen(fen), Standard).position.board))
-    fens.foreach: fen =>
-      assertNot(kingPawnFortress(fenToGame(FullFen(fen), Standard).position))
+      val position = fenToGame(FullFen(fen), Standard).position
+      assertNot(allPawnsLocked(position.board))
+      assertNot(kingPawnFortress(position))
 
   test("detect king pawn fortresses"):
     val fens: List[String] = List(
@@ -157,7 +154,11 @@ class InsufficientMatingMaterialTest extends ChessTest:
       "8/8/3k4/1p2p3/pP2Pp2/P4Pp1/K5P1/8 w - - 0 58"
     )
     fens.foreach: fen =>
-      assert(kingPawnFortress(fenToGame(FullFen(fen), Standard).position))
+      val position = fenToGame(FullFen(fen), Standard).position
+      assert(kingPawnFortress(position))
+      assert(apply(position))
+      assert(apply(position, White))
+      assert(apply(position, Black))
 
   test("detect not king pawn fortresses"):
     val fens: List[String] = List(
@@ -171,6 +172,10 @@ class InsufficientMatingMaterialTest extends ChessTest:
       "8/8/3k4/1p2p3/pP2Pp2/5Pp1/PK4P1/8 w - - 0 58"
     )
     fens.foreach: fen =>
-      assertNot(kingPawnFortress(fenToGame(FullFen(fen), Standard).position))
+      val position = fenToGame(FullFen(fen), Standard).position
+      assertNot(kingPawnFortress(position))
+      assertNot(apply(position))
+      assertNot(apply(position, White))
+      assertNot(apply(position, Black))
 
   // todo - for insufficient material, test variants too by looping thru them?

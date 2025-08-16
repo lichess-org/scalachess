@@ -13,7 +13,7 @@ object InsufficientMatingMaterial:
     board.bishops.intersects(Bitboard.lightSquares) &&
       board.bishops.intersects(Bitboard.darkSquares)
 
-  /*
+  /**
    * Returns true if a pawn cannot progress forward because it is blocked by a pawn
    * and it doesn't have any capture
    */
@@ -28,15 +28,74 @@ object InsufficientMatingMaterial:
           }
       )
 
-  /*
+  /**
+   * Returns whether some square in `destinations` can be reached by a king moving from `startSquare`,
+   * while avoiding all squares in `forbidden`.
+   *
+   * `destinations` must not contain `startSquare`, or any square in `forbidden`.
+   */
+  def kingPathExists(startSquare: Square, destinations: Bitboard, forbidden: Bitboard): Boolean =
+    if destinations.intersects(forbidden) || destinations.contains(startSquare) then
+      throw IllegalArgumentException(
+        "`destinations` contains either the start square or some forbidden square"
+      )
+
+    var skip = forbidden
+    var frontier = startSquare.bb
+
+    while frontier.nonEmpty do
+      if frontier.intersects(destinations) then return true
+      skip |= frontier
+      frontier = frontier.fold(Bitboard.empty) { (newFrontier, sq) =>
+        newFrontier | (sq.kingAttacks & ~skip)
+      }
+    end while
+
+    false
+
+  /**
+    * Checks if all pawns are locked, just with respect to each other. Other pieces that could allow the
+    * pawns to make captures are not considered.
+    */
+  def allPawnsLocked(board: Board): Boolean =
+    List(White, Black).forall: color =>
+      board.squaresAttackedByPawns(color).isDisjoint(board.byPiece(!color, Pawn)) &&
+        board
+          .byPiece(color, Pawn)
+          .forall: pawnSq =>
+            pawnSq
+              .nextRank(color)
+              .exists: frontSq =>
+                board.pawns.contains(frontSq)
+
+  def kingPawnFortress(position: Position): Boolean =
+    val board = position.board
+    (board.kings | board.pawns) == board.occupied &&
+    allPawnsLocked(board) &&
+    (
+      List(White, Black).forall: color =>
+        val squaresAttackedByEnemyPawns = board.squaresAttackedByPawns(!color)
+        val squareOfKing = board.kingPosOf(color).get
+        !squaresAttackedByEnemyPawns.contains(squareOfKing) && !kingPathExists(
+          squareOfKing,
+          board.byPiece(!color, Pawn) & ~squaresAttackedByEnemyPawns,
+          board.byPiece(color, Pawn) | squaresAttackedByEnemyPawns
+        )
+    ) &&
+    position.enPassantSquare.isEmpty
+
+  /**
    * Determines whether a board position is an automatic draw due to neither player
    * being able to mate the other as informed by the traditional chess rules.
    */
-  def apply(board: Board): Boolean =
-    board.kingsAndMinorsOnly &&
-      (board.nbPieces <= 3 || (board.kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
+  def apply(position: Position): Boolean =
+    val board = position.board
+    (
+      board.kingsAndMinorsOnly &&
+        (board.nbPieces <= 3 || (board.kingsAndBishopsOnly && !bishopsOnOppositeColors(board)))
+    ) || kingPawnFortress(position)
 
-  /*
+  /**
    * Determines whether a color does not have mating material. In general:
    * King by itself is not mating material
    * King + knight mates against king + any(rook, bishop, knight, pawn)
@@ -49,8 +108,9 @@ object InsufficientMatingMaterial:
    *   - opposite color bishop(s)
    *   - or knight(s) or pawn(s)
    */
-  def apply(board: Board, color: Color): Boolean =
+  def apply(position: Position, color: Color): Boolean =
     import board.*
+    val board = position.board
     inline def onlyKing = kingsOnlyOf(color)
     inline def KN =
       onlyOf(color, King, Knight) && count(color, Knight) == 1 && onlyOf(!color, King, Queen)
@@ -58,4 +118,4 @@ object InsufficientMatingMaterial:
       onlyOf(color, King, Bishop) &&
         !(bishopsOnOppositeColors(board) || byPiece(!color, Knight, Pawn).nonEmpty)
 
-    onlyKing || KN || KB
+    onlyKing || KN || KB || kingPawnFortress(position)

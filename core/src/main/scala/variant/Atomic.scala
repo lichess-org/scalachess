@@ -27,7 +27,7 @@ case object Atomic
     * a piece in the opponent's king's proximity. On the other hand, a king alone or a king with
     * immobile pawns is not sufficient material to win with.
     */
-  override def hasInsufficientMaterial(position: Position, color: Color): Boolean =
+  override protected def hasInsufficientMaterial(position: Position, color: Color): Boolean =
     position.kingsOnlyOf(color)
 
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */

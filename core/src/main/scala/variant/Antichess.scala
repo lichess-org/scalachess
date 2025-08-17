@@ -55,8 +55,7 @@ case object Antichess
 
   // In antichess, if the only remaining pieces are a knight each, then exactly one
   // player can win (depending on whose turn it is).
-
-  override def hasInsufficientMaterial(position: Position, color: Color): Boolean =
+  override protected def hasInsufficientMaterial(position: Position, color: Color): Boolean =
     val isPlayer = color == position.color
     justOneKnightEach(position) && allOnSameColourSquares(position) != isPlayer
 

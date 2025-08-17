@@ -146,7 +146,7 @@ abstract class Variant private[variant] (
     */
   def isInsufficientMaterial(position: Position): Boolean = InsufficientMatingMaterial(position)
 
-  def hasInsufficientMaterial(position: Position, color: Color): Boolean =
+  protected def hasInsufficientMaterial(position: Position, color: Color): Boolean =
     InsufficientMatingMaterial(position, color)
 
   /** Returns true if the other player cannot win. This is relevant when the

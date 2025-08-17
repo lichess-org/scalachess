@@ -29,5 +29,5 @@ case object KingOfTheHill
 
   /** You only need a king to be able to win in this variant
     */
-  override def hasInsufficientMaterial(position: Position, color: Color): Boolean = false
+  override protected def hasInsufficientMaterial(position: Position, color: Color): Boolean = false
   override def isInsufficientMaterial(position: Position): Boolean = false

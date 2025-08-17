@@ -35,8 +35,8 @@ case object ThreeCheck
 
   /** It's not possible to check or checkmate the opponent with only a king
     */
-  override def opponentHasInsufficientMaterial(position: Position): Boolean =
-    position.kingsOnlyOf(!position.color)
+  override def hasInsufficientMaterial(position: Position, color: Color): Boolean =
+    position.kingsOnlyOf(color)
 
   /**
   * When there is insufficient mating material, there is still potential to win by checking the opponent 3 times

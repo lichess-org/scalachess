@@ -63,11 +63,9 @@ case object Horde
     * Technically there are some positions where stalemate is unavoidable which
     * this method does not detect; however, such are trivial to premove.
     */
-  override def opponentHasInsufficientMaterial(position: Position): Boolean =
-    hasInsufficientMaterial(position.board, !position.color) || isInsufficientMaterial(position)
 
-  override def playerHasInsufficientMaterial(position: Position): Boolean =
-    hasInsufficientMaterial(position.board, position.color) || isInsufficientMaterial(position)
+  override def hasInsufficientMaterial(position: Position, color: Color): Boolean =
+    pureMaterialInsufficiency(position.board, color) || isInsufficientMaterial(position)
 
   /** If the horde is stalemated and all of Black's moves keep the stalemate, it's a fortress draw.
     * This does not consider imminent fortresses such as 8/p7/P7/8/8/P7/8/k7 b - -
@@ -87,7 +85,7 @@ case object Horde
       val bishops = board.bishops & board.byColor(side)
       bishops.intersects(Bitboard.lightSquares) && bishops.intersects(Bitboard.darkSquares)
 
-  private[chess] def hasInsufficientMaterial(board: Board, color: Color): Boolean =
+  private[chess] def pureMaterialInsufficiency(board: Board, color: Color): Boolean =
     import SquareColor.*
     // Black can always win by capturing the horde
     if color.black then false
@@ -141,7 +139,10 @@ case object Horde
           val pawnSquare = (board.pawns & board.byColor(Color.white)).first.get // we know there is a pawn
           val promoteToQueen = board.putOrReplace(White.queen, pawnSquare)
           val promoteToKnight = board.putOrReplace(White.knight, pawnSquare)
-          hasInsufficientMaterial(promoteToQueen, color) && hasInsufficientMaterial(promoteToKnight, color)
+          pureMaterialInsufficiency(promoteToQueen, color) && pureMaterialInsufficiency(
+            promoteToKnight,
+            color
+          )
         else if horde.rook == 1 then
           // A lone rook mates a king on A8 bounded by a pawn/rook on A7 and a
           // pawn/knight on B7. We ignore every other case, since it can be

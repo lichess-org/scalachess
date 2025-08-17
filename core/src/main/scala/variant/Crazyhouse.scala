@@ -61,7 +61,7 @@ case object Crazyhouse
     super.checkmate(position) && !canDropStuff(position)
 
   // there is always sufficient mating material in Crazyhouse
-  override def opponentHasInsufficientMaterial(position: Position): Boolean = false
+  override def hasInsufficientMaterial(position: Position, color: Color): Boolean = false
   override def isInsufficientMaterial(position: Position): Boolean = false
 
   // if the king is not in check, all drops are possible, we just return None

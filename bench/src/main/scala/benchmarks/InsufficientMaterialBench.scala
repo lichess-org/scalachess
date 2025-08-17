@@ -66,3 +66,18 @@ class InsufficientMaterialBench:
   def insufficientMatingMaterial() =
     fens.map: position =>
       InsufficientMatingMaterial(position)
+
+  @Benchmark
+  def isInsufficientMaterial() =
+    fens.map: position =>
+      position.variant.isInsufficientMaterial(position)
+
+  @Benchmark
+  def playerHasInsufficientMaterial() =
+    fens.map: position =>
+      position.variant.playerHasInsufficientMaterial(position)
+
+  @Benchmark
+  def opponentHasInsufficientMaterial() =
+    fens.map: position =>
+      position.variant.opponentHasInsufficientMaterial(position)

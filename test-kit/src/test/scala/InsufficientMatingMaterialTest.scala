@@ -152,7 +152,8 @@ class InsufficientMatingMaterialTest extends ChessTest:
       "8/8/3k1p1p/2p1pPpP/1pP1P1P1/1P2K3/8/8 b - - 0 60",
       "8/8/1p1k4/1Pp1p1p1/2P1p1P1/1K2P3/8/8 b - - 0 113",
       "8/8/3k4/1p2p3/pP2Pp2/P4Pp1/K5P1/8 w - - 0 58",
-      "8/8/3k4/1p2p3/pP2Pp2/P4Pp1/K5P1/8 b - - 0 58"
+      "8/8/3k4/1p2p3/pP2Pp2/P4Pp1/K5P1/8 b - - 0 58",
+      "8/6k1/1p2p3/1Pp1Pp2/KpP2Pp1/1P4P1/8/8 w - - 0 1"
     )
     fens.foreach: fen =>
       val position = fenToGame(FullFen(fen), Standard).position
@@ -160,6 +161,9 @@ class InsufficientMatingMaterialTest extends ChessTest:
       assert(apply(position))
       assert(apply(position, White))
       assert(apply(position, Black))
+      assert(position.variant.isInsufficientMaterial(position))
+      assert(position.variant.playerHasInsufficientMaterial(position))
+      assert(position.variant.opponentHasInsufficientMaterial(position))
 
   test("detect not king pawn fortresses"):
     val fens: List[String] = List(
@@ -174,7 +178,8 @@ class InsufficientMatingMaterialTest extends ChessTest:
       "8/8/3k4/1p2p3/pP2Pp2/PK3Pp1/6P1/8 w - - 0 58",
       "8/8/3k4/1p2p3/pP2Pp2/PK3Pp1/6P1/8 b - - 0 58",
       "8/8/8/1p2pk2/pP2Pp2/P4Pp1/K5P1/8 b - - 0 58",
-      "8/8/8/1p2pk2/pP2Pp2/P4Pp1/K5P1/8 w - - 0 58"
+      "8/8/8/1p2pk2/pP2Pp2/P4Pp1/K5P1/8 w - - 0 58",
+      "4k3/8/1p6/1Pp5/KpP5/1P6/8/8 w - - 0 1"
     )
     fens.foreach: fen =>
       val position = fenToGame(FullFen(fen), Standard).position
@@ -182,3 +187,6 @@ class InsufficientMatingMaterialTest extends ChessTest:
       assertNot(apply(position))
       assertNot(apply(position, White))
       assertNot(apply(position, Black))
+      assertNot(position.variant.isInsufficientMaterial(position))
+      assertNot(position.variant.playerHasInsufficientMaterial(position))
+      assertNot(position.variant.opponentHasInsufficientMaterial(position))

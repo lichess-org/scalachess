@@ -34,24 +34,22 @@ object InsufficientMatingMaterial:
    *
    * `destinations` must not contain `startSquare`, or any square in `forbidden`.
    */
-  def kingPathExists(startSquare: Square, destinations: Bitboard, forbidden: Bitboard): Boolean =
+  def kingPathExists(startSquare: Square, destinations: Bitboard, forbidden: Bitboard): Option[Boolean] =
     if destinations.intersects(forbidden) || destinations.contains(startSquare) then
-      throw IllegalArgumentException(
-        "`destinations` contains either the start square or some forbidden square"
-      )
+      None
+    else
+      var skip = forbidden
+      var frontier = startSquare.bb
 
-    var skip = forbidden
-    var frontier = startSquare.bb
+      while frontier.nonEmpty do
+        if frontier.intersects(destinations) then return Some(true)
+        skip |= frontier
+        frontier = frontier.fold(Bitboard.empty) { (newFrontier, sq) =>
+          newFrontier | (sq.kingAttacks & ~skip)
+        }
+      end while
 
-    while frontier.nonEmpty do
-      if frontier.intersects(destinations) then return true
-      skip |= frontier
-      frontier = frontier.fold(Bitboard.empty) { (newFrontier, sq) =>
-        newFrontier | (sq.kingAttacks & ~skip)
-      }
-    end while
-
-    false
+      Some(false)
 
   /**
     * Checks if all pawns are locked, just with respect to each other. Other pieces that could allow the
@@ -80,7 +78,7 @@ object InsufficientMatingMaterial:
           squareOfKing,
           board.byPiece(!color, Pawn) & ~squaresAttackedByEnemyPawns,
           board.byPiece(color, Pawn) | squaresAttackedByEnemyPawns
-        )
+        ).get
     ) &&
     position.enPassantSquare.isEmpty
 

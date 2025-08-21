@@ -107,15 +107,15 @@ class InsufficientMatingMaterialTest extends ChessTest:
     testCases.foreach: testCase =>
       val illegalSquaresToCheck = testCase.forbiddenSquares.add(testCase.kingStartPos)
       assertEquals(
-        kingPathExists(testCase.kingStartPos, testCase.occupiedByBaseEnemyPawns, testCase.forbiddenSquares),
+        kingPathExists(testCase.kingStartPos, testCase.occupiedByBaseEnemyPawns, testCase.forbiddenSquares).get,
         testCase.kingShouldBreakthrough
       )
 
       Bitboard.all.squares.foreach: sq =>
         lazy val pathExists =
           kingPathExists(testCase.kingStartPos, Bitboard.apply(sq), testCase.forbiddenSquares)
-        if illegalSquaresToCheck.contains(sq) then intercept[IllegalArgumentException](pathExists)
-        else assertEquals(pathExists, testCase.reachableSquaresForKing.contains(sq))
+        if illegalSquaresToCheck.contains(sq) then assertEquals(pathExists, None)
+        else assertEquals(pathExists.get, testCase.reachableSquaresForKing.contains(sq))
 
   test("detect all pawns locked"):
     val fens: List[String] = List(

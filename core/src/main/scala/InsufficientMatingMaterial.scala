@@ -35,21 +35,16 @@ object InsufficientMatingMaterial:
    * `destinations` must not contain `startSquare`, or any square in `forbidden`.
    */
   def kingPathExists(startSquare: Square, destinations: Bitboard, forbidden: Bitboard): Option[Boolean] =
-    if destinations.intersects(forbidden) || destinations.contains(startSquare) then
-      None
+    if destinations.intersects(forbidden.add(startSquare)) then None
     else
-      var skip = forbidden
-      var frontier = startSquare.bb
-
-      while frontier.nonEmpty do
-        if frontier.intersects(destinations) then return Some(true)
-        skip |= frontier
-        frontier = frontier.fold(Bitboard.empty) { (newFrontier, sq) =>
-          newFrontier | (sq.kingAttacks & ~skip)
-        }
-      end while
-
-      Some(false)
+      @annotation.tailrec
+      def bfs(frontier: Bitboard, skip: Bitboard): Boolean =
+        if frontier.isEmpty then false
+        else if frontier.intersects(destinations) then true
+        else
+          val updatedSkip = skip | frontier
+          bfs(frontier.fold(Bitboard.empty)((acc, sq) => acc | sq.kingAttacks) & ~updatedSkip, updatedSkip)
+      Some(bfs(startSquare.bb, forbidden))
 
   /**
     * Checks if all pawns are locked, just with respect to each other. Other pieces that could allow the

@@ -107,7 +107,11 @@ class InsufficientMatingMaterialTest extends ChessTest:
     testCases.foreach: testCase =>
       val illegalSquaresToCheck = testCase.forbiddenSquares.add(testCase.kingStartPos)
       assertEquals(
-        kingPathExists(testCase.kingStartPos, testCase.occupiedByBaseEnemyPawns, testCase.forbiddenSquares).get,
+        kingPathExists(
+          testCase.kingStartPos,
+          testCase.occupiedByBaseEnemyPawns,
+          testCase.forbiddenSquares
+        ).get,
         testCase.kingShouldBreakthrough
       )
 

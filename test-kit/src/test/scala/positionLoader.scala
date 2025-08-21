@@ -1,10 +1,9 @@
 package chess
 
-import java.nio.file.{ Files, Paths, Path }
-import scala.io.{ Source, Codec }
-import scala.util.Try
-import scala.util.boundary
+import java.nio.file.{ Files, Path, Paths }
+import scala.io.{ Codec, Source }
 import scala.util.boundary.break
+import scala.util.{ Try, boundary }
 
 object FortressesCsv:
 

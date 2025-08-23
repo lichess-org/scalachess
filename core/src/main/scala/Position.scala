@@ -370,10 +370,8 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
       after <- b3.put(color.rook, rookTo)
     yield after
 
-    val isChess960 =
-      if variant.standard then false
-      else if variant.chess960 then true
-      else king.file != File.E || !(rook.file == File.A || rook.file == File.H)
+    val isChess960 = variant.chess960 || (!variant.standard &&
+      (king.file != File.E || !(rook.file == File.A || rook.file == File.H)))
 
     val destInput = if !isChess960 then List(rook, kingTo) else List(rook)
 

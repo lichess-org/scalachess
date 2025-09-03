@@ -85,6 +85,15 @@ class VariantTest extends ChessTest:
       assert(game.variant.valid(game, true))
       assert(game.variant.valid(game, false))
 
+    test(
+      s"$variant when multiple steppers give check"
+    ):
+      val game = Fen
+        .read(variant, FullFen("2kq1r2/5rq1/1N1N4/N3N3/1KN5/N3B3/1N1N4/8 b k - 0 1"))
+        .get
+      assertNot(game.variant.valid(game, true))
+      assert(game.variant.valid(game, false))
+
   test("standard position pieces correctly"):
     assertEquals(
       Standard.initialPieces,

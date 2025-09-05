@@ -176,7 +176,7 @@ case class AverageRatingOfOpponents(modifier: CutModifier)
         val points = tour
           .opponentsOf(player.id)
           .collect:
-            case Tiebreak.Player(_, Some(elo)) => TiebreakPoint(elo.value)
+            case Tiebreak.Player(_, _, Some(elo)) => TiebreakPoint(elo.value)
           .sorted
           .cut(modifier)
           .average
@@ -280,7 +280,7 @@ trait Tournament:
         .computePerformanceRating:
           myGames
             .collect:
-              case Tiebreak.Game(points, Tiebreak.Player(_, Some(rating)), _, _) =>
+              case Tiebreak.Game(points, Tiebreak.Player(_, _, Some(rating)), _, _) =>
                 Elo.Game(points, rating)
         .so(_.value.toFloat)
 
@@ -343,12 +343,25 @@ trait Tournament:
 
       loop(a, b)
 
+  given Ordering[Player] = new Ordering[Player]:
+    def compare(a: Player, b: Player): Int =
+      val ratingComparison = b.rating.map(_.value).compare(a.rating.map(_.value))
+      if ratingComparison != 0 then ratingComparison
+      else a.name.compare(b.name)
+
   given Ordering[PlayerWithScore] = new Ordering[PlayerWithScore]:
     def compare(a: PlayerWithScore, b: PlayerWithScore): Int =
-      // sort by score descending, then by tiebreaks descending
+      /* Sort players by:
+      1. Score (higher is better)
+      2. Tiebreak points (compare each tiebreak in order, higher is better)
+      3. Player rating
+      4. Player name (alphabetical)
+       */
       val scoreComparison = b.score.compare(a.score)
+      val tiebreakComparison = Ordering[List[TiebreakPoint]].compare(b.tiebreakPoints, a.tiebreakPoints)
       if scoreComparison != 0 then scoreComparison
-      else Ordering[List[TiebreakPoint]].compare(b.tiebreakPoints, a.tiebreakPoints)
+      else if tiebreakComparison != 0 then tiebreakComparison
+      else Ordering[Player].compare(a.player, b.player)
 
   // compute and sort players by their scores and tiebreaks
   def compute(tiebreaks: List[Tiebreak]): List[PlayerWithScore] =
@@ -479,7 +492,7 @@ object Tiebreak:
 
   case class Game(points: Outcome.Points, opponent: Player, color: Color, roundId: Option[String])
 
-  case class Player(id: PlayerId, rating: Option[Elo])
+  case class Player(id: PlayerId, name: Option[String], rating: Option[Elo])
 
   val allSimple: List[Tiebreak] = List(
     NbBlackGames,

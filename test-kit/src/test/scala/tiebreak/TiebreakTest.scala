@@ -9,11 +9,11 @@ import chess.tiebreak.Tiebreak.*
 
 class TiebreakTest extends ChessTest:
 
-  val playerA = Player("PlayerA", rating = Elo(1500).some)
-  val playerB = Player("PlayerB", rating = Elo(1600).some)
-  val playerC = Player("PlayerC", rating = Elo(1550).some)
-  val playerD = Player("PlayerD", rating = Elo(1450).some)
-  val playerE = Player("PlayerE", rating = Elo(1650).some)
+  val playerA = Player("1", "PlayerA".some, rating = Elo(1500).some)
+  val playerB = Player("2", "PlayerB".some, rating = Elo(1600).some)
+  val playerC = Player("3", "PlayerC".some, rating = Elo(1550).some)
+  val playerD = Player("4", "PlayerD".some, rating = Elo(1450).some)
+  val playerE = Player("5", "PlayerE".some, rating = Elo(1650).some)
 
   case class TestGame(white: Player, black: Player, result: ByColor[Points], roundId: Option[String])
 
@@ -216,7 +216,7 @@ class TiebreakTest extends ChessTest:
     // Create a player X that has not played against A or D
     // A, D and X are all on 2.5 points with partial tiebreaks of 1 but only A and D have met
     val playerX_Games = PlayerWithGames(
-      Player("PlayerX", rating = Elo(1500).some),
+      Player("99", "PlayerX".some, rating = Elo(1500).some),
       Seq(
         Game(Points.Half, playerB, Color.White, "1".some),
         Game(Points.One, playerD, Color.White, "2".some),
@@ -269,7 +269,7 @@ class TiebreakTest extends ChessTest:
     assertEquals(points, Some(TiebreakPoint(0f)))
 
   test("AverageOpponentRating with unrated opponents"):
-    val unratedOpponent = Player("Unrated Opponent", rating = None)
+    val unratedOpponent = Player("100", "Unrated Opponent".some, rating = None)
     val unratedGames = Seq(
       Game(Points.One, unratedOpponent, Color.White, "1".some)
     )
@@ -322,20 +322,20 @@ class TiebreakTest extends ChessTest:
 
   test("PerfectTournamentPerformance - Perfect scores"):
     // from https://chess-results.com/tnr1166026.aspx?lan=1&art=1&rd=8
-    val ruslan = Player("Ruslan Pogorelov", rating = Elo(2255).some)
-    val josep = Player("Josep M. Beltran Reverter", rating = Elo(1834).some)
-    val carles = Player("Carles Costas Bella", rating = Elo(1929).some)
-    val sergi = Player("Sergi Aubanell Ber", rating = Elo(1988).some)
-    val xavier = Player("Xavier Palomo Teruel", rating = Elo(2145).some)
-    val agusti = Player("Agusti Guasch Figuerola", rating = Elo(1990).some)
-    val daniel = Player("Daniel Torrens Gonzalez", rating = Elo(1965).some)
-    val aaron = Player("Aaron Alfonso Pellisa", rating = Elo(2125).some)
+    val ruslan = Player("1", "Ruslan Pogorelov".some, rating = Elo(2255).some)
+    val josep = Player("2", "Josep M. Beltran Reverter".some, rating = Elo(1834).some)
+    val carles = Player("3", "Carles Costas Bella".some, rating = Elo(1929).some)
+    val sergi = Player("4", "Sergi Aubanell Ber".some, rating = Elo(1988).some)
+    val xavier = Player("5", "Xavier Palomo Teruel".some, rating = Elo(2145).some)
+    val agusti = Player("6", "Agusti Guasch Figuerola".some, rating = Elo(1990).some)
+    val daniel = Player("7", "Daniel Torrens Gonzalez".some, rating = Elo(1965).some)
+    val aaron = Player("8", "Aaron Alfonso Pellisa".some, rating = Elo(2125).some)
 
     val ruslanGames = Seq(
       Game(Points.One, josep, Color.White, "1".some),
       Game(Points.One, carles, Color.Black, "2".some),
       Game(Points.One, sergi, Color.White, "3".some),
-      Game(Points.Half, Player("bye", None), Color.White, "4".some),
+      Game(Points.Half, Player("0", "bye".some, None), Color.White, "4".some),
       Game(Points.One, xavier, Color.Black, "5".some),
       Game(Points.One, agusti, Color.White, "6".some),
       Game(Points.One, daniel, Color.Black, "7".some),
@@ -352,13 +352,13 @@ class TiebreakTest extends ChessTest:
     ) // chess-results says 2949. Perfect scores though so :shrug:
 
   test("PerfectTournamentPerformance - Regular"):
-    val marc = Player("Marc Guardia Curto", rating = Elo(1830).some)
-    val enric = Player("Enric Regue Farran", rating = Elo(1914).some)
-    val josepmg = Player("Josep Maria Guasch Murtra", rating = Elo(1867).some)
-    val francesc = Player("Francesc Xavier Senso Moreno", rating = Elo(1818).some)
-    val ruslan = Player("Ruslan Pogorelov", rating = Elo(2255).some)
-    val agusti = Player("Agusti Guasch Figuerola", rating = Elo(1990).some)
-    val xavier = Player("Xavier Palomo Teruel", rating = Elo(2145).some)
+    val marc = Player("1", "Marc Guardia Curto".some, rating = Elo(1830).some)
+    val enric = Player("2", "Enric Regue Farran".some, rating = Elo(1914).some)
+    val josepmg = Player("3", "Josep Maria Guasch Murtra".some, rating = Elo(1867).some)
+    val francesc = Player("4", "Francesc Xavier Senso Moreno".some, rating = Elo(1818).some)
+    val ruslan = Player("5", "Ruslan Pogorelov".some, rating = Elo(2255).some)
+    val agusti = Player("6", "Agusti Guasch Figuerola".some, rating = Elo(1990).some)
+    val xavier = Player("7", "Xavier Palomo Teruel".some, rating = Elo(2145).some)
 
     val xavierGames = Seq(
       Game(Points.One, marc, Color.White, "1".some),

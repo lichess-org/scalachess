@@ -19,7 +19,7 @@ object Helper:
       .map(_.toString)
       .orElse(name)
       .map: id =>
-        Player(id, rating.map(_.into(Elo)))
+        Player(id, name, rating.map(_.into(Elo)))
 
   def tiebreakGames(pgnSplit: List[String]): List[(Player, Game)] =
     parsedTags(pgnSplit).foldLeft(List.empty): (acc, tags) =>

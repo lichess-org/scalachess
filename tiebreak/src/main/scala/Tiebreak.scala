@@ -352,10 +352,10 @@ trait Tournament:
   given Ordering[PlayerWithScore] = new Ordering[PlayerWithScore]:
     def compare(a: PlayerWithScore, b: PlayerWithScore): Int =
       /* Sort players by:
-      1. Score (higher is better)
+      1. Score (Descending)
       2. Tiebreak points (compare each tiebreak in order, higher is better)
-      3. Player rating
-      4. Player name (alphabetical)
+      3. Player rating (Descending)
+      4. Player name (Alphabetical, ascending)
        */
       val scoreComparison = b.score.compare(a.score)
       val tiebreakComparison = Ordering[List[TiebreakPoint]].compare(b.tiebreakPoints, a.tiebreakPoints)

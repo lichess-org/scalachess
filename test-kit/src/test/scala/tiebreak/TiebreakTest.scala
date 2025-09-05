@@ -399,3 +399,21 @@ class TiebreakTest extends ChessTest:
       points,
       Some(TiebreakPoint(1523f))
     ) // 1444 + 1549 + 1668 + 1432 = 6093 / 4 = 1523.25, rounded to 1523
+
+  test("Sorting - highest rated first if equal tiebreaks"):
+    val withoutGames = allGames.map((id, pwg) => id -> pwg.copy(games = Seq.empty))
+    assertEquals(
+      Tournament(withoutGames).compute(List.empty).headOption,
+      Some(PlayerWithScore(playerE, 0, Nil))
+    )
+
+  test("Sorting - Alphabetical by name if all else equal"):
+    val withoutGames = allGames.map((id, pwg) => id -> pwg.copy(games = Seq.empty))
+    val playersEandBHighestRated = withoutGames.updated(
+      playerE.id,
+      withoutGames(playerE.id).copy(player = playerE.copy(rating = Elo(1600).some))
+    )
+    assertEquals(
+      Tournament(playersEandBHighestRated).compute(List.empty).headOption,
+      Some(PlayerWithScore(playerB, 0, Nil))
+    )

@@ -154,6 +154,9 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   def sliders: Bitboard =
     bishops ^ rooks ^ queens
 
+  def steppers: Bitboard =
+    knights ^ kings ^ pawns
+
   def attacks(s: Square, attacker: Color): Boolean =
     attackers(s, attacker).nonEmpty
 

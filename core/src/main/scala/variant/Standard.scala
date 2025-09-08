@@ -78,6 +78,7 @@ case object Standard
     val checkerCount = activeCheckers.count
     if checkerCount <= 1 then true
     else if checkerCount >= 3 then false
+    else if (activeCheckers & position.steppers).moreThanOne then false
     else
       (for
         firstChecker <- activeCheckers.first

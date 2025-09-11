@@ -2,7 +2,7 @@ import snapshot4s.BuildInfo.snapshot4sVersion
 
 inThisBuild(
   Seq(
-    scalaVersion := "3.7.2",
+    scalaVersion := "3.7.3",
     version := "17.9.6",
     organization := "com.github.lichess-org.scalachess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
@@ -87,7 +87,7 @@ lazy val testKit = project
       "org.scalacheck" %% "scalacheck" % "1.19.0",
       "org.typelevel" %% "literally" % "1.2.0",
       "org.scalameta" %% "munit" % "1.1.2" % Test,
-      "org.scalameta" %% "munit-scalacheck" % "1.1.0" % Test,
+      "org.scalameta" %% "munit-scalacheck" % "1.2.0" % Test,
       "org.typelevel" %% "weaver-cats" % "0.10.1" % Test,
       "org.typelevel" %% "weaver-scalacheck" % "0.10.1" % Test,
       "co.fs2" %% "fs2-core" % "3.12.2" % Test,

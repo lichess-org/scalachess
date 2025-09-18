@@ -30,6 +30,8 @@ case class Tags(value: List[Tag]) extends AnyVal:
     val name = which(Tag)
     value.find(_.name == name).map(_.value)
 
+  def map(f: List[Tag] => List[Tag]) = Tags(f(value))
+
   def timeControl: Option[TournamentClock] =
     val strict = apply(_.Site).exists(Tags.SiteIsStrictRegex.matches)
     value
@@ -66,9 +68,11 @@ case class Tags(value: List[Tag]) extends AnyVal:
   def points: Option[Outcome.GamePoints] =
     apply(_.Result).flatMap(Outcome.pointsFromResult)
 
+  def -(name: TagType) = map(_.filterNot(_.name == name))
+
   def ++(tags: Tags) = tags.value.foldLeft(this)(_ + _)
 
-  def +(tag: Tag) = Tags(value.filterNot(_.name == tag.name) :+ tag)
+  def +(tag: Tag) = this.-(tag.name).map(_ :+ tag)
 
   def sorted =
     copy(

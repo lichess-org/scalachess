@@ -36,8 +36,8 @@ R   K""".withColor(color = Black)
       FullFen("rnbqkbnr/ppp2ppp/8/3pp3/4P3/3B1N2/PPPP1PPP/RNBQK2R w KQkq - 0 4"),
       variant.Standard
     )
-    assertEquals(from(E1, G1).get._1.history.lastMove, Uci("e1g1"))
-    assertEquals(from(E1, H1).get._1.history.lastMove, Uci("e1g1"))
+    assertEquals(from(E1, G1).get._1.history.lastMove, Uci("e1h1"))
+    assertEquals(from(E1, H1).get._1.history.lastMove, Uci("e1h1"))
 
   test("Castle lastMove UCI normalization: chess960"):
     val from = fenToGame(

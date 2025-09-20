@@ -58,15 +58,13 @@ case class Move(
 
   inline def castles: Boolean = castle.isDefined
 
-  /* There are 2 ways to represent a castle move:
-   * 1. Standard chess: The king moves 2 squares towards the rook (e.g. e1 to g1)
-   * 2. Chess960: The king moves to the rook's square (e.g. e1 to h1)
-   * This normalizes the move to the correct representation
+  /* king to rook is the only variant-proof castling representation
+   * it's required for chess960 where king and rook can start anywhere
+   * and just works reqardless of variant
    */
   inline def normalizeCastle: Move =
     castle.fold(this): x =>
-      val dest = if before.variant == variant.Chess960 then x.rook else x.kingTo
-      copy(dest = dest)
+      copy(dest = x.rook)
 
   override inline def color: Color = piece.color
 

@@ -51,8 +51,8 @@ object RatingPeriodsPerDay extends OpaqueDouble[RatingPeriodsPerDay]:
 
 opaque type ColorAdvantage = Double
 object ColorAdvantage extends OpaqueDouble[ColorAdvantage]:
-  val zero: ColorAdvantage                                 = 0d
-  val standard: ColorAdvantage                             = 7.786d
-  val crazyhouse: ColorAdvantage                           = 15.171d
-  extension (c: ColorAdvantage) def half: ColorAdvantage   = c / 2.0d
+  val zero: ColorAdvantage = 0d
+  val standard: ColorAdvantage = 7.786d
+  val crazyhouse: ColorAdvantage = 15.171d
+  extension (c: ColorAdvantage) def half: ColorAdvantage = c / 2.0d
   extension (c: ColorAdvantage) def negate: ColorAdvantage = -c

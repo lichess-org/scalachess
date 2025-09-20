@@ -48,7 +48,7 @@ final private[glicko] class GameResult(first: Rating, second: Rating, outcome: c
   def getScore(player: Rating): Double = outcome.winner match
     case Some(chess.Color.White) => if player == first then POINTS_FOR_WIN else POINTS_FOR_LOSS
     case Some(chess.Color.Black) => if player == first then POINTS_FOR_LOSS else POINTS_FOR_WIN
-    case _                       =>
+    case _ =>
       if participated(player) then POINTS_FOR_DRAW
       else throw new IllegalArgumentException("Player did not participate in match");
 

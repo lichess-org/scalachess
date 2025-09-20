@@ -6,9 +6,9 @@ import munit.ScalaCheckSuite
 class GlickoCalculatorWithColorAdvantageTest extends ScalaCheckSuite with chess.MunitExtensions:
   // Validate results with reference implementations
   // http://www.glicko.net/glicko/glicko2.pdf
-  val R: Double  = 1500d
+  val R: Double = 1500d
   val RD: Double = 350d
-  val V: Double  = 0.06d
+  val V: Double = 0.06d
 
   val calc = GlickoCalculator(
     ratingPeriodsPerDay = RatingPeriodsPerDay(0.21436d),

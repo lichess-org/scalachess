@@ -61,7 +61,7 @@ object Attacks:
     var subset = 0L
     while
       val attack = slidingAttacks(square, subset, deltas)
-      val idx    = ((magic.factor * subset) >>> (64 - shift)).toInt + magic.offset
+      val idx = ((magic.factor * subset) >>> (64 - shift)).toInt + magic.offset
       ATTACKS(idx) = attack
 
       // Carry-rippler trick for enumerating subsets.

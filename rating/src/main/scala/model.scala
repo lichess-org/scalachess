@@ -8,7 +8,7 @@ object IntRatingDiff extends RichOpaqueInt[IntRatingDiff]:
   extension (diff: IntRatingDiff)
     def positive: Boolean = diff > 0
     def negative: Boolean = diff < 0
-    def zero: Boolean     = diff == 0
+    def zero: Boolean = diff == 0
   given Zero[IntRatingDiff] = Zero(0)
 
 opaque type Rating = Double

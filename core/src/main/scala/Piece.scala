@@ -5,22 +5,22 @@ import cats.derived.*
 
 case class Piece(color: Color, role: Role) derives Eq:
 
-  def is(c: Color): Boolean   = c == color
-  def is(r: Role): Boolean    = r == role
+  def is(c: Color): Boolean = c == color
+  def is(r: Role): Boolean = r == role
   def isNot(r: Role): Boolean = r != role
-  def unary_! : Piece         = Piece(!color, role)
+  def unary_! : Piece = Piece(!color, role)
 
   def forsyth: Char = if color.white then role.forsythUpper else role.forsyth
 
   // the piece at from can attack the target to when mask are all the occupied squares
   def eyes(from: Square, to: Square, mask: Bitboard): Boolean =
     role match
-      case King   => from.kingAttacks.contains(to)
-      case Queen  => from.queenAttacks(mask).contains(to)
-      case Rook   => from.rookAttacks(mask).contains(to)
+      case King => from.kingAttacks.contains(to)
+      case Queen => from.queenAttacks(mask).contains(to)
+      case Rook => from.rookAttacks(mask).contains(to)
       case Bishop => from.bishopAttacks(mask).contains(to)
       case Knight => from.knightAttacks.contains(to)
-      case Pawn   => from.pawnAttacks(color).contains(to)
+      case Pawn => from.pawnAttacks(color).contains(to)
 
   override def toString = s"$color-$role".toLowerCase
 

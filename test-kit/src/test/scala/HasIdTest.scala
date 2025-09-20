@@ -20,7 +20,7 @@ class HasIdTest extends ScalaCheckSuite:
 
   test("removeById reserves order"):
     forAll: (xs: List[Int], id: Int) =>
-      val sorted  = xs.sorted
+      val sorted = xs.sorted
       val removed = sorted.removeById(id)
       removed == removed.sorted
 

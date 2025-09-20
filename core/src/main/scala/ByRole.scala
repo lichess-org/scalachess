@@ -4,20 +4,20 @@ import cats.Functor
 
 case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
   def apply(role: Role): A = role match
-    case Pawn   => pawn
+    case Pawn => pawn
     case Knight => knight
     case Bishop => bishop
-    case Rook   => rook
-    case Queen  => queen
-    case King   => king
+    case Rook => rook
+    case Queen => queen
+    case King => king
 
   inline def update(role: Role, f: A => A): ByRole[A] = role match
-    case Pawn   => copy(pawn = f(pawn))
+    case Pawn => copy(pawn = f(pawn))
     case Knight => copy(knight = f(knight))
     case Bishop => copy(bishop = f(bishop))
-    case Rook   => copy(rook = f(rook))
-    case Queen  => copy(queen = f(queen))
-    case King   => copy(king = f(king))
+    case Rook => copy(rook = f(rook))
+    case Queen => copy(queen = f(queen))
+    case King => copy(king = f(king))
 
   inline def find(f: A => Boolean): Option[A] =
     if f(pawn) then Some(pawn)

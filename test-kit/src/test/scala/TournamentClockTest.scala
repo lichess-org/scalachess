@@ -4,7 +4,7 @@ import Clock.*
 
 class TournamentClockTest extends ChessTest:
 
-  val parse       = TournamentClock.parse(false)
+  val parse = TournamentClock.parse(false)
   val parseStrict = TournamentClock.parse(true)
 
   def someClock(seconds: Int, inc: Int) = Some:

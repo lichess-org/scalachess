@@ -5,7 +5,7 @@ import scala.annotation.static
 
 class Magic(val mask: Long, val factor: Long, val offset: Int):
   def bishopIndex(occupied: Long): Int = (factor * (occupied & mask) >>> (64 - 9)).toInt + offset
-  def rookIndex(occupied: Long): Int   = (factor * (occupied & mask) >>> (64 - 12)).toInt + offset
+  def rookIndex(occupied: Long): Int = (factor * (occupied & mask) >>> (64 - 12)).toInt + offset
 
 object Magic:
   @static

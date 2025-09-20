@@ -47,7 +47,7 @@ class OpeningTest extends ChessTest:
 
   test("search should find by replay in d4"):
     val moves = variant.Standard.initialPosition.playMoves(List(SanStr("d4"))).toOption.get
-    val op    = OpeningDb.search(moves).get
+    val op = OpeningDb.search(moves).get
     assertEquals(op.opening.name, OpeningName("Queen's Pawn Game"))
     assertEquals(op.ply, Ply(1))
 

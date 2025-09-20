@@ -22,7 +22,7 @@ class StatsTest extends ChessTest:
       beApprox(s.mean, comp.mean)
       (s.variance, comp.variance) match
         case (Some(sv), Some(cv)) => beApprox(sv, cv)
-        case (sv, cv)             => assertEquals(sv, cv)
+        case (sv, cv) => assertEquals(sv, cv)
 
   test("empty stats: have good defaults"):
     assertEquals(Stats.empty.variance, None)
@@ -37,8 +37,8 @@ class StatsTest extends ChessTest:
 
   test("large values"):
     // Tight data w/ large mean. Shuffled for Stats.
-    val base         = (1 to 100) ++ (1 to 100) ++ (1 to 200)
-    val data         = base.map { _ + 1e5f }
+    val base = (1 to 100) ++ (1 to 100) ++ (1 to 200)
+    val data = base.map { _ + 1e5f }
     val shuffledData = base.sortWith(_ % 8 > _ % 8).map { _ + 1e5f }
 
     val statsN = Stats.empty.record(shuffledData)

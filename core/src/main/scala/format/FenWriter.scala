@@ -12,7 +12,7 @@ import chess.variant.Crazyhouse
 trait FenWriter:
 
   private given Ordering[File] = Ordering.by[File, Int](_.value)
-  given Ordering[Square]       = Ordering.by[Square, File](_.file)
+  given Ordering[Square] = Ordering.by[Square, File](_.file)
 
   def write(position: Position): FullFen =
     write(position, FullMoveNumber(1))
@@ -47,13 +47,13 @@ trait FenWriter:
         .fold("-")(_.key)}"
 
   def writeBoard(position: Position): BoardFen =
-    val fen   = scala.collection.mutable.StringBuilder(70)
+    val fen = scala.collection.mutable.StringBuilder(70)
     var empty = 0
     for y <- Rank.allReversed do
       empty = 0
       for x <- File.all do
         position.pieceAt(x, y) match
-          case None        => empty = empty + 1
+          case None => empty = empty + 1
           case Some(piece) =>
             if empty == 0 then fen.append(piece.forsyth.toString)
             else
@@ -81,8 +81,8 @@ trait FenWriter:
       case _ => ""
 
   private[chess] def writeCastles(position: Position): String =
-    val wr  = position.rooks & position.white & Bitboard.rank(White.backRank)
-    val br  = position.rooks & position.black & Bitboard.rank(Black.backRank)
+    val wr = position.rooks & position.white & Bitboard.rank(White.backRank)
+    val br = position.rooks & position.black & Bitboard.rank(Black.backRank)
     val wur = position.unmovedRooks.without(Black).bb
     val bur = position.unmovedRooks.without(White).bb
     (if position.castles.whiteKingSide then
@@ -106,4 +106,4 @@ trait FenWriter:
            .getOrElse("q")
        else "") match
       case "" => "-"
-      case s  => s
+      case s => s

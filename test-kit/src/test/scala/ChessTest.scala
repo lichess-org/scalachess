@@ -11,17 +11,17 @@ import variant.{ Chess960, Variant, Standard, Crazyhouse }
 trait ChessTestCommon:
 
   given Conversion[String, Position] = Visual.<<
-  given Conversion[String, PgnStr]   = PgnStr(_)
-  given Conversion[PgnStr, String]   = _.value
+  given Conversion[String, PgnStr] = PgnStr(_)
+  given Conversion[PgnStr, String] = _.value
 
   extension (str: String)
-    def chess960: Position         = makeBoard(str, chess.variant.Chess960)
-    def kingOfTheHill: Position    = makeBoard(str, chess.variant.KingOfTheHill)
-    def threeCheck: Position       = makeBoard(str, chess.variant.ThreeCheck)
+    def chess960: Position = makeBoard(str, chess.variant.Chess960)
+    def kingOfTheHill: Position = makeBoard(str, chess.variant.KingOfTheHill)
+    def threeCheck: Position = makeBoard(str, chess.variant.ThreeCheck)
     def as(color: Color): Position = (Visual << str).withColor(color)
 
   extension (board: Position)
-    def visual                                        = Visual >> board
+    def visual = Visual >> board
     def destsFrom(from: Square): Option[List[Square]] =
       board
         .pieceAt(from)
@@ -93,7 +93,7 @@ trait ChessTestCommon:
   def makeChess960Board(position: Int) =
     Position(Board.fromMap(Chess960.initialPieces(position)), Chess960, White)
   def makeChess960Game(position: Int) = Game(makeChess960Board(position))
-  def chess960Boards                  = (0 to 959).map(makeChess960Board).toList
+  def chess960Boards = (0 to 959).map(makeChess960Board).toList
 
   def makeEmptyBoard: Position = Position(Board.empty, Standard, White)
 
@@ -150,8 +150,8 @@ trait MunitExtensions extends munit.FunSuite:
   given [A, B](using comp: munit.Compare[A, B]): munit.Compare[Option[A], Option[B]] with
     def isEqual(obtained: Option[A], expected: Option[B]): Boolean = (obtained, expected) match
       case (Some(o), Some(e)) => comp.isEqual(o, e)
-      case (None, None)       => true
-      case _                  => false
+      case (None, None) => true
+      case _ => false
 
   given [A, B](using sr: SameRuntime[B, A]): munit.Compare[List[A], List[B]] with
     def isEqual(obtained: List[A], expected: List[B]): Boolean =
@@ -164,21 +164,21 @@ trait MunitExtensions extends munit.FunSuite:
   extension [A](v: Option[A])
     def assertSome(f: PartialFunction[A, Unit])(using Location): Any = v match
       case Some(a) => f.lift(a).getOrElse(fail(s"Unexpected Some value: $a"))
-      case None    => fail(s"Expected Some but received None")
+      case None => fail(s"Expected Some but received None")
 
   extension [E, A](v: Either[E, A])
     def assertRight(f: PartialFunction[A, Unit])(using Location): Any = v match
       case Right(r) => f.lift(r).getOrElse(fail(s"Unexpected Right value: $r"))
-      case Left(_)  => fail(s"Expected Right but received $v")
+      case Left(_) => fail(s"Expected Right but received $v")
     def get: A = v match
       case Right(r) => r
-      case Left(_)  => fail(s"Expected Right but received $v")
+      case Left(_) => fail(s"Expected Right but received $v")
 
 trait ChessTest extends munit.FunSuite with ChessTestCommon with MunitExtensions:
   import munit.Location
 
   object clockConv:
-    given Conversion[Int, Clock.LimitSeconds]     = Clock.LimitSeconds(_)
+    given Conversion[Int, Clock.LimitSeconds] = Clock.LimitSeconds(_)
     given Conversion[Int, Clock.IncrementSeconds] = Clock.IncrementSeconds(_)
 
   object compare:

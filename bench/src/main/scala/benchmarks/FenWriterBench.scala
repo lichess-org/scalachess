@@ -23,14 +23,14 @@ class FenWriterBench:
   @Param(Array("100"))
   var games: Int = scala.compiletime.uninitialized
 
-  var threecheckInput: List[Game]  = scala.compiletime.uninitialized
-  var antichessInput: List[Game]   = scala.compiletime.uninitialized
-  var atomicInput: List[Game]      = scala.compiletime.uninitialized
-  var crazyhouseInput: List[Game]  = scala.compiletime.uninitialized
+  var threecheckInput: List[Game] = scala.compiletime.uninitialized
+  var antichessInput: List[Game] = scala.compiletime.uninitialized
+  var atomicInput: List[Game] = scala.compiletime.uninitialized
+  var crazyhouseInput: List[Game] = scala.compiletime.uninitialized
   var racingkingsInput: List[Game] = scala.compiletime.uninitialized
-  var hordeInput: List[Game]       = scala.compiletime.uninitialized
-  var randomInput: List[Game]      = scala.compiletime.uninitialized
-  var trickyInput: List[Game]      = scala.compiletime.uninitialized
+  var hordeInput: List[Game] = scala.compiletime.uninitialized
+  var randomInput: List[Game] = scala.compiletime.uninitialized
+  var trickyInput: List[Game] = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =

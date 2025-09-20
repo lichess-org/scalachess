@@ -26,15 +26,15 @@ case class DivideResult(val move: MoveOrDrop, nodes: Long):
 
 object Perft:
 
-  lazy val threeCheckPerfts  = Perft.read("3check.perft")
-  lazy val antichessPerfts   = Perft.read("antichess.perft")
-  lazy val atomicPerfts      = Perft.read("atomic.perft")
-  lazy val crazyhousePerfts  = Perft.read("crazyhouse.perft")
-  lazy val hordePerfts       = Perft.read("horde.perft")
+  lazy val threeCheckPerfts = Perft.read("3check.perft")
+  lazy val antichessPerfts = Perft.read("antichess.perft")
+  lazy val atomicPerfts = Perft.read("atomic.perft")
+  lazy val crazyhousePerfts = Perft.read("crazyhouse.perft")
+  lazy val hordePerfts = Perft.read("horde.perft")
   lazy val racingkingsPerfts = Perft.read("racingkings.perft")
-  lazy val randomPerfts      = Perft.read("random.perft")
-  lazy val trickyPerfts      = Perft.read("tricky.perft")
-  lazy val chess960          = Perft.read("chess960.perft")
+  lazy val randomPerfts = Perft.read("random.perft")
+  lazy val trickyPerfts = Perft.read("tricky.perft")
+  lazy val chess960 = Perft.read("chess960.perft")
 
   private def read(file: String): List[Perft] =
     import cats.implicits.toShow
@@ -43,7 +43,7 @@ object Perft:
 
   def printResult(results: List[DivideResult]) =
     val builder = StringBuilder()
-    var sum     = 0L
+    var sum = 0L
     results.foreach { r =>
       sum += r.nodes
       builder.append(r).append("\n")

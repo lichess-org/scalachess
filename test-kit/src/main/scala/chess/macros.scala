@@ -16,11 +16,11 @@ object macros:
   object PgnLiteral extends Literally[ParsedPgn]:
     def validate(s: String)(using Quotes) =
       Parser.full(PgnStr(s)) match
-        case Right(_)  => Right('{ Parser.full(PgnStr(${ Expr(s) })).toOption.get })
+        case Right(_) => Right('{ Parser.full(PgnStr(${ Expr(s) })).toOption.get })
         case Left(err) => Left(err.toString)
 
   object UciLiteral extends Literally[Uci]:
     def validate(s: String)(using Quotes) =
       Uci(s) match
         case Some(_) => Right('{ Uci(${ Expr(s) }).get })
-        case _       => Left(s"Invalid UCI: $s")
+        case _ => Left(s"Invalid UCI: $s")

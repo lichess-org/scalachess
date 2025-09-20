@@ -17,8 +17,8 @@ final class GlickoCalculator(
 
   // Simpler use case: a single game
   def computeGame(game: Game, skipDeviationIncrease: Boolean = false): Try[ByColor[Player]] =
-    val ratings       = game.players.map(conversions.toRating)
-    val gameResult    = conversions.toGameResult(ratings, game.outcome)
+    val ratings = game.players.map(conversions.toRating)
+    val gameResult = conversions.toGameResult(ratings, game.outcome)
     val periodResults = impl.GameRatingPeriodResults(List(gameResult))
     Try:
       calculator.updateRatings(periodResults, skipDeviationIncrease)

@@ -16,9 +16,9 @@ case class Tag(name: TagType, value: String):
     str.replace("\\", "\\\\").replace("\"", "\\\"")
 
 trait TagType:
-  lazy val name      = toString
+  lazy val name = toString
   lazy val lowercase = name.toLowerCase
-  val isUnknown      = false
+  val isUnknown = false
 
 case class Tags(value: List[Tag]) extends AnyVal:
 
@@ -30,8 +30,10 @@ case class Tags(value: List[Tag]) extends AnyVal:
     val name = which(Tag)
     value.find(_.name == name).map(_.value)
 
+  def map(f: List[Tag] => List[Tag]) = Tags(f(value))
+
   def timeControl: Option[TournamentClock] =
-    val strict = exists(_.GameId) // lichess games use proper PGN specification
+    val strict = apply(_.Site).exists(Tags.SiteIsStrictRegex.matches)
     value
       .collectFirst { case Tag(Tag.TimeControl, str) => str }
       .flatMap(TournamentClock.parse(strict))
@@ -41,15 +43,15 @@ case class Tags(value: List[Tag]) extends AnyVal:
       .map(_.toLowerCase)
       .flatMap:
         case "chess 960" | "fischerandom" | "fischerrandom" => chess.variant.Chess960.some
-        case "3 check" | "3-check"                          => chess.variant.ThreeCheck.some
-        case name                                           => chess.variant.Variant.byName(name)
+        case "3 check" | "3-check" => chess.variant.ThreeCheck.some
+        case name => chess.variant.Variant.byName(name)
 
   def anyDate: Option[String] = apply(_.UTCDate).orElse(apply(_.Date))
 
   def year: Option[Int] =
     anyDate.flatMap:
       case Tags.DateRegex(y, _, _) => y.toIntOption
-      case _                       => None
+      case _ => None
 
   def fen: Option[FullFen] = FullFen.from(apply(_.FEN))
 
@@ -66,9 +68,11 @@ case class Tags(value: List[Tag]) extends AnyVal:
   def points: Option[Outcome.GamePoints] =
     apply(_.Result).flatMap(Outcome.pointsFromResult)
 
+  def -(name: TagType) = map(_.filterNot(_.name == name))
+
   def ++(tags: Tags) = tags.value.foldLeft(this)(_ + _)
 
-  def +(tag: Tag) = Tags(value.filterNot(_.name == tag.name) :+ tag)
+  def +(tag: Tag) = this.-(tag.name).map(_ :+ tag)
 
   def sorted =
     copy(
@@ -88,7 +92,7 @@ case class Tags(value: List[Tag]) extends AnyVal:
           .flatMap(_.split('.').lift(1))
           .flatMap(_.toIntOption)
 
-  def names: ByColor[Option[PlayerName]]  = ByColor(apply(_.White), apply(_.Black)).map(PlayerName.from(_))
+  def names: ByColor[Option[PlayerName]] = ByColor(apply(_.White), apply(_.Black)).map(PlayerName.from(_))
   def ratings: ByColor[Option[IntRating]] = ByColor(apply(_.WhiteElo), apply(_.BlackElo)).map: r =>
     IntRating.from(r.flatMap(_.toIntOption))
   def titles: ByColor[Option[PlayerTitle]] =
@@ -106,8 +110,8 @@ case class Tags(value: List[Tag]) extends AnyVal:
         yield minutes * 60 + seconds
         s.split(':').toList match
           case List(h, m, s) => (h.toIntOption, readMinutesAndSeconds(m, s)).mapN(_ * 3600 + _)
-          case List(m, s)    => readMinutesAndSeconds(m, s)
-          case _             => None
+          case List(m, s) => readMinutesAndSeconds(m, s)
+          case _ => None
       seconds.map(Centis.ofSeconds)
 
   override def toString = sorted.value.mkString("\n")
@@ -136,54 +140,56 @@ object Tags:
         else tag.copy(value = tag.value.replace("\"", "").trim)
 
   private val DateRegex = """(\d{4}|\?{4})\.(\d\d|\?\?)\.(\d\d|\?\?)""".r
+  private val SiteIsStrictRegex =
+    """(?i)\b(?:lichess\.org|chess\.com|idChess\.com|tcec-chess\.com)\b""".r.unanchored
 
 object Tag:
 
   given Eq[Tag] = Eq.fromUniversalEquals
 
-  case object Event   extends TagType
-  case object Site    extends TagType
-  case object Date    extends TagType
+  case object Event extends TagType
+  case object Site extends TagType
+  case object Date extends TagType
   case object UTCDate extends TagType:
     val format = DateTimeFormatter.ofPattern("yyyy.MM.dd")
   case object UTCTime extends TagType:
     val format = DateTimeFormatter.ofPattern("HH:mm:ss")
-  case object Round             extends TagType
-  case object Board             extends TagType
-  case object White             extends TagType
-  case object Black             extends TagType
-  case object TimeControl       extends TagType
-  case object WhiteClock        extends TagType
-  case object BlackClock        extends TagType
-  case object ReferenceTime     extends TagType
-  case object WhiteElo          extends TagType
-  case object BlackElo          extends TagType
-  case object WhiteRatingDiff   extends TagType
-  case object BlackRatingDiff   extends TagType
-  case object WhiteTitle        extends TagType
-  case object BlackTitle        extends TagType
-  case object WhiteTeam         extends TagType
-  case object BlackTeam         extends TagType
-  case object WhiteFideId       extends TagType
-  case object BlackFideId       extends TagType
-  case object Result            extends TagType
-  case object FEN               extends TagType
-  case object Variant           extends TagType
-  case object ECO               extends TagType
-  case object Opening           extends TagType
-  case object Termination       extends TagType
-  case object Annotator         extends TagType
-  case object GameId            extends TagType
+  case object Round extends TagType
+  case object Board extends TagType
+  case object White extends TagType
+  case object Black extends TagType
+  case object TimeControl extends TagType
+  case object WhiteClock extends TagType
+  case object BlackClock extends TagType
+  case object ReferenceTime extends TagType
+  case object WhiteElo extends TagType
+  case object BlackElo extends TagType
+  case object WhiteRatingDiff extends TagType
+  case object BlackRatingDiff extends TagType
+  case object WhiteTitle extends TagType
+  case object BlackTitle extends TagType
+  case object WhiteTeam extends TagType
+  case object BlackTeam extends TagType
+  case object WhiteFideId extends TagType
+  case object BlackFideId extends TagType
+  case object Result extends TagType
+  case object FEN extends TagType
+  case object Variant extends TagType
+  case object ECO extends TagType
+  case object Opening extends TagType
+  case object Termination extends TagType
+  case object Annotator extends TagType
+  case object GameId extends TagType
   case class Unknown(n: String) extends TagType:
-    override def toString  = n
+    override def toString = n
     override val isUnknown = true
 
-  val names   = ByColor(White, Black)
-  val elos    = ByColor(WhiteElo, BlackElo)
-  val titles  = ByColor(WhiteTitle, BlackTitle)
+  val names = ByColor(White, Black)
+  val elos = ByColor(WhiteElo, BlackElo)
+  val titles = ByColor(WhiteTitle, BlackTitle)
   val fideIds = ByColor(WhiteFideId, BlackFideId)
-  val teams   = ByColor(WhiteTeam, BlackTeam)
-  val clocks  = ByColor(WhiteClock, BlackClock)
+  val teams = ByColor(WhiteTeam, BlackTeam)
+  val clocks = ByColor(WhiteClock, BlackClock)
 
   val tagTypes = List(
     Event,

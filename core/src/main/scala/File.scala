@@ -6,14 +6,14 @@ object File:
   extension (a: File)
     inline def value: Int = a
 
-    inline infix def >(inline o: File): Boolean  = a > o
-    inline infix def <(inline o: File): Boolean  = a < o
+    inline infix def >(inline o: File): Boolean = a > o
+    inline infix def <(inline o: File): Boolean = a < o
     inline infix def >=(inline o: File): Boolean = a >= o
     inline infix def <=(inline o: File): Boolean = a <= o
 
     inline def char: Char = (97 + a).toChar
 
-    inline def upperCaseChar: Char       = (65 + a).toChar
+    inline def upperCaseChar: Char = (65 + a).toChar
     inline def toUpperCaseString: String = upperCaseChar.toString
 
     // the bitboard of the file

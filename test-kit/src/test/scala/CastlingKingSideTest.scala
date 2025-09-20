@@ -12,7 +12,7 @@ class CastlingKingSideTest extends ChessTest:
   val goodHist = """
 PPPPPPPP
 R  QK  R"""
-  val badHist  = goodHist.updateHistory(_.withoutCastles(White))
+  val badHist = goodHist.updateHistory(_.withoutCastles(White))
   test("impossible"):
     assertEquals(goodHist.place(White.bishop, F1).flatMap(_.destsFrom(E1)), Set())
     assertEquals(goodHist.place(White.knight, G1).flatMap(_.destsFrom(E1)), Set(F1))

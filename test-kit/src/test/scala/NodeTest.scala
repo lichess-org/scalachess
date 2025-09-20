@@ -109,7 +109,7 @@ class NodeTest extends ScalaCheckSuite:
 
   test("modifyAt and modifyChildAt are consistent if the child exists"):
     forAll: (p: NodeWithPath[Int], f: Int => Int) =>
-      val (node, path)                 = p
+      val (node, path) = p
       def modifyChild(node: Tree[Int]) =
         node.withChild(node.child.map(c => c.withValue(f(c.value)))).some
 
@@ -139,15 +139,15 @@ class NodeTest extends ScalaCheckSuite:
   test("addValueAsChildAt and find are consistent"):
     forAll: (p: NodeWithPath[Foo], foo: Foo) =>
       val (node, ps) = p
-      val path       = ps.map(_.id)
-      val added      = node.addValueAsChildAt(path, foo)
+      val path = ps.map(_.id)
+      val added = node.addValueAsChildAt(path, foo)
       added.isEmpty || added.flatMap(_.find(path :+ foo.id)).isDefined
 
   test("addValueAsChildAt size"):
     forAll: (p: NodeWithPath[Foo], foo: Foo) =>
       val (node, ps) = p
       ps.nonEmpty ==> {
-        val path  = ps.map(_.id)
+        val path = ps.map(_.id)
         val added = node.addValueAsChildAt(path, foo)
         added.isEmpty || added.get.size >= node.size
       }
@@ -156,8 +156,8 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (p: NodeWithPath[Foo], foo: Foo) =>
       val (node, ps) = p
       ps.nonEmpty ==> {
-        val path       = ps.map(_.id)
-        val added      = node.addValueAsChildAt(path, foo)
+        val path = ps.map(_.id)
+        val added = node.addValueAsChildAt(path, foo)
         val addedTwice = added.flatMap(_.addValueAsChildAt(path, foo))
         added.isEmpty || added.get.size == addedTwice.get.size
       }
@@ -194,7 +194,7 @@ class NodeTest extends ScalaCheckSuite:
 
   test("modifyInMainlineAt with updateValue return have the same size"):
     forAll: (node: Node[Int], f: Int => Int) =>
-      val n      = Random.nextInt(node.mainline.size)
+      val n = Random.nextInt(node.mainline.size)
       val output = node.modifyInMainlineAt(n, _.updateValue(f))
       output.get.size == node.size && output.get.mainline.size == node.mainline.size
 
@@ -208,7 +208,7 @@ class NodeTest extends ScalaCheckSuite:
 
   test("take n doesn't impact by modifyInMainlineAt n"):
     forAll: (node: Node[Int], s: Short, newNode: Node[Int]) =>
-      val n      = s.toInt
+      val n = s.toInt
       val output = node.modifyInMainlineAt(n, _ => newNode)
       n >= node.mainline.size || output.flatMap(_.take(n)) == node.take(n)
 
@@ -241,7 +241,7 @@ class NodeTest extends ScalaCheckSuite:
   test("promote will never change node.size"):
     forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
-      val output       = node.promote(path)
+      val output = node.promote(path)
       output.isEmpty || output.get.size == node.size
 
   test("promote success reduce mainline nodes count in the path"):
@@ -250,7 +250,7 @@ class NodeTest extends ScalaCheckSuite:
 
     forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
-      val output       = node.promote(path)
+      val output = node.promote(path)
       output.isEmpty || {
         nodesInPath(output.get, path) == nodesInPath(node, path) + 1
       }
@@ -258,7 +258,7 @@ class NodeTest extends ScalaCheckSuite:
   test("findPath.isEmpty => promote.isEmpty"):
     forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
-      val ps           = node.findPath(path)
+      val ps = node.findPath(path)
       ps.isEmpty ==> {
         node.promote(path).isEmpty
       }
@@ -266,7 +266,7 @@ class NodeTest extends ScalaCheckSuite:
   test("promote and findPath are consistent"):
     forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
-      val ps           = node.findPath(path)
+      val ps = node.findPath(path)
       (ps.isDefined && ps.get.exists(_.isVariation)) ==> {
         node.promote(path).isDefined
       }
@@ -274,19 +274,19 @@ class NodeTest extends ScalaCheckSuite:
   test("promoteToMainline will never change node.size"):
     forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
-      val output       = node.promoteToMainline(path)
+      val output = node.promoteToMainline(path)
       output.isEmpty || output.get.size == node.size
 
   test("promoteToMainline => path is a subset of mainlineValues"):
     forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
-      val output       = node.promoteToMainline(path)
+      val output = node.promoteToMainline(path)
       output.isEmpty || output.get.mainlineValues.startsWith(path)
 
   test("findPath.isEmpty => promoteToMainline.isEmpty"):
     forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
-      val ps           = node.findPath(path)
+      val ps = node.findPath(path)
       ps.isEmpty ==> {
         node.promoteToMainline(path).isEmpty
       }
@@ -294,7 +294,7 @@ class NodeTest extends ScalaCheckSuite:
   test("promoteToMainline and findPath are consistent"):
     forAll: (p: NodeWithPath[Int]) =>
       val (node, path) = p
-      val ps           = node.findPath(path)
+      val ps = node.findPath(path)
       ps.isDefined ==> {
         node.promoteToMainline(path).isDefined
       }
@@ -321,15 +321,15 @@ class NodeTest extends ScalaCheckSuite:
 
   test("variations.add size"):
     forAll: (vs: List[Variation[Foo]], v: Variation[Foo]) =>
-      val added       = vs.add(v)
+      val added = vs.add(v)
       val isContained = vs.exists(_.value.id == v.value.id)
       added.size == vs.size + (if isContained then 0 else 1)
 
   test("variations.add keeps the order"):
     forAll: (vs: List[Variation[Foo]], v: Variation[Foo]) =>
-      val added       = vs.add(v)
+      val added = vs.add(v)
       val isContained = vs.exists(_.sameId(v))
-      val expected    =
+      val expected =
         if isContained then vs.map(_.id)
         else vs.map(_.id) :+ v.id
 
@@ -344,20 +344,20 @@ class NodeTest extends ScalaCheckSuite:
     forAll: (vs: List[Variation[Foo]], v: Variation[Foo]) =>
       val added = vs.add(v)
       vs.exists(_.sameId(v)) ==> {
-        val orig   = vs.find(_.sameId(v)).get
+        val orig = vs.find(_.sameId(v)).get
         val output = added.find(_.sameId(v)).get
         orig.value.merge(v.value) == output.value.some
       }
 
   test("variations.add list"):
     forAll: (vs: List[Variation[Foo]], xs: List[Variation[Foo]]) =>
-      val added  = vs.add(xs)
+      val added = vs.add(xs)
       val allIds = vs.map(_.id).toSet ++ xs.map(_.id).toSet
       added.map(_.id).toSet == allIds
 
   test("variations.add list size"):
     forAll: (vs: List[Variation[Foo]], xs: List[Variation[Foo]]) =>
-      val added       = vs.add(xs)
+      val added = vs.add(xs)
       val intersected = vs.map(_.id).toSet.intersect(xs.map(_.id).toSet)
       added.map(_.id).toSet.size == vs.map(_.id).toSet.size + xs.map(_.id).toSet.size - intersected.size
 
@@ -380,7 +380,7 @@ object Foo:
 
   given Arbitrary[Foo] = Arbitrary:
     for
-      id   <- Arbitrary.arbitrary[Int]
+      id <- Arbitrary.arbitrary[Int]
       name <- Gen.alphaLowerStr
     yield Foo(id, name)
 

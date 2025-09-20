@@ -9,104 +9,167 @@ class HordeVariantTest extends ChessTest:
 
   test("Must not be insufficient winning material for horde with only 1 pawn left"):
     val position = FullFen("k7/ppP5/brp5/8/8/8/8/8 b - -")
-    val game     = fenToGame(position, Horde)
+    val game = fenToGame(position, Horde)
     assertNot(game.position.opponentHasInsufficientMaterial)
 
   test("Must recognise insufficient winning material for horde with only 1 pawn left"):
     val position = FullFen("8/2k5/3q4/8/8/8/1P6/8 b - -")
-    val game     = fenToGame(position, Horde)
+    val game = fenToGame(position, Horde)
     assert(game.position.opponentHasInsufficientMaterial)
 
   test("Must not be insufficient winning material for king with only 1 pawn left"):
     val position = FullFen("8/2k5/3q4/8/8/8/1P6/8 w - -")
-    val game     = fenToGame(position, Horde)
+    val game = fenToGame(position, Horde)
     assertNot(game.position.opponentHasInsufficientMaterial)
 
   test("Must recognise insufficient winning material for horde with only 1 bishop left"):
     val position = FullFen("r7/2Bb4/q3k3/8/8/3q4/8/5qqr b - -")
-    val game     = fenToGame(position, Horde)
+    val game = fenToGame(position, Horde)
     assertNot(game.position.autoDraw)
     assertNot(game.position.end)
     assert(game.position.opponentHasInsufficientMaterial)
+    assertNot(game.position.playerHasInsufficientMaterial)
+    assertNot(Horde.isInsufficientMaterial((game.position)))
 
   test("Must recognise insufficient winning material for horde with only 1 queen left"):
     val position = FullFen("8/2k5/3q4/8/8/1Q6/8/8 b - -")
-    val game     = fenToGame(position, Horde)
+    val game = fenToGame(position, Horde)
     assert(game.position.opponentHasInsufficientMaterial)
 
   test("Must not be insufficient winning material for king with only 1 queen left"):
     val position = FullFen("8/2k5/3q4/8/8/1Q6/8/8 w - -")
-    val game     = fenToGame(position, Horde)
+    val game = fenToGame(position, Horde)
     assertNot(game.position.opponentHasInsufficientMaterial)
+    assert(game.position.playerHasInsufficientMaterial)
+    assertNot(game.position.autoDraw)
+    assertNot(Horde.isInsufficientMaterial((game.position)))
 
   test("Must recognise insufficient winning material for horde with only 2 minor pieces left"):
     val position = FullFen("8/2k5/3q4/8/8/1B2N3/8/8 b - -")
-    val game     = fenToGame(position, Horde)
+    val game = fenToGame(position, Horde)
     assert(game.position.opponentHasInsufficientMaterial)
+    assertNot(game.position.playerHasInsufficientMaterial)
+    assertNot(Horde.isInsufficientMaterial(game.position))
+    assertNot(game.position.autoDraw)
 
   test("Must not be insufficient winning material for king with only 2 minor pieces left"):
     val position = FullFen("8/2k5/3q4/8/8/1B2N3/8/8 w - -")
-    val game     = fenToGame(position, Horde)
+    val game = fenToGame(position, Horde)
     assertNot(game.position.opponentHasInsufficientMaterial)
+    assert(game.position.playerHasInsufficientMaterial)
+    assertNot(Horde.isInsufficientMaterial(game.position))
+    assertNot(game.position.autoDraw)
 
   test("Must not be insufficient winning material for horde with 3 minor pieces left"):
     val position = FullFen("8/2k5/3q4/8/8/3B4/4NB2/8 b - -")
-    val game     = fenToGame(position, Horde)
+    val game = fenToGame(position, Horde)
     assertNot(game.position.opponentHasInsufficientMaterial)
+    assertNot(game.position.playerHasInsufficientMaterial)
+    assertNot(game.position.autoDraw)
+    assertNot(Horde.isInsufficientMaterial(game.position))
 
   test("Must not be insufficient winning material for king with queen and rook left"):
     val position = FullFen("8/5k2/7q/7P/6rP/6P1/6P1/8 b - - 0 52")
-    val game     = fenToGame(position, Horde)
+    val game = fenToGame(position, Horde)
     assertNot(game.position.opponentHasInsufficientMaterial)
+    assertNot(game.position.playerHasInsufficientMaterial)
     assertNot(game.position.autoDraw)
+    assertNot(Horde.isInsufficientMaterial(game.position))
 
   test("Must auto-draw in simple pawn fortress"):
     val position = FullFen("8/p7/pk6/P7/P7/8/8/8 b - -")
-    val game     = fenToGame(position, Horde)
+    val game = fenToGame(position, Horde)
     assert(game.position.autoDraw)
     assert(game.position.opponentHasInsufficientMaterial)
+    assert(game.position.playerHasInsufficientMaterial)
+    assert(Horde.isInsufficientMaterial(game.position))
 
   test("Must auto-draw if horde is stalemated and only king can move"):
     val position = FullFen("QNBRRBNQ/PPpPPpPP/P1P2PkP/8/8/8/8/8 b - -")
-    val game     = fenToGame(position, Horde)
+    val game = fenToGame(position, Horde)
     assert(game.position.autoDraw)
     assert(game.position.opponentHasInsufficientMaterial)
+    assert(game.position.playerHasInsufficientMaterial)
+    assert(Horde.isInsufficientMaterial(game.position))
 
   test("Must auto-draw if horde is stalemated and only king can move"):
     val position = FullFen("b7/pk6/P7/P7/8/8/8/8 b - - 0 1")
-    val game     = fenToGame(position, Horde)
+    val game = fenToGame(position, Horde)
     assert(game.position.autoDraw)
     assert(game.position.opponentHasInsufficientMaterial)
+    assert(game.position.playerHasInsufficientMaterial)
+    assert(Horde.isInsufficientMaterial(game.position))
+
+  test("Must auto-draw if horde is stalemated and all moves keep stalemate"):
+    val position = FullFen("8/p7/P7/P7/8/2q5/8/7k b - - 0 1")
+    val game = fenToGame(position, Horde)
+    assert(game.position.autoDraw)
+    assert(game.position.opponentHasInsufficientMaterial)
+    assert(game.position.playerHasInsufficientMaterial)
+    assert(Horde.isInsufficientMaterial(game.position))
+
+  test("Must auto-draw if horde will be stalemated after all possible moves"):
+    val position = FullFen("krb5/pb1p4/P2Pp3/P3Pp2/5Pp1/6Pp/7P/8 b - - 0 1")
+    val game = fenToGame(position, Horde)
+    assert(game.position.autoDraw)
+    assert(game.position.opponentHasInsufficientMaterial)
+    assert(game.position.playerHasInsufficientMaterial)
+    assert(Horde.isInsufficientMaterial(game.position))
+
+  test("Must not auto draw if currently stalemated horde can be unstalemated"):
+    val position = FullFen("k7/p2p4/P2Pp1p1/P3PpPp/5PpP/6Pp/7P/7n b - - 0 1")
+    val game = fenToGame(position, Horde)
+    assertNot(game.position.autoDraw)
+    assertNot(game.position.opponentHasInsufficientMaterial)
+    assertNot(game.position.playerHasInsufficientMaterial)
+    assertNot(Horde.isInsufficientMaterial(game.position))
 
   test("Must not auto-draw if horde is not stalemated after the only king move"):
     val position = FullFen("8/1b5r/1P6/1Pk3q1/1PP5/r1P5/P1P5/2P5 b - - 0 52")
-    val game     = fenToGame(position, Horde)
+    val game = fenToGame(position, Horde)
     assertNot(game.position.autoDraw)
     assertNot(game.position.opponentHasInsufficientMaterial)
+    assertNot(game.position.playerHasInsufficientMaterial)
+    assertNot(Horde.isInsufficientMaterial(game.position))
 
   test("Must not auto-draw if not all black King moves leads to stalemate"):
     val position = FullFen("8/8/8/7k/7P/7P/8/8 b - - 0 58")
-    val game     = fenToGame(position, Horde)
+    val game = fenToGame(position, Horde)
     assertNot(game.position.autoDraw)
     assertNot(game.position.end)
     assertEquals(game.position.status, None)
     assertNot(Horde.isInsufficientMaterial(game.position))
     assertNot(game.position.opponentHasInsufficientMaterial)
+    assertNot(game.position.playerHasInsufficientMaterial)
+
+  test("Must not auto-draw if horde is not stalemated after some move by any piece"):
+    val position = FullFen("8/p7/P7/P7/8/8/8/6qk b - - 0 1")
+    val game = fenToGame(position, Horde)
+    assertNot(game.position.autoDraw)
+    assertNot(game.position.opponentHasInsufficientMaterial)
+    assertNot(game.position.playerHasInsufficientMaterial)
+    assertNot(Horde.isInsufficientMaterial(game.position))
 
   test("Must not auto-draw in B vs K endgame, king can win"):
-    val position = FullFen("7B/6k1/8/8/8/8/8/8 b - -")
-    val game     = fenToGame(position, Horde)
-    assertNot(game.position.autoDraw)
-    assert(game.position.opponentHasInsufficientMaterial)
+    val game1 = fenToGame(FullFen("7B/6k1/8/8/8/8/8/8 b - -"), Horde)
+    assertNot(game1.position.autoDraw)
+    assert(game1.position.opponentHasInsufficientMaterial)
+    assertNot(game1.position.playerHasInsufficientMaterial)
+    assertNot(Horde.isInsufficientMaterial(game1.position))
+    val game2 = fenToGame(FullFen("7B/7k/8/8/8/8/8/8 w - - 0 1"), Horde)
+    assertNot(game2.position.autoDraw)
+    assert(game2.position.playerHasInsufficientMaterial)
+    assertNot(game2.position.opponentHasInsufficientMaterial)
+    assertNot(Horde.isInsufficientMaterial(game2.position))
 
   test("Pawn on first rank should able to move two squares"):
     val position = FullFen("8/pp1k2q1/3P2p1/8/P3PP2/PPP2r2/PPP5/PPPP4 w - - 1 2")
-    val game     = fenToGame(position, Horde)
+    val game = fenToGame(position, Horde)
     assert(game.position.legalMoves.exists(m => m.orig == Square.D1 && m.dest == Square.D3))
 
   test("Cannot en passant a pawn from the first rank"):
     val position = FullFen("k7/5p2/4p2P/3p2P1/2p2P2/1p2P2P/p2P2P1/2P2P2 w - - 0 1")
-    val game     = fenToGame(position, Horde)(Square.C1, Square.C3).get
+    val game = fenToGame(position, Horde)(Square.C1, Square.C3).get
     assertNot(game._1.position.legalMoves.exists(m => m.orig == Square.B3 && m.dest == Square.C2))
 
   test("Castle with one rook moved"):
@@ -125,6 +188,6 @@ class HordeVariantTest extends ChessTest:
 
   test("the h8 rooks move"):
     val position = FullFen("r3kbnr/p1pqppp1/1pnp3P/PPPP1P1P/PPP1PPP1/1PPP1PPP/PPPPPPPP/PPPPPPPP b kq - 0 7")
-    val game     = fenToGame(position, Horde)(Square.H8, Square.H6).get
+    val game = fenToGame(position, Horde)(Square.H8, Square.H6).get
     assertEquals(game._1.position.history.unmovedRooks, UnmovedRooks(Set(Square.A8)))
     assertEquals(game._1.position.history.castles, Castles(false, false, false, true))

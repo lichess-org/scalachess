@@ -12,7 +12,7 @@ import scala.annotation.targetName
  * a typeclass that can apply a Moveable and produce a new state and a MoveOrDrop.
 */
 trait CanPlay[A]:
-  type Step      = (next: A, move: MoveOrDrop, ply: Ply)
+  type Step = (next: A, move: MoveOrDrop, ply: Ply)
   type Result[B] = (state: A, moves: List[B], error: Option[ErrorStr])
   extension (a: A)
     /**
@@ -286,6 +286,6 @@ trait CanPlay[A]:
 object CanPlay:
 
   inline def makeError(currentPly: Ply, move: Moveable): ErrorStr =
-    val moveAt  = currentPly.fullMoveNumber
+    val moveAt = currentPly.fullMoveNumber
     val moveStr = move.rawString.getOrElse(move.toString)
     ErrorStr(s"Cannot play $moveStr at move $moveAt by ${currentPly.turn.name}")

@@ -15,16 +15,16 @@ import chess.variant.{ Crazyhouse, Variant }
 object Visual:
 
   def <<(source: String): Position =
-    val lines    = augmentString(source).linesIterator.to(List)
+    val lines = augmentString(source).linesIterator.to(List)
     val filtered = lines.size match
-      case 8          => lines
+      case 8 => lines
       case n if n > 8 => lines.slice(1, 9)
-      case n          => (List.fill(8 - n)("")) ::: lines
+      case n => (List.fill(8 - n)("")) ::: lines
     val p = createPosition(
       pieces = (for
         (l, y) <- filtered.zipWithIndex
         (c, x) <- l.zipWithIndex
-        role   <- Role.forsyth(c.toLower)
+        role <- Role.forsyth(c.toLower)
       yield Square.at(x, 7 - y).map { square =>
         square -> (Color.fromWhite(c.isUpper) - role)
       }).flatten,
@@ -50,7 +50,7 @@ object Visual:
   def addNewLines(str: String) = "\n" + str + "\n"
 
   def createPosition(pieces: Iterable[(Square, Piece)], variant: Variant): Position =
-    val board        = Board.fromMap(pieces.toMap)
+    val board = Board.fromMap(pieces.toMap)
     val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Position(
       board,

@@ -37,7 +37,7 @@ case object RacingKings
   )
   override val initialBoard: Board = Board.fromMap(initialPieces)
 
-  override val castles: Castles        = Castles.none
+  override val castles: Castles = Castles.none
   override val allowsCastling: Boolean = false
 
   override val initialFen: FullFen = FullFen("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")
@@ -53,7 +53,7 @@ case object RacingKings
   override def valid(position: Position, strict: Boolean): Boolean =
     super.valid(position, strict) && (!strict || position.check.no)
 
-  override def isInsufficientMaterial(position: Position): Boolean          = false
+  override def isInsufficientMaterial(position: Position): Boolean = false
   override def opponentHasInsufficientMaterial(position: Position): Boolean = false
 
   // It is a win, when exactly one king made it to the goal. When white reaches

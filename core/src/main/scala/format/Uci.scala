@@ -21,10 +21,10 @@ object Uci:
   ) extends Uci:
 
     def keys: String = s"${orig.key}${dest.key}"
-    def uci: String  = s"$keys$promotionString"
+    def uci: String = s"$keys$promotionString"
 
     def charKeys: String = s"${orig.asChar}${dest.asChar}"
-    def chars: String    = s"$charKeys$promotionString"
+    def chars: String = s"$charKeys$promotionString"
 
     def promotionString: String = promotion.fold("")(_.forsyth.toString)
 
@@ -67,12 +67,12 @@ object Uci:
   object Drop:
 
     def fromChars(move: String): Option[Drop] = for
-      role   <- move.headOption.flatMap(Role.allByPgn.get)
+      role <- move.headOption.flatMap(Role.allByPgn.get)
       square <- move.lift(2).flatMap(Square.fromChar)
     yield Uci.Drop(role, square)
 
     def fromStrings(roleS: String, posS: String): Option[Drop] = for
-      role   <- Role.allByName.get(roleS)
+      role <- Role.allByName.get(roleS)
       square <- Square.fromKey(posS)
     yield Drop(role, square)
 
@@ -85,7 +85,7 @@ object Uci:
   def apply(move: String): Option[Uci] =
     if move.lift(1).contains('@') then
       for
-        role   <- move.headOption.flatMap(Role.allByPgn.get)
+        role <- move.headOption.flatMap(Role.allByPgn.get)
         square <- Square.fromKey(move.slice(2, 4))
       yield Uci.Drop(role, square)
     else Uci.Move(move)

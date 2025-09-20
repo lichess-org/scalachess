@@ -23,8 +23,8 @@ case class ByColor[A](white: A, black: A):
 
   def map[B](fw: A => B, fb: A => B): ByColor[B] = ByColor(fw(white), fb(black))
 
-  def map[B](f: A => B): ByColor[B]                 = map(f, f)
-  def mapList[B](f: A => B): List[B]                = List(f(white), f(black))
+  def map[B](f: A => B): ByColor[B] = map(f, f)
+  def mapList[B](f: A => B): List[B] = List(f(white), f(black))
   def mapReduce[B, C](f: A => B)(r: (B, B) => C): C = r(f(white), f(black))
 
   def mapWithColor[B](f: (Color, A) => B): ByColor[B] = ByColor(f(White, white), f(Black, black))
@@ -33,13 +33,13 @@ case class ByColor[A](white: A, black: A):
   def zip[B, C](other: ByColor[B], f: (A, B) => C): ByColor[C] =
     ByColor(f(white, other.white), f(black, other.black))
   def zipColor: ByColor[(Color, A)] = ByColor((White, white), (Black, black))
-  def toPair: (A, A)                = (white, black)
+  def toPair: (A, A) = (white, black)
 
   lazy val all: List[A] = List(white, black)
 
   def reduce[B](f: (A, A) => B): B = f(white, black)
 
-  def fold[B](init: B)(f: (B, A) => B): B        = f(f(init, white), black)
+  def fold[B](init: B)(f: (B, A) => B): B = f(f(init, white), black)
   def fold[B](init: B)(f: (B, Color, A) => B): B = f(f(init, White, white), Black, black)
 
   def foreach[U](f: A => U): Unit =
@@ -95,7 +95,7 @@ case class ByColor[A](white: A, black: A):
     (f(white), f(black)).mapN(r)
 
 object ByColor:
-  inline def fill[A](a: A): ByColor[A]          = ByColor(a, a)
+  inline def fill[A](a: A): ByColor[A] = ByColor(a, a)
   inline def fromPair[A](p: (A, A)): ByColor[A] = ByColor(p._1, p._2)
 
   def apply[A](f: Color => A)(using NotGiven[f.type <:< PartialFunction[Color, A]]): ByColor[A] =
@@ -112,7 +112,7 @@ object ByColor:
     def zero = ByColor.fill(Zero[A].zero)
 
   given [A: Monoid]: Monoid[ByColor[A]] with
-    def empty                                 = ByColor.fill(Monoid[A].empty)
+    def empty = ByColor.fill(Monoid[A].empty)
     def combine(x: ByColor[A], y: ByColor[A]) =
       ByColor(Monoid[A].combine(x.white, y.white), Monoid[A].combine(x.black, y.black))
 
@@ -129,7 +129,7 @@ object ByColor:
     def traverse[G[_]: Applicative, A, B](fa: ByColor[A])(f: A => G[B]): G[ByColor[B]] =
       fa.traverse(f)
 
-    def pure[A](a: A): ByColor[A]                                 = ByColor.fill(a)
+    def pure[A](a: A): ByColor[A] = ByColor.fill(a)
     def ap[A, B](ff: ByColor[A => B])(fa: ByColor[A]): ByColor[B] =
       ByColor(ff.white(fa.white), ff.black(fa.black))
 

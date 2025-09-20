@@ -10,7 +10,7 @@ class PgnRenderTest extends ChessTest:
 
   import Fixtures.*
 
-  given Conversion[String, SanStr]  = SanStr(_)
+  given Conversion[String, SanStr] = SanStr(_)
   given Conversion[String, Comment] = Comment(_)
 
   extension (pgn: ParsedPgn)
@@ -22,8 +22,8 @@ class PgnRenderTest extends ChessTest:
 
   def removeRawString(san: San): San =
     san match
-      case std: Std       => std.copy(rawString = None)
-      case drop: Drop     => drop.copy(rawString = None)
+      case std: Std => std.copy(rawString = None)
+      case drop: Drop => drop.copy(rawString = None)
       case castle: Castle => castle.copy(rawString = None)
 
   def removeRawString(node: Node[PgnNodeData]): Node[PgnNodeData] =
@@ -52,7 +52,7 @@ class PgnRenderTest extends ChessTest:
 
   test("pgn round trip tests compare ParsedPgn"):
     (pgns ++ wcc2023).foreach: x =>
-      val pgn    = Parser.full(x).get
+      val pgn = Parser.full(x).get
       val output = Parser.full(pgn.toPgn.render).get
       assertEquals(output.cleanTags.cleanRawString, pgn.cleanTags.cleanRawString)
 

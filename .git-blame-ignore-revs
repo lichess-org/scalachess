@@ -33,3 +33,6 @@ bfb4e29c0fe449fb539105fd58a34aa8fb81deae
 
 # Scala Steward: Reformat with scalafmt 3.9.7
 75c3e38d7a008c9609a3c0416ff9741c06bf6ccc
+
+# scalafmt align.preset = none
+4765295c1cd366eec50050569b9ce14320f4f883

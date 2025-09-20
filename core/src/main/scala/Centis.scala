@@ -16,14 +16,14 @@ object Centis extends RichOpaqueInt[Centis]:
 
     inline def *(inline o: Int): Centis = centis * o
 
-    def roundTenths: Int      = (if centis > 0 then centis + 5 else centis - 4) / 10
+    def roundTenths: Int = (if centis > 0 then centis + 5 else centis - 4) / 10
     def roundSeconds: Seconds = Seconds(Math.round(centis * 0.01f))
 
     inline def toSeconds: BigDecimal = java.math.BigDecimal.valueOf(centis, 2)
-    inline def millis: Long          = centis * 10L
-    def toDuration: FiniteDuration   = FiniteDuration(millis, MILLISECONDS)
+    inline def millis: Long = centis * 10L
+    def toDuration: FiniteDuration = FiniteDuration(millis, MILLISECONDS)
 
-    def *~(scalar: Float): Centis   = ofFloat(scalar * centis)
+    def *~(scalar: Float): Centis = ofFloat(scalar * centis)
     def /(div: Int): Option[Centis] = (div != 0).option(centis / div)
 
     def avg(other: Centis): Centis = (centis + other.value) >> 1
@@ -36,7 +36,7 @@ object Centis extends RichOpaqueInt[Centis]:
 
   given Monoid[Centis] with
     def combine(c1: Centis, c2: Centis) = c1 + c2
-    val empty                           = 0
+    val empty = 0
 
   def ofLong(l: Long): Centis =
     try Math.toIntExact(l)
@@ -50,7 +50,7 @@ object Centis extends RichOpaqueInt[Centis]:
       if d.unit eq MILLISECONDS then d.length
       else d.toMillis
 
-  inline def ofFloat(f: Float): Centis   = Math.round(f)
+  inline def ofFloat(f: Float): Centis = Math.round(f)
   inline def ofDouble(d: Double): Centis = ofLong(Math.round(d))
 
   inline def ofSeconds(s: Int): Centis = 100 * s

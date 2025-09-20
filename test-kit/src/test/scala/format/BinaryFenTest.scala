@@ -168,8 +168,8 @@ class BinaryFenTest extends ScalaCheckSuite:
     )
 
   private def assertRoundtrip(variant: Variant, fen: FullFen) =
-    val board        = Fen.readWithMoveNumber(variant, fen).get
-    val bytes        = BinaryFen.write(board)
+    val board = Fen.readWithMoveNumber(variant, fen).get
+    val bytes = BinaryFen.write(board)
     val roundtripped = bytes.read
     assertEquals(Fen.write(roundtripped), fen)
 

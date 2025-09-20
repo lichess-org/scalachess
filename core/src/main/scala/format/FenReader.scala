@@ -20,7 +20,7 @@ trait FenReader:
     makeBoard(variant, fBoard).map { (board, crazyData) =>
       // We trust Fen's color to be correct, if there is no color we use the color of the king in check
       // If there is no king in check we use white
-      val color    = fColor.orElse(variant.checkColor(board)) | Color.White
+      val color = fColor.orElse(variant.checkColor(board)) | Color.White
       val position = new Position(
         board,
         History(
@@ -36,7 +36,7 @@ trait FenReader:
         else
           fCastling.foldLeft(Castles.none -> UnmovedRooks.none):
             case ((c, r), ch) =>
-              val color    = Color.fromWhite(ch.isUpper)
+              val color = Color.fromWhite(ch.isUpper)
               val backRank = Bitboard.rank(color.backRank)
               // rooks that can be used for castling
               val rooks = position.rooks & position.byColor(color) & backRank
@@ -44,8 +44,8 @@ trait FenReader:
                 for
                   kingSquare <- (position.kingOf(color) & backRank).first
                   rookSquare <- ch.toLower match
-                    case 'k'  => rooks.findLast(_ ?> kingSquare)
-                    case 'q'  => rooks.find(_ ?< kingSquare)
+                    case 'k' => rooks.findLast(_ ?> kingSquare)
+                    case 'q' => rooks.find(_ ?< kingSquare)
                     case file => rooks.find(_.file.char == file)
                   side <- Side.kingRookSide(kingSquare, rookSquare)
                 yield (c.add(color, side), r | rookSquare.bl)
@@ -149,33 +149,33 @@ trait FenReader:
 
   def makeBoardWithCrazyPromoted(boardFen: String): (BoardWithCrazyPromoted, Option[String]) =
     var promoted = Bitboard.empty
-    var pawns    = Bitboard.empty
-    var knights  = Bitboard.empty
-    var bishops  = Bitboard.empty
-    var rooks    = Bitboard.empty
-    var queens   = Bitboard.empty
-    var kings    = Bitboard.empty
-    var white    = Bitboard.empty
-    var black    = Bitboard.empty
+    var pawns = Bitboard.empty
+    var knights = Bitboard.empty
+    var bishops = Bitboard.empty
+    var rooks = Bitboard.empty
+    var queens = Bitboard.empty
+    var kings = Bitboard.empty
+    var white = Bitboard.empty
+    var black = Bitboard.empty
     var occupied = Bitboard.empty
 
     inline def addPieceAt(p: Piece, s: Long) =
       occupied |= s
       p.role match
-        case Pawn   => pawns |= s
+        case Pawn => pawns |= s
         case Knight => knights |= s
         case Bishop => bishops |= s
-        case Rook   => rooks |= s
-        case Queen  => queens |= s
-        case King   => kings |= s
+        case Rook => rooks |= s
+        case Queen => queens |= s
+        case King => kings |= s
 
       p.color match
         case Color.White => white |= s
         case Color.Black => black |= s
 
-    var rank  = 7
-    var file  = 0
-    val iter  = boardFen.iterator.buffered
+    var rank = 7
+    var file = 0
+    val iter = boardFen.iterator.buffered
     var error = none[String]
     while iter.hasNext && error.isEmpty
     do
@@ -185,7 +185,7 @@ trait FenReader:
       if rank < 0 then error = Some("too many ranks")
       else
         iter.next match
-          case '/'                          => // ignored, optional. Rank switch is automatic
+          case '/' => // ignored, optional. Rank switch is automatic
           case ch if numberSet.contains(ch) =>
             file += (ch - '0')
             if file > 8 then error = Some(s"file = $file")

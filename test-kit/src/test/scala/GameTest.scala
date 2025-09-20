@@ -1,10 +1,10 @@
 package chess
 
+import chess.format.{FullFen, Uci}
+
 import scala.language.implicitConversions
 
 import Square.*
-import chess.format.FullFen
-import chess.format.Uci
 
 class GameTest extends ChessTest:
 

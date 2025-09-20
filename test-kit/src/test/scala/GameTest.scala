@@ -1,6 +1,6 @@
 package chess
 
-import chess.format.{FullFen, Uci}
+import chess.format.{ FullFen, Uci }
 
 import scala.language.implicitConversions
 

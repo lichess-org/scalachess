@@ -1,6 +1,5 @@
 package chess
 
-import cats.syntax.option.none
 import chess.Clock.Config
 
 import java.text.DecimalFormat
@@ -81,15 +80,15 @@ case class Clock(
         )
       case Some(t) =>
         val elapsed = toNow(t)
-        val lag     = ~metrics.reportedLag(elapsed) nonNeg
+        val lag = (~metrics.reportedLag(elapsed)).nonNeg
 
-        val player              = players(color)
+        val player = players(color)
         val (lagComp, lagTrack) = player.lag.onMove(lag)
 
-        val moveTime = (elapsed - lagComp) nonNeg
+        val moveTime = (elapsed - lagComp).nonNeg
 
         val clockActive = gameActive && moveTime < player.remaining
-        val inc         = clockActive.so(player.increment)
+        val inc = clockActive.so(player.increment)
 
         val newC = updatePlayer(color):
           _.takeTime(moveTime - inc)
@@ -103,27 +102,27 @@ case class Clock(
   // To do: safely add this to takeback to remove inc from player.
   // def deinc = updatePlayer(color, _.giveTime(-incrementOf(color)))
 
-  def takeback = switch
+  def takeback: Clock = switch
 
-  def giveTime(c: Color, t: Centis) =
+  def giveTime(c: Color, t: Centis): Clock =
     updatePlayer(c):
       _.giveTime(t)
 
-  def setRemainingTime(c: Color, centis: Centis) =
+  def setRemainingTime(c: Color, centis: Centis): Clock =
     updatePlayer(c):
       _.setRemaining(centis)
 
-  def incrementOf(c: Color) = players(c).increment
+  def incrementOf(c: Color): Centis = players(c).increment
 
-  def goBerserk(c: Color) = updatePlayer(c) { _.copy(berserk = true) }
+  def goBerserk(c: Color): Clock = updatePlayer(c)(_.copy(berserk = true))
 
-  def berserked(c: Color) = players(c).berserk
-  def lag(c: Color)       = players(c).lag
+  def berserked(c: Color): Boolean = players(c).berserk
+  def lag(c: Color): LagTracker = players(c).lag
 
-  def lagCompAvg = players.mapReduce(~_.lag.compAvg)(_.avg(_))
+  def lagCompAvg: Centis = players.mapReduce(~_.lag.compAvg)(_.avg(_))
 
   // Lowball estimate of next move's lag comp for UI butter.
-  def lagCompEstimate(c: Color) = players(c).lag.compEstimate
+  def lagCompEstimate(c: Color): Option[Centis] = players(c).lag.compEstimate
 
 case class ClockPlayer(
     config: Clock.Config,
@@ -131,30 +130,30 @@ case class ClockPlayer(
     elapsed: Centis = Centis(0),
     berserk: Boolean = false
 ):
-  def limit =
+  def limit: Centis =
     if berserk then config.initTime - config.berserkPenalty
     else config.initTime
 
-  def recordLag(l: Centis) = copy(lag = lag.recordLag(l))
+  def recordLag(l: Centis): ClockPlayer = copy(lag = lag.recordLag(l))
 
-  def remaining = limit - elapsed
+  def remaining: Centis = limit - elapsed
 
-  def takeTime(t: Centis) = copy(elapsed = elapsed + t)
+  def takeTime(t: Centis): ClockPlayer = copy(elapsed = elapsed + t)
 
-  def giveTime(t: Centis) = takeTime(-t)
+  def giveTime(t: Centis): ClockPlayer = takeTime(-t)
 
-  def setRemaining(t: Centis) = copy(elapsed = limit - t)
+  def setRemaining(t: Centis): ClockPlayer = copy(elapsed = limit - t)
 
-  def increment = if berserk then Centis(0) else config.increment
+  def increment: Centis = if berserk then Centis(0) else config.increment
 
-  def withFrameLag(frameLag: Centis) = copy(lag = lag.withFrameLag(frameLag, config))
+  def withFrameLag(frameLag: Centis): ClockPlayer = copy(lag = lag.withFrameLag(frameLag, config))
 
 object ClockPlayer:
-  def withConfig(config: Clock.Config) =
+  def withConfig(config: Clock.Config): ClockPlayer =
     ClockPlayer(config, LagTracker.init(config))
 
 object Clock:
-  private val limitFormatter = DecimalFormat("#.##")
+  private val limitFormatter: DecimalFormat = DecimalFormat("#.##")
 
   opaque type LimitSeconds = Int
   object LimitSeconds extends RelaxedOpaqueInt[LimitSeconds]
@@ -168,23 +167,23 @@ object Clock:
   // All unspecified durations are expressed in centi-seconds
   case class Config(limitSeconds: LimitSeconds, incrementSeconds: IncrementSeconds):
 
-    def berserkable = incrementSeconds == 0 || limitSeconds > 0
+    def berserkable: Boolean = incrementSeconds == 0 || limitSeconds > 0
 
-    def emergSeconds = math.min(60, math.max(10, limitSeconds / 8))
+    def emergSeconds: Int = math.min(60, math.max(10, limitSeconds / 8))
 
-    def estimateTotalSeconds = limitSeconds + 40 * incrementSeconds
+    def estimateTotalSeconds: Int = limitSeconds + 40 * incrementSeconds
 
-    def estimateTotalTime = Centis.ofSeconds(estimateTotalSeconds)
+    def estimateTotalTime: Centis = Centis.ofSeconds(estimateTotalSeconds)
 
-    def hasIncrement = incrementSeconds > 0
+    def hasIncrement: Boolean = incrementSeconds > 0
 
-    def increment = Centis.ofSeconds(incrementSeconds)
+    def increment: Centis = Centis.ofSeconds(incrementSeconds)
 
-    def limit = Centis.ofSeconds(limitSeconds)
+    def limit: Centis = Centis.ofSeconds(limitSeconds)
 
-    def limitInMinutes = limitSeconds / 60d
+    def limitInMinutes: Double = limitSeconds / 60d
 
-    def toClock = Clock(this)
+    def toClock: Clock = Clock(this)
 
     def limitString: String =
       limitSeconds match
@@ -193,9 +192,9 @@ object Clock:
         case 30 => "½"
         case 45 => "¾"
         case 90 => "1.5"
-        case _  => limitFormatter.format(limitSeconds / 60d)
+        case _ => limitFormatter.format(limitSeconds / 60d)
 
-    def show = toString
+    def show: String = toString
 
     override def toString = s"$limitString+$incrementSeconds"
 
@@ -206,16 +205,6 @@ object Clock:
     def initTime: Centis =
       if limitSeconds == 0 then increment.atLeast(Centis(300))
       else limit
-
-  // [TimeControl "600+2"] -> 10+2
-  def readPgnConfig(str: String): Option[Config] =
-    str.split('+') match
-      case Array(initStr, incStr) =>
-        for
-          init <- initStr.toIntOption
-          inc  <- incStr.toIntOption
-        yield Config(init, inc)
-      case _ => none
 
   def apply(limit: LimitSeconds, increment: IncrementSeconds): Clock = apply(Config(limit, increment))
 

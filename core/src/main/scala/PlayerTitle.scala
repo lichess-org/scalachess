@@ -11,49 +11,49 @@ object PlayerTitle:
 
   private inline def apply(inline s: String): PlayerTitle = s.asInstanceOf[PlayerTitle]
   extension (t: PlayerTitle)
-    inline def value: String  = t
-    def isLichess: Boolean    = t == "LM" || t == "BOT"
+    inline def value: String = t
+    def isLichess: Boolean = t == "LM" || t == "BOT"
     def isFederation: Boolean = !isLichess
 
   given Render[PlayerTitle] = _.value
 
-  val GM: PlayerTitle  = "GM"
+  val GM: PlayerTitle = "GM"
   val WGM: PlayerTitle = "WGM"
-  val IM: PlayerTitle  = "IM"
+  val IM: PlayerTitle = "IM"
   val WIM: PlayerTitle = "WIM"
-  val FM: PlayerTitle  = "FM"
+  val FM: PlayerTitle = "FM"
   val WFM: PlayerTitle = "WFM"
-  val NM: PlayerTitle  = "NM"
-  val CM: PlayerTitle  = "CM"
+  val NM: PlayerTitle = "NM"
+  val CM: PlayerTitle = "CM"
   val WCM: PlayerTitle = "WCM"
   val WNM: PlayerTitle = "WNM"
-  val LM: PlayerTitle  = "LM"
+  val LM: PlayerTitle = "LM"
   val BOT: PlayerTitle = "BOT"
 
   // names are as stated on FIDE profile pages
   val all = List[(PlayerTitle, String)](
-    GM  -> "Grandmaster",
+    GM -> "Grandmaster",
     WGM -> "Woman Grandmaster",
-    IM  -> "International Master",
+    IM -> "International Master",
     WIM -> "Woman Intl. Master",
-    FM  -> "FIDE Master",
+    FM -> "FIDE Master",
     WFM -> "Woman FIDE Master",
-    NM  -> "National Master",
-    CM  -> "Candidate Master",
+    NM -> "National Master",
+    CM -> "Candidate Master",
     WCM -> "Woman Candidate Master",
     WNM -> "Woman National Master",
-    LM  -> "Lichess Master",
+    LM -> "Lichess Master",
     BOT -> "Chess Robot"
   )
 
-  val names: Map[PlayerTitle, String]          = all.toMap
+  val names: Map[PlayerTitle, String] = all.toMap
   lazy val fromNames: Map[String, PlayerTitle] = all.map(_.swap).toMap
 
   val acronyms: List[PlayerTitle] = all.map(_._1)
 
   def titleName(title: PlayerTitle): String = names.getOrElse(title, title.value)
 
-  def get(str: String): Option[PlayerTitle]      = Option(PlayerTitle(str.toUpperCase)).filter(names.contains)
+  def get(str: String): Option[PlayerTitle] = Option(PlayerTitle(str.toUpperCase)).filter(names.contains)
   def get(strs: List[String]): List[PlayerTitle] = strs.flatMap { get(_) }
 
   // ordered by difficulty to achieve

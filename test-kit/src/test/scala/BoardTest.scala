@@ -1,12 +1,14 @@
 package chess
 
+import chess.variant.Standard
+
 import scala.language.implicitConversions
 
 import Square.*
 
 class BoardTest extends ChessTest:
 
-  val board = makeBoard
+  val board = Standard.initialPosition
 
   test("position pieces correctly"):
     assertEquals(
@@ -54,19 +56,19 @@ class BoardTest extends ChessTest:
     assertEquals(board.history.castles, Castles.init)
 
   test("allow a piece to be placed"):
-    assertEquals(board.place(White - Rook, E3).get.apply(E3), Option(White - Rook))
+    assertEquals(board.place(White - Rook, E3).get.pieceAt(E3), Option(White - Rook))
 
   test("allow a piece to be taken"):
     board
       .take(A1)
       .assertSome: b =>
-        assertEquals(b(A1), None)
+        assertEquals(b.pieceAt(A1), None)
 
   test("allow a piece to move"):
     board
       .move(E2, E4)
       .assertSome: b =>
-        assertEquals(b(E4), Option(White - Pawn))
+        assertEquals(b.pieceAt(E4), Option(White - Pawn))
 
   test("not allow an empty position to move"):
     assertEquals(board.move(E5, E6), None)
@@ -82,7 +84,7 @@ class BoardTest extends ChessTest:
         _.move(A2, A4)
       )
       .assertSome: b =>
-        assertEquals(b(A4), Option(White - Pawn))
+        assertEquals(b.pieceAt(A4), Option(White - Pawn))
 
   test("fail on bad actions chain"):
     assertEquals(
@@ -93,3 +95,91 @@ class BoardTest extends ChessTest:
       ),
       None
     )
+
+  test("detect check: by rook"):
+    assert:
+      """
+  K  r
+  """.as(White).check.yes
+  test("detect check: by knight"):
+    assert:
+      ("""
+  n
+K
+""".as(White)).check.yes
+  test("detect check: by bishop"):
+    assert:
+      ("""
+  b
+
+
+     K
+""".as(White)).check.yes
+  test("detect check: by pawn"):
+    assert:
+      ("""
+    p
+     K
+""".as(White)).check.yes
+  test("detect check: not"):
+    assert:
+      ("""
+   n
+K
+""".as(White)).check.no
+  test("detect check mate: by rook"):
+    assert:
+      ("""
+PP
+K  r
+""".as(White)).checkMate
+  test("detect check mate: by knight"):
+    assert:
+      ("""
+PPn
+KR
+""".as(White)).checkMate
+  test("detect check mate: not"):
+    assertNot:
+      ("""
+  n
+K
+""".as(White)).checkMate
+  test("stale mate: stuck in a corner"):
+    assert:
+      ("""
+prr
+K
+""".as(White)).staleMate
+  test("stale mate: not"):
+    assertNot:
+      ("""
+  b
+K
+""".as(White)).staleMate
+
+  test("Give the correct winner for a game"):
+    val game =
+      """
+PP
+K  r
+""".as(White)
+    assert(game.checkMate)
+    assertEquals(game.winner, Some(Black))
+
+  test("Not give a winner if the game is still in progress"):
+    val game = """
+      p
+      K
+      """.as(White)
+    assertEquals(game.winner, None)
+
+  test("not be playable: with touching kings"):
+    val game = "kK BN".as(Black)
+    assertNot(game.playable(true))
+    assertNot(game.playable(false))
+
+  test("not be playable: with other side in check"):
+    val game = "k Q K".as(White)
+    assertNot(game.playable(true))
+    assertNot(game.playable(false))

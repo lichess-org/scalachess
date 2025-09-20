@@ -176,14 +176,14 @@ object BinaryTestUtils:
     (Binary.readMoves(m.split(',').toList.map(parseBinary))).get
 
   def parseBinary(s: String): Byte =
-    var i    = s.length - 1
-    var sum  = 0
+    var i = s.length - 1
+    var sum = 0
     var mult = 1
     while i >= 0 do
       s.charAt(i) match
         case '1' => sum += mult
         case '0' =>
-        case x   => sys.error(s"invalid binary literal: $x in $s")
+        case x => sys.error(s"invalid binary literal: $x in $s")
       mult *= 2
       i -= 1
     sum.toByte

@@ -25,11 +25,11 @@ object FullFen extends OpaqueString[FullFen]:
 
     def isInitial: Boolean = a == initial
 
-    def simple: SimpleFen    = SimpleFen.fromFull(a)
+    def simple: SimpleFen = SimpleFen.fromFull(a)
     def opening: StandardFen = SimpleFen.opening(a)
-    def board: BoardFen      = SimpleFen.board(a)
+    def board: BoardFen = SimpleFen.board(a)
 
-  val initial: FullFen               = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+  val initial: FullFen = FullFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
   def clean(source: String): FullFen = FullFen(source.replace("_", " ").trim)
   def getColor(arr: Array[String]): Option[Color] =
     if arr.length < 2 then None
@@ -41,22 +41,22 @@ object FullFen extends OpaqueString[FullFen]:
 opaque type SimpleFen = String
 object SimpleFen extends OpaqueString[SimpleFen]:
   extension (a: SimpleFen)
-    def color: Option[Color]      = a.split(' ').lift(1).flatMap(_.headOption).flatMap(Color.apply)
-    def colorOrWhite: Color       = color | Color.White
-    def castling: String          = a.split(' ').lift(2) | "-"
+    def color: Option[Color] = a.split(' ').lift(1).flatMap(_.headOption).flatMap(Color.apply)
+    def colorOrWhite: Color = color | Color.White
+    def castling: String = a.split(' ').lift(2) | "-"
     def enpassant: Option[Square] = a.split(' ').lift(3).flatMap(Square.fromKey(_))
-    def opening: StandardFen      = StandardFen.fromSimple(a)
-    def board: BoardFen           = a.takeWhile(_ != ' ')
+    def opening: StandardFen = StandardFen.fromSimple(a)
+    def board: BoardFen = a.takeWhile(_ != ' ')
   def fromFull(fen: FullFen): StandardFen =
     fen.value.split(' ').take(4) match
       case Array(board, turn, castle, ep) => SimpleFen(s"$board $turn $castle $ep")
-      case _                              => fen.into(SimpleFen)
+      case _ => fen.into(SimpleFen)
 
 // Like SimpleFen, but for standard chess, without ZH pockets
 opaque type StandardFen = String
 object StandardFen extends OpaqueString[StandardFen]:
   extension (a: StandardFen) def board: BoardFen = a.value.takeWhile(_ != ' ')
-  def fromFull(fen: FullFen): StandardFen        = fromSimple(FullFen.simple(fen))
+  def fromFull(fen: FullFen): StandardFen = fromSimple(FullFen.simple(fen))
   def fromSimple(fen: SimpleFen): StandardFen =
     fen.value.split(' ').take(4) match
       case Array(board, turn, castle, ep) =>

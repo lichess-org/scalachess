@@ -3,23 +3,23 @@ package chess
 opaque type PositionHash = Array[Byte]
 object PositionHash:
   def apply(value: Array[Byte]): PositionHash = value
-  def apply(h: Hash): PositionHash            = Array((h >>> 16).toByte, (h >>> 8).toByte, h.toByte)
-  val empty: PositionHash                     = Array.empty
+  def apply(h: Hash): PositionHash = Array((h >>> 16).toByte, (h >>> 8).toByte, h.toByte)
+  val empty: PositionHash = Array.empty
 
   extension (p: PositionHash)
-    def value: Array[Byte]                                = p
-    inline def isEmpty: Boolean                           = p.length == 0
+    def value: Array[Byte] = p
+    inline def isEmpty: Boolean = p.length == 0
     inline def combine(other: PositionHash): PositionHash = p ++ other
     def isRepetition(times: Int) =
       if times <= 1 then true
       else if p.length <= (times - 1) * 4 * Hash.size then false
       else
         // compare only hashes for positions with the same side to move
-        var i     = Hash.size * 2
+        var i = Hash.size * 2
         var count = 0
-        val x     = p(0)
-        val y     = p(1)
-        val z     = p(2)
+        val x = p(0)
+        val y = p(1)
+        val z = p(2)
         while i <= p.length - Hash.size && count < times - 1
         do
           if x == p(i) && y == p(i + 1) && z == p(i + 2) then count += 1
@@ -28,43 +28,42 @@ object PositionHash:
 
 opaque type Hash = Int
 object Hash:
-  val size                              = 3
-  def apply(value: Int): Hash           = value >>> 8
-  def apply(situation: Situation): Hash = hashSituation(situation) >>> 8
+  val size = 3
+  def apply(value: Int): Hash = value >>> 8
+  def apply(position: Position): Hash = hashPosition(position) >>> 8
 
-  private def hashSituation(situation: Situation): Int =
-    import situation.board
+  private def hashPosition(position: Position): Int =
 
     val hPieces =
       var h = 0
-      board.byColor.foreach: (color, c) =>
+      position.byColor.foreach: (color, c) =>
         val colorSubTable = ZobristTables.actorMasks(color)
-        board.byRole.foreach: (role, r) =>
+        position.byRole.foreach: (role, r) =>
           val subTable = colorSubTable(role)
           (c & r).foreach: s =>
             h ^= subTable(s.hashCode)
       h
 
-    val hTurn = situation.color.fold(ZobristTables.whiteTurnMask, 0)
+    val hTurn = position.color.fold(ZobristTables.whiteTurnMask, 0)
 
     val hCastling =
-      if board.variant.allowsCastling then
-        (if board.history.castles.whiteKingSide then ZobristTables.castlingMasks.white(0) else 0) ^
-          (if board.history.castles.whiteQueenSide then ZobristTables.castlingMasks.white(1) else 0) ^
-          (if board.history.castles.blackKingSide then ZobristTables.castlingMasks.black(0) else 0) ^
-          (if board.history.castles.blackQueenSide then ZobristTables.castlingMasks.black(1) else 0)
+      if position.variant.allowsCastling then
+        (if position.history.castles.whiteKingSide then ZobristTables.castlingMasks.white(0) else 0) ^
+          (if position.history.castles.whiteQueenSide then ZobristTables.castlingMasks.white(1) else 0) ^
+          (if position.history.castles.blackKingSide then ZobristTables.castlingMasks.black(0) else 0) ^
+          (if position.history.castles.blackQueenSide then ZobristTables.castlingMasks.black(1) else 0)
       else 0
 
-    val hEp = situation.enPassantSquare.fold(0): square =>
+    val hEp = position.enPassantSquare.fold(0): square =>
       ZobristTables.enPassantMasks(square.file.value)
 
-    val hChecks = board.variant match
+    val hChecks = position.variant match
       case variant.ThreeCheck =>
-        hashThreeCheck(Black, situation.history.checkCount.black) ^
-          hashThreeCheck(White, situation.history.checkCount.white)
+        hashThreeCheck(Black, position.history.checkCount.black) ^
+          hashThreeCheck(White, position.history.checkCount.white)
       case _ => 0
 
-    val hCrazy = board.crazyData.fold(0): data =>
+    val hCrazy = position.crazyData.fold(0): data =>
       var h = 0
       data.promoted.foreach: s =>
         h ^= ZobristTables.crazyPromotionMasks(s.hashCode)
@@ -74,7 +73,7 @@ object Hash:
       h
 
     hPieces ^ hTurn ^ hCastling ^ hEp ^ hChecks ^ hCrazy
-  end hashSituation
+  end hashPosition
 
   private def hashThreeCheck(color: Color, count: Int): Int =
     val subTable = ZobristTables.threeCheckMasks(color)

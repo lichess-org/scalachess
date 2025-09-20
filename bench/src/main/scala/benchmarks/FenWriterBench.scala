@@ -5,7 +5,7 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 import chess.variant.*
-import chess.{ Mode as _, * }
+import chess.*
 import chess.perft.Perft
 import chess.format.Fen
 
@@ -23,25 +23,25 @@ class FenWriterBench:
   @Param(Array("100"))
   var games: Int = scala.compiletime.uninitialized
 
-  var threecheckInput: List[Game]  = scala.compiletime.uninitialized
-  var antichessInput: List[Game]   = scala.compiletime.uninitialized
-  var atomicInput: List[Game]      = scala.compiletime.uninitialized
-  var crazyhouseInput: List[Game]  = scala.compiletime.uninitialized
+  var threecheckInput: List[Game] = scala.compiletime.uninitialized
+  var antichessInput: List[Game] = scala.compiletime.uninitialized
+  var atomicInput: List[Game] = scala.compiletime.uninitialized
+  var crazyhouseInput: List[Game] = scala.compiletime.uninitialized
   var racingkingsInput: List[Game] = scala.compiletime.uninitialized
-  var hordeInput: List[Game]       = scala.compiletime.uninitialized
-  var randomInput: List[Game]      = scala.compiletime.uninitialized
-  var trickyInput: List[Game]      = scala.compiletime.uninitialized
+  var hordeInput: List[Game] = scala.compiletime.uninitialized
+  var randomInput: List[Game] = scala.compiletime.uninitialized
+  var trickyInput: List[Game] = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =
-    threecheckInput = makeSituations(Perft.threeCheckPerfts, ThreeCheck, games)
-    antichessInput = makeSituations(Perft.antichessPerfts, Antichess, games)
-    atomicInput = makeSituations(Perft.atomicPerfts, Atomic, games)
-    crazyhouseInput = makeSituations(Perft.crazyhousePerfts, Crazyhouse, games)
-    racingkingsInput = makeSituations(Perft.racingkingsPerfts, RacingKings, games)
-    hordeInput = makeSituations(Perft.hordePerfts, Horde, games)
-    randomInput = makeSituations(Perft.randomPerfts, Chess960, games)
-    trickyInput = makeSituations(Perft.trickyPerfts, Chess960, games)
+    threecheckInput = makeBoards(Perft.threeCheckPerfts, ThreeCheck, games)
+    antichessInput = makeBoards(Perft.antichessPerfts, Antichess, games)
+    atomicInput = makeBoards(Perft.atomicPerfts, Atomic, games)
+    crazyhouseInput = makeBoards(Perft.crazyhousePerfts, Crazyhouse, games)
+    racingkingsInput = makeBoards(Perft.racingkingsPerfts, RacingKings, games)
+    hordeInput = makeBoards(Perft.hordePerfts, Horde, games)
+    randomInput = makeBoards(Perft.randomPerfts, Chess960, games)
+    trickyInput = makeBoards(Perft.trickyPerfts, Chess960, games)
 
   @Benchmark
   def threecheck(bh: Blackhole) =
@@ -81,7 +81,7 @@ class FenWriterBench:
       Fen.write(x)
     bh.consume(x)
 
-  private def makeSituations(perfts: List[Perft], variant: Variant, games: Int): List[Game] =
+  private def makeBoards(perfts: List[Perft], variant: Variant, games: Int): List[Game] =
     perfts
       .take(games)
       .map(p => Fen.read(variant, p.epd).getOrElse(throw RuntimeException("boooo")))

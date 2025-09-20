@@ -33,10 +33,10 @@ case class CorrespondenceClock(
 
 object CorrespondenceClock:
   val hourSeconds = 60 * 60
-  val daySeconds  = 24 * hourSeconds
+  val daySeconds = 24 * hourSeconds
 
   def apply(daysPerTurn: Int, turnColor: Color, lastMoveAt: Instant): CorrespondenceClock =
-    val increment   = daysPerTurn * 24 * 60 * 60
+    val increment = daysPerTurn * 24 * 60 * 60
     val secondsLeft = (lastMoveAt.toSeconds + increment - nowSeconds).toInt.max(0)
     CorrespondenceClock(
       increment = increment,

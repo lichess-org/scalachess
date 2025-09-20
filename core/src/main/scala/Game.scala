@@ -1,18 +1,18 @@
 package chess
 
-import chess.format.pgn.SanStr
-import chess.format.{ Fen, Uci, pgn }
+import chess.format.pgn.{ SanStr, Tags }
+import chess.format.{ Fen, Uci }
 
 case class Game(
-    situation: Situation,
+    position: Position,
     sans: Vector[SanStr] = Vector(),
     clock: Option[Clock] = None,
     ply: Ply = Ply.initial, // plies
     startedAtPly: Ply = Ply.initial
 ):
 
-  export situation.{ board, color as player, variant, history }
-  export situation.board.history.halfMoveClock
+  export position.{ color as player, variant, history }
+  export position.history.halfMoveClock
 
   def apply(
       orig: Square,
@@ -28,41 +28,42 @@ case class Game(
       promotion: Option[PromotableRole] = None,
       metrics: MoveMetrics = MoveMetrics.empty
   ): Either[ErrorStr, (Clock.WithCompensatedLag[Game], Move)] =
-    situation
+    position
       .move(orig, dest, promotion)
       .map(_.normalizeCastle.withMetrics(metrics))
       .map(move => applyWithCompensated(move) -> move)
-
-  def apply(move: Move): Game = applyWithCompensated(move).value
-
-  def applyWithCompensated(move: Move): Clock.WithCompensatedLag[Game] =
-    val newSituation = move.situationAfter
-    val newClock     = applyClock(move.metrics, newSituation.status.isEmpty)
-
-    Clock.WithCompensatedLag(
-      copy(
-        situation = newSituation,
-        ply = ply + 1,
-        sans = sans :+ move.san,
-        clock = newClock.map(_.value)
-      ),
-      newClock.flatMap(_.compensated)
-    )
 
   def drop(
       role: Role,
       square: Square,
       metrics: MoveMetrics = MoveMetrics.empty
   ): Either[ErrorStr, (Game, Drop)] =
-    situation.drop(role, square).map(_.withMetrics(metrics)).map(drop => applyDrop(drop) -> drop)
+    position.drop(role, square).map(_.withMetrics(metrics)).map(drop => applyDrop(drop) -> drop)
+
+  def apply(move: Move): Game =
+    applyWithCompensated(move).value
+
+  def applyWithCompensated(move: Move): Clock.WithCompensatedLag[Game] =
+    val newPosition = move.after
+    val newClock = applyClock(move.metrics, newPosition.status.isEmpty)
+
+    Clock.WithCompensatedLag(
+      copy(
+        position = newPosition,
+        ply = ply + 1,
+        sans = sans :+ move.toSanStr,
+        clock = newClock.map(_.value)
+      ),
+      newClock.flatMap(_.compensated)
+    )
 
   def applyDrop(drop: Drop): Game =
-    val newSituation = drop.situationAfter
+    val newPosition = drop.after
     copy(
-      situation = newSituation,
+      position = newPosition,
       ply = ply + 1,
-      sans = sans :+ drop.san,
-      clock = applyClock(drop.metrics, newSituation.status.isEmpty).map(_.value)
+      sans = sans :+ drop.toSanStr,
+      clock = applyClock(drop.metrics, newPosition.status.isEmpty).map(_.value)
     )
 
   private def applyClock(
@@ -83,37 +84,35 @@ case class Game(
 
   inline def fullMoveNumber: FullMoveNumber = ply.fullMoveNumber
 
-  inline def withBoard(inline b: Board) = copy(situation = situation.copy(board = b))
+  inline def withPosition(inline p: Position): Game = copy(position = p)
 
-  inline def updateBoard(inline f: Board => Board) = withBoard(f(board))
+  inline def updatePosition(inline f: Position => Position): Game = withPosition(f(position))
 
-  inline def withPlayer(c: Color) = copy(situation = situation.copy(color = c))
+  inline def withPlayer(c: Color): Game = copy(position = position.copy(color = c))
 
-  inline def withTurns(t: Ply) = copy(ply = t)
+  inline def withTurns(t: Ply): Game = copy(ply = t)
 
 object Game:
 
   def apply(variant: chess.variant.Variant): Game =
-    Game(Situation(Board.init(variant), White))
+    Game(variant.initialPosition)
 
-  def apply(board: Board): Game = apply(board, White)
+  def apply(variant: Option[chess.variant.Variant], fen: Option[Fen.Full]): Game =
+    apply(variant | chess.variant.Standard, fen)
 
-  def apply(board: Board, color: Color): Game = Game(Situation(board, color))
-
-  def apply(variantOption: Option[chess.variant.Variant], fen: Option[Fen.Full]): Game =
-    val variant = variantOption | chess.variant.Standard
-    val g       = apply(variant)
+  def apply(variant: chess.variant.Variant, fen: Option[Fen.Full]): Game =
     fen
-      .flatMap:
-        format.Fen.readWithMoveNumber(variant, _)
-      .fold(g): parsed =>
-        g.copy(
-          situation = Situation(
-            board = parsed.situation.board.withVariant(g.board.variant).withCrazyData {
-              parsed.situation.board.crazyData.orElse(g.board.crazyData)
-            },
-            color = parsed.situation.color
-          ),
-          ply = parsed.ply,
-          startedAtPly = parsed.ply
-        )
+      .flatMap(format.Fen.readWithMoveNumber(variant, _))
+      .fold(Game(variant))(_.toGame)
+
+  def apply(tags: Tags): Game =
+    val g = Game(variant = tags.variant, fen = tags.fen)
+    g.copy(startedAtPly = g.ply, clock = tags.timeControl.flatMap(_.toClockConfig).map(Clock.apply))
+
+  given CanPlay[Game]:
+    extension (game: Game)
+      def apply[M <: Moveable](move: M): Either[ErrorStr, (Game, MoveOrDrop)] =
+        move(game.position).map(md => md.applyGame(game) -> md)
+
+  given HasPosition[Game]:
+    extension (game: Game) inline def position: Position = game.position

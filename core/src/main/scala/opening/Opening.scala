@@ -14,12 +14,12 @@ final class Opening(
 
   val (family: OpeningFamily, variation: Option[OpeningVariation]) = name.value.split(":", 2) match
     case Array(f, v) => OpeningFamily(OpeningName(f)) -> Some(OpeningVariation(v.takeWhile(',' !=).trim))
-    case Array(f)    => OpeningFamily(OpeningName(f)) -> None
-    case _           => OpeningFamily(name)           -> None
+    case Array(f) => OpeningFamily(OpeningName(f)) -> None
+    case _ => OpeningFamily(name) -> None
 
-  lazy val nbMoves: Int              = uci.value.count(' ' ==) + 1
+  lazy val nbMoves: Int = uci.value.count(' ' ==) + 1
   lazy val lastUci: Option[Uci.Move] = uci.value.split(' ').lastOption.flatMap(Uci.Move.apply)
-  lazy val key: OpeningKey           = Opening.nameToKey(name)
+  lazy val key: OpeningKey = Opening.nameToKey(name)
 
   override def toString = name.value
 
@@ -34,8 +34,8 @@ object Opening:
 
   object nameToKey:
     private val splitAccentRegex = "[\u0300-\u036f]".r
-    private val multiSpaceRegex  = """\s+""".r
-    private val badChars         = """[^\w\-]+""".r
+    private val multiSpaceRegex = """\s+""".r
+    private val badChars = """[^\w\-]+""".r
     def apply(name: OpeningName) = OpeningKey:
       badChars.replaceAllIn(
         multiSpaceRegex.replaceAllIn(

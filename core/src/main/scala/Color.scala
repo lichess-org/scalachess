@@ -2,7 +2,6 @@ package chess
 
 import cats.Eq
 import cats.derived.*
-import cats.syntax.all.*
 
 import scala.annotation.targetName
 
@@ -19,24 +18,24 @@ enum Color(val name: String, val letter: Char) derives Eq:
   @targetName("negate")
   def unary_! = fold(Black, White)
 
-  lazy val backRank: Rank           = fold(Rank.First, Rank.Eighth)
-  lazy val thirdRank: Rank          = fold(Rank.Third, Rank.Sixth)
-  lazy val fourthRank: Rank         = fold(Rank.Fourth, Rank.Fifth)
-  lazy val fifthRank: Rank          = fold(Rank.Fifth, Rank.Fourth)
-  lazy val sixthRank: Rank          = fold(Rank.Sixth, Rank.Third)
-  lazy val seventhRank: Rank        = fold(Rank.Seventh, Rank.Second)
-  lazy val lastRank: Rank           = fold(Rank.Eighth, Rank.First)
-  lazy val passablePawnRank: Rank   = fifthRank
+  lazy val backRank: Rank = fold(Rank.First, Rank.Eighth)
+  lazy val thirdRank: Rank = fold(Rank.Third, Rank.Sixth)
+  lazy val fourthRank: Rank = fold(Rank.Fourth, Rank.Fifth)
+  lazy val fifthRank: Rank = fold(Rank.Fifth, Rank.Fourth)
+  lazy val sixthRank: Rank = fold(Rank.Sixth, Rank.Third)
+  lazy val seventhRank: Rank = fold(Rank.Seventh, Rank.Second)
+  lazy val lastRank: Rank = fold(Rank.Eighth, Rank.First)
+  lazy val passablePawnRank: Rank = fifthRank
   lazy val promotablePawnRank: Rank = lastRank
 
   inline def -(inline role: Role) = Piece(this, role)
 
-  inline def pawn   = this - Pawn
+  inline def pawn = this - Pawn
   inline def bishop = this - Bishop
   inline def knight = this - Knight
-  inline def rook   = this - Rook
-  inline def queen  = this - Queen
-  inline def king   = this - King
+  inline def rook = this - Rook
+  inline def queen = this - Queen
+  inline def king = this - King
 
   override def hashCode = fold(1, 2)
 

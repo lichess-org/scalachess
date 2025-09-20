@@ -16,7 +16,7 @@ case class UciCharPair(a: Char, b: Char):
       case None =>
         char2promotionMap.get(b) match
           case Some((file, prom)) => Uci.Move(from, Square(file, lastRank(from)), Some(prom))
-          case None               => Uci.Drop(unsafeCharToDropRole(b), from)
+          case None => Uci.Drop(unsafeCharToDropRole(b), from)
 
 object UciCharPair:
 
@@ -24,14 +24,14 @@ object UciCharPair:
 
   def apply(uci: Uci): UciCharPair =
     uci match
-      case Uci.Move(orig, dest, None)       => UciCharPair(toChar(orig), toChar(dest))
+      case Uci.Move(orig, dest, None) => UciCharPair(toChar(orig), toChar(dest))
       case Uci.Move(orig, dest, Some(role)) => UciCharPair(toChar(orig), toChar(dest.file, role))
       case Uci.Drop(role, square) => UciCharPair(toChar(square), dropRole2charMap.getOrElse(role, voidChar))
 
   object implementation:
 
-    val charShift = 35        // Start at Char(35) == '#'
-    val voidChar  = 33.toChar // '!'. We skipped Char(34) == '"'.
+    val charShift = 35 // Start at Char(35) == '#'
+    val voidChar = 33.toChar // '!'. We skipped Char(34) == '"'.
 
     val square2charMap: Map[Square, Char] = Square.all.map { square =>
       square -> (square.hashCode + charShift).toChar
@@ -44,7 +44,7 @@ object UciCharPair:
 
     val promotion2charMap: Map[(File, PromotableRole), Char] = for
       (role, index) <- Role.allPromotable.zipWithIndex.toMap
-      file          <- File.all
+      file <- File.all
     yield (file, role) -> (charShift + square2charMap.size + index * 8 + file.value).toChar
 
     lazy val char2promotionMap: Map[Char, (File, PromotableRole)] =

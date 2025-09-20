@@ -9,7 +9,7 @@ import scala.util.NotGiven
 
 case class ByColor[A](white: A, black: A):
 
-  inline def apply(inline color: Color) = if color.white then white else black
+  inline def apply(inline color: Color): A = if color.white then white else black
 
   inline def apply[B](inline color: Color)(f: A => B): B = if color.white then f(white) else f(black)
 
@@ -21,10 +21,10 @@ case class ByColor[A](white: A, black: A):
     if color.white then f(white).map(w => copy(white = w))
     else f(black).map(b => copy(black = b))
 
-  def map[B](fw: A => B, fb: A => B) = ByColor(fw(white), fb(black))
+  def map[B](fw: A => B, fb: A => B): ByColor[B] = ByColor(fw(white), fb(black))
 
-  def map[B](f: A => B): ByColor[B]                 = map(f, f)
-  def mapList[B](f: A => B): List[B]                = List(f(white), f(black))
+  def map[B](f: A => B): ByColor[B] = map(f, f)
+  def mapList[B](f: A => B): List[B] = List(f(white), f(black))
   def mapReduce[B, C](f: A => B)(r: (B, B) => C): C = r(f(white), f(black))
 
   def mapWithColor[B](f: (Color, A) => B): ByColor[B] = ByColor(f(White, white), f(Black, black))
@@ -33,26 +33,26 @@ case class ByColor[A](white: A, black: A):
   def zip[B, C](other: ByColor[B], f: (A, B) => C): ByColor[C] =
     ByColor(f(white, other.white), f(black, other.black))
   def zipColor: ByColor[(Color, A)] = ByColor((White, white), (Black, black))
-  def toPair: (A, A)                = (white, black)
+  def toPair: (A, A) = (white, black)
 
   lazy val all: List[A] = List(white, black)
 
   def reduce[B](f: (A, A) => B): B = f(white, black)
 
-  def fold[B](init: B)(f: (B, A) => B): B        = f(f(init, white), black)
+  def fold[B](init: B)(f: (B, A) => B): B = f(f(init, white), black)
   def fold[B](init: B)(f: (B, Color, A) => B): B = f(f(init, White, white), Black, black)
 
   def foreach[U](f: A => U): Unit =
-    f(white)
-    f(black)
+    f(white): Unit
+    f(black): Unit
 
   def foreach[U](f: (Color, A) => U): Unit =
-    f(White, white)
-    f(Black, black)
+    f(White, white): Unit
+    f(Black, black): Unit
 
-  def forall(pred: A => Boolean) = pred(white) && pred(black)
+  def forall(pred: A => Boolean): Boolean = pred(white) && pred(black)
 
-  def exists(pred: A => Boolean) = pred(white) || pred(black)
+  def exists(pred: A => Boolean): Boolean = pred(white) || pred(black)
 
   def swap: ByColor[A] = copy(white = black, black = white)
 
@@ -95,7 +95,7 @@ case class ByColor[A](white: A, black: A):
     (f(white), f(black)).mapN(r)
 
 object ByColor:
-  inline def fill[A](a: A): ByColor[A]          = ByColor(a, a)
+  inline def fill[A](a: A): ByColor[A] = ByColor(a, a)
   inline def fromPair[A](p: (A, A)): ByColor[A] = ByColor(p._1, p._2)
 
   def apply[A](f: Color => A)(using NotGiven[f.type <:< PartialFunction[Color, A]]): ByColor[A] =

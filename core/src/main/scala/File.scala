@@ -1,25 +1,23 @@
 package chess
 
-import chess.bitboard.Bitboard
-
 opaque type File = Int
 object File:
 
   extension (a: File)
     inline def value: Int = a
 
-    inline infix def >(inline o: File): Boolean  = a > o
-    inline infix def <(inline o: File): Boolean  = a < o
+    inline infix def >(inline o: File): Boolean = a > o
+    inline infix def <(inline o: File): Boolean = a < o
     inline infix def >=(inline o: File): Boolean = a >= o
     inline infix def <=(inline o: File): Boolean = a <= o
 
     inline def char: Char = (97 + a).toChar
 
-    inline def upperCaseChar: Char       = (65 + a).toChar
+    inline def upperCaseChar: Char = (65 + a).toChar
     inline def toUpperCaseString: String = upperCaseChar.toString
 
     // the bitboard of the file
-    def bb: Bitboard = Bitboard.file(value)
+    inline def bb: Bitboard = Bitboard.file(value)
   end extension
 
   inline def of(inline square: Square): File = square.value & 0x7

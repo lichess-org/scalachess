@@ -10,7 +10,7 @@ class MergeableTest extends ScalaCheckSuite:
   test("add size"):
     forAll: (xs: List[Foo], foo: Foo) =>
       val added = xs.add(foo)
-      val diff  = if xs.exists(_.sameId(foo)) then 0 else 1
+      val diff = if xs.exists(_.sameId(foo)) then 0 else 1
       xs.size == added.size - diff
 
   test("add size"):
@@ -20,7 +20,7 @@ class MergeableTest extends ScalaCheckSuite:
 
   test("associativity"):
     forAll: (xs: List[Foo], ys: List[Foo], zs: List[Foo]) =>
-      val left  = xs.add(ys).add(zs)
+      val left = xs.add(ys).add(zs)
       val right = xs.add(ys.add(zs))
       left.size == right.size
 

@@ -8,25 +8,28 @@ opaque type FullMoveNumber = Int
 object FullMoveNumber extends RichOpaqueInt[FullMoveNumber]:
   val initial: FullMoveNumber = 1
   extension (e: FullMoveNumber)
-    def ply(turn: Color)     = Ply(e * 2 - turn.fold(2, 1))
+    def ply(turn: Color): Ply = Ply(e * 2 - turn.fold(2, 1))
     def next: FullMoveNumber = e + 1
 
 opaque type Ply = Int
 object Ply extends RelaxedOpaqueInt[Ply]:
-  val initial: Ply   = 0
+  val initial: Ply = 0
   val firstMove: Ply = 1
   extension (e: Ply)
-    inline def turn    = Color.fromWhite(e.isEven) // whose turn it is to play now
-    def fullMoveNumber = FullMoveNumber(1 + e / 2)
-    inline def isEven  = (e & 1) == 0
-    inline def isOdd   = !e.isEven
-    inline def next    = Ply(e + 1)
+    inline def turn: Color = Color.fromWhite(e.isEven) // whose turn it is to play now
+    def fullMoveNumber: FullMoveNumber = FullMoveNumber(1 + e / 2)
+    inline def isEven: Boolean = (e & 1) == 0
+    inline def isOdd: Boolean = !e.isEven
+    inline def next: Ply = Ply(e + 1)
 
 /* The halfmove clock specifies a decimal number of half moves with respect to the 50 move draw rule.
  * It is reset to zero after a capture or a pawn move and incremented otherwise. */
 opaque type HalfMoveClock = Int
 object HalfMoveClock extends RichOpaqueInt[HalfMoveClock]:
   val initial: HalfMoveClock = 0
+  extension (e: HalfMoveClock)
+    inline def incr: HalfMoveClock =
+      HalfMoveClock(e + 1)
 
 opaque type Check = Boolean
 object Check extends YesNo[Check]

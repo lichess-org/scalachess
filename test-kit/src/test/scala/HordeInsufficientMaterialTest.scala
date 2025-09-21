@@ -9,21 +9,20 @@ import fs2.*
 import fs2.io.file.Files
 import weaver.*
 
-object InsufficientMaterialTest extends SimpleIOSuite:
+object HordeInsufficientMaterialTest extends SimpleIOSuite:
 
   test("horde"):
-    run("test-kit/src/test/resources/horde_insufficient_material.csv", Horde).map(assert(_))
+    run("test-kit/src/test/resources/horde_insufficient_material.csv", Horde).map(expect(_))
 
   given Monoid[Boolean] with
-    def empty                           = true
+    def empty = true
     def combine(x: Boolean, y: Boolean) = x && y
 
   private def run(file: String, variant: Variant): IO[Boolean] =
     parser(file)
       .foldMap(_.run(variant))
       .compile
-      .toList
-      .map(_.head)
+      .lastOrError
 
   private def parser(file: String): Stream[IO, Case] =
     Files[IO]
@@ -42,5 +41,5 @@ object InsufficientMaterialTest extends SimpleIOSuite:
 
 private case class Case(fen: FullFen, expected: Boolean, comment: Option[String]):
   def run(variant: Variant): Boolean =
-    val situation = Fen.read(variant, fen).get
-    Horde.hasInsufficientMaterial(situation.board, !situation.color) == expected
+    val board = Fen.read(variant, fen).get
+    Horde.hasInsufficientMaterial(board.board, !board.color) == expected

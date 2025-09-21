@@ -4,10 +4,11 @@ import org.openjdk.jmh.annotations.*
 import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
-import cats.syntax.all.*
-import chess.{ FullMoveNumber, Situation }
-import chess.format.BinaryFen
-import chess.variant.Standard
+import chess.{ FullMoveNumber, Position }
+import chess.variant.Chess960
+import chess.*
+import chess.format.{ Fen, BinaryFen }
+import chess.perft.Perft
 
 @State(Scope.Thread)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -21,43 +22,38 @@ class BinaryFenBench:
   // the unit of CPU work per iteration
   private val Work: Long = 10
 
-  private val binary = BinaryFen(
-    Array(
-      0xff.toByte,
-      0xff.toByte,
-      0x00.toByte,
-      0x00.toByte,
-      0x10.toByte,
-      0x00.toByte,
-      0xef.toByte,
-      0xff.toByte,
-      0x2d.toByte,
-      0x84.toByte,
-      0x4a.toByte,
-      0xd2.toByte,
-      0x00.toByte,
-      0x00.toByte,
-      0x00.toByte,
-      0x00.toByte,
-      0x11.toByte,
-      0x11.toByte,
-      0x11.toByte,
-      0x11.toByte,
-      0x3e.toByte,
-      0x95.toByte,
-      0x5f.toByte,
-      0xe3.toByte
-    )
-  )
+  @Param(Array("10", "100", "1000"))
+  var games: Int = scala.compiletime.uninitialized
+  var sits: List[Position.AndFullMoveNumber] = scala.compiletime.uninitialized
+  var fens: List[BinaryFen] = scala.compiletime.uninitialized
 
-  @Benchmark
-  def read(bh: Blackhole) =
-    Blackhole.consumeCPU(Work)
-    bh.consume(binary.read)
+  @Setup
+  def setup(): Unit =
+    sits = makeBoards(Perft.randomPerfts, games)
+    fens = sits.map(BinaryFen.write)
 
-  private val situation = Situation.AndFullMoveNumber(Situation(Standard), FullMoveNumber(1))
+  private def makeBoards(perfts: List[Perft], games: Int): List[Position.AndFullMoveNumber] =
+    perfts
+      .take(games)
+      .flatMap(x => Fen.read(Chess960, x.epd))
+      .map(Position.AndFullMoveNumber(_, FullMoveNumber(1)))
 
   @Benchmark
   def write(bh: Blackhole) =
-    Blackhole.consumeCPU(Work)
-    bh.consume(BinaryFen.write(situation))
+    val games = this.sits
+    var i = 0
+    while i < games.size do
+      val game = games(i)
+      Blackhole.consumeCPU(Work)
+      bh.consume(BinaryFen.write(game))
+      i += 1
+
+  @Benchmark
+  def read(bh: Blackhole) =
+    val games = this.fens
+    var i = 0
+    while i < games.size do
+      val fen = games(i)
+      Blackhole.consumeCPU(Work)
+      bh.consume(fen.read)
+      i += 1

@@ -4,7 +4,6 @@ package bitboard
 import chess.format.{ Fen, FullFen }
 
 import Square.*
-import Bitboard.*
 
 class BoardTest extends ChessTest:
 
@@ -13,15 +12,15 @@ class BoardTest extends ChessTest:
   given Conversion[Int, Square] = Square.unsafe(_)
 
   def parseFen(fen: FullFen): Board =
-    Fen.read(fen).map(_.board.board).getOrElse(throw RuntimeException("boooo"))
+    Fen.read(fen).map(_.board).getOrElse(throw RuntimeException("boooo"))
 
   test("generateMovesAt(square) = generateMoves.filter(_.orig == square)"):
     for
       fen <- FenFixtures.fens
-      situation = Fen.read(fen).getOrElse(throw RuntimeException("boooo"))
+      board = Fen.read(fen).getOrElse(throw RuntimeException("boooo"))
       sq <- Square.all
-      legalMoves   = situation.legalMoves.filter(_.orig == sq)
-      legalMovesAt = situation.generateMovesAt(sq)
+      legalMoves = board.legalMoves.filter(_.orig == sq)
+      legalMovesAt = board.generateMovesAt(sq)
     yield assertEquals(legalMoves.toSet, legalMovesAt.toSet)
 
   test("discard an empty square returns the same board"):
@@ -32,6 +31,13 @@ class BoardTest extends ChessTest:
       if !board.isOccupied(s)
       newBoard = board.discard(s)
     yield assertEquals(newBoard, board)
+
+  test("pieceAt are consistent"):
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      s <- Square.all
+    yield assertEquals(board.pieceAt(s), board.pieceAt(s.file, s.rank))
 
   test("discard an occupied square returns a board with one piece left"):
     for
@@ -45,7 +51,7 @@ class BoardTest extends ChessTest:
   test("discard all occupied squares returns an empty board"):
     for
       str <- FenFixtures.fens
-      board    = parseFen(str)
+      board = parseFen(str)
       newBoard = board.occupied.fold(board) { (b, s) => b.discard(s) }
     yield assertEquals(newBoard, Board.empty)
 
@@ -81,7 +87,7 @@ class BoardTest extends ChessTest:
       board = parseFen(str)
       s <- Square.all
       if board.isOccupied(s)
-      piece    <- board.pieceAt(s)
+      piece <- board.pieceAt(s)
       newBoard <- board.discard(s).put(piece, s)
     yield assertEquals(newBoard, board)
 
@@ -110,7 +116,7 @@ class BoardTest extends ChessTest:
       s <- Square.all
       if !board.isOccupied(s)
       newPiece = for
-        x        <- board.put(White.king, s)
+        x <- board.put(White.king, s)
         newBoard <- x.replace(White.queen, s)
         newPiece <- newBoard.pieceAt(s)
       yield newPiece
@@ -156,7 +162,7 @@ class BoardTest extends ChessTest:
   test("pieceMap . fromMap == identity"):
     for
       str <- FenFixtures.fens
-      board  = parseFen(str)
+      board = parseFen(str)
       result = Board.fromMap(board.pieceMap)
     yield assertEquals(result, board)
 
@@ -181,12 +187,20 @@ class BoardTest extends ChessTest:
       square <- Square.all
     yield assertEquals(board.isOccupied(square), board.pieceMap.contains(square))
 
-  test("isOccupied(piece) == true if pieces contains piece"):
+  test("contains(piece) == true if pieces contains piece"):
     for
       str <- FenFixtures.fens
       board = parseFen(str)
       piece <- board.pieces
-    yield assert(board.isOccupied(piece))
+    yield assert(board.contains(piece))
+
+  test("contains(piece) == contains(color, role)"):
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      role <- Role.all
+      color <- Color.all
+    yield assertEquals(board.contains(Piece(color, role)), board.contains(color, role))
 
   test("move(x, x) always returns None"):
     for
@@ -201,7 +215,7 @@ class BoardTest extends ChessTest:
       str <- FenFixtures.fens
       board = parseFen(str)
       from <- Square.all
-      to   <- Square.all
+      to <- Square.all
       if from != to
       moved = board.move(from, to)
     yield assertEquals(moved.isDefined, board.isOccupied(from) && !board.isOccupied(to))
@@ -211,9 +225,9 @@ class BoardTest extends ChessTest:
       str <- FenFixtures.fens
       board = parseFen(str)
       from <- Square.all
-      to   <- Square.all
+      to <- Square.all
       if from != to
-      moved     = board.move(from, to)
+      moved = board.move(from, to)
       movedBack = moved.flatMap(_.move(to, from))
     yield assert(movedBack.isEmpty || movedBack == Some(board))
 
@@ -222,13 +236,13 @@ class BoardTest extends ChessTest:
       str <- FenFixtures.fens
       board = parseFen(str)
       from <- Square.all
-      to   <- Square.all
+      to <- Square.all
       if from != to
       moved = board.move(from, to)
       takeAndPut = for
-        piece     <- board.pieceAt(from)
+        piece <- board.pieceAt(from)
         afterTake <- board.take(from)
-        newBoard  <- afterTake.put(piece, to)
+        newBoard <- afterTake.put(piece, to)
       yield newBoard
     yield assertEquals(moved, takeAndPut)
 
@@ -237,13 +251,13 @@ class BoardTest extends ChessTest:
       str <- FenFixtures.fens
       board = parseFen(str)
       from <- Square.all
-      to   <- Square.all
+      to <- Square.all
       if from != to
       taking = board.taking(from, to)
       takeAndReplace = for
-        piece     <- board.pieceAt(from)
+        piece <- board.pieceAt(from)
         afterTake <- board.take(from)
-        newBoard  <- afterTake.replace(piece, to)
+        newBoard <- afterTake.replace(piece, to)
       yield newBoard
     yield assertEquals(taking, takeAndReplace)
 
@@ -251,16 +265,16 @@ class BoardTest extends ChessTest:
     for
       str <- FenFixtures.fens
       board = parseFen(str)
-      from  <- Square.all
-      to    <- Square.all
+      from <- Square.all
+      to <- Square.all
       taken <- Square.all
       if taken != from && from != to && taken != to
       taking <- board.taking(from, to, Some(taken))
       takeAndPutAndTake <- for
-        piece     <- board.pieceAt(from)
+        piece <- board.pieceAt(from)
         afterTake <- board.take(from)
-        afterPut  <- afterTake.put(piece, to)
-        newBoard  <- afterPut.take(taken)
+        afterPut <- afterTake.put(piece, to)
+        newBoard <- afterPut.take(taken)
       yield newBoard
     yield assertEquals(taking, takeAndPutAndTake)
 
@@ -269,12 +283,12 @@ class BoardTest extends ChessTest:
       str <- FenFixtures.fens
       board = parseFen(str)
       from <- Square.all
-      to   <- Square.all
+      to <- Square.all
       if from != to && !board.isOccupied(to)
-      piece    = White.knight
+      piece = White.knight
       promoted = board.promote(from, to, piece)
       moveAndReplace = for
-        moved    <- board.move(from, to)
+        moved <- board.move(from, to)
         newBoard <- moved.replace(piece, to)
       yield newBoard
     yield assertEquals(promoted, moveAndReplace)
@@ -284,12 +298,12 @@ class BoardTest extends ChessTest:
       str <- FenFixtures.fens
       board = parseFen(str)
       from <- Square.all
-      to   <- Square.all
+      to <- Square.all
       if from != to && board.isOccupied(to)
-      piece    = White.knight
+      piece = White.knight
       promoted = board.promote(from, to, piece)
       takingAndReplace = for
-        moved    <- board.taking(from, to)
+        moved <- board.taking(from, to)
         newBoard <- moved.replace(piece, to)
       yield newBoard
     yield assertEquals(promoted, takingAndReplace)

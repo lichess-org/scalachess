@@ -5,7 +5,6 @@ import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
 
 import chess.variant.*
-import chess.{ Mode as _, * }
 import chess.format.FullFen
 import chess.perft.Perft
 import chess.format.Fen
@@ -24,14 +23,14 @@ class FenReaderBench:
   @Param(Array("100"))
   var games: Int = scala.compiletime.uninitialized
 
-  var threecheckInput: List[(Variant, FullFen)]  = scala.compiletime.uninitialized
-  var antichessInput: List[(Variant, FullFen)]   = scala.compiletime.uninitialized
-  var atomicInput: List[(Variant, FullFen)]      = scala.compiletime.uninitialized
-  var crazyhouseInput: List[(Variant, FullFen)]  = scala.compiletime.uninitialized
+  var threecheckInput: List[(Variant, FullFen)] = scala.compiletime.uninitialized
+  var antichessInput: List[(Variant, FullFen)] = scala.compiletime.uninitialized
+  var atomicInput: List[(Variant, FullFen)] = scala.compiletime.uninitialized
+  var crazyhouseInput: List[(Variant, FullFen)] = scala.compiletime.uninitialized
   var racingkingsInput: List[(Variant, FullFen)] = scala.compiletime.uninitialized
-  var hordeInput: List[(Variant, FullFen)]       = scala.compiletime.uninitialized
-  var randomInput: List[(Variant, FullFen)]      = scala.compiletime.uninitialized
-  var trickyInput: List[(Variant, FullFen)]      = scala.compiletime.uninitialized
+  var hordeInput: List[(Variant, FullFen)] = scala.compiletime.uninitialized
+  var randomInput: List[(Variant, FullFen)] = scala.compiletime.uninitialized
+  var trickyInput: List[(Variant, FullFen)] = scala.compiletime.uninitialized
 
   @Setup
   def setup(): Unit =

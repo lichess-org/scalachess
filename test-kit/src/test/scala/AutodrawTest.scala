@@ -12,12 +12,13 @@ class AutodrawTest extends ChessTest:
   test("by lack of pieces: empty"):
     assert(makeEmptyBoard.autoDraw)
   test("by lack of pieces: new"):
-    assertNot(makeBoard.autoDraw)
+    assertNot(Standard.initialPosition.autoDraw)
+
   test("by lack of pieces: opened"):
     assertEquals(
       makeGame
         .playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5)
-        .map(_.board.autoDraw),
+        .map(_.position.autoDraw),
       Right(false)
     )
   test("by lack of pieces: two kings"):
@@ -67,14 +68,14 @@ K B b B""".autoDraw
 K   bB""".autoDraw
 
   test("by fifty moves: new"):
-    assertNot(makeBoard.autoDraw)
+    assertNot(Standard.initialPosition.autoDraw)
   test("by fifty moves: opened"):
     assertNot:
-      makeGame.playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5).get.board.autoDraw
+      makeGame.playMoves(E2 -> E4, C7 -> C5, C2 -> C3, D7 -> D5, E4 -> D5).get.position.autoDraw
   test("by fifty moves: tons of pointless moves"):
     val moves = List.fill(30)(List(B1 -> C3, B8 -> C6, C3 -> B1, C6 -> B8))
     assert:
-      makeGame.playMoves(moves.flatten*).get.board.autoDraw
+      makeGame.playMoves(moves.flatten*).get.position.autoDraw
   test("by threefold: from prod should 3fold"):
     val moves = List(
       E2 -> E4,
@@ -176,7 +177,7 @@ K   bB""".autoDraw
       H6 -> G6
     )
     assert:
-      makeGame.playMoves(moves*).get.board.history.threefoldRepetition
+      makeGame.playMoves(moves*).get.position.history.threefoldRepetition
   test("by threefold: from prod should not 3fold"):
     val moves = List(
       E2 -> E4,
@@ -272,16 +273,16 @@ K   bB""".autoDraw
       G6 -> H6
     )
     assertNot:
-      makeGame.playMoves(moves*).get.board.history.threefoldRepetition
+      makeGame.playMoves(moves*).get.position.history.threefoldRepetition
   test("by threefold: 3fold on initial position"):
     val moves: List[(Square, Square)] = List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten
     assert:
-      makeGame.playMoves(moves*).get.board.history.threefoldRepetition
+      makeGame.playMoves(moves*).get.position.history.threefoldRepetition
   test("by threefold: pawn move then minimalist 3fold"):
     val moves: List[(Square, Square)] = List(E2 -> E4, E7 -> E5) :::
       (List.fill(2)(List(G1 -> F3, B8 -> C6, F3 -> G1, C6 -> B8)).flatten: List[(Square, Square)])
     assert:
-      makeGame.playMoves(moves*).get.board.history.threefoldRepetition
+      makeGame.playMoves(moves*).get.position.history.threefoldRepetition
 
   // https://lichess.org/BdvgPSMd#82
   val moves = List(
@@ -370,76 +371,76 @@ K   bB""".autoDraw
   )
   test("by fivefold: from prod should be fivefold"):
     assert:
-      makeGame.playMoves(moves*).get.situation.autoDraw
+      makeGame.playMoves(moves*).get.position.autoDraw
   test("by fivefold: from prod should not be fivefold"):
     assertNot:
-      makeGame.playMoves(moves.dropRight(1)*).get.situation.autoDraw
+      makeGame.playMoves(moves.dropRight(1)*).get.position.autoDraw
 
   test("do not detect insufficient material: on two knights"):
     val position = FullFen("1n2k1n1/8/8/8/8/8/8/4K3 w - - 0 1")
-    val game     = fenToGame(position, Standard)
-    assertNot(game.situation.autoDraw)
-    assertNot(game.situation.end)
-    assertNot(game.situation.opponentHasInsufficientMaterial)
+    val game = fenToGame(position, Standard)
+    assertNot(game.position.autoDraw)
+    assertNot(game.position.end)
+    assertNot(game.position.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on knight versus pawn"):
     val position = FullFen("7K/5k2/7P/6n1/8/8/8/8 b - - 0 40")
     fenToGame(position, Standard)
       .playMove(Square.F7, Square.F8)
       .assertRight: game =>
-        assertNot(game.situation.autoDraw)
-        assertNot(game.situation.end)
-        assertNot(game.situation.opponentHasInsufficientMaterial)
+        assertNot(game.position.autoDraw)
+        assertNot(game.position.end)
+        assertNot(game.position.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on bishops versus pawn"):
     val position = FullFen("1b1b3K/8/5k1P/8/8/8/8/8 b - - 0 40")
     fenToGame(position, Standard)
       .playMove(Square.B8, Square.E5)
       .assertRight: game =>
-        assertNot(game.situation.autoDraw)
-        assertNot(game.situation.end)
-        assertNot(game.situation.opponentHasInsufficientMaterial)
+        assertNot(game.position.autoDraw)
+        assertNot(game.position.end)
+        assertNot(game.position.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on bishops versus queen"):
     val position = FullFen("b2b3K/8/5k1Q/8/8/8/8/8 b - -")
     fenToGame(position, Standard)
       .playMove(Square.F6, Square.E5)
       .assertRight: game =>
-        assertNot(game.situation.autoDraw)
-        assertNot(game.situation.end)
-        assertNot(game.situation.opponentHasInsufficientMaterial)
+        assertNot(game.position.autoDraw)
+        assertNot(game.position.end)
+        assertNot(game.position.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on bishops versus queen"):
     val position = FullFen("1b1b3K/8/5k1Q/8/8/8/8/8 b - -")
     fenToGame(position, Standard)
       .playMove(Square.F6, Square.E5)
       .assertRight: game =>
-        assertNot(game.situation.autoDraw)
-        assertNot(game.situation.end)
-        assert(game.situation.opponentHasInsufficientMaterial)
+        assertNot(game.position.autoDraw)
+        assertNot(game.position.end)
+        assert(game.position.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on knight versus pawns"):
     val position = FullFen("8/8/5N2/8/6p1/8/5K1p/7k w - - 0 37")
     fenToGame(position, Standard)
       .playMove(Square.F6, Square.E4)
       .assertRight: game =>
-        assertNot(game.situation.autoDraw)
-        assertNot(game.situation.end)
-        assertNot(game.situation.opponentHasInsufficientMaterial)
+        assertNot(game.position.autoDraw)
+        assertNot(game.position.end)
+        assertNot(game.position.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on knight versus pieces"):
     val position = FullFen("8/8/8/4N3/4k1p1/6K1/8/3b4 w - - 5 59")
     fenToGame(position, Standard)
       .playMove(Square.E5, Square.F7)
       .assertRight: game =>
-        assertNot(game.situation.autoDraw)
-        assertNot(game.situation.end)
-        assertNot(game.situation.opponentHasInsufficientMaterial)
+        assertNot(game.position.autoDraw)
+        assertNot(game.position.end)
+        assertNot(game.position.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on opposite bishops with queen"):
     val position = FullFen("8/8/3Q4/2bK4/B7/8/8/k7 b - - 0 67")
     fenToGame(position, Standard)
       .playMove(Square.A1, Square.B2)
       .assertRight: game =>
-        assertNot(game.situation.autoDraw)
-        assertNot(game.situation.end)
-        assertNot(game.situation.opponentHasInsufficientMaterial)
+        assertNot(game.position.autoDraw)
+        assertNot(game.position.end)
+        assertNot(game.position.opponentHasInsufficientMaterial)
   test("do not detect insufficient material: on same-color bishops on both sides"):
     val position = FullFen("5K2/8/8/1B6/8/k7/6b1/8 w - - 0 39")
-    val game     = fenToGame(position, Standard)
-    assert(game.situation.autoDraw)
-    assert(game.situation.end)
-    assert(game.situation.opponentHasInsufficientMaterial)
+    val game = fenToGame(position, Standard)
+    assert(game.position.autoDraw)
+    assert(game.position.end)
+    assert(game.position.opponentHasInsufficientMaterial)

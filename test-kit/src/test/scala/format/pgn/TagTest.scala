@@ -62,3 +62,18 @@ class TagTest extends ChessTest:
       Tags.sanitize(List(Tag(Tag.White, "Schwarzenegger, Arnold \"The Terminator\""))).value,
       List(Tag(Tag.White, "Schwarzenegger, Arnold \"The Terminator\""))
     )
+
+  test("clocks MM:SS"):
+    val tags = Tags(List(Tag(_.WhiteClock, "00:01"), Tag(_.BlackClock, "10:02")))
+    assertEquals(tags.clocks.white, Some(Centis.ofSeconds(1)))
+    assertEquals(tags.clocks.black, Some(Centis.ofSeconds(10 * 60 + 2)))
+
+  test("clocks HH:MM:SS"):
+    val tags = Tags(List(Tag(_.WhiteClock, "0:00:01"), Tag(_.BlackClock, "10:00:02")))
+    assertEquals(tags.clocks.white, Some(Centis.ofSeconds(1)))
+    assertEquals(tags.clocks.black, Some(Centis.ofSeconds(10 * 3600 + 2)))
+
+  test("clocks seconds"):
+    val tags = Tags(List(Tag(_.WhiteClock, "1"), Tag(_.BlackClock, "12345")))
+    assertEquals(tags.clocks.white, Some(Centis.ofSeconds(1)))
+    assertEquals(tags.clocks.black, Some(Centis.ofSeconds(12345)))

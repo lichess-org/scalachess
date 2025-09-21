@@ -15,15 +15,18 @@ jobs:
     steps:
 
       - name: Checkout current branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup JVM
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
           cache: sbt
 
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
+        
       - name: Test
         run: sbt testKit/test
 
@@ -35,15 +38,18 @@ jobs:
     steps:
 
       - name: Checkout current branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup JVM
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
           cache: sbt
 
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
+        
       - name: compile
         run: sbt compile
 
@@ -54,14 +60,17 @@ jobs:
     steps:
 
       - name: Checkout current branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup JVM
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
           cache: sbt
 
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
+        
       - name: Check Formatting
         run: sbt check

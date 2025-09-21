@@ -6,10 +6,6 @@ import chess.variant.Variant
 
 object UciDump:
 
-  // a2a4, b8c6
-  def apply(force960Notation: Boolean)(replay: Replay): List[String] =
-    replay.chronoMoves.map(move(replay.setup.board.variant, force960Notation))
-
   def apply(
       moves: Seq[pgn.SanStr],
       initialFen: Option[FullFen],
@@ -17,7 +13,10 @@ object UciDump:
       force960Notation: Boolean = false
   ): Either[ErrorStr, List[String]] =
     if moves.isEmpty then Nil.asRight
-    else Replay(moves, initialFen, variant).flatMap(_.valid).map(apply(force960Notation))
+    else
+      Position(variant, initialFen)
+        .play(moves, Ply.initial): step =>
+          move(variant, force960Notation)(step.move)
 
   def move(variant: Variant, force960Notation: Boolean = false)(mod: MoveOrDrop): String =
     mod match

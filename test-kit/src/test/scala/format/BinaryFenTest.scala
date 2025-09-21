@@ -168,12 +168,12 @@ class BinaryFenTest extends ScalaCheckSuite:
     )
 
   private def assertRoundtrip(variant: Variant, fen: FullFen) =
-    val situation    = Fen.readWithMoveNumber(variant, fen).get
-    val bytes        = BinaryFen.write(situation)
+    val board = Fen.readWithMoveNumber(variant, fen).get
+    val bytes = BinaryFen.write(board)
     val roundtripped = bytes.read
     assertEquals(Fen.write(roundtripped), fen)
 
   private def assertPersistence(variant: Variant, fen: FullFen, hex: String) =
-    val situation = Fen.readWithMoveNumber(variant, fen).get
-    val bytes     = BinaryFen.write(situation)
+    val board = Fen.readWithMoveNumber(variant, fen).get
+    val bytes = BinaryFen.write(board)
     assertEquals(bytes.value.map("%02x" format _).mkString, hex)

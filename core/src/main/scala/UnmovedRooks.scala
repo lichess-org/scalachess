@@ -2,18 +2,16 @@ package chess
 
 import scala.annotation.targetName
 
-import bitboard.Bitboard
-
 opaque type UnmovedRooks = Long
 object UnmovedRooks:
   // for lila testing only
   val default: UnmovedRooks = UnmovedRooks(Bitboard.rank(Rank.First) | Bitboard.rank(Rank.Eighth))
   val corners: UnmovedRooks = 0x8100000000000081L
-  val none: UnmovedRooks    = 0L
+  val none: UnmovedRooks = 0L
 
   @targetName("applyUnmovedRooks")
-  def apply(b: Bitboard): UnmovedRooks                        = b.value
-  def apply(l: Long): UnmovedRooks                            = l
+  def apply(b: Bitboard): UnmovedRooks = b.value
+  def apply(l: Long): UnmovedRooks = l
   inline def apply(inline xs: Iterable[Square]): UnmovedRooks = xs.foldLeft(none)((b, s) => b | s.bl)
 
   // guess unmovedRooks from board
@@ -24,19 +22,22 @@ object UnmovedRooks:
     UnmovedRooks(wr | br)
 
   extension (ur: UnmovedRooks)
-    inline def bb: Bitboard  = Bitboard(ur)
-    def isEmpty              = ur == 0L
-    def value: Long          = ur
+    inline def bb: Bitboard = Bitboard(ur)
+    def isEmpty = ur == 0L
+    def value: Long = ur
     def toList: List[Square] = ur.bb.squares
 
     def without(color: Color): UnmovedRooks =
       ur & Bitboard.rank(color.lastRank).value
 
-    // Try to guess the side of the rook at postion `square`
-    // If the position is not a ummovedRook return None
-    // If the position is a ummovedRook but there is no other rook on the
-    // same rank return Some(None) (because we cannot guess)
-    // If there are two rooks on the same rank, return the side of the rook
+    /**
+    * Guess the side of the rook at the given square
+    *
+    * If the position is not a ummovedRook return None
+    * If the position is a ummovedRook but there is no other rook on the
+    * same rank return Some(None) (because we cannot guess)
+    * If there are two rooks on the same rank, return the side of the rook
+    */
     def side(square: Square): Option[Option[Side]] =
       val rook = square.bb
       if rook.isDisjoint(ur) then None
@@ -50,7 +51,7 @@ object UnmovedRooks:
     def contains(square: Square): Boolean =
       (ur & (1L << square.value)) != 0L
 
-    inline def unary_~ : UnmovedRooks                = ~ur
+    inline def unary_~ : UnmovedRooks = ~ur
     inline infix def &(inline o: Long): UnmovedRooks = ur & o
     inline infix def ^(inline o: Long): UnmovedRooks = ur ^ o
     inline infix def |(inline o: Long): UnmovedRooks = ur | o

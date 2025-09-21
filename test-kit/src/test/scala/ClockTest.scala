@@ -9,7 +9,7 @@ class ClockTest extends ChessTest:
   import clockConv.given
 
   val clock = Clock(5 * 60 * 1000, 0)
-  val game  = makeGame.withClock(clock.start)
+  val game = makeGame.withClock(clock.start)
 
   test("play with a clock: new game"):
     assertEquals(game.clock.map { _.color }, Option(White))
@@ -53,12 +53,12 @@ class ClockLagCompTest extends ChessTest:
   def clockStep(clock: Clock, wait: Int, lags: Int*) =
     (lags
       .foldLeft(clock) { (clk, lag) =>
-        advance(clk.step().value, wait + lag).step(durOf(lag)) value
+        advance(clk.step().value, wait + lag).step(durOf(lag)).value
       }
       .remainingTime(Black))
       .centis
 
-  def clockStep60(w: Int, l: Int*)  = clockStep(fakeClock60, w, l*)
+  def clockStep60(w: Int, l: Int*) = clockStep(fakeClock60, w, l*)
   def clockStep600(w: Int, l: Int*) = clockStep(fakeClock600, w, l*)
 
   def clockStart(lag: Int) =

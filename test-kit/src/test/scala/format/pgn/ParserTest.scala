@@ -1,7 +1,7 @@
 package chess
 package format.pgn
 
-import cats.syntax.option.*
+import cats.syntax.all.*
 
 import scala.language.implicitConversions
 
@@ -11,12 +11,17 @@ class ParserTest extends ChessTest:
 
   import Fixtures.*
 
-  given Conversion[SanStr, String]                                   = _.value
-  given Conversion[String, SanStr]                                   = SanStr(_)
+  given Conversion[SanStr, String] = _.value
+  given Conversion[String, SanStr] = SanStr(_)
   extension (tree: Option[ParsedPgnTree]) def firstMove: PgnNodeData = tree.get.mainline.head.value
-  extension (parsed: ParsedPgn) def metas                            = parsed.tree.get.value.metas
+  extension (parsed: ParsedPgn) def metas = parsed.tree.get.value.metas
 
-  import Parser.{ full as parse, move as parseMove }
+  import Parser.{
+    full as parse,
+    move as parseMove,
+    mainlineWithMetas as parseMainlineWithMetas,
+    mainline as parseMainline
+  }
 
   test("bom header should be ignored"):
     // "with tags" in:
@@ -44,7 +49,7 @@ class ParserTest extends ChessTest:
   test("promotion check as a queen"):
     parse("b8=Q ").assertRight: parsed =>
       parsed.mainline.headOption.assertSome: san =>
-        assertEquals(san, Std(Square.B8, Pawn, promotion = Option(Queen)))
+        assertEquals(san, Std(Square.B8, Pawn, promotion = Option(Queen), rawString = "b8=Q".some))
 
   test("promotion check as a rook"):
     parse("b8=R ").assertRight: parsed =>
@@ -83,24 +88,27 @@ class ParserTest extends ChessTest:
   test("glyphs"):
 
     parseMove("b8=B ").assertRight: node =>
-      assertEquals(node.value.san, Std(Square.B8, Pawn, promotion = Option(Bishop)))
+      assertEquals(node.value.san, Std(Square.B8, Pawn, promotion = Option(Bishop), rawString = "b8=B".some))
 
     parseMove("1. e4").assertRight: node =>
-      assertEquals(node.value.san, Std(Square.E4, Pawn))
+      assertEquals(node.value.san, Std(Square.E4, Pawn, rawString = "e4".some))
 
     parseMove("e4").assertRight: node =>
-      assertEquals(node.value.san, Std(Square.E4, Pawn))
+      assertEquals(node.value.san, Std(Square.E4, Pawn, rawString = "e4".some))
 
     parseMove("e4!").assertRight: node =>
-      assertEquals(node.value.san, Std(Square.E4, Pawn))
+      assertEquals(node.value.san, Std(Square.E4, Pawn, rawString = "e4".some))
       assertEquals(node.value.metas.glyphs, Glyphs(Glyph.MoveAssessment.good.some, None, Nil))
 
     parseMove("Ne7g6+?!").assertRight: node =>
-      assertEquals(node.value.san, Std(Square.G6, Knight, false, Some(File.E), Some(Rank.Seventh)))
+      assertEquals(
+        node.value.san,
+        Std(Square.G6, Knight, false, Some(File.E), Some(Rank.Seventh), rawString = "Ne7g6".some)
+      )
       assertEquals(node.value.metas.glyphs, Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil))
 
     parseMove("P@e4?!").assertRight: node =>
-      assertEquals(node.value.san, Drop(Pawn, Square.E4))
+      assertEquals(node.value.san, Drop(Pawn, Square.E4, rawString = "P@e4".some))
       assertEquals(node.value.metas.glyphs, Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil))
 
   test("nags"):
@@ -137,6 +145,54 @@ class ParserTest extends ChessTest:
     test(s"sans only size: $size"):
       parse(sans).assertRight: a =>
         assertEquals(a.mainline.size, size)
+
+  test("raws with moves"):
+    raws.foreach: sans =>
+      val result = Parser.moves(sans.split(' ').toList.map(SanStr(_))).toOption.get
+      val expected = parse(sans).toOption.get.mainline
+      assertEquals(result, expected)
+
+  test("sanOnly with nested variations"):
+    val sanStr = SanStr("1. e4 (1... e5 (2. Nf3))")
+    Parser
+      .san(sanStr)
+      .assertRight: san =>
+        assertEquals(san, Std(Square.E4, Pawn, rawString = "e4".some))
+
+  test("mainlineWithMetas == full.mainlineWithMetas"):
+    verifyMainlineWithMetas(raws)
+    verifyMainlineWithMetas(shortCastles)
+    verifyMainlineWithMetas(longCastles)
+    verifyMainlineWithMetas(annotatedCastles)
+    verifyMainlineWithMetas(wcc2023)
+    verifyMainlineWithMetas(
+      List(fromProd1, fromProd2, castleCheck1, castleCheck2, fromCrafty, fromWikipedia, fromTcec)
+    )
+
+  def verifyMainlineWithMetas(pgns: List[String]) =
+    val expected = pgns.map(PgnStr(_)).traverse(parse).toOption.get.map(_.mainlineWithMetas)
+    val mainline = pgns.map(PgnStr(_)).traverse(parseMainlineWithMetas).toOption.get.map(_.moves)
+    assertEquals(mainline, expected)
+
+  test("mainline == full.mainline"):
+    verifyMainline(raws)
+    verifyMainline(shortCastles)
+    verifyMainline(longCastles)
+    verifyMainline(annotatedCastles)
+    verifyMainline(wcc2023)
+    verifyMainline(
+      List(fromProd1, fromProd2, castleCheck1, castleCheck2, fromCrafty, fromWikipedia, fromTcec)
+    )
+
+  test("tags = full.tags"):
+    val expected = wcc2023.map(PgnStr(_)).traverse(parse).toOption.get.map(_.tags)
+    val tags = wcc2023.map(PgnStr(_)).traverse(Parser.tags).toOption.get
+    assertEquals(tags, expected)
+
+  def verifyMainline(pgns: List[String]) =
+    val expected = pgns.map(PgnStr(_)).traverse(parse).toOption.get.map(_.mainline)
+    val mainline = pgns.map(PgnStr(_)).traverse(parseMainline).toOption.get.map(_.moves)
+    assertEquals(mainline, expected)
 
   (shortCastles ++ longCastles ++ annotatedCastles).foreach: sans =>
     val size = sans.split(' ').length

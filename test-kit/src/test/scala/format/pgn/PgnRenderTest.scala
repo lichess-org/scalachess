@@ -1,18 +1,36 @@
 package chess
 package format.pgn
 
+import cats.syntax.all.*
+import monocle.syntax.all.*
+
 import scala.language.implicitConversions
 
 class PgnRenderTest extends ChessTest:
 
   import Fixtures.*
 
-  given Conversion[String, SanStr]  = SanStr(_)
+  given Conversion[String, SanStr] = SanStr(_)
   given Conversion[String, Comment] = Comment(_)
 
   extension (pgn: ParsedPgn)
     def cleanTags: ParsedPgn =
       pgn.copy(tags = Tags.empty)
+
+    def cleanRawString: ParsedPgn =
+      pgn.copy(tree = pgn.tree.map(removeRawString))
+
+  def removeRawString(san: San): San =
+    san match
+      case std: Std => std.copy(rawString = None)
+      case drop: Drop => drop.copy(rawString = None)
+      case castle: Castle => castle.copy(rawString = None)
+
+  def removeRawString(node: Node[PgnNodeData]): Node[PgnNodeData] =
+    node
+      .focus(_.value.san)
+      .modify(removeRawString)
+      .map(_.focus(_.san).modify(removeRawString))
 
   lazy val pgns = List(
     pgn2,
@@ -34,9 +52,9 @@ class PgnRenderTest extends ChessTest:
 
   test("pgn round trip tests compare ParsedPgn"):
     (pgns ++ wcc2023).foreach: x =>
-      val pgn    = Parser.full(x).get
+      val pgn = Parser.full(x).get
       val output = Parser.full(pgn.toPgn.render).get
-      assertEquals(output.cleanTags, pgn.cleanTags)
+      assertEquals(output.cleanTags.cleanRawString, pgn.cleanTags.cleanRawString)
 
   test("pgn round trip tests compare Pgn"):
     List(pgn1, pgn3, pgn4).foreach: x =>

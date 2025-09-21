@@ -12,7 +12,11 @@ case object FromPosition
       standardInitialPosition = false
     ):
 
-  def pieces = Standard.pieces
+  override val initialBoard: Board = Board.standard
+  override def initialPieces: Map[Square, Piece] = initialBoard.pieceMap
 
-  def validMoves(situation: Situation): List[Move] =
-    Standard.validMoves(situation)
+  override def validMoves(position: Position): List[Move] =
+    Standard.validMoves(position)
+
+  override def validMovesAt(position: Position, square: Square): List[Move] =
+    super.validMovesAt(position, square).filter(kingSafety)

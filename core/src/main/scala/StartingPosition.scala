@@ -1,5 +1,6 @@
 package chess
 
+import cats.syntax.all.*
 import chess.format.StandardFen
 import chess.opening.{ Opening, OpeningDb }
 
@@ -96,7 +97,7 @@ object StartingPosition:
         of(StandardFen("r1bqkb1r/pppp1ppp/2n2n2/4N3/4P3/2N5/PPPP1PPP/R1BQKB1R b KQkq -")),
         of(StandardFen("rnbqkbnr/pppp1ppp/8/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq -")),
         of(StandardFen("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPPKPPP/RNBQ1BNR b kq -"), featurable = false)
-      ).flatten
+      ).sequence.get
     ),
     Category(
       "d4",
@@ -133,7 +134,6 @@ object StartingPosition:
         of(StandardFen("r1bqk2r/pp3ppp/2nppn2/2p5/2PP4/2PBPN2/P4PPP/R1BQK2R w KQkq -")),
         of(StandardFen("rnbqk2r/pppp1ppp/4pn2/8/1bPP4/2N2N2/PP2PPPP/R1BQKB1R b KQkq -")),
         of(StandardFen("rnbqk2r/pppp1ppp/4pn2/6B1/1bPP4/2N5/PP2PPPP/R2QKBNR b KQkq -")),
-        of(StandardFen("rnbqk2r/pppp1ppp/4pn2/8/2PP4/P1P5/4PPPP/R1BQKBNR b KQkq -")),
         of(StandardFen("rnbqkb1r/ppp1pppp/3p1n2/8/2PP4/8/PP2PPPP/RNBQKBNR w KQkq -")),
         of(StandardFen("rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq -")),
         of(StandardFen("rnbqkbnr/ppp1pppp/8/8/2pP4/8/PP2PPPP/RNBQKBNR w KQkq -")),
@@ -152,7 +152,7 @@ object StartingPosition:
         of(StandardFen("rnbqkb1r/pppp1ppp/5n2/4p3/2PP4/8/PP2PPPP/RNBQKBNR w KQkq -"), featurable = false),
         of(StandardFen("rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq -"), featurable = false),
         of(StandardFen("rnbqkb1r/pppppppp/5n2/6B1/3P4/8/PPP1PPPP/RN1QKBNR b KQkq -"))
-      ).flatten
+      ).sequence.get
     ),
     Category(
       "Nf3",
@@ -160,7 +160,7 @@ object StartingPosition:
         of(StandardFen("rnbqkbnr/pppppppp/8/8/8/5N2/PPPPPPPP/RNBQKB1R b KQkq -"), featurable = false),
         of(StandardFen("rnbqkbnr/ppp1pppp/8/3p4/8/5NP1/PPPPPP1P/RNBQKB1R b KQkq -")),
         of(StandardFen("rnbqkbnr/ppp1pppp/8/3p4/2P5/5N2/PP1PPPPP/RNBQKB1R b KQkq -"))
-      ).flatten
+      ).sequence.get
     ),
     Category(
       "c4",
@@ -169,44 +169,45 @@ object StartingPosition:
         of(StandardFen("rnbqkbnr/pppp1ppp/8/4p3/2P5/8/PP1PPPPP/RNBQKBNR w KQkq -")),
         of(StandardFen("rnbqkbnr/pp1ppppp/8/2p5/2P5/8/PP1PPPPP/RNBQKBNR w KQkq -")),
         of(StandardFen("r1bqk1nr/ppp2pbp/2np2p1/4p3/2P5/2NP2P1/PP2PPBP/R1BQK1NR w KQkq -"))
-      ).flatten
+      ).sequence.get
     ),
     Category(
       "b3",
       List(
         of(StandardFen("rnbqkbnr/pppppppp/8/8/8/1P6/P1PPPPPP/RNBQKBNR b KQkq -"), featurable = false)
-      ).flatten
+      ).sequence.get
     ),
     Category(
       "b4",
       List(
         of(StandardFen("rnbqkbnr/pppppppp/8/8/1P6/8/P1PPPPPP/RNBQKBNR b KQkq -"), featurable = false)
-      ).flatten
+      ).sequence.get
     ),
     Category(
       "f4",
       List(
         of(StandardFen("rnbqkbnr/pppppppp/8/8/5P2/8/PPPPP1PP/RNBQKBNR b KQkq -")),
         of(StandardFen("rnbqkbnr/ppp1pppp/8/3p4/5P2/8/PPPPP1PP/RNBQKBNR w KQkq -"))
-      ).flatten
+      ).sequence.get
     ),
     Category(
       "g3",
       List(
         of(StandardFen("rnbqkbnr/pppppppp/8/8/8/6P1/PPPPPP1P/RNBQKBNR b KQkq -"), featurable = false)
-      ).flatten
+      ).sequence.get
     )
   )
 
   val all: IndexedSeq[StartingPosition] = categories.flatMap(_.positions).toIndexedSeq
 
-  lazy val featurable = scala.util.Random(475591).shuffle(all.filter(_.featurable))
+  lazy val featurable: IndexedSeq[StartingPosition] =
+    scala.util.Random(475591).shuffle(all.filter(_.featurable))
 
-  def randomFeaturable = featurable(scala.util.Random.nextInt(featurable.size))
+  def randomFeaturable: StartingPosition = featurable(scala.util.Random.nextInt(featurable.size))
 
   private def of(fen: StandardFen, featurable: Boolean = true): Option[StartingPosition] =
-    OpeningDb.findByStandardFen(fen).map { StartingPosition(_, featurable) }
+    OpeningDb.findByStandardFen(fen).map(StartingPosition(_, featurable))
 
   object presets:
-    val halloween    = of(StandardFen("r1bqkb1r/pppp1ppp/2n2n2/4N3/4P3/2N5/PPPP1PPP/R1BQKB1R b KQkq -"))
+    val halloween = of(StandardFen("r1bqkb1r/pppp1ppp/2n2n2/4N3/4P3/2N5/PPPP1PPP/R1BQKB1R b KQkq -"))
     val frankenstein = of(StandardFen("rnbqkb1r/pppp1ppp/8/4p3/2B1n3/2N5/PPPP1PPP/R1BQK1NR w KQkq -"))

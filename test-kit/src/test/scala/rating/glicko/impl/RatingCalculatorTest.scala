@@ -1,7 +1,6 @@
 package chess.rating.glicko
 package impl
 
-import cats.syntax.all.*
 import chess.Outcome
 import munit.ScalaCheckSuite
 

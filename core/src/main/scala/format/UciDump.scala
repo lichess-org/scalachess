@@ -9,21 +9,18 @@ object UciDump:
   def apply(
       moves: Seq[pgn.SanStr],
       initialFen: Option[FullFen],
-      variant: Variant,
-      force960Notation: Boolean = false
+      variant: Variant
   ): Either[ErrorStr, List[String]] =
     if moves.isEmpty then Nil.asRight
     else
       Position(variant, initialFen)
         .play(moves, Ply.initial): step =>
-          move(variant, force960Notation)(step.move)
+          move(step.move)
 
-  def move(variant: Variant, force960Notation: Boolean = false)(mod: MoveOrDrop): String =
+  def move(mod: MoveOrDrop): String =
     mod match
       case m: Move =>
         m.castle
           .fold(m.toUci.uci): c =>
-            if force960Notation || c.king == c.kingTo || variant.chess960 || variant.fromPosition then
-              c.king.key + c.rook.key
-            else c.king.key + c.kingTo.key
+            c.king.key + c.rook.key
       case d: Drop => d.toUci.uci

@@ -34,7 +34,7 @@ val cluelessDeviation = 230
 
 case class Player(
     glicko: Glicko,
-    numberOfResults: Int,
+    numberOfResults: Int = 0,
     lastRatingPeriodEnd: Option[Instant] = None
 ):
   export glicko.*
@@ -48,3 +48,11 @@ object Tau extends OpaqueDouble[Tau]:
 opaque type RatingPeriodsPerDay = Double
 object RatingPeriodsPerDay extends OpaqueDouble[RatingPeriodsPerDay]:
   val default: RatingPeriodsPerDay = 0d
+
+opaque type ColorAdvantage = Double
+object ColorAdvantage extends OpaqueDouble[ColorAdvantage]:
+  val zero: ColorAdvantage = 0d
+  val standard: ColorAdvantage = 11.782457d
+  val crazyhouse: ColorAdvantage = 20.30966d
+  extension (c: ColorAdvantage) def half: ColorAdvantage = c / 2.0d
+  extension (c: ColorAdvantage) def negate: ColorAdvantage = -c

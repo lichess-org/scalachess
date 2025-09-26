@@ -3,6 +3,8 @@ package impl
 
 private[glicko] trait Result:
 
+  def getAdvantage(advantage: ColorAdvantage, p: Rating): ColorAdvantage
+
   def getScore(player: Rating): Double
 
   def getOpponent(player: Rating): Rating
@@ -14,6 +16,8 @@ private[glicko] trait Result:
 // score from 0 (opponent wins) to 1 (player wins)
 final private[glicko] class FloatingResult(player: Rating, opponent: Rating, score: Float) extends Result:
 
+  def getAdvantage(advantage: ColorAdvantage, p: Rating): ColorAdvantage = ColorAdvantage.zero
+
   def getScore(p: Rating) = if p == player then score else 1 - score
 
   def getOpponent(p: Rating) = if p == player then opponent else player
@@ -22,14 +26,17 @@ final private[glicko] class FloatingResult(player: Rating, opponent: Rating, sco
 
   def players = List(player, opponent)
 
-final private[glicko] class GameResult(winner: Rating, loser: Rating, isDraw: Boolean) extends Result:
+final private[glicko] class GameResult(first: Rating, second: Rating, outcome: chess.Outcome) extends Result:
   private val POINTS_FOR_WIN = 1.0d
   private val POINTS_FOR_LOSS = 0.0d
   private val POINTS_FOR_DRAW = 0.5d
 
-  def players = List(winner, loser)
+  def players = List(first, second)
 
-  def participated(player: Rating) = player == winner || player == loser
+  def participated(player: Rating) = player == first || player == second
+
+  def getAdvantage(advantage: ColorAdvantage, player: Rating): ColorAdvantage =
+    if player == first then advantage.half else advantage.negate.half
 
   /** Returns the "score" for a match.
     *
@@ -38,18 +45,19 @@ final private[glicko] class GameResult(winner: Rating, loser: Rating, isDraw: Bo
     *   1 for a win, 0.5 for a draw and 0 for a loss
     * @throws IllegalArgumentException
     */
-  def getScore(player: Rating): Double =
-    if isDraw then POINTS_FOR_DRAW
-    else if winner == player then POINTS_FOR_WIN
-    else if loser == player then POINTS_FOR_LOSS
-    else throw new IllegalArgumentException("Player did not participate in match");
+  def getScore(player: Rating): Double = outcome.winner match
+    case Some(chess.Color.White) => if player == first then POINTS_FOR_WIN else POINTS_FOR_LOSS
+    case Some(chess.Color.Black) => if player == first then POINTS_FOR_LOSS else POINTS_FOR_WIN
+    case _ =>
+      if participated(player) then POINTS_FOR_DRAW
+      else throw new IllegalArgumentException("Player did not participate in match");
 
   def getOpponent(player: Rating) =
-    if winner == player then loser
-    else if loser == player then winner
+    if first == player then second
+    else if second == player then first
     else throw new IllegalArgumentException("Player did not participate in match");
 
-  override def toString = s"$winner vs $loser = $isDraw"
+  override def toString = s"$first vs $second = $outcome"
 
 private[glicko] trait RatingPeriodResults[R <: Result]():
   val results: List[R]

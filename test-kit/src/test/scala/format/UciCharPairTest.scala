@@ -6,7 +6,7 @@ import org.scalacheck.Prop
 
 import CoreArbitraries.given
 
-class UciChairPairTest extends ScalaCheckSuite:
+class UciCharPairTest extends ScalaCheckSuite:
 
   test("convert move to pair"):
     assertEquals(UciCharPair(Uci.Move(Square.E2, Square.E4)).toString, "/?")

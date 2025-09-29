@@ -33,9 +33,9 @@ object Elo extends RichOpaqueInt[Elo]:
    * A difference in rating of more than 400 points shall be counted for rating purposes as though it were a difference of 400 points.  In any tournament, a player may benefit from only one upgrade under this rule, for the game in which the rating difference is greatest.
    * For players rated 2650 and above, the difference between ratings shall be used in all cases.”
    */
-  def playersRatingDiff(player: Elo, opponent: Elo): Int =
-    val ratingDiff = opponent - player
-    if player >= 2650 then ratingDiff else ratingDiff.atLeast(-400).atMost(400)
+  def playersRatingDiff(playerElo: Elo, opponentElo: Elo): Int =
+    val ratingDiff = opponentElo - playerElo
+    if playerElo >= 2650 then ratingDiff else ratingDiff.atLeast(-400).atMost(400)
 
   def getExpectedScore(ratingDiff: Int): Float =
     val absRatingDiff = ratingDiff.abs

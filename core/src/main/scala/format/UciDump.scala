@@ -2,7 +2,7 @@ package chess
 package format
 
 import cats.syntax.all.*
-import chess.variant.Variant
+import chess.variant.{ Chess960, Variant }
 
 object UciDump:
 
@@ -28,3 +28,17 @@ object UciDump:
             then c.king.key + c.kingTo.key
             else c.king.key + c.rook.key
       case d: Drop => d.toUci.uci
+
+  // Keys to highlight to show the last move made on the board.
+  // Does not render as UCI.
+  def lastMove(uci: Uci, variant: Variant): String = uci match
+    case d: Uci.Drop => d.square.key * 2
+    case m: Uci.Move =>
+      if variant == Chess960 then m.keys
+      else
+        m.keys match
+          case "e1h1" => "e1g1"
+          case "e8h8" => "e8g8"
+          case "e1a1" => "e1c1"
+          case "e8a8" => "e8c8"
+          case k => k

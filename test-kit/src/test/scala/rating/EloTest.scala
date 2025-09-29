@@ -34,6 +34,13 @@ class EloTest extends ChessTest:
     ratingDiff(2000, 40, 1900, One, 14)
     ratingDiff(2000, 40, 1900, Zero, -26)
     ratingDiff(2000, 40, 1900, Half, -6)
+    ratingDiff(2800, 10, 1800, One, 0)
+
+  test("new rating calculation over multiple games"):
+    assertEquals(
+      Elo.computeRatingDiff(Elo.Player(Elo(2800), KFactor(10)), List.fill(11)(Elo.Game(One, Elo(1800)))),
+      1
+    )
 
   private def expectedScore(ratingDiff: Int, expScore: Float)(using munit.Location) =
     assertCloseTo(Elo.getExpectedScore(ratingDiff), expScore, 0.001f)

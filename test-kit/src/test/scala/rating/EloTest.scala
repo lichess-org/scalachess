@@ -46,8 +46,8 @@ class EloTest extends ChessTest:
     expectedScore(-300, 0.85f)
     expectedScore(400, 0.08f)
     expectedScore(-400, 0.92f)
-    expectedScore(800, 0.08f)
-    expectedScore(-800, 0.92f)
+    expectedScore(800, 0.01f)
+    expectedScore(-800, 0.99f)
 
   private def perfRating(games: Seq[Elo.Game], expected: Int)(using munit.Location) =
     assertEquals(Elo.computePerformanceRating(games), Some(Elo(expected)))

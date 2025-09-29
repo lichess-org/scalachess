@@ -17,14 +17,14 @@ object UciDump:
     else
       Position(variant, initialFen)
         .play(moves, Ply.initial): step =>
-          move(step.move, variant, legacyStandardCastling)
+          move(step.move, legacyStandardCastling && variant.standard)
 
-  def move(mod: MoveOrDrop, variant: Variant, legacyStandardCastling: Boolean = false): String =
+  def move(mod: MoveOrDrop, legacyStandardCastling: Boolean = false): String =
     mod match
       case m: Move =>
         m.castle
           .fold(m.toUci.uci): c =>
-            if legacyStandardCastling && variant.standard
+            if legacyStandardCastling
             then c.king.key + c.kingTo.key
             else c.king.key + c.rook.key
       case d: Drop => d.toUci.uci

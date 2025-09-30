@@ -39,7 +39,7 @@ object Elo extends RichOpaqueInt[Elo]:
 
   def getExpectedScore(ratingDiff: Int): Float =
     val absRatingDiff = ratingDiff.abs
-    val expectedScore = conversionTableFIDE.getOrElse(absRatingDiff, 0.99f)
+    val expectedScore = conversionTableFIDE.getOrElse(absRatingDiff, 1.0f)
     if ratingDiff <= 0 then expectedScore else 1.0f - expectedScore
 
   def computePerformanceRating(games: Seq[Game]): Option[Elo] =

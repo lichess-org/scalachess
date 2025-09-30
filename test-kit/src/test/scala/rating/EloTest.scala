@@ -39,7 +39,7 @@ class EloTest extends ChessTest:
   test("new rating calculation over multiple games"):
     assertEquals(
       Elo.computeRatingDiff(Elo.Player(Elo(2800), KFactor(10)), List.fill(11)(Elo.Game(One, Elo(1800)))),
-      1
+      0
     )
 
   private def expectedScore(ratingDiff: Int, expScore: Float)(using munit.Location) =
@@ -53,8 +53,8 @@ class EloTest extends ChessTest:
     expectedScore(-300, 0.85f)
     expectedScore(400, 0.08f)
     expectedScore(-400, 0.92f)
-    expectedScore(800, 0.01f)
-    expectedScore(-800, 0.99f)
+    expectedScore(800, 0f)
+    expectedScore(-800, 1f)
 
   private def perfRating(games: Seq[Elo.Game], expected: Int)(using munit.Location) =
     assertEquals(Elo.computePerformanceRating(games), Some(Elo(expected)))

@@ -181,7 +181,6 @@ case object Horde
               || (pieces.knight >= 1 && pieces.bishop >= 1)
               || (pieces.knight >= 1 && pieces.pawn >= 1)
               || (pieces.bishop >= 1 && pieces.pawn >= 1)
-              || (pieces.bishop >= 1 && pieces.pawn >= 1)
               || (board.hasBishopPair(Black) && pieces.pawn >= 1))
             && (piecesBishops(Dark) < 2 || piecesOfTypeNot(piecesBishops(Dark)) >= 3)
             && (piecesBishops(Light) < 2 || piecesOfTypeNot(piecesBishops(Light)) >= 3))

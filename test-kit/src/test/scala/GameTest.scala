@@ -1,5 +1,7 @@
 package chess
 
+import chess.format.{ FullFen, Uci }
+
 import scala.language.implicitConversions
 
 import Square.*
@@ -28,3 +30,18 @@ R   K""".withColor(color = Black)
   test("update half move clock: not increment"):
     Game(variant.Standard)(E2, E4).assertRight: (game, _) =>
       assertEquals(game.halfMoveClock, 0)
+
+  test("Castle lastMove UCI normalization: standard"):
+    val from = fenToGame(
+      FullFen("rnbqkbnr/ppp2ppp/8/3pp3/4P3/3B1N2/PPPP1PPP/RNBQK2R w KQkq - 0 4"),
+      variant.Standard
+    )
+    assertEquals(from(E1, G1).get._1.history.lastMove, Uci("e1h1"))
+    assertEquals(from(E1, H1).get._1.history.lastMove, Uci("e1h1"))
+
+  test("Castle lastMove UCI normalization: chess960"):
+    val from = fenToGame(
+      FullFen("rnbqkbnr/ppp2ppp/8/3pp3/4P3/3B1N2/PPPP1PPP/RNBQK2R w KQkq - 0 4"),
+      variant.Chess960
+    )
+    assertEquals(from(E1, H1).get._1.history.lastMove, Uci("e1h1"))

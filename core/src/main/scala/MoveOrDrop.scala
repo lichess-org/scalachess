@@ -58,8 +58,13 @@ case class Move(
 
   inline def castles: Boolean = castle.isDefined
 
+  /* king to rook is the only variant-proof castling representation
+   * it's required for chess960 where king and rook can start anywhere
+   * and just works reqardless of variant
+   */
   inline def normalizeCastle: Move =
-    castle.fold(this)(x => copy(dest = x.rook))
+    castle.fold(this): x =>
+      copy(dest = x.rook)
 
   override inline def color: Color = piece.color
 

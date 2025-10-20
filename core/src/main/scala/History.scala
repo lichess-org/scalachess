@@ -30,8 +30,6 @@ case class History(
 
   inline def withCastles(inline c: Castles): History = copy(castles = c)
 
-  inline def withLastMove(inline m: Uci): History = copy(lastMove = Option(m))
-
   def withCheck(color: Color, check: Check): History =
     if check.yes then copy(checkCount = checkCount.add(color)) else this
 

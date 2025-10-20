@@ -330,26 +330,6 @@ trait Tournament:
         games.take(i + 1).score.into(TiebreakPoint)
       .sorted
 
-  given Ordering[List[TiebreakPoint]] = new:
-    def compare(a: List[TiebreakPoint], b: List[TiebreakPoint]): Int =
-      @scala.annotation.tailrec
-      def loop(a: List[TiebreakPoint], b: List[TiebreakPoint]): Int = (a, b) match
-        case (Nil, Nil) => 0
-        case (Nil, _) => -1 // a is empty, b is not
-        case (_, Nil) => 1 // b is empty, a is not
-        case (ah :: at, bh :: bt) =>
-          val cmp = ah.value.compare(bh.value)
-          if cmp != 0 then cmp else loop(at, bt)
-
-      loop(a, b)
-
-  given Ordering[PlayerWithScore] = new Ordering[PlayerWithScore]:
-    def compare(a: PlayerWithScore, b: PlayerWithScore): Int =
-      // sort by score descending, then by tiebreaks descending
-      val scoreComparison = b.score.compare(a.score)
-      if scoreComparison != 0 then scoreComparison
-      else Ordering[List[TiebreakPoint]].compare(b.tiebreakPoints, a.tiebreakPoints)
-
   // compute and sort players by their scores and tiebreaks
   def compute(tiebreaks: List[Tiebreak]): List[PlayerWithScore] =
     val points = tiebreaks.foldLeft(Map.empty[PlayerId, List[TiebreakPoint]]): (acc, tiebreaks) =>
@@ -357,7 +337,6 @@ trait Tournament:
     players.toList
       .map: player =>
         PlayerWithScore(player, scoreOf(player.id).value, points.getOrElse(player.id, Nil))
-      .sorted
 
 object Tournament:
 

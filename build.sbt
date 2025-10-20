@@ -2,8 +2,8 @@ import snapshot4s.BuildInfo.snapshot4sVersion
 
 inThisBuild(
   Seq(
-    scalaVersion := "3.7.2",
-    version := "17.9.5",
+    scalaVersion := "3.7.3",
+    version := "17.12.3",
     organization := "com.github.lichess-org.scalachess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
     publishTo := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", "")))),
@@ -12,7 +12,7 @@ inThisBuild(
   )
 )
 
-val scalalibVersion = "11.9.0"
+val scalalibVersion = "11.9.4"
 
 val commonSettings = Seq(
   scalacOptions := Seq(
@@ -50,7 +50,7 @@ lazy val playJson: Project = Project("playJson", file("playJson"))
     commonSettings,
     name := "scalachess-play-json",
     libraryDependencies ++= List(
-      "org.playframework" %% "play-json" % "3.0.5",
+      "org.playframework" %% "play-json" % "3.0.6",
       "com.github.lichess-org.scalalib" %% "scalalib-play-json" % scalalibVersion
     )
   )
@@ -84,14 +84,14 @@ lazy val testKit = project
     commonSettings,
     name := "scalachess-test-kit",
     libraryDependencies ++= List(
-      "org.scalacheck" %% "scalacheck" % "1.18.1",
+      "org.scalacheck" %% "scalacheck" % "1.19.0",
       "org.typelevel" %% "literally" % "1.2.0",
-      "org.scalameta" %% "munit" % "1.1.1" % Test,
-      "org.scalameta" %% "munit-scalacheck" % "1.1.0" % Test,
-      "org.typelevel" %% "weaver-cats" % "0.9.3" % Test,
-      "org.typelevel" %% "weaver-scalacheck" % "0.9.3" % Test,
-      "co.fs2" %% "fs2-core" % "3.12.0" % Test,
-      "co.fs2" %% "fs2-io" % "3.12.0" % Test,
+      "org.scalameta" %% "munit" % "1.2.1" % Test,
+      "org.scalameta" %% "munit-scalacheck" % "1.2.0" % Test,
+      "org.typelevel" %% "weaver-cats" % "0.10.1" % Test,
+      "org.typelevel" %% "weaver-scalacheck" % "0.10.1" % Test,
+      "co.fs2" %% "fs2-core" % "3.12.2" % Test,
+      "co.fs2" %% "fs2-io" % "3.12.2" % Test,
       "org.typelevel" %% "discipline-munit" % "2.0.0" % Test,
       "org.typelevel" %% "cats-laws" % "2.13.0" % Test,
       "com.siriusxm" %% "snapshot4s-munit" % snapshot4sVersion % Test

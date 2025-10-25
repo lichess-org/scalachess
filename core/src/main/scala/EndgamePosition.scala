@@ -183,5 +183,11 @@ object EndgamePosition:
     EndgamePosition("Pawns Ending XXVIII", FullFen("8/8/8/p3kPp1/6P1/4K3/8/8 w - - 0 1")),
     EndgamePosition("Pawns Ending XXIX", FullFen("8/8/2p1kPp1/6P1/4K3/8/8/8 w - - 0 1")),
     EndgamePosition("Pawns Ending XXX", FullFen("8/8/3k4/1p2p3/1P2K3/8/7P/8 w - - 0 1")),
-    EndgamePosition("Queen vs Rook", FullFen("8/8/4r3/3k4/8/8/3K1Q2/8 w - - 0 1"))
+    EndgamePosition("Queen vs Rook", FullFen("8/8/4r3/3k4/8/8/3K1Q2/8 w - - 0 1")),
+    EndgamePosition("Maximum DTZ KRvK", FullFen("8/8/8/8/8/8/2Rk4/1K6 b - - 0 1")),
+    EndgamePosition("Maximum DTZ KBNvK", FullFen("8/8/8/6B1/8/8/4k3/1K5N b - - 0 1")),
+    EndgamePosition("Maximum DTZ KNNvKP", FullFen("K7/N7/k7/8/3p4/8/N7/8 w - - 0 1")),
+    EndgamePosition("Maximum DTZ KRNvKNN", FullFen("6N1/5KR1/2n5/8/8/8/2n5/1k6 w - - 0 1")),
+    EndgamePosition("Maximum DTZ KQNvKRBN", FullFen("QN4n1/6r1/3k4/8/b2K4/8/8/8 b - - 0 1")),
+    EndgamePosition("Maximum DTC KRBBPvKQP", FullFen("R7/8/8/8/7q/2K1B2p/7P/2Bk4 w - - 0 1"))
   )

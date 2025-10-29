@@ -115,11 +115,12 @@ class BoardTest extends ChessTest:
       board = parseFen(str)
       s <- Square.all
       if !board.isOccupied(s)
-      newPiece = for
-        x <- board.put(White.king, s)
-        newBoard <- x.replace(White.queen, s)
-        newPiece <- newBoard.pieceAt(s)
-      yield newPiece
+      newPiece =
+        for
+          x <- board.put(White.king, s)
+          newBoard <- x.replace(White.queen, s)
+          newPiece <- newBoard.pieceAt(s)
+        yield newPiece
     yield assertEquals(newPiece.get, White.queen)
 
   test("putOrReplace an empty square returns a board with one more piece"):
@@ -239,11 +240,12 @@ class BoardTest extends ChessTest:
       to <- Square.all
       if from != to
       moved = board.move(from, to)
-      takeAndPut = for
-        piece <- board.pieceAt(from)
-        afterTake <- board.take(from)
-        newBoard <- afterTake.put(piece, to)
-      yield newBoard
+      takeAndPut =
+        for
+          piece <- board.pieceAt(from)
+          afterTake <- board.take(from)
+          newBoard <- afterTake.put(piece, to)
+        yield newBoard
     yield assertEquals(moved, takeAndPut)
 
   test("taking(from, to, None) == take(from) . replace(to)"):
@@ -254,11 +256,12 @@ class BoardTest extends ChessTest:
       to <- Square.all
       if from != to
       taking = board.taking(from, to)
-      takeAndReplace = for
-        piece <- board.pieceAt(from)
-        afterTake <- board.take(from)
-        newBoard <- afterTake.replace(piece, to)
-      yield newBoard
+      takeAndReplace =
+        for
+          piece <- board.pieceAt(from)
+          afterTake <- board.take(from)
+          newBoard <- afterTake.replace(piece, to)
+        yield newBoard
     yield assertEquals(taking, takeAndReplace)
 
   test("taking(from, to, taken) == take(from) . put(to) . take(taken)"):
@@ -270,12 +273,13 @@ class BoardTest extends ChessTest:
       taken <- Square.all
       if taken != from && from != to && taken != to
       taking <- board.taking(from, to, Some(taken))
-      takeAndPutAndTake <- for
-        piece <- board.pieceAt(from)
-        afterTake <- board.take(from)
-        afterPut <- afterTake.put(piece, to)
-        newBoard <- afterPut.take(taken)
-      yield newBoard
+      takeAndPutAndTake <-
+        for
+          piece <- board.pieceAt(from)
+          afterTake <- board.take(from)
+          afterPut <- afterTake.put(piece, to)
+          newBoard <- afterPut.take(taken)
+        yield newBoard
     yield assertEquals(taking, takeAndPutAndTake)
 
   test("promote(from, to, piece) == move(from, to).replace(piece, to) when to is empty"):
@@ -287,10 +291,11 @@ class BoardTest extends ChessTest:
       if from != to && !board.isOccupied(to)
       piece = White.knight
       promoted = board.promote(from, to, piece)
-      moveAndReplace = for
-        moved <- board.move(from, to)
-        newBoard <- moved.replace(piece, to)
-      yield newBoard
+      moveAndReplace =
+        for
+          moved <- board.move(from, to)
+          newBoard <- moved.replace(piece, to)
+        yield newBoard
     yield assertEquals(promoted, moveAndReplace)
 
   test("promote(from, to, piece) == taking(from, to).put(piece, to) when to is occupied"):
@@ -302,8 +307,9 @@ class BoardTest extends ChessTest:
       if from != to && board.isOccupied(to)
       piece = White.knight
       promoted = board.promote(from, to, piece)
-      takingAndReplace = for
-        moved <- board.taking(from, to)
-        newBoard <- moved.replace(piece, to)
-      yield newBoard
+      takingAndReplace =
+        for
+          moved <- board.taking(from, to)
+          newBoard <- moved.replace(piece, to)
+        yield newBoard
     yield assertEquals(promoted, takingAndReplace)

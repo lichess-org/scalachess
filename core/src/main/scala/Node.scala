@@ -576,6 +576,11 @@ object Tree:
           case _ => None
 
   given Traverse[Tree] with
+    override def map[A, B](fa: Tree[A])(f: A => B): Tree[B] =
+      fa match
+        case n: Node[A] => n.map(f)
+        case v: Variation[A] => v.map(f)
+
     def traverse[G[_]: Applicative, A, B](fa: Tree[A])(f: A => G[B]): G[Tree[B]] =
       fa match
         case n: Node[A] => n.traverse(f).widen[Tree[B]]
@@ -592,6 +597,29 @@ object Tree:
         case v: Variation[A] => v.foldRight(lb)(f)
 
   given Traverse[Node] with
+    // Converts tree to list, maps, then rebuilds - avoids deep recursion
+    override def map[A, B](fa: Node[A])(f: A => B): Node[B] =
+      val mappedValue = f(fa.value)
+
+      val mappedVariations = fa.variations.map(v => mapVariation(v, f))
+
+      val mappedChild = fa.child.flatMap { child =>
+        child.mainlineReverse
+          .map(n => (f(n.value), n.variations.map(v => mapVariation(v, f))))
+          .foldLeft(None: Option[Node[B]]) { case (childAcc, (value, vars)) =>
+            Some(Node(value, childAcc, vars))
+          }
+
+      }
+
+      Node(mappedValue, mappedChild, mappedVariations)
+
+    private def mapVariation[A, B](va: Variation[A], f: A => B): Variation[B] =
+      Variation(
+        f(va.value),
+        va.child.map(c => c.map(f)) // Delegates back to Node's map
+      )
+
     def traverse[G[_]: Applicative, A, B](fa: Node[A])(f: A => G[B]): G[Node[B]] =
       val gValue = f(fa.value)
       val gChild = fa.child.traverse(_.traverse(f))
@@ -604,11 +632,19 @@ object Tree:
       fa.variations.foldLeft(b2)((acc, v) => v.foldLeft(acc)(f))
 
     def foldRight[A, B](fa: Node[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
-      val variationsLb = fa.variations.foldRight(lb)((v, acc) => v.foldRight(acc)(f))
-      val childLb = fa.child.foldRight(variationsLb)((n, acc) => n.foldRight(acc)(f))
-      f(fa.value, childLb)
+      // Wrap everything in Eval.defer to ensure laziness
+      Eval.defer {
+        val variationsLb = fa.variations.foldRight(lb)((v, acc) => Eval.defer(v.foldRight(acc)(f)))
+        val childLb = fa.child.foldRight(variationsLb)((n, acc) => Eval.defer(n.foldRight(acc)(f)))
+        f(fa.value, childLb)
+      }
 
   given Traverse[Variation] with
+    override def map[A, B](fa: Variation[A])(f: A => B): Variation[B] =
+      val mappedValue = f(fa.value)
+      val mappedChild = fa.child.map(_.map(f))
+      Variation(mappedValue, mappedChild)
+
     def traverse[G[_]: Applicative, A, B](fa: Variation[A])(f: A => G[B]): G[Variation[B]] =
       val gValue = f(fa.value)
       val gChild = fa.child.traverse(_.traverse(f))
@@ -619,5 +655,7 @@ object Tree:
       fa.child.foldLeft(b1)((acc, n) => n.foldLeft(acc)(f))
 
     def foldRight[A, B](fa: Variation[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
-      val childLb = fa.child.foldRight(lb)((n, acc) => n.foldRight(acc)(f))
-      f(fa.value, childLb)
+      Eval.defer {
+        val childLb = fa.child.foldRight(lb)((n, acc) => Eval.defer(n.foldRight(acc)(f)))
+        f(fa.value, childLb)
+      }

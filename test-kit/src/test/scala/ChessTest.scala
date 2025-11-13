@@ -28,7 +28,7 @@ trait ChessTestCommon:
         .map: piece =>
           board.withColor(piece.color).generateMovesAt(from).map(_.dest)
 
-    def seq(actions: Position => Option[Position]*): Option[Position] =
+    def seq(actions: (Position => Option[Position])*): Option[Position] =
       actions.foldLeft(board.some)(_ flatMap _)
 
     def place(piece: Piece, at: Square): Option[Position] =

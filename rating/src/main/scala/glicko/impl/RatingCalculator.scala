@@ -169,17 +169,12 @@ final private[glicko] class RatingCalculator(
     var v = 0.0d
     for result <- results do
       val opponent = result.getOpponent(player)
-      v = v + ((Math.pow(g(opponent.getGlicko2RatingDeviation), 2))
-        * E(
-          player.getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, player)),
-          opponent.getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, opponent)),
-          opponent.getGlicko2RatingDeviation
-        )
-        * (1.0 - E(
-          player.getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, player)),
-          opponent.getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, opponent)),
-          opponent.getGlicko2RatingDeviation
-        )))
+      val expectedScore = E(
+        player.getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, player)),
+        opponent.getGlicko2RatingWithAdvantage(result.getAdvantage(colorAdvantage, opponent)),
+        opponent.getGlicko2RatingDeviation
+      )
+      v += Math.pow(g(opponent.getGlicko2RatingDeviation), 2) * expectedScore * (1.0 - expectedScore)
     1 / v
 
   /** This is a formula as per step 4 of Glickman's paper.

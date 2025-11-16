@@ -59,7 +59,7 @@ object PlayerTitle:
   // ordered by difficulty to achieve
   // if a player has multiple titles, the most valuable one is used
   private val titleRank: Map[PlayerTitle, Int] =
-    List(GM, IM, WGM, FM, WIM, WFM, NM, CM, WCM, WNM).zipWithIndex.toMap
+    List(GM, IM, WGM, FM, WIM, NM, CM, WFM, WCM, WNM).zipWithIndex.toMap
 
   def mostValuable(t1: Option[PlayerTitle], t2: Option[PlayerTitle]): Option[PlayerTitle] =
     t1.flatMap(titleRank.get)

@@ -137,7 +137,6 @@ class ParserTest extends ChessTest:
 
   test("variation starts with comment"):
     parse("1.d4 {the best move} ( { one } { two } { three } 1.e4 { is not as good } )").assertRight: parsed =>
-      parsed.toPgn.toString.pp // ensure we can render it back to Pgn
       assertEquals(parsed.tree.get.variations.head.value.variationComments, List("one", "two", "three"))
 
   test("first move variation"):

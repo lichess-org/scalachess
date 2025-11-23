@@ -86,7 +86,7 @@ object Move:
     extension (m: Move)
       def appendSanStr(builder: StringBuilder) = m.appendSanStr(builder)
       def appendVariationComment(builder: StringBuilder) =
-        m.variationComments.foreach(x => builder.append(" { ").append(x.value).append(" }"))
+        m.variationComments.foreach(x => builder.append(" { ").append(x.value).append(" } "))
       def hasComment = m.hasComment
 
   private val noDoubleLineBreakRegex = "(\r?\n){2,}".r

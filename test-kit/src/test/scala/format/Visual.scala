@@ -40,8 +40,8 @@ object Visual:
         (square, char)
       })
     }
-    for (y <- Rank.allReversed) yield {
-      for (x <- File.all) yield
+    for y <- Rank.allReversed yield {
+      for x <- File.all yield
         val square = Square(x, y)
         markedPoss.get(square).getOrElse(board.pieceAt(square).fold(' ')(_.forsyth))
     }.mkString

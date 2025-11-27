@@ -1,9 +1,9 @@
 package chess.rating
 
 import cats.syntax.all.*
+import chess.FideTC
 import scalalib.extensions.*
 import scalalib.newtypes.*
-import chess.FideTC
 
 opaque type Elo = Int
 

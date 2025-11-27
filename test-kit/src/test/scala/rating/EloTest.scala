@@ -5,42 +5,63 @@ class EloTest extends ChessTest:
 
   import Outcome.Points.*
 
-  private def ratingDiff(r: Int, k: Int, opRating: Int, points: Outcome.Points, expected: Int)(using
+  private def ratingDiff(
+      r: Int,
+      k: Int,
+      opRating: Int,
+      points: Outcome.Points,
+      fideCat: FideTC,
+      expected: Int
+  )(using
       munit.Location
   ) =
     val player = Elo.Player(Elo(r), KFactor(k))
     val game = Elo.Game(points, Elo(opRating))
-    assertEquals(Elo.computeRatingDiff(player, List(game)), expected)
+    assertEquals(Elo.computeRatingDiff(fideCat)(player, List(game)), expected)
+
+  private def ratingDiffStandard(r: Int, k: Int, opRating: Int, points: Outcome.Points, expected: Int)(using
+      munit.Location
+  ) = ratingDiff(r, k, opRating, points, FideTC.Standard, expected)
 
   test("new rating calculation over one game"):
-    ratingDiff(1500, 40, 1500, One, 20)
-    ratingDiff(1500, 40, 1500, Zero, -20)
-    ratingDiff(1500, 40, 1500, Half, 0)
-    ratingDiff(1500, 40, 1900, One, 37)
-    ratingDiff(1500, 40, 1900, Zero, -3)
-    ratingDiff(1500, 40, 1900, Half, 17)
-    ratingDiff(1500, 40, 2900, One, 37)
-    ratingDiff(1500, 40, 2900, Zero, -3)
-    ratingDiff(1500, 40, 2900, Half, 17)
-    ratingDiff(1500, 40, 1600, One, 26)
-    ratingDiff(1500, 40, 1600, Zero, -14)
-    ratingDiff(1500, 40, 1600, Half, 6)
-    ratingDiff(2000, 40, 1600, One, 3)
-    ratingDiff(2000, 40, 1600, Zero, -37)
-    ratingDiff(2000, 40, 1600, Half, -17)
-    ratingDiff(2000, 40, 1000, One, 3)
-    ratingDiff(2000, 40, 1000, Zero, -37)
-    ratingDiff(2000, 40, 1000, Half, -17)
-    ratingDiff(2000, 40, 1900, One, 14)
-    ratingDiff(2000, 40, 1900, Zero, -26)
-    ratingDiff(2000, 40, 1900, Half, -6)
-    ratingDiff(2800, 10, 1800, One, 0)
+    ratingDiffStandard(1500, 40, 1500, One, 20)
+    ratingDiffStandard(1500, 40, 1500, Zero, -20)
+    ratingDiffStandard(1500, 40, 1500, Half, 0)
+    ratingDiffStandard(1500, 40, 1900, One, 37)
+    ratingDiffStandard(1500, 40, 1900, Zero, -3)
+    ratingDiffStandard(1500, 40, 1900, Half, 17)
+    ratingDiffStandard(1500, 40, 2900, One, 37)
+    ratingDiffStandard(1500, 40, 2900, Zero, -3)
+    ratingDiffStandard(1500, 40, 2900, Half, 17)
+    ratingDiffStandard(1500, 40, 1600, One, 26)
+    ratingDiffStandard(1500, 40, 1600, Zero, -14)
+    ratingDiffStandard(1500, 40, 1600, Half, 6)
+    ratingDiffStandard(2000, 40, 1600, One, 3)
+    ratingDiffStandard(2000, 40, 1600, Zero, -37)
+    ratingDiffStandard(2000, 40, 1600, Half, -17)
+    ratingDiffStandard(2000, 40, 1000, One, 3)
+    ratingDiffStandard(2000, 40, 1000, Zero, -37)
+    ratingDiffStandard(2000, 40, 1000, Half, -17)
+    ratingDiffStandard(2000, 40, 1900, One, 14)
+    ratingDiffStandard(2000, 40, 1900, Zero, -26)
+    ratingDiffStandard(2000, 40, 1900, Half, -6)
+    ratingDiffStandard(2800, 10, 1800, One, 0)
 
   test("new rating calculation over multiple games"):
     assertEquals(
-      Elo.computeRatingDiff(Elo.Player(Elo(2800), KFactor(10)), List.fill(11)(Elo.Game(One, Elo(1800)))),
+      Elo.computeRatingDiff(FideTC.Standard)(
+        Elo.Player(Elo(2800), KFactor(10)),
+        List.fill(11)(Elo.Game(One, Elo(1800)))
+      ),
       0
     )
+
+  test("new rating calculation rapid/blitz"):
+    ratingDiff(1800, 40, 2601, Zero, FideTC.Rapid, 0)
+    ratingDiff(2601, 10, 1800, One, FideTC.Rapid, 0)
+    ratingDiff(2600, 10, 1900, One, FideTC.Rapid, 1)
+    ratingDiff(1500, 40, 1500, One, FideTC.Rapid, 20)
+    ratingDiff(1500, 40, 1900, Half, FideTC.Blitz, 17)
 
   private def expectedScore(ratingDiff: Int, expScore: Float)(using munit.Location) =
     assertCloseTo(Elo.getExpectedScore(ratingDiff), expScore, 0.001f)

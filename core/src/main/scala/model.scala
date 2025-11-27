@@ -41,6 +41,9 @@ object ErrorStr extends OpaqueString[ErrorStr]:
 opaque type FideId = Int
 object FideId extends OpaqueInt[FideId]
 
+enum FideTC:
+  case Standard, Rapid, Blitz
+
 opaque type PlayerName = String
 object PlayerName extends OpaqueString[PlayerName]
 

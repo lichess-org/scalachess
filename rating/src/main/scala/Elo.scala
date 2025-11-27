@@ -3,6 +3,7 @@ package chess.rating
 import cats.syntax.all.*
 import scalalib.extensions.*
 import scalalib.newtypes.*
+import chess.FideTC
 
 opaque type Elo = Int
 
@@ -16,13 +17,23 @@ object KFactor extends OpaqueInt[KFactor]:
  * */
 object Elo extends RichOpaqueInt[Elo]:
 
-  def computeRatingDiff(player: Player, games: Seq[Game]): IntRatingDiff =
-    IntRatingDiff(computeNewRating(player, games) - player.rating)
+  def computeRatingDiff(tc: FideTC)(player: Player, games: Seq[Game]): IntRatingDiff =
+    IntRatingDiff(computeNewRating(tc)(player, games) - player.rating)
 
-  def computeNewRating(player: Player, games: Seq[Game]): Elo =
+  /*
+   * https://handbook.fide.com/chapter/B02RBRegulations2024
+   * Rapid and Blitz Rating Adjustments 7.3.1:
+   * Effective from 1 December 2024: Games played between players with a rating difference of 600 points or more shall not be rated if at least one of the players is rated above 2600 on the relevant list.
+   */
+  def computeNewRating(tc: FideTC)(player: Player, games: Seq[Game]): Elo =
+    val playerElo = player.rating
+    def rnbUnratedCondition(opponentElo: Elo): Boolean =
+      tc != FideTC.Standard &&
+        (opponentElo - playerElo).abs >= 600 && List(playerElo, opponentElo).exists(_ > 2600)
     val expectedScore = games.foldMap: game =>
-      val prd = playersRatingDiff(player.rating, game.opponentRating)
-      getExpectedScore(prd)
+      if rnbUnratedCondition(game.opponentRating)
+      then game.points.value // Set expected score to actual score (no rating change)
+      else getExpectedScore(adjustedRatingDiff(tc)(playerElo, game.opponentRating))
     val achievedScore = games.foldMap(_.points.value)
     val ratingDiff =
       Math.round(player.kFactor * (achievedScore - expectedScore))
@@ -33,9 +44,10 @@ object Elo extends RichOpaqueInt[Elo]:
    * A difference in rating of more than 400 points shall be counted for rating purposes as though it were a difference of 400 points.  In any tournament, a player may benefit from only one upgrade under this rule, for the game in which the rating difference is greatest.
    * For players rated 2650 and above, the difference between ratings shall be used in all cases.”
    */
-  def playersRatingDiff(playerElo: Elo, opponentElo: Elo): Int =
+  def adjustedRatingDiff(tc: FideTC)(playerElo: Elo, opponentElo: Elo): Int =
     val ratingDiff = opponentElo - playerElo
-    if playerElo >= 2650 then ratingDiff else ratingDiff.atLeast(-400).atMost(400)
+    if tc == FideTC.Standard && playerElo >= 2650 then ratingDiff
+    else ratingDiff.atLeast(-400).atMost(400)
 
   def getExpectedScore(ratingDiff: Int): Float =
     val absRatingDiff = ratingDiff.abs

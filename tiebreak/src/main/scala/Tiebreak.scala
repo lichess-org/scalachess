@@ -258,6 +258,7 @@ trait Tournament:
   def toPlayerGames: Map[PlayerId, Tiebreak.PlayerWithGames]
   def opponentsOf: PlayerId => List[Player]
   def scoreOf: PlayerId => TournamentScore
+  def lastRoundId: Option[String]
   // def currentRound: Int
   // def totalRounds: Int
   // def byes: (PlayerId, Int) => Boolean // playerId, round => true if player has a bye in that round
@@ -297,12 +298,6 @@ trait Tournament:
       .map(opponent => scoreOf(opponent.id).into(TiebreakPoint))
       .sorted
 
-  lazy val lastRoundId: Option[String] = toPlayerGames.values
-    .maxBy(_.games.size)
-    .games
-    .lastOption
-    .flatMap(_.roundId)
-
   lazy val foreBuchholzSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>
     lastRoundId.fold(buchholzSeq(id)): lastRound =>
       opponentsOf(id)
@@ -340,7 +335,8 @@ trait Tournament:
 
 object Tournament:
 
-  private case class Impl(games: Map[PlayerId, Tiebreak.PlayerWithGames]) extends Tournament:
+  private case class Impl(games: Map[PlayerId, Tiebreak.PlayerWithGames], lastRoundId: Option[String])
+      extends Tournament:
 
     override def toPlayerGames: Map[PlayerId, PlayerWithGames] = games
 
@@ -375,8 +371,8 @@ object Tournament:
       if expectedScoreFor(mid, oppRatings) >= myScore then binarySearch(oppRatings, myScore)(low, mid)
       else binarySearch(oppRatings, myScore)(mid + 1, high)
 
-  def apply(games: Map[PlayerId, Tiebreak.PlayerWithGames]): Tournament =
-    Impl(games)
+  def apply(games: Map[PlayerId, Tiebreak.PlayerWithGames], lastRoundId: Option[String]): Tournament =
+    Impl(games, lastRoundId)
 
 enum CutModifier(val code: String, val name: String, val top: Int, val bottom: Int):
   case None extends CutModifier("", "", 0, 0)
@@ -442,9 +438,10 @@ object Tiebreak:
 
   def compute(
       games: Map[PlayerId, Tiebreak.PlayerWithGames],
-      tiebreaks: List[Tiebreak]
+      tiebreaks: List[Tiebreak],
+      lastRoundId: Option[String]
   ): List[PlayerWithScore] =
-    Tournament(games).compute(tiebreaks)
+    Tournament(games, lastRoundId).compute(tiebreaks)
 
   type PlayerPoints = Map[PlayerId, List[TiebreakPoint]]
 

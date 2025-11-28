@@ -24,7 +24,9 @@ class TiebreakBench:
 
   @Setup
   def setup(): Unit =
-    tournament = Tournament(Helper.games("FWWRC.pgn"))
+    val games = Helper.games("FWWRC.pgn")
+    val lastRoundId = Helper.lastRoundId(games)
+    tournament = Tournament(games, lastRoundId)
 
   @Benchmark
   def averageOfOpponentsBuchholz(bh: Blackhole) =

@@ -28,7 +28,7 @@ object Elo extends RichOpaqueInt[Elo]:
   def computeNewRating(tc: FideTC)(player: Player, games: Seq[Game]): Elo =
     val playerElo = player.rating
     def rnbUnratedCondition(opponentElo: Elo): Boolean =
-      tc != FideTC.Standard &&
+      tc != FideTC.standard &&
         (opponentElo - playerElo).abs >= 600 && List(playerElo, opponentElo).exists(_ > 2600)
     val expectedScore = games.foldMap: game =>
       if rnbUnratedCondition(game.opponentRating)
@@ -46,7 +46,7 @@ object Elo extends RichOpaqueInt[Elo]:
    */
   def adjustedRatingDiff(tc: FideTC)(playerElo: Elo, opponentElo: Elo): Int =
     val ratingDiff = opponentElo - playerElo
-    if tc == FideTC.Standard && playerElo >= 2650 then ratingDiff
+    if tc == FideTC.standard && playerElo >= 2650 then ratingDiff
     else ratingDiff.atLeast(-400).atMost(400)
 
   def getExpectedScore(ratingDiff: Int): Float =

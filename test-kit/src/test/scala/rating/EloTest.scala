@@ -21,7 +21,7 @@ class EloTest extends ChessTest:
 
   private def ratingDiffStandard(r: Int, k: Int, opRating: Int, points: Outcome.Points, expected: Int)(using
       munit.Location
-  ) = ratingDiff(r, k, opRating, points, FideTC.Standard, expected)
+  ) = ratingDiff(r, k, opRating, points, FideTC.standard, expected)
 
   test("new rating calculation over one game"):
     ratingDiffStandard(1500, 40, 1500, One, 20)
@@ -49,7 +49,7 @@ class EloTest extends ChessTest:
 
   test("new rating calculation over multiple games"):
     assertEquals(
-      Elo.computeRatingDiff(FideTC.Standard)(
+      Elo.computeRatingDiff(FideTC.standard)(
         Elo.Player(Elo(2800), KFactor(10)),
         List.fill(11)(Elo.Game(One, Elo(1800)))
       ),
@@ -57,11 +57,11 @@ class EloTest extends ChessTest:
     )
 
   test("new rating calculation rapid/blitz"):
-    ratingDiff(1800, 40, 2601, Zero, FideTC.Rapid, 0)
-    ratingDiff(2601, 10, 1800, One, FideTC.Rapid, 0)
-    ratingDiff(2600, 10, 1900, One, FideTC.Rapid, 1)
-    ratingDiff(1500, 40, 1500, One, FideTC.Rapid, 20)
-    ratingDiff(1500, 40, 1900, Half, FideTC.Blitz, 17)
+    ratingDiff(1800, 40, 2601, Zero, FideTC.rapid, 0)
+    ratingDiff(2601, 10, 1800, One, FideTC.rapid, 0)
+    ratingDiff(2600, 10, 1900, One, FideTC.rapid, 1)
+    ratingDiff(1500, 40, 1500, One, FideTC.rapid, 20)
+    ratingDiff(1500, 40, 1900, Half, FideTC.blitz, 17)
 
   private def expectedScore(ratingDiff: Int, expScore: Float)(using munit.Location) =
     assertCloseTo(Elo.getExpectedScore(ratingDiff), expScore, 0.001f)

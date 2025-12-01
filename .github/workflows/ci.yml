@@ -15,7 +15,7 @@ jobs:
     steps:
 
       - name: Checkout current branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup JVM
         uses: actions/setup-java@v5
@@ -38,7 +38,7 @@ jobs:
     steps:
 
       - name: Checkout current branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup JVM
         uses: actions/setup-java@v5
@@ -60,7 +60,7 @@ jobs:
     steps:
 
       - name: Checkout current branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup JVM
         uses: actions/setup-java@v5

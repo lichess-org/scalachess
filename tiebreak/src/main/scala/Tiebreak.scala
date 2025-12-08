@@ -299,11 +299,12 @@ trait Tournament:
     lastRoundId.fold(buchholzSeq(id)): lastRound =>
       opponentsOf(id)
         .map: opponent =>
-          TiebreakPoint:
-            val opponentGames = gamesById(opponent.id)
-            val lastRoundGame = opponentGames.find(_.roundId.exists(_ == lastRound))
-            if lastRoundGame.isDefined then opponentGames.dropRight(1).score.value + 0.5f
-            else opponentGames.score.value
+          gamesById(opponent.id)
+            .map: game =>
+              if game.roundId.contains(lastRound) then game.copy(points = Points.Half)
+              else game
+            .score
+            .into(TiebreakPoint)
         .sorted
 
   lazy val sonnebornBergerSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>

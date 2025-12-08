@@ -152,7 +152,7 @@ case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
           tiedPlayers.toSet.excl(player).subsetOf(tour.opponentsOf(player.id).toSet)
         tiedPlayers.foreach: player =>
           val points =
-            if tiedPlayers.size <= 1 || !allTiedPlayersHaveMet then TiebreakPoint.zero
+            if tiedPlayers.sizeIs <= 1 || !allTiedPlayersHaveMet then TiebreakPoint.zero
             else
               val directGames =
                 tour.gamesById(player.id).filter(g => tiedPlayers.toSet.excl(player).contains(g.opponent))

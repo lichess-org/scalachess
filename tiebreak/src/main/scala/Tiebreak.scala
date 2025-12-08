@@ -196,10 +196,10 @@ case object AveragePerformanceOfOpponents extends Tiebreak("APRO", "Average perf
 case class KoyaSystem(val limit: LimitModifier)
     extends Tiebreak("KS", s"Koya system (limit ${(limit.value * 100).toInt}% of score)"):
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
+    val maxPossibleScoreWithLimit = tour.maxRounds * limit.value
     tour.players.view
       .map: player =>
         val myGames = tour.gamesById(player.id)
-        val maxPossibleScoreWithLimit = tour.maxRounds * limit.value
         val points = myGames
           .filter: game =>
             tour.scoreOf(game.opponent.id).value >= maxPossibleScoreWithLimit

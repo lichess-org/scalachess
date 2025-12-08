@@ -149,13 +149,13 @@ case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
       .groupBy(p => (tour.scoreOf(p.id), previousPoints.get(p.id)))
       .foreach: (_, tiedPlayers) =>
         lazy val allTiedPlayersHaveMet = tiedPlayers.forall: player =>
-          tiedPlayers.toSet.excl(player).subsetOf(tour.opponentsOf(player.id).toSet)
+          tiedPlayers.excl(player).subsetOf(tour.opponentsOf(player.id).toSet)
         tiedPlayers.foreach: player =>
           val points =
             if tiedPlayers.sizeIs <= 1 || !allTiedPlayersHaveMet then TiebreakPoint.zero
             else
               val directGames =
-                tour.gamesById(player.id).filter(g => tiedPlayers.toSet.excl(player).contains(g.opponent))
+                tour.gamesById(player.id).filter(g => tiedPlayers.excl(player).contains(g.opponent))
               if directGames.isEmpty then TiebreakPoint.zero
               else
                 TiebreakPoint:
@@ -241,7 +241,6 @@ case object AveragePerfectPerformanceOfOpponents
           .opponentsOf(player.id)
           .map: opp =>
             tour.perfectTournamentPerformance(opp.id)
-          .toSeq
           .average
           .map(_.round) // Fide says to round up
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)

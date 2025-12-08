@@ -254,7 +254,6 @@ import Tiebreak.*
 trait Tournament:
   def players: Set[Player]
   def gamesById(id: PlayerId): List[Game]
-  def pointsById(id: PlayerId): Option[Float]
   def toPlayerGames: Map[PlayerId, Tiebreak.PlayerWithGames]
   def opponentsOf: PlayerId => List[Player]
   def scoreOf: PlayerId => TournamentScore
@@ -351,10 +350,6 @@ object Tournament:
     override def gamesById(id: PlayerId): List[Game] =
       games.get(id).fold(Nil)(_.games.toList)
 
-    override def pointsById(id: PlayerId): Option[Float] =
-      games
-        .get(id)
-        .map(_.games.map(_.points.value).sum)
 
   // Find the lowest integer rating R such that sum of expected scores >= myScore
   // Use the full FIDE conversion table, no ±400 cut

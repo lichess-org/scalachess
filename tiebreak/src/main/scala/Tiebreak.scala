@@ -212,9 +212,8 @@ case class SumOfProgressiveScores(modifier: CutModifier)
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val pointsSeq = tour.progressiveScoresSeq(player.id)
-        val points: TiebreakPoint = pointsSeq.cut(modifier).sum
-        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
+        player.id -> (previousPoints
+          .getOrElse(player.id, Nil) :+ tour.progressiveScoresSeq(player.id).cutSum(modifier))
       .toMap
 
 case object TournamentPerformanceRating extends Tiebreak("TPR", "Tournament performance rating"):
@@ -348,7 +347,6 @@ object Tournament:
 
     override def gamesById(id: PlayerId): List[Game] =
       games.get(id).fold(Nil)(_.games.toList)
-
 
   // Find the lowest integer rating R such that sum of expected scores >= myScore
   // Use the full FIDE conversion table, no ±400 cut

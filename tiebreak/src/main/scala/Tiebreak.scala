@@ -87,7 +87,7 @@ case object NbBlackGames extends Tiebreak("BPG", "Number of games played with bl
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val myBlackGames = tour.gamesById(player.id).filter(_.color == Color.Black).size
+        val myBlackGames = tour.gamesById(player.id).count(_.color == Color.Black)
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(myBlackGames))
       .toMap
 

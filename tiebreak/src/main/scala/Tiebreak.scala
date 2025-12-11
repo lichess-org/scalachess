@@ -175,8 +175,8 @@ case class AverageRatingOfOpponents(modifier: CutModifier)
       .map: player =>
         val points = tour
           .opponentsOf(player.id)
-          .collect:
-            case Tiebreak.Player(_, Some(elo)) => TiebreakPoint(elo.value)
+          .flatMap: opponent =>
+            opponent.rating.map(r => TiebreakPoint(r.value))
           .sorted
           .cut(modifier)
           .average
@@ -272,15 +272,12 @@ trait Tournament:
       else TiebreakPoint(Tournament.binarySearch(oppRatings, myScore)(minR, maxR))
 
   lazy val tournamentPerformance: PlayerId => TiebreakPoint = memoize: id =>
-    val myGames = gamesById(id)
-    TiebreakPoint:
-      Elo
-        .computePerformanceRating:
-          myGames
-            .collect:
-              case Tiebreak.Game(points, Tiebreak.Player(_, Some(rating)), _, _) =>
-                Elo.Game(points, rating)
-        .so(_.value.toFloat)
+    Elo
+      .computePerformanceRating:
+        gamesById(id)
+          .flatMap: game =>
+            game.opponent.rating.map(r => Elo.Game(game.points, r))
+      .map(elo => TiebreakPoint(elo.value)) | TiebreakPoint.zero
 
   lazy val maxRounds = players.map(p => gamesById(p.id).size).maxOption.getOrElse(0)
 

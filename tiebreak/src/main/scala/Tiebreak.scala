@@ -305,7 +305,7 @@ trait Tournament:
         .sorted
 
   lazy val sonnebornBergerSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>
-    toPlayerGames(id).games
+    gamesById(id)
       .map: game =>
         game.points match
           case Points.One => scoreOf(game.opponent.id).into(TiebreakPoint)

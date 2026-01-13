@@ -163,6 +163,14 @@ class ParserTest extends ChessTest:
       .assertRight: san =>
         assertEquals(san, Std(Square.E4, Pawn, rawString = "e4".some))
 
+  test("comment ordering".only):
+    parse("{test 1 } {test 2} 1.d4 {test 3} { test 4}")
+      .assertRight: parsed =>
+        val rootComments = parsed.initialPosition.comments
+        assertEquals(rootComments, Comment.from(List("test 1", "test 2")))
+        val firstMoveComments = parsed.tree.firstMove.comments
+        assertEquals(firstMoveComments, Comment.from(List("test 3", "test 4")))
+
   test("mainlineWithMetas == full.mainlineWithMetas"):
     verifyMainlineWithMetas(raws)
     verifyMainlineWithMetas(shortCastles)

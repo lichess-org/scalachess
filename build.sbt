@@ -2,7 +2,7 @@ import snapshot4s.BuildInfo.snapshot4sVersion
 
 inThisBuild(
   Seq(
-    scalaVersion := "3.7.4",
+    scalaVersion := "3.8.1",
     version := "17.14.3",
     organization := "com.github.lichess-org.scalachess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
@@ -12,7 +12,7 @@ inThisBuild(
   )
 )
 
-val scalalibVersion = "11.9.5"
+val scalalibVersion = "11.10.0"
 
 val commonSettings = Seq(
   scalacOptions := Seq(

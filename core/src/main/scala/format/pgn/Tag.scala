@@ -141,7 +141,7 @@ object Tags:
 
   private val DateRegex = """(\d{4}|\?{4})\.(\d\d|\?\?)\.(\d\d|\?\?)""".r
   private val SiteIsStrictRegex =
-    """(?i)\b(?:lichess\.org|chess\.com|idChess\.com|tcec-chess\.com)\b""".r.unanchored
+    """(?i)\b(?:lichess\.org|chess\.com|tcec-chess\.com)\b""".r.unanchored
 
 object Tag:
 

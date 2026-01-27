@@ -3,7 +3,7 @@ import snapshot4s.BuildInfo.snapshot4sVersion
 inThisBuild(
   Seq(
     scalaVersion := "3.7.4",
-    version := "17.14.2",
+    version := "17.14.3",
     organization := "com.github.lichess-org.scalachess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
     publishTo := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", "")))),

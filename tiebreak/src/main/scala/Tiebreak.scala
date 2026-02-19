@@ -252,7 +252,6 @@ import Tiebreak.*
 trait Tournament:
   def players: Set[Player]
   def gamesById(id: PlayerId): List[Game]
-  def toPlayerGames: Map[PlayerId, Tiebreak.PlayerWithGames]
   def opponentsOf: PlayerId => List[Player]
   def scoreOf: PlayerId => TournamentScore
   def lastRoundId: Option[String]
@@ -332,8 +331,6 @@ object Tournament:
 
   private case class Impl(games: Map[PlayerId, Tiebreak.PlayerWithGames], lastRoundId: Option[String])
       extends Tournament:
-
-    override def toPlayerGames: Map[PlayerId, PlayerWithGames] = games
 
     override lazy val players: Set[Player] = games.values.map(_.player).toSet
 

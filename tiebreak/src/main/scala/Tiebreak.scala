@@ -143,29 +143,75 @@ case object AverageOfOpponentsBuchholz extends Tiebreak("AOB", "Average of oppon
       .toMap
 
 case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
+
+  private def allTiedPlayersHaveMet(tour: Tournament, tiedPlayers: Set[Player]): Boolean =
+    tiedPlayers.forall: player =>
+      tiedPlayers.excl(player).subsetOf(tour.opponentsOf(player.id).toSet)
+
+  private def isUnrankable(tour: Tournament, tiedPlayers: Set[Player]): Boolean =
+    tiedPlayers.sizeIs <= 1 || !allTiedPlayersHaveMet(tour, tiedPlayers)
+
+  private def directScore(tour: Tournament, tiedPlayers: Set[Player], player: Player): Float =
+    tour
+      .gamesById(player.id)
+      .filter(g => tiedPlayers.excl(player).contains(g.opponent))
+      .groupBy(_.opponent.id)
+      .map: (_, games) =>
+        // If the players meet more than once, FIDE says that we average the score
+        games.nonEmpty.so(games.score.value / games.size)
+      .sum
+
+  private def playerRanks(tour: Tournament, tiedPlayers: Set[Player]): Map[PlayerId, TiebreakPoint] =
+    import scala.math.Ordering.Implicits.seqOrdering
+
+    case class RankingTask(players: Set[Player], scoreHierarchy: List[Float])
+
+    @annotation.tailrec
+    def expandAllGroups(
+        pending: List[RankingTask],
+        completed: Map[PlayerId, List[Float]]
+    ): Map[PlayerId, List[Float]] =
+      pending match
+        case Nil => completed
+        case task :: remaining =>
+          val tied = task.players
+          if isUnrankable(tour, tied) then
+            expandAllGroups(remaining, completed ++ tied.map(p => p.id -> task.scoreHierarchy))
+          else
+            val (toSplit, resolved) = tied
+              .groupBy(directScore(tour, tied, _))
+              .partition: (_, cohort) =>
+                cohort.sizeIs > 1 && cohort != tied
+            val newTasks = toSplit
+              .map: (score, subgroup) =>
+                RankingTask(subgroup, task.scoreHierarchy :+ score)
+              .toList
+            val terminals = resolved.flatMap: (score, subgroup) =>
+              subgroup.map(_.id -> (task.scoreHierarchy :+ score))
+            expandAllGroups(newTasks ++ remaining, completed ++ terminals)
+
+    if isUnrankable(tour, tiedPlayers) then tiedPlayers.map(p => p.id -> TiebreakPoint.zero).toMap
+    else
+      val sorted = expandAllGroups(List(RankingTask(tiedPlayers, Nil)), Map.empty).toList.sortBy(_._2.map(-_))
+      val rankByHierarchy = sorted
+        .map(_._2)
+        .zipWithIndex
+        .foldLeft(Map.empty[List[Float], Int]):
+          case (acc, (hierarchy, idx)) => acc.updatedWith(hierarchy)(_.orElse(Some(idx + 1)))
+      sorted
+        .map: (playerId, hierarchy) =>
+          playerId -> TiebreakPoint(rankByHierarchy.getOrElse(hierarchy, 0))
+        .toMap
+
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     val builder = Map.newBuilder[PlayerId, List[TiebreakPoint]]
     tour.players
       .groupBy(p => (tour.scoreOf(p.id), previousPoints.get(p.id)))
       .foreach: (_, tiedPlayers) =>
-        lazy val allTiedPlayersHaveMet = tiedPlayers.forall: player =>
-          tiedPlayers.excl(player).subsetOf(tour.opponentsOf(player.id).toSet)
+        val ranks = playerRanks(tour, tiedPlayers)
         tiedPlayers.foreach: player =>
-          val points =
-            if tiedPlayers.sizeIs <= 1 || !allTiedPlayersHaveMet then TiebreakPoint.zero
-            else
-              val directGames =
-                tour.gamesById(player.id).filter(g => tiedPlayers.excl(player).contains(g.opponent))
-              if directGames.isEmpty then TiebreakPoint.zero
-              else
-                TiebreakPoint:
-                  directGames
-                    .groupBy(_.opponent)
-                    .map: (_, games) =>
-                      // If the players meet more than once, FIDE says that we average the score
-                      games.score.value / games.size
-                    .sum
-          builder.addOne(player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points))
+          val rank = ranks.getOrElse(player.id, TiebreakPoint.zero)
+          builder.addOne(player.id -> (previousPoints.getOrElse(player.id, Nil) :+ rank))
     builder.result()
 
 case class AverageRatingOfOpponents(modifier: CutModifier)

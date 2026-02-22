@@ -35,13 +35,7 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
 | (Sum of) Progressive Scores                         | B    | 7.5     | PS      |   ●   | ✅
 | Tournament Performance Rating                       | DB   | 10.2    | TPR     |       | ✅
 
-1. DE - Not implemented this clause:
-  If the tied participants have not played all the games against each other,
-  but one of them will be alone at the top of the separate standings whatever the outcome of the missing games,
-  that participant is ranked first among the tied participants –
-  the same applies to the second rank when the first is assigned this way; and so on.
-
-2. BH, FB, AOB and SB -
+1. BH, FB, AOB and SB -
   We don't have information about byes and forfeits so we do not implement FIDE's recommendations about
   handling unplayed rounds. (Section 16)
  */
@@ -148,18 +142,24 @@ case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
     tiedPlayers.forall: player =>
       tiedPlayers.excl(player).subsetOf(tour.opponentsOf(player.id).toSet)
 
-  private def isUnrankable(tour: Tournament, tiedPlayers: Set[Player]): Boolean =
-    tiedPlayers.sizeIs <= 1 || !allTiedPlayersHaveMet(tour, tiedPlayers)
+  private def missingOpponentsCount(tour: Tournament, tiedPlayers: Set[Player], player: Player): Int =
+    tiedPlayers
+      .excl(player)
+      .count: opponent =>
+        !tour.opponentsOf(player.id).contains(opponent)
 
-  private def directScore(tour: Tournament, tiedPlayers: Set[Player], player: Player): Float =
-    tour
-      .gamesById(player.id)
-      .filter(g => tiedPlayers.excl(player).contains(g.opponent))
-      .groupBy(_.opponent.id)
-      .map: (_, games) =>
-        // If the players meet more than once, FIDE says that we average the score
-        games.nonEmpty.so(games.score.value / games.size)
-      .sum
+  private def guaranteedTopPlayer(tour: Tournament, tiedPlayers: Set[Player]): Option[Player] =
+    val bounds = for
+      player <- tiedPlayers
+      score = tour.directScore(tiedPlayers).getOrElse(player.id, 0f)
+      potentialHigh = score + missingOpponentsCount(tour, tiedPlayers, player)
+    yield player -> (score, potentialHigh)
+
+    bounds
+      .maxByOption(_._2._1)
+      .filter:
+        case (_, (score, _)) => !bounds.exists(_._2._2 >= score)
+      ._1F
 
   private def playerRanks(tour: Tournament, tiedPlayers: Set[Player]): Map[PlayerId, TiebreakPoint] =
     import scala.math.Ordering.Implicits.seqOrdering
@@ -175,11 +175,11 @@ case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
         case Nil => completed
         case task :: remaining =>
           val tied = task.players
-          if isUnrankable(tour, tied) then
+          if tied.sizeIs <= 1 then
             expandAllGroups(remaining, completed ++ tied.map(p => p.id -> task.scoreHierarchy))
           else
             val (toSplit, resolved) = tied
-              .groupBy(directScore(tour, tied, _))
+              .groupBy(p => tour.directScore(tied).getOrElse(p.id, 0f))
               .partition: (_, cohort) =>
                 cohort.sizeIs > 1 && cohort != tied
             val newTasks = toSplit
@@ -190,18 +190,40 @@ case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
               subgroup.map(_.id -> (task.scoreHierarchy :+ score))
             expandAllGroups(newTasks ++ remaining, completed ++ terminals)
 
-    if isUnrankable(tour, tiedPlayers) then tiedPlayers.map(p => p.id -> TiebreakPoint.zero).toMap
+    @annotation.tailrec
+    def resolveGuaranteedPrefix(
+        remaining: Set[Player],
+        resolved: Set[Player]
+    ): (Set[Player], Set[Player]) =
+      if remaining.sizeIs <= 1 then (resolved, remaining)
+      else
+        guaranteedTopPlayer(tour, remaining) match
+          case None => (resolved, remaining)
+          case Some(player) => resolveGuaranteedPrefix(remaining.excl(player), resolved + player)
+
+    if tiedPlayers.sizeIs <= 1 then tiedPlayers.map(p => p.id -> TiebreakPoint.zero).toMap
     else
-      val sorted = expandAllGroups(List(RankingTask(tiedPlayers, Nil)), Map.empty).toList.sortBy(_._2.map(-_))
-      val rankByHierarchy = sorted
-        .map(_._2)
-        .zipWithIndex
-        .foldLeft(Map.empty[List[Float], Int]):
-          case (acc, (hierarchy, idx)) => acc.updatedWith(hierarchy)(_.orElse(Some(idx + 1)))
-      sorted
-        .map: (playerId, hierarchy) =>
-          playerId -> TiebreakPoint(rankByHierarchy.getOrElse(hierarchy, 0))
-        .toMap
+      val (guaranteedPrefix, unresolved) = resolveGuaranteedPrefix(tiedPlayers, Set.empty)
+      val guaranteedRanks = guaranteedPrefix.zipWithIndex.map: (player, idx) =>
+        player.id -> TiebreakPoint(idx + 1)
+
+      val unresolvedRanks =
+        if unresolved.isEmpty then Map.empty[PlayerId, TiebreakPoint]
+        else if allTiedPlayersHaveMet(tour, unresolved) then
+          val sorted =
+            expandAllGroups(List(RankingTask(unresolved, Nil)), Map.empty).toList.sortBy(_._2.map(-_))
+          val rankByHierarchy = sorted
+            .map(_._2)
+            .zipWithIndex
+            .foldLeft(Map.empty[List[Float], Int]):
+              case (acc, (hierarchy, idx)) => acc.updatedWith(hierarchy)(_.orElse(Some(idx + 1)))
+          sorted
+            .map: (playerId, hierarchy) =>
+              playerId -> TiebreakPoint(guaranteedPrefix.size + rankByHierarchy.getOrElse(hierarchy, 0))
+            .toMap
+        else unresolved.map(_.id -> TiebreakPoint.zero).toMap
+
+      (guaranteedRanks ++ unresolvedRanks).toMap
 
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     val builder = Map.newBuilder[PlayerId, List[TiebreakPoint]]
@@ -325,6 +347,18 @@ trait Tournament:
       .map(elo => TiebreakPoint(elo.value)) | TiebreakPoint.zero
 
   lazy val maxRounds = players.map(p => gamesById(p.id).size).maxOption.getOrElse(0)
+
+  lazy val directScore: Set[Player] => Map[PlayerId, Float] = memoize: tiedPlayers =>
+    tiedPlayers
+      .map: p =>
+        p.id -> gamesById(p.id)
+          .filter(g => tiedPlayers.excl(g.opponent).contains(g.opponent))
+          .groupBy(_.opponent.id)
+          .map: (_, games) =>
+            // If the players meet more than once, FIDE says that we average the score
+            games.nonEmpty.so(games.score.value / games.size)
+          .sum
+      .toMap
 
   lazy val buchholz: PlayerId => TiebreakPoint = memoize: id =>
     buchholzSeq(id).sum

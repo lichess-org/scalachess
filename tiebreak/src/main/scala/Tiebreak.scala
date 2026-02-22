@@ -242,10 +242,7 @@ case class AverageRatingOfOpponents(modifier: CutModifier)
     tour.players.view
       .map: player =>
         val points = tour
-          .opponentsOf(player.id)
-          .flatMap: opponent =>
-            opponent.rating.map(r => TiebreakPoint(r.value))
-          .sorted
+          .averageRatingOfOpponentsSeq(player.id)
           .cut(modifier)
           .average
           .map(_.round) // Fide says to round up
@@ -369,6 +366,10 @@ trait Tournament:
   lazy val buchholzSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>
     opponentsOf(id)
       .map(opponent => scoreOf(opponent.id).into(TiebreakPoint))
+
+  lazy val averageRatingOfOpponentsSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>
+    opponentsOf(id)
+      .flatMap(opponent => opponent.rating.map(r => TiebreakPoint(r.value)))
       .sorted
 
   lazy val foreBuchholzSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>

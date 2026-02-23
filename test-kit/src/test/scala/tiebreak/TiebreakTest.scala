@@ -305,26 +305,30 @@ class TiebreakTest extends ChessTest:
   test("DirectEncounter assigns guaranteed top ranks with missing games"):
     val playerF = Player("PlayerF", rating = Elo(1520).some)
     val playerG = Player("PlayerG", rating = Elo(1530).some)
+    val playerH = Player("PlayerH", rating = Elo(1540).some)
 
     val partialGames = Seq(
       playerA.beats(playerB, "1"),
-      playerA.beats(playerC, "1"),
-      playerA.beats(playerD, "1"),
-      playerB.beats(playerC, "2"),
-      playerB.beats(playerD, "2"),
-      // C and D have not played each other
-      playerA.loses(playerF, "3"),
+      playerA.beats(playerE, "2"),
+      playerA.beats(playerF, "3"),
+      playerB.beats(playerE, "2"),
       playerB.beats(playerF, "3"),
-      playerC.beats(playerF, "3"),
-      playerD.beats(playerF, "3"),
-      playerA.loses(playerG, "4"),
-      playerB.loses(playerG, "4"),
-      playerC.beats(playerG, "4"),
-      playerD.beats(playerG, "4")
+      playerB.beats(playerH, "4"),
+      playerC.beats(playerD, "1"),
+      playerC.beats(playerG, "2"),
+      playerD.beats(playerE, "3"),
+      playerD.beats(playerH, "4"),
+      playerG.beats(playerF, "3"),
+      playerG.beats(playerH, "4")
     )
+    // Crosstable (relevant groups):
+    // A = 3, B = 3
+    // C = 2, D = 2, G = 2
+    // In {C,D,G}: C scored 2, D scored 0, G scored 0 and D-G is missing.
+    // C is uncatchable and should be guaranteed top in that score group.
 
     val games =
-      Seq(playerA, playerB, playerC, playerD, playerF, playerG)
+      Seq(playerA, playerB, playerC, playerD, playerE, playerF, playerG, playerH)
         .map(player => PlayerWithGames(player, povGamesFrom(partialGames, player)))
         .mapBy(_.player.id)
 
@@ -332,15 +336,17 @@ class TiebreakTest extends ChessTest:
       playerA.id -> List(TiebreakPoint(1f)),
       playerB.id -> List(TiebreakPoint(1f)),
       playerC.id -> List(TiebreakPoint(1f)),
-      playerD.id -> List(TiebreakPoint(1f))
+      playerD.id -> List(TiebreakPoint(1f)),
+      playerG.id -> List(TiebreakPoint(1f))
     )
 
     val ranks = DirectEncounter.compute(Tournament(games, None), previousPoints)
 
-    assertEquals(Some(TiebreakPoint(1)), ranks.get(playerA.id).flatMap(_.lift(1)))
-    assertEquals(Some(TiebreakPoint(2)), ranks.get(playerB.id).flatMap(_.lift(1)))
-    assertEquals(Some(TiebreakPoint(0)), ranks.get(playerC.id).flatMap(_.lift(1)))
-    assertEquals(Some(TiebreakPoint(0)), ranks.get(playerD.id).flatMap(_.lift(1)))
+    assertEquals(ranks.get(playerA.id).flatMap(_.lift(1)), Some(TiebreakPoint(1)))
+    assertEquals(ranks.get(playerB.id).flatMap(_.lift(1)), Some(TiebreakPoint(2)))
+    assertEquals(ranks.get(playerC.id).flatMap(_.lift(1)), Some(TiebreakPoint(1)))
+    assertEquals(ranks.get(playerD.id).flatMap(_.lift(1)), Some(TiebreakPoint(0)))
+    assertEquals(ranks.get(playerG.id).flatMap(_.lift(1)), Some(TiebreakPoint(0)))
 
   test("AverageOpponentRating"):
     val points = computeTournamentPoints(allGames, playerA, AverageRatingOfOpponents(CutModifier.None))

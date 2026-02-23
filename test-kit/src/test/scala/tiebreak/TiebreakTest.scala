@@ -302,6 +302,46 @@ class TiebreakTest extends ChessTest:
     assertEquals(Some(TiebreakPoint(3)), ranks.get(playerC.id).flatMap(_.lift(1)))
     assertEquals(Some(TiebreakPoint(4)), ranks.get(playerD.id).flatMap(_.lift(1)))
 
+  test("DirectEncounter assigns guaranteed top ranks with missing games"):
+    val playerF = Player("PlayerF", rating = Elo(1520).some)
+    val playerG = Player("PlayerG", rating = Elo(1530).some)
+
+    val partialGames = Seq(
+      playerA.beats(playerB, "1"),
+      playerA.beats(playerC, "1"),
+      playerA.beats(playerD, "1"),
+      playerB.beats(playerC, "2"),
+      playerB.beats(playerD, "2"),
+      // C and D have not played each other
+      playerA.loses(playerF, "3"),
+      playerB.beats(playerF, "3"),
+      playerC.beats(playerF, "3"),
+      playerD.beats(playerF, "3"),
+      playerA.loses(playerG, "4"),
+      playerB.loses(playerG, "4"),
+      playerC.beats(playerG, "4"),
+      playerD.beats(playerG, "4")
+    )
+
+    val games =
+      Seq(playerA, playerB, playerC, playerD, playerF, playerG)
+        .map(player => PlayerWithGames(player, povGamesFrom(partialGames, player)))
+        .mapBy(_.player.id)
+
+    val previousPoints = Map(
+      playerA.id -> List(TiebreakPoint(1f)),
+      playerB.id -> List(TiebreakPoint(1f)),
+      playerC.id -> List(TiebreakPoint(1f)),
+      playerD.id -> List(TiebreakPoint(1f))
+    )
+
+    val ranks = DirectEncounter.compute(Tournament(games, None), previousPoints)
+
+    assertEquals(Some(TiebreakPoint(1)), ranks.get(playerA.id).flatMap(_.lift(1)))
+    assertEquals(Some(TiebreakPoint(2)), ranks.get(playerB.id).flatMap(_.lift(1)))
+    assertEquals(Some(TiebreakPoint(0)), ranks.get(playerC.id).flatMap(_.lift(1)))
+    assertEquals(Some(TiebreakPoint(0)), ranks.get(playerD.id).flatMap(_.lift(1)))
+
   test("AverageOpponentRating"):
     val points = computeTournamentPoints(allGames, playerA, AverageRatingOfOpponents(CutModifier.None))
     assertEquals(points, Some(TiebreakPoint(1563f)))

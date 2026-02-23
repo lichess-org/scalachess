@@ -149,17 +149,21 @@ case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
         !tour.opponentsOf(player.id).contains(opponent)
 
   private def guaranteedTopPlayer(tour: Tournament, tiedPlayers: Set[Player]): Option[Player] =
-    val bounds = for
+    lazy val bounds = for
       player <- tiedPlayers
       score = tour.directScore(tiedPlayers).getOrElse(player.id, 0f)
       potentialHigh = score + missingOpponentsCount(tour, tiedPlayers, player)
     yield player -> (score, potentialHigh)
 
-    bounds
-      .maxByOption(_._2._1)
-      .filter:
-        case (_, (score, _)) => !bounds.exists(_._2._2 >= score)
-      ._1F
+    tiedPlayers.headOption
+      .map(p => tour.scoreOf(p.id))
+      .exists(s => tiedPlayers.sizeIs >= s.value.toInt)
+      .so:
+        bounds
+          .maxByOption(_._2._1)
+          .filter:
+            case (_, (score, _)) => !bounds.exists(_._2._2 >= score)
+          ._1F
 
   private def playerRanks(tour: Tournament, tiedPlayers: Set[Player]): Map[PlayerId, TiebreakPoint] =
     import scala.math.Ordering.Implicits.seqOrdering
@@ -191,24 +195,24 @@ case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
             expandAllGroups(newTasks ++ remaining, completed ++ terminals)
 
     @annotation.tailrec
-    def resolveGuaranteedPrefix(
+    def resolveGuaranteedTop(
         remaining: Set[Player],
-        resolved: Set[Player]
-    ): (Set[Player], Set[Player]) =
+        resolved: List[Player]
+    ): (List[Player], Set[Player]) =
       if remaining.sizeIs <= 1 then (resolved, remaining)
       else
         guaranteedTopPlayer(tour, remaining) match
           case None => (resolved, remaining)
-          case Some(player) => resolveGuaranteedPrefix(remaining.excl(player), resolved + player)
+          case Some(player) => resolveGuaranteedTop(remaining - player, resolved :+ player)
 
     if tiedPlayers.sizeIs <= 1 then tiedPlayers.map(p => p.id -> TiebreakPoint.zero).toMap
     else
-      val (guaranteedPrefix, unresolved) = resolveGuaranteedPrefix(tiedPlayers, Set.empty)
-      val guaranteedRanks = guaranteedPrefix.zipWithIndex.map: (player, idx) =>
+      val (guaranteedTop, unresolved) = resolveGuaranteedTop(tiedPlayers, List.empty)
+      val guaranteedRanks = guaranteedTop.mapWithIndex: (player, idx) =>
         player.id -> TiebreakPoint(idx + 1)
 
       val unresolvedRanks =
-        if unresolved.isEmpty then Map.empty[PlayerId, TiebreakPoint]
+        if unresolved.isEmpty then Map.empty
         else if allTiedPlayersHaveMet(tour, unresolved) then
           val sorted =
             expandAllGroups(List(RankingTask(unresolved, Nil)), Map.empty).toList.sortBy(_._2.map(-_))
@@ -219,7 +223,7 @@ case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
               case (acc, (hierarchy, idx)) => acc.updatedWith(hierarchy)(_.orElse(Some(idx + 1)))
           sorted
             .map: (playerId, hierarchy) =>
-              playerId -> TiebreakPoint(guaranteedPrefix.size + rankByHierarchy.getOrElse(hierarchy, 0))
+              playerId -> TiebreakPoint(guaranteedTop.size + rankByHierarchy.getOrElse(hierarchy, 0))
             .toMap
         else unresolved.map(_.id -> TiebreakPoint.zero).toMap
 

@@ -370,6 +370,7 @@ trait Tournament:
   lazy val buchholzSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>
     opponentsOf(id)
       .map(opponent => scoreOf(opponent.id).into(TiebreakPoint))
+      .sorted
 
   lazy val averageRatingOfOpponentsSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>
     opponentsOf(id)

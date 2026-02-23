@@ -149,20 +149,23 @@ case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
         !tour.opponentsOf(player.id).contains(opponent)
 
   private def guaranteedTopPlayer(tour: Tournament, tiedPlayers: Set[Player]): Option[Player] =
+    val directScores = tiedPlayers.view.map: player =>
+      player -> tour.directScore(tiedPlayers).getOrElse(player.id, 0f)
     lazy val bounds = for
-      player <- tiedPlayers
-      score = tour.directScore(tiedPlayers).getOrElse(player.id, 0f)
+      (player, score) <- directScores
       potentialHigh = score + missingOpponentsCount(tour, tiedPlayers, player)
     yield player -> (score, potentialHigh)
+    val cohortSize = tiedPlayers.size
 
-    tiedPlayers.headOption
-      .map(p => tour.scoreOf(p.id))
-      .exists(s => tiedPlayers.sizeIs >= s.value.toInt)
+    directScores
+      .exists(_._2 > cohortSize / 2)
       .so:
         bounds
           .maxByOption(_._2._1)
           .filter:
-            case (_, (score, _)) => !bounds.exists(_._2._2 >= score)
+            case (candidate, (score, _)) =>
+              !bounds.exists:
+                case (player, (_, potentialScore)) => candidate != player && potentialScore >= score
           ._1F
 
   private def playerRanks(tour: Tournament, tiedPlayers: Set[Player]): Map[PlayerId, TiebreakPoint] =

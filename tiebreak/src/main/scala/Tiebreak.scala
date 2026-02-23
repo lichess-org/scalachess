@@ -349,7 +349,7 @@ trait Tournament:
     tiedPlayers
       .map: p =>
         p.id -> gamesById(p.id)
-          .filter(g => tiedPlayers.excl(g.opponent).contains(g.opponent))
+          .filter(g => tiedPlayers.excl(p).contains(g.opponent))
           .groupBy(_.opponent.id)
           .map: (_, games) =>
             // If the players meet more than once, FIDE says that we average the score

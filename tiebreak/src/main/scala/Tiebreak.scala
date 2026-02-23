@@ -132,7 +132,7 @@ case object AverageOfOpponentsBuchholz extends Tiebreak("AOB", "Average of oppon
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val points = tour.opponentsOf(player.id).map(opp => tour.buchholz(opp.id)).average
+        val points = tour.opponentsOf(player.id).map(opp => tour.buchholzSum(opp.id)).average
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
       .toMap
 
@@ -361,7 +361,7 @@ trait Tournament:
           .sum
       .toMap
 
-  lazy val buchholz: PlayerId => TiebreakPoint = memoize: id =>
+  lazy val buchholzSum: PlayerId => TiebreakPoint = memoize: id =>
     buchholzSeq(id).sum
 
   // Memoize sorted sequences of cuttable tiebreaks so that we can cut them later in the tournament if necessary

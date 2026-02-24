@@ -208,29 +208,32 @@ case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
           case None => (resolved, remaining)
           case Some(player) => resolveGuaranteedTop(remaining - player, resolved :+ player)
 
+    def expandAndRank(tiedPlayers: Set[Player]): Map[PlayerId, TiebreakPoint] =
+      val sorted =
+        expandAllGroups(List(RankingTask(tiedPlayers, Nil)), Map.empty).toList.sortBy(_._2.map(-_))
+      val rankByHierarchy = sorted
+        .map(_._2)
+        .zipWithIndex
+        .foldLeft(Map.empty[List[Float], Int]):
+          case (acc, (hierarchy, idx)) => acc.updatedWith(hierarchy)(_.orElse(Some(idx + 1)))
+      sorted
+        .map: (playerId, hierarchy) =>
+          playerId -> TiebreakPoint(rankByHierarchy.getOrElse(hierarchy, 0))
+        .toMap
+
     if tiedPlayers.sizeIs <= 1 then tiedPlayers.map(p => p.id -> TiebreakPoint.zero).toMap
+    else if allTiedPlayersHaveMet(tour, tiedPlayers) then expandAndRank(tiedPlayers)
     else
       val (guaranteedTop, unresolved) = resolveGuaranteedTop(tiedPlayers, List.empty)
-      val guaranteedRanks = guaranteedTop.mapWithIndex: (player, idx) =>
-        player.id -> TiebreakPoint(idx + 1)
-
-      val unresolvedRanks =
-        if unresolved.isEmpty then Map.empty
-        else if allTiedPlayersHaveMet(tour, unresolved) then
-          val sorted =
-            expandAllGroups(List(RankingTask(unresolved, Nil)), Map.empty).toList.sortBy(_._2.map(-_))
-          val rankByHierarchy = sorted
-            .map(_._2)
-            .zipWithIndex
-            .foldLeft(Map.empty[List[Float], Int]):
-              case (acc, (hierarchy, idx)) => acc.updatedWith(hierarchy)(_.orElse(Some(idx + 1)))
-          sorted
-            .map: (playerId, hierarchy) =>
-              playerId -> TiebreakPoint(guaranteedTop.size + rankByHierarchy.getOrElse(hierarchy, 0))
-            .toMap
-        else unresolved.map(_.id -> TiebreakPoint.zero).toMap
-
-      (guaranteedRanks ++ unresolvedRanks).toMap
+      val guaranteedRanks = guaranteedTop
+        .mapWithIndex: (player, idx) =>
+          player.id -> TiebreakPoint(idx + 1)
+        .toMap
+      val unresolvedRanks = if allTiedPlayersHaveMet(tour, unresolved) then
+        val rankOffset = guaranteedTop.size
+        expandAndRank(unresolved).view.mapValues(p => TiebreakPoint(p.value + rankOffset)).toMap
+      else unresolved.map(_.id -> TiebreakPoint.zero).toMap
+      (guaranteedRanks ++ unresolvedRanks)
 
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     val builder = Map.newBuilder[PlayerId, List[TiebreakPoint]]

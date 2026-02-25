@@ -47,11 +47,14 @@ class TiebreakTest extends ChessTest:
     playerD.beats(playerE, "4")
   )
 
-  def povGames(player: Player): Seq[Game] =
-    games.collect:
+  def povGamesFrom(testGames: Seq[TestGame], player: Player): Seq[Game] =
+    testGames.collect:
       case TestGame(white, black, result, roundId) if white == player || black == player =>
         val playerColor = Color.fromWhite(white == player)
         Game(result(playerColor), playerColor.fold(black, white), playerColor, roundId)
+
+  def povGames(player: Player): Seq[Game] =
+    povGamesFrom(games, player)
 
   val playerA_Games = PlayerWithGames(playerA, povGames(playerA))
   val playerB_Games = PlayerWithGames(playerB, povGames(playerB))
@@ -158,7 +161,7 @@ class TiebreakTest extends ChessTest:
   test("DirectEncounter"):
     val points1 = computeTournamentPoints(allGames, playerA, DirectEncounter)
     val points2 = computeTournamentPoints(allGames, playerD, DirectEncounter)
-    assertEquals(points1, Some(TiebreakPoint(0f)))
+    assertEquals(points1, Some(TiebreakPoint(2f)))
     assertEquals(points2, Some(TiebreakPoint(1f)))
 
   test("DirectEncounter with more than one game"):
@@ -175,8 +178,8 @@ class TiebreakTest extends ChessTest:
     ).mapBy(_.player.id)
     val points1 = computeTournamentPoints(extraDraw, playerD, DirectEncounter)
     val points2 = computeTournamentPoints(extraDraw, playerA, DirectEncounter)
-    assertEquals(points1, Some(TiebreakPoint(0.75f)))
-    assertEquals(points2, Some(TiebreakPoint(0.25f)))
+    assertEquals(points1, Some(TiebreakPoint(1f)))
+    assertEquals(points2, Some(TiebreakPoint(2f)))
 
   test("DirectEncounter with unequal partial tiebreaks"):
     val previousPoints = Map(
@@ -210,7 +213,7 @@ class TiebreakTest extends ChessTest:
       .compute(Tournament(allGames, lastRoundId), previousPoints)
       .get(playerD.id)
       .flatMap(_.lift(1))
-    assertEquals(points1, Some(TiebreakPoint(0f)))
+    assertEquals(points1, Some(TiebreakPoint(2f)))
     assertEquals(points2, Some(TiebreakPoint(1f)))
 
   test("DirectEncounter with equal partial tiebreaks but not all players have met"):
@@ -251,6 +254,99 @@ class TiebreakTest extends ChessTest:
     assertEquals(points1, Some(TiebreakPoint(0f)))
     assertEquals(points2, Some(TiebreakPoint(0f)))
     assertEquals(pointsX, Some(TiebreakPoint(0f)))
+
+  test("DirectEncounter recursively resolves equal subgroup scores"):
+    val playerF = Player("PlayerF", rating = Elo(1520).some)
+
+    val recursiveGames = Seq(
+      playerA.beats(playerB, "1"),
+      playerA.beats(playerC, "2"),
+      playerA.loses(playerD, "3"),
+      playerA.loses(playerF, "4"),
+      playerB.beats(playerC, "2"),
+      playerB.beats(playerD, "3"),
+      playerB.loses(playerF, "4"),
+      playerC.beats(playerD, "3"),
+      playerC.beats(playerF, "4"),
+      playerD.beats(playerF, "4")
+    ) // Crosstable:
+    //          | A   B   C   D   F   | Total
+    // ---------------------------------------
+    // PlayerA  | X   1   1   0   0   | 2.0
+    // PlayerB  | 0   X   1   1   0   | 2.0
+    // PlayerC  | 0   0   X   1   1   | 2.0
+    // PlayerD  | 1   0   0   X   1   | 2.0
+    // PlayerF  | 1   1   0   0   X   | 2.0
+    // F only exists to boost player scores and is not part of calculation.
+    // First expansion: Score Hierarchy [2]. Players = (A,B,C,D). (A,B)=2. (C,D)=1.
+    // Second expansion: Score Hierarchy [2,2]. Players = (A,B). A=1, B=0.
+    // Third expansion: Score Hierarchy [2,1]. Players = (C,D). C=1, D=0.
+    // Final Ranks = A=1, B=2, C=3, D=4
+
+    val games =
+      Seq(playerA, playerB, playerC, playerD, playerF)
+        .map(player => PlayerWithGames(player, povGamesFrom(recursiveGames, player)))
+        .mapBy(_.player.id)
+
+    val previousPoints = Map(
+      playerA.id -> List(TiebreakPoint(1f)),
+      playerB.id -> List(TiebreakPoint(1f)),
+      playerC.id -> List(TiebreakPoint(1f)),
+      playerD.id -> List(TiebreakPoint(1f))
+    )
+
+    val ranks = DirectEncounter.compute(Tournament(games, None), previousPoints)
+
+    assertEquals(Some(TiebreakPoint(1)), ranks.get(playerA.id).flatMap(_.lift(1)))
+    assertEquals(Some(TiebreakPoint(2)), ranks.get(playerB.id).flatMap(_.lift(1)))
+    assertEquals(Some(TiebreakPoint(3)), ranks.get(playerC.id).flatMap(_.lift(1)))
+    assertEquals(Some(TiebreakPoint(4)), ranks.get(playerD.id).flatMap(_.lift(1)))
+
+  test("DirectEncounter assigns guaranteed top ranks with missing games"):
+    val playerF = Player("PlayerF", rating = Elo(1520).some)
+    val playerG = Player("PlayerG", rating = Elo(1530).some)
+    val playerH = Player("PlayerH", rating = Elo(1540).some)
+
+    val partialGames = Seq(
+      playerA.beats(playerB, "1"),
+      playerA.beats(playerE, "2"),
+      playerA.beats(playerF, "3"),
+      playerB.beats(playerE, "2"),
+      playerB.beats(playerF, "3"),
+      playerB.beats(playerH, "4"),
+      playerC.beats(playerD, "1"),
+      playerC.beats(playerG, "2"),
+      playerD.beats(playerE, "3"),
+      playerD.beats(playerH, "4"),
+      playerG.beats(playerF, "3"),
+      playerG.beats(playerH, "4")
+    )
+    // Crosstable (relevant groups):
+    // A = 3, B = 3
+    // C = 2, D = 2, G = 2
+    // In {C,D,G}: C scored 2, D scored 0, G scored 0 and D-G is missing.
+    // C is uncatchable and should be guaranteed top in that score group.
+
+    val games =
+      Seq(playerA, playerB, playerC, playerD, playerE, playerF, playerG, playerH)
+        .map(player => PlayerWithGames(player, povGamesFrom(partialGames, player)))
+        .mapBy(_.player.id)
+
+    val previousPoints = Map(
+      playerA.id -> List(TiebreakPoint(1f)),
+      playerB.id -> List(TiebreakPoint(1f)),
+      playerC.id -> List(TiebreakPoint(1f)),
+      playerD.id -> List(TiebreakPoint(1f)),
+      playerG.id -> List(TiebreakPoint(1f))
+    )
+
+    val ranks = DirectEncounter.compute(Tournament(games, None), previousPoints)
+
+    assertEquals(ranks.get(playerA.id).flatMap(_.lift(1)), Some(TiebreakPoint(1)))
+    assertEquals(ranks.get(playerB.id).flatMap(_.lift(1)), Some(TiebreakPoint(2)))
+    assertEquals(ranks.get(playerC.id).flatMap(_.lift(1)), Some(TiebreakPoint(1)))
+    assertEquals(ranks.get(playerD.id).flatMap(_.lift(1)), Some(TiebreakPoint(0)))
+    assertEquals(ranks.get(playerG.id).flatMap(_.lift(1)), Some(TiebreakPoint(0)))
 
   test("AverageOpponentRating"):
     val points = computeTournamentPoints(allGames, playerA, AverageRatingOfOpponents(CutModifier.None))

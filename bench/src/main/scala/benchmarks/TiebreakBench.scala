@@ -39,6 +39,11 @@ class TiebreakBench:
       AveragePerfectPerformanceOfOpponents.compute(tournament, Map.empty)
 
   @Benchmark
+  def buchholz(bh: Blackhole) =
+    bh.consume:
+      Buchholz(CutModifier.None).compute(tournament, Map.empty)
+
+  @Benchmark
   def directEncounter(bh: Blackhole) =
     bh.consume:
       DirectEncounter.compute(tournament, Map.empty)

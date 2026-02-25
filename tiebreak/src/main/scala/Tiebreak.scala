@@ -35,13 +35,7 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
 | (Sum of) Progressive Scores                         | B    | 7.5     | PS      |   ●   | ✅
 | Tournament Performance Rating                       | DB   | 10.2    | TPR     |       | ✅
 
-1. DE - Not implemented this clause:
-  If the tied participants have not played all the games against each other,
-  but one of them will be alone at the top of the separate standings whatever the outcome of the missing games,
-  that participant is ranked first among the tied participants –
-  the same applies to the second rank when the first is assigned this way; and so on.
-
-2. BH, FB, AOB and SB -
+1. BH, FB, AOB and SB -
   We don't have information about byes and forfeits so we do not implement FIDE's recommendations about
   handling unplayed rounds. (Section 16)
  */
@@ -87,7 +81,7 @@ case object NbBlackGames extends Tiebreak("BPG", "Number of games played with bl
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val myBlackGames = tour.gamesById(player.id).filter(_.color == Color.Black).size
+        val myBlackGames = tour.gamesById(player.id).count(_.color == Color.Black)
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(myBlackGames))
       .toMap
 
@@ -138,35 +132,11 @@ case object AverageOfOpponentsBuchholz extends Tiebreak("AOB", "Average of oppon
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val points = tour.opponentsOf(player.id).map(opp => tour.buchholz(opp.id)).average
+        val points = tour.opponentsOf(player.id).map(opp => tour.buchholzSum(opp.id)).average
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
       .toMap
 
-case object DirectEncounter extends Tiebreak("DE", "Direct encounter"):
-  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
-    val builder = Map.newBuilder[PlayerId, List[TiebreakPoint]]
-    tour.players
-      .groupBy(p => (tour.scoreOf(p.id), previousPoints.get(p.id)))
-      .foreach: (_, tiedPlayers) =>
-        lazy val allTiedPlayersHaveMet = tiedPlayers.forall: player =>
-          tiedPlayers.toSet.excl(player).subsetOf(tour.opponentsOf(player.id).toSet)
-        tiedPlayers.foreach: player =>
-          val points =
-            if tiedPlayers.size <= 1 || !allTiedPlayersHaveMet then TiebreakPoint.zero
-            else
-              val directGames =
-                tour.gamesById(player.id).filter(g => tiedPlayers.toSet.excl(player).contains(g.opponent))
-              if directGames.isEmpty then TiebreakPoint.zero
-              else
-                TiebreakPoint:
-                  directGames
-                    .groupBy(_.opponent)
-                    .map: (_, games) =>
-                      // If the players meet more than once, FIDE says that we average the score
-                      games.score.value / games.size
-                    .sum
-          builder.addOne(player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points))
-    builder.result()
+case object DirectEncounter extends Tiebreak("DE", "Direct encounter") with DirectEncounterImpl
 
 case class AverageRatingOfOpponents(modifier: CutModifier)
     extends Tiebreak("ARO", modifier.extendedDescription("Average rating of opponents")):
@@ -174,10 +144,7 @@ case class AverageRatingOfOpponents(modifier: CutModifier)
     tour.players.view
       .map: player =>
         val points = tour
-          .opponentsOf(player.id)
-          .collect:
-            case Tiebreak.Player(_, Some(elo)) => TiebreakPoint(elo.value)
-          .sorted
+          .averageRatingOfOpponentsSeq(player.id)
           .cut(modifier)
           .average
           .map(_.round) // Fide says to round up
@@ -196,10 +163,10 @@ case object AveragePerformanceOfOpponents extends Tiebreak("APRO", "Average perf
 case class KoyaSystem(val limit: LimitModifier)
     extends Tiebreak("KS", s"Koya system (limit ${(limit.value * 100).toInt}% of score)"):
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
+    val maxPossibleScoreWithLimit = tour.maxRounds * limit.value
     tour.players.view
       .map: player =>
         val myGames = tour.gamesById(player.id)
-        val maxPossibleScoreWithLimit = tour.maxRounds * limit.value
         val points = myGames
           .filter: game =>
             tour.scoreOf(game.opponent.id).value >= maxPossibleScoreWithLimit
@@ -212,9 +179,8 @@ case class SumOfProgressiveScores(modifier: CutModifier)
   def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val pointsSeq = tour.progressiveScoresSeq(player.id)
-        val points: TiebreakPoint = pointsSeq.cut(modifier).sum
-        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
+        player.id -> (previousPoints
+          .getOrElse(player.id, Nil) :+ tour.progressiveScoresSeq(player.id).cutSum(modifier))
       .toMap
 
 case object TournamentPerformanceRating extends Tiebreak("TPR", "Tournament performance rating"):
@@ -241,7 +207,6 @@ case object AveragePerfectPerformanceOfOpponents
           .opponentsOf(player.id)
           .map: opp =>
             tour.perfectTournamentPerformance(opp.id)
-          .toSeq
           .average
           .map(_.round) // Fide says to round up
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
@@ -254,8 +219,6 @@ import Tiebreak.*
 trait Tournament:
   def players: Set[Player]
   def gamesById(id: PlayerId): List[Game]
-  def pointsById(id: PlayerId): Option[Float]
-  def toPlayerGames: Map[PlayerId, Tiebreak.PlayerWithGames]
   def opponentsOf: PlayerId => List[Player]
   def scoreOf: PlayerId => TournamentScore
   def lastRoundId: Option[String]
@@ -275,19 +238,28 @@ trait Tournament:
       else TiebreakPoint(Tournament.binarySearch(oppRatings, myScore)(minR, maxR))
 
   lazy val tournamentPerformance: PlayerId => TiebreakPoint = memoize: id =>
-    val myGames = gamesById(id)
-    TiebreakPoint:
-      Elo
-        .computePerformanceRating:
-          myGames
-            .collect:
-              case Tiebreak.Game(points, Tiebreak.Player(_, Some(rating)), _, _) =>
-                Elo.Game(points, rating)
-        .so(_.value.toFloat)
+    Elo
+      .computePerformanceRating:
+        gamesById(id)
+          .flatMap: game =>
+            game.opponent.rating.map(r => Elo.Game(game.points, r))
+      .map(elo => TiebreakPoint(elo.value)) | TiebreakPoint.zero
 
   lazy val maxRounds = players.map(p => gamesById(p.id).size).maxOption.getOrElse(0)
 
-  lazy val buchholz: PlayerId => TiebreakPoint = memoize: id =>
+  lazy val directScore: Set[Player] => Map[PlayerId, Float] = memoize: tiedPlayers =>
+    tiedPlayers
+      .map: p =>
+        p.id -> gamesById(p.id)
+          .filter(g => tiedPlayers.excl(p).contains(g.opponent))
+          .groupBy(_.opponent.id)
+          .map: (_, games) =>
+            // If the players meet more than once, FIDE says that we average the score
+            games.nonEmpty.so(games.score.value / games.size)
+          .sum
+      .toMap
+
+  lazy val buchholzSum: PlayerId => TiebreakPoint = memoize: id =>
     buchholzSeq(id).sum
 
   // Memoize sorted sequences of cuttable tiebreaks so that we can cut them later in the tournament if necessary
@@ -298,19 +270,25 @@ trait Tournament:
       .map(opponent => scoreOf(opponent.id).into(TiebreakPoint))
       .sorted
 
+  lazy val averageRatingOfOpponentsSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>
+    opponentsOf(id)
+      .flatMap(opponent => opponent.rating.map(r => TiebreakPoint(r.value)))
+      .sorted
+
   lazy val foreBuchholzSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>
     lastRoundId.fold(buchholzSeq(id)): lastRound =>
       opponentsOf(id)
         .map: opponent =>
-          TiebreakPoint:
-            val opponentGames = gamesById(opponent.id)
-            val lastRoundGame = opponentGames.find(_.roundId.exists(_ == lastRound))
-            if lastRoundGame.isDefined then opponentGames.dropRight(1).score.value + 0.5f
-            else opponentGames.score.value
+          gamesById(opponent.id)
+            .map: game =>
+              if game.roundId.contains(lastRound) then game.copy(points = Points.Half)
+              else game
+            .score
+            .into(TiebreakPoint)
         .sorted
 
   lazy val sonnebornBergerSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>
-    toPlayerGames(id).games
+    gamesById(id)
       .map: game =>
         game.points match
           case Points.One => scoreOf(game.opponent.id).into(TiebreakPoint)
@@ -338,8 +316,6 @@ object Tournament:
   private case class Impl(games: Map[PlayerId, Tiebreak.PlayerWithGames], lastRoundId: Option[String])
       extends Tournament:
 
-    override def toPlayerGames: Map[PlayerId, PlayerWithGames] = games
-
     override lazy val players: Set[Player] = games.values.map(_.player).toSet
 
     override lazy val opponentsOf: PlayerId => List[Player] = memoize: id =>
@@ -350,11 +326,6 @@ object Tournament:
 
     override def gamesById(id: PlayerId): List[Game] =
       games.get(id).fold(Nil)(_.games.toList)
-
-    override def pointsById(id: PlayerId): Option[Float] =
-      games
-        .get(id)
-        .map(_.games.map(_.points.value).sum)
 
   // Find the lowest integer rating R such that sum of expected scores >= myScore
   // Use the full FIDE conversion table, no ±400 cut

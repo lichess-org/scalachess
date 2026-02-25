@@ -2,7 +2,7 @@ import snapshot4s.BuildInfo.snapshot4sVersion
 
 inThisBuild(
   Seq(
-    scalaVersion := "3.8.1",
+    scalaVersion := "3.8.2",
     version := "17.15.1",
     organization := "com.github.lichess-org.scalachess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),

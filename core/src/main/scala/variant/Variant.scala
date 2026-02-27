@@ -144,18 +144,20 @@ abstract class Variant private[variant] (
 
   /** Returns true if neither player can win. The game should end immediately.
     */
-  def isInsufficientMaterial(position: Position): Boolean = InsufficientMatingMaterial(position.board)
+  def isInsufficientMaterial(position: Position): Boolean = InsufficientMatingMaterial(position)
+
+  protected def hasInsufficientMaterial(position: Position, color: Color): Boolean =
+    InsufficientMatingMaterial(position, color)
 
   /** Returns true if the other player cannot win. This is relevant when the
     * side to move times out or disconnects. Instead of losing on time,
     * the game should be drawn.
     */
-  def opponentHasInsufficientMaterial(position: Position): Boolean =
-    InsufficientMatingMaterial(position.board, !position.color)
+  final def opponentHasInsufficientMaterial(position: Position): Boolean =
+    hasInsufficientMaterial(position, !position.color)
 
-  def playerHasInsufficientMaterial(position: Position): Boolean =
-    // For all variants except Antichess and Horde, considering turn isn't needed:
-    opponentHasInsufficientMaterial(position.withColor(!position.color))
+  final def playerHasInsufficientMaterial(position: Position): Boolean =
+    hasInsufficientMaterial(position, position.color)
 
   def fiftyMoves(history: History): Boolean =
     history.halfMoveClock >= HalfMoveClock(100)

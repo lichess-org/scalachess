@@ -441,7 +441,7 @@ object Tiebreak:
   case class Player(id: PlayerId, rating: Option[Elo])
 
   val allSimple: List[Tiebreak] = List(
-    ArranzSystem
+    ArranzSystem,
     NbBlackGames,
     NbWins,
     NbBlackWins,

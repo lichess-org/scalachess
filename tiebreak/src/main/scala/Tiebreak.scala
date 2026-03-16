@@ -74,7 +74,7 @@ sealed trait Tiebreak(val code: Code, val description: String):
         g(modifier)
       case TournamentPerformanceRating | PerfectTournamentPerformance | NbBlackGames | NbWins | NbBlackWins |
           AverageOfOpponentsBuchholz | DirectEncounter | AveragePerformanceOfOpponents |
-          AveragePerfectPerformanceOfOpponents =>
+          AveragePerfectPerformanceOfOpponents | ArranzSystem =>
         default
 
 case object NbBlackGames extends Tiebreak("BPG", "Number of games played with black"):
@@ -100,6 +100,17 @@ case object NbBlackWins extends Tiebreak("BWG", "Number of wins with black"):
         val myBlackWins =
           tour.gamesById(player.id).count(g => g.color == Color.Black && g.points == Points.One)
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(myBlackWins))
+      .toMap
+
+case object ArranzSystem extends Tiebreak("ARZ", "Arranz System"):
+  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
+    tour.players.view
+      .map: player =>
+        val myGames = tour.gamesById(player.id)
+        val myWins = myGames.count(g => g.points == Points.One)
+        val myBlackHalf = myGames.count(g => g.color == Color.Black && g.points == Points.Half) * 0.6f
+        val myWhiteHalf = myGames.count(g => g.color == Color.White && g.points == Points.Half) * 0.4f
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(myWins + myBlackHalf + myWhiteHalf))
       .toMap
 
 case class SonnebornBerger(modifier: CutModifier)
@@ -391,6 +402,7 @@ object Tiebreak:
       mkLimitModifier: => F[LimitModifier]
   ): F[Tiebreak] =
     code match
+      case "ARZ" => ArranzSystem.pure[F]
       case "BPG" => NbBlackGames.pure[F]
       case "WON" => NbWins.pure[F]
       case "BWG" => NbBlackWins.pure[F]
@@ -429,6 +441,7 @@ object Tiebreak:
   case class Player(id: PlayerId, rating: Option[Elo])
 
   val allSimple: List[Tiebreak] = List(
+    ArranzSystem
     NbBlackGames,
     NbWins,
     NbBlackWins,

@@ -385,13 +385,13 @@ object LimitModifier:
   extension (lm: LimitModifier) inline def value: Float = lm
 
 object Tiebreak:
-  type Code = "BPG" | "WON" | "BWG" | "BH" | "FB" | "AOB" | "DE" | "ARO" | "APRO" | "APPO" | "KS" | "TPR" |
+  type Code = "ARZ" | "BPG" | "WON" | "BWG" | "BH" | "FB" | "AOB" | "DE" | "ARO" | "APRO" | "APPO" | "KS" | "TPR" |
     "PTP" | "SB" | "PS"
 
   object Code:
 
     //format: off
-    private val all: List[Code] = List("BPG", "WON", "BWG", "BH", "FB", "AOB", "DE", "ARO", "APRO", "APPO", "KS", "TPR", "PTP", "SB", "PS")
+    private val all: List[Code] = List("ARZ", "BPG", "WON", "BWG", "BH", "FB", "AOB", "DE", "ARO", "APRO", "APPO", "KS", "TPR", "PTP", "SB", "PS")
     //format: on
 
     val byStr: Map[String, Code] = all.mapBy(_.toString)

@@ -86,7 +86,7 @@ class TiebreakTest extends ChessTest:
   test("ArranzSystem - PlayerA"):
     val points = computeTournamentPoints(allGames, playerA, ArranzSystem)
     assertEquals(points, Some(TiebreakPoint(2.4f)))
-  
+
   test("ArranzSystem - PlayerC"):
     val points = computeTournamentPoints(allGames, playerC, ArranzSystem)
     assertEquals(points, Some(TiebreakPoint(2.0f)))

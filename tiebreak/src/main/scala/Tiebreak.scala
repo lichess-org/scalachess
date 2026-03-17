@@ -36,9 +36,9 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
 | Tournament Performance Rating                       | DB   | 10.2    | TPR     |       | ✅
 
 Tiebreaks non-FIDE in handbook
-| Name (in alphabetical order)                        | Available                               |    
+| Name (in alphabetical order)                        | Available                               |
 |-----------------------------------------------------|-----------------------------------------|
-| Arranz System                                       | Vesus.org, Swiss-Manager, Tornelo       |  (*1) 
+| Arranz System                                       | Vesus.org, Swiss-Manager, Tornelo       |  (*1)
 
 1. BH, FB, AOB and SB -
   We don't have information about byes and forfeits so we do not implement FIDE's recommendations about
@@ -83,16 +83,22 @@ sealed trait Tiebreak(val code: Code, val description: String):
         default
 
 case object ArranzSystem extends Tiebreak("ARZ", "Arranz System"):
+  private val WinWeight = 1f
+  private val BlackHalfWeight = 0.6f
+  private val WhiteHalfWeight = 0.4f
+
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
-        val myGames = tour.gamesById(player.id)
-        val myWins = myGames.count(g => g.points == Points.One)
-        val myBlackHalf = myGames.count(g => g.color == Color.Black && g.points == Points.Half) * 0.6f
-        val myWhiteHalf = myGames.count(g => g.color == Color.White && g.points == Points.Half) * 0.4f
-        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(
-          myWins + myBlackHalf + myWhiteHalf
-        ))
+        val myPoints = tour
+          .gamesById(player.id)
+          .foldLeft(0f): (points, game) =>
+            (game.points, game.color) match
+              case (Points.One, _) => points + WinWeight
+              case (Points.Half, Color.Black) => points + BlackHalfWeight
+              case (Points.Half, Color.White) => points + WhiteHalfWeight
+              case _ => points
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(myPoints))
       .toMap
 
 case object NbBlackGames extends Tiebreak("BPG", "Number of games played with black"):

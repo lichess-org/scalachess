@@ -82,6 +82,19 @@ sealed trait Tiebreak(val code: Code, val description: String):
           AveragePerfectPerformanceOfOpponents | ArranzSystem =>
         default
 
+case object ArranzSystem extends Tiebreak("ARZ", "Arranz System"):
+  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
+    tour.players.view
+      .map: player =>
+        val myGames = tour.gamesById(player.id)
+        val myWins = myGames.count(g => g.points == Points.One)
+        val myBlackHalf = myGames.count(g => g.color == Color.Black && g.points == Points.Half) * 0.6f
+        val myWhiteHalf = myGames.count(g => g.color == Color.White && g.points == Points.Half) * 0.4f
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(
+          myWins + myBlackHalf + myWhiteHalf
+        ))
+      .toMap
+
 case object NbBlackGames extends Tiebreak("BPG", "Number of games played with black"):
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
@@ -105,19 +118,6 @@ case object NbBlackWins extends Tiebreak("BWG", "Number of wins with black"):
         val myBlackWins =
           tour.gamesById(player.id).count(g => g.color == Color.Black && g.points == Points.One)
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(myBlackWins))
-      .toMap
-
-case object ArranzSystem extends Tiebreak("ARZ", "Arranz System"):
-  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
-    tour.players.view
-      .map: player =>
-        val myGames = tour.gamesById(player.id)
-        val myWins = myGames.count(g => g.points == Points.One)
-        val myBlackHalf = myGames.count(g => g.color == Color.Black && g.points == Points.Half) * 0.6f
-        val myWhiteHalf = myGames.count(g => g.color == Color.White && g.points == Points.Half) * 0.4f
-        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(
-          myWins + myBlackHalf + myWhiteHalf
-        ))
       .toMap
 
 case class SonnebornBerger(modifier: CutModifier)

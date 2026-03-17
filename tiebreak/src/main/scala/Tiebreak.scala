@@ -35,6 +35,11 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
 | (Sum of) Progressive Scores                         | B    | 7.5     | PS      |   ●   | ✅
 | Tournament Performance Rating                       | DB   | 10.2    | TPR     |       | ✅
 
+Tiebreaks non-FIDE in handbook
+| Name (in alphabetical order)                        | Available                               |    
+|-----------------------------------------------------|-----------------------------------------|
+| Arranz System                                       | Vesus.org, Swiss-Manager, Tornelo       |  (*1) 
+
 1. BH, FB, AOB and SB -
   We don't have information about byes and forfeits so we do not implement FIDE's recommendations about
   handling unplayed rounds. (Section 16)

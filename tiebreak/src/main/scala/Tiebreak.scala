@@ -110,7 +110,9 @@ case object ArranzSystem extends Tiebreak("ARZ", "Arranz System"):
         val myWins = myGames.count(g => g.points == Points.One)
         val myBlackHalf = myGames.count(g => g.color == Color.Black && g.points == Points.Half) * 0.6f
         val myWhiteHalf = myGames.count(g => g.color == Color.White && g.points == Points.Half) * 0.4f
-        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(myWins + myBlackHalf + myWhiteHalf))
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(
+          myWins + myBlackHalf + myWhiteHalf
+        ))
       .toMap
 
 case class SonnebornBerger(modifier: CutModifier)
@@ -385,8 +387,8 @@ object LimitModifier:
   extension (lm: LimitModifier) inline def value: Float = lm
 
 object Tiebreak:
-  type Code = "ARZ" | "BPG" | "WON" | "BWG" | "BH" | "FB" | "AOB" | "DE" | "ARO" | "APRO" | "APPO" | "KS" | "TPR" |
-    "PTP" | "SB" | "PS"
+  type Code = "ARZ" | "BPG" | "WON" | "BWG" | "BH" | "FB" | "AOB" | "DE" | "ARO" | "APRO" | "APPO" | "KS" |
+    "TPR" | "PTP" | "SB" | "PS"
 
   object Code:
 

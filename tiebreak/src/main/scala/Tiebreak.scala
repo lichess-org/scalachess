@@ -83,22 +83,23 @@ sealed trait Tiebreak(val code: Code, val description: String):
         default
 
 case object ArranzSystem extends Tiebreak("ARZ", "Arranz System"):
-  private val WinWeight = 1f
-  private val BlackHalfWeight = 0.6f
-  private val WhiteHalfWeight = 0.4f
+  private val WinWeight = 10
+  private val BlackHalfWeight = 6
+  private val WhiteHalfWeight = 4
 
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
     tour.players.view
       .map: player =>
         val myPoints = tour
           .gamesById(player.id)
-          .foldLeft(0f): (points, game) =>
+          .foldLeft(0): (points, game) =>
             (game.points, game.color) match
               case (Points.One, _) => points + WinWeight
               case (Points.Half, Color.Black) => points + BlackHalfWeight
               case (Points.Half, Color.White) => points + WhiteHalfWeight
               case _ => points
-        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(myPoints))
+        val myTiebreakPoints = myPoints / 10f
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(myTiebreakPoints))
       .toMap
 
 case object NbBlackGames extends Tiebreak("BPG", "Number of games played with black"):

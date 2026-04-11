@@ -92,9 +92,11 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
           legalMoves.sortBy(_.captures).forall { move =>
             val newPos = move.after
             val winner = newPos.winner
-            winner == Some(color) ||
-            newPos.playerHasInsufficientMaterial ||
-            (newPos.staleMate && winner != Some(!color))
+            winner != Some(!color) && (
+              winner == Some(color) ||
+                newPos.playerHasInsufficientMaterial ||
+                newPos.staleMate
+            )
           }
       )
 

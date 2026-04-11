@@ -88,6 +88,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
     variant.opponentHasInsufficientMaterial(this) ||
       (
         legalMoves.nonEmpty &&
+          drops.forall(_.isEmpty) &&
           legalMoves.sortBy(_.captures).forall { move =>
             val newPos = move.after
             val winner = newPos.winner

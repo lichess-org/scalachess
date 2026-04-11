@@ -88,7 +88,13 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
     variant.opponentHasInsufficientMaterial(this) ||
       (
         legalMoves.nonEmpty &&
-          legalMoves.forall(_.after.playerHasInsufficientMaterial)
+          legalMoves.sortBy(_.captures).forall { move =>
+            val newPos = move.after
+            val winner = newPos.winner
+            winner == Some(color) ||
+            newPos.playerHasInsufficientMaterial ||
+            (newPos.staleMate && winner != Some(!color))
+          }
       )
 
   inline def playerHasInsufficientMaterial: Boolean = variant.playerHasInsufficientMaterial(this)

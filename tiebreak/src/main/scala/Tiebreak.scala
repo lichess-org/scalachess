@@ -35,6 +35,11 @@ https://handbook.fide.com/chapter/TieBreakRegulations082024
 | (Sum of) Progressive Scores                         | B    | 7.5     | PS      |   ●   | ✅
 | Tournament Performance Rating                       | DB   | 10.2    | TPR     |       | ✅
 
+Tiebreaks non-FIDE in handbook
+| Name (in alphabetical order)                        | Available                               |
+|-----------------------------------------------------|-----------------------------------------|
+| Arranz System                                       | Vesus.org, Swiss-Manager, Tornelo       |  (*1)
+
 1. BH, FB, AOB and SB -
   We don't have information about byes and forfeits so we do not implement FIDE's recommendations about
   handling unplayed rounds. (Section 16)
@@ -74,8 +79,28 @@ sealed trait Tiebreak(val code: Code, val description: String):
         g(modifier)
       case TournamentPerformanceRating | PerfectTournamentPerformance | NbBlackGames | NbWins | NbBlackWins |
           AverageOfOpponentsBuchholz | DirectEncounter | AveragePerformanceOfOpponents |
-          AveragePerfectPerformanceOfOpponents =>
+          AveragePerfectPerformanceOfOpponents | ArranzSystem =>
         default
+
+case object ArranzSystem extends Tiebreak("ARZ", "Arranz System"):
+  private val WinWeight = 10
+  private val BlackHalfWeight = 6
+  private val WhiteHalfWeight = 4
+
+  override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
+    tour.players.view
+      .map: player =>
+        val myPoints = tour
+          .gamesById(player.id)
+          .foldLeft(0): (points, game) =>
+            (game.points, game.color) match
+              case (Points.One, _) => points + WinWeight
+              case (Points.Half, Color.Black) => points + BlackHalfWeight
+              case (Points.Half, Color.White) => points + WhiteHalfWeight
+              case _ => points
+        val myTiebreakPoints = myPoints / 10f
+        player.id -> (previousPoints.getOrElse(player.id, Nil) :+ TiebreakPoint(myTiebreakPoints))
+      .toMap
 
 case object NbBlackGames extends Tiebreak("BPG", "Number of games played with black"):
   override def compute(tour: Tournament, previousPoints: PlayerPoints): PlayerPoints =
@@ -374,13 +399,13 @@ object LimitModifier:
   extension (lm: LimitModifier) inline def value: Float = lm
 
 object Tiebreak:
-  type Code = "BPG" | "WON" | "BWG" | "BH" | "FB" | "AOB" | "DE" | "ARO" | "APRO" | "APPO" | "KS" | "TPR" |
-    "PTP" | "SB" | "PS"
+  type Code = "ARZ" | "BPG" | "WON" | "BWG" | "BH" | "FB" | "AOB" | "DE" | "ARO" | "APRO" | "APPO" | "KS" |
+    "TPR" | "PTP" | "SB" | "PS"
 
   object Code:
 
     //format: off
-    private val all: List[Code] = List("BPG", "WON", "BWG", "BH", "FB", "AOB", "DE", "ARO", "APRO", "APPO", "KS", "TPR", "PTP", "SB", "PS")
+    private val all: List[Code] = List("ARZ", "BPG", "WON", "BWG", "BH", "FB", "AOB", "DE", "ARO", "APRO", "APPO", "KS", "TPR", "PTP", "SB", "PS")
     //format: on
 
     val byStr: Map[String, Code] = all.mapBy(_.toString)
@@ -391,6 +416,7 @@ object Tiebreak:
       mkLimitModifier: => F[LimitModifier]
   ): F[Tiebreak] =
     code match
+      case "ARZ" => ArranzSystem.pure[F]
       case "BPG" => NbBlackGames.pure[F]
       case "WON" => NbWins.pure[F]
       case "BWG" => NbBlackWins.pure[F]
@@ -429,6 +455,7 @@ object Tiebreak:
   case class Player(id: PlayerId, rating: Option[Elo])
 
   val allSimple: List[Tiebreak] = List(
+    ArranzSystem,
     NbBlackGames,
     NbWins,
     NbBlackWins,

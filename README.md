@@ -49,3 +49,9 @@ To run [scalafmt](https://scalameta.org/scalafmt/docs/installation.html) and [sc
 ## Install (python)
 
 For python code, [install pipenv](https://pipenv.pypa.io/en/latest/installation.html#installing-pipenv), and run `$ pipenv install` from project root.
+
+## Release
+
+1. Bump version in `build.sbt`.
+2. Commit the bersion bump and push to master.
+3. `gh release create X.Y.Z`

@@ -2,8 +2,8 @@ import snapshot4s.BuildInfo.snapshot4sVersion
 
 inThisBuild(
   Seq(
-    scalaVersion := "3.8.2",
-    version := "17.15.3",
+    scalaVersion := "3.8.3",
+    version := "17.15.5",
     organization := "com.github.lichess-org.scalachess",
     licenses += ("MIT" -> url("https://opensource.org/licenses/MIT")),
     publishTo := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", "")))),
@@ -12,7 +12,7 @@ inThisBuild(
   )
 )
 
-val scalalibVersion = "11.10.3"
+val scalalibVersion = "11.10.4"
 
 val commonSettings = Seq(
   scalacOptions := Seq(
@@ -86,12 +86,12 @@ lazy val testKit = project
     libraryDependencies ++= List(
       "org.scalacheck" %% "scalacheck" % "1.19.0",
       "org.typelevel" %% "literally" % "1.2.0",
-      "org.scalameta" %% "munit" % "1.2.4" % Test,
+      "org.scalameta" %% "munit" % "1.3.0" % Test,
       "org.scalameta" %% "munit-scalacheck" % "1.2.0" % Test,
       "org.typelevel" %% "weaver-cats" % "0.12.0" % Test,
       "org.typelevel" %% "weaver-scalacheck" % "0.12.0" % Test,
-      "co.fs2" %% "fs2-core" % "3.12.2" % Test,
-      "co.fs2" %% "fs2-io" % "3.12.2" % Test,
+      "co.fs2" %% "fs2-core" % "3.13.0" % Test,
+      "co.fs2" %% "fs2-io" % "3.13.0" % Test,
       "org.typelevel" %% "discipline-munit" % "2.0.0" % Test,
       "org.typelevel" %% "cats-laws" % "2.13.0" % Test,
       "com.siriusxm" %% "snapshot4s-munit" % snapshot4sVersion % Test

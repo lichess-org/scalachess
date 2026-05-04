@@ -171,8 +171,7 @@ case class AverageRatingOfOpponents(modifier: CutModifier)
         val points = tour
           .averageRatingOfOpponentsSeq(player.id)
           .cut(modifier)
-          .average
-          .map(_.round) // Fide says to round up
+          .roundedAverage
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
       .toMap
 
@@ -181,7 +180,7 @@ case object AveragePerformanceOfOpponents extends Tiebreak("APRO", "Average perf
     tour.players.view
       .map: player =>
         val myOpponents = tour.opponentsOf(player.id)
-        val points = myOpponents.map(opp => tour.tournamentPerformance(opp.id)).average
+        val points = myOpponents.map(opp => tour.tournamentPerformance(opp.id)).roundedAverage
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
       .toMap
 
@@ -232,8 +231,7 @@ case object AveragePerfectPerformanceOfOpponents
           .opponentsOf(player.id)
           .map: opp =>
             tour.perfectTournamentPerformance(opp.id)
-          .average
-          .map(_.round) // Fide says to round up
+          .roundedAverage
         player.id -> (previousPoints.getOrElse(player.id, Nil) :+ points)
       .toMap
 
@@ -493,6 +491,9 @@ extension (tieBreakSeq: Seq[TiebreakPoint])
   def average: TiebreakPoint =
     tieBreakSeq.nonEmpty.so:
       tieBreakSeq.sum / tieBreakSeq.size
+
+  def roundedAverage: TiebreakPoint =
+    average.map(_.round)
 
 extension (games: Seq[Tiebreak.Game])
   def score: TournamentScore =

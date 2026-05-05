@@ -265,6 +265,30 @@ class CrazyhouseVariantTest extends ChessTest:
     assertNot(game.position.end)
     assertNot(game.position.opponentHasInsufficientMaterial)
 
+  test("insufficient mating material: not draw when drop possible for player"):
+    assertNot(
+      fenToGame(
+        FullFen("7k/5P1p/5PBR/5B1R/8/8/4K3/8/N w - - 0 1"),
+        Crazyhouse
+      ).position.opponentHasInsufficientMaterial
+    )
+
+  test("insufficient mating material: not draw when opponent's drop prevents stalemate"):
+    assertNot(
+      fenToGame(
+        FullFen("8/5B1k/5B1p/6KP/8/8/8/8/q w - - 0 1"),
+        Crazyhouse
+      ).position.opponentHasInsufficientMaterial
+    )
+
+  test("insufficient mating material: draw when stalemate on next move guaranteed"):
+    assert(
+      fenToGame(
+        FullFen("8/5B1k/5B1p/6KP/8/8/8/8/N w - - 0 1"),
+        Crazyhouse
+      ).position.opponentHasInsufficientMaterial
+    )
+
   test("destinations prod bug on game VVXRgsQT"):
     assertEquals(
       chess

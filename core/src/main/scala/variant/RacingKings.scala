@@ -54,7 +54,7 @@ case object RacingKings
     super.valid(position, strict) && (!strict || position.check.no)
 
   override def isInsufficientMaterial(position: Position): Boolean = false
-  override def opponentHasInsufficientMaterial(position: Position): Boolean = false
+  override protected def hasInsufficientMaterial(position: Position, color: Color): Boolean = false
 
   // It is a win, when exactly one king made it to the goal. When white reaches
   // the goal and black can make it on the next ply, he is given a chance to

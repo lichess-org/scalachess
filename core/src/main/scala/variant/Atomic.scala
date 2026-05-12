@@ -30,6 +30,9 @@ case object Atomic
   override def opponentHasInsufficientMaterial(position: Position) =
     position.kingsOnlyOf(!position.color)
 
+  override def playerHasInsufficientMaterial(position: Position) =
+    position.kingsOnlyOf(position.color)
+
   /** Atomic chess has a special end where a king has been killed by exploding with an adjacent captured piece */
   override def specialEnd(position: Position): Boolean = position.kings.count < 2
   override def validMovesAt(position: Position, square: Square): List[Move] =

@@ -257,7 +257,7 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
         val piece = color - role
         (c & r).foreach: s =>
           m += s -> piece
-    m.result
+    m.result()
 
   def piecesOf(c: Color): Map[Square, Piece] =
     pieceMap.filter((_, p) => p.color == c)

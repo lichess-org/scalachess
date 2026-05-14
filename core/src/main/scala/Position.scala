@@ -23,6 +23,8 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
   export color.white as isWhiteTurn
 
+  def isTurn(c: Color): Boolean = c == color
+
   def withCastles(c: Castles) = updateHistory(_.withCastles(c))
 
   def unary_! : Position = withColor(color = !color)

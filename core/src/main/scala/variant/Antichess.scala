@@ -57,10 +57,45 @@ case object Antichess
   // player can win (depending on whose turn it is).
 
   override def opponentHasInsufficientMaterial(position: Position): Boolean =
-    justOneKnightEach(position) && allOnSameColourSquares(position)
+    hasInsufficientMaterial(position, !position.color)
 
   override def playerHasInsufficientMaterial(position: Position): Boolean =
-    justOneKnightEach(position) && !allOnSameColourSquares(position)
+    hasInsufficientMaterial(position, position.color)
+
+  private def hasInsufficientMaterial(position: Position, color: Color): Boolean =
+    (
+       position.onlyKnights &&
+       position.white.count == 1 &&
+       position.black.count == 1 &&
+       position.isTurn(color) != allOnSameColourSquares(position)
+    ) ||
+    {
+      val subject = if position.isTurn(color) then position.us else position.them
+      val opposing = if position.isTurn(color) then position.them else position.us
+      val subjectBishops = subject & position.bishops
+      val subjectPawns = subject & position.pawns
+      val opposingBishops = opposing & position.bishops
+      subjectBishops.nonEmpty &&
+      opposingBishops.nonEmpty &&
+      opposingBishops == opposing &&
+      List(Bitboard.lightSquares, Bitboard.darkSquares).exists(colorComplex =>
+        opposingBishops.isDisjoint(colorComplex) && subjectBishops.intersects(colorComplex)
+      ) &&
+      (
+        subjectPawns.isEmpty || (
+          // todo - handle cases with > 1 subject pawn/opposing bishop that are still
+          // impossible for subject to be win
+          subjectPawns.count == 1 &&
+          opposingBishops.count == 1 &&
+          List(
+            (File.B, Bitboard.lightSquares),
+            (File.G, Bitboard.darkSquares)
+          ).forall: (file, colorComplexForWhite) =>
+            subjectPawns.isDisjoint(Bitboard.file(file)) ||
+            subjectBishops.isDisjoint(if color == Color.White then colorComplexForWhite else ~colorComplexForWhite)
+        )
+      )
+    }
 
   // No player can win if the only remaining pieces are opposing bishops on different coloured
   // diagonals. There may be pawns that are incapable of moving and do not attack the right color
@@ -102,6 +137,3 @@ case object Antichess
   private def allOnSameColourSquares(position: Position): Boolean =
     Bitboard.lightSquares.isDisjoint(position.occupied) ||
       Bitboard.darkSquares.isDisjoint(position.occupied)
-
-  private def justOneKnightEach(position: Position): Boolean =
-    position.onlyKnights && position.white.count == 1 && position.black.count == 1

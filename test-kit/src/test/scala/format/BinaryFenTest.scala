@@ -14,13 +14,13 @@ class BinaryFenTest extends ScalaCheckSuite:
     forAll: (v: Long) =>
       val builder = ArrayBuilder.ofByte()
       BinaryFen.implementation.writeLong(builder, v)
-      assertEquals(BinaryFen.implementation.readLong(builder.result.iterator), v)
+      assertEquals(BinaryFen.implementation.readLong(builder.result().iterator), v)
 
   test("leb128 roundtrip"):
     forAll(Gen.posNum[Int]): (v: Int) =>
       val builder = ArrayBuilder.ofByte()
       BinaryFen.implementation.writeLeb128(builder, v)
-      assertEquals(BinaryFen.implementation.readLeb128(builder.result.iterator), v)
+      assertEquals(BinaryFen.implementation.readLeb128(builder.result().iterator), v)
 
   private val genNibble = Gen.chooseNum[Int](0, 15)
 
@@ -28,7 +28,7 @@ class BinaryFenTest extends ScalaCheckSuite:
     forAll(genNibble, genNibble): (lo: Int, hi: Int) =>
       val builder = ArrayBuilder.ofByte()
       BinaryFen.implementation.writeNibbles(builder, lo, hi)
-      assertEquals(BinaryFen.implementation.readNibbles(builder.result.iterator), (lo, hi))
+      assertEquals(BinaryFen.implementation.readNibbles(builder.result().iterator), (lo, hi))
 
   test("rewrite fixpoint"):
     forAll: (bytes: Array[Byte]) =>

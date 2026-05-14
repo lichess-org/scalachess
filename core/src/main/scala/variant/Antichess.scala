@@ -88,12 +88,10 @@ case object Antichess
             subjectPawns.count == 1 &&
               opposingBishops.count == 1 &&
               List(
-                (File.B, Bitboard.lightSquares),
-                (File.G, Bitboard.darkSquares)
-              ).forall: (file, colorComplexForWhite) =>
-                subjectPawns.isDisjoint(Bitboard.file(file)) ||
-                  subjectBishops.isDisjoint(if color == Color.White then colorComplexForWhite
-                  else ~colorComplexForWhite)
+                (File.B, if color == Color.White then Bitboard.darkSquares else Bitboard.lightSquares),
+                (File.G, if color == Color.White then Bitboard.lightSquares else Bitboard.darkSquares)
+              ).forall: (file, colorComplex) =>
+                subjectPawns.isDisjoint(Bitboard.file(file)) || opposingBishops.isDisjoint(colorComplex)
           )
         )
       }

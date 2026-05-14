@@ -217,6 +217,9 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
       "7B/8/8/5b2/8/6p1/8/8 b - - 0 1" -> (Square.F5 -> Square.E4),
       "8/7B/8/4b3/8/1p6/8/8 b - - 0 1" -> (Square.E5 -> Square.D4),
       "3b4/8/2B5/2P1b3/8/8/8/8 w - - 0 1" -> (Square.C6 -> Square.A8),
+      "8/8/BP6/B5b1/8/8/8/8 w - - 0 1" -> (Square.A6 -> Square.B5),
+      // the following are actually insufficient material, but don't qualify under curr behaviour
+      "8/8/BP6/B6b/8/8/8/8 w - - 0 1" -> (Square.A6 -> Square.B5),
       "8/8/2B5/P1P1b3/8/8/8/8 w - - 0 1" -> (Square.C6 -> Square.A8)
     ).foreach: (fen, move) =>
       val game = fenToGame(FullFen(fen), Antichess)

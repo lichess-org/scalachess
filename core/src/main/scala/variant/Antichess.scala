@@ -83,8 +83,8 @@ case object Antichess
         ) &&
         (
           subjectPawns.isEmpty || (
-            // todo - handle cases with > 1 subject pawn/opposing bishop that are still
-            // impossible for subject to be win
+            // TODO: handle cases with > 1 subject pawn/opposing bishop that are still
+            // impossible for the subject to win.
             subjectPawns.count == 1 &&
               opposingBishops.count == 1 &&
               List(

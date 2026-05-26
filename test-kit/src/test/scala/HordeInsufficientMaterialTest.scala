@@ -31,7 +31,7 @@ object HordeInsufficientMaterialTest extends SimpleIOSuite:
       .map(parseSample)
 
   private def csvParser[F[_]]: Pipe[F, Byte, List[String]] =
-    _.through(text.utf8Decode)
+    _.through(text.utf8.decode)
       .through(text.lines)
       .filter(_.nonEmpty)
       .map(_.split(',').toList)

@@ -48,6 +48,7 @@ Tiebreaks non-FIDE in handbook
 opaque type TiebreakPoint = Float
 object TiebreakPoint extends OpaqueFloat[TiebreakPoint]:
   val zero: TiebreakPoint = TiebreakPoint(0f)
+  inline def apply(x: Int): TiebreakPoint = TiebreakPoint(x.toFloat)
 given Numeric[TiebreakPoint] = Numeric[Float]
 
 opaque type TournamentScore = Float
@@ -478,8 +479,9 @@ object Tiebreak:
 
   val preset: List[Tiebreak] = allSimple ++ allCuttable
 
-private def memoize[I, O](f: I => O): I => O = new collection.mutable.HashMap[I, O]():
-  override def apply(key: I) = getOrElseUpdate(key, f(key))
+private def memoize[I, O](f: I => O): I => O = key =>
+  val hashMap = new collection.mutable.HashMap[I, O]
+  hashMap.getOrElseUpdate(key, f(key))
 
 extension (tieBreakSeq: Seq[TiebreakPoint])
   def cut(modifier: CutModifier): Seq[TiebreakPoint] =
@@ -493,7 +495,7 @@ extension (tieBreakSeq: Seq[TiebreakPoint])
       tieBreakSeq.sum / tieBreakSeq.size
 
   def roundedAverage: TiebreakPoint =
-    average.map(_.round)
+    average.map(_.round.toFloat)
 
 extension (games: Seq[Tiebreak.Game])
   def score: TournamentScore =

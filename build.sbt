@@ -22,9 +22,10 @@ val commonSettings = Seq(
     // "-indent",
     "-feature",
     "-language:postfixOps",
+    "-release:21",
     "-Wunused:all",
-    "-release:21"
-    // "-Werror"
+    "-Werror",
+    "-deprecation"
     // Warnings as errors!
     /* "-Xfatal-warnings" */
   )

@@ -53,7 +53,7 @@ class BoardTest extends ChessTest:
     assertNot(board.allPieces.isEmpty)
 
   test("have castling rights by default"):
-    assertEquals(board.history.castles, Castles.init)
+    assertEquals(board.history.castlingRights, CastlingRights.init)
 
   test("allow a piece to be placed"):
     assertEquals(board.place(White - Rook, E3).get.pieceAt(E3), Option(White - Rook))

@@ -80,14 +80,12 @@ case class Move(
     val after = this.afterWithoutHistory
       .withColor(!piece.color)
       .updateHistory { h =>
-        val (castles, unmovedRooks) = castleRights
         h.copy(
           lastMove = Option(toUci),
           halfMoveClock =
             if piece.is(Pawn) || captures || promotes then HalfMoveClock.initial
             else h.halfMoveClock.incr,
-          castles = castles,
-          unmovedRooks = unmovedRooks
+          castlingRights = newCastlingRights
         )
       }
 
@@ -102,47 +100,15 @@ case class Move(
       h.copy(positionHashes = PositionHash(Hash(after)).combine(basePositionHashes))
     }
 
-  private def castleRights: (Castles, UnmovedRooks) =
-    var castleRights: Castles = afterWithoutHistory.history.castles
-    var unmovedRooks: UnmovedRooks = afterWithoutHistory.history.unmovedRooks
-
-    // if the rook is captured
-    // remove the captured rook from unmovedRooks
-    // check the captured rook's side and remove it from castlingRights
-    if captures then
-      unmovedRooks.side(dest) match
-        case Some(result) =>
-          unmovedRooks = unmovedRooks & ~dest.bl
-          result match
-            case Some(side) =>
-              castleRights = castleRights.without(!piece.color, side)
-            case None =>
-              // There is only one unmovedrook left so just remove the color from castlingRights
-              castleRights = castleRights.without(!piece.color)
-        case _ =>
-
-    // if a rook is moved
-    // remove that rook from unmovedRooks
-    // check the moved rook's side and remove it from castlingRights
-    if piece.is(Rook) && unmovedRooks.contains(orig) then
-      unmovedRooks.side(orig) match
-        case Some(result) =>
-          unmovedRooks = unmovedRooks & ~orig.bl
-          result match
-            case Some(side) =>
-              castleRights = castleRights.without(piece.color, side)
-            case None =>
-              // There is only one unmovedrook left so just remove the color from castlingRights
-              castleRights = castleRights.without(piece.color)
-        case _ =>
-
-    // If the King is moved
-    // remove castlingRights and unmovedRooks for the moving side
-    else if piece.is(King) then
-      unmovedRooks = unmovedRooks.without(piece.color)
-      castleRights = castleRights.without(piece.color)
-
-    (castleRights, unmovedRooks)
+  private def newCastlingRights: CastlingRights =
+    var cr = afterWithoutHistory.history.castlingRights
+    // A captured rook loses its castling right.
+    if captures then cr = cr & ~dest.bl
+    // A moving rook loses its castling right.
+    if piece.is(Rook) then cr = cr & ~orig.bl
+    // A moving king forfeits all of its color's castling rights.
+    else if piece.is(King) then cr = cr.without(piece.color)
+    cr
 
 end Move
 
@@ -179,7 +145,7 @@ case class Drop(
           if h.positionHashes.value.isEmpty then PositionHash(Hash(before)) else h.positionHashes
         h.copy(
           lastMove = toUci.some,
-          unmovedRooks = before.unmovedRooks,
+          castlingRights = before.castlingRights,
           halfMoveClock = if piece.is(Pawn) then HalfMoveClock.initial else h.halfMoveClock.incr,
           positionHashes = PositionHash(Hash(after)).combine(basePositionHashes)
         )

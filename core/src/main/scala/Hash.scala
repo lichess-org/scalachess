@@ -48,10 +48,10 @@ object Hash:
 
     val hCastling =
       if position.variant.allowsCastling then
-        (if position.history.castles.whiteKingSide then ZobristTables.castlingMasks.white(0) else 0) ^
-          (if position.history.castles.whiteQueenSide then ZobristTables.castlingMasks.white(1) else 0) ^
-          (if position.history.castles.blackKingSide then ZobristTables.castlingMasks.black(0) else 0) ^
-          (if position.history.castles.blackQueenSide then ZobristTables.castlingMasks.black(1) else 0)
+        (if position.canCastle(White, KingSide) then ZobristTables.castlingMasks.white(0) else 0) ^
+          (if position.canCastle(White, QueenSide) then ZobristTables.castlingMasks.white(1) else 0) ^
+          (if position.canCastle(Black, KingSide) then ZobristTables.castlingMasks.black(0) else 0) ^
+          (if position.canCastle(Black, QueenSide) then ZobristTables.castlingMasks.black(1) else 0)
       else 0
 
     val hEp = position.enPassantSquare.fold(0): square =>

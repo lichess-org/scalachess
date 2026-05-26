@@ -10,7 +10,7 @@ import variant.{ Variant, Crazyhouse }
 
 case class Position(board: Board, history: History, variant: Variant, color: Color):
 
-  export history.{ castles, unmovedRooks, crazyData }
+  export history.{ castlingRights, crazyData }
   // format: off
   export board.{ attackers, attacks, bishops, black, byColor, byPiece, byRole, byRoleOf, colorAt,
     fold, foreach, isCheck, isOccupied, kingOf, kingPosOf, kings, kingsAndBishopsOnly,
@@ -23,7 +23,34 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
   export color.white as isWhiteTurn
 
-  def withCastles(c: Castles) = updateHistory(_.withCastles(c))
+  def withCastlingRights(cr: CastlingRights) = updateHistory(_.withCastlingRights(cr))
+
+  /** Can `color` castle on either side (rook with rights present on its back rank)? */
+  def canCastle(color: Color): Boolean =
+    (castlingRights.bb & Bitboard.rank(color.backRank)).nonEmpty
+
+  /** Can `color` castle on the given side?
+    *
+    * A castling-rights bit is on the `side` of the king if it sits on the matching side
+    * of the king's file. Standard chess: king on E, kingside = file > E, queenside = file < E.
+    */
+  def canCastle(color: Color, side: Side): Boolean =
+    kingOf(color).first.exists: king =>
+      val rookBits = castlingRights.bb & Bitboard.rank(color.backRank)
+      side match
+        case Side.KingSide => rookBits.exists(_.file > king.file)
+        case Side.QueenSide => rookBits.exists(_.file < king.file)
+
+  /** Classify a rook square as king-side or queen-side relative to its color's king.
+    *
+    * Returns None if the square is not in `castlingRights` or if the king is missing.
+    */
+  def castlingSide(square: Square): Option[Side] =
+    if !castlingRights.contains(square) then None
+    else
+      val color = if Bitboard.rank(White.backRank).contains(square) then White else Black
+      kingOf(color).first.map: king =>
+        if square.file > king.file then Side.KingSide else Side.QueenSide
 
   def unary_! : Position = withColor(color = !color)
 
@@ -259,13 +286,11 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
     yield move
 
   def genCastling(king: Square): List[Move] =
-    if !history.castles.can(color) || king.rank != color.backRank then Nil
+    if king.rank != color.backRank then Nil
     else
-      val rooks = Bitboard.rank(color.backRank) & board.rooks & history.unmovedRooks.value
+      val rooks = Bitboard.rank(color.backRank) & board.rooks & history.castlingRights.value
       for
         rook <- rooks
-        if (rook.value < king.value && history.castles.can(color, QueenSide))
-          || (rook.value > king.value && history.castles.can(color, KingSide))
         toKingFile = if rook.value < king.value then File.C else File.G
         toRookFile = if rook.value < king.value then File.D else File.F
         kingTo = Square(toKingFile, king.rank)
@@ -421,12 +446,10 @@ object Position:
     extension (position: AndFullMoveNumber) inline def position: Position = position.position
 
   def apply(board: Board, variant: Variant, color: Color): Position =
-    val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Position(
       board,
       History(
-        castles = variant.castles,
-        unmovedRooks = unmovedRooks,
+        castlingRights = variant.makeCastlingRights(board.rooks),
         crazyData = variant.crazyhouse.option(Crazyhouse.Data.init)
       ),
       variant,

@@ -63,8 +63,14 @@ trait ChessTestCommon:
       sit.moves.getOrElse(s, Nil)
 
   def castleHistory(color: Color, kingSide: Boolean, queenSide: Boolean): History =
-    val castles = Castles.init.update(color, kingSide, queenSide)
-    History(castles = castles, unmovedRooks = UnmovedRooks.corners, crazyData = None)
+    // Keep only the requested corners for `color`; leave the other color untouched.
+    val withColor = color.fold(
+      (if kingSide then Square.H1.bl else 0L) | (if queenSide then Square.A1.bl else 0L) |
+        (Square.H8.bl | Square.A8.bl),
+      (if kingSide then Square.H8.bl else 0L) | (if queenSide then Square.A8.bl else 0L) |
+        (Square.H1.bl | Square.A1.bl)
+    )
+    History(castlingRights = CastlingRights(withColor), crazyData = None)
 
   def fenToGameEither(positionString: FullFen, variant: Variant): Either[String, Game] =
     Fen
@@ -109,17 +115,15 @@ trait ChessTestCommon:
   def defaultHistory(
       lastMove: Option[Uci] = None,
       positionHashes: PositionHash = PositionHash.empty,
-      castles: Castles = Castles.init,
+      castlingRights: CastlingRights = CastlingRights.init,
       checkCount: CheckCount = CheckCount(0, 0),
-      unmovedRooks: UnmovedRooks = UnmovedRooks.corners,
       halfMoveClock: HalfMoveClock = HalfMoveClock.initial,
       crazyData: Option[Crazyhouse.Data] = None
   ) = History(
     lastMove = lastMove,
     positionHashes = positionHashes,
-    castles = castles,
+    castlingRights = castlingRights,
     checkCount = checkCount,
-    unmovedRooks = unmovedRooks,
     halfMoveClock = halfMoveClock,
     crazyData = crazyData
   )

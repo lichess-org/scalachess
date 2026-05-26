@@ -81,29 +81,36 @@ trait FenWriter:
       case _ => ""
 
   private[chess] def writeCastles(position: Position): String =
+    val cr = position.castlingRights.bb
     val wr = position.rooks & position.white & Bitboard.rank(White.backRank)
     val br = position.rooks & position.black & Bitboard.rank(Black.backRank)
-    val wur = position.unmovedRooks.without(Black).bb
-    val bur = position.unmovedRooks.without(White).bb
-    (if position.castles.whiteKingSide then
-       wur.last
-         .map(sq => if wr.last.contains(sq) then "K" else sq.file.toUpperCaseString)
-         .getOrElse("K")
-     else "") +
-      (if position.castles.whiteQueenSide then
-         wur.first
-           .map(sq => if wr.first.contains(sq) then "Q" else sq.file.toUpperCaseString)
-           .getOrElse("Q")
-       else "") +
-      (if position.castles.blackKingSide then
-         bur.last
-           .map(sq => if br.last.contains(sq) then "k" else sq.file.char.toString)
-           .getOrElse("k")
-       else "") +
-      (if position.castles.blackQueenSide then
-         bur.first
-           .map(sq => if br.first.contains(sq) then "q" else sq.file.char.toString)
-           .getOrElse("q")
-       else "") match
-      case "" => "-"
-      case s => s
+    val wcr = cr & Bitboard.rank(White.backRank)
+    val bcr = cr & Bitboard.rank(Black.backRank)
+    val whiteKing = (position.white & position.kings & Bitboard.rank(White.backRank)).first
+    val blackKing = (position.black & position.kings & Bitboard.rank(Black.backRank)).first
+
+    // Emit castling notation for one color: standard K/Q if the rook is on the
+    // outermost file of its side, otherwise x-FEN file letter.
+    def perSide(
+        rights: Bitboard,
+        king: Option[Square],
+        allRooks: Bitboard,
+        kLetter: String,
+        qLetter: String,
+        fileChar: Square => String
+    ): String =
+      king.fold(""): k =>
+        val kingSideStr = rights
+          .findLast(_.file > k.file)
+          .fold(""): sq =>
+            if allRooks.last.contains(sq) then kLetter else fileChar(sq)
+        val queenSideStr = rights
+          .find(_.file < k.file)
+          .fold(""): sq =>
+            if allRooks.first.contains(sq) then qLetter else fileChar(sq)
+        kingSideStr + queenSideStr
+
+    val result =
+      perSide(wcr, whiteKing, wr, "K", "Q", _.file.toUpperCaseString) +
+        perSide(bcr, blackKing, br, "k", "q", _.file.char.toString)
+    if result.isEmpty then "-" else result

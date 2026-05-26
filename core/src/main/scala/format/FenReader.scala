@@ -24,32 +24,29 @@ trait FenReader:
       val position = new Position(
         board,
         History(
-          unmovedRooks = variant.makeUnmovedRooks(board.rooks),
+          castlingRights = variant.makeCastlingRights(board.rooks),
           crazyData = variant.crazyhouse.so(crazyData)
         ),
         variant,
         color
       )
-      // todo verify unmovedRooks vs board.rooks
-      val (castles, unmovedRooks) =
-        if !variant.allowsCastling then (Castles.none -> UnmovedRooks.none)
+      val castlingRights: CastlingRights =
+        if !variant.allowsCastling then CastlingRights.none
         else
-          fCastling.foldLeft(Castles.none -> UnmovedRooks.none):
-            case ((c, r), ch) =>
-              val color = Color.fromWhite(ch.isUpper)
-              val backRank = Bitboard.rank(color.backRank)
-              // rooks that can be used for castling
-              val rooks = position.rooks & position.byColor(color) & backRank
-              {
-                for
-                  kingSquare <- (position.kingOf(color) & backRank).first
-                  rookSquare <- ch.toLower match
-                    case 'k' => rooks.findLast(_ ?> kingSquare)
-                    case 'q' => rooks.find(_ ?< kingSquare)
-                    case file => rooks.find(_.file.char == file)
-                  side <- Side.kingRookSide(kingSquare, rookSquare)
-                yield (c.add(color, side), r | rookSquare.bl)
-              }.getOrElse(c -> r)
+          fCastling.foldLeft(CastlingRights.none): (cr, ch) =>
+            val color = Color.fromWhite(ch.isUpper)
+            val backRank = Bitboard.rank(color.backRank)
+            // rooks that can be used for castling
+            val rooks = position.rooks & position.byColor(color) & backRank
+            {
+              for
+                kingSquare <- (position.kingOf(color) & backRank).first
+                rookSquare <- ch.toLower match
+                  case 'k' => rooks.findLast(_ ?> kingSquare)
+                  case 'q' => rooks.find(_ ?< kingSquare)
+                  case file => rooks.find(_.file.char == file)
+              yield cr | rookSquare.bl
+            }.getOrElse(cr)
 
       import position.color.{ fifthRank, sixthRank, seventhRank }
 
@@ -68,8 +65,7 @@ trait FenReader:
           val history = original.copy(
             lastMove = enpassantMove,
             positionHashes = PositionHash.empty,
-            castles = castles,
-            unmovedRooks = unmovedRooks
+            castlingRights = castlingRights
           )
           val checkCount = variant.threeCheck.so:
             val splitted = fen.value.split(' ')

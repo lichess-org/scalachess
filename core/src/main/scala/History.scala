@@ -7,9 +7,8 @@ import format.Uci
 case class History(
     lastMove: Option[Uci] = None,
     positionHashes: PositionHash = PositionHash.empty,
-    castles: Castles = Castles.init,
     checkCount: CheckCount = CheckCount(0, 0),
-    unmovedRooks: UnmovedRooks,
+    castlingRights: CastlingRights,
     halfMoveClock: HalfMoveClock = HalfMoveClock.initial,
     crazyData: Option[Crazyhouse.Data]
 ):
@@ -19,16 +18,12 @@ case class History(
   inline def threefoldRepetition: Boolean = positionHashes.isRepetition(3)
   inline def fivefoldRepetition: Boolean = positionHashes.isRepetition(5)
 
-  inline def canCastle(inline color: Color): Boolean = castles.can(color)
-  inline def canCastle(inline color: Color, inline side: Side): Boolean = castles.can(color, side)
+  inline def withoutCastlingRights(inline color: Color): History =
+    copy(castlingRights = castlingRights.without(color))
 
-  inline def withoutCastles(inline color: Color): History = copy(castles = castles.without(color))
+  inline def withoutAnyCastlingRights: History = copy(castlingRights = CastlingRights.none)
 
-  inline def withoutAnyCastles: History = copy(castles = Castles.none)
-
-  inline def withoutCastle(color: Color, side: Side): History = copy(castles = castles.without(color, side))
-
-  inline def withCastles(inline c: Castles): History = copy(castles = c)
+  inline def withCastlingRights(inline cr: CastlingRights): History = copy(castlingRights = cr)
 
   def withCheck(color: Color, check: Check): History =
     if check.yes then copy(checkCount = checkCount.add(color)) else this

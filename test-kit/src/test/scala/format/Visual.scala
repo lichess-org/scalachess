@@ -30,7 +30,7 @@ object Visual:
       }).flatten,
       variant = chess.variant.Variant.default
     )
-    p.updateHistory(_ => History(unmovedRooks = UnmovedRooks.from(p.board), crazyData = None))
+    p.updateHistory(_ => History(castlingRights = CastlingRights.from(p.board), crazyData = None))
 
   def >>(board: Position): String = >>|(board, Map.empty)
 
@@ -51,12 +51,10 @@ object Visual:
 
   def createPosition(pieces: Iterable[(Square, Piece)], variant: Variant): Position =
     val board = Board.fromMap(pieces.toMap)
-    val unmovedRooks = if variant.allowsCastling then UnmovedRooks(board.rooks) else UnmovedRooks.none
     Position(
       board,
       History(
-        castles = variant.castles,
-        unmovedRooks = unmovedRooks,
+        castlingRights = variant.makeCastlingRights(board.rooks),
         crazyData = variant.crazyhouse.option(Crazyhouse.Data.init)
       ),
       variant,

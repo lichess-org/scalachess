@@ -155,7 +155,13 @@ class VariantTest extends ChessTest:
     assertEquals(Chess960.initialPieces.get(A2), Some(White - Pawn))
 
   test("chess960 initialize the board with castling rights"):
-    assertEquals(Chess960.initialPosition.history.castles, Castles.init)
+    val pos = Chess960.initialPosition
+    // In Chess960 castlingRights mirrors the actual rook squares (not the 4 corners).
+    assertEquals(pos.history.castlingRights.bb.value, pos.rooks.value)
+    assert(pos.canCastle(White, KingSide))
+    assert(pos.canCastle(White, QueenSide))
+    assert(pos.canCastle(Black, KingSide))
+    assert(pos.canCastle(Black, QueenSide))
 
   test("kingOfTheHill detect win"):
     val game = Game(
@@ -189,7 +195,7 @@ PP
     assertEquals(sit.winner, Some(Black))
 
   test("kingOfTheHill initialize the board with castling rights"):
-    assertEquals(KingOfTheHill.initialPosition.history.castles, Castles.init)
+    assertEquals(KingOfTheHill.initialPosition.history.castlingRights, CastlingRights.init)
 
   test("threeCheck detect win"):
     assertNot(
@@ -263,7 +269,7 @@ K  r
     assertEquals(game.position.status, Status.Draw.some)
 
   test("threeCheck initialize the board with castling rights"):
-    assertEquals(KingOfTheHill.initialPosition.history.castles, Castles.init)
+    assertEquals(KingOfTheHill.initialPosition.history.castlingRights, CastlingRights.init)
 
   test("racingKings call it stalemate when there is no legal move"):
     val position = FullFen("8/8/8/8/3K4/8/1k6/b7 b - - 5 3")
@@ -307,7 +313,7 @@ K  r
     assertEquals(game.position.status, Status.Draw.some)
 
   test("racingKings initialize the board without castling rights"):
-    assert(RacingKings.initialPosition.history.castles.isEmpty)
+    assert(RacingKings.initialPosition.history.castlingRights.isEmpty)
 
   List(
     "1bb4r/kr5p/p7/2pP4/4PK2/8/PPP3PP/RNBQ1BNR w HAh c6 0 4",
@@ -328,7 +334,7 @@ K  r
       assert(game.variant.valid(game, false))
 
   test("antichess initialize the board without castling rights"):
-    assert(Antichess.initialPosition.history.castles.isEmpty)
+    assert(Antichess.initialPosition.history.castlingRights.isEmpty)
 
   test("antichess calculate material imbalance"):
     val position = FullFen("8/p7/8/8/2B5/b7/PPPK2PP/RNB3NR w - - 1 16")

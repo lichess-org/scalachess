@@ -11,30 +11,43 @@ import format.FullFen
 
 class UnmovedRooksTest extends ChessTest:
 
-  given munit.Compare[UnmovedRooks, Bitboard] with
-    def isEqual(obtained: UnmovedRooks, expected: Bitboard): Boolean =
+  given munit.Compare[CastlingRights, Bitboard] with
+    def isEqual(obtained: CastlingRights, expected: Bitboard): Boolean =
       obtained.value == expected.value
-  given munit.Compare[UnmovedRooks, Long] with
-    def isEqual(obtained: UnmovedRooks, expected: Long): Boolean =
+  given munit.Compare[CastlingRights, Long] with
+    def isEqual(obtained: CastlingRights, expected: Long): Boolean =
       obtained.value == expected
 
-  test("UnmovedRooks with 960 initial fen"):
+  /** Helper: assert that a position's per-side castling availability matches the four booleans. */
+  def assertCanCastle(
+      position: Position,
+      whiteKingSide: Boolean,
+      whiteQueenSide: Boolean,
+      blackKingSide: Boolean,
+      blackQueenSide: Boolean
+  )(using munit.Location): Unit =
+    assertEquals(position.canCastle(White, KingSide), whiteKingSide, "White king-side")
+    assertEquals(position.canCastle(White, QueenSide), whiteQueenSide, "White queen-side")
+    assertEquals(position.canCastle(Black, KingSide), blackKingSide, "Black king-side")
+    assertEquals(position.canCastle(Black, QueenSide), blackQueenSide, "Black queen-side")
+
+  test("castlingRights with 960 initial fen"):
     assertEquals(
       Fen
         .read(Chess960, FullFen("rkrnnqbb/pppppppp/8/8/8/8/PPPPPPPP/RKRNNQBB w KQkq - 0 1"))
-        .map(_.history.unmovedRooks),
-      Option(360287970189639685L)
+        .map(_.history.castlingRights),
+      Option(CastlingRights(360287970189639685L))
     )
 
-  test("At the start, unmovedRooks == rooks"):
+  test("At the start, castlingRights == rooks"):
     chess960Boards.map: board =>
-      assertEquals(board.history.unmovedRooks, Board.fromMap(board.pieces).rooks)
+      assertEquals(board.history.castlingRights, Board.fromMap(board.pieces).rooks)
 
-  test("At the start, both sides should have two unmoved rooks"):
+  test("At the start, both sides should have two unmoved rooks classified per side"):
     chess960Boards.map: board =>
       board.rooks.squares
         .traverse: square =>
-          board.history.unmovedRooks.side(square).flatten
+          board.castlingSide(square)
         .assertSome: sides =>
           assertEquals(sides.count(_ == QueenSide), 2)
           assertEquals(sides.count(_ == KingSide), 2)
@@ -42,12 +55,11 @@ class UnmovedRooksTest extends ChessTest:
   test("side 1"):
     Fen
       .read(Chess960, FullFen("rkrnnqbb/pppppppp/8/8/8/8/PPPPPPPP/RKRNNQBB w KQkq - 0 1"))
-      .map(_.history.unmovedRooks)
-      .assertSome: ur =>
-        assertEquals(ur.side(A1).flatten, Some(QueenSide))
-        assertEquals(ur.side(C1).flatten, Some(KingSide))
-        assertEquals(ur.side(A8).flatten, Some(QueenSide))
-        assertEquals(ur.side(C8).flatten, Some(KingSide))
+      .assertSome: position =>
+        assertEquals(position.castlingSide(A1), Some(QueenSide))
+        assertEquals(position.castlingSide(C1), Some(KingSide))
+        assertEquals(position.castlingSide(A8), Some(QueenSide))
+        assertEquals(position.castlingSide(C8), Some(KingSide))
 
   test("rook capture rook"):
     fenToGame(
@@ -55,11 +67,17 @@ class UnmovedRooksTest extends ChessTest:
       Chess960
     ).playMoves(B1 -> B8)
       .assertRight: g =>
-        assertNot(g.history.unmovedRooks.contains(B1))
-        assertNot(g.history.unmovedRooks.contains(B8))
-        assert(g.history.unmovedRooks.contains(G1))
-        assert(g.history.unmovedRooks.contains(G8))
-        assertEquals(g.position.castles, Castles(true, false, true, false))
+        assertNot(g.history.castlingRights.contains(B1))
+        assertNot(g.history.castlingRights.contains(B8))
+        assert(g.history.castlingRights.contains(G1))
+        assert(g.history.castlingRights.contains(G8))
+        assertCanCastle(
+          g.position,
+          whiteKingSide = true,
+          whiteQueenSide = false,
+          blackKingSide = true,
+          blackQueenSide = false
+        )
 
   test("capture at the corner"):
     fenToGame(
@@ -67,9 +85,15 @@ class UnmovedRooksTest extends ChessTest:
       Chess960
     ).playMoves(H8 -> A1)
       .assertRight: g =>
-        assert(g.history.unmovedRooks.contains(B1))
-        assert(g.history.unmovedRooks.contains(B8))
-        assertEquals(g.position.castles, Castles(false, true, false, true))
+        assert(g.history.castlingRights.contains(B1))
+        assert(g.history.castlingRights.contains(B8))
+        assertCanCastle(
+          g.position,
+          whiteKingSide = false,
+          whiteQueenSide = true,
+          blackKingSide = false,
+          blackQueenSide = true
+        )
 
   test("capture an unmovedRook"):
     fenToGame(
@@ -77,11 +101,17 @@ class UnmovedRooksTest extends ChessTest:
       Chess960
     ).playMoves(D4 -> G1)
       .assertRight: g =>
-        assert(g.history.unmovedRooks.contains(B1))
-        assert(g.history.unmovedRooks.contains(B8))
-        assertNot(g.history.unmovedRooks.contains(G1))
-        assert(g.history.unmovedRooks.contains(G8))
-        assertEquals(g.position.castles, Castles(false, true, true, true))
+        assert(g.history.castlingRights.contains(B1))
+        assert(g.history.castlingRights.contains(B8))
+        assertNot(g.history.castlingRights.contains(G1))
+        assert(g.history.castlingRights.contains(G8))
+        assertCanCastle(
+          g.position,
+          whiteKingSide = false,
+          whiteQueenSide = true,
+          blackKingSide = true,
+          blackQueenSide = true
+        )
 
   test("Atomic: explode an unmovedRook"):
     fenToGame(
@@ -89,43 +119,66 @@ class UnmovedRooksTest extends ChessTest:
       Atomic
     ).playMoves(H6 -> G7)
       .assertRight: g =>
-        assert(g.history.unmovedRooks.contains(A1))
-        assert(g.history.unmovedRooks.contains(H1))
-        assert(g.history.unmovedRooks.contains(A8))
-        assertNot(g.history.unmovedRooks.contains(H8))
-        assertEquals(
-          g.position.castles,
-          Castles(whiteKingSide = true, whiteQueenSide = true, blackKingSide = false, blackQueenSide = true)
+        assert(g.history.castlingRights.contains(A1))
+        assert(g.history.castlingRights.contains(H1))
+        assert(g.history.castlingRights.contains(A8))
+        assertNot(g.history.castlingRights.contains(H8))
+        assertCanCastle(
+          g.position,
+          whiteKingSide = true,
+          whiteQueenSide = true,
+          blackKingSide = false,
+          blackQueenSide = true
         )
 
   test("An unmovedRooks moves, white"):
     fenToGame(FullFen("qrnbkrbn/ppppp1pp/8/5p2/5P2/8/PPPPP1PP/QRNBKRBN w KQkq - 0 2"), Chess960)
       .playMoves(F1 -> F2)
       .assertRight: g =>
-        assert(g.history.unmovedRooks.contains(B1))
-        assert(g.history.unmovedRooks.contains(B8))
-        assertNot(g.history.unmovedRooks.contains(F1))
-        assert(g.history.unmovedRooks.contains(F8))
-        assertEquals(g.position.castles, Castles(false, true, true, true))
+        assert(g.history.castlingRights.contains(B1))
+        assert(g.history.castlingRights.contains(B8))
+        assertNot(g.history.castlingRights.contains(F1))
+        assert(g.history.castlingRights.contains(F8))
+        assertCanCastle(
+          g.position,
+          whiteKingSide = false,
+          whiteQueenSide = true,
+          blackKingSide = true,
+          blackQueenSide = true
+        )
+
   test("An unmovedRooks moves, black"):
     fenToGame(FullFen("qrnbkrbn/ppppp1pp/8/5p2/4PP2/8/PPPP2PP/QRNBKRBN b KQkq - 0 2"), Chess960)
       .playMoves(F8 -> F6)
       .assertRight: g =>
-        assert(g.history.unmovedRooks.contains(B1))
-        assert(g.history.unmovedRooks.contains(B8))
-        assert(g.history.unmovedRooks.contains(F1))
-        assertNot(g.history.unmovedRooks.contains(F8))
-        assertEquals(g.position.castles, Castles(true, true, false, true))
+        assert(g.history.castlingRights.contains(B1))
+        assert(g.history.castlingRights.contains(B8))
+        assert(g.history.castlingRights.contains(F1))
+        assertNot(g.history.castlingRights.contains(F8))
+        assertCanCastle(
+          g.position,
+          whiteKingSide = true,
+          whiteQueenSide = true,
+          blackKingSide = false,
+          blackQueenSide = true
+        )
 
   test("the king moves, white"):
     fenToGame(FullFen("rkrnnqbb/p1pppppp/1p6/8/8/1P6/P1PPPPPP/RKRNNQBB w KQkq - 0 2"), Chess960)
       .playMoves(B1 -> B2)
       .assertRight: g =>
-        assertNot(g.history.unmovedRooks.contains(A1))
-        assert(g.history.unmovedRooks.contains(A8))
-        assertNot(g.history.unmovedRooks.contains(C1))
-        assert(g.history.unmovedRooks.contains(C8))
-        assertEquals(g.position.castles, Castles(false, false, true, true))
+        assertNot(g.history.castlingRights.contains(A1))
+        assert(g.history.castlingRights.contains(A8))
+        assertNot(g.history.castlingRights.contains(C1))
+        assert(g.history.castlingRights.contains(C8))
+        assertCanCastle(
+          g.position,
+          whiteKingSide = false,
+          whiteQueenSide = false,
+          blackKingSide = true,
+          blackQueenSide = true
+        )
+
   test("the king moves, black"):
     fenToGame(
       FullFen("rkrnnqbb/p1pppppp/1p6/8/5P2/1P6/P1PPP1PP/RKRNNQBB b KQkq - 0 2"),
@@ -133,8 +186,14 @@ class UnmovedRooksTest extends ChessTest:
     )
       .playMoves(B8 -> B7)
       .assertRight: g =>
-        assert(g.history.unmovedRooks.contains(A1))
-        assertNot(g.history.unmovedRooks.contains(A8))
-        assert(g.history.unmovedRooks.contains(C1))
-        assertNot(g.history.unmovedRooks.contains(C8))
-        assertEquals(g.position.castles, Castles(true, true, false, false))
+        assert(g.history.castlingRights.contains(A1))
+        assertNot(g.history.castlingRights.contains(A8))
+        assert(g.history.castlingRights.contains(C1))
+        assertNot(g.history.castlingRights.contains(C8))
+        assertCanCastle(
+          g.position,
+          whiteKingSide = true,
+          whiteQueenSide = true,
+          blackKingSide = false,
+          blackQueenSide = false
+        )

@@ -30,7 +30,12 @@ case object Horde
 
   override val initialBoard: Board = Board.fromMap(initialPieces)
 
-  override val castles: Castles = Castles.black
+  override val initialCastlingRights: CastlingRights = CastlingRights.black
+
+  // In Horde only Black can castle, so any white rooks (e.g. from pawn promotion)
+  // must never enter castlingRights.
+  override def makeCastlingRights(rooks: Bitboard): CastlingRights =
+    CastlingRights(rooks & Bitboard.rank(Black.backRank))
 
   override val initialFen: FullFen =
     FullFen("rnbqkbnr/pppppppp/8/1PP2PP1/PPPPPPPP/PPPPPPPP/PPPPPPPP/PPPPPPPP w kq - 0 1")

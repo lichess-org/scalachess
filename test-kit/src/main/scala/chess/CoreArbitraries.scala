@@ -24,7 +24,7 @@ object CoreArbitraries:
       role <- Arbitrary.arbitrary[Role]
     yield Piece(color, role)
 
-  given Arbitrary[Castles] = Arbitrary(castlesGen)
+  given Arbitrary[CastlingRights] = Arbitrary(castlingRightsGen)
   given Arbitrary[Bitboard] = Arbitrary(Gen.long.map(Bitboard(_)))
 
   given Arbitrary[PromotableRole] = Arbitrary(Gen.oneOf(Rook, Knight, Bishop, Queen))
@@ -80,13 +80,13 @@ object CoreArbitraries:
     yield Uci.Drop(role, dest)
 
   private val genBool = Gen.prob(0.5)
-  private val castlesGen =
+  private val castlingRightsGen =
     for
       wks <- genBool
       wqs <- genBool
       bks <- genBool
       bqs <- genBool
-    yield Castles(wks, wqs, bks, bqs)
+    yield CastlingRights(wks, wqs, bks, bqs)
 
   private def squareFromBitboardGen(bb: Bitboard): Gen[Square] =
     Gen.oneOf(bb.squares)

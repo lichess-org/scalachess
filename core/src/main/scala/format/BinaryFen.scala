@@ -27,7 +27,7 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
     var black = Bitboard.empty
 
     var turn = White
-    var unmovedRooks = UnmovedRooks(Bitboard.empty)
+    var castlingRights = CastlingRights.none
     var epMove: Option[Uci.Move] = None
 
     def unpackPiece(sq: Square, nibble: Int) =
@@ -77,11 +77,11 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
         case 13 =>
           rooks |= bb
           white |= bb
-          unmovedRooks |= bb
+          castlingRights = castlingRights | bb
         case 14 =>
           rooks |= bb
           black |= bb
-          unmovedRooks |= bb
+          castlingRights = castlingRights | bb
         case 15 =>
           kings |= bb
           black |= bb
@@ -154,8 +154,7 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
         History(
           lastMove = epMove,
           checkCount = checkCount,
-          castles = maximumCastles(unmovedRooks = unmovedRooks, white = white, black = black, kings = kings),
-          unmovedRooks = unmovedRooks,
+          castlingRights = castlingRights,
           halfMoveClock = halfMoveClock,
           crazyData = crazyData
         ),
@@ -194,7 +193,7 @@ object BinaryFen:
     val occupied = position.board.occupied
     writeLong(builder, occupied.value)
 
-    val unmovedRooks = minimumUnmovedRooks(position)
+    val castlingRights = position.history.castlingRights
     val pawnPushedTo = position.enPassantSquare.flatMap(_.prevRank(position.color))
 
     def packPiece(sq: Square): Byte =
@@ -208,8 +207,8 @@ object BinaryFen:
         case Some(Piece(Black, Knight)) => 3
         case Some(Piece(White, Bishop)) => 4
         case Some(Piece(Black, Bishop)) => 5
-        case Some(Piece(White, Rook)) => if unmovedRooks.contains(sq) then 13 else 6
-        case Some(Piece(Black, Rook)) => if unmovedRooks.contains(sq) then 14 else 7
+        case Some(Piece(White, Rook)) => if castlingRights.contains(sq) then 13 else 6
+        case Some(Piece(Black, Rook)) => if castlingRights.contains(sq) then 14 else 7
         case Some(Piece(White, Queen)) => 8
         case Some(Piece(Black, Queen)) => 9
         case Some(Piece(White, King)) => 10
@@ -305,31 +304,3 @@ object BinaryFen:
     def readNibbles(reader: Iterator[Byte]): (Int, Int) =
       val b = reader.next()
       ((b & 0xf), (b >>> 4) & 0xf)
-
-    def minimumUnmovedRooks(position: Position): UnmovedRooks =
-      val white = position.history.unmovedRooks.bb & position.white & Bitboard.firstRank
-      val black = position.history.unmovedRooks.bb & position.black & Bitboard.lastRank
-      val castles = position.history.castles
-      UnmovedRooks(
-        (if castles.whiteKingSide then white.isolateLast else Bitboard.empty) |
-          (if castles.whiteQueenSide then white.isolateFirst else Bitboard.empty) |
-          (if castles.blackKingSide then black.isolateLast else Bitboard.empty) |
-          (if castles.blackQueenSide then black.isolateFirst else Bitboard.empty)
-      )
-
-    def maximumCastles(
-        unmovedRooks: UnmovedRooks,
-        white: Bitboard,
-        black: Bitboard,
-        kings: Bitboard
-    ): Castles =
-      val whiteRooks = unmovedRooks.bb & white & Bitboard.firstRank
-      val blackRooks = unmovedRooks.bb & black & Bitboard.lastRank
-      val whiteKing = (white & kings & Bitboard.firstRank).first.getOrElse(Square.E1)
-      val blackKing = (black & kings & Bitboard.lastRank).first.getOrElse(Square.E8)
-      Castles(
-        whiteKingSide = whiteRooks.last.exists(r => r.value > whiteKing.value),
-        whiteQueenSide = whiteRooks.first.exists(r => r.value < whiteKing.value),
-        blackKingSide = blackRooks.last.exists(r => r.value > blackKing.value),
-        blackQueenSide = blackRooks.first.exists(r => r.value < blackKing.value)
-      )

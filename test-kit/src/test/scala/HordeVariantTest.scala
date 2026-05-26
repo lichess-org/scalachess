@@ -181,13 +181,11 @@ class HordeVariantTest extends ChessTest:
     assertRight(Horde.initialPosition.playMoves(sans)): steps =>
       assertEquals(steps.last.after.legalMoves.exists(_.castles), true)
 
-  test("UnmovedRooks & castles at the starting position"):
+  test("CastlingRights at the starting position"):
     val board = Horde.initialPosition
-    assertEquals(board.history.unmovedRooks, UnmovedRooks(Set(Square.A8, Square.H8)))
-    assertEquals(board.history.castles, Castles(false, false, true, true))
+    assertEquals(board.history.castlingRights, CastlingRights(Set(Square.A8, Square.H8)))
 
   test("the h8 rooks move"):
     val position = FullFen("r3kbnr/p1pqppp1/1pnp3P/PPPP1P1P/PPP1PPP1/1PPP1PPP/PPPPPPPP/PPPPPPPP b kq - 0 7")
     val game = fenToGame(position, Horde)(Square.H8, Square.H6).get
-    assertEquals(game._1.position.history.unmovedRooks, UnmovedRooks(Set(Square.A8)))
-    assertEquals(game._1.position.history.castles, Castles(false, false, false, true))
+    assertEquals(game._1.position.history.castlingRights, CastlingRights(Set(Square.A8)))

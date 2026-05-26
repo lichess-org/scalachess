@@ -4,53 +4,37 @@ import munit.ScalaCheckSuite
 import org.scalacheck.Prop
 
 import CoreArbitraries.given
-import Castles.*
 
 class CastlesTest extends ScalaCheckSuite:
 
-  test("can(color, side) should be consistent with properties"):
-    Prop.forAll { (c: Castles) =>
-      (c.can(White, KingSide) == c.whiteKingSide) &&
-      (c.can(White, QueenSide) == c.whiteQueenSide) &&
-      (c.can(Black, KingSide) == c.blackKingSide) &&
-      (c.can(Black, QueenSide) == c.blackQueenSide)
-    }
-
-  test("apply with booleans"):
+  test("standard apply round-trip with booleans"):
     Prop.forAll:
       (whiteKingSide: Boolean, whiteQueenSide: Boolean, blackKingSide: Boolean, blackQueenSide: Boolean) =>
-        val c = Castles(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
-        (c.can(White, KingSide) == whiteKingSide) &&
-        (c.can(White, QueenSide) == whiteQueenSide) &&
-        (c.can(Black, KingSide) == blackKingSide) &&
-        (c.can(Black, QueenSide) == blackQueenSide)
+        val cr = CastlingRights(whiteKingSide, whiteQueenSide, blackKingSide, blackQueenSide)
+        cr.contains(Square.H1) == whiteKingSide &&
+        cr.contains(Square.A1) == whiteQueenSide &&
+        cr.contains(Square.H8) == blackKingSide &&
+        cr.contains(Square.A8) == blackQueenSide
 
-  test("without color"):
-    Prop.forAll { (c: Castles, color: Color) =>
-      val updated = c.without(color)
-      updated.can(color) == false &&
-      updated.can(!color) == c.can(!color)
+  test("without(color) removes only that color's back-rank bits"):
+    Prop.forAll { (cr: CastlingRights, color: Color) =>
+      val updated = cr.without(color)
+      val cleanedRank = Bitboard.rank(color.backRank).value
+      val keptRank = Bitboard.rank((!color).backRank).value
+      (updated.value & cleanedRank) == 0L &&
+      (updated.value & keptRank) == (cr.value & keptRank)
     }
 
-  test("without color and side"):
-    Prop.forAll { (c: Castles, color: Color, side: Side) =>
-      val updated = c.without(color, side)
-      updated.can(color, side) == false &&
-      updated.can(color, !side) == c.can(color, !side) &&
-      updated.can(!color) == c.can(!color)
+  test("bitwise & with complement of square removes that bit"):
+    Prop.forAll { (cr: CastlingRights, color: Color) =>
+      val sq = if color.white then Square.A1 else Square.A8
+      val updated = cr & ~sq.bl
+      !updated.contains(sq) &&
+      // All other bits unchanged
+      (updated.value | sq.bl) == (cr.value | sq.bl)
     }
 
-  test("add"):
-    Prop.forAll { (c: Castles, color: Color, side: Side) =>
-      val updated = c.add(color, side)
-      updated.can(color) == true &&
-      updated.can(!color) == c.can(!color)
-    }
-
-  test("update"):
-    Prop.forAll { (c: Castles, color: Color, kingSide: Boolean, queenSide: Boolean) =>
-      val updated = c.update(color, kingSide, queenSide)
-      updated.can(color, KingSide) == kingSide &&
-      updated.can(color, QueenSide) == queenSide &&
-      updated.can(!color) == c.can(!color)
+  test("isEmpty iff no bits set"):
+    Prop.forAll { (cr: CastlingRights) =>
+      cr.isEmpty == (cr.value == 0L)
     }

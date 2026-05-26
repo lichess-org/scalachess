@@ -2,7 +2,6 @@ package chess
 
 import chess.format.Fen
 import chess.variant.Standard
-import monocle.syntax.all.*
 
 import scala.language.implicitConversions
 
@@ -53,7 +52,11 @@ class CastlingTest extends ChessTest:
     val board: Position = """R   KB R"""
     assertEquals(board.place(Black.rook, B3).flatMap(_.destsFrom(E1)), Set(A1, C1, D1, D2, E2, F2))
 
-  test("unmovedRooks and castles are consistent"):
+  test("only rooks listed in castlingRights are recognised as castle-eligible"):
     val s1 = Fen.read(Standard, Fen.Full("rnbqk2r/pppppppp/8/8/8/8/PPPPPPPP/RNBQK2R w Qq - 0 1")).get
-    val s2 = s1.focus(_.history.unmovedRooks).replace(UnmovedRooks.corners)
-    assertEquals(s2.legalMoves.filter(_.castles), Nil)
+    // FEN said `Qq`: white queen-side and black queen-side. Other sides are not in castlingRights.
+    assert(s1.castlingRights.contains(Square.A1))
+    assertNot(s1.castlingRights.contains(Square.H1))
+    assert(s1.castlingRights.contains(Square.A8))
+    assertNot(s1.castlingRights.contains(Square.H8))
+    // (Path-clearing is independent: the FEN's pieces block the actual moves; that's not our concern here.)

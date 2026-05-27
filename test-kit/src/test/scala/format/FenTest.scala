@@ -72,6 +72,21 @@ class FenTest extends ChessTest:
     assertEquals(board.history.castlingRights, CastlingRights(Square.A1.bl))
     assertEquals(board.legalMoves.filter(_.castles), Nil)
 
+  test("writeCastles omits a color's letters when its king is missing from back rank"):
+    // Reproduces the atomicRegression scenario where white's king has been exploded
+    // (1. e4 d5 2. Nf3 dxe4 3. Bb5+ Qxd2#). Even if castlingRights still carries
+    // bits for the king-less color's rooks, FenWriter must not emit `K` / `Q`.
+    val fen = Fen.Full("rnb1kbnr/ppp1pppp/8/1B6/8/8/PPP2PPP/RN5R w - - 0 1")
+    val position = Fen
+      .read(Atomic, fen)
+      .get
+      .updateHistory(_.withCastlingRights(CastlingRights.corners))
+    val castlingField = Fen.write(position).value.split(' ')(2)
+    assertNot(castlingField.contains('K'), s"white K leaked into FEN: $castlingField")
+    assertNot(castlingField.contains('Q'), s"white Q leaked into FEN: $castlingField")
+    assert(castlingField.contains('k'), s"black k missing from FEN: $castlingField")
+    assert(castlingField.contains('q'), s"black q missing from FEN: $castlingField")
+
   test("castling rights with 2 rooks on the same side"):
     val f1 = Fen.Full("4k3/8/8/8/8/8/8/4K1RR w G -")
     val f2 = Fen.Full("4k3/8/8/8/8/8/8/4K1RR w K -")

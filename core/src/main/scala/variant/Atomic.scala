@@ -87,8 +87,17 @@ case object Atomic
       val afterExplosions = afterBoard.withBoard(afterBoard.board.discard(squaresToExplode))
 
       val rooksToExploded = squaresToExplode & afterBoard.rooks
+      // If a king is exploded, its color forfeits all castling rights — same
+      // semantics as if the king had moved. This keeps castlingRights free of
+      // ghost bits when the exploded king's rooks survive on the back rank.
+      val kingsExploded = squaresToExplode & afterBoard.kings
+      val whiteKingExploded = (kingsExploded & afterBoard.white).nonEmpty
+      val blackKingExploded = (kingsExploded & afterBoard.black).nonEmpty
       val newBoard = afterExplosions.updateHistory: h =>
-        h.copy(castlingRights = h.castlingRights & ~rooksToExploded)
+        var cr = h.castlingRights & ~rooksToExploded
+        if whiteKingExploded then cr = cr.without(White)
+        if blackKingExploded then cr = cr.without(Black)
+        h.copy(castlingRights = cr)
       move.copy(afterWithoutHistory = newBoard)
     else move
 

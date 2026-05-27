@@ -57,6 +57,19 @@ class AtomicVariantTest extends ChessTest:
         assert(g.position.variantEnd)
         assertEquals(g.position.winner, Some(Black))
 
+  test("Exploding a king clears that color's castling rights"):
+    val fenPosition = FullFen("rnb1kbnr/ppp1pppp/8/3q4/8/7P/PPPP1PP1/RNBQKBNR b KQkq -")
+    fenToGame(fenPosition, Atomic)
+      .playMoves((Square.D5, Square.D2))
+      .assertRight: g =>
+        val whiteBackRank = Bitboard.rank(White.backRank)
+        assertEquals(
+          (g.position.castlingRights.bb & whiteBackRank).value,
+          0L,
+          "white rook bits should be cleared after king explosion"
+        )
+        assert((g.position.castlingRights.bb & Bitboard.rank(Black.backRank)).nonEmpty)
+
   test("The game must end by a traditional checkmate (atomic mate)"):
     val fenPosition = FullFen("1k6/8/8/8/8/8/PP5r/K7 b - -")
     val game = fenToGame(fenPosition, Atomic)

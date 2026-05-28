@@ -30,7 +30,7 @@ case object Horde
 
   override val initialBoard: Board = Board.fromMap(initialPieces)
 
-  override val initialCastlingRights: CastlingRights = CastlingRights.black
+  override val allowsCastling: Boolean = true
 
   // In Horde only Black can castle, so any white rooks (e.g. from pawn promotion)
   // must never enter castlingRights.

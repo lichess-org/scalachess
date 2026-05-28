@@ -37,7 +37,6 @@ case object RacingKings
   )
   override val initialBoard: Board = Board.fromMap(initialPieces)
 
-  override val initialCastlingRights: CastlingRights = CastlingRights.none
   override val allowsCastling: Boolean = false
 
   override val initialFen: FullFen = FullFen("8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - - 0 1")

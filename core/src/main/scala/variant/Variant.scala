@@ -35,15 +35,13 @@ abstract class Variant private[variant] (
 
   inline def exotic: Boolean = !standard
 
-  def allowsCastling: Boolean = !initialCastlingRights.isEmpty
+  def allowsCastling: Boolean = true
 
   def makeCastlingRights(rooks: Bitboard): CastlingRights =
     if allowsCastling then CastlingRights(rooks) else CastlingRights.none
 
   protected val backRank: Vector[Role] =
     Vector(Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook)
-
-  def initialCastlingRights: CastlingRights = CastlingRights.init
 
   val initialFen: Fen.Full = Fen.Full.initial
 

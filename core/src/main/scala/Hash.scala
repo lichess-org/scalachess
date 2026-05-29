@@ -47,11 +47,22 @@ object Hash:
     val hTurn = position.color.fold(ZobristTables.whiteTurnMask, 0)
 
     val hCastling =
-      if position.variant.allowsCastling then
-        (if position.canCastle(White, KingSide) then ZobristTables.castlingMasks.white(0) else 0) ^
-          (if position.canCastle(White, QueenSide) then ZobristTables.castlingMasks.white(1) else 0) ^
-          (if position.canCastle(Black, KingSide) then ZobristTables.castlingMasks.black(0) else 0) ^
-          (if position.canCastle(Black, QueenSide) then ZobristTables.castlingMasks.black(1) else 0)
+      if position.variant.allowsCastling && position.castlingRights.nonEmpty then
+        // Derive the four (color, side) bits from one king lookup + one masked rook
+        // bitboard per color, instead of four independent `canCastle` queries that
+        // each re-fetch the king and re-mask the rights.
+        def perColor(color: Color, kMask: Int, qMask: Int): Int =
+          val rights = position.castlingRights.bb & Bitboard.rank(color.backRank)
+          if rights.isEmpty then 0
+          else
+            position
+              .kingOf(color)
+              .first
+              .fold(0): king =>
+                (if rights.exists(_.file > king.file) then kMask else 0) ^
+                  (if rights.exists(_.file < king.file) then qMask else 0)
+        perColor(White, ZobristTables.castlingMasks.white(0), ZobristTables.castlingMasks.white(1)) ^
+          perColor(Black, ZobristTables.castlingMasks.black(0), ZobristTables.castlingMasks.black(1))
       else 0
 
     val hEp = position.enPassantSquare.fold(0): square =>

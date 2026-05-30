@@ -35,11 +35,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
     * of the king's file. Standard chess: king on E, kingside = file > E, queenside = file < E.
     */
   def canCastle(color: Color, side: Side): Boolean =
-    kingOf(color).first.exists: king =>
-      val rookBits = castlingRights.bb & Bitboard.rank(color.backRank)
-      side match
-        case Side.KingSide => rookBits.exists(_.file > king.file)
-        case Side.QueenSide => rookBits.exists(_.file < king.file)
+    castlingRights.canCastle(kingOf(color), side)
 
   /** Classify a rook square as king-side or queen-side relative to its color's king.
     *

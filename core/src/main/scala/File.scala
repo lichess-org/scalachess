@@ -19,9 +19,11 @@ object File:
     // the bitboard of the file
     inline def bb: Bitboard = Bitboard.file(value)
 
+    /** Every square on files with a higher index than this one (toward the H-file). */
     inline def above: Bitboard =
       Bitboard.filesAbove(value)
 
+    /** Every square on files with a lower index than this one (toward the A-file). */
     inline def below: Bitboard =
       Bitboard.filesBelow(value)
 

@@ -70,6 +70,19 @@ object CastlingRights:
           case Side.KingSide => (rights & king.file.above).nonEmpty
           case Side.QueenSide => (rights & king.file.below).nonEmpty
 
+    /** King-side / queen-side castling availability for `kings` in a single pass.
+      *
+      * Equivalent to `(canCastle(kings, KingSide), canCastle(kings, QueenSide))` but
+      * shares the king-square and back-rank-mask work — used by the position hash, which
+      * needs both bits per color on every move.
+      */
+    inline def foldCastle[A](kings: Bitboard)(inline f: (kingSide: Boolean, queenSide: Boolean) => A): A =
+      if cr == 0L || kings.isEmpty then f(false, false)
+      else
+        val king = Square.unsafe(java.lang.Long.numberOfTrailingZeros(kings.value))
+        val rights = cr & king.rank.bb.value
+        f((rights & king.file.above).nonEmpty, (rights & king.file.below).nonEmpty)
+
     def without(color: Color): CastlingRights =
       cr & ~Bitboard.rank(color.backRank).value
 

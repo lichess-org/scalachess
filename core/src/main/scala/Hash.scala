@@ -49,9 +49,8 @@ object Hash:
     val hCastling =
       if position.variant.allowsCastling && position.castlingRights.nonEmpty then
         def perColor(color: Color, kMask: Int, qMask: Int): Int =
-          val kings = position.kingOf(color)
-          (if position.castlingRights.canCastle(kings, KingSide) then kMask else 0) ^
-            (if position.castlingRights.canCastle(kings, QueenSide) then qMask else 0)
+          position.castlingRights.foldCastle(position.kingOf(color)): (kingSide, queenSide) =>
+            (if kingSide then kMask else 0) ^ (if queenSide then qMask else 0)
         perColor(White, ZobristTables.castlingMasks.white(0), ZobristTables.castlingMasks.white(1)) ^
           perColor(Black, ZobristTables.castlingMasks.black(0), ZobristTables.castlingMasks.black(1))
       else 0

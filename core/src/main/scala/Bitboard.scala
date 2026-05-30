@@ -31,6 +31,15 @@ object Bitboard:
   def aligned(a: Square, b: Square, c: Square): Boolean = ray(a, b).contains(c)
   def between(a: Square, b: Square): Bitboard = BETWEEN(a.value)(b.value)
 
+  // Bitboards of every square on files strictly above / below a given file (0..7).
+  // Used by the castling hash to classify a rook as king-side (file > king's) or
+  // queen-side (file < king's) with a plain `&` instead of a bitboard scan.
+  private val fileColumn = 0x0101010101010101L
+  val filesAbove: Array[Bitboard] = Array.tabulate(8): f =>
+    (f + 1 until 8).foldLeft(0L)((m, g) => m | (fileColumn << g))
+  val filesBelow: Array[Bitboard] = Array.tabulate(8): f =>
+    (0 until f).foldLeft(0L)((m, g) => m | (fileColumn << g))
+
   extension (l: Long)
     private def lsb: Square = Square.unsafe(java.lang.Long.numberOfTrailingZeros(l))
     private def msb: Square = Square.unsafe(63 - java.lang.Long.numberOfLeadingZeros(l))

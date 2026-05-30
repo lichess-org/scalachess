@@ -59,6 +59,17 @@ object CastlingRights:
     def nonEmpty: Boolean = cr != 0L
     def toList: List[Square] = cr.bb.squares
 
+    def canCastle(kings: Bitboard, side: Side): Boolean =
+      if cr == 0L || kings.isEmpty then false
+      else
+        // unsafe but we know kings is nonEmpty
+        val king = Square.unsafe(java.lang.Long.numberOfTrailingZeros(kings.value))
+        // restrict to rooks on the king's rank, so the other color's rights don't leak in
+        val rights = cr & king.rank.bb.value
+        side match
+          case Side.KingSide => (rights & king.file.above).nonEmpty
+          case Side.QueenSide => (rights & king.file.below).nonEmpty
+
     def without(color: Color): CastlingRights =
       cr & ~Bitboard.rank(color.backRank).value
 

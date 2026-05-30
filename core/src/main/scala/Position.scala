@@ -44,6 +44,7 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
   /** Classify a rook square as king-side or queen-side relative to its color's king.
     *
     * Returns None if the square is not in `castlingRights` or if the king is missing.
+    * tests only
     */
   def castlingSide(square: Square): Option[Side] =
     if !castlingRights.contains(square) then None
@@ -286,9 +287,10 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
     yield move
 
   def genCastling(king: Square): List[Move] =
-    if king.rank != color.backRank then Nil
+    val backRankRights = history.castlingRights.value & Bitboard.rank(color.backRank).value
+    if king.rank != color.backRank || backRankRights == 0L then Nil
     else
-      val rooks = Bitboard.rank(color.backRank) & board.rooks & history.castlingRights.value
+      val rooks = board.rooks & backRankRights
       for
         rook <- rooks
         toKingFile = if rook.value < king.value then File.C else File.G

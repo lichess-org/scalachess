@@ -48,19 +48,10 @@ object Hash:
 
     val hCastling =
       if position.variant.allowsCastling && position.castlingRights.nonEmpty then
-        // Derive the four (color, side) bits from one king lookup + one masked rook
-        // bitboard per color, instead of four independent `canCastle` queries that
-        // each re-fetch the king and re-mask the rights.
         def perColor(color: Color, kMask: Int, qMask: Int): Int =
-          val rights = position.castlingRights.bb & Bitboard.rank(color.backRank)
-          if rights.isEmpty then 0
-          else
-            position
-              .kingOf(color)
-              .first
-              .fold(0): king =>
-                (if rights.exists(_.file > king.file) then kMask else 0) ^
-                  (if rights.exists(_.file < king.file) then qMask else 0)
+          val kings = position.kingOf(color)
+          (if position.castlingRights.canCastle(kings, KingSide) then kMask else 0) ^
+            (if position.castlingRights.canCastle(kings, QueenSide) then qMask else 0)
         perColor(White, ZobristTables.castlingMasks.white(0), ZobristTables.castlingMasks.white(1)) ^
           perColor(Black, ZobristTables.castlingMasks.black(0), ZobristTables.castlingMasks.black(1))
       else 0
@@ -253,6 +244,15 @@ private object ZobristTables:
       0xf165_b587
     )
   )
+
+  // Bitboards of every square on files strictly above / below a given file (0..7).
+  // Used by the castling hash to classify a rook as king-side (file > king's) or
+  // queen-side (file < king's) with a plain `&` instead of a bitboard scan.
+  private val fileColumn = 0x0101010101010101L
+  val filesAbove: Array[Long] = Array.tabulate(8): f =>
+    (f + 1 until 8).foldLeft(0L)((m, g) => m | (fileColumn << g))
+  val filesBelow: Array[Long] = Array.tabulate(8): f =>
+    (0 until f).foldLeft(0L)((m, g) => m | (fileColumn << g))
 
   val enPassantMasks = Array(
     0x70cc_73d9, 0xe21a_6b35, 0x003a_93d8, 0x1c99_ded3, 0xcf31_45de, 0xd0e4_427a, 0x77c6_21cc, 0x67a3_4dac

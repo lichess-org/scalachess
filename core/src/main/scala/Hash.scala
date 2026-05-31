@@ -32,7 +32,43 @@ object Hash:
   def apply(value: Int): Hash = value >>> 8
   def apply(position: Position): Hash = hashPosition(position) >>> 8
 
-  private def hashPosition(position: Position): Int =
+  /** EXPERIMENT-ONLY hook: hash with a chosen castling-hash implementation, to A/B the
+    * three variants under the same full-hash path. `mode`: 0 = current (foldCastle),
+    * 1 = corner fast-path, 2 = stored-bits ceiling. Remove after the experiment. */
+  def hashWith(position: Position, mode: Int): Hash = hashPosition(position, mode) >>> 8
+
+  private def hashPosition(position: Position): Int = hashPosition(position, 0)
+
+  private def castlingHashFold(position: Position): Int =
+    def perColor(color: Color, kMask: Int, qMask: Int): Int =
+      position.castlingRights.foldCastle(position.kingOf(color)): (kingSide, queenSide) =>
+        (if kingSide then kMask else 0) ^ (if queenSide then qMask else 0)
+    perColor(White, ZobristTables.castlingMasks.white(0), ZobristTables.castlingMasks.white(1)) ^
+      perColor(Black, ZobristTables.castlingMasks.black(0), ZobristTables.castlingMasks.black(1))
+
+  // Corner fast-path: when every rights bit is a standard corner (A1/H1/A8/H8) the side is
+  // decided by the square alone (H = king-side, A = queen-side) with NO king lookup.
+  // Non-corner bits (chess960 / from-position) fall back to the king-lookup fold.
+  private def castlingHashCorner(position: Position): Int =
+    val cr = position.castlingRights.value
+    if (cr & ~CastlingRights.corners.value) == 0L then
+      (if (cr & Square.H1.bl) != 0L then ZobristTables.castlingMasks.white(0) else 0) ^
+        (if (cr & Square.A1.bl) != 0L then ZobristTables.castlingMasks.white(1) else 0) ^
+        (if (cr & Square.H8.bl) != 0L then ZobristTables.castlingMasks.black(0) else 0) ^
+        (if (cr & Square.A8.bl) != 0L then ZobristTables.castlingMasks.black(1) else 0)
+    else castlingHashFold(position)
+
+  // Ceiling probe: zero king work — recompute the 4 bits the cheapest conceivable way for
+  // the corner case, NO fallback (not shippable; 960 would be wrong). Establishes the
+  // upper bound the other variants are measured against.
+  private def castlingHashCeiling(position: Position): Int =
+    val cr = position.castlingRights.value
+    (if (cr & Square.H1.bl) != 0L then ZobristTables.castlingMasks.white(0) else 0) ^
+      (if (cr & Square.A1.bl) != 0L then ZobristTables.castlingMasks.white(1) else 0) ^
+      (if (cr & Square.H8.bl) != 0L then ZobristTables.castlingMasks.black(0) else 0) ^
+      (if (cr & Square.A8.bl) != 0L then ZobristTables.castlingMasks.black(1) else 0)
+
+  private def hashPosition(position: Position, castlingMode: Int): Int =
 
     val hPieces =
       var h = 0
@@ -48,11 +84,10 @@ object Hash:
 
     val hCastling =
       if position.variant.allowsCastling && position.castlingRights.nonEmpty then
-        def perColor(color: Color, kMask: Int, qMask: Int): Int =
-          position.castlingRights.foldCastle(position.kingOf(color)): (kingSide, queenSide) =>
-            (if kingSide then kMask else 0) ^ (if queenSide then qMask else 0)
-        perColor(White, ZobristTables.castlingMasks.white(0), ZobristTables.castlingMasks.white(1)) ^
-          perColor(Black, ZobristTables.castlingMasks.black(0), ZobristTables.castlingMasks.black(1))
+        castlingMode match
+          case 1 => castlingHashCorner(position)
+          case 2 => castlingHashCeiling(position)
+          case _ => castlingHashFold(position)
       else 0
 
     val hEp = position.enPassantSquare.fold(0): square =>

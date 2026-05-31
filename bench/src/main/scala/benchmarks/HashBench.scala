@@ -20,21 +20,32 @@ class HashBench:
   // the unit of CPU work per iteration
   private val Work: Long = 10
 
+  // EXPERIMENT-ONLY: which castling-hash implementation to exercise.
+  // current = foldCastle (king lookup), corner = corner fast-path, ceiling = zero-king upper bound.
+  @Param(Array("current", "corner", "ceiling"))
+  var castlingMode: String = scala.compiletime.uninitialized
+  private def modeInt: Int = castlingMode match
+    case "corner" => 1
+    case "ceiling" => 2
+    case _ => 0
+
   var boards: List[Position] = scala.compiletime.uninitialized
 
   @Setup
   def setup() =
-    val results = for
-      results <- Fixtures.gamesForPerfTest.traverse(Replay.mainline(_))
-      replays <- results.traverse(_.valid)
-    yield replays.flatMap(_.moves).map(_.after)
+    val results =
+      for
+        results <- Fixtures.gamesForPerfTest.traverse(Replay.mainline(_))
+        replays <- results.traverse(_.valid)
+      yield replays.flatMap(_.moves).map(_.after)
     boards = results.toOption.get
 
   @Benchmark
   def hashes(bh: Blackhole) =
+    val mode = modeInt
     val result = boards.map: x =>
       Blackhole.consumeCPU(Work)
-      Hash(x)
+      Hash.hashWith(x, mode)
     bh.consume(result)
 
   @Benchmark

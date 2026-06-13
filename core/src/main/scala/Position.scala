@@ -6,7 +6,7 @@ import chess.format.{ Fen, Uci }
 
 import scala.annotation.threadUnsafe
 
-import variant.{ Variant, Crazyhouse }
+import variant.{ Crazyhouse, Variant }
 
 case class Position(board: Board, history: History, variant: Variant, color: Color):
 

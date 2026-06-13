@@ -4,9 +4,9 @@ import cats.syntax.all.*
 
 import scala.language.implicitConversions
 
-import format.{ FullFen, Fen, Uci, Visual }
+import format.{ Fen, FullFen, Uci, Visual }
 import format.pgn.PgnStr
-import variant.{ Chess960, Variant, Standard, Crazyhouse }
+import variant.{ Chess960, Crazyhouse, Standard, Variant }
 
 trait ChessTestCommon:
 

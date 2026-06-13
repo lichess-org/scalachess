@@ -1,13 +1,13 @@
 package chess
 package json
 
-import chess.format.pgn.{ Glyph, Glyphs }
-import chess.format.{ Uci, UciCharPair }
-import chess.opening.Opening
-import chess.variant.Crazyhouse
+import format.pgn.{ Glyph, Glyphs }
+import format.{ Uci, UciCharPair }
+import opening.Opening
 import play.api.libs.json.{ Json as PlayJson, * }
 import scalalib.json.Json as LibJson
 import scalalib.json.Json.given
+import variant.Crazyhouse
 
 object Json:
 

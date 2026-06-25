@@ -351,9 +351,15 @@ final case class Node[A](
     copy(value = f(value), child = child.map(_.modifyInMainline(f)))
 
   def modifyInMainlineAt(n: Int, f: Node[A] => Node[A]): Option[Node[A]] =
-    if n < 0 || n >= mainline.size then none
-    else if n == 0 then f(this).some
-    else child.flatMap(_.modifyInMainlineAt(n - 1, f)).map(c => withChild(c.some))
+    @tailrec
+    def loop(n: Int, node: Node[A], acc: List[Node[A]]): Option[Node[A]] =
+      if n == 0 then
+        acc.foldLeft(f(node).some)((child, ancestor) => ancestor.withChild(child).some)
+      else
+        node.child match
+          case None => none // n points past the end of the mainline
+          case Some(child) => loop(n - 1, child, node.withoutChild :: acc)
+    if n < 0 then none else loop(n, this, Nil)
 
   /**
       * get node at nth in mainline

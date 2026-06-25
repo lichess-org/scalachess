@@ -233,6 +233,7 @@ class NodeTest extends ScalaCheckSuite:
         .flatMap(_.getMainlineNodeAt(depth - 1))
         .exists(_.value == depth)
     )
+    assertEquals(deep.modifyInMainline(_ + 1).mainlineValues, (1 to depth).toList)
 
   test("clearVariations.size == mainline.size"):
     forAll: (node: Node[Int]) =>

@@ -356,7 +356,14 @@ final case class Node[A](
     loop(this, Nil)
 
   def modifyInMainline(f: A => A): Node[A] =
-    copy(value = f(value), child = child.map(_.modifyInMainline(f)))
+    @tailrec
+    def loop(node: Node[A], acc: List[Node[A]]): List[Node[A]] =
+      val updated = node.updateValue(f)
+      node.child match
+        case None => updated :: acc
+        case Some(child) => loop(child, updated.withoutChild :: acc)
+    // every spine node keeps its variations; only value and child change
+    Tree.buildReverse(loop(this, Nil)).getOrElse(this)
 
   def modifyInMainlineAt(n: Int, f: Node[A] => Node[A]): Option[Node[A]] =
     @tailrec

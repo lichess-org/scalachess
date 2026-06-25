@@ -212,7 +212,6 @@ class NodeTest extends ScalaCheckSuite:
       val output = node.modifyInMainlineAt(n, _ => newNode)
       n >= node.mainline.size || output.flatMap(_.take(n)) == node.take(n)
 
-  override def scalaCheckInitialSeed = "z_ejR8Ve8lZWkWpnrN7gBGfK1bta0yof-THAkg8qgjK="
   test("modifyInMainlineAt(n)(node) . get(n) == node"):
     forAll: (node: Node[Int], newNode: Node[Int]) =>
       val n = Random.nextInt(node.mainline.size)

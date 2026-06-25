@@ -344,8 +344,16 @@ final case class Node[A](
         case Some(c) => c.findInMainline(predicate)
 
   def modifyInMainline(predicate: A => Boolean, f: Node[A] => Node[A]): Option[Node[A]] =
-    if predicate(value) then f(this).some
-    else child.flatMap(_.modifyInMainline(predicate, f)).map(c => withChild(c.some))
+    @tailrec
+    def loop(node: Node[A], acc: List[Node[A]]): Option[Node[A]] =
+      if predicate(node.value) then
+        // f's result replaces the whole subtree here; ancestors fold back on top
+        acc.foldLeft(f(node).some)((child, ancestor) => ancestor.withChild(child).some)
+      else
+        node.child match
+          case None => none // no mainline node matches the predicate
+          case Some(child) => loop(child, node.withoutChild :: acc)
+    loop(this, Nil)
 
   def modifyInMainline(f: A => A): Node[A] =
     copy(value = f(value), child = child.map(_.modifyInMainline(f)))

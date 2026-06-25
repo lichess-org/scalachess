@@ -353,8 +353,7 @@ final case class Node[A](
   def modifyInMainlineAt(n: Int, f: Node[A] => Node[A]): Option[Node[A]] =
     @tailrec
     def loop(n: Int, node: Node[A], acc: List[Node[A]]): Option[Node[A]] =
-      if n == 0 then
-        acc.foldLeft(f(node).some)((child, ancestor) => ancestor.withChild(child).some)
+      if n == 0 then acc.foldLeft(f(node).some)((child, ancestor) => ancestor.withChild(child).some)
       else
         node.child match
           case None => none // n points past the end of the mainline
@@ -369,7 +368,7 @@ final case class Node[A](
       */
   @tailrec
   def getMainlineNodeAt(n: Int): Option[Node[A]] =
-    if n < 0 || n >= mainline.size then none
+    if n < 0 then none
     else if n == 0 then this.some
     else
       child.match

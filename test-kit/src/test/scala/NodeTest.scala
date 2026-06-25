@@ -223,6 +223,11 @@ class NodeTest extends ScalaCheckSuite:
     val output = deep.modifyInMainlineAt(depth - 1, _.updateValue(_ + 1)).get
     output.mainlineValues == (0 until depth).map(i => if i == depth - 1 then i + 1 else i).toList
 
+  test("mainline-walking methods are stack-safe on a deep mainline"):
+    val depth = 1_000_000
+    val deep = Tree.build(0 until depth).get
+    assert(deep.getMainlineNodeAt(depth - 1).exists(_.value == depth - 1))
+
   test("clearVariations.size == mainline.size"):
     forAll: (node: Node[Int]) =>
       node.clearVariations.size == node.mainline.size

@@ -187,11 +187,6 @@ class NodeTest extends ScalaCheckSuite:
       node.modifyInMainlineAt(-1, _.updateValue(f)) == none &&
         node.modifyInMainlineAt(node.mainline.size, _.updateValue(f)) == none
 
-  test("modifyInMainlineAt return none when n is out of range"):
-    forAll: (node: Node[Int], f: Int => Int) =>
-      node.modifyInMainlineAt(-1, _.updateValue(f)) == none &&
-        node.modifyInMainlineAt(node.mainline.size, _.updateValue(f)) == none
-
   test("modifyInMainlineAt with updateValue return have the same size"):
     forAll: (node: Node[Int], f: Int => Int) =>
       val n = Random.nextInt(node.mainline.size)

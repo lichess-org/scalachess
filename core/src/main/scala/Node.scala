@@ -344,16 +344,36 @@ final case class Node[A](
         case Some(c) => c.findInMainline(predicate)
 
   def modifyInMainline(predicate: A => Boolean, f: Node[A] => Node[A]): Option[Node[A]] =
-    if predicate(value) then f(this).some
-    else child.flatMap(_.modifyInMainline(predicate, f)).map(c => withChild(c.some))
+    @tailrec
+    def loop(node: Node[A], acc: List[Node[A]]): Option[Node[A]] =
+      if predicate(node.value) then
+        // f's result replaces the whole subtree here; ancestors fold back on top
+        acc.foldLeft(f(node).some)((child, ancestor) => ancestor.withChild(child).some)
+      else
+        node.child match
+          case None => none // no mainline node matches the predicate
+          case Some(child) => loop(child, node.withoutChild :: acc)
+    loop(this, Nil)
 
   def modifyInMainline(f: A => A): Node[A] =
-    copy(value = f(value), child = child.map(_.modifyInMainline(f)))
+    @tailrec
+    def loop(node: Node[A], acc: List[Node[A]]): List[Node[A]] =
+      val updated = node.updateValue(f)
+      node.child match
+        case None => updated :: acc
+        case Some(child) => loop(child, updated.withoutChild :: acc)
+    // every spine node keeps its variations; only value and child change
+    Tree.buildReverse(loop(this, Nil)).getOrElse(this)
 
   def modifyInMainlineAt(n: Int, f: Node[A] => Node[A]): Option[Node[A]] =
-    if n < 0 || n >= mainline.size then none
-    else if n == 0 then f(this).some
-    else child.flatMap(_.modifyInMainlineAt(n - 1, f)).map(c => withChild(c.some))
+    @tailrec
+    def loop(n: Int, node: Node[A], acc: List[Node[A]]): Option[Node[A]] =
+      if n == 0 then acc.foldLeft(f(node).some)((child, ancestor) => ancestor.withChild(child).some)
+      else
+        node.child match
+          case None => none // n points past the end of the mainline
+          case Some(child) => loop(n - 1, child, node.withoutChild :: acc)
+    if n < 0 then none else loop(n, this, Nil)
 
   /**
       * get node at nth in mainline
@@ -363,7 +383,7 @@ final case class Node[A](
       */
   @tailrec
   def getMainlineNodeAt(n: Int): Option[Node[A]] =
-    if n < 0 || n >= mainline.size then none
+    if n < 0 then none
     else if n == 0 then this.some
     else
       child.match

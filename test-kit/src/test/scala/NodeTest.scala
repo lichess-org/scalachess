@@ -212,11 +212,28 @@ class NodeTest extends ScalaCheckSuite:
       val output = node.modifyInMainlineAt(n, _ => newNode)
       n >= node.mainline.size || output.flatMap(_.take(n)) == node.take(n)
 
-  override def scalaCheckInitialSeed = "z_ejR8Ve8lZWkWpnrN7gBGfK1bta0yof-THAkg8qgjK="
   test("modifyInMainlineAt(n)(node) . get(n) == node"):
     forAll: (node: Node[Int], newNode: Node[Int]) =>
       val n = Random.nextInt(node.mainline.size)
       node.modifyInMainlineAt(n, _ => newNode).get.getMainlineNodeAt(n) == newNode.some
+
+  test("modifyInMainlineAt is stack-safe and preserves ancestors on a deep mainline"):
+    val depth = 1_000_000
+    val deep = Tree.build(0 until depth).get
+    val output = deep.modifyInMainlineAt(depth - 1, _.updateValue(_ + 1)).get
+    output.mainlineValues == (0 until depth).map(i => if i == depth - 1 then i + 1 else i).toList
+
+  test("mainline-walking methods are stack-safe on a deep mainline"):
+    val depth = 1_000_000
+    val deep = Tree.build(0 until depth).get
+    assert(deep.getMainlineNodeAt(depth - 1).exists(_.value == depth - 1))
+    assert(
+      deep
+        .modifyInMainline(_ == depth - 1, _.updateValue(_ + 1))
+        .flatMap(_.getMainlineNodeAt(depth - 1))
+        .exists(_.value == depth)
+    )
+    assertEquals(deep.modifyInMainline(_ + 1).mainlineValues, (1 to depth).toList)
 
   test("clearVariations.size == mainline.size"):
     forAll: (node: Node[Int]) =>

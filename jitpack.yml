@@ -1,2 +1,6 @@
 jdk:
   - openjdk21
+before_install:
+  - wget -O sbt.jar https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/2.0.0/sbt-launch-2.0.0.jar
+install:
+  - java -Xms2048m -Xmx2048m -XX:ReservedCodeCacheSize=512m -jar sbt.jar -Dsbt.log.noformat=true 'clean; publishM2'

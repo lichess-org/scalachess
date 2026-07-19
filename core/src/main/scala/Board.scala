@@ -220,19 +220,25 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
     Option.when(isOccupied(at))(putOrReplace(piece, at))
 
   // put a piece into the board
-  def putOrReplace(s: Square, role: Role, color: Color): Board =
-    val b = discard(s)
-    val m = s.bl
-    Board(
-      b.occupied | m,
-      b.byColor.update(color, _ | m),
-      b.byRole.update(role, _ | m)
-    )
-
-  // put a piece into the board
   // remove the existing piece at that square if needed
   def putOrReplace(p: Piece, s: Square): Board =
     putOrReplace(s, p.role, p.color)
+
+  // put a piece into the board
+  def putOrReplace(s: Square, role: Role, color: Color): Board =
+    putOrReplace(s.bb, s.bl, role, color)
+
+  /** A more performance but equivalent to discard(removed).putOrReplace(added, role, color)
+   *  Clear `removed` from every role/colour, then put `piece` on `added`, building the
+   *  result in a single pass.
+   */
+  def putOrReplace(removed: Bitboard, added: Long, role: Role, color: Color): Board =
+    val notRemoved = ~removed
+    Board(
+      occupied & notRemoved | added,
+      byColor.mapBB(_ & notRemoved).update(color, _ | added),
+      byRole.mapBB(_ & notRemoved).update(role, _ | added)
+    )
 
   def take(at: Square): Option[Board] =
     isOccupied(at).option(discard(at))
@@ -240,14 +246,14 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   // move without capture
   def move(orig: Square, dest: Square): Option[Board] =
     if isOccupied(dest) then None
-    else pieceAt(orig).map(discard(orig).putOrReplace(_, dest))
+    else pieceAt(orig).map(p => putOrReplace(orig.bb, dest.bl, p.role, p.color))
 
   def taking(orig: Square, dest: Square, taking: Option[Square] = None): Option[Board] =
     for
       piece <- pieceAt(orig)
       takenSquare = taking.getOrElse(dest)
       if isOccupied(takenSquare)
-    yield discard(orig).discard(takenSquare).putOrReplace(piece, dest)
+    yield putOrReplace(orig.bb | takenSquare.bb, dest.bl, piece.role, piece.color)
 
   def promote(orig: Square, dest: Square, piece: Piece): Option[Board] =
     take(orig).map(_.putOrReplace(piece, dest))

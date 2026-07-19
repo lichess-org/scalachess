@@ -1,0 +1,8 @@
+8/8/8/8/8/8/krbnNBRK/qrbnNBRQ w - -
+e1c2 e1d3 e1f3 e2g3 e2d4 e2f4 f2e3 f2g3 f2d4 f2h4 f2c5 f2b6 f2a7 g2g3 g2g4 g2g5 g2g6 g2g7 g2g8 h2g3 h2h3
+
+4brn1/2K2k2/8/8/8/8/8/8 w - -
+c7b6 c7d6 c7b7 c7b8 c7c8 c7d8
+
+8/8/1rk4K/8/8/8/2bnNBR1/qrbnNBRQ b - -
+d1b2 d1f2 d1c3 d1e3 c1b2 c1a3 c2b3 c2d3 c2a4 c2e4 c2f5 c2g6 c2h7 b1b2 b1b3 b1b4 b1b5 b6b2 b6b3 b6b4 b6b5 b6a6 b6b7 b6b8 a1a2 a1b2 a1a3 a1c3 a1a4 a1d4 a1a5 a1e5 a1a6 a1a7 a1a8 c6d6

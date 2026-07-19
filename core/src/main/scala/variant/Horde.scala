@@ -1,7 +1,6 @@
 package chess
 package variant
 
-import cats.syntax.all.*
 import chess.Bitboard.*
 import chess.format.FullFen
 

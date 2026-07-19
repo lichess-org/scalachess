@@ -81,7 +81,8 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
     roles.foldLeft(Bitboard.empty)((acc, r) => acc | byRole(r))
 
   def byRoleOf(color: Color): ByRole[Bitboard] =
-    byRole.map(_ & byColor(color))
+    val mask = byColor(color)
+    byRole.mapBB(_ & mask)
 
   def kings(color: Color): List[Square] =
     kingOf(color).squares
@@ -206,8 +207,8 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
     val notMask = ~mask
     Board(
       occupied & notMask,
-      byColor.map(_ & notMask),
-      byRole.map(_ & notMask)
+      byColor.mapBB(_ & notMask),
+      byRole.mapBB(_ & notMask)
     )
 
   // put a piece to an empty square

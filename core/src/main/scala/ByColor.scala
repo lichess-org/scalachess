@@ -98,6 +98,13 @@ object ByColor:
   inline def fill[A](a: A): ByColor[A] = ByColor(a, a)
   inline def fromPair[A](p: (A, A)): ByColor[A] = ByColor(p._1, p._2)
 
+  /** Bitboard-specialised map. The generic `map` boxes two
+    * `java.lang.Long` per call; this reduces to raw `long` operations.
+    */
+  extension (byColor: ByColor[Bitboard])
+    inline def mapBB(inline f: Bitboard => Bitboard): ByColor[Bitboard] =
+      ByColor(f(byColor.white), f(byColor.black))
+
   def apply[A](f: Color => A)(using NotGiven[f.type <:< PartialFunction[Color, A]]): ByColor[A] =
     ByColor(white = f(White), black = f(Black))
 

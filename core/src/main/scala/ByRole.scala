@@ -68,23 +68,5 @@ object ByRole:
 
   def fill[A](a: A): ByRole[A] = ByRole(a, a, a, a, a, a)
 
-  /** Bitboard-specialised map.
-    *
-    * The generic `map` above erases `A`, so mapping a `ByRole[Bitboard]` boxes six
-    * `java.lang.Long` per call. Taking an `inline` function parameter lets the compiler
-    * beta-reduce the applications down to raw `long` operations, leaving a single
-    * `ByRole` allocation. `Board.discard` runs on every candidate move, so this is hot.
-    */
-  extension (byRole: ByRole[Bitboard])
-    inline def mapBB(inline f: Bitboard => Bitboard): ByRole[Bitboard] =
-      ByRole(
-        f(byRole.pawn),
-        f(byRole.knight),
-        f(byRole.bishop),
-        f(byRole.rook),
-        f(byRole.queen),
-        f(byRole.king)
-      )
-
   given Functor[ByRole] with
     override def map[A, B](byRole: ByRole[A])(f: A => B): ByRole[B] = byRole.map(f)

@@ -165,10 +165,9 @@ class BoardTest extends ChessTest:
       str <- FenFixtures.fens
       board = parseFen(str)
       s <- Square.all
-      result = board.putOrReplace(s.bb, s.bl,  King, White)
+      result = board.putOrReplace(s.bb, s.bl, King, White)
       expected = board.discard(s).putOrReplace(White.king, s)
     yield assertEquals(result, expected)
-
 
   test("pieceMap . fromMap == identity"):
     for

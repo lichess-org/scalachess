@@ -39,11 +39,8 @@ case object Standard
 
   // Used for filtering candidate moves that would leave put the king in check.
   private def isSafe(position: Position, king: Square, blockers: Bitboard)(move: Move): Boolean =
-    import position.{ us, them }
-    if move.enpassant then
-      val newOccupied = (position.occupied ^ move.orig.bl ^ move.dest.withRankOf(move.orig).bl) | move.dest.bl
-      (king.rookAttacks(newOccupied) & them & (position.rooks ^ position.queens)).isEmpty &&
-      (king.bishopAttacks(newOccupied) & them & (position.bishops ^ position.queens)).isEmpty
+    import position.us
+    if move.enpassant then isLegalEnPassant(position, move)
     else if !move.castles || !move.promotes then
       !(us & blockers).contains(move.orig) || Bitboard.aligned(move.orig, move.dest, king)
     else true

@@ -111,9 +111,10 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
   @threadUnsafe
   lazy val legalMoves: List[Move] = variant.validMoves(this)
 
+  // must agree with legalMoves.find(_.enpassant).map(_.dest)
   @threadUnsafe
   lazy val enPassantSquare: Option[Square] =
-    potentialEpSquare >> legalMoves.find(_.enpassant).map(_.dest)
+    potentialEpSquare >> genEnPassant(us & board.pawns).find(variant.isLegalEnPassant(this, _)).map(_.dest)
 
   @threadUnsafe
   lazy val ourKing: Option[Square] = kingPosOf(color)

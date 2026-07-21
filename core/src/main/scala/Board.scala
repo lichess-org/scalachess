@@ -57,8 +57,10 @@ case class Board(occupied: Bitboard, byColor: ByColor[Bitboard], byRole: ByRole[
   def colorAt(file: File, rank: Rank): Option[Color] =
     byColor.findColor(_.contains(file, rank))
 
-  def pieceAt(file: File, rank: Rank): Option[Piece] =
-    (colorAt(file, rank), roleAt(file, rank)).mapN(Piece.apply)
+  def pieceAt(file: File, rank: Rank): Option[Piece] = for
+    color <- colorAt(file, rank)
+    role <- roleAt(file, rank)
+  yield Piece(color, role)
 
   def pieceAt(s: Square): Option[Piece] =
     pieceAt(s.file, s.rank)

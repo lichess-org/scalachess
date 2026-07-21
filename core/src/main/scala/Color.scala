@@ -28,14 +28,21 @@ enum Color(val name: String, val letter: Char) derives Eq:
   lazy val passablePawnRank: Rank = fifthRank
   lazy val promotablePawnRank: Rank = lastRank
 
-  inline def -(inline role: Role) = Piece(this, role)
+  // cached so the hot move generators never allocate a Piece
+  lazy val pawn: Piece = Piece(this, Pawn)
+  lazy val bishop: Piece = Piece(this, Bishop)
+  lazy val knight: Piece = Piece(this, Knight)
+  lazy val rook: Piece = Piece(this, Rook)
+  lazy val queen: Piece = Piece(this, Queen)
+  lazy val king: Piece = Piece(this, King)
 
-  inline def pawn = this - Pawn
-  inline def bishop = this - Bishop
-  inline def knight = this - Knight
-  inline def rook = this - Rook
-  inline def queen = this - Queen
-  inline def king = this - King
+  def -(role: Role): Piece = role match
+    case Pawn => pawn
+    case Knight => knight
+    case Bishop => bishop
+    case Rook => rook
+    case Queen => queen
+    case King => king
 
   override def hashCode = fold(1, 2)
 

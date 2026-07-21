@@ -292,11 +292,14 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
     if from.rank == color.seventhRank then variant.promotableRoles.flatMap(promotion(from, to, _, capture))
     else normalMove(from, to, Pawn, capture).toList
 
+  // the generators guarantee a pawn of our color sits on orig,
+  // so the after-board is built directly without re-deriving the piece
   private def enpassant(orig: Square, dest: Square): Option[Move] =
     val capture = Square(dest.file, orig.rank)
-    board
-      .taking(orig, dest, capture.some)
-      .map(after =>
+    if !board.isOccupied(capture) then None
+    else
+      val after = board.putOrReplace(orig.bb | capture.bb, dest.bl, Pawn, color)
+      Some(
         Move(
           piece = color.pawn,
           orig = orig,
@@ -310,41 +313,47 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
         )
       )
 
+  // the generators guarantee a (color, role) piece sits on orig,
+  // so the after-board is built directly without re-deriving the piece
   private def normalMove(orig: Square, dest: Square, role: Role, capture: Boolean): Option[Move] =
-    val taken = if capture then Option(dest) else None
-    val after =
-      if capture then board.taking(orig, dest, taken)
-      else board.move(orig, dest)
-    after.map(board =>
-      Move(
-        piece = Piece(color, role),
-        orig = orig,
-        dest = dest,
-        before = this,
-        afterWithoutHistory = withBoard(board),
-        capture = taken,
-        castle = None,
-        promotion = None,
-        enpassant = false
+    if capture != board.isOccupied(dest) then None
+    else
+      val taken = if capture then Option(dest) else None
+      val removed = if capture then orig.bb | dest.bb else orig.bb
+      val after = board.putOrReplace(removed, dest.bl, role, color)
+      Some(
+        Move(
+          piece = color - role,
+          orig = orig,
+          dest = dest,
+          before = this,
+          afterWithoutHistory = withBoard(after),
+          capture = taken,
+          castle = None,
+          promotion = None,
+          enpassant = false
+        )
       )
-    )
 
+  // clearing both orig and dest before adding the promoted piece matches
+  // the old take(orig) + putOrReplace(piece, dest) two-step in one board
   private def promotion(
       orig: Square,
       dest: Square,
       promotion: PromotableRole,
       capture: Boolean
   ): Option[Move] =
-    val taken = if capture then Option(dest) else None
-    board
-      .promote(orig, dest, color - promotion)
-      .map(board =>
+    if !board.isOccupied(orig) then None
+    else
+      val taken = if capture then Option(dest) else None
+      val after = board.putOrReplace(orig.bb | dest.bb, dest.bl, promotion, color)
+      Some(
         Move(
           piece = color.pawn,
           orig = orig,
           dest = dest,
           before = this,
-          afterWithoutHistory = withBoard(board),
+          afterWithoutHistory = withBoard(after),
           capture = taken,
           castle = None,
           promotion = Some(promotion),

@@ -1,6 +1,5 @@
 package chess
 
-import cats.syntax.all.*
 import chess.Bitboard.*
 
 // Chess board representation
@@ -99,10 +98,11 @@ case class Board(
     else if black.contains(file, rank) then Some(Black)
     else None
 
-  def pieceAt(file: File, rank: Rank): Option[Piece] = for
-    color <- colorAt(file, rank)
-    role <- roleAt(file, rank)
-  yield Piece(color, role)
+  def pieceAt(file: File, rank: Rank): Option[Piece] =
+    for
+      color <- colorAt(file, rank)
+      role <- roleAt(file, rank)
+    yield Piece(color, role)
 
   def pieceAt(s: Square): Option[Piece] =
     pieceAt(s.file, s.rank)

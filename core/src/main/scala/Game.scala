@@ -5,7 +5,7 @@ import chess.format.{ Fen, Uci }
 
 case class Game(
     position: Position,
-    sans: Vector[SanStr] = Vector(),
+    sans: Vector[SanStr],
     clock: Option[Clock] = None,
     ply: Ply = Ply.initial, // plies
     startedAtPly: Ply = Ply.initial
@@ -95,7 +95,7 @@ case class Game(
 object Game:
 
   def apply(variant: chess.variant.Variant): Game =
-    Game(variant.initialPosition)
+    Game(variant.initialPosition, Vector.empty)
 
   def apply(variant: Option[chess.variant.Variant], fen: Option[Fen.Full]): Game =
     apply(variant | chess.variant.Standard, fen)

@@ -394,7 +394,7 @@ object Position:
 
   case class AndFullMoveNumber(position: Position, fullMoveNumber: FullMoveNumber):
     def ply: Ply = fullMoveNumber.ply(position.color)
-    def toGame: Game = Game(position = position, ply = ply, startedAtPly = ply)
+    def toGame: Game = Game(position, Vector.empty, ply = ply, startedAtPly = ply)
 
   object AndFullMoveNumber:
 

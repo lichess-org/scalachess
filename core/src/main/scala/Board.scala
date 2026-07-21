@@ -5,49 +5,42 @@ import chess.Bitboard.*
 
 // Chess board representation
 case class Board(
-    occupied: Bitboard,
-    white: Bitboard,
-    black: Bitboard,
-    pawn: Bitboard,
-    knight: Bitboard,
-    bishop: Bitboard,
-    rook: Bitboard,
-    queen: Bitboard,
-    king: Bitboard
+    val occupied: Bitboard,
+    val white: Bitboard,
+    val black: Bitboard,
+    val pawns: Bitboard,
+    val knights: Bitboard,
+    val bishops: Bitboard,
+    val rooks: Bitboard,
+    val queens: Bitboard,
+    val kings: Bitboard
 ):
-
-  final def pawns: Bitboard = pawn
-  final def knights: Bitboard = knight
-  final def bishops: Bitboard = bishop
-  final def rooks: Bitboard = rook
-  final def queens: Bitboard = queen
-  final def kings: Bitboard = king
 
   def byColor(color: Color): Bitboard =
     if color.white then white else black
 
   def byRole(role: Role): Bitboard = role match
-    case Pawn => pawn
-    case Knight => knight
-    case Bishop => bishop
-    case Rook => rook
-    case Queen => queen
-    case King => king
+    case Pawn => pawns
+    case Knight => knights
+    case Bishop => bishops
+    case Rook => rooks
+    case Queen => queens
+    case King => kings
 
   // iterates in the historical order: (White, Black) x (Pawn .. King)
   private inline def foreachPiece(inline f: (Color, Role, Bitboard) => Unit): Unit =
-    f(White, Pawn, white & pawn)
-    f(White, Knight, white & knight)
-    f(White, Bishop, white & bishop)
-    f(White, Rook, white & rook)
-    f(White, Queen, white & queen)
-    f(White, King, white & king)
-    f(Black, Pawn, black & pawn)
-    f(Black, Knight, black & knight)
-    f(Black, Bishop, black & bishop)
-    f(Black, Rook, black & rook)
-    f(Black, Queen, black & queen)
-    f(Black, King, black & king)
+    f(White, Pawn, white & pawns)
+    f(White, Knight, white & knights)
+    f(White, Bishop, white & bishops)
+    f(White, Rook, white & rooks)
+    f(White, Queen, white & queens)
+    f(White, King, white & kings)
+    f(Black, Pawn, black & pawns)
+    f(Black, Knight, black & knights)
+    f(Black, Bishop, black & bishops)
+    f(Black, Rook, black & rooks)
+    f(Black, Queen, black & queens)
+    f(Black, King, black & kings)
 
   def nbPieces: Int = occupied.count
 
@@ -76,22 +69,22 @@ case class Board(
 
   /* return a Role at a given square if any */
   def roleAt(s: Square): Option[Role] =
-    if pawn.contains(s) then Some(Pawn)
-    else if knight.contains(s) then Some(Knight)
-    else if bishop.contains(s) then Some(Bishop)
-    else if rook.contains(s) then Some(Rook)
-    else if queen.contains(s) then Some(Queen)
-    else if king.contains(s) then Some(King)
+    if pawns.contains(s) then Some(Pawn)
+    else if knights.contains(s) then Some(Knight)
+    else if bishops.contains(s) then Some(Bishop)
+    else if rooks.contains(s) then Some(Rook)
+    else if queens.contains(s) then Some(Queen)
+    else if kings.contains(s) then Some(King)
     else None
 
   /* return a Role at a square by given file and rank if any */
   def roleAt(file: File, rank: Rank): Option[Role] =
-    if pawn.contains(file, rank) then Some(Pawn)
-    else if knight.contains(file, rank) then Some(Knight)
-    else if bishop.contains(file, rank) then Some(Bishop)
-    else if rook.contains(file, rank) then Some(Rook)
-    else if queen.contains(file, rank) then Some(Queen)
-    else if king.contains(file, rank) then Some(King)
+    if pawns.contains(file, rank) then Some(Pawn)
+    else if knights.contains(file, rank) then Some(Knight)
+    else if bishops.contains(file, rank) then Some(Bishop)
+    else if rooks.contains(file, rank) then Some(Rook)
+    else if queens.contains(file, rank) then Some(Queen)
+    else if kings.contains(file, rank) then Some(King)
     else None
 
   /* return a Color at a square by if any */
@@ -131,7 +124,7 @@ case class Board(
 
   def byRoleOf(color: Color): ByRole[Bitboard] =
     val mask = byColor(color)
-    ByRole(pawn & mask, knight & mask, bishop & mask, rook & mask, queen & mask, king & mask)
+    ByRole(pawns & mask, knights & mask, bishops & mask, rooks & mask, queens & mask, kings & mask)
 
   def kings(color: Color): List[Square] =
     kingOf(color).squares
@@ -258,12 +251,12 @@ case class Board(
       occupied & notMask,
       white & notMask,
       black & notMask,
-      pawn & notMask,
-      knight & notMask,
-      bishop & notMask,
-      rook & notMask,
-      queen & notMask,
-      king & notMask
+      pawns & notMask,
+      knights & notMask,
+      bishops & notMask,
+      rooks & notMask,
+      queens & notMask,
+      kings & notMask
     )
 
   // put a piece to an empty square
@@ -292,12 +285,12 @@ case class Board(
     val occ = occupied & notRemoved | added
     val w = if color.white then white & notRemoved | added else white & notRemoved
     val b = if color.white then black & notRemoved else black & notRemoved | added
-    val p = pawn & notRemoved
-    val n = knight & notRemoved
-    val bi = bishop & notRemoved
-    val r = rook & notRemoved
-    val q = queen & notRemoved
-    val k = king & notRemoved
+    val p = pawns & notRemoved
+    val n = knights & notRemoved
+    val bi = bishops & notRemoved
+    val r = rooks & notRemoved
+    val q = queens & notRemoved
+    val k = kings & notRemoved
     role match
       case Pawn => Board(occ, w, b, p | added, n, bi, r, q, k)
       case Knight => Board(occ, w, b, p, n | added, bi, r, q, k)
@@ -378,12 +371,12 @@ object Board:
     occupied = Bitboard(0xffff00000000ffffL),
     white = Bitboard(0x000000000000ffffL),
     black = Bitboard(0xffff000000000000L),
-    pawn = Bitboard(0x00ff00000000ff00L),
-    knight = Bitboard(0x4200000000000042L),
-    bishop = Bitboard(0x2400000000000024L),
-    rook = Bitboard(0x8100000000000081L),
-    queen = Bitboard(0x0800000000000008L),
-    king = Bitboard(0x1000000000000010L)
+    pawns = Bitboard(0x00ff00000000ff00L),
+    knights = Bitboard(0x4200000000000042L),
+    bishops = Bitboard(0x2400000000000024L),
+    rooks = Bitboard(0x8100000000000081L),
+    queens = Bitboard(0x0800000000000008L),
+    kings = Bitboard(0x1000000000000010L)
   )
   def fromMap(pieces: PieceMap): Board =
     var pawns = Bitboard.empty

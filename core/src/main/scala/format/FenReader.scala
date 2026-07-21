@@ -205,11 +205,11 @@ trait FenReader:
       occupied = occupied,
       white = white,
       black = black,
-      pawn = pawns,
-      knight = knights,
-      bishop = bishops,
-      rook = rooks,
-      queen = queens,
-      king = kings
+      pawns = pawns,
+      knights = knights,
+      bishops = bishops,
+      rooks = rooks,
+      queens = queens,
+      kings = kings
     )
     (board -> promoted, error)

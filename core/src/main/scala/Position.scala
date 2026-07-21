@@ -55,7 +55,8 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
     legalMoves.groupBy(_.orig)
 
   @threadUnsafe
-  lazy val destinations: Map[Square, Bitboard] = legalMoves.groupMapReduce(_.orig)(_.dest.bb)(_ | _)
+  lazy val destinations: Map[Square, Bitboard] =
+    legalMoves.groupMapReduce(_.orig)(_.dest.bb)(_ | _)
 
   def drops: Option[List[Square]] =
     variant match

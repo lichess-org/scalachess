@@ -1,11 +1,8 @@
 package chess
 
 import cats.Eq
-import cats.derived.*
 
-// The constructor is private: Piece.apply returns one of the twelve
-// instances below, so pieces are never allocated after class init.
-case class Piece private (color: Color, role: Role) derives Eq:
+case class Piece private (color: Color, role: Role):
 
   def is(c: Color): Boolean = c == color
   def is(r: Role): Boolean = r == role
@@ -27,6 +24,8 @@ case class Piece private (color: Color, role: Role) derives Eq:
   override def toString = s"$color-$role".toLowerCase
 
 object Piece:
+
+  given Eq[Piece] = Eq.fromUniversalEquals[Piece]
 
   val WhitePawn: Piece = new Piece(White, Pawn)
   val WhiteKnight: Piece = new Piece(White, Knight)

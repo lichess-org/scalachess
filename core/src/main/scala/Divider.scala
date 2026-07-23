@@ -47,41 +47,53 @@ object Divider:
     (Bitboard.firstRank & board.white).count < 4 ||
       (Bitboard.lastRank & board.black).count < 4
 
-  private def score(y: Int)(white: Int, black: Int): Int =
-    ((white, black): @switch) match
-      case (0, 0) => 0
-
-      case (1, 0) => 1 + (8 - y)
-      case (2, 0) => if y > 2 then 2 + (y - 2) else 0
-      case (3, 0) => if y > 1 then 3 + (y - 1) else 0
-      case (4, 0) =>
-        if y > 1 then 3 + (y - 1) else 0 // group of 4 on the homerow = 0
-
-      case (0, 1) => 1 + y
-      case (1, 1) => 5 + (4 - y).abs
-      case (2, 1) => 4 + (y - 1)
-      case (3, 1) => 5 + (y - 1)
-
-      case (0, 2) => if y < 6 then 2 + (6 - y) else 0
-      case (1, 2) => 4 + (7 - y)
-      case (2, 2) => 7
-
-      case (0, 3) => if y < 7 then 3 + (7 - y) else 0
-      case (1, 3) => 5 + (7 - y)
-
-      case (0, 4) => if y < 7 then 3 + (7 - y) else 0
-
+  private def score(y: Int, white: Int, black: Int): Int =
+    (white: @switch) match
+      case 0 =>
+        (black: @switch) match
+          case 1 => 1 + y
+          case 2 => if y < 6 then 2 + (6 - y) else 0
+          case 3 => if y < 7 then 3 + (7 - y) else 0
+          case 4 => if y < 7 then 3 + (7 - y) else 0
+          case _ => 0
+      case 1 =>
+        (black: @switch) match
+          case 0 => 1 + (8 - y)
+          case 1 => 5 + (4 - y).abs
+          case 2 => 4 + (7 - y)
+          case 3 => 5 + (7 - y)
+          case _ => 0
+      case 2 =>
+        (black: @switch) match
+          case 0 => if y > 2 then 2 + (y - 2) else 0
+          case 1 => 4 + (y - 1)
+          case 2 => 7
+          case _ => 0
+      case 3 =>
+        (black: @switch) match
+          case 0 => if y > 1 then 3 + (y - 1) else 0
+          case 1 => 5 + (y - 1)
+          case _ => 0
+      case 4 =>
+        (black: @switch) match
+          case 0 => if y > 1 then 3 + (y - 1) else 0 // group of 4 on the homerow = 0
+          case _ => 0
       case _ => 0
 
-  private val mixednessRegions: List[(Long, Int)] = {
+  private val mixednessRegions: Array[Long] = {
     val smallSquare = 0x0303L
     for
       y <- 0 to 6
       x <- 0 to 6
-    yield (smallSquare << (x + 8 * y), y + 1)
-  }.toList
+    yield smallSquare << (x + 8 * y)
+  }.toArray
 
   private def mixedness(board: Board): Int =
-    mixednessRegions.foldLeft(0):
-      case (acc, (region, y)) =>
-        acc + board.byColor.mapReduce(c => (c & region).count)(score(y))
+    var acc = 0
+    var i = 0
+    while i < mixednessRegions.length do
+      val region = mixednessRegions(i)
+      val y = i / 7 + 1
+      acc += score(y, (board.white & region).count, (board.black & region).count)
+      i += 1
+    acc

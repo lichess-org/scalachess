@@ -50,6 +50,9 @@ case object RacingKings
   override def validMovesAt(position: Position, square: Square): List[Move] =
     super.validMovesAt(position, square).filter(kingSafety)
 
+  // validMoves never generates pawn moves, so no en passant is ever playable
+  override private[chess] def isLegalEnPassant(position: Position, move: Move): Boolean = false
+
   override def valid(position: Position, strict: Boolean): Boolean =
     super.valid(position, strict) && (!strict || position.check.no)
 

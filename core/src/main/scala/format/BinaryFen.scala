@@ -138,18 +138,14 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
       Position(
         Board(
           occupied = occupied,
-          ByColor(
-            white = white,
-            black = black
-          ),
-          ByRole(
-            pawn = pawns,
-            knight = knights,
-            bishop = bishops,
-            rook = rooks,
-            queen = queens,
-            king = kings
-          )
+          white = white,
+          black = black,
+          pawns = pawns,
+          knights = knights,
+          bishops = bishops,
+          rooks = rooks,
+          queens = queens,
+          kings = kings
         ),
         History(
           lastMove = epMove,

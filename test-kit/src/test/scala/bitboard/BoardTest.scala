@@ -160,6 +160,15 @@ class BoardTest extends ChessTest:
       expected <- board.put(White.king, s).orElse(board.replace(White.king, s))
     yield assertEquals(result, expected)
 
+  test("discard(s).putOrReplace(s, role, color) == putOrReplace(s.bb, s.bb, role, color))"):
+    for
+      str <- FenFixtures.fens
+      board = parseFen(str)
+      s <- Square.all
+      result = board.putOrReplace(s.bb, s.bl, King, White)
+      expected = board.discard(s).putOrReplace(White.king, s)
+    yield assertEquals(result, expected)
+
   test("pieceMap . fromMap == identity"):
     for
       str <- FenFixtures.fens

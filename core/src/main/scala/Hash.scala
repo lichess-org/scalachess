@@ -36,12 +36,8 @@ object Hash:
 
     val hPieces =
       var h = 0
-      position.byColor.foreach: (color, c) =>
-        val colorSubTable = ZobristTables.actorMasks(color)
-        position.byRole.foreach: (role, r) =>
-          val subTable = colorSubTable(role)
-          (c & r).foreach: s =>
-            h ^= subTable(s.hashCode)
+      position.board.foreach: (color, role, s) =>
+        h ^= ZobristTables.actorMasks(color)(role)(s.hashCode)
       h
 
     val hTurn = position.color.fold(ZobristTables.whiteTurnMask, 0)

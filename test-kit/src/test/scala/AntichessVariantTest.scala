@@ -199,14 +199,51 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
   ):
     val position = FullFen("1n6/8/8/8/8/4N3/8/8 w - - 0 1")
     val game = fenToGame(position, Antichess).playMoves(Square.E3 -> Square.D1).get
-    assertEquals(game.position.playerHasInsufficientMaterial, true)
+    assert(game.position.playerHasInsufficientMaterial)
 
   test(
     "Player has sufficient material when there are only two remaining knights on same color squares"
   ):
     val position = FullFen("1n6/8/8/8/8/8/8/7N w - - 0 1")
     val game = fenToGame(position, Antichess).playMoves(Square.H1 -> Square.G3).get
-    assertEquals(game.position.playerHasInsufficientMaterial, false)
+    assertNot(game.position.playerHasInsufficientMaterial)
+
+  test("Side has sufficient material - bishops"):
+    List(
+      "3b4/1B6/6b1/6N1/3K1R2/8/3QK3/8 w - - 0 1" -> (Square.G5 -> Square.H7),
+      "8/8/8/8/8/3p1b1B/8/8 b - - 0 1" -> (Square.D3 -> Square.D2),
+      "8/8/1PB5/4b3/8/8/8/8 w - - 0 1" -> (Square.C6 -> Square.A8),
+      "7B/8/6P1/5b2/8/8/8/8 w - - 0 1" -> (Square.G6 -> Square.G7),
+      "7B/8/8/5b2/8/6p1/8/8 b - - 0 1" -> (Square.F5 -> Square.E4),
+      "8/7B/8/4b3/8/1p6/8/8 b - - 0 1" -> (Square.E5 -> Square.D4),
+      "3b4/8/2B5/2P1b3/8/8/8/8 w - - 0 1" -> (Square.C6 -> Square.A8),
+      "8/8/BP6/B5b1/8/8/8/8 w - - 0 1" -> (Square.A6 -> Square.B5),
+      // the following is actually insufficient material, but doesn't qualify under curr behaviour
+      "8/8/2B5/P1P1b3/8/8/8/8 w - - 0 1" -> (Square.C6 -> Square.A8)
+    ).foreach: (fen, move) =>
+      val game = fenToGame(FullFen(fen), Antichess)
+      assertNot(game.position.playerHasInsufficientMaterial)
+      assertNot(game.position.opponentHasInsufficientMaterial)
+      val updated = game.playMoves(move).get
+      assertNot(updated.position.playerHasInsufficientMaterial)
+      assertNot(updated.position.opponentHasInsufficientMaterial)
+
+  test("Side has insufficient material - bishops"):
+    List(
+      "6b1/BB6/6b1/6N1/B2K1R2/8/3QK3/1b6 w - - 0 1" -> (Square.G5 -> Square.H7),
+      "8/8/1P6/2B2b2/8/8/8/8 w - - 0 1" -> (Square.C5 -> Square.A3),
+      "6B1/8/6P1/8/5b2/8/8/8 w - - 0 1" -> (Square.G6 -> Square.G7),
+      "8/7B/8/8/5b2/6p1/8/8 b - - 0 1" -> (Square.F4 -> Square.E3),
+      "8/8/7B/8/6b1/1p6/8/8 b - - 0 1" -> (Square.B3 -> Square.B2),
+      "8/8/2B5/2P1b3/8/8/8/8 w - - 0 1" -> (Square.C6 -> Square.A8),
+      "8/8/BP6/B6b/8/8/8/8 w - - 0 1" -> (Square.A6 -> Square.B5)
+    ).foreach: (fen, move) =>
+      val game = fenToGame(FullFen(fen), Antichess)
+      assert(game.position.playerHasInsufficientMaterial)
+      assertNot(game.position.opponentHasInsufficientMaterial)
+      val updated = game.playMoves(move).get
+      assertNot(updated.position.playerHasInsufficientMaterial)
+      assert(updated.position.opponentHasInsufficientMaterial)
 
   test("Not be drawn on insufficient mating material"):
     val position = FullFen("4K3/8/1b6/8/8/8/5B2/3k4 b - -")

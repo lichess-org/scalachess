@@ -84,7 +84,21 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
   inline def autoDraw: Boolean = variant.autoDraw(this) || variant.specialDraw(this)
 
-  inline def opponentHasInsufficientMaterial: Boolean = variant.opponentHasInsufficientMaterial(this)
+  inline def opponentHasInsufficientMaterial: Boolean =
+    variant.opponentHasInsufficientMaterial(this) ||
+      (
+        legalMoves.nonEmpty &&
+          drops.forall(_.isEmpty) &&
+          legalMoves.sortBy(_.captures).forall { move =>
+            val newPos = move.after
+            val winner = newPos.winner
+            winner != Some(!color) && (
+              winner == Some(color) ||
+                newPos.playerHasInsufficientMaterial ||
+                newPos.staleMate
+            )
+          }
+      )
 
   inline def playerHasInsufficientMaterial: Boolean = variant.playerHasInsufficientMaterial(this)
 

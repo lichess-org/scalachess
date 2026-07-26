@@ -20,7 +20,7 @@ class DestinationsBench:
 
   private val Work: Long = 5
 
-  @Param(Array("100"))
+  @Param(Array("10"))
   var games: Int = scala.compiletime.uninitialized
 
   var threecheckInput: List[Position] = scala.compiletime.uninitialized
@@ -75,13 +75,21 @@ class DestinationsBench:
   def tricky(bh: Blackhole) =
     bench(trickyInput)(bh)
 
+  // `destinations` — and `legalMoves` behind it — is a `@threadUnsafe lazy val`, so a Position
+  // that has already been asked once answers from a memoized field. `@Setup` runs once per trial,
+  // so calling `destinations` on the stored Positions measures ~n field reads from warmup
+  // iteration 2 onward: exactly the bug this harness had until 2026-07.
+  // `.copy()` yields a structurally identical Position with fresh (uninitialized) lazy-val state
+  // — the same trick `Move.after = finalizeHistory.copy()` uses deliberately.
   private def bench(sits: List[Position])(bh: Blackhole) =
-    val x = sits.map: x =>
+    var i = 0
+    while i < sits.size do
+      val position = sits(i).copy()
       Blackhole.consumeCPU(Work)
-      x.destinations
-    bh.consume(x)
+      bh.consume(position.destinations)
+      i += 1
 
   private def makeBoards(perfts: List[Perft], variant: Variant, games: Int): List[Position] =
     perfts
       .take(games)
-      .map(p => Fen.read(variant, p.epd).getOrElse(throw RuntimeException("boooo")))
+      .map(p => Fen.read(variant, p.epd).getOrElse(throw RuntimeException(s"Invalid fen: ${p.epd}")))

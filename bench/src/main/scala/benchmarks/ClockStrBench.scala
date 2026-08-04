@@ -1,5 +1,6 @@
 package benchmarks
 
+import cats.syntax.all.*
 import org.openjdk.jmh.annotations.*
 import org.openjdk.jmh.infra.Blackhole
 import java.util.concurrent.TimeUnit
@@ -22,4 +23,14 @@ class ClockStrBench:
   @Benchmark
   def formatPgnSeconds(bh: Blackhole) =
     Blackhole.consumeCPU(Work)
-    seconds.map(Move.formatPgnSeconds)
+    seconds.map(Move.formatPgnSeconds(_, StringBuilder(16))).toString
+
+  var clocks = (none, none) :: (for
+    clk <- seconds
+    emt <- List(0.some, 3.some, 11.some, 63.some, 1923.some, none)
+  yield (clk.some, emt.map(Seconds(_))))
+
+  @Benchmark
+  def clockString(bh: Blackhole) =
+    Blackhole.consumeCPU(Work)
+    clocks.map(Move.clockString)

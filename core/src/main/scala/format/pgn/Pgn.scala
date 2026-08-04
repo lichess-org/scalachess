@@ -1,7 +1,6 @@
 package chess
 package format.pgn
 
-import cats.syntax.all.*
 import monocle.syntax.all.*
 import scalalib.model.Seconds
 
@@ -59,7 +58,11 @@ case class Move(
   def hasComment: Boolean = comments.nonEmpty || timeLeft.isDefined || moveTime.isDefined
 
   def render: String =
-    val builder = new StringBuilder
+    val builder = StringBuilder:
+      8 + (if comments.nonEmpty then 128 else 0) +
+        (if opening.isDefined then 64 else 0) +
+        (if timeLeft.isDefined then 16 else 0) +
+        (if moveTime.isDefined then 16 else 0)
     appendSanStr(builder)
     builder.toString
 
@@ -67,18 +70,13 @@ case class Move(
 
   private def appendSanStr(builder: StringBuilder): Unit =
     builder.append(san.value)
-    glyphs.toList.foreach:
-      case glyph if glyph.id <= 6 => builder.append(glyph.symbol)
-      case glyph => builder.append(" $").append(glyph.id)
+    glyphs.toList.foreach: glyph =>
+      if glyph.id <= 6 then builder.append(glyph.symbol)
+      else builder.append(" $").append(glyph.id)
     if nonEmpty then
-      List(clockString, opening, result).flatten
+      List(Move.clockString(timeLeft, moveTime), opening, result).flatten
         .:::(comments.map(_.map(Move.noDoubleLineBreak)))
         .foreach(x => builder.append(" { ").append(x).append(" }"))
-
-  private def clockString: Option[String] = List(
-    timeLeft.map(seconds => "[%clk " + Move.formatPgnSeconds(seconds) + "]"),
-    moveTime.map(seconds => "[%emt " + Move.formatPgnSeconds(seconds) + "]")
-  ).flatten.some.filter(_.nonEmpty).map(_.mkString(" "))
 
 object Move:
 
@@ -92,18 +90,31 @@ object Move:
   private val noDoubleLineBreakRegex = "(\r?\n){2,}".r
 
   private def noDoubleLineBreak(txt: String) =
-    noDoubleLineBreakRegex.replaceAllIn(txt, "\n")
+    if txt.contains("\n") then noDoubleLineBreakRegex.replaceAllIn(txt, "\n")
+    else txt
+
+  def clockString(clk: Option[Seconds], emt: Option[Seconds]): Option[String] =
+    if clk.isEmpty && emt.isEmpty then None
+    else
+      val builder = new StringBuilder(if emt.isDefined then 32 else 16)
+      clk.foreach: seconds =>
+        builder.append("[%clk ")
+        Move.formatPgnSeconds(seconds, builder)
+        builder.append("]")
+      emt.foreach: seconds =>
+        if clk.isDefined then builder.append(' ')
+        builder.append("[%emt ")
+        Move.formatPgnSeconds(seconds, builder)
+        builder.append("]")
+      Some(builder.toString)
 
   // optimized for speed to match:
   // f"${d.toHours}:${d.toMinutesPart}%02d:${d.toSecondsPart}%02d"
-  def formatPgnSeconds(t: Seconds): String =
+  def formatPgnSeconds(t: Seconds, builder: StringBuilder): Unit =
     val d = java.time.Duration.ofSeconds(t.value)
-    // f"${d.toHours}:${d.toMinutesPart}%02d:${d.toSecondsPart}%02d"
-    val builder = new StringBuilder(8)
     builder.append(d.toHours).append(':')
     val (minutes, seconds) = (d.toMinutesPart, d.toSecondsPart)
     if minutes < 10 then builder.append('0')
     builder.append(minutes).append(':')
     if seconds < 10 then builder.append('0')
     builder.append(seconds)
-    builder.toString

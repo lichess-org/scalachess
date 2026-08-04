@@ -94,6 +94,16 @@ object Move:
   private def noDoubleLineBreak(txt: String) =
     noDoubleLineBreakRegex.replaceAllIn(txt, "\n")
 
+  // optimized for speed to match:
+  // f"${d.toHours}:${d.toMinutesPart}%02d:${d.toSecondsPart}%02d"
   def formatPgnSeconds(t: Seconds): String =
     val d = java.time.Duration.ofSeconds(t.value)
-    f"${d.toHours}:${d.toMinutesPart}%02d:${d.toSecondsPart}%02d"
+    // f"${d.toHours}:${d.toMinutesPart}%02d:${d.toSecondsPart}%02d"
+    val builder = new StringBuilder(8)
+    builder.append(d.toHours).append(':')
+    val (minutes, seconds) = (d.toMinutesPart, d.toSecondsPart)
+    if minutes < 10 then builder.append('0')
+    builder.append(minutes).append(':')
+    if seconds < 10 then builder.append('0')
+    builder.append(seconds)
+    builder.toString

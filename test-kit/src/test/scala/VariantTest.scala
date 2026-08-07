@@ -139,7 +139,7 @@ class VariantTest extends ChessTest:
     assertEquals(game.position.materialImbalance, -91)
     assert(game.position.opponentHasInsufficientMaterial)
 
-  test("standard Identify sufficient mating material when called (bishop)."):
+  test("standard Do not identify insufficient mating material when called (bishop)."):
     val position = FullFen("8/7B/K7/2b5/1k6/8/8/8 b - -")
     val game = fenToGame(position, Standard)
     assertEquals(game.position.materialImbalance, 0)
@@ -150,6 +150,32 @@ class VariantTest extends ChessTest:
     val game = fenToGame(position, Standard)
     assertEquals(game.position.materialImbalance, -6)
     assert(game.position.opponentHasInsufficientMaterial)
+
+  List(
+    "2kQ4/8/2K5/8/8/8/8/8 b - - 0 1",
+    "2kQ4/8/2K5/2N5/8/8/8/8 b - - 0 1",
+    "2kQ4/8/2K5/2B5/8/8/8/8 b - - 0 1",
+    "1bkQ4/8/2K5/8/8/8/8/8 b - - 0 1",
+    "n1kQ4/8/2K5/8/8/8/8/8 b - - 0 1",
+    "5Q1k/4b3/7K/3r4/7n/8/7P/8 b - - 0 1",
+    "7k/5Q1p/7P/8/8/8/1q4R1/K7 w - - 0 1"
+  ).foreach: fen =>
+    test("standard Identify insufficient mating material when only move(s) lead to at least a draw"):
+      assert(fenToGame(FullFen(fen), Standard).position.opponentHasInsufficientMaterial)
+
+  List(
+    "2kQ4/8/8/2K5/8/8/8/8 b - - 0 1",
+    "K2kr3/P3Q3/8/8/8/8/1r6/8 b - - 0 1"
+  ).foreach: fen =>
+    test(
+      "standard Do not identify insufficient mating material when some move doesn't lead to at least a draw"
+    ):
+      assertNot(fenToGame(FullFen(fen), Standard).position.opponentHasInsufficientMaterial)
+
+  test("standard Do not identify insufficient mating material in stalemates"):
+    assertNot(
+      fenToGame(FullFen("k7/2Q5/8/2K5/8/8/8/8 b - - 0 1"), Standard).position.opponentHasInsufficientMaterial
+    )
 
   test("chess960 position pieces correctly"):
     assertEquals(Chess960.initialPieces.get(A2), Some(White - Pawn))

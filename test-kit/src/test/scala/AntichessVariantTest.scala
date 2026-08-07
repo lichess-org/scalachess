@@ -208,6 +208,20 @@ g4 {[%emt 0.200]} 34. Rxg4 {[%emt 0.172]} 0-1"""
     val game = fenToGame(position, Antichess).playMoves(Square.H1 -> Square.G3).get
     assertEquals(game.position.playerHasInsufficientMaterial, false)
 
+  test(
+    "Opponent has sufficient material when player's only move leads to the former winning"
+  ):
+    val position = FullFen("8/7p/8/8/7P/8/8/8 b - - 0 1")
+    val game = fenToGame(position, Antichess).playMoves(Square.H7 -> Square.H6).get
+    assertEquals(game.position.opponentHasInsufficientMaterial, false)
+
+  test(
+    "Opponent has insufficient material when player's only move leads to the former having insufficient material"
+  ):
+    val position = FullFen("8/6p1/3n4/8/7N/8/8/8 b - - 0 1")
+    val game = fenToGame(position, Antichess).playMoves(Square.G7 -> Square.G6).get
+    assertEquals(game.position.opponentHasInsufficientMaterial, true)
+
   test("Not be drawn on insufficient mating material"):
     val position = FullFen("4K3/8/1b6/8/8/8/5B2/3k4 b - -")
     val game = fenToGame(position, Antichess)

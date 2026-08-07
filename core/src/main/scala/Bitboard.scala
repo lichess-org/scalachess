@@ -11,6 +11,8 @@ object Bitboard:
   inline def apply(inline xs: Iterable[Square]): Bitboard = xs.foldLeft(empty)((b, s) => b | s.bl)
   inline def apply(inline xs: Square*): Bitboard = apply(xs.toList)
 
+  def fromKeys(keys: String*): Bitboard = Bitboard(keys.flatMap(Square.fromKey))
+
   val empty: Bitboard = 0L
   val all: Bitboard = -1L
   // E4, D4, E5, D5

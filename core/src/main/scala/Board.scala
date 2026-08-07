@@ -217,6 +217,13 @@ case class Board(
         s.pawnAttacks(!attacker) & pawns
     )
 
+  def squaresAttackedByPawns(attacker: Color): Bitboard =
+    var enemyPawnAttacks = Bitboard.empty
+    byPiece(attacker, Pawn).foreach { sq =>
+      enemyPawnAttacks |= sq.pawnAttacks(attacker)
+    }
+    enemyPawnAttacks
+
   /* is a king of this color in check */
   def isCheck(color: Color): Check =
     Check(kings(color).exists(attacks(_, !color)))

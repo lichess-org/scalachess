@@ -13,7 +13,7 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
     val reader = new Iterator[Byte]:
       val inner = value.iterator
       override inline def hasNext: Boolean = inner.hasNext
-      override inline def next: Byte = if hasNext then inner.next else 0.toByte
+      override inline def next: Byte = if hasNext then inner.next() else 0.toByte
 
     val occupied = Bitboard(readLong(reader))
 
@@ -92,12 +92,12 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
     while it.hasNext
     do
       val (lo, hi) = readNibbles(reader)
-      unpackPiece(it.next, lo)
-      if it.hasNext then unpackPiece(it.next, hi)
+      unpackPiece(it.next(), lo)
+      if it.hasNext then unpackPiece(it.next(), hi)
 
     val halfMoveClock = HalfMoveClock(readLeb128(reader))
     val ply = Ply(readLeb128(reader))
-    val variant = reader.next match
+    val variant = reader.next() match
       case 0 => Standard
       case 1 => Crazyhouse
       case 2 => Chess960
@@ -138,18 +138,14 @@ case class BinaryFen(value: Array[Byte]) extends AnyVal:
       Position(
         Board(
           occupied = occupied,
-          ByColor(
-            white = white,
-            black = black
-          ),
-          ByRole(
-            pawn = pawns,
-            knight = knights,
-            bishop = bishops,
-            rook = rooks,
-            queen = queens,
-            king = kings
-          )
+          white = white,
+          black = black,
+          pawns = pawns,
+          knights = knights,
+          bishops = bishops,
+          rooks = rooks,
+          queens = queens,
+          kings = kings
         ),
         History(
           lastMove = epMove,
@@ -218,7 +214,7 @@ object BinaryFen:
 
     val it = occupied.iterator
     while it.hasNext
-    do writeNibbles(builder, packPiece(it.next), if it.hasNext then packPiece(it.next) else 0)
+    do writeNibbles(builder, packPiece(it.next()), if it.hasNext then packPiece(it.next()) else 0)
 
     val halfMoveClock = position.history.halfMoveClock.value
     val ply = input.fullMoveNumber.ply(position.color).value
@@ -256,7 +252,7 @@ object BinaryFen:
         writeNibbles(builder, pockets.white.queen, pockets.black.queen)
         if crazyData.promoted.nonEmpty then writeLong(builder, crazyData.promoted.value)
 
-    builder.result
+    builder.result()
 
   object implementation:
 
@@ -271,14 +267,14 @@ object BinaryFen:
       builder.addOne(v.toByte)
 
     def readLong(reader: Iterator[Byte]): Long =
-      ((reader.next & 0xffL) << 56) |
-        ((reader.next & 0xffL) << 48) |
-        ((reader.next & 0xffL) << 40) |
-        ((reader.next & 0xffL) << 32) |
-        ((reader.next & 0xffL) << 24) |
-        ((reader.next & 0xffL) << 16) |
-        ((reader.next & 0xffL) << 8) |
-        (reader.next & 0xffL)
+      ((reader.next() & 0xffL) << 56) |
+        ((reader.next() & 0xffL) << 48) |
+        ((reader.next() & 0xffL) << 40) |
+        ((reader.next() & 0xffL) << 32) |
+        ((reader.next() & 0xffL) << 24) |
+        ((reader.next() & 0xffL) << 16) |
+        ((reader.next() & 0xffL) << 8) |
+        (reader.next() & 0xffL)
 
     def writeLeb128(builder: ArrayBuilder[Byte], v: Int): Unit =
       var n = v
@@ -292,7 +288,7 @@ object BinaryFen:
       var n = 0
       var shift = 0
       while
-        val b = reader.next
+        val b = reader.next()
         n |= (b & 127) << shift
         shift += 7
         (b & 128) != 0
@@ -303,7 +299,7 @@ object BinaryFen:
       builder.addOne((lo | (hi << 4)).toByte)
 
     def readNibbles(reader: Iterator[Byte]): (Int, Int) =
-      val b = reader.next
+      val b = reader.next()
       ((b & 0xf), (b >>> 4) & 0xf)
 
     def minimumUnmovedRooks(position: Position): UnmovedRooks =

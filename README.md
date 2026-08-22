@@ -22,7 +22,7 @@ To run the tests
 
     testKit / test
 
-To run benchmarks (takes more than 1 hour to finish):
+To run full benchmarks (takes more than 1 hour to finish):
 
     bench / Jmh / run
 
@@ -32,7 +32,11 @@ Or to output a json file
 
 To run quick benchmarks (results may be inaccurate):
 
-    bench / Jmh / run -i 1 -wi 1 -f1 -t1
+    bench / Jmh / run -i 1 -wi 1 -f1
+
+To run longer benchmarks:
+
+    bench / Jmh / run -i 3 -wi 2 -f2
 
 To run benchmarks for a specific class:
 
@@ -46,3 +50,8 @@ To run [scalafmt](https://scalameta.org/scalafmt/docs/installation.html) and [sc
 
 For python code, [install pipenv](https://pipenv.pypa.io/en/latest/installation.html#installing-pipenv), and run `$ pipenv install` from project root.
 
+## Release
+
+1. Bump version in `build.sbt`.
+2. Commit the version bump and push to master.
+3. `gh release create X.Y.Z`

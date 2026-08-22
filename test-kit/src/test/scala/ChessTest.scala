@@ -4,9 +4,9 @@ import cats.syntax.all.*
 
 import scala.language.implicitConversions
 
-import format.{ FullFen, Fen, Uci, Visual }
+import format.{ Fen, FullFen, Uci, Visual }
 import format.pgn.PgnStr
-import variant.{ Chess960, Variant, Standard, Crazyhouse }
+import variant.{ Chess960, Crazyhouse, Standard, Variant }
 
 trait ChessTestCommon:
 
@@ -28,7 +28,7 @@ trait ChessTestCommon:
         .map: piece =>
           board.withColor(piece.color).generateMovesAt(from).map(_.dest)
 
-    def seq(actions: Position => Option[Position]*): Option[Position] =
+    def seq(actions: (Position => Option[Position])*): Option[Position] =
       actions.foldLeft(board.some)(_ flatMap _)
 
     def place(piece: Piece, at: Square): Option[Position] =

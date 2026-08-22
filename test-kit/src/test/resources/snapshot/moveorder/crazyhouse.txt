@@ -1,0 +1,11 @@
+2k5/8/8/8/8/8/8/4K3[QRBNPqrbnp] w - -
+e1d1 e1f1 e1d2 e1e2 e1f2
+
+2k5/8/8/8/8/8/8/4K3[Qn] w - -
+e1d1 e1f1 e1d2 e1e2 e1f2
+
+r1bqk2r/pppp1ppp/2n1p3/4P3/1b1Pn3/2NB1N2/PPP2PPP/R1BQK2R[] b KQkq -
+a7a6 b7b6 d7d6 f7f6 g7g6 h7h6 a7a5 b7b5 d7d5 f7f5 g7g5 h7h5 e4d2 e4f2 e4c3 e4g3 e4c5 e4g5 e4d6 e4f6 c6d4 c6a5 c6e5 c6e7 c6b8 b4a3 b4c3 b4a5 b4c5 b4d6 b4e7 b4f8 a8b8 h8f8 h8g8 d8h4 d8g5 d8f6 d8e7 e8e7 e8f8 e8h8 e8g8
+
+4k3/1Q~6/8/8/4b3/8/Kpp5/8/ b - - 0 1
+b2b1q b2b1r b2b1b b2b1n c2c1q c2c1r c2c1b c2c1n e4h1 e4g2 e4d3 e4f3 e4d5 e4f5 e4c6 e4g6 e4b7 e4h7 e8d8 e8f8

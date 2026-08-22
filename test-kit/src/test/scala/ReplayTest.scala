@@ -7,7 +7,7 @@ import chess.variant.{ Chess960, FromPosition, Standard }
 import snapshot4s.generated.snapshotConfig
 import snapshot4s.munit.SnapshotAssertions
 
-import format.{ FullFen, Fen }
+import format.{ Fen, FullFen }
 
 class ReplayTest extends MunitExtensions with SnapshotAssertions:
 

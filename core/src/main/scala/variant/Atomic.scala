@@ -35,6 +35,10 @@ case object Atomic
   override def validMovesAt(position: Position, square: Square): List[Move] =
     super.validMovesAt(position, square).view.map(explodeSurroundingPieces).filter(kingSafety).toList
 
+  // validMoves explodes the move before its kingSafety filter, so mirror that here
+  override private[chess] def isLegalEnPassant(position: Position, move: Move): Boolean =
+    kingSafety(explodeSurroundingPieces(move))
+
   private def genKing(position: Position, mask: Bitboard) =
     import position.{ genUnsafeKing, genCastling }
     position.ourKing.fold(Nil): king =>

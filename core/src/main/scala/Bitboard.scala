@@ -130,7 +130,7 @@ object Bitboard:
       do
         builder += b.lsb
         b &= (b - 1L)
-      builder.result
+      builder.result()
 
     def toSet: Set[Square] =
       squares.toSet
@@ -189,7 +189,7 @@ object Bitboard:
       do
         if f(b.lsb) then builder += b.lsb
         b &= (b - 1L)
-      builder.result
+      builder.result()
 
     def withFilter(f: Square => Boolean): List[Square] =
       filter(f)
@@ -226,7 +226,7 @@ object Bitboard:
       do
         builder ++= f(b.lsb)
         b &= (b - 1L)
-      builder.result
+      builder.result()
 
     def map[B](f: Square => B): List[B] =
       var b = a
@@ -235,7 +235,7 @@ object Bitboard:
       do
         builder += f(b.lsb)
         b &= (b - 1L)
-      builder.result
+      builder.result()
 
     def iterator: Iterator[Square] = new:
       private var b = a
@@ -253,4 +253,4 @@ object Bitboard:
           builder ++= (if contains(s) then "1" else ".")
           if f != File.H then builder ++= " "
           else if s != Square.H1 then builder ++= "\n"
-      builder.result
+      builder.result()

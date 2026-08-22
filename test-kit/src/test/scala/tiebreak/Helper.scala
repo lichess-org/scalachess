@@ -47,3 +47,6 @@ object Helper:
       .groupBy(_._1)
       .map: (player, games) =>
         player.id -> PlayerWithGames(player, games.map(_._2))
+
+  def lastRoundId(gamesMap: Map[String, PlayerWithGames]): Option[String] =
+    gamesMap.values.maxByOption(_.games.size).flatMap(_.games.lastOption.flatMap(_.roundId))

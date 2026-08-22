@@ -2,7 +2,7 @@ package chess
 
 import cats.syntax.all.*
 
-import Clock.{ LimitSeconds, LimitMinutes, IncrementSeconds }
+import Clock.{ IncrementSeconds, LimitMinutes, LimitSeconds }
 
 case class TournamentClock(limitSeconds: LimitSeconds, incrementSeconds: IncrementSeconds):
 

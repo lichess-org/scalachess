@@ -24,7 +24,9 @@ class TiebreakBench:
 
   @Setup
   def setup(): Unit =
-    tournament = Tournament(Helper.games("FWWRC.pgn"))
+    val games = Helper.games("FWWRC.pgn")
+    val lastRoundId = Helper.lastRoundId(games)
+    tournament = Tournament(games, lastRoundId)
 
   @Benchmark
   def averageOfOpponentsBuchholz(bh: Blackhole) =
@@ -35,6 +37,11 @@ class TiebreakBench:
   def averagePerfectPerformanceOfOpponents(bh: Blackhole) =
     bh.consume:
       AveragePerfectPerformanceOfOpponents.compute(tournament, Map.empty)
+
+  @Benchmark
+  def buchholz(bh: Blackhole) =
+    bh.consume:
+      Buchholz(CutModifier.None).compute(tournament, Map.empty)
 
   @Benchmark
   def directEncounter(bh: Blackhole) =

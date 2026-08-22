@@ -184,7 +184,7 @@ trait FenReader:
         rank -= 1
       if rank < 0 then error = Some("too many ranks")
       else
-        iter.next match
+        iter.next() match
           case '/' => // ignored, optional. Rank switch is automatic
           case ch if numberSet.contains(ch) =>
             file += (ch - '0')
@@ -198,22 +198,18 @@ trait FenReader:
                   addPieceAt(p, square)
                   if iter.headOption == Some('~') then
                     promoted |= square
-                    val _ = iter.next
+                    val _ = iter.next()
                 case None => error = Some(s"invalid piece $ch")
             file += 1
     val board = Board(
       occupied = occupied,
-      ByColor(
-        white = white,
-        black = black
-      ),
-      ByRole(
-        pawn = pawns,
-        knight = knights,
-        bishop = bishops,
-        rook = rooks,
-        queen = queens,
-        king = kings
-      )
+      white = white,
+      black = black,
+      pawns = pawns,
+      knights = knights,
+      bishops = bishops,
+      rooks = rooks,
+      queens = queens,
+      kings = kings
     )
     (board -> promoted, error)

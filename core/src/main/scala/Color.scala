@@ -28,6 +28,7 @@ enum Color(val name: String, val letter: Char) derives Eq:
   lazy val passablePawnRank: Rank = fifthRank
   lazy val promotablePawnRank: Rank = lastRank
 
+  // Piece.apply returns cached instances, so these never allocate
   inline def -(inline role: Role) = Piece(this, role)
 
   inline def pawn = this - Pawn

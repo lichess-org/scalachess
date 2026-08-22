@@ -1,7 +1,6 @@
 package chess
 package variant
 
-import cats.syntax.all.*
 import chess.Bitboard.*
 import chess.format.FullFen
 
@@ -42,6 +41,10 @@ case object Horde
 
   override def validMovesAt(position: Position, square: Square): List[Move] =
     super.validMovesAt(position, square).filter(kingSafety)
+
+  // white has no king to leave in check; black plays by the standard rules
+  override private[chess] def isLegalEnPassant(position: Position, move: Move): Boolean =
+    position.isWhiteTurn || super.isLegalEnPassant(position, move)
 
   override def valid(position: Position, strict: Boolean): Boolean =
     position.kingOf(White).isEmpty

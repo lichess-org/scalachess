@@ -1,12 +1,11 @@
 package chess
 
 import cats.*
-import cats.derived.*
 import cats.syntax.all.*
 
 import scala.annotation.{ tailrec, targetName }
 
-sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]) derives Traverse:
+sealed abstract class Tree[A](val value: A, val child: Option[Node[A]]):
 
   final def withValue(value: A): TreeSelector[A, this.type] = this match
     case n: Node[A] => n.copy(value = value)
@@ -146,7 +145,7 @@ final case class Node[A](
     override val value: A,
     override val child: Option[Node[A]] = None,
     override val variations: List[Variation[A]] = Nil
-) extends Tree[A](value, child) derives Traverse:
+) extends Tree[A](value, child):
 
   import Tree.given
 
@@ -345,16 +344,36 @@ final case class Node[A](
         case Some(c) => c.findInMainline(predicate)
 
   def modifyInMainline(predicate: A => Boolean, f: Node[A] => Node[A]): Option[Node[A]] =
-    if predicate(value) then f(this).some
-    else child.flatMap(_.modifyInMainline(predicate, f)).map(c => withChild(c.some))
+    @tailrec
+    def loop(node: Node[A], acc: List[Node[A]]): Option[Node[A]] =
+      if predicate(node.value) then
+        // f's result replaces the whole subtree here; ancestors fold back on top
+        acc.foldLeft(f(node).some)((child, ancestor) => ancestor.withChild(child).some)
+      else
+        node.child match
+          case None => none // no mainline node matches the predicate
+          case Some(child) => loop(child, node.withoutChild :: acc)
+    loop(this, Nil)
 
   def modifyInMainline(f: A => A): Node[A] =
-    copy(value = f(value), child = child.map(_.modifyInMainline(f)))
+    @tailrec
+    def loop(node: Node[A], acc: List[Node[A]]): List[Node[A]] =
+      val updated = node.updateValue(f)
+      node.child match
+        case None => updated :: acc
+        case Some(child) => loop(child, updated.withoutChild :: acc)
+    // every spine node keeps its variations; only value and child change
+    Tree.buildReverse(loop(this, Nil)).getOrElse(this)
 
   def modifyInMainlineAt(n: Int, f: Node[A] => Node[A]): Option[Node[A]] =
-    if n < 0 || n >= mainline.size then none
-    else if n == 0 then f(this).some
-    else child.flatMap(_.modifyInMainlineAt(n - 1, f)).map(c => withChild(c.some))
+    @tailrec
+    def loop(n: Int, node: Node[A], acc: List[Node[A]]): Option[Node[A]] =
+      if n == 0 then acc.foldLeft(f(node).some)((child, ancestor) => ancestor.withChild(child).some)
+      else
+        node.child match
+          case None => none // n points past the end of the mainline
+          case Some(child) => loop(n - 1, child, node.withoutChild :: acc)
+    if n < 0 then none else loop(n, this, Nil)
 
   /**
       * get node at nth in mainline
@@ -364,7 +383,7 @@ final case class Node[A](
       */
   @tailrec
   def getMainlineNodeAt(n: Int): Option[Node[A]] =
-    if n < 0 || n >= mainline.size then none
+    if n < 0 then none
     else if n == 0 then this.some
     else
       child.match
@@ -433,7 +452,7 @@ final case class Node[A](
     copy(child = None, variations = Nil)
 
 final case class Variation[A](override val value: A, override val child: Option[Node[A]] = None)
-    extends Tree[A](value, child) derives Traverse:
+    extends Tree[A](value, child):
 
   def modifyChildAt[Id](
       path: List[Id],
@@ -575,3 +594,88 @@ object Tree:
             val newChild = Tree.merge(a.child, other.child)
             Variation(v, newChild).some
           case _ => None
+
+  given Traverse[Tree] with
+    override def map[A, B](fa: Tree[A])(f: A => B): Tree[B] =
+      fa match
+        case n: Node[A] => n.map(f)
+        case v: Variation[A] => v.map(f)
+
+    def traverse[G[_]: Applicative, A, B](fa: Tree[A])(f: A => G[B]): G[Tree[B]] =
+      fa match
+        case n: Node[A] => n.traverse(f).widen[Tree[B]]
+        case v: Variation[A] => v.traverse(f).widen[Tree[B]]
+
+    def foldLeft[A, B](fa: Tree[A], b: B)(f: (B, A) => B): B =
+      fa match
+        case n: Node[A] => n.foldLeft(b)(f)
+        case v: Variation[A] => v.foldLeft(b)(f)
+
+    def foldRight[A, B](fa: Tree[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
+      fa match
+        case n: Node[A] => n.foldRight(lb)(f)
+        case v: Variation[A] => v.foldRight(lb)(f)
+
+  given Traverse[Node] with
+    // Converts tree to list, maps, then rebuilds - avoids deep recursion
+    override def map[A, B](fa: Node[A])(f: A => B): Node[B] =
+      val mappedValue = f(fa.value)
+
+      val mappedVariations = fa.variations.map(v => mapVariation(v, f))
+
+      val mappedChild = fa.child.flatMap { child =>
+        child.mainlineReverse
+          .map(n => (f(n.value), n.variations.map(v => mapVariation(v, f))))
+          .foldLeft(None: Option[Node[B]]) { case (childAcc, (value, vars)) =>
+            Some(Node(value, childAcc, vars))
+          }
+
+      }
+
+      Node(mappedValue, mappedChild, mappedVariations)
+
+    private def mapVariation[A, B](va: Variation[A], f: A => B): Variation[B] =
+      Variation(
+        f(va.value),
+        va.child.map(c => c.map(f)) // Delegates back to Node's map
+      )
+
+    def traverse[G[_]: Applicative, A, B](fa: Node[A])(f: A => G[B]): G[Node[B]] =
+      val gValue = f(fa.value)
+      val gChild = fa.child.traverse(_.traverse(f))
+      val gVariations = fa.variations.traverse(_.traverse(f))
+      (gValue, gChild, gVariations).mapN(Node(_, _, _))
+
+    def foldLeft[A, B](fa: Node[A], b: B)(f: (B, A) => B): B =
+      val b1 = f(b, fa.value)
+      val b2 = fa.child.foldLeft(b1)((acc, n) => n.foldLeft(acc)(f))
+      fa.variations.foldLeft(b2)((acc, v) => v.foldLeft(acc)(f))
+
+    def foldRight[A, B](fa: Node[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
+      // Wrap everything in Eval.defer to ensure laziness
+      Eval.defer {
+        val variationsLb = fa.variations.foldRight(lb)((v, acc) => Eval.defer(v.foldRight(acc)(f)))
+        val childLb = fa.child.foldRight(variationsLb)((n, acc) => Eval.defer(n.foldRight(acc)(f)))
+        f(fa.value, childLb)
+      }
+
+  given Traverse[Variation] with
+    override def map[A, B](fa: Variation[A])(f: A => B): Variation[B] =
+      val mappedValue = f(fa.value)
+      val mappedChild = fa.child.map(_.map(f))
+      Variation(mappedValue, mappedChild)
+
+    def traverse[G[_]: Applicative, A, B](fa: Variation[A])(f: A => G[B]): G[Variation[B]] =
+      val gValue = f(fa.value)
+      val gChild = fa.child.traverse(_.traverse(f))
+      (gValue, gChild).mapN(Variation(_, _))
+
+    def foldLeft[A, B](fa: Variation[A], b: B)(f: (B, A) => B): B =
+      val b1 = f(b, fa.value)
+      fa.child.foldLeft(b1)((acc, n) => n.foldLeft(acc)(f))
+
+    def foldRight[A, B](fa: Variation[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
+      Eval.defer {
+        val childLb = fa.child.foldRight(lb)((n, acc) => Eval.defer(n.foldRight(acc)(f)))
+        f(fa.value, childLb)
+      }

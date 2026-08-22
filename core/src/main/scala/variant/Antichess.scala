@@ -24,6 +24,9 @@ case object Antichess
   // In antichess, the king can't be put into check so we always return false
   override def kingSafety(m: Move): Boolean = true
 
+  // en passant is a capture, so it is always part of validMoves when available
+  override private[chess] def isLegalEnPassant(position: Position, move: Move): Boolean = true
+
   override def kingThreatened(board: Board, color: Color): Check = Check.No
 
   override def validMoves(position: Position): List[Move] =

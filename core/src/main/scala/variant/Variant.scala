@@ -71,6 +71,19 @@ abstract class Variant private[variant] (
           case King => position.genKingAt(targets, square)
     }
 
+  /** Whether this en passant candidate (built by Position.genEnPassant) is actually
+    * playable, i.e. appears in validMoves. Lets Position.enPassantSquare avoid
+    * generating every legal move; must agree with validMoves.
+    * The default is the standard rule: the capture may not leave our king
+    * attacked by a slider through either vacated pawn square.
+    */
+  private[chess] def isLegalEnPassant(position: Position, move: Move): Boolean =
+    position.ourKing.exists: king =>
+      val newOccupied =
+        (position.occupied ^ move.orig.bl ^ move.dest.withRankOf(move.orig).bl) | move.dest.bl
+      (king.rookAttacks(newOccupied) & position.them & (position.rooks ^ position.queens)).isEmpty &&
+      (king.bishopAttacks(newOccupied) & position.them & (position.bishops ^ position.queens)).isEmpty
+
   def pieceThreatened(board: Board, by: Color, to: Square): Boolean =
     board.attacks(to, by)
 

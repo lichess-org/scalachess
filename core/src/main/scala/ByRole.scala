@@ -61,17 +61,12 @@ case class ByRole[A](pawn: A, knight: A, bishop: A, rook: A, queen: A, king: A):
 
   def values: List[A] = List(pawn, knight, bishop, rook, queen, king)
 
+  def map[B](f: A => B): ByRole[B] =
+    ByRole(f(pawn), f(knight), f(bishop), f(rook), f(queen), f(king))
+
 object ByRole:
 
   def fill[A](a: A): ByRole[A] = ByRole(a, a, a, a, a, a)
 
   given Functor[ByRole] with
-    def map[A, B](byRole: ByRole[A])(f: A => B): ByRole[B] =
-      ByRole(
-        f(byRole.pawn),
-        f(byRole.knight),
-        f(byRole.bishop),
-        f(byRole.rook),
-        f(byRole.queen),
-        f(byRole.king)
-      )
+    override def map[A, B](byRole: ByRole[A])(f: A => B): ByRole[B] = byRole.map(f)

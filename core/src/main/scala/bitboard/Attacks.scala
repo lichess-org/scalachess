@@ -1,7 +1,7 @@
 package chess
 package bitboard
 
-import scala.annotation.static
+import scala.annotation.{ static, unused }
 
 class Attacks
 object Attacks:
@@ -100,7 +100,13 @@ object Attacks:
             (1L << a) | (1L << b) | slidingAttacks(a, 0, BISHOP_DELTAS) & slidingAttacks(b, 0, BISHOP_DELTAS)
     yield ()
 
-  val _ = initialize()
+  // Must be @static so it runs inside the class `<clinit>` *after* the @static
+  // array fields above are assigned. As a plain module field it lands in the
+  // `Attacks$` constructor, whose ordering vs. the static field init is not
+  // guaranteed — observed as `RANKS == null` during initialize() (NPE) depending
+  // on which class triggers `Attacks` loading first.
+  @static @unused
+  private val initialized: Unit = initialize()
 
   extension (l: Long)
     private def contains(s: Int): Boolean =

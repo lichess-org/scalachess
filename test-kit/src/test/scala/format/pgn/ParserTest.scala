@@ -135,6 +135,10 @@ class ParserTest extends ChessTest:
       parsed.tree.get.variations.headOption.assertSome: variation =>
         assertEquals(variation.mainlineValues.size, 2)
 
+  test("variation starts with comment"):
+    parse("1.d4 {the best move} ( { one } { two } { three } 1.e4 { is not as good } )").assertRight: parsed =>
+      assertEquals(parsed.tree.get.variations.head.value.variationComments, List("one", "two", "three"))
+
   test("first move variation"):
     parse("1. e4 (1. d4)").assertRight: parsed =>
       parsed.tree.get.variations.headOption.assertSome: variation =>
@@ -158,6 +162,14 @@ class ParserTest extends ChessTest:
       .san(sanStr)
       .assertRight: san =>
         assertEquals(san, Std(Square.E4, Pawn, rawString = "e4".some))
+
+  test("comment ordering"):
+    parse("{test 1 } {test 2} 1.d4 {test 3} { test 4}")
+      .assertRight: parsed =>
+        val rootComments = parsed.initialPosition.comments
+        assertEquals(rootComments, Comment.from(List("test 1", "test 2")))
+        val firstMoveComments = parsed.tree.firstMove.comments
+        assertEquals(firstMoveComments, Comment.from(List("test 3", "test 4")))
 
   test("mainlineWithMetas == full.mainlineWithMetas"):
     verifyMainlineWithMetas(raws)

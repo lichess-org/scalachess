@@ -285,7 +285,7 @@ class AtomicVariantTest extends ChessTest:
         .isRight
     )
 
-  test("Identify that a player does not have sufficient material to win when they only have a king"):
+  test("Identify that a player has insufficient material to win when they only have a king"):
     val position = FullFen("8/8/8/8/7p/2k4q/2K3P1/8 w - - 19 54")
     val game = fenToGame(position, Atomic)
     assertNot(game.position.end)
@@ -293,6 +293,14 @@ class AtomicVariantTest extends ChessTest:
       .playMoves(Square.G2 -> Square.H3)
       .assertRight: game =>
         assert(game.position.opponentHasInsufficientMaterial)
+        assertNot(game.position.playerHasInsufficientMaterial)
+        assertNot(game.position.autoDraw)
+    game
+      .playMoves(Square.G2 -> Square.H3, Square.C3 -> Square.D4)
+      .assertRight: game =>
+        assertNot(game.position.opponentHasInsufficientMaterial)
+        assert(game.position.playerHasInsufficientMaterial)
+        assertNot(game.position.autoDraw)
 
   test("An automatic draw in a closed position with only kings and pawns which cannot move"):
     val position = FullFen("8/8/6p1/3K4/6P1/2k5/8/8 w - -")
@@ -301,6 +309,15 @@ class AtomicVariantTest extends ChessTest:
       .assertRight: game =>
         assert(game.position.autoDraw)
         assert(game.position.end)
+
+  test(
+    "Not draw inappropriately in seemingly closed position where en passant possible"
+  ):
+    val position = FullFen("3k4/8/6p1/5pP1/5P2/8/3K4/8 w - f6 0 1")
+    val game = fenToGame(position, Atomic)
+    assertNot(game.position.playerHasInsufficientMaterial)
+    assertNot(game.position.opponentHasInsufficientMaterial)
+    assertNot(game.position.autoDraw)
 
   test("Not draw inappropriately on bishops vs bishops (where an explosion taking out the king is possible)"):
     val position = FullFen("B2BBBB1/7P/8/8/8/8/3kb3/4K3 w - - 1 53")

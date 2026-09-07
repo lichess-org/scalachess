@@ -39,7 +39,7 @@ object Status:
     s.id >= Mate.id && s.id != Cheat.id
   }
 
-  val finishedWithWinner = List(Mate, Resign, Timeout, Outoftime, Cheat, NoStart, VariantEnd)
+  val finishedWithWinner = List(Mate, Resign, Cheat, VariantEnd)
 
   val byId = all.mapBy(_.id)
 

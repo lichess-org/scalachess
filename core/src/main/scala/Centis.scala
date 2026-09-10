@@ -38,12 +38,14 @@ object Centis extends RichOpaqueInt[Centis]:
     def combine(c1: Centis, c2: Centis) = c1 + c2
     val empty = 0
 
-  def ofLong(l: Long): Centis =
+  private inline def longToIntExact(l: Long): Int =
     try Math.toIntExact(l)
     catch
       case _: ArithmeticException =>
         if l > 0 then Integer.MAX_VALUE
         else Integer.MIN_VALUE
+
+  inline def ofLong(l: Long): Centis = longToIntExact(l)
 
   def apply(d: FiniteDuration): Centis =
     ofMillis:
@@ -54,4 +56,5 @@ object Centis extends RichOpaqueInt[Centis]:
   inline def ofDouble(d: Double): Centis = ofLong(Math.round(d))
 
   inline def ofSeconds(s: Int): Centis = 100 * s
-  inline def ofMillis(l: Long): Centis = ofLong(if l > 0 then l + 5 else l - 4) / 10
+  inline def ofMillis(i: Int): Centis = (if i > 0 then i + 5 else i - 4) / 10
+  inline def ofMillis(l: Long): Centis = ofMillis(longToIntExact(l))

@@ -111,7 +111,7 @@ class ParserTest extends ChessTest:
       assertEquals(node.value.san, Drop(Pawn, Square.E4, rawString = "P@e4".some))
       assertEquals(node.value.metas.glyphs, Glyphs(Glyph.MoveAssessment.dubious.some, None, Nil))
 
-    parseMove("e4-+").assertRight: node =>
+    parseMove("e4−+").assertRight: node =>
       assertEquals(node.value.metas.glyphs, Glyphs.fromList(List(Glyph.PositionAssessment.blackMuchBetter)))
 
   test("nags"):

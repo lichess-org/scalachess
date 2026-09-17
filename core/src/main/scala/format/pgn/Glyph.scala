@@ -86,7 +86,7 @@ object Glyph:
     val whiteQuiteBetter = new Glyph(16, "±", "White is better") with PositionAssessment
     val blackQuiteBetter = new Glyph(17, "∓", "Black is better") with PositionAssessment
     val whiteMuchBetter = new Glyph(18, "+−", "White is winning") with PositionAssessment
-    val blackMuchBetter = new Glyph(19, "-+", "Black is winning") with PositionAssessment
+    val blackMuchBetter = new Glyph(19, "−+", "Black is winning") with PositionAssessment
 
     val all = List(
       equal,

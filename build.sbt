@@ -23,7 +23,7 @@ scalacOptions := Seq(
   /* "-Xfatal-warnings" */
 )
 
-val scalalibVersion = "11.10.12"
+val scalalibVersion = "11.11.0"
 
 lazy val scalachess: Project = Project("scalachess", file("core"))
   .settings(

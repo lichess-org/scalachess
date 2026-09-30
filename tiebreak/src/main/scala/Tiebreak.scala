@@ -321,10 +321,9 @@ trait Tournament:
       .sorted
 
   lazy val progressiveScoresSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>
-    val games = gamesById(id)
-    games.indices
-      .map: i =>
-        games.take(i + 1).score.into(TiebreakPoint)
+    gamesById(id)
+      .foldLeft(List.empty[TiebreakPoint]): (sums, game) =>
+        sums.headOption.getOrElse(TiebreakPoint.zero).map(s => s + game.points.value) :: sums
       .sorted
 
   // compute and sort players by their scores and tiebreaks

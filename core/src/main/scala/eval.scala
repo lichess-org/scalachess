@@ -5,31 +5,58 @@ import scalalib.model.Percent
 
 enum Score:
   case Cp(c: Eval.Cp)
-  case Mate(m: Eval.Mate)
+  case Mate(m: Eval.Mate) // Mate(0) is a loss
+  case MateGiven // Win
 
-  inline def fold[A](w: Eval.Cp => A, b: Eval.Mate => A): A = this match
-    case Cp(cp) => w(cp)
-    case Mate(mate) => b(mate)
+  inline def fold[A](cp: Eval.Cp => A, mate: Eval.Mate => A, mateGiven: => A): A = this match
+    case Cp(c) => cp(c)
+    case Mate(m) => mate(m)
+    case MateGiven => mateGiven
 
-  inline def cp: Option[Eval.Cp] = fold(Some(_), _ => None)
-  inline def mate: Option[Eval.Mate] = fold(_ => None, Some(_))
+  inline def cp: Option[Eval.Cp] = fold(Some(_), _ => None, None)
+  inline def mate: Option[Eval.Mate] = fold(_ => None, Some(_), None)
 
-  inline def isCheckmate = mate.exists(_.value == 0)
-  inline def mateFound = mate.isDefined
+  inline def isMateFound = fold(_ => false, _ => true, true)
+  inline def isGameOver = fold(_ => false, _.value == 0, true)
 
-  inline def invert: Score = fold(c => Cp(c.invert), m => Mate(m.invert))
+  def invert: Score = this match
+    case Cp(c) => Cp(c.invert)
+    case Score.mated => MateGiven
+    case Mate(m) => Mate(Eval.Mate(-m.value))
+    case MateGiven => Score.mated
   inline def invertIf(cond: Boolean): Score = if cond then invert else this
 
 object Score:
-  val initial = Cp(Eval.Cp.initial)
+  val mated = Mate(Eval.Mate(0))
   def cp(cp: Int): Score = Cp(Eval.Cp(cp))
   def mate(mate: Int): Score = Mate(Eval.Mate(mate))
+
+opaque type WhiteScore = Score
+object WhiteScore:
+  def apply(score: Score, turn: Color): WhiteScore = score.invertIf(turn.black)
+  inline def fromWhite(score: Score): WhiteScore = score
+
+  val initial: WhiteScore = Score.cp(15)
+
+  extension (score: WhiteScore)
+    def pov(turn: Color): Score = score.invertIf(turn.black)
+    inline def white: Score = score
+
+    inline def isMateFound: Boolean = score.isMateFound
+    inline def isGameOver: Boolean = score.isGameOver
+
+    // Mate value from the point of view of white, where Some(0) means the
+    // player to move is mated (the only possible meaning in standard chess,
+    // but not in variants).
+    def exportMate(turn: Color): Option[Int] = score.pov(turn) match
+      case Score.mated => Some(0)
+      case Score.MateGiven => None
+      case _ => score.mate.map(_.moves)
 
 object Eval:
   opaque type Cp = Int
   object Cp extends OpaqueInt[Cp]:
     val CEILING = Cp(1000)
-    val initial = Cp(15)
     inline def ceilingWithSignum(signum: Int) = CEILING.invertIf(signum < 0)
 
     extension (cp: Cp)
@@ -55,11 +82,6 @@ object Eval:
     extension (mate: Mate)
       inline def moves: Int = mate.value
 
-      inline def invert: Mate = Mate(-moves)
-      inline def invertIf(cond: Boolean): Mate = if cond then invert else mate
-
-      inline def signum: Int = if positive then 1 else -1
-
       inline def positive = mate.value > 0
       inline def negative = mate.value < 0
 
@@ -72,9 +94,10 @@ object WinPercent extends OpaqueDouble[WinPercent]:
 
   extension (a: WinPercent) def toInt = Percent.toInt(a)
 
-  def fromScore(score: Score): WinPercent = score.fold(fromCentiPawns, fromMate)
+  def fromScore(score: Score): WinPercent =
+    score.fold(fromCentiPawns, fromMate, fromCentiPawns(Eval.Cp.CEILING))
 
-  def fromMate(mate: Eval.Mate) = fromCentiPawns(Eval.Cp.ceilingWithSignum(mate.signum))
+  def fromMate(mate: Eval.Mate) = fromCentiPawns(Eval.Cp.CEILING.invertIf(!mate.positive))
 
   // [0, 100]
   def fromCentiPawns(cp: Eval.Cp) = WinPercent:

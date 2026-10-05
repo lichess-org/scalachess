@@ -110,3 +110,11 @@ object CoreArbitraries:
 
   given Arbitrary[Move.Castle] = Arbitrary:
     Arbitrary.arbitrary[Color].flatMap(castleGen)
+
+  given Arbitrary[eval.Score] = Arbitrary:
+    Gen.frequency(
+      4 -> Gen.choose(-100_000, 100_000).map(eval.Score.cp),
+      4 -> Gen.choose(-246, 246).map(eval.Score.mate),
+      1 -> Gen.const(eval.Score.mated),
+      1 -> Gen.const(eval.Score.MateGiven)
+    )

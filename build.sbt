@@ -1,6 +1,6 @@
 import snapshot4s.BuildInfo.snapshot4sVersion
 
-scalaVersion := "3.9.0"
+scalaVersion := "3.8.4"
 version := "17.17.1"
 organization := "com.github.lichess-org.scalachess"
 licenses += ("MIT" -> url("https://opensource.org/licenses/MIT"))
@@ -23,7 +23,7 @@ scalacOptions := Seq(
   /* "-Xfatal-warnings" */
 )
 
-val scalalibVersion = "11.11.0"
+val scalalibVersion = "11.10.12"
 
 lazy val scalachess: Project = Project("scalachess", file("core"))
   .settings(

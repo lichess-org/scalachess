@@ -94,11 +94,11 @@ case class Move(
     // Update position hashes last, only after updating the board,
     // castling rights and en-passant rights.
     after.updateHistory { h =>
-      lazy val positionHashesOfBoardBefore =
-        if h.positionHashes.isEmpty then PositionHash(Hash(before)) else h.positionHashes
       val resetsPositionHashes = after.variant.isIrreversible(this)
       val basePositionHashes =
-        if resetsPositionHashes then PositionHash.empty else positionHashesOfBoardBefore
+        if resetsPositionHashes then PositionHash.empty
+        else if h.positionHashes.isEmpty then PositionHash(Hash(before))
+        else h.positionHashes
       h.copy(positionHashes = PositionHash(Hash(after)).combine(basePositionHashes))
     }
 

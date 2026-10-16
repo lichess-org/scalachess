@@ -137,7 +137,8 @@ object Parser:
     val glyph: P[Glyph] = mapParser(Glyph.MoveAssessment.all.mapBy(_.symbol), "glyph")
     val glyphs = glyph.rep0.map(Glyphs.fromList)
 
-    val capture = P.char('x').?.map(_.isDefined)
+    // capture or long algebraic separator, e.g. "exd5" or "e2-e4"
+    val capture = P.charIn('x', '-').?.map(_.contains('x'))
 
     val check = P.char('+').?.map(o => Check(o.isDefined))
 

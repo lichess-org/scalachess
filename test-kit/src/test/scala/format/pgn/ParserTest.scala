@@ -219,6 +219,39 @@ class ParserTest extends ChessTest:
     parse(disambiguated).assertRight: a =>
       assertEquals(a.mainline.size, 3)
 
+  test("long algebraic notation with hyphen"):
+    parse("1. e2-e4 e7-e5 2. Ng1-f3 Nb8-c6").assertRight: a =>
+      assertEquals(a.mainline.size, 4)
+      assertEquals(
+        a.mainline.head,
+        Std(Square.E4, Pawn, false, Some(File.E), Some(Rank.Second), rawString = "e2-e4".some)
+      )
+    // the /paste path parses the mainline with metas
+    parseMainlineWithMetas("1. e2-e4 e7-e5 2. Ng1-f3").assertRight: a =>
+      assertEquals(a.moves.size, 3)
+    // hyphen is just a separator, not a capture
+    parseMainlineWithMetas("1. e4 d5 2. e4-d5").assertRight: a =>
+      assertEquals(a.moves.size, 3)
+      assertEquals(
+        a.moves(2).san,
+        Std(Square.D5, Pawn, false, Some(File.E), Some(Rank.Fourth), rawString = "e4-d5".some)
+      )
+    // promotion
+    parseMainlineWithMetas("1. e7-e8=Q").assertRight: a =>
+      assertEquals(a.moves.size, 1)
+      assertEquals(
+        a.moves.head.san,
+        Std(
+          Square.E8,
+          Pawn,
+          false,
+          Some(File.E),
+          Some(Rank.Seventh),
+          promotion = Option(Queen),
+          rawString = "e7-e8=Q".some
+        )
+      )
+
   List(fromProd1, fromProd2, castleCheck1, castleCheck2).foreach { sans =>
     val size = sans.split(' ').length
     test(s"sans only from prod size: $size"):

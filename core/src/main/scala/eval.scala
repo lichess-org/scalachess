@@ -36,8 +36,6 @@ object WhiteScore:
   def apply(score: Score, turn: Color): WhiteScore = score.invertIf(turn.black)
   inline def fromWhite(score: Score): WhiteScore = score
 
-  val initial: WhiteScore = Score.cp(15)
-
   extension (score: WhiteScore)
     def pov(turn: Color): Score = score.invertIf(turn.black)
     inline def white: Score = score

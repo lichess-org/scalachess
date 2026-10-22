@@ -66,6 +66,25 @@ class ReplayTest extends MunitExtensions with SnapshotAssertions:
     assert(init.playMoves(List(SanStr("O-O"))).isLeft)
     assert(init.play(SanStr("Qd2")).isRight)
 
+  test("a SAN capture flag on a move to an empty square plays the quiet move"):
+    Replay
+      .mainline(PgnStr("1. e4 e5 2. Nxf3"))
+      .assertRight: result =>
+        assertEquals(result.failure, None)
+        assertEquals(result.replay.chronoMoves.map(_.toUci.uci), List("e2e4", "e7e5", "g1f3"))
+        assertEquals(result.replay.chronoMoves.flatMap(_.move).map(_.captures), List(false, false, false))
+
+  test("a SAN without the capture flag on a move to an occupied square plays the capture"):
+    Replay
+      .mainline(PgnStr("1. e4 d5 2. ed5 Qd5"))
+      .assertRight: result =>
+        assertEquals(result.failure, None)
+        assertEquals(result.replay.chronoMoves.map(_.toUci.uci), List("e2e4", "d7d5", "e4d5", "d8d5"))
+        assertEquals(
+          result.replay.chronoMoves.flatMap(_.move).map(_.captures),
+          List(false, false, true, true)
+        )
+
 
   // format: off
   private val fixtures = PgnStr.from:

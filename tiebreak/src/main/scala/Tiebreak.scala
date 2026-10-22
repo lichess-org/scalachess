@@ -478,9 +478,9 @@ object Tiebreak:
 
   val preset: List[Tiebreak] = allSimple ++ allCuttable
 
-private def memoize[I, O](f: I => O): I => O = key =>
+private def memoize[I, O](f: I => O): I => O =
   val hashMap = new collection.mutable.HashMap[I, O]
-  hashMap.getOrElseUpdate(key, f(key))
+  key => hashMap.getOrElseUpdate(key, f(key))
 
 extension (tieBreakSeq: Seq[TiebreakPoint])
   def cut(modifier: CutModifier): Seq[TiebreakPoint] =

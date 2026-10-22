@@ -299,17 +299,17 @@ trait Tournament:
       .flatMap(opponent => opponent.rating.map(r => TiebreakPoint(r.value)))
       .sorted
 
+  // the score with the last round games counted as draws
+  lazy val foreScoreOf: PlayerId => TournamentScore = memoize: id =>
+    lastRoundId.fold(scoreOf(id)): lastRound =>
+      gamesById(id).foldLeft(scoreOf(id)): (score, game) =>
+        if game.roundId.contains(lastRound) then score.map(_ - game.points.value + Points.Half.value)
+        else score
+
   lazy val foreBuchholzSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>
-    lastRoundId.fold(buchholzSeq(id)): lastRound =>
-      opponentsOf(id)
-        .map: opponent =>
-          gamesById(opponent.id)
-            .map: game =>
-              if game.roundId.contains(lastRound) then game.copy(points = Points.Half)
-              else game
-            .score
-            .into(TiebreakPoint)
-        .sorted
+    opponentsOf(id)
+      .map(opponent => foreScoreOf(opponent.id).into(TiebreakPoint))
+      .sorted
 
   lazy val sonnebornBergerSeq: PlayerId => Seq[TiebreakPoint] = memoize: id =>
     gamesById(id)

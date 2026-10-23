@@ -74,8 +74,7 @@ class PgnRenderTest extends ChessTest with SnapshotAssertions:
   val pgn1 = """
 [Result "*"]
 
-{ Root comment }
-1. e4! $16 $40 $32 (1. d4?? d5 $146 { d5 is a good move }) (1. c4 { and }) (1. f4 { better }) 1... e6?! { e6 is a naughty move } *
+{ Root comment } 1. e4! $16 $40 $32 (1. d4?? d5 $146 { d5 is a good move }) (1. c4 { and }) (1. f4 { better }) 1... e6?! { e6 is a naughty move } *
   """.trim
 
   val pgn2 = """

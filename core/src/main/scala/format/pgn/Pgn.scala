@@ -38,7 +38,9 @@ case class Pgn(tags: Tags, initial: InitialComments, tree: Option[PgnTree], star
     val builder = new StringBuilder
 
     if tags.value.nonEmpty then builder.append(tags).addOne('\n').addOne('\n'): Unit
-    if initial.comments.nonEmpty then builder.append(initial.comments.mkString("{ ", " } { ", " }\n"))
+    if initial.comments.nonEmpty then
+      builder.append(initial.comments.mkString("{ ", " } { ", " }"))
+      if tree.isDefined then builder.addOne(' '): Unit
     tree.foreach(_.appendPgnStr(builder, startPly))
     tags(_.Result).foreach(x => builder.addOne(' ').append(x))
 

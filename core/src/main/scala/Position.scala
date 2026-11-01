@@ -83,7 +83,16 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
 
   inline def staleMate: Boolean = variant.staleMate(this)
 
-  inline def autoDraw: Boolean = variant.autoDraw(this) || variant.specialDraw(this)
+  inline def autoDraw: Boolean = variant.autoDraw(this) || variant.specialDraw(this) || lockedOut
+
+  /** A dead position (FIDE 5.2.2): pawns, kings and bishops that no series of legal moves can open, so
+    * neither side can ever be mated (chess.mateless.Lock). Asked after a capture or a pawn move and one
+    * move later (halfmove clock 0 or 1): a lock appears only then, at once, or once an en passant right
+    * has lapsed or a king has stepped out of a pawn's check. Standard and From Position only.
+    */
+  def lockedOut: Boolean =
+    history.halfMoveClock.value < 2 && (variant.standard || variant.fromPosition) &&
+      mateless.Lock.cannotBeMated(this, Color.White) && mateless.Lock.cannotBeMated(this, Color.Black)
 
   def opponentHasInsufficientMaterial: Boolean =
     variant.opponentHasInsufficientMaterial(this) ||

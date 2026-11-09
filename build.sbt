@@ -18,7 +18,9 @@ scalacOptions := Seq(
   "-release:21",
   "-Wunused:all",
   "-Werror",
-  "-deprecation"
+  "-deprecation",
+  "-Wconf:msg=method ArrowAssoc in object Predef is deprecated:silent",
+  "-Wconf:msg=class ArrowAssoc is deprecated:silent"
   // Warnings as errors!
   /* "-Xfatal-warnings" */
 )

@@ -1,7 +1,7 @@
 import snapshot4s.BuildInfo.snapshot4sVersion
 
 scalaVersion := "3.10.0"
-version := "18.0.1"
+version := "18.1.0"
 organization := "com.github.lichess-org.scalachess"
 licenses += ("MIT" -> uri("https://opensource.org/licenses/MIT"))
 publishTo := Option(Resolver.file("file", new File(sys.props.getOrElse("publishTo", ""))))

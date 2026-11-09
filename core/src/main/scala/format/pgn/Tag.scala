@@ -180,6 +180,7 @@ object Tag:
   case object Termination extends TagType
   case object Annotator extends TagType
   case object GameId extends TagType
+  case object Orientation extends TagType
   case class Unknown(n: String) extends TagType:
     override def toString = n
     override val isUnknown = true
@@ -222,7 +223,8 @@ object Tag:
     Opening,
     Termination,
     Annotator,
-    GameId
+    GameId,
+    Orientation
   )
   val tagTypesByLowercase: Map[String, TagType] = tagTypes.mapBy(_.lowercase)
 

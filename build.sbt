@@ -1,6 +1,6 @@
 import snapshot4s.BuildInfo.snapshot4sVersion
 
-scalaVersion := "3.8.4"
+scalaVersion := "3.10.0"
 version := "18.0.1"
 organization := "com.github.lichess-org.scalachess"
 licenses += ("MIT" -> url("https://opensource.org/licenses/MIT"))
@@ -18,7 +18,9 @@ scalacOptions := Seq(
   "-release:21",
   "-Wunused:all",
   "-Werror",
-  "-deprecation"
+  "-deprecation",
+  "-Wconf:msg=method ArrowAssoc in object Predef is deprecated:silent",
+  "-Wconf:msg=class ArrowAssoc is deprecated:silent"
   // Warnings as errors!
   /* "-Xfatal-warnings" */
 )

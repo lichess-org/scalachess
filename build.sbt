@@ -1,6 +1,6 @@
 import snapshot4s.BuildInfo.snapshot4sVersion
 
-scalaVersion := "3.10.0"
+scalaVersion := "3.10.1"
 version := "18.1.0"
 organization := "com.github.lichess-org.scalachess"
 licenses += ("MIT" -> uri("https://opensource.org/licenses/MIT"))

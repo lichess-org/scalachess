@@ -89,14 +89,18 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
     * A lock can only appear right after a capture or a pawn move, or one move later.
     */
   def lockedOut: Boolean =
-    history.halfMoveClock.value < 2 && lockable &&
-      mateless.Lock.cannotBeMated(this, Color.White) && mateless.Lock.cannotBeMated(this, Color.Black)
+    history.halfMoveClock.value < 2 && lockedFor(Color.White) && lockedFor(Color.Black)
 
   // With no rook on the board there is no castling: in Chess960 a lock is the same as in Standard.
   private inline def lockable: Boolean = variant.standard || variant.chess960 || variant.fromPosition
 
+  /** `flagged` can never be mated: pawns, kings and bishops lock its opponent out of any mate. */
+  private def lockedFor(flagged: Color): Boolean =
+    lockable && mateless.Lock.cannotBeMated(this, flagged)
+
   def opponentHasInsufficientMaterial: Boolean =
     variant.opponentHasInsufficientMaterial(this) ||
+      (lockedFor(color) && legalMoves.nonEmpty) ||
       (
         legalMoves.nonEmpty &&
           drops.forall(_.isEmpty) &&
@@ -106,7 +110,8 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
             winner =!= Some(!color) && (
               winner === Some(color) ||
                 newPos.playerHasInsufficientMaterial ||
-                newPos.staleMate
+                newPos.staleMate ||
+                newPos.lockedFor(color)
             )
           }
       )

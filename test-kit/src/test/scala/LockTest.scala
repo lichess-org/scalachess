@@ -71,3 +71,13 @@ class LockTest extends ChessTest:
   test("flag: not locked"):
     assertNot(at("8/8/4k3/3p2p1/1p1P1pP1/1P3P2/8/3KN3 b - - 47 92").opponentHasInsufficientMaterial)
     assertNot(at("8/8/4k3/3p2p1/1p1P1pP1/1P2P3/8/3K4 b - - 0 92").opponentHasInsufficientMaterial)
+
+  // lila asks the same two functions when a player resigns or offers a draw (RoundGame.cannotLose):
+  // opponentHasInsufficientMaterial on the player's own turn, playerHasInsufficientMaterial otherwise.
+  test("resign: the locked side cannot lose, on either turn"):
+    assert(at("8/1p1k4/4p3/1P1pP1p1/1p1P2Pp/1P1K3P/8/8 w - - 0 47").opponentHasInsufficientMaterial)
+    assert(at("8/1p1k4/4p3/1P1pP1p1/1p1P2Pp/1P1K3P/8/8 b - - 0 47").playerHasInsufficientMaterial)
+
+  test("resign: the side that is not locked can still lose"):
+    assertNot(at("8/1p1k4/4p3/1P1pP1p1/1p1P2Pp/1P1K3P/8/8 w - - 0 47").playerHasInsufficientMaterial)
+    assertNot(at("8/1p1k4/4p3/1P1pP1p1/1p1P2Pp/1P1K3P/8/8 b - - 0 47").opponentHasInsufficientMaterial)

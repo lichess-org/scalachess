@@ -110,13 +110,13 @@ case class Position(board: Board, history: History, variant: Variant, color: Col
             winner =!= Some(!color) && (
               winner === Some(color) ||
                 newPos.playerHasInsufficientMaterial ||
-                newPos.staleMate ||
-                newPos.lockedFor(color)
+                newPos.staleMate
             )
           }
       )
 
-  inline def playerHasInsufficientMaterial: Boolean = variant.playerHasInsufficientMaterial(this)
+  def playerHasInsufficientMaterial: Boolean =
+    variant.playerHasInsufficientMaterial(this) || lockedFor(!color)
 
   @threadUnsafe
   lazy val threefoldRepetition: Boolean = history.threefoldRepetition
